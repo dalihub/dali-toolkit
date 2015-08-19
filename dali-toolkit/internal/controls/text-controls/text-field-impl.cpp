@@ -108,14 +108,14 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",                FLOAT,     CURSOR_BLINK_INTERVAL                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",                FLOAT,     CURSOR_BLINK_DURATION                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",                    STRING,    GRAB_HANDLE_IMAGE                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            VECTOR4,   GRAB_HANDLE_PRESSED_IMAGE            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-speed",                         FLOAT,     SCROLL_SPEED                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          STRING,    SELECTION_HANDLE_IMAGE_LEFT          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         STRING,    SELECTION_HANDLE_IMAGE_RIGHT         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  STRING,    SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            VECTOR4,   SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
 
@@ -347,7 +347,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const Vector4 color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-          impl.mDecorator->SetColor( PRIMARY_CURSOR, color );
+          impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
           impl.RequestTextRelayout();
         }
         break;
@@ -359,7 +359,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const Vector4 color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-          impl.mDecorator->SetColor( SECONDARY_CURSOR, color );
+          impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
           impl.RequestTextRelayout();
         }
         break;
@@ -873,16 +873,16 @@ void TextField::OnInitialize()
 
   mController = Text::Controller::New( *this );
 
-  mDecorator = Text::Decorator::New( *mController );
+  mDecorator = Text::Decorator::New( *mController,
+                                     *mController );
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
 
   mController->EnableTextInput( mDecorator );
 
   // Forward input events to controller
-  EnableGestureDetection(Gesture::Tap);
+  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan |Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
-  EnableGestureDetection(Gesture::Pan);
 
   self.TouchedSignal().Connect( this, &TextField::OnTouched );
 
@@ -896,6 +896,7 @@ void TextField::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
+  self.OnStageSignal().Connect( this, &TextField::OnStageConnect );
 }
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -930,35 +931,64 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    RenderableActor renderableActor;
-    if( mRenderer )
-    {
-      renderableActor = mRenderer->Render( mController->GetView() );
-    }
-
     EnableClipping( (Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy), size );
+    RenderText();
+  }
+}
 
-    if( renderableActor != mRenderableActor )
+void TextField::RenderText()
+{
+  Actor self = Self();
+  Actor renderableActor;
+  if( mRenderer )
+  {
+    renderableActor = mRenderer->Render( mController->GetView(), self.GetHierarchyDepth() );
+  }
+
+  if( renderableActor != mRenderableActor )
+  {
+    UnparentAndReset( mRenderableActor );
+    mRenderableActor = renderableActor;
+  }
+
+  if( mRenderableActor )
+  {
+    const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
+
+    mRenderableActor.SetPosition( offset.x, offset.y );
+
+    Actor clipRootActor;
+    if( mClipper )
     {
-      UnparentAndReset( mRenderableActor );
-      mRenderableActor = renderableActor;
+      clipRootActor = mClipper->GetRootActor();
     }
 
-    if( mRenderableActor )
+    for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
+           endIt = mClippingDecorationActors.end();
+         it != endIt;
+         ++it )
     {
-      const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
+      Actor actor = *it;
 
-      mRenderableActor.SetPosition( offset.x, offset.y );
-
-      // Make sure the actor is parented correctly with/without clipping
-      if( mClipper )
+      if( clipRootActor )
       {
-        mClipper->GetRootActor().Add( mRenderableActor );
+        clipRootActor.Add( actor );
       }
       else
       {
-        Self().Add( mRenderableActor );
+        self.Add( actor );
       }
+    }
+    mClippingDecorationActors.clear();
+
+    // Make sure the actor is parented correctly with/without clipping
+    if( clipRootActor )
+    {
+      clipRootActor.Add( mRenderableActor );
+    }
+    else
+    {
+      self.Add( mRenderableActor );
     }
   }
 }
@@ -982,7 +1012,14 @@ void TextField::OnKeyInputFocusGained()
     imfManager.SetRestoreAfterFocusLost( true );
   }
 
-  mController->KeyboardFocusGainEvent();
+   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+
+   if ( notifier )
+   {
+      notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
+   }
+
+  mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
 
   EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
 }
@@ -1003,6 +1040,13 @@ void TextField::OnKeyInputFocusLost()
     imfManager.Deactivate();
 
     imfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
+  }
+
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+
+  if ( notifier )
+  {
+    notifier.ContentSelectedSignal().Disconnect( this, &TextField::OnClipboardTextSelected );
   }
 
   mController->KeyboardFocusLostEvent();
@@ -1031,6 +1075,11 @@ void TextField::OnPan( const PanGesture& gesture )
   mController->PanEvent( gesture.state, gesture.displacement );
 }
 
+void TextField::OnLongPress( const LongPressGesture& gesture )
+{
+  mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
+}
+
 bool TextField::OnKeyEvent( const KeyEvent& event )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyEvent %p keyCode %d\n", mController.Get(), event.keyCode );
@@ -1045,11 +1094,18 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-void TextField::AddDecoration( Actor& actor )
+void TextField::AddDecoration( Actor& actor, bool needsClipping )
 {
   if( actor )
   {
-    Self().Add( actor );
+    if( needsClipping )
+    {
+      mClippingDecorationActors.push_back( actor );
+    }
+    else
+    {
+      Self().Add( actor );
+    }
   }
 }
 
@@ -1062,6 +1118,18 @@ void TextField::TextChanged()
 {
   Dali::Toolkit::TextField handle( GetOwner() );
   mTextChangedSignal.Emit( handle );
+}
+
+void TextField::OnStageConnect( Dali::Actor actor )
+{
+  if ( mHasBeenStaged )
+  {
+    RenderText();
+  }
+  else
+  {
+    mHasBeenStaged = true;
+  }
 }
 
 void TextField::MaxLengthReached()
@@ -1104,6 +1172,11 @@ void TextField::EnableClipping( bool clipping, const Vector2& size )
   }
 }
 
+void TextField::OnClipboardTextSelected( ClipboardEventNotifier& clipboard )
+{
+  mController->PasteClipboardItemEvent();
+}
+
 void TextField::KeyboardStatusChanged(bool keyboardShown)
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::KeyboardStatusChanged %p keyboardShown %d\n", mController.Get(), keyboardShown );
@@ -1113,6 +1186,21 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   {
     mController->KeyboardFocusLostEvent();
   }
+  else
+  {
+    mController->KeyboardFocusGainEvent(); // Initially called by OnKeyInputFocusGained
+  }
+}
+
+void TextField::OnStageConnection( int depth )
+{
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // Sets the depth to the renderers inside the text's decorator.
+  mDecorator->SetTextDepth( depth );
+
+  // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
 bool TextField::OnTouched( Actor actor, const TouchEvent& event )
@@ -1123,7 +1211,8 @@ bool TextField::OnTouched( Actor actor, const TouchEvent& event )
 TextField::TextField()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
-  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP )
+  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
+  mHasBeenStaged( false )
 {
 }
 

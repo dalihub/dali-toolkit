@@ -506,23 +506,6 @@ void GridLayout::GetDefaultItemSize( unsigned int itemId, const Vector3& layoutS
   itemSize.height = itemSize.depth = itemSize.width * 0.75f;
 }
 
-void GridLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const
-{
-  if(animation)
-  {
-    Vector3 currentSize( actor.GetCurrentSize() );
-    Vector3 shrink( currentSize );
-
-    shrink.width = std::min(size.width, currentSize.width);
-    shrink.height = std::min(size.height, currentSize.height);
-
-    // Do a nonlinear size animation to shrink the actor first when the actor size changes,
-    // so that we can avoid the actors overlapping during orientation change.
-    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), shrink, AlphaFunction::EASE_OUT, TimePeriod( 0.0f, durationSeconds * 0.5f ) );
-    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size, AlphaFunction::EASE_IN, TimePeriod( 0.0f, durationSeconds ) );
-  }
-}
-
 Degree GridLayout::GetScrollDirection() const
 {
   Degree scrollDirection(0.0f);

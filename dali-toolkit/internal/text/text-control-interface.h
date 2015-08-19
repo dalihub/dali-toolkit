@@ -50,8 +50,9 @@ public:
    * @brief Add a decoration.
    *
    * @param[in] decoration The actor displaying a decoration.
+   * @param[in] needsClipping Whether the actor needs clipping.
    */
-  virtual void AddDecoration( Actor& actor ) = 0;
+  virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
 
   /**
    * @brief Called to request a text relayout.

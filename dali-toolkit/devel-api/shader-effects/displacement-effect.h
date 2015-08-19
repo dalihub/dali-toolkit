@@ -28,8 +28,9 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new displacement effect
  *
- * Class for two state displacement effect shader that works on a per object basis. By passing a height-normal map as an effect image, the user can create
+ * Two state displacement effect shader that works on a per object basis. By passing a height-normal map as an effect image, the user can create
  * various styles of buttons on an image actor. The shader requires two height-normal maps in one image, one for each state.
  *
  *    The normals and height information for the two states of the button should be strictly specified in this format:
@@ -55,7 +56,7 @@ namespace Toolkit
  * Usage example:-
  *
  * // Create shader used for doing soft button\n
- * DisplacementEffect buttonEffect = DisplacementEffect::New();
+ * ShaderEffect buttonEffect = CreateDisplacementEffect();
  * buttonEffect.SetEffectImage(Image::New( FANCY_BUTTON_HEIGHT_MAP_IMAGE_PATH ););
  *
  * // set shader to the soft button\n
@@ -66,155 +67,127 @@ namespace Toolkit
  *
  *
  * Animation animation = Animation::New( ... );\n
- * animation.AnimateTo( Property(buttonEffect, buttonEffect.GetStatePropertyName()), 1.0f, AlphaFunction::BOUNCE, ... );\n
+ * animation.AnimateTo( Property(buttonEffect, "uState"), 1.0f, AlphaFunction::BOUNCE, ... );\n
  * animation.Play();\n
  *
+ * Animatable/Constrainable uniforms:
+ *   "uLightDirection"      - The light direction is used in the lighting calculation. The angle of incidence directly affects the amount of light reflected.
+ *                            Default (0.0f, 0.7070168f, 0.7071068f), i.e angled at the surface from in front and above.
+ *   "uAmbientLightColor"   - The ambient light is used in the lighting calculation. Care must be taken to not saturate the image by setting this value too high,
+ *                            or the indentation will not look correct. Default 0.15.
+ *   "uDiffuseLightColor"   - The diffuse light is used in the lighting calculation. Default is (1.0f, 1.0f, 1.0f).
+ *   "uLightMultiplier"     - The ambient and diffuse lighting is multiplied by this factor. Since a diffuse light at an angle will cause the whole image to darken,
+ *                            this property can be used to scale the image back up closer to the pixel values of the original diffuse texture. Care must be taken
+ *                            to not saturate the image,or the indentation will not look correct. Default 1.0
+ *   "uState"               - The shader can have a maximum of two end states 0 or 1, Animate between these two values to do the transitions
+ *                            between states. Default 0.0
+ *   "uHightScale"          - The height displacement is multiplied by this factor. Tweak this to get the required level of depth. Default 0.1
+ *   "uFixedNormal"         - The Fixed normal will be used for the light calculation. Tweak this to get the required level of light.
+ *                            Only applicable for the FIXED type shader and not for DISPLACED type
+ *
+ * @param type The type of the effect, can be either DISPLACED, or FIXED.
+ * @return A handle to a newly allocated ShaderEffect
+ *
  */
-class DALI_IMPORT_API DisplacementEffect : public ShaderEffect
+
+typedef enum
 {
+  DISPLACEMENT_EFFECT_DISPLACED = 0,    /// Image gets displaced
+  DISPLACEMENT_EFFECT_FIXED             /// Image does not displace. Useful for matching lighting between areas that do not displace and those that do, e.g for backgrounds which are visible between buttons.
+}DisplacementEffectType;
 
-public:
+inline ShaderEffect CreateDisplacementEffect(DisplacementEffectType type)
+{
+  std::string fragmentSourceFixed;
+  fragmentSourceFixed =  "precision mediump float;\n"
+      "uniform vec3 uLightDirection;\n"
+      "uniform vec3 uAmbientLightColor;\n"
+      "uniform vec3 uDiffuseLightColor;\n"
+      "uniform float uLightMultiplier;\n"
+      "uniform float uState;\n"
+      "uniform float uHightScale;\n"
+      "uniform vec3 uFixedNormal;\n"
 
-  typedef enum
+      "void main()\n"
+      "{\n"
+      "  vec4 col = texture2D(sTexture, vTexCoord);\n"
+      // calc lighting
+      "  float intensity = dot(uLightDirection, uFixedNormal);"
+      "  vec3 lighting = (intensity * uDiffuseLightColor) + uAmbientLightColor;\n"
+      "  lighting *= uLightMultiplier;\n"
+      // output col = image * light
+      "  gl_FragColor = vec4(col.rgb * lighting * uColor.rgb, col.a * uColor.a);\n"
+      "}\n";
+
+
+
+  std::string fragmentSourceDisplaced(
+      "precision mediump float;\n"
+      "uniform vec3 uLightDirection;\n"
+      "uniform vec3 uAmbientLightColor;\n"
+      "uniform vec3 uDiffuseLightColor;\n"
+      "uniform float uLightMultiplier;\n"
+      "uniform float uState;\n"
+      "uniform float uHightScale;\n"
+      "void main()\n"
+      "{\n"
+      "  highp vec4 displacementMap1 = texture2D(sEffect, vec2(vTexCoord.s, vTexCoord.t/2.0));\n"
+      "  highp vec4 displacementMap2 = texture2D(sEffect, vec2(vTexCoord.s, 0.5+vTexCoord.t/2.0));\n"
+      "  highp vec4 displacementMap = mix(displacementMap1, displacementMap2, uState);\n"
+
+      "  vec3 normalAdjusted = normalize(displacementMap.rgb*2.0-1.0);\n"
+      "  float height = uHightScale * (displacementMap.a*2.0 - 1.0);\n"
+      "  vec2 displacement = vec2(0.0);\n"
+      "  displacement += (vec2(0.5)-vTexCoord.st)*height;\n"
+      "  vec2 newCoord = vTexCoord.st + displacement.xy;\n"
+
+      "  vec4 col = texture2D(sTexture, newCoord);\n"
+      // Y-Axis for the normal map is taken as in Y-Down format, So inverting it for GL
+      "  float intensity = dot(uLightDirection, vec3(1.0,-1.0, 1.0) * normalAdjusted);"
+      "  vec3 lighting = (intensity * uDiffuseLightColor) + uAmbientLightColor;\n"
+      "  lighting *= uLightMultiplier;\n"
+      "  vec3 color = col.rgb * lighting * uColor.rgb;\n"
+      "  gl_FragColor = vec4(color, col.a * uColor.a);\n"
+      "}\n");
+
+  //////////////////////////////////////
+  // Create shader effect
+  //
+  //
+
+  ShaderEffect shaderEffect;
+  switch(type)
   {
-    DISPLACED = 0,    /// Image gets displaced
-    FIXED             /// Image does not displace. Useful for matching lighting between areas that do not displace and those that do, e.g for backgrounds which are visible between buttons.
-  }Type;
+    case DISPLACEMENT_EFFECT_DISPLACED:
+      shaderEffect = ShaderEffect::New( "", fragmentSourceDisplaced);
+      break;
 
-  /**
-   * Create an uninitialized DisplacementEffect; this can be initialized with DisplacementEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  DisplacementEffect();
+    case DISPLACEMENT_EFFECT_FIXED:
+    default:
+      shaderEffect = ShaderEffect::New( "", fragmentSourceFixed);
+      break;
+  }
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~DisplacementEffect();
 
-  /**
-   * Create an initialized DisplacementEffect
-   * @param type The type of the effect, can be either DISPLACED, or FIXED.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static DisplacementEffect New(Type type);
+  //////////////////////////////////////
+  // Register uniform properties
+  //
+  //
+  // factors that scale the look, defaults
+  shaderEffect.SetUniform("uLightDirection",Vector3(0.0, 0.7070168f, 0.7071068f));
+  shaderEffect.SetUniform("uAmbientLightColor",Vector3(0.15f, 0.15f, 0.15f));
+  shaderEffect.SetUniform("uDiffuseLightColor",Vector3(1.0f, 1.0f, 1.0f));
+  shaderEffect.SetUniform("uLightMultiplier",1.0f);
+  shaderEffect.SetUniform("uState",0.0f);
+  shaderEffect.SetUniform("uHightScale",0.1f);
 
-  /**
-   * Get the name for the light direction property (Vector3)
-   * The light direction is used in the lighting calculation. The angle of incidence directly affects the amount of light reflected.
-   * Default (0.0f, 0.7070168f, 0.7071068f), i.e angled at the surface from in front and above.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetLightDirectionPropertyName() const;
+  if(type == DISPLACEMENT_EFFECT_FIXED)
+  {
+    shaderEffect.SetUniform("uFixedNormal",Vector3(0.0f, 0.0f, 1.0f) );
+  }
 
-  /**
-   * Get the name for the ambient lighting color property (Vector3)
-   * The ambient light is used in the lighting calculation. Care must be taken to not saturate the image by setting this value too high,
-   * or the indentation will not look correct. Default 0.15.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAmbientLightColorPropertyName() const;
-
-  /**
-   * Get the name for the diffuse light color property (Vector3).
-   * The diffuse light is used in the lighting calculation. Default is (1.0f, 1.0f, 1.0f).
-   * @return A std::string containing the property name
-   */
-  const std::string& GetDiffuseLightColorPropertyName() const;
-
-  /**
-   * Get the name for the lighting multiplier property (float).
-   * The ambient and diffuse lighting is multiplied by this factor. Since a diffuse light at an angle will cause the whole image to darken,
-   * this property can be used to scale the image back up closer to the pixel values of the original diffuse texture. Care must be taken to not saturate the image,
-   * or the indentation will not look correct. Default 1.0
-   * @return A std::string containing the property name
-   */
-  const std::string& GetLightingMultiplierPropertyName() const;
-
-  /**
-   * Get the name for the state property (float).
-   * The shader can have a maximum of two end states 0 or 1, Animate between these two values to do the transitions between states.
-   * Default 0.0
-   * @return A std::string containing the property name.
-   */
-  const std::string& GetStatePropertyName() const;
-
-  /**
-   * Get the name for the height scale property (float).
-   * The height displacement is multiplied by this factor. Tweak this to get the required level of depth.
-   * Default 0.1
-   * @return A std::string containing the property name.
-   */
-  const std::string& GetHeightScalePropertyName() const;
-
-  /**
-   * Get the name for the fixed normal property (Vector3).
-   * Only applicable for the FIXED type shader and not for DISPLACEMENT type.
-   * The Fixed normal will be used for the light calculation. Tweak this to get the required level of light.
-   * Default (0.0f, 0.0f, 1.0f)
-   * @return A std::string containing the property name.
-   */
-  const std::string& GetFixedNormalPropertyName() const;
-
-  /**
-   * Set the light direction property
-   * The light direction is used in the lighting calculation. The angle of incidence directly affects the amount of light reflected.
-   * Default (0.0f, 0.7070168f, 0.7071068f), i.e angled at the surface from in front and above.
-   * @param [in] lightDirection The new light direction.
-   */
-  void SetLightDirection(Vector3 lightDirection);
-
-  /**
-   * Set the ambient light color property
-   * The ambient light is used in the lighting calculation. Care must be taken to not saturate the image by setting this value too high,
-   * or the indentation will not look correct. Default (0.15f, 0.15f, 0.15f).
-   * @param [in] ambientLight The new ambient light value.
-   */
-  void SetAmbientLightColorProperty(Vector3 ambientLight);
-
-  /**
-   * Set the diffuse light color property.
-   * The diffuse light is used in the lighting calculation. Default is (1.0f, 1.0f, 1.0f), i.e. a white light so the natural image color is shown.
-   * @param [in] diffuseLight The new diffuse light value.
-   */
-  void SetDiffuseLightColorProperty(Vector3 diffuseLight);
-
-  /**
-   * Get the name for the lighting multiplier property.
-   * The ambient and diffuse lighting is multiplied by this factor. Since a diffuse light at an angle will cause the whole image to darken,
-   * this property can be used to scale the image back up closer to the pixel values of the original diffuse texture. Care must be taken to not saturate the image,
-   * or the indentation will not look correct. Default 1.0
-   * @param [in] lightMultiplier The new light multiplier value.
-   */
-  void SetLightingMultiplierProperty(float lightMultiplier);
-
-  /**
-   * Get the name for the state property.
-   * The shader can only be in or in between two states 0 or 1, Animate between these two values to do the transitions between states.
-   * @param [in] state The new state value.
-   */
-  void SetStateProperty(float state);
-
-  /**
-   * Set the name for the height scale property.
-   * The height displacement is multiplied by this factor. Tweak this to get the required level of depth. Default 0.1
-   * @param [in] heightScale The new height scale.
-   */
-  void SetHeightScaleProperty(float heightScale);
-
-  /**
-   * Set the name for fixed normal property, Only applicable for the FIXED type shader and not for DISPLACEMENT type.
-   * The Fixed normal will be used for the light calculation. Tweak this to get the required level of light.
-   * @param [in] fixedNormal The new normal for the fixed type shader effect.
-   */
-  void SetFixedNormalProperty(Vector3 fixedNormal);
-
-private:
-  // Not intended for application developers
-  DALI_INTERNAL DisplacementEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 }
 

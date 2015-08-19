@@ -24,6 +24,9 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+
 namespace Dali
 {
 
@@ -34,6 +37,8 @@ class Vector4;
 
 namespace Toolkit
 {
+
+class TextSelectionPopupCallbackInterface;
 
 namespace Internal
 {
@@ -132,7 +137,7 @@ public:
      *
      * @param[in] decoration The actor displaying a decoration.
      */
-    virtual void AddDecoration( Actor& actor ) = 0;
+    virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
 
     /**
      * @brief An input event from one of the handles.
@@ -149,9 +154,12 @@ public:
    * @brief Create a new instance of a Decorator.
    *
    * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
+   *
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( ControllerInterface& controller );
+  static DecoratorPtr New( ControllerInterface& controller,
+                           TextSelectionPopupCallbackInterface& callbackInterface );
 
   /**
    * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
@@ -249,7 +257,7 @@ public:
    * @param[in] cursor Whether this color is for the primary or secondary cursor.
    * @param[in] color The color to use.
    */
-  void SetColor( Cursor cursor, const Dali::Vector4& color );
+  void SetCursorColor( Cursor cursor, const Dali::Vector4& color );
 
   /**
    * @brief Retrieves the color for a cursor.
@@ -335,6 +343,20 @@ public:
   Dali::Image GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const;
 
   /**
+   * @brief Sets the color of the handles
+   *
+   * @param[in] color The color to use.
+   */
+  void SetHandleColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the handles color.
+   *
+   * @return The color of the handles.
+   */
+  const Vector4& GetHandleColor() const;
+
+  /**
    * @brief Sets the position of a selection handle.
    *
    * @param[in] handleType The handle to set.
@@ -355,6 +377,23 @@ public:
   void GetPosition( HandleType handleType, float& x, float& y, float& lineHeight ) const;
 
   /**
+   * @brief Retrieves the position of a selection handle.
+   *
+   * @param[in] handleType The handle to get.
+   *
+   * @return The position of the selection handle relative to the top-left of the parent control.
+   */
+  const Vector2& GetPosition( HandleType handleType ) const;
+
+  /**
+   * @brief Swaps the selection handle's images.
+   *
+   * This method is called by the text controller to swap the handles
+   * when the start index is bigger than the end one.
+   */
+  void SwapSelectionHandlesEnabled( bool enable );
+
+  /**
    * @brief Adds a quad to the existing selection highlights.
    *
    * @param[in] x1 The top-left x position.
@@ -372,16 +411,23 @@ public:
   /**
    * @brief Sets the selection highlight color.
    *
-   * @param[in] image The image to use.
+   * @param[in] color The color to use.
    */
   void SetHighlightColor( const Vector4& color );
 
   /**
    * @brief Retrieves the selection highlight color.
    *
-   * @return The image.
+   * @return The color of the highlight
    */
   const Vector4& GetHighlightColor() const;
+
+  /**
+   * @brief Sets into the decorator the depth used to render the text.
+   *
+   * @param[in] depth The text's depth.
+   */
+  void SetTextDepth( int textDepth );
 
   /**
    * @brief Set the Selection Popup to show or hide via the active flaf
@@ -395,6 +441,18 @@ public:
    * @return True if the Selection Popup should be active.
    */
   bool IsPopupActive() const;
+
+  /**
+   * @brief Set a bit mask of the buttons to be shown by Popup
+   * @param[in] enabledButtonsBitMask from TextSelectionPopup::Buttons enum
+   */
+  void SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask );
+
+  /**
+   * @brief Get the current bit mask of buttons to be shown by Popup
+   * @return bitmask of TextSelectionPopup::Buttons
+   */
+  TextSelectionPopup::Buttons& GetEnabledPopupButtons();
 
   /**
    * @brief Sets the scroll threshold.
@@ -430,18 +488,9 @@ public:
   float GetScrollSpeed() const;
 
   /**
-   * @brief Sets the scroll interval.
-   *
-   * @param[in] seconds The scroll interval in seconds.
+   * @brief Notifies the decorator the whole text has been scrolled.
    */
-  void SetScrollTickInterval( float seconds );
-
-  /**
-   * @brief Retrieves the scroll interval.
-   *
-   * @return The scroll interval.
-   */
-  float GetScrollTickInterval() const;
+  void NotifyEndOfScroll();
 
 protected:
 
@@ -455,8 +504,10 @@ private:
   /**
    * @brief Private constructor.
    * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    */
-  Decorator( ControllerInterface& controller );
+  Decorator( ControllerInterface& controller,
+             TextSelectionPopupCallbackInterface& callbackInterface );
 
   // Undefined
   Decorator( const Decorator& handle );

@@ -162,13 +162,6 @@ void SetBidirectionalInfo( const Vector<Character>& text,
   }
 }
 
-void ReplaceBidirectionalInfo( LogicalModel& model,
-                               CharacterIndex characterIndex,
-                               Length numberOfCharactersToRemove,
-                               Length numberOfCharactersToInsert )
-{
-}
-
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                    Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns )
@@ -222,24 +215,19 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
       // The memory is freed after the visual to logical to visual conversion tables are built in the logical model.
       lineInfoRun.visualToLogicalMap = reinterpret_cast<CharacterIndex*>( malloc( line.characterRun.numberOfCharacters * sizeof( CharacterIndex ) ) );
 
-      // Reorders the line.
-      bidirectionalSupport.Reorder( paragraphInfo.bidirectionalInfoIndex,
-                                    line.characterRun.characterIndex - paragraphInfo.characterRun.characterIndex,
-                                    line.characterRun.numberOfCharacters,
-                                    lineInfoRun.visualToLogicalMap );
+      if( NULL != lineInfoRun.visualToLogicalMap )
+      {
+        // Reorders the line.
+        bidirectionalSupport.Reorder( paragraphInfo.bidirectionalInfoIndex,
+                                      line.characterRun.characterIndex - paragraphInfo.characterRun.characterIndex,
+                                      line.characterRun.numberOfCharacters,
+                                      lineInfoRun.visualToLogicalMap );
+      }
 
       // Push the run into the vector.
       lineInfoRuns.PushBack( lineInfoRun );
     }
   }
-}
-
-void ReorderLines( LogicalModel& logicalModel,
-                   const VisualModel& visualModel,
-                   CharacterIndex characterIndex,
-                   Length numberOfCharactersToRemove,
-                   Length numberOfCharactersToInsert )
-{
 }
 
 bool GetMirroredText( const Vector<Character>& text,

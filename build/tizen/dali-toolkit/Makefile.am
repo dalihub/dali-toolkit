@@ -22,11 +22,7 @@ toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
 devel_api_src_dir  = ../../../dali-toolkit/devel-api
 
-if MOBILE_PROFILE
-toolkit_styles_dir = ../../../dali-toolkit/styles/mobile
-else
-toolkit_styles_dir = ../../../dali-toolkit/styles
-endif
+toolkit_styles_dir = $(STYLE_DIR)
 
 include ../../../dali-toolkit/images/file.list
 include ../../../dali-toolkit/sounds/file.list
@@ -96,7 +92,6 @@ develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
 develapiscriptingdir =          $(develapidir)/scripting
-develapibubbleeffectdir =       $(develapidir)/shader-effects/bubble-effect
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapistylingdir =            $(develapidir)/styling
@@ -106,7 +101,6 @@ develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 # devel headers
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
-develapibubbleeffect_HEADERS =      $(devel_api_bubble_effect_header_files)
 develapibuilder_HEADERS =           $(devel_api_builder_header_files)
 develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
@@ -121,37 +115,39 @@ develapistyling_HEADERS =           $(devel_api_styling_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
-develapitextselectionpopup_HEADERS = $(devel_api_text_selection_popup_header_files)
+develapitextselectionpopup_HEADERS = $(devel_api_text_controls_header_files)
 
 # public api source
-publicapidir =                  $(topleveldir)/public-api
-publicapicontrolsdir =          $(publicapidir)/controls
-publicapialignmentdir =         $(publicapicontrolsdir)/alignment
-publicapibuttonsdir =           $(publicapicontrolsdir)/buttons
-publicapidefaultcontrolsdir =   $(publicapicontrolsdir)/default-controls
-publicapigaussianblurviewdir =  $(publicapicontrolsdir)/gaussian-blur-view
-publicapiscrollbardir =         $(publicapicontrolsdir)/scroll-bar
-publicapiscrollabledir =        $(publicapicontrolsdir)/scrollable
-publicapiscrollviewdir =        $(publicapicontrolsdir)/scrollable/scroll-view
-publicapiitemviewdir =          $(publicapicontrolsdir)/scrollable/item-view
-publicapitableviewdir =         $(publicapicontrolsdir)/table-view
-publicapitextcontrolsdir =      $(publicapicontrolsdir)/text-controls
-publicapifocusmanagerdir =      $(publicapidir)/focus-manager
-publicapirenderingbackenddir =  $(publicapidir)/text
+publicapidir =                    $(topleveldir)/public-api
+publicapicontrolsdir =            $(publicapidir)/controls
+develapiaccessibilitymanagerdir = $(publicapidir)/accessibility-manager
+publicapialignmentdir =           $(publicapicontrolsdir)/alignment
+publicapibuttonsdir =             $(publicapicontrolsdir)/buttons
+publicapidefaultcontrolsdir =     $(publicapicontrolsdir)/default-controls
+publicapigaussianblurviewdir =    $(publicapicontrolsdir)/gaussian-blur-view
+publicapiscrollbardir =           $(publicapicontrolsdir)/scroll-bar
+publicapiscrollabledir =          $(publicapicontrolsdir)/scrollable
+publicapiscrollviewdir =          $(publicapicontrolsdir)/scrollable/scroll-view
+publicapiitemviewdir =            $(publicapicontrolsdir)/scrollable/item-view
+publicapitableviewdir =           $(publicapicontrolsdir)/table-view
+publicapitextcontrolsdir =        $(publicapicontrolsdir)/text-controls
+publicapifocusmanagerdir =        $(publicapidir)/focus-manager
+publicapirenderingbackenddir =    $(publicapidir)/text
 
 # public api headers
-publicapi_HEADERS =                 $(public_api_header_files)
-publicapicontrols_HEADERS =         $(public_api_controls_header_files)
-publicapialignment_HEADERS =        $(public_api_alignment_header_files)
-publicapibuttons_HEADERS =          $(public_api_buttons_header_files)
-publicapidefaultcontrols_HEADERS =  $(public_api_default_controls_header_files)
-publicapigaussianblurview_HEADERS = $(public_api_gaussian_blur_view_header_files)
-publicapiitemview_HEADERS =         $(public_api_item_view_header_files)
-publicapiscrollbar_HEADERS =        $(public_api_scroll_bar_header_files)
-publicapiscrollable_HEADERS =       $(public_api_scrollable_header_files)
-publicapiscrollview_HEADERS =       $(public_api_scroll_view_header_files)
-publicapitableview_HEADERS =        $(public_api_table_view_header_files)
-publicapitextcontrols_HEADERS =     $(public_api_text_controls_header_files)
-publicapifocusmanager_HEADERS =     $(public_api_focus_manager_header_files)
-publicapirenderingbackend_HEADERS = $(public_api_rendering_backend_header_files)
+publicapi_HEADERS =                    $(public_api_header_files)
+publicapicontrols_HEADERS =            $(public_api_controls_header_files)
+develapiaccessibilitymanager_HEADERS = $(public_api_accessibility_manager_header_files)
+publicapialignment_HEADERS =           $(public_api_alignment_header_files)
+publicapibuttons_HEADERS =             $(public_api_buttons_header_files)
+publicapidefaultcontrols_HEADERS =     $(public_api_default_controls_header_files)
+publicapigaussianblurview_HEADERS =    $(public_api_gaussian_blur_view_header_files)
+publicapiitemview_HEADERS =            $(public_api_item_view_header_files)
+publicapiscrollbar_HEADERS =           $(public_api_scroll_bar_header_files)
+publicapiscrollable_HEADERS =          $(public_api_scrollable_header_files)
+publicapiscrollview_HEADERS =          $(public_api_scroll_view_header_files)
+publicapitableview_HEADERS =           $(public_api_table_view_header_files)
+publicapitextcontrols_HEADERS =        $(public_api_text_controls_header_files)
+publicapifocusmanager_HEADERS =        $(public_api_focus_manager_header_files)
+publicapirenderingbackend_HEADERS =    $(public_api_rendering_backend_header_files)
 

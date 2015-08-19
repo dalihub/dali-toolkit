@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/rendering/cull-face.h>
 
 namespace Dali
 {
@@ -86,14 +87,14 @@ ImageActor PageTurnLandscapeView::NewPageFromRenderBuffer( int pageIndex )
 void PageTurnLandscapeView::OnAddPage( ImageActor newPage, bool isLeftSide )
 {
   newPage.SetParentOrigin( ParentOrigin::CENTER );
-  newPage.SetCullFace( CullBack );
+  SetCullFace( newPage, CullBack );
 
   if( 0 < newPage.GetChildCount() )
   {
      ImageActor backImage = ImageActor::DownCast( newPage.GetChildAt( 0 ) );
      backImage.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
      backImage.SetSize( mPageSize );
-     backImage.SetCullFace( CullFront );
+     SetCullFace( backImage, CullFront );
      backImage.SetZ( 0.25f * STATIC_PAGE_INTERVAL_DISTANCE );
   }
   if( isLeftSide )

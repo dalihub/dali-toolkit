@@ -21,6 +21,10 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
+
+//INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 namespace Dali
 {
@@ -44,6 +48,10 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::CheckBoxButton), typeid(Toolkit::Button), Create );
 
+const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "checkbox-unselected.png";
+const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "checkbox-selected.png";
+const char* const DISABLED_UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "checkbox-unselected-disabled.png";
+const char* const DISABLED_SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "checkbox-selected-diabled.png";
 }
 
 Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
@@ -71,16 +79,22 @@ CheckBoxButton::CheckBoxButton()
 
 CheckBoxButton::~CheckBoxButton()
 {
-  if( mTransitionAnimation )
-  {
-    mTransitionAnimation.Clear();
-  }
 }
 
 void CheckBoxButton::OnButtonInitialize()
 {
   // Wrap around all children
   Self().SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+
+  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image disabledImage = Dali::ResourceImage::New( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image disabledSelectedImage = Dali::ResourceImage::New( DISABLED_SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+
+  SetButtonImage( ImageActor::New( buttonImage ) );
+  SetSelectedImage( ImageActor::New( selectedImage ) );
+  SetDisabledImage( ImageActor::New( disabledImage ) );
+  SetDisabledSelectedImage( ImageActor::New( disabledSelectedImage ) );
 }
 
 void CheckBoxButton::OnLabelSet()
@@ -100,6 +114,14 @@ void CheckBoxButton::OnLabelSet()
     {
       label.SetX( GetBackgroundImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
+    else if( IsSelected() && GetSelectedImage())
+    {
+      label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
+    else if( GetButtonImage() )
+    {
+      label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
     else
     {
       label.SetX( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
@@ -107,96 +129,15 @@ void CheckBoxButton::OnLabelSet()
   }
 }
 
-bool CheckBoxButton::OnSelected()
-{
-  Actor& selectedImage = GetSelectedImage();
-
-  PaintState paintState = GetPaintState();
-
-  switch( paintState )
-  {
-    case UnselectedState:
-    {
-      StartTransitionAnimation( selectedImage );
-      break;
-    }
-    case SelectedState:
-    {
-      RemoveChild( selectedImage );
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      StopTransitionAnimation( false );
-      RemoveChild( selectedImage );
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  if( mTransitionAnimation )
-  {
-    return true;
-  }
-
-  return false;
-}
-
-bool CheckBoxButton::OnDisabled()
+void CheckBoxButton::OnDisabled()
 {
   Actor& backgroundImage = GetBackgroundImage();
-  Actor& selectedImage = GetSelectedImage();
   Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
-  Actor& disabledSelectedImage = GetDisabledSelectedImage();
-
-  PaintState paintState = GetPaintState();
-
-  switch( paintState )
-  {
-    case UnselectedState:
-    {
-      RemoveChild( backgroundImage );
-      break;
-    }
-    case SelectedState:
-    {
-      RemoveChild( backgroundImage );
-      RemoveChild( selectedImage );
-      break;
-    }
-    case DisabledUnselectedState:
-    {
-      RemoveChild( disabledBackgroundImage );
-      break;
-    }
-    case DisabledSelectedState:
-    {
-      RemoveChild( disabledBackgroundImage );
-      RemoveChild( disabledSelectedImage );
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      StopTransitionAnimation();
-
-      RemoveChild( backgroundImage );
-      RemoveChild( selectedImage );
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
 
   Actor& label = GetLabel();
-
   if( label )
   {
-    if( IsDisabled() && disabledBackgroundImage)
+    if( IsDisabled() && disabledBackgroundImage )
     {
       label.SetX( disabledBackgroundImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
@@ -204,73 +145,93 @@ bool CheckBoxButton::OnDisabled()
     {
       label.SetX( backgroundImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
+    else if( IsSelected() && GetSelectedImage())
+    {
+      label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
+    else if( GetButtonImage() )
+    {
+      label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
     else
     {
       label.SetX( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
   }
-
-  if( mTransitionAnimation )
-  {
-    return true;
-  }
-
-  return false;
 }
 
-void CheckBoxButton::StopAllAnimations()
+void CheckBoxButton::PrepareForTranstionIn( Actor actor )
 {
-  StopTransitionAnimation();
-}
-
-void CheckBoxButton::StartTransitionAnimation( Actor& actor )
-{
-  if( actor )
+  Actor& selectedImage = GetSelectedImage();
+  if( actor == selectedImage )
   {
-    if( !mTickUVEffect )
-    {
-      ImageActor imageActor = ImageActor::DownCast( actor );
-      mTickUVEffect = ImageRegionEffect::New();
-      imageActor.SetShaderEffect( mTickUVEffect );
-    }
-
     actor.SetScale( Vector3( 0.0f, 1.0f, 1.0f ) );
 
-    mTickUVEffect.SetBottomRight( Vector2( 0.0f, 1.0f ) );
-
-    if( !mTransitionAnimation )
+    if( !mTickUVEffect )
     {
-      mTransitionAnimation = Dali::Animation::New( GetAnimationTime()  );
+      mTickUVEffect = CreateImageRegionEffect();
     }
+    mTickUVEffect.SetUniform("uBottomRight", Vector2( 0.0f, 1.0f ) );
 
-    // UV anim
-    mTransitionAnimation.AnimateTo( Property( mTickUVEffect, mTickUVEffect.GetBottomRightPropertyName() ), Vector2( 1.0f, 1.0f ) );
-
-    // Actor size anim
-    mTransitionAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );
-
-    mTransitionAnimation.FinishedSignal().Connect( this, &CheckBoxButton::TransitionAnimationFinished );
-    mTransitionAnimation.Play();
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if( imageActor )
+    {
+      imageActor.SetShaderEffect( mTickUVEffect );
+    }
   }
 }
 
-void CheckBoxButton::StopTransitionAnimation( bool remove )
+void CheckBoxButton::PrepareForTranstionOut( Actor actor )
 {
-  if( mTransitionAnimation )
+  Actor& selectedImage = GetSelectedImage();
+  if( actor == selectedImage )
   {
-    mTransitionAnimation.Clear();
-    mTransitionAnimation.Reset();
-  }
+    actor.SetScale( Vector3::ONE );
 
-  if( remove )
-  {
-    UpdatePaintTransitionState();
+    if( !mTickUVEffect )
+    {
+        mTickUVEffect = CreateImageRegionEffect();
+    }
+    mTickUVEffect.SetUniform("uBottomRight", Vector2::ONE );
+
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if( imageActor )
+    {
+      imageActor.SetShaderEffect( mTickUVEffect );
+    }
   }
 }
 
-void CheckBoxButton::TransitionAnimationFinished( Dali::Animation& source )
+void CheckBoxButton::OnTransitionIn( Actor actor )
 {
-  StopTransitionAnimation();
+  Actor& selectedImage = GetSelectedImage();
+  if( actor && actor == selectedImage )
+  {
+    if( GetPaintState() == UnselectedState )
+    {
+      Dali::Animation transitionAnimation = GetTransitionAnimation();
+      if( transitionAnimation )
+      {
+        DALI_ASSERT_DEBUG( mTickUVEffect );
+        if( mTickUVEffect )
+        {
+          // UV anim
+          transitionAnimation.AnimateTo( Property( mTickUVEffect, "uBottomRight" ), Vector2::ONE );
+        }
+        // Actor size anim
+        transitionAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );
+      }
+    }
+    else
+    {
+      //explicitly end the swipe animation
+      actor.SetScale( Vector3::ONE );
+      if( mTickUVEffect )
+      {
+    	mTickUVEffect.SetUniform("uBottomRight", Vector2::ONE );
+      }
+    }
+  }
 }
 
 } // namespace Internal

@@ -28,169 +28,156 @@ namespace Toolkit
 {
 
 /**
+ * Creates a new DistanceFieldEffect
+ *
  * DistanceFieldEffect is a custom shader effect to achieve distance field on Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *
+ *  "uSmoothing"    - Soft edge smoothing. Specify the distance field value for the center of the edge.
+
+ *  "uDoGlow"       - The glow state. If true, glow is enabled
+ *  "uGlowBoundary" - The glow boundary factor
+ *  "uGlowColor"    - The glow color multiplier
+
+ *  "uDoShadow"     - The shadow state. If true, shadows is enabled. Cannot be used with glow/and or outline
+ *  "uShadowColor"  - The shadow color multiplier
+ *  "uShadowOffset" - The shadow offset
+
+ *  "uDoOutline"    - The outline state. If true, outline is enabled
+ *  "uOutlineColor" - The outline color multiplier
+ *  "uOutlineParams"- Thickness of outline. The outline thickness is determined by two values.
+ *                    First value [0-1] Specifies the distance field value for the center of the outline.
+ *                    Second value [0-1] Specifies the softness/width/anti-aliasing of the outlines inner edge.
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API DistanceFieldEffect : public ShaderEffect
+inline ShaderEffect CreateDistanceFieldEffect()
 {
-public:
+  std::string fragmentShaderPrefix(
+      "#extension GL_OES_standard_derivatives : enable\n"
+      "\n"
+  );
 
-  /**
-   * Create an uninitialized DistanceFieldEffect; this can be initialized with DistanceFieldEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  DistanceFieldEffect();
+  std::string fragmentShader(
+      "uniform mediump float uSmoothing;\n"
+      "uniform mediump float uGlowBoundary;\n"
+      "uniform mediump vec2  uOutlineParams;\n"
+      "uniform lowp    vec4  uOutlineColor;\n"
+      "uniform lowp    vec4  uShadowColor;\n"
+      "uniform mediump vec2  uShadowOffset;\n"
+      "uniform lowp    vec4  uGlowColor;\n"
+      "uniform lowp    float uDoOutline;\n"
+      "uniform lowp    float uDoShadow;\n"
+      "uniform lowp    float uDoGlow;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      "  // sample distance field\n"
+      "  mediump float distance = texture2D(sTexture, vTexCoord).a;\n"
+      "  mediump float smoothWidth = fwidth(distance);\n"
+      "  mediump float alphaFactor = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);\n"
+      "  lowp    vec4  color;\n"
+      "  if (uDoShadow == 0.0)\n"
+      "  {\n"
+      "    mediump float alpha = uColor.a * alphaFactor;\n"
+      "    lowp    vec4  rgb = uColor;\n"
+      "\n"
+      "    if (uDoOutline > 0.0)\n"
+      "    {\n"
+      "      mediump float outlineWidth = uOutlineParams[1] + smoothWidth;\n"
+      "      mediump float outlineBlend = smoothstep(uOutlineParams[0] - outlineWidth, uOutlineParams[0] + outlineWidth, distance);\n"
+      "      alpha = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);\n"
+      "      rgb = mix(uOutlineColor, uColor, outlineBlend);\n"
+      "    }\n"
+      "\n"
+      "    if (uDoGlow > 0.0)\n"
+      "    {\n"
+      "      rgb = mix(uGlowColor, rgb, alphaFactor);\n"
+      "      alpha = smoothstep(uGlowBoundary, uSmoothing, distance);\n"
+      "    }\n"
+      "\n"
+      "    // set fragment color\n"
+      "    color = vec4(rgb.rgb, alpha);\n"
+      "  }\n"
+      "\n"
+      "  else // (uDoShadow > 0.0)\n"
+      "  {\n"
+      "    mediump float shadowDistance = texture2D(sTexture, vTexCoord - uShadowOffset).a;\n"
+      "    mediump float inText = alphaFactor;\n"
+      "    mediump float inShadow = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, shadowDistance);\n"
+      "\n"
+      "    // inside object, outside shadow\n"
+      "    if (inText == 1.0)\n"
+      "    {\n"
+      "      color = uColor;\n"
+      "    }\n"
+      "    // inside object, outside shadow\n"
+      "    else if ((inText != 0.0) && (inShadow == 0.0))\n"
+      "    {\n"
+      "      color = uColor;\n"
+      "      color.a *= inText;\n"
+      "    }\n"
+      "    // outside object, completely inside shadow\n"
+      "    else if ((inText == 0.0) && (inShadow == 1.0))\n"
+      "    {\n"
+      "      color = uShadowColor;\n"
+      "    }\n"
+      "    // inside object, completely inside shadow\n"
+      "    else if ((inText != 0.0) && (inShadow == 1.0))\n"
+      "    {\n"
+      "      color = mix(uShadowColor, uColor, inText);\n"
+      "      color.a = uShadowColor.a;\n"
+      "    }\n"
+      "    // inside object, inside shadow's border\n"
+      "    else if ((inText != 0.0) && (inShadow != 0.0))\n"
+      "    {\n"
+      "      color = mix(uShadowColor, uColor, inText);\n"
+      "      color.a *= max(inText, inShadow);\n"
+      "    }\n"
+      "    // inside shadow's border\n"
+      "    else if (inShadow != 0.0)\n"
+      "    {\n"
+      "      color = uShadowColor;\n"
+      "      color.a *= inShadow;\n"
+      "    }\n"
+      "    // outside shadow and object\n"
+      "    else \n"
+      "    {\n"
+      "      color.a = 0.0;\n"
+      "    }\n"
+      "\n"
+      "  }\n"
+      "\n"
+      "  gl_FragColor = color;\n"
+      "\n"
+      "}\n"
+  );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~DistanceFieldEffect();
+  // Create the implementation, temporarily owned on stack
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::NewWithPrefix(
+      "", "",
+      fragmentShaderPrefix, fragmentShader,
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING));
 
-  /**
-   * Create an initialized DistanceFieldEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static DistanceFieldEffect New();
+  shaderEffect.SetUniform("uSmoothing",0.5f);
+  shaderEffect.SetUniform("uOutlineColor",Color::BLACK);
+  shaderEffect.SetUniform("uOutlineParams",Vector2(0.51f, 0.0f));
+  shaderEffect.SetUniform("uGlowBoundary",0.4f);
+  shaderEffect.SetUniform("uGlowColor",Color::GREEN);
+  shaderEffect.SetUniform("uShadowColor",Vector4(0.0f, 0.0f, 0.0f, 0.4f));
 
-  /**
-   * Set the shadow state
-   * @param[in] shadowEnable value - true, enable shadow.
-   * @note Shadow cannot be used with glow/and or outline.
-   */
-  void SetShadow(bool shadowEnable);
+  // TODO: find a way to set the shadow offset in texel coordinates instead of UVs.
+  shaderEffect.SetUniform("uShadowOffset",Vector2(0.05f, 0.05f));
 
-  /**
-   * Set the shadow color multiplier (e.g. output RGB)
-   * @param[in] color Shadow color value
-   */
-  void SetShadowColor(const Vector4& color);
+  // Default:
+  shaderEffect.SetUniform("uDoOutline",false);
+  shaderEffect.SetUniform("uDoGlow",false);
+  shaderEffect.SetUniform("uDoShadow",false);
 
-  /**
-   * Set the shadow offset
-   * @param[in] color shadow offset value
-   */
-  void SetShadowOffset(const Vector2& color);
+  return shaderEffect;
+}
 
-  /**
-   * Set the glow state
-   * @param[in] glowEnable value - true, enable glow.
-   */
-
-  void SetGlow(bool glowEnable);
-
-  /**
-   * Set the glow color multiplier (e.g. output RGB)
-   * @param[in] color Glow color value
-   */
-  void SetGlowColor(const Vector4& color);
-
-  /**
-   * Set the glow boundary factor
-   * @param[in] glowBoundary glow boundary
-   */
-  void SetGlowBoundary(float glowBoundary);
-
-  /**
-   * Set the outline state
-   * @param[in] outlineEnable value - true, enable outline.
-   */
-
-  void SetOutline(bool outlineEnable);
-
-  /**
-   * Set the outline color multiplier (e.g. output RGB)
-   * @param[in] color Outline color value
-   */
-  void SetOutlineColor(const Vector4& color);
-
-  /**
-   * Sets the outline parameters.
-   * @param[in] outlineParams  Thickness of outline. The outline thickness is determined by two parameters.
-   *              params[0] (0-1) Specifies the distance field value for the center of the outline.
-   *                      0 <= params[0] <= 1
-   *              params[1] (0-1) Specifies the softness/width/anti-aliasing of the outlines inner edge.
-   *                      0 <= params[0] <= 1
-   */
-  void SetOutlineParams(const Vector2& outlineParams);
-
-  /**
-   * Set soft edge smoothing
-   * @param[in] smoothing Specify the distance field value for the center of the edge.
-   *                      0 <= params <= 1
-   */
-  void SetSmoothingEdge(float smoothing);
-
-  /**
-   * Get the name for the outline-enable property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetOutlineEnablePropertyName() const;
-
-  /**
-   * Get the name for the glow-enable property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetGlowEnablePropertyName() const;
-
-  /**
-   * Get the name for the shadow-enable property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetShadowEnablePropertyName() const;
-
-  /**
-   * Get the name for the radius property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetColorPropertyName() const;
-
-  /**
-   * Get the name for the smoothing property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetSmoothingPropertyName() const;
-
-  /**
-   * Get the name for the outline color property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetOutlineColorPropertyName() const;
-
-  /**
-   * Get the name for the outline size property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetOutlineSizePropertyName() const;
-
-  /**
-   * Get the name for the shadow color property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetShadowColorPropertyName() const;
-
-  /**
-   * Get the name for the shadow offset property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetShadowOffsetPropertyName() const;
-
-  /**
-   * Get the name for the glow color property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetGlowColorPropertyName() const;
-
-  /**
-   * Get the name for the glow boundary property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetGlowBoundaryPropertyName() const;
-
-private:
-  DALI_INTERNAL DistanceFieldEffect(ShaderEffect handle);
-
-};
 
 } // namespace Toolkit
 

@@ -69,25 +69,24 @@ AtlasGlyphManager::AtlasGlyphManager(Internal::AtlasGlyphManager *impl)
 {
 }
 
-void AtlasGlyphManager::Add( Text::FontId fontId,
-                             const Text::GlyphInfo& glyph,
+void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
                              const BufferImage& bitmap,
                              AtlasManager::AtlasSlot& slot )
 {
-  GetImplementation(*this).Add( fontId, glyph, bitmap, slot );
+  GetImplementation(*this).Add( glyph, bitmap, slot );
 }
 
 void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
                                           const Vector2& position,
-                                          MeshData& meshData )
+                                          Toolkit::AtlasManager::Mesh2D& mesh )
 {
   GetImplementation(*this).GenerateMeshData( imageId,
                                              position,
-                                             meshData );
+                                             mesh );
 }
 
-void AtlasGlyphManager::StitchMesh( MeshData& first,
-                                    const MeshData& second )
+void AtlasGlyphManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                                    const Toolkit::AtlasManager::Mesh2D& second )
 {
   GetImplementation(*this).StitchMesh( first, second );
 }
@@ -114,14 +113,34 @@ Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
   return GetImplementation(*this).GetPixelFormat( atlasId );
 }
 
+Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
+{
+  return GetImplementation(*this).GetMaterial( atlasId );
+}
+
+Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+{
+  return GetImplementation(*this).GetSampler( atlasId );
+}
+
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
   return GetImplementation(*this).GetMetrics();
 }
 
-void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta )
+void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta )
 {
-  GetImplementation(*this).AdjustReferenceCount( fontId, imageId, delta );
+  GetImplementation(*this).AdjustReferenceCount( fontId, index, delta );
+}
+
+Shader AtlasGlyphManager::GetEffectBufferShader() const
+{
+  return GetImplementation(*this).GetEffectBufferShader();
+}
+
+Shader AtlasGlyphManager::GetGlyphShadowShader() const
+{
+  return GetImplementation(*this).GetGlyphShadowShader();
 }
 
 } // namespace Toolkit

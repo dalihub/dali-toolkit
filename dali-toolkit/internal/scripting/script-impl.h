@@ -51,7 +51,7 @@ public:
   /**
    * @copydoc Toolkit::Script::ExecuteFile
    */
-  void ExecuteFile( const std::string& filename );
+  bool ExecuteFile( const std::string& filename );
 
 protected:
 

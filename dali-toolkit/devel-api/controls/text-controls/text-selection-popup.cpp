@@ -29,9 +29,11 @@ namespace Dali
 namespace Toolkit
 {
 
-TextSelectionPopup TextSelectionPopup::New()
+TextSelectionPopup TextSelectionPopup::New( Buttons enabledButtons,
+                                            TextSelectionPopupCallbackInterface* callbackInterface )
 {
-  return Internal::TextSelectionPopup::New();
+  return Internal::TextSelectionPopup::New( enabledButtons,
+                                            callbackInterface );
 }
 
 TextSelectionPopup::TextSelectionPopup()
@@ -59,6 +61,16 @@ TextSelectionPopup::~TextSelectionPopup()
 TextSelectionPopup TextSelectionPopup::DownCast( BaseHandle handle )
 {
   return Control::DownCast<TextSelectionPopup, Internal::TextSelectionPopup>(handle);
+}
+
+void TextSelectionPopup::RaiseAbove( Layer target )
+{
+  GetImpl(*this).RaiseAbove( target );
+}
+
+void TextSelectionPopup::ShowPopup()
+{
+  GetImpl(*this).ShowPopup();
 }
 
 TextSelectionPopup::TextSelectionPopup( Internal::TextSelectionPopup& implementation )

@@ -131,9 +131,9 @@ public:
   /**
    * @brief Set the density of the bubble.
    *
-   * Ideally every bubble's moving track is controlled by different uniforms in BubbleEffect shaders.
+   * Ideally every bubble's moving track is controlled by different uniforms in shader.
    * To increase the density, 'density' number of bubbles are sharing one group of uniforms, but with random offsets between these bubbles.
-   * The available density is one to nine. The default density is five.
+   * The available densities are one to nine only. The default value is five.
    * By set the density bigger than one, instead of emit one bubble each time, a 'density' number of bubbles are emitted.
    * @param[in] density The density of the bubble.
    */
@@ -142,7 +142,7 @@ public:
   /**
    * @brief Enable different blending mode for rendering.
    *
-   * @param[in] enable If false, the default blending function for RenderableActor is used.
+   * @param[in] enable If false, the default blending function if ImageActor is used.
    */
   void SetBlendMode( bool enable );
 
@@ -156,14 +156,6 @@ public:
    * @param[in] displacement The displacement used to bound the moving distance of the bubble.
    */
   void EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
-
-  /**
-   * @brief Start an animation to enlarge every activated bubble's size and moving speed.
-   *
-   * @param[in] duration The duration of the animation
-   * @param[in] multiple The bubble size and moving speed will be increased gradually to multiple speed during the animation.
-   */
-  void StartExplosion( float duration, float multiple );
 
   /**
    * @brief Reset all the parameters controlling the bubbles after animation.

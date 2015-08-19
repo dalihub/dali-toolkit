@@ -595,18 +595,18 @@ int UtcDaliTableViewSetGetProperty(void)
   // Test "rows" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_ROWS ) == TableView::Property::ROWS );
 
-  tableView.SetProperty( TableView::Property::ROWS, 4u );
+  tableView.SetProperty( TableView::Property::ROWS, 4 );
 
   DALI_TEST_CHECK( tableView.GetRows() == 4u );
-  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::ROWS).Get<unsigned int>() == 4u );
+  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::ROWS).Get<int>() == 4 );
 
   // Test "columns" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_COLUMNS ) == TableView::Property::COLUMNS );
 
-  tableView.SetProperty( TableView::Property::COLUMNS, 5u );
+  tableView.SetProperty( TableView::Property::COLUMNS, 5 );
 
   DALI_TEST_CHECK( tableView.GetColumns() == 5u );
-  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::COLUMNS).Get<unsigned int>() == 5u );
+  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::COLUMNS).Get<int>() == 5 );
 
   // Test "cell-padding" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_CELL_PADDING ) == TableView::Property::CELL_PADDING );
@@ -693,13 +693,14 @@ int UtcDaliTableViewCustomProperties(void)
 
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
-  Constraint constraint = Constraint::New<Vector3>( tableView, Actor::Property::SIZE, Constraint100() );
-  constraint.Apply();
+  Stage::GetCurrent().Add( tableView );
+  tableView.SetSize( Dali::Vector2( 100.0f, 100.0f ) );
+
   DALI_TEST_CHECK( tableView );
 
   // Create a child actor with the custom properties
   Actor child1 = Actor::New();
-  child1.RegisterProperty( TableView::CELL_INDICES_PROPERTY_NAME, Vector2( 3, 4 ) );
+  child1.RegisterProperty( "cell-index", Vector2( 3, 4 ), Property::READ_WRITE );
   tableView.Add( child1 );
   // Check for actors at actual positions.
   DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(3,4)) == child1);
@@ -708,9 +709,9 @@ int UtcDaliTableViewCustomProperties(void)
   Actor child2 = Actor::New();
   float rowSpan = 3.f;
   float columnSpan = 2.f;
-  child2.RegisterProperty( TableView::CELL_INDICES_PROPERTY_NAME, Vector2( 6, 1 ) );
-  child2.RegisterProperty( TableView::ROW_SPAN_PROPERTY_NAME, rowSpan );
-  child2.RegisterProperty( TableView::COLUMN_SPAN_PROPERTY_NAME, columnSpan );
+  child2.RegisterProperty( "cell-index", Vector2( 6, 1 ), Property::READ_WRITE );
+  child2.RegisterProperty( "row-span", rowSpan, Property::READ_WRITE );
+  child2.RegisterProperty( "column-span", columnSpan, Property::READ_WRITE );
   tableView.Add( child2 );
   // Check for actors at actual positions.
   for( int i=0; i<rowSpan; i++ )
@@ -720,6 +721,22 @@ int UtcDaliTableViewCustomProperties(void)
       DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(6+i,1+j)) == child2);
     }
   }
+
+  // Create a third child actor with the cell alignment properties
+  Actor child3 = Actor::New();
+  child3.SetSize( 5.f,5.f );
+  child3.RegisterProperty( "cell-horizontal-alignment", "center", Property::READ_WRITE );
+  child3.RegisterProperty( "cell-vertical-alignment", "bottom", Property::READ_WRITE );
+  tableView.Add( child3 );
+
+  // store the actor in the first available cell
+  DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(0,0)) == child3)
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( child3.GetCurrentAnchorPoint(), AnchorPoint::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentPosition(), Vector3(2.5f, 5.0f, 0.0f), TEST_LOCATION );
 
   END_TEST;
 }

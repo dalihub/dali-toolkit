@@ -28,79 +28,66 @@ namespace Toolkit
 {
 
 /**
- * @brief SwirlEffect is a custom shader effect to achieve swirl effects in Image actors.
+ * @brief Creates a new SwirlEffect
+ *
+ * SwirlEffect is a custom shader effect to achieve swirl effects in Image actors.
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uAngle"  - The angle of the swirl
+ *  "uCenter" - The center of the swirl
+ *  "uRadius" - The radius of the swirl
+ *
+ * @param[in] warp True if the effect should warp
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API SwirlEffect : public ShaderEffect
+inline ShaderEffect CreateSwirlEffect( bool warp )
 {
-public:
+  // append the default version
+  std::string fragmentShader(
+      "uniform mediump vec2  uTextureSize;\n"
+      "uniform highp float uRadius;\n"
+      "uniform highp float uAngle;\n"
+      "uniform mediump vec2  uCenter;\n"
+      "void main()\n"
+      "{\n"
+      "  highp vec2 textureCenter = (sTextureRect.xy + sTextureRect.zw) * 0.5;\n"
+      "  textureCenter = vTexCoord.st - textureCenter;\n"
+      "  highp float distance = length(textureCenter);\n"
+      "  if (distance >= uRadius)\n"
+      "     discard;\n"
+      "  highp float percent = (uRadius - distance) / uRadius;\n"
+      "  highp float theta = percent * percent * uAngle * 4.0;\n"
+      "  highp float sinTheta = sin(theta);\n"
+      "  highp float cosTheta = cos(theta);\n" );
+  // if warp, loose the sign from sin
+  if( warp )
+  {
+    fragmentShader.append(
+        "  textureCenter = vec2( dot( textureCenter, vec2(cosTheta, sinTheta) ), "
+        "                        dot( textureCenter, vec2(sinTheta, cosTheta) ) );\n" );
+  }
+  else
+  {
+    fragmentShader.append(
+        "  textureCenter = vec2( dot( textureCenter, vec2(cosTheta, -sinTheta) ), "
+        "                        dot( textureCenter, vec2(sinTheta, cosTheta) ) );\n" );
+  }
+  fragmentShader.append(
+      "  textureCenter += uCenter;\n"
+      "  gl_FragColor = texture2D( sTexture, textureCenter ) * uColor;\n"
+      "}" );
 
-  /**
-   * @brief Create an uninitialized SwirlEffect; this can be initialized with SwirlEffect::New().
-   *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  SwirlEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      "",
+      fragmentShader,
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~SwirlEffect();
+  shaderEffect.SetUniform( "uAngle", 0.0f );
+  shaderEffect.SetUniform( "uCenter", Vector2(0.5f, 0.5f) );
+  shaderEffect.SetUniform( "uRadius", 1.0f );
 
-  /**
-   * @brief Create an initialized SwirlEffect.
-   *
-   * @param[in] warp True if the effect should warp.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static SwirlEffect New(bool warp);
-
-  /**
-   * @brief Set the angle of the swirl.
-   *
-   * @param[in] angle The angle in float.
-   */
-  void SetAngle(float angle);
-
-  /**
-   * @brief Set the center of the swirl.
-   *
-   * @param[in] center The center in Vector2.
-   */
-  void SetCenter(const Vector2& center);
-
-  /**
-   * @brief Set the radius of the swirl.
-   *
-   * @param[in] radius The radius in float.
-   */
-  void SetRadius(float radius);
-
-  /**
-   * @brief Get the name for the angle property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAnglePropertyName() const;
-
-  /**
-   * @brief Get the name for the center property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-  /**
-   * @brief Get the name for the radius property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetRadiusPropertyName() const;
-
-private: // Not intended for application developers
-  DALI_INTERNAL SwirlEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

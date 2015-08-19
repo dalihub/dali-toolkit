@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -42,7 +42,7 @@ typedef IntrusivePtr<Renderer> RendererPtr;
  * @brief Abstract base class for Text renderers.
  *
  * This is reponsible for rendering the glyphs from a ViewInterface in the specified positions.
- * It is implemented by returning a RenderableActor intended as the child of a UI control.
+ * It is implemented by returning an Actor intended as the child of a UI control.
  */
 class Renderer : public RefObject
 {
@@ -52,9 +52,10 @@ public:
    * @brief Render the glyphs from a ViewInterface.
    *
    * @param[in] view The interface to a view.
+   * @param[in] depth The depth in the tree of the parent.
    * @return The Renderable actor used to position the text.
    */
-  virtual RenderableActor Render( ViewInterface& view ) = 0;
+  virtual Actor Render( ViewInterface& view, int depth ) = 0;
 
 protected:
 

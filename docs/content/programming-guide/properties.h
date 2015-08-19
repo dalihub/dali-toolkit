@@ -33,7 +33,7 @@ Within the public-api header file; image-actor.h:
 @code
 /**
  * @brief An enumeration of properties belonging to the ImageActor class.
- * Properties additional to RenderableActor.
+ * Properties additional to Actor.
  */
 struct Property
 {

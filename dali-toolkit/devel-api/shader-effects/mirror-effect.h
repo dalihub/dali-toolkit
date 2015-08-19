@@ -28,60 +28,63 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new MirrorEffect
+ *
  * MirrorEffect is a custom shader effect to achieve square effects in Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uDepth"  - The depth of the mirror effect. Default value 0.5
+ *  "uAlpha"  - The alpha of the mirror effect. Default value 1.0
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API MirrorEffect : public ShaderEffect
+inline ShaderEffect CreateMirrorEffect()
 {
-public:
+  std::string vertexShader(
+      "void main()                                  \n"
+      "{                                            \n"
+      "  mediump vec3 pos = aPosition;              \n"
+      "  pos.y = pos.y * 3.0;                       \n"
+      "  mediump vec4 world = uModelView * vec4(pos,1.0); \n"
+      "  gl_Position = uProjection * world;         \n"
+      "  vTexCoord = aTexCoord;                     \n"
+      "}                                            \n" );
 
-  /**
-   * Create an uninitialized MirrorEffect; this can be initialized with MirrorEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  MirrorEffect();
+  std::string fragmentShader(
+      "uniform  mediump float  uDepth;              \n"
+      "uniform  mediump float  uAlpha;              \n"
+      "void main()                                  \n"
+      "{                                            \n"
+      " if(vTexCoord.y < 1.0 / 3.0)                 \n"
+      " {                                           \n"
+      "   gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);  \n"
+      " }                                           \n"
+      " else if(vTexCoord.y < 2.0 / 3.0)            \n"
+      " {                                           \n"
+      "   gl_FragColor = texture2D(sTexture, vec2(vTexCoord.x, vTexCoord.y * 3.0 - 1.0)) * uColor;    \n"
+      "   gl_FragColor.a *= uAlpha;                 \n"
+      " }                                           \n"
+      " else                                        \n"
+      " {                                           \n"
+      "   highp float darkness = 3.0 - vTexCoord.y * 3.0;                                                   \n"
+      "   darkness = (1.0 - 1.0 / uDepth + darkness * 1.0/ uDepth) * 0.65;                            \n"
+      "   highp vec4 color = texture2D(sTexture, vec2(vTexCoord.x, -vTexCoord.y *3.0 + 3.0)) * uColor;      \n"
+      "   color.a *= uAlpha;                                                                          \n"
+      "   gl_FragColor = color * vec4(darkness, darkness, darkness, darkness);                        \n"
+      " }                                           \n"
+      "}                                            \n" );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~MirrorEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      vertexShader,
+      fragmentShader,
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ));
 
-  /**
-   * Create an initialized MirrorEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static MirrorEffect New();
+  shaderEffect.SetUniform("uAlpha", 1.0f);
+  shaderEffect.SetUniform("uDepth", 0.5f);
 
-  /**
-   * Set the depth of the mirror effect.
-   * @param [in] depth The new mirror depth value.
-   */
-  void SetDepth(float depth);
+  return shaderEffect;
+}
 
-  /**
-   * Set the alpha of the mirror effect.
-   * @param [in] alpha The new mirror alpha value.
-   */
-  void SetAlpha(float alpha);
-
-  /**
-   * Get the name for the depth property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetDepthPropertyName() const;
-
-  /**
-   * Get the name for the alpha property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAlphaPropertyName() const;
-
-private: // Not intended for application developers
-  DALI_INTERNAL MirrorEffect(ShaderEffect handle);
-};
 
 } // namespace Toolkit
 

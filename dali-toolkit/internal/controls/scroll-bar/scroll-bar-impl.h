@@ -201,6 +201,11 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
+   * @copydoc Toolkit::Control::OnPan
+   */
+  virtual void OnPan( const PanGesture& gesture );
+
+  /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
   virtual void OnSizeSet( const Vector3& size );
@@ -243,14 +248,6 @@ private:
    */
   void OnIndicatorHeightPolicyPropertySet(Property::Value propertyValue);
 
-  /**
-   * Pan gesture callback
-   *
-   * @param[in] actor The actor the event is raised for
-   * @param[in] gesture The pan event info
-   */
-  void OnPan(Actor source, const PanGesture& gesture);
-
 private:
 
   /**
@@ -289,8 +286,6 @@ private:
 
   Toolkit::ScrollBar::IndicatorHeightPolicy mIndicatorHeightPolicy;  ///< The height policy of scroll indicator (variable or fixed)
   float mIndicatorFixedHeight;                                      ///< The fixed height of scroll indicator
-
-  PanGestureDetector mPanGestureDetector;                            ///< The pan gesture detector for scroll indicator
 
   Timer mContractDelayTimer;                                         ///< Timer guarantee contract delay time.
   Timer mPanProcessTimer;                                            ///< The timer to process the pan gesture after the gesture is started.

@@ -29,7 +29,7 @@ namespace Text
 
 namespace BasicShadowShader
 {
-
+/*
 Dali::ShaderEffect New()
 {
   std::string vertexShader = DALI_COMPOSE_SHADER(
@@ -49,11 +49,10 @@ Dali::ShaderEffect New()
   );
 
   Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( vertexShader, fragmentShader,
-                                                             Dali::GeometryType( Dali::GEOMETRY_TYPE_TEXTURED_MESH ),
                                                              Dali::ShaderEffect::GeometryHints( Dali::ShaderEffect::HINT_NONE ) );
   return shaderEffect;
 }
-
+*/
 } // namespace BasicShadowShader
 
 } // namespace Text

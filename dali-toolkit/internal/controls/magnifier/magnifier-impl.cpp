@@ -24,11 +24,35 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 
-using namespace Dali;
+namespace Dali
+{
+
+namespace Toolkit
+{
+
+namespace Internal
+{
 
 namespace // unnamed namespace
 {
+
+
+Dali::BaseHandle Create()
+{
+  return Toolkit::Magnifier::New();
+}
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Magnifier, Toolkit::Control, Create )
+
+DALI_PROPERTY_REGISTRATION( Toolkit, Magnifier, "frame-visibility",     BOOLEAN, FRAME_VISIBILITY     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Magnifier, "magnification-factor", FLOAT,   MAGNIFICATION_FACTOR )
+
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Magnifier, "source-position", VECTOR3, SOURCE_POSITION )
+
+DALI_TYPE_REGISTRATION_END()
 
 const char* DEFAULT_FRAME_IMAGE_PATH = DALI_IMAGE_DIR "magnifier-image-frame.png";
 
@@ -92,16 +116,7 @@ struct RenderTaskViewportSizeConstraint
   }
 };
 
-}
-
-namespace Dali
-{
-
-namespace Toolkit
-{
-
-namespace Internal
-{
+} // unnamed namespace
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Magnifier
@@ -124,7 +139,6 @@ Dali::Toolkit::Magnifier Magnifier::New()
 
 Magnifier::Magnifier()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
-  mPropertySourcePosition(Property::INVALID_INDEX),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
@@ -136,15 +150,9 @@ void Magnifier::SetSourceActor(Actor actor)
   mTask.SetSourceActor( actor );
 }
 
-void Magnifier::SetSourcePosition(const Vector3& position)
-{
-  Self().SetProperty(mPropertySourcePosition, position);
-}
-
 void Magnifier::Initialize()
 {
   Actor self = Self();
-  mPropertySourcePosition = self.RegisterProperty( Toolkit::Magnifier::SOURCE_POSITION_PROPERTY_NAME, Vector3::ZERO );
   Vector2 stageSize(Stage::GetCurrent().GetSize());
 
   // NOTE:
@@ -161,7 +169,7 @@ void Magnifier::Initialize()
   Stage().GetCurrent().Add(mSourceActor);
   mSourceActor.SetParentOrigin(ParentOrigin::CENTER);
   Constraint constraint = Constraint::New<Vector3>( mSourceActor, Actor::Property::POSITION, EqualToConstraint() );
-  constraint.AddSource( Source( self, mPropertySourcePosition ) );
+  constraint.AddSource( Source( self, Toolkit::Magnifier::Property::SOURCE_POSITION ) );
   constraint.Apply();
 
   // create the render task this will render content on top of everything
@@ -247,7 +255,6 @@ void Magnifier::SetFrameVisibility(bool visible)
 
     Image image = ResourceImage::New( DEFAULT_FRAME_IMAGE_PATH );
     mFrame = ImageActor::New( image );
-    mFrame.SetDrawMode(DrawMode::OVERLAY);
     mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );
     mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
     mFrame.SetInheritScale(true);
@@ -315,6 +322,56 @@ void Magnifier::Update()
 
   // Adjust aspect ratio to compensate for rectangular viewports.
   mCameraActor.SetAspectRatio( worldSize.width / worldSize.height );
+}
+
+void Magnifier::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::Magnifier magnifier = Toolkit::Magnifier::DownCast( Dali::BaseHandle( object ) );
+
+  if( magnifier )
+  {
+    Magnifier& magnifierImpl( GetImpl( magnifier ) );
+    switch( index )
+    {
+      case Toolkit::Magnifier::Property::FRAME_VISIBILITY:
+      {
+        magnifierImpl.SetFrameVisibility( value.Get< bool >() );
+        break;
+      }
+      case Toolkit::Magnifier::Property::MAGNIFICATION_FACTOR:
+      {
+        magnifierImpl.SetMagnificationFactor( value.Get< float >() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value Magnifier::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::Magnifier magnifier = Toolkit::Magnifier::DownCast( Dali::BaseHandle( object ) );
+
+  if( magnifier )
+  {
+    Magnifier& magnifierImpl( GetImpl( magnifier ) );
+    switch( index )
+    {
+      case Toolkit::Magnifier::Property::FRAME_VISIBILITY:
+      {
+        value = magnifierImpl.GetFrameVisibility();
+        break;
+      }
+      case Toolkit::Magnifier::Property::MAGNIFICATION_FACTOR:
+      {
+        value = magnifierImpl.GetMagnificationFactor();
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 } // namespace Internal

@@ -453,6 +453,7 @@ void TextLabel::OnInitialize()
   // Enable the text ellipsis.
   LayoutEngine& engine = mController->GetLayoutEngine();
   engine.SetTextEllipsisEnabled( true );
+  self.OnStageSignal().Connect( this, &TextLabel::OnStageConnect );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -479,38 +480,62 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     {
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
-
-    RenderableActor renderableActor;
-    if( mRenderer )
-    {
-      renderableActor = mRenderer->Render( mController->GetView() );
-    }
-
-    if( renderableActor != mRenderableActor )
-    {
-      UnparentAndReset( mRenderableActor );
-
-      if( renderableActor )
-      {
-        const Vector2& alignmentOffset = mController->GetAlignmentOffset();
-        renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
-
-        Self().Add( renderableActor );
-      }
-
-      mRenderableActor = renderableActor;
-    }
+    RenderText();
   }
-}
-
-void TextLabel::AddDecoration( Actor& actor )
-{
-  // TextLabel does not show decorations
 }
 
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+void TextLabel::RenderText()
+{
+  Actor self = Self();
+  Actor renderableActor;
+  if( mRenderer )
+  {
+    renderableActor = mRenderer->Render( mController->GetView(), self.GetHierarchyDepth() );
+  }
+
+  if( renderableActor != mRenderableActor )
+  {
+    UnparentAndReset( mRenderableActor );
+
+    if( renderableActor )
+    {
+      const Vector2& alignmentOffset = mController->GetAlignmentOffset();
+      renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
+
+      self.Add( renderableActor );
+    }
+    mRenderableActor = renderableActor;
+  }
+}
+
+void TextLabel::OnStageConnect( Dali::Actor actor )
+{
+  if ( mHasBeenStaged )
+  {
+    RenderText();
+  }
+  else
+  {
+    mHasBeenStaged = true;
+  }
+}
+
+void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
+{
+  // TextLabel does not show decorations
+}
+
+void TextLabel::OnStageConnection( int depth )
+{
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
 void TextLabel::TextChanged()
@@ -525,7 +550,8 @@ void TextLabel::MaxLengthReached()
 
 TextLabel::TextLabel()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
-  mRenderingBackend( DEFAULT_RENDERING_BACKEND )
+  mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
+  mHasBeenStaged( false )
 {
 }
 

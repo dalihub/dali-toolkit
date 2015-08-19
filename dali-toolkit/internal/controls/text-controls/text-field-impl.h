@@ -27,6 +27,9 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+
 namespace Dali
 {
 
@@ -137,6 +140,16 @@ private: // From Control
   virtual void OnPan( const PanGesture& gesture );
 
   /**
+   * @copydoc Control::OnLongPress()
+   */
+  virtual void OnLongPress( const LongPressGesture& gesture );
+
+  /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
@@ -144,7 +157,7 @@ private: // From Control
   /**
    * @copydoc Text::ControlInterface::AddDecoration()
    */
-  virtual void AddDecoration( Actor& actor );
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
@@ -165,6 +178,12 @@ private: // From Control
    * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
    */
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+
+  /**
+   * @brief Callback when Clipboard signals an item should be pasted
+   * @param[in] clipboard handle to Clipboard Event Notifier
+   */
+  void OnClipboardTextSelected( ClipboardEventNotifier& clipboard );
 
 private: // Implementation
 
@@ -205,6 +224,14 @@ private: // Implementation
   TextField(const TextField&);
   TextField& operator=(const TextField& rhs);
 
+  /**
+   * @brief Render view, create and attach actor(s) to this Text Field.
+   */
+  void RenderText();
+
+  // Connection needed to re-render text, when a Text Field returns to the stage.
+  void OnStageConnect( Dali::Actor actor );
+
 private: // Data
 
   // Signals
@@ -215,11 +242,13 @@ private: // Data
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
   Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
+  std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
-  RenderableActor mRenderableActor;
+  Actor mRenderableActor;
 
   int mRenderingBackend;
   int mExceedPolicy;
+  bool mHasBeenStaged:1;
 };
 
 } // namespace Internal

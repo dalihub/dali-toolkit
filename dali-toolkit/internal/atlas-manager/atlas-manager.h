@@ -20,9 +20,9 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/devel-api/geometry/mesh-data.h>
-#include <dali/devel-api/images/atlas.h>
 #include <dali/public-api/images/buffer-image.h>
+#include <dali/devel-api/images/atlas.h>
+#include <dali/devel-api/rendering/material.h>
 
 namespace Dali
 {
@@ -162,10 +162,10 @@ public:
 
   struct AtlasSize
   {
-    SizeType mWidth;              // width of the atlas in pixels
-    SizeType mHeight;             // height of the atlas in pixels
-    SizeType mBlockWidth;         // width of a block in pixels
-    SizeType mBlockHeight;        // height of a block in pixels
+    SizeType mWidth;              ///< width of the atlas in pixels
+    SizeType mHeight;             ///< height of the atlas in pixels
+    SizeType mBlockWidth;         ///< width of a block in pixels
+    SizeType mBlockHeight;        ///< height of a block in pixels
   };
 
   /**
@@ -174,17 +174,37 @@ public:
    */
   struct AtlasMetricsEntry
   {
-    AtlasSize mSize;                 // size of atlas and blocks
-    SizeType mBlocksUsed;            // number of blocks used in the atlas
-    SizeType mTotalBlocks;           // total blocks used by atlas
-    Pixel::Format mPixelFormat;      // pixel format of the atlas
+    AtlasSize mSize;                 ///< size of atlas and blocks
+    SizeType mBlocksUsed;            ///< number of blocks used in the atlas
+    SizeType mTotalBlocks;           ///< total blocks used by atlas
+    Pixel::Format mPixelFormat;      ///< pixel format of the atlas
   };
 
   struct Metrics
   {
-    SizeType mAtlasCount;                               // number of atlases
-    SizeType mTextureMemoryUsed;                        // texture memory used by atlases
-    Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    // container of atlas information
+    Metrics()
+    : mAtlasCount( 0u ),
+      mTextureMemoryUsed( 0u )
+    {}
+
+    ~Metrics()
+    {}
+
+    SizeType mAtlasCount;                               ///< number of atlases
+    SizeType mTextureMemoryUsed;                        ///< texture memory used by atlases
+    Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    ///< container of atlas information
+  };
+
+  struct Vertex2D
+  {
+    Vector2 mPosition;
+    Vector2 mTexCoords;
+  };
+
+  struct Mesh2D
+  {
+    Vector< Vertex2D > mVertices;
+    Vector< unsigned int> mIndices;
   };
 
   /**
@@ -221,8 +241,8 @@ public:
    */
   struct AtlasSlot
   {
-    ImageId mImageId;                           // Id of stored Image
-    AtlasId mAtlasId;                           // Id of Atlas containing this slot
+    ImageId mImageId;                           ///< Id of stored Image
+    AtlasId mAtlasId;                           ///< Id of Atlas containing this slot
   };
 
   typedef Dali::Vector< AtlasManager::AtlasSlot > slotContainer;
@@ -278,7 +298,7 @@ public:
    */
   void GenerateMeshData( ImageId id,
                          const Vector2& position,
-                         MeshData& mesh,
+                         Mesh2D& mesh,
                          bool addReference = true );
 
   /**
@@ -288,8 +308,8 @@ public:
    * @param[in] second Second mesh
    * @param[in] optimize should we optimize vertex data
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second,
+  void StitchMesh( Mesh2D& first,
+                   const Mesh2D& second,
                    bool optimize = false );
 
   /**
@@ -300,9 +320,9 @@ public:
    * @param[in] optimize should we optimize vertex data
    * @param[out] out resulting mesh
    */
-  void StitchMesh( const MeshData& first,
-                   const MeshData& second,
-                   MeshData& out,
+  void StitchMesh( const Mesh2D& first,
+                   const Mesh2D& second,
+                   Mesh2D& out,
                    bool optimize = false );
 
   /**
@@ -372,6 +392,23 @@ public:
    */
   void GetMetrics( Metrics& metrics );
 
+  /**
+   * @brief Get Material used by atlas
+   *
+   * @param atlas[in] atlas AtlasId
+   *
+   * @return Material used by atlas
+   */
+  Material GetMaterial( AtlasId atlas ) const;
+
+ /**
+   * @brief Get Sampler used by atlas
+   *
+   * @param atlas[in] atlas AtlasId
+   *
+   * @return Sampler used by atlas
+   */
+  Sampler GetSampler( AtlasId atlas ) const;
 private:
 
   explicit DALI_INTERNAL AtlasManager(Internal::AtlasManager *impl);

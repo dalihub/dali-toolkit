@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali
 {
@@ -50,7 +51,6 @@ Dali::ShaderEffect New()
   );
 
   Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( vertexShader, fragmentShader,
-                                                             Dali::GeometryType( Dali::GEOMETRY_TYPE_TEXTURED_MESH ),
                                                              Dali::ShaderEffect::GeometryHints( Dali::ShaderEffect::HINT_NONE ) );
   return shaderEffect;
 }

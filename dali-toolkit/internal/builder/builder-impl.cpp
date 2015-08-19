@@ -67,6 +67,8 @@ Integration::Log::Filter* gFilterScript  = Integration::Log::Filter::New(Debug::
 namespace
 {
 
+#define TOKEN_STRING(x) #x
+
 const std::string KEYNAME_STYLES    = "styles";
 const std::string KEYNAME_TYPE      = "type";
 const std::string KEYNAME_ACTORS    = "actors";
@@ -120,11 +122,6 @@ std::string PropertyValueToString( const Property::Value& value )
     case Property::INTEGER:
     {
       ret = ToString( value.Get<int>() );
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      ret = ToString( value.Get<unsigned int>() );
       break;
     }
     case Property::VECTOR2:
@@ -258,7 +255,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
       // special field 'effect' references the shader effect instances
       if(key == "effect")
       {
-        RenderableActor actor = RenderableActor::DownCast(handle);
+        ImageActor actor = ImageActor::DownCast(handle);
         if( actor )
         {
           OptionalString str = constant.IsString( keyChild.second );
@@ -282,7 +279,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
 
       if( Property::INVALID_INDEX == index )
       {
-        RenderableActor actor = RenderableActor::DownCast(handle);
+        ImageActor actor = ImageActor::DownCast(handle);
         if( actor )
         {
           if( ShaderEffect effect = actor.GetShaderEffect() )
@@ -1357,6 +1354,13 @@ Builder::Builder()
 : mSlotDelegate( this )
 {
   mParser = Dali::Toolkit::JsonParser::New();
+
+  Property::Map defaultDirs;
+  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]  = DALI_IMAGE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]  = DALI_SOUND_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ] = DALI_STYLE_DIR;
+
+  AddConstants( defaultDirs );
 }
 
 Builder::~Builder()

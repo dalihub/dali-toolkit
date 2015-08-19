@@ -38,6 +38,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class FeedbackStyle;
+
 /**
  * @copydoc Toolkit::StyleManager
  */
@@ -109,6 +112,13 @@ public:
    * @param[in] control The control to apply style.
    */
   void ApplyThemeStyle( Toolkit::Control control );
+
+  /**
+   * @brief Apply the theme style to a control at initialization.
+   *
+   * @param[in] control The control to apply style.
+   */
+  void ApplyThemeStyleAtInit( Toolkit::Control control );
 
   /**
    * @copydoc Toolkit::StyleManager::ApplyStyle
@@ -250,6 +260,8 @@ private:
   Property::Map mStyleBuilderConstants;   ///< Constants specific to building styles
 
   BuilderMap mBuilderCache;           ///< Cache of builders keyed by JSON file name
+
+  Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
   // Signals
   Toolkit::StyleManager::StyleChangeSignalType       mStyleChangeSignal;         ///< Emitted when the style( theme/font ) changes

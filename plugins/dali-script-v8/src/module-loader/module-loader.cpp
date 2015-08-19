@@ -29,7 +29,6 @@ namespace V8Plugin
 
 ModuleLoader::ModuleLoader()
 {
-
 }
 
 ModuleLoader::~ModuleLoader()
@@ -96,6 +95,11 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
   std::string contents;
 
   V8Utils::GetFileContents( fileName, contents );
+
+  if( contents.empty() )
+  {
+    return false;
+  }
 
   return ExecuteScript( isolate, contents, fileName );
 }
@@ -306,9 +310,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  * @for ModuleLoader
  *
  */
-void ModuleLoader::Require(const v8::FunctionCallbackInfo< v8::Value >& args,
-
-                           v8::Persistent<v8::ObjectTemplate>& globalObjectTemplate )
+void ModuleLoader::Require(const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
@@ -388,6 +390,12 @@ void ModuleLoader::Require(const v8::FunctionCallbackInfo< v8::Value >& args,
   args.GetReturnValue().Set( moduleExports );
 
 }
+
+void ModuleLoader::StorePreBuiltModule( v8::Isolate* isolate, v8::Local<v8::Object>& exportObject, const std::string& name )
+{
+  StoreModule( "", name, name, isolate, exportObject );
+}
+
 void ModuleLoader::StoreScriptInfo( const std::string& sourceFileName )
 {
   V8Utils::GetFileDirectory( sourceFileName, mCurrentScriptPath);

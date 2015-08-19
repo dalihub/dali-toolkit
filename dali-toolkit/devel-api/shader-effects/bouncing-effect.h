@@ -28,69 +28,79 @@ namespace Toolkit
 {
 
 /**
- * @brief BouncingEffect is a custom overscroll effect with two waves appearing at two sides then moving towards center and overlapping.
+ * @brief Creates a new bouncing effect
+ *
+ * BouncingEffect is a custom overscroll effect with two waves appearing at two sides then moving towards center and overlapping.
  *
  * Usage Example:
  *
  *  // Create the an imageActor, set shader effect, and add it to the stage
  *  ImageActor imageActor = ImageActor::New( BufferImage::New( 1, 1 ) );
  *  imageActor.SetSize(720.f,58.f);
- *  Toolkit::BouncingEffect bouncingEffect = Toolkit::BouncingEffect::New( Vector4(0.f,1.f,1.f,0.5f) );
+ *  Toolkit::ShaderEffect bouncingEffect = CreateBouncingEffect( Vector4(0.f,1.f,1.f,0.5f) );
  *  imageActor.SetShaderEffect( bouncingEffect );
  *  imageActor.SetParentOrigin( ParentOrigin::CENTER );
  *  Stage::GetCurrent().Add( imageActor );
  *
  *   // Start the animation
  *   Animation animation = Animation::New(1.f);
- *   animation.AnimateTo( Property( bouncingEffect, bouncingEffect.GetProgressRatePropertyName() ),
+ *   animation.AnimateTo( Property( bouncingEffect,"uProgressRate" ),
  *                        1.f, AlphaFunction::BOUNCE );
  *   animation.Play();
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uProgressRate" - The progress rate to the effect
+ *
+ * @param[in] color The color used on the bouncing stripe
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API BouncingEffect : public ShaderEffect
+
+inline ShaderEffect CreateBouncingEffect(const Vector4& color)
 {
-public:
+  std::string fragmentShader = DALI_COMPOSE_SHADER(
+      precision mediump float;\n
+      uniform float uProgressRate;\n
+      uniform vec4 uAssignedColor;\n
+      void main()\n
+      {\n
+        float progressRate = abs(uProgressRate)*0.5;\n
+        float amplitude = 0.15 - progressRate*0.15 ;\n
+        float x1 = 7.5 * (vTexCoord.x - progressRate);\n
+        float x2 = 7.5 * (vTexCoord.x - 1.0 + progressRate);\n
+        float height1 = max(0.00001, 0.3 - amplitude * ( exp(x1) + exp(-x1) ) );\n
+        float height2 = max(0.00001, 0.3 - amplitude * ( exp(x2) + exp(-x2) ) );\n
+        float height3 = max(0.00001, 1.0 - 3.0 * amplitude * ( exp(x1*0.5) + exp(-x1*0.5) ) );\n
+        float height4 = max(0.00001, 1.0 - 3.0 * amplitude * ( exp(x2*0.5) + exp(-x2*0.5) ) );\n
+        vec4 fragColor = vec4(0.0);\n
+        float y = vTexCoord.y/(height1+height2);\n
+        float y2 = vTexCoord.y/max(height3,height4);\n
+        float coef = max(height1,height2)*5.0/( 1.0+exp(y*12.0-6.0) );\n
+        float alpha = pow( max(0.0,(1.0-y2))*(1.0-min(abs(x1),abs(x2))/5.0), 2.0);\n
+        if( vTexCoord.y < 0.075 )\n
+        {\n
+          fragColor= mix(uAssignedColor, vec4(1.0), coef);\n
+          fragColor += (vec4(1.0)-fragColor) * alpha;\n
+        }\n
+        else if (y2<1.0)\n
+        {\n
+          fragColor =vec4(1.0,1.0,1.0, alpha + (1.0-alpha)*coef);\n
+          fragColor.rgb -= ( vec3(1.0)-uAssignedColor.rgb )*min(clamp(y*1.2-0.3, 0.0, 0.3),clamp(0.9-y*1.2,0.0,0.3));\n
+        }\n
+        fragColor.a *= 10.0*min(min(vTexCoord.x, 1.0-vTexCoord.x),0.1)*min(1.0, progressRate/0.2);\n
+        gl_FragColor =  fragColor;\n
+      }
+  );
 
-  /**
-   * @brief Creates an empty BouncingEffect handle
-   */
-  BouncingEffect();
+  ShaderEffect shaderEffect;
+  shaderEffect = ShaderEffect::New( "", fragmentShader,
+                                    ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~BouncingEffect();
+  shaderEffect.SetUniform( "uAssignedColor", color );
+  shaderEffect.SetUniform( "uProgressRate", 0.0f );
 
-  /**
-   * @brief Create a BouncingEffect object
-   *
-   * @param[in] color The color used on the bouncing stripe
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static BouncingEffect New( const Vector4& color );
+  return shaderEffect;
+}
 
-  /**
-   * @brief Set the progress rate to the effect.
-   *
-   * The whole progress ( with progress rate from 0.0 to 1.0 ):
-   *      two waves appear at two sides; move towards center and overlap.
-   * @param[in] progressRate The progress rate value.
-   */
-  void SetProgressRate( float progressRate );
-
-  /**
-   * @brief Get the name for the progress rate property.
-   *
-   * @return A std::string containing the property name.
-   */
-  const std::string& GetProgressRatePropertyName() const;
-
-
-private: // Not intended for application developers
-  DALI_INTERNAL BouncingEffect( ShaderEffect handle );
-
-};
 
 } // namespace Toolkit
 

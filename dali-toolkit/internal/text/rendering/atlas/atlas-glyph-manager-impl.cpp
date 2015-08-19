@@ -20,6 +20,71 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/integration-api/debug.h>
+
+#define MAKE_SHADER(A)#A
+
+namespace
+{
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+#endif
+
+const char* VERTEX_SHADER = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
+uniform   mediump mat4    uMvpMatrix;
+uniform   mediump vec3    uSize;
+varying   mediump vec2    vTexCoord;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  position.xyz *= uSize;
+  gl_Position = uMvpMatrix * position;
+  vTexCoord = aTexCoord;
+}
+);
+
+const char* FRAGMENT_SHADER = MAKE_SHADER(
+uniform         sampler2D sTexture;
+varying mediump vec2      vTexCoord;
+
+void main()
+{
+  gl_FragColor = texture2D( sTexture, vTexCoord );
+}
+);
+
+const char* VERTEX_SHADER_SHADOW = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
+uniform   mediump vec3    uSize;
+varying   mediump vec2    vTexCoord;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  position.xyz *= uSize;
+  gl_Position = position;
+  vTexCoord = aTexCoord;
+}
+);
+
+const char* FRAGMENT_SHADER_SHADOW = MAKE_SHADER(
+uniform         sampler2D sTexture;
+uniform lowp    vec4      uColor;
+varying mediump vec2      vTexCoord;
+
+void main()
+{
+  mediump vec4 color = texture2D( sTexture, vTexCoord );
+  gl_FragColor = vec4(uColor.rgb, uColor.a*color.r);
+}
+);
+
+} // unnamed namespace
 
 namespace Dali
 {
@@ -30,41 +95,19 @@ namespace Toolkit
 namespace Internal
 {
 
-//#define DISPLAY_ATLAS
-
 AtlasGlyphManager::AtlasGlyphManager()
-: mCount( 0 )
 {
   mAtlasManager = Dali::Toolkit::AtlasManager::New();
+  mEffectBufferShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW, Dali::Shader::HINT_MODIFIES_GEOMETRY );
 }
 
-AtlasGlyphManager::~AtlasGlyphManager()
-{
-  // Clear up any remaining references
-  for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
-        fontGlyphRecordIt != mFontGlyphRecords.end();
-        ++fontGlyphRecordIt )
-  {
-    for ( Vector< GlyphRecordEntry >::Iterator glyphRecordEntryIt = fontGlyphRecordIt->mGlyphRecords.Begin();
-          glyphRecordEntryIt != fontGlyphRecordIt->mGlyphRecords.End();
-          ++glyphRecordEntryIt )
-    {
-      mAtlasManager.Remove( glyphRecordEntryIt->mImageId );
-    }
-  }
-}
-
-AtlasGlyphManagerPtr AtlasGlyphManager::New()
-{
-  AtlasGlyphManagerPtr internal = new AtlasGlyphManager();
-  return internal;
-}
-
-void AtlasGlyphManager::Add( Text::FontId fontId,
-                             const Text::GlyphInfo& glyph,
+void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
                              const BufferImage& bitmap,
                              Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Added glyph, font: %d index: %d\n", glyph.fontId, glyph.index );
+
   mAtlasManager.Add( bitmap, slot );
 
   GlyphRecordEntry record;
@@ -77,7 +120,7 @@ void AtlasGlyphManager::Add( Text::FontId fontId,
   for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
         fontGlyphRecordIt != mFontGlyphRecords.end(); ++fontGlyphRecordIt )
   {
-    if ( fontGlyphRecordIt->mFontId == fontId )
+    if ( fontGlyphRecordIt->mFontId == glyph.fontId )
     {
       fontGlyphRecordIt->mGlyphRecords.PushBack( record );
       foundGlyph = true;
@@ -89,46 +132,28 @@ void AtlasGlyphManager::Add( Text::FontId fontId,
   {
     // We need to add a new font entry
     FontGlyphRecord fontGlyphRecord;
-    fontGlyphRecord.mFontId = fontId;
+    fontGlyphRecord.mFontId = glyph.fontId;
     fontGlyphRecord.mGlyphRecords.PushBack( record );
     mFontGlyphRecords.push_back( fontGlyphRecord );
   }
-
-#ifdef DISPLAY_ATLAS
-  {
-    uint32_t atlasCount = mAtlasManager.GetAtlasCount();
-    if ( atlasCount > mCount )
-    {
-      for ( uint32_t i = 0; i < atlasCount; ++i )
-      {
-        ImageActor actor = ImageActor::New( mAtlasManager.GetAtlasContainer( i + 1u ) );
-        actor.SetParentOrigin( Vector3( 0.5f, 0.25f + ( static_cast< float >( i ) * 0.25f ), 0.5f ) );
-        actor.SetAnchorPoint( AnchorPoint::CENTER );
-        actor.SetSize( 256.0f, 256.0f );
-        Stage::GetCurrent().Add( actor );
-      }
-    }
-    mCount = atlasCount;
-  }
-#endif
 }
 
 void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
                                           const Vector2& position,
-                                          MeshData& meshData )
+                                          Toolkit::AtlasManager::Mesh2D& mesh )
 {
   // Generate mesh data and tell Atlas Manager not to handle reference counting ( we'll do it )
-  mAtlasManager.GenerateMeshData( imageId, position, meshData, false );
+  mAtlasManager.GenerateMeshData( imageId, position, mesh, false );
 }
 
-void AtlasGlyphManager::StitchMesh( MeshData& first,
-                                    const MeshData& second )
+void AtlasGlyphManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                                    const Toolkit::AtlasManager::Mesh2D& second )
 {
   mAtlasManager.StitchMesh( first, second );
 }
 
 bool AtlasGlyphManager::Cached( Text::FontId fontId,
-                                uint32_t index,
+                                Text::GlyphIndex index,
                                 Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
   for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
@@ -177,36 +202,81 @@ Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
-  mMetrics.mGlyphCount = mFontGlyphRecords.size();
-  mAtlasManager.GetMetrics( mMetrics.mAtlasMetrics );
-  return mMetrics;
-}
+  std::ostringstream verboseMetrics;
 
-void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta )
-{
+  mMetrics.mGlyphCount = 0u;
   for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
         fontGlyphRecordIt != mFontGlyphRecords.end();
         ++fontGlyphRecordIt )
   {
-    if ( fontGlyphRecordIt->mFontId == fontId )
+    mMetrics.mGlyphCount += fontGlyphRecordIt->mGlyphRecords.Size();
+
+    verboseMetrics << "[FontId " << fontGlyphRecordIt->mFontId << " Glyph ";
+    for ( Vector< GlyphRecordEntry >::Iterator glyphRecordEntryIt = fontGlyphRecordIt->mGlyphRecords.Begin();
+          glyphRecordEntryIt != fontGlyphRecordIt->mGlyphRecords.End();
+          ++glyphRecordEntryIt )
     {
-      for ( Vector< GlyphRecordEntry >::Iterator glyphRecordIt = fontGlyphRecordIt->mGlyphRecords.Begin();
-            glyphRecordIt != fontGlyphRecordIt->mGlyphRecords.End();
-            ++glyphRecordIt )
+      verboseMetrics << glyphRecordEntryIt->mIndex << "(" << glyphRecordEntryIt->mCount << ") ";
+    }
+    verboseMetrics << "] ";
+  }
+  mMetrics.mVerboseGlyphCounts = verboseMetrics.str();
+
+  mAtlasManager.GetMetrics( mMetrics.mAtlasMetrics );
+
+  return mMetrics;
+}
+
+void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta )
+{
+  if( 0 != delta )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::General, "AdjustReferenceCount %d, font: %d index: %d\n", delta, fontId, index );
+
+    for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
+          fontGlyphRecordIt != mFontGlyphRecords.end();
+          ++fontGlyphRecordIt )
+    {
+      if ( fontGlyphRecordIt->mFontId == fontId )
       {
-        if ( glyphRecordIt->mImageId == imageId )
+        for ( Vector< GlyphRecordEntry >::Iterator glyphRecordIt = fontGlyphRecordIt->mGlyphRecords.Begin();
+              glyphRecordIt != fontGlyphRecordIt->mGlyphRecords.End();
+              ++glyphRecordIt )
         {
-          glyphRecordIt->mCount += delta;
-          if ( !glyphRecordIt->mCount )
+          if ( glyphRecordIt->mIndex == index )
           {
-            mAtlasManager.Remove( glyphRecordIt->mImageId );
-            fontGlyphRecordIt->mGlyphRecords.Remove( glyphRecordIt );
+            glyphRecordIt->mCount += delta;
+            DALI_ASSERT_DEBUG( glyphRecordIt->mCount >= 0 && "Glyph ref-count should not be negative" );
+
+            if ( !glyphRecordIt->mCount )
+            {
+              mAtlasManager.Remove( glyphRecordIt->mImageId );
+              fontGlyphRecordIt->mGlyphRecords.Remove( glyphRecordIt );
+            }
+            return;
           }
-          return;
         }
       }
     }
+
+    // Should not arrive here
+    DALI_ASSERT_DEBUG( false && "Failed to adjust ref-count" );
   }
+}
+
+Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
+{
+  return mAtlasManager.GetMaterial( atlasId );
+}
+
+Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+{
+  return mAtlasManager.GetSampler( atlasId );
+}
+
+AtlasGlyphManager::~AtlasGlyphManager()
+{
+  // mAtlasManager handle is automatically released here
 }
 
 } // namespace Internal

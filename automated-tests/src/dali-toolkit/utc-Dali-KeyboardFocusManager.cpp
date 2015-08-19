@@ -594,7 +594,7 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
 
   bool focusedActorActivatedSignalVerified = false;
   FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
-  manager.FocusedActorActivatedSignal().Connect( &focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback );
+  manager.FocusedActorEnterKeySignal().Connect( &focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback );
 
   Integration::KeyEvent returnEvent("Return", "", 0, 0, 0, Integration::KeyEvent::Up);
 

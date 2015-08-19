@@ -67,7 +67,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
     // If ellipsis is enabled, the number of glyphs the layout engine has laid out may be less than 'numberOfGlyphs'.
     // Check the last laid out line to know if the layout engine elided some text.
 
-    const Length numberOfLines = mImpl->mVisualModel->GetNumberOfLines();
+    const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
     if( numberOfLines > 0u )
     {
       const LineRun& lastLine = *( mImpl->mVisualModel->mLines.Begin() + ( numberOfLines - 1u ) );
@@ -302,8 +302,8 @@ Length View::GetNumberOfGlyphs() const
   {
     VisualModel& model = *mImpl->mVisualModel;
 
-    Length glyphCount = model.GetNumberOfGlyphs();
-    Length positionCount = model.GetNumberOfGlyphPositions();
+    const Length glyphCount = model.mGlyphs.Count();
+    const Length positionCount = model.mGlyphPositions.Count();
 
     DALI_ASSERT_DEBUG( positionCount <= glyphCount && "Invalid glyph positions in Model" );
 
