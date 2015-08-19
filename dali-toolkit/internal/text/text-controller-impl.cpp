@@ -1709,7 +1709,7 @@ void Controller::Impl::UpdateCursorPosition()
     return;
   }
 
-  if( IsShowingPlaceholderText() )
+  if( IsShowingPlaceholderText() || ( 0u == mLogicalModel->mText.Count() ) )
   {
     // Do not want to use the place-holder text to set the cursor position.
 
