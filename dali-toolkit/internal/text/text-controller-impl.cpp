@@ -1320,10 +1320,25 @@ LineIndex Controller::Impl::GetClosestLine( float y ) const
 void Controller::Impl::FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex )
 {
   CharacterIndex hitCharacter = GetClosestCursorIndex( visualX, visualY );
+  DALI_ASSERT_DEBUG( hitCharacter <= mLogicalModel->mText.Count() && "GetClosestCursorIndex returned out of bounds index" );
+
+  if ( mLogicalModel->mText.Count() == 0 )
+  {
+    return;  // if model empty
+  }
+
   if( hitCharacter >= mLogicalModel->mText.Count() )
   {
-    // Selection out of bounds.
-    return;
+    // Closest hit character is the last character.
+    if ( hitCharacter ==  mLogicalModel->mText.Count() )
+    {
+      hitCharacter--; //Hit character index set to last character in logical model
+    }
+    else
+    {
+      // hitCharacter is out of bounds
+      return;
+    }
   }
 
   startIndex = hitCharacter;
@@ -1355,6 +1370,8 @@ void Controller::Impl::FindSelectionIndices( float visualX, float visualY, Chara
 CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
                                                         float visualY )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetClosestCursorIndex %p closest visualX %f visualY %f\n", this, visualX, visualY );
+
   if( NULL == mEventData )
   {
     // Nothing to do if there is no text input.
@@ -1457,6 +1474,8 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   logicalIndex = hasRightToLeftCharacters ? *( visualToLogicalCursorBuffer + visualIndex ) : visualIndex;
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
+
+  DALI_ASSERT_DEBUG( ( logicalIndex <= mLogicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );
 
   return logicalIndex;
 }
