@@ -1390,11 +1390,10 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
   if( NULL != mImpl->mEventData )
   {
-    const bool isShowingPlaceholderText = mImpl->IsShowingPlaceholderText();
     if( 1u == tapCount )
     {
-      if( !isShowingPlaceholderText &&
-          ( EventData::EDITING == mImpl->mEventData->mState ) )
+      if( mImpl->IsShowingRealText() &&
+          EventData::EDITING == mImpl->mEventData->mState )
       {
         mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
       }
@@ -1412,11 +1411,13 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
       mImpl->RequestRelayout();
     }
-    else if( !isShowingPlaceholderText &&
-             mImpl->mEventData->mSelectionEnabled &&
-             ( 2u == tapCount ) )
+    else if( 2u == tapCount )
     {
-      SelectEvent( x, y, false );
+      if( mImpl->mEventData->mSelectionEnabled &&
+          mImpl->IsShowingRealText() )
+      {
+        SelectEvent( x, y, false );
+      }
     }
   }
 
