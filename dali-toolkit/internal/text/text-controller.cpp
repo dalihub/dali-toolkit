@@ -1291,24 +1291,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
         mImpl->mEventData->mPreEditLength = utf32Characters.Count();
         mImpl->mEventData->mPreEditFlag = true;
 
-        if( 0u != mImpl->mVisualModel->mCharactersToGlyph.Count() )
-        {
-          // Add the underline for the pre-edit text.
-          const GlyphIndex* const charactersToGlyphBuffer = mImpl->mVisualModel->mCharactersToGlyph.Begin();
-          const Length* const glyphsPerCharacterBuffer = mImpl->mVisualModel->mGlyphsPerCharacter.Begin();
-
-          const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mImpl->mEventData->mPreEditStartPosition );
-          const CharacterIndex lastPreEditCharacter = mImpl->mEventData->mPreEditStartPosition + ( ( mImpl->mEventData->mPreEditLength > 0u ) ? mImpl->mEventData->mPreEditLength - 1u : 0u );
-          const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
-          const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
-
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex = glyphStart;
-          underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
-
-          // TODO: At the moment the underline runs are only for pre-edit.
-          mImpl->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
-        }
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
       }
     }

@@ -436,6 +436,27 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       glyph.advance = 0.f;
     }
   }
+
+  if( mEventData &&
+      mEventData->mPreEditFlag &&
+      ( 0u != mVisualModel->mCharactersToGlyph.Count() ) )
+  {
+    // Add the underline for the pre-edit text.
+    const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+
+    const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mEventData->mPreEditStartPosition );
+    const CharacterIndex lastPreEditCharacter = mEventData->mPreEditStartPosition + ( ( mEventData->mPreEditLength > 0u ) ? mEventData->mPreEditLength - 1u : 0u );
+    const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
+    const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
+
+    GlyphRun underlineRun;
+    underlineRun.glyphIndex = glyphStart;
+    underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
+
+    // TODO: At the moment the underline runs are only for pre-edit.
+    mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+  }
 }
 
 void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
