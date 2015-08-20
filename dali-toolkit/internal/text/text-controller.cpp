@@ -34,7 +34,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Verbose, true, "LOG_TEXT_CONTROLS");
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
