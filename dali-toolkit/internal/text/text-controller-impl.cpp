@@ -1957,8 +1957,9 @@ void Controller::Impl::ScrollTextToMatchCursor()
   }
 
   // Set which cursors are active according the state.
-  if( ( EventData::EDITING == mEventData->mState ) ||
-      ( EventData::EDITING_WITH_POPUP == mEventData->mState ) ||
+  if( ( EventData::EDITING == mEventData->mState )                  ||
+      ( EventData::EDITING_WITH_POPUP == mEventData->mState )       ||
+      ( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState ) ||
       ( EventData::GRAB_HANDLE_PANNING == mEventData->mState ) )
   {
     if( cursorInfo.isSecondaryCursor )

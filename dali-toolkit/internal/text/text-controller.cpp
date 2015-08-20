@@ -81,9 +81,10 @@ void Controller::SetText( const std::string& text )
   if( mImpl->mEventData )
   {
     // If popup shown then hide it by switching to Editing state
-    if ( EventData::SELECTING == mImpl->mEventData->mState ||
-         EventData::SELECTION_CHANGED == mImpl->mEventData->mState ||
-         EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState )
+    if( ( EventData::SELECTING == mImpl->mEventData->mState )          ||
+        ( EventData::SELECTION_CHANGED == mImpl->mEventData->mState )  ||
+        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
@@ -708,8 +709,9 @@ void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
     mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
 
     // Update the cursor if it's in editing mode.
-    if( ( EventData::EDITING == mImpl->mEventData->mState ) ||
-        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) )
+    if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
+        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
     {
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
@@ -762,8 +764,13 @@ void Controller::TextInsertedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mUpdateCursorPosition = true;
-  mImpl->mEventData->mScrollAfterUpdatePosition = true;
+  if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
+      ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+      ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+  {
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    mImpl->mEventData->mScrollAfterUpdatePosition = true;
+  }
 }
 
 void Controller::TextDeletedEvent()
