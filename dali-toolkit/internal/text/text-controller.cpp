@@ -329,7 +329,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfChars %d\n",
                  this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfChars );
 
-  if( ! mImpl->IsShowingPlaceholderText() )
+  if( !mImpl->IsShowingPlaceholderText() )
   {
     // Delete at current cursor position
     Vector<Character>& currentText = mImpl->mLogicalModel->mText;
@@ -785,7 +785,14 @@ void Controller::TextDeletedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mScrollAfterDelete = true;
+  if( 0u == mImpl->mLogicalModel->mText.Count() )
+  {
+    mImpl->mEventData->mUpdateCursorPosition = true;
+  }
+  else
+  {
+    mImpl->mEventData->mScrollAfterDelete = true;
+  }
 }
 
 bool Controller::DoRelayout( const Size& size,
@@ -1646,7 +1653,21 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
     case ImfManager::DELETESURROUNDING:
     {
-      RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+      update = RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+
+      if( update )
+      {
+        if( 0u != mImpl->mLogicalModel->mText.Count() ||
+            !mImpl->IsPlaceholderAvailable() )
+        {
+          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+        }
+        else
+        {
+          ShowPlaceholderText();
+          mImpl->mEventData->mUpdateCursorPosition = true;
+        }
+      }
       requestRelayout = true;
       break;
     }
