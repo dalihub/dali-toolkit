@@ -25,6 +25,7 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -268,7 +269,7 @@ private:
 
   Toolkit::ScrollBar::Direction mDirection;                          ///< The direction of scroll bar (vertical or horizontal)
 
-  Handle mScrollableObject;                                          ///< Object to be scrolled
+  WeakHandleBase mScrollableObject;                                      ///< Object to be scrolled
 
   Property::Index mPropertyScrollPosition;                           ///< Index of scroll position property owned by the object to be scrolled
   Property::Index mPropertyMinScrollPosition;                        ///< Index of minimum scroll position property owned by the object to be scrolled

@@ -323,7 +323,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         CreateGrabHandle();
 
-        grabHandle.actor.SetPosition( position.x,
+        grabHandle.actor.SetPosition( position.x - floor( 0.5f * mCursorWidth ),
                                       position.y + grabHandle.lineHeight ); // TODO : Fix for multiline.
       }
       grabHandle.actor.SetVisible( isVisible );
@@ -471,7 +471,7 @@ struct Decorator::Impl : public ConnectionTracker
     cursor = CreateSolidColorActor( color );
     cursor.SetSortModifier( DECORATION_DEPTH_INDEX );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
-    cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+    cursor.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
   }
 
   // Add or Remove cursor(s) from parent
