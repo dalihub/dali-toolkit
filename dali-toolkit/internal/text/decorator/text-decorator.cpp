@@ -772,7 +772,6 @@ struct Decorator::Impl : public ConnectionTracker
 
         for( std::size_t v = 0; iter != endIter; ++iter,v+=4 )
         {
-
           QuadCoordinates& quad = *iter;
 
           // top-left (v+0)
@@ -846,7 +845,10 @@ struct Decorator::Impl : public ConnectionTracker
 
       mHighlightQuadList.clear();
 
-      mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
+      if( mHighlightRenderer )
+      {
+        mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
+      }
     }
   }
 
