@@ -537,13 +537,16 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
     if( 1u == tapCount )
     {
-      if( ! IsShowingPlaceholderText() )
+      if( IsShowingRealText() )
       {
         const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
         const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
         mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
                                                                     yPosition );
+
+        // When the cursor position is changing, delay cursor blinking
+        mEventData->mDecorator->DelayCursorBlink();
       }
       else
       {

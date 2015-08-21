@@ -270,6 +270,11 @@ public:
   void StopCursorBlink();
 
   /**
+   * @brief Temporarily stops the cursor from blinking.
+   */
+  void DelayCursorBlink();
+
+  /**
    * @brief Set the interval between cursor blinks.
    *
    * @param[in] seconds The interval in seconds.

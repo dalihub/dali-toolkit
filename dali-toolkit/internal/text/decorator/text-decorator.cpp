@@ -260,6 +260,7 @@ struct Decorator::Impl : public ConnectionTracker
     mTextDepth( 0u ),
     mActiveCopyPastePopup( false ),
     mCursorBlinkStatus( true ),
+    mDelayCursorBlink( false ),
     mPrimaryCursorVisible( false ),
     mSecondaryCursorVisible( false ),
     mSwapSelectionHandles( false ),
@@ -294,7 +295,7 @@ struct Decorator::Impl : public ConnectionTracker
                                     position.y );
         mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
-      mPrimaryCursor.SetVisible( mPrimaryCursorVisible );
+      mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
     }
     if( mSecondaryCursor )
     {
@@ -306,7 +307,7 @@ struct Decorator::Impl : public ConnectionTracker
                                       cursor.position.y );
         mSecondaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
-      mSecondaryCursor.SetVisible( mSecondaryCursorVisible );
+      mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
     }
 
     // Show or hide the grab handle
@@ -535,17 +536,25 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool OnCursorBlinkTimerTick()
   {
-    // Cursor blinking
-    if ( mPrimaryCursor )
+    if( !mDelayCursorBlink )
     {
-      mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
-    }
-    if ( mSecondaryCursor )
-    {
-      mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
-    }
+      // Cursor blinking
+      if ( mPrimaryCursor )
+      {
+        mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
+      }
+      if ( mSecondaryCursor )
+      {
+        mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
+      }
 
-    mCursorBlinkStatus = !mCursorBlinkStatus;
+      mCursorBlinkStatus = !mCursorBlinkStatus;
+    }
+    else
+    {
+      // Resume blinking
+      mDelayCursorBlink = false;
+    }
 
     return true;
   }
@@ -1312,6 +1321,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool                mActiveCopyPastePopup   : 1;
   bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
+  bool                mDelayCursorBlink       : 1; ///< Used to avoid cursor blinking when entering text.
   bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
   bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
   bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
@@ -1408,6 +1418,14 @@ void Decorator::StopCursorBlink()
   {
     mImpl->mCursorBlinkTimer.Stop();
   }
+
+  mImpl->mCursorBlinkStatus = true; // Keep cursor permanently shown
+}
+
+void Decorator::DelayCursorBlink()
+{
+  mImpl->mCursorBlinkStatus = true; // Show cursor for a bit longer
+  mImpl->mDelayCursorBlink = true;
 }
 
 void Decorator::SetCursorBlinkInterval( float seconds )

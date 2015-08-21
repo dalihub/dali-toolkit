@@ -681,6 +681,13 @@ void Controller::ProcessModifyEvents()
     }
   }
 
+  if( mImpl->mEventData &&
+      0 != events.size() )
+  {
+    // When the text is being modified, delay cursor blinking
+    mImpl->mEventData->mDecorator->DelayCursorBlink();
+  }
+
   // Discard temporary text
   events.clear();
 }
@@ -1374,24 +1381,40 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
   {
     if( 1u == tapCount )
     {
+      // This is to avoid unnecessary relayouts when tapping an empty text-field
+      bool relayoutNeeded( false );
+
       if( mImpl->IsShowingRealText() &&
           EventData::EDITING == mImpl->mEventData->mState )
       {
+        // Show grab handle on second tap
         mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        relayoutNeeded = true;
       }
-      else if( EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState  )
+      else if( EventData::EDITING                  != mImpl->mEventData->mState &&
+               EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState )
       {
-        // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+        // Show cursor on first tap
         mImpl->ChangeState( EventData::EDITING );
+        relayoutNeeded = true;
+      }
+      else if( mImpl->IsShowingRealText() )
+      {
+        // Move the cursor
+        relayoutNeeded = true;
       }
 
-      Event event( Event::TAP_EVENT );
-      event.p1.mUint = tapCount;
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
+      // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+      if( relayoutNeeded )
+      {
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = tapCount;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
 
-      mImpl->RequestRelayout();
+        mImpl->RequestRelayout();
+      }
     }
     else if( 2u == tapCount )
     {
