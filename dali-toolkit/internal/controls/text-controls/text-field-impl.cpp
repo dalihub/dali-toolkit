@@ -234,7 +234,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const float pointSize = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_STYLE %f\n", impl.mController.Get(), pointSize );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
 
           if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
           {

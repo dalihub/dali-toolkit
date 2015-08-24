@@ -78,20 +78,20 @@ namespace Text
  * @param[in] numberOfGlyphs The number of glyphs.
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
  * @param[in] visualModel The visual model.
- * @param[in] fontClient The font client.
+ * @param[in] metrics Used to access metrics from FontClient.
  */
 void GetGlyphsMetrics( GlyphIndex glyphIndex,
                        Length numberOfGlyphs,
                        GlyphMetrics& glyphMetrics,
-                       VisualModelPtr visualModel,
-                       TextAbstraction::FontClient& fontClient )
+                       VisualModelPtr& visualModel,
+                       MetricsPtr& metrics )
 {
   const GlyphInfo* glyphsBuffer = visualModel->mGlyphs.Begin();
 
   const GlyphInfo& firstGlyph = *( glyphsBuffer + glyphIndex );
 
   Text::FontMetrics fontMetrics;
-  fontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
+  metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
 
   glyphMetrics.fontHeight = fontMetrics.height;
   glyphMetrics.advance = firstGlyph.advance;
@@ -423,7 +423,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   if( GET_GLYPH_METRICS & operations )
   {
     GlyphInfo* glyphsBuffer = glyphs.Begin();
-    mFontClient.GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
+    mMetrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
 
     // Update the width and advance of all new paragraph characters.
     for( Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it )
@@ -487,7 +487,7 @@ float Controller::Impl::GetDefaultFontLineHeight()
   }
 
   Text::FontMetrics fontMetrics;
-  mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+  mMetrics->GetFontMetrics( defaultFontId, fontMetrics );
 
   return( fontMetrics.ascender - fontMetrics.descender );
 }
@@ -1462,7 +1462,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
                       numberOfGlyphs,
                       glyphMetrics,
                       mVisualModel,
-                      mFontClient );
+                      mMetrics );
 
     const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
 
@@ -1601,7 +1601,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                     primaryNumberOfGlyphs,
                     glyphMetrics,
                     mVisualModel,
-                    mFontClient );
+                    mMetrics );
 
   // Whether to add the glyph's advance to the cursor position.
   // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
@@ -1691,7 +1691,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                       secondaryNumberOfGlyphs,
                       glyphMetrics,
                       mVisualModel,
-                      mFontClient );
+                      mMetrics );
 
     // Set the secondary cursor's position.
     cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
@@ -1777,7 +1777,7 @@ void Controller::Impl::UpdateCursorPosition()
     }
 
     Text::FontMetrics fontMetrics;
-    mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+    mMetrics->GetFontMetrics( defaultFontId, fontMetrics );
 
     lineHeight = fontMetrics.ascender - fontMetrics.descender;
 

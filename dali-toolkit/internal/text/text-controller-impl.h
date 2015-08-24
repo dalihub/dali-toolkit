@@ -207,6 +207,7 @@ struct Controller::Impl
     mFontClient(),
     mClipboard(),
     mView(),
+    mMetrics(),
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
@@ -222,6 +223,10 @@ struct Controller::Impl
     mClipboard = Clipboard::Get();
 
     mView.SetVisualModel( mVisualModel );
+
+    // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
+    mMetrics = Metrics::New( mFontClient );
+    mLayoutEngine.SetMetrics( mMetrics );
 
     // Set the text properties to default
     mVisualModel->SetUnderlineEnabled( false );
@@ -468,8 +473,9 @@ struct Controller::Impl
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
   EventData* mEventData;                   ///< Avoid allocating everything for text input until EnableTextInput().
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
-  Clipboard mClipboard;                   ///< Handle to the system clipboard
+  Clipboard mClipboard;                    ///< Handle to the system clipboard
   View mView;                              ///< The view interface to the rendering back-end.
+  MetricsPtr mMetrics;                     ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color

@@ -331,6 +331,16 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         textCacheEntry.mIndex = glyph.index;
         newTextCache.PushBack( textCacheEntry );
 
+        // Adjust the vertices if the fixed-size font should be down-scaled
+        if( glyph.scaleFactor > 0 )
+        {
+          for( unsigned int i=0; i<newMesh.mVertices.Count(); ++i )
+          {
+            newMesh.mVertices[i].mPosition.x = position.x + ( ( newMesh.mVertices[i].mPosition.x - position.x ) * glyph.scaleFactor );
+            newMesh.mVertices[i].mPosition.y = position.y + ( ( newMesh.mVertices[i].mPosition.y - position.y ) * glyph.scaleFactor );
+          }
+        }
+
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
         StitchTextMesh( meshContainer,
                         newMesh,
