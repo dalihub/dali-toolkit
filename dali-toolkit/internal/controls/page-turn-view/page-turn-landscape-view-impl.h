@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-view-impl.h>
 
 namespace Dali
@@ -59,11 +59,6 @@ protected: // From PageTurnView
    * @copydoc PageTurnView::OnPageTurnViewInitialize
    */
   virtual void OnPageTurnViewInitialize();
-
-  /**
-   * copydoc PageTurnView::NewPAgeFromRenderBuffer
-   */
-  virtual ImageActor NewPageFromRenderBuffer( int pageIndex );
 
   /**
    * @copydoc PageTurnView::OnAddPage

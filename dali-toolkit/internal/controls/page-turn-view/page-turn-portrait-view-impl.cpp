@@ -83,11 +83,6 @@ void PageTurnPortraitView::OnPageTurnViewInitialize()
   mTurningPageLayer.SetParentOrigin( ParentOrigin::CENTER_LEFT );
 }
 
-ImageActor PageTurnPortraitView::NewPageFromRenderBuffer( int pageIndex )
-{
-  return ImageActor::New(mRenderedPage[pageIndex % NUMBER_OF_CACHED_PAGES]);
-}
-
 Vector2 PageTurnPortraitView::SetPanPosition( const Vector2& gesturePosition )
 {
   return gesturePosition;
@@ -98,6 +93,7 @@ void PageTurnPortraitView::SetPanActor( const Vector2& panPosition )
   if( mCurrentPageIndex < mTotalPageCount )
   {
     mPanActor = mPageActors[mCurrentPageIndex%NUMBER_OF_CACHED_PAGES];
+    mTurningPageIndex = mCurrentPageIndex;
   }
   else
   {
@@ -124,7 +120,7 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
   if( mCurrentPageIndex > 0 && gestureSpeed > GESTURE_SPEED_THRESHOLD && offset.x > fabs( offset.y ))
   {
     ImageActor actor = mPageActors[ (mCurrentPageIndex-1) % NUMBER_OF_CACHED_PAGES ];
-    if(actor.GetParent() != mRootOnScreen)
+    if(actor.GetParent() != Self())
     {
       return;
     }
@@ -132,13 +128,16 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
     // Guard against destruction during signal emission
     //Emit signal, to notify that page[mCurrentPageIndex-1] is turning backwards
     Toolkit::PageTurnView handle( GetOwner() );
-    mPageTurnStartedSignal.Emit( handle, static_cast<unsigned int>(mCurrentPageIndex-1), false );
+    mTurningPageIndex = mCurrentPageIndex-1;
+    mPageTurnStartedSignal.Emit( handle, static_cast<unsigned int>(mTurningPageIndex), false );
 
     //update pages
     mCurrentPageIndex--;
     RemovePage( mCurrentPageIndex+NUMBER_OF_CACHED_PAGES_EACH_SIDE );
     AddPage( mCurrentPageIndex-NUMBER_OF_CACHED_PAGES_EACH_SIDE );
     OrganizePageDepth();
+
+    mPageActors[mTurningPageIndex%NUMBER_OF_CACHED_PAGES].SetVisible(true);
 
     // Add the page to tuning page layer and set up PageTurnEffect
     mShadowView.Add( actor );
@@ -152,7 +151,7 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
 
     // Start an animation to turn the previous page back
     Animation animation = Animation::New( PAGE_TURN_OVER_ANIMATION_DURATION );
-    mAnimationActorPair[animation] = actor;
+    mAnimationPageIdPair[animation] = mCurrentPageIndex;
     mAnimationIndexPair[animation] = mIndex;
 
     animation.AnimateTo( Property( mTurnEffect[mIndex], "uCurrentCenter" ),
@@ -166,13 +165,21 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
     {
       SetCullFace( imageActor, CullBack );
     }
-    animation.FinishedSignal().Connect( this, &PageTurnPortraitView::OnTurnedOver );
+    animation.FinishedSignal().Connect( this, &PageTurnPortraitView::TurnedOverBackwards );
   }
 }
 
-void PageTurnPortraitView::OnTurnedOver( Animation& animation )
+void PageTurnPortraitView::OnTurnedOver( ImageActor actor, bool isLeftSide )
 {
-  ImageActor imageActor = ImageActor::DownCast( mAnimationActorPair[ animation ] );
+  if( isLeftSide )
+  {
+    actor.SetVisible( false );
+  }
+}
+
+void PageTurnPortraitView::TurnedOverBackwards( Animation& animation )
+{
+  ImageActor imageActor =  mPageActors[mAnimationPageIdPair[animation] % NUMBER_OF_CACHED_PAGES];
   if( imageActor )
   {
     SetCullFace( imageActor, CullNone );

@@ -8,10 +8,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
   $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-factory.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
@@ -46,12 +42,6 @@ devel_api_effects_view_header_files = \
 
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
-
-devel_api_page_turn_view_header_files = \
-  $(devel_api_src_dir)/controls/page-turn-view/page-factory.h \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
-  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.h
 
 devel_api_popup_header_files = \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.h \
