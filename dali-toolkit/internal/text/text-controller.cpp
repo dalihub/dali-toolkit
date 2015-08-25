@@ -1105,7 +1105,12 @@ void Controller::KeyboardFocusGainEvent()
 
   if( mImpl->mEventData )
   {
-    mImpl->ChangeState( EventData::EDITING );
+    if( ( EventData::INACTIVE == mImpl->mEventData->mState ) ||
+        ( EventData::INTERRUPTED == mImpl->mEventData->mState ) )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+      mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
+    }
 
     if( mImpl->IsShowingPlaceholderText() )
     {
@@ -1113,7 +1118,6 @@ void Controller::KeyboardFocusGainEvent()
       ShowPlaceholderText();
     }
 
-    mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
     mImpl->RequestRelayout();
   }
 }
@@ -1199,7 +1203,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    if ( mImpl->mEventData->mState != EventData::INTERRUPTED &&  mImpl->mEventData->mState != EventData::INACTIVE )
+    if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
+         ( mImpl->mEventData->mState != EventData::INACTIVE ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
