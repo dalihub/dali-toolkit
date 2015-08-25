@@ -363,7 +363,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
   // Copy the fonts set by application developers.
   const Length numberOfFontRuns = fonts.Count();
-  const Vector<FontRun> definedFonts = fonts;
+  const Vector<FontRun> userSetFonts = fonts;
   fonts.Clear();
 
   // Traverse the characters and validate/set the fonts.
@@ -386,8 +386,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
   // Iterators of the font and script runs.
-  Vector<FontRun>::ConstIterator fontRunIt = definedFonts.Begin();
-  Vector<FontRun>::ConstIterator fontRunEndIt = definedFonts.End();
+  Vector<FontRun>::ConstIterator fontRunIt = userSetFonts.Begin();
+  Vector<FontRun>::ConstIterator fontRunEndIt = userSetFonts.End();
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
 

@@ -149,6 +149,9 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 {
   Toolkit::TextField textField = Toolkit::TextField::DownCast( Dali::BaseHandle( object ) );
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField SetProperty\n");
+
+
   if( textField )
   {
     TextField& impl( GetImpl( textField ) );
@@ -210,7 +213,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
           if( impl.mController->GetDefaultFontFamily() != fontFamily )
           {
-            impl.mController->SetDefaultFontFamily( fontFamily );
+            impl.mController->SetDefaultFontFamily( fontFamily, true ); // "true" as SetProperty means user defined font so don't change when system font changes.
           }
         }
         break;
@@ -929,12 +932,10 @@ void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
    {
      case StyleChange::DEFAULT_FONT_CHANGE:
      {
-       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE\n");
-       if ( mController->GetDefaultFontFamily() == "" )
-       {
-         // Property system did not set the font so should update it.
-         // todo instruct text-controller to update model
-       }
+       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange DEFAULT_FONT_CHANGE\n");
+       std::string newFont = styleManager.GetDefaultFontFamily();
+       // Property system did not set the font so should update it.
+       mController->UpdateAfterFontChange( newFont );
        break;
      }
 
@@ -969,6 +970,8 @@ float TextField::GetHeightForWidth( float width )
 
 void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField OnRelayout\n");
+
   if( mController->Relayout( size ) ||
       !mRenderer )
   {

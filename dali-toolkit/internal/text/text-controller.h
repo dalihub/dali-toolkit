@@ -178,8 +178,9 @@ public:
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.
+   * @param[in] userDefined If set by the user
    */
-  void SetDefaultFontFamily( const std::string& defaultFontFamily );
+  void SetDefaultFontFamily( const std::string& defaultFontFamily, bool userDefined );
 
   /**
    * @brief Retrieve the default font family.
@@ -215,6 +216,12 @@ public:
    * @return The default point size.
    */
   float GetDefaultPointSize() const;
+
+  /**
+   * @ brief Update the text after a font change
+   * @param[in] newDefaultFont The new font to change to
+   */
+  void UpdateAfterFontChange( std::string& newDefaultFont );
 
   /**
    * @brief Set the text color
