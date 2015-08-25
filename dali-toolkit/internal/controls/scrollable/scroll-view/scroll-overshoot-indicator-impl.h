@@ -76,11 +76,6 @@ public:
   void Reset();
 
   /**
-   * Clears the overshoot
-   */
-  void ClearOvershoot();
-
-  /**
    * Create an initialized ScrollOvershootIndicator
    *
    * @return A pointer to the created ScrollOvershootIndicator.
