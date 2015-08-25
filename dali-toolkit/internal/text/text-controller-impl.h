@@ -175,8 +175,8 @@ struct ModifyEvent
 struct FontDefaults
 {
   FontDefaults()
-  : mDefaultFontFamily(""),
-    mDefaultFontStyle(""),
+  : mFontDescription(),
+    mFontStyle(),
     mDefaultPointSize(0.0f),
     mFontId(0u)
   {
@@ -187,14 +187,14 @@ struct FontDefaults
     if( !mFontId )
     {
       Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
-      mFontId = fontClient.GetFontId( mDefaultFontFamily, mDefaultFontStyle, pointSize );
+      mFontId = fontClient.GetFontId( mFontDescription, pointSize );
     }
 
     return mFontId;
   }
 
-  std::string mDefaultFontFamily;
-  std::string mDefaultFontStyle;
+  TextAbstraction::FontDescription mFontDescription;
+  std::string mFontStyle;
   float mDefaultPointSize;
   FontId mFontId;
 };
@@ -218,7 +218,7 @@ struct Controller::Impl
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50 ),
     mRecalculateNaturalSize( true ),
-    mUserDefinedFontFamily( false)
+    mUserDefinedFontFamily( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -488,7 +488,7 @@ struct Controller::Impl
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
-  bool mUserDefinedFontFamily:1;           ///< Whether the Font family was Set by the user instead of being left as sytem default
+  bool mUserDefinedFontFamily:1;           ///< Whether the Font family was set by the user instead of being left as sytem default.
 };
 
 } // namespace Text

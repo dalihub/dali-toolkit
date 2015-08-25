@@ -19,14 +19,12 @@
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
-#include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -158,15 +156,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          const std::string fontStyle = value.Get< std::string >();
-
-          if( impl.mController->GetDefaultFontStyle() != fontStyle )
-          {
-            impl.mController->SetDefaultFontStyle( fontStyle );
-          }
-        }
+        SetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:
@@ -341,10 +331,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontStyle();
-        }
+        GetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:

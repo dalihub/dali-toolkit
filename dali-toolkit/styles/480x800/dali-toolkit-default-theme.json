@@ -110,7 +110,7 @@ distributing this software or its derivatives.
       "label":
       {
         "point-size":8,
-        "font-style":"Light"
+        "font-style":"{\"weight\":\"light\"}"
       }
     },
     "scrollview":

@@ -19,21 +19,17 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <iostream>
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
-#include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -57,7 +53,6 @@ namespace // unnamed namespace
 #endif
 
   const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
-
 } // unnamed namespace
 
 namespace
@@ -220,16 +215,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          const std::string fontStyle = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_STYLE %s\n", impl.mController.Get(), fontStyle.c_str() );
-
-          if( impl.mController->GetDefaultFontStyle() != fontStyle )
-          {
-            impl.mController->SetDefaultFontStyle( fontStyle );
-          }
-        }
+        SetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextField::Property::POINT_SIZE:
@@ -630,10 +616,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontStyle();
-        }
+        GetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextField::Property::POINT_SIZE:
