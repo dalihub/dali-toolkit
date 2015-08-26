@@ -436,6 +436,27 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       glyph.advance = 0.f;
     }
   }
+
+  if( mEventData &&
+      mEventData->mPreEditFlag &&
+      ( 0u != mVisualModel->mCharactersToGlyph.Count() ) )
+  {
+    // Add the underline for the pre-edit text.
+    const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+
+    const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mEventData->mPreEditStartPosition );
+    const CharacterIndex lastPreEditCharacter = mEventData->mPreEditStartPosition + ( ( mEventData->mPreEditLength > 0u ) ? mEventData->mPreEditLength - 1u : 0u );
+    const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
+    const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
+
+    GlyphRun underlineRun;
+    underlineRun.glyphIndex = glyphStart;
+    underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
+
+    // TODO: At the moment the underline runs are only for pre-edit.
+    mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+  }
 }
 
 void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
@@ -516,13 +537,16 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
     if( 1u == tapCount )
     {
-      if( ! IsShowingPlaceholderText() )
+      if( IsShowingRealText() )
       {
         const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
         const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
         mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
                                                                     yPosition );
+
+        // When the cursor position is changing, delay cursor blinking
+        mEventData->mDecorator->DelayCursorBlink();
       }
       else
       {
@@ -1053,6 +1077,9 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
 
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
 
+  // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
+  mEventData->mPrimaryCursorPosition = (indicesSwapped)?mEventData->mLeftSelectionPosition:mEventData->mRightSelectionPosition;
+
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
 }
@@ -1317,10 +1344,25 @@ LineIndex Controller::Impl::GetClosestLine( float y ) const
 void Controller::Impl::FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex )
 {
   CharacterIndex hitCharacter = GetClosestCursorIndex( visualX, visualY );
+  DALI_ASSERT_DEBUG( hitCharacter <= mLogicalModel->mText.Count() && "GetClosestCursorIndex returned out of bounds index" );
+
+  if ( mLogicalModel->mText.Count() == 0 )
+  {
+    return;  // if model empty
+  }
+
   if( hitCharacter >= mLogicalModel->mText.Count() )
   {
-    // Selection out of bounds.
-    return;
+    // Closest hit character is the last character.
+    if ( hitCharacter ==  mLogicalModel->mText.Count() )
+    {
+      hitCharacter--; //Hit character index set to last character in logical model
+    }
+    else
+    {
+      // hitCharacter is out of bounds
+      return;
+    }
   }
 
   startIndex = hitCharacter;
@@ -1352,6 +1394,8 @@ void Controller::Impl::FindSelectionIndices( float visualX, float visualY, Chara
 CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
                                                         float visualY )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetClosestCursorIndex %p closest visualX %f visualY %f\n", this, visualX, visualY );
+
   if( NULL == mEventData )
   {
     // Nothing to do if there is no text input.
@@ -1454,6 +1498,8 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   logicalIndex = hasRightToLeftCharacters ? *( visualToLogicalCursorBuffer + visualIndex ) : visualIndex;
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
+
+  DALI_ASSERT_DEBUG( ( logicalIndex <= mLogicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );
 
   return logicalIndex;
 }
@@ -1709,7 +1755,7 @@ void Controller::Impl::UpdateCursorPosition()
     return;
   }
 
-  if( IsShowingPlaceholderText() )
+  if( IsShowingPlaceholderText() || ( 0u == mLogicalModel->mText.Count() ) )
   {
     // Do not want to use the place-holder text to set the cursor position.
 
@@ -1954,8 +2000,9 @@ void Controller::Impl::ScrollTextToMatchCursor()
   }
 
   // Set which cursors are active according the state.
-  if( ( EventData::EDITING == mEventData->mState ) ||
-      ( EventData::EDITING_WITH_POPUP == mEventData->mState ) ||
+  if( ( EventData::EDITING == mEventData->mState )                  ||
+      ( EventData::EDITING_WITH_POPUP == mEventData->mState )       ||
+      ( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState ) ||
       ( EventData::GRAB_HANDLE_PANNING == mEventData->mState ) )
   {
     if( cursorInfo.isSecondaryCursor )

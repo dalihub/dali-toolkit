@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
@@ -35,11 +36,6 @@ using namespace Dali;
 
 namespace //Unnamed namespace
 {
-// To register type
-
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnView, Toolkit::Control, NULL )
-DALI_TYPE_REGISTRATION_END()
-
 // default grid density for page turn effect, 10 pixels by 10 pixels
 const float DEFAULT_GRID_DENSITY(10.0f);
 
@@ -206,43 +202,6 @@ struct ShadowBlurStrengthConstraint
   float mThres;
 };
 
-bool IsActorHittableFunction( Actor actor, Dali::HitTestAlgorithm::TraverseType type )
-{
-  bool hittable = false;
-
-  switch (type)
-  {
-    case Dali::HitTestAlgorithm::CHECK_ACTOR:
-    {
-      // Check whether the actor is visible and not fully transparent.
-      Property::Index propertyActorHittable = actor.GetPropertyIndex(Toolkit::PageFactory::ACTOR_HITTABLE);
-      if( actor.IsSensitive()
-       && actor.IsVisible()
-       && actor.GetCurrentWorldColor().a > 0.01f// not FULLY_TRANSPARENT
-       && ( propertyActorHittable != Property::INVALID_INDEX &&
-            actor.GetProperty<bool>( propertyActorHittable ) ) )
-      {
-         hittable = true;
-      }
-      break;
-    }
-    case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
-    {
-      if( actor.IsSensitive() && actor.IsVisible() ) // Actor is visible, if not visible then none of its children are visible.
-      {
-        hittable = true;
-      }
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  return hittable;
-}
-
 } //unnamed namespace
 
 namespace Dali
@@ -253,6 +212,31 @@ namespace Toolkit
 
 namespace Internal
 {
+
+namespace
+{
+
+BaseHandle Create()
+{
+  // empty handle as we cannot create PageTurnView(but type registered for page turn signal)
+  return BaseHandle();
+}
+
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnView, Toolkit::Control, Create );
+
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "page-size",       VECTOR2, PAGE_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "current-page-id", INTEGER, CURRENT_PAGE_ID )
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "spine-shadow",    VECTOR2, SPINE_SHADOW )
+
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-turn-started",  SIGNAL_PAGE_TURN_STARTED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-turn-finished", SIGNAL_PAGE_TURN_FINISHED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-pan-started",   SIGNAL_PAGE_PAN_STARTED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-pan-finished",  SIGNAL_PAGE_PAN_FINISHED )
+
+DALI_TYPE_REGISTRATION_END()
+
+}
 
 // these several constants are also used in the derived classes
 const int PageTurnView::MAXIMUM_TURNING_NUM = 4;
@@ -265,11 +249,10 @@ PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )
   mPageFactory( pageFactory ),
   mPageSize( pageSize ),
   mTotalPageCount( 0 ),
-  mIsEditMode( false ),
-  mNeedOffscreenRendering( false ),
   mPanning( false ),
   mSpineShadowParameter( DEFAULT_SPINE_SHADOW_PARAMETER ),
   mCurrentPageIndex( 0 ),
+  mTurningPageIndex( 0 ),
   mIndex( 0 ),
   mPress( false ),
   mPageUpdated( true ),
@@ -312,7 +295,7 @@ void PageTurnView::OnInitialize()
   // create the page turn effect objects
   for( int i = 0; i < MAXIMUM_TURNING_NUM; i++ )
   {
-    mTurnEffect[i] = CreatePageTurnEffect( false );
+    mTurnEffect[i] = CreatePageTurnEffect();
     mTurnEffect[i].SetProperty( ShaderEffect::Property::GRID_DENSITY, Property::Value( DEFAULT_GRID_DENSITY ) );
     mTurnEffect[i].SetUniform( "uPageSize", mPageSize );
     mTurnEffect[i].SetUniform( "uShadowWidth", 0.f);
@@ -325,73 +308,27 @@ void PageTurnView::OnInitialize()
 
   mTurningPageLayer = Layer::New();
   mTurningPageLayer.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-  // Set control size and the parent origin of turningPageLayer
+  mTurningPageLayer.SetBehavior(Layer::LAYER_3D);
+
+  // Set control size and the parent origin of page layers
   OnPageTurnViewInitialize();
 
-  mRootOnScreen = Actor::New();
-  mRootOnScreen.SetPositionInheritanceMode( USE_PARENT_POSITION );
-  mRootOnScreen.SetSize( mControlSize );
-  Self().Add( mRootOnScreen );
-  mRootOnScreen.Add(mTurningPageLayer);
+  Self().Add(mTurningPageLayer);
 
   mTotalPageCount = static_cast<int>( mPageFactory.GetNumberOfPages() );
-  mNeedOffscreenRendering = mPageFactory.IsOffscreenRenderingNeeded();
-  if( mNeedOffscreenRendering )
-  {
-    SetupRenderTasks();
-  }
-
   // add pages to the scene, and set depth for the stacked pages
   for( int i = 0; i < NUMBER_OF_CACHED_PAGES_EACH_SIDE; i++ )
   {
     AddPage( i );
     if(mPageActors[i])
     {
-      mPageActors[i].SetSortModifier( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPageActors[i].SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
   }
+  mPageActors[0].SetVisible(true);
 
   // enable the pan gesture which is attached to the control
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
-
-  mPageFactory.PageRefreshSignal().Connect(this, &PageTurnView::RenderPage);
-}
-
-void PageTurnView::SetupRenderTasks()
-{
-  mPageSourceActor.resize( NUMBER_OF_CACHED_PAGES );
-  mOffscreenTask.resize( NUMBER_OF_CACHED_PAGES );
-  mRenderedPage.resize( NUMBER_OF_CACHED_PAGES );
-
-  mCameraActor = CameraActor::New(mControlSize);
-  mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
-  mCameraActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-  mCameraActor.SetInheritScale( false );
-  Self().Add(mCameraActor);
-
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  for(int i=0; i<NUMBER_OF_CACHED_PAGES; i++)
-  {
-    mPageSourceActor[i] = Actor::New();
-    mPageSourceActor[i].SetParentOrigin(ParentOrigin::CENTER);
-    mPageSourceActor[i].SetColorMode( USE_OWN_COLOR );
-    mPageSourceActor[i].SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-    mPageSourceActor[i].SetInheritScale( false );
-    Self().Add( mPageSourceActor[i] );
-    mPageSourceActor[i].SetSensitive( false );
-
-    mRenderedPage[i] = FrameBufferImage::New( mControlSize.width, mControlSize.height, Pixel::RGB8888, Image::UNUSED );
-    mOffscreenTask[i] = taskList.CreateTask();
-    mOffscreenTask[i].SetRefreshRate( RenderTask::REFRESH_ONCE );
-    mOffscreenTask[i].SetCameraActor(mCameraActor);
-    mOffscreenTask[i].SetSourceActor( mPageSourceActor[i] );
-    mOffscreenTask[i].SetExclusive(true);
-    mOffscreenTask[i].SetInputEnabled( false );
-    mOffscreenTask[i].SetClearEnabled( true );
-    mOffscreenTask[i].SetClearColor( Vector4(0.f,0.f,0.f,0.f) );
-    mOffscreenTask[i].SetTargetFrameBuffer( mRenderedPage[i] );
-    mOffscreenTask[i].SetScreenToFrameBufferMappingActor( Self() );
-   }
 }
 
 void PageTurnView::SetupShadowView()
@@ -403,22 +340,17 @@ void PageTurnView::SetupShadowView()
   mShadowView.SetPointLightFieldOfView( Math::PI / 2.0f);
   mShadowView.SetShadowColor(DEFAULT_SHADOW_COLOR);
 
-  mShadowLayer = Layer::New();
-  mShadowLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
-  mRootOnScreen.Add(mShadowLayer);
-  mShadowLayer.Raise();
-
   mShadowPlane = CreateSolidColorActor( Vector4 (0.0f, 0.0f, 0.0f, 0.0f) );
   mShadowPlane.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   mShadowPlane.SetSize( mControlSize );
-  mShadowLayer.Add( mShadowPlane );
+  Self().Add( mShadowPlane );
   mShadowView.SetShadowPlane( mShadowPlane );
 
   mPointLight = Actor::New();
   mPointLight.SetAnchorPoint( origin );
   mPointLight.SetParentOrigin( origin );
   mPointLight.SetPosition( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO );
-  mRootOnScreen.Add( mPointLight );
+  Self().Add( mPointLight );
   mShadowView.SetPointLight( mPointLight );
 
   mTurningPageLayer.Add( mShadowView );
@@ -428,16 +360,16 @@ void PageTurnView::SetupShadowView()
 void PageTurnView::OnStageConnection( int depth )
 {
   SetupShadowView();
-  mTurningPageLayer.RaiseToTop();
+  mTurningPageLayer.Raise();
 }
 
 void PageTurnView::OnStageDisconnection()
 {
   if(mShadowView)
   {
-    Self().Remove(mPointLight);
-    Self().Remove(mShadowLayer);
-    mTurningPageLayer.Remove( mShadowView );
+    mPointLight.Unparent();
+    mShadowPlane.Unparent();
+    mShadowView.Unparent();
   }
 
   // make sure the status of the control is updated correctly when the pan gesture is interrupted
@@ -445,7 +377,7 @@ void PageTurnView::OnStageDisconnection()
   {
     mPanning = false;
 
-    mRootOnScreen.Add(mPanActor);
+    Self().Add(mPanActor);
     mIsAnimating[mIndex] = false;
     mPanActor.RemoveConstraints();
     mTurnEffect[mIndex].RemoveConstraints();
@@ -453,6 +385,46 @@ void PageTurnView::OnStageDisconnection()
 
     SetSpineEffect( mPanActor, mIsTurnBack[mPanActor] );
   }
+}
+
+void PageTurnView::SetPageSize( const Vector2& pageSize )
+{
+  mPageSize = pageSize;
+  mSpineEffectFront.SetUniform("uPageWidth", mPageSize.width );
+  mSpineEffectBack.SetUniform("uPageWidth", mPageSize.width );
+  for( int i = 0; i < MAXIMUM_TURNING_NUM; i++ )
+  {
+    mTurnEffect[i].SetUniform( "uPageSize", mPageSize );
+  }
+
+  if( mPointLight )
+  {
+    mPointLight.SetPosition( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO );
+  }
+
+  for( size_t i=0; i<mPageActors.size(); i++ )
+  {
+    if( mPageActors[i] )
+    {
+      mPageActors[i].SetSize( mPageSize );
+      if( mPageActors[i].GetChildCount()>0 )
+      {
+        mPageActors[i].GetChildAt(0).SetSize( mPageSize );
+      }
+    }
+  }
+
+  OnPageTurnViewInitialize();
+
+  if( mShadowPlane )
+  {
+    mShadowPlane.SetSize( mControlSize );
+  }
+}
+
+Vector2 PageTurnView::GetPageSize()
+{
+  return mPageSize;
 }
 
 void PageTurnView::SetSpineShadowParameter( const Vector2& spineShadowParameter )
@@ -475,7 +447,13 @@ Vector2 PageTurnView::GetSpineShadowParameter()
 
 void PageTurnView::GoToPage( unsigned int pageId )
 {
-  int pageIdx = static_cast<int>(pageId);
+  int pageIdx = Clamp( static_cast<int>(pageId), 0, mTotalPageCount-1);
+
+  if( mCurrentPageIndex == pageIdx  )
+  {
+    return;
+  }
+
   // record the new current page index
   mCurrentPageIndex = pageIdx;
 
@@ -494,6 +472,12 @@ void PageTurnView::GoToPage( unsigned int pageId )
   {
     AddPage( i );
   }
+
+  mPageActors[pageId%NUMBER_OF_CACHED_PAGES].SetVisible(true);
+  if( pageId > 0 )
+  {
+    mPageActors[(pageId-1)%NUMBER_OF_CACHED_PAGES].SetVisible(true);
+  }
   // set ordered depth to the stacked pages
   OrganizePageDepth();
 }
@@ -504,100 +488,18 @@ unsigned int PageTurnView::GetCurrentPage()
   return static_cast< unsigned int >( mCurrentPageIndex );
 }
 
-Actor PageTurnView::EnterEditMode()
-{
-  if( mNeedOffscreenRendering )
-  {
-    DALI_ASSERT_ALWAYS( mCurrentPageIndex >= 0 );
-
-    mIsEditMode = true;
-
-    int index = mCurrentPageIndex % NUMBER_OF_CACHED_PAGES;
-    mOffscreenTask[index].SetInputEnabled( true );
-    mPageSourceActor[index].SetSensitive( true );
-    mOffscreenTask[index].SetRefreshRate( RenderTask::REFRESH_ALWAYS );
-
-    mRootOnScreen.SetSensitive(false);
-
-    return mPageSourceActor[index].GetChildAt( 0 );
-  }
-  else
-  {
-    return Actor();
-  }
-}
-
-void PageTurnView::LeaveEditMode()
-{
-  if( mNeedOffscreenRendering )
-  {
-    DALI_ASSERT_ALWAYS( mCurrentPageIndex >= 0 );
-
-    mIsEditMode = false;
-
-    int index = mCurrentPageIndex % NUMBER_OF_CACHED_PAGES;
-    mOffscreenTask[index].SetInputEnabled( false );
-    mPageSourceActor[index].SetSensitive( false );
-    mOffscreenTask[index].SetRefreshRate( RenderTask::REFRESH_ONCE );
-
-    mRootOnScreen.SetSensitive(true);
-  }
-}
-
-Actor PageTurnView::GetHitActor( Vector2& screenCoordinates, Vector2& actorCoordinates )
-{
-  if( mNeedOffscreenRendering && mCurrentPageIndex < mTotalPageCount)
-  {
-    int index = mCurrentPageIndex % NUMBER_OF_CACHED_PAGES;
-
-    Dali::HitTestAlgorithm::Results results;
-    if( !mOffscreenTask[index].GetInputEnabled() )
-    {
-      mOffscreenTask[index].SetInputEnabled( true );
-      mPageSourceActor[index].SetSensitive( true );
-      Dali::HitTestAlgorithm::HitTest( mOffscreenTask[index], screenCoordinates, results, IsActorHittableFunction );
-      mOffscreenTask[index].SetInputEnabled( false );
-      mPageSourceActor[index].SetSensitive( false );
-    }
-    else
-    {
-      Dali::HitTestAlgorithm::HitTest( mOffscreenTask[index], screenCoordinates, results, IsActorHittableFunction );
-    }
-    actorCoordinates = results.actorCoordinates;
-    return results.actor;
-  }
-  else
-  {
-    return Actor();
-  }
-}
-
 void PageTurnView::AddPage( int pageIndex )
 {
   if(pageIndex > -1  && pageIndex < mTotalPageCount) // whether the page is available from the page factory
   {
     int index = pageIndex % NUMBER_OF_CACHED_PAGES;
-    ImageActor newPage;
-    if( mNeedOffscreenRendering )
-    {
-      Actor source = mPageFactory.NewPage( pageIndex );
-      if( mPageSourceActor[index].GetChildCount() > 0 )
-      {
-        mPageSourceActor[index].Remove( mPageSourceActor[index].GetChildAt( 0 ) );
-      }
-      mPageSourceActor[index].Add( source );
-      mOffscreenTask[index].SetRefreshRate( RenderTask::REFRESH_ONCE );
-      newPage = NewPageFromRenderBuffer( pageIndex );
-    }
-    else
-    {
-      newPage= ImageActor::DownCast( mPageFactory.NewPage( pageIndex ) );
-      DALI_ASSERT_ALWAYS( newPage );
-    }
+    ImageActor newPage= ImageActor::DownCast( mPageFactory.NewPage( pageIndex ) );
+     DALI_ASSERT_ALWAYS( newPage );
+
     newPage.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
     newPage.SetParentOrigin( ParentOrigin::CENTER_LEFT );
     newPage.SetSize( mPageSize );
-    mRootOnScreen.Add( newPage );
+    Self().Add( newPage );
     mPageActors[index] = newPage;
 
     bool isLeftSide = ( pageIndex < mCurrentPageIndex );
@@ -609,8 +511,10 @@ void PageTurnView::AddPage( int pageIndex )
     }
     else
     {
-      SetShaderEffect( newPage, mSpineEffectFront);
+      newPage.SetShaderEffect(mSpineEffectFront);
     }
+
+    newPage.SetVisible( false );
 
     // For Portrait, nothing to do
     // For Landscape, set spineEffectBack to the new effect if it is in the left side, and set properties to the back image actor if it exists
@@ -626,59 +530,11 @@ void PageTurnView::RemovePage( int pageIndex )
     mPageActors[index].Unparent();
     mIsTurnBack.erase( mPageActors[index] );
     mPageActors[index].Reset();
-    if( mNeedOffscreenRendering )
-    {
-      mPageSourceActor[index].Remove( mPageSourceActor[index].GetChildAt( 0 ) );
-    }
   }
-}
-
-void PageTurnView::RenderPage( int pageIndex )
-{
-  if( pageIndex > std::max(-1, mCurrentPageIndex - NUMBER_OF_CACHED_PAGES_EACH_SIDE -1)
-   && pageIndex < std::min(mTotalPageCount, mCurrentPageIndex + NUMBER_OF_CACHED_PAGES_EACH_SIDE))
-  {
-    int index = pageIndex % NUMBER_OF_CACHED_PAGES;
-    mOffscreenTask[index].SetRefreshRate( RenderTask::REFRESH_ONCE );
-  }
-}
-
-void PageTurnView::RefreshAll()
-{
-  mTotalPageCount = static_cast<int>( mPageFactory.GetNumberOfPages() );
-  if( mTotalPageCount > 0 )
-  {
-    if(mCurrentPageIndex < mTotalPageCount)
-    {
-      GoToPage( mCurrentPageIndex );
-    }
-    else
-    {
-      GoToPage( mCurrentPageIndex-- );
-    }
-  }
-}
-
-void PageTurnView::RefreshCurrentPage()
-{
-  RenderPage( mCurrentPageIndex );
 }
 
 void PageTurnView::OnPan( const PanGesture& gesture )
 {
-  if( mIsEditMode )
-  {
-    // when interrupted by the call of DisplayCurrentPageSourceActor(),
-    // make sure the panFinished is always called before stopping to responding the gesture
-    // so the status of the control is updated correctly
-    if(mPanning)
-    {
-      mPanning = false;
-      PanFinished( SetPanPosition( gesture.position ), gesture.GetSpeed() );
-    }
-
-    return;
-  }
   // the pan gesture is attached to control itself instead of each page
   switch( gesture.state )
   {
@@ -707,7 +563,7 @@ void PageTurnView::OnPan( const PanGesture& gesture )
       if( mPageUpdated && animatable )
       {
         SetPanActor( gesture.position ); // determine which page actor is panned
-        if(mPanActor && mPanActor.GetParent() != mRootOnScreen) // if the page is added to turning layer,it is undergoing an animation currently
+        if(mPanActor && mPanActor.GetParent() != Self()) // if the page is added to turning layer,it is undergoing an animation currently
         {
           mPanActor.Reset();
         }
@@ -795,7 +651,12 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
       mPress = true;
       mIsAnimating[mIndex] = true;
 
-      mPageTurnStartedSignal.Emit( handle, static_cast<unsigned int>(mCurrentPageIndex + ( ( mIsTurnBack[mPanActor] ) ? -1 : 0 ) ), !mIsTurnBack[mPanActor] );
+      mPageTurnStartedSignal.Emit( handle, static_cast<unsigned int>(mTurningPageIndex), !mIsTurnBack[mPanActor] );
+      int id = mTurningPageIndex + (mIsTurnBack[mPanActor]? -1 : 1);
+      if( id >=0 && id < mTotalPageCount )
+      {
+        mPageActors[id%NUMBER_OF_CACHED_PAGES].SetVisible(true);
+      }
 
       mShadowView.RemoveConstraints();
       Actor self = Self();
@@ -951,8 +812,8 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
       animation.AnimateTo( Property(self, mPropertyPanDisplacement[mIndex]),
                            width,AlphaFunction::EASE_OUT_SINE);
       animation.AnimateTo( Property(self, mPropertyCurrentCenter[mIndex]),
-                           Vector2(-mPageSize.width, 0.5f*mPageSize.height), AlphaFunction::EASE_OUT_SINE);
-      mAnimationActorPair[animation] = actor;
+                           Vector2(-mPageSize.width*1.1f, 0.5f*mPageSize.height), AlphaFunction::EASE_OUT_SINE);
+      mAnimationPageIdPair[animation] = mTurningPageIndex;
       mAnimationIndexPair[animation] = mIndex;
       animation.Play();
       animation.FinishedSignal().Connect( this, &PageTurnView::TurnedOver );
@@ -962,13 +823,13 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
       Animation animation= Animation::New( PAGE_SLIDE_BACK_ANIMATION_DURATION * (mOriginalCenter.x - mCurrentCenter.x) / mPageSize.width / PAGE_TURN_OVER_THRESHOLD_RATIO );
       animation.AnimateTo( Property( mTurnEffect[mIndex], "uCurrentCenter" ),
                            mOriginalCenter, AlphaFunction::LINEAR );
-      mAnimationActorPair[animation] = actor;
+      mAnimationPageIdPair[animation] = mTurningPageIndex;
       mAnimationIndexPair[animation] = mIndex;
       animation.Play();
       mIsSliding[mIndex] = true;
       animation.FinishedSignal().Connect( this, &PageTurnView::SliddenBack );
 
-      mPageTurnStartedSignal.Emit( handle, static_cast<unsigned int>( mCurrentPageIndex + ( ( mIsTurnBack[mPanActor] ) ? -1 : 0 ) ), mIsTurnBack[mPanActor] );
+      mPageTurnStartedSignal.Emit( handle, static_cast<unsigned int>(mTurningPageIndex), mIsTurnBack[actor] );
     }
   }
   else
@@ -983,38 +844,54 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
 
 void PageTurnView::TurnedOver( Animation& animation )
 {
-  ImageActor actor = mAnimationActorPair[animation];
+  int pageId = mAnimationPageIdPair[animation];
+  ImageActor actor = mPageActors[pageId % NUMBER_OF_CACHED_PAGES];
   mIsTurnBack[actor] = !mIsTurnBack[actor];
   actor.RemoveConstraints();
-  mRootOnScreen.Add(actor);
+  Self().Add(actor);
   int index = mAnimationIndexPair[animation];
   mIsAnimating[index] = false;
   mTurnEffect[index].RemoveConstraints();
   mAnimationIndexPair.erase( animation );
-  mAnimationActorPair.erase( animation );
+  mAnimationPageIdPair.erase( animation );
 
   SetSpineEffect( actor, mIsTurnBack[actor] );
 
+  int id = pageId + (mIsTurnBack[actor]? -1 : 1);
+  if( id >=0 && id < mTotalPageCount )
+  {
+    mPageActors[id%NUMBER_OF_CACHED_PAGES].SetVisible(false);
+  }
+
+  OnTurnedOver( actor, mIsTurnBack[actor] );
+
   // Guard against destruction during signal emission
   Toolkit::PageTurnView handle( GetOwner() );
-  mPageTurnFinishedSignal.Emit( handle, static_cast<unsigned int>( mCurrentPageIndex + ( ( mIsTurnBack[actor] ) ? -1 : 0 ) ), mIsTurnBack[actor] );
+  mPageTurnFinishedSignal.Emit( handle, static_cast<unsigned int>(pageId), mIsTurnBack[actor] );
 }
 
 void PageTurnView::SliddenBack( Animation& animation )
 {
-  ImageActor actor = mAnimationActorPair[animation];
-  mRootOnScreen.Add(actor);
+  int pageId = mAnimationPageIdPair[animation];
+  ImageActor actor = mPageActors[pageId % NUMBER_OF_CACHED_PAGES];
+  Self().Add(actor);
   int index = mAnimationIndexPair[animation];
   mIsSliding[index] = false;
   mIsAnimating[index] = false;
   mAnimationIndexPair.erase( animation );
-  mAnimationActorPair.erase( animation );
+  mAnimationPageIdPair.erase( animation );
 
   SetSpineEffect( actor, mIsTurnBack[actor] );
 
+  int id = pageId + (mIsTurnBack[actor]? -1 : 1);
+  if( id >=0 && id < mTotalPageCount )
+  {
+    mPageActors[id%NUMBER_OF_CACHED_PAGES].SetVisible(false);
+  }
+
   // Guard against destruction during signal emission
   Toolkit::PageTurnView handle( GetOwner() );
-  mPageTurnFinishedSignal.Emit( handle, static_cast<unsigned int>( mCurrentPageIndex + ( ( mIsTurnBack[mPanActor] ) ? -1 : 0 ) ), mIsTurnBack[actor] );
+  mPageTurnFinishedSignal.Emit( handle, static_cast<unsigned int>(pageId), mIsTurnBack[actor] );
 }
 
 void PageTurnView::OrganizePageDepth()
@@ -1023,11 +900,11 @@ void PageTurnView::OrganizePageDepth()
   {
     if(mCurrentPageIndex+i < mTotalPageCount)
     {
-      mPageActors[( mCurrentPageIndex+i )%NUMBER_OF_CACHED_PAGES].SetSortModifier( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPageActors[( mCurrentPageIndex+i )%NUMBER_OF_CACHED_PAGES].SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
     if( mCurrentPageIndex >= i + 1 )
     {
-      mPageActors[( mCurrentPageIndex-i-1 )%NUMBER_OF_CACHED_PAGES].SetSortModifier( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPageActors[( mCurrentPageIndex-i-1 )%NUMBER_OF_CACHED_PAGES].SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
   }
 }
@@ -1055,6 +932,99 @@ Toolkit::PageTurnView::PagePanSignal& PageTurnView::PagePanStartedSignal()
 Toolkit::PageTurnView::PagePanSignal& PageTurnView::PagePanFinishedSignal()
 {
   return mPagePanFinishedSignal;
+}
+
+bool PageTurnView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( true );
+  Toolkit::PageTurnView pageTurnView = Toolkit::PageTurnView::DownCast( handle );
+
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_PAGE_TURN_STARTED ) )
+  {
+    pageTurnView.PageTurnStartedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_PAGE_TURN_FINISHED ) )
+  {
+    pageTurnView.PageTurnFinishedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_PAGE_PAN_STARTED ) )
+  {
+    pageTurnView.PagePanStartedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_PAGE_PAN_FINISHED ) )
+  {
+    pageTurnView.PagePanFinishedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
+}
+
+void PageTurnView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::PageTurnView pageTurnView = Toolkit::PageTurnView::DownCast( Dali::BaseHandle( object ) );
+
+  if( pageTurnView )
+  {
+    PageTurnView& pageTurnViewImpl( GetImplementation( pageTurnView ) );
+
+    switch( index )
+    {
+      case Toolkit::PageTurnView::Property::PAGE_SIZE:
+      {
+        pageTurnViewImpl.SetPageSize( value.Get<Vector2>() );
+        break;
+      }
+      case Toolkit::PageTurnView::Property::CURRENT_PAGE_ID:
+      {
+        pageTurnViewImpl.GoToPage( value.Get<int>() );
+        break;
+      }
+      case Toolkit::PageTurnView::Property::SPINE_SHADOW:
+      {
+        pageTurnViewImpl.SetSpineShadowParameter( value.Get<Vector2>() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value PageTurnView::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::PageTurnView pageTurnView = Toolkit::PageTurnView::DownCast( Dali::BaseHandle( object ) );
+
+  if( pageTurnView )
+  {
+    PageTurnView& pageTurnViewImpl( GetImplementation( pageTurnView ) );
+
+    switch( index )
+    {
+      case Toolkit::PageTurnView::Property::PAGE_SIZE:
+      {
+        value = pageTurnViewImpl.GetPageSize();
+        break;
+      }
+      case Toolkit::PageTurnView::Property::CURRENT_PAGE_ID:
+      {
+        value = static_cast<int>( pageTurnViewImpl.GetCurrentPage() );
+        break;
+      }
+      case Toolkit::PageTurnView::Property::SPINE_SHADOW:
+      {
+        value = pageTurnViewImpl.GetSpineShadowParameter();
+        break;
+      }
+    }
+  }
+  return value;
 }
 
 } // namespace Internal

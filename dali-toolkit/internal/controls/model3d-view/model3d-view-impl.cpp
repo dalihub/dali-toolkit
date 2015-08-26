@@ -566,7 +566,7 @@ void Model3dView::UpdateShaderUniforms()
     UpdateView();
 
     Vector3 lightPosition( 0, 0, 0 );
-    Dali::Property::Index lightProperty = mShader.RegisterProperty( "lightPosition", lightPosition );
+    Dali::Property::Index lightProperty = mShader.RegisterProperty( "uLightPosition", lightPosition );
 
     CustomActor self = Self();
 

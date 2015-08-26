@@ -68,7 +68,7 @@ void PageTurnApplyInternalConstraint( ShaderEffect& shaderEffect);
  * //set initial values
  * pageTurnEffect.SetUniform("uPageSize", Vector2);\n
  * pageTurnEffect.SetUniform("uOriginalCenter", Vector2);\n
- * pageTurnEffect.SetUniform("uIsTurningBack", bool) SetIsTurningBack();\n
+ * pageTurnEffect.SetUniform("uIsTurningBack", bool);\n
  * pageTurnEffect.SetUniform("uCurrentCenter",Vector2);\n
  *
  * //Animate it with the current center property\n
@@ -79,11 +79,8 @@ void PageTurnApplyInternalConstraint( ShaderEffect& shaderEffect);
  * animation[mAnimationIndex].Play(); \n
  *
  * Animatable/Constrainable uniforms:
- *
- * @param[in] enableBlending If true, apply HINT_BLENDING when creating the shader object; If false, disable the HINT_BLENDING
- * @return A handle to a newly allocated ShaderEffect
  */
-ShaderEffect CreatePageTurnEffect(bool enableBlending = true);
+ShaderEffect CreatePageTurnEffect();
 
 } // namespace Internal
 

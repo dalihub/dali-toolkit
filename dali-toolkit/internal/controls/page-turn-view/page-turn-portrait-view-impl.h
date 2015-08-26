@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-view-impl.h>
 
 namespace Dali
@@ -65,11 +65,6 @@ protected: // From PageTurnView
   virtual void OnPageTurnViewInitialize();
 
   /**
-   * @copydoc PageTurnView::NewPageFromRenderBuffer
-   */
-  virtual ImageActor NewPageFromRenderBuffer( int pageIndex );
-
-  /**
    * @copydoc PageTurnView::SetPanPosition
    */
   virtual Vector2 SetPanPosition( const Vector2& gesturePosition );
@@ -89,12 +84,14 @@ protected: // From PageTurnView
    */
   virtual void OnPossibleOutwardsFlick( const Vector2& panPosition, float gestureSpeed );
 
+  virtual void OnTurnedOver( ImageActor actor, bool isLeftSide );
+
 private:
 
   /**
    * @copydoc PageTurnView::TurnedOver
    */
-  void OnTurnedOver( Animation& animation );
+  void TurnedOverBackwards( Animation& animation );
 
 private:
 

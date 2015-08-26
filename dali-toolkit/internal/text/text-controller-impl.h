@@ -279,6 +279,12 @@ struct Controller::Impl
     return ( mEventData && mEventData->mIsShowingPlaceholderText );
   }
 
+  bool IsShowingRealText() const
+  {
+    return ( !IsShowingPlaceholderText() &&
+             0u != mLogicalModel->mText.Count() );
+  }
+
   /**
    * @brief Called when placeholder-text is hidden
    */

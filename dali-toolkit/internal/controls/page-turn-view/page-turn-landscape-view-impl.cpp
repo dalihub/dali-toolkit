@@ -71,19 +71,6 @@ void PageTurnLandscapeView::OnPageTurnViewInitialize()
   mTurningPageLayer.SetParentOrigin( ParentOrigin::CENTER );
 }
 
-ImageActor PageTurnLandscapeView::NewPageFromRenderBuffer( int pageIndex )
-{
-  int index = pageIndex % NUMBER_OF_CACHED_PAGES;
-  ImageActor page = ImageActor::New( mRenderedPage[ index ],
-                                     ImageActor::PixelArea( mPageSize.width, 0, mPageSize.width, mPageSize.height  ) );
-  if( pageIndex <= mTotalPageCount-1)
-  {
-    int nextIndex = (pageIndex+1) % NUMBER_OF_CACHED_PAGES;
-    page.Add( ImageActor::New( mRenderedPage[ nextIndex ],ImageActor::PixelArea( 0, 0, mPageSize.width, mPageSize.height  ) ) );
-  }
-  return page;
-}
-
 void PageTurnLandscapeView::OnAddPage( ImageActor newPage, bool isLeftSide )
 {
   newPage.SetParentOrigin( ParentOrigin::CENTER );
@@ -120,10 +107,12 @@ void PageTurnLandscapeView::SetPanActor( const Vector2& panPosition )
   if( panPosition.x > mPageSize.width  && mCurrentPageIndex < mTotalPageCount-1 )
   {
     mPanActor = mPageActors[mCurrentPageIndex%NUMBER_OF_CACHED_PAGES]; // right side page
+    mTurningPageIndex = mCurrentPageIndex;
   }
   else if( panPosition.x <= mPageSize.width && mCurrentPageIndex > 0 )
   {
     mPanActor = mPageActors[ (mCurrentPageIndex-1)%NUMBER_OF_CACHED_PAGES ]; // left side page
+    mTurningPageIndex = mCurrentPageIndex - 1;
   }
   else
   {

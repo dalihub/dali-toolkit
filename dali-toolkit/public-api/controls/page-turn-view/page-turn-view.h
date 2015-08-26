@@ -51,10 +51,42 @@ class PageTurnView;
  * 3) Pan with no animation: PagePanStarted -> PagePanFinished
  * Pan with no animation will occur when the user touches the page in an area that does not start the
  * page turning.
+ *
+ *  Signals
+ * | %Signal Name       | Method                        |
+ * |--------------------|-------------------------------|
+ * | page-turn-started  | @ref PageTurnStartedSignal()  |
+ * | page-turn-finished | @ref PageTurnFinishedSignal() |
+ * | page-pan-started   | @ref PagePanStartedSignal()   |
+ * | page-pan-finished  | @ref PagePanFinishedSignal()  |
  */
 class DALI_IMPORT_API PageTurnView : public Control
 {
 public:
+
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
+
+  struct Property
+  {
+    enum
+    {
+      PAGE_SIZE = PROPERTY_START_INDEX, ///< name "page-size",       type Vector2
+      CURRENT_PAGE_ID,                  ///< name "current-page-id", type Integer
+
+      /**
+       * The two values are the major&minor radius (in pixels) to form an ellipse shape.
+       * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow.
+       */
+      SPINE_SHADOW,                     ///< name "spine-shadow",    type Vector2
+    };
+  };
 
   /**
    * Creates an empty PageTurnView handle. Only derived versions can be instantiated.
@@ -88,67 +120,6 @@ public:
    * @return handle to a PageTurnView or an uninitialized handle
    */
   static PageTurnView DownCast( BaseHandle handle );
-
-  /**
-   * Set the spine shadow parameter to the shader effects
-   * The two parameters are the major&minor radius (in pixels) to form an ellipse shape
-   * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow
-   * @param [in] spineShadowParameter The major&minor ellipse radius for the simulated spine shadow
-   */
-  void SetSpineShadowParameter( const Vector2& spineShadowParameter );
-
-  /**
-   * Retrieve the spine shadow parameter of the shader effects
-   * @return The major&minor ellipse radius for the simulated spine shadow
-   */
-  Vector2 GetSpineShadowParameter();
-
-  /*
-   * Go to a specific page
-   * @param[in] pageId The new current page index
-   */
-  void GoToPage( unsigned int pageId );
-
-  /**
-   * Retrieve the index of the current Page
-   * @return The index of the current page
-   */
-  unsigned int GetCurrentPage();
-
-  /**
-   * Enter edit mode
-   * Case 1, the page factory passes image actor into the view as page content, do nothing.
-   * Case 2, the page factory passes an actor tree into the view as page content,
-   *    the actor tree will receive the touch event in edit mode, and set the refresh rate of the off screen render task to always
-   * @return an empty actor in case 1; the actor tree root of the current page
-   */
-  Actor EnterEditMode();
-
-  /**
-   * Leave edit mode
-   * Case 1, the page factory passes image actor into the view as page content, do nothing.
-   * Case 2, the page factory passes an actor tree into the view as page content,
-   *   the page actor will receive all the touch event, and set the refresh rage of the off screen render task to once.
-   */
-  void LeaveEditMode();
-
-  /**
-   * Return the actor get hit in the actor tree of the current page by given the touch position on the PageTurnView
-   * @param[in] screenCoordinates The hit position of the PageTurnView
-   * @param[out] actorCoordinates The local hit position of the hitted actor
-   * @return the hitted actor
-   */
-  Actor GetHitActor( Vector2& screenCoordinates, Vector2& actorCoordinates );
-
-  /**
-   * Refresh all the cached pages by calling the render task to refresh.
-   */
-  void RefreshAll();
-
-  /**
-   * Refresh current page by calling the render task to refresh
-   */
-  void RefreshCurrentPage();
 
 public: //Signal
 

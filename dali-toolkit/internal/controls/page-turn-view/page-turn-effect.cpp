@@ -96,7 +96,7 @@ void Dali::Toolkit::Internal::PageTurnApplyInternalConstraint( ShaderEffect& sha
   constraint.Apply();
 }
 
-ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect(bool enableBlending)
+ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect()
 {
   std::string vertexShader = DALI_COMPOSE_SHADER(
       /*
@@ -121,7 +121,6 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect(bool enableBlending)
       \n
       uniform vec2 uPageSize;\n
       uniform float uIsTurningBack;\n
-      uniform float uShadowWidth;\n
       varying vec3 vNormal;\n
       varying vec4 vPosition;\n
       varying float vEdgeShadow;\n
@@ -253,33 +252,10 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect(bool enableBlending)
         vTexCoord = aTexCoord;
         vNormal = uNormalMatrix*normal;\n
         vPosition = uModelView * position;\n
-  );
-
-  std::string vertexShaderWithFakedShadow = DALI_COMPOSE_SHADER(
-      // display shadow, the fake shadow value is calculated according to the height and the distance from page edge
-      vTexCoord.x = (aTexCoord.x-sTextureRect.s) /( 1.0 - uShadowWidth ) + sTextureRect.s;\n
-      vTexCoord.y = ( aTexCoord.y-sTextureRect.t-0.5*uShadowWidth*(sTextureRect.q-sTextureRect.t) )/( 1.0 - uShadowWidth ) + sTextureRect.t;\n
-      float heightCoef = (1.0 + position.z*uIsTurningBack*3.0 / uPageSize.x) * 0.6;
-      vEdgeShadow = clamp(0.9 - heightCoef, 0.0, 0.9 ); \n
-      if( vTexCoord.y >= sTextureRect.q || vTexCoord.y <= sTextureRect.t || vTexCoord.x >= sTextureRect.p  )\n
-      {\n
-        float inversedShadowWidth = (1.0-uShadowWidth) / uShadowWidth ;\n
-        float alpha1 = (vTexCoord.x-sTextureRect.p) * inversedShadowWidth / (sTextureRect.p - sTextureRect.s);\n
-        inversedShadowWidth = 2.0 * inversedShadowWidth  / (sTextureRect.q - sTextureRect.t); \n
-        float alpha2 = (vTexCoord.y-sTextureRect.q) * inversedShadowWidth;\n
-        float alpha3 = (sTextureRect.t-vTexCoord.y) * inversedShadowWidth;\n
-        float alpha;\n
-        if(alpha1 > 0.0 && alpha2 > 0.0) alpha = sqrt(alpha2*alpha2+alpha1*alpha1)/sqrt(1.0 + max(alpha1,alpha2)*max(alpha1,alpha2));\n //bottom-right corner
-        else if(alpha1 > 0.0 && alpha3 > 0.0) alpha = sqrt(alpha3*alpha3+alpha1*alpha1)/sqrt(1.0+max(alpha1,alpha3)*max(alpha1,alpha3));\n //top-right corner
-        else alpha = max(alpha1,max(alpha2,alpha3)); \n
-        alpha = 0.9 - alpha*0.9;\n
-        vEdgeShadow = clamp(alpha - heightCoef, 0.0, 0.9 ); \n
       }\n
   );
 
-  std::string vertexShaderEnd("}");
-
-  std::string fragmentShaderPartOne = DALI_COMPOSE_SHADER(
+  std::string fragmentShader = DALI_COMPOSE_SHADER(
       precision mediump float;\n
       uniform vec2 uPageSize;\n
       uniform vec2 uSpineShadowParameter;\n
@@ -293,64 +269,35 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect(bool enableBlending)
         vec3 normal = normalize(vNormal);\n
         vec4 texel;\n
         float spineShadowCoef = 1.0; \n
-  );
-
-  std::string fragmentShaderWithFakedShadow = DALI_COMPOSE_SHADER(
-      if( vTexCoord.y > sTextureRect.q || vTexCoord.y < sTextureRect.t || vTexCoord.x > sTextureRect.p  )\n
-      texel = vec4(0.0,0.0,0.0,vEdgeShadow);
-      else \n
-  );
-
-  std::string fragmentShaderPartTwo = DALI_COMPOSE_SHADER(
-      { \n
-    // display page content
-    // display back image of the page, flip the texture
-    if(  dot(vPosition.xyz, normal) > 0.0 ) texel = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) );\n
-    // display front image of the page
-    else texel = texture2D( sTexture, vTexCoord );\n
-    // display book spine, a stripe of shadowed texture
-    float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageSize.x; \n
-    if(pixelPos < uSpineShadowParameter.x) \n
-    {\n
-      float x = pixelPos - uSpineShadowParameter.x;\n
-      float y = sqrt( uSpineShadowParameter.x*uSpineShadowParameter.x - x*x);\n
-      spineShadowCoef = normalize( vec2( uSpineShadowParameter.y*x/uSpineShadowParameter.x, y ) ).y;\n
-    }\n
-      }\n
-      // calculate the lighting
-      // set the ambient color as vec3(0.4);
-      float lightColor = abs( normal.z ) * 0.6 + 0.4;\n
-      gl_FragColor = vec4( ( spineShadowCoef* lightColor)* texel.rgb , texel.a ) * uColor;\n
+        // display page content
+        // display back image of the page, flip the texture
+        if(  dot(vPosition.xyz, normal) > 0.0 ) texel = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) );\n
+        // display front image of the page
+        else texel = texture2D( sTexture, vTexCoord );\n
+        // display book spine, a stripe of shadowed texture
+        float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageSize.x; \n
+        if(pixelPos < uSpineShadowParameter.x) \n
+        {\n
+          float x = pixelPos - uSpineShadowParameter.x;\n
+          float y = sqrt( uSpineShadowParameter.x*uSpineShadowParameter.x - x*x);\n
+          spineShadowCoef = normalize( vec2( uSpineShadowParameter.y*x/uSpineShadowParameter.x, y ) ).y;\n
+        }\n
+        // calculate the lighting
+        // set the ambient color as vec3(0.4);
+        float lightColor = abs( normal.z ) * 0.6 + 0.4;\n
+        gl_FragColor = vec4( ( spineShadowCoef* lightColor)* texel.rgb , texel.a ) * uColor;\n
       }
   );
 
   // Create the implementation, temporarily owned on stack,
-  Dali::ShaderEffect shaderEffectCustom;
-  std::ostringstream vertexShaderStringStream;
-  std::ostringstream fragmentShaderStringStream;
-  if( enableBlending )
-  {
-    vertexShaderStringStream<< vertexShader << vertexShaderWithFakedShadow << vertexShaderEnd;
-    fragmentShaderStringStream<< fragmentShaderPartOne << fragmentShaderWithFakedShadow << fragmentShaderPartTwo;
-    shaderEffectCustom = Dali::ShaderEffect::New( vertexShaderStringStream.str(), fragmentShaderStringStream.str(),
-                                                  ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER | ShaderEffect::HINT_BLENDING) );
-  }
-  else
-  {
-    vertexShaderStringStream<< vertexShader << vertexShaderEnd;
-    fragmentShaderStringStream<< fragmentShaderPartOne << fragmentShaderPartTwo;
-    shaderEffectCustom = Dali::ShaderEffect::New( vertexShaderStringStream.str(), fragmentShaderStringStream.str(),
-                                                  ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ) );
-  }
+  Dali::ShaderEffect shaderEffectCustom = Dali::ShaderEffect::New( vertexShader, fragmentShader,ShaderEffect::HINT_GRID );
 
-  static const float DEFAULT_SHADOW_WIDTH(0.15f);
   static const Vector2 DEFAULT_SPINE_SHADOW_PARAMETER(50.0f, 20.0f);
 
   Vector2 defaultPageSize = Dali::Stage::GetCurrent().GetSize();
   Dali::Matrix zeroMatrix(true);
   shaderEffectCustom.SetUniform( "uCommonParameters", zeroMatrix );
-  shaderEffectCustom.SetUniform( "uPageSize", defaultPageSize/(1.f-DEFAULT_SHADOW_WIDTH) );
-  shaderEffectCustom.SetUniform( "uShadowWidth", DEFAULT_SHADOW_WIDTH );
+  shaderEffectCustom.SetUniform( "uPageSize", defaultPageSize );
   shaderEffectCustom.SetUniform( "uSpineShadowParameter", DEFAULT_SPINE_SHADOW_PARAMETER );
 
   shaderEffectCustom.RegisterProperty( "uOriginalCenter", Vector2( defaultPageSize[0], defaultPageSize[1]*0.5f ) );

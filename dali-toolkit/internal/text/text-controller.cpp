@@ -34,7 +34,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
@@ -81,9 +81,10 @@ void Controller::SetText( const std::string& text )
   if( mImpl->mEventData )
   {
     // If popup shown then hide it by switching to Editing state
-    if ( EventData::SELECTING == mImpl->mEventData->mState ||
-         EventData::SELECTION_CHANGED == mImpl->mEventData->mState ||
-         EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState )
+    if( ( EventData::SELECTING == mImpl->mEventData->mState )          ||
+        ( EventData::SELECTION_CHANGED == mImpl->mEventData->mState )  ||
+        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
@@ -329,7 +330,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfChars %d\n",
                  this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfChars );
 
-  if( ! mImpl->IsShowingPlaceholderText() )
+  if( !mImpl->IsShowingPlaceholderText() )
   {
     // Delete at current cursor position
     Vector<Character>& currentText = mImpl->mLogicalModel->mText;
@@ -680,6 +681,13 @@ void Controller::ProcessModifyEvents()
     }
   }
 
+  if( mImpl->mEventData &&
+      0 != events.size() )
+  {
+    // When the text is being modified, delay cursor blinking
+    mImpl->mEventData->mDecorator->DelayCursorBlink();
+  }
+
   // Discard temporary text
   events.clear();
 }
@@ -708,8 +716,9 @@ void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
     mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
 
     // Update the cursor if it's in editing mode.
-    if( ( EventData::EDITING == mImpl->mEventData->mState ) ||
-        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) )
+    if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
+        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
     {
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
@@ -762,8 +771,13 @@ void Controller::TextInsertedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mUpdateCursorPosition = true;
-  mImpl->mEventData->mScrollAfterUpdatePosition = true;
+  if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
+      ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+      ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+  {
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    mImpl->mEventData->mScrollAfterUpdatePosition = true;
+  }
 }
 
 void Controller::TextDeletedEvent()
@@ -785,7 +799,14 @@ void Controller::TextDeletedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mScrollAfterDelete = true;
+  if( 0u == mImpl->mLogicalModel->mText.Count() )
+  {
+    mImpl->mEventData->mUpdateCursorPosition = true;
+  }
+  else
+  {
+    mImpl->mEventData->mScrollAfterDelete = true;
+  }
 }
 
 bool Controller::DoRelayout( const Size& size,
@@ -1084,7 +1105,12 @@ void Controller::KeyboardFocusGainEvent()
 
   if( mImpl->mEventData )
   {
-    mImpl->ChangeState( EventData::EDITING );
+    if( ( EventData::INACTIVE == mImpl->mEventData->mState ) ||
+        ( EventData::INTERRUPTED == mImpl->mEventData->mState ) )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+      mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
+    }
 
     if( mImpl->IsShowingPlaceholderText() )
     {
@@ -1092,7 +1118,6 @@ void Controller::KeyboardFocusGainEvent()
       ShowPlaceholderText();
     }
 
-    mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
     mImpl->RequestRelayout();
   }
 }
@@ -1160,6 +1185,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Menu/Home key behaviour does not allow edit mode to resume like Power key
       // Avoids calling the InsertText() method which can delete selected text
     }
+    else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
+    {
+      // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the imf?) when the predictive text is enabled
+      // and a character is typed after the type of a upper case latin character.
+
+      // Do nothing.
+    }
     else
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
@@ -1171,7 +1203,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    if ( mImpl->mEventData->mState != EventData::INTERRUPTED &&  mImpl->mEventData->mState != EventData::INACTIVE )
+    if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
+         ( mImpl->mEventData->mState != EventData::INACTIVE ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
@@ -1210,6 +1243,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       0 != mImpl->mEventData->mPreEditLength )
   {
     CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
+
     removedPrevious = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
 
     mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
@@ -1221,7 +1255,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     removedPrevious = RemoveSelectedText();
   }
 
-  if( ! text.empty() )
+  if( !text.empty() )
   {
     //  Convert text into UTF-32
     utf32Characters.Resize( text.size() );
@@ -1268,22 +1302,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
         mImpl->mEventData->mPreEditLength = utf32Characters.Count();
         mImpl->mEventData->mPreEditFlag = true;
-
-        // Add the underline for the pre-edit text.
-        const GlyphIndex* const charactersToGlyphBuffer = mImpl->mVisualModel->mCharactersToGlyph.Begin();
-        const Length* const glyphsPerCharacterBuffer = mImpl->mVisualModel->mGlyphsPerCharacter.Begin();
-
-        const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mImpl->mEventData->mPreEditStartPosition );
-        const CharacterIndex lastPreEditCharacter = mImpl->mEventData->mPreEditStartPosition + ( ( mImpl->mEventData->mPreEditLength > 0u ) ? mImpl->mEventData->mPreEditLength - 1u : 0u );
-        const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
-        const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
-
-        GlyphRun underlineRun;
-        underlineRun.glyphIndex = glyphStart;
-        underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
-
-        // TODO: At the moment the underline runs are only for pre-edit.
-        mImpl->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
 
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
       }
@@ -1366,33 +1384,50 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
   if( NULL != mImpl->mEventData )
   {
-    const bool isShowingPlaceholderText = mImpl->IsShowingPlaceholderText();
     if( 1u == tapCount )
     {
-      if( !isShowingPlaceholderText &&
-          ( EventData::EDITING == mImpl->mEventData->mState ) )
+      // This is to avoid unnecessary relayouts when tapping an empty text-field
+      bool relayoutNeeded( false );
+
+      if( mImpl->IsShowingRealText() &&
+          EventData::EDITING == mImpl->mEventData->mState )
       {
+        // Show grab handle on second tap
         mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        relayoutNeeded = true;
       }
-      else if( EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState  )
+      else if( EventData::EDITING                  != mImpl->mEventData->mState &&
+               EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState )
       {
-        // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+        // Show cursor on first tap
         mImpl->ChangeState( EventData::EDITING );
+        relayoutNeeded = true;
+      }
+      else if( mImpl->IsShowingRealText() )
+      {
+        // Move the cursor
+        relayoutNeeded = true;
       }
 
-      Event event( Event::TAP_EVENT );
-      event.p1.mUint = tapCount;
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
+      // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+      if( relayoutNeeded )
+      {
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = tapCount;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
 
-      mImpl->RequestRelayout();
+        mImpl->RequestRelayout();
+      }
     }
-    else if( !isShowingPlaceholderText &&
-             mImpl->mEventData->mSelectionEnabled &&
-             ( 2u == tapCount ) )
+    else if( 2u == tapCount )
     {
-      SelectEvent( x, y, false );
+      if( mImpl->mEventData->mSelectionEnabled &&
+          mImpl->IsShowingRealText() )
+      {
+        SelectEvent( x, y, false );
+      }
     }
   }
 
@@ -1639,7 +1674,21 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
     case ImfManager::DELETESURROUNDING:
     {
-      RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+      update = RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+
+      if( update )
+      {
+        if( 0u != mImpl->mLogicalModel->mText.Count() ||
+            !mImpl->IsPlaceholderAvailable() )
+        {
+          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+        }
+        else
+        {
+          ShowPlaceholderText();
+          mImpl->mEventData->mUpdateCursorPosition = true;
+        }
+      }
       requestRelayout = true;
       break;
     }
