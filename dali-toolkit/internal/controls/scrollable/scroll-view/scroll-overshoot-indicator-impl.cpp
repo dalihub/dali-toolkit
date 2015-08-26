@@ -112,18 +112,6 @@ void ScrollOvershootIndicator::SetOvershootEffectColor( const Vector4& color )
   }
 }
 
-void ScrollOvershootIndicator::ClearOvershoot()
-{
-  if(mEffectX)
-  {
-    mEffectX->SetOvershoot(0.0f);
-  }
-  if(mEffectY)
-  {
-    mEffectY->SetOvershoot(0.0f);
-  }
-}
-
 ScrollOvershootEffect::ScrollOvershootEffect( bool vertical ) :
     mVertical(vertical)
 {

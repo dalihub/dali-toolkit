@@ -2439,11 +2439,6 @@ void ScrollView::OnPan( const PanGesture& gesture )
         {
           mScrollMainInternalPrePositionConstraint.Remove();
         }
-
-        if( mOvershootIndicator )
-        {
-          mOvershootIndicator->ClearOvershoot();
-        }
       }
       else
       {
