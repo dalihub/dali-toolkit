@@ -410,7 +410,6 @@ struct Decorator::Impl : public ConnectionTracker
     mHandle[ LEFT_SELECTION_HANDLE ].position += scrollOffset;
     mHandle[ RIGHT_SELECTION_HANDLE ].position += scrollOffset;
     mHighlightPosition += scrollOffset;
-    DeterminePositionPopup();
   }
 
   void ShowPopup()
