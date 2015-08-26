@@ -36,7 +36,8 @@ namespace Internal
 BubbleActor::BubbleActor( unsigned int numberOfBubble,
                           const Vector2& movementArea)
 : mMovementArea( movementArea ),
-  mNumBubble( numberOfBubble )
+  mNumBubble( numberOfBubble ),
+  mRandomSeed( 0 )
 {
   mActor = Actor::New();
 }
@@ -61,18 +62,20 @@ void BubbleActor::MakeRenderable( Geometry geometry, Material material  )
 
   mIndexInvertedMovementArea = mActor.RegisterProperty( "uInvertedMovementArea", Vector2(1.f,1.f) / mMovementArea );
 
-  srand(time(NULL));
   mIndicesOffset.resize(9);
   int offset = mMovementArea.Length() / 10.f;
-  mIndicesOffset[0] = mActor.RegisterProperty( "uOffset[0]", Vector2(0.f,0.f));
-  mIndicesOffset[1] = mActor.RegisterProperty( "uOffset[1]", Vector2(rand()%offset,rand()%offset) );
-  mIndicesOffset[2] = mActor.RegisterProperty( "uOffset[2]", Vector2(rand()%offset,-rand()%offset) );
-  mIndicesOffset[3] = mActor.RegisterProperty( "uOffset[3]", Vector2(-rand()%offset,rand()%offset) );
-  mIndicesOffset[4] = mActor.RegisterProperty( "uOffset[4]", Vector2(-rand()%offset,-rand()%offset) );
-  mIndicesOffset[5] = mActor.RegisterProperty( "uOffset[5]", Vector2(rand()%offset,0.f));
-  mIndicesOffset[6] = mActor.RegisterProperty( "uOffset[6]", Vector2(-rand()%offset,0.f));
-  mIndicesOffset[7] = mActor.RegisterProperty( "uOffset[7]", Vector2(0.f,rand()%offset));
-  mIndicesOffset[8] = mActor.RegisterProperty( "uOffset[8]", Vector2(0.f,-rand()%offset));
+
+  mRandomSeed = time( NULL );
+
+  mIndicesOffset[0] = mActor.RegisterProperty( "uOffset[0]", Vector2( 0.f,0.f ) );
+  mIndicesOffset[1] = mActor.RegisterProperty( "uOffset[1]", Vector2( rand_r( &mRandomSeed ) % offset,  rand_r( &mRandomSeed ) % offset ) );
+  mIndicesOffset[2] = mActor.RegisterProperty( "uOffset[2]", Vector2( rand_r( &mRandomSeed ) % offset, -rand_r( &mRandomSeed ) % offset ) );
+  mIndicesOffset[3] = mActor.RegisterProperty( "uOffset[3]", Vector2(-rand_r( &mRandomSeed ) % offset,  rand_r( &mRandomSeed ) % offset ) );
+  mIndicesOffset[4] = mActor.RegisterProperty( "uOffset[4]", Vector2(-rand_r( &mRandomSeed ) % offset, -rand_r( &mRandomSeed ) % offset ) );
+  mIndicesOffset[5] = mActor.RegisterProperty( "uOffset[5]", Vector2( rand_r( &mRandomSeed ) % offset, 0.f ) );
+  mIndicesOffset[6] = mActor.RegisterProperty( "uOffset[6]", Vector2(-rand_r( &mRandomSeed ) % offset, 0.f ) );
+  mIndicesOffset[7] = mActor.RegisterProperty( "uOffset[7]", Vector2( 0.f,  rand_r( &mRandomSeed ) % offset ) );
+  mIndicesOffset[8] = mActor.RegisterProperty( "uOffset[8]", Vector2( 0.f, -rand_r( &mRandomSeed ) % offset ) );
 
   Vector4 zeroVector;
   mIndiceStartEndPos.resize( mNumBubble );
@@ -111,14 +114,15 @@ void BubbleActor::SetMovementArea( const Vector2& movementArea )
   mActor.SetProperty( mIndexInvertedMovementArea, Vector2(1.f,1.f) / mMovementArea );
 
   int offset = mMovementArea.Length() / 10.f;
-  mActor.SetProperty( mIndicesOffset[1], Vector2(rand()%offset,rand()%offset) );
-  mActor.SetProperty( mIndicesOffset[2], Vector2(rand()%offset,-rand()%offset) );
-  mActor.SetProperty( mIndicesOffset[3], Vector2(-rand()%offset,rand()%offset) );
-  mActor.SetProperty( mIndicesOffset[4], Vector2(-rand()%offset,-rand()%offset) );
-  mActor.SetProperty( mIndicesOffset[5], Vector2(rand()%offset,0.f));
-  mActor.SetProperty( mIndicesOffset[6], Vector2(-rand()%offset,0.f));
-  mActor.SetProperty( mIndicesOffset[7], Vector2(0.f,rand()%offset));
-  mActor.SetProperty( mIndicesOffset[8], Vector2(0.f,-rand()%offset));
+
+  mActor.SetProperty( mIndicesOffset[1], Vector2( rand_r( &mRandomSeed ) % offset,  rand_r( &mRandomSeed ) % offset ) );
+  mActor.SetProperty( mIndicesOffset[2], Vector2( rand_r( &mRandomSeed ) % offset, -rand_r( &mRandomSeed ) % offset ) );
+  mActor.SetProperty( mIndicesOffset[3], Vector2(-rand_r( &mRandomSeed ) % offset,  rand_r( &mRandomSeed ) % offset ) );
+  mActor.SetProperty( mIndicesOffset[4], Vector2(-rand_r( &mRandomSeed ) % offset, -rand_r( &mRandomSeed ) % offset ) );
+  mActor.SetProperty( mIndicesOffset[5], Vector2( rand_r( &mRandomSeed ) % offset, 0.f ) );
+  mActor.SetProperty( mIndicesOffset[6], Vector2(-rand_r( &mRandomSeed ) % offset, 0.f ) );
+  mActor.SetProperty( mIndicesOffset[7], Vector2( 0.f,  rand_r( &mRandomSeed ) % offset ) );
+  mActor.SetProperty( mIndicesOffset[8], Vector2( 0.f, -rand_r( &mRandomSeed ) % offset ) );
 }
 
 void BubbleActor::SetStartAndEndPosition( unsigned int index, const Vector4& startAndEndPosition )

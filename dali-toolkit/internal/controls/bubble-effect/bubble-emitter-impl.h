@@ -178,6 +178,7 @@ private:
   unsigned int                mDensity;             ///< How many bubbles will emit at each time, they are controlled by same uniforms in the shader.
   unsigned int                mTotalNumOfBubble;    ///< mNumBubblePerShader*mNumShader.
   unsigned int                mCurrentBubble;       ///< Keep track of the index for the newly emitted bubble
+  unsigned int                mRandomSeed;          ///< Seed to generate random number.
 
   bool                        mRenderTaskRunning;   ///< If the background render task is currently running
 
