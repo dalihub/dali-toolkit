@@ -12,6 +12,14 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/json-parser-impl.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
+   $(toolkit_src_dir)/controls/renderers/control-renderer-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/renderer-factory-cache.cpp \
+   $(toolkit_src_dir)/controls/renderers/renderer-factory-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/color/color-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/gradient.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/linear-gradient.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/radial-gradient.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/gradient-renderer.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
