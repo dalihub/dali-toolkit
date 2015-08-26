@@ -257,6 +257,14 @@ protected:
 
 private:
 
+  // Undefined
+  GridLayout( const GridLayout& itemLayout );
+
+  // Undefined
+  GridLayout& operator=( const GridLayout& rhs );
+
+private:
+
   struct Impl;
   Impl* mImpl;
 };
