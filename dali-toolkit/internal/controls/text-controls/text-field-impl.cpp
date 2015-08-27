@@ -1130,7 +1130,15 @@ void TextField::OnPan( const PanGesture& gesture )
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
 {
+  // Show the keyboard if it was hidden.
+  if (!VirtualKeyboard::IsVisible())
+  {
+    VirtualKeyboard::Show();
+  }
+
   mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
+
+  SetKeyInputFocus();
 }
 
 bool TextField::OnKeyEvent( const KeyEvent& event )
