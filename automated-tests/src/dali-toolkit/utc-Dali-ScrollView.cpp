@@ -1324,8 +1324,11 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 105, false);
   overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
   overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
-  DALI_TEST_CHECK(overshootXValue > 0.49f && overshootXValue < 0.51f);
-  DALI_TEST_CHECK(overshootYValue > 0.49f && overshootYValue < 0.51f);
+  // The overshoot value is a 0.0f - 1.0f ranged value of the amount overshot related to the maximum overshoot.
+  // EG. If we move 105, max overshoot is 50, then we overshot 50 / 105.
+  float correctOvershootValue = 50.0f / 105.f;
+  DALI_TEST_EQUALS( overshootXValue, correctOvershootValue, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( overshootYValue, correctOvershootValue, 0.001f, TEST_LOCATION );
 
   // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
@@ -1373,7 +1376,8 @@ int UtcDaliToolkitScrollViewSetScrollingDirectionP(void)
   Wait(application);
   // Try a vertical swipe.
   PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(10.0f, -50.0f), TEST_LOCATION );
+  // Take into account resampling done when prediction is off.
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   scrollView.SetScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
 
@@ -1389,7 +1393,7 @@ int UtcDaliToolkitScrollViewSetScrollingDirectionP(void)
   Wait(application);
   // Try a vertical swipe.
   PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(10.0f, -50.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1423,7 +1427,8 @@ int UtcDaliToolkitScrollViewRemoveScrollingDirectionP(void)
   Wait(application);
   // Try a vertical swipe.
   PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(10.0f, -50.0f), TEST_LOCATION );
+  // Take into account resampling done when prediction is off.
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   END_TEST;
 }
