@@ -670,11 +670,24 @@ bool Controller::Relayout( const Size& size )
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
 
+  // Keep the current offset and alignment as it will be used to update the decorator's positions.
+  Vector2 offset;
+  if( mImpl->mEventData )
+  {
+    offset = mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition;
+  }
+
   // After doing the text layout, the alignment offset to place the actor in the desired position can be calculated.
   CalculateTextAlignment( size );
 
   if( mImpl->mEventData )
   {
+    // If there is a nex size, the scroll position needs to be clamped.
+    mImpl->ClampHorizontalScroll( layoutSize );
+
+    // Update the decorator's positions.
+    mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition - offset );
+
     // Move the cursor, grab handle etc.
     updated = mImpl->ProcessInputEvents() || updated;
   }
