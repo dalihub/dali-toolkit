@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
-#include <iostream>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
