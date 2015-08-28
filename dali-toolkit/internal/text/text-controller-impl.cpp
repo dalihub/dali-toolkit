@@ -881,7 +881,7 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
   uint32_t lengthOfSelectedText =  mEventData->mRightSelectionPosition - startOfSelectedText;
 
   // Validate the start and end selection points
-  if( ( startOfSelectedText >= 0 ) && (  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() ) )
+  if(  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() )
   {
     //Get text as a UTF8 string
     Vector<Character>& utf32Characters = mLogicalModel->mText;
