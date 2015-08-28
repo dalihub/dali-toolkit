@@ -100,6 +100,7 @@ Toolkit::StyleManager StyleManager::Get()
 StyleManager::StyleManager()
 : mOrientationDegrees( 0 ),  // Portrait
   mDefaultFontSize( -1 ),
+  mDefaultFontFamily(""),
   mThemeFile( DEFAULT_THEME ),
   mFeedbackStyle( NULL )
 {
@@ -153,6 +154,11 @@ void StyleManager::SetOrientation( Orientation orientation )
   {
     mOrientation.ChangedSignal().Connect( this, &StyleManager::OnOrientationChanged );
   }
+}
+
+std::string StyleManager::GetDefaultFontFamily() const
+{
+  return mDefaultFontFamily;
 }
 
 Orientation StyleManager::GetOrientation()
@@ -417,6 +423,7 @@ void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::T
   {
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
+      mDefaultFontFamily = styleMonitor.GetDefaultFontFamily();
       break;
     }
 

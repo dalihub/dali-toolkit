@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <iostream>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
@@ -174,7 +175,9 @@ struct ModifyEvent
 struct FontDefaults
 {
   FontDefaults()
-  : mDefaultPointSize(0.0f),
+  : mDefaultFontFamily(""),
+    mDefaultFontStyle(""),
+    mDefaultPointSize(0.0f),
     mFontId(0u)
   {
   }
@@ -214,7 +217,8 @@ struct Controller::Impl
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50 ),
-    mRecalculateNaturalSize( true )
+    mRecalculateNaturalSize( true ),
+    mUserDefinedFontFamily( false)
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -482,7 +486,9 @@ struct Controller::Impl
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
+
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
+  bool mUserDefinedFontFamily:1;           ///< Whether the Font family was Set by the user instead of being left as sytem default
 };
 
 } // namespace Text

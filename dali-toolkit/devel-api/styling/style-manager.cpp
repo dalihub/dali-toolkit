@@ -58,6 +58,11 @@ void StyleManager::SetOrientation( Orientation orientation )
   GetImpl(*this).SetOrientation( orientation );
 }
 
+std::string StyleManager::GetDefaultFontFamily() const
+{
+  return GetImpl(*this).GetDefaultFontFamily();
+}
+
 Orientation StyleManager::GetOrientation()
 {
   return GetImpl(*this).GetOrientation();

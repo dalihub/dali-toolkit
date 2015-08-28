@@ -81,6 +81,11 @@ public:
   Orientation GetOrientation();
 
   /**
+   * @copydoc Toolkit::StyleManager::GetDefaultFontFamily
+   */
+  std::string GetDefaultFontFamily() const;
+
+  /**
    * @copydoc Toolkit::StyleManager::SetStyleConstant
    */
   void SetStyleConstant( const std::string& key, const Property::Value& value );
@@ -253,6 +258,8 @@ private:
   int mOrientationDegrees;            ///< Directly set value of orientation
 
   int mDefaultFontSize;               ///< Logical size, not a point-size
+
+  std::string mDefaultFontFamily;
 
   std::string mThemeFile;             ///< The full path of the current theme file
 

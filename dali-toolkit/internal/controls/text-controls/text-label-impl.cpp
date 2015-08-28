@@ -151,7 +151,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
 
           if( impl.mController->GetDefaultFontFamily() != fontFamily )
           {
-            impl.mController->SetDefaultFontFamily( fontFamily );
+            impl.mController->SetDefaultFontFamily( fontFamily, true );
           }
         }
         break;
