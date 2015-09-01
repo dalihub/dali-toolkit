@@ -25,13 +25,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
-#include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
-#include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
-#include <dali-toolkit/internal/text/text-io.h>
-#include <dali-toolkit/internal/text/text-view.h>
 
 namespace
 {
@@ -329,7 +325,6 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     {
       // Retrieves the scripts used in the text.
       multilanguageSupport.SetScripts( utf32Characters,
-                                       lineBreakInfo,
                                        scripts );
     }
 
@@ -352,12 +347,11 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   Vector<Character> mirroredUtf32Characters;
   bool textMirrored = false;
+  Length numberOfParagraphs = 0u;
   if( BIDI_INFO & operations )
   {
     // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
     // bidirectional info.
-
-    Length numberOfParagraphs = 0u;
 
     const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
     for( Length index = 0u; index < numberOfCharacters; ++index )
@@ -382,7 +376,9 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // This paragraph has right to left text. Some characters may need to be mirrored.
       // TODO: consider if the mirrored string can be stored as well.
 
-      textMirrored = GetMirroredText( utf32Characters, mirroredUtf32Characters );
+      textMirrored = GetMirroredText( utf32Characters,
+                                      mirroredUtf32Characters,
+                                      bidirectionalInfo );
 
       // Only set the character directions if there is right to left characters.
       Vector<CharacterDirection>& directions = mLogicalModel->mCharacterDirections;
@@ -396,12 +392,14 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // There is no right to left characters. Clear the directions vector.
       mLogicalModel->mCharacterDirections.Clear();
     }
-
-   }
+  }
 
   Vector<GlyphInfo>& glyphs = mVisualModel->mGlyphs;
   Vector<CharacterIndex>& glyphsToCharactersMap = mVisualModel->mGlyphsToCharacters;
   Vector<Length>& charactersPerGlyph = mVisualModel->mCharactersPerGlyph;
+  Vector<GlyphIndex> newParagraphGlyphs;
+  newParagraphGlyphs.Reserve( numberOfParagraphs );
+
   if( SHAPE_TEXT & operations )
   {
     const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
@@ -412,7 +410,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                validFonts,
                glyphs,
                glyphsToCharactersMap,
-               charactersPerGlyph );
+               charactersPerGlyph,
+               newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
     mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
@@ -423,7 +422,40 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   if( GET_GLYPH_METRICS & operations )
   {
-    mFontClient.GetGlyphMetrics( glyphs.Begin(), numberOfGlyphs );
+    GlyphInfo* glyphsBuffer = glyphs.Begin();
+    mFontClient.GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
+
+    // Update the width and advance of all new paragraph characters.
+    for( Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it )
+    {
+      const GlyphIndex index = *it;
+      GlyphInfo& glyph = *( glyphsBuffer + index );
+
+      glyph.xBearing = 0.f;
+      glyph.width = 0.f;
+      glyph.advance = 0.f;
+    }
+  }
+
+  if( mEventData &&
+      mEventData->mPreEditFlag &&
+      ( 0u != mVisualModel->mCharactersToGlyph.Count() ) )
+  {
+    // Add the underline for the pre-edit text.
+    const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+
+    const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mEventData->mPreEditStartPosition );
+    const CharacterIndex lastPreEditCharacter = mEventData->mPreEditStartPosition + ( ( mEventData->mPreEditLength > 0u ) ? mEventData->mPreEditLength - 1u : 0u );
+    const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
+    const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
+
+    GlyphRun underlineRun;
+    underlineRun.glyphIndex = glyphStart;
+    underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
+
+    // TODO: At the moment the underline runs are only for pre-edit.
+    mVisualModel->mUnderlineRuns.PushBack( underlineRun );
   }
 }
 
@@ -505,13 +537,16 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
     if( 1u == tapCount )
     {
-      if( ! IsShowingPlaceholderText() )
+      if( IsShowingRealText() )
       {
         const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
         const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
         mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
                                                                     yPosition );
+
+        // When the cursor position is changing, delay cursor blinking
+        mEventData->mDecorator->DelayCursorBlink();
       }
       else
       {
@@ -726,7 +761,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
 
       // Position the grag handle close to either the left or right edge.
-      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+      position.x = scrollRightDirection ? 0.f : mVisualModel->mControlSize.width;
 
       // Get the new handle position.
       // The grab handle's position is in decorator coords. Need to transforms to text coords.
@@ -747,7 +782,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
 
       // Position the selection handle close to either the left or right edge.
-      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+      position.x = scrollRightDirection ? 0.f : mVisualModel->mControlSize.width;
 
       // Get the new handle position.
       // The selection handle's position is in decorator coords. Need to transforms to text coords.
@@ -923,36 +958,108 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
   const GlyphInfo* const glyphsBuffer = mVisualModel->mGlyphs.Begin();
   const Vector2* const positionsBuffer = mVisualModel->mGlyphPositions.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+  const CharacterIndex* const glyphToCharacterBuffer = mVisualModel->mGlyphsToCharacters.Begin();
+  const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != mLogicalModel->mCharacterDirections.Count() ) ? mLogicalModel->mCharacterDirections.Begin() : NULL;
 
   // TODO: Better algorithm to create the highlight box.
   // TODO: Multi-line.
 
+  // Get the height of the line.
   const Vector<LineRun>& lines = mVisualModel->mLines;
   const LineRun& firstLine = *lines.Begin();
   const float height = firstLine.ascender + -firstLine.descender;
 
+  // Swap the indices if the start is greater than the end.
   const bool indicesSwapped = ( selectionStart > selectionEnd );
   if( indicesSwapped )
   {
     std::swap( selectionStart, selectionEnd );
   }
 
+  // Get the indices to the first and last selected glyphs.
+  const CharacterIndex selectionEndMinusOne = selectionEnd - 1u;
   const GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
-  const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) );
-  const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
+  const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + selectionEndMinusOne );
+  const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + selectionEndMinusOne ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
 
+  // Check if the first glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
+  const Length numberOfCharactersStart = *( charactersPerGlyphBuffer + glyphStart );
+  bool splitStartGlyph = ( numberOfCharactersStart > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionStart ) );
+
+  // Check if the last glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
+  const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
+  bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
+
+  // Tell the decorator to swap the selection handles if needed.
   mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
+  // Traverse the glyphs.
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
   {
-    // TODO: Fix the LATIN ligatures. i.e ff, fi, etc...
     const GlyphInfo& glyph = *( glyphsBuffer + index );
     const Vector2& position = *( positionsBuffer + index );
 
+    if( splitStartGlyph )
+    {
+      // If the first glyph is a ligature that must be broken it may be needed to add only part of the glyph to the highlight box.
+
+      const float glyphAdvance = glyph.advance / static_cast<float>( numberOfCharactersStart );
+      const CharacterIndex interGlyphIndex = selectionStart - *( glyphToCharacterBuffer + glyphStart );
+      // Get the direction of the character.
+      CharacterDirection isCurrentRightToLeft = false;
+      if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+      {
+        isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + selectionStart );
+      }
+
+      // The end point could be in the middle of the ligature.
+      // Calculate the number of characters selected.
+      const Length numberOfCharacters = ( glyphStart == glyphEnd ) ? ( selectionEnd - selectionStart ) : ( numberOfCharactersStart - interGlyphIndex );
+
+      const float xPosition = position.x - glyph.xBearing + offset.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            offset.y,
+                                            xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance,
+                                            offset.y + height );
+
+      splitStartGlyph = false;
+      continue;
+    }
+
+    if( splitEndGlyph && ( index == glyphEnd ) )
+    {
+      // Equally, if the last glyph is a ligature that must be broken it may be needed to add only part of the glyph to the highlight box.
+
+      const float glyphAdvance = glyph.advance / static_cast<float>( numberOfCharactersEnd );
+      const CharacterIndex interGlyphIndex = selectionEnd - *( glyphToCharacterBuffer + glyphEnd );
+      // Get the direction of the character.
+      CharacterDirection isCurrentRightToLeft = false;
+      if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+      {
+        isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + selectionEnd );
+      }
+
+      const Length numberOfCharacters = numberOfCharactersEnd - interGlyphIndex;
+
+      const float xPosition = position.x - glyph.xBearing + offset.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            offset.y,
+                                            xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance,
+                                            offset.y + height );
+
+      splitEndGlyph = false;
+      continue;
+    }
+
     const float xPosition = position.x - glyph.xBearing + offset.x;
-    mEventData->mDecorator->AddHighlight( xPosition, offset.y, xPosition + glyph.advance, height );
+    mEventData->mDecorator->AddHighlight( xPosition,
+                                          offset.y,
+                                          xPosition + glyph.advance,
+                                          offset.y + height );
   }
 
   CursorInfo primaryCursorInfo;
@@ -969,6 +1076,9 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   mEventData->mDecorator->SetPosition( LEFT_SELECTION_HANDLE, primaryPosition.x, primaryPosition.y, primaryCursorInfo.lineHeight );
 
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
+
+  // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
+  mEventData->mPrimaryCursorPosition = (indicesSwapped)?mEventData->mLeftSelectionPosition:mEventData->mRightSelectionPosition;
 
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
@@ -1234,10 +1344,25 @@ LineIndex Controller::Impl::GetClosestLine( float y ) const
 void Controller::Impl::FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex )
 {
   CharacterIndex hitCharacter = GetClosestCursorIndex( visualX, visualY );
+  DALI_ASSERT_DEBUG( hitCharacter <= mLogicalModel->mText.Count() && "GetClosestCursorIndex returned out of bounds index" );
+
+  if ( mLogicalModel->mText.Count() == 0 )
+  {
+    return;  // if model empty
+  }
+
   if( hitCharacter >= mLogicalModel->mText.Count() )
   {
-    // Selection out of bounds.
-    return;
+    // Closest hit character is the last character.
+    if ( hitCharacter ==  mLogicalModel->mText.Count() )
+    {
+      hitCharacter--; //Hit character index set to last character in logical model
+    }
+    else
+    {
+      // hitCharacter is out of bounds
+      return;
+    }
   }
 
   startIndex = hitCharacter;
@@ -1269,6 +1394,8 @@ void Controller::Impl::FindSelectionIndices( float visualX, float visualY, Chara
 CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
                                                         float visualY )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetClosestCursorIndex %p closest visualX %f visualY %f\n", this, visualX, visualY );
+
   if( NULL == mEventData )
   {
     // Nothing to do if there is no text input.
@@ -1339,8 +1466,8 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
     const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
 
-    // Prevents to jump the whole Latin ligatures like fi, ff, ...
-    const Length numberOfCharactersInLigature = ( TextAbstraction::LATIN == script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
+    // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ...
+    const Length numberOfCharactersInLigature = HasLigatureMustBreak( script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
     const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfCharactersInLigature );
 
     for( GlyphIndex index = 0u; !matched && ( index < numberOfCharactersInLigature ); ++index )
@@ -1372,6 +1499,8 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   logicalIndex = hasRightToLeftCharacters ? *( visualToLogicalCursorBuffer + visualIndex ) : visualIndex;
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
 
+  DALI_ASSERT_DEBUG( ( logicalIndex <= mLogicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );
+
   return logicalIndex;
 }
 
@@ -1390,7 +1519,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
-    cursorInfo.primaryPosition.x = 1.f;
+    cursorInfo.primaryPosition.x = mEventData->mDecorator->GetCursorWidth();
     cursorInfo.primaryPosition.y = 0.f;
 
     // Nothing else to do.
@@ -1414,7 +1543,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
   }
 
   // Get the line where the character is laid-out.
-  const LineRun* modelLines = mVisualModel->mLines.Begin();
+  const LineRun* const modelLines = mVisualModel->mLines.Begin();
 
   const LineIndex lineIndex = mVisualModel->GetLineOfCharacter( characterIndex );
   const LineRun& line = *( modelLines + lineIndex );
@@ -1455,10 +1584,16 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     }
   }
 
+  const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+  const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+  const CharacterIndex* const glyphsToCharactersBuffer = mVisualModel->mGlyphsToCharacters.Begin();
+  const Vector2* const glyphPositionsBuffer = mVisualModel->mGlyphPositions.Begin();
+
   // Convert the cursor position into the glyph position.
-  const GlyphIndex primaryGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + index );
-  const Length primaryNumberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + index );
-  const Length primaryNumberOfCharacters = *( mVisualModel->mCharactersPerGlyph.Begin() + primaryGlyphIndex );
+  const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
+  const Length primaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
+  const Length primaryNumberOfCharacters = *( charactersPerGlyphBuffer + primaryGlyphIndex );
 
   // Get the metrics for the group of glyphs.
   GlyphMetrics glyphMetrics;
@@ -1468,33 +1603,70 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                     mVisualModel,
                     mFontClient );
 
-  float glyphAdvance = 0.f;
+  // Whether to add the glyph's advance to the cursor position.
+  // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
+  //     if the logical cursor is one, the position is the position of the first glyph and the advance is added.
+  // A 'truth table' was build and an online Karnaugh map tool was used to simplify the logic.
+  //
+  // FLCP A
+  // ------
+  // 0000 1
+  // 0001 1
+  // 0010 0
+  // 0011 0
+  // 0100 1
+  // 0101 0
+  // 0110 1
+  // 0111 0
+  // 1000 0
+  // 1001 x
+  // 1010 x
+  // 1011 1
+  // 1100 x
+  // 1101 x
+  // 1110 x
+  // 1111 x
+  //
+  // Where F -> isFirstPosition
+  //       L -> isLastPosition
+  //       C -> isCurrentRightToLeft
+  //       P -> isRightToLeftParagraph
+  //       A -> Whether to add the glyph's advance.
+
+  const bool addGlyphAdvance = ( ( isLastPosition && !isRightToLeftParagraph ) ||
+                                 ( isFirstPosition && isRightToLeftParagraph ) ||
+                                 ( !isFirstPosition && !isLastPosition && !isCurrentRightToLeft ) );
+
+  float glyphAdvance = addGlyphAdvance ? glyphMetrics.advance : 0.f;
+
   if( !isLastPosition &&
       ( primaryNumberOfCharacters > 1u ) )
   {
-    const CharacterIndex firstIndex = *( mVisualModel->mGlyphsToCharacters.Begin() + primaryGlyphIndex );
-    glyphAdvance = static_cast<float>( 1u + characterIndex - firstIndex ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
-  }
-  else
-  {
-    glyphAdvance = glyphMetrics.advance;
+    const CharacterIndex firstIndex = *( glyphsToCharactersBuffer + primaryGlyphIndex );
+
+    bool isCurrentRightToLeft = false;
+    if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+    {
+      isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + index );
+    }
+
+    Length numberOfGlyphAdvance = ( isFirstPosition ? 0u : 1u ) + characterIndex - firstIndex;
+    if( isCurrentRightToLeft )
+    {
+      numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
+    }
+
+    glyphAdvance = static_cast<float>( numberOfGlyphAdvance ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
   }
 
   // Get the glyph position and x bearing.
-  const Vector2& primaryPosition = *( mVisualModel->mGlyphPositions.Begin() + primaryGlyphIndex );
+  const Vector2& primaryPosition = *( glyphPositionsBuffer + primaryGlyphIndex );
 
   // Set the primary cursor's height.
   cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
 
   // Set the primary cursor's position.
-  if( isLastPosition )
-  {
-    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + ( isRightToLeftParagraph ? 0.f : glyphMetrics.advance );
-  }
-  else
-  {
-    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + ( ( ( isFirstPosition && !isCurrentRightToLeft ) || ( !isFirstPosition && isCurrentRightToLeft ) ) ? 0.f : glyphAdvance );
-  }
+  cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
   cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
 
   // Calculate the secondary cursor.
@@ -1510,10 +1682,10 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
       index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? nextCharacterIndex : characterIndex;
     }
 
-    const GlyphIndex secondaryGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + index );
-    const Length secondaryNumberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + index );
+    const GlyphIndex secondaryGlyphIndex = *( charactersToGlyphBuffer + index );
+    const Length secondaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
 
-    const Vector2& secondaryPosition = *( mVisualModel->mGlyphPositions.Begin() + index );
+    const Vector2& secondaryPosition = *( glyphPositionsBuffer + secondaryGlyphIndex );
 
     GetGlyphsMetrics( secondaryGlyphIndex,
                       secondaryNumberOfGlyphs,
@@ -1537,25 +1709,27 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex( CharacterIndex index )
 
   CharacterIndex cursorIndex = mEventData->mPrimaryCursorPosition;
 
-  const Script script = mLogicalModel->GetScript( index );
-  const GlyphIndex* charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
-  const Length* charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+  const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
 
-  Length numberOfCharacters = 0u;
-  if( TextAbstraction::LATIN == script )
+  GlyphIndex glyphIndex = *( charactersToGlyphBuffer + index );
+  Length numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
+
+  if( numberOfCharacters > 1u )
   {
-    // Prevents to jump the whole Latin ligatures like fi, ff, ...
-    numberOfCharacters = 1u;
+    const Script script = mLogicalModel->GetScript( index );
+    if( HasLigatureMustBreak( script ) )
+    {
+      // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ,  ...
+      numberOfCharacters = 1u;
+    }
   }
   else
   {
-    GlyphIndex glyphIndex = *( charactersToGlyphBuffer + index );
-    numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
-
     while( 0u == numberOfCharacters )
     {
-      numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
       ++glyphIndex;
+      numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
     }
   }
 
@@ -1581,7 +1755,7 @@ void Controller::Impl::UpdateCursorPosition()
     return;
   }
 
-  if( IsShowingPlaceholderText() )
+  if( IsShowingPlaceholderText() || ( 0u == mLogicalModel->mText.Count() ) )
   {
     // Do not want to use the place-holder text to set the cursor position.
 
@@ -1614,17 +1788,17 @@ void Controller::Impl::UpdateCursorPosition()
     {
       case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
       {
-        cursorPosition.x = 1.f;
+        cursorPosition.x = mEventData->mDecorator->GetCursorWidth();
         break;
       }
       case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
       {
-        cursorPosition.x = floor( 0.5f * mControlSize.width );
+        cursorPosition.x = floor( 0.5f * mVisualModel->mControlSize.width );
         break;
       }
       case LayoutEngine::HORIZONTAL_ALIGN_END:
       {
-        cursorPosition.x = mControlSize.width;
+        cursorPosition.x = mVisualModel->mControlSize.width;
         break;
       }
     }
@@ -1638,12 +1812,12 @@ void Controller::Impl::UpdateCursorPosition()
       }
       case LayoutEngine::VERTICAL_ALIGN_CENTER:
       {
-        cursorPosition.y = floorf( 0.5f * ( mControlSize.height - lineHeight ) );
+        cursorPosition.y = floorf( 0.5f * ( mVisualModel->mControlSize.height - lineHeight ) );
         break;
       }
       case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
       {
-        cursorPosition.y = mControlSize.height - lineHeight;
+        cursorPosition.y = mVisualModel->mControlSize.height - lineHeight;
         break;
       }
     }
@@ -1728,9 +1902,9 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType )
 void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
 {
   // Clamp between -space & 0 (and the text alignment).
-  if( actualSize.width > mControlSize.width )
+  if( actualSize.width > mVisualModel->mControlSize.width )
   {
-    const float space = ( actualSize.width - mControlSize.width ) + mAlignmentOffset.x;
+    const float space = ( actualSize.width - mVisualModel->mControlSize.width ) + mAlignmentOffset.x;
     mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
     mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
 
@@ -1745,9 +1919,9 @@ void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
 void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
 {
   // Clamp between -space & 0 (and the text alignment).
-  if( actualSize.height > mControlSize.height )
+  if( actualSize.height > mVisualModel->mControlSize.height )
   {
-    const float space = ( actualSize.height - mControlSize.height ) + mAlignmentOffset.y;
+    const float space = ( actualSize.height - mVisualModel->mControlSize.height ) + mAlignmentOffset.y;
     mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
     mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
 
@@ -1769,9 +1943,9 @@ void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
     mEventData->mScrollPosition.x += offset.x;
     updateDecorator = true;
   }
-  else if( position.x > mControlSize.width )
+  else if( position.x > mVisualModel->mControlSize.width )
   {
-    offset.x = mControlSize.width - position.x;
+    offset.x = mVisualModel->mControlSize.width - position.x;
     mEventData->mScrollPosition.x += offset.x;
     updateDecorator = true;
   }
@@ -1826,8 +2000,9 @@ void Controller::Impl::ScrollTextToMatchCursor()
   }
 
   // Set which cursors are active according the state.
-  if( ( EventData::EDITING == mEventData->mState ) ||
-      ( EventData::EDITING_WITH_POPUP == mEventData->mState ) ||
+  if( ( EventData::EDITING == mEventData->mState )                  ||
+      ( EventData::EDITING_WITH_POPUP == mEventData->mState )       ||
+      ( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState ) ||
       ( EventData::GRAB_HANDLE_PANNING == mEventData->mState ) )
   {
     if( cursorInfo.isSecondaryCursor )

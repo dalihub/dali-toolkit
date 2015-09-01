@@ -19,14 +19,7 @@
 #include <dali-toolkit/internal/text/shaper.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/script.h>
 #include <dali/devel-api/text-abstraction/shaping.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/font-run.h>
-#include <dali-toolkit/internal/text/logical-model-impl.h>
-#include <dali-toolkit/internal/text/script-run.h>
-#include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
 {
@@ -49,7 +42,8 @@ void ShapeText( const Vector<Character>& text,
                 const Vector<FontRun>& fonts,
                 Vector<GlyphInfo>& glyphs,
                 Vector<CharacterIndex>& glyphToCharacterMap,
-                Vector<Length>& charactersPerGlyph )
+                Vector<Length>& charactersPerGlyph,
+                Vector<GlyphIndex>& newParagraphGlyphs )
 {
   const Length numberOfCharacters = text.Count();
 
@@ -74,7 +68,7 @@ void ShapeText( const Vector<Character>& text,
 
   // The text needs to be split in chunks of consecutive characters.
   // Each chunk must contain characters with the same font id and script set.
-  // A chunk of consecutive characters must not contain a LINE_MUST_BREAK, if there is one a new chunk have to be created.
+  // A chunk of consecutive characters must not contain a LINE_MUST_BREAK, if there is one a new chunk has to be created.
 
   TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
 
@@ -100,8 +94,8 @@ void ShapeText( const Vector<Character>& text,
   // The actual number of glyphs.
   Length totalNumberOfGlyphs = 0u;
 
-  const Character* textBuffer = text.Begin();
-  const LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
+  const Character* const textBuffer = text.Begin();
+  const LineBreakInfo* const lineBreakInfoBuffer = lineBreakInfo.Begin();
   GlyphInfo* glyphsBuffer = glyphs.Begin();
   CharacterIndex* glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
@@ -121,33 +115,26 @@ void ShapeText( const Vector<Character>& text,
 
     // Check if there is a line must break.
     bool mustBreak = false;
+
+    // Check if the current index is a new paragraph character.
+    // A new paragraph character is going to be shaped in order to not to mess the conversion tables.
+    // However, the metrics need to be changed in order to not to draw a square.
+    bool isNewParagraph = false;
+
     for( CharacterIndex index = previousIndex; index < currentIndex; ++index )
     {
       mustBreak = TextAbstraction::LINE_MUST_BREAK == *( lineBreakInfoBuffer + index );
       if( mustBreak )
       {
-        currentIndex = index;
+        isNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + index ) );
+        currentIndex = index + 1u;
         break;
       }
     }
 
-    // Check if the current index is a new paragraph character.
-    // A \n is going to be shaped in order to not to mess the conversion tables.
-    // After the \n character is shaped, the glyph is going to be reset to its
-    // default in order to not to get any metric or font index for it.
-    const bool isNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + currentIndex ) );
-
-    // The last character is always a must-break even if it's not a \n.
-    Length numberOfCharactersToShape = currentIndex - previousIndex;
-    if( mustBreak )
-    {
-      // Add one more character to shape.
-      ++numberOfCharactersToShape;
-    }
-
     // Shape the text for the current chunk.
     const Length numberOfGlyphs = shaping.Shape( textBuffer + previousIndex,
-                                                 numberOfCharactersToShape,
+                                                 ( currentIndex - previousIndex ), // The number of characters to shape.
                                                  currentFontId,
                                                  currentScript );
 
@@ -172,14 +159,9 @@ void ShapeText( const Vector<Character>& text,
 
     if( isNewParagraph )
     {
-      // TODO : This is a work around to avoid drawing a square in the
-      //        place of a new line character.
-
-      // If the last character is a \n, it resets the glyph to the default
-      // to avoid getting any metric for it.
-      GlyphInfo& glyph = *( glyphsBuffer + glyphIndex + ( numberOfGlyphs - 1u ) );
-
-      glyph = GlyphInfo();
+      // Add the index of the new paragraph glyph to a vector.
+      // Their metrics will be updated in a following step.
+      newParagraphGlyphs.PushBack( totalNumberOfGlyphs - 1u );
     }
 
     // Update indices.
@@ -202,8 +184,8 @@ void ShapeText( const Vector<Character>& text,
       ++scriptRunIt;
     }
 
-    // Update the previous index. Jumps the \n if needed.
-    previousIndex = mustBreak ? currentIndex + 1u : currentIndex;
+    // Update the previous index.
+    previousIndex = currentIndex;
   }
 
   // Add the number of characters per glyph.

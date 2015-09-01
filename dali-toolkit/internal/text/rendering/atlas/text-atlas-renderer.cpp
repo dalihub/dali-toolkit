@@ -19,17 +19,20 @@
 #include <dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
-#include <dali/devel-api/object/property-buffer.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/shader.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/text/glyph-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
+#include <dali-toolkit/internal/text/text-view.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -50,7 +53,6 @@ const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
 }
 struct AtlasRenderer::Impl : public ConnectionTracker
 {
-
   enum Style
   {
     STYLE_NORMAL,
@@ -59,15 +61,34 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct MeshRecord
   {
+    MeshRecord()
+    : mColor( Color::BLACK ),
+      mAtlasId( 0 )
+    {
+    }
+
     Vector4 mColor;
     uint32_t mAtlasId;
     AtlasManager::Mesh2D mMesh;
     FrameBufferImage mBuffer;
-    bool mIsUnderline;
   };
 
+  /**
+   * brief Struct used to generate the underline mesh.
+   * There is one Extent per line of text.
+   */
   struct Extent
   {
+    Extent()
+    : mBaseLine( 0.0f ),
+      mLeft( 0.0f ),
+      mRight( 0.0f ),
+      mUnderlinePosition( 0.0f ),
+      mUnderlineThickness( 0.0f ),
+      mMeshRecordIndex( 0 )
+    {
+    }
+
     float mBaseLine;
     float mLeft;
     float mRight;
@@ -78,6 +99,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct MaxBlockSize
   {
+    MaxBlockSize()
+    : mFontId( 0 ),
+      mNeededBlockWidth( 0 ),
+      mNeededBlockHeight( 0 )
+    {
+    }
+
     FontId mFontId;
     uint32_t mNeededBlockWidth;
     uint32_t mNeededBlockHeight;
@@ -85,12 +113,25 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct CheckEntry
   {
+    CheckEntry()
+    : mFontId( 0 ),
+      mIndex( 0 )
+    {
+    }
+
     FontId mFontId;
     Text::GlyphIndex mIndex;
   };
 
   struct TextCacheEntry
   {
+    TextCacheEntry()
+    : mFontId( 0 ),
+      mIndex( 0 ),
+      mImageId( 0 )
+    {
+    }
+
     FontId mFontId;
     Text::GlyphIndex mIndex;
     uint32_t mImageId;
@@ -107,14 +148,31 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     mQuadIndexFormat[ "indices" ] = Property::INTEGER;
   }
 
-  void AddGlyphs( const std::vector<Vector2>& positions,
+  bool IsGlyphUnderlined( GlyphIndex index,
+                          const Vector<GlyphRun>& underlineRuns )
+  {
+    // TODO: At the moment it works because we always traverse the glyphs starting from the beginning
+    //       and there is only one glyph run! If there are more they should be ordered.
+
+    for( Vector<GlyphRun>::ConstIterator it = underlineRuns.Begin(),
+           endIt = underlineRuns.End();
+           it != endIt;
+         ++it )
+    {
+      const GlyphRun& run = *it;
+
+      if( ( run.glyphIndex <= index ) && ( index < run.glyphIndex + run.numberOfGlyphs ) )
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  void AddGlyphs( Text::ViewInterface& view,
+                  const Vector<Vector2>& positions,
                   const Vector<GlyphInfo>& glyphs,
-                  const Vector4& textColor,
-                  const Vector2& shadowOffset,
-                  const Vector4& shadowColor,
-                  bool underlineEnabled,
-                  const Vector4& underlineColor,
-                  float underlineHeight,
                   int depth )
   {
     AtlasManager::AtlasSlot slot;
@@ -123,10 +181,30 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     TextCacheEntry textCacheEntry;
     mDepth = depth;
 
+    const Vector2& actorSize( view.GetControlSize() );
+    const Vector2 halfActorSize( actorSize * 0.5f );
+    const Vector4& textColor( view.GetTextColor() );
+    const Vector2& shadowOffset( view.GetShadowOffset() );
+    const Vector4& shadowColor( view.GetShadowColor() );
+    const bool underlineEnabled( view.IsUnderlineEnabled() );
+    const Vector4& underlineColor( view.GetUnderlineColor() );
+    const float underlineHeight( view.GetUnderlineHeight() );
+
+    // Get the underline runs.
+    const Length numberOfUnderlineRuns = view.GetNumberOfUnderlineRuns();
+    Vector<GlyphRun> underlineRuns;
+    underlineRuns.Resize( numberOfUnderlineRuns );
+    view.GetUnderlineRuns( underlineRuns.Begin(),
+                           0u,
+                           numberOfUnderlineRuns );
+
+    bool thereAreUnderlinedGlyphs = false;
+
     float currentUnderlinePosition = ZERO;
     float currentUnderlineThickness = underlineHeight;
     uint32_t currentBlockSize = 0;
     FontId lastFontId = 0;
+    FontId lastUnderlinedFontId = 0;
     Style style = STYLE_NORMAL;
 
     if ( fabsf( shadowOffset.x ) > Math::MACHINE_EPSILON_1 || fabsf( shadowOffset.y ) > Math::MACHINE_EPSILON_1 )
@@ -138,22 +216,27 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     // Avoid emptying mTextCache (& removing references) until after incremented references for the new text
     Vector< TextCacheEntry > newTextCache;
+    const GlyphInfo* const glyphsBuffer = glyphs.Begin();
+    const Vector2* const positionsBuffer = positions.Begin();
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
-      const GlyphInfo& glyph = glyphs[ i ];
+      const GlyphInfo& glyph = *( glyphsBuffer + i );
+
+      const bool underlineGlyph = underlineEnabled || IsGlyphUnderlined( i, underlineRuns );
+      thereAreUnderlinedGlyphs = thereAreUnderlinedGlyphs || underlineGlyph;
 
       // No operation for white space
       if ( glyph.width && glyph.height )
       {
         // Are we still using the same fontId as previous
-        if ( glyph.fontId != lastFontId )
+        if ( underlineGlyph && ( glyph.fontId != lastUnderlinedFontId ) )
         {
           // We need to fetch fresh font underline metrics
           FontMetrics fontMetrics;
           mFontClient.GetFontMetrics( glyph.fontId, fontMetrics );
           currentUnderlinePosition = ceil( fabsf( fontMetrics.underlinePosition ) );
-          float descender = ceil( fabsf( fontMetrics.descender ) );
+          const float descender = ceil( fabsf( fontMetrics.descender ) );
 
           if ( underlineHeight == ZERO )
           {
@@ -180,10 +263,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
             // Move offset down by one ( EFL behavior )
             currentUnderlinePosition = ONE;
           }
-        }
 
-        const Vector2& position = positions[ i ];
-        AtlasManager::Mesh2D newMesh;
+          lastUnderlinedFontId = glyph.fontId;
+        } // underline
 
         if ( !mGlyphManager.Cached( glyph.fontId, glyph.index, slot ) )
         {
@@ -238,7 +320,11 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           mGlyphManager.AdjustReferenceCount( glyph.fontId, glyph.index, 1/*increment*/ );
         }
 
+        // Move the origin (0,0) of the mesh to the center of the actor
+        Vector2 position = *( positionsBuffer + i ) - halfActorSize;
+
         // Generate mesh data for this quad, plugging in our supplied position
+        AtlasManager::Mesh2D newMesh;
         mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
         textCacheEntry.mFontId = glyph.fontId;
         textCacheEntry.mImageId = slot.mImageId;
@@ -251,18 +337,19 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         extents,
                         textColor,
                         position.y + glyph.yBearing,
+                        underlineGlyph,
                         currentUnderlinePosition,
                         currentUnderlineThickness,
                         slot );
         lastFontId = glyph.fontId;
       }
-    }
+    } // glyphs
 
     // Now remove references for the old text
     RemoveText();
     mTextCache.Swap( newTextCache );
 
-    if ( underlineEnabled )
+    if( thereAreUnderlinedGlyphs )
     {
       // Check to see if any of the text needs an underline
       GenerateUnderlines( meshContainer, extents, underlineColor, textColor );
@@ -273,17 +360,18 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     {
       for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt )
       {
-        Actor actor = CreateMeshActor( *mIt );
+        Actor actor = CreateMeshActor( *mIt, actorSize );
 
         // Create an effect if necessary
         if ( style == STYLE_DROP_SHADOW )
         {
-          actor.Add( GenerateShadow( *mIt, shadowOffset, shadowColor ) );
+          Actor shadowActor = GenerateShadow( *mIt, actorSize, shadowOffset, shadowColor );
+          shadowActor.Add( actor );
+          actor = shadowActor;
         }
 
         if( mActor )
         {
-          actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
           mActor.Add( actor );
         }
         else
@@ -325,7 +413,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     mTextCache.Resize( 0 );
   }
 
-  Actor CreateMeshActor( const MeshRecord& meshRecord )
+  Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize )
   {
     PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, meshRecord.mMesh.mVertices.Size() );
     PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
@@ -344,17 +432,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     actor.SetName( "Text renderable actor" );
 #endif
     actor.AddRenderer( renderer );
-    actor.SetSize( 1.0f, 1.0f );
+    actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
+    actor.SetSize( actorSize );
     actor.SetColor( meshRecord.mColor );
-
-    if ( meshRecord.mIsUnderline )
-    {
-      actor.SetColorMode( USE_OWN_COLOR );
-    }
-    else
-    {
-      actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-    }
     return actor;
   }
 
@@ -363,6 +443,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                        Vector< Extent >& extents,
                        const Vector4& color,
                        float baseLine,
+                       bool underlineGlyph,
                        float underlinePosition,
                        float underlineThickness,
                        AtlasManager::AtlasSlot& slot )
@@ -374,20 +455,28 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
       // Check to see if there's a mesh data object that references the same atlas ?
       uint32_t index = 0;
-      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt, ++index )
+      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(),
+              mEndIt = meshContainer.end();
+            mIt != mEndIt;
+            ++mIt, ++index )
       {
         if ( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
         {
           // Stitch the mesh to the existing mesh and adjust any extents
           mGlyphManager.StitchMesh( mIt->mMesh, newMesh );
-          AdjustExtents( extents,
-                         meshContainer,
-                         index,
-                         left,
-                         right,
-                         baseLine,
-                         underlinePosition,
-                         underlineThickness );
+
+          if( underlineGlyph )
+          {
+            AdjustExtents( extents,
+                           meshContainer,
+                           index,
+                           left,
+                           right,
+                           baseLine,
+                           underlinePosition,
+                           underlineThickness );
+          }
+
           return;
         }
       }
@@ -397,19 +486,20 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       meshRecord.mAtlasId = slot.mAtlasId;
       meshRecord.mMesh = newMesh;
       meshRecord.mColor = color;
-      meshRecord.mIsUnderline = false;
       meshContainer.push_back( meshRecord );
 
-      // Adjust extents for this new meshrecord
-      AdjustExtents( extents,
-                     meshContainer,
-                     meshContainer.size() - 1u,
-                     left,
-                     right,
-                     baseLine,
-                     underlinePosition,
-                     underlineThickness );
-
+      if( underlineGlyph )
+      {
+        // Adjust extents for this new meshrecord
+        AdjustExtents( extents,
+                       meshContainer,
+                       meshContainer.size() - 1u,
+                       left,
+                       right,
+                       baseLine,
+                       underlinePosition,
+                       underlineThickness );
+      }
     }
   }
 
@@ -423,7 +513,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                       float underlineThickness )
   {
     bool foundExtent = false;
-    for ( Vector< Extent >::Iterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
+    for ( Vector< Extent >::Iterator eIt = extents.Begin(),
+            eEndIt = extents.End();
+          eIt != eEndIt;
+          ++eIt )
     {
       if ( Equals( baseLine, eIt->mBaseLine ) )
       {
@@ -486,14 +579,17 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  void GenerateUnderlines( std::vector< MeshRecord>& meshRecords,
+  void GenerateUnderlines( std::vector< MeshRecord >& meshRecords,
                            Vector< Extent >& extents,
                            const Vector4& underlineColor,
                            const Vector4& textColor )
   {
     AtlasManager::Mesh2D newMesh;
     unsigned short faceIndex = 0;
-    for ( Vector< Extent >::ConstIterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
+    for ( Vector< Extent >::ConstIterator eIt = extents.Begin(),
+            eEndIt = extents.End();
+          eIt != eEndIt;
+          ++eIt )
     {
       AtlasManager::Vertex2D vert;
       uint32_t index = eIt->mMeshRecordIndex;
@@ -548,13 +644,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         record.mMesh = newMesh;
         record.mAtlasId = meshRecords[ index ].mAtlasId;
         record.mColor = underlineColor;
-        record.mIsUnderline = true;
         meshRecords.push_back( record );
       }
     }
   }
 
   Actor GenerateShadow( MeshRecord& meshRecord,
+                        const Vector2& actorSize,
                         const Vector2& shadowOffset,
                         const Vector4& shadowColor )
   {
@@ -618,10 +714,11 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
 
     // Ensure shadow is behind the text...
-    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth - 1 );
+    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
-    actor.SetSize( 1.0f, 1.0f );
+    actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
+    actor.SetSize( actorSize );
 
     // Create a sub actor to render the source with normalized vertex positions
     Vector< AtlasManager::Vertex2D > normVertexList;
@@ -648,8 +745,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     Dali::Renderer normRenderer = Dali::Renderer::New( normGeometry, normMaterial );
     Actor subActor = Actor::New();
     subActor.AddRenderer( normRenderer );
-    subActor.SetSize( 1.0f, 1.0f );
-    subActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    subActor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
+    subActor.SetSize( actorSize );
     subActor.SetColor( shadowColor );
 
     // Create a render task to render the effect
@@ -713,24 +810,19 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
 
-    std::vector<Vector2> positions;
-    positions.resize( numberOfGlyphs );
+    Vector<Vector2> positions;
+    positions.Resize( numberOfGlyphs );
 
     numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
-                                     &positions[0],
+                                     positions.Begin(),
                                      0u,
                                      numberOfGlyphs );
     glyphs.Resize( numberOfGlyphs );
-    positions.resize( numberOfGlyphs );
+    positions.Resize( numberOfGlyphs );
 
-    mImpl->AddGlyphs( positions,
+    mImpl->AddGlyphs( view,
+                      positions,
                       glyphs,
-                      view.GetTextColor(),
-                      view.GetShadowOffset(),
-                      view.GetShadowColor(),
-                      view.IsUnderlineEnabled(),
-                      view.GetUnderlineColor(),
-                      view.GetUnderlineHeight(),
                       depth );
   }
 

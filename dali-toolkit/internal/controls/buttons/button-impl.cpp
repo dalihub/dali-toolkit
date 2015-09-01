@@ -21,12 +21,14 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 /**
@@ -80,16 +82,23 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initial-auto-repeating-delay", FLO
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "next-auto-repeating-delay",    FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                     BOOLEAN, SELECTED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "normal-state-actor",           MAP,     NORMAL_STATE_ACTOR           )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-state-actor",         MAP,     SELECTED_STATE_ACTOR         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled-state-actor",         MAP,     DISABLED_STATE_ACTOR         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label-actor",                  MAP,     LABEL_ACTOR                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-state-image",       STRING,  UNSELECTED_STATE_IMAGE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-state-image",         STRING,  SELECTED_STATE_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled-state-image",         STRING,  DISABLED_STATE_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-color",             VECTOR4, UNSELECTED_COLOR             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-color",               VECTOR4, SELECTED_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                        MAP,     LABEL                        )
 
+// Deprecated properties:
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label-text",                   STRING,  LABEL_TEXT                   )
+
+// Signals:
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "released",                              SIGNAL_RELEASED              )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "clicked",                               SIGNAL_CLICKED               )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
 
+// Actions:
 DALI_ACTION_REGISTRATION(   Toolkit, Button, "button-click",                          ACTION_BUTTON_CLICK          )
 
 DALI_TYPE_REGISTRATION_END()
@@ -102,6 +111,8 @@ const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 Button::Button()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mAutoRepeatingTimer(),
+  mUnselectedColor( Color::WHITE ), // The natural colors of the specified images will be used by default.
+  mSelectedColor( Color::WHITE ),
   mDisabled( false ),
   mAutoRepeating( false ),
   mTogglableButton( false ),
@@ -147,8 +158,11 @@ void Button::SetDisabled( bool disabled )
       TransitionButtonImage( mDisabledBackgroundContent );
       AddButtonImage( mUnselectedContent );
       TransitionButtonImage( mDisabledContent );
+
+      AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       ReAddLabel();
 
+      TransitionOut( mDecoration[ SELECTED_DECORATION ] );
       TransitionOut( mUnselectedContent );
       TransitionOut( mSelectedContent );
       TransitionOut( mBackgroundContent );
@@ -172,8 +186,11 @@ void Button::SetDisabled( bool disabled )
       TransitionButtonImage( mDisabledBackgroundContent );
       AddButtonImage( mSelectedContent );
       TransitionButtonImage( mDisabledSelectedContent );
+
+      AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
       ReAddLabel();
 
+      TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
       TransitionOut( mUnselectedContent );
       TransitionOut( mSelectedContent );
       TransitionOut( mBackgroundContent );
@@ -195,8 +212,11 @@ void Button::SetDisabled( bool disabled )
       TransitionButtonImage( mBackgroundContent );
       AddButtonImage( mDisabledContent );
       TransitionButtonImage( mUnselectedContent );
+
+      AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       ReAddLabel();
 
+      TransitionOut( mDecoration[ SELECTED_DECORATION ] );
       TransitionOut( mSelectedContent );
       TransitionOut( mSelectedBackgroundContent );
       TransitionOut( mDisabledContent );
@@ -220,8 +240,11 @@ void Button::SetDisabled( bool disabled )
       TransitionButtonImage( mSelectedBackgroundContent );
       AddButtonImage( mDisabledSelectedContent );
       TransitionButtonImage( mSelectedContent );
+
+      AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
       ReAddLabel();
 
+      TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
       TransitionOut( mUnselectedContent );
       TransitionOut( mDisabledContent );
       TransitionOut( mDisabledSelectedContent );
@@ -331,8 +354,12 @@ void Button::SetSelected( bool selected, bool emitSignal )
       TransitionButtonImage( mSelectedBackgroundContent );
       AddButtonImage( mUnselectedContent );
       TransitionButtonImage( mSelectedContent );
+
+      AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
+      TransitionButtonImage( mDecoration[ SELECTED_DECORATION ] );
       ReAddLabel();
 
+      TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
       TransitionOut( mUnselectedContent );
       TransitionOut( mDisabledContent );
       TransitionOut( mDisabledSelectedContent );
@@ -351,8 +378,12 @@ void Button::SetSelected( bool selected, bool emitSignal )
       AddButtonImage( mBackgroundContent );
       AddButtonImage( mSelectedContent );
       TransitionButtonImage( mUnselectedContent );
+
+      AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
+      TransitionButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       ReAddLabel();
 
+      TransitionOut( mDecoration[ SELECTED_DECORATION ] );
       TransitionOut( mSelectedContent );
       TransitionOut( mSelectedBackgroundContent );
       TransitionOut( mDisabledContent );
@@ -398,100 +429,206 @@ float Button::GetAnimationTime() const
   return mAnimationTime;
 }
 
-void Button::SetLabel( const std::string& label )
+void Button::SetLabelText( const std::string& label )
 {
-  Toolkit::TextLabel textLabel = Toolkit::TextLabel::New( label );
-  SetLabel( textLabel );
+  Property::Map labelProperty;
+  labelProperty.Insert( "text", label );
+  ModifyLabel( labelProperty );
 }
 
-void Button::SetLabel( Actor label )
+std::string Button::GetLabelText() const
 {
-  if( mLabel != label )
+  Toolkit::TextLabel label = Dali::Toolkit::TextLabel::DownCast( mLabel );
+  if( label )
   {
-    if( mLabel && mLabel.GetParent() )
-    {
-      mLabel.GetParent().Remove( mLabel );
-    }
+    return label.GetProperty<std::string>( Dali::Toolkit::TextLabel::Property::TEXT );
+  }
+  return std::string();
+}
 
-    mLabel = label;
-    mLabel.SetPosition( 0.f, 0.f );
-
+void Button::ModifyLabel( const Property::Map& properties )
+{
+  // If we don't have a label yet, create one.
+  if( !mLabel )
+  {
+    // If we don't have a label, create one and set it up.
+    // Note: The label text is set from the passed in property map after creation.
+    mLabel = Toolkit::TextLabel::New();
+    mLabel.SetPosition( 0.0f, 0.0f );
     // label should be the top of the button
     Self().Add( mLabel );
+  }
 
-    OnLabelSet();
+  // Set any properties specified for the label by iterating through all property key-value pairs.
+  for( unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i )
+  {
+    const StringValuePair& propertyPair( properties.GetPair( i ) );
 
+    // Convert the property string to a property index.
+    Property::Index setPropertyIndex = mLabel.GetPropertyIndex( propertyPair.first );
+    if( setPropertyIndex != Property::INVALID_INDEX )
+    {
+      // If the conversion worked, we have a valid property index,
+      // Set the property to the new value.
+      mLabel.SetProperty( setPropertyIndex, propertyPair.second );
+    }
+  }
+
+  // Notify derived button classes of the change.
+  OnLabelSet( false );
+
+  RelayoutRequest();
+}
+
+Actor& Button::GetLabelActor()
+{
+  return mLabel;
+}
+
+void Button::SetDecoration( DecorationState state, Actor actor )
+{
+  if( mDecoration[ state ] && mDecoration[ state ].GetParent() )
+  {
+    mDecoration[ state ].Unparent();
+  }
+
+  mDecoration[ state ] = actor;
+  mDecoration[ state ].SetColorMode( USE_OWN_COLOR );
+
+  ResetImageLayers();
+  RelayoutRequest();
+}
+
+Actor& Button::GetDecoration( DecorationState state )
+{
+  return mDecoration[ state ];
+}
+
+void Button::SetupContent( Actor& actorToModify, Actor newActor )
+{
+  if( newActor )
+  {
+    StopTransitionAnimation();
+
+    if( actorToModify && actorToModify.GetParent() )
+    {
+      actorToModify.Unparent();
+    }
+
+    actorToModify = newActor;
+
+    if( actorToModify )
+    {
+      actorToModify.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      actorToModify.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      actorToModify.SetPosition( 0.f, 0.f );
+    }
+
+    ResetImageLayers();
+  }
+}
+
+void Button::SetUnselectedColor( const Vector4& color )
+{
+  mUnselectedColor = color;
+
+  if( mUnselectedContent && !GetUnselectedImageFilename().empty() )
+  {
+    // If there is existing unselected content, change the color on it directly.
+    mUnselectedContent.SetColor( mUnselectedColor );
+  }
+  else
+  {
+    // If there is no existing content, create a new actor to use for flat color.
+    SetupContent( mUnselectedContent, CreateSolidColorActor( mUnselectedColor ) );
+    mUnselectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  }
+}
+
+const Vector4 Button::GetUnselectedColor() const
+{
+  return mUnselectedColor;
+}
+
+void Button::SetSelectedColor( const Vector4& color )
+{
+  mSelectedColor = color;
+
+  if( mSelectedContent && !GetSelectedImageFilename().empty() )
+  {
+    // If there is existing unselected content, change the color on it directly.
+    mSelectedContent.SetColor( mSelectedColor );
+  }
+  else
+  {
+    // If there is no existing content, create a new actor to use for flat color.
+    SetupContent( mSelectedContent, CreateSolidColorActor( mSelectedColor ) );
+    mSelectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  }
+}
+
+const Vector4 Button::GetSelectedColor() const
+{
+  return mSelectedColor;
+}
+
+void Button::SetUnselectedImage( const std::string& filename )
+{
+  ImageActor newContent;
+  if( !filename.empty() )
+  {
+    Image resourceimage = Dali::ResourceImage::New( filename );
+    if( resourceimage )
+    {
+      newContent = ImageActor::New( resourceimage );
+    }
+  }
+  else
+  {
+    newContent = ImageActor::New();
+  }
+
+  if( newContent )
+  {
+    SetupContent( mUnselectedContent, newContent );
+
+    mUnselectedContent.SetColor( mUnselectedColor );
+
+    OnUnselectedImageSet();
     RelayoutRequest();
   }
 }
 
-Actor Button::GetLabel() const
-{
-  return mLabel;
-}
-
-Actor& Button::GetLabel()
-{
-  return mLabel;
-}
-
-void Button::SetButtonImage( Actor image )
-{
-  StopTransitionAnimation();
-
-  if( mUnselectedContent && mUnselectedContent.GetParent() )
-  {
-    Self().Remove( mUnselectedContent );
-  }
-
-  mUnselectedContent = image;
-  if( mUnselectedContent )
-  {
-    mUnselectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mUnselectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mUnselectedContent.SetPosition( 0.f, 0.f );
-  }
-  ResetImageLayers();
-  OnButtonImageSet();
-
-  RelayoutRequest();
-}
-
-Actor Button::GetButtonImage() const
+Actor& Button::GetUnselectedImage()
 {
   return mUnselectedContent;
 }
 
-Actor& Button::GetButtonImage()
+void Button::SetSelectedImage( const std::string& filename )
 {
-  return mUnselectedContent;
-}
-
-void Button::SetSelectedImage( Actor image )
-{
-  StopTransitionAnimation();
-
-  if( mSelectedContent && mSelectedContent.GetParent() )
+  ImageActor newContent;
+  if( !filename.empty() )
   {
-    Self().Remove( mSelectedContent );
+    Image resourceimage = Dali::ResourceImage::New( filename );
+    if( resourceimage )
+    {
+      newContent = ImageActor::New( resourceimage );
+    }
+  }
+  else
+  {
+    newContent = ImageActor::New();
   }
 
-  mSelectedContent = image;
-  if( mSelectedContent )
+  if( newContent )
   {
-    mSelectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mSelectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mSelectedContent.SetPosition( 0.f, 0.f );
+    SetupContent( mSelectedContent, newContent );
+
+    mSelectedContent.SetColor( mSelectedColor );
+
+    OnSelectedImageSet();
+    RelayoutRequest();
   }
-  ResetImageLayers();
-  OnSelectedImageSet();
-
-  RelayoutRequest();
-}
-
-Actor Button::GetSelectedImage() const
-{
-  return mSelectedContent;
 }
 
 Actor& Button::GetSelectedImage()
@@ -499,31 +636,16 @@ Actor& Button::GetSelectedImage()
   return mSelectedContent;
 }
 
-void Button::SetBackgroundImage( Actor image )
+void Button::SetBackgroundImage( const std::string& filename )
 {
-  StopTransitionAnimation();
-
-  if( mBackgroundContent && mBackgroundContent.GetParent() )
+  Image resourceimage = Dali::ResourceImage::New( filename );
+  if( resourceimage )
   {
-    Self().Remove( mBackgroundContent );
+    SetupContent( mBackgroundContent, ImageActor::New( resourceimage ) );
+
+    OnBackgroundImageSet();
+    RelayoutRequest();
   }
-
-  mBackgroundContent = image;
-  if( mBackgroundContent )
-  {
-    mBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mBackgroundContent.SetPosition( 0.f, 0.f );
-  }
-  ResetImageLayers();
-  OnBackgroundImageSet();
-
-  RelayoutRequest();
-}
-
-Actor Button::GetBackgroundImage() const
-{
-  return mBackgroundContent;
 }
 
 Actor& Button::GetBackgroundImage()
@@ -531,31 +653,16 @@ Actor& Button::GetBackgroundImage()
   return mBackgroundContent;
 }
 
-void Button::SetSelectedBackgroundImage( Actor image )
+void Button::SetSelectedBackgroundImage( const std::string& filename )
 {
-  StopTransitionAnimation();
-
-  if( mSelectedBackgroundContent && mSelectedBackgroundContent.GetParent() )
+  Image resourceimage = Dali::ResourceImage::New( filename );
+  if( resourceimage )
   {
-    Self().Remove( mSelectedBackgroundContent );
+    SetupContent( mSelectedBackgroundContent, ImageActor::New( resourceimage ) );
+
+    OnSelectedBackgroundImageSet();
+    RelayoutRequest();
   }
-
-  mSelectedBackgroundContent = image;
-  if( mSelectedBackgroundContent )
-  {
-    mSelectedBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mSelectedBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mSelectedBackgroundContent.SetPosition( 0.f, 0.f );
-  }
-  ResetImageLayers();
-  OnSelectedBackgroundImageSet();
-
-  RelayoutRequest();
-}
-
-Actor Button::GetSelectedBackgroundImage() const
-{
-  return mSelectedBackgroundContent;
 }
 
 Actor& Button::GetSelectedBackgroundImage()
@@ -563,30 +670,16 @@ Actor& Button::GetSelectedBackgroundImage()
   return mSelectedBackgroundContent;
 }
 
-void Button::SetDisabledImage( Actor image )
+void Button::SetDisabledImage( const std::string& filename )
 {
-  StopTransitionAnimation();
-
-  if( mDisabledContent && mDisabledContent.GetParent() )
+  Image resourceimage = Dali::ResourceImage::New( filename );
+  if( resourceimage )
   {
-    Self().Remove( mDisabledContent );
+    SetupContent( mDisabledContent, ImageActor::New( resourceimage ) );
+
+    OnDisabledImageSet();
+    RelayoutRequest();
   }
-
-  mDisabledContent = image;
-  if( mDisabledContent )
-  {
-    mDisabledContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mDisabledContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mDisabledContent.SetPosition( 0.f, 0.f );
-  }
-
-  ResetImageLayers();
-  OnDisabledImageSet();
-}
-
-Actor Button::GetDisabledImage() const
-{
-  return mDisabledContent;
 }
 
 Actor& Button::GetDisabledImage()
@@ -594,30 +687,16 @@ Actor& Button::GetDisabledImage()
   return mDisabledContent;
 }
 
-void Button::SetDisabledSelectedImage( Actor image )
+void Button::SetDisabledSelectedImage( const std::string& filename )
 {
-  StopTransitionAnimation();
-
-  if( mDisabledSelectedContent && mDisabledSelectedContent.GetParent() )
+  Image resourceimage = Dali::ResourceImage::New( filename );
+  if( resourceimage )
   {
-    Self().Remove( mDisabledSelectedContent );
+    SetupContent( mDisabledSelectedContent, ImageActor::New( resourceimage ) );
+
+    OnDisabledSelectedImageSet();
+    RelayoutRequest();
   }
-
-  mDisabledSelectedContent = image;
-  if( mDisabledSelectedContent )
-  {
-    mDisabledSelectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mDisabledSelectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mDisabledSelectedContent.SetPosition( 0.f, 0.f );
-  }
-
-  ResetImageLayers();
-  OnDisabledSelectedImageSet();
-}
-
-Actor Button::GetDisabledSelectedImage() const
-{
-  return mDisabledSelectedContent;
 }
 
 Actor& Button::GetDisabledSelectedImage()
@@ -625,34 +704,112 @@ Actor& Button::GetDisabledSelectedImage()
   return mDisabledSelectedContent;
 }
 
-void Button::SetDisabledBackgroundImage( Actor image )
+void Button::SetDisabledBackgroundImage( const std::string& filename )
 {
-  StopTransitionAnimation();
-
-  if( mDisabledBackgroundContent && mDisabledBackgroundContent.GetParent() )
+  Image resourceimage = Dali::ResourceImage::New( filename );
+  if( resourceimage )
   {
-    Self().Remove( mDisabledBackgroundContent );
-  }
+    SetupContent( mDisabledBackgroundContent, ImageActor::New( resourceimage ) );
 
-  mDisabledBackgroundContent = image;
-  if( mDisabledBackgroundContent )
-  {
-    mDisabledBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mDisabledBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mDisabledBackgroundContent.SetPosition( 0.f, 0.f );
+    OnDisabledBackgroundImageSet();
+    RelayoutRequest();
   }
-  ResetImageLayers();
-  OnDisabledBackgroundImageSet();
-}
-
-Actor Button::GetDisabledBackgroundImage() const
-{
-  return mDisabledBackgroundContent;
 }
 
 Actor& Button::GetDisabledBackgroundImage()
 {
   return mDisabledBackgroundContent;
+}
+
+std::string Button::GetUnselectedImageFilename() const
+{
+  if( mUnselectedContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mUnselectedContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
+}
+
+std::string Button::GetSelectedImageFilename() const
+{
+  if( mSelectedContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mSelectedContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
+}
+
+std::string Button::GetBackgroundImageFilename() const
+{
+  if( mBackgroundContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mBackgroundContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
+}
+
+std::string Button::GetSelectedBackgroundImageFilename() const
+{
+  if( mSelectedBackgroundContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mSelectedBackgroundContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
+}
+
+std::string Button::GetDisabledImageFilename() const
+{
+  if( mDisabledContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mDisabledContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
+}
+
+std::string Button::GetDisabledSelectedImageFilename() const
+{
+  if( mDisabledSelectedContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mDisabledSelectedContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
+}
+
+std::string Button::GetDisabledBackgroundImageFilename() const
+{
+  if( mDisabledBackgroundContent )
+  {
+    ResourceImage image = ResourceImage::DownCast( mDisabledBackgroundContent );
+    if( image )
+    {
+      return image.GetUrl();
+    }
+  }
+  return std::string();
 }
 
 bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
@@ -963,9 +1120,9 @@ void Button::Pressed()
     StopTransitionAnimation();
 
     // Notifies the derived class the button has been pressed.
-     OnPressed();
+    OnPressed();
 
-     //Layer Order
+    //Layer Order
     //(4) mSelectedContent (Inserted)
     //(3) mUnselectedContent
     //(2) mSelectedBackgroundContent (Inserted)
@@ -975,8 +1132,12 @@ void Button::Pressed()
     TransitionButtonImage( mSelectedBackgroundContent );
     AddButtonImage( mUnselectedContent );
     TransitionButtonImage( mSelectedContent );
+
+    AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
+    TransitionButtonImage( mDecoration[ SELECTED_DECORATION ] );
     ReAddLabel();
 
+    TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
     TransitionOut( mUnselectedContent );
     TransitionOut( mDisabledContent );
     TransitionOut( mDisabledSelectedContent );
@@ -1005,8 +1166,12 @@ void Button::Released()
     AddButtonImage( mBackgroundContent );
     AddButtonImage( mSelectedContent );
     TransitionButtonImage( mUnselectedContent );
+
+    AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
+    TransitionButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
     ReAddLabel();
 
+    TransitionOut( mDecoration[ SELECTED_DECORATION ] );
     TransitionOut( mSelectedContent );
     TransitionOut( mSelectedBackgroundContent );
     TransitionOut( mDisabledContent );
@@ -1056,6 +1221,7 @@ void Button::AddButtonImage( Actor& actor )
 {
   if( actor )
   {
+    actor.Unparent();
     Self().Add( actor );
   }
 }
@@ -1115,6 +1281,7 @@ void Button::ResetImageLayers()
       //(2) mUnselectedContent
       //(1) mBackgroundContent
 
+      RemoveButtonImage( mDecoration[ SELECTED_DECORATION ] );
       RemoveButtonImage( mSelectedContent );
       RemoveButtonImage( mSelectedBackgroundContent );
       RemoveButtonImage( mDisabledContent );
@@ -1123,6 +1290,9 @@ void Button::ResetImageLayers()
 
       PrepareAddButtonImage( mBackgroundContent );
       PrepareAddButtonImage( mUnselectedContent );
+
+      PrepareAddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
+      ReAddLabel();
       break;
     }
     case SelectedState:
@@ -1132,6 +1302,7 @@ void Button::ResetImageLayers()
       //(2) mSelectedBackgroundContent
       //(1) mBackgroundContent
 
+      RemoveButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       RemoveButtonImage( mUnselectedContent );
       RemoveButtonImage( mDisabledContent );
       RemoveButtonImage( mDisabledSelectedContent );
@@ -1140,6 +1311,8 @@ void Button::ResetImageLayers()
       PrepareAddButtonImage( mBackgroundContent );
       PrepareAddButtonImage( mSelectedBackgroundContent );
       PrepareAddButtonImage( mSelectedContent );
+
+      PrepareAddButtonImage( mDecoration[ SELECTED_DECORATION ] );
       ReAddLabel();
       break;
     }
@@ -1149,14 +1322,18 @@ void Button::ResetImageLayers()
       //(2) mDisabledContent
       //(1) mDisabledBackgroundContent
 
+      RemoveButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       RemoveButtonImage( mUnselectedContent );
       RemoveButtonImage( mBackgroundContent );
+      RemoveButtonImage( mDecoration[ SELECTED_DECORATION ] );
       RemoveButtonImage( mSelectedContent );
       RemoveButtonImage( mDisabledSelectedContent );
       RemoveButtonImage( mSelectedBackgroundContent );
 
       PrepareAddButtonImage( mDisabledBackgroundContent ? mDisabledBackgroundContent : mBackgroundContent );
       PrepareAddButtonImage( mDisabledContent ? mDisabledContent : mUnselectedContent );
+
+      PrepareAddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       ReAddLabel();
       break;
     }
@@ -1166,7 +1343,9 @@ void Button::ResetImageLayers()
       // (2) mDisabledSelectedContent
       // (1) mDisabledBackgroundContent
 
+      RemoveButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
       RemoveButtonImage( mUnselectedContent );
+      RemoveButtonImage( mDecoration[ SELECTED_DECORATION ] );
       RemoveButtonImage( mSelectedContent );
       RemoveButtonImage( mBackgroundContent );
       RemoveButtonImage( mSelectedBackgroundContent );
@@ -1183,6 +1362,8 @@ void Button::ResetImageLayers()
       }
 
       PrepareAddButtonImage( mDisabledSelectedContent ? mDisabledSelectedContent : mSelectedContent );
+
+      PrepareAddButtonImage( mDecoration[ SELECTED_DECORATION ] );
       ReAddLabel();
       break;
     }
@@ -1271,29 +1452,52 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         break;
       }
 
-      case Toolkit::Button::Property::NORMAL_STATE_ACTOR:
+      case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
       {
-        GetImplementation( button ).SetButtonImage( Scripting::NewActor( value.Get< Property::Map >() ) );
+        GetImplementation( button ).SetUnselectedImage( value.Get< std::string >() );
         break;
       }
 
-      case Toolkit::Button::Property::SELECTED_STATE_ACTOR:
+      case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
       {
-        GetImplementation( button ).SetSelectedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
+        GetImplementation( button ).SetSelectedImage( value.Get< std::string >() );
         break;
       }
 
-      case Toolkit::Button::Property::DISABLED_STATE_ACTOR:
+      case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
       {
-        GetImplementation( button ).SetDisabledImage( Scripting::NewActor( value.Get< Property::Map >() ) );
+        GetImplementation( button ).SetDisabledImage( value.Get< std::string >() );
         break;
       }
 
-      case Toolkit::Button::Property::LABEL_ACTOR:
+      case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
-        GetImplementation( button ).SetLabel( Scripting::NewActor( value.Get< Property::Map >() ) );
+        GetImplementation( button ).SetUnselectedColor( value.Get< Vector4 >() );
         break;
       }
+
+      case Toolkit::Button::Property::SELECTED_COLOR:
+      {
+        GetImplementation( button ).SetSelectedColor( value.Get< Vector4 >() );
+        break;
+      }
+
+      case Toolkit::Button::Property::LABEL_TEXT:
+      {
+        GetImplementation( button ).SetLabelText( value.Get< std::string >() );
+        break;
+      }
+
+      case Toolkit::Button::Property::LABEL:
+      {
+        // Get a Property::Map from the property if possible.
+        Property::Map setPropertyMap;
+        if( value.Get( setPropertyMap ) )
+        {
+          GetImplementation( button ).ModifyLabel( setPropertyMap );
+        }
+      }
+      break;
     }
   }
 }
@@ -1344,35 +1548,46 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Button::Property::NORMAL_STATE_ACTOR:
+      case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
       {
-        Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mUnselectedContent, map );
-        value = map;
+        value = GetImplementation( button ).GetUnselectedImageFilename();
         break;
       }
 
-      case Toolkit::Button::Property::SELECTED_STATE_ACTOR:
+      case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
       {
-        Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mSelectedContent, map );
-        value = map;
+        value = GetImplementation( button ).GetSelectedImageFilename();
         break;
       }
 
-      case Toolkit::Button::Property::DISABLED_STATE_ACTOR:
+      case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
       {
-        Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mDisabledContent, map );
-        value = map;
+        value = GetImplementation( button ).GetDisabledImageFilename();
         break;
       }
 
-      case Toolkit::Button::Property::LABEL_ACTOR:
+      case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
-        Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mLabel, map );
-        value = map;
+        value = GetImplementation( button ).GetUnselectedColor();
+        break;
+      }
+
+      case Toolkit::Button::Property::SELECTED_COLOR:
+      {
+        value = GetImplementation( button ).GetSelectedColor();
+        break;
+      }
+
+      case Toolkit::Button::Property::LABEL_TEXT:
+      {
+        value = GetImplementation( button ).GetLabelText();
+        break;
+      }
+
+      case Toolkit::Button::Property::LABEL:
+      {
+        Property::Map emptyMap;
+        value = emptyMap;
         break;
       }
     }
@@ -1380,6 +1595,132 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
 
   return value;
 }
+
+// Deprecated API
+
+void Button::SetLabel( Actor label )
+{
+  if( mLabel != label )
+  {
+    if( mLabel && mLabel.GetParent() )
+    {
+      mLabel.GetParent().Remove( mLabel );
+    }
+
+    mLabel = label;
+    mLabel.SetPosition( 0.0f, 0.0f );
+
+    // label should be the top of the button
+    Self().Add( mLabel );
+
+    ResetImageLayers();
+    OnLabelSet( true );
+
+    RelayoutRequest();
+  }
+}
+
+void Button::SetButtonImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mUnselectedContent, image );
+
+    OnUnselectedImageSet();
+    RelayoutRequest();
+  }
+}
+
+void Button::SetSelectedImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mSelectedContent, image );
+
+    OnSelectedImageSet();
+    RelayoutRequest();
+  }
+}
+
+void Button::SetBackgroundImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mBackgroundContent, image );
+
+    OnBackgroundImageSet();
+    RelayoutRequest();
+  }
+}
+
+void Button::SetSelectedBackgroundImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mSelectedBackgroundContent, image );
+
+    OnSelectedBackgroundImageSet();
+    RelayoutRequest();
+  }
+}
+
+void Button::SetDisabledImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mDisabledContent, image );
+
+    OnDisabledImageSet();
+    RelayoutRequest();
+  }
+}
+
+void Button::SetDisabledSelectedImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mDisabledSelectedContent, image );
+
+    OnDisabledSelectedImageSet();
+    RelayoutRequest();
+  }
+}
+
+void Button::SetDisabledBackgroundImage( Actor image )
+{
+  if( image )
+  {
+    StopTransitionAnimation();
+
+    SetupContent( mDisabledBackgroundContent, image );
+
+    OnDisabledBackgroundImageSet();
+    RelayoutRequest();
+  }
+}
+
+Actor Button::GetButtonImage() const
+{
+  return mUnselectedContent;
+}
+
+Actor Button::GetSelectedImage() const
+{
+  return mSelectedContent;
+}
+
 
 } // namespace Internal
 

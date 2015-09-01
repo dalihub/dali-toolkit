@@ -153,7 +153,7 @@ const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
 ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mDirection(direction),
-  mScrollableObject(Handle()),
+  mScrollableObject(WeakHandleBase()),
   mPropertyScrollPosition(Property::INVALID_INDEX),
   mPropertyMinScrollPosition(Property::INVALID_INDEX),
   mPropertyMaxScrollPosition(Property::INVALID_INDEX),
@@ -186,7 +186,7 @@ void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index property
       && propertyMaxScrollPosition != Property::INVALID_INDEX
       && propertyScrollContentSize != Property::INVALID_INDEX )
   {
-    mScrollableObject = handle;
+    mScrollableObject = WeakHandleBase(handle);
     mPropertyScrollPosition = propertyScrollPosition;
     mPropertyMinScrollPosition = propertyMinScrollPosition;
     mPropertyMaxScrollPosition = propertyMaxScrollPosition;
@@ -249,7 +249,9 @@ Actor ScrollBar::GetScrollIndicator()
 
 void ScrollBar::ApplyConstraints()
 {
-  if( mScrollableObject )
+  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+
+  if( scrollableHandle )
   {
     if(mIndicatorSizeConstraint)
     {
@@ -265,7 +267,7 @@ void ScrollBar::ApplyConstraints()
     {
       mIndicatorSizeConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::SIZE, IndicatorSizeConstraint() );
       mIndicatorSizeConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      mIndicatorSizeConstraint.AddSource( Source( mScrollableObject, mPropertyScrollContentSize ) );
+      mIndicatorSizeConstraint.AddSource( Source( scrollableHandle, mPropertyScrollContentSize ) );
       mIndicatorSizeConstraint.Apply();
     }
 
@@ -277,9 +279,9 @@ void ScrollBar::ApplyConstraints()
     mIndicatorPositionConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::POSITION, IndicatorPositionConstraint() );
     mIndicatorPositionConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
     mIndicatorPositionConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    mIndicatorPositionConstraint.AddSource( Source( mScrollableObject, mPropertyScrollPosition ) );
-    mIndicatorPositionConstraint.AddSource( Source( mScrollableObject, mPropertyMinScrollPosition ) );
-    mIndicatorPositionConstraint.AddSource( Source( mScrollableObject, mPropertyMaxScrollPosition ) );
+    mIndicatorPositionConstraint.AddSource( Source( scrollableHandle, mPropertyScrollPosition ) );
+    mIndicatorPositionConstraint.AddSource( Source( scrollableHandle, mPropertyMinScrollPosition ) );
+    mIndicatorPositionConstraint.AddSource( Source( scrollableHandle, mPropertyMaxScrollPosition ) );
     mIndicatorPositionConstraint.Apply();
   }
 }
@@ -288,14 +290,16 @@ void ScrollBar::SetScrollPositionIntervals( const Dali::Vector<float>& positions
 {
   mScrollPositionIntervals = positions;
 
-  if( mScrollableObject )
+  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+
+  if( scrollableHandle )
   {
     if( mPositionNotification )
     {
-      mScrollableObject.RemovePropertyNotification(mPositionNotification);
+      scrollableHandle.RemovePropertyNotification(mPositionNotification);
     }
 
-    mPositionNotification = mScrollableObject.AddPropertyNotification( mPropertyScrollPosition, VariableStepCondition(mScrollPositionIntervals) );
+    mPositionNotification = scrollableHandle.AddPropertyNotification( mPropertyScrollPosition, VariableStepCondition(mScrollPositionIntervals) );
     mPositionNotification.NotifySignal().Connect( this, &ScrollBar::OnScrollPositionIntervalReached );
   }
 }
@@ -308,9 +312,10 @@ Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
 void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
 {
   // Emit the signal to notify the scroll position crossing
-  if(mScrollableObject)
+  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  if(scrollableHandle)
   {
-    mScrollPositionIntervalReachedSignal.Emit(mScrollableObject.GetProperty<float>(mPropertyScrollPosition));
+    mScrollPositionIntervalReachedSignal.Emit(scrollableHandle.GetProperty<float>(mPropertyScrollPosition));
   }
 }
 
@@ -359,9 +364,10 @@ void ScrollBar::HideIndicator()
 bool ScrollBar::OnPanGestureProcessTick()
 {
   // Update the scroll position property.
-  if( mScrollableObject )
+  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  if( scrollableHandle )
   {
-    mScrollableObject.SetProperty(mPropertyScrollPosition, mCurrentScrollPosition);
+    scrollableHandle.SetProperty(mPropertyScrollPosition, mCurrentScrollPosition);
   }
 
   return true;
@@ -369,9 +375,11 @@ bool ScrollBar::OnPanGestureProcessTick()
 
 void ScrollBar::OnPan( const PanGesture& gesture )
 {
-  if(mScrollableObject)
+  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+
+  if(scrollableHandle)
   {
-    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(mScrollableObject);
+    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(scrollableHandle);
 
     switch(gesture.state)
     {
@@ -386,7 +394,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
         }
 
         ShowIndicator();
-        mScrollStart = mScrollableObject.GetProperty<float>(mPropertyScrollPosition);
+        mScrollStart = scrollableHandle.GetProperty<float>(mPropertyScrollPosition);
         mGestureDisplacement = Vector3::ZERO;
         mIsPanning = true;
 
@@ -398,8 +406,8 @@ void ScrollBar::OnPan( const PanGesture& gesture )
         mGestureDisplacement+=delta;
 
         Vector3 span = Self().GetCurrentSize() - mIndicator.GetCurrentSize();
-        float minScrollPosition = mScrollableObject.GetProperty<float>(mPropertyMinScrollPosition);
-        float maxScrollPosition = mScrollableObject.GetProperty<float>(mPropertyMaxScrollPosition);
+        float minScrollPosition = scrollableHandle.GetProperty<float>(mPropertyMinScrollPosition);
+        float maxScrollPosition = scrollableHandle.GetProperty<float>(mPropertyMaxScrollPosition);
         float domainSize = maxScrollPosition - minScrollPosition;
 
         mCurrentScrollPosition = mScrollStart - mGestureDisplacement.y * domainSize / span.y;

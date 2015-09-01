@@ -37,10 +37,32 @@ class Button;
  *
  * This class provides the disabled property and the clicked signal.
  *
- * A ClickedSignal() is emitted when the button is touched and the touch
- * point doesn't leave the boundary of the button.
+ * A ClickedSignal() is emitted when the button is touched and the touch point doesn't leave the boundary of the button.
  *
  * When the \e disabled property is set to \e true, no signal is emitted.
+ *
+ * Button provides the following properties which modify the signals emitted:
+ * <ul>
+ *   <li>\e autorepeating
+ *       When \e autorepeating is set to \e true, a Button::PressedSignal(), Button::ReleasedSignal() and Button::ClickedSignal() signals are emitted at regular
+ *       intervals while the button is touched.
+ *       The intervals could be modified with the Button::SetInitialAutoRepeatingDelay and Button::SetNextAutoRepeatingDelay methods.
+ *
+ *       A \e togglable button can't be \e autorepeating. If the \e autorepeating property is set to \e true, then the \e togglable property is set to
+ *       false but no signal is emitted.
+ *
+ *   <li>\e togglable
+ *       When \e togglable is set to \e true, a Button::StateChangedSignal() signal is emitted, with the selected state.
+ * </ul>
+ *
+ * The button's appearance can be modified by setting properties for the various image filenames.
+ *
+ * The \e background is always shown and doesn't change if the button is pressed or released. The \e button image is shown over the \e background image when the
+ * button is not pressed and is replaced by the \e selected image when the button is pressed. The text label is placed always on the top of all images.
+ *
+ * When the button is disabled, \e background, \e button and \e selected images are replaced by their \e disabled images.
+ *
+ * Is not mandatory set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e selected images.
  *
  * Signals
  * | %Signal Name      | Method                      |
@@ -81,10 +103,15 @@ public:
       NEXT_AUTO_REPEATING_DELAY,       ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type float
       TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool
       SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool
-      NORMAL_STATE_ACTOR,              ///< name "normal-state-actor",           @see SetButtonImage(),               type Map
-      SELECTED_STATE_ACTOR,            ///< name "selected-state-actor",         @see SetSelectedImage(),             type Map
-      DISABLED_STATE_ACTOR,            ///< name "disabled-state-actor",         @see SetDisabledImage(),             type Map
-      LABEL_ACTOR,                     ///< name "label-actor",                  @see SetLabel(),                     type Map
+      UNSELECTED_STATE_IMAGE,          ///< name "unselected-state-image",       @see SetUnselectedImage(),           type std::string
+      SELECTED_STATE_IMAGE,            ///< name "selected-state-image",         @see SetSelectedImage(),             type std::string
+      DISABLED_STATE_IMAGE,            ///< name "disabled-state-image",         @see SetDisabledImage(),             type std::string
+      UNSELECTED_COLOR,                ///< name "unselected-color",                                                  type Vector4
+      SELECTED_COLOR,                  ///< name "selected-color",                                                    type Vector4
+      LABEL,                           ///< name "label",                                                             type Property::Map
+
+      // Deprecated properties:
+      LABEL_TEXT,                      ///< name "label-text",                   @see SetLabelText(),                 type std::string
     };
   };
 
@@ -218,7 +245,7 @@ public:
   /**
    * @brief Sets the animation time.
    *
-   * @param [in] animationTime The animation time in seconds.
+   * @param[in] animationTime The animation time in seconds.
    */
   void SetAnimationTime( float animationTime );
 
@@ -230,72 +257,99 @@ public:
   float GetAnimationTime() const;
 
   /**
-   * @brief Sets the button label.
+   * @brief Sets the button's label.
    *
-   * @param[in] label The button label.
+   * @param[in] label The label text.
    */
-  void SetLabel( const std::string& label );
-
-  /**
-   * @copydoc SetLabel( const std::string& label )
-   */
-  void SetLabel( Actor label );
+  void SetLabelText( const std::string& label );
 
   /**
    * @brief Gets the label.
    *
-   * @return An actor with the label.
+   * @return The label text.
    */
-  Actor GetLabel() const;
+  std::string GetLabelText() const;
 
   /**
-   * @brief Sets the button image.
+   * @brief Sets the unselected button image.
    *
-   * @param[in] image The button image.
+   * @param[in] filename The button image.
    */
-  void SetButtonImage( Image image );
+  void SetUnselectedImage( const std::string& filename );
 
   /**
    * @brief Sets the background image.
    *
-   * @param[in] image The background image.
+   * @param[in] filename The background image.
    */
-  void SetBackgroundImage( Image image );
+  void SetBackgroundImage( const std::string& filename );
 
   /**
    * @brief Sets the selected image.
    *
-   * @param[in] image The selected image.
+   * @param[in] filename The selected image.
    */
-  void SetSelectedImage( Image image );
+  void SetSelectedImage( const std::string& filename );
 
   /**
    * @brief Sets the selected background image.
    *
-   * @param[in] image The selected background image.
+   * @param[in] filename The selected background image.
    */
-  void SetSelectedBackgroundImage( Image image );
+  void SetSelectedBackgroundImage( const std::string& filename );
 
   /**
    * @brief Sets the disabled background image.
    *
-   * @param[in] image The disabled background image.
+   * @param[in] filename The disabled background image.
    */
-  void SetDisabledBackgroundImage( Image image );
+  void SetDisabledBackgroundImage( const std::string& filename );
 
   /**
    * @brief Sets the disabled button image.
    *
-   * @param[in] image The disabled button image.
+   * @param[in] filename The disabled button image.
    */
-  void SetDisabledImage( Image image );
+  void SetDisabledImage( const std::string& filename );
 
   /**
    * @brief Sets the disabled selected button image.
    *
-   * @param[in] image The disabled selected button image.
+   * @param[in] filename The disabled selected button image.
    */
-  void SetDisabledSelectedImage( Image image );
+  void SetDisabledSelectedImage( const std::string& filename );
+
+  // Deprecated API
+
+  /**
+   * @deprecated Sets the label with an actor.
+   * @param[in]  label The actor to use as a label
+   */
+  void SetLabel( Actor label );
+
+  /**
+   * @deprecated Sets the button image.
+   * @param[in]  image The button image.
+   */
+  void SetButtonImage( Image image );
+
+  /**
+   * @deprecated Sets the selected image.
+   * @param[in]  image The selected image.
+   */
+  void SetSelectedImage( Image image );
+
+  /**
+   * @deprecated Gets the button image.
+   * @return     An actor with the button image.
+   */
+  Actor GetButtonImage() const;
+
+  /**
+   * @deprecated Gets the selected image.
+   * @return     An actor with the selected image.
+   */
+  Actor GetSelectedImage() const;
 
 public: //Signals
 

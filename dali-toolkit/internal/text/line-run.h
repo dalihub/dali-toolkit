@@ -18,11 +18,9 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/math/vector2.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/glyph-run.h>
 
 namespace Dali
 {
@@ -38,9 +36,8 @@ namespace Text
  */
 struct LineRun
 {
-  GlyphIndex         glyphIndex;      ///< The initial glyph index.
-  Length             numberOfGlyphs;  ///< The number of glyphs of the run.
-  CharacterRun       characterRun;    ///< The initial character and the number of characters.
+  GlyphRun           glyphRun;        ///< The initial glyph index and the number of glyphs of the run.
+  CharacterRun       characterRun;    ///< The initial character index and the number of characters of the run.
   float              width;           ///< The line's width.
   float              ascender;        ///< The line's ascender.
   float              descender;       ///< The line's descender.

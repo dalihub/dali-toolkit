@@ -9,6 +9,11 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/buttons/push-button.cpp \
   $(public_api_src_dir)/controls/buttons/radio-button.cpp \
   $(public_api_src_dir)/controls/default-controls/solid-color-actor.cpp \
+  $(public_api_src_dir)/controls/image-view/image-view.cpp \
+  $(public_api_src_dir)/controls/model3d-view/model3d-view.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
   $(public_api_src_dir)/controls/scroll-bar/scroll-bar.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/default-item-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-layout.cpp \
@@ -49,8 +54,20 @@ public_api_buttons_header_files = \
 public_api_default_controls_header_files = \
   $(public_api_src_dir)/controls/default-controls/solid-color-actor.h
 
+public_api_model3d_view_header_files = \
+  $(public_api_src_dir)/controls/model3d-view/model3d-view.h
+
 public_api_gaussian_blur_view_header_files = \
   $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
+
+public_api_image_view_header_files = \
+  $(public_api_src_dir)/controls/image-view/image-view.h
+
+public_api_page_turn_view_header_files = \
+  $(public_api_src_dir)/controls/page-turn-view/page-factory.h \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-view.h
 
 public_api_item_view_header_files = \
   $(public_api_src_dir)/controls/scrollable/item-view/default-item-layout.h \

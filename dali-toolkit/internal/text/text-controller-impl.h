@@ -20,13 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard.h>
-#include <dali/devel-api/adaptor-framework/imf-manager.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
@@ -209,7 +209,6 @@ struct Controller::Impl
     mView(),
     mLayoutEngine(),
     mModifyEvents(),
-    mControlSize(),
     mTextColor( Color::BLACK ),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
@@ -231,6 +230,7 @@ struct Controller::Impl
 
   ~Impl()
   {
+    delete mFontDefaults;
     delete mEventData;
   }
 
@@ -277,6 +277,12 @@ struct Controller::Impl
   bool IsShowingPlaceholderText() const
   {
     return ( mEventData && mEventData->mIsShowingPlaceholderText );
+  }
+
+  bool IsShowingRealText() const
+  {
+    return ( !IsShowingPlaceholderText() &&
+             0u != mLogicalModel->mText.Count() );
   }
 
   /**
@@ -466,7 +472,6 @@ struct Controller::Impl
   View mView;                              ///< The view interface to the rendering back-end.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
-  Size mControlSize;                       ///< The size of the control.
   Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.

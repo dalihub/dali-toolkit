@@ -2186,6 +2186,97 @@ int UtcDaliToolkitScrollViewFixedRulerSnapP(void)
   END_TEST;
 }
 
+int UtcDaliToolkitScrollViewConstraintsMove(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewConstraintsMove");
 
+  // Set up a scrollView...
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  scrollView.SetSize(stageSize);
+  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
+  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
+  // Position rulers.
+  RulerPtr rulerX = new DefaultRuler();
+  RulerPtr rulerY = new DefaultRuler();
+  rulerX->SetDomain( RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true) );
+  rulerY->SetDomain( RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true) );
+  scrollView.SetRulerX(rulerX);
+  scrollView.SetRulerY(rulerY);
 
+  // Add an Actor to ScrollView,
+  Actor a = Actor::New();
+  scrollView.Add(a);
+  a.SetPosition( TEST_ACTOR_POSITION );
+  Wait(application);
+
+  const Vector2 target = Vector2(100.0f, 100.0f);
+  const Vector2 target2 = Vector2(200.0f, 200.0f);
+
+  Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, MoveActorConstraint );
+  constraint.AddSource( Source(scrollView, ScrollView::Property::SCROLL_POSITION) );
+  constraint.SetRemoveAction(Constraint::Discard);
+  scrollView.ApplyConstraintToChildren(constraint);
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+  scrollView.ScrollTo( target2 );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewConstraintsWrap(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewConstraintsWrap");
+
+  // Set up a scrollView...
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  scrollView.SetSize(stageSize);
+  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
+  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+
+  // Position rulers.
+  RulerPtr rulerX = new DefaultRuler();
+  RulerPtr rulerY = new DefaultRuler();
+  rulerX->SetDomain( RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true) );
+  rulerY->SetDomain( RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true) );
+  scrollView.SetRulerX(rulerX);
+  scrollView.SetRulerY(rulerY);
+
+  // Add an Actor to ScrollView,
+  Actor a = Actor::New();
+  scrollView.Add(a);
+  a.SetPosition( TEST_ACTOR_POSITION );
+  Wait(application);
+
+  const Vector2 target = Vector2(100.0f, 100.0f);
+  const Vector2 target2 = Vector2(200.0f, 200.0f);
+
+  Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, WrapActorConstraint );
+  constraint.AddSource( LocalSource( Actor::Property::SCALE ) );
+  constraint.AddSource( LocalSource( Actor::Property::ANCHOR_POINT ) );
+  constraint.AddSource( LocalSource( Actor::Property::SIZE ) );
+  constraint.AddSource( Source( scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source( scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source( scrollView, Toolkit::ScrollView::Property::WRAP ) );
+  constraint.SetRemoveAction(Constraint::Discard);
+  scrollView.ApplyConstraintToChildren(constraint);
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+  scrollView.ScrollTo( target2 );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  END_TEST;
+}

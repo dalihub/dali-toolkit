@@ -559,12 +559,6 @@ private:
    */
   void OnRefreshNotification(PropertyNotification& source);
 
-  /**
-   * This is called when the change of scroll position is notified by ScrollBar.
-   * @param[in] position The new scroll position
-   */
-  void OnScrollPositionChanged( float position );
-
 private:
 
   ItemFactory& mItemFactory;

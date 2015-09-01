@@ -58,201 +58,162 @@ protected:
 public:
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetDisabled( bool disabled )
+   * @copydoc Dali::Toolkit::Button::SetDisabled
    */
   void SetDisabled( bool disabled );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsDisabled() const
+   * @copydoc Dali::Toolkit::Button::IsDisabled
    */
   bool IsDisabled() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetAutoRepeating( bool autoRepeating )
+   * @copydoc Dali::Toolkit::Button::SetAutoRepeating
    */
   void SetAutoRepeating( bool autoRepeating );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsAutoRepeating() const
+   * @copydoc Dali::Toolkit::Button::IsAutoRepeating
    */
   bool IsAutoRepeating() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
+   * @copydoc Dali::Toolkit::Button::SetInitialAutoRepeatingDelay
    */
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetInitialAutoRepeatingDelay() const
+   * @copydoc Dali::Toolkit::Button::GetInitialAutoRepeatingDelay
    */
   float GetInitialAutoRepeatingDelay() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay )
+   * @copydoc Dali::Toolkit::Button::SetNextAutoRepeatingDelay
    */
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetNextAutoRepeatingDelay() const
+   * @copydoc Dali::Toolkit::Button::GetNextAutoRepeatingDelay
    */
   float GetNextAutoRepeatingDelay() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetTogglableButton( bool togglable )
+   * @copydoc Dali::Toolkit::Button::SetTogglableButton
    */
   void SetTogglableButton( bool togglable );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsTogglableButton() const
+   * @copydoc Dali::Toolkit::Button::IsTogglableButton
    */
   bool IsTogglableButton() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetSelected( bool selected )
+   * @copydoc Dali::Toolkit::Button::SetSelected
    */
   void SetSelected( bool selected );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsSelected() const
+   * @copydoc Dali::Toolkit::Button::IsSelected
    */
   bool IsSelected() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetAnimationTime()
+   * @copydoc Dali::Toolkit::Button::SetAnimationTime
    */
   void SetAnimationTime( float animationTime );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetAnimationTime()
+   * @copydoc Dali::Toolkit::Button::GetAnimationTime
    */
   float GetAnimationTime() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetLabel( const std::string& label )
+   * @copydoc Dali::Toolkit::Button::SetLabelText
    */
-  void SetLabel( const std::string& label );
+  void SetLabelText( const std::string& label );
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetLabel( Actor label )
+   * @copydoc Dali::Toolkit::Button::GetLabelText
    */
-  void SetLabel( Actor label );
+  std::string GetLabelText() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetLabel()
+   * @copydoc Dali::Toolkit::PushButton::SetUnselectedImage
    */
-  Actor GetLabel() const;
+  void SetUnselectedImage( const std::string& filename );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetButtonImage( Actor image )
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage
    */
-  void SetButtonImage( Actor image );
+  void SetSelectedImage( const std::string& filename );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetButtonImage()
+   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage
    */
-  Actor GetButtonImage() const;
+  void SetBackgroundImage( const std::string& filename );
 
   /**
-   * Internal use only.
-   * @return A reference to the button image.
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedBackgroundImage
    */
-  Actor& GetButtonImage();
+  void SetSelectedBackgroundImage( const std::string& filename );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( Actor image )
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage
    */
-  void SetSelectedImage( Actor image );
+  void SetDisabledImage( const std::string& filename );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetSelectedImage()
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage
    */
-  Actor GetSelectedImage() const;
+  void SetDisabledSelectedImage( const std::string& filename );
 
   /**
-   * Internal use only.
-   * @return A reference to the selected image.
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage
    */
-  Actor& GetSelectedImage();
+  void SetDisabledBackgroundImage( const std::string& filename );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage( Actor image )
+   * @return The filename used for the button image.
    */
-  void SetBackgroundImage( Actor image );
+  std::string GetUnselectedImageFilename() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetBackgroundImage()
+   * @return The filename used for the selected image.
    */
-  Actor GetBackgroundImage() const;
+  std::string GetSelectedImageFilename() const;
 
   /**
-   * Internal use only.
-   * @return A reference to the background image.
+   * @return The filename used for the background image.
    */
-  Actor& GetBackgroundImage();
+  std::string GetBackgroundImageFilename() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedBackgroundImage( Actor image )
+   * @return The filename used for the selected background image.
    */
-  void SetSelectedBackgroundImage( Actor image );
+  std::string GetSelectedBackgroundImageFilename() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetSelectedBackgroundImage()
+   * @return The filename used for the disabled button image.
    */
-  Actor GetSelectedBackgroundImage() const;
+  std::string GetDisabledImageFilename() const;
 
   /**
-   * Internal use only.
-   * @return A reference to the selected background image.
+   * @return The filename used for the disabled selected image.
    */
-  Actor& GetSelectedBackgroundImage();
+  std::string GetDisabledSelectedImageFilename() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Actor image )
+   * @return The filename used for the disabled background image.
    */
-  void SetDisabledImage( Actor image );
+  std::string GetDisabledBackgroundImageFilename() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetDisabledImage()
+   * @brief Sets the specified properties on the button label.
+   * If the label does not exist yet, it is created.
+   * The derived buttons are notified if any properties are changed.
+   * @param[in] properties A Property::Map of key-value pairs of properties to set.
    */
-  Actor GetDisabledImage() const;
-
-  /**
-   * Internal use only.
-   * @return A reference to the disabled button image.
-   */
-  Actor& GetDisabledImage();
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage( Actor image )
-   */
-  void SetDisabledSelectedImage( Actor image );
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::GetDisabledSelectedImage()
-   */
-  Actor GetDisabledSelectedImage() const;
-
-  /**
-   * Internal use only.
-   * @return A reference to the disabled selected image.
-   */
-  Actor& GetDisabledSelectedImage();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Actor image )
-   */
-  void SetDisabledBackgroundImage( Actor image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::GetDisabledBackgroundImage()
-   */
-  Actor GetDisabledBackgroundImage() const;
-
-  /**
-   * Internal use only.
-   * @return A reference to the disabled background image.
-   */
-  Actor& GetDisabledBackgroundImage();
+  void ModifyLabel( const Property::Map& properties );
 
   /**
    * Performs actions as requested using the action name.
@@ -263,12 +224,106 @@ public:
    */
   static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
 
+public: // Deprecated API
+
+  /**
+   * @copydoc Dali::Toolkit::Button::SetLabel( Actor label )
+   */
+  void SetLabel( Actor label );
+
+  /**
+   * @deprecated Sets the unselected image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetButtonImage( Actor image );
+
+  /**
+   * @deprecated Sets the selected image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetSelectedImage( Actor image );
+
+  /**
+   * @deprecated Sets the background image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetBackgroundImage( Actor image );
+
+  /**
+   * @deprecated Sets the selected background image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetSelectedBackgroundImage( Actor image );
+
+  /**
+   * @deprecated Sets the disabled image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetDisabledImage( Actor image );
+
+  /**
+   * @deprecated Sets the disabled selected image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetDisabledSelectedImage( Actor image );
+
+  /**
+   * @deprecated Sets the disabled background image with an Actor.
+   * @param[in] image The Actor to use.
+   */
+  void SetDisabledBackgroundImage( Actor image );
+
+  /**
+   * @copydoc Dali::Toolkit::Button::GetButtonImage
+   */
+  Actor GetButtonImage() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Button::GetSelectedImage
+   */
+  Actor GetSelectedImage() const;
+
 protected:
 
   /**
    * @return A reference to the label actor.
    */
-  Actor& GetLabel();
+  Actor& GetLabelActor();
+
+  /**
+   * @return A reference to the unselected button image.
+   */
+  Actor& GetUnselectedImage();
+
+  /**
+   * @return A reference to the selected image.
+   */
+  Actor& GetSelectedImage();
+
+  /**
+   * @return A reference to the background image.
+   */
+  Actor& GetBackgroundImage();
+
+  /**
+   * @return A reference to the selected background image.
+   */
+  Actor& GetSelectedBackgroundImage();
+
+  /**
+   * @return A reference to the disabled button image.
+   */
+  Actor& GetDisabledImage();
+
+  /**
+   * @return A reference to the disabled selected image.
+   */
+  Actor& GetDisabledSelectedImage();
+
+  /**
+   * @return A reference to the disabled background image.
+   */
+  Actor& GetDisabledBackgroundImage();
 
 private:
 
@@ -287,13 +342,14 @@ private:
 
   /**
    * This method is called when the label is set.
+   * @param[in] noPadding Used to bypass padding if the label is to be treated generically.
    */
-  virtual void OnLabelSet() {}
+  virtual void OnLabelSet( bool noPadding ) {}
 
   /**
-   * This method is called when the button image is set
+   * This method is called when the unselected button image is set
    */
-  virtual void OnButtonImageSet() {}
+  virtual void OnUnselectedImageSet() {}
 
   /**
    * This method is called when the selected image is set
@@ -497,6 +553,40 @@ private:
    */
   void Released();
 
+  /**
+   * Used to perform common setup applied to images within button.
+   * This will replace the current image with the specifed one.
+   * @param[in]  actorToModify The image to replace.
+   * @param[out] newActor The new image to use.
+   */
+  void SetupContent( Actor& actorToModify, Actor newActor );
+
+  /**
+   * Sets the color of the unselected image.
+   * If no image exists, it is created.
+   * @param[in]  color The color to use.
+   */
+  void SetUnselectedColor( const Vector4& color );
+
+  /**
+   * Gets the unselected content color.
+   * @return     The currently used unselected color.
+   */
+  const Vector4 GetUnselectedColor() const;
+
+  /**
+   * Sets the color of the selected image.
+   * If no image exists, it is created.
+   * @param[in]  color The color to use.
+   */
+  void SetSelectedColor( const Vector4& color );
+
+  /**
+   * Gets the selected content color.
+   * @return     The currently used selected color.
+   */
+  const Vector4 GetSelectedColor() const;
+
 protected:
 
   enum ButtonState
@@ -516,8 +606,21 @@ protected:
     DisabledSelectedState,        ///< The button is disabled and selected.
   };
 
+  /**
+   * Enum to specify which decoration when getting and setting decorations.
+   */
+  enum DecorationState
+  {
+    UNSELECTED_DECORATION = 0,
+    SELECTED_DECORATION,
+    DECORATION_STATES
+  };
+
   ButtonState GetState();
   PaintState GetPaintState();
+  void SetDecoration( DecorationState state, Actor actor );
+  Actor& GetDecoration( DecorationState state );
+
 
   /**
    * Returns the animation to be used for transitioning creating the animation if needed.
@@ -554,6 +657,7 @@ protected:
   virtual void OnTransitionOut( Actor actor ) {}
 
 private:
+
   /**
    * Starts the transition animation.
    * Button::TransitionFinished is called when the animation finishes.
@@ -634,6 +738,8 @@ private:
 
   Actor mLabel;                                ///< Stores the button label.
 
+  Actor mDecoration[ DECORATION_STATES ];      ///< Stores the decorations for both selected and unselected states.
+
   Actor mUnselectedContent;                    ///< Stores the unselected content.
   Actor mSelectedContent;                      ///< Stores the selected content.
   Actor mBackgroundContent;                    ///< Stores the background content.
@@ -645,6 +751,9 @@ private:
   Animation        mTransitionAnimation;       ///< Animation used in the state transitions.
 
   TapGestureDetector mTapDetector;
+
+  Vector4          mUnselectedColor;           ///< Color to use for unselected content.
+  Vector4          mSelectedColor;             ///< Color to use for selected content.
 
   bool             mDisabled;                  ///< Stores the disabled property.
   bool             mAutoRepeating;             ///< Stores the autorepeating property.

@@ -457,11 +457,14 @@ void ItemView::DeactivateCurrentLayout()
 
 void ItemView::OnRefreshNotification(PropertyNotification& source)
 {
-  if(mRefreshEnabled || mScrollAnimation)
+  // Cancel scroll animation to prevent any fighting of setting the scroll position property by scroll bar during fast scroll.
+  if(!mRefreshEnabled && mScrollAnimation)
   {
-    // Only refresh the cache during normal scrolling
-    DoRefresh(GetCurrentLayoutPosition(0), true);
+    RemoveAnimation(mScrollAnimation);
   }
+
+  // Only cache extra items when it is not a fast scroll
+  DoRefresh(GetCurrentLayoutPosition(0), mRefreshEnabled || mScrollAnimation);
 }
 
 void ItemView::Refresh()
@@ -957,7 +960,6 @@ void ItemView::OnChildAdd(Actor& child)
                                         Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_Y,
                                         Toolkit::Scrollable::Property::SCROLL_POSITION_MAX_Y,
                                         Toolkit::ItemView::Property::SCROLL_CONTENT_SIZE);
-      scrollBar.ScrollPositionIntervalReachedSignal().Connect( this, &ItemView::OnScrollPositionChanged );
     }
   }
 }
@@ -1425,6 +1427,7 @@ Vector2 ItemView::GetCurrentScrollPosition() const
 
 void ItemView::AddOverlay(Actor actor)
 {
+  actor.SetDrawMode( DrawMode::OVERLAY_2D );
   Self().Add(actor);
 }
 
@@ -1477,6 +1480,7 @@ void ItemView::EnableScrollOvershoot( bool enable )
     mOvershootOverlay.SetColor(mOvershootEffectColor);
     mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
     mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
     self.Add(mOvershootOverlay);
 
     Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint );
@@ -1623,18 +1627,6 @@ void ItemView::GetItemsRange(ItemRange& range)
     range.begin = 0;
     range.end = 0;
   }
-}
-
-void ItemView::OnScrollPositionChanged( float position )
-{
-  // Cancel scroll animation to prevent any fighting of setting the scroll position property.
-  if(!mRefreshEnabled)
-  {
-    RemoveAnimation(mScrollAnimation);
-  }
-
-  // Refresh the cache immediately when the scroll position is changed.
-  DoRefresh(position, false); // No need to cache extra items.
 }
 
 bool ItemView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

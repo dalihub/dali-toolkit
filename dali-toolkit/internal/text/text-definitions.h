@@ -51,6 +51,7 @@ typedef TextAbstraction::CharacterDirection CharacterDirection; ///< The charact
 typedef uint32_t                         GlyphIndex;            ///< An index into an array of glyphs.
 typedef uint32_t                         ScriptRunIndex;        ///< An index into an array of script runs.
 typedef uint32_t                         FontRunIndex;          ///< An index into an array of font runs.
+typedef uint32_t                         UnderlineRunIndex;     ///< An index into an array of underline runs.
 typedef uint32_t                         BidirectionalRunIndex; ///< An index into an array of font runs.
 typedef uint32_t                         LineIndex;             ///< An index into an array of lines.
 

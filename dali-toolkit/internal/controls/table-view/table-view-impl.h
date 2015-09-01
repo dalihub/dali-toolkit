@@ -261,6 +261,11 @@ private: // From Control
    */
   virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
 
+  /**
+   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
+   */
+  virtual void OnSizeSet( const Vector3& size );
+
 private: // Implementation
 
   /**

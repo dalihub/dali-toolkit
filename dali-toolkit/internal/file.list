@@ -22,9 +22,12 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
+   $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
+   $(toolkit_src_dir)/controls/popup/confirmation-popup-impl.cpp \
+   $(toolkit_src_dir)/controls/model3d-view/model3d-view-impl.cpp \
+   $(toolkit_src_dir)/controls/model3d-view/obj-loader.cpp \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
-   $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
@@ -83,9 +86,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shadow-shader.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-bgra-shader.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \

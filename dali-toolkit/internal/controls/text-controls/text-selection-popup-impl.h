@@ -97,12 +97,10 @@ public:
 
   /**
    * @brief New constructor with provided buttons to enable.
-   * @param[in] buttonsToEnable bit mask of buttons to enable
    * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    * @return A handle to the TextSelectionPopup control.
    */
-  static Toolkit::TextSelectionPopup New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable,
-                                          TextSelectionPopupCallbackInterface* callbackInterface );
+  static Toolkit::TextSelectionPopup New( TextSelectionPopupCallbackInterface* callbackInterface );
 
   // Properties
 
@@ -124,6 +122,11 @@ public:
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
   /**
+   * @copydoc Toolkit::EnableButtons
+   */
+  void EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
+
+  /**
    * @copydoc Toolkit::TextSelectionPopup::RaiseAbove()
    */
   void RaiseAbove( Layer target );
@@ -132,6 +135,11 @@ public:
    * @copydoc Toolkit::TextSelectionPopup::ShowPopup()
    */
   void ShowPopup();
+
+  /**
+   * @copydoc Toolkiut::TextSelectionPopup::HidePopup()
+   */
+  void HidePopup();
 
 private: // From Control
 
@@ -146,6 +154,8 @@ private: // From Control
   virtual void OnStageConnection( int depth );
 
 private: // Implementation
+
+  void HideAnimationFinished( Animation& animation );
 
   /**
    * @brief When the cut button is pressed.
@@ -220,6 +230,20 @@ private: // Implementation
    */
   Dali::Image GetButtonImage( Toolkit::TextSelectionPopup::Buttons button );
 
+  /**
+   * @brief Sets the image for the pressed state of a popup option.
+   *
+   * @param[in]  filename The image filename to use.
+   */
+  void SetPressedImage( const std::string& filename);
+
+  /**
+   * @brief Gets the image used for the pressed state of a popup option.
+   *
+   * @return     The image filename used.
+   */
+  std::string GetPressedImage() const;
+
   void CreateOrderedListOfPopupOptions();
 
   void AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption );
@@ -227,8 +251,6 @@ private: // Implementation
   std::size_t GetNumberOfEnabledOptions();
 
   void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
-
-  void CreatePopup();
 
   /**
    * Construct a new TextField.
@@ -261,18 +283,20 @@ private: // Data
   Image mSelectIconImage;
   Image mSelectAllIconImage;
 
-  Size mOptionMaxSize;                 // Maximum size of an Option button
-  Size mOptionMinSize;                 // Minimum size of an Option button
-  Size mOptionDividerSize;             // Size of divider line
+  Size mPopupMaxSize;                   // Maximum size of the Popup
+  Size mOptionMaxSize;                  // Maximum size of an Option button
+  Size mOptionMinSize;                  // Minimum size of an Option button
+  Size mOptionDividerSize;              // Size of divider line
 
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
   Toolkit::TextSelectionPopup::Buttons mEnabledButtons; // stores enabled buttons
   Toolkit::TextSelectionPopupCallbackInterface* mCallbackInterface;
 
+  std::string mPressedImage;            // Image used for the popup option when pressed.
+  Vector4 mPressedColor;                // Color of the popup option when pressed.
   Vector4 mDividerColor;                // Color of the divider between buttons
   Vector4 mIconColor;                   // Color of the popup icon.
-  Vector4 mPressedColor;                // Color of the popup option when pressed.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;    // Position of Select Button
@@ -281,9 +305,13 @@ private: // Data
   std::size_t mCopyOptionPriority;      // Position of Copy button
   std::size_t mPasteOptionPriority;     // Position of Paste button
   std::size_t mClipboardOptionPriority; // Position of Clipboard button
+  float mFadeInDuration;                // Duration of the animation to fade in the Popup
+  float mFadeOutDuration;               // Duration of the animation to fade out the Popup
 
   bool mShowIcons:1; // Flag to show icons
   bool mShowCaptions:1; // Flag to show text captions
+  bool mPopupShowing:1; // Flag to indicate Popup showing
+  bool mButtonsChanged:1; // Flag to indicate the Popup Buttons have changed
 
 };
 

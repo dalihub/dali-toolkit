@@ -25,8 +25,6 @@
 namespace Dali
 {
 
-struct Vector2;
-
 namespace Toolkit
 {
 
@@ -56,6 +54,11 @@ public:
    * @param[in] visualModel The visual model used by the View.
    */
   void SetVisualModel( VisualModelPtr visualModel );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetControlSize()
+   */
+  virtual const Vector2& GetControlSize() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfGlyphs()
@@ -99,6 +102,18 @@ public:
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineHeight()
    */
   virtual float GetUnderlineHeight() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfUnderlineRuns()
+   */
+  virtual Length GetNumberOfUnderlineRuns() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineRuns()
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
+                                 UnderlineRunIndex index,
+                                 Length numberOfRuns ) const;
 
 private:
 

@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/popup/popup-impl.h>
-#include <dali-toolkit/public-api/controls/buttons/button.h>
 
 using namespace Dali;
 
@@ -77,69 +76,73 @@ Popup Popup::DownCast( BaseHandle handle )
   return Control::DownCast<Popup, Internal::Popup>(handle);
 }
 
-void Popup::SetBackgroundImage( Actor image )
+// Properties:
+
+void Popup::SetTitle( Actor titleActor )
 {
-  GetImpl(*this).SetBackgroundImage( image );
+  GetImpl( *this ).SetTitle( titleActor );
 }
 
-void Popup::SetTitle( const std::string& text )
+Actor Popup::GetTitle() const
 {
-  GetImpl(*this).SetTitle( text );
+  return GetImpl( *this ).GetTitle();
 }
 
-std::string Popup::GetTitle() const
+void Popup::SetContent( Actor content )
 {
-  return GetImpl(*this).GetTitle();
+  GetImpl( *this ).SetContent( content );
 }
 
-void Popup::AddButton( Button button )
+Actor Popup::GetContent() const
 {
-  GetImpl(*this).AddButton( button );
+  return GetImpl( *this ).GetContent();
 }
 
-void Popup::SetState( PopupState state )
+void Popup::SetFooter( Actor footer )
 {
-  GetImpl(*this).SetState( state );
+  GetImpl( *this ).SetFooter( footer );
 }
 
-void Popup::SetState( PopupState state, float duration )
+Actor Popup::GetFooter() const
 {
-  GetImpl(*this).SetState( state, duration );
+  return GetImpl( *this ).GetFooter();
 }
 
-Popup::PopupState Popup::GetState() const
+void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
 {
-  return GetImpl(*this).GetState();
+  GetImpl( *this ).SetDisplayState( displayState );
 }
 
-void Popup::Show()
+Toolkit::Popup::DisplayState Popup::GetDisplayState() const
 {
-  GetImpl(*this).SetState( POPUP_SHOW );
+  return GetImpl( *this ).GetDisplayState();
 }
 
-void Popup::Hide()
-{
-  GetImpl(*this).SetState( POPUP_HIDE );
-}
-
-void Popup::ShowTail(const Vector3& position)
-{
-  GetImpl(*this).ShowTail( position );
-}
-
-void Popup::HideTail()
-{
-  GetImpl(*this).HideTail();
-}
+// Signals:
 
 Popup::TouchedOutsideSignalType& Popup::OutsideTouchedSignal()
 {
-  return GetImpl(*this).OutsideTouchedSignal();
+  return GetImpl( *this ).OutsideTouchedSignal();
 }
 
-Popup::HiddenSignalType& Popup::HiddenSignal()
+Popup::DisplayStateChangeSignalType& Popup::ShowingSignal()
 {
-  return GetImpl(*this).HiddenSignal();
+  return GetImpl( *this ).ShowingSignal();
+}
+
+Popup::DisplayStateChangeSignalType& Popup::ShownSignal()
+{
+  return GetImpl( *this ).ShownSignal();
+}
+
+Popup::DisplayStateChangeSignalType& Popup::HidingSignal()
+{
+  return GetImpl( *this ).HidingSignal();
+}
+
+Popup::DisplayStateChangeSignalType& Popup::HiddenSignal()
+{
+  return GetImpl( *this ).HiddenSignal();
 }
 
 } // namespace Toolkit

@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -30,15 +31,12 @@
 namespace Dali
 {
 
-struct Vector2;
-
 namespace Toolkit
 {
 
 namespace Text
 {
 
-struct LineRun;
 class VisualModel;
 typedef IntrusivePtr<VisualModel> VisualModelPtr;
 
@@ -153,6 +151,19 @@ public:
    * @return The line index.
    */
   LineIndex GetLineOfCharacter( CharacterIndex characterIndex );
+
+  // Underline runs
+
+  /**
+   * @brief Retrieves the underline runs.
+   *
+   * @param[out] underlineRuns Pointer to a buffer where the underline runs are copied.
+   * @param[in] index Index of the first underline run to be copied.
+   * @param[in] numberOfRuns Number of underline runs to be copied.
+   */
+  void GetUnderlineRuns( GlyphRun* underlineRuns,
+                         UnderlineRunIndex index,
+                         Length numberOfRuns ) const;
 
   // Size interface
 
@@ -302,14 +313,14 @@ public:
   Vector<Length>         mGlyphsPerCharacter;   ///< For each character, the number of glyphs that are shaped.
   Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
   Vector<LineRun>        mLines;                ///< The laid out lines.
+  Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
 
+  Vector2                mControlSize;           ///< The size of the UI control the decorator is adding it's decorations to.
   Vector4                mTextColor;            ///< The text color
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
-
-
 
 private:
 

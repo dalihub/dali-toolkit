@@ -564,7 +564,7 @@ int UtcDaliEffectsViewSizeSet(void)
 
   {
     EffectsView view = EffectsView::New();
-    view.SetSize( 200.0f, 200.0f, 200.0f );
+    view.SetSize( 200.0f, 200.0f, 0.0f );
     stage.Add( view );
     view.Enable();
     application.SendNotification();
@@ -573,25 +573,25 @@ int UtcDaliEffectsViewSizeSet(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 200.0f ), TEST_LOCATION );
+    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   {
     EffectsView view = EffectsView::New();
     view.SetOutputImage( FrameBufferImage::New( 200, 200 ) );
     view.SetType( EffectsView::EMBOSS );
-    view.SetSize( 200.0f, 200.0f, 200.0f );
+    view.SetSize( 200.0f, 200.0f, 0.0f );
     stage.Add( view );
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 200.0f ), TEST_LOCATION );
+    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   {
     EffectsView view = EffectsView::New();
     view.SetType( EffectsView::DROP_SHADOW );
-    view.SetSize( 200.0f, 200.0f, 200.0f );
+    view.SetSize( 200.0f, 200.0f, 0.0f );
     stage.Add( view );
     application.SendNotification();
     application.Render();
@@ -600,7 +600,7 @@ int UtcDaliEffectsViewSizeSet(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 200.0f ), TEST_LOCATION );
+    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   END_TEST;

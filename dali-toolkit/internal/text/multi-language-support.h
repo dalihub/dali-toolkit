@@ -42,8 +42,6 @@ class MultilanguageSupport;
 
 } // Internal
 
-class LogicalModel;
-
 /**
  * @brief Sets the character's scripts to the model and validates the fonts set by the user or assigns default ones.
  */
@@ -91,11 +89,9 @@ public:
    *   script of the first character of the paragraph with a defined script.
    *
    * @param[in] text Vector of UTF-32 characters.
-   * @param[in] lineBreakInfo Vector with the line break info.
    * @param[out] scripts Vector containing the script runs for the whole text.
    */
   void SetScripts( const Vector<Character>& text,
-                   const Vector<LineBreakInfo>& lineBreakInfo,
                    Vector<ScriptRun>& scripts );
 
   /**

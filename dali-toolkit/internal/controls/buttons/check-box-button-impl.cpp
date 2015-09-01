@@ -86,20 +86,15 @@ void CheckBoxButton::OnButtonInitialize()
   // Wrap around all children
   Self().SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
-  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image disabledImage = Dali::ResourceImage::New( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image disabledSelectedImage = Dali::ResourceImage::New( DISABLED_SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-
-  SetButtonImage( ImageActor::New( buttonImage ) );
-  SetSelectedImage( ImageActor::New( selectedImage ) );
-  SetDisabledImage( ImageActor::New( disabledImage ) );
-  SetDisabledSelectedImage( ImageActor::New( disabledSelectedImage ) );
+  SetUnselectedImage( UNSELECTED_BUTTON_IMAGE_DIR );
+  SetSelectedImage( SELECTED_BUTTON_IMAGE_DIR );
+  SetDisabledImage( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR );
+  SetDisabledSelectedImage( DISABLED_SELECTED_BUTTON_IMAGE_DIR );
 }
 
-void CheckBoxButton::OnLabelSet()
+void CheckBoxButton::OnLabelSet( bool noPadding )
 {
-  Actor& label = GetLabel();
+  Actor& label = GetLabelActor();
 
   if( label )
   {
@@ -118,9 +113,9 @@ void CheckBoxButton::OnLabelSet()
     {
       label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
-    else if( GetButtonImage() )
+    else if( GetUnselectedImage() )
     {
-      label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+      label.SetX( GetUnselectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
     else
     {
@@ -134,7 +129,7 @@ void CheckBoxButton::OnDisabled()
   Actor& backgroundImage = GetBackgroundImage();
   Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
 
-  Actor& label = GetLabel();
+  Actor& label = GetLabelActor();
   if( label )
   {
     if( IsDisabled() && disabledBackgroundImage )
@@ -149,9 +144,9 @@ void CheckBoxButton::OnDisabled()
     {
       label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
-    else if( GetButtonImage() )
+    else if( GetUnselectedImage() )
     {
-      label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+      label.SetX( GetUnselectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
     else
     {

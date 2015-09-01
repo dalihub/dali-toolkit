@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <memory.h>
-#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
@@ -150,13 +149,13 @@ void VisualModel::GetNumberOfLines( GlyphIndex glyphIndex,
   {
     const LineRun& line = *it;
 
-    if( ( line.glyphIndex + line.numberOfGlyphs > glyphIndex ) &&
-        ( lastGlyphIndex > line.glyphIndex ) )
+    if( ( line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs > glyphIndex ) &&
+        ( lastGlyphIndex > line.glyphRun.glyphIndex ) )
     {
       firstLineFound = true;
       ++numberOfLines;
     }
-    else if( lastGlyphIndex <= line.glyphIndex )
+    else if( lastGlyphIndex <= line.glyphRun.glyphIndex )
     {
       // nothing else to do.
       break;
@@ -215,6 +214,15 @@ LineIndex VisualModel::GetLineOfCharacter( CharacterIndex characterIndex )
   }
 
   return index;
+}
+
+void VisualModel::GetUnderlineRuns( GlyphRun* underlineRuns,
+                                    UnderlineRunIndex index,
+                                    Length numberOfRuns ) const
+{
+  memcpy( underlineRuns,
+          mUnderlineRuns.Begin() + index,
+          numberOfRuns * sizeof( GlyphRun ) );
 }
 
 void VisualModel::SetNaturalSize( const Vector2& size  )

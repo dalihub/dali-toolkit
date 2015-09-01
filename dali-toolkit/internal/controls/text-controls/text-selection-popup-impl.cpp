@@ -25,11 +25,14 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+
 #include <libintl.h>
 #include <cfloat>
 
@@ -47,7 +50,8 @@ namespace
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("elementary", string)
 
-const std::string TEXT_SELECTION_POPUP_LABEL = "textselectionpopuplabel";
+const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "textselectionpopupbutton" );
+const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 1.0f ) );
 
 #ifdef DGETTEXT_ENABLED
 
@@ -78,7 +82,7 @@ const char* const OPTION_CLIPBOARD("option-clipboard");                         
 
 BaseHandle Create()
 {
-  return Toolkit::TextSelectionPopup::New( Toolkit::TextSelectionPopup::NONE, NULL );
+  return Toolkit::TextSelectionPopup::New( NULL );
 }
 
 // Setup properties, signals and actions using the type-registry.
@@ -96,17 +100,19 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-copy-button-imag
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-paste-button-image", STRING, POPUP_PASTE_BUTTON_ICON_IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-select-button-image", STRING, POPUP_SELECT_BUTTON_ICON_IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-select-all-button-image", STRING, POPUP_SELECT_ALL_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-divider-color", VECTOR4, DIVIDER_COLOR )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-icon-color", VECTOR4, ICON_COLOR )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-color", VECTOR4, PRESSED_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-divider-color", VECTOR4, POPUP_DIVIDER_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-icon-color", VECTOR4, POPUP_ICON_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-color", VECTOR4, POPUP_PRESSED_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-image", STRING, POPUP_PRESSED_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-fade-in-duration", FLOAT, POPUP_FADE_IN_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-fade-out-duration", FLOAT, POPUP_FADE_OUT_DURATION )
 
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
 
-Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable,
-                                                           TextSelectionPopupCallbackInterface* callbackInterface )
+Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( TextSelectionPopupCallbackInterface* callbackInterface )
 {
    // Create the implementation, temporarily owned by this handle on stack
   IntrusivePtr< TextSelectionPopup > impl = new TextSelectionPopup( callbackInterface );
@@ -114,7 +120,6 @@ Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectio
   // Pass ownership to CustomActor handle
   Dali::Toolkit::TextSelectionPopup handle( *impl );
 
-  impl->mEnabledButtons = buttonsToEnable;
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
   impl->Initialize();
@@ -188,19 +193,34 @@ void TextSelectionPopup::SetProperty( BaseObject* object, Property::Index index,
         impl.SetButtonImage( Toolkit::TextSelectionPopup::SELECT_ALL, image );
         break;
       }
-      case Toolkit::TextSelectionPopup::Property::DIVIDER_COLOR:
+      case Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR:
       {
         impl.mDividerColor = value.Get< Vector4 >();
         break;
       }
-      case Toolkit::TextSelectionPopup::Property::ICON_COLOR:
+      case Toolkit::TextSelectionPopup::Property::POPUP_ICON_COLOR:
       {
         impl.mIconColor = value.Get< Vector4 >();
         break;
       }
-      case Toolkit::TextSelectionPopup::Property::PRESSED_COLOR:
+      case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_COLOR:
       {
         impl.mPressedColor = value.Get< Vector4 >();
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
+      {
+        impl.SetPressedImage( value.Get< std::string >() );
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
+      {
+        impl.mFadeInDuration = value.Get < float >();
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
+      {
+        impl.mFadeOutDuration = value.Get < float >();
         break;
       }
     } // switch
@@ -293,9 +313,30 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
         }
         break;
       }
+      case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
+      {
+        value = impl.GetPressedImage();
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
+      {
+        value = impl.mFadeInDuration;
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
+      {
+        value = impl.mFadeOutDuration;
+        break;
+      }
     } // switch
   }
   return value;
+}
+
+void TextSelectionPopup::EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable )
+{
+  mEnabledButtons = buttonsToEnable;
+  mButtonsChanged = true;
 }
 
 void TextSelectionPopup::RaiseAbove( Layer target )
@@ -308,12 +349,36 @@ void TextSelectionPopup::RaiseAbove( Layer target )
 
 void TextSelectionPopup::ShowPopup()
 {
-  AddPopupOptionsToToolbar( mShowIcons, mShowCaptions );
+  if ( !mPopupShowing || mButtonsChanged )
+  {
+    Actor self = Self();
+    AddPopupOptionsToToolbar( mShowIcons, mShowCaptions );
+
+    Animation animation = Animation::New( mFadeInDuration );
+    animation.AnimateTo( Property(self, Actor::Property::COLOR_ALPHA), 1.0f  );
+    animation.Play();
+    mPopupShowing = true;
+  }
+}
+
+void TextSelectionPopup::HidePopup()
+{
+  if ( mPopupShowing )
+  {
+    mPopupShowing = false;
+    Actor self = Self();
+    Animation animation = Animation::New( mFadeOutDuration );
+    animation.AnimateTo( Property(self, Actor::Property::COLOR_ALPHA), 0.0f  );
+    animation.FinishedSignal().Connect( this, &TextSelectionPopup::HideAnimationFinished );
+    animation.Play();
+  }
 }
 
 void TextSelectionPopup::OnInitialize()
 {
-  CreatePopup();
+  Actor self = Self();
+  self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  self.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
 }
 
 void TextSelectionPopup::OnStageConnection( int depth )
@@ -322,6 +387,15 @@ void TextSelectionPopup::OnStageConnection( int depth )
   Control::OnStageConnection( depth );
 
   // TextSelectionToolbar::OnStageConnection() will set the depths of all the popup's components.
+}
+
+void TextSelectionPopup::HideAnimationFinished( Animation& animation )
+{
+  Actor self = Self();
+  if ( !mPopupShowing ) // During the Hide/Fade animation there could be a call to Show the Popup again, mPopupShowing will be true in this case.
+  {
+    UnparentAndReset( self );  // Popup needs to be shown so do not unparent
+  }
 }
 
 bool TextSelectionPopup::OnCutButtonPressed( Toolkit::Button button )
@@ -390,6 +464,7 @@ void TextSelectionPopup::SetDimensionToCustomise( const PopupCustomisations& set
   {
     case POPUP_MAXIMUM_SIZE :
     {
+      mPopupMaxSize = dimension;
       if ( mToolbar )
       {
         mToolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, dimension );
@@ -426,7 +501,14 @@ Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& set
   {
     case POPUP_MAXIMUM_SIZE :
     {
-      return mToolbar.GetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE ).Get< Vector2 >();
+      if ( mToolbar )
+      {
+        return mToolbar.GetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE ).Get< Vector2 >();
+      }
+      else
+      {
+        return mPopupMaxSize;
+      }
     }
     case OPTION_MAXIMUM_SIZE :
     {
@@ -530,6 +612,16 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
   return Dali::Image();
 }
 
+void TextSelectionPopup::SetPressedImage( const std::string& filename )
+{
+  mPressedImage = filename;
+}
+
+std::string TextSelectionPopup::GetPressedImage() const
+{
+  return mPressedImage;
+}
+
  void TextSelectionPopup::CreateOrderedListOfPopupOptions()
  {
    mOrderListOfButtons.clear();
@@ -549,85 +641,11 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
 
  void TextSelectionPopup::AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption  )
  {
-   const std::string& name = button.name;
-   const std::string& caption = button.caption;
-   Image iconImage = button.icon;
-
-   // 1. Create the backgrounds for the popup option both normal and pressed.
-   // Both containers will be added to a button.
-
-   Toolkit::TableView optionContainer = Toolkit::TableView::New( (showIcons&showCaption)?2:1 , 1 );
-   optionContainer.SetFitHeight( 0 );
-   optionContainer.SetFitWidth( 0 );
-
-   Toolkit::TableView  optionPressedContainer = Toolkit::TableView::New( (showIcons&showCaption)?2:1 , 1 );
-   optionPressedContainer.SetFitHeight( 0 );
-   optionPressedContainer.SetFitWidth( 0 );
-   optionPressedContainer.SetBackgroundColor( mPressedColor );
-
-#ifdef DECORATOR_DEBUG
-   optionContainer.SetName("optionContainer");
-   optionPressedContainer.SetName("optionPressedContainer");
-#endif
-   // 2. Add text.
-
-   if ( showCaption )
-   {
-     Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
-     captionTextLabel.SetStyleName( TEXT_SELECTION_POPUP_LABEL );
-     captionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
-     captionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-
-     Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
-     pressedCaptionTextLabel.SetStyleName( TEXT_SELECTION_POPUP_LABEL );
-     pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
-     pressedCaptionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-
-     Padding padding;
-     padding.left = 24.0f;
-     padding.right = 24.0f;
-     padding.top = 14.0f;
-     padding.bottom = 14.0f;
-     captionTextLabel.SetPadding( padding );
-     pressedCaptionTextLabel.SetPadding( padding );
-
-     optionContainer.AddChild( captionTextLabel, Toolkit::TableView::CellPosition(( showIcons&showCaption)?1:0, 0 )  );
-     optionPressedContainer.AddChild( pressedCaptionTextLabel, Toolkit::TableView::CellPosition(( showIcons&showCaption)?1:0, 0 ) );
-   }
-
-   int depth = Self().GetHierarchyDepth();
-   // 3. Create the icons
-   if ( showIcons && iconImage )
-   {
-     ImageActor pressedIcon = ImageActor::New(  iconImage );
-     ImageActor icon = ImageActor::New(  iconImage );
-     icon.SetSortModifier( DECORATION_DEPTH_INDEX + depth - 1 );
-     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX + depth - 1 );
-
-     icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-     pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-     icon.SetColor( mIconColor );
-
-     if ( showCaption & showIcons )
-     {
-       optionContainer.SetFitHeight( 1 );
-       optionContainer.SetFitWidth( 1 );
-       optionPressedContainer.SetFitHeight( 1 );
-       optionPressedContainer.SetFitWidth( 1 );
-     }
-
-     optionContainer.AddChild( icon, Toolkit::TableView::CellPosition( 0, 0 )  );
-     optionPressedContainer.AddChild( pressedIcon, Toolkit::TableView::CellPosition( 0, 0 )  );
-
-     icon.SetPadding( Padding( 10.0f, 10.0f, 10.0f, 10.0f ) );
-     pressedIcon.SetPadding( Padding( 10.0f, 10.0f, 10.0f, 10.0f ) );
-   }
-
-   // 4. Create a option.
+   // 1. Create a option.
    Toolkit::PushButton option = Toolkit::PushButton::New();
-   option.SetName( name );
+   option.SetName( button.name );
    option.SetAnimationTime( 0.0f );
-   option.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+   option.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
    switch( button.id )
    {
@@ -668,16 +686,40 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      }
    }
 
-   // 5. Set the normal option image.
-   option.SetButtonImage( optionContainer );
+   // 2. Set the options contents.
+   if( showCaption )
+   {
+     // PushButton layout properties.
+     option.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 24.0f, 24.0f, 14.0f, 14.0f ) );
 
-   // 6. Set the pressed option image
-   option.SetSelectedImage( optionPressedContainer );
+     // Label properties.
+     Property::Map buttonLabelProperties;
+     buttonLabelProperties.Insert( "text", button.caption );
+     option.SetProperty( Toolkit::Button::Property::LABEL, buttonLabelProperties );
+   }
+   if( showIcons )
+   {
+     option.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+     option.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "TOP" );
 
-   // 7 Add option to tool bar
+     // TODO: This is temporarily disabled until the text-selection-popup image API is changed to strings.
+     //option.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, button.icon );
+     //option.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, button.icon );
+   }
+
+   // 3. Set the normal option image (blank / Transparent).
+   option.SetUnselectedImage( "" );
+
+   // 4. Set the pressed option image.
+   // The image can be blank, the color can be used regardless.
+   option.SetSelectedImage( mPressedImage );
+   option.SetProperty( Toolkit::Button::Property::SELECTED_COLOR, mPressedColor );
+   option.SetProperty( Toolkit::Control::Property::STYLE_NAME, TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME );
+
+   // 5 Add option to tool bar
    mToolbar.AddOption( option );
 
-   // 8. Add the divider
+   // 6. Add the divider
    if( showDivider )
    {
      const Size size( mOptionDividerSize.width, 0.0f ); // Height FILL_TO_PARENT
@@ -689,7 +731,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      divider.SetSize( size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
      divider.SetColor( mDividerColor );
-     divider.SetSortModifier( DECORATION_DEPTH_INDEX + depth );
+     divider.SetSortModifier( DECORATION_DEPTH_INDEX );
      mToolbar.AddDivider( divider );
    }
  }
@@ -711,6 +753,26 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
 
  void TextSelectionPopup::AddPopupOptionsToToolbar( bool showIcons, bool showCaptions )
  {
+   CreateOrderedListOfPopupOptions();
+
+   mButtonsChanged = false;
+   UnparentAndReset( mToolbar);
+
+   if( !mToolbar )
+   {
+     Actor self = Self();
+     mToolbar = Toolkit::TextSelectionToolbar::New();
+     if ( mPopupMaxSize != Vector2::ZERO ) // If PopupMaxSize property set then apply to Toolbar. Toolbar currently is not retriving this from json
+     {
+       mToolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, mPopupMaxSize );
+     }
+     mToolbar.SetParentOrigin( ParentOrigin::CENTER );
+#ifdef DECORATOR_DEBUG
+     mToolbar.SetName("TextSelectionToolbar");
+#endif
+     self.Add( mToolbar );
+   }
+
    // Iterate list of buttons and add active ones to Toolbar
    std::size_t numberOfOptionsRequired =  GetNumberOfEnabledOptions();
    std::size_t numberOfOptionsAdded = 0u;
@@ -725,37 +787,30 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    }
  }
 
- void TextSelectionPopup::CreatePopup()
- {
-   Actor self = Self();
-   CreateOrderedListOfPopupOptions();
-   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-
-   if( !mToolbar )
-   {
-     mToolbar = Toolkit::TextSelectionToolbar::New();
-     mToolbar.SetParentOrigin( ParentOrigin::CENTER );
-     self.Add( mToolbar );
-   }
- }
-
 TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface )
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mToolbar(),
+  mPopupMaxSize(),
+  mOptionMaxSize(),
+  mOptionMinSize(),
   mOptionDividerSize(),
   mEnabledButtons( Toolkit::TextSelectionPopup::NONE ),
   mCallbackInterface( callbackInterface ),
+  mPressedColor( DEFAULT_OPTION_PRESSED_COLOR ),
   mDividerColor( Color::WHITE ),
-  mIconColor(  Color::WHITE ),
-  mPressedColor(  Color::WHITE ),
+  mIconColor( Color::WHITE ),
   mSelectOptionPriority( 1 ),
   mSelectAllOptionPriority ( 2 ),
   mCutOptionPriority ( 4 ),
   mCopyOptionPriority ( 3 ),
   mPasteOptionPriority ( 5 ),
   mClipboardOptionPriority( 6 ),
+  mFadeInDuration(0.0f),
+  mFadeOutDuration(0.0f),
   mShowIcons( false ),
-  mShowCaptions( true )
+  mShowCaptions( true ),
+  mPopupShowing( false ),
+  mButtonsChanged( false )
 {
 }
 

@@ -41,7 +41,7 @@ int UtcDaliToolkitTextSelectionPopupNewP(void)
 
   DALI_TEST_CHECK( !textSelectionPopup );
 
-  textSelectionPopup = TextSelectionPopup::New( TextSelectionPopup::COPY, NULL );
+  textSelectionPopup = TextSelectionPopup::New( NULL );
 
   DALI_TEST_CHECK( textSelectionPopup );
   END_TEST;
@@ -61,7 +61,7 @@ int UtcDaliToolkitTextSelectionPopupCopyConstructorP(void)
   ToolkitTestApplication application;
   TextSelectionPopup textSelectionPopup;
 
-  textSelectionPopup = TextSelectionPopup::New( TextSelectionPopup::COPY, NULL );
+  textSelectionPopup = TextSelectionPopup::New( NULL );
   TextSelectionPopup copy( textSelectionPopup );
 
   DALI_TEST_CHECK( copy == textSelectionPopup );
@@ -85,7 +85,7 @@ int UtcDaliToolkitTextSelectionPopupAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
   TextSelectionPopup textSelectionPopup;
-  textSelectionPopup = TextSelectionPopup::New( TextSelectionPopup::COPY, NULL );
+  textSelectionPopup = TextSelectionPopup::New(  NULL );
   TextSelectionPopup copy;
   copy = textSelectionPopup;
 
@@ -97,7 +97,7 @@ int UtcDaliToolkitTextSelectionPopupDownCastP(void)
 {
   ToolkitTestApplication application;
   TextSelectionPopup textSelectionPopup;
-  textSelectionPopup = TextSelectionPopup::New( TextSelectionPopup::COPY, NULL );
+  textSelectionPopup = TextSelectionPopup::New( NULL );
 
   TextSelectionPopup cast = TextSelectionPopup::DownCast( textSelectionPopup );
 

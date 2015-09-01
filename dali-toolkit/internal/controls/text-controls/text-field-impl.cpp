@@ -35,6 +35,7 @@
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 using namespace Dali::Toolkit::Text;
@@ -107,14 +108,17 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondary-cursor-color",       
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",                  BOOLEAN,   ENABLE_CURSOR_BLINK                  )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",                FLOAT,     CURSOR_BLINK_INTERVAL                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",                FLOAT,     CURSOR_BLINK_DURATION                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-width",                         INTEGER,   CURSOR_WIDTH                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",                    STRING,    GRAB_HANDLE_IMAGE                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-speed",                         FLOAT,     SCROLL_SPEED                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          STRING,    SELECTION_HANDLE_IMAGE_LEFT          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         STRING,    SELECTION_HANDLE_IMAGE_RIGHT         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  STRING,    SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          MAP,       SELECTION_HANDLE_IMAGE_LEFT          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         MAP,       SELECTION_HANDLE_IMAGE_RIGHT         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  MAP,       SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", MAP,       SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-marker-image-left",   MAP,       SELECTION_HANDLE_MARKER_IMAGE_LEFT   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-marker-image-right",  MAP,       SELECTION_HANDLE_MARKER_IMAGE_RIGHT  )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            VECTOR4,   SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
@@ -239,6 +243,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          const int max = value.Get< int >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p MAX_LENGTH %d\n", impl.mController.Get(), max );
+
+          impl.mController->SetMaximumNumberOfCharacters( max );
+        }
+        break;
+      }
       case Toolkit::TextField::Property::EXCEED_POLICY:
       {
         // TODO
@@ -249,7 +264,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const std::string alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
           LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
           if( Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
@@ -267,7 +282,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const std::string alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
           LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
           if( Scripting::GetEnumeration< LayoutEngine::VerticalAlignment >( alignStr.c_str(),
@@ -345,7 +360,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           const Vector4 color = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
           impl.RequestTextRelayout();
@@ -357,7 +372,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           const Vector4 color = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
           impl.RequestTextRelayout();
@@ -392,9 +407,21 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           const float duration = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_INTERVAL %f\n", impl.mController.Get(), duration );
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_DURATION %f\n", impl.mController.Get(), duration );
 
           impl.mDecorator->SetCursorBlinkDuration( duration );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::CURSOR_WIDTH:
+      {
+        if( impl.mDecorator )
+        {
+          const int width = value.Get< int >();
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_WIDTH %d\n", impl.mController.Get(), width );
+
+          impl.mDecorator->SetCursorWidth( width );
+          impl.mController->GetLayoutEngine().SetCursorWidth( width );
         }
         break;
       }
@@ -446,8 +473,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_LEFT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -458,8 +484,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_RIGHT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -470,8 +495,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_LEFT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -482,8 +506,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_RIGHT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -492,10 +515,30 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
+      {
+        const Image image = Scripting::NewImage( value );
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
+      {
+        const Image image = Scripting::NewImage( value );
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
       case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
       {
         const Vector4 color = value.Get< Vector4 >();
-        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTION_HIGHLIGHT_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTION_HIGHLIGHT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
         if( impl.mDecorator )
         {
@@ -513,17 +556,6 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
           impl.mDecorator->SetBoundingBox( box );
           impl.RequestTextRelayout();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::MAX_LENGTH:
-      {
-        if( impl.mController )
-        {
-          const int max = value.Get< int >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p MAX_LENGTH %d\n", impl.mController.Get(), max );
-
-          impl.mController->SetMaximumNumberOfCharacters( max );
         }
         break;
       }
@@ -606,6 +638,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->GetDefaultPointSize();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetMaximumNumberOfCharacters();
         }
         break;
       }
@@ -711,6 +751,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::CURSOR_WIDTH:
+      {
+        if( impl.mDecorator )
+        {
+          value = impl.mDecorator->GetCursorWidth();
+        }
+        break;
+      }
       case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
       {
         if( impl.mDecorator )
@@ -753,50 +801,32 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED );
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) ;
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED );
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED );
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
+      {
+        impl.GetHandleImagePropertyValue( value, LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED );
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
+      {
+        impl.GetHandleImagePropertyValue( value, RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED );
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
@@ -812,14 +842,6 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mDecorator )
         {
           value = impl.mDecorator->GetBoundingBox();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::MAX_LENGTH:
-      {
-        if( impl.mController )
-        {
-          value = impl.mController->GetMaximumNumberOfCharacters();
         }
         break;
       }
@@ -901,7 +923,38 @@ void TextField::OnInitialize()
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
-  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange\n");
+
+   switch ( change )
+   {
+     case StyleChange::DEFAULT_FONT_CHANGE:
+     {
+       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE\n");
+       if ( mController->GetDefaultFontFamily() == "" )
+       {
+         // Property system did not set the font so should update it.
+         // todo instruct text-controller to update model
+       }
+       break;
+     }
+
+     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
+     {
+       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
+
+       if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
+       {
+         // Property system did not set the PointSize so should update it.
+         // todo instruct text-controller to update model
+       }
+       break;
+     }
+     case StyleChange::THEME_CHANGE:
+     {
+       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+       break;
+     }
+   }
 }
 
 Vector3 TextField::GetNaturalSize()
@@ -1142,6 +1195,21 @@ ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager,
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
   return mController->OnImfEvent( imfManager, imfEvent );
+}
+
+void TextField::GetHandleImagePropertyValue(  Property::Value& value, Text::HandleType handleType, Text::HandleImageType handleImageType )
+{
+  if( mDecorator )
+  {
+    ResourceImage image = ResourceImage::DownCast( mDecorator->GetHandleImage( handleType, handleImageType ) );
+
+    if ( image )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( image, map );
+      value = map;
+    }
+  }
 }
 
 void TextField::EnableClipping( bool clipping, const Vector2& size )

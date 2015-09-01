@@ -1092,11 +1092,9 @@ int UtcDaliAccessibilityManagerGetReadPositionP(void)
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
-  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
-  Vector2 position( 1.0f, 2.0f );
-  accessibilityAdaptor.MockSetReadPosition( position );
-
-  DALI_TEST_EQUALS( manager.GetReadPosition(), position, TEST_LOCATION );
+  Vector2 readPosition( manager.GetReadPosition() );
+  DALI_TEST_EQUALS( readPosition.x, 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( readPosition.y, 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }

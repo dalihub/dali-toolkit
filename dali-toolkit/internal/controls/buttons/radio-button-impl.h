@@ -65,24 +65,24 @@ private:
 private: // From Button
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonInitialize()
+   * @copydoc Toolkit::Internal::Button::OnButtonInitialize
    */
   virtual void OnButtonInitialize();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonUp()
+   * @copydoc Toolkit::Internal::Button::OnButtonUp
    */
   virtual void OnButtonUp();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelected()
+   * @copydoc Toolkit::Internal::Button::OnSelected
    */
   virtual void OnSelected();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnLabelSet()
+   * @copydoc Toolkit::Internal::Button::OnLabelSet
    */
-  virtual void OnLabelSet();
+  virtual void OnLabelSet( bool noPadding );
 
 private:
 

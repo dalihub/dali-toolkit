@@ -20,39 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/actors/actor.h>
+
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/events/tap-gesture.h>
-#include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/pan-gesture.h>
-#include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/public-api/signals/connection-tracker.h>
 
-#include <dali/devel-api/object/property-buffer.h>
 #include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/material.h>
 #include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
@@ -105,8 +87,6 @@ namespace
 {
 
 const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "cursor_handler_center.png" );
-const char* DEFAULT_SELECTION_HANDLE_ONE_RELEASED( DALI_IMAGE_DIR "selection_handle_left.png" );
-const char* DEFAULT_SELECTION_HANDLE_TWO_RELEASED( DALI_IMAGE_DIR "selection_handle_right.png" );
 
 const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
 
@@ -126,6 +106,8 @@ const unsigned int SCROLL_TICK_INTERVAL = 50u;
 const float SCROLL_THRESHOLD = 10.f;
 const float SCROLL_SPEED = 300.f;
 const float SCROLL_DISTANCE = SCROLL_SPEED * SCROLL_TICK_INTERVAL * TO_SECONDS;
+
+const float CURSOR_WIDTH = 1.f;
 
 /**
  * structure to hold coordinates of each quad, which will make up the mesh.
@@ -232,6 +214,7 @@ struct Decorator::Impl : public ConnectionTracker
 
     ImageActor actor;
     Actor grabArea;
+    ImageActor markerActor;
 
     Vector2 position;
     float lineHeight; ///< Not the handle height
@@ -268,6 +251,7 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveCursor( ACTIVE_CURSOR_NONE ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration( 0.0f ),
+    mCursorWidth( CURSOR_WIDTH ),
     mHandleScrolling( HANDLE_TYPE_COUNT ),
     mScrollDirection( SCROLL_NONE ),
     mScrollThreshold( SCROLL_THRESHOLD ),
@@ -276,6 +260,7 @@ struct Decorator::Impl : public ConnectionTracker
     mTextDepth( 0u ),
     mActiveCopyPastePopup( false ),
     mCursorBlinkStatus( true ),
+    mDelayCursorBlink( false ),
     mPrimaryCursorVisible( false ),
     mSecondaryCursorVisible( false ),
     mSwapSelectionHandles( false ),
@@ -308,9 +293,9 @@ struct Decorator::Impl : public ConnectionTracker
 
         mPrimaryCursor.SetPosition( position.x,
                                     position.y );
-        mPrimaryCursor.SetSize( Size( 1.0f, cursor.cursorHeight ) );
+        mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
-      mPrimaryCursor.SetVisible( mPrimaryCursorVisible );
+      mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
     }
     if( mSecondaryCursor )
     {
@@ -320,9 +305,9 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mSecondaryCursor.SetPosition( cursor.position.x,
                                       cursor.position.y );
-        mSecondaryCursor.SetSize( Size( 1.0f, cursor.cursorHeight ) );
+        mSecondaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
-      mSecondaryCursor.SetVisible( mSecondaryCursorVisible );
+      mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
     }
 
     // Show or hide the grab handle
@@ -339,8 +324,8 @@ struct Decorator::Impl : public ConnectionTracker
 
         CreateGrabHandle();
 
-        grabHandle.actor.SetPosition( position.x,
-                                      grabHandle.lineHeight ); // TODO : Fix for multiline.
+        grabHandle.actor.SetPosition( position.x - floor( 0.5f * mCursorWidth ),
+                                      position.y + grabHandle.lineHeight ); // TODO : Fix for multiline.
       }
       grabHandle.actor.SetVisible( isVisible );
     }
@@ -369,13 +354,17 @@ struct Decorator::Impl : public ConnectionTracker
         if( isPrimaryVisible )
         {
           primary.actor.SetPosition( primaryPosition.x,
-                                     primary.lineHeight ); // TODO : Fix for multiline.
+                                     primaryPosition.y + primary.lineHeight ); // TODO : Fix for multiline.
+
+          SetSelectionHandleMarkerSize( primary );
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
-                                       secondary.lineHeight ); // TODO : Fix for multiline.
+                                       secondaryPosition.y + secondary.lineHeight ); // TODO : Fix for multiline.
+
+          SetSelectionHandleMarkerSize( secondary );
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );
@@ -402,18 +391,13 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( mActiveCopyPastePopup )
     {
-      if( !mCopyPastePopup.actor.GetParent() )
-      {
-        mActiveLayer.Add( mCopyPastePopup.actor );
-      }
-
-      mCopyPastePopup.actor.RaiseAbove( mActiveLayer );
+      ShowPopup();
     }
     else
     {
       if( mCopyPastePopup.actor )
       {
-        mCopyPastePopup.actor.Unparent();
+        mCopyPastePopup.actor.HidePopup();
       }
     }
   }
@@ -427,6 +411,22 @@ struct Decorator::Impl : public ConnectionTracker
     mHandle[ RIGHT_SELECTION_HANDLE ].position += scrollOffset;
     mHighlightPosition += scrollOffset;
     DeterminePositionPopup();
+  }
+
+  void ShowPopup()
+  {
+    if ( !mCopyPastePopup.actor )
+    {
+      return;
+    }
+
+    if( !mCopyPastePopup.actor.GetParent() )
+    {
+      mActiveLayer.Add( mCopyPastePopup.actor );
+    }
+
+    mCopyPastePopup.actor.RaiseAbove( mActiveLayer );
+    mCopyPastePopup.actor.ShowPopup();
   }
 
   void DeterminePositionPopup()
@@ -463,7 +463,6 @@ struct Decorator::Impl : public ConnectionTracker
   void PopupRelayoutComplete( Actor actor )
   {
     // Size negotiation for CopyPastePopup complete so can get the size and constrain position within bounding box.
-    mCopyPastePopup.actor.OnRelayoutSignal().Disconnect( this, &Decorator::Impl::PopupRelayoutComplete  );
 
     DeterminePositionPopup();
   }
@@ -473,7 +472,7 @@ struct Decorator::Impl : public ConnectionTracker
     cursor = CreateSolidColorActor( color );
     cursor.SetSortModifier( DECORATION_DEPTH_INDEX );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
-    cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+    cursor.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
   }
 
   // Add or Remove cursor(s) from parent
@@ -537,17 +536,25 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool OnCursorBlinkTimerTick()
   {
-    // Cursor blinking
-    if ( mPrimaryCursor )
+    if( !mDelayCursorBlink )
     {
-      mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
-    }
-    if ( mSecondaryCursor )
-    {
-      mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
-    }
+      // Cursor blinking
+      if ( mPrimaryCursor )
+      {
+        mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
+      }
+      if ( mSecondaryCursor )
+      {
+        mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
+      }
 
-    mCursorBlinkStatus = !mCursorBlinkStatus;
+      mCursorBlinkStatus = !mCursorBlinkStatus;
+    }
+    else
+    {
+      // Resume blinking
+      mDelayCursorBlink = false;
+    }
 
     return true;
   }
@@ -585,6 +592,15 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     mActiveLayer.RaiseToTop();
+  }
+
+  void SetSelectionHandleMarkerSize( HandleImpl& handle )
+  {
+    if ( handle.markerActor )
+    {
+      handle.markerActor.SetResizePolicy ( ResizePolicy::FIXED, Dimension::HEIGHT );
+      handle.markerActor.SetSize( 0, handle.lineHeight );
+    }
   }
 
   void CreateGrabHandle()
@@ -637,16 +653,32 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
+  void CreateHandleMarker( HandleImpl& handle, Image& image, HandleType handleType )
+  {
+    if ( image)
+    {
+      handle.markerActor = ImageActor::New( image );
+      handle.markerActor.SetColor( mHandleColor );
+      handle.actor.Add( handle.markerActor );
+
+      if ( LEFT_SELECTION_HANDLE == handleType )
+      {
+        handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+        handle.markerActor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+      }
+      else if ( RIGHT_SELECTION_HANDLE == handleType )
+      {
+        handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+        handle.markerActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      }
+    }
+  }
+
   void CreateSelectionHandles()
   {
     HandleImpl& primary = mHandle[ LEFT_SELECTION_HANDLE ];
     if( !primary.actor )
     {
-      if( !mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
-      {
-        mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_RELEASED );
-      }
-
       primary.actor = ImageActor::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
       primary.actor.SetName("SelectionHandleOne");
@@ -670,6 +702,8 @@ struct Decorator::Impl : public ConnectionTracker
       primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
       primary.actor.Add( primary.grabArea );
+
+      CreateHandleMarker( primary, mHandleImages[LEFT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], LEFT_SELECTION_HANDLE );
     }
 
     if( !primary.actor.GetParent() )
@@ -680,11 +714,6 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( !secondary.actor )
     {
-      if( !mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
-      {
-        mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_RELEASED );
-      }
-
       secondary.actor = ImageActor::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
       secondary.actor.SetName("SelectionHandleTwo");
@@ -708,6 +737,8 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
       secondary.actor.Add( secondary.grabArea );
+
+      CreateHandleMarker( secondary, mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], RIGHT_SELECTION_HANDLE  );
     }
 
     if( !secondary.actor.GetParent() )
@@ -750,7 +781,6 @@ struct Decorator::Impl : public ConnectionTracker
 
         for( std::size_t v = 0; iter != endIter; ++iter,v+=4 )
         {
-
           QuadCoordinates& quad = *iter;
 
           // top-left (v+0)
@@ -824,7 +854,10 @@ struct Decorator::Impl : public ConnectionTracker
 
       mHighlightQuadList.clear();
 
-      mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
+      if( mHighlightRenderer )
+      {
+        mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
+      }
     }
   }
 
@@ -1150,6 +1183,15 @@ struct Decorator::Impl : public ConnectionTracker
     rightHandle.actor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE][rightImageType] );
 
     rightHandle.actor.SetAnchorPoint( rightFlipped ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
+
+    if ( leftHandle.markerActor )
+    {
+      leftHandle.markerActor.SetImage( leftFlipped ? mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][leftImageType] : mHandleImages[LEFT_SELECTION_HANDLE_MARKER][leftImageType] );
+    }
+    if ( rightHandle.markerActor )
+    {
+      rightHandle.markerActor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE_MARKER][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][rightImageType] );
+    }
   }
 
   void SetScrollThreshold( float threshold )
@@ -1269,6 +1311,7 @@ struct Decorator::Impl : public ConnectionTracker
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;
   float               mCursorBlinkDuration;
+  float               mCursorWidth;             ///< The width of the cursors in pixels.
   HandleType          mHandleScrolling;         ///< The handle which is scrolling.
   ScrollDirection     mScrollDirection;         ///< The direction of the scroll.
   float               mScrollThreshold;         ///< Defines a square area inside the control, close to the edge. A cursor entering this area will trigger scroll events.
@@ -1278,6 +1321,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool                mActiveCopyPastePopup   : 1;
   bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
+  bool                mDelayCursorBlink       : 1; ///< Used to avoid cursor blinking when entering text.
   bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
   bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
   bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
@@ -1374,6 +1418,14 @@ void Decorator::StopCursorBlink()
   {
     mImpl->mCursorBlinkTimer.Stop();
   }
+
+  mImpl->mCursorBlinkStatus = true; // Keep cursor permanently shown
+}
+
+void Decorator::DelayCursorBlink()
+{
+  mImpl->mCursorBlinkStatus = true; // Show cursor for a bit longer
+  mImpl->mDelayCursorBlink = true;
 }
 
 void Decorator::SetCursorBlinkInterval( float seconds )
@@ -1394,6 +1446,16 @@ void Decorator::SetCursorBlinkDuration( float seconds )
 float Decorator::GetCursorBlinkDuration() const
 {
   return mImpl->mCursorBlinkDuration;
+}
+
+void Decorator::SetCursorWidth( int width )
+{
+  mImpl->mCursorWidth = static_cast<float>( width );
+}
+
+int Decorator::GetCursorWidth() const
+{
+  return static_cast<int>( mImpl->mCursorWidth );
 }
 
 /** Handles **/
@@ -1516,20 +1578,17 @@ void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButt
 {
    mImpl->mEnabledPopupButtons = enabledButtonsBitMask;
 
-   UnparentAndReset( mImpl->mCopyPastePopup.actor );
-   mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( mImpl->mEnabledPopupButtons,
-                                                           &mImpl->mTextSelectionPopupCallbackInterface );
-#ifdef DECORATOR_DEBUG
-   mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
-#endif
-   mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
-   mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
-
-   if( mImpl->mActiveLayer )
+   if ( !mImpl->mCopyPastePopup.actor )
    {
-     mImpl->mActiveLayer.Add( mImpl->mCopyPastePopup.actor );
-     mImpl->mCopyPastePopup.actor.ShowPopup();
+     mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( &mImpl->mTextSelectionPopupCallbackInterface );
+#ifdef DECORATOR_DEBUG
+     mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
+#endif
+     mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
+     mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
    }
+
+   mImpl->mCopyPastePopup.actor.EnableButtons( mImpl->mEnabledPopupButtons );
 }
 
 TextSelectionPopup::Buttons& Decorator::GetEnabledPopupButtons()

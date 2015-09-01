@@ -20,9 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
-#include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
@@ -46,6 +45,7 @@ namespace
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
+const float CURSOR_WIDTH = 1.f;
 
 } //namespace
 
@@ -102,6 +102,7 @@ struct LayoutEngine::Impl
   : mLayout( LayoutEngine::SINGLE_LINE_BOX ),
     mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
     mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP ),
+    mCursorWidth( CURSOR_WIDTH ),
     mEllipsisEnabled( false )
   {
     mFontClient = TextAbstraction::FontClient::Get();
@@ -211,7 +212,7 @@ struct LayoutEngine::Impl
 
     float tmpExtraBearing = ( 0.f > glyphInfo.xBearing ) ? -glyphInfo.xBearing : 0.f;
 
-    tmpLineLayout.length += 1.f; // Added one unit to give some space to the cursor.
+    tmpLineLayout.length += mCursorWidth; // Added to give some space to the cursor.
 
     // Calculate the line height if there is no characters.
     FontId lastFontId = glyphInfo.fontId;
@@ -451,7 +452,7 @@ struct LayoutEngine::Impl
 
     const GlyphInfo& glyph = *glyphsBuffer;
     float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-    penX += 1.f; // Added one unit to give some space to the cursor.
+    penX += mCursorWidth; // Added to give some space to the cursor.
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -528,11 +529,11 @@ struct LayoutEngine::Impl
 
           penY -= layout.ascender - lineRun.descender;
 
-          ellipsisLayout.glyphIndex = lineRun.glyphIndex;
+          ellipsisLayout.glyphIndex = lineRun.glyphRun.glyphIndex;
         }
         else
         {
-          lineRun.glyphIndex = 0u;
+          lineRun.glyphRun.glyphIndex = 0u;
           ellipsisLayout.glyphIndex = 0u;
         }
 
@@ -541,22 +542,23 @@ struct LayoutEngine::Impl
                              currentParagraphDirection,
                              true );
 
-        lineRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
+        lineRun.glyphRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = ellipsisLayout.characterIndex;
         lineRun.characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
         lineRun.width = ellipsisLayout.length;
         lineRun.extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
         lineRun.ascender = ellipsisLayout.ascender;
         lineRun.descender = ellipsisLayout.descender;
+        lineRun.direction = !RTL;
         lineRun.ellipsis = true;
 
         actualSize.width = layoutParameters.boundingBox.width;
         actualSize.height += ( lineRun.ascender + -lineRun.descender );
 
-        SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun.glyphIndex,
+        SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun.glyphRun.glyphIndex,
                            ellipsisLayout.numberOfGlyphs,
                            penY,
-                           glyphPositions.Begin() + lineRun.glyphIndex );
+                           glyphPositions.Begin() + lineRun.glyphRun.glyphIndex );
 
         if( 0u != numberOfLines )
         {
@@ -576,11 +578,11 @@ struct LayoutEngine::Impl
         const bool isLastLine = index + layout.numberOfGlyphs == layoutParameters.totalNumberOfGlyphs;
 
         LineRun lineRun;
-        lineRun.glyphIndex = index;
-        lineRun.numberOfGlyphs = layout.numberOfGlyphs;
+        lineRun.glyphRun.glyphIndex = index;
+        lineRun.glyphRun.numberOfGlyphs = layout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = layout.characterIndex;
         lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-        if( isLastLine )
+        if( isLastLine && !layoutParameters.isLastNewParagraph )
         {
           const float width = layout.extraBearing + layout.length + layout.extraWidth + layout.wsLengthEndOfLine;
           if( MULTI_LINE_BOX == mLayout )
@@ -601,7 +603,7 @@ struct LayoutEngine::Impl
         }
         lineRun.ascender = layout.ascender;
         lineRun.descender = layout.descender;
-        lineRun.direction = false;
+        lineRun.direction = !RTL;
         lineRun.ellipsis = false;
 
         lines.PushBack( lineRun );
@@ -623,8 +625,36 @@ struct LayoutEngine::Impl
 
         // Increase the glyph index.
         index += layout.numberOfGlyphs;
+
+        if( isLastLine &&
+            layoutParameters.isLastNewParagraph &&
+            ( mLayout == MULTI_LINE_BOX ) )
+        {
+          // Need to add a new line with no characters but with height to increase the actualSize.height
+          const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
+
+          Text::FontMetrics fontMetrics;
+          mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
+
+          LineRun lineRun;
+          lineRun.glyphRun.glyphIndex = 0u;
+          lineRun.glyphRun.numberOfGlyphs = 0u;
+          lineRun.characterRun.characterIndex = 0u;
+          lineRun.characterRun.numberOfCharacters = 0u;
+          lineRun.width = 0.f;
+          lineRun.ascender = fontMetrics.ascender;
+          lineRun.descender = fontMetrics.descender;
+          lineRun.extraLength = 0.f;
+          lineRun.alignmentOffset = 0.f;
+          lineRun.direction = !RTL;
+          lineRun.ellipsis = false;
+
+          actualSize.height += ( lineRun.ascender + -lineRun.descender );
+
+          lines.PushBack( lineRun );
+        }
       }
-    }
+    } // end for() traversing glyphs.
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
 
@@ -643,7 +673,7 @@ struct LayoutEngine::Impl
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
       float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-      penX += 1.f; // Added one unit to give some space to the cursor.
+      penX += mCursorWidth; // Added to give some space to the cursor.
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
@@ -789,6 +819,7 @@ struct LayoutEngine::Impl
   LayoutEngine::Layout mLayout;
   LayoutEngine::HorizontalAlignment mHorizontalAlignment;
   LayoutEngine::VerticalAlignment mVerticalAlignment;
+  float mCursorWidth;
 
   TextAbstraction::FontClient mFontClient;
 
@@ -844,6 +875,16 @@ void LayoutEngine::SetVerticalAlignment( VerticalAlignment alignment )
 LayoutEngine::VerticalAlignment LayoutEngine::GetVerticalAlignment() const
 {
   return mImpl->mVerticalAlignment;
+}
+
+void LayoutEngine::SetCursorWidth( int width )
+{
+  mImpl->mCursorWidth = static_cast<float>( width );
+}
+
+int LayoutEngine::GetCursorWidth() const
+{
+  return static_cast<int>( mImpl->mCursorWidth );
 }
 
 bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,

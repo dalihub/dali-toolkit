@@ -19,10 +19,8 @@
 #include <dali-toolkit/internal/text/clipping/text-clipper.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/integration-api/debug.h>
 
 namespace
 {

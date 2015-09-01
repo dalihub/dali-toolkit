@@ -1,6 +1,5 @@
-
-#ifndef __DALI_TOOLKIT_TEXT_BGRA_SHADER_H__
-#define __DALI_TOOLKIT_TEXT_BGRA_SHADER_H__
+#ifndef __DALI_TOOLKIT_TEXT_GLYPH_RUN_H__
+#define __DALI_TOOLKIT_TEXT_GLYPH_RUN_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,8 +18,8 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader-effect.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {
@@ -32,18 +31,13 @@ namespace Text
 {
 
 /**
- * @brief A BGRA shader for rendering glyphs.
+ * @brief A run of consecutive glyphs.
  */
-namespace BgraShader
+struct GlyphRun
 {
-
-/**
- * Create a basic text shader.
- * @return A handle to a newly allocated ShaderEffect
- */
-Dali::ShaderEffect New();
-
-} // namespace BGRAShader
+  GlyphIndex glyphIndex;     ///< Index to the first glyph.
+  Length     numberOfGlyphs; ///< Number of glyphs in the run.
+};
 
 } // namespace Text
 
@@ -51,4 +45,4 @@ Dali::ShaderEffect New();
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_BGRA_SHADER_H__
+#endif // __DALI_TOOLKIT_TEXT_GLYPH_RUN_H__

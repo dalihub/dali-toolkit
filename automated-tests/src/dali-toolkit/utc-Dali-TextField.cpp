@@ -60,6 +60,7 @@ const char* const PROPERTY_NAME_SECONDARY_CURSOR_COLOR               = "secondar
 const char* const PROPERTY_NAME_ENABLE_CURSOR_BLINK                  = "enable-cursor-blink";
 const char* const PROPERTY_NAME_CURSOR_BLINK_INTERVAL                = "cursor-blink-interval";
 const char* const PROPERTY_NAME_CURSOR_BLINK_DURATION                = "cursor-blink-duration";
+const char* const PROPERTY_NAME_CURSOR_WIDTH                         = "cursor-width";
 const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE                    = "grab-handle-image";
 const char* const PROPERTY_NAME_GRAB_HANDLE_PRESSED_IMAGE            = "grab-handle-pressed-image";
 const char* const PROPERTY_NAME_SCROLL_THRESHOLD                     = "scroll-threshold";
@@ -68,6 +69,8 @@ const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_LEFT          = "selectio
 const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_RIGHT         = "selection-handle-image-right";
 const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_LEFT  = "selection-handle-pressed-image-left";
 const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_RIGHT = "selection-handle-pressed-image-right";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_LEFT   = "selection-handle-marker-image-left";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_RIGHT  = "selection-handle-marker-image-right";
 const char* const PROPERTY_NAME_SELECTION_HIGHLIGHT_COLOR            = "selection-highlight-color";
 const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX              = "decoration-bounding-box";
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "input-method-settings";
@@ -245,6 +248,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_CURSOR_BLINK ) == TextField::Property::ENABLE_CURSOR_BLINK );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_CURSOR_BLINK_INTERVAL ) == TextField::Property::CURSOR_BLINK_INTERVAL );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_CURSOR_BLINK_DURATION ) == TextField::Property::CURSOR_BLINK_DURATION );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_CURSOR_WIDTH ) == TextField::Property::CURSOR_WIDTH );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_IMAGE ) == TextField::Property::GRAB_HANDLE_IMAGE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_PRESSED_IMAGE ) == TextField::Property::GRAB_HANDLE_PRESSED_IMAGE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SCROLL_THRESHOLD ) == TextField::Property::SCROLL_THRESHOLD );
@@ -253,10 +257,30 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SELECTION_HANDLE_IMAGE_RIGHT ) == TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_LEFT ) == TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_RIGHT ) == TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_LEFT ) == TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_RIGHT ) == TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SELECTION_HIGHLIGHT_COLOR ) == TextField::Property::SELECTION_HIGHLIGHT_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_DECORATION_BOUNDING_BOX ) == TextField::Property::DECORATION_BOUNDING_BOX );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == TextField::Property::INPUT_METHOD_SETTINGS );
   END_TEST;
+}
+
+bool SetPropertyMapRetrieved( TextField& field, const Property::Index property, const std::string mapKey, const std::string mapValue )
+{
+  bool result = false;
+  Property::Map imageMap;
+  imageMap[mapKey] =mapValue;
+
+  field.SetProperty( property , imageMap );
+  Property::Value propValue = field.GetProperty( property );
+  Property::Map* resultMap = propValue.GetMap();
+
+  if ( resultMap->Find( mapKey )->Get< std::string>() == mapValue )
+  {
+    result = true;
+  }
+
+  return result;
 }
 
 // Positive test case for a method
@@ -266,6 +290,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   tet_infoline(" UtcDaliToolkitTextFieldSetPropertyP");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
 
@@ -329,9 +354,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::ENABLE_CURSOR_BLINK, false );
   DALI_TEST_EQUALS( field.GetProperty<bool>( TextField::Property::ENABLE_CURSOR_BLINK ), false, TEST_LOCATION );
   field.SetProperty( TextField::Property::CURSOR_BLINK_INTERVAL, 1.f );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_INTERVAL ), 1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_INTERVAL ), 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   field.SetProperty( TextField::Property::CURSOR_BLINK_DURATION, 10.f );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_DURATION ), 10.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_DURATION ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  field.SetProperty( TextField::Property::CURSOR_WIDTH, 1 );
+  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::CURSOR_WIDTH ), 1, TEST_LOCATION );
 
   // Check scroll properties.
   field.SetProperty( TextField::Property::SCROLL_THRESHOLD, 1.f );
@@ -345,13 +372,14 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, "image2" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::GRAB_HANDLE_PRESSED_IMAGE ), "image2", TEST_LOCATION );
   field.SetProperty( TextField::Property::SELECTION_HANDLE_IMAGE_LEFT, "image3" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_IMAGE_LEFT ), "image3", TEST_LOCATION );
-  field.SetProperty( TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT, "image4" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT ), "image4", TEST_LOCATION );
-  field.SetProperty( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, "image5" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT ), "image5", TEST_LOCATION );
-  field.SetProperty( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, "image6" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT ), "image6", TEST_LOCATION );
+
+  // Check handle images
+  DALI_TEST_CHECK( SetPropertyMapRetrieved( field, TextField::Property::SELECTION_HANDLE_IMAGE_LEFT, "filename", "leftHandleImage" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetrieved( field, TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT, "filename", "rightHandleImage" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetrieved( field, TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, "filename", "leftHandleImagePressed" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetrieved( field, TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, "filename", "rightHandleImagePressed" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetrieved( field, TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT, "filename", "leftHandleMarkerImage" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetrieved( field, TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT, "filename", "rightHandleMarkerImage" )  );
 
   // Check the highlight color
   field.SetProperty( TextField::Property::SELECTION_HIGHLIGHT_COLOR, Color::GREEN );

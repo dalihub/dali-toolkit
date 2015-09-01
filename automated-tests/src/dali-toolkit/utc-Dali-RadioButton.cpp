@@ -140,14 +140,14 @@ int UtcDaliRadioButtonLabelActor(void)
 {
   ToolkitTestApplication application;
 
-  TextLabel actor1 = TextLabel::New( "test actor 1" );
+  std::string labelText = "test actor 1";
 
-  RadioButton radioButton = RadioButton::New( actor1 );
-  DALI_TEST_CHECK( actor1 == radioButton.GetLabel() );
+  RadioButton radioButton = RadioButton::New( labelText );
+  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText, TEST_LOCATION );
 
-  TextLabel actor2 = TextLabel::New( "test actor 2" );
-  radioButton.SetLabel( actor2 );
-  DALI_TEST_CHECK( actor2 == radioButton.GetLabel() );
+  std::string labelText2 = "test actor 2";
+  radioButton.SetLabelText( labelText2 );
+  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText2, TEST_LOCATION );
 
   END_TEST;
 }
@@ -236,8 +236,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
     Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
-    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 10.0f );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 1.0f, 1.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 1.0f, 1.0f );
 
     event1.AddPoint( pointDown );
     application.ProcessEvent( event1 );
@@ -257,8 +257,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
     Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
-    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 10.0f );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 1.0f, 1.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 1.0f, 1.0f );
 
     event1.AddPoint( pointDown );
     application.ProcessEvent( event1 );
@@ -278,8 +278,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
     Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 50.0f );
-    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 50.0f );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 1.0f, 41.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 1.0f, 41.0f );
 
     event1.AddPoint( pointDown );
     application.ProcessEvent( event1 );
@@ -299,8 +299,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
     Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 500.0f );
-    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 500.0f );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 1.0f, 500.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 1.0f, 500.0f );
 
     event1.AddPoint( pointDown );
     application.ProcessEvent( event1 );

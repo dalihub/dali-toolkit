@@ -1,4 +1,3 @@
-
 #ifndef __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__
 #define __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__
 
@@ -185,5 +184,4 @@ inline Internal::AtlasGlyphManager& GetImplementation(Toolkit::AtlasGlyphManager
 
 } // namespace Dali
 
-
- #endif // __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__
+#endif // __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__

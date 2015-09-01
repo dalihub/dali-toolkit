@@ -28,8 +28,6 @@
 namespace Dali
 {
 
-struct Vector2;
-
 namespace Toolkit
 {
 
@@ -128,6 +126,20 @@ public:
    * @return The required alignment.
    */
   VerticalAlignment GetVerticalAlignment() const;
+
+  /**
+   * @brief Sets the width of the cursor.
+   *
+   * @param[in] width The width of the cursor in pixels.
+   */
+  void SetCursorWidth( int width );
+
+  /**
+   * @brief Retrieves the width of the cursor.
+   *
+   * @return The width of the cursor in pixels.
+   */
+  int GetCursorWidth() const;
 
   /**
    * @brief Store the visual position of glyphs in the VisualModel.

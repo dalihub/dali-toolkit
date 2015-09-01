@@ -94,7 +94,6 @@ public:
    * @copydoc Dali::MultilanguageSupport::SetScripts()
    */
   void SetScripts( const Vector<Character>& text,
-                   const Vector<LineBreakInfo>& lineBreakInfo,
                    Vector<ScriptRun>& scripts );
 
   /**

@@ -82,14 +82,17 @@ public:
       ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",                 Whether the cursor should blink or not,                                   type BOOLEAN
       CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",               The time interval in seconds between cursor on/off states,                type FLOAT
       CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",               The cursor will stop blinking after this number of seconds (if non-zero), type FLOAT
+      CURSOR_WIDTH,                             ///< name "cursor-width",                        The cursor width,                                                         type INTEGER
       GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",                   The image to display for the grab handle,                                 type STRING
       GRAB_HANDLE_PRESSED_IMAGE,                ///< name "grab-handle-pressed-image",           The image to display when the grab handle is pressed,                     type STRING
       SCROLL_THRESHOLD,                         ///< name "scroll-threshold"                     Scrolling will occur if the cursor is this close to the control border,   type FLOAT
       SCROLL_SPEED,                             ///< name "scroll-speed"                         The scroll speed in pixels per second,                                    type FLOAT
-      SELECTION_HANDLE_IMAGE_LEFT,              ///< name "selection-handle-image-left",         The image to display for the left selection handle,                       type STRING
-      SELECTION_HANDLE_IMAGE_RIGHT,             ///< name "selection-handle-image-right",        The image to display for the right selection handle,                      type STRING
-      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selection-handle-pressed-image-left"  The image to display when the left selection handle is pressed,           type STRING
-      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selection-handle-pressed-image-right" The image to display when the right selection handle is pressed,          type STRING
+      SELECTION_HANDLE_IMAGE_LEFT,              ///< name "selection-handle-image-left",         The image to display for the left selection handle,                       type MAP
+      SELECTION_HANDLE_IMAGE_RIGHT,             ///< name "selection-handle-image-right",        The image to display for the right selection handle,                      type MAP
+      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selection-handle-pressed-image-left"  The image to display when the left selection handle is pressed,           type MAP
+      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selection-handle-pressed-image-right" The image to display when the right selection handle is pressed,          type MAP
+      SELECTION_HANDLE_MARKER_IMAGE_LEFT,       ///< name "selection-handle-marker-image-left",  The image to display for the left selection handle marker,                type MAP
+      SELECTION_HANDLE_MARKER_IMAGE_RIGHT,      ///< name "selection-handle-marker-image-right", The image to display for the right selection handle marker,               type MAP
       SELECTION_HIGHLIGHT_COLOR,                ///< name "selection-highlight-color"            The color of the selection highlight,                                     type VECTOR4
       DECORATION_BOUNDING_BOX,                  ///< name "decoration-bounding-box"              The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
       INPUT_METHOD_SETTINGS                     ///< name "input-method-settings"                The settings to relating to the System's Input Method, Key and Value      type MAP

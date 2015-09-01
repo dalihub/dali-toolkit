@@ -22,7 +22,6 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
@@ -30,20 +29,11 @@
 namespace Dali
 {
 
-class Actor;
-class Image;
-class Vector2;
-class Vector4;
+struct Vector2;
+struct Vector4;
 
 namespace Toolkit
 {
-
-class TextSelectionPopupCallbackInterface;
-
-namespace Internal
-{
-class Control;
-}
 
 namespace Text
 {
@@ -91,6 +81,8 @@ enum HandleType
   GRAB_HANDLE,
   LEFT_SELECTION_HANDLE,
   RIGHT_SELECTION_HANDLE,
+  LEFT_SELECTION_HANDLE_MARKER,
+  RIGHT_SELECTION_HANDLE_MARKER,
   HANDLE_TYPE_COUNT
 };
 
@@ -126,9 +118,9 @@ public:
     virtual ~ControllerInterface() {};
 
     /**
-     * @brief An input event from one of the handles.
+     * @brief Query the target size of the UI control.
      *
-     * @param[out] targetSize The Size of the UI control the decorator is adding it's decorations to.
+     * @param[out] targetSize The size of the UI control the decorator is adding it's decorations to.
      */
     virtual void GetTargetSize( Vector2& targetSize ) = 0;
 
@@ -278,6 +270,11 @@ public:
   void StopCursorBlink();
 
   /**
+   * @brief Temporarily stops the cursor from blinking.
+   */
+  void DelayCursorBlink();
+
+  /**
    * @brief Set the interval between cursor blinks.
    *
    * @param[in] seconds The interval in seconds.
@@ -304,6 +301,20 @@ public:
    * @return The cursor blink-duration.
    */
   float GetCursorBlinkDuration() const;
+
+  /**
+   * @brief Sets the width of the cursors.
+   *
+   * @param[in] width The width of the cursor in pixels.
+   */
+  void SetCursorWidth( int width );
+
+  /**
+   * @brief Retrieves the width of the cursors.
+   *
+   * @return The width of the cursors in pixels.
+   */
+  int GetCursorWidth() const;
 
   /**
    * @brief Sets whether a handle is active.

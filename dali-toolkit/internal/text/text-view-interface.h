@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/math/vector4.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
@@ -28,6 +25,7 @@ namespace Dali
 {
 
 struct Vector2;
+struct Vector4;
 
 namespace Toolkit
 {
@@ -35,7 +33,7 @@ namespace Toolkit
 namespace Text
 {
 
-struct LineRun;
+struct GlyphRun;
 
 /**
  * @brief Abstract interface to provide the information necessary displaying text.
@@ -58,6 +56,13 @@ public:
    * @brief Virtual destructor
    */
   virtual ~ViewInterface();
+
+  /**
+   * @brief Retrieves the target size of the UI control.
+   *
+   * @return The text's size.
+   */
+  virtual const Vector2& GetControlSize() const = 0;
 
   /**
    * Retrieves the number of glyphs.
@@ -126,6 +131,23 @@ public:
    */
   virtual float GetUnderlineHeight() const = 0;
 
+  /**
+   * @brief Retrieves the number of underline runs.
+   *
+   * @return The number of underline runs.
+   */
+  virtual Length GetNumberOfUnderlineRuns() const = 0;
+
+  /**
+   * @brief Retrieves the underline runs.
+   *
+   * @param[out] underlineRuns Pointer to a buffer where the underline runs are copied.
+   * @param[in] index Index of the first underline run to be copied.
+   * @param[in] numberOfRuns Number of underline runs to be copied.
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
+                                 UnderlineRunIndex index,
+                                 Length numberOfRuns ) const = 0;
 };
 
 } // namespace Text
