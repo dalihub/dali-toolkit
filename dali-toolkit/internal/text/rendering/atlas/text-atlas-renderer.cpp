@@ -723,8 +723,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
 
-    // Ensure shadow is behind the text...
-    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth );
+    // Set depth index to -1.0 to make sure shadow is rendered first in 3D layers
+    renderer.SetDepthIndex( -1.0f );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
