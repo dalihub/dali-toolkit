@@ -48,7 +48,7 @@ namespace Internal
 namespace
 {
 // todo Move this to adaptor??
-#define GET_LOCALE_TEXT(string) dgettext("elementary", string)
+#define GET_LOCALE_TEXT(string) dgettext("sys_string", string)
 
 const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "textselectionpopupbutton" );
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 1.0f ) );
