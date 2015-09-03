@@ -58,8 +58,6 @@ struct GlyphMetrics
   float xBearing;   ///< The x bearing of the first glyph.
 };
 
-const std::string EMPTY_STRING("");
-
 } // namespace
 
 namespace Dali
@@ -478,8 +476,8 @@ float Controller::Impl::GetDefaultFontLineHeight()
   FontId defaultFontId = 0u;
   if( NULL == mFontDefaults )
   {
-    defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                           EMPTY_STRING );
+    TextAbstraction::FontDescription fontDescription;
+    defaultFontId = mFontClient.GetFontId( fontDescription );
   }
   else
   {
@@ -1768,8 +1766,8 @@ void Controller::Impl::UpdateCursorPosition()
     FontId defaultFontId = 0u;
     if( NULL == mFontDefaults )
     {
-      defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                             EMPTY_STRING );
+      TextAbstraction::FontDescription fontDescription;
+      defaultFontId = mFontClient.GetFontId( fontDescription );
     }
     else
     {

@@ -60,7 +60,7 @@ public:
       RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",    The type or rendering e.g. bitmap-based,          type INT
       TEXT,                                     ///< name "text",                 The text to display in UTF-8 format,              type STRING
       FONT_FAMILY,                              ///< name "font-family",          The requested font family,                        type STRING
-      FONT_STYLE,                               ///< name "font-style",           The requested font style e.g. Regular/Italic,     type STRING
+      FONT_STYLE,                               ///< name "font-style",           The requested font style,                         type STRING
       POINT_SIZE,                               ///< name "point-size",           The size of font in points,                       type FLOAT
       MULTI_LINE,                               ///< name "multi-line",           The single-line or multi-line layout option,      type BOOLEAN
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment", The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END"

@@ -41,6 +41,7 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const unsigned int POINTS_PER_INCH = 72;
 
 const std::string EMPTY_STRING("");
+const unsigned int ZERO = 0u;
 
 float ConvertToEven( float value )
 {
@@ -232,8 +233,9 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily, boo
     mImpl->mFontDefaults = new FontDefaults();
   }
 
-  mImpl->mFontDefaults->mDefaultFontFamily = defaultFontFamily;
+  mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
   mImpl->mUserDefinedFontFamily = userDefined;
+
   // Clear the font-specific data
   ClearFontData();
 
@@ -247,20 +249,40 @@ const std::string& Controller::GetDefaultFontFamily() const
 {
   if( mImpl->mFontDefaults )
   {
-    return mImpl->mFontDefaults->mDefaultFontFamily;
+    return mImpl->mFontDefaults->mFontDescription.family;
   }
 
   return EMPTY_STRING;
 }
 
-void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
+void Controller::SetDefaultFontStyle( const std::string& style )
 {
   if( !mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
 
-  mImpl->mFontDefaults->mDefaultFontStyle = defaultFontStyle;
+  mImpl->mFontDefaults->mFontStyle = style;
+}
+
+const std::string& Controller::GetDefaultFontStyle() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontStyle;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultFontWidth( FontWidth width )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.width = width;
 
   // Clear the font-specific data
   ClearFontData();
@@ -271,14 +293,70 @@ void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
   mImpl->RequestRelayout();
 }
 
-const std::string& Controller::GetDefaultFontStyle() const
+FontWidth Controller::GetDefaultFontWidth() const
 {
   if( mImpl->mFontDefaults )
   {
-    return mImpl->mFontDefaults->mDefaultFontStyle;
+    return mImpl->mFontDefaults->mFontDescription.width;
   }
 
-  return EMPTY_STRING;
+  return TextAbstraction::FontWidth::NORMAL;
+}
+
+void Controller::SetDefaultFontWeight( FontWeight weight )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.weight = weight;
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->RequestRelayout();
+}
+
+FontWeight Controller::GetDefaultFontWeight() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontDescription.weight;
+  }
+
+  return TextAbstraction::FontWeight::NORMAL;
+}
+
+void Controller::SetDefaultFontSlant( FontSlant slant )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.slant = slant;
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->RequestRelayout();
+}
+
+FontSlant Controller::GetDefaultFontSlant() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontDescription.slant;
+  }
+
+  return TextAbstraction::FontSlant::NORMAL;
 }
 
 void Controller::SetDefaultPointSize( float pointSize )
@@ -327,7 +405,7 @@ void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
   if ( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
-    mImpl->mFontDefaults->mDefaultFontFamily=newDefaultFont;
+    mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
     mImpl->UpdateModel( ALL_OPERATIONS );
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
     mImpl->mRecalculateNaturalSize = true;
