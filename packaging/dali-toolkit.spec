@@ -73,7 +73,7 @@ cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
-%configure --enable-profile=%{dali_toolkit_profile} --with-style=%{dali_style_folder}
+%configure --enable-profile=%{dali_toolkit_profile} --with-style=%{dali_style_folder} --enable-i18n=yes
 make %{?jobs:-j%jobs}
 
 ##############################
