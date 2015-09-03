@@ -1713,6 +1713,13 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     {
       mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
       mImpl->mOperationsPending = ALL_OPERATIONS;
+
+      // This is to reset the virtual keyboard to Upper-case
+      if( 0u == mImpl->mLogicalModel->mText.Count() )
+      {
+        NotifyImfManager();
+      }
+
       if( 0u != mImpl->mLogicalModel->mText.Count() ||
           !mImpl->IsPlaceholderAvailable() )
       {
@@ -1876,6 +1883,12 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
+    // This is to reset the virtual keyboard to Upper-case
+    if( 0u == mImpl->mLogicalModel->mText.Count() )
+    {
+      NotifyImfManager();
+    }
+
     if( 0u != mImpl->mLogicalModel->mText.Count() ||
         !mImpl->IsPlaceholderAvailable() )
     {
@@ -1889,6 +1902,22 @@ bool Controller::BackspaceKeyEvent()
   }
 
   return removed;
+}
+
+void Controller::NotifyImfManager()
+{
+  ImfManager imfManager = ImfManager::Get();
+
+  if( imfManager )
+  {
+    // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
+    std::string text;
+    GetText( text );
+    imfManager.SetSurroundingText( text );
+
+    imfManager.SetCursorPosition( GetLogicalCursorPosition() );
+    imfManager.NotifyCursorPosition();
+  }
 }
 
 void Controller::ShowPlaceholderText()

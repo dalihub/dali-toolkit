@@ -643,6 +643,11 @@ private:
   bool BackspaceKeyEvent();
 
   /**
+   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
+   */
+  void NotifyImfManager();
+
+  /**
    * @brief Helper to clear font-specific data.
    */
   void ShowPlaceholderText();
