@@ -1574,21 +1574,38 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
 
 void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
 
-  if  ( mImpl->IsShowingPlaceholderText() || mImpl->mLogicalModel->mText.Count() == 0u )
+  if( state == Gesture::Started &&
+      mImpl->mEventData )
   {
-    if ( mImpl->mEventData )
+    if( ! mImpl->IsShowingRealText() )
     {
       Event event( Event::LONG_PRESS_EVENT );
       event.p1.mInt = state;
       mImpl->mEventData->mEventQueue.push_back( event );
       mImpl->RequestRelayout();
     }
-  }
-  else if( mImpl->mEventData )
-  {
-    SelectEvent( x, y, false );
+    else
+    {
+      // The 1st long-press on inactive text-field is treated as tap
+      if( EventData::INACTIVE == mImpl->mEventData->mState )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = 1;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
+
+        mImpl->RequestRelayout();
+      }
+      else
+      {
+        SelectEvent( x, y, false );
+      }
+    }
   }
 }
 
