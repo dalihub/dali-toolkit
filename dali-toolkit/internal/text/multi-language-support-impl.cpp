@@ -32,7 +32,7 @@ namespace Toolkit
 namespace
 {
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_MULTI_LANGUAGE_SUPPORT");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULTI_LANGUAGE_SUPPORT");
 #endif
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
@@ -351,12 +351,12 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           Vector<FontRun>& fonts )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->MultilanguageSupport::ValidateFonts\n" );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n" );
   const Length numberOfCharacters = text.Count();
 
   if( 0u == numberOfCharacters )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
+    DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
     // Nothing to do if there are no characters.
     return;
   }
@@ -585,7 +585,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // Store the last run.
     fonts.PushBack( currentFontRun );
   }
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
 }
 
 } // namespace Internal
