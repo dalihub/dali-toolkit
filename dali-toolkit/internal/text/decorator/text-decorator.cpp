@@ -159,6 +159,16 @@ void LocalToWorldCoordinatesBoundingBox( const Dali::Rect<int>& boundingRectangl
                                originY + boundingRectangle.height );
 }
 
+void WorldToLocalCoordinatesBoundingBox( const Dali::Vector4& boundingBox, Dali::Rect<int>& boundingRectangle )
+{
+  // Convert to local coordinates and store as a Dali::Rect.
+  Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
+
+  boundingRectangle.x = boundingBox.x + 0.5f * stageSize.width;
+  boundingRectangle.y = boundingBox.y + 0.5f * stageSize.height;
+  boundingRectangle.width = boundingBox.z - boundingBox.x;
+  boundingRectangle.height = boundingBox.w - boundingBox.y;
+}
 
 } // end of namespace
 
@@ -202,13 +212,15 @@ struct Decorator::Impl : public ConnectionTracker
   {
     HandleImpl()
     : position(),
+      size(),
       lineHeight( 0.0f ),
       grabDisplacementX( 0.f ),
       grabDisplacementY( 0.f ),
       active( false ),
       visible( false ),
       pressed( false ),
-      flipped( false )
+      horizontallyFlipped( false ),
+      verticallyFlipped( false )
     {
     }
 
@@ -217,13 +229,15 @@ struct Decorator::Impl : public ConnectionTracker
     ImageActor markerActor;
 
     Vector2 position;
-    float lineHeight; ///< Not the handle height
-    float grabDisplacementX;
-    float grabDisplacementY;
-    bool active  : 1;
-    bool visible : 1;
-    bool pressed : 1;
-    bool flipped : 1;
+    Size    size;
+    float   lineHeight;              ///< Not the handle height
+    float   grabDisplacementX;
+    float   grabDisplacementY;
+    bool    active  : 1;
+    bool    visible : 1;
+    bool    pressed : 1;
+    bool    horizontallyFlipped : 1; ///< Whether the handle has been horizontally flipped.
+    bool    verticallyFlipped   : 1; ///< Whether the handle has been vertically flipped.
   };
 
   struct PopupImpl
@@ -245,7 +259,7 @@ struct Decorator::Impl : public ConnectionTracker
     mEnabledPopupButtons( TextSelectionPopup::NONE ),
     mTextSelectionPopupCallbackInterface( callbackInterface ),
     mHandleColor( HANDLE_COLOR ),
-    mBoundingBox( Rect<int>() ),
+    mBoundingBox(),
     mHighlightColor( LIGHT_BLUE ),
     mHighlightPosition( Vector2::ZERO ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
@@ -263,12 +277,19 @@ struct Decorator::Impl : public ConnectionTracker
     mDelayCursorBlink( false ),
     mPrimaryCursorVisible( false ),
     mSecondaryCursorVisible( false ),
-    mSwapSelectionHandles( false ),
+    mFlipSelectionHandlesOnCross( false ),
+    mFlipLeftSelectionHandleDirection( false ),
+    mFlipRightSelectionHandleDirection( false ),
+    mHandlePanning( false ),
+    mHandleCurrentCrossed( false ),
+    mHandlePreviousCrossed( false ),
     mNotifyEndOfScroll( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadIndexFormat[ "indices" ] = Property::INTEGER;
     mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
+
+    SetupTouchEvents();
   }
 
   /**
@@ -289,7 +310,7 @@ struct Decorator::Impl : public ConnectionTracker
       mPrimaryCursorVisible = ( cursor.position.x <= size.width ) && ( cursor.position.x >= 0.f );
       if( mPrimaryCursorVisible )
       {
-        Vector2 position = cursor.position;
+        const Vector2& position = cursor.position;
 
         mPrimaryCursor.SetPosition( position.x,
                                     position.y );
@@ -314,18 +335,19 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( grabHandle.active )
     {
-      Vector2 position = grabHandle.position;
+      const Vector2& position = grabHandle.position;
 
       const bool isVisible = ( position.x <= size.width ) && ( position.x >= 0.f );
 
       if( isVisible )
       {
-        SetupTouchEvents();
-
         CreateGrabHandle();
 
-        grabHandle.actor.SetPosition( position.x - floor( 0.5f * mCursorWidth ),
-                                      position.y + grabHandle.lineHeight ); // TODO : Fix for multiline.
+        // Sets the grab handle position and calculate if it needs to be vertically flipped if it exceeds the boundary box.
+        SetGrabHandlePosition();
+
+        // Sets the grab handle image according if it's pressed, flipped, etc.
+        SetHandleImage( GRAB_HANDLE );
       }
       grabHandle.actor.SetVisible( isVisible );
     }
@@ -339,30 +361,32 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( primary.active || secondary.active )
     {
-      Vector2 primaryPosition = primary.position;
-      Vector2 secondaryPosition = secondary.position;
+      const Vector2& primaryPosition = primary.position;
+      const Vector2& secondaryPosition = secondary.position;
 
       const bool isPrimaryVisible = ( primaryPosition.x <= size.width ) && ( primaryPosition.x >= 0.f );
       const bool isSecondaryVisible = ( secondaryPosition.x <= size.width ) && ( secondaryPosition.x >= 0.f );
 
       if( isPrimaryVisible || isSecondaryVisible )
       {
-        SetupTouchEvents();
-
         CreateSelectionHandles();
 
         if( isPrimaryVisible )
         {
-          primary.actor.SetPosition( primaryPosition.x,
-                                     primaryPosition.y + primary.lineHeight ); // TODO : Fix for multiline.
+          SetSelectionHandlePosition( LEFT_SELECTION_HANDLE );
+
+          // Sets the primary handle image according if it's pressed, flipped, etc.
+          SetHandleImage( LEFT_SELECTION_HANDLE );
 
           SetSelectionHandleMarkerSize( primary );
         }
 
         if( isSecondaryVisible )
         {
-          secondary.actor.SetPosition( secondaryPosition.x,
-                                       secondaryPosition.y + secondary.lineHeight ); // TODO : Fix for multiline.
+          SetSelectionHandlePosition( RIGHT_SELECTION_HANDLE );
+
+          // Sets the secondary handle image according if it's pressed, flipped, etc.
+          SetHandleImage( RIGHT_SELECTION_HANDLE );
 
           SetSelectionHandleMarkerSize( secondary );
         }
@@ -560,17 +584,11 @@ struct Decorator::Impl : public ConnectionTracker
 
   void SetupTouchEvents()
   {
-    if ( !mTapDetector )
-    {
-      mTapDetector = TapGestureDetector::New();
-      mTapDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnTap );
-    }
+    mTapDetector = TapGestureDetector::New();
+    mTapDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnTap );
 
-    if ( !mPanGestureDetector )
-    {
-      mPanGestureDetector = PanGestureDetector::New();
-      mPanGestureDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnPan );
-    }
+    mPanGestureDetector = PanGestureDetector::New();
+    mPanGestureDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnPan );
   }
 
   void CreateActiveLayer()
@@ -597,7 +615,6 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if ( handle.markerActor )
     {
-      handle.markerActor.SetResizePolicy ( ResizePolicy::FIXED, Dimension::HEIGHT );
       handle.markerActor.SetSize( 0, handle.lineHeight );
     }
   }
@@ -609,7 +626,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if( !mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] )
       {
-        mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_RELEASED );
+        SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_RELEASED ) );
       }
 
       grabHandle.actor = ImageActor::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
@@ -654,11 +671,13 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CreateHandleMarker( HandleImpl& handle, Image& image, HandleType handleType )
   {
-    if ( image)
+    if ( image )
     {
       handle.markerActor = ImageActor::New( image );
       handle.markerActor.SetColor( mHandleColor );
       handle.actor.Add( handle.markerActor );
+
+      handle.markerActor.SetResizePolicy ( ResizePolicy::FIXED, Dimension::HEIGHT );
 
       if ( LEFT_SELECTION_HANDLE == handleType )
       {
@@ -684,7 +703,6 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
       primary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
-      primary.flipped = false;
       primary.actor.SetColor( mHandleColor );
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -719,7 +737,6 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
       secondary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
-      secondary.flipped = false;
       secondary.actor.SetColor( mHandleColor );
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -744,6 +761,141 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mActiveLayer.Add( secondary.actor );
     }
+  }
+
+  void CalculateHandleWorldCoordinates( HandleImpl& handle, Vector2& position )
+  {
+    // Get the world position of the active layer
+    const Vector3 parentWorldPosition = mActiveLayer.GetCurrentWorldPosition();
+
+    // Get the size of the UI control.
+    Vector2 targetSize;
+    mController.GetTargetSize( targetSize );
+
+    // The grab handle position in world coords.
+    position.x = parentWorldPosition.x - 0.5f * targetSize.width + handle.position.x;
+    position.y = parentWorldPosition.y - 0.5f * targetSize.height + handle.position.y + handle.lineHeight;
+  }
+
+  void SetGrabHandlePosition()
+  {
+    // Reference to the grab handle.
+    HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+
+    // The grab handle position in world coords.
+    Vector2 grabHandleWorldPosition;
+    CalculateHandleWorldCoordinates( grabHandle, grabHandleWorldPosition );
+
+    // Check if the grab handle exceeds the boundaries of the decoration box.
+    // At the moment only the height is checked for the grab handle.
+    grabHandle.verticallyFlipped = ( grabHandleWorldPosition.y + grabHandle.size.height > mBoundingBox.w );
+
+    // The grab handle 'y' position in local coords.
+    // If the grab handle exceeds the bottom of the decoration box,
+    // set the 'y' position to the top of the line.
+    // The SetGrabHandleImage() method will change the orientation.
+    const float yLocalPosition = grabHandle.verticallyFlipped ? grabHandle.position.y : grabHandle.position.y + grabHandle.lineHeight;
+
+    grabHandle.actor.SetPosition( grabHandle.position.x - floor( 0.5f * mCursorWidth ),
+                                  yLocalPosition ); // TODO : Fix for multiline.
+  }
+
+  void SetSelectionHandlePosition( HandleType type )
+  {
+    const bool isPrimaryHandle = LEFT_SELECTION_HANDLE == type;
+
+    // Reference to the selection handle.
+    HandleImpl& handle = mHandle[type];
+
+    // Get the world coordinates of the handle position.
+    Vector2 handleWorldPosition;
+    CalculateHandleWorldCoordinates( handle, handleWorldPosition );
+
+    // Whether to flip the handle.
+    bool flipHandle = isPrimaryHandle ? mFlipLeftSelectionHandleDirection : mFlipRightSelectionHandleDirection;
+
+    // Whether to flip the handles if they are crossed.
+    bool crossFlip = false;
+    if( mFlipSelectionHandlesOnCross || !mHandlePanning )
+    {
+      crossFlip = mHandleCurrentCrossed;
+    }
+
+    // Does not flip if both conditions are true (double flip)
+    flipHandle = flipHandle != ( crossFlip || mHandlePreviousCrossed );
+
+    // Check if the selection handle exceeds the boundaries of the decoration box.
+    const bool exceedsLeftEdge = ( isPrimaryHandle ? !flipHandle : flipHandle ) && ( handleWorldPosition.x - handle.size.width < mBoundingBox.x );
+
+    const bool exceedsRightEdge = ( isPrimaryHandle ? flipHandle : !flipHandle ) && ( handleWorldPosition.x + handle.size.width > mBoundingBox.z );
+
+    // Does not flip if both conditions are true (double flip)
+    flipHandle = flipHandle != ( exceedsLeftEdge || exceedsRightEdge );
+
+    if( flipHandle )
+    {
+      if( !handle.horizontallyFlipped )
+      {
+        // Change the anchor point to flip the image.
+        handle.actor.SetAnchorPoint( isPrimaryHandle ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
+
+        handle.horizontallyFlipped = true;
+      }
+    }
+    else
+    {
+      if( handle.horizontallyFlipped )
+      {
+        // Reset the anchor point.
+        handle.actor.SetAnchorPoint( isPrimaryHandle ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
+
+        handle.horizontallyFlipped = false;
+      }
+    }
+
+    // Whether to flip the handle vertically.
+    handle.verticallyFlipped = ( handleWorldPosition.y + handle.size.height > mBoundingBox.w );
+
+    // The primary selection handle 'y' position in local coords.
+    // If the handle exceeds the bottom of the decoration box,
+    // set the 'y' position to the top of the line.
+    // The SetHandleImage() method will change the orientation.
+    const float yLocalPosition = handle.verticallyFlipped ? handle.position.y : handle.position.y + handle.lineHeight;
+
+    handle.actor.SetPosition( handle.position.x,
+                              yLocalPosition ); // TODO : Fix for multiline.
+  }
+
+  void SetHandleImage( HandleType type )
+  {
+    HandleImpl& handle = mHandle[type];
+
+    HandleType markerType = HANDLE_TYPE_COUNT;
+    // If the selection handle is flipped it chooses the image of the other selection handle. Does nothing for the grab handle.
+    if( LEFT_SELECTION_HANDLE == type )
+    {
+      type = handle.horizontallyFlipped ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE;
+      markerType = handle.horizontallyFlipped ? RIGHT_SELECTION_HANDLE_MARKER : LEFT_SELECTION_HANDLE_MARKER;
+    }
+    else if( RIGHT_SELECTION_HANDLE == type )
+    {
+      type = handle.horizontallyFlipped ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE;
+      markerType = handle.horizontallyFlipped ? LEFT_SELECTION_HANDLE_MARKER : RIGHT_SELECTION_HANDLE_MARKER;
+    }
+
+    // Chooses between the released or pressed image. It checks whether the pressed image exists.
+    const HandleImageType imageType = ( handle.pressed ? ( mHandleImages[type][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
+
+    handle.actor.SetImage( mHandleImages[type][imageType] );
+
+    if( HANDLE_TYPE_COUNT != markerType )
+    {
+      const HandleImageType markerImageType = ( handle.pressed ? ( mHandleImages[markerType][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
+      handle.markerActor.SetImage( mHandleImages[markerType][markerImageType] );
+    }
+
+    // Whether to flip the handle vertically.
+    handle.actor.SetOrientation( handle.verticallyFlipped ? ANGLE_180 : ANGLE_0, Vector3::XAXIS );
   }
 
   void CreateHighlight()
@@ -905,6 +1057,8 @@ struct Decorator::Impl : public ConnectionTracker
         StopScrollTimer();
         mController.DecorationEvent( type, HANDLE_PRESSED, x, y );
       }
+
+      mHandlePanning = true;
     }
     else if( Gesture::Finished  == gesture.state ||
              Gesture::Cancelled == gesture.state )
@@ -922,22 +1076,10 @@ struct Decorator::Impl : public ConnectionTracker
         mController.DecorationEvent( type, HANDLE_RELEASED, x, y );
       }
 
-      if( GRAB_HANDLE == type )
-      {
-        handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
-      }
-      else
-      {
-        HandleType selectionHandleType = type;
-
-        if( mSwapSelectionHandles != handle.flipped )
-        {
-          selectionHandleType = ( LEFT_SELECTION_HANDLE == type ) ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE;
-        }
-
-        handle.actor.SetImage( mHandleImages[selectionHandleType][HANDLE_IMAGE_RELEASED] );
-      }
+      handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
       handle.pressed = false;
+
+      mHandlePanning = false;
     }
   }
 
@@ -972,22 +1114,14 @@ struct Decorator::Impl : public ConnectionTracker
       if( TouchPoint::Down == point.state )
       {
         mHandle[GRAB_HANDLE].pressed = true;
-        Image imagePressed = mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED];
-        if( imagePressed )
-        {
-          mHandle[GRAB_HANDLE].actor.SetImage( imagePressed );
-        }
       }
       else if( ( TouchPoint::Up == point.state ) ||
                ( TouchPoint::Interrupted == point.state ) )
       {
         mHandle[GRAB_HANDLE].pressed = false;
-        Image imageReleased = mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED];
-        if( imageReleased )
-        {
-          mHandle[GRAB_HANDLE].actor.SetImage( imageReleased );
-        }
       }
+
+      SetHandleImage( GRAB_HANDLE );
     }
 
     // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
@@ -1002,26 +1136,19 @@ struct Decorator::Impl : public ConnectionTracker
     {
       const TouchPoint& point = event.GetPoint(0);
 
-      const bool flip = mSwapSelectionHandles != mHandle[LEFT_SELECTION_HANDLE].flipped;
       if( TouchPoint::Down == point.state )
       {
         mHandle[LEFT_SELECTION_HANDLE].pressed = true;
-        Image imagePressed = mHandleImages[flip ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED];
-        if( imagePressed )
-        {
-          mHandle[LEFT_SELECTION_HANDLE].actor.SetImage( imagePressed );
-        }
       }
       else if( ( TouchPoint::Up == point.state ) ||
                ( TouchPoint::Interrupted == point.state ) )
       {
         mHandle[LEFT_SELECTION_HANDLE].pressed = false;
-        Image imageReleased = mHandleImages[flip ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
-        if( imageReleased )
-        {
-          mHandle[LEFT_SELECTION_HANDLE].actor.SetImage( imageReleased );
-        }
+        mHandlePreviousCrossed = mHandleCurrentCrossed;
+        mHandlePanning = false;
       }
+
+      SetHandleImage( LEFT_SELECTION_HANDLE );
     }
 
     // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
@@ -1036,26 +1163,19 @@ struct Decorator::Impl : public ConnectionTracker
     {
       const TouchPoint& point = event.GetPoint(0);
 
-      const bool flip = mSwapSelectionHandles != mHandle[RIGHT_SELECTION_HANDLE].flipped;
       if( TouchPoint::Down == point.state )
       {
-        Image imagePressed = mHandleImages[flip ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED];
         mHandle[RIGHT_SELECTION_HANDLE].pressed = true;
-        if( imagePressed )
-        {
-          mHandle[RIGHT_SELECTION_HANDLE].actor.SetImage( imagePressed );
-        }
       }
       else if( ( TouchPoint::Up == point.state ) ||
                ( TouchPoint::Interrupted == point.state ) )
       {
-        Image imageReleased = mHandleImages[flip ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
         mHandle[RIGHT_SELECTION_HANDLE].pressed = false;
-        if( imageReleased )
-        {
-          mHandle[RIGHT_SELECTION_HANDLE].actor.SetImage( imageReleased );
-        }
+        mHandlePreviousCrossed = mHandleCurrentCrossed;
+        mHandlePanning = false;
       }
+
+      SetHandleImage( RIGHT_SELECTION_HANDLE );
     }
 
     // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
@@ -1108,19 +1228,16 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Exceeding vertical boundary
 
-    Vector4 worldCoordinatesBoundingBox;
-    LocalToWorldCoordinatesBoundingBox( mBoundingBox, worldCoordinatesBoundingBox );
-
     float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT);
 
     PropertyNotification verticalExceedNotification = mCopyPastePopup.actor.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
-                                                      OutsideCondition( worldCoordinatesBoundingBox.y + popupHeight * 0.5f,
-                                                                        worldCoordinatesBoundingBox.w - popupHeight * 0.5f ) );
+                                                      OutsideCondition( mBoundingBox.y + popupHeight * 0.5f,
+                                                                        mBoundingBox.w - popupHeight * 0.5f ) );
 
     verticalExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesVerticalBoundary );
   }
 
-  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, Vector3& popupSize, Vector3 anchorPoint, Actor& parent, Rect<int>& boundingBox )
+  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, Vector3& popupSize, Vector3 anchorPoint, Actor& parent, const Vector4& boundingRectangleWorld )
   {
     DALI_ASSERT_DEBUG ( "Popup parent not on stage" && parent.OnStage() )
 
@@ -1129,10 +1246,6 @@ struct Decorator::Impl : public ConnectionTracker
     Vector3 parentWorldPositionLeftAnchor = parent.GetCurrentWorldPosition() - parent.GetCurrentSize()*parentAnchorPoint;
     Vector3 popupWorldPosition = parentWorldPositionLeftAnchor + requiredPopupPosition;  // Parent World position plus popup local position gives World Position
     Vector3 popupDistanceFromAnchorPoint = popupSize*anchorPoint;
-
-    // Bounding rectangle is supplied as screen coordinates, bounding will be done in world coordinates.
-    Vector4 boundingRectangleWorld;
-    LocalToWorldCoordinatesBoundingBox( boundingBox, boundingRectangleWorld );
 
     // Calculate distance to move popup (in local space) so fits within the boundary
     float xOffSetToKeepWithinBounds = 0.0f;
@@ -1156,41 +1269,14 @@ struct Decorator::Impl : public ConnectionTracker
     // Prevent pixel mis-alignment by rounding down.
     requiredPopupPosition.x = static_cast<int>( requiredPopupPosition.x );
     requiredPopupPosition.y = static_cast<int>( requiredPopupPosition.y );
-
   }
 
-  void FlipSelectionHandleImages()
+  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image )
   {
-    SetupTouchEvents();
+    HandleImpl& handle = mHandle[handleType];
+    handle.size = Size( image.GetWidth(), image.GetHeight() );
 
-    CreateSelectionHandles();
-
-    HandleImpl& leftHandle = mHandle[LEFT_SELECTION_HANDLE];
-    HandleImpl& rightHandle = mHandle[RIGHT_SELECTION_HANDLE];
-
-    // If handle pressed and pressed image exists then use pressed image else stick with released image
-    const HandleImageType leftImageType = ( leftHandle.pressed && mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] ) ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
-    const HandleImageType rightImageType = ( rightHandle.pressed && mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] ) ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
-
-    const bool leftFlipped = mSwapSelectionHandles != leftHandle.flipped;
-    const bool rightFlipped = mSwapSelectionHandles != rightHandle.flipped;
-
-    leftHandle.actor.SetImage( leftFlipped ? mHandleImages[RIGHT_SELECTION_HANDLE][leftImageType] : mHandleImages[LEFT_SELECTION_HANDLE][leftImageType] );
-
-    leftHandle.actor.SetAnchorPoint( leftFlipped ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
-
-    rightHandle.actor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE][rightImageType] );
-
-    rightHandle.actor.SetAnchorPoint( rightFlipped ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
-
-    if ( leftHandle.markerActor )
-    {
-      leftHandle.markerActor.SetImage( leftFlipped ? mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][leftImageType] : mHandleImages[LEFT_SELECTION_HANDLE_MARKER][leftImageType] );
-    }
-    if ( rightHandle.markerActor )
-    {
-      rightHandle.markerActor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE_MARKER][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][rightImageType] );
-    }
+    mHandleImages[handleType][handleImageType] = image;
   }
 
   void SetScrollThreshold( float threshold )
@@ -1303,7 +1389,7 @@ struct Decorator::Impl : public ConnectionTracker
   Geometry            mQuadGeometry;
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
 
-  Rect<int>           mBoundingBox;
+  Vector4             mBoundingBox;               ///< The bounding box in world coords.
   Vector4             mHighlightColor;            ///< Color of the highlight
   Vector2             mHighlightPosition;         ///< The position of the highlight actor.
 
@@ -1318,13 +1404,18 @@ struct Decorator::Impl : public ConnectionTracker
   float               mScrollDistance;          ///< Distance the text scrolls during a scroll interval.
   int                 mTextDepth;               ///< The depth used to render the text.
 
-  bool                mActiveCopyPastePopup   : 1;
-  bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
-  bool                mDelayCursorBlink       : 1; ///< Used to avoid cursor blinking when entering text.
-  bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
-  bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
-  bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
-  bool                mNotifyEndOfScroll      : 1; ///< Whether to notify the end of the scroll.
+  bool                mActiveCopyPastePopup              : 1;
+  bool                mCursorBlinkStatus                 : 1; ///< Flag to switch between blink on and blink off.
+  bool                mDelayCursorBlink                  : 1; ///< Used to avoid cursor blinking when entering text.
+  bool                mPrimaryCursorVisible              : 1; ///< Whether the primary cursor is visible.
+  bool                mSecondaryCursorVisible            : 1; ///< Whether the secondary cursor is visible.
+  bool                mFlipSelectionHandlesOnCross       : 1; ///< Whether to flip the selection handles as soon as they cross.
+  bool                mFlipLeftSelectionHandleDirection  : 1; ///< Whether to flip the left selection handle image because of the character's direction.
+  bool                mFlipRightSelectionHandleDirection : 1; ///< Whether to flip the right selection handle image because of the character's direction.
+  bool                mHandlePanning                     : 1; ///< Whether any of the handles is moving.
+  bool                mHandleCurrentCrossed              : 1; ///< Whether the handles are crossed.
+  bool                mHandlePreviousCrossed             : 1; ///< Whether the handles where crossed at the last handle touch up.
+  bool                mNotifyEndOfScroll                 : 1; ///< Whether to notify the end of the scroll.
 };
 
 DecoratorPtr Decorator::New( ControllerInterface& controller,
@@ -1336,12 +1427,12 @@ DecoratorPtr Decorator::New( ControllerInterface& controller,
 
 void Decorator::SetBoundingBox( const Rect<int>& boundingBox )
 {
-  mImpl->mBoundingBox = boundingBox;
+  LocalToWorldCoordinatesBoundingBox( boundingBox, mImpl->mBoundingBox );
 }
 
-const Rect<int>& Decorator::GetBoundingBox() const
+void Decorator::GetBoundingBox( Rect<int>& boundingBox ) const
 {
-  return mImpl->mBoundingBox;
+  WorldToLocalCoordinatesBoundingBox( mImpl->mBoundingBox, boundingBox );
 }
 
 void Decorator::Relayout( const Vector2& size )
@@ -1465,6 +1556,11 @@ void Decorator::SetHandleActive( HandleType handleType, bool active )
 
   if( !active )
   {
+    if( ( LEFT_SELECTION_HANDLE == handleType ) || ( RIGHT_SELECTION_HANDLE == handleType ) )
+    {
+      mImpl->mHandlePreviousCrossed = false;
+    }
+
     // TODO: this is a work-around.
     // The problem is the handle actor does not receive the touch event with the Interrupt
     // state when the power button is pressed and the application goes to background.
@@ -1476,6 +1572,7 @@ void Decorator::SetHandleActive( HandleType handleType, bool active )
        imageActor.SetImage( imageReleased );
     }
   }
+
 }
 
 bool Decorator::IsHandleActive( HandleType handleType ) const
@@ -1485,7 +1582,7 @@ bool Decorator::IsHandleActive( HandleType handleType ) const
 
 void Decorator::SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image )
 {
-  mImpl->mHandleImages[handleType][handleImageType] = image;
+  mImpl->SetHandleImage( handleType, handleImageType, image );
 }
 
 Dali::Image Decorator::GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const
@@ -1530,11 +1627,16 @@ const Vector2& Decorator::GetPosition( HandleType handleType ) const
   return mImpl->mHandle[handleType].position;
 }
 
-void Decorator::SwapSelectionHandlesEnabled( bool enable )
+void Decorator::FlipSelectionHandlesOnCrossEnabled( bool enable )
 {
-  mImpl->mSwapSelectionHandles = enable;
+  mImpl->mFlipSelectionHandlesOnCross = enable;
+}
 
-  mImpl->FlipSelectionHandleImages();
+void Decorator::SetSelectionHandleFlipState( bool indicesSwapped, bool left, bool right )
+{
+  mImpl->mHandleCurrentCrossed = indicesSwapped;
+  mImpl->mFlipLeftSelectionHandleDirection = left;
+  mImpl->mFlipRightSelectionHandleDirection = right;
 }
 
 void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )

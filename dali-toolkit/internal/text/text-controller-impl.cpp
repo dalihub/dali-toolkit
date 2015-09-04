@@ -874,9 +874,11 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
     return;
   }
 
+  const bool handlesCrossed = mEventData->mLeftSelectionPosition > mEventData->mRightSelectionPosition;
+
   //Get start and end position of selection
-  uint32_t startOfSelectedText = mEventData->mLeftSelectionPosition;
-  uint32_t lengthOfSelectedText =  mEventData->mRightSelectionPosition - startOfSelectedText;
+  uint32_t startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+  uint32_t lengthOfSelectedText =  ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
   // Validate the start and end selection points
   if(  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() )
@@ -895,7 +897,7 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       Vector<Character>::Iterator last  = first + lengthOfSelectedText;
       currentText.Erase( first, last );
     }
-    mEventData->mPrimaryCursorPosition = mEventData->mLeftSelectionPosition;
+    mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
     mEventData->mScrollAfterDelete = true;
     mEventData->mDecoratorUpdated = true;
   }
@@ -968,8 +970,16 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   const LineRun& firstLine = *lines.Begin();
   const float height = firstLine.ascender + -firstLine.descender;
 
+  const bool isLastCharacter = selectionEnd >= mLogicalModel->mText.Count();
+  const bool startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
+  const bool endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
+
   // Swap the indices if the start is greater than the end.
-  const bool indicesSwapped = ( selectionStart > selectionEnd );
+  const bool indicesSwapped = selectionStart > selectionEnd;
+
+  // Tell the decorator to flip the selection handles if needed.
+  mEventData->mDecorator->SetSelectionHandleFlipState( indicesSwapped, startDirection, endDirection );
+
   if( indicesSwapped )
   {
     std::swap( selectionStart, selectionEnd );
@@ -988,9 +998,6 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   // Check if the last glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
   const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
   bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
-
-  // Tell the decorator to swap the selection handles if needed.
-  mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
@@ -1076,7 +1083,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
 
   // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
-  mEventData->mPrimaryCursorPosition = (indicesSwapped)?mEventData->mLeftSelectionPosition:mEventData->mRightSelectionPosition;
+  mEventData->mPrimaryCursorPosition = ( indicesSwapped ) ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
 
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;

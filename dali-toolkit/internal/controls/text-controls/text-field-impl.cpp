@@ -464,7 +464,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -475,7 +475,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -486,7 +486,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
           impl.RequestTextRelayout();
@@ -497,7 +497,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
           impl.RequestTextRelayout();
@@ -507,7 +507,8 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
       {
         const Image image = Scripting::NewImage( value );
-        if( impl.mDecorator )
+
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -517,7 +518,8 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
       {
         const Image image = Scripting::NewImage( value );
-        if( impl.mDecorator )
+
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -827,7 +829,9 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          value = impl.mDecorator->GetBoundingBox();
+          Rect<int> boundingBox;
+          impl.mDecorator->GetBoundingBox( boundingBox );
+          value = boundingBox;
         }
         break;
       }
@@ -895,7 +899,10 @@ void TextField::OnInitialize()
   self.TouchedSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
-  if ( mDecorator->GetBoundingBox().IsEmpty() )
+  Rect<int> boundingBox;
+  mDecorator->GetBoundingBox( boundingBox );
+
+  if( boundingBox.IsEmpty() )
   {
     Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
     mDecorator->SetBoundingBox( Rect<int>( 0.0f, 0.0f, stageSize.width, stageSize.height ) );
