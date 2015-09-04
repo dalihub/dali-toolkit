@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class ImageView;
 }
+/**
+ * @addtogroup dali-toolkit-controls-image-view
+ * @{
+ */
 
 /**
  *
@@ -157,6 +161,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

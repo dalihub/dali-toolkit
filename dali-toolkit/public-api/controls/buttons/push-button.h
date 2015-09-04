@@ -35,6 +35,10 @@ namespace Internal DALI_INTERNAL
 
 class PushButton;
 }
+/**
+ * @addtogroup dali-toolkit-controls-buttons
+ * @{
+ */
 
 /**
  * @brief A PushButton changes its appearance when is pressed and returns to its original when is released.
@@ -193,6 +197,9 @@ public: // Not intended for application developers
   DALI_INTERNAL PushButton( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

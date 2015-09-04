@@ -49,6 +49,10 @@ class GaussianBlurView;
 class BloomView;
 
 } // namespace Internal
+/**
+ * @addtogroup dali-toolkit-controls-gaussian-blur-view
+ * @{
+ */
 
 /**
  *
@@ -274,6 +278,9 @@ public:
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

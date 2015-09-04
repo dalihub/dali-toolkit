@@ -38,6 +38,9 @@ daliimage_DATA = ${dali_toolkit_image_files}
 dalisounddir = ${dataReadOnlyDir}/toolkit/sounds/
 dalisound_DATA = ${dali_toolkit_sound_files}
 
+package_doxy_dir = ../../../doc
+include ../../../doc/file.list
+
 # The library
 lib_LTLIBRARIES = libdali-toolkit.la
 
@@ -155,3 +158,6 @@ publicapitextcontrols_HEADERS =        $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =        $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS =    $(public_api_rendering_backend_header_files)
 
+# package doxygen file (contains doxygen grouping information)
+packagedoxydir = $(topleveldir)/doc
+packagedoxy_HEADERS = $(package_doxy_files)

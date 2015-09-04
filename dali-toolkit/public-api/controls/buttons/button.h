@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class Button;
 }
+/**
+ * @addtogroup dali-toolkit-controls-buttons
+ * @{
+ */
 
 /**
  * @brief Button is a base class for different kind of buttons.
@@ -420,6 +424,9 @@ public: // Not intended for application developers
   DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali
