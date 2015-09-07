@@ -77,6 +77,9 @@ void Controller::SetText( const std::string& text )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
 
+  // Reset keyboard as text changed
+  mImpl->ResetImfManager();
+
   // Remove the previously set text
   ResetText();
 
@@ -142,8 +145,8 @@ void Controller::SetText( const std::string& text )
     mImpl->mEventData->mEventQueue.clear();
   }
 
-  // Reset keyboard as text changed
-  mImpl->ResetImfManager();
+  // Notify IMF as text changed
+  NotifyImfManager();
 
   // Do this last since it provides callbacks into application code
   mImpl->mControlInterface.TextChanged();
@@ -1923,17 +1926,20 @@ bool Controller::BackspaceKeyEvent()
 
 void Controller::NotifyImfManager()
 {
-  ImfManager imfManager = ImfManager::Get();
-
-  if( imfManager )
+  if( mImpl->mEventData )
   {
-    // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
-    std::string text;
-    GetText( text );
-    imfManager.SetSurroundingText( text );
+    ImfManager imfManager = ImfManager::Get();
 
-    imfManager.SetCursorPosition( GetLogicalCursorPosition() );
-    imfManager.NotifyCursorPosition();
+    if( imfManager )
+    {
+      // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
+      std::string text;
+      GetText( text );
+      imfManager.SetSurroundingText( text );
+
+      imfManager.SetCursorPosition( GetLogicalCursorPosition() );
+      imfManager.NotifyCursorPosition();
+    }
   }
 }
 
