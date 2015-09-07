@@ -147,6 +147,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           const std::string fontFamily = value.Get< std::string >();
 
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str() );
           if( impl.mController->GetDefaultFontFamily() != fontFamily )
           {
             impl.mController->SetDefaultFontFamily( fontFamily, true );
@@ -457,9 +458,9 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
   {
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE\n");
       // Property system did not set the font so should update it.
       std::string newFont = styleManager.GetDefaultFontFamily();
+      DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE newFont(%s)\n", newFont.c_str() );
       mController->UpdateAfterFontChange( newFont );
       break;
     }

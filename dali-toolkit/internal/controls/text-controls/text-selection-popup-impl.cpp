@@ -32,6 +32,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/integration-api/debug.h>
 
 #include <libintl.h>
 #include <cfloat>
@@ -52,6 +53,10 @@ namespace
 
 const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "textselectionpopupbutton" );
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 1.0f ) );
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
+#endif
 
 #ifdef DGETTEXT_ENABLED
 
@@ -114,6 +119,8 @@ DALI_TYPE_REGISTRATION_END()
 
 Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( TextSelectionPopupCallbackInterface* callbackInterface )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextSelectionPopup::New\n" );
+
    // Create the implementation, temporarily owned by this handle on stack
   IntrusivePtr< TextSelectionPopup > impl = new TextSelectionPopup( callbackInterface );
 
@@ -376,6 +383,7 @@ void TextSelectionPopup::HidePopup()
 
 void TextSelectionPopup::OnInitialize()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::OnInitialize\n" );
   Actor self = Self();
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   self.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
@@ -383,6 +391,7 @@ void TextSelectionPopup::OnInitialize()
 
 void TextSelectionPopup::OnStageConnection( int depth )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::OnStageConnection\n" );
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
@@ -394,7 +403,8 @@ void TextSelectionPopup::HideAnimationFinished( Animation& animation )
   Actor self = Self();
   if ( !mPopupShowing ) // During the Hide/Fade animation there could be a call to Show the Popup again, mPopupShowing will be true in this case.
   {
-    UnparentAndReset( self );  // Popup needs to be shown so do not unparent
+    DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::HideAnimationFinished\n" );
+    UnparentAndReset( mToolbar );
   }
 }
 
@@ -642,6 +652,8 @@ std::string TextSelectionPopup::GetPressedImage() const
  void TextSelectionPopup::AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption  )
  {
    // 1. Create a option.
+   DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::AddOption\n" );
+
    Toolkit::PushButton option = Toolkit::PushButton::New();
    option.SetName( button.name );
    option.SetAnimationTime( 0.0f );
@@ -753,6 +765,8 @@ std::string TextSelectionPopup::GetPressedImage() const
 
  void TextSelectionPopup::AddPopupOptionsToToolbar( bool showIcons, bool showCaptions )
  {
+   DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::AddPopupOptionsToToolbar\n" );
+
    CreateOrderedListOfPopupOptions();
 
    mButtonsChanged = false;

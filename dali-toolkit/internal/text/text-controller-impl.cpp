@@ -33,7 +33,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 /**
@@ -277,6 +277,8 @@ bool Controller::Impl::ProcessInputEvents()
 
 void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::UpdateModel\n" );
+
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mOperationsPending & operationsRequired );
 
@@ -461,6 +463,7 @@ void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfC
 {
   if( mFontDefaults )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::GetDefaultFonts font family(%s)\n", mFontDefaults->mFontDescription.family.c_str() );
     FontRun fontRun;
     fontRun.characterRun.characterIndex = 0;
     fontRun.characterRun.numberOfCharacters = numberOfCharacters;
