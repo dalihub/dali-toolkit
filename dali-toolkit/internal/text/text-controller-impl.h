@@ -319,14 +319,17 @@ struct Controller::Impl
 
   void ResetImfManager()
   {
-    // Reset incase we are in a pre-edit state.
-    ImfManager imfManager = ImfManager::Get();
-    if ( imfManager )
+    if( mEventData )
     {
-      imfManager.Reset(); // Will trigger a commit message
-    }
+      // Reset incase we are in a pre-edit state.
+      ImfManager imfManager = ImfManager::Get();
+      if ( imfManager )
+      {
+        imfManager.Reset(); // Will trigger a commit message
+      }
 
-    ClearPreEditFlag();
+      ClearPreEditFlag();
+    }
   }
 
   bool IsClipboardEmpty()
