@@ -19,14 +19,12 @@
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
-#include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -149,24 +147,17 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           const std::string fontFamily = value.Get< std::string >();
 
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str() );
           if( impl.mController->GetDefaultFontFamily() != fontFamily )
           {
-            impl.mController->SetDefaultFontFamily( fontFamily );
+            impl.mController->SetDefaultFontFamily( fontFamily, true );
           }
         }
         break;
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          const std::string fontStyle = value.Get< std::string >();
-
-          if( impl.mController->GetDefaultFontStyle() != fontStyle )
-          {
-            impl.mController->SetDefaultFontStyle( fontStyle );
-          }
-        }
+        SetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:
@@ -341,10 +332,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontStyle();
-        }
+        GetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:
@@ -470,12 +458,10 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
   {
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE\n");
-      if ( mController->GetDefaultFontFamily() == "" )
-      {
-        // Property system did not set the font so should update it.
-        // todo instruct text-controller to update model
-      }
+      // Property system did not set the font so should update it.
+      std::string newFont = styleManager.GetDefaultFontFamily();
+      DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE newFont(%s)\n", newFont.c_str() );
+      mController->UpdateAfterFontChange( newFont );
       break;
     }
 

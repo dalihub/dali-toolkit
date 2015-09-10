@@ -27,7 +27,6 @@ namespace Dali
 
 namespace Toolkit
 {
-
 /**
  * @brief Creates a Dali::ImageActor with a solid color, optionally it creates a border.
  *
@@ -40,7 +39,6 @@ namespace Toolkit
  * @return a handle to the new ImageActor
  */
 DALI_IMPORT_API ImageActor CreateSolidColorActor( const Vector4& color, bool border = false, const Vector4& borderColor = Color::WHITE, const unsigned int borderSize = 1 );
-
 } // namespace Toolkit
 
 } // namespace Dali

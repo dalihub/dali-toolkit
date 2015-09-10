@@ -664,11 +664,15 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
       {
         Property::Value value( Property::ARRAY );
         Property::Array* array = value.GetArray();
-        Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
-        size_t positionCount( array->Count() );
-        for( size_t i( 0 ); i != positionCount; ++i )
+
+        if( array )
         {
-          array->PushBack( positions[i] );
+          Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
+          size_t positionCount( array->Count() );
+          for( size_t i( 0 ); i != positionCount; ++i )
+          {
+            array->PushBack( positions[i] );
+          }
         }
         break;
       }

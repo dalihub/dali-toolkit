@@ -33,7 +33,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 /**
@@ -58,8 +58,6 @@ struct GlyphMetrics
   float xBearing;   ///< The x bearing of the first glyph.
 };
 
-const std::string EMPTY_STRING("");
-
 } // namespace
 
 namespace Dali
@@ -78,20 +76,20 @@ namespace Text
  * @param[in] numberOfGlyphs The number of glyphs.
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
  * @param[in] visualModel The visual model.
- * @param[in] fontClient The font client.
+ * @param[in] metrics Used to access metrics from FontClient.
  */
 void GetGlyphsMetrics( GlyphIndex glyphIndex,
                        Length numberOfGlyphs,
                        GlyphMetrics& glyphMetrics,
-                       VisualModelPtr visualModel,
-                       TextAbstraction::FontClient& fontClient )
+                       VisualModelPtr& visualModel,
+                       MetricsPtr& metrics )
 {
   const GlyphInfo* glyphsBuffer = visualModel->mGlyphs.Begin();
 
   const GlyphInfo& firstGlyph = *( glyphsBuffer + glyphIndex );
 
   Text::FontMetrics fontMetrics;
-  fontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
+  metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
 
   glyphMetrics.fontHeight = fontMetrics.height;
   glyphMetrics.advance = firstGlyph.advance;
@@ -279,6 +277,8 @@ bool Controller::Impl::ProcessInputEvents()
 
 void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::UpdateModel\n" );
+
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mOperationsPending & operationsRequired );
 
@@ -423,7 +423,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   if( GET_GLYPH_METRICS & operations )
   {
     GlyphInfo* glyphsBuffer = glyphs.Begin();
-    mFontClient.GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
+    mMetrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
 
     // Update the width and advance of all new paragraph characters.
     for( Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it )
@@ -463,6 +463,7 @@ void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfC
 {
   if( mFontDefaults )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::GetDefaultFonts font family(%s)\n", mFontDefaults->mFontDescription.family.c_str() );
     FontRun fontRun;
     fontRun.characterRun.characterIndex = 0;
     fontRun.characterRun.numberOfCharacters = numberOfCharacters;
@@ -478,8 +479,8 @@ float Controller::Impl::GetDefaultFontLineHeight()
   FontId defaultFontId = 0u;
   if( NULL == mFontDefaults )
   {
-    defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                           EMPTY_STRING );
+    TextAbstraction::FontDescription fontDescription;
+    defaultFontId = mFontClient.GetFontId( fontDescription );
   }
   else
   {
@@ -487,7 +488,7 @@ float Controller::Impl::GetDefaultFontLineHeight()
   }
 
   Text::FontMetrics fontMetrics;
-  mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+  mMetrics->GetFontMetrics( defaultFontId, fontMetrics );
 
   return( fontMetrics.ascender - fontMetrics.descender );
 }
@@ -876,12 +877,14 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
     return;
   }
 
+  const bool handlesCrossed = mEventData->mLeftSelectionPosition > mEventData->mRightSelectionPosition;
+
   //Get start and end position of selection
-  uint32_t startOfSelectedText = mEventData->mLeftSelectionPosition;
-  uint32_t lengthOfSelectedText =  mEventData->mRightSelectionPosition - startOfSelectedText;
+  uint32_t startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+  uint32_t lengthOfSelectedText =  ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
   // Validate the start and end selection points
-  if( ( startOfSelectedText >= 0 ) && (  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() ) )
+  if(  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() )
   {
     //Get text as a UTF8 string
     Vector<Character>& utf32Characters = mLogicalModel->mText;
@@ -897,7 +900,7 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       Vector<Character>::Iterator last  = first + lengthOfSelectedText;
       currentText.Erase( first, last );
     }
-    mEventData->mPrimaryCursorPosition = mEventData->mLeftSelectionPosition;
+    mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
     mEventData->mScrollAfterDelete = true;
     mEventData->mDecoratorUpdated = true;
   }
@@ -970,8 +973,16 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   const LineRun& firstLine = *lines.Begin();
   const float height = firstLine.ascender + -firstLine.descender;
 
+  const bool isLastCharacter = selectionEnd >= mLogicalModel->mText.Count();
+  const bool startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
+  const bool endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
+
   // Swap the indices if the start is greater than the end.
-  const bool indicesSwapped = ( selectionStart > selectionEnd );
+  const bool indicesSwapped = selectionStart > selectionEnd;
+
+  // Tell the decorator to flip the selection handles if needed.
+  mEventData->mDecorator->SetSelectionHandleFlipState( indicesSwapped, startDirection, endDirection );
+
   if( indicesSwapped )
   {
     std::swap( selectionStart, selectionEnd );
@@ -990,9 +1001,6 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   // Check if the last glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
   const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
   bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
-
-  // Tell the decorator to swap the selection handles if needed.
-  mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
@@ -1078,7 +1086,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
 
   // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
-  mEventData->mPrimaryCursorPosition = (indicesSwapped)?mEventData->mLeftSelectionPosition:mEventData->mRightSelectionPosition;
+  mEventData->mPrimaryCursorPosition = ( indicesSwapped ) ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
 
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
@@ -1462,7 +1470,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
                       numberOfGlyphs,
                       glyphMetrics,
                       mVisualModel,
-                      mFontClient );
+                      mMetrics );
 
     const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
 
@@ -1601,7 +1609,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                     primaryNumberOfGlyphs,
                     glyphMetrics,
                     mVisualModel,
-                    mFontClient );
+                    mMetrics );
 
   // Whether to add the glyph's advance to the cursor position.
   // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
@@ -1691,7 +1699,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                       secondaryNumberOfGlyphs,
                       glyphMetrics,
                       mVisualModel,
-                      mFontClient );
+                      mMetrics );
 
     // Set the secondary cursor's position.
     cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
@@ -1768,8 +1776,8 @@ void Controller::Impl::UpdateCursorPosition()
     FontId defaultFontId = 0u;
     if( NULL == mFontDefaults )
     {
-      defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                             EMPTY_STRING );
+      TextAbstraction::FontDescription fontDescription;
+      defaultFontId = mFontClient.GetFontId( fontDescription );
     }
     else
     {
@@ -1777,7 +1785,7 @@ void Controller::Impl::UpdateCursorPosition()
     }
 
     Text::FontMetrics fontMetrics;
-    mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+    mMetrics->GetFontMetrics( defaultFontId, fontMetrics );
 
     lineHeight = fontMetrics.ascender - fontMetrics.descender;
 

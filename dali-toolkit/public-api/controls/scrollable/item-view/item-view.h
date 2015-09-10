@@ -34,6 +34,10 @@ namespace Internal DALI_INTERNAL
 {
 class ItemView;
 }
+/**
+ * @addtogroup dali-toolkit-controls-item-view
+ * @{
+ */
 
 class ItemFactory;
 class ItemLayout;
@@ -462,6 +466,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL ItemView( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

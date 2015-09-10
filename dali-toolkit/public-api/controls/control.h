@@ -40,6 +40,10 @@ namespace Internal
 {
 class Control;
 }
+/**
+ * @addtogroup dali-toolkit-controls
+ * @{
+ */
 
 /**
  * @brief Control is the base class for all controls.
@@ -403,6 +407,9 @@ public: // Templates for Deriving Classes
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

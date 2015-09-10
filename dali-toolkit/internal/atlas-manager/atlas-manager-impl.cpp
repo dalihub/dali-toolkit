@@ -132,11 +132,31 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   atlasDescriptor.mHorizontalStrip = BufferImage::New( blockWidth, SINGLE_PIXEL_PADDING, pixelformat );
   atlasDescriptor.mVerticalStrip = BufferImage::New( SINGLE_PIXEL_PADDING, blockHeight - DOUBLE_PIXEL_PADDING, pixelformat );
 
-  memset( atlasDescriptor.mHorizontalStrip.GetBuffer(), 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
-  memset( atlasDescriptor.mVerticalStrip.GetBuffer(), 0, atlasDescriptor.mVerticalStrip.GetBufferSize() );
+  PixelBuffer* buffer = atlasDescriptor.mHorizontalStrip.GetBuffer();
+  if( buffer == NULL )
+  {
+    DALI_LOG_ERROR("atlasDescriptor.mHorizontalStrip.GetBuffer() returns NULL\n");
+    return 0;
+  }
+  memset( buffer, 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
+
+  buffer = atlasDescriptor.mVerticalStrip.GetBuffer();
+  if( buffer == NULL )
+  {
+    DALI_LOG_ERROR("atlasDescriptor.mVerticalStrip.GetBuffer() returns NULL\n");
+    return 0;
+  }
+  memset( buffer, 0, atlasDescriptor.mVerticalStrip.GetBufferSize() );
 
   BufferImage filledPixelImage = BufferImage::New( 1u, 1u, pixelformat );
-  memset( filledPixelImage.GetBuffer(), 0xFF, filledPixelImage.GetBufferSize() );
+  buffer = filledPixelImage.GetBuffer();
+  if( buffer == NULL)
+  {
+    DALI_LOG_ERROR("filledPixelImage.GetBuffer() returns NULL\n");
+    return 0;
+  }
+
+  memset( buffer, 0xFF, filledPixelImage.GetBufferSize() );
   atlas.Upload( filledPixelImage, 0, 0 );
 
   Sampler sampler = Sampler::New( atlas, "sTexture" );

@@ -38,8 +38,10 @@ namespace
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
+const unsigned int POINTS_PER_INCH = 72;
 
 const std::string EMPTY_STRING("");
+const unsigned int ZERO = 0u;
 
 float ConvertToEven( float value )
 {
@@ -73,6 +75,11 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
 
 void Controller::SetText( const std::string& text )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
+
+  // Reset keyboard as text changed
+  mImpl->ResetImfManager();
+
   // Remove the previously set text
   ResetText();
 
@@ -138,8 +145,8 @@ void Controller::SetText( const std::string& text )
     mImpl->mEventData->mEventQueue.clear();
   }
 
-  // Reset keyboard as text changed
-  mImpl->ResetImfManager();
+  // Notify IMF as text changed
+  NotifyImfManager();
 
   // Do this last since it provides callbacks into application code
   mImpl->mControlInterface.TextChanged();
@@ -222,14 +229,16 @@ int Controller::GetMaximumNumberOfCharacters()
   return mImpl->mMaximumNumberOfCharacters;
 }
 
-void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
+void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily, bool userDefined )
 {
   if( !mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
 
-  mImpl->mFontDefaults->mDefaultFontFamily = defaultFontFamily;
+  mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s userDefined: %s\n", defaultFontFamily.c_str(), userDefined ? "true":"false" );
+  mImpl->mUserDefinedFontFamily = userDefined;
 
   // Clear the font-specific data
   ClearFontData();
@@ -244,20 +253,40 @@ const std::string& Controller::GetDefaultFontFamily() const
 {
   if( mImpl->mFontDefaults )
   {
-    return mImpl->mFontDefaults->mDefaultFontFamily;
+    return mImpl->mFontDefaults->mFontDescription.family;
   }
 
   return EMPTY_STRING;
 }
 
-void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
+void Controller::SetDefaultFontStyle( const std::string& style )
 {
   if( !mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
 
-  mImpl->mFontDefaults->mDefaultFontStyle = defaultFontStyle;
+  mImpl->mFontDefaults->mFontStyle = style;
+}
+
+const std::string& Controller::GetDefaultFontStyle() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontStyle;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultFontWidth( FontWidth width )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.width = width;
 
   // Clear the font-specific data
   ClearFontData();
@@ -268,14 +297,70 @@ void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
   mImpl->RequestRelayout();
 }
 
-const std::string& Controller::GetDefaultFontStyle() const
+FontWidth Controller::GetDefaultFontWidth() const
 {
   if( mImpl->mFontDefaults )
   {
-    return mImpl->mFontDefaults->mDefaultFontStyle;
+    return mImpl->mFontDefaults->mFontDescription.width;
   }
 
-  return EMPTY_STRING;
+  return TextAbstraction::FontWidth::NORMAL;
+}
+
+void Controller::SetDefaultFontWeight( FontWeight weight )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.weight = weight;
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->RequestRelayout();
+}
+
+FontWeight Controller::GetDefaultFontWeight() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontDescription.weight;
+  }
+
+  return TextAbstraction::FontWeight::NORMAL;
+}
+
+void Controller::SetDefaultFontSlant( FontSlant slant )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.slant = slant;
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->RequestRelayout();
+}
+
+FontSlant Controller::GetDefaultFontSlant() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontDescription.slant;
+  }
+
+  return TextAbstraction::FontSlant::NORMAL;
 }
 
 void Controller::SetDefaultPointSize( float pointSize )
@@ -286,6 +371,15 @@ void Controller::SetDefaultPointSize( float pointSize )
   }
 
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
+
+  unsigned int horizontalDpi( 0u );
+  unsigned int verticalDpi( 0u );
+  mImpl->mFontClient.GetDpi( horizontalDpi, verticalDpi );
+
+  // Adjust the metrics if the fixed-size font should be down-scaled
+  int maxEmojiSize( pointSize/POINTS_PER_INCH * verticalDpi );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultPointSize %p setting MaxEmojiSize %d\n", this, maxEmojiSize );
+  mImpl->mMetrics->SetMaxEmojiSize( maxEmojiSize );
 
   // Clear the font-specific data
   ClearFontData();
@@ -304,6 +398,23 @@ float Controller::GetDefaultPointSize() const
   }
 
   return 0.0f;
+}
+
+void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
+
+  ClearFontData();
+
+  if ( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
+    mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
+    mImpl->UpdateModel( ALL_OPERATIONS );
+    mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
+    mImpl->mRecalculateNaturalSize = true;
+    mImpl->RequestRelayout();
+  }
 }
 
 void Controller::SetTextColor( const Vector4& textColor )
@@ -641,11 +752,24 @@ bool Controller::Relayout( const Size& size )
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
 
+  // Keep the current offset and alignment as it will be used to update the decorator's positions.
+  Vector2 offset;
+  if( mImpl->mEventData )
+  {
+    offset = mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition;
+  }
+
   // After doing the text layout, the alignment offset to place the actor in the desired position can be calculated.
   CalculateTextAlignment( size );
 
   if( mImpl->mEventData )
   {
+    // If there is a nex size, the scroll position needs to be clamped.
+    mImpl->ClampHorizontalScroll( layoutSize );
+
+    // Update the decorator's positions.
+    mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition - offset );
+
     // Move the cursor, grab handle etc.
     updated = mImpl->ProcessInputEvents() || updated;
   }
@@ -1453,21 +1577,38 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
 
 void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
 
-  if  ( mImpl->IsShowingPlaceholderText() || mImpl->mLogicalModel->mText.Count() == 0u )
+  if( state == Gesture::Started &&
+      mImpl->mEventData )
   {
-    if ( mImpl->mEventData )
+    if( ! mImpl->IsShowingRealText() )
     {
       Event event( Event::LONG_PRESS_EVENT );
       event.p1.mInt = state;
       mImpl->mEventData->mEventQueue.push_back( event );
       mImpl->RequestRelayout();
     }
-  }
-  else if( mImpl->mEventData )
-  {
-    SelectEvent( x, y, false );
+    else
+    {
+      // The 1st long-press on inactive text-field is treated as tap
+      if( EventData::INACTIVE == mImpl->mEventData->mState )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = 1;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
+
+        mImpl->RequestRelayout();
+      }
+      else
+      {
+        SelectEvent( x, y, false );
+      }
+    }
   }
 }
 
@@ -1592,6 +1733,13 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     {
       mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
       mImpl->mOperationsPending = ALL_OPERATIONS;
+
+      // This is to reset the virtual keyboard to Upper-case
+      if( 0u == mImpl->mLogicalModel->mText.Count() )
+      {
+        NotifyImfManager();
+      }
+
       if( 0u != mImpl->mLogicalModel->mText.Count() ||
           !mImpl->IsPlaceholderAvailable() )
       {
@@ -1755,6 +1903,12 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
+    // This is to reset the virtual keyboard to Upper-case
+    if( 0u == mImpl->mLogicalModel->mText.Count() )
+    {
+      NotifyImfManager();
+    }
+
     if( 0u != mImpl->mLogicalModel->mText.Count() ||
         !mImpl->IsPlaceholderAvailable() )
     {
@@ -1768,6 +1922,25 @@ bool Controller::BackspaceKeyEvent()
   }
 
   return removed;
+}
+
+void Controller::NotifyImfManager()
+{
+  if( mImpl->mEventData )
+  {
+    ImfManager imfManager = ImfManager::Get();
+
+    if( imfManager )
+    {
+      // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
+      std::string text;
+      GetText( text );
+      imfManager.SetSurroundingText( text );
+
+      imfManager.SetCursorPosition( GetLogicalCursorPosition() );
+      imfManager.NotifyCursorPosition();
+    }
+  }
 }
 
 void Controller::ShowPlaceholderText()

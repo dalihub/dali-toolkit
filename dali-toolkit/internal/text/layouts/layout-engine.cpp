@@ -105,7 +105,6 @@ struct LayoutEngine::Impl
     mCursorWidth( CURSOR_WIDTH ),
     mEllipsisEnabled( false )
   {
-    mFontClient = TextAbstraction::FontClient::Get();
   }
 
   /**
@@ -117,7 +116,7 @@ struct LayoutEngine::Impl
   void UpdateLineHeight( FontId fontId, LineLayout& lineLayout )
   {
     Text::FontMetrics fontMetrics;
-    mFontClient.GetFontMetrics( fontId, fontMetrics );
+    mMetrics->GetFontMetrics( fontId, fontMetrics );
 
     // Sets the maximum ascender.
     if( fontMetrics.ascender > lineLayout.ascender )
@@ -634,7 +633,7 @@ struct LayoutEngine::Impl
           const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
 
           Text::FontMetrics fontMetrics;
-          mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
+          mMetrics->GetFontMetrics( glyphInfo.fontId, fontMetrics );
 
           LineRun lineRun;
           lineRun.glyphRun.glyphIndex = 0u;
@@ -821,7 +820,7 @@ struct LayoutEngine::Impl
   LayoutEngine::VerticalAlignment mVerticalAlignment;
   float mCursorWidth;
 
-  TextAbstraction::FontClient mFontClient;
+  IntrusivePtr<Metrics> mMetrics;
 
   bool mEllipsisEnabled:1;
 };
@@ -835,6 +834,11 @@ LayoutEngine::LayoutEngine()
 LayoutEngine::~LayoutEngine()
 {
   delete mImpl;
+}
+
+void LayoutEngine::SetMetrics( MetricsPtr& metrics )
+{
+  mImpl->mMetrics = metrics;
 }
 
 void LayoutEngine::SetLayout( Layout layout )

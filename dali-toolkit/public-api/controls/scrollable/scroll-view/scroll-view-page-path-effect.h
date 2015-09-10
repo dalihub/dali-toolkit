@@ -34,6 +34,10 @@ namespace Internal DALI_INTERNAL
 {
 class ScrollViewPagePathEffect;
 }
+/**
+ * @addtogroup dali-toolkit-controls-scroll-view
+ * @{
+ */
 
 /**
  * ScrollView Page Path Effect.
@@ -103,6 +107,9 @@ protected:
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

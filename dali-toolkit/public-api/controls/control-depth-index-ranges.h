@@ -23,6 +23,11 @@ namespace Dali
 {
 namespace Toolkit
 {
+/**
+ * @addtogroup dali-toolkit-controls
+ * @{
+ */
+
 enum ControlDepthIndexRanges
 {
     BACKGROUND_DEPTH_INDEX    = static_cast<int>( -Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f ),
@@ -30,6 +35,9 @@ enum ControlDepthIndexRanges
     DECORATION_DEPTH_INDEX    = static_cast<int>( Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f )
 };
 
+/**
+ * @}
+ */
 }
 
 }

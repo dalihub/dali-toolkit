@@ -178,8 +178,9 @@ public:
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.
+   * @param[in] userDefined If set by the user
    */
-  void SetDefaultFontFamily( const std::string& defaultFontFamily );
+  void SetDefaultFontFamily( const std::string& defaultFontFamily, bool userDefined );
 
   /**
    * @brief Retrieve the default font family.
@@ -189,23 +190,67 @@ public:
   const std::string& GetDefaultFontFamily() const;
 
   /**
-   * @brief Set the default font style.
+   * @brief Sets the font's style string.
    *
-   * @param[in] defaultFontStyle The default font style.
+   * @note The style set may be changed by the underlying font system. The string is stored to be recovered.
+   *
+   * @param[in] style The font's style string.
    */
-  void SetDefaultFontStyle( const std::string& defaultFontStyle );
+  void SetDefaultFontStyle( const std::string& style );
 
   /**
-   * @brief Retrieve the default font style.
+   * @brief Retrieves the font's style.
    *
-   * @return The default font style.
+   * @return The font's style.
    */
   const std::string& GetDefaultFontStyle() const;
 
   /**
+   * @brief Sets the default font width.
+   *
+   * @param[in] width The font width.
+   */
+  void SetDefaultFontWidth( FontWidth width );
+
+  /**
+   * @brief Retrieves the default font width.
+   *
+   * @return The default font width.
+   */
+  FontWidth GetDefaultFontWidth() const;
+
+  /**
+   * @brief Sets the default font weight.
+   *
+   * @param[in] weight The font weight.
+   */
+  void SetDefaultFontWeight( FontWeight weight );
+
+  /**
+   * @brief Retrieves the default font weight.
+   *
+   * @return The default font weight.
+   */
+  FontWeight GetDefaultFontWeight() const;
+
+  /**
+   * @brief Sets the default font slant.
+   *
+   * @param[in] slant The font slant.
+   */
+  void SetDefaultFontSlant( FontSlant slant );
+
+  /**
+   * @brief Retrieves the default font slant.
+   *
+   * @return The default font slant.
+   */
+  FontSlant GetDefaultFontSlant() const;
+
+  /**
    * @brief Set the default point size.
    *
-   * @param[in] defaultFontStyle The default point size.
+   * @param[in] pointSize The default point size.
    */
   void SetDefaultPointSize( float pointSize );
 
@@ -215,6 +260,12 @@ public:
    * @return The default point size.
    */
   float GetDefaultPointSize() const;
+
+  /**
+   * @ brief Update the text after a font change
+   * @param[in] newDefaultFont The new font to change to
+   */
+  void UpdateAfterFontChange( std::string& newDefaultFont );
 
   /**
    * @brief Set the text color
@@ -590,6 +641,11 @@ private:
    * @return True if a character was deleted.
    */
   bool BackspaceKeyEvent();
+
+  /**
+   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
+   */
+  void NotifyImfManager();
 
   /**
    * @brief Helper to clear font-specific data.

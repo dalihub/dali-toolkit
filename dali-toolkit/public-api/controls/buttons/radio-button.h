@@ -35,6 +35,10 @@ namespace Internal DALI_INTERNAL
 
 class RadioButton;
 }
+/**
+ * @addtogroup dali-toolkit-controls-buttons
+ * @{
+ */
 
 /**
  * @brief A RadioButton provides a radio button which two states \e selected or \e unselected.
@@ -124,6 +128,9 @@ class DALI_IMPORT_API RadioButton: public Button
   DALI_INTERNAL RadioButton( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

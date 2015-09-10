@@ -32,7 +32,7 @@ namespace Toolkit
 namespace
 {
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_MULTI_LANGUAGE_SUPPORT");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULTI_LANGUAGE_SUPPORT");
 #endif
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
@@ -351,19 +351,19 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           Vector<FontRun>& fonts )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->MultilanguageSupport::ValidateFonts\n" );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n" );
   const Length numberOfCharacters = text.Count();
 
   if( 0u == numberOfCharacters )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
+    DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
     // Nothing to do if there are no characters.
     return;
   }
 
   // Copy the fonts set by application developers.
   const Length numberOfFontRuns = fonts.Count();
-  const Vector<FontRun> definedFonts = fonts;
+  const Vector<FontRun> userSetFonts = fonts;
   fonts.Clear();
 
   // Traverse the characters and validate/set the fonts.
@@ -386,8 +386,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
   // Iterators of the font and script runs.
-  Vector<FontRun>::ConstIterator fontRunIt = definedFonts.Begin();
-  Vector<FontRun>::ConstIterator fontRunEndIt = definedFonts.End();
+  Vector<FontRun>::ConstIterator fontRunIt = userSetFonts.Begin();
+  Vector<FontRun>::ConstIterator fontRunEndIt = userSetFonts.End();
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
 
@@ -585,7 +585,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // Store the last run.
     fonts.PushBack( currentFontRun );
   }
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
 }
 
 } // namespace Internal

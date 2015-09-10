@@ -82,7 +82,7 @@ public:
       }
 
       // fire the scene create signal
-      adaptor->SceneCreated();
+      adaptor->NotifySceneCreated();
 
       mInitialized = true;
     }
