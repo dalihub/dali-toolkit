@@ -1256,7 +1256,7 @@ void Controller::KeyboardFocusLostEvent()
     {
       mImpl->ChangeState( EventData::INACTIVE );
 
-      if( mImpl->IsShowingPlaceholderText() )
+      if( !mImpl->IsShowingRealText() )
       {
         // Revert to regular placeholder-text when not editing
         ShowPlaceholderText();
@@ -1523,6 +1523,11 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       else if( EventData::EDITING                  != mImpl->mEventData->mState &&
                EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState )
       {
+        if( mImpl->IsShowingPlaceholderText() &&  ! mImpl->IsFocusedPlaceholderAvailable() )
+        {
+          // Hide placeholder text
+          ResetText();
+        }
         // Show cursor on first tap
         mImpl->ChangeState( EventData::EDITING );
         relayoutNeeded = true;
