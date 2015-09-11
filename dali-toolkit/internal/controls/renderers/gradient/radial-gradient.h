@@ -72,6 +72,14 @@ public:
 
 private:
 
+  // Undefined
+  RadialGradient( const RadialGradient& gradient );
+
+  // Undefined
+  RadialGradient& operator=( const RadialGradient& handle );
+
+private:
+
   Vector2 mCenter;
   float   mRadius;
 };

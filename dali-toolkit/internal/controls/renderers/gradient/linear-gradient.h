@@ -72,6 +72,14 @@ public:
 
 private:
 
+  // Undefined
+  LinearGradient( const LinearGradient& gradient );
+
+  // Undefined
+  LinearGradient& operator=( const LinearGradient& handle );
+
+private:
+
   Vector2 mStartPosition;
   Vector2 mEndPosition;
 };

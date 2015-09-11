@@ -63,6 +63,18 @@ protected:
 
 private:
 
+  /**
+   * Undefined copy constructor.
+   */
+  RendererFactory(const RendererFactory&);
+
+  /**
+   * Undefined assignment operator.
+   */
+  RendererFactory& operator=(const RendererFactory& rhs);
+
+private:
+
   RendererFactoryCachePtr mFactoryCache;
 };
 

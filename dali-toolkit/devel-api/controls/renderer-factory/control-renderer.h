@@ -42,9 +42,32 @@ class DALI_IMPORT_API ControlRenderer : public BaseHandle
 {
 public:
 
+  /**
+   * @brief Create an empty ControlRenderer Handle
+   */
   ControlRenderer();
-  ControlRenderer(Internal::ControlRenderer *impl);
+
+  /**
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   */
   ~ControlRenderer();
+
+  /**
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
+   * @param[in] handle A reference to the copied handle.
+   */
+  ControlRenderer( const ControlRenderer& handle );
+
+  /**
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
+   * @param [in] handle  A reference to the copied handle.
+   * @return A reference to this.
+   */
+  ControlRenderer& operator=( const ControlRenderer& handle );
 
   /**
    * Set the size of the painting area.
@@ -92,6 +115,10 @@ public:
    * @param[in] actor The actor applying this renderer.
    */
   void SetOffStage( Actor& actor );
+
+public: // Not intended for application developers
+
+  explicit DALI_INTERNAL ControlRenderer(Internal::ControlRenderer *impl);
 
 };
 

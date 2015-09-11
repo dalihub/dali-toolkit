@@ -35,6 +35,17 @@ ControlRenderer::~ControlRenderer()
 {
 }
 
+ControlRenderer::ControlRenderer( const ControlRenderer& handle )
+: BaseHandle( handle )
+{
+}
+
+ControlRenderer& ControlRenderer::operator=( const ControlRenderer& handle )
+{
+  BaseHandle::operator=( handle );
+  return *this;
+}
+
 ControlRenderer::ControlRenderer(Internal::ControlRenderer *impl)
 : BaseHandle(impl)
 {

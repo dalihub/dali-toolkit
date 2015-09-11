@@ -109,6 +109,16 @@ protected:
    */
   virtual ~RendererFactoryCache();
 
+  /**
+   * Undefined copy constructor.
+   */
+  RendererFactoryCache(const RendererFactoryCache&);
+
+  /**
+   * Undefined assignment operator.
+   */
+  RendererFactoryCache& operator=(const RendererFactoryCache& rhs);
+
 private:
 
   // ToDo: test whether using the WeakHandle could improve the performance
