@@ -25,6 +25,8 @@
 
 namespace Dali
 {
+class Image;
+class Vector4;
 
 namespace Toolkit
 {
@@ -84,12 +86,49 @@ public:
   RendererFactory& operator=( const RendererFactory& handle );
 
   /**
-   * Request the control renderer
+   * @brief Request the control renderer
+   *
    * @param[in] propertyMap The map contains the properties required by the control renderer
    *            Depends on the content of the map, different kind of renderer would be returned.
-   * @return the  pointer pointing to control renderer
+   * @return The pointer pointing to control renderer
    */
   ControlRenderer GetControlRenderer( const Property::Map& propertyMap  );
+
+  /**
+   * @brief Request the control renderer to render the given color
+   *
+   * @param[in] color The color to be rendered
+   * @return The pointer pointing to the control renderer
+   */
+  ControlRenderer GetControlRenderer( const Vector4& color );
+
+  /**
+   * @brief Request the current control renderer to render the given color
+   *
+   * if the current renderer is a handle to an internal color renderer, set this color to it,
+   * else the renderer would be a handle to a newly created internal color renderer.
+   *
+   * @return Whether a new internal control renderer is created.
+   */
+  bool ResetRenderer( ControlRenderer& renderer, const Vector4& color );
+
+  /**
+   * @brief Request the control renderer to render the image.
+   *
+   * @param[in] image The image to be rendered.
+   * @return The pointer pointing to the control renderer
+   */
+  ControlRenderer GetControlRenderer( const Image& image );
+
+  /**
+   * @brief Request the current control renderer to render the given image
+   *
+   * if the current renderer is a handle to an internal image renderer, set this image to it,
+   * else the renderer would be a handle to a newly created internal image renderer.
+   *
+   * @return Whether a new internal control renderer is created.
+   */
+  bool ResetRenderer( ControlRenderer& renderer, const Image& image );
 
 private:
 

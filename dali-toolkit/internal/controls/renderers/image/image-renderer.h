@@ -83,6 +83,7 @@ public:
   ~ImageRenderer();
 
 public:  // from ControlRenderer
+
   /**
    * @copydoc ControlRenderer::Initialize
    */
@@ -115,6 +116,13 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
 public:
+
+  /**
+   * Request the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   */
+  void Initialize( RendererFactoryCache& factoryCache );
 
   /**
    * @brief Sets the image of this renderer to the resource at imageUrl

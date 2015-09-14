@@ -94,10 +94,10 @@ int UtcDaliRendererFactoryCopyAndAssignment(void)
   END_TEST;
 }
 
-int UtcDaliRendererFactoryGetColorRenderer(void)
+int UtcDaliRendererFactoryGetColorRenderer1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetColorRenderer" );
+  tet_infoline( "UtcDaliRendererFactoryGetColorRenderer1:  Request color renderer with a Property::Map" );
 
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -108,6 +108,38 @@ int UtcDaliRendererFactoryGetColorRenderer(void)
   propertyMap.Insert("blend-color", testColor);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetColorRenderer2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetColorRenderer2: Request color renderer with a Vector4" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
+  ControlRenderer controlRenderer = factory.GetControlRenderer(testColor);
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -234,10 +266,10 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   END_TEST;
 }
 
-int UtcDaliRendererFactoryGetImageRenderer(void)
+int UtcDaliRendererFactoryGetImageRenderer1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetImageRenderer" );
+  tet_infoline( "UtcDaliRendererFactoryGetImageRenderer1: Request image renderer with a Property::Map" );
 
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -278,6 +310,146 @@ int UtcDaliRendererFactoryGetImageRenderer(void)
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetImageRenderer2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetImageRenderer2: Request image renderer with an image handle" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
+  ControlRenderer controlRenderer = factory.GetControlRenderer( image );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render();
+
+  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
+  if(request)
+  {
+    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
+  }
+
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryResetRenderer1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryResetRenderer1" );
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( Color::RED );
+  DALI_TEST_CHECK( controlRenderer );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render(0);
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+
+  bool isNewRenderer = factory.ResetRenderer( controlRenderer, Color::GREEN );
+  DALI_TEST_CHECK( !isNewRenderer );
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
+
+  Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  isNewRenderer = factory.ResetRenderer( controlRenderer, bufferImage );
+  DALI_TEST_CHECK( isNewRenderer );
+
+  Actor actor2 = Actor::New();
+  actor2.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor2 );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor2 );
+  application.SendNotification();
+  application.Render(0);
+  Image samplerImage = actor2.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
+  DALI_TEST_CHECK( BufferImage::DownCast( samplerImage ) );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryResetRenderer2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryResetRenderer2" );
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Image resourceImage = ResourceImage::New(TEST_IMAGE_FILE_NAME);
+  ControlRenderer controlRenderer = factory.GetControlRenderer( resourceImage );
+  DALI_TEST_CHECK( controlRenderer );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  application.SendNotification();
+  application.Render(0);
+  Image samplerImage = actor.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
+  DALI_TEST_CHECK( ResourceImage::DownCast( samplerImage ) );
+
+  Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  bool isNewRenderer = factory.ResetRenderer( controlRenderer, bufferImage );
+  DALI_TEST_CHECK( !isNewRenderer );
+  application.SendNotification();
+  application.Render(0);
+  samplerImage = actor.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
+  DALI_TEST_CHECK( BufferImage::DownCast( samplerImage ) );
+
+  isNewRenderer = factory.ResetRenderer( controlRenderer, Color::RED );
+  DALI_TEST_CHECK( isNewRenderer );
+
+  Actor actor2 = Actor::New();
+  actor2.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor2 );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor2 );
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render(0);
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
   END_TEST;
 }

@@ -87,6 +87,26 @@ ControlRenderer RendererFactory::GetControlRenderer( const Property::Map& proper
   return GetImplementation( *this ).GetControlRenderer( propertyMap );
 }
 
+ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
+{
+  return GetImplementation( *this ).GetControlRenderer( color );
+}
+
+bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Vector4& color )
+{
+  return GetImplementation( *this ).ResetRenderer( renderer, color );
+}
+
+ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
+{
+  return GetImplementation( *this ).GetControlRenderer( image );
+}
+
+bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Image& image )
+{
+  return GetImplementation( *this ).ResetRenderer( renderer, image );
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

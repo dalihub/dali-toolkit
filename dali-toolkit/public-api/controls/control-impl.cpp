@@ -22,7 +22,6 @@
 #include <cstring> // for strcmp
 #include <limits>
 #include <stack>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
@@ -34,11 +33,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 
 namespace Dali
 {
@@ -162,127 +164,96 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
+
+const char * const BACKGROUND_COLOR_NAME("color");
+
 /**
  * Structure which holds information about the background of a control
  */
 struct Background
 {
-  Actor actor;   ///< Background actor
-  Vector4 color; ///< The color of the actor.
+  //ToDo: remove this actor and apply the Renderer on the Control
+  //      when the implementation of Actor::RemoveRenderer(Renderer&) is in place.
+  Actor actor;                      ///< Background actor
+  ControlRenderer controlRenderer;  ///< The control renderer to render the background
+  // The background can either be an image or a solid color.
+  Image image;                      ///< The background image
+  Vector4 color;                    ///< The background color
 
   /**
    * Constructor
    */
   Background()
   : actor(),
-    color( Color::WHITE )
+    controlRenderer(),
+    image(),
+    color( Color::TRANSPARENT )
   {
   }
 };
 
-unsigned int gQuadIndex[6] = { 0, 2, 1, 1, 2, 3 };
+//ToDo: skip this actor creation and apply the Renderer on the Control
+//      when the implementation of Actor::RemoveRenderer(Renderer&) is in place.
+Actor CreateBackgroundActor()
+{
+  // Create the actor
+  Actor actor = Actor::New();
+  actor.SetSize( Vector3::ONE );
+  actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  actor.SetColorMode( USE_PARENT_COLOR );
 
-Vector2 gQuad[] = {
-                   Vector2( -0.5f, -0.5f ),
-                   Vector2(  0.5f, -0.5f ),
-                   Vector2( -0.5f,  0.5f ),
-                   Vector2(  0.5f,  0.5f )
-};
+  //Constraint scale of the background actor to the size of the control
+  Constraint constraint = Constraint::New<Vector3>( actor,
+                                                    Actor::Property::SCALE,
+                                                    EqualToConstraint() );
+  constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+  constraint.Apply();
 
-
-const char* VERTEX_SHADER_COLOR = DALI_COMPOSE_SHADER(
-    attribute mediump vec2 aPosition;\n
-    uniform mediump mat4 uMvpMatrix;\n
-    void main()\n
-    {\n
-      gl_Position = uMvpMatrix * vec4( aPosition, 0.0, 1.0 );\n
-    }\n
-);
-
-const char* FRAGMENT_SHADER_COLOR = DALI_COMPOSE_SHADER(
-    uniform lowp vec4 uBackgroundColor;\n
-    uniform lowp vec4 uColor;\n
-    void main()\n
-    {\n
-      gl_FragColor = uBackgroundColor * uColor;\n
-    }\n
-);
-
+  return actor;
+}
 
 /**
  * @brief Create the background actor for the control.
  *
  * @param[in] actor The parent actor of the background
  * @param[in] color The background color
- * @param[in] image If a valid image is supplied this will be the texture used by the background
- *
- * @return An actor which will render the background
- *
  */
-Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image() )
+void CreateBackground( Background& background, const Vector4& color )
 {
-  if( !image )
-  {
-    PropertyBuffer vertexBuffer;
-    Shader shader;
-    Material material;
+  background.actor = CreateBackgroundActor();
 
-    Property::Map vertexFormat;
-    vertexFormat["aPosition"] = Property::VECTOR2;
+  background.image.Reset();
+  background.color = color;
 
-    //Create a vertex buffer for vertex positions
-    vertexBuffer = PropertyBuffer::New( vertexFormat, 4u );
-    vertexBuffer.SetData( gQuad );
+ // Create the control renderer
+  RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+  background.controlRenderer = rendererFactory.GetControlRenderer(color);
 
-    shader = Shader::New( VERTEX_SHADER_COLOR, FRAGMENT_SHADER_COLOR );
-    material = Material::New( shader );
+  // ToDo: Call SetOnStage at Control::OnStageConnection and call SetOffStage at Control::OnStageDisconnection;
+  //       Currently Actor::RemoveRenderer doesnot work yet.
+  background.controlRenderer.SetOnStage( background.actor );
+}
 
-    //Create the index buffer
-    Property::Map indexFormat;
-    indexFormat["indices"] = Property::INTEGER;
-    PropertyBuffer indexBuffer = PropertyBuffer::New( indexFormat, 6u );
-    indexBuffer.SetData(gQuadIndex);
+/**
+ * @brief Create the background actor for the control.
+ *
+ * @param[in] actor The parent actor of the background
+ * @param[in] image The background image
+ */
+void CreateBackground( Background& background, const Image& image )
+{
+  background.actor = CreateBackgroundActor();
 
-    //Create the geometry
-    Geometry mesh = Geometry::New();
-    mesh.AddVertexBuffer( vertexBuffer );
-    mesh.SetIndexBuffer( indexBuffer );
+  background.color = Color::TRANSPARENT;
+  background.image = image;
 
-    //Add uniforms to the shader
-    shader.RegisterProperty( "uBackgroundColor", color );
+  // Create the control renderer
+  RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+  background.controlRenderer = rendererFactory.GetControlRenderer(image);
 
-    //Create the renderer
-    Renderer renderer = Renderer::New( mesh, material );
-    renderer.SetDepthIndex( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
-
-    //Create the actor
-    Actor meshActor = Actor::New();
-    meshActor.SetSize( Vector3::ONE );
-    meshActor.AddRenderer( renderer );
-    meshActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-    meshActor.SetColorMode( USE_PARENT_COLOR );
-
-    //Constraint scale of the mesh actor to the size of the control
-    Constraint constraint = Constraint::New<Vector3>( meshActor,
-                                                      Actor::Property::SCALE,
-                                                      EqualToConstraint() );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.Apply();
-
-    return meshActor;
-  }
-  else
-  {
-    ImageActor imageActor = ImageActor::New( image );
-    imageActor.SetColor( color );
-    imageActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-    imageActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-    imageActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    imageActor.SetSortModifier( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
-
-    return imageActor;
-  }
-
+  // ToDo: Call SetOnStage at Control::OnStageConnection and call SetOffStage at Control::OnStageDisconnection;
+  //       Currently Actor::RemoveRenderer doesnot work yet.
+  background.controlRenderer.SetOnStage( background.actor );
 }
 
 } // unnamed namespace
@@ -379,25 +350,28 @@ public:
           controlImpl.SetStyleName( value.Get< std::string >() );
           break;
         }
-
-        case Toolkit::Control::Property::BACKGROUND_COLOR:
-        {
-          controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        case Toolkit::Control::Property::BACKGROUND:
         {
           Image image = Scripting::NewImage( value );
           if ( image )
           {
             controlImpl.SetBackgroundImage( image );
+            break;
           }
-          else
+          const Property::Map* map = value.GetMap();
+          if( map )
           {
-            // An empty map means the background is no longer required
-            controlImpl.ClearBackground();
+            const Property::Value* colorValue = map->Find( BACKGROUND_COLOR_NAME );
+            Vector4 color;
+            if( colorValue && colorValue->Get(color))
+            {
+              controlImpl.SetBackgroundColor( color );
+              break;
+            }
           }
+
+          // The background is neither an valid image nor a valid color, so it is no longer required
+          controlImpl.ClearBackground();
           break;
         }
 
@@ -441,35 +415,20 @@ public:
           break;
         }
 
-        case Toolkit::Control::Property::BACKGROUND_COLOR:
-        {
-          value = controlImpl.GetBackgroundColor();
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
 
           Background* back = controlImpl.mImpl->mBackground;
-          if ( back && back->actor )
+          if ( back && back->actor)
           {
-            if( back->actor.GetRendererCount() > 0 && back->actor.GetRendererAt(0).GetMaterial().GetNumberOfSamplers() > 0 )
+            if( back->image )
             {
-              Image image = back->actor.GetRendererAt(0).GetMaterial().GetSamplerAt(0).GetImage();
-              if ( image )
-              {
-                Scripting::CreatePropertyMap( image, map );
-              }
+              Scripting::CreatePropertyMap( back->image, map );
             }
             else
             {
-              ImageActor imageActor = ImageActor::DownCast( back->actor );
-              if ( imageActor )
-              {
-                Image image = imageActor.GetImage();
-                Scripting::CreatePropertyMap( image, map );
-              }
+              map[BACKGROUND_COLOR_NAME] = back->color;
             }
           }
 
@@ -513,14 +472,12 @@ public:
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
   static PropertyRegistration PROPERTY_3;
-  static PropertyRegistration PROPERTY_4;
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "background-image", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",      Toolkit::Control::Property::STYLE_NAME,      Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "key-input-focus", Toolkit::Control::Property::KEY_INPUT_FOCUS, Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -566,30 +523,28 @@ void Control::SetBackgroundColor( const Vector4& color )
 {
   Background& background( mImpl->GetBackground() );
 
-  if ( background.actor )
+  // The background renderer exits and it is a color renderer, we continue to use the current renderer
+  if ( background.actor && (!background.image)
+      &&  (!Toolkit::RendererFactory::Get().ResetRenderer( background.controlRenderer, color ) ))
   {
-    if( background.actor.GetRendererCount() > 0 )
-    {
-      Shader shader = background.actor.GetRendererAt(0).GetMaterial().GetShader();
-      shader.SetProperty( shader.GetPropertyIndex("uBackgroundColor"), color );
-    }
-    else
-    {
-      background.actor.SetColor( color );
-    }
+    background.color = color;
   }
   else
   {
-    // Create Mesh Actor
-    Actor actor = CreateBackground(Self(), color );
-    background.actor = actor;
+    // TODO: Apply the new renderer directly, as Actor::RemoveRenderer is not working yet, we create a new actor
+    if( background.actor )
+    {
+      mImpl->mAddRemoveBackgroundChild = true;
+      Self().Remove( background.actor );
+      mImpl->mAddRemoveBackgroundChild = false;
+    }
+    // Create background actor
+    CreateBackground(background, color );
     mImpl->mAddRemoveBackgroundChild = true;
     // The actor does not need to be inserted to guarantee order.
-    Self().Add( actor );
+    Self().Add( background.actor );
     mImpl->mAddRemoveBackgroundChild = false;
   }
-
-  background.color = color;
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -605,23 +560,28 @@ void Control::SetBackgroundImage( Image image )
 {
   Background& background( mImpl->GetBackground() );
 
-   if ( background.actor )
-   {
-     // Remove Current actor, unset AFTER removal
-     mImpl->mAddRemoveBackgroundChild = true;
-     Self().Remove( background.actor );
-     mImpl->mAddRemoveBackgroundChild = false;
-     background.actor.Reset();
-   }
-
-   Actor actor = CreateBackground(Self(), background.color, image);
-
-   // Set the background actor before adding so that we do not inform derived classes
-   background.actor = actor;
-   mImpl->mAddRemoveBackgroundChild = true;
-   // The actor does not need to be inserted to guarantee order.
-   Self().Add( actor );
-   mImpl->mAddRemoveBackgroundChild = false;
+  // The background renderer exits and it is an image renderer, we continue to use the current renderer
+  if( background.actor && background.image
+      && (! Toolkit::RendererFactory::Get().ResetRenderer( background.controlRenderer, image ) ) )
+  {
+    background.image = image;
+  }
+  else
+  {
+    // TODO: Apply the new renderer directly, as Actor::RemoveRenderer is not working yet, we create a new actor
+    if( background.actor )
+    {
+      mImpl->mAddRemoveBackgroundChild = true;
+      Self().Remove( background.actor );
+      mImpl->mAddRemoveBackgroundChild = false;
+    }
+    // Create background actor
+    CreateBackground(background, image);
+    mImpl->mAddRemoveBackgroundChild = true;
+    // The actor does not need to be inserted to guarantee order.
+    Self().Add( background.actor );
+    mImpl->mAddRemoveBackgroundChild = false;
+  }
 }
 
 void Control::ClearBackground()
@@ -968,25 +928,9 @@ void Control::OnStageConnection( int depth )
     }
   }
 
-  if( mImpl->mBackground )
+  if( mImpl->mBackground && mImpl->mBackground->controlRenderer)
   {
-    if(mImpl->mBackground->actor.GetRendererCount() > 0 )
-    {
-      Renderer backgroundRenderer = mImpl->mBackground->actor.GetRendererAt( 0 );
-      if(backgroundRenderer)
-      {
-        backgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX+depth );
-      }
-    }
-    else
-    {
-
-      ImageActor imageActor = ImageActor::DownCast( mImpl->mBackground->actor );
-      if ( imageActor )
-      {
-        imageActor.SetSortModifier( BACKGROUND_DEPTH_INDEX+depth );
-      }
-    }
+    mImpl->mBackground->controlRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX+depth );
   }
 }
 

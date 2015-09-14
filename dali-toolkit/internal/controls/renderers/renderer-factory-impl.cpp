@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/image.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -105,6 +106,64 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
   }
 
   return Toolkit::ControlRenderer(rendererPtr);
+}
+
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
+{
+  ColorRenderer* rendererPtr = new ColorRenderer();
+
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+
+  rendererPtr->SetColor(color);
+
+  return Toolkit::ControlRenderer(rendererPtr);
+}
+
+bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color )
+{
+  ColorRenderer* rendererPtr = dynamic_cast<ColorRenderer*>(&GetImplementation(renderer));
+  if( rendererPtr )
+  {
+    rendererPtr->SetColor(color);
+    return false;
+  }
+  else
+  {
+    renderer = GetControlRenderer(color);
+    return true;
+  }
+}
+
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
+{
+  ImageRenderer* rendererPtr = new ImageRenderer();
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+  rendererPtr->SetImage( image );
+
+  return Toolkit::ControlRenderer(rendererPtr);
+}
+
+bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image )
+{
+  ImageRenderer* rendererPtr = dynamic_cast<ImageRenderer*>(&GetImplementation(renderer));
+  if( rendererPtr )
+  {
+    rendererPtr->SetImage(image);
+    return false;
+  }
+  else
+  {
+    renderer = GetControlRenderer(image);
+    return true;
+  }
 }
 
 } // namespace Internal

@@ -66,7 +66,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 }
 
 ColorRenderer::ColorRenderer()
-: ControlRenderer()
+: ControlRenderer(),
+  mBlendColorIndex( Property::INVALID_INDEX )
 {
 }
 
@@ -76,19 +77,7 @@ ColorRenderer::~ColorRenderer()
 
 void ColorRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
-  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
-  if( !(mImpl->mGeometry) )
-  {
-    mImpl->mGeometry =  RendererFactoryCache::CreateQuadGeometry();
-    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
-  }
-
-  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::COLOR_SHADER );
-  if( !(mImpl->mShader) )
-  {
-    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    factoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, mImpl->mShader );
-  }
+  Initialize( factoryCache );
 
   Property::Value* color = propertyMap.Find( COLOR_NAME );
   if( !( color && color->Get(mBlendColor) ) )
@@ -118,10 +107,41 @@ void ColorRenderer::SetOffset( const Vector2& offset )
 
 void ColorRenderer::DoSetOnStage( Actor& actor )
 {
-  (mImpl->mRenderer).RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
+  mBlendColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )
   {
     (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+  }
+}
+
+void ColorRenderer::Initialize( RendererFactoryCache& factoryCache)
+{
+  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
+  if( !(mImpl->mGeometry) )
+  {
+    mImpl->mGeometry =  RendererFactoryCache::CreateQuadGeometry();
+    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
+  }
+
+  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::COLOR_SHADER );
+  if( !(mImpl->mShader) )
+  {
+    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    factoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, mImpl->mShader );
+  }
+}
+
+void ColorRenderer::SetColor(const Vector4& color)
+{
+  mBlendColor = color;
+
+  if( mImpl->mIsOnStage )
+  {
+    (mImpl->mRenderer).SetProperty( mBlendColorIndex, color );
+    if( color.a < 1.f &&  (mImpl->mRenderer).GetMaterial().GetBlendMode() != BlendingMode::ON)
+    {
+      (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+    }
   }
 }
 

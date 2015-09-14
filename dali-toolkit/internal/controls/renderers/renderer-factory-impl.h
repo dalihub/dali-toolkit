@@ -50,9 +50,29 @@ public:
   RendererFactory();
 
   /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Property::Map& )
    */
   Toolkit::ControlRenderer GetControlRenderer( const Property::Map& propertyMap  );
+
+  /**
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Vector4& )
+   */
+  Toolkit::ControlRenderer GetControlRenderer( const Vector4& color );
+
+  /**
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, const Vector4& )
+   */
+  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color );
+
+  /**
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Image& )
+   */
+  Toolkit::ControlRenderer GetControlRenderer( const Image& image );
+
+  /**
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, const Image& )
+   */
+  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image );
 
 protected:
 

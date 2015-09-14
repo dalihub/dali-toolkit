@@ -36,7 +36,6 @@ namespace Internal
 namespace
 {
 
-
 const char * const IMAGE_URL_NAME("image-url");
 const char * const IMAGE_FITTING_MODE("image-fitting-mode");
 const char * const IMAGE_SAMPLING_MODE("image-sampling-mode");
@@ -91,24 +90,7 @@ ImageRenderer::~ImageRenderer()
 
 void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
-  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
-  if( !(mImpl->mGeometry) )
-  {
-    mImpl->mGeometry =  factoryCache.CreateQuadGeometry();
-    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
-  }
-
-  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
-  if( !mImpl->mShader )
-  {
-    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, mImpl->mShader );
-  }
-
-  mDesiredSize = ImageDimensions();
-  mFittingMode = FittingMode::DEFAULT;
-  mSamplingMode = SamplingMode::DEFAULT;
-  mImageUrl.clear();
+  Initialize(factoryCache);
 
   Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
   if( imageURLValue )
@@ -249,6 +231,28 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   }
 
   ControlRenderer::SetOffStage( actor );
+}
+
+void ImageRenderer::Initialize( RendererFactoryCache& factoryCache )
+{
+  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
+  if( !(mImpl->mGeometry) )
+  {
+    mImpl->mGeometry =  factoryCache.CreateQuadGeometry();
+    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
+  }
+
+  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
+  if( !mImpl->mShader )
+  {
+    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, mImpl->mShader );
+  }
+
+  mDesiredSize = ImageDimensions();
+  mFittingMode = FittingMode::DEFAULT;
+  mSamplingMode = SamplingMode::DEFAULT;
+  mImageUrl.clear();
 }
 
 void ImageRenderer::SetImage( const std::string& imageUrl )

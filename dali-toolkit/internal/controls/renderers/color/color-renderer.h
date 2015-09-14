@@ -81,6 +81,21 @@ protected:
    */
   virtual void DoSetOnStage( Actor& actor );
 
+public:
+
+  /**
+   * Request the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   */
+  void Initialize( RendererFactoryCache& factoryCache );
+
+  /**
+   * Set the color for rendering.
+   * @param[in] color The color to be rendered.
+   */
+  void SetColor( const Vector4& color );
+
 private:
 
   // Undefined
@@ -92,6 +107,7 @@ private:
 private:
 
   Vector4 mBlendColor;
+  Property::Index mBlendColorIndex;
 
 };
 
