@@ -49,6 +49,7 @@ SET(TC_SOURCES
    utc-Dali-SuperBlurView.cpp
    utc-Dali-Toolkit.cpp
    utc-Dali-Model3dView.cpp
+   utc-Dali-ControlRenderer.cpp
    utc-Dali-RendererFactory.cpp
 )
 

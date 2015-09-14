@@ -56,16 +56,6 @@ void ControlRenderer::SetSize( const Vector2& size )
   GetImplementation( *this ).SetSize(size);
 }
 
-void ControlRenderer::SetClipRect( const Rect<int>& clipRect )
-{
-  GetImplementation( *this ).SetClipRect(clipRect);
-}
-
-void ControlRenderer::SetOffset( const Vector2& offset )
-{
-  GetImplementation( *this ).SetOffset(offset);
-}
-
 void ControlRenderer::SetDepthIndex( float index )
 {
   GetImplementation( *this ).SetDepthIndex(index);
@@ -74,11 +64,6 @@ void ControlRenderer::SetDepthIndex( float index )
 void ControlRenderer::SetOnStage( Actor& actor )
 {
   GetImplementation( *this ).SetOnStage(actor);
-}
-
-void ControlRenderer::SetOffStage( Actor& actor )
-{
-  GetImplementation( *this ).SetOffStage(actor);
 }
 
 } // namespace Toolkit

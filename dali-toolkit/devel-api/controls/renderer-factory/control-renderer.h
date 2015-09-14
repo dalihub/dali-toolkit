@@ -77,21 +77,6 @@ public:
   void SetSize( const Vector2& size );
 
   /**
-   * Set the clip rectangular of this renderer.
-   * The contents of the renderer will not be visible outside this rectangular.
-   *
-   * @param [in] clipRect The clipping rectangular.
-   */
-  void SetClipRect( const Rect<int>& clipRect );
-
-  /**
-   * Reposition this renderer with a 2D offset.
-   *
-   * @param[in] offset The offset to reposition the renderer.
-   */
-  void SetOffset( const Vector2& offset );
-
-  /**
    * Set the depth index of this renderer.
    * Depth-index controls draw-order for overlapping renderers.
    * Renderer with higher depth indices are rendered in front of other renderer with smaller values
@@ -107,14 +92,6 @@ public:
    * @param[in] actor The actor applying this renderer.
    */
   void SetOnStage( Actor& actor );
-
-  /**
-   * Renderer is destroyed when control is off stage.
-   * This function should be called when the control removes from stage
-   *
-   * @param[in] actor The actor applying this renderer.
-   */
-  void SetOffStage( Actor& actor );
 
 public: // Not intended for application developers
 

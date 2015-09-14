@@ -57,8 +57,33 @@ int UtcDaliRendererFactoryGet(void)
   // Check that renderer factory is a singleton
   DALI_TEST_CHECK(factory == newFactory);
 
-  RendererFactory newFactory2(factory);
-  DALI_TEST_CHECK(factory == newFactory2);
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryCopyAndAssignment(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryCopyAndAssignment" );
+  RendererFactory factory = RendererFactory::Get();
+
+  RendererFactory factoryCopy( factory );
+  DALI_TEST_CHECK(factory == factoryCopy);
+
+  RendererFactory emptyFactory;
+  RendererFactory emptyFactoryCopy( emptyFactory );
+  DALI_TEST_CHECK(emptyFactory == emptyFactoryCopy);
+
+  RendererFactory factoryEquals;
+  factoryEquals = factory;
+  DALI_TEST_CHECK(factory == factoryEquals);
+
+  RendererFactory emptyFactoryEquals;
+  emptyFactoryEquals = emptyFactory;
+  DALI_TEST_CHECK( emptyFactory == emptyFactoryEquals );
+
+  //self assignment
+  factory = factory;
+  DALI_TEST_CHECK( factory = factoryCopy );
 
   END_TEST;
 }
@@ -95,10 +120,6 @@ int UtcDaliRendererFactoryGetColorRenderer(void)
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
-
-  Stage::GetCurrent().Remove( actor );
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
@@ -147,10 +168,6 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 
   application.SendNotification();
   application.Render(0);
-
-  Stage::GetCurrent().Remove( actor );
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
@@ -207,10 +224,6 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   Matrix3 actualValue( Matrix3::IDENTITY );
   DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uAlignmentMatrix", actualValue ) );
   DALI_TEST_EQUALS( actualValue, alignMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  Stage::GetCurrent().Remove( actor );
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }

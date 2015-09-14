@@ -61,12 +61,21 @@ public:
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Toolkit::ControlRenderer::SetCipRect
+   * ToDo: Add this function to Toolkit::ControlRenderer when it is fully implemented.
+   *
+   * Set the clip rectangular of this renderer.
+   * The contents of the renderer will not be visible outside this rectangular.
+   *
+   * @param [in] clipRect The clipping rectangular.
    */
   virtual void SetClipRect( const Rect<int>& clipRect );
 
   /**
-   * @copydoc Toolkit::ControlRenderer::SetOffset
+   *ToDo: Add this function to Toolkit::ControlRenderer when it is fully implemented.
+   *
+   * Reposition this renderer with a 2D offset.
+   *
+   * @param[in] offset The offset to reposition the renderer.
    */
   virtual void SetOffset( const Vector2& offset );
 
@@ -81,7 +90,12 @@ public:
   virtual void SetOnStage( Actor& actor );
 
   /**
-   * @copydoc Toolkit::ControlRenderer::SetOffStage
+   * ToDo: Add this function to Toolkit::ControlRenderer when the Renderer can be removed from actor properly.
+   *
+   * Renderer is destroyed when control is off stage.
+   * This function should be called when the control removes from stage
+   *
+   * @param[in] actor The actor applying this renderer.
    */
   void SetOffStage( Actor& actor );
 
