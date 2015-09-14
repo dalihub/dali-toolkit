@@ -25,6 +25,12 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+namespace
+{
+const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
+} // namespace
+
+
 void dali_renderer_factory_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -224,6 +230,54 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   Matrix3 actualValue( Matrix3::IDENTITY );
   DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uAlignmentMatrix", actualValue ) );
   DALI_TEST_EQUALS( actualValue, alignMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetImageRenderer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetImageRenderer" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( "renderer-type", "image-renderer" );
+  propertyMap.Insert( "image-url", TEST_IMAGE_FILE_NAME );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render();
+
+  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
+  if(request)
+  {
+    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
+  }
+
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
 
   END_TEST;
 }

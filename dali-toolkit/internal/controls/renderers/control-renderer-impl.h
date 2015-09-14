@@ -86,8 +86,9 @@ public:
 
   /**
    * @copydoc Toolkit::ControlRenderer::SetOnStage
+   * @pre Impl->mGeometry must be created before this method is called
    */
-  virtual void SetOnStage( Actor& actor );
+  void SetOnStage( Actor& actor );
 
   /**
    * ToDo: Add this function to Toolkit::ControlRenderer when the Renderer can be removed from actor properly.
@@ -110,6 +111,22 @@ protected:
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~ControlRenderer();
+
+protected:
+
+  /**
+   * Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
+   *
+   * @param[in] actor The actor applying this renderer.
+   */
+  virtual void DoSetOnStage( Actor& actor );
+
+  /**
+   * Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
+   *
+   * @param[in] actor The actor applying this renderer.
+   */
+  virtual void DoSetOffStage( Actor& actor );
 
 private:
 

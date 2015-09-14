@@ -26,6 +26,7 @@
 // Internal HEADER
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 
 namespace
@@ -33,6 +34,7 @@ namespace
 const char * const RENDERER_TYPE_NAME( "renderer-type" );
 const char * const COLOR_RENDERER("color-renderer");
 const char * const GRADIENT_RENDERER("gradient-renderer");
+const char * const IMAGE_RENDERER("image-renderer");
 }
 
 namespace Dali
@@ -82,6 +84,10 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     else if( typeValue ==  GRADIENT_RENDERER )
     {
       rendererPtr = new GradientRenderer();
+    }
+    else if( typeValue ==  IMAGE_RENDERER )
+    {
+      rendererPtr = new ImageRenderer();
     }
   }
 

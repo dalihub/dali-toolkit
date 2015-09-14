@@ -41,6 +41,7 @@ struct Internal::ControlRenderer::Impl
   Vector2   mOffset;
   Rect<int> mClipRect;
   float     mDepthIndex;
+  bool      mIsOnStage;
 };
 
 } // namespace Internal

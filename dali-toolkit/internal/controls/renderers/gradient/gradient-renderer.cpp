@@ -208,17 +208,20 @@ void GradientRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
-void GradientRenderer::SetOnStage( Actor& actor )
+void GradientRenderer::DoSetOnStage( Actor& actor )
 {
-  ControlRenderer::SetOnStage(actor);
-
   mGradientTransformIndex = (mImpl->mRenderer).RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 
   Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
   Sampler sampler = Sampler::New( lookupTexture, UNIFORM_TEXTULRE_NAME );
   Sampler::WrapMode wrap = GetWrapMode( mGradient->GetSpreadMethod() );
   sampler.SetWrapMode(  wrap, wrap  );
-  ((mImpl->mRenderer).GetMaterial()).AddSampler( sampler );
+
+  Material material = (mImpl->mRenderer).GetMaterial();
+  if( material )
+  {
+    material.AddSampler( sampler );
+  }
 }
 
 bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& propertyMap)

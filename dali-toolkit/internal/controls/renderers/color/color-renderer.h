@@ -75,10 +75,11 @@ public:  // from ControlRenderer
    */
   virtual void SetOffset( const Vector2& offset );
 
+protected:
   /**
-   * @copydoc ControlRenderer::SetOnStage
+   * @copydoc ControlRenderer::DoSetOnStage
    */
-  virtual void SetOnStage( Actor& actor );
+  virtual void DoSetOnStage( Actor& actor );
 
 private:
 

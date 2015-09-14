@@ -36,6 +36,7 @@ namespace Internal
 ControlRenderer::ControlRenderer()
 : mImpl( new Impl() )
 {
+  mImpl->mIsOnStage = false;
 }
 
 ControlRenderer::~ControlRenderer()
@@ -73,12 +74,27 @@ void ControlRenderer::SetOnStage( Actor& actor )
   mImpl->mRenderer = Renderer::New( mImpl->mGeometry, material );
   mImpl->mRenderer.SetDepthIndex( mImpl->mDepthIndex );
   actor.AddRenderer( mImpl->mRenderer );
+  mImpl->mIsOnStage = true;
+
+  DoSetOnStage( actor );
 }
 
 void ControlRenderer::SetOffStage( Actor& actor )
 {
+  DoSetOffStage( actor );
+
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
+
+  mImpl->mIsOnStage = false;
+}
+
+void ControlRenderer::DoSetOnStage( Actor& actor )
+{
+}
+
+void ControlRenderer::DoSetOffStage( Actor& actor )
+{
 }
 
 } // namespace Internal

@@ -116,9 +116,8 @@ void ColorRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
-void ColorRenderer::SetOnStage( Actor& actor )
+void ColorRenderer::DoSetOnStage( Actor& actor )
 {
-  ControlRenderer::SetOnStage(actor);
   (mImpl->mRenderer).RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )
   {
