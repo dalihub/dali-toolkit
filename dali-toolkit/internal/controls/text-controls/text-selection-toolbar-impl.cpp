@@ -52,6 +52,7 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "max-size", VECTOR2, MAX_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enable-overshoot", BOOLEAN, ENABLE_OVERSHOOT )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -87,7 +88,11 @@ void TextSelectionToolbar::SetProperty( BaseObject* object, Property::Index inde
        impl.SetPopupMaxSize( value.Get< Vector2 >() );
        break;
       }
-
+      case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
+      {
+        impl.mScrollView.SetOvershootEnabled( value.Get< bool >() );
+        break;
+      }
     } // switch
   } // TextSelectionToolbar
 }
@@ -107,6 +112,11 @@ Property::Value TextSelectionToolbar::GetProperty( BaseObject* object, Property:
       case Toolkit::TextSelectionToolbar::Property::MAX_SIZE:
       {
         value = impl.GetPopupMaxSize();
+        break;
+      }
+      case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
+      {
+        value = impl.mScrollView.IsOvershootEnabled();
         break;
       }
     } // switch
