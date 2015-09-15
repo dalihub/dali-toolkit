@@ -105,7 +105,7 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     DALI_LOG_ERROR( "Renderer type unknown" );
   }
 
-  return Toolkit::ControlRenderer(rendererPtr);
+  return Toolkit::ControlRenderer( rendererPtr );
 }
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
@@ -118,22 +118,22 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& col
   }
   rendererPtr->Initialize( *( mFactoryCache.Get() ) );
 
-  rendererPtr->SetColor(color);
+  rendererPtr->SetColor( color );
 
-  return Toolkit::ControlRenderer(rendererPtr);
+  return Toolkit::ControlRenderer( rendererPtr );
 }
 
 bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color )
 {
-  ColorRenderer* rendererPtr = dynamic_cast<ColorRenderer*>(&GetImplementation(renderer));
+  ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
   if( rendererPtr )
   {
-    rendererPtr->SetColor(color);
+    rendererPtr->SetColor( color );
     return false;
   }
   else
   {
-    renderer = GetControlRenderer(color);
+    renderer = GetControlRenderer( color );
     return true;
   }
 }
@@ -148,20 +148,48 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
   rendererPtr->Initialize( *( mFactoryCache.Get() ) );
   rendererPtr->SetImage( image );
 
-  return Toolkit::ControlRenderer(rendererPtr);
+  return Toolkit::ControlRenderer( rendererPtr );
 }
 
 bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image )
 {
-  ImageRenderer* rendererPtr = dynamic_cast<ImageRenderer*>(&GetImplementation(renderer));
+  ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
   if( rendererPtr )
   {
-    rendererPtr->SetImage(image);
+    rendererPtr->SetImage( image );
     return false;
   }
   else
   {
-    renderer = GetControlRenderer(image);
+    renderer = GetControlRenderer( image );
+    return true;
+  }
+}
+
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+{
+  ImageRenderer* rendererPtr = new ImageRenderer();
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+  rendererPtr->SetImage( url );
+
+  return Toolkit::ControlRenderer( rendererPtr );
+}
+
+bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& url )
+{
+  ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+  if( rendererPtr )
+  {
+    rendererPtr->SetImage( url );
+    return false;
+  }
+  else
+  {
+    renderer = GetControlRenderer( url );
     return true;
   }
 }

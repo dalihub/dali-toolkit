@@ -107,6 +107,16 @@ bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Image& ima
   return GetImplementation( *this ).ResetRenderer( renderer, image );
 }
 
+ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+{
+  return GetImplementation( *this ).GetControlRenderer( url );
+}
+
+bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const std::string& url )
+{
+  return GetImplementation( *this ).ResetRenderer( renderer, url );
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
