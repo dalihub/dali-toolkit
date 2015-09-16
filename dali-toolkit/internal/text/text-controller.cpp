@@ -1611,6 +1611,9 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
       }
       else
       {
+        // Reset the imf manger to commit the pre-edit before selecting the text.
+        mImpl->ResetImfManager();
+
         SelectEvent( x, y, false );
       }
     }
