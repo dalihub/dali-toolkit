@@ -404,11 +404,10 @@ void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
 
-  ClearFontData();
-
   if ( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
+    ClearFontData();
     mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
     mImpl->UpdateModel( ALL_OPERATIONS );
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
