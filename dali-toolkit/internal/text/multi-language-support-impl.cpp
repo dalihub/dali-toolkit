@@ -428,6 +428,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Whether the font being validated is a default one not set by the user.
     const bool isDefault = ( 0u == fontId );
+    FontId preferredFont = fontId;
 
     DALI_LOG_INFO( gLogFilter,
                    Debug::Verbose,
@@ -525,8 +526,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         // Emojis are present in many monochrome fonts; prefer color by default.
         bool preferColor = ( TextAbstraction::EMOJI == script );
 
-        // Find a default font.
-        fontId = fontClient.FindDefaultFont( character, pointSize, preferColor );
+        // Find a fallback-font.
+        fontId = fontClient.FindFallbackFont( preferredFont, character, pointSize, preferColor );
 
         // If the system does not support a suitable font, fallback to Latin
         if( 0u == fontId )
