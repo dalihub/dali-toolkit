@@ -113,6 +113,10 @@ distributing this software or its derivatives.
         "font-style":"{\"weight\":\"light\"}"
       }
     },
+    "textselectiontoolbar":
+    {
+      "enable-overshoot":true
+    },
     "scrollview":
     {
       "overshoot-effect-color":"B018"

@@ -62,7 +62,8 @@ public:
   {
     enum
     {
-      MAX_SIZE =  PROPERTY_START_INDEX   ///< name "max-size",                The maximum size the Popup can be,              type VECTOR2
+      MAX_SIZE =  PROPERTY_START_INDEX, ///< name "max-size",                The maximum size the Popup can be,              type VECTOR2
+      ENABLE_OVERSHOOT,                 ///< name "enable-overshoot",        Whether the overshoot image is enabled,         type BOOLEAN
     };
   };
 
