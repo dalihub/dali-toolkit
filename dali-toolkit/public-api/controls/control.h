@@ -279,8 +279,6 @@ public:
   /**
    * @brief Sets an image as the background of the control.
    *
-   * The color of this image is blended with the background color @see SetBackgroundColor
-   *
    * @param[in] image The image to set as the background.
    */
   void SetBackgroundImage( Image image );
