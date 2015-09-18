@@ -89,8 +89,7 @@ public:
     enum
     {
       STYLE_NAME = PROPERTY_START_INDEX,       ///< name "style-name",       @see SetStyleName,       type std::string
-      BACKGROUND_COLOR,                        ///< name "background-color", @see SetBackgroundColor, type Vector4
-      BACKGROUND_IMAGE,                        ///< name "background-image", @see SetBackgroundImage, type Map
+      BACKGROUND,                              ///< name "background",       @see SetBackgroundImage, type Map
       KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
   };
@@ -270,6 +269,8 @@ public:
 
   /**
    * @brief Retrieves the background color of the control.
+   *
+   * @deprecated DALi 1.1.3 API removed.
    *
    * @return The background color of the control.
    */

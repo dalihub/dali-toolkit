@@ -290,6 +290,14 @@ struct Controller::Impl
     return ( mEventData && mEventData->mIsShowingPlaceholderText );
   }
 
+  /**
+   * @brief Helper to check whether active place-holder text is available.
+   */
+  bool IsFocusedPlaceholderAvailable() const
+  {
+    return ( mEventData && !mEventData->mPlaceholderTextActive.empty() );
+  }
+
   bool IsShowingRealText() const
   {
     return ( !IsShowingPlaceholderText() &&

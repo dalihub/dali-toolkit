@@ -396,17 +396,21 @@ int UtcDaliControlBackgroundImage(void)
 
   Image image = ResourceImage::New("TestImage");
   control.SetBackgroundImage( image );
-  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   control.SetBackgroundColor( Color::GREEN );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::GREEN, TEST_LOCATION );
+
+  control.SetBackgroundColor( Color::RED );
+  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
 
   control.ClearBackground();
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   control.SetBackgroundColor( Color::YELLOW );
   control.SetBackgroundImage( image );
-  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::YELLOW, TEST_LOCATION );
+  // The background can be either an image or a color, not both
+  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }
@@ -418,32 +422,33 @@ int UtcDaliControlBackgroundProperties(void)
 
   DALI_TEST_CHECK( control.GetChildCount() == 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND ).Get< Property::Map >().Empty() );
 
-  control.SetProperty( Control::Property::BACKGROUND_COLOR, Color::RED );
-  DALI_TEST_CHECK( control.GetChildCount() > 0 );
+  Property::Map colorMap;
+  colorMap["color"] = Color::RED;
+  control.SetProperty( Control::Property::BACKGROUND, colorMap );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
+  DALI_TEST_CHECK( control.GetChildCount() > 0 );
+  Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( "color" ) );
+  DALI_TEST_CHECK( resultMap->Find( "color" )->Get<Vector4>() == Color::RED );
 
   Property::Map imageMap;
   imageMap[ "filename" ] = "TestImage";
-  control.SetProperty( Control::Property::BACKGROUND_IMAGE, imageMap );
+  control.SetProperty( Control::Property::BACKGROUND, imageMap );
   DALI_TEST_CHECK( control.GetChildCount() > 0 );
-  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
-
-  Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
-  Property::Map* resultMap = propValue.GetMap();
+  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
+  propValue = control.GetProperty( Control::Property::BACKGROUND );
+  resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "filename" ) );
   DALI_TEST_CHECK( resultMap->Find( "filename" )->Get< std::string>() == "TestImage" );
 
   Property::Map emptyMap;
-  control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
+  control.SetProperty( Control::Property::BACKGROUND, emptyMap );
   DALI_TEST_CHECK( control.GetChildCount() == 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND ).Get< Property::Map >().Empty() );
 
   END_TEST;
 }
