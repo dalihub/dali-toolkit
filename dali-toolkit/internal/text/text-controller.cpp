@@ -1817,6 +1817,7 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     case ImfManager::COMMIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
+      update=true;
       requestRelayout = true;
       break;
     }
@@ -1910,11 +1911,10 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
-    // This is to reset the virtual keyboard to Upper-case
-    if( 0u == mImpl->mLogicalModel->mText.Count() )
-    {
-      NotifyImfManager();
-    }
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE RemovedText\n", this );
+    // Notifiy the IMF manager after text changed
+    // Automatic  Upper-case and restarting prediction on an existing word require this.
+    NotifyImfManager();
 
     if( 0u != mImpl->mLogicalModel->mText.Count() ||
         !mImpl->IsPlaceholderAvailable() )
