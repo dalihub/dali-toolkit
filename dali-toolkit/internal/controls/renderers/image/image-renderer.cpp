@@ -298,6 +298,11 @@ void ImageRenderer::SetImage( Image image )
   }
 }
 
+Image ImageRenderer::GetImage() const
+{
+  return mImage;
+}
+
 void ImageRenderer::ApplyImageToSampler()
 {
   if( mImage )

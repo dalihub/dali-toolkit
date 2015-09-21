@@ -59,7 +59,7 @@ public:
   {
     enum
     {
-      RESOURCE_URL = PROPERTY_START_INDEX, ///< name "resource-url", @see SetImage(), type string
+      IMAGE = PROPERTY_START_INDEX, ///< name "image", @see SetImage(), type string if it is a url, map otherwise
     };
   };
 
@@ -137,7 +137,15 @@ public:
   void SetImage( Image image );
 
   /**
-   * @brief Gets the Image
+   * @brief Sets this ImageView from an Image url
+   *
+   * If the handle is empty, ImageView will display nothing
+   * @param[in] url The Image resource to display.
+   */
+  void SetImage( const std::string& url );
+
+  /**
+   * @deprecated Gets the Image
    *
    * @return The Image currently set to this ImageView
    */

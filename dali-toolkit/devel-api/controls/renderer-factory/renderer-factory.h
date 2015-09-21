@@ -108,6 +108,8 @@ public:
    * if the current renderer is a handle to an internal color renderer, set this color to it,
    * else the renderer would be a handle to a newly created internal color renderer.
    *
+   * @param[in] renderer The ControlRenderer to reset
+   * @param[in] color The color to be rendered.
    * @return Whether a new internal control renderer is created.
    */
   bool ResetRenderer( ControlRenderer& renderer, const Vector4& color );
@@ -126,9 +128,31 @@ public:
    * if the current renderer is a handle to an internal image renderer, set this image to it,
    * else the renderer would be a handle to a newly created internal image renderer.
    *
+   * @param[in] renderer The ControlRenderer to reset
+   * @param[in] image The Image to be rendered.
    * @return Whether a new internal control renderer is created.
    */
   bool ResetRenderer( ControlRenderer& renderer, const Image& image );
+
+  /**
+   * @brief Request the control renderer to render the given resource at the url.
+   *
+   * @param[in] url The URL to the resource to be rendered.
+   * @return The pointer pointing to the control renderer
+   */
+  ControlRenderer GetControlRenderer( const std::string& url );
+
+  /**
+   * @brief Request the current control renderer to render the given resource at the url
+   *
+   * if the current renderer is a handle to an internal image renderer, set this image to it,
+   * else the renderer would be a handle to a newly created internal image renderer.
+   *
+   * @param[in] renderer The ControlRenderer to reset
+   * @param[in] url The URL to the resource to be rendered.
+   * @return Whether a new internal control renderer is created.
+   */
+  bool ResetRenderer( ControlRenderer& renderer, const std::string& url );
 
 private:
 

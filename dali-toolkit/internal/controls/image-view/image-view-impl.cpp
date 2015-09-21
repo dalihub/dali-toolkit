@@ -3,14 +3,16 @@
 // CLASS HEADER
 #include "image-view-impl.h"
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
-
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 
 namespace Dali
 {
@@ -24,71 +26,6 @@ namespace Internal
 namespace
 {
 
-#define MAKE_SHADER(A)#A
-
-const char* VERTEX_SHADER = MAKE_SHADER(
-  attribute mediump vec2 aPosition;
-  attribute highp vec2 aTexCoord;
-  varying mediump vec2 vTexCoord;
-  uniform mediump mat4 uMvpMatrix;
-  uniform mediump vec3 uSize;
-
-  void main()
-  {
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
-    vertexPosition.xyz *= uSize;
-    vertexPosition = uMvpMatrix * vertexPosition;
-
-    vTexCoord = aTexCoord;
-    gl_Position = vertexPosition;
-  }
-);
-
-const char* FRAGMENT_SHADER = MAKE_SHADER(
-  varying mediump vec2 vTexCoord;
-  uniform sampler2D sTexture;
-  uniform lowp vec4 uColor;
-
-  void main()
-  {
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
-  }
-);
-
-//TODO: remove when RendererFactory is implemented, so if there are multiple images that render as quads we only end up with one instance of geometry
-Geometry CreateGeometry( int width, int height )
-{
-  // Create vertices
-  const float halfWidth = 0.5f;
-  const float halfHeight = 0.5f;
-  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
-    TexturedQuadVertex texturedQuadVertexData[4] = { { Vector2(-halfWidth, -halfHeight), Vector2(0.f, 0.f) },
-                                                     { Vector2( halfWidth, -halfHeight), Vector2(1.f, 0.f) },
-                                                     { Vector2(-halfWidth, halfHeight), Vector2(0.f, 1.f) },
-                                                     { Vector2( halfWidth, halfHeight), Vector2(1.f, 1.f) } };
-
-  Property::Map texturedQuadVertexFormat;
-  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
-  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
-  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
-  texturedQuadVertices.SetData(texturedQuadVertexData);
-
-  // Create indices
-  //TODO: replace with triangle strip when Geometry supports it
-  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 6 );
-  indices.SetData(indexData);
-
-  // Create the geometry object
-  Geometry texturedQuadGeometry = Geometry::New();
-  texturedQuadGeometry.AddVertexBuffer( texturedQuadVertices );
-  texturedQuadGeometry.SetIndexBuffer( indices );
-
-  return texturedQuadGeometry;
-}
-
 BaseHandle Create()
 {
   return Toolkit::ImageView::New();
@@ -96,7 +33,7 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
-DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "resource-url", STRING, RESOURCE_URL )
+DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
 DALI_TYPE_REGISTRATION_END()
 
 } // anonymous namespace
@@ -116,7 +53,7 @@ Toolkit::ImageView ImageView::New()
 {
   ImageView* impl = new ImageView();
 
-  Dali::Toolkit::ImageView handle = Dali::Toolkit::ImageView( *impl );
+  Toolkit::ImageView handle = Toolkit::ImageView( *impl );
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -129,65 +66,120 @@ Toolkit::ImageView ImageView::New()
 
 void ImageView::SetImage( Image image )
 {
-  mImage = image;
+  if( mImage != image )
+  {
+    mUrl.clear();
+    mPropertyMap.Clear();
 
-  ResourceImage resourceImage = ResourceImage::DownCast( mImage );
-  if( resourceImage )
-  {
-    mImageUrl = resourceImage.GetUrl();
-  }
-  else
-  {
-    mImageUrl.clear();
-  }
+    mImage = image;
 
-  if( mImage )
-  {
-    if( Self().OnStage() )
-    {
-      AttachImage();
-    }
-    RelayoutRequest();
-  }
-  else
-  {
+    bool newRendererCreated = false;
     if( mRenderer )
     {
-      Self().RemoveRenderer( mRenderer );
+      newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, image );
     }
-    mSampler.Reset();
-    mMaterial.Reset();
-    mMesh.Reset();
-    mRenderer.Reset();
+    else
+    {
+      mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( image );
+      newRendererCreated = true;
+    }
+
+    //we need to inform any newly created renderers if it is on stage
+    if( newRendererCreated && Self().OnStage() )
+    {
+      CustomActor self = Self();
+      mRenderer.SetOnStage( self );
+    }
+
+    mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
   }
 }
 
-Image ImageView::GetImage() const
+void ImageView::SetImage( Property::Map map )
 {
-  return mImage;
+  mImage.Reset();
+  mUrl.clear();
+  mPropertyMap = map;
+
+  mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mPropertyMap );
+
+  //we need to inform any newly created renderers if it is on stage
+  if( Self().OnStage() )
+  {
+    CustomActor self = Self();
+    mRenderer.SetOnStage( self );
+  }
+
+  int width = 0;
+  Property::Value* widthValue = mPropertyMap.Find( "width" );
+  if( widthValue )
+  {
+    widthValue->Get( width );
+  }
+
+  int height = 0;
+  Property::Value* heightValue = mPropertyMap.Find( "height" );
+  if( heightValue )
+  {
+    heightValue->Get( height );
+  }
+
+  mImageSize = ImageDimensions( width, height );
+}
+
+void ImageView::SetImage( const std::string& url )
+{
+  if( mUrl != url )
+  {
+    mImage.Reset();
+    mPropertyMap.Clear();
+
+    mUrl = url;
+
+    bool newRendererCreated = false;
+    if( mRenderer )
+    {
+      newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, mUrl );
+    }
+    else
+    {
+      mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mUrl );
+      newRendererCreated = true;
+    }
+
+    //we need to inform any newly created renderers if it is on stage
+    if( newRendererCreated && Self().OnStage() )
+    {
+      CustomActor self = Self();
+      mRenderer.SetOnStage( self );
+    }
+
+    mImageSize = ResourceImage::GetImageSize( mUrl );
+  }
 }
 
 Vector3 ImageView::GetNaturalSize()
 {
-  // if no image then use Control's natural size
   Vector3 size;
 
-  if( mImage )
+  size.x = mImageSize.GetWidth();
+  size.y = mImageSize.GetHeight();
+  size.z = std::min(size.x, size.y);
+
+  if( size.x > 0 && size.x > 0 )
   {
-    size.x = mImage.GetWidth();
-    size.y = mImage.GetHeight();
-    size.z = std::min(size.x, size.y);
+    return size;
   }
   else
   {
-    size = Control::GetNaturalSize();
+    // if no image then use Control's natural size
+    return Control::GetNaturalSize();
   }
-  return size;
 }
 
 float ImageView::GetHeightForWidth( float width )
 {
-  if( mImage )
+  if( mImageSize.GetWidth() > 0 && mImageSize.GetHeight() > 0 )
   {
     return GetHeightForWidthBase( width );
   }
@@ -199,7 +191,7 @@ float ImageView::GetHeightForWidth( float width )
 
 float ImageView::GetWidthForHeight( float height )
 {
-  if( mImage )
+  if( mImageSize.GetWidth() > 0 && mImageSize.GetHeight() > 0 )
   {
     return GetWidthForHeightBase( height );
   }
@@ -214,43 +206,12 @@ float ImageView::GetWidthForHeight( float height )
 // Private methods
 //
 
-void ImageView::AttachImage()
-{
-  if( !mRenderer )
-  {
-    Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mMaterial = Material::New( shader );
-
-    mSampler = Sampler::New( mImage, "sTexture" );
-    mMaterial.AddSampler( mSampler );
-
-    Vector3 size = Self().GetCurrentSize();
-    mMesh = CreateGeometry( size.width, size.height );
-    mRenderer = Renderer::New( mMesh, mMaterial );
-    Self().AddRenderer( mRenderer );
-  }
-  else
-  {
-    mSampler.SetImage( mImage );
-  }
-}
-
-void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  Control::OnRelayout( size, container );
-
-  if( mRenderer )
-  {
-    mMesh = CreateGeometry( size.width, size.height );
-    mRenderer.SetGeometry( mMesh );
-  }
-}
-
 void ImageView::OnStageConnection( int depth )
 {
-  if( mImage )
+  if( mRenderer )
   {
-    AttachImage();
+    CustomActor self = Self();
+    mRenderer.SetOnStage( self );
   }
 }
 
@@ -267,17 +228,23 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
   {
     switch ( index )
     {
-      case Toolkit::ImageView::Property::RESOURCE_URL:
+      case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
         if( value.Get( imageUrl ) )
         {
           ImageView& impl = GetImpl( imageView );
-          impl.mImageUrl = imageUrl;
-
-          Image image = ResourceImage::New( imageUrl );
-          impl.SetImage( image );
+          impl.SetImage( imageUrl );
         }
+
+        // if its not a string then get a Property::Map from the property if possible.
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          ImageView& impl = GetImpl( imageView );
+          impl.SetImage( map );
+        }
+
         break;
       }
     }
@@ -294,9 +261,23 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
   {
     switch ( propertyIndex )
     {
-      case Toolkit::ImageView::Property::RESOURCE_URL:
+      case Toolkit::ImageView::Property::IMAGE:
       {
-        value = GetImpl( imageview ).mImageUrl;
+        ImageView& impl = GetImpl( imageview );
+        if ( !impl.mUrl.empty() )
+        {
+          value = impl.mUrl;
+        }
+        else if( impl.mImage )
+        {
+          Property::Map map;
+          Scripting::CreatePropertyMap( impl.mImage, map );
+          value = map;
+        }
+        else if( !impl.mPropertyMap.Empty() )
+        {
+          value = impl.mPropertyMap;
+        }
         break;
       }
     }

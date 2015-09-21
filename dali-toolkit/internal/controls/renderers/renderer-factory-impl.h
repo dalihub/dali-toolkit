@@ -74,6 +74,16 @@ public:
    */
   bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image );
 
+  /**
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const std::string& )
+   */
+  Toolkit::ControlRenderer GetControlRenderer( const std::string& image );
+
+  /**
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, const std::string& )
+   */
+  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& image );
+
 protected:
 
   /**
