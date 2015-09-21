@@ -783,18 +783,18 @@ void Controller::ProcessModifyEvents()
 
   for( unsigned int i=0; i<events.size(); ++i )
   {
-    if( ModifyEvent::TEXT_REPLACED == events[0].type )
+    if( ModifyEvent::TEXT_REPLACED == events[i].type )
     {
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
       DALI_ASSERT_DEBUG( 0 == i && "Unexpected TEXT_REPLACED event" );
 
       TextReplacedEvent();
     }
-    else if( ModifyEvent::TEXT_INSERTED == events[0].type )
+    else if( ModifyEvent::TEXT_INSERTED == events[i].type )
     {
       TextInsertedEvent();
     }
-    else if( ModifyEvent::TEXT_DELETED == events[0].type )
+    else if( ModifyEvent::TEXT_DELETED == events[i].type )
     {
       // Placeholder-text cannot be deleted
       if( !mImpl->IsShowingPlaceholderText() )
