@@ -126,7 +126,10 @@ public:
   using Button::SetButtonImage;
 
   /**
-   * @deprecated Sets the unselected image with an Actor.
+   * @brief Sets the unselected image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetButtonImage( Actor image );
@@ -134,7 +137,10 @@ public:
   using Button::SetBackgroundImage;
 
   /**
-   * @deprecated Sets the background image with an Actor.
+   * @brief Sets the background image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetBackgroundImage( Actor image );
@@ -142,7 +148,10 @@ public:
   using Button::SetSelectedImage;
 
   /**
-   * @deprecated Sets the selected image with an Actor.
+   * @brief Sets the selected image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetSelectedImage( Actor image );
@@ -150,7 +159,10 @@ public:
   using Button::SetSelectedBackgroundImage;
 
   /**
-   * @deprecated Sets the selected background image with an Actor.
+   * @brief Sets the selected background image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetSelectedBackgroundImage( Actor image );
@@ -158,7 +170,10 @@ public:
   using Button::SetDisabledBackgroundImage;
 
   /**
-   * @deprecated Sets the disabled background image with an Actor.
+   * @brief Sets the disabled background image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetDisabledBackgroundImage( Actor image );
@@ -166,7 +181,10 @@ public:
   using Button::SetDisabledImage;
 
   /**
-   * @deprecated Sets the disabled image with an Actor.
+   * @brief Sets the disabled image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetDisabledImage( Actor image );
@@ -174,7 +192,10 @@ public:
   using Button::SetDisabledSelectedImage;
 
   /**
-   * @deprecated Sets the disabled selected image with an Actor.
+   * @brief Sets the disabled selected image with an Actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in] image The Actor to use.
    */
   void SetDisabledSelectedImage( Actor image );
