@@ -28,6 +28,129 @@ using namespace Dali::Toolkit;
 namespace
 {
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
+const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
+
+Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
+{
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
+  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
+  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
+
+  memset( pixbuffer, initialColor, imageHeight * imageWidth * bytesPerPixel );
+
+  return bitmap;
+}
+
+void InitialiseRegionsToZeroAlpha( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat )
+{
+  PixelBuffer* pixbuffer = image->GetBuffer();
+  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
+
+  for( unsigned int row = 0; row < imageWidth; ++row )
+  {
+    unsigned int pixelOffset = row * bytesPerPixel;
+    pixbuffer[ pixelOffset + 3 ] = 0x00;
+    pixelOffset += ( imageHeight - 1 ) * imageWidth * bytesPerPixel;
+    pixbuffer[ pixelOffset + 3 ] = 0x00;
+  }
+
+  for ( unsigned int column = 0; column < imageHeight; ++column )
+  {
+    unsigned int pixelOffset = column * imageWidth * bytesPerPixel;
+    pixbuffer[ pixelOffset + 3 ] = 0x00;
+    pixelOffset += ( imageWidth -1 ) * bytesPerPixel;
+    pixbuffer[ pixelOffset + 3 ] = 0x00;
+  }
+}
+
+void AddStretchRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, const Vector4& requiredStretchBorder, Pixel::Format pixelFormat )
+{
+  PixelBuffer* pixbuffer = image->GetBuffer();
+  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
+
+  for( unsigned int column = requiredStretchBorder.x; column < imageWidth - requiredStretchBorder.z; ++column )
+  {
+    unsigned int pixelOffset = column * bytesPerPixel;
+    pixbuffer[ pixelOffset ] = 0x00;
+    pixbuffer[ pixelOffset + 1 ] = 0x00;
+    pixbuffer[ pixelOffset + 2 ] = 0x00;
+    pixbuffer[ pixelOffset + 3 ] = 0xFF;
+  }
+
+  for( unsigned int row = requiredStretchBorder.y; row < imageHeight - requiredStretchBorder.w; ++row )
+  {
+    unsigned int pixelOffset = row * imageWidth * bytesPerPixel;
+    pixbuffer[ pixelOffset ] = 0x00;
+    pixbuffer[ pixelOffset + 1 ] = 0x00;
+    pixbuffer[ pixelOffset + 2 ] = 0x00;
+    pixbuffer[ pixelOffset + 3 ] = 0xFF;
+  }
+}
+
+void AddChildRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, const Vector4& requiredChildRegion, Pixel::Format pixelFormat )
+{
+  PixelBuffer* pixbuffer = image->GetBuffer();
+  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
+
+  Integration::Bitmap::PackedPixelsProfile* srcProfile = image->GetPackedPixelsProfile();
+  unsigned int bufferStride = srcProfile->GetBufferStride();
+
+  // Add bottom child region
+  for( unsigned int column = requiredChildRegion.x; column < imageWidth - requiredChildRegion.z; ++column )
+  {
+    unsigned int pixelOffset = column * bytesPerPixel;
+    pixelOffset += ( imageHeight - 1 ) * bufferStride;
+    pixbuffer[ pixelOffset ] = 0x00;
+    pixbuffer[ pixelOffset + 1 ] = 0x00;
+    pixbuffer[ pixelOffset + 2 ] = 0x00;
+    pixbuffer[ pixelOffset + 3 ] = 0xFF;
+  }
+
+  // Add right child region
+  for ( unsigned int row = requiredChildRegion.y; row < imageHeight - requiredChildRegion.w; ++row )
+  {
+    unsigned int pixelOffset = row * bufferStride + ( imageWidth - 1 ) * bytesPerPixel;
+    pixbuffer[ pixelOffset ] = 0x00;
+    pixbuffer[ pixelOffset + 1 ] = 0x00;
+    pixbuffer[ pixelOffset + 2 ] = 0x00;
+    pixbuffer[ pixelOffset + 3 ] = 0xFF;
+  }
+}
+
+Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
+                                                 unsigned int ninePatchImageWidth,
+                                                 unsigned int ninePatchImageHeight,
+                                                 const Vector4& requiredStretchBorder,
+                                                 bool addChildRegion = false,
+                                                 Vector4 requiredChildRegion = Vector4::ZERO )
+{
+  TestPlatformAbstraction& platform = application.GetPlatform();
+
+  Pixel::Format pixelFormat = Pixel::RGBA8888;
+
+  tet_infoline("Create Bitmap");
+  platform.SetClosestImageSize(Vector2( ninePatchImageWidth, ninePatchImageHeight));
+  Integration::Bitmap* bitmap = CreateBitmap( ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat );
+
+  tet_infoline("Clear border regions");
+  InitialiseRegionsToZeroAlpha( bitmap, ninePatchImageWidth, ninePatchImageHeight, pixelFormat );
+
+  tet_infoline("Add Stretch regions to Bitmap");
+  AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder, pixelFormat );
+
+  if( addChildRegion )
+  {
+    tet_infoline("Add Child regions to Bitmap");
+    AddChildRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredChildRegion, pixelFormat );
+  }
+
+  tet_infoline("Getting resource");
+  Integration::ResourcePointer resourcePtr(bitmap);
+  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+
+  return resourcePtr;
+}
+
 } // namespace
 
 
@@ -348,6 +471,176 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
   application.SendNotification();
 
   DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetNPatchRenderer1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer1: Request n-patch renderer with a Property::Map" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  const unsigned int ninePatchImageHeight = 18;
+  const unsigned int ninePatchImageWidth = 28;
+  const Vector4 requiredStretchBorder( 3, 4, 5, 6 );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( "renderer-type", "n-patch-renderer" );
+  propertyMap.Insert( "image-url", TEST_NPATCH_FILE_NAME );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render();
+
+  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
+  if(request)
+  {
+    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, ninePatchResource );
+  }
+
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetNPatchRenderer2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer2: Request n-patch renderer with an image url" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  const unsigned int ninePatchImageHeight = 18;
+  const unsigned int ninePatchImageWidth = 28;
+  const Vector4 requiredStretchBorder( 3, 4, 5, 6 );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_NPATCH_FILE_NAME );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render();
+
+  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
+  if(request)
+  {
+    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, ninePatchResource );
+  }
+
+  application.Render();
+  application.SendNotification();
+
+  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetNPatchRendererN1(void)
+{
+  //This should still load but display an error image
+
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRendererN: Request n-patch renderer with an invalid image url" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( "ERROR.9.jpg" );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render();
+
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetNPatchRendererN2(void)
+{
+  //This should still load but display an error image
+
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRendererN: Request n-patch renderer with an invalid Property::Map" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( "renderer-type", "n-patch-renderer" );
+  propertyMap.Insert( "image-url", 111 );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render();
 
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );

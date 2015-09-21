@@ -44,8 +44,6 @@ const char * const IMAGE_DESIRED_HEIGHT("image-desired-height");
 
 std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
-#define MAKE_SHADER(A)#A
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n

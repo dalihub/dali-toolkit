@@ -58,7 +58,7 @@ Geometry RendererFactoryCache::GetGeometry( GeometryType type )
   return mGeometry[type];
 }
 
-void RendererFactoryCache::SaveGeometry( GeometryType type, Geometry geometry)
+void RendererFactoryCache::SaveGeometry( GeometryType type, Geometry geometry )
 {
   mGeometry[type] = geometry;
 }

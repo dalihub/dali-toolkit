@@ -27,6 +27,7 @@
 // Internal HEADER
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 
@@ -36,6 +37,7 @@ const char * const RENDERER_TYPE_NAME( "renderer-type" );
 const char * const COLOR_RENDERER("color-renderer");
 const char * const GRADIENT_RENDERER("gradient-renderer");
 const char * const IMAGE_RENDERER("image-renderer");
+const char * const N_PATCH_RENDERER("n-patch-renderer");
 }
 
 namespace Dali
@@ -90,6 +92,10 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     {
       rendererPtr = new ImageRenderer();
     }
+    else if( typeValue ==  N_PATCH_RENDERER )
+    {
+      rendererPtr = new NPatchRenderer();
+    }
   }
 
   if( rendererPtr )
@@ -140,54 +146,105 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const V
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
 {
-  ImageRenderer* rendererPtr = new ImageRenderer();
   if( !mFactoryCache )
   {
     mFactoryCache = new RendererFactoryCache();
   }
-  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
-  rendererPtr->SetImage( image );
 
-  return Toolkit::ControlRenderer( rendererPtr );
+  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+  if( npatchImage )
+  {
+    NPatchRenderer* rendererPtr = new NPatchRenderer();
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( npatchImage );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
+  else
+  {
+    ImageRenderer* rendererPtr = new ImageRenderer();
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( image );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
 }
 
 bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image )
 {
-  ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
-  if( rendererPtr )
+  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+  if( npatchImage )
   {
-    rendererPtr->SetImage( image );
-    return false;
+    NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( npatchImage );
+      return false;
+    }
   }
   else
   {
-    renderer = GetControlRenderer( image );
-    return true;
+    ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( image );
+      return false;
+    }
   }
+
+  renderer = GetControlRenderer( image );
+  return true;
 }
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
 {
-  ImageRenderer* rendererPtr = new ImageRenderer();
-  if( !mFactoryCache )
+  if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    mFactoryCache = new RendererFactoryCache();
-  }
-  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
-  rendererPtr->SetImage( url );
+    NPatchRenderer* rendererPtr = new NPatchRenderer();
+    if( !mFactoryCache )
+    {
+      mFactoryCache = new RendererFactoryCache();
+    }
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( url );
 
-  return Toolkit::ControlRenderer( rendererPtr );
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
+  else
+  {
+    ImageRenderer* rendererPtr = new ImageRenderer();
+    if( !mFactoryCache )
+    {
+      mFactoryCache = new RendererFactoryCache();
+    }
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( url );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
 }
 
 bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& url )
 {
-  ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
-  if( rendererPtr )
+  if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    rendererPtr->SetImage( url );
-    return false;
+    NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( url );
+      return false;
+    }
   }
   else
+  {
+    ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( url );
+      return false;
+    }
+  }
+
   {
     renderer = GetControlRenderer( url );
     return true;

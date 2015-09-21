@@ -17,6 +17,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/renderers/renderer-factory-impl.cpp \
    $(toolkit_src_dir)/controls/renderers/color/color-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/image/image-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/npatch/npatch-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/gradient.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/linear-gradient.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/radial-gradient.cpp \
