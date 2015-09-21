@@ -495,7 +495,7 @@ struct Decorator::Impl : public ConnectionTracker
     cursor = CreateSolidColorActor( color );
     cursor.SetSortModifier( DECORATION_DEPTH_INDEX );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
-    cursor.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
+    cursor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   }
 
   // Add or Remove cursor(s) from parent
