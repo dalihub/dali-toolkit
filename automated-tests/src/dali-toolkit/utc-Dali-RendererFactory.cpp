@@ -285,6 +285,87 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
   END_TEST;
 }
 
+int UtcDaliRendererFactoryGetBorderRenderer1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetBorderRenderer1:  Request border renderer with a Property::Map" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
+  float testSize = 5.f;
+  propertyMap.Insert("renderer-type", "border-renderer");
+  propertyMap.Insert("border-color", testColor);
+  propertyMap.Insert("border-size", testSize);
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 actualColor(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBorderColor", actualColor ) );
+  DALI_TEST_EQUALS( actualColor, testColor, TEST_LOCATION );
+
+  float actualSize = 0.f;
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uBorderSize", actualSize ) );
+  DALI_TEST_EQUALS( actualSize, testSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetBorderRenderer2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetBorderRenderer2:  Request border renderer with a borderSize and a borderColor" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
+  float testSize = 5.f;
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer(testSize, testColor);
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 actualColor(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBorderColor", actualColor ) );
+  DALI_TEST_EQUALS( actualColor, testColor, TEST_LOCATION );
+
+  float actualSize = 0.f;
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uBorderSize", actualSize ) );
+  DALI_TEST_EQUALS( actualSize, testSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
 int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 {
   ToolkitTestApplication application;

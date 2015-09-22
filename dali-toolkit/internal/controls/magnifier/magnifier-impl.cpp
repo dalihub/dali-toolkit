@@ -27,6 +27,9 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+
 namespace Dali
 {
 
@@ -54,9 +57,7 @@ DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Magnifier, "source-position", VE
 
 DALI_TYPE_REGISTRATION_END()
 
-const char* DEFAULT_FRAME_IMAGE_PATH = DALI_IMAGE_DIR "magnifier-image-frame.png";
-
-const float IMAGE_BORDER_INDENT = 14.0f;            ///< Indent of border in pixels.
+const float IMAGE_BORDER_INDENT = 5.0f;            ///< Indent of border in pixels.
 
 struct CameraActorPositionConstraint
 {
@@ -253,20 +254,22 @@ void Magnifier::SetFrameVisibility(bool visible)
   {
     Actor self(Self());
 
-    Image image = ResourceImage::New( DEFAULT_FRAME_IMAGE_PATH );
-    mFrame = ImageActor::New( image );
-    mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );
+    mFrame = Actor::New( );
     mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
     mFrame.SetInheritScale(true);
     mFrame.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
     mFrame.SetSizeModeFactor( sizeOffset );
 
+    //TODO Set the renderer onto the control self when Actor::RemoveRenderer is supported
+    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+    Toolkit::ControlRenderer borderRenderer = rendererFactory.GetControlRenderer(IMAGE_BORDER_INDENT, Color::WHITE);
+    borderRenderer.SetOnStage( mFrame );
+
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
     constraint.AddSource( ParentSource( Actor::Property::WORLD_POSITION ) );
     constraint.Apply();
 
-    mFrame.SetNinePatchBorder( Vector4::ONE * IMAGE_BORDER_INDENT );
     self.Add(mFrame);
   }
   else if(!visible && mFrame)

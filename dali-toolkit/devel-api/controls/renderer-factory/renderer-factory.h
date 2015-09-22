@@ -115,6 +115,15 @@ public:
   bool ResetRenderer( ControlRenderer& renderer, const Vector4& color );
 
   /**
+   * @brief Request the control renderer to renderer the border with the given size and color.
+   *
+   * @param[in] borderSize The size of the border. Border size is the same along all edges.
+   * @param[in] borderColor The color of the border.
+   * @return The pointer pointing to the control renderer
+   */
+  ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor );
+
+  /**
    * @brief Request the control renderer to render the image.
    *
    * @param[in] image The image to be rendered.

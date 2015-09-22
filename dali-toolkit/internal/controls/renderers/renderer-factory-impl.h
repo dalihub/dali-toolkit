@@ -65,6 +65,11 @@ public:
   bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color );
 
   /**
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( float, const Vector4& )
+   */
+  Toolkit::ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor );
+
+  /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Image& )
    */
   Toolkit::ControlRenderer GetControlRenderer( const Image& image );

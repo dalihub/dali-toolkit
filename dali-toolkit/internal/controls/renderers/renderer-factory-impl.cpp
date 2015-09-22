@@ -25,6 +25,7 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 
 // Internal HEADER
+#include <dali-toolkit/internal/controls/renderers/border/border-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
@@ -34,7 +35,9 @@
 namespace
 {
 const char * const RENDERER_TYPE_NAME( "renderer-type" );
+
 const char * const COLOR_RENDERER("color-renderer");
+const char * const BORDER_RENDERER("border-renderer");
 const char * const GRADIENT_RENDERER("gradient-renderer");
 const char * const IMAGE_RENDERER("image-renderer");
 const char * const N_PATCH_RENDERER("n-patch-renderer");
@@ -96,6 +99,10 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     {
       rendererPtr = new NPatchRenderer();
     }
+    else if( typeValue == BORDER_RENDERER )
+    {
+      rendererPtr = new BorderRenderer();
+    }
   }
 
   if( rendererPtr )
@@ -142,6 +149,22 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const V
     renderer = GetControlRenderer( color );
     return true;
   }
+}
+
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
+{
+  BorderRenderer* rendererPtr = new BorderRenderer();
+
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+
+  rendererPtr->SetBorderSize( borderSize );
+  rendererPtr->SetBorderColor( borderColor );
+
+  return Toolkit::ControlRenderer( rendererPtr );
 }
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
