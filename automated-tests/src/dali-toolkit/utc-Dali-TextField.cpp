@@ -738,11 +738,6 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Cursor position should be the same than position2.
-  Vector3 position6 = cursor.GetCurrentPosition();
-
-  DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
-
   // Should not be renderer.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
 
