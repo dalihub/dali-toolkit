@@ -308,13 +308,11 @@ struct Decorator::Impl : public ConnectionTracker
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
-      mPrimaryCursorVisible = ( cursor.position.x <= size.width ) && ( cursor.position.x >= 0.f );
+      mPrimaryCursorVisible = ( cursor.position.x + mCursorWidth <= size.width ) && ( cursor.position.x >= 0.f );
       if( mPrimaryCursorVisible )
       {
-        const Vector2& position = cursor.position;
-
-        mPrimaryCursor.SetPosition( position.x,
-                                    position.y );
+        mPrimaryCursor.SetPosition( cursor.position.x,
+                                    cursor.position.y );
         mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
       mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
@@ -322,7 +320,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( mSecondaryCursor )
     {
       const CursorImpl& cursor = mCursor[SECONDARY_CURSOR];
-      mSecondaryCursorVisible = ( cursor.position.x <= size.width ) && ( cursor.position.x >= 0.f );
+      mSecondaryCursorVisible = ( cursor.position.x + mCursorWidth <= size.width ) && ( cursor.position.x >= 0.f );
       if( mSecondaryCursorVisible )
       {
         mSecondaryCursor.SetPosition( cursor.position.x,
@@ -336,9 +334,7 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( grabHandle.active )
     {
-      const Vector2& position = grabHandle.position;
-
-      const bool isVisible = ( position.x <= size.width ) && ( position.x >= 0.f );
+      const bool isVisible = ( grabHandle.position.x + floor( 0.5f * mCursorWidth ) <= size.width ) && ( grabHandle.position.x >= 0.f );
 
       if( isVisible )
       {
@@ -350,7 +346,11 @@ struct Decorator::Impl : public ConnectionTracker
         // Sets the grab handle image according if it's pressed, flipped, etc.
         SetHandleImage( GRAB_HANDLE );
       }
-      grabHandle.actor.SetVisible( isVisible );
+
+      if( grabHandle.actor )
+      {
+        grabHandle.actor.SetVisible( isVisible );
+      }
     }
     else if( grabHandle.actor )
     {
@@ -362,11 +362,8 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( primary.active || secondary.active )
     {
-      const Vector2& primaryPosition = primary.position;
-      const Vector2& secondaryPosition = secondary.position;
-
-      const bool isPrimaryVisible = ( primaryPosition.x <= size.width ) && ( primaryPosition.x >= 0.f );
-      const bool isSecondaryVisible = ( secondaryPosition.x <= size.width ) && ( secondaryPosition.x >= 0.f );
+      const bool isPrimaryVisible = ( primary.position.x <= size.width ) && ( primary.position.x >= 0.f );
+      const bool isSecondaryVisible = ( secondary.position.x <= size.width ) && ( secondary.position.x >= 0.f );
 
       if( isPrimaryVisible || isSecondaryVisible )
       {
@@ -392,8 +389,15 @@ struct Decorator::Impl : public ConnectionTracker
           SetSelectionHandleMarkerSize( secondary );
         }
       }
-      primary.actor.SetVisible( isPrimaryVisible );
-      secondary.actor.SetVisible( isSecondaryVisible );
+
+      if( primary.actor )
+      {
+        primary.actor.SetVisible( isPrimaryVisible );
+      }
+      if( secondary.actor )
+      {
+        secondary.actor.SetVisible( isSecondaryVisible );
+      }
 
       CreateHighlight();
       UpdateHighlight();
@@ -802,7 +806,7 @@ struct Decorator::Impl : public ConnectionTracker
     // The SetGrabHandleImage() method will change the orientation.
     const float yLocalPosition = grabHandle.verticallyFlipped ? grabHandle.position.y : grabHandle.position.y + grabHandle.lineHeight;
 
-    grabHandle.actor.SetPosition( grabHandle.position.x - floor( 0.5f * mCursorWidth ),
+    grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ),
                                   yLocalPosition ); // TODO : Fix for multiline.
   }
 

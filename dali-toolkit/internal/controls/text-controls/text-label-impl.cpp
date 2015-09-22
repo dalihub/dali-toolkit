@@ -442,7 +442,10 @@ void TextLabel::OnInitialize()
 
   // Enable the text ellipsis.
   LayoutEngine& engine = mController->GetLayoutEngine();
+
   engine.SetTextEllipsisEnabled( true );
+  engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
+
   self.OnStageSignal().Connect( this, &TextLabel::OnStageConnect );
 }
 

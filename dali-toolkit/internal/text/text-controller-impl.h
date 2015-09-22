@@ -390,7 +390,7 @@ struct Controller::Impl
 
   void GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString );
 
-  void RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd );
+  void RepositionSelectionHandles();
   void RepositionSelectionHandles( float visualX, float visualY );
 
   void SetPopupButtons();
@@ -438,18 +438,23 @@ struct Controller::Impl
   /**
    * @brief Updates the cursor position.
    *
-   * Retrieves the x,y position of the cursor logical position and sets it into the decorator.
+   * Sets the cursor's position into the decorator. It transforms the cursor's position into decorator's coords.
    * It sets the position of the secondary cursor if it's a valid one.
    * Sets which cursors are active.
+   *
+   * @param[in] cursorInfo Contains the selection handle position in Actor's coords.
+   *
    */
-  void UpdateCursorPosition();
+  void UpdateCursorPosition( const CursorInfo& cursorInfo );
 
   /**
-   * @brief Updates the position of the given selection handle.
+   * @brief Updates the position of the given selection handle. It transforms the handle's position into decorator's coords.
    *
    * @param[in] handleType One of the selection handles.
+   * @param[in] cursorInfo Contains the selection handle position in Actor's coords.
    */
-  void UpdateSelectionHandle( HandleType handleType );
+  void UpdateSelectionHandle( HandleType handleType,
+                              const CursorInfo& cursorInfo );
 
   /**
    * @biref Clamps the horizontal scrolling to get the control always filled with text.
@@ -482,7 +487,7 @@ struct Controller::Impl
    *
    * This method is called after deleting text.
    */
-  void ScrollTextToMatchCursor();
+  void ScrollTextToMatchCursor( const CursorInfo& cursorInfo);
 
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
