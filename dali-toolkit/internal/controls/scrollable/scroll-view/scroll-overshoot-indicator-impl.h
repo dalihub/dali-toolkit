@@ -251,8 +251,9 @@ private:
   PropertyNotification  mOvershootDecreaseNotification;///< notification used to inform as overshoot decreases
   Property::Index       mOvershootProperty;            ///< index of the overshoot property in the scrollable actor
   Property::Index       mEffectOvershootProperty;      ///< index of the effect's overshoot property
-  float                mOvershoot;                    ///< last overshoot value as detected by notifications
-  unsigned short      mAnimationStateFlags;          ///< contains flags indicating the current state of the overshoot animation
+  float                 mOvershoot;                    ///< last overshoot value as detected by notifications
+  Vector2               mOvershootSize;                ///< The size of the overshoot effect
+  unsigned short        mAnimationStateFlags;          ///< contains flags indicating the current state of the overshoot animation
 };
 
 } // namespace Internal

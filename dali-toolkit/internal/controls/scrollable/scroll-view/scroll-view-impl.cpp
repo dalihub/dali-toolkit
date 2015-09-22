@@ -648,8 +648,6 @@ void ScrollView::OnInitialize()
   mRulerX = ruler;
   mRulerY = ruler;
 
-  SetOvershootEnabled(true);
-
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, mCanScrollVertical);
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, mCanScrollHorizontal);
 
@@ -1698,19 +1696,25 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
 
 void ScrollView::EnableScrollOvershoot(bool enable)
 {
-  if(enable && !mOvershootIndicator)
+  if (enable)
   {
-    mOvershootIndicator = ScrollOvershootIndicator::New();
-  }
-  if( enable )
-  {
+    if (!mOvershootIndicator)
+    {
+      mOvershootIndicator = ScrollOvershootIndicator::New();
+    }
+
     mOvershootIndicator->AttachToScrollable(*this);
   }
   else
   {
     mMaxOvershoot = mUserMaxOvershoot;
-    mOvershootIndicator->DetachFromScrollable(*this);
+
+    if (mOvershootIndicator)
+    {
+      mOvershootIndicator->DetachFromScrollable(*this);
+    }
   }
+
   UpdateMainInternalConstraint();
 }
 

@@ -27,13 +27,13 @@ using namespace Dali;
 
 namespace
 {
-const Vector2 OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE( 720.0f, 42.0f );
+
 const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 
 // local helper function to resize the height of the bounce actor
-float GetBounceActorHeight( float width )
+float GetBounceActorHeight( float width, float defaultHeight )
 {
-  return (width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height * 0.5f;
+  return (width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD) ? defaultHeight : defaultHeight * 0.5f;
 }
 
 const float MAX_OVERSHOOT_NOTIFY_AMOUNT = 0.99f;                     // maximum amount to set notification for increased overshoot, beyond this we just wait for it to reduce again
@@ -129,6 +129,7 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrolla
     mOvershootProperty(Property::INVALID_INDEX),
     mEffectOvershootProperty(Property::INVALID_INDEX),
     mOvershoot(0.0f),
+    mOvershootSize( scrollable.GetOvershootSize() ),
     mAnimationStateFlags(0)
 {
   mOvershootOverlay = CreateBouncingEffectActor(mEffectOvershootProperty);
@@ -145,7 +146,7 @@ void ScrollOvershootEffectRipple::Apply()
   mOvershootProperty = IsVertical() ? Toolkit::ScrollView::Property::OVERSHOOT_Y : Toolkit::ScrollView::Property::OVERSHOOT_X;
 
   // make sure height is set, since we only create a constraint for image width
-  mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
+  mOvershootOverlay.SetSize( mOvershootSize );
 
   mAttachedScrollView.AddOverlay(mOvershootOverlay);
 
@@ -242,12 +243,12 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       if(IsVertical())
       {
         mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) );
-        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
+        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth);
       }
       else
       {
         mOvershootOverlay.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
-        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
+        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth);
         relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
       }
       mOvershootOverlay.SetPosition(relativeOffset * parentSize);
@@ -261,13 +262,13 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       if(IsVertical())
       {
         mOvershootOverlay.SetOrientation( Quaternion( Radian( Math::PI ), Vector3::ZAXIS ) );
-        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
+        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth);
         relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
       }
       else
       {
         mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS ) );
-        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
+        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth);
         relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
       }
       mOvershootOverlay.SetPosition(relativeOffset * parentSize);

@@ -110,6 +110,11 @@ public:
    */
   float GetOvershootAnimationSpeed() const;
 
+  /**
+   * @copydoc Dali::Toolkit::Scrollable::GetOvershootSize()
+   */
+  const Vector2& GetOvershootSize() const;
+
 private:
 
   /**
@@ -205,6 +210,7 @@ protected:
 
   Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
   float           mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
+  Vector2         mOvershootSize;           ///<The size of the overshoot effect
 
   Toolkit::Scrollable::ScrollStartedSignalType mScrollStartedSignal;
   Toolkit::Scrollable::ScrollUpdatedSignalType mScrollUpdatedSignal;

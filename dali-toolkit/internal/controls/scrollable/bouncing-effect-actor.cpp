@@ -39,7 +39,14 @@ namespace Internal
 namespace
 {
 // Bouncing effect is presented by stacked three layers with same color and opacity
-const Vector3 LAYER_HEIGHTS( 1.f, 27.f/42.f, 13.f/42.f);
+const float LAYER_HEIGHTS[5] =
+{
+  1.f,
+  26.f * 4.f/ 130.f,
+  26.f * 3.f / 130.f,
+  26.f * 2.f / 130.f,
+  26.f / 130.f
+};
 
 #define MAKE_SHADER(A)#A
 
@@ -77,33 +84,43 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
     Vector3 position2;
   };
   // 4 vertices 2 triangles per layer. The depth interval between each layer is 0.01
-  VertexPosition vertexData[12] = {
-    //bottom layer
+  VertexPosition vertexData[20] = {
+    // bottom layer
     { Vector3( -0.5f, -0.5f, 0.f ),  Vector3( -0.5f, -0.5f, 0.f )  },
     { Vector3( 0.5f, -0.5f, 0.f ),   Vector3( 0.5f, -0.5f, 0.f )   },
     { Vector3( -0.5f, -0.5f, 0.f ),  Vector3( -0.5f, -0.5f + LAYER_HEIGHTS[0], 0.f ) },
     { Vector3( 0.5f, -0.5f, 0.f ),   Vector3( 0.5f, -0.5f+ LAYER_HEIGHTS[0], 0.f )   },
-    // middle layer
+    // mid-bottom layer
     { Vector3( -0.5f, -0.5f, 0.01f ),  Vector3( -0.5f, -0.5f, 0.01f )  },
     { Vector3( 0.5f, -0.5f, 0.01f ),   Vector3( 0.5f, -0.5f, 0.01f )   },
     { Vector3( -0.5f, -0.5f, 0.01f ),  Vector3( -0.5f, -0.5f + LAYER_HEIGHTS[1], 0.01f ) },
     { Vector3( 0.5f, -0.5f, 0.01f ),   Vector3( 0.5f, -0.5f+ LAYER_HEIGHTS[1], 0.01f )   },
-    // top layer
+    // middle layer
     { Vector3( -0.5f, -0.5f, 0.02f ),  Vector3( -0.5f, -0.5f, 0.02f )  },
     { Vector3( 0.5f, -0.5f, 0.02f ),   Vector3( 0.5f, -0.5f, 0.02f )   },
     { Vector3( -0.5f, -0.5f, 0.02f ),  Vector3( -0.5f, -0.5f + LAYER_HEIGHTS[2], 0.02f ) },
-    { Vector3( 0.5f, -0.5f, 0.02f ),   Vector3( 0.5f, -0.5f+ LAYER_HEIGHTS[2], 0.02f )   }
+    { Vector3( 0.5f, -0.5f, 0.02f ),   Vector3( 0.5f, -0.5f+ LAYER_HEIGHTS[2], 0.02f )   },
+    // mid-top layer
+    { Vector3( -0.5f, -0.5f, 0.03f ),  Vector3( -0.5f, -0.5f, 0.03f )  },
+    { Vector3( 0.5f, -0.5f, 0.03f ),   Vector3( 0.5f, -0.5f, 0.03f )   },
+    { Vector3( -0.5f, -0.5f, 0.03f ),  Vector3( -0.5f, -0.5f + LAYER_HEIGHTS[3], 0.03f ) },
+    { Vector3( 0.5f, -0.5f, 0.03f ),   Vector3( 0.5f, -0.5f+ LAYER_HEIGHTS[3], 0.03f )   },
+    // top layer
+    { Vector3( -0.5f, -0.5f, 0.04f ),  Vector3( -0.5f, -0.5f, 0.04f )  },
+    { Vector3( 0.5f, -0.5f, 0.04f ),   Vector3( 0.5f, -0.5f, 0.04f )   },
+    { Vector3( -0.5f, -0.5f, 0.04f ),  Vector3( -0.5f, -0.5f + LAYER_HEIGHTS[4], 0.04f ) },
+    { Vector3( 0.5f, -0.5f, 0.04f ),   Vector3( 0.5f, -0.5f+ LAYER_HEIGHTS[4], 0.04f )   }
   };
   Property::Map vertexFormat;
   vertexFormat["aPosition1"] = Property::VECTOR3;
   vertexFormat["aPosition2"] = Property::VECTOR3;
-  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat, 12u );
+  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat, 20u );
   vertices.SetData( vertexData );
 
-  unsigned int indexData[18] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11 };
+  unsigned int indexData[30] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11,12,15,13,12,14,15,16,19,17,16,18,19};
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 18u );
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 30u );
   indices.SetData( indexData );
 
   Geometry meshGeometry = Geometry::New();

@@ -882,6 +882,7 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
+  scrollView.SetOvershootEnabled(true);
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
@@ -1093,6 +1094,7 @@ int UtcDaliToolkitScrollViewOvershoot(void)
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
+  scrollView.SetOvershootEnabled(true);
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);

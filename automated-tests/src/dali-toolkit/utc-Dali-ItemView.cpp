@@ -704,11 +704,11 @@ int UtcDaliItemViewReplaceItemsP(void)
 
   for( unsigned int i = 0u; i < 10; ++i )
   {
-    Actor child = view.GetChildAt( i );
+    Actor child = view.GetItem( i );
     Actor newActor = Actor::New();
     newActor.SetName("Replaced");
 
-    replaceList.push_back( Item( view.GetItemId(child), newActor ) );
+    replaceList.push_back( Item( i, newActor ) );
   }
 
   if( !replaceList.empty() )
