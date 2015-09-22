@@ -183,8 +183,6 @@ private:
 
   NinePatchImage mImage; ///< The image to render if the renderer was set from an NinePatchImage, empty otherwise
   Image mCroppedImage;
-  Geometry mNinePatchGeometry;
-  Geometry mNinePatchBorderGeometry;
 
   std::string mImageUrl; ///< The url to the image resource to render if the renderer was set from an image resource url, empty otherwise
   NinePatchImage::StretchRanges mStretchPixelsX;
