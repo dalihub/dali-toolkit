@@ -30,6 +30,8 @@ namespace Toolkit
 /**
  * PageFactory is an abstract interface for providing image actors to PageTurnView
  * Each image actor is identified by a unique ID, and has a linear order from 0 to GetNumberOfPages()-1
+ *
+ * @since DALi 1.1.4
  */
 class DALI_IMPORT_API PageFactory
 {
