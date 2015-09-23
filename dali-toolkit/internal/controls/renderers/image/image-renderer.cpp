@@ -229,8 +229,6 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   {
     mImage.Reset();
   }
-
-  ControlRenderer::SetOffStage( actor );
 }
 
 void ImageRenderer::Initialize( RendererFactoryCache& factoryCache )
