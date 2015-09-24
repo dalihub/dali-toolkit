@@ -35,6 +35,8 @@ class PageTurnPortraitView;
 
 /**
  * PageTurnLandscapeView provides a page turn view in portrait mode
+ *
+ * @since DALi 1.1.4
  */
 class DALI_IMPORT_API PageTurnPortraitView : public PageTurnView
 {
