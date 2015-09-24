@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class TextLabel;
 }
 /**
- * @addtogroup dali-toolkit-controls-text-controls
+ * @addtogroup dali_toolkit_controls_text_controls
  * @{
  */
 

@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class TextField;
 }
 /**
- * @addtogroup dali-toolkit-controls-text-controls
+ * @addtogroup dali_toolkit_controls_text_controls
  * @{
  */
 
