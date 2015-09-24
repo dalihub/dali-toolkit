@@ -36,7 +36,7 @@ namespace Internal DALI_INTERNAL
 class PushButton;
 }
 /**
- * @addtogroup dali-toolkit-controls-buttons
+ * @addtogroup dali_toolkit_controls_buttons
  * @{
  */
 

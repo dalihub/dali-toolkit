@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class Alignment;
 }
 /**
- * @addtogroup dali-toolkit-controls-alignment
+ * @addtogroup dali_toolkit_controls_alignment
  * @{
  */
 

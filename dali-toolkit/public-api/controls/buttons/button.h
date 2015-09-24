@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class Button;
 }
 /**
- * @addtogroup dali-toolkit-controls-buttons
+ * @addtogroup dali_toolkit_controls_buttons
  * @{
  */
 

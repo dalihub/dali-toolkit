@@ -38,7 +38,7 @@ class ScrollViewEffect;
 class ScrollViewWobbleEffect;
 }
 /**
- * @addtogroup dali-toolkit-controls-scroll-view
+ * @addtogroup dali_toolkit_controls_scroll_view
  * @{
  */
 

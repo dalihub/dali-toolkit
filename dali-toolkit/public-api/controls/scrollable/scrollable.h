@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class Scrollable;
 }
 /**
- * @addtogroup dali-toolkit-controls-scrollable
+ * @addtogroup dali_toolkit_controls_scrollable
  * @{
  */
 

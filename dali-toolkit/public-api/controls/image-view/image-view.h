@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class ImageView;
 }
 /**
- * @addtogroup dali-toolkit-controls-image-view
+ * @addtogroup dali_toolkit_controls_image_view
  * @{
  */
 

@@ -41,7 +41,7 @@ namespace Internal
 class Control;
 }
 /**
- * @addtogroup dali-toolkit-controls
+ * @addtogroup dali_toolkit_controls
  * @{
  */
 

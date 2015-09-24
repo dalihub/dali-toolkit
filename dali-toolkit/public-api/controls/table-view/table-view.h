@@ -36,7 +36,7 @@ namespace Internal DALI_INTERNAL
 class TableView;
 }
 /**
- * @addtogroup dali-toolkit-controls-table-view
+ * @addtogroup dali_toolkit_controls_table_view
  * @{
  */
 

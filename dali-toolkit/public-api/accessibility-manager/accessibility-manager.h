@@ -33,7 +33,7 @@ namespace Internal DALI_INTERNAL
 class AccessibilityManager;
 }
 /**
- * @addtogroup dali-toolkit-accessibility-manager
+ * @addtogroup dali_toolkit_accessibility_manager
  * @{
  */
 

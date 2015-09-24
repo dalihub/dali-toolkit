@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class KeyboardFocusManager;
 }
 /**
- * @addtogroup dali-toolkit-focus-manager
+ * @addtogroup dali_toolkit_focus_manager
  * @{
  */
 
