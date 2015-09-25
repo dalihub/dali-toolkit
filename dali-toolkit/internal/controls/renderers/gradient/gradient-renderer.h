@@ -103,6 +103,11 @@ public:  // from ControlRenderer
    */
   virtual void SetOffset( const Vector2& offset );
 
+  /**
+   * @copydoc ControlRenderer::CreatePropertyMap
+   */
+  virtual void CreatePropertyMap( Property::Map& map ) const;
+
 protected:
   /**
    * @copydoc ControlRenderer::DoSetOnStage
@@ -126,6 +131,15 @@ private:
    * @return True if the property map provides valid properties to create a gradient. Otherwise, returns false.
    */
   bool NewGradient(Type gradientType, const Property::Map& propertyMap);
+
+  /**
+   * Get the stop-offsets from the property.
+   * The valid property type are ARRAY, VECTOR2, VECTOR3, VECTOR4.
+   *
+   * @param[in] value The property value of stop-offsets
+   * @param[out] stopOffsets The vector contains the stop offset values.
+   */
+  static bool GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets);
 
   // Undefined
   GradientRenderer( const GradientRenderer& gradientRenderer );

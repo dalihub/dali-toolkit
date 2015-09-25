@@ -91,6 +91,12 @@ public:
   void AddStop(float offset, const Vector4& color);
 
   /**
+   * Get the gradient stops.
+   * @return The vector of gradient stops.
+   */
+  const Vector<GradientStop>& GetStops();
+
+  /**
    * Set the coordinate system used by the gradient attributes.
    * @param[in] gradientUnits The the attributes are defined using the current user coordinate system or the bounding box of the shape.
    */

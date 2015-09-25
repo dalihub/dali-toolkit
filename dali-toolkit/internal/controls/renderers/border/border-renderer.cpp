@@ -37,6 +37,9 @@ namespace Internal
 
 namespace
 {
+const char * const RENDERER_TYPE("renderer-type");
+const char * const RENDERER_TYPE_VALUE("border-renderer");
+
 const char * const COLOR_NAME("border-color");
 const char * const COLOR_UNIFORM_NAME("uBorderColor");
 const char * const SIZE_NAME("border-size");
@@ -117,6 +120,14 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
     (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
   }
   mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_UNIFORM_NAME, mBorderSize );
+}
+
+void BorderRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( COLOR_NAME, mBorderColor );
+  map.Insert( SIZE_NAME, mBorderSize );
 }
 
 void BorderRenderer::Initialize( RendererFactoryCache& factoryCache)

@@ -91,14 +91,14 @@ public:
   void SetOnStage( Actor& actor );
 
   /**
-   * ToDo: Add this function to Toolkit::ControlRenderer when the Renderer can be removed from actor properly.
-   *
-   * Renderer is destroyed when control is off stage.
-   * This function should be called when the control removes from stage
-   *
-   * @param[in] actor The actor applying this renderer.
+   * @copydoc Toolkit::ControlRenderer::SetOffStage
    */
   void SetOffStage( Actor& actor );
+
+  /**
+   * @copydoc Toolkit::ControlRenderer::CreatePropertyMap
+   */
+  virtual void CreatePropertyMap( Property::Map& map ) const = 0;
 
 protected:
 

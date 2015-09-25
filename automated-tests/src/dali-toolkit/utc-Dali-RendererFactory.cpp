@@ -282,6 +282,9 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
   END_TEST;
 }
 
@@ -323,6 +326,9 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   float actualSize = 0.f;
   DALI_TEST_CHECK( gl.GetUniformValue<float>( "uBorderSize", actualSize ) );
   DALI_TEST_EQUALS( actualSize, testSize, TEST_LOCATION );
+
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
@@ -410,6 +416,9 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 
   application.SendNotification();
   application.Render(0);
+
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
@@ -515,6 +524,9 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
 
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
   END_TEST;
 }
 
@@ -609,6 +621,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }

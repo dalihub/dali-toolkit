@@ -66,6 +66,16 @@ void ControlRenderer::SetOnStage( Actor& actor )
   GetImplementation( *this ).SetOnStage(actor);
 }
 
+void ControlRenderer::SetOffStage( Actor& actor )
+{
+  GetImplementation( *this ).SetOffStage(actor);
+}
+
+void ControlRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  GetImplementation( *this ).CreatePropertyMap( map );
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

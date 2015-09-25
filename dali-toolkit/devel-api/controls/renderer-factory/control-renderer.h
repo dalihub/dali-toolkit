@@ -33,7 +33,8 @@ class ControlRenderer;
 }
 
 /**
- * ControlRenderer provides renderer for rendering the controls. A control may have multiple ControlRenders.
+ * @brief ControlRenderer provides renderer for rendering the controls. A control may have multiple ControlRenders.
+ *
  * ControlRenderers reuses geometry, shader etc. across controls and manages the renderer and material to exist only when control is on-stage.
  * It also responds to actor size and color change, and provides the clipping at the renderer level.
  * Note: The control renderer responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
@@ -70,14 +71,15 @@ public:
   ControlRenderer& operator=( const ControlRenderer& handle );
 
   /**
-   * Set the size of the painting area.
+   * @brief Set the size of the painting area.
    *
    * @param[in] size The size of the painting area.
    */
   void SetSize( const Vector2& size );
 
   /**
-   * Set the depth index of this renderer.
+   * @brief Set the depth index of this renderer.
+   *
    * Depth-index controls draw-order for overlapping renderers.
    * Renderer with higher depth indices are rendered in front of other renderer with smaller values
    *
@@ -86,12 +88,29 @@ public:
   void SetDepthIndex( float index );
 
   /**
-   * Renderer only exists when control is on stage.
+   * @brief Renderer only exists when control is on stage.
+   *
    * This function should be called when the control put on stage.
    *
    * @param[in] actor The actor applying this renderer.
    */
   void SetOnStage( Actor& actor );
+
+  /**
+   * @brief Renderer is destroyed when control is off stage.
+   *
+   * This function should be called when the control removes from stage
+   *
+   * @param[in] actor The actor applying this renderer.
+   */
+  void SetOffStage( Actor& actor );
+
+  /**
+   * @brief Create the property map representing this renderer.
+   *
+   * @param[out] map The renderer property map.
+   */
+  void CreatePropertyMap( Property::Map& map ) const;
 
 public: // Not intended for application developers
 
