@@ -45,7 +45,6 @@ namespace NinePatchImageApi
   /**
    * Ninepatch Image API see nine-patch-image.h for a description
    */
-  void GetStretchBorders( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetChildRectangle( const v8::FunctionCallbackInfo< v8::Value >& args );
   void CreateCroppedBufferImage( const v8::FunctionCallbackInfo< v8::Value >& args );
 

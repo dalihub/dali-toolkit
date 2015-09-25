@@ -151,6 +151,13 @@ public:
    */
   void SetImage( Image image );
 
+  /**
+   * @brief Gets the image this renderer uses
+   *
+   * @return The image this renderer uses, which may be null if the image is set from a URL string and the renderer is not set as onstage
+   */
+  Image GetImage() const;
+
 private:
 
   /**

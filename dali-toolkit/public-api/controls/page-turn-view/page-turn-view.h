@@ -59,6 +59,8 @@ class PageTurnView;
  * | page-turn-finished | @ref PageTurnFinishedSignal() |
  * | page-pan-started   | @ref PagePanStartedSignal()   |
  * | page-pan-finished  | @ref PagePanFinishedSignal()  |
+ *
+ * @since DALi 1.1.4
  */
 class DALI_IMPORT_API PageTurnView : public Control
 {

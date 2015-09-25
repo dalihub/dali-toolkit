@@ -761,7 +761,7 @@ INPUT                  = @DOXYGEN_DOCS_DIR@/content \
                          @prefix@/include/dali/doc/dali-core-doc.h \
                          @prefix@/include/dali/doc/dali-adaptor-doc.h \
                          ../../../../dali-toolkit/doc/dali-toolkit-doc.h \
-                         @prefix@/include/dali \
+                         @prefix@/include/dali/public-api \
                          ../../../../dali-toolkit/dali-toolkit/public-api \
                          ../../../automated-tests/README.md
 

@@ -97,6 +97,11 @@ bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Vector4& c
   return GetImplementation( *this ).ResetRenderer( renderer, color );
 }
 
+ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
+{
+  return GetImplementation( *this ).GetControlRenderer( borderSize, borderColor );
+}
+
 ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
 {
   return GetImplementation( *this ).GetControlRenderer( image );
@@ -105,6 +110,16 @@ ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
 bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Image& image )
 {
   return GetImplementation( *this ).ResetRenderer( renderer, image );
+}
+
+ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+{
+  return GetImplementation( *this ).GetControlRenderer( url );
+}
+
+bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const std::string& url )
+{
+  return GetImplementation( *this ).ResetRenderer( renderer, url );
 }
 
 } // namespace Toolkit

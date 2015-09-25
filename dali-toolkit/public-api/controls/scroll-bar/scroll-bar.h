@@ -34,7 +34,7 @@ namespace Internal DALI_INTERNAL
 class ScrollBar;
 }
 /**
- * @addtogroup dali-toolkit-controls-scroll-bar
+ * @addtogroup dali_toolkit_controls_scroll_bar
  * @{
  */
 

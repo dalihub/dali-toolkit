@@ -152,7 +152,7 @@ private:
 
   RenderTask mTask;                             ///< Render Task to render the source actor contents.
   CameraActor mCameraActor;                     ///< CameraActor attached to RenderTask
-  ImageActor mFrame;                            ///< The Magnifier Frame
+  Actor mFrame;                                 ///< The Magnifier Frame
   Actor mSourceActor;                           ///< Source Delegate Actor represents the source position to read.
   float mDefaultCameraDistance;                 ///< Default RenderTask's camera distance from target.
   Vector3 mActorSize;                           ///< The Actor size

@@ -404,11 +404,10 @@ void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
 
-  ClearFontData();
-
   if ( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
+    ClearFontData();
     mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
     mImpl->UpdateModel( ALL_OPERATIONS );
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
@@ -784,18 +783,18 @@ void Controller::ProcessModifyEvents()
 
   for( unsigned int i=0; i<events.size(); ++i )
   {
-    if( ModifyEvent::TEXT_REPLACED == events[0].type )
+    if( ModifyEvent::TEXT_REPLACED == events[i].type )
     {
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
       DALI_ASSERT_DEBUG( 0 == i && "Unexpected TEXT_REPLACED event" );
 
       TextReplacedEvent();
     }
-    else if( ModifyEvent::TEXT_INSERTED == events[0].type )
+    else if( ModifyEvent::TEXT_INSERTED == events[i].type )
     {
       TextInsertedEvent();
     }
-    else if( ModifyEvent::TEXT_DELETED == events[0].type )
+    else if( ModifyEvent::TEXT_DELETED == events[i].type )
     {
       // Placeholder-text cannot be deleted
       if( !mImpl->IsShowingPlaceholderText() )
@@ -1818,6 +1817,7 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     case ImfManager::COMMIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
+      update=true;
       requestRelayout = true;
       break;
     }
@@ -1911,11 +1911,10 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
-    // This is to reset the virtual keyboard to Upper-case
-    if( 0u == mImpl->mLogicalModel->mText.Count() )
-    {
-      NotifyImfManager();
-    }
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE RemovedText\n", this );
+    // Notifiy the IMF manager after text changed
+    // Automatic  Upper-case and restarting prediction on an existing word require this.
+    NotifyImfManager();
 
     if( 0u != mImpl->mLogicalModel->mText.Count() ||
         !mImpl->IsPlaceholderAvailable() )

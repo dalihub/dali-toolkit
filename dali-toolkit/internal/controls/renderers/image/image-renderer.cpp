@@ -44,8 +44,6 @@ const char * const IMAGE_DESIRED_HEIGHT("image-desired-height");
 
 std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
-#define MAKE_SHADER(A)#A
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
@@ -229,8 +227,6 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   {
     mImage.Reset();
   }
-
-  ControlRenderer::SetOffStage( actor );
 }
 
 void ImageRenderer::Initialize( RendererFactoryCache& factoryCache )
@@ -296,6 +292,11 @@ void ImageRenderer::SetImage( Image image )
       ApplyImageToSampler();
     }
   }
+}
+
+Image ImageRenderer::GetImage() const
+{
+  return mImage;
 }
 
 void ImageRenderer::ApplyImageToSampler()

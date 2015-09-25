@@ -50,7 +50,7 @@ class BloomView;
 
 } // namespace Internal
 /**
- * @addtogroup dali-toolkit-controls-gaussian-blur-view
+ * @addtogroup dali_toolkit_controls_gaussian_blur_view
  * @{
  */
 

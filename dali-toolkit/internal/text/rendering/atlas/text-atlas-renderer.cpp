@@ -759,26 +759,41 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     subActor.SetSize( actorSize );
     subActor.SetColor( shadowColor );
 
+    // Discard redundant render-tasks
+    RemoveShadowRenderTask();
+
     // Create a render task to render the effect
-    RenderTask task = Stage::GetCurrent().GetRenderTaskList().CreateTask();
-    task.SetTargetFrameBuffer( meshRecord.mBuffer );
-    task.SetSourceActor( subActor );
-    task.SetClearEnabled( true );
-    task.SetClearColor( Vector4::ZERO );
-    task.SetExclusive( true );
-    task.SetRefreshRate( RenderTask::REFRESH_ONCE );
-    task.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
+    mShadowTask = Stage::GetCurrent().GetRenderTaskList().CreateTask();
+    mShadowTask.SetTargetFrameBuffer( meshRecord.mBuffer );
+    mShadowTask.SetSourceActor( subActor );
+    mShadowTask.SetClearEnabled( true );
+    mShadowTask.SetClearColor( Vector4::ZERO );
+    mShadowTask.SetExclusive( true );
+    mShadowTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
+    mShadowTask.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
     actor.Add( subActor );
 
     return actor;
   }
 
+  void RemoveShadowRenderTask()
+  {
+    if( mShadowTask )
+    {
+      mShadowTask.FinishedSignal().Disconnect( this, &AtlasRenderer::Impl::RenderComplete );
+
+      // Guard to prevent accessing Stage after dali-core destruction
+      if( Stage::IsInstalled() )
+      {
+        Stage::GetCurrent().GetRenderTaskList().RemoveTask( mShadowTask );
+      }
+
+      mShadowTask.Reset();
+    }
+  }
+
   void RenderComplete( RenderTask& renderTask )
   {
-    // Disconnect and remove this single shot render task
-    renderTask.FinishedSignal().Disconnect( this, &AtlasRenderer::Impl::RenderComplete );
-    Stage::GetCurrent().GetRenderTaskList().RemoveTask( renderTask );
-
     // Get the actor used for render to buffer and remove it from the parent
     Actor renderActor = renderTask.GetSourceActor();
     if ( renderActor )
@@ -789,10 +804,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         parent.Remove( renderActor );
       }
     }
+
+    RemoveShadowRenderTask();
   }
 
   Actor mActor;                                       ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
+  RenderTask mShadowTask;                             ///< Used to render shadows
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
   std::vector< uint32_t > mFace;                      ///> Face indices for a quad
@@ -847,6 +865,8 @@ AtlasRenderer::AtlasRenderer()
 
 AtlasRenderer::~AtlasRenderer()
 {
+  mImpl->RemoveShadowRenderTask();
+
   mImpl->RemoveText();
   delete mImpl;
 }

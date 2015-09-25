@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -37,6 +38,73 @@ void utc_dali_toolkit_image_view_cleanup(void)
 namespace
 {
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
+const char* TEST_IMAGE_FILE_NAME2 =  "gallery_image_02.jpg";
+
+void TestImage( ImageView imageView, BufferImage image )
+{
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  Property::Map map;
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  DALI_TEST_CHECK( map.Find( "width" ) );
+  DALI_TEST_CHECK( map.Find( "height" ) );
+  DALI_TEST_CHECK( map.Find( "type" ) );
+
+  int width = 0;
+  DALI_TEST_CHECK( map[ "width" ].Get( width ) );
+  DALI_TEST_EQUALS( width, image.GetWidth(), TEST_LOCATION );
+
+  int height = 0;
+  DALI_TEST_CHECK( map[ "height" ].Get( height ) );
+  DALI_TEST_EQUALS( height, image.GetHeight(), TEST_LOCATION );
+
+  std::string type;
+  DALI_TEST_CHECK( map[ "type" ].Get( type ) );
+  DALI_TEST_EQUALS( type, "BufferImage", TEST_LOCATION );
+}
+
+void TestImage( ImageView imageView, ResourceImage image )
+{
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  Property::Map map;
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  if( map.Find( "width" ) )
+  {
+    int width = 0;
+    DALI_TEST_CHECK( map[ "width" ].Get( width ) );
+    DALI_TEST_EQUALS( width, image.GetWidth(), TEST_LOCATION );
+  }
+
+  if( map.Find( "height" ) )
+  {
+    int height = 0;
+    DALI_TEST_CHECK( map[ "height" ].Get( height ) );
+    DALI_TEST_EQUALS( height, image.GetHeight(), TEST_LOCATION );
+  }
+
+  DALI_TEST_CHECK( map.Find( "type" ) );
+
+  std::string type;
+  DALI_TEST_CHECK( map[ "type" ].Get( type ) );
+  DALI_TEST_EQUALS( type, "ResourceImage", TEST_LOCATION );
+
+  std::string filename;
+  DALI_TEST_CHECK( map[ "filename" ].Get( filename ) );
+  DALI_TEST_EQUALS( filename, image.GetUrl(), TEST_LOCATION );
+}
+
+void TestUrl( ImageView imageView, const std::string url )
+{
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  std::string urlActual;
+  DALI_TEST_CHECK( value.Get( urlActual ) );
+  DALI_TEST_EQUALS( urlActual, url, TEST_LOCATION );
+}
+
 } // namespace
 
 int UtcDaliImageViewNewP(void)
@@ -54,11 +122,11 @@ int UtcDaliImageViewNewImageP(void)
 {
   TestApplication application;
 
-  Image image = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  BufferImage image = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   ImageView imageView = ImageView::New( image );
 
   DALI_TEST_CHECK( imageView );
-  DALI_TEST_EQUALS( image, imageView.GetImage(), TEST_LOCATION );
+  TestImage( imageView, image );
 
   END_TEST;
 }
@@ -69,19 +137,8 @@ int UtcDaliImageViewNewUrlP(void)
 
   ImageView imageView = ImageView::New( TEST_IMAGE_FILE_NAME );
   DALI_TEST_CHECK( imageView );
-  DALI_TEST_CHECK( imageView.GetImage() );
 
-  Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "resource-url" ) );
-  std::string resource_url;
-  DALI_TEST_CHECK( val.Get( resource_url ) );
-  DALI_TEST_EQUALS( resource_url, TEST_IMAGE_FILE_NAME, TEST_LOCATION );
-
-  Image image = imageView.GetImage();
-  DALI_TEST_CHECK( image );
-
-  ResourceImage resourceImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resourceImage );
-  DALI_TEST_EQUALS( resourceImage.GetUrl(), TEST_IMAGE_FILE_NAME, TEST_LOCATION );
+  TestUrl( imageView, TEST_IMAGE_FILE_NAME );
 
   END_TEST;
 }
@@ -174,27 +231,17 @@ int UtcDaliImageViewTypeRegistry(void)
   END_TEST;
 }
 
-int UtcDaliImageViewSetGetProperty(void)
+int UtcDaliImageViewSetGetProperty01(void)
 {
   ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
 
-  Property::Index idx = imageView.GetPropertyIndex( "resource-url" );
-  DALI_TEST_EQUALS( idx, ImageView::Property::RESOURCE_URL, TEST_LOCATION );
+  Property::Index idx = imageView.GetPropertyIndex( "image" );
+  DALI_TEST_EQUALS( idx, ImageView::Property::IMAGE, TEST_LOCATION );
 
   imageView.SetProperty( idx, TEST_IMAGE_FILE_NAME );
-  Property::Value val = imageView.GetProperty( idx );
-  std::string resource_url;
-  DALI_TEST_CHECK( val.Get( resource_url ) );
-  DALI_TEST_EQUALS( resource_url, TEST_IMAGE_FILE_NAME, TEST_LOCATION );
-
-  Image image = imageView.GetImage();
-  DALI_TEST_CHECK( image );
-
-  ResourceImage resourceImage = ResourceImage::DownCast( image );
-  DALI_TEST_CHECK( resourceImage );
-  DALI_TEST_EQUALS( resourceImage.GetUrl(), TEST_IMAGE_FILE_NAME, TEST_LOCATION );
+  TestUrl( imageView, TEST_IMAGE_FILE_NAME );
 
   END_TEST;
 }
@@ -296,32 +343,35 @@ int UtcDaliImageViewSetBufferImage(void)
 {
   ToolkitTestApplication application;
 
-  int width = 300;
-  int height = 400;
-  Image image = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  int width1 = 300;
+  int height1 = 400;
+  BufferImage image1 = CreateBufferImage( width1, height1, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   ImageView imageView = ImageView::New();
-  imageView.SetImage( image );
+  imageView.SetImage( image1 );
 
-  std::string resource_url;
-  Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "resource-url" ) );
-  DALI_TEST_CHECK( val.Get( resource_url ) );
-  DALI_TEST_CHECK( resource_url.empty() );
+  TestImage( imageView, image1 );
+
+  int width2 = 600;
+  int height2 = 500;
+  BufferImage image2 = CreateBufferImage( width2, height2, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  imageView.SetImage( image2 );
+
+  TestImage( imageView, image2 );
 
   END_TEST;
 }
 
-int UtcDaliImageViewSetResourceImage(void)
+int UtcDaliImageViewSetImageUrl(void)
 {
   ToolkitTestApplication application;
 
-  Image image = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   ImageView imageView = ImageView::New();
-  imageView.SetImage( image );
+  imageView.SetImage( TEST_IMAGE_FILE_NAME );
+  TestUrl( imageView, TEST_IMAGE_FILE_NAME );
 
-  std::string resource_url;
-  Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "resource-url" ) );
-  DALI_TEST_CHECK( val.Get( resource_url ) );
-  DALI_TEST_EQUALS( resource_url, TEST_IMAGE_FILE_NAME, TEST_LOCATION );
+
+  imageView.SetImage( TEST_IMAGE_FILE_NAME2 );
+  TestUrl( imageView, TEST_IMAGE_FILE_NAME2 );
 
   END_TEST;
 }
@@ -336,19 +386,15 @@ int UtcDaliImageViewSetImageOnstageP(void)
   application.SendNotification();
   application.Render();
 
-  Image image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
+  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   imageView.SetImage( image1 );
-
-  Image image2 = imageView.GetImage();
-  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  TestImage( imageView, image1 );
 
   int width = 300;
   int height = 400;
-  Image image3 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  imageView.SetImage( image3 );
-
-  Image image4 = imageView.GetImage();
-  DALI_TEST_EQUALS( image3, image4, TEST_LOCATION );
+  BufferImage image2 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  imageView.SetImage( image2 );
+  TestImage( imageView, image2 );
 
   END_TEST;
 }
@@ -363,17 +409,21 @@ int UtcDaliImageViewSetImageOnstageN(void)
   application.SendNotification();
   application.Render();
 
-  Image image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
+  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   imageView.SetImage( image1 );
+  TestImage( imageView, image1 );
 
-  Image image2 = imageView.GetImage();
-  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  Image image2;
+  imageView.SetImage( image2 );
 
-  Image image3;
-  imageView.SetImage( image3 );
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
 
-  Image image4 = imageView.GetImage();
-  DALI_TEST_CHECK( !image4 );
+  //the value should be empty
+  std::string url;
+  DALI_TEST_CHECK( !value.Get( url ) );
+
+  Property::Map map;
+  DALI_TEST_CHECK( !value.Get( map ) );
 
   END_TEST;
 }
@@ -389,19 +439,15 @@ int UtcDaliImageViewSetImageOffstageP(void)
   application.Render();
   Stage::GetCurrent().Remove( imageView );
 
-  Image image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
+  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   imageView.SetImage( image1 );
-
-  Image image2 = imageView.GetImage();
-  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  TestImage( imageView, image1 );
 
   int width = 300;
   int height = 400;
-  Image image3 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  imageView.SetImage( image3 );
-
-  Image image4 = imageView.GetImage();
-  DALI_TEST_EQUALS( image3, image4, TEST_LOCATION );
+  BufferImage image2 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
+  imageView.SetImage( image2 );
+  TestImage( imageView, image2 );
 
   END_TEST;
 }
@@ -417,17 +463,21 @@ int UtcDaliImageViewSetImageOffstageN(void)
   application.Render();
   Stage::GetCurrent().Remove( imageView );
 
-  Image image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
+  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   imageView.SetImage( image1 );
+  TestImage( imageView, image1 );
 
-  Image image2 = imageView.GetImage();
-  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  Image image2;
+  imageView.SetImage( image2 );
 
-  Image image3;
-  imageView.SetImage( image3 );
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
 
-  Image image4 = imageView.GetImage();
-  DALI_TEST_CHECK( !image4 );
+  //the value should be empty
+  std::string url;
+  DALI_TEST_CHECK( !value.Get( url ) );
+
+  Property::Map map;
+  DALI_TEST_CHECK( !value.Get( map ) );
 
   END_TEST;
 }
@@ -440,13 +490,18 @@ int UtcDaliImageViewSetImageN(void)
   ImageView imageView = ImageView::New();
   imageView.SetImage( image1 );
 
-  Image image2 = imageView.GetImage();
-  DALI_TEST_CHECK( !image2 );
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  //the value should be empty
+  std::string url;
+  DALI_TEST_CHECK( !value.Get( url ) );
+
+  Property::Map map;
+  DALI_TEST_CHECK( !value.Get( map ) );
 
   std::string resource_url;
-  Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "resource-url" ) );
-  DALI_TEST_CHECK( val.Get( resource_url ) );
-  DALI_TEST_CHECK( resource_url.empty() );
+  Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  DALI_TEST_CHECK( !val.Get( resource_url ) );
 
   END_TEST;
 }

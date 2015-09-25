@@ -35,7 +35,7 @@ namespace Internal DALI_INTERNAL
 class ItemView;
 }
 /**
- * @addtogroup dali-toolkit-controls-item-view
+ * @addtogroup dali_toolkit_controls_item_view
  * @{
  */
 

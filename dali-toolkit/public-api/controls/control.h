@@ -41,7 +41,7 @@ namespace Internal
 class Control;
 }
 /**
- * @addtogroup dali-toolkit-controls
+ * @addtogroup dali_toolkit_controls
  * @{
  */
 
@@ -89,7 +89,7 @@ public:
     enum
     {
       STYLE_NAME = PROPERTY_START_INDEX,       ///< name "style-name",       @see SetStyleName,       type std::string
-      BACKGROUND,                              ///< name "background",       @see SetBackgroundImage, type Map
+      BACKGROUND,                              ///< name "background",       @see SetBackgroundImage, type Map,         @since DALi 1.1.4
       KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
   };
@@ -278,8 +278,6 @@ public:
 
   /**
    * @brief Sets an image as the background of the control.
-   *
-   * The color of this image is blended with the background color @see SetBackgroundColor
    *
    * @param[in] image The image to set as the background.
    */

@@ -99,34 +99,6 @@ Image NinePatchImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args 
   return NinePatchImage::New( url );
 }
 
-
-/**
- * Get the Stretch Borders
- *
- * @method getStretchBorders
- * @for NinePatchImage
- * @return object containing x,y,w,h properties
- */
-void NinePatchImageApi::GetStretchBorders( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  NinePatchImage image = GetNinePatchImage( isolate, args );
-
-  v8::Local<v8::Object> rectObject = v8::Object::New( isolate );
-
-  Vector4 borders = image.GetStretchBorders();
-  // Set the direction
-
-  rectObject->Set( v8::String::NewFromUtf8( isolate, "x" ), v8::Integer::New( isolate,borders.x ) );
-  rectObject->Set( v8::String::NewFromUtf8( isolate, "y" ), v8::Integer::New( isolate,borders.y ) );
-  rectObject->Set( v8::String::NewFromUtf8( isolate, "w" ), v8::Integer::New( isolate,borders.z ) );
-  rectObject->Set( v8::String::NewFromUtf8( isolate, "h" ), v8::Integer::New( isolate,borders.w ) );
-
-  args.GetReturnValue().Set( rectObject );
-}
-
 /**
  * Get the child rectangle
  * @method getChildRectangle

@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class Button;
 }
 /**
- * @addtogroup dali-toolkit-controls-buttons
+ * @addtogroup dali_toolkit_controls_buttons
  * @{
  */
 
@@ -326,31 +326,46 @@ public:
   // Deprecated API
 
   /**
-   * @deprecated Sets the label with an actor.
+   * @brief Sets the label with an actor.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in]  label The actor to use as a label
    */
   void SetLabel( Actor label );
 
   /**
-   * @deprecated Sets the button image.
+   * @brief Sets the button image.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in]  image The button image.
    */
   void SetButtonImage( Image image );
 
   /**
-   * @deprecated Sets the selected image.
+   * @brief Sets the selected image.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @param[in]  image The selected image.
    */
   void SetSelectedImage( Image image );
 
   /**
-   * @deprecated Gets the button image.
+   * @brief Gets the button image.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @return     An actor with the button image.
    */
   Actor GetButtonImage() const;
 
   /**
-   * @deprecated Gets the selected image.
+   * @brief Gets the selected image.
+   *
+   * @deprecated DALi 1.0.50
+   *
    * @return     An actor with the selected image.
    */
   Actor GetSelectedImage() const;

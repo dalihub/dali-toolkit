@@ -25,17 +25,22 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 
 // Internal HEADER
+#include <dali-toolkit/internal/controls/renderers/border/border-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 
 namespace
 {
 const char * const RENDERER_TYPE_NAME( "renderer-type" );
+
 const char * const COLOR_RENDERER("color-renderer");
+const char * const BORDER_RENDERER("border-renderer");
 const char * const GRADIENT_RENDERER("gradient-renderer");
 const char * const IMAGE_RENDERER("image-renderer");
+const char * const N_PATCH_RENDERER("n-patch-renderer");
 }
 
 namespace Dali
@@ -90,6 +95,14 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     {
       rendererPtr = new ImageRenderer();
     }
+    else if( typeValue ==  N_PATCH_RENDERER )
+    {
+      rendererPtr = new NPatchRenderer();
+    }
+    else if( typeValue == BORDER_RENDERER )
+    {
+      rendererPtr = new BorderRenderer();
+    }
   }
 
   if( rendererPtr )
@@ -105,7 +118,7 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     DALI_LOG_ERROR( "Renderer type unknown" );
   }
 
-  return Toolkit::ControlRenderer(rendererPtr);
+  return Toolkit::ControlRenderer( rendererPtr );
 }
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
@@ -118,50 +131,145 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& col
   }
   rendererPtr->Initialize( *( mFactoryCache.Get() ) );
 
-  rendererPtr->SetColor(color);
+  rendererPtr->SetColor( color );
 
-  return Toolkit::ControlRenderer(rendererPtr);
+  return Toolkit::ControlRenderer( rendererPtr );
 }
 
 bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color )
 {
-  ColorRenderer* rendererPtr = dynamic_cast<ColorRenderer*>(&GetImplementation(renderer));
+  ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
   if( rendererPtr )
   {
-    rendererPtr->SetColor(color);
+    rendererPtr->SetColor( color );
     return false;
   }
   else
   {
-    renderer = GetControlRenderer(color);
+    renderer = GetControlRenderer( color );
     return true;
   }
 }
 
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
 {
-  ImageRenderer* rendererPtr = new ImageRenderer();
+  BorderRenderer* rendererPtr = new BorderRenderer();
+
   if( !mFactoryCache )
   {
     mFactoryCache = new RendererFactoryCache();
   }
   rendererPtr->Initialize( *( mFactoryCache.Get() ) );
-  rendererPtr->SetImage( image );
 
-  return Toolkit::ControlRenderer(rendererPtr);
+  rendererPtr->SetBorderSize( borderSize );
+  rendererPtr->SetBorderColor( borderColor );
+
+  return Toolkit::ControlRenderer( rendererPtr );
+}
+
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
+{
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+
+  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+  if( npatchImage )
+  {
+    NPatchRenderer* rendererPtr = new NPatchRenderer();
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( npatchImage );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
+  else
+  {
+    ImageRenderer* rendererPtr = new ImageRenderer();
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( image );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
 }
 
 bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image )
 {
-  ImageRenderer* rendererPtr = dynamic_cast<ImageRenderer*>(&GetImplementation(renderer));
-  if( rendererPtr )
+  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+  if( npatchImage )
   {
-    rendererPtr->SetImage(image);
-    return false;
+    NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( npatchImage );
+      return false;
+    }
   }
   else
   {
-    renderer = GetControlRenderer(image);
+    ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( image );
+      return false;
+    }
+  }
+
+  renderer = GetControlRenderer( image );
+  return true;
+}
+
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+{
+  if( NinePatchImage::IsNinePatchUrl( url ) )
+  {
+    NPatchRenderer* rendererPtr = new NPatchRenderer();
+    if( !mFactoryCache )
+    {
+      mFactoryCache = new RendererFactoryCache();
+    }
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( url );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
+  else
+  {
+    ImageRenderer* rendererPtr = new ImageRenderer();
+    if( !mFactoryCache )
+    {
+      mFactoryCache = new RendererFactoryCache();
+    }
+    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    rendererPtr->SetImage( url );
+
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
+}
+
+bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& url )
+{
+  if( NinePatchImage::IsNinePatchUrl( url ) )
+  {
+    NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( url );
+      return false;
+    }
+  }
+  else
+  {
+    ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetImage( url );
+      return false;
+    }
+  }
+
+  {
+    renderer = GetControlRenderer( url );
     return true;
   }
 }
