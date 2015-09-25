@@ -166,13 +166,13 @@ private:
    *
    * @param nPatchImage The NinePatchImage to base our cropped images and stretch borders from
    */
-  void InitialiseFromImage( NinePatchImage nPatchImage );
+  void InitializeFromImage( NinePatchImage nPatchImage );
 
   /**
-   * @brief Creates a black Image to indicate that there was an error in either the image url or the parsing of the image
+   * @brief Creates an error Image to indicate that there was an error in either the image url or the parsing of the image
    *
    */
-  void CreateErrorImage();
+  void InitializeFromBrokenImage();
 
   /**
    * @brief Applies this renderer's image to the sampler to the material used for this renderer

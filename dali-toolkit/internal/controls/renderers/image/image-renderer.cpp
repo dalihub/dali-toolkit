@@ -401,7 +401,10 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
 {
   if( !mImageUrl.empty() && !mImage )
   {
-    mImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+    Dali::ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+    resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+
+    mImage = resourceImage;
   }
 
   ApplyImageToSampler();
@@ -529,7 +532,10 @@ void ImageRenderer::SetImage( const std::string& imageUrl, int desiredWidth, int
 
     if( !mImageUrl.empty() && mImpl->mIsOnStage )
     {
-      mImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      Dali::ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+      mImage = resourceImage;
+
       ApplyImageToSampler();
     }
     else
@@ -576,6 +582,18 @@ void ImageRenderer::ApplyImageToSampler()
       }
 
       material.AddTexture( mImage,TEXTURE_UNIFORM_NAME );
+    }
+  }
+}
+
+void ImageRenderer::OnImageLoaded( ResourceImage image )
+{
+  if( image.GetLoadingState() == Dali::ResourceLoadingFailed )
+  {
+    mImage = RendererFactory::GetBrokenRendererImage();
+    if( mImpl->mIsOnStage )
+    {
+      ApplyImageToSampler();
     }
   }
 }
