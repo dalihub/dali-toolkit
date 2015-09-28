@@ -66,9 +66,9 @@ public:
 public:  // from ControlRenderer
 
   /**
-   * @copydoc ControlRenderer::Initialize
+   * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
+  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::GetNaturalSize
@@ -88,7 +88,7 @@ public:  // from ControlRenderer
   /**
    * @copydoc ControlRenderer::CreatePropertyMap
    */
-  virtual void CreatePropertyMap( Property::Map& map ) const;
+  virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
   /**

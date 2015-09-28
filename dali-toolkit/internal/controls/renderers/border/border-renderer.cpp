@@ -88,7 +88,7 @@ BorderRenderer::~BorderRenderer()
 {
 }
 
-void BorderRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void BorderRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   Initialize( factoryCache );
 
@@ -122,7 +122,7 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
   mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_UNIFORM_NAME, mBorderSize );
 }
 
-void BorderRenderer::CreatePropertyMap( Property::Map& map ) const
+void BorderRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );

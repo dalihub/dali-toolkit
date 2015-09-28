@@ -122,6 +122,11 @@ bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const std::strin
   return GetImplementation( *this ).ResetRenderer( renderer, url );
 }
 
+bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Property::Map& propertyMap )
+{
+  return GetImplementation( *this ).ResetRenderer( renderer, propertyMap );
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

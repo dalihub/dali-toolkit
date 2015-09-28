@@ -18,11 +18,15 @@
 // CLASS HEADER
 #include "image-renderer.h"
 
+// EXTERNAL HEADER
+#include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL HEADER
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
-#include <dali/public-api/images/resource-image.h>
 
 namespace Dali
 {
@@ -39,11 +43,11 @@ const char * const RENDERER_TYPE("renderer-type");
 const char * const RENDERER_TYPE_VALUE("image-renderer");
 
 // property names
-const char * const IMAGE_URL_NAME("image-url");
-const char * const IMAGE_FITTING_MODE("image-fitting-mode");
-const char * const IMAGE_SAMPLING_MODE("image-sampling-mode");
-const char * const IMAGE_DESIRED_WIDTH("image-desired-width");
-const char * const IMAGE_DESIRED_HEIGHT("image-desired-height");
+const char * const IMAGE_URL_NAME( "image-url" );
+const char * const IMAGE_FITTING_MODE( "image-fitting-mode" );
+const char * const IMAGE_SAMPLING_MODE( "image-sampling-mode" );
+const char * const IMAGE_DESIRED_WIDTH( "image-desired-width" );
+const char * const IMAGE_DESIRED_HEIGHT( "image-desired-height" );
 
 // fitting modes
 const char * const SHRINK_TO_FIT("shrink-to-fit");
@@ -91,6 +95,93 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
+void AddQuadIndices( Vector< unsigned int >& indices, unsigned int rowIdx, unsigned int nextRowIdx )
+{
+  indices.PushBack( rowIdx );
+  indices.PushBack( nextRowIdx + 1 );
+  indices.PushBack( rowIdx + 1 );
+
+  indices.PushBack( rowIdx );
+  indices.PushBack( nextRowIdx );
+  indices.PushBack( nextRowIdx + 1 );
+}
+
+Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned int >& indices )
+{
+  Property::Map vertexFormat;
+  vertexFormat[ "aPosition" ] = Property::VECTOR2;
+  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat, vertices.Size() );
+  if( vertices.Size() > 0 )
+  {
+    vertexPropertyBuffer.SetData( &vertices[ 0 ] );
+  }
+
+  Property::Map indexFormat;
+  indexFormat[ "indices" ] = Property::INTEGER;
+  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat, indices.Size() );
+  if( indices.Size() > 0 )
+  {
+    indexPropertyBuffer.SetData( &indices[ 0 ] );
+  }
+
+  // Create the geometry object
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexPropertyBuffer );
+  geometry.SetIndexBuffer( indexPropertyBuffer );
+
+  return geometry;
+}
+
+Geometry CreateGeometry( RendererFactoryCache& factoryCache, ImageDimensions gridSize )
+{
+  Geometry geometry;
+
+  if( gridSize == ImageDimensions( 1, 1 ) )
+  {
+    geometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
+    if( !geometry )
+    {
+      geometry =  factoryCache.CreateQuadGeometry();
+      factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
+    }
+  }
+  else
+  {
+    uint16_t gridWidth = gridSize.GetWidth();
+    uint16_t gridHeight = gridSize.GetHeight();
+
+    // Create vertices
+    Vector< Vector2 > vertices;
+    vertices.Reserve( ( gridWidth + 1 ) * ( gridHeight + 1 ) );
+
+    for( int y = 0; y < gridHeight + 1; ++y )
+    {
+      for( int x = 0; x < gridWidth + 1; ++x )
+      {
+        vertices.PushBack( Vector2( (float)x/gridWidth - 0.5f, (float)y/gridHeight  - 0.5f) );
+      }
+    }
+
+    // Create indices
+    Vector< unsigned int > indices;
+    indices.Reserve( gridWidth * gridHeight * 6 );
+
+    unsigned int rowIdx     = 0;
+    unsigned int nextRowIdx = gridWidth + 1;
+    for( int y = 0; y < gridHeight; ++y, ++nextRowIdx, ++rowIdx )
+    {
+      for( int x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx )
+      {
+        AddQuadIndices( indices, rowIdx, nextRowIdx );
+      }
+    }
+
+    return GenerateGeometry( vertices, indices );
+  }
+
+  return geometry;
+}
+
 } //unnamed namespace
 
 ImageRenderer::ImageRenderer()
@@ -105,7 +196,7 @@ ImageRenderer::~ImageRenderer()
 {
 }
 
-void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void ImageRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   Initialize(factoryCache);
 
@@ -113,6 +204,10 @@ void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Proper
   if( imageURLValue )
   {
     imageURLValue->Get( mImageUrl );
+    if( !mImageUrl.empty() )
+    {
+      mImage.Reset();
+    }
 
     Property::Value* fittingValue = propertyMap.Find( IMAGE_FITTING_MODE );
     if( fittingValue )
@@ -208,8 +303,6 @@ void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Proper
 
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
   }
-
-  mImage.Reset();
 }
 
 void ImageRenderer::SetSize( const Vector2& size )
@@ -270,7 +363,7 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   }
 }
 
-void ImageRenderer::CreatePropertyMap( Property::Map& map ) const
+void ImageRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
@@ -368,24 +461,49 @@ void ImageRenderer::CreatePropertyMap( Property::Map& map ) const
 
 void ImageRenderer::Initialize( RendererFactoryCache& factoryCache )
 {
-  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
-  if( !(mImpl->mGeometry) )
+  if( !mImpl->mCustomShader )
   {
-    mImpl->mGeometry =  factoryCache.CreateQuadGeometry();
-    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
+    mImpl->mGeometry = CreateGeometry( factoryCache, ImageDimensions( 1, 1 ) );
+
+    mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
+
+    if( !mImpl->mShader )
+    {
+      mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, mImpl->mShader );
+    }
+  }
+  else
+  {
+    mImpl->mGeometry = CreateGeometry( factoryCache, mImpl->mCustomShader->mGridSize );
+
+    if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
+    {
+      mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
+
+      if( !mImpl->mShader )
+      {
+        mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+        factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, mImpl->mShader );
+      }
+    }
+    else
+    {
+      mImpl->mShader = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
+                                    mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER : mImpl->mCustomShader->mFragmentShader,
+                                    mImpl->mCustomShader->mHints );
+    }
   }
 
-  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
-  if( !mImpl->mShader )
+  if( mImpl->mRenderer )
   {
-    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, mImpl->mShader );
+    mImpl->mRenderer.SetGeometry( mImpl->mGeometry );
+    Material material = mImpl->mRenderer.GetMaterial();
+    if( material )
+    {
+      material.SetShader( mImpl->mShader );
+    }
   }
-
-  mDesiredSize = ImageDimensions();
-  mFittingMode = FittingMode::DEFAULT;
-  mSamplingMode = SamplingMode::DEFAULT;
-  mImageUrl.clear();
 }
 
 void ImageRenderer::SetImage( const std::string& imageUrl )

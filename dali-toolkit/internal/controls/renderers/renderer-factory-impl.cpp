@@ -274,6 +274,48 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const s
   }
 }
 
+bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Property::Map& propertyMap )
+{
+  Property::Value* type = propertyMap.Find( RENDERER_TYPE_NAME );
+  std::string typeValue ;
+  if( type && type->Get( typeValue ))
+  {
+    //If there's been a renderer type change then we have to return a new shader
+    if( typeValue ==  COLOR_RENDERER && typeid( renderer ) != typeid( ColorRenderer ) )
+    {
+      renderer = GetControlRenderer( propertyMap );
+      return true;
+    }
+    else if( typeValue ==  GRADIENT_RENDERER && typeid( renderer ) != typeid( GradientRenderer ) )
+    {
+      renderer = GetControlRenderer( propertyMap );
+      return true;
+    }
+    else if( typeValue ==  IMAGE_RENDERER && typeid( renderer ) != typeid( ImageRenderer ) )
+    {
+      renderer = GetControlRenderer( propertyMap );
+      return true;
+    }
+    else if( typeValue ==  N_PATCH_RENDERER && typeid( renderer ) != typeid( NPatchRenderer ) )
+    {
+      renderer = GetControlRenderer( propertyMap );
+      return true;
+    }
+    else if( typeValue ==  BORDER_RENDERER && typeid( renderer ) != typeid( BorderRenderer ) )
+    {
+      renderer = GetControlRenderer( propertyMap );
+      return true;
+    }
+  }
+
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+  GetImplementation( renderer ).Initialize( *( mFactoryCache.Get() ), propertyMap );
+  return false;
+}
+
 } // namespace Internal
 
 } // namespace Toolkit

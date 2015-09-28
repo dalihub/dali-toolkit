@@ -160,7 +160,7 @@ NPatchRenderer::~NPatchRenderer()
 {
 }
 
-void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void NPatchRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   Initialize(factoryCache);
 
@@ -243,7 +243,7 @@ void NPatchRenderer::DoSetOffStage( Actor& actor )
   mCroppedImage.Reset();
 }
 
-void NPatchRenderer::CreatePropertyMap( Property::Map& map ) const
+void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );

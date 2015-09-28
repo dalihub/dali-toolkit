@@ -123,24 +123,69 @@ int UtcDaliCreateDisplacementEffectFixed(void)
   END_TEST;
 }
 
-int UtcDaliCreateDissolveEffect(void)
+int UtcDaliCreateDissolveEffect( bool highPrecision )
 {
   ToolkitTestApplication application;
 
-  ShaderEffect effect = Toolkit::CreateDissolveEffect();
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateDissolveEffect( highPrecision );
+  DALI_TEST_CHECK( !effect.Empty() );
+
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  DALI_TEST_CHECK( vertexShaderValue );
+
+  std::string vertexShader;
+  DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
+  DALI_TEST_CHECK( !vertexShader.empty() );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  DALI_TEST_CHECK( fragmentShaderValue );
+
+  std::string fragmentShader;
+  DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
+  DALI_TEST_CHECK( !fragmentShader.empty() );
+
+  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  DALI_TEST_CHECK( gridXValue );
+
+  int gridX = 0;
+  DALI_TEST_CHECK( gridXValue->Get( gridX ) );
+  DALI_TEST_CHECK( gridX > 1 );
+
+  Property::Value* gridYValue = customShader.Find( "subdivide-grid-y" );
+  DALI_TEST_CHECK( gridYValue );
+
+  int gridY = 0;
+  DALI_TEST_CHECK( gridYValue->Get( gridY ) );
+  DALI_TEST_CHECK( gridY > 1 );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( hintsValue );
+
+  std::string hints;
+  DALI_TEST_CHECK( hintsValue->Get( hints ) );
+  DALI_TEST_CHECK( hints == "output-is-transparent" );
+
+  Actor actor = Actor::New();
+  Toolkit::DissolveEffectSetCentralLine( actor, Vector2::ONE, Vector2::ONE, 0.0f );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uPercentage" ) != Property::INVALID_INDEX );
 
   END_TEST;
 }
 
+int UtcDaliCreateDissolveEffectHighPrecision(void)
+{
+  return UtcDaliCreateDissolveEffect(true);
+}
+
 int UtcDaliCreateDissolveEffectMediumPrecision(void)
 {
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateDissolveEffect(false);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
+  return UtcDaliCreateDissolveEffect(false);
 }
 
 int UtcDaliCreateDissolveLocalEffect(void)

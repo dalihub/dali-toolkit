@@ -19,7 +19,40 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <string.h>
+#include <dali/devel-api/rendering/shader.h>
+
+namespace
+{
+  template < typename T>
+  void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value )
+  {
+    Dali::Property::Index index = actor.GetPropertyIndex( name );
+    if ( Dali::Property::INVALID_INDEX == index )
+    {
+      index = actor.RegisterProperty( name, value );
+    }
+    else
+    {
+      actor.SetProperty( index, value );
+    }
+  }
+
+  template < typename T>
+  void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value, Dali::Property::AccessMode accessMode )
+  {
+    Dali::Property::Index index = actor.GetPropertyIndex( name );
+    if ( Dali::Property::INVALID_INDEX == index )
+    {
+      index = actor.RegisterProperty( name, value, accessMode );
+    }
+    else
+    {
+      actor.SetProperty( index, value );
+    }
+  }
+
+};
 
 namespace Dali
 {
@@ -34,11 +67,11 @@ namespace Toolkit
  * As we use the texture coordinate as pixel position to calculate random offset,
  * the line should passing through rectangle {(0,0),(0,1),(1,0),(1,1)},
  * so make the position parameter with two component values between 0.0 to 1.0
- * @param[in] dissolveEffect The shader effect
  * @param[in] position The point ( locates within rectangle {(0,0),(0,1),(1,0),(1,1)} ) passed through by the central line
  * @param[in] displacement The direction of the central line
+ * @param[in] initialProgress, the normalised initial progress of the shader
  */
-inline void DissolveEffectSetCentralLine( ShaderEffect& dissolveEffect, const Vector2& position, const Vector2& displacement )
+inline void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress )
 {
   // the line passes through 'position' and has the direction of 'displacement'
     float coefA, coefB, coefC; //line equation: Ax+By+C=0;
@@ -102,10 +135,11 @@ inline void DissolveEffectSetCentralLine( ShaderEffect& dissolveEffect, const Ve
     rotation = Vector2(-displacement.x, displacement.y);
     rotation.Normalize();
 
-    dissolveEffect.SetUniform( "uSaddleParam", saddleParam );
-    dissolveEffect.SetUniform( "uTranslation", translation );
-    dissolveEffect.SetUniform( "uRotation", rotation );
-    dissolveEffect.SetUniform( "uToNext", toNext );
+    SafeSetCustomProperty( actor, "uSaddleParam", saddleParam );
+    SafeSetCustomProperty( actor, "uTranslation", translation );
+    SafeSetCustomProperty( actor, "uRotation", rotation );
+    SafeSetCustomProperty( actor, "uToNext", toNext );
+    SafeSetCustomProperty( actor, "uPercentage", initialProgress, Dali::Property::ANIMATABLE );
 }
 /**
  * @brief Create a new Dissolve effect
@@ -119,69 +153,108 @@ inline void DissolveEffectSetCentralLine( ShaderEffect& dissolveEffect, const Ve
  *  @return A handle to a newly allocated ShaderEffect
  */
 
-inline ShaderEffect CreateDissolveEffect(bool useHighPrecision = true)
+inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
 {
-  std::string prefixHighPrecision( "precision highp float;\n");
-    std::string prefixMediumPrecision( "precision mediump float;\n" );
-    std::string vertexShader(
-      "uniform float uPercentage;\n"
-      "uniform vec3 uSaddleParam;\n"
-      "uniform vec2 uTranslation;\n"
-      "uniform vec2 uRotation; \n"
-      "uniform float uToNext;\n"
-      "varying float vPercentage;\n"
-      "void main()\n"
-      "{\n"
-        "gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-        "vTexCoord = aTexCoord;\n"
-        //Calculate the distortion value given the dissolve central line
-        "vec2 texCoor = vec2( (aTexCoord.s - sTextureRect.s ) / (sTextureRect.p - sTextureRect.s), (aTexCoord.t- sTextureRect.t)/(sTextureRect.q - sTextureRect.t) ); \n"
-        "vec2 value = texCoor + uTranslation; \n"
-        "mat2 rotateMatrix = mat2( uRotation.s, uRotation.t, -uRotation.t, uRotation.s ); \n"
-        "value = rotateMatrix * value; \n"
-        "if(uToNext == 1.0)  \n"
-        "  value.s = uSaddleParam[2] + value.s; \n"
-        "float delay = value.t*value.t / uSaddleParam[0] - value.s*value.s/uSaddleParam[1];\n"
-        "vPercentage = clamp( uPercentage*2.0 - 0.5*sin(delay*1.571) - 0.5, 0.0, 1.0 ); \n"
-      "}\n");
-    std::string fragmentShader(
-      "varying float vPercentage;\n"
-      "float rand(vec2 co) \n"
-      "{\n"
-      "  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); \n"
-      "}\n"
-      "void main()\n"
-      "{\n"
-        //Calculate the randomness
-        "float offsetS = rand( vTexCoord * vPercentage ) * (sTextureRect.p - sTextureRect.s) - vTexCoord.s  + sTextureRect.s; \n"
-        "float offsetT = rand( vec2(vTexCoord.t*vPercentage, vTexCoord.s * vPercentage) ) * (sTextureRect.q - sTextureRect.t) - vTexCoord.t + sTextureRect.t; \n"
-        "vec2 lookupCoord = vTexCoord + vec2(offsetS, offsetT) * vPercentage; \n"
-        "gl_FragColor = texture2D( sTexture, lookupCoord ) * uColor; \n"
-        "gl_FragColor.a *= 1.0 - vPercentage; \n"
-      "}" );
+  const char* prefixHighPrecision( "precision highp float;\n");
+  const char* prefixMediumPrecision( "precision mediump float;\n" );
 
-    // Create the implementation, temporarily owned on stack,
-    Dali::ShaderEffect shaderEffect;
-    if( useHighPrecision )
-    {
-      shaderEffect =  Dali::ShaderEffect::New(
-          prefixHighPrecision+vertexShader, prefixHighPrecision + fragmentShader,
-          ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
-    }
-    else
-    {
-      shaderEffect =  Dali::ShaderEffect::New(
-          prefixMediumPrecision+vertexShader, prefixMediumPrecision + fragmentShader,
-          ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
-    }
+  const char* vertexShader( DALI_COMPOSE_SHADER(
+    attribute mediump vec2 aPosition;\n
+    \n
+    uniform mediump mat4 uMvpMatrix;\n
+    uniform vec3 uSize;\n
+    uniform vec4 uTextureRect;
+    \n
+    uniform float uPercentage;\n
+    uniform vec3 uSaddleParam;\n
+    uniform vec2 uTranslation;\n
+    uniform vec2 uRotation; \n
+    uniform float uToNext;\n
+    \n
+    varying float vPercentage;\n
+    varying vec2 vTexCoord;\n
 
-    shaderEffect.SetUniform( "uPercentage", 0.0f );
-    shaderEffect.SetProperty( ShaderEffect::Property::GRID_DENSITY, Dali::Property::Value(50.0f) );
+    void main()\n
+    {\n
+      mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+      vertexPosition.xyz *= uSize;\n
+      vertexPosition = uMvpMatrix * vertexPosition;\n
+      gl_Position = vertexPosition;\n
 
-    DissolveEffectSetCentralLine( shaderEffect, Vector2(1.0f,0.5f), Vector2(-1.0f, 0.0f) );
+      vec2 texCoord = aPosition + vec2(0.5);
+      vTexCoord = texCoord;\n
+      //Calculate the distortion value given the dissolve central line
+      vec2 value = texCoord + uTranslation; \n
+      mat2 rotateMatrix = mat2( uRotation.s, uRotation.t, -uRotation.t, uRotation.s ); \n
+      value = rotateMatrix * value; \n
+      if(uToNext == 1.0)  \n
+        value.s = uSaddleParam[2] + value.s; \n
+      float delay = value.t*value.t / uSaddleParam[0] - value.s*value.s/uSaddleParam[1];\n
+      vPercentage = clamp( uPercentage*2.0 - 0.5*sin(delay*1.571) - 0.5, 0.0, 1.0 ); \n
+    })
+  );
 
-    return shaderEffect;
+  const char* fragmentShader( DALI_COMPOSE_SHADER(
+    varying float vPercentage;\n
+    varying mediump vec2 vTexCoord;\n
+    \n
+    uniform sampler2D sTexture;\n
+    uniform lowp vec4 uColor;\n
+    uniform vec4 uTextureRect;
+    \n
+    float rand(vec2 co) \n
+    {\n
+      return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); \n
+    }\n
+    \n
+    void main()\n
+    {\n
 
+      //Calculate the randomness
+      float offsetS = rand( vTexCoord * vPercentage ) - vTexCoord.s; \n
+      float offsetT = rand( vec2(vTexCoord.t*vPercentage, vTexCoord.s * vPercentage) ) - vTexCoord.t; \n
+      vec2 lookupCoord = vTexCoord + vec2(offsetS, offsetT) * vPercentage; \n
+      gl_FragColor = texture2D( sTexture, lookupCoord ) * uColor; \n
+      gl_FragColor.a *= 1.0 - vPercentage; \n
+    } )
+  );
+
+  Property::Map map;
+
+  Property::Map customShader;
+
+  std::string vertexShaderString;
+  std::string fragmentShaderString;
+  if( useHighPrecision )
+  {
+    vertexShaderString.reserve(strlen( prefixHighPrecision ) + strlen( vertexShader ));
+    vertexShaderString.append( prefixHighPrecision );
+
+    fragmentShaderString.reserve(strlen( prefixHighPrecision ) + strlen( fragmentShader ));
+    fragmentShaderString.append( prefixHighPrecision );
+  }
+  else
+  {
+    vertexShaderString.reserve(strlen( prefixMediumPrecision ) + strlen( vertexShader ));
+    vertexShaderString.append( prefixMediumPrecision );
+
+    fragmentShaderString.reserve(strlen( prefixMediumPrecision ) + strlen( fragmentShader ));
+    fragmentShaderString.append( prefixMediumPrecision );
+  }
+
+  vertexShaderString.append( vertexShader );
+  fragmentShaderString.append( fragmentShader );
+
+  customShader[ "vertex-shader" ] = vertexShaderString;
+  customShader[ "fragment-shader" ] = fragmentShaderString;
+
+  customShader[ "subdivide-grid-x" ] = 20;
+  customShader[ "subdivide-grid-y" ] = 20;
+
+  customShader[ "hints" ] = "output-is-transparent";
+
+  map[ "shader" ] = customShader;
+  return map;
 }
 
 } // namespace Toolkit

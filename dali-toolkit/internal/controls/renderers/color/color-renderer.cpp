@@ -77,7 +77,7 @@ ColorRenderer::~ColorRenderer()
 {
 }
 
-void ColorRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void ColorRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   Initialize( factoryCache );
 
@@ -107,7 +107,7 @@ void ColorRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
-void ColorRenderer::CreatePropertyMap( Property::Map& map ) const
+void ColorRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
