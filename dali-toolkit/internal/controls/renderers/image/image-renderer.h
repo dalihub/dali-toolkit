@@ -95,6 +95,11 @@ public:  // from ControlRenderer
   virtual void SetSize( const Vector2& size );
 
   /**
+   * @copydoc ControlRenderer::GetNaturalSize
+   */
+  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+
+  /**
    * @copydoc ControlRenderer::SetClipRect
    */
   virtual void SetClipRect( const Rect<int>& clipRect );

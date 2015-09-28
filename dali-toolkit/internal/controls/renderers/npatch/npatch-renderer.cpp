@@ -187,6 +187,25 @@ void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache, const Prope
   }
 }
 
+void NPatchRenderer::GetNaturalSize( Vector2& naturalSize ) const
+{
+  if( mImage )
+  {
+    naturalSize.x = mImage.GetWidth();
+    naturalSize.y = mImage.GetHeight();
+    return;
+  }
+  else if( !mImageUrl.empty() )
+  {
+    ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
+    naturalSize.x = dimentions.GetWidth();
+    naturalSize.y = dimentions.GetHeight();
+    return;
+  }
+
+  naturalSize = Vector2::ZERO;
+}
+
 void NPatchRenderer::SetClipRect( const Rect<int>& clipRect )
 {
   ControlRenderer::SetClipRect( clipRect );

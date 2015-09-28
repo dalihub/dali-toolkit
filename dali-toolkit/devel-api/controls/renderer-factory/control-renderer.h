@@ -78,6 +78,22 @@ public:
   void SetSize( const Vector2& size );
 
   /**
+   * @brief Get the size of the painting area.
+   *
+   * @return The size of the renderer's painting area.
+   */
+  const Vector2& GetSize() const;
+
+  /**
+   * @brief Return the natural size of the renderer.
+   *
+   * Deriving classes stipulate the natural size and by default a renderer has a ZERO natural size.
+   *
+   * @param[out] naturalSize The renderer's natural size
+   */
+  void GetNaturalSize( Vector2& naturalSize ) const;
+
+  /**
    * @brief Set the depth index of this renderer.
    *
    * Depth-index controls draw-order for overlapping renderers.
@@ -86,6 +102,13 @@ public:
    * @param[in] depthIndex The depth index of this renderer.
    */
   void SetDepthIndex( float index );
+
+  /**
+   * @brief Get the depth index of this renderer
+   *
+   * @return The depth index of this renderer.
+   */
+  float GetDepthIndex() const;
 
   /**
    * @brief Renderer only exists when control is on stage.
@@ -104,6 +127,15 @@ public:
    * @param[in] actor The actor applying this renderer.
    */
   void SetOffStage( Actor& actor );
+
+  /**
+   * @brief Remove the renderer from actor and reset the control renderer self.
+   *
+   * This function can be called with an empty handle. If the control renderer is empty, do nothing.
+   *
+   * @param[in] actor The actor to be set off stage.
+   */
+  void RemoveAndReset( Actor& actor );
 
   /**
    * @brief Create the property map representing this renderer.
