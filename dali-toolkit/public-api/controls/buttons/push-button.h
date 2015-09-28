@@ -126,9 +126,9 @@ public:
   using Button::SetButtonImage;
 
   /**
-   * @brief Sets the unselected image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the unselected image with an Actor.
    *
    * @param[in] image The Actor to use.
    */
@@ -137,9 +137,9 @@ public:
   using Button::SetBackgroundImage;
 
   /**
-   * @brief Sets the background image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the background image with an Actor.
    *
    * @param[in] image The Actor to use.
    */
@@ -148,9 +148,9 @@ public:
   using Button::SetSelectedImage;
 
   /**
-   * @brief Sets the selected image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the selected image with an Actor.
    *
    * @param[in] image The Actor to use.
    */
@@ -159,9 +159,9 @@ public:
   using Button::SetSelectedBackgroundImage;
 
   /**
-   * @brief Sets the selected background image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the selected background image with an Actor.
    *
    * @param[in] image The Actor to use.
    */
@@ -170,9 +170,9 @@ public:
   using Button::SetDisabledBackgroundImage;
 
   /**
-   * @brief Sets the disabled background image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the disabled background image with an Actor.
    *
    * @param[in] image The Actor to use.
    */
@@ -181,9 +181,9 @@ public:
   using Button::SetDisabledImage;
 
   /**
-   * @brief Sets the disabled image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the disabled image with an Actor.
    *
    * @param[in] image The Actor to use.
    */
@@ -192,9 +192,9 @@ public:
   using Button::SetDisabledSelectedImage;
 
   /**
-   * @brief Sets the disabled selected image with an Actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the disabled selected image with an Actor.
    *
    * @param[in] image The Actor to use.
    */

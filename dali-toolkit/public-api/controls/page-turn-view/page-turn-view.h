@@ -36,7 +36,8 @@ class PageTurnView;
 }
 
 /**
- * PageTurnView is a base class of different mode of pageTurnViews ( portrait or landscape )
+ * @brief PageTurnView is a base class of different mode of pageTurnViews ( portrait or landscape )
+ *
  * Page actors are provided from an external PageFactory
  * PanGesture is used to activate the page bending, streching and tuning forward/backward
  *

@@ -141,9 +141,9 @@ public:
    *
    * If the handle is empty, ImageView will display nothing
    *
-   * @param[in] url The Image resource to display.
-   *
    * @since DALi 1.1.4
+   *
+   * @param[in] url The Image resource to display.
    */
   void SetImage( const std::string& url );
 
