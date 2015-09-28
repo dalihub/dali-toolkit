@@ -150,14 +150,6 @@ bool TestPlatformAbstraction::IsLoading()
 }
 
 /**
- * @copydoc PlatformAbstraction::GetDefaultFontDescription()
- */
-void TestPlatformAbstraction::GetDefaultFontDescription( std::string& family, std::string& style ) const
-{
-  // TODO
-}
-
-/**
  * @copydoc PlatformAbstraction::GetDefaultFontSize()
  */
 int TestPlatformAbstraction::GetDefaultFontSize() const
