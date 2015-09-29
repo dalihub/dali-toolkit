@@ -41,6 +41,8 @@ namespace Internal
 
 namespace
 {
+const char * const RENDERER_TYPE("renderer-type");
+const char * const RENDERER_TYPE_VALUE("n-patch-renderer");
 
 const char * const IMAGE_URL_NAME("image-url");
 const char * const BORDER_ONLY("border-only");
@@ -220,6 +222,21 @@ void NPatchRenderer::DoSetOnStage( Actor& actor )
 void NPatchRenderer::DoSetOffStage( Actor& actor )
 {
   mCroppedImage.Reset();
+}
+
+void NPatchRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  if( !mImageUrl.empty() )
+  {
+    map.Insert( IMAGE_URL_NAME, mImageUrl );
+  }
+  else if( mImage )
+  {
+    map.Insert( IMAGE_URL_NAME, mImage.GetUrl() );
+  }
+  map.Insert( BORDER_ONLY, mBorderOnly );
 }
 
 void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache )

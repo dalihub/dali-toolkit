@@ -37,7 +37,7 @@ class RendererFactory;
 }
 
 /**
- * RendererFactory is a singleton object that provides and shares renderers for controls
+ * @brief RendererFactory is a singleton object that provides and shares renderers for controls
  *
  * The renderer type is required in the property map for requesting a control renderer.
  *

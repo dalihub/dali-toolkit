@@ -75,6 +75,11 @@ public:  // from ControlRenderer
    */
   virtual void SetOffset( const Vector2& offset );
 
+  /**
+   * @copydoc ControlRenderer::CreatePropertyMap
+   */
+  virtual void CreatePropertyMap( Property::Map& map ) const;
+
 protected:
   /**
    * @copydoc ControlRenderer::DoSetOnStage

@@ -46,6 +46,7 @@ namespace Internal
  * | %Property Name            | Type             |
  * |---------------------------|------------------|
  * | image-url                 | STRING           |
+ * | border-only               | BOOLEAN
  *
  */
 class NPatchRenderer: public ControlRenderer
@@ -78,6 +79,11 @@ public:  // from ControlRenderer
    * @copydoc ControlRenderer::SetOffset
    */
   virtual void SetOffset( const Vector2& offset );
+
+  /**
+   * @copydoc ControlRenderer::CreatePropertyMap
+   */
+  virtual void CreatePropertyMap( Property::Map& map ) const;
 
 protected:
   /**

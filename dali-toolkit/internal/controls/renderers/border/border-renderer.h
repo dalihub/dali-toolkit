@@ -75,6 +75,11 @@ protected:
    */
   virtual void DoSetOnStage( Actor& actor );
 
+  /**
+   * @copydoc ControlRenderer::CreatePropertyMap
+   */
+  virtual void CreatePropertyMap( Property::Map& map ) const;
+
 public:
 
   /**

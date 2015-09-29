@@ -35,12 +35,31 @@ namespace Internal
 
 namespace
 {
+const char * const RENDERER_TYPE("renderer-type");
+const char * const RENDERER_TYPE_VALUE("image-renderer");
 
+// property names
 const char * const IMAGE_URL_NAME("image-url");
 const char * const IMAGE_FITTING_MODE("image-fitting-mode");
 const char * const IMAGE_SAMPLING_MODE("image-sampling-mode");
 const char * const IMAGE_DESIRED_WIDTH("image-desired-width");
 const char * const IMAGE_DESIRED_HEIGHT("image-desired-height");
+
+// fitting modes
+const char * const SHRINK_TO_FIT("shrink-to-fit");
+const char * const SCALE_TO_FILL("scale-to-fill");
+const char * const FIT_WIDTH("fit-width");
+const char * const FIT_HEIGHT("fit-height");
+const char * const DEFAULT("default");
+
+// sampling modes
+const char * const BOX("box");
+const char * const NEAREST("nearest");
+const char * const LINEAR("linear");
+const char * const BOX_THEN_NEAREST("box-then-nearest");
+const char * const BOX_THEN_LINEAR("box-then-linear");
+const char * const NO_FILTER("no-filter");
+const char * const DONT_CARE("dont-care");
 
 std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
@@ -102,23 +121,23 @@ void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Proper
       fittingValue->Get( fitting );
 
       mFittingMode = FittingMode::DEFAULT;
-      if( fitting == "shrink-to-fit" )
+      if( fitting == SHRINK_TO_FIT )
       {
         mFittingMode = FittingMode::SHRINK_TO_FIT;
       }
-      else if( fitting == "scale-to-fill" )
+      else if( fitting == SCALE_TO_FILL )
       {
         mFittingMode = FittingMode::SCALE_TO_FILL;
       }
-      else if( fitting == "fit-width" )
+      else if( fitting == FIT_WIDTH )
       {
         mFittingMode = FittingMode::FIT_WIDTH;
       }
-      else if( fitting == "fit-height" )
+      else if( fitting == FIT_HEIGHT )
       {
         mFittingMode = FittingMode::FIT_HEIGHT;
       }
-      else if( fitting == "default" )
+      else if( fitting == DEFAULT )
       {
         mFittingMode = FittingMode::DEFAULT;
       }
@@ -135,35 +154,35 @@ void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Proper
       samplingValue->Get( sampling );
 
       mSamplingMode = SamplingMode::DEFAULT;
-      if( sampling == "box" )
+      if( sampling == BOX )
       {
         mSamplingMode = SamplingMode::BOX;
       }
-      else if( sampling == "nearest" )
+      else if( sampling == NEAREST )
       {
         mSamplingMode = SamplingMode::NEAREST;
       }
-      else if( sampling == "linear" )
+      else if( sampling == LINEAR )
       {
         mSamplingMode = SamplingMode::LINEAR;
       }
-      else if( sampling == "box-then-nearest" )
+      else if( sampling == BOX_THEN_NEAREST )
       {
         mSamplingMode = SamplingMode::BOX_THEN_NEAREST;
       }
-      else if( sampling == "box-then-linear" )
+      else if( sampling == BOX_THEN_LINEAR )
       {
         mSamplingMode = SamplingMode::BOX_THEN_LINEAR;
       }
-      else if( sampling == "no-filter" )
+      else if( sampling == NO_FILTER )
       {
         mSamplingMode = SamplingMode::NO_FILTER;
       }
-      else if( sampling == "dont-care" )
+      else if( sampling == DONT_CARE )
       {
         mSamplingMode = SamplingMode::DONT_CARE;
       }
-      else if( sampling == "default" )
+      else if( sampling == DEFAULT )
       {
         mSamplingMode = SamplingMode::DEFAULT;
       }
@@ -226,6 +245,102 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   if( !mImageUrl.empty() )
   {
     mImage.Reset();
+  }
+}
+
+void ImageRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  if( !mImageUrl.empty() )
+  {
+    map.Insert( IMAGE_URL_NAME, mImageUrl );
+    map.Insert( IMAGE_DESIRED_WIDTH, mDesiredSize.GetWidth() );
+    map.Insert( IMAGE_DESIRED_HEIGHT, mDesiredSize.GetHeight() );
+  }
+  else if( mImage )
+  {
+    map.Insert( IMAGE_DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
+    map.Insert( IMAGE_DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
+
+    ResourceImage resourceImage = ResourceImage::DownCast(mImage);
+    if( resourceImage )
+    {
+      map.Insert( IMAGE_URL_NAME, resourceImage.GetUrl() );
+    }
+  }
+
+  switch( mFittingMode )
+  {
+    case Dali::FittingMode::FIT_HEIGHT:
+    {
+      map.Insert( IMAGE_FITTING_MODE, FIT_HEIGHT );
+      break;
+    }
+    case Dali::FittingMode::FIT_WIDTH:
+    {
+      map.Insert( IMAGE_FITTING_MODE, FIT_WIDTH );
+      break;
+    }
+    case Dali::FittingMode::SCALE_TO_FILL:
+    {
+      map.Insert( IMAGE_FITTING_MODE, SCALE_TO_FILL );
+      break;
+    }
+    case Dali::FittingMode::SHRINK_TO_FIT:
+    {
+      map.Insert( IMAGE_FITTING_MODE, SHRINK_TO_FIT );
+      break;
+    }
+    default:
+    {
+      map.Insert( IMAGE_FITTING_MODE, DEFAULT );
+      break;
+    }
+  }
+
+  switch( mSamplingMode )
+  {
+    case Dali::SamplingMode::BOX:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, BOX );
+      break;
+    }
+    case Dali::SamplingMode::NEAREST:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, NEAREST );
+      break;
+    }
+    case Dali::SamplingMode::LINEAR:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, LINEAR );
+      break;
+    }
+    case Dali::SamplingMode::BOX_THEN_LINEAR:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, BOX_THEN_LINEAR );
+      break;
+    }
+    case Dali::SamplingMode::BOX_THEN_NEAREST:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, BOX_THEN_NEAREST );
+      break;
+    }
+    case Dali::SamplingMode::NO_FILTER:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, NO_FILTER );
+      break;
+    }
+    case Dali::SamplingMode::DONT_CARE:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, DONT_CARE );
+      break;
+    }
+    default:
+    {
+      map.Insert( IMAGE_SAMPLING_MODE, DEFAULT );
+      break;
+    }
   }
 }
 
