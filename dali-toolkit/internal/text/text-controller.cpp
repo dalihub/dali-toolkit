@@ -229,7 +229,7 @@ int Controller::GetMaximumNumberOfCharacters()
   return mImpl->mMaximumNumberOfCharacters;
 }
 
-void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily, bool userDefined )
+void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 {
   if( !mImpl->mFontDefaults )
   {
@@ -237,8 +237,8 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily, boo
   }
 
   mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s userDefined: %s\n", defaultFontFamily.c_str(), userDefined ? "true":"false" );
-  mImpl->mUserDefinedFontFamily = userDefined;
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
+  mImpl->mUserDefinedFontFamily = true;
 
   // Clear the font-specific data
   ClearFontData();
