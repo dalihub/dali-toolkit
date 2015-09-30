@@ -358,6 +358,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     // Now remove references for the old text
     RemoveText();
     mTextCache.Swap( newTextCache );
+    RemoveAllShadowRenderTasks();
 
     if( thereAreUnderlinedGlyphs )
     {
@@ -759,36 +760,33 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     subActor.SetSize( actorSize );
     subActor.SetColor( shadowColor );
 
-    // Discard redundant render-tasks
-    RemoveShadowRenderTask();
-
     // Create a render task to render the effect
-    mShadowTask = Stage::GetCurrent().GetRenderTaskList().CreateTask();
-    mShadowTask.SetTargetFrameBuffer( meshRecord.mBuffer );
-    mShadowTask.SetSourceActor( subActor );
-    mShadowTask.SetClearEnabled( true );
-    mShadowTask.SetClearColor( Vector4::ZERO );
-    mShadowTask.SetExclusive( true );
-    mShadowTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
-    mShadowTask.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
+    RenderTask shadowTask = Stage::GetCurrent().GetRenderTaskList().CreateTask();
+    shadowTask.SetTargetFrameBuffer( meshRecord.mBuffer );
+    shadowTask.SetSourceActor( subActor );
+    shadowTask.SetClearEnabled( true );
+    shadowTask.SetClearColor( Vector4::ZERO );
+    shadowTask.SetExclusive( true );
+    shadowTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
+    shadowTask.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
+    mShadowTasks.push_back( shadowTask );
     actor.Add( subActor );
 
     return actor;
   }
 
-  void RemoveShadowRenderTask()
+  void RemoveShadowRenderTask( RenderTask renderTask )
   {
-    if( mShadowTask )
+    if( renderTask )
     {
-      mShadowTask.FinishedSignal().Disconnect( this, &AtlasRenderer::Impl::RenderComplete );
+      renderTask.FinishedSignal().Disconnect( this, &AtlasRenderer::Impl::RenderComplete );
 
       // Guard to prevent accessing Stage after dali-core destruction
       if( Stage::IsInstalled() )
       {
-        Stage::GetCurrent().GetRenderTaskList().RemoveTask( mShadowTask );
+        Stage::GetCurrent().GetRenderTaskList().RemoveTask( renderTask );
       }
-
-      mShadowTask.Reset();
+      renderTask.Reset();
     }
   }
 
@@ -805,12 +803,21 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       }
     }
 
-    RemoveShadowRenderTask();
+    RemoveShadowRenderTask( renderTask );
+  }
+
+  void RemoveAllShadowRenderTasks()
+  {
+    for ( std::vector< RenderTask >::iterator shadowIterator = mShadowTasks.begin();
+          shadowIterator != mShadowTasks.end(); ++shadowIterator )
+    {
+      RemoveShadowRenderTask( *shadowIterator );
+    }
   }
 
   Actor mActor;                                       ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
-  RenderTask mShadowTask;                             ///< Used to render shadows
+  std::vector< RenderTask > mShadowTasks;             ///< Used to render shadows
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
   std::vector< uint32_t > mFace;                      ///> Face indices for a quad
@@ -865,7 +872,7 @@ AtlasRenderer::AtlasRenderer()
 
 AtlasRenderer::~AtlasRenderer()
 {
-  mImpl->RemoveShadowRenderTask();
+  mImpl->RemoveAllShadowRenderTasks();
 
   mImpl->RemoveText();
   delete mImpl;
