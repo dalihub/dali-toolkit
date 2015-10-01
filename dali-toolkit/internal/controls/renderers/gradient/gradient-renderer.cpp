@@ -143,7 +143,7 @@ GradientRenderer::~GradientRenderer()
 {
 }
 
-void GradientRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void GradientRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !(mImpl->mGeometry) )
@@ -214,7 +214,7 @@ void GradientRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
-void GradientRenderer::CreatePropertyMap( Property::Map& map ) const
+void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );

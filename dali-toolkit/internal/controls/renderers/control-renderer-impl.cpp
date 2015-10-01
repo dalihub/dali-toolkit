@@ -20,9 +20,21 @@
 
 // EXTERNAL HEADER
 #include <dali/public-api/common/dali-common.h>
+#include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
+
+namespace
+{
+//custom shader
+const char * const CUSTOM_SHADER( "shader" );
+const char * const CUSTOM_VERTEX_SHADER( "vertex-shader" );
+const char * const CUSTOM_FRAGMENT_SHADER( "fragment-shader" );
+const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivide-grid-x" );
+const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivide-grid-y" );
+const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hints
+}
 
 namespace Dali
 {
@@ -36,12 +48,32 @@ namespace Internal
 ControlRenderer::ControlRenderer()
 : mImpl( new Impl() )
 {
-  mImpl->mIsOnStage = false;
 }
 
 ControlRenderer::~ControlRenderer()
 {
   delete mImpl;
+}
+
+void ControlRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+{
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->SetPropertyMap( propertyMap );
+  }
+  else
+  {
+    Property::Value* customShaderValue = propertyMap.Find( CUSTOM_SHADER );
+    if( customShaderValue )
+    {
+      Property::Map customShader;
+      if( customShaderValue->Get( customShader ) )
+      {
+        mImpl->mCustomShader = new Impl::CustomShader( propertyMap );
+      }
+    }
+  }
+  DoInitialize( factoryCache, propertyMap );
 }
 
 void ControlRenderer::SetSize( const Vector2& size )
@@ -113,6 +145,15 @@ void ControlRenderer::DoSetOnStage( Actor& actor )
 
 void ControlRenderer::DoSetOffStage( Actor& actor )
 {
+}
+
+void ControlRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->CreatePropertyMap( map );
+  }
+  DoCreatePropertyMap( map );
 }
 
 } // namespace Internal

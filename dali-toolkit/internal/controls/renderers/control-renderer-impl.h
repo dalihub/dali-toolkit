@@ -21,7 +21,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/rendering/shader.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
 
@@ -40,6 +43,21 @@ class RendererFactoryCache;
  * Base class for all Control rendering logic. A control may have multiple control renderers.
  *
  * Note: The control renderer responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
+ *
+ * The following properties are optional
+ *
+ * | %Property Name            | Type             |
+ * |---------------------------|------------------|
+ * | custom-shader             | MAP              |
+ *
+ * where custom-shader is a map with the following properties:
+ * | %Property Name            | Type             |
+ * |---------------------------|------------------|
+ * | vertex-shader             | STRING           |
+ * | fragment-shader           | STRING           |
+ * | subdivide-grid-x          | INT              |
+ * | subdivide-grid-y          | INT              |
+ * | shader-hints              | INT              |
  */
 class ControlRenderer : public BaseObject
 {
@@ -53,7 +71,7 @@ public:
    * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  virtual void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap ) = 0;
+  void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::ControlRenderer::SetSize
@@ -113,7 +131,7 @@ public:
   /**
    * @copydoc Toolkit::ControlRenderer::CreatePropertyMap
    */
-  virtual void CreatePropertyMap( Property::Map& map ) const = 0;
+  void CreatePropertyMap( Property::Map& map ) const;
 
 protected:
 
@@ -128,16 +146,32 @@ protected:
   virtual ~ControlRenderer();
 
 protected:
+  /**
+   * @brief Called by CreatePropertyMap() allowing sub classes to respond to the CreatePropertyMap event
+   *
+   * @param[out] map The renderer property map.
+   */
+  virtual void DoCreatePropertyMap( Property::Map& map ) const = 0;
 
   /**
-   * Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
+   * @brief Called by Initialize() allowing sub classes to respond to the Initialize event
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   * @param[in] propertyMap The properties for the requested ControlRenderer object.
+   */
+  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap ) = 0;
+
+protected:
+
+  /**
+   * @brief Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
    *
    * @param[in] actor The actor applying this renderer.
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
+   * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
    *
    * @param[in] actor The actor applying this renderer.
    */
@@ -152,7 +186,6 @@ private:
   ControlRenderer& operator=( const ControlRenderer& renderer );
 
 protected:
-
   struct Impl;
   Impl* mImpl;
 };

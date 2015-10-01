@@ -18,9 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
 #include <dali/devel-api/rendering/renderer.h>
+
+#include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 
 namespace Dali
 {
@@ -33,15 +35,32 @@ namespace Internal
 
 struct Internal::ControlRenderer::Impl
 {
+  struct CustomShader
+  {
+    std::string mVertexShader;
+    std::string mFragmentShader;
+    Dali::ImageDimensions mGridSize;
+    Dali::Shader::ShaderHints mHints; //(bitfield) values from enum Shader::Hints
+
+    CustomShader( const Property::Map& map );
+    void SetPropertyMap( const Property::Map& map );
+    void CreatePropertyMap( Property::Map& map ) const;
+  };
+
   Geometry mGeometry;
   Shader   mShader;
   Renderer mRenderer;
+
+  CustomShader* mCustomShader;
 
   Vector2   mSize;
   Vector2   mOffset;
   Rect<int> mClipRect;
   float     mDepthIndex;
   bool      mIsOnStage;
+
+  Impl();
+  ~Impl();
 };
 
 } // namespace Internal

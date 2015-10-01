@@ -52,7 +52,12 @@ public:
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Property::Map& )
    */
-  Toolkit::ControlRenderer GetControlRenderer( const Property::Map& propertyMap  );
+  Toolkit::ControlRenderer GetControlRenderer( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Toolkit::RenderFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Property::Map& propertyMap )
+   */
+  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Vector4& )

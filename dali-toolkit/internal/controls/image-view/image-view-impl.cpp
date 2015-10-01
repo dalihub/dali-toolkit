@@ -97,16 +97,23 @@ void ImageView::SetImage( Image image )
 
 void ImageView::SetImage( Property::Map map )
 {
-  mImage.Reset();
-  mUrl.clear();
   mPropertyMap = map;
 
-  mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mPropertyMap );
+  bool newRendererCreated = false;
+  if( mRenderer )
+  {
+    newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, mPropertyMap );
+  }
+  else
+  {
+    mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mPropertyMap );
+    newRendererCreated = true;
+  }
 
   //we need to inform any newly created renderers if it is on stage
-  if( Self().OnStage() )
+  CustomActor self = Self();
+  if( newRendererCreated && self.OnStage() )
   {
-    CustomActor self = Self();
     mRenderer.SetOnStage( self );
   }
 
