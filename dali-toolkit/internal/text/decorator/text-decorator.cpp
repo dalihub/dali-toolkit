@@ -273,6 +273,7 @@ struct Decorator::Impl : public ConnectionTracker
     mScrollDistance( SCROLL_DISTANCE ),
     mTextDepth( 0u ),
     mActiveCopyPastePopup( false ),
+    mPopupSetNewPosition( true ),
     mCursorBlinkStatus( true ),
     mDelayCursorBlink( false ),
     mPrimaryCursorVisible( false ),
@@ -422,6 +423,7 @@ struct Decorator::Impl : public ConnectionTracker
       if( mCopyPastePopup.actor )
       {
         mCopyPastePopup.actor.HidePopup();
+        mPopupSetNewPosition = true;
       }
     }
   }
@@ -459,19 +461,22 @@ struct Decorator::Impl : public ConnectionTracker
       return;
     }
 
-    if ( mHandle[LEFT_SELECTION_HANDLE].active || mHandle[RIGHT_SELECTION_HANDLE].active )
+    if( mPopupSetNewPosition )
     {
-      float minHandleXPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
-      float maxHandleXPosition = std::max (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
+      if ( mHandle[LEFT_SELECTION_HANDLE].active || mHandle[RIGHT_SELECTION_HANDLE].active )
+      {
+        float minHandleXPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
+        float maxHandleXPosition = std::max (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
 
-      float minHandleYPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.y, mHandle[RIGHT_SELECTION_HANDLE].position.y );
+        float minHandleYPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.y, mHandle[RIGHT_SELECTION_HANDLE].position.y );
 
-      mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) *0.5f );
-      mCopyPastePopup.position.y = minHandleYPosition + mCopyPastePopup.offset;
-    }
-    else
-    {
-      mCopyPastePopup.position = Vector3( mCursor[PRIMARY_CURSOR].position.x, mCursor[PRIMARY_CURSOR].position.y -100.0f , 0.0f ); //todo 100 to be an offset Property
+        mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) *0.5f );
+        mCopyPastePopup.position.y = minHandleYPosition + mCopyPastePopup.offset;
+      }
+      else
+      {
+        mCopyPastePopup.position = Vector3( mCursor[PRIMARY_CURSOR].position.x, mCursor[PRIMARY_CURSOR].position.y -100.0f , 0.0f ); //todo 100 to be an offset Property
+      }
     }
 
     Vector3 popupSize = Vector3( mCopyPastePopup.actor.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
@@ -481,6 +486,7 @@ struct Decorator::Impl : public ConnectionTracker
     SetUpPopupPositionNotifications();
 
     mCopyPastePopup.actor.SetPosition( mCopyPastePopup.position );
+    mPopupSetNewPosition = false;
   }
 
   void PopupRelayoutComplete( Actor actor )
@@ -1405,6 +1411,7 @@ struct Decorator::Impl : public ConnectionTracker
   int                 mTextDepth;               ///< The depth used to render the text.
 
   bool                mActiveCopyPastePopup              : 1;
+  bool                mPopupSetNewPosition               : 1;
   bool                mCursorBlinkStatus                 : 1; ///< Flag to switch between blink on and blink off.
   bool                mDelayCursorBlink                  : 1; ///< Used to avoid cursor blinking when entering text.
   bool                mPrimaryCursorVisible              : 1; ///< Whether the primary cursor is visible.
@@ -1677,19 +1684,19 @@ bool Decorator::IsPopupActive() const
 
 void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask )
 {
-   mImpl->mEnabledPopupButtons = enabledButtonsBitMask;
+  mImpl->mEnabledPopupButtons = enabledButtonsBitMask;
 
-   if ( !mImpl->mCopyPastePopup.actor )
-   {
-     mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( &mImpl->mTextSelectionPopupCallbackInterface );
+  if ( !mImpl->mCopyPastePopup.actor )
+  {
+    mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( &mImpl->mTextSelectionPopupCallbackInterface );
 #ifdef DECORATOR_DEBUG
-     mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
+    mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
 #endif
-     mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
-     mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
-   }
+    mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
+    mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
+  }
 
-   mImpl->mCopyPastePopup.actor.EnableButtons( mImpl->mEnabledPopupButtons );
+  mImpl->mCopyPastePopup.actor.EnableButtons( mImpl->mEnabledPopupButtons );
 }
 
 TextSelectionPopup::Buttons& Decorator::GetEnabledPopupButtons()
