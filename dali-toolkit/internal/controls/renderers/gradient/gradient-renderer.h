@@ -72,6 +72,15 @@ class GradientRenderer: public ControlRenderer
 public:
 
   /**
+   * Types of the gradient
+   */
+  enum Type
+  {
+    LINEAR,
+    RADIAL
+  };
+
+  /**
    * @brief Constructor.
    */
   GradientRenderer();
@@ -115,15 +124,6 @@ protected:
   virtual void DoSetOnStage( Actor& actor );
 
 private:
-
-  /**
-   * Types of the gradient
-   */
-  enum Type
-  {
-    LINEAR,
-    RADIAL
-  };
 
   /**
    * New a gradient object with the given property map.

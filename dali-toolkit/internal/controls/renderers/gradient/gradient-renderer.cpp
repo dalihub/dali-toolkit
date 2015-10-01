@@ -71,8 +71,28 @@ const char * const SPREAD_REPEAT("repeat");
 const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
 const char * const UNIFORM_TEXTULRE_NAME("sTexture");
 
+RendererFactoryCache::ShaderType GetShaderType( GradientRenderer::Type type, Gradient::GradientUnits units)
+{
+  if( type==GradientRenderer::LINEAR )
+  {
+   if( units == Gradient::USER_SPACE_ON_USE )
+   {
+     return RendererFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE;
+   }
+   return RendererFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX;
+  }
+  else if( units == Gradient::USER_SPACE_ON_USE )
+  {
+    return RendererFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE;
+  }
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  return RendererFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX;
+}
+
+const char* VERTEX_SHADER[] =
+{
+// vertex shader for gradient units as USER_SPACE_ON_USE
+DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
@@ -87,9 +107,31 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     \n
     vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
   }\n
-);
+),
 
-const char* FRAGMENT_SHADER_LINEAR = DALI_COMPOSE_SHADER(
+// vertex shader for gradient units as OBJECT_BOUNDING_BOX
+ DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump mat3 uAlignmentMatrix;\n
+  varying mediump vec2 vTexCoord;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
+    \n
+    vertexPosition.xyz *= uSize;\n
+    gl_Position = uMvpMatrix * vertexPosition;\n
+  }\n
+)
+};
+
+const char* FRAGMENT_SHADER[] =
+{
+// fragment shader for linear gradient
+DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n // sampler1D?
   uniform lowp vec4 uColor;\n
   varying mediump vec2 vTexCoord;\n
@@ -98,9 +140,10 @@ const char* FRAGMENT_SHADER_LINEAR = DALI_COMPOSE_SHADER(
   {\n
     gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * uColor;\n
   }\n
-);
+),
 
-const char* FRAGMENT_SHADER_RADIAL = DALI_COMPOSE_SHADER(
+// fragment shader for radial gradient
+DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n // sampler1D?
   uniform lowp vec4 uColor;\n
   varying mediump vec2 vTexCoord;\n
@@ -109,7 +152,8 @@ const char* FRAGMENT_SHADER_RADIAL = DALI_COMPOSE_SHADER(
   {\n
     gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * uColor;\n
   }\n
-);
+)
+};
 
 Sampler::WrapMode GetWrapMode( Gradient::SpreadMethod spread )
 {
@@ -152,30 +196,34 @@ void GradientRenderer::DoInitialize( RendererFactoryCache& factoryCache, const P
     factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
   }
 
-  Type gradientType;
+  Gradient::GradientUnits gradientUnits = Gradient::OBJECT_BOUNDING_BOX;
+  Property::Value* unitsValue = propertyMap.Find( GRADIENT_UNITS_NAME );
+  std::string units;
+  // The default unit is OBJECT_BOUNDING_BOX.
+  // Only need to set new units if 'user-space'
+  if( unitsValue && unitsValue->Get( units ) && units == UNIT_USER_SPACE )
+  {
+    gradientUnits = Gradient::USER_SPACE_ON_USE;
+  }
+
+  Type gradientType = LINEAR;
   if( propertyMap.Find( GRADIENT_RADIUS_NAME ))
   {
-    mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::GRADIENT_SHADER_RADIAL );
-    if( !(mImpl->mShader) )
-    {
-      mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RADIAL );
-      factoryCache.SaveShader( RendererFactoryCache::GRADIENT_SHADER_RADIAL, mImpl->mShader );
-    }
     gradientType = RADIAL;
   }
-  else
+
+  RendererFactoryCache::ShaderType shaderType = GetShaderType( gradientType, gradientUnits );
+
+  mImpl->mShader = factoryCache.GetShader( shaderType );
+  if( !(mImpl->mShader) )
   {
-    mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::GRADIENT_SHADER_LINEAR );
-    if( !(mImpl->mShader) )
-    {
-      mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_LINEAR );
-      factoryCache.SaveShader( RendererFactoryCache::GRADIENT_SHADER_LINEAR, mImpl->mShader );
-    }
-    gradientType = LINEAR;
+    mImpl->mShader = Shader::New( VERTEX_SHADER[gradientUnits], FRAGMENT_SHADER[gradientType] );
+    factoryCache.SaveShader( shaderType, mImpl->mShader );
   }
 
   if( NewGradient(gradientType, propertyMap) )
   {
+    mGradient->SetGradientUnits( gradientUnits );
     mGradientTransform = mGradient->GetAlignmentTransform();
   }
   else
@@ -187,19 +235,6 @@ void GradientRenderer::DoInitialize( RendererFactoryCache& factoryCache, const P
 void GradientRenderer::SetSize( const Vector2& size )
 {
   ControlRenderer::SetSize( size );
-
-  if( mGradient->GetGradientUnits() == Gradient::OBJECT_BOUNDING_BOX )
-  {
-    // Apply scaling
-    Matrix3 scaling( 1.f/(size.x+Math::MACHINE_EPSILON_100), 0.f, 0.f,
-                     0.f, 1.f/(size.y+Math::MACHINE_EPSILON_100), 0.f, 0.5f, 0.5f, 1.f );
-    Matrix3::Multiply( mGradientTransform, scaling, mGradient->GetAlignmentTransform() );
-
-    if( mImpl->mRenderer )
-    {
-      (mImpl->mRenderer).SetProperty( mGradientTransformIndex, mGradientTransform );
-    }
-  }
 }
 
 void GradientRenderer::SetClipRect( const Rect<int>& clipRect )
@@ -347,15 +382,6 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
   if( numValidStop < 1u ) // no valid stop
   {
     return false;
-  }
-
-  Property::Value* unitsValue = propertyMap.Find( GRADIENT_UNITS_NAME );
-  std::string units;
-  // The default unit is OBJECT_BOUNDING_BOX.
-  // Only need to set new units if 'user-space'
-  if( unitsValue && unitsValue->Get( units ) && units == UNIT_USER_SPACE )
-  {
-     mGradient->SetGradientUnits( Gradient::USER_SPACE_ON_USE );
   }
 
   Property::Value* spread = propertyMap.Find( GRADIENT_SPREAD_METHOD_NAME );
