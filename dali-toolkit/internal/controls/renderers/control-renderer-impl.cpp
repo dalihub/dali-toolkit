@@ -49,6 +49,16 @@ void ControlRenderer::SetSize( const Vector2& size )
   mImpl->mSize = size;
 }
 
+const Vector2& ControlRenderer::GetSize() const
+{
+  return mImpl->mSize;
+}
+
+void ControlRenderer::GetNaturalSize( Vector2& naturalSize ) const
+{
+  naturalSize = Vector2::ZERO;
+}
+
 void ControlRenderer::SetClipRect( const Rect<int>& clipRect )
 {
   mImpl->mClipRect = clipRect;
@@ -68,6 +78,11 @@ void ControlRenderer::SetDepthIndex( float index )
   }
 }
 
+float ControlRenderer::GetDepthIndex() const
+{
+  return mImpl->mDepthIndex;
+}
+
 void ControlRenderer::SetOnStage( Actor& actor )
 {
   Material material = Material::New( mImpl->mShader );
@@ -81,12 +96,15 @@ void ControlRenderer::SetOnStage( Actor& actor )
 
 void ControlRenderer::SetOffStage( Actor& actor )
 {
-  DoSetOffStage( actor );
+  if( mImpl->mIsOnStage )
+  {
+    DoSetOffStage( actor );
 
-  actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
+    actor.RemoveRenderer( mImpl->mRenderer );
+    mImpl->mRenderer.Reset();
 
-  mImpl->mIsOnStage = false;
+    mImpl->mIsOnStage = false;
+  }
 }
 
 void ControlRenderer::DoSetOnStage( Actor& actor )

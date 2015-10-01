@@ -215,18 +215,40 @@ void ImageRenderer::Initialize( RendererFactoryCache& factoryCache, const Proper
 void ImageRenderer::SetSize( const Vector2& size )
 {
   ControlRenderer::SetSize( size );
-  // ToDo: renderer responds to the size change
+}
+
+void ImageRenderer::GetNaturalSize( Vector2& naturalSize ) const
+{
+  if(mImage)
+  {
+    naturalSize.x = mImage.GetWidth();
+    naturalSize.y = mImage.GetHeight();
+    return;
+  }
+  else if( mDesiredSize.GetWidth()>0 && mDesiredSize.GetHeight()>0)
+  {
+    naturalSize.x = mDesiredSize.GetWidth();
+    naturalSize.y = mDesiredSize.GetHeight();
+    return;
+  }
+  else if( !mImageUrl.empty() )
+  {
+    ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
+    naturalSize.x = dimentions.GetWidth();
+    naturalSize.y = dimentions.GetHeight();
+    return;
+  }
+
+  naturalSize = Vector2::ZERO;
 }
 
 void ImageRenderer::SetClipRect( const Rect<int>& clipRect )
 {
   ControlRenderer::SetClipRect( clipRect );
-  //ToDo: renderer responds to the clipRect change
 }
 
 void ImageRenderer::SetOffset( const Vector2& offset )
 {
-  //ToDo: renderer applies the offset
 }
 
 void ImageRenderer::DoSetOnStage( Actor& actor )

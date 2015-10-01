@@ -71,6 +71,11 @@ public:  // from ControlRenderer
   virtual void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
+   * @copydoc ControlRenderer::GetNaturalSize
+   */
+  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+
+  /**
    * @copydoc ControlRenderer::SetClipRect
    */
   virtual void SetClipRect( const Rect<int>& clipRect );

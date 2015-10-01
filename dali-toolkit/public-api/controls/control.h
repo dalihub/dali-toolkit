@@ -89,7 +89,7 @@ public:
     enum
     {
       STYLE_NAME = PROPERTY_START_INDEX,       ///< name "style-name",       @see SetStyleName,       type std::string
-      BACKGROUND,                              ///< name "background",       @see SetBackgroundImage, type Map,         @since DALi 1.1.4
+      BACKGROUND,                              ///< name "background",       @since DALi 1.1.4,       type Map
       KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
   };

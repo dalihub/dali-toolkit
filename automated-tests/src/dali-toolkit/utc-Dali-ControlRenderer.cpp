@@ -74,7 +74,7 @@ int UtcDaliControlRendererCopyAndAssignment(void)
   END_TEST;
 }
 
-int UtcDaliControlRendererSetDepthIndex(void)
+int UtcDaliControlRendererSetGetDepthIndex(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliControlRendererSetDepthIndex" );
@@ -93,9 +93,75 @@ int UtcDaliControlRendererSetDepthIndex(void)
   controlRenderer.SetOnStage( actor );
 
   DALI_TEST_EQUALS( actor.GetRendererAt(0u).GetDepthIndex(), 1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controlRenderer.GetDepthIndex(), 1.f, TEST_LOCATION );
 
   controlRenderer.SetDepthIndex( -1.f );
   DALI_TEST_EQUALS( actor.GetRendererAt(0u).GetDepthIndex(), -1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controlRenderer.GetDepthIndex(), -1.f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlRendererSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliControlRendererGetNaturalSize" );
+
+  RendererFactory factory = RendererFactory::Get();
+  Vector2 rendererSize( 20.f, 30.f );
+  Vector2 naturalSize;
+
+  // color renderer
+  ControlRenderer colorRenderer = factory.GetControlRenderer( Color::MAGENTA );
+  colorRenderer.SetSize( rendererSize );
+  DALI_TEST_EQUALS( colorRenderer.GetSize(), rendererSize, TEST_LOCATION );
+  colorRenderer.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
+
+  // image renderer
+  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
+  ControlRenderer imageRenderer = factory.GetControlRenderer( image );
+  imageRenderer.SetSize( rendererSize );
+  DALI_TEST_EQUALS( imageRenderer.GetSize(), rendererSize, TEST_LOCATION );
+  imageRenderer.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 200.f), TEST_LOCATION );
+
+  // n patch renderer
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  Vector2 testSize(80.f, 160.f);
+  platform.SetClosestImageSize(testSize);
+  image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
+  ControlRenderer nPatchRenderer = factory.GetControlRenderer( image );
+  nPatchRenderer.SetSize( rendererSize );
+  DALI_TEST_EQUALS( nPatchRenderer.GetSize(), rendererSize, TEST_LOCATION );
+  nPatchRenderer.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS( naturalSize, testSize, TEST_LOCATION );
+
+  // border renderer
+  float borderSize = 5.f;
+  ControlRenderer borderRenderer = factory.GetControlRenderer( borderSize, Color::RED );
+  borderRenderer.SetSize( rendererSize );
+  DALI_TEST_EQUALS( borderRenderer.GetSize(), rendererSize, TEST_LOCATION );
+  borderRenderer.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
+
+  // gradient renderer
+  Property::Map propertyMap;
+  propertyMap.Insert("renderer-type", "gradient-renderer");
+  Vector2 start(-1.f, -1.f);
+  Vector2 end(1.f, 1.f);
+  propertyMap.Insert("gradient-start-position", start);
+  propertyMap.Insert("gradient-end-position", end);
+  propertyMap.Insert("gradient-stop-offset", Vector2(0.f, 1.f));
+  Property::Array stopColors;
+  stopColors.PushBack( Color::RED );
+  stopColors.PushBack( Color::GREEN );
+  propertyMap.Insert("gradient-stop-color", stopColors);
+  ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
+  gradientRenderer.SetSize( rendererSize );
+  DALI_TEST_EQUALS( gradientRenderer.GetSize(), rendererSize, TEST_LOCATION );
+  gradientRenderer.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
 
   END_TEST;
 }
@@ -128,6 +194,47 @@ int UtcDaliControlRendererSetOnOffStage(void)
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliControlRendererRemoveAndReset(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "intUtcDaliControlRendererRemoveAndReset" );
+
+  RendererFactory factory = RendererFactory::Get();
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+
+  ControlRenderer imageRenderer;
+  // test calling RemoveAndReset with an empty handle
+  try
+  {
+    imageRenderer.RemoveAndReset( actor );
+    tet_result(TET_PASS);
+  }
+  catch (DaliException& exception)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
+  imageRenderer = factory.GetControlRenderer(image);
+  DALI_TEST_CHECK( imageRenderer );
+
+  imageRenderer.SetOnStage( actor );
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  imageRenderer.RemoveAndReset( actor );
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u ); // renderer is removed from actor
+  DALI_TEST_CHECK( !imageRenderer ); // control renderer is reset
 
   END_TEST;
 }

@@ -61,6 +61,16 @@ public:
   virtual void SetSize( const Vector2& size );
 
   /**
+   * @copydoc Toolkit::ControlRenderer::GetSize
+   */
+  const Vector2& GetSize() const;
+
+  /**
+   * @copydoc Toolkit::ControlRenderer::GetNaturalSize
+   */
+  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+
+  /**
    * ToDo: Add this function to Toolkit::ControlRenderer when it is fully implemented.
    *
    * Set the clip rectangular of this renderer.
@@ -83,6 +93,11 @@ public:
    * @copydoc Toolkit::ControlRenderer::SetDepthIndex
    */
   void SetDepthIndex( float index );
+
+  /**
+   * @copydoc Toolkit::ControlRenderer::GetDepthIndex
+   */
+  float GetDepthIndex() const;
 
   /**
    * @copydoc Toolkit::ControlRenderer::SetOnStage

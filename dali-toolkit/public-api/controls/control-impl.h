@@ -102,6 +102,13 @@ public:
   void SetBackgroundImage( Image image );
 
   /**
+   * @brief Set the background with a property map.
+   *
+   * @param[in] map The background property map.
+   */
+  void SetBackground(const Property::Map& map);
+
+  /**
    * @copydoc Dali::Toolkit::Control::ClearBackground
    */
   void ClearBackground();
