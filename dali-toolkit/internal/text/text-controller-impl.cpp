@@ -899,10 +899,12 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       Vector<Character>::Iterator first = currentText.Begin() + startOfSelectedText;
       Vector<Character>::Iterator last  = first + lengthOfSelectedText;
       currentText.Erase( first, last );
+
+      // Scroll after delete.
+      mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+      mEventData->mScrollAfterDelete = true;
+      mEventData->mDecoratorUpdated = true;
     }
-    mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
-    mEventData->mScrollAfterDelete = true;
-    mEventData->mDecoratorUpdated = true;
   }
 }
 
