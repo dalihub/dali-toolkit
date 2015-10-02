@@ -20,9 +20,21 @@
 
 // EXTERNAL HEADER
 #include <dali/public-api/common/dali-common.h>
+#include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
+
+namespace
+{
+//custom shader
+const char * const CUSTOM_SHADER( "shader" );
+const char * const CUSTOM_VERTEX_SHADER( "vertex-shader" );
+const char * const CUSTOM_FRAGMENT_SHADER( "fragment-shader" );
+const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivide-grid-x" );
+const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivide-grid-y" );
+const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hints
+}
 
 namespace Dali
 {
@@ -36,7 +48,6 @@ namespace Internal
 ControlRenderer::ControlRenderer()
 : mImpl( new Impl() )
 {
-  mImpl->mIsOnStage = false;
 }
 
 ControlRenderer::~ControlRenderer()
@@ -44,9 +55,40 @@ ControlRenderer::~ControlRenderer()
   delete mImpl;
 }
 
+void ControlRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+{
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->SetPropertyMap( propertyMap );
+  }
+  else
+  {
+    Property::Value* customShaderValue = propertyMap.Find( CUSTOM_SHADER );
+    if( customShaderValue )
+    {
+      Property::Map customShader;
+      if( customShaderValue->Get( customShader ) )
+      {
+        mImpl->mCustomShader = new Impl::CustomShader( propertyMap );
+      }
+    }
+  }
+  DoInitialize( factoryCache, propertyMap );
+}
+
 void ControlRenderer::SetSize( const Vector2& size )
 {
   mImpl->mSize = size;
+}
+
+const Vector2& ControlRenderer::GetSize() const
+{
+  return mImpl->mSize;
+}
+
+void ControlRenderer::GetNaturalSize( Vector2& naturalSize ) const
+{
+  naturalSize = Vector2::ZERO;
 }
 
 void ControlRenderer::SetClipRect( const Rect<int>& clipRect )
@@ -68,6 +110,11 @@ void ControlRenderer::SetDepthIndex( float index )
   }
 }
 
+float ControlRenderer::GetDepthIndex() const
+{
+  return mImpl->mDepthIndex;
+}
+
 void ControlRenderer::SetOnStage( Actor& actor )
 {
   Material material = Material::New( mImpl->mShader );
@@ -81,12 +128,15 @@ void ControlRenderer::SetOnStage( Actor& actor )
 
 void ControlRenderer::SetOffStage( Actor& actor )
 {
-  DoSetOffStage( actor );
+  if( mImpl->mIsOnStage )
+  {
+    DoSetOffStage( actor );
 
-  actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
+    actor.RemoveRenderer( mImpl->mRenderer );
+    mImpl->mRenderer.Reset();
 
-  mImpl->mIsOnStage = false;
+    mImpl->mIsOnStage = false;
+  }
 }
 
 void ControlRenderer::DoSetOnStage( Actor& actor )
@@ -95,6 +145,15 @@ void ControlRenderer::DoSetOnStage( Actor& actor )
 
 void ControlRenderer::DoSetOffStage( Actor& actor )
 {
+}
+
+void ControlRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->CreatePropertyMap( map );
+  }
+  DoCreatePropertyMap( map );
 }
 
 } // namespace Internal

@@ -178,9 +178,8 @@ public:
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.
-   * @param[in] userDefined If set by the user
    */
-  void SetDefaultFontFamily( const std::string& defaultFontFamily, bool userDefined );
+  void SetDefaultFontFamily( const std::string& defaultFontFamily );
 
   /**
    * @brief Retrieve the default font family.

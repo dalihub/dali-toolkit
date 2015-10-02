@@ -37,7 +37,7 @@ class RendererFactory;
 }
 
 /**
- * RendererFactory is a singleton object that provides and shares renderers for controls
+ * @brief RendererFactory is a singleton object that provides and shares renderers for controls
  *
  * The renderer type is required in the property map for requesting a control renderer.
  *
@@ -162,6 +162,19 @@ public:
    * @return Whether a new internal control renderer is created.
    */
   bool ResetRenderer( ControlRenderer& renderer, const std::string& url );
+
+
+  /**
+   * @brief Request the current control renderer from the property map, merging the property map with the renderer
+   *
+   * if the current renderer is capable of merging with the property map the reset the renderer with the merged properties
+   * else the renderer would be a handle to a newly created internal renderer.
+   *
+   * @param[in] propertyMap The map contains the properties required by the control renderer
+   *            Depends on the content of the map, different kind of renderer would be returned.
+   * @return Whether a new internal control renderer is created.
+   */
+  bool ResetRenderer( ControlRenderer& renderer, const Property::Map& propertyMap );
 
 private:
 

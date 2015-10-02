@@ -56,14 +56,48 @@ void ControlRenderer::SetSize( const Vector2& size )
   GetImplementation( *this ).SetSize(size);
 }
 
+const Vector2& ControlRenderer::GetSize() const
+{
+  return GetImplementation( *this ).GetSize();
+}
+
+void ControlRenderer::GetNaturalSize(Vector2& naturalSize ) const
+{
+  GetImplementation( *this ).GetNaturalSize( naturalSize );
+}
+
 void ControlRenderer::SetDepthIndex( float index )
 {
   GetImplementation( *this ).SetDepthIndex(index);
 }
 
+float ControlRenderer::GetDepthIndex() const
+{
+  return GetImplementation( *this ).GetDepthIndex();
+}
+
 void ControlRenderer::SetOnStage( Actor& actor )
 {
   GetImplementation( *this ).SetOnStage(actor);
+}
+
+void ControlRenderer::SetOffStage( Actor& actor )
+{
+  GetImplementation( *this ).SetOffStage(actor);
+}
+
+void ControlRenderer::RemoveAndReset( Actor& actor )
+{
+  if( actor && *this )
+  {
+    SetOffStage( actor );
+  }
+  Reset();
+}
+
+void ControlRenderer::CreatePropertyMap( Property::Map& map ) const
+{
+  GetImplementation( *this ).CreatePropertyMap( map );
 }
 
 } // namespace Toolkit

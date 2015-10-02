@@ -205,11 +205,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           const std::string fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
-
-          if( impl.mController->GetDefaultFontFamily() != fontFamily )
-          {
-            impl.mController->SetDefaultFontFamily( fontFamily, true ); // "true" as SetProperty means user defined font so don't change when system font changes.
-          }
+          impl.mController->SetDefaultFontFamily( fontFamily );
         }
         break;
       }

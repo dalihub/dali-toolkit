@@ -19,6 +19,7 @@
 #include "gradient-renderer.h"
 
 // EXTERNAL INCLUDES
+#include <typeinfo>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/buffer-image.h>
@@ -42,6 +43,9 @@ namespace Internal
 
 namespace
 {
+const char * const RENDERER_TYPE("renderer-type");
+const char * const RENDERER_TYPE_VALUE("gradient-renderer");
+
 // properties: linear gradient
 const char * const GRADIENT_START_POSITION_NAME("gradient-start-position"); // Property::VECTOR2
 const char * const GRADIENT_END_POSITION_NAME("gradient-end-position"); // Property::VECTOR2
@@ -58,6 +62,8 @@ const char * const GRADIENT_SPREAD_METHOD_NAME("gradient-spread-method"); // Pro
 
 // string values
 const char * const UNIT_USER_SPACE("user-space");
+const char * const UNIT_BOUNDING_BOX("object-bounding-box");
+const char * const SPREAD_PAD("pad");
 const char * const SPREAD_REFLECT("reflect");
 const char * const SPREAD_REPEAT("repeat");
 
@@ -137,7 +143,7 @@ GradientRenderer::~GradientRenderer()
 {
 }
 
-void GradientRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void GradientRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !(mImpl->mGeometry) )
@@ -208,6 +214,61 @@ void GradientRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
+void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+
+  Gradient::GradientUnits units = mGradient->GetGradientUnits();
+  if( units == Gradient::USER_SPACE_ON_USE )
+  {
+    map.Insert( GRADIENT_UNITS_NAME, UNIT_USER_SPACE );
+  }
+  else // if( units == Gradient::OBJECT_BOUNDING_BOX )
+  {
+    map.Insert( GRADIENT_UNITS_NAME, UNIT_BOUNDING_BOX );
+  }
+
+  Gradient::SpreadMethod spread = mGradient->GetSpreadMethod();
+  if( spread == Gradient::PAD )
+  {
+    map.Insert( GRADIENT_SPREAD_METHOD_NAME, SPREAD_PAD );
+  }
+  else if( spread == Gradient::REFLECT )
+  {
+    map.Insert( GRADIENT_SPREAD_METHOD_NAME, SPREAD_REFLECT );
+  }
+  else // if( units == Gradient::REPEAT )
+  {
+    map.Insert( GRADIENT_SPREAD_METHOD_NAME, SPREAD_REPEAT );
+  }
+
+  const Vector<Gradient::GradientStop>& stops( mGradient->GetStops() );
+  Property::Array offsets;
+  Property::Array colors;
+  for( unsigned int i=0; i<stops.Count(); i++ )
+  {
+    offsets.PushBack( stops[i].mOffset );
+    colors.PushBack( stops[i].mStopColor );
+  }
+
+  map.Insert( GRADIENT_STOP_OFFSET_NAME, offsets );
+  map.Insert( GRADIENT_STOP_COLOR_NAME, colors );
+
+  if( &typeid( *mGradient ) == &typeid(LinearGradient) )
+  {
+    LinearGradient* gradient = static_cast<LinearGradient*>( mGradient.Get() );
+    map.Insert( GRADIENT_START_POSITION_NAME, gradient->GetStartPosition() );
+    map.Insert( GRADIENT_END_POSITION_NAME, gradient->GetEndPosition() );
+  }
+  else // if( &typeid( *mGradient ) == &typeid(RadialGradient) )
+  {
+    RadialGradient* gradient = static_cast<RadialGradient*>( mGradient.Get() );
+    map.Insert( GRADIENT_CENTER_NAME, gradient->GetCenter() );
+    map.Insert( GRADIENT_RADIUS_NAME, gradient->GetRadius() );
+  }
+}
+
 void GradientRenderer::DoSetOnStage( Actor& actor )
 {
   mGradientTransformIndex = (mImpl->mRenderer).RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
@@ -265,25 +326,24 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
   Property::Value* stopColorValue = propertyMap.Find( GRADIENT_STOP_COLOR_NAME );
   if( stopOffsetValue && stopColorValue )
   {
-    Property::Array* offsetArray = stopOffsetValue->GetArray();
+    Vector<float> offsetArray;
     Property::Array* colorArray = stopColorValue->GetArray();
-    if( offsetArray && colorArray )
+    if( colorArray && GetStopOffsets( stopOffsetValue, offsetArray ))
     {
-      unsigned int numStop = offsetArray->Count() < colorArray->Count() ?
-                             offsetArray->Count() : colorArray->Count();
-      float offset;
+      unsigned int numStop = offsetArray.Count() < colorArray->Count() ?
+                             offsetArray.Count() : colorArray->Count();
       Vector4 color;
       for( unsigned int i=0; i<numStop; i++ )
       {
-        if( (offsetArray->GetElementAt(i)).Get(offset)
-         && (colorArray->GetElementAt(i)).Get(color) )
+        if( (colorArray->GetElementAt(i)).Get(color) )
         {
-          mGradient->AddStop( offset, color);
+          mGradient->AddStop( offsetArray[i], color);
           numValidStop++;
         }
       }
     }
   }
+
   if( numValidStop < 1u ) // no valid stop
   {
     return false;
@@ -315,6 +375,53 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
   }
 
   return true;
+}
+
+bool GradientRenderer::GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets)
+{
+  Vector2 offset2;
+  if( value->Get( offset2 ) )
+  {
+    stopOffsets.PushBack( offset2.x );
+    stopOffsets.PushBack( offset2.y );
+    return true;
+  }
+
+  Vector3 offset3;
+  if( value->Get( offset3 ) )
+  {
+    stopOffsets.PushBack( offset3.x );
+    stopOffsets.PushBack( offset3.y );
+    stopOffsets.PushBack( offset3.z );
+    return true;
+  }
+
+  Vector4 offset4;
+  if( value->Get( offset4 ) )
+  {
+    stopOffsets.PushBack( offset4.x );
+    stopOffsets.PushBack( offset4.y );
+    stopOffsets.PushBack( offset4.z );
+    stopOffsets.PushBack( offset4.w );
+    return true;
+  }
+
+  Property::Array* offsetArray = value->GetArray();
+  if( offsetArray )
+  {
+    unsigned int numStop = offsetArray->Count();
+    float offset;
+    for( unsigned int i=0; i<numStop; i++ )
+    {
+      if( offsetArray->GetElementAt(i).Get(offset) )
+      {
+        stopOffsets.PushBack( offset );
+      }
+    }
+    return true;
+  }
+
+  return false;
 }
 
 } // namespace Internal

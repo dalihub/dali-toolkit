@@ -41,6 +41,8 @@ namespace Internal
 
 namespace
 {
+const char * const RENDERER_TYPE("renderer-type");
+const char * const RENDERER_TYPE_VALUE("n-patch-renderer");
 
 const char * const IMAGE_URL_NAME("image-url");
 const char * const BORDER_ONLY("border-only");
@@ -158,7 +160,7 @@ NPatchRenderer::~NPatchRenderer()
 {
 }
 
-void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void NPatchRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   Initialize(factoryCache);
 
@@ -183,6 +185,25 @@ void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache, const Prope
       DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
     }
   }
+}
+
+void NPatchRenderer::GetNaturalSize( Vector2& naturalSize ) const
+{
+  if( mImage )
+  {
+    naturalSize.x = mImage.GetWidth();
+    naturalSize.y = mImage.GetHeight();
+    return;
+  }
+  else if( !mImageUrl.empty() )
+  {
+    ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
+    naturalSize.x = dimentions.GetWidth();
+    naturalSize.y = dimentions.GetHeight();
+    return;
+  }
+
+  naturalSize = Vector2::ZERO;
 }
 
 void NPatchRenderer::SetClipRect( const Rect<int>& clipRect )
@@ -220,6 +241,21 @@ void NPatchRenderer::DoSetOnStage( Actor& actor )
 void NPatchRenderer::DoSetOffStage( Actor& actor )
 {
   mCroppedImage.Reset();
+}
+
+void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  if( !mImageUrl.empty() )
+  {
+    map.Insert( IMAGE_URL_NAME, mImageUrl );
+  }
+  else if( mImage )
+  {
+    map.Insert( IMAGE_URL_NAME, mImage.GetUrl() );
+  }
+  map.Insert( BORDER_ONLY, mBorderOnly );
 }
 
 void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache )

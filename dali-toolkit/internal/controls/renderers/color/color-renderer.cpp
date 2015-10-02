@@ -37,6 +37,8 @@ namespace Internal
 
 namespace
 {
+const char * const RENDERER_TYPE("renderer-type");
+const char * const RENDERER_TYPE_VALUE("color-renderer");
 const char * const COLOR_NAME("blend-color");
 const char * const COLOR_UNIFORM_NAME("uBlendColor");
 
@@ -75,7 +77,7 @@ ColorRenderer::~ColorRenderer()
 {
 }
 
-void ColorRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void ColorRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
 {
   Initialize( factoryCache );
 
@@ -103,6 +105,13 @@ void ColorRenderer::SetClipRect( const Rect<int>& clipRect )
 void ColorRenderer::SetOffset( const Vector2& offset )
 {
   //ToDo: renderer applies the offset
+}
+
+void ColorRenderer::DoCreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( COLOR_NAME, mBlendColor );
 }
 
 void ColorRenderer::DoSetOnStage( Actor& actor )

@@ -49,6 +49,11 @@ void Gradient::AddStop( float offset, const Vector4& color )
   mGradientStops.PushBack( GradientStop( Clamp( offset, 0.f, 1.f ), color) );
 }
 
+const Vector<Gradient::GradientStop>& Gradient::GetStops()
+{
+  return mGradientStops;
+}
+
 void Gradient::SetGradientUnits( GradientUnits gradientUnits )
 {
   mGradientUnits = gradientUnits;

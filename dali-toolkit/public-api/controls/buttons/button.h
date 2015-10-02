@@ -326,45 +326,45 @@ public:
   // Deprecated API
 
   /**
-   * @brief Sets the label with an actor.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the label with an actor.
    *
    * @param[in]  label The actor to use as a label
    */
   void SetLabel( Actor label );
 
   /**
-   * @brief Sets the button image.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the button image.
    *
    * @param[in]  image The button image.
    */
   void SetButtonImage( Image image );
 
   /**
-   * @brief Sets the selected image.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the selected image.
    *
    * @param[in]  image The selected image.
    */
   void SetSelectedImage( Image image );
 
   /**
-   * @brief Gets the button image.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Gets the button image.
    *
    * @return     An actor with the button image.
    */
   Actor GetButtonImage() const;
 
   /**
-   * @brief Gets the selected image.
-   *
    * @deprecated DALi 1.0.50
+   *
+   * @brief Gets the selected image.
    *
    * @return     An actor with the selected image.
    */

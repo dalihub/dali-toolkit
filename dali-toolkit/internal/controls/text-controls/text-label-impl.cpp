@@ -148,10 +148,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string fontFamily = value.Get< std::string >();
 
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str() );
-          if( impl.mController->GetDefaultFontFamily() != fontFamily )
-          {
-            impl.mController->SetDefaultFontFamily( fontFamily, true );
-          }
+          impl.mController->SetDefaultFontFamily( fontFamily );
         }
         break;
       }

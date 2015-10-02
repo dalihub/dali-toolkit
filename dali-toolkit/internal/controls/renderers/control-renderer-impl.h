@@ -21,7 +21,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/rendering/shader.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
 
@@ -40,6 +43,21 @@ class RendererFactoryCache;
  * Base class for all Control rendering logic. A control may have multiple control renderers.
  *
  * Note: The control renderer responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
+ *
+ * The following properties are optional
+ *
+ * | %Property Name            | Type             |
+ * |---------------------------|------------------|
+ * | custom-shader             | MAP              |
+ *
+ * where custom-shader is a map with the following properties:
+ * | %Property Name            | Type             |
+ * |---------------------------|------------------|
+ * | vertex-shader             | STRING           |
+ * | fragment-shader           | STRING           |
+ * | subdivide-grid-x          | INT              |
+ * | subdivide-grid-y          | INT              |
+ * | shader-hints              | INT              |
  */
 class ControlRenderer : public BaseObject
 {
@@ -53,12 +71,22 @@ public:
    * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  virtual void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap ) = 0;
+  void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::ControlRenderer::SetSize
    */
   virtual void SetSize( const Vector2& size );
+
+  /**
+   * @copydoc Toolkit::ControlRenderer::GetSize
+   */
+  const Vector2& GetSize() const;
+
+  /**
+   * @copydoc Toolkit::ControlRenderer::GetNaturalSize
+   */
+  virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
    * ToDo: Add this function to Toolkit::ControlRenderer when it is fully implemented.
@@ -85,20 +113,25 @@ public:
   void SetDepthIndex( float index );
 
   /**
+   * @copydoc Toolkit::ControlRenderer::GetDepthIndex
+   */
+  float GetDepthIndex() const;
+
+  /**
    * @copydoc Toolkit::ControlRenderer::SetOnStage
    * @pre Impl->mGeometry must be created before this method is called
    */
   void SetOnStage( Actor& actor );
 
   /**
-   * ToDo: Add this function to Toolkit::ControlRenderer when the Renderer can be removed from actor properly.
-   *
-   * Renderer is destroyed when control is off stage.
-   * This function should be called when the control removes from stage
-   *
-   * @param[in] actor The actor applying this renderer.
+   * @copydoc Toolkit::ControlRenderer::SetOffStage
    */
   void SetOffStage( Actor& actor );
+
+  /**
+   * @copydoc Toolkit::ControlRenderer::CreatePropertyMap
+   */
+  void CreatePropertyMap( Property::Map& map ) const;
 
 protected:
 
@@ -113,16 +146,32 @@ protected:
   virtual ~ControlRenderer();
 
 protected:
+  /**
+   * @brief Called by CreatePropertyMap() allowing sub classes to respond to the CreatePropertyMap event
+   *
+   * @param[out] map The renderer property map.
+   */
+  virtual void DoCreatePropertyMap( Property::Map& map ) const = 0;
 
   /**
-   * Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
+   * @brief Called by Initialize() allowing sub classes to respond to the Initialize event
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   * @param[in] propertyMap The properties for the requested ControlRenderer object.
+   */
+  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap ) = 0;
+
+protected:
+
+  /**
+   * @brief Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
    *
    * @param[in] actor The actor applying this renderer.
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
+   * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
    *
    * @param[in] actor The actor applying this renderer.
    */
@@ -137,7 +186,6 @@ private:
   ControlRenderer& operator=( const ControlRenderer& renderer );
 
 protected:
-
   struct Impl;
   Impl* mImpl;
 };
