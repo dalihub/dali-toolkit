@@ -95,17 +95,6 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-void AddQuadIndices( Vector< unsigned int >& indices, unsigned int rowIdx, unsigned int nextRowIdx )
-{
-  indices.PushBack( rowIdx );
-  indices.PushBack( nextRowIdx + 1 );
-  indices.PushBack( rowIdx + 1 );
-
-  indices.PushBack( rowIdx );
-  indices.PushBack( nextRowIdx );
-  indices.PushBack( nextRowIdx + 1 );
-}
-
 Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned int >& indices )
 {
   Property::Map vertexFormat;
@@ -128,6 +117,7 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexPropertyBuffer );
   geometry.SetIndexBuffer( indexPropertyBuffer );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }
@@ -164,15 +154,27 @@ Geometry CreateGeometry( RendererFactoryCache& factoryCache, ImageDimensions gri
 
     // Create indices
     Vector< unsigned int > indices;
-    indices.Reserve( gridWidth * gridHeight * 6 );
+    indices.Reserve( (gridWidth+2)*gridHeight*2 - 2);
 
-    unsigned int rowIdx     = 0;
-    unsigned int nextRowIdx = gridWidth + 1;
-    for( int y = 0; y < gridHeight; ++y, ++nextRowIdx, ++rowIdx )
+    for( unsigned int row = 0u; row < gridHeight; ++row )
     {
-      for( int x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx )
+      unsigned int rowStartIndex = row*(gridWidth+1u);
+      unsigned int nextRowStartIndex = rowStartIndex + gridWidth +1u;
+
+      if( row != 0u ) // degenerate index on non-first row
       {
-        AddQuadIndices( indices, rowIdx, nextRowIdx );
+        indices.PushBack( rowStartIndex );
+      }
+
+      for( unsigned int column = 0u; column < gridWidth+1u; column++) // main strip
+      {
+        indices.PushBack( rowStartIndex + column);
+        indices.PushBack( nextRowStartIndex + column);
+      }
+
+      if( row != gridHeight-1u ) // degenerate index on non-last row
+      {
+        indices.PushBack( nextRowStartIndex + gridWidth );
       }
     }
 

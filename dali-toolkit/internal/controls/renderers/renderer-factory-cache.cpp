@@ -91,18 +91,10 @@ Geometry RendererFactoryCache::CreateQuadGeometry()
   PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat, 4 );
   quadVertices.SetData(quadVertexData);
 
-  // Create indices
-  //TODO: replace with triangle strip when Geometry supports it
-  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 6 );
-  indices.SetData(indexData);
-
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( quadVertices );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }

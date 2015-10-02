@@ -180,11 +180,11 @@ void BorderRenderer::SetBorderSize( float size )
  * | /| /| /|
  * |/ |/ |/ |
  * 4--5--6--7
- * | /|  | /|
- * |/ |  |/ |
+ * |\ |  |\ |
+ * | \|  | \|
  * 8--9--10-11
- * | /| /| /|
- * |/ |/ |/ |
+ * | /| /|\ |
+ * |/ |/ | \|
  * 12-13-14-15
  */
 Geometry BorderRenderer::CreateBorderGeometry()
@@ -222,19 +222,17 @@ Geometry BorderRenderer::CreateBorderGeometry()
   borderVertices.SetData(borderVertexData);
 
   // Create indices
-  unsigned int indexData[48] = { 0, 4, 1, 1, 4, 5, 1, 5, 2, 2, 5, 6, 2, 6,3, 3, 6, 7,
-                                 4, 8, 5, 5, 8, 9, 6, 10, 7, 7, 10, 11,
-                                 8, 12, 9, 9, 12, 13, 9, 13, 10, 10, 13, 14, 10, 11, 14, 11, 14, 15};
-
+  unsigned int indexData[24] = { 0,4,1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5 };
   Property::Map indexFormat;
   indexFormat[INDEX_NAME] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 48 );
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 24 );
   indices.SetData(indexData);
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( borderVertices );
   geometry.SetIndexBuffer( indices );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }
