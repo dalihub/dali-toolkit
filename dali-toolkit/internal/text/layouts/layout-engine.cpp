@@ -451,7 +451,6 @@ struct LayoutEngine::Impl
 
     const GlyphInfo& glyph = *glyphsBuffer;
     float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-    penX += mCursorWidth; // Added to give some space to the cursor.
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -672,7 +671,6 @@ struct LayoutEngine::Impl
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
       float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-      penX += mCursorWidth; // Added to give some space to the cursor.
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 

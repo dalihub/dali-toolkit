@@ -725,7 +725,9 @@ bool Controller::Relayout( const Size& size )
     return glyphsRemoved;
   }
 
-  if( size != mImpl->mVisualModel->mControlSize )
+  const bool newSize = ( size != mImpl->mVisualModel->mControlSize );
+
+  if( newSize )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mVisualModel->mControlSize.width, mImpl->mVisualModel->mControlSize.height );
 
@@ -751,9 +753,9 @@ bool Controller::Relayout( const Size& size )
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
 
-  // Keep the current offset and alignment as it will be used to update the decorator's positions.
+  // Keep the current offset and alignment as it will be used to update the decorator's positions (if the size changes).
   Vector2 offset;
-  if( mImpl->mEventData )
+  if( newSize && mImpl->mEventData )
   {
     offset = mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition;
   }
@@ -763,11 +765,14 @@ bool Controller::Relayout( const Size& size )
 
   if( mImpl->mEventData )
   {
-    // If there is a nex size, the scroll position needs to be clamped.
-    mImpl->ClampHorizontalScroll( layoutSize );
+    if( newSize )
+    {
+      // If there is a new size, the scroll position needs to be clamped.
+      mImpl->ClampHorizontalScroll( layoutSize );
 
-    // Update the decorator's positions.
-    mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition - offset );
+      // Update the decorator's positions is needed if there is a new size.
+      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition - offset );
+    }
 
     // Move the cursor, grab handle etc.
     updated = mImpl->ProcessInputEvents() || updated;
@@ -922,11 +927,8 @@ void Controller::TextDeletedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  if( 0u == mImpl->mLogicalModel->mText.Count() )
-  {
-    mImpl->mEventData->mUpdateCursorPosition = true;
-  }
-  else
+  mImpl->mEventData->mUpdateCursorPosition = true;
+  if( 0u != mImpl->mLogicalModel->mText.Count() )
   {
     mImpl->mEventData->mScrollAfterDelete = true;
   }
@@ -1179,8 +1181,7 @@ void Controller::CalculateTextAlignment( const Size& size )
     }
     case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
     {
-      const int intOffset = static_cast<int>( 0.5f * ( size.width - actualSize.width ) ); // try to avoid pixel alignment.
-      mImpl->mAlignmentOffset.x = static_cast<float>( intOffset );
+      mImpl->mAlignmentOffset.x = floorf( 0.5f * ( size.width - actualSize.width ) ); // try to avoid pixel alignment.
       break;
     }
     case LayoutEngine::HORIZONTAL_ALIGN_END:
@@ -1200,8 +1201,7 @@ void Controller::CalculateTextAlignment( const Size& size )
     }
     case LayoutEngine::VERTICAL_ALIGN_CENTER:
     {
-      const int intOffset = static_cast<int>( 0.5f * ( size.height - actualSize.height ) ); // try to avoid pixel alignment.
-      mImpl->mAlignmentOffset.y = static_cast<float>( intOffset );
+      mImpl->mAlignmentOffset.y = floorf( 0.5f * ( size.height - actualSize.height ) ); // try to avoid pixel alignment.
       break;
     }
     case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
