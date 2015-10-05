@@ -67,8 +67,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 );
 }
 
-ColorRenderer::ColorRenderer()
-: ControlRenderer(),
+ColorRenderer::ColorRenderer( RendererFactoryCache& factoryCache )
+: ControlRenderer( factoryCache ),
   mBlendColorIndex( Property::INVALID_INDEX )
 {
 }
@@ -77,10 +77,8 @@ ColorRenderer::~ColorRenderer()
 {
 }
 
-void ColorRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void ColorRenderer::DoInitialize( const Property::Map& propertyMap )
 {
-  Initialize( factoryCache );
-
   Property::Value* color = propertyMap.Find( COLOR_NAME );
   if( !( color && color->Get(mBlendColor) ) )
   {
@@ -114,29 +112,41 @@ void ColorRenderer::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( COLOR_NAME, mBlendColor );
 }
 
-void ColorRenderer::DoSetOnStage( Actor& actor )
+void ColorRenderer::InitializeRenderer( Renderer& renderer )
 {
-  mBlendColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
+  Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
+  if( !geometry )
+  {
+    geometry =  RendererFactoryCache::CreateQuadGeometry();
+    mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
+  }
+
+  Shader shader = mFactoryCache.GetShader( RendererFactoryCache::COLOR_SHADER );
+  if( !shader )
+  {
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mFactoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, shader );
+  }
+
+  if( !renderer )
+  {
+    Material material = Material::New( shader );
+    renderer = Renderer::New( geometry, material );
+  }
+  else
+  {
+    mImpl->mRenderer.SetGeometry( geometry );
+    Material material = mImpl->mRenderer.GetMaterial();
+    if( material )
+    {
+      material.SetShader( shader );
+    }
+  }
+
+  mBlendColorIndex = renderer.RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )
   {
-    (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
-  }
-}
-
-void ColorRenderer::Initialize( RendererFactoryCache& factoryCache)
-{
-  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
-  if( !(mImpl->mGeometry) )
-  {
-    mImpl->mGeometry =  RendererFactoryCache::CreateQuadGeometry();
-    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
-  }
-
-  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::COLOR_SHADER );
-  if( !(mImpl->mShader) )
-  {
-    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    factoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, mImpl->mShader );
+    renderer.GetMaterial().SetBlendMode( BlendingMode::ON );
   }
 }
 

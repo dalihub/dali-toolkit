@@ -75,8 +75,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 );
 }
 
-BorderRenderer::BorderRenderer()
-: ControlRenderer(),
+BorderRenderer::BorderRenderer( RendererFactoryCache& factoryCache )
+: ControlRenderer( factoryCache ),
   mBorderColor( Color::TRANSPARENT ),
   mBorderSize( 0.f ),
   mBorderColorIndex( Property::INVALID_INDEX ),
@@ -88,10 +88,8 @@ BorderRenderer::~BorderRenderer()
 {
 }
 
-void BorderRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void BorderRenderer::DoInitialize( const Property::Map& propertyMap )
 {
-  Initialize( factoryCache );
-
   Property::Value* color = propertyMap.Find( COLOR_NAME );
   if( !( color && color->Get(mBorderColor) ) )
   {
@@ -130,20 +128,35 @@ void BorderRenderer::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( SIZE_NAME, mBorderSize );
 }
 
-void BorderRenderer::Initialize( RendererFactoryCache& factoryCache)
+void BorderRenderer::InitializeRenderer( Renderer& renderer )
 {
-  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::BORDER_GEOMETRY );
-  if( !(mImpl->mGeometry) )
+  Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::BORDER_GEOMETRY );
+  if( !geometry )
   {
-    mImpl->mGeometry =  CreateBorderGeometry();
-    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
+    geometry =  CreateBorderGeometry();
+    mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
 
-  mImpl->mShader = factoryCache.GetShader( RendererFactoryCache::BORDER_SHADER );
-  if( !(mImpl->mShader) )
+  Shader shader = mFactoryCache.GetShader( RendererFactoryCache::BORDER_SHADER );
+  if( !shader )
   {
-    mImpl->mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    factoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, mImpl->mShader );
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mFactoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, shader );
+  }
+
+  if( !renderer )
+  {
+    Material material = Material::New( shader );
+    renderer = Renderer::New( geometry, material );
+  }
+  else
+  {
+    mImpl->mRenderer.SetGeometry( geometry );
+    Material material = mImpl->mRenderer.GetMaterial();
+    if( material )
+    {
+      material.SetShader( shader );
+    }
   }
 }
 
