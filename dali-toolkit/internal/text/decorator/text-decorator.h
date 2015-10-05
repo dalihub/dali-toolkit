@@ -397,6 +397,23 @@ public:
   const Vector2& GetPosition( HandleType handleType ) const;
 
   /**
+   * @brief Whether to flip vertically a handle.
+   *
+   * @param[in] handleType The handle to flip vertically.
+   * @param[in] flip Whether to flip vertically.
+   */
+  void FlipHandleVertically( HandleType handleType, bool flip );
+
+  /**
+   * @brief Retrieves whether the handle is vertically flipped.
+   *
+   * @param[in] handleType The handle to query.
+   *
+   * @return @e ture if the handle is vertically flipped.
+   */
+  bool IsHandleVerticallyFlipped( HandleType handleType ) const;
+
+  /**
    * @brief Whether to flip the selection handles as soon as they are crossed.
    *
    * By default they flip when the handle is released.
