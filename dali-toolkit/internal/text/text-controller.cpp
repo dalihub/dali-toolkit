@@ -89,7 +89,6 @@ void Controller::SetText( const std::string& text )
   {
     // If popup shown then hide it by switching to Editing state
     if( ( EventData::SELECTING == mImpl->mEventData->mState )          ||
-        ( EventData::SELECTION_CHANGED == mImpl->mEventData->mState )  ||
         ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
         ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
     {
@@ -1485,8 +1484,7 @@ bool Controller::RemoveSelectedText()
 {
   bool textRemoved( false );
 
-  if ( EventData::SELECTING         == mImpl->mEventData->mState ||
-       EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+  if( EventData::SELECTING == mImpl->mEventData->mState )
   {
     std::string removedString;
     mImpl->RetrieveSelection( removedString, true );
@@ -1623,14 +1621,7 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
 {
   if( mImpl->mEventData )
   {
-    if ( mImpl->mEventData->mState == EventData::SELECTING )
-    {
-      mImpl->ChangeState( EventData::SELECTION_CHANGED );
-    }
-    else
-    {
-      mImpl->ChangeState( EventData::SELECTING );
-    }
+    mImpl->ChangeState( EventData::SELECTING );
 
     if( selectAll )
     {
@@ -1898,8 +1889,7 @@ bool Controller::BackspaceKeyEvent()
 
   bool removed( false );
 
-  if ( EventData::SELECTING         == mImpl->mEventData->mState ||
-       EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+  if( EventData::SELECTING == mImpl->mEventData->mState )
   {
     removed = RemoveSelectedText();
   }

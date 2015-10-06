@@ -1154,7 +1154,7 @@ void Controller::Impl::SetPopupButtons()
 
   TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::NONE;
 
-  if ( ( EventData::SELECTING == mEventData->mState ) || ( EventData::SELECTION_CHANGED == mEventData->mState ) )
+  if( EventData::SELECTING == mEventData->mState )
   {
     buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
 
@@ -1228,16 +1228,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
       if( mEventData->mGrabHandlePopupEnabled )
       {
         SetPopupButtons();
-        mEventData->mDecorator->SetPopupActive( true );
-      }
-      mEventData->mDecoratorUpdated = true;
-    }
-    else if ( EventData::SELECTION_CHANGED  == mEventData->mState )
-    {
-      if( mEventData->mGrabHandlePopupEnabled )
-      {
-        SetPopupButtons();
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
