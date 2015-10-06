@@ -159,11 +159,9 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   memset( buffer, 0xFF, filledPixelImage.GetBufferSize() );
   atlas.Upload( filledPixelImage, 0, 0 );
 
-  Sampler sampler = Sampler::New( atlas, "sTexture" );
-  sampler.SetProperty( Sampler::Property::AFFECTS_TRANSPARENCY, true );
   atlasDescriptor.mMaterial = Material::New( pixelformat == Pixel::L8 ? mShaderL8 : mShaderRgba );
-  atlasDescriptor.mMaterial.AddSampler( sampler );
-  atlasDescriptor.mSampler = sampler;
+  atlasDescriptor.mMaterial.AddTexture(atlas, "sTexture" );
+  atlasDescriptor.mImage = atlas;
   atlasDescriptor.mMaterial.SetBlendMode( BlendingMode::ON );
   mAtlasList.push_back( atlasDescriptor );
   return mAtlasList.size();
@@ -792,13 +790,13 @@ Material AtlasManager::GetMaterial( AtlasId atlas ) const
   return null;
 }
 
-Sampler AtlasManager::GetSampler( AtlasId atlas ) const
+Image AtlasManager::GetImage( AtlasId atlas ) const
 {
   if ( atlas && atlas-- <= mAtlasList.size() )
   {
-    return mAtlasList[ atlas ].mSampler;
+    return mAtlasList[ atlas ].mImage;
   }
-  Sampler null;
+  Image null;
   return null;
 }
 

@@ -132,16 +132,14 @@ void BubbleEmitter::OnInitialize()
   // Prepare the frame buffer to store the color adjusted background image
   mEffectImage = FrameBufferImage::New( mMovementArea.width/4.f, mMovementArea.height/4.f, Pixel::RGBA8888, Dali::Image::UNUSED );
 
-  // Generate the samplers and geometry, which is used by all bubbleActors
-  mSamplerBackground = Sampler::New( mEffectImage, "sBackground" );
-  mSamplerBubbleShape = Sampler::New( mShapeImage, "sBubbleShape" );
+  // Generate the geometry, which is used by all bubbleActors
   mMeshGeometry =  CreateGeometry( mNumBubblePerActor*mDensity );
 
   Shader bubbleShader = CreateBubbleShader (mNumBubblePerActor );
 
   mMaterial = Material::New( bubbleShader );
-  mMaterial.AddSampler( mSamplerBackground );
-  mMaterial.AddSampler( mSamplerBubbleShape );
+  mMaterial.AddTexture( mEffectImage, "sBackground" );
+  mMaterial.AddTexture( mShapeImage,  "sBubbleShape" );
 
   mBubbleActors.resize( mNumActor );
 
@@ -195,7 +193,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
 
 void BubbleEmitter::SetShapeImage( Image shapeImage )
 {
-  mSamplerBubbleShape.SetImage( shapeImage );
+  mMaterial.SetTextureImage( 1, shapeImage );
 }
 
 void BubbleEmitter::SetBubbleScale( float scale )

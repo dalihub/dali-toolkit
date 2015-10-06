@@ -121,7 +121,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
    */
-  Sampler GetSampler( uint32_t atlasId ) const;
+  Image GetImage( uint32_t atlasId ) const;
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMetrics

@@ -627,11 +627,8 @@ void Model3dView::LoadTextures()
     Image tex0 = ResourceImage::New( imgUrl );
     if( tex0 )
     {
-      Sampler sampler = Sampler::New( tex0, "sDiffuse" );
-      sampler.SetWrapMode(Sampler::REPEAT,Sampler::REPEAT);
-      sampler.SetAffectsTransparency(false);
-
-      mMaterial.AddSampler( sampler );
+      size_t index = mMaterial.AddTexture( tex0, "sDiffuse" );
+      mMaterial.SetTextureAffectsTransparency(index, false );
     }
   }
 
@@ -643,12 +640,8 @@ void Model3dView::LoadTextures()
     Image tex1 = ResourceImage::New( imgUrl );
     if (tex1)
     {
-      Sampler sampler = Sampler::New( tex1, "sNormal" );
-      sampler.SetWrapMode(Sampler::REPEAT,Sampler::REPEAT);
-      sampler.SetAffectsTransparency(false);
-      sampler.SetFilterMode(Sampler::LINEAR,Sampler::LINEAR);
-
-      mMaterial.AddSampler( sampler );
+      size_t index = mMaterial.AddTexture( tex1, "sNormal" );
+      mMaterial.SetTextureAffectsTransparency(index, false );
     }
   }
 
@@ -660,12 +653,8 @@ void Model3dView::LoadTextures()
     Image tex2 = ResourceImage::New( imgUrl );
     if( tex2 )
     {
-      Sampler sampler = Sampler::New( tex2, "sGloss" );
-      sampler.SetWrapMode(Sampler::REPEAT,Sampler::REPEAT);
-      sampler.SetAffectsTransparency(false);
-      sampler.SetFilterMode(Sampler::LINEAR,Sampler::LINEAR);
-
-      mMaterial.AddSampler( sampler );
+      size_t index = mMaterial.AddTexture( tex2, "sGloss" );
+      mMaterial.SetTextureAffectsTransparency(index, false );
     }
   }
 }

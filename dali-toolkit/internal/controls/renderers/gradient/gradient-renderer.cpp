@@ -155,22 +155,22 @@ DALI_COMPOSE_SHADER(
 )
 };
 
-Sampler::WrapMode GetWrapMode( Gradient::SpreadMethod spread )
+Dali::WrapMode::Type GetWrapMode( Gradient::SpreadMethod spread )
 {
   switch(spread)
   {
     case Gradient::REPEAT:
     {
-      return Sampler::REPEAT;
+      return Dali::WrapMode::REPEAT;
     }
     case Gradient::REFLECT:
     {
-      return Sampler::MIRRORED_REPEAT;
+      return Dali::WrapMode::MIRRORED_REPEAT;
     }
     case Gradient::PAD:
     default:
     {
-      return Sampler::CLAMP_TO_EDGE;
+      return Dali::WrapMode::CLAMP_TO_EDGE;
     }
   }
 }
@@ -324,11 +324,11 @@ void GradientRenderer::InitializeRenderer( Dali::Renderer& renderer )
   }
 
   Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
-  Sampler sampler = Sampler::New( lookupTexture, UNIFORM_TEXTULRE_NAME );
-  Sampler::WrapMode wrap = GetWrapMode( mGradient->GetSpreadMethod() );
+  Sampler sampler = Sampler::New();
+  Dali::WrapMode::Type wrap = GetWrapMode( mGradient->GetSpreadMethod() );
   sampler.SetWrapMode(  wrap, wrap  );
 
-  material.AddSampler( sampler );
+  material.AddTexture( lookupTexture, UNIFORM_TEXTULRE_NAME, sampler );
 
   renderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 }

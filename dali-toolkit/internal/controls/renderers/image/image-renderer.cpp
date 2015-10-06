@@ -568,18 +568,14 @@ void ImageRenderer::ApplyImageToSampler()
     Material material = mImpl->mRenderer.GetMaterial();
     if( material )
     {
-      for( std::size_t i = 0; i < material.GetNumberOfSamplers(); ++i )
+      int index = material.GetTextureIndex(TEXTURE_UNIFORM_NAME);
+      if( index != -1 )
       {
-        Sampler sampler = material.GetSamplerAt( i );
-        if( sampler.GetUniformName() == TEXTURE_UNIFORM_NAME )
-        {
-          sampler.SetImage( mImage );
-          return;
-        }
+        material.SetTextureImage( index, mImage );
+        return;
       }
 
-      Sampler sampler = Sampler::New( mImage, TEXTURE_UNIFORM_NAME );
-      material.AddSampler( sampler );
+      material.AddTexture( mImage,TEXTURE_UNIFORM_NAME );
     }
   }
 }

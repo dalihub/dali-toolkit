@@ -65,7 +65,7 @@ public:
     BufferImage mHorizontalStrip;                                       // Image used to pad upload
     BufferImage mVerticalStrip;                                         // Image used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
-    Sampler mSampler;                                                   // sampler used for atlas texture
+    Image mImage;
     SizeType mTotalBlocks;                                              // total number of blocks in atlas
     SizeType mAvailableBlocks;                                          // number of blocks available in atlas
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
@@ -177,9 +177,9 @@ public:
   Material GetMaterial( AtlasId atlas ) const;
 
 /**
-   * @copydoc Toolkit::AtlasManager::GetSampler
+   * @copydoc Toolkit::AtlasManager::GetImage
    */
-  Sampler GetSampler( AtlasId atlas ) const;
+  Image GetImage( AtlasId atlas ) const;
 
 private:
 

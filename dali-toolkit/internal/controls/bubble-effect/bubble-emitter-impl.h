@@ -163,8 +163,6 @@ private:
   FrameBufferImage            mEffectImage;         ///< The image stores the adjusted color of the background image.The bubbles pick color from this image.
   CameraActor                 mCameraActor;         ///< The render task views the scene from the perspective of this actor.
 
-  Sampler                     mSamplerBackground;    ///< The sampler which provides the background image to material
-  Sampler                     mSamplerBubbleShape;   ///< The sampler which provides the bubble shape image to material
   Geometry                    mMeshGeometry;         ///< The mesh geometry which contains the vertices and indices data
   Material                    mMaterial;             ///< The material which controls the bubble display
   std::vector<BubbleActorPtr> mBubbleActors;         ///< The meshActor vector, its size is mNumShader.

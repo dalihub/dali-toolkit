@@ -164,7 +164,7 @@ public:
    *
    * @return The sampler used by the atlas
    */
-  Sampler GetSampler( uint32_t atlasId ) const;
+  Image GetImage( uint32_t atlasId ) const;
 
   /**
    * @brief Get Glyph Manager metrics

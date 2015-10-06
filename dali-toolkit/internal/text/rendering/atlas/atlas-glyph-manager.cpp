@@ -117,9 +117,9 @@ Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
   return GetImplementation(*this).GetMaterial( atlasId );
 }
 
-Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+Image AtlasGlyphManager::GetImage( uint32_t atlasId ) const
 {
-  return GetImplementation(*this).GetSampler( atlasId );
+  return GetImplementation(*this).GetImage( atlasId );
 }
 
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()

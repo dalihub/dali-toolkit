@@ -172,7 +172,7 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
   vertices.PushBack( Vector2( x, y ) );
 }
 
-void RegisterStretchProperties( Sampler& sampler, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
+void RegisterStretchProperties( Material& material, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
 {
   uint16_t prevEnd = 0;
   uint16_t prevFix = 0;
@@ -188,7 +188,7 @@ void RegisterStretchProperties( Sampler& sampler, const char * uniformName, cons
 
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    sampler.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
+    material.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
 
     prevEnd = end;
     prevFix = fix;
@@ -199,7 +199,7 @@ void RegisterStretchProperties( Sampler& sampler, const char * uniformName, cons
     prevFix += imageExtent - prevEnd;
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    sampler.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
+    material.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
   }
 }
 
@@ -462,20 +462,14 @@ void NPatchRenderer::ApplyImageToSampler()
   Material material = mImpl->mRenderer.GetMaterial();
   if( material )
   {
-    Sampler sampler;
-    for( std::size_t i = 0; i < material.GetNumberOfSamplers(); ++i )
+    int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
+    if( index > -1 )
     {
-      sampler = material.GetSamplerAt( i );
-      if( sampler.GetUniformName() == TEXTURE_UNIFORM_NAME )
-      {
-        sampler.SetImage( mCroppedImage );
-        break;
-      }
+      material.SetTextureImage( index, mCroppedImage );
     }
-    if( !sampler )
+    else
     {
-      sampler = Sampler::New( mCroppedImage, TEXTURE_UNIFORM_NAME );
-      material.AddSampler( sampler );
+      material.AddTexture(  mCroppedImage, TEXTURE_UNIFORM_NAME );
     }
 
     if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
@@ -487,18 +481,18 @@ void NPatchRenderer::ApplyImageToSampler()
       uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
       uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
 
-      sampler.RegisterProperty( "uFixed[0]", Vector2::ZERO );
-      sampler.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
-      sampler.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
-      sampler.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
+      material.RegisterProperty( "uFixed[0]", Vector2::ZERO );
+      material.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
+      material.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
+      material.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
     }
     else
     {
-      sampler.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
-      sampler.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
+      material.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
+      material.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
 
-      RegisterStretchProperties( sampler, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
-      RegisterStretchProperties( sampler, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
+      RegisterStretchProperties( material, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
+      RegisterStretchProperties( material, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
     }
   }
 }

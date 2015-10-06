@@ -718,9 +718,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     quadGeometry.AddVertexBuffer( quadVertices );
     quadGeometry.SetIndexBuffer( quadIndices );
 
-    Sampler sampler = Sampler::New( meshRecord.mBuffer, "sTexture" );
     Material material = Material::New( mGlyphManager.GetEffectBufferShader() );
-    material.AddSampler( sampler );
+    material.AddTexture(meshRecord.mBuffer, "sTexture");
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
 
@@ -751,8 +750,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     normGeometry.SetIndexBuffer( normIndices );
 
     Material normMaterial = Material::New( mGlyphManager.GetGlyphShadowShader() );
-    Sampler normSampler =  mGlyphManager.GetSampler( meshRecord.mAtlasId );
-    normMaterial.AddSampler( normSampler );
+    Image normImage =  mGlyphManager.GetImage( meshRecord.mAtlasId );
+    normMaterial.AddTexture( normImage, "sTexture" );
     Dali::Renderer normRenderer = Dali::Renderer::New( normGeometry, normMaterial );
     Actor subActor = Actor::New();
     subActor.AddRenderer( normRenderer );

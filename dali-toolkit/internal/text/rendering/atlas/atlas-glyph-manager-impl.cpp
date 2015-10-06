@@ -263,9 +263,9 @@ Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
   return mAtlasManager.GetMaterial( atlasId );
 }
 
-Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+Image AtlasGlyphManager::GetImage( uint32_t atlasId ) const
 {
-  return mAtlasManager.GetSampler( atlasId );
+  return mAtlasManager.GetImage( atlasId );
 }
 
 AtlasGlyphManager::~AtlasGlyphManager()

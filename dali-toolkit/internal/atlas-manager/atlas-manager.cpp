@@ -130,9 +130,9 @@ Material AtlasManager::GetMaterial( AtlasId atlas ) const
   return GetImplementation(*this).GetMaterial( atlas );
 }
 
-Sampler AtlasManager::GetSampler( AtlasId atlas ) const
+Image AtlasManager::GetImage( AtlasId atlas ) const
 {
-  return GetImplementation(*this).GetSampler( atlas );
+  return GetImplementation(*this).GetImage( atlas );
 }
 
 } // namespace Toolkit

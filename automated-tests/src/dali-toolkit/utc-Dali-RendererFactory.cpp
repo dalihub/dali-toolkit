@@ -173,7 +173,7 @@ void TestControlRendererRender( ToolkitTestApplication& application, Actor& acto
   controlRenderer.SetOnStage( actor );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == expectedSamplers );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == expectedSamplers );
 
   application.SendNotification();
   application.Render();
@@ -804,8 +804,6 @@ int UtcDaliRendererFactoryResetRenderer1(void)
   controlRenderer.SetOnStage( actor2 );
   application.SendNotification();
   application.Render(0);
-  Image samplerImage = actor2.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
-  DALI_TEST_CHECK( BufferImage::DownCast( samplerImage ) );
 
   END_TEST;
 }
@@ -830,16 +828,12 @@ int UtcDaliRendererFactoryResetRenderer2(void)
 
   application.SendNotification();
   application.Render(0);
-  Image samplerImage = actor.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
-  DALI_TEST_CHECK( ResourceImage::DownCast( samplerImage ) );
 
   Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   bool isNewRenderer = factory.ResetRenderer( controlRenderer, bufferImage );
   DALI_TEST_CHECK( !isNewRenderer );
   application.SendNotification();
   application.Render(0);
-  samplerImage = actor.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
-  DALI_TEST_CHECK( BufferImage::DownCast( samplerImage ) );
 
   isNewRenderer = factory.ResetRenderer( controlRenderer, Color::RED );
   DALI_TEST_CHECK( isNewRenderer );

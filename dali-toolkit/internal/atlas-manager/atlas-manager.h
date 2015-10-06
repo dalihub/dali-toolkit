@@ -389,13 +389,13 @@ public:
   Material GetMaterial( AtlasId atlas ) const;
 
  /**
-   * @brief Get Sampler used by atlas
+   * @brief Get Image used by atlas
    *
    * @param atlas[in] atlas AtlasId
    *
    * @return Sampler used by atlas
    */
-  Sampler GetSampler( AtlasId atlas ) const;
+  Image GetImage( AtlasId atlas ) const;
 private:
 
   explicit DALI_INTERNAL AtlasManager(Internal::AtlasManager *impl);
