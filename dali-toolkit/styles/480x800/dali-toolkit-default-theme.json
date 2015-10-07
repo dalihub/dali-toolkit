@@ -65,11 +65,9 @@ distributing this software or its derivatives.
       "secondary-cursor-color":[0.0,0.72,0.9,1.0],
       "cursor-width":1,
       "selection-highlight-color":[0.75,0.96,1.0,1.0],
-      "grab-handle-image": { "filename":"{DALI_IMAGE_DIR}cursor_handler_center.png" },
-      "selection-handle-image-left" : {"filename":"{DALI_IMAGE_DIR}selection_handle_left.png" },
-      "selection-handle-image-right": {"filename":"{DALI_IMAGE_DIR}selection_handle_right.png" },
-      "selection-handle-marker-image-left":{ "filename":"{DALI_IMAGE_DIR}selection_marker_left.png" },
-      "selection-handle-marker-image-right":{ "filename":"{DALI_IMAGE_DIR}selection_marker_right.png" }
+      "grab-handle-image" : "{DALI_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selection-handle-image-left" : {"filename":"{DALI_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selection-handle-image-right": {"filename":"{DALI_IMAGE_DIR}selection_handle_drop_right.png" }
     },
 
     "textfield-font-size-0":
