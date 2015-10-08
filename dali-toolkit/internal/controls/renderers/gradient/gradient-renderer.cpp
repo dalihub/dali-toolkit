@@ -178,8 +178,9 @@ Sampler::WrapMode GetWrapMode( Gradient::SpreadMethod spread )
 }
 
 
-GradientRenderer::GradientRenderer()
-:mGradientTransformIndex( Property::INVALID_INDEX )
+GradientRenderer::GradientRenderer( RendererFactoryCache& factoryCache )
+: ControlRenderer( factoryCache ),
+  mGradientType( LINEAR )
 {
 }
 
@@ -187,15 +188,8 @@ GradientRenderer::~GradientRenderer()
 {
 }
 
-void GradientRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void GradientRenderer::DoInitialize( const Property::Map& propertyMap )
 {
-  mImpl->mGeometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
-  if( !(mImpl->mGeometry) )
-  {
-    mImpl->mGeometry =  RendererFactoryCache::CreateQuadGeometry();
-    factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, mImpl->mGeometry );
-  }
-
   Gradient::GradientUnits gradientUnits = Gradient::OBJECT_BOUNDING_BOX;
   Property::Value* unitsValue = propertyMap.Find( GRADIENT_UNITS_NAME );
   std::string units;
@@ -206,22 +200,13 @@ void GradientRenderer::DoInitialize( RendererFactoryCache& factoryCache, const P
     gradientUnits = Gradient::USER_SPACE_ON_USE;
   }
 
-  Type gradientType = LINEAR;
+  mGradientType = LINEAR;
   if( propertyMap.Find( GRADIENT_RADIUS_NAME ))
   {
-    gradientType = RADIAL;
+    mGradientType = RADIAL;
   }
 
-  RendererFactoryCache::ShaderType shaderType = GetShaderType( gradientType, gradientUnits );
-
-  mImpl->mShader = factoryCache.GetShader( shaderType );
-  if( !(mImpl->mShader) )
-  {
-    mImpl->mShader = Shader::New( VERTEX_SHADER[gradientUnits], FRAGMENT_SHADER[gradientType] );
-    factoryCache.SaveShader( shaderType, mImpl->mShader );
-  }
-
-  if( NewGradient(gradientType, propertyMap) )
+  if( NewGradient( mGradientType, propertyMap ) )
   {
     mGradient->SetGradientUnits( gradientUnits );
     mGradientTransform = mGradient->GetAlignmentTransform();
@@ -304,20 +289,48 @@ void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
-void GradientRenderer::DoSetOnStage( Actor& actor )
+void GradientRenderer::InitializeRenderer( Dali::Renderer& renderer )
 {
-  mGradientTransformIndex = (mImpl->mRenderer).RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
+  Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
+  if( !geometry )
+  {
+    geometry =  RendererFactoryCache::CreateQuadGeometry();
+    mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
+  }
+
+  Gradient::GradientUnits gradientUnits = mGradient->GetGradientUnits();
+  RendererFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, gradientUnits );
+  Shader shader = mFactoryCache.GetShader( shaderType );
+  if( !shader )
+  {
+    shader = Shader::New( VERTEX_SHADER[gradientUnits], FRAGMENT_SHADER[ mGradientType ] );
+    mFactoryCache.SaveShader( shaderType, shader );
+  }
+
+  Material material;
+  if( !renderer )
+  {
+    material = Material::New( shader );
+    renderer = Renderer::New( geometry, material );
+  }
+  else
+  {
+    mImpl->mRenderer.SetGeometry( geometry );
+    material = mImpl->mRenderer.GetMaterial();
+    if( material )
+    {
+      material.SetShader( shader );
+    }
+  }
 
   Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
   Sampler sampler = Sampler::New( lookupTexture, UNIFORM_TEXTULRE_NAME );
   Sampler::WrapMode wrap = GetWrapMode( mGradient->GetSpreadMethod() );
   sampler.SetWrapMode(  wrap, wrap  );
 
-  Material material = (mImpl->mRenderer).GetMaterial();
-  if( material )
-  {
-    material.AddSampler( sampler );
-  }
+  material.AddSampler( sampler );
+
+  renderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 }
 
 bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& propertyMap)

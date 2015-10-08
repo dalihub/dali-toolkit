@@ -17,10 +17,13 @@
  * limitations under the License.
  */
 
+#include <map>
+
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/devel-api/rendering/shader.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 namespace Dali
 {
@@ -106,6 +109,47 @@ public:
    */
   static Geometry CreateQuadGeometry();
 
+public:
+  struct CachedRenderer : RefObject
+  {
+    std::string mKey;
+    Renderer mRenderer;
+
+    CachedRenderer( const std::string& key, const Renderer& renderer )
+    : mKey( key ),
+      mRenderer( renderer )
+    {}
+  };
+
+  typedef IntrusivePtr< CachedRenderer > CachedRendererPtr;
+
+  /**
+   * @brief Request renderer from the url
+   *
+   * @return The cached renderer if exist in the cache. Otherwise null is returned.
+   */
+  CachedRendererPtr GetRenderer( const std::string& key ) const;
+
+  /**
+   * @brief Cache the renderer based on the given key.
+   *
+   * If the key already exists in the cache, then the cache will save an additional renderer to the cache.
+   * RemoveRenderer will then need to be called twice to remove both items from the cache.
+   *
+   * @param[in] key The key to use for caching
+   * @param[in] renderer The Renderer to be cached
+   *
+   * @return The cached renderer stored in the cache
+   */
+  CachedRendererPtr SaveRenderer( const std::string& key, Renderer& renderer );
+
+  /**
+   * @brief Removes the renderer from the cache based on the given key
+   *
+   * @param[in] key The key used for caching
+   */
+  void RemoveRenderer( const std::string& key );
+
 protected:
 
   /**
@@ -124,12 +168,25 @@ protected:
   RendererFactoryCache& operator=(const RendererFactoryCache& rhs);
 
 private:
+  typedef Dali::Vector< std::size_t > HashVector;
+  typedef std::vector< CachedRendererPtr > CachedRenderers;
 
+  /**
+   * @brief Finds the first index into the cached renderers from the url
+   *
+   * @return Returns the first index into the cached renderer from the url if it exists in the cache, otherwise returns -1
+   */
+  int FindRenderer( const std::string& key ) const;
+
+private:
   // ToDo: test whether using the WeakHandle could improve the performance
   //       With WeakHandle, the resource would be released automatically when no control is using it
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX+1];
   Shader mShader[SHADER_TYPE_MAX+1];
+
+  HashVector mRendererHashes;
+  CachedRenderers mRenderers;
 };
 
 } // namespace Internal

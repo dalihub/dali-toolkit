@@ -102,6 +102,11 @@ private: // From Control
   virtual void OnStageConnection( int depth );
 
   /**
+   * @copydoc Toolkit::Control::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   virtual Vector3 GetNaturalSize();

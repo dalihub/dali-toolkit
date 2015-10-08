@@ -27,6 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 
 namespace Dali
 {
@@ -36,8 +37,6 @@ namespace Toolkit
 
 namespace Internal
 {
-
-class RendererFactoryCache;
 
 /**
  * Base class for all Control rendering logic. A control may have multiple control renderers.
@@ -68,10 +67,9 @@ public:
    *  request the geometry and shader from the cache, if not available, create and save to the cache for sharing;
    *  record the property values.
    *
-   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  void Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
+  void Initialize( const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::ControlRenderer::SetSize
@@ -137,8 +135,10 @@ protected:
 
   /**
    * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    */
-  ControlRenderer();
+  ControlRenderer( RendererFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -159,7 +159,14 @@ protected:
    * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap ) = 0;
+  virtual void DoInitialize( const Property::Map& propertyMap ) = 0;
+
+  /**
+   * @brief Initialises a renderer ready to be put on stage.
+   *
+   * @param[inout] renderer The Renderer to initialise. If the renderer is not empty then re-initialise the renderer
+   */
+  virtual void InitializeRenderer( Renderer& renderer ) = 0;
 
 protected:
 
@@ -177,6 +184,15 @@ protected:
    */
   virtual void DoSetOffStage( Actor& actor );
 
+protected:
+
+  /**
+   * @brief Sets the key to use for caching the renderer. If this is empty then no caching will occur
+   *
+   * @param[in] cachedRendererKey The key to use for caching the renderer.
+   */
+  void SetCachedRendererKey( const std::string& cachedRendererKey );
+
 private:
 
   // Undefined
@@ -188,6 +204,7 @@ private:
 protected:
   struct Impl;
   Impl* mImpl;
+  RendererFactoryCache& mFactoryCache;
 };
 
 } // namespace Internal

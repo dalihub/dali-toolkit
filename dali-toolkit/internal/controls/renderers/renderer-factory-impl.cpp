@@ -83,35 +83,36 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
   std::string typeValue ;
   if( type && type->Get( typeValue ))
   {
+    if( !mFactoryCache )
+    {
+      mFactoryCache = new RendererFactoryCache();
+    }
+
     if( typeValue ==  COLOR_RENDERER )
     {
-      rendererPtr = new ColorRenderer();
+      rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
     }
     else if( typeValue ==  GRADIENT_RENDERER )
     {
-      rendererPtr = new GradientRenderer();
+      rendererPtr = new GradientRenderer( *( mFactoryCache.Get() ) );
     }
     else if( typeValue ==  IMAGE_RENDERER )
     {
-      rendererPtr = new ImageRenderer();
+      rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
     }
     else if( typeValue ==  N_PATCH_RENDERER )
     {
-      rendererPtr = new NPatchRenderer();
+      rendererPtr = new NPatchRenderer( *( mFactoryCache.Get() ) );
     }
     else if( typeValue == BORDER_RENDERER )
     {
-      rendererPtr = new BorderRenderer();
+      rendererPtr = new BorderRenderer( *( mFactoryCache.Get() ) );
     }
   }
 
   if( rendererPtr )
   {
-    if( !mFactoryCache )
-    {
-      mFactoryCache = new RendererFactoryCache();
-    }
-    rendererPtr->Initialize( *( mFactoryCache.Get() ), propertyMap );
+    rendererPtr->Initialize( propertyMap );
   }
   else
   {
@@ -123,14 +124,12 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
 {
-  ColorRenderer* rendererPtr = new ColorRenderer();
-
   if( !mFactoryCache )
   {
     mFactoryCache = new RendererFactoryCache();
   }
-  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
 
+  ColorRenderer* rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
   rendererPtr->SetColor( color );
 
   return Toolkit::ControlRenderer( rendererPtr );
@@ -153,13 +152,16 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const V
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
 {
-  BorderRenderer* rendererPtr = new BorderRenderer();
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+  BorderRenderer* rendererPtr = new BorderRenderer( *mFactoryCache.Get() );
 
   if( !mFactoryCache )
   {
     mFactoryCache = new RendererFactoryCache();
   }
-  rendererPtr->Initialize( *( mFactoryCache.Get() ) );
 
   rendererPtr->SetBorderSize( borderSize );
   rendererPtr->SetBorderColor( borderColor );
@@ -177,16 +179,14 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
   if( npatchImage )
   {
-    NPatchRenderer* rendererPtr = new NPatchRenderer();
-    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    NPatchRenderer* rendererPtr = new NPatchRenderer( *( mFactoryCache.Get() ) );
     rendererPtr->SetImage( npatchImage );
 
     return Toolkit::ControlRenderer( rendererPtr );
   }
   else
   {
-    ImageRenderer* rendererPtr = new ImageRenderer();
-    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
     rendererPtr->SetImage( image );
 
     return Toolkit::ControlRenderer( rendererPtr );
@@ -221,26 +221,21 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const I
 
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
 {
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new RendererFactoryCache();
+  }
+
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    NPatchRenderer* rendererPtr = new NPatchRenderer();
-    if( !mFactoryCache )
-    {
-      mFactoryCache = new RendererFactoryCache();
-    }
-    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    NPatchRenderer* rendererPtr = new NPatchRenderer( *( mFactoryCache.Get() ) );
     rendererPtr->SetImage( url );
 
     return Toolkit::ControlRenderer( rendererPtr );
   }
   else
   {
-    ImageRenderer* rendererPtr = new ImageRenderer();
-    if( !mFactoryCache )
-    {
-      mFactoryCache = new RendererFactoryCache();
-    }
-    rendererPtr->Initialize( *( mFactoryCache.Get() ) );
+    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
     rendererPtr->SetImage( url );
 
     return Toolkit::ControlRenderer( rendererPtr );
@@ -308,11 +303,7 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const P
     }
   }
 
-  if( !mFactoryCache )
-  {
-    mFactoryCache = new RendererFactoryCache();
-  }
-  GetImplementation( renderer ).Initialize( *( mFactoryCache.Get() ), propertyMap );
+  GetImplementation( renderer ).Initialize( propertyMap );
   return false;
 }
 

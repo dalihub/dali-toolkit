@@ -82,8 +82,10 @@ public:
 
   /**
    * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    */
-  GradientRenderer();
+  GradientRenderer( RendererFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -91,11 +93,6 @@ public:
   ~GradientRenderer();
 
 public:  // from ControlRenderer
-
-  /**
-   * @copydoc ControlRenderer::DoInitialize
-   */
-  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::SetSize
@@ -119,9 +116,14 @@ public:  // from ControlRenderer
 
 protected:
   /**
-   * @copydoc ControlRenderer::DoSetOnStage
+   * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoSetOnStage( Actor& actor );
+  virtual void DoInitialize( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc ControlRenderer::InitializeRenderer
+   */
+  virtual void InitializeRenderer( Renderer& renderer );
 
 private:
 
@@ -150,8 +152,8 @@ private:
 private:
 
   Matrix3 mGradientTransform;
-  Property::Index mGradientTransformIndex;
   IntrusivePtr<Gradient> mGradient;
+  Type mGradientType;
 };
 
 } // namespace Internal

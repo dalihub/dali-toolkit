@@ -47,8 +47,8 @@ struct Internal::ControlRenderer::Impl
     void CreatePropertyMap( Property::Map& map ) const;
   };
 
-  Geometry mGeometry;
-  Shader   mShader;
+  std::string mCachedRendererKey;  ///< The key to use for caching of the renderer. If it is empty then no caching will occur
+  RendererFactoryCache::CachedRendererPtr mCachedRenderer; ///< The current cached renderer from the Factory Cache. mCachedRenderer == null whilst this control render is offstage
   Renderer mRenderer;
 
   CustomShader* mCustomShader;

@@ -55,8 +55,10 @@ public:
 
   /**
    * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    */
-  NPatchRenderer();
+  NPatchRenderer( RendererFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -64,11 +66,6 @@ public:
   ~NPatchRenderer();
 
 public:  // from ControlRenderer
-
-  /**
-   * @copydoc ControlRenderer::DoInitialize
-   */
-  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::GetNaturalSize
@@ -91,6 +88,17 @@ public:  // from ControlRenderer
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
+
+  /**
+   * @copydoc ControlRenderer::DoInitialize
+   */
+  virtual void DoInitialize( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc ControlRenderer::InitializeRenderer
+   */
+  virtual void InitializeRenderer( Renderer& renderer );
+
   /**
    * @copydoc ControlRenderer::DoSetOnStage
    */
@@ -102,13 +110,6 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
 public:
-
-  /**
-   * Request the geometry and shader from the cache, if not available, create and save to the cache for sharing.
-   *
-   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
-   */
-  void Initialize( RendererFactoryCache& factoryCache );
 
   /**
    * @brief Sets the 9 patch image of this renderer to the resource at imageUrl
@@ -184,7 +185,6 @@ private:
   Image mCroppedImage;
   Geometry mNinePatchGeometry;
   Geometry mNinePatchBorderGeometry;
-  Shader mNinePatchShader;
 
   std::string mImageUrl; ///< The url to the image resource to render if the renderer was set from an image resource url, empty otherwise
   NinePatchImage::StretchRanges mStretchPixelsX;
