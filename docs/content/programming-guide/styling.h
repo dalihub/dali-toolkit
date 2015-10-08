@@ -57,6 +57,6 @@ Each style selector can have resource folders associated with it.
 
 Images for that style should be in their own folder named images.
 
-Common images not specific for a particular style will be in the dali-toolkit common images folder.
+Common images not specific for a particular style will be in the images-common folder located in the style folder.
 *
 */
