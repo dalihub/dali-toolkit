@@ -45,8 +45,9 @@ namespace Toolkit
 namespace Internal
 {
 
-ControlRenderer::ControlRenderer()
-: mImpl( new Impl() )
+ControlRenderer::ControlRenderer( RendererFactoryCache& factoryCache )
+: mImpl( new Impl() ),
+  mFactoryCache( factoryCache )
 {
 }
 
@@ -55,7 +56,7 @@ ControlRenderer::~ControlRenderer()
   delete mImpl;
 }
 
-void ControlRenderer::Initialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void ControlRenderer::Initialize( const Property::Map& propertyMap )
 {
   if( mImpl->mCustomShader )
   {
@@ -73,7 +74,12 @@ void ControlRenderer::Initialize( RendererFactoryCache& factoryCache, const Prop
       }
     }
   }
-  DoInitialize( factoryCache, propertyMap );
+  DoInitialize( propertyMap );
+
+  if( mImpl->mIsOnStage )
+  {
+    InitializeRenderer( mImpl->mRenderer );
+  }
 }
 
 void ControlRenderer::SetSize( const Vector2& size )
@@ -115,10 +121,57 @@ float ControlRenderer::GetDepthIndex() const
   return mImpl->mDepthIndex;
 }
 
+void ControlRenderer::SetCachedRendererKey( const std::string& cachedRendererKey )
+{
+  if( mImpl->mCachedRendererKey == cachedRendererKey )
+  {
+    return;
+  }
+  if( !mImpl->mIsOnStage )
+  {
+    mImpl->mCachedRendererKey = cachedRendererKey;
+  }
+  else
+  {
+    //remove the cached renderer from the cache if we and the cache are the only things that hold a reference to it
+    if( mImpl->mCachedRenderer && mImpl->mCachedRenderer->ReferenceCount() == 2 )
+    {
+      mFactoryCache.RemoveRenderer( mImpl->mCachedRenderer->mKey );
+    }
+    mImpl->mCachedRenderer.Reset();
+
+    //add the new renderer
+    mImpl->mCachedRendererKey = cachedRendererKey;
+    if( !mImpl->mCachedRendererKey.empty() && !mImpl->mCustomShader )
+    {
+      DALI_ASSERT_DEBUG( mImpl->mRenderer && "The control render is on stage but it doesn't have a valid renderer.");
+      mImpl->mCachedRenderer = mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
+    }
+  }
+}
+
 void ControlRenderer::SetOnStage( Actor& actor )
 {
-  Material material = Material::New( mImpl->mShader );
-  mImpl->mRenderer = Renderer::New( mImpl->mGeometry, material );
+  if( !mImpl->mCachedRendererKey.empty() && !mImpl->mCustomShader )
+  {
+    mImpl->mCachedRenderer = mFactoryCache.GetRenderer( mImpl->mCachedRendererKey );
+    if( !mImpl->mCachedRenderer || !mImpl->mCachedRenderer->mRenderer )
+    {
+      InitializeRenderer( mImpl->mRenderer );
+      mImpl->mCachedRenderer = mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
+    }
+
+    if( mImpl->mCachedRenderer && mImpl->mCachedRenderer->mRenderer )
+    {
+      mImpl->mRenderer = mImpl->mCachedRenderer->mRenderer;
+    }
+  }
+
+  if( !mImpl->mRenderer )
+  {
+    InitializeRenderer( mImpl->mRenderer );
+  }
+
   mImpl->mRenderer.SetDepthIndex( mImpl->mDepthIndex );
   actor.AddRenderer( mImpl->mRenderer );
   mImpl->mIsOnStage = true;
@@ -131,6 +184,13 @@ void ControlRenderer::SetOffStage( Actor& actor )
   if( mImpl->mIsOnStage )
   {
     DoSetOffStage( actor );
+
+    //remove the cached renderer from the cache if we and the cache are the only things that hold a reference to it
+    if( mImpl->mCachedRenderer && mImpl->mCachedRenderer->ReferenceCount() == 2 )
+    {
+      mFactoryCache.RemoveRenderer( mImpl->mCachedRenderer->mKey );
+    }
+    mImpl->mCachedRenderer.Reset();
 
     actor.RemoveRenderer( mImpl->mRenderer );
     mImpl->mRenderer.Reset();

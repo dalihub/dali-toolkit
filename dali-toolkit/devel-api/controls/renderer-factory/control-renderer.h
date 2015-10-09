@@ -116,6 +116,7 @@ public:
    * This function should be called when the control put on stage.
    *
    * @param[in] actor The actor applying this renderer.
+   * @post SetOffStage should be called with the same actor when the control is put off stage otherwise memory will be leaked
    */
   void SetOnStage( Actor& actor );
 

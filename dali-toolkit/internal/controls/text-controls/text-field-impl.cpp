@@ -889,7 +889,7 @@ void TextField::OnInitialize()
   mController->EnableTextInput( mDecorator );
 
   // Forward input events to controller
-  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan |Gesture::LongPress ) );
+  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
   self.TouchedSignal().Connect( this, &TextField::OnTouched );
@@ -903,6 +903,9 @@ void TextField::OnInitialize()
     Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
     mDecorator->SetBoundingBox( Rect<int>( 0.0f, 0.0f, stageSize.width, stageSize.height ) );
   }
+
+  // Flip vertically the 'left' selection handle
+  mDecorator->FlipHandleVertically( LEFT_SELECTION_HANDLE, true );
 
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );

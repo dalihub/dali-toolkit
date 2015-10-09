@@ -222,6 +222,16 @@ void ImageView::OnStageConnection( int depth )
   }
 }
 
+void ImageView::OnStageDisconnection()
+{
+  if( mRenderer )
+  {
+    CustomActor self = Self();
+    mRenderer.SetOffStage( self );
+  }
+}
+
+
 ///////////////////////////////////////////////////////////
 //
 // Properties

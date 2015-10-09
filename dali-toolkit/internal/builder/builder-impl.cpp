@@ -1363,6 +1363,7 @@ Builder::Builder()
   defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]  = DALI_IMAGE_DIR;
   defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]  = DALI_SOUND_DIR;
   defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ] = DALI_STYLE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_STYLE_IMAGE_DIR) ] = DALI_STYLE_IMAGE_DIR;
 
   AddConstants( defaultDirs );
 }

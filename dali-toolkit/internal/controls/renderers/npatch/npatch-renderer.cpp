@@ -150,8 +150,8 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
 
 /////////////////NPatchRenderer////////////////
 
-NPatchRenderer::NPatchRenderer()
-: ControlRenderer(),
+NPatchRenderer::NPatchRenderer( RendererFactoryCache& factoryCache )
+: ControlRenderer( factoryCache ),
   mBorderOnly( false )
 {
 }
@@ -160,10 +160,8 @@ NPatchRenderer::~NPatchRenderer()
 {
 }
 
-void NPatchRenderer::DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap )
+void NPatchRenderer::DoInitialize( const Property::Map& propertyMap )
 {
-  Initialize(factoryCache);
-
   Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
   if( imageURLValue )
   {
@@ -217,6 +215,51 @@ void NPatchRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
+void NPatchRenderer::InitializeRenderer( Renderer& renderer )
+{
+  Geometry geometry;
+  if( !mBorderOnly )
+  {
+    geometry = mFactoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY );
+    if( !geometry )
+    {
+      geometry = CreateGeometry( Uint16Pair( 3, 3 ) );
+      mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY, geometry );
+    }
+  }
+  else
+  {
+    geometry = mFactoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY );
+    if( !geometry )
+    {
+      geometry = CreateGeometryBorder( Uint16Pair( 3, 3 ) );
+      mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY, geometry );
+    }
+  }
+
+  Shader shader = mFactoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
+  if( !shader )
+  {
+    shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
+    mFactoryCache.SaveShader( RendererFactoryCache::NINE_PATCH_SHADER, shader );
+  }
+
+  if( !renderer )
+  {
+    Material material = Material::New( shader );
+    renderer = Renderer::New( geometry, material );
+  }
+  else
+  {
+    mImpl->mRenderer.SetGeometry( geometry );
+    Material material = mImpl->mRenderer.GetMaterial();
+    if( material )
+    {
+      material.SetShader( shader );
+    }
+  }
+}
+
 void NPatchRenderer::DoSetOnStage( Actor& actor )
 {
   if( !mCroppedImage )
@@ -256,35 +299,6 @@ void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( IMAGE_URL_NAME, mImage.GetUrl() );
   }
   map.Insert( BORDER_ONLY, mBorderOnly );
-}
-
-void NPatchRenderer::Initialize( RendererFactoryCache& factoryCache )
-{
-  mNinePatchGeometry = factoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY );
-  if( !(mNinePatchGeometry) )
-  {
-    mNinePatchGeometry = CreateGeometry( Uint16Pair( 3, 3 ) );
-    factoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY, mNinePatchGeometry );
-  }
-
-  mNinePatchBorderGeometry = factoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY );
-  if( !(mNinePatchBorderGeometry) )
-  {
-    mNinePatchBorderGeometry = CreateGeometryBorder( Uint16Pair( 3, 3 ) );
-    factoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY, mNinePatchBorderGeometry );
-  }
-
-  mNinePatchShader = factoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
-  if( !mNinePatchShader )
-  {
-    mNinePatchShader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
-    factoryCache.SaveShader( RendererFactoryCache::NINE_PATCH_SHADER, mNinePatchShader );
-  }
-
-  mImpl->mGeometry = mNinePatchGeometry;
-  mImpl->mShader = mNinePatchShader;
-
-  mImageUrl.clear();
 }
 
 void NPatchRenderer::SetImage( const std::string& imageUrl, bool borderOnly )
@@ -338,13 +352,6 @@ void NPatchRenderer::InitialiseFromImage( NinePatchImage nPatch )
 
   mStretchPixelsX = nPatch.GetStretchPixelsX();
   mStretchPixelsY = nPatch.GetStretchPixelsY();
-
-  if( mStretchPixelsX.Size() > 0 && mStretchPixelsY.Size() > 0 )
-  {
-    //only 9 patch supported for now
-    mImpl->mGeometry = !mBorderOnly ? mNinePatchGeometry : mNinePatchBorderGeometry;
-    mImpl->mShader = mNinePatchShader;
-  }
 }
 
 void NPatchRenderer::CreateErrorImage()
@@ -367,9 +374,6 @@ void NPatchRenderer::CreateErrorImage()
   mStretchPixelsX.PushBack( Uint16Pair( 0, mImageSize.GetWidth() ) );
   mStretchPixelsY.Clear();
   mStretchPixelsY.PushBack( Uint16Pair( 0, mImageSize.GetHeight() ) );
-
-  mImpl->mGeometry = mNinePatchGeometry;
-  mImpl->mShader = mNinePatchShader;
 }
 
 void NPatchRenderer::ApplyImageToSampler()

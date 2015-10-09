@@ -17,7 +17,10 @@
 // CLASS HEADER
 #include "renderer-factory-cache.h"
 
-// Internal HEADER
+// EXTERNAL HEADER
+#include <dali/devel-api/common/hash.h>
+
+// INTERNAL HEADER
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 
 namespace Dali
@@ -35,23 +38,7 @@ RendererFactoryCache::RendererFactoryCache()
 
 RendererFactoryCache::~RendererFactoryCache()
 {
-  for( int i=0; i<= SHADER_TYPE_MAX; i++)
-  {
-    if(mShader[i])
-    {
-      mShader[i].Reset();
-    }
-  }
-
-  for( int i=0; i<= GEOMETRY_TYPE_MAX; i++)
-  {
-    if(mGeometry[i])
-    {
-      mGeometry[i].Reset();
-    }
-  }
 }
-
 
 Geometry RendererFactoryCache::GetGeometry( GeometryType type )
 {
@@ -73,6 +60,80 @@ void RendererFactoryCache::SaveShader( ShaderType type, Shader shader )
   mShader[type] = shader;
 }
 
+int RendererFactoryCache::FindRenderer( const std::string& key ) const
+{
+  int hash = Dali::CalculateHash( key );
+
+  HashVector::Iterator startIt = mRendererHashes.Begin();
+  HashVector::Iterator it;
+
+  for(;;)
+  {
+    it = std::find( startIt, mRendererHashes.End(), hash );
+    if( it != mRendererHashes.End() )
+    {
+      int index = it - mRendererHashes.Begin();
+      const CachedRendererPtr& cachedRenderer = mRenderers[ index ];
+
+      if( cachedRenderer && cachedRenderer->mKey == key )
+      {
+        return index;
+      }
+    }
+    else
+    {
+      break;
+    }
+    startIt = it + 1;
+  }
+
+  return -1;
+}
+
+RendererFactoryCache::CachedRendererPtr RendererFactoryCache::GetRenderer( const std::string& key ) const
+{
+  int index = FindRenderer( key );
+  if( index != -1 )
+  {
+    return mRenderers[ index ];
+  }
+  else
+  {
+    return CachedRendererPtr();
+  }
+}
+
+RendererFactoryCache::CachedRendererPtr RendererFactoryCache::SaveRenderer( const std::string& key, Renderer& renderer )
+{
+  int hash = Dali::CalculateHash( key );
+  CachedRendererPtr newCachedRenderer = new CachedRenderer( key, renderer );
+
+  CachedRenderers::iterator it = std::find(mRenderers.begin(), mRenderers.end(), CachedRendererPtr() );
+  if( it != mRenderers.end() )
+  {
+    *it = newCachedRenderer;
+    int index = it - mRenderers.begin();
+    mRendererHashes[ index ] = hash;
+  }
+  else
+  {
+    mRendererHashes.PushBack( hash );
+    mRenderers.push_back( newCachedRenderer );
+  }
+
+  return newCachedRenderer;
+}
+
+void RendererFactoryCache::RemoveRenderer( const std::string& key )
+{
+  int index = FindRenderer( key );
+  if( index != -1 )
+  {
+    mRendererHashes[ index ] = Dali::CalculateHash( "" );
+    mRenderers[ index ].Reset();
+  }
+}
+
 Geometry RendererFactoryCache::CreateQuadGeometry()
 {
   const float halfWidth = 0.5f;
@@ -91,18 +152,10 @@ Geometry RendererFactoryCache::CreateQuadGeometry()
   PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat, 4 );
   quadVertices.SetData(quadVertexData);
 
-  // Create indices
-  //TODO: replace with triangle strip when Geometry supports it
-  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 6 );
-  indices.SetData(indexData);
-
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( quadVertices );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }

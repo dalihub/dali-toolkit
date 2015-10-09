@@ -72,9 +72,20 @@ class GradientRenderer: public ControlRenderer
 public:
 
   /**
-   * @brief Constructor.
+   * Types of the gradient
    */
-  GradientRenderer();
+  enum Type
+  {
+    LINEAR,
+    RADIAL
+  };
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   */
+  GradientRenderer( RendererFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -82,11 +93,6 @@ public:
   ~GradientRenderer();
 
 public:  // from ControlRenderer
-
-  /**
-   * @copydoc ControlRenderer::DoInitialize
-   */
-  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::SetSize
@@ -110,20 +116,16 @@ public:  // from ControlRenderer
 
 protected:
   /**
-   * @copydoc ControlRenderer::DoSetOnStage
+   * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoSetOnStage( Actor& actor );
-
-private:
+  virtual void DoInitialize( const Property::Map& propertyMap );
 
   /**
-   * Types of the gradient
+   * @copydoc ControlRenderer::InitializeRenderer
    */
-  enum Type
-  {
-    LINEAR,
-    RADIAL
-  };
+  virtual void InitializeRenderer( Renderer& renderer );
+
+private:
 
   /**
    * New a gradient object with the given property map.
@@ -150,8 +152,8 @@ private:
 private:
 
   Matrix3 mGradientTransform;
-  Property::Index mGradientTransformIndex;
   IntrusivePtr<Gradient> mGradient;
+  Type mGradientType;
 };
 
 } // namespace Internal

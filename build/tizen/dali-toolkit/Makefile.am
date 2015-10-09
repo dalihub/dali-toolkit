@@ -16,15 +16,16 @@
 
 # Build the Dali Toolkit library
 
-toolkit_images_dir = ../../../dali-toolkit/images
+toolkit_images_dir = ../../../dali-toolkit/images-common
 toolkit_sounds_dir = ../../../dali-toolkit/sounds
 toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
 devel_api_src_dir  = ../../../dali-toolkit/devel-api
 
 toolkit_styles_dir = $(STYLE_DIR)
+toolkit_style_images_dir = $(STYLE_DIR)/images
 
-include ../../../dali-toolkit/images/file.list
+include ../../../dali-toolkit/images-common/file.list
 include ../../../dali-toolkit/sounds/file.list
 include ../../../dali-toolkit/styles/file.list
 include ../../../dali-toolkit/internal/file.list
@@ -52,12 +53,16 @@ libdali_toolkit_la_SOURCES = \
 dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
 dalistyle_DATA = ${dali_toolkit_style_files}
 
+dalistyleimagesdir = ${dataReadOnlyDir}/toolkit/styles/images/
+dalistyleimages_DATA = ${dali_toolkit_style_images}
+
 libdali_toolkit_la_DEPENDENCIES =
 
 libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
                       -DDALI_SOUND_DIR="\"${dalisounddir}\"" \
                       -DDALI_STYLE_DIR="\"${dalistyledir}\"" \
+                      -DDALI_STYLE_IMAGE_DIR="\"${dalistyleimagesdir}\"" \
                       -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                       -Werror -Wall \
                       -I../../../ \

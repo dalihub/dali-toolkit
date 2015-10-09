@@ -74,8 +74,10 @@ public:
 
   /**
    * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    */
-  ImageRenderer();
+  ImageRenderer( RendererFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -83,11 +85,6 @@ public:
   ~ImageRenderer();
 
 public:  // from ControlRenderer
-
-  /**
-   * @copydoc ControlRenderer::DoInitialize
-   */
-  virtual void DoInitialize( RendererFactoryCache& factoryCache, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::SetSize
@@ -116,6 +113,11 @@ public:  // from ControlRenderer
 
 protected:
   /**
+   * @copydoc ControlRenderer::DoInitialize
+   */
+  virtual void DoInitialize( const Property::Map& propertyMap );
+
+  /**
    * @copydoc ControlRenderer::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
@@ -125,14 +127,12 @@ protected:
    */
   virtual void DoSetOffStage( Actor& actor );
 
-public:
-
   /**
-   * Request the geometry and shader from the cache, if not available, create and save to the cache for sharing.
-   *
-   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   * @copydoc ControlRenderer::InitializeRenderer
    */
-  void Initialize( RendererFactoryCache& factoryCache );
+  virtual void InitializeRenderer( Renderer& renderer );
+
+public:
 
   /**
    * @brief Sets the image of this renderer to the resource at imageUrl

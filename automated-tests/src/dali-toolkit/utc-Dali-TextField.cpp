@@ -705,8 +705,8 @@ int utcDaliTextFieldEvent02(void)
   // Send some taps and check the cursor positions.
 
   // Try to tap at the beginning.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
 
   // Render and notify
   application.SendNotification();
@@ -718,8 +718,8 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( position2, position4, TEST_LOCATION ); // Should be in the same position2.
 
   // Tap away from the start position.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 13.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 13.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 16.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 16.0f, 25.0f ) ) );
 
   // Render and notify
   application.SendNotification();
@@ -738,7 +738,12 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Should not be renderer.
+  // Cursor position should be the same than position2.
+  Vector3 position6 = cursor.GetCurrentPosition();
+
+  DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
+
+  // Should not be a renderer.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
 
   END_TEST;

@@ -85,9 +85,6 @@ Integration::Log::Filter* gLogFilter( Integration::Log::Filter::New(Debug::NoLog
 // Local Data
 namespace
 {
-
-const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "cursor_handler_center.png" );
-
 const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
 
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
@@ -219,6 +216,7 @@ struct Decorator::Impl : public ConnectionTracker
       active( false ),
       visible( false ),
       pressed( false ),
+      verticallyFlippedPreferred( false ),
       horizontallyFlipped( false ),
       verticallyFlipped( false )
     {
@@ -236,8 +234,9 @@ struct Decorator::Impl : public ConnectionTracker
     bool    active  : 1;
     bool    visible : 1;
     bool    pressed : 1;
-    bool    horizontallyFlipped : 1; ///< Whether the handle has been horizontally flipped.
-    bool    verticallyFlipped   : 1; ///< Whether the handle has been vertically flipped.
+    bool    verticallyFlippedPreferred : 1; ///< Whether the handle is preferred to be vertically flipped.
+    bool    horizontallyFlipped        : 1; ///< Whether the handle has been horizontally flipped.
+    bool    verticallyFlipped          : 1; ///< Whether the handle has been vertically flipped.
   };
 
   struct PopupImpl
@@ -308,13 +307,11 @@ struct Decorator::Impl : public ConnectionTracker
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
-      mPrimaryCursorVisible = ( cursor.position.x <= size.width ) && ( cursor.position.x >= 0.f );
+      mPrimaryCursorVisible = ( cursor.position.x + mCursorWidth <= size.width ) && ( cursor.position.x >= 0.f );
       if( mPrimaryCursorVisible )
       {
-        const Vector2& position = cursor.position;
-
-        mPrimaryCursor.SetPosition( position.x,
-                                    position.y );
+        mPrimaryCursor.SetPosition( cursor.position.x,
+                                    cursor.position.y );
         mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
       mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
@@ -322,7 +319,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( mSecondaryCursor )
     {
       const CursorImpl& cursor = mCursor[SECONDARY_CURSOR];
-      mSecondaryCursorVisible = ( cursor.position.x <= size.width ) && ( cursor.position.x >= 0.f );
+      mSecondaryCursorVisible = ( cursor.position.x + mCursorWidth <= size.width ) && ( cursor.position.x >= 0.f );
       if( mSecondaryCursorVisible )
       {
         mSecondaryCursor.SetPosition( cursor.position.x,
@@ -336,9 +333,7 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( grabHandle.active )
     {
-      const Vector2& position = grabHandle.position;
-
-      const bool isVisible = ( position.x <= size.width ) && ( position.x >= 0.f );
+      const bool isVisible = ( grabHandle.position.x + floor( 0.5f * mCursorWidth ) <= size.width ) && ( grabHandle.position.x >= 0.f );
 
       if( isVisible )
       {
@@ -350,7 +345,11 @@ struct Decorator::Impl : public ConnectionTracker
         // Sets the grab handle image according if it's pressed, flipped, etc.
         SetHandleImage( GRAB_HANDLE );
       }
-      grabHandle.actor.SetVisible( isVisible );
+
+      if( grabHandle.actor )
+      {
+        grabHandle.actor.SetVisible( isVisible );
+      }
     }
     else if( grabHandle.actor )
     {
@@ -362,11 +361,8 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( primary.active || secondary.active )
     {
-      const Vector2& primaryPosition = primary.position;
-      const Vector2& secondaryPosition = secondary.position;
-
-      const bool isPrimaryVisible = ( primaryPosition.x <= size.width ) && ( primaryPosition.x >= 0.f );
-      const bool isSecondaryVisible = ( secondaryPosition.x <= size.width ) && ( secondaryPosition.x >= 0.f );
+      const bool isPrimaryVisible = ( primary.position.x <= size.width ) && ( primary.position.x >= 0.f );
+      const bool isSecondaryVisible = ( secondary.position.x <= size.width ) && ( secondary.position.x >= 0.f );
 
       if( isPrimaryVisible || isSecondaryVisible )
       {
@@ -392,8 +388,15 @@ struct Decorator::Impl : public ConnectionTracker
           SetSelectionHandleMarkerSize( secondary );
         }
       }
-      primary.actor.SetVisible( isPrimaryVisible );
-      secondary.actor.SetVisible( isSecondaryVisible );
+
+      if( primary.actor )
+      {
+        primary.actor.SetVisible( isPrimaryVisible );
+      }
+      if( secondary.actor )
+      {
+        secondary.actor.SetVisible( isSecondaryVisible );
+      }
 
       CreateHighlight();
       UpdateHighlight();
@@ -619,7 +622,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void SetSelectionHandleMarkerSize( HandleImpl& handle )
   {
-    if ( handle.markerActor )
+    if( handle.markerActor )
     {
       handle.markerActor.SetSize( 0, handle.lineHeight );
     }
@@ -630,11 +633,6 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( !grabHandle.actor )
     {
-      if( !mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] )
-      {
-        SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_RELEASED ) );
-      }
-
       grabHandle.actor = ImageActor::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
       grabHandle.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
       grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
@@ -677,7 +675,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CreateHandleMarker( HandleImpl& handle, Image& image, HandleType handleType )
   {
-    if ( image )
+    if( image )
     {
       handle.markerActor = ImageActor::New( image );
       handle.markerActor.SetColor( mHandleColor );
@@ -685,12 +683,12 @@ struct Decorator::Impl : public ConnectionTracker
 
       handle.markerActor.SetResizePolicy ( ResizePolicy::FIXED, Dimension::HEIGHT );
 
-      if ( LEFT_SELECTION_HANDLE == handleType )
+      if( LEFT_SELECTION_HANDLE == handleType )
       {
         handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
         handle.markerActor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
       }
-      else if ( RIGHT_SELECTION_HANDLE == handleType )
+      else if( RIGHT_SELECTION_HANDLE == handleType )
       {
         handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
         handle.markerActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
@@ -794,7 +792,10 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Check if the grab handle exceeds the boundaries of the decoration box.
     // At the moment only the height is checked for the grab handle.
-    grabHandle.verticallyFlipped = ( grabHandleWorldPosition.y + grabHandle.size.height > mBoundingBox.w );
+
+    grabHandle.verticallyFlipped = ( grabHandle.verticallyFlippedPreferred &&
+                                     ( ( grabHandleWorldPosition.y - grabHandle.lineHeight - grabHandle.size.height ) > mBoundingBox.y ) ) ||
+                                   ( grabHandleWorldPosition.y + grabHandle.size.height > mBoundingBox.w );
 
     // The grab handle 'y' position in local coords.
     // If the grab handle exceeds the bottom of the decoration box,
@@ -802,7 +803,7 @@ struct Decorator::Impl : public ConnectionTracker
     // The SetGrabHandleImage() method will change the orientation.
     const float yLocalPosition = grabHandle.verticallyFlipped ? grabHandle.position.y : grabHandle.position.y + grabHandle.lineHeight;
 
-    grabHandle.actor.SetPosition( grabHandle.position.x - floor( 0.5f * mCursorWidth ),
+    grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ),
                                   yLocalPosition ); // TODO : Fix for multiline.
   }
 
@@ -817,7 +818,7 @@ struct Decorator::Impl : public ConnectionTracker
     Vector2 handleWorldPosition;
     CalculateHandleWorldCoordinates( handle, handleWorldPosition );
 
-    // Whether to flip the handle.
+    // Whether to flip the handle (horizontally).
     bool flipHandle = isPrimaryHandle ? mFlipLeftSelectionHandleDirection : mFlipRightSelectionHandleDirection;
 
     // Whether to flip the handles if they are crossed.
@@ -829,6 +830,21 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Does not flip if both conditions are true (double flip)
     flipHandle = flipHandle != ( crossFlip || mHandlePreviousCrossed );
+
+    // Will flip the handles vertically if the user prefers it.
+    bool verticallyFlippedPreferred = handle.verticallyFlippedPreferred;
+
+    if( crossFlip || mHandlePreviousCrossed )
+    {
+      if( isPrimaryHandle )
+      {
+        verticallyFlippedPreferred = mHandle[RIGHT_SELECTION_HANDLE].verticallyFlippedPreferred;
+      }
+      else
+      {
+        verticallyFlippedPreferred = mHandle[LEFT_SELECTION_HANDLE].verticallyFlippedPreferred;
+      }
+    }
 
     // Check if the selection handle exceeds the boundaries of the decoration box.
     const bool exceedsLeftEdge = ( isPrimaryHandle ? !flipHandle : flipHandle ) && ( handleWorldPosition.x - handle.size.width < mBoundingBox.x );
@@ -860,7 +876,9 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     // Whether to flip the handle vertically.
-    handle.verticallyFlipped = ( handleWorldPosition.y + handle.size.height > mBoundingBox.w );
+    handle.verticallyFlipped = ( verticallyFlippedPreferred &&
+                                 ( ( handleWorldPosition.y - handle.lineHeight - handle.size.height ) > mBoundingBox.y ) ) ||
+                               ( handleWorldPosition.y + handle.size.height > mBoundingBox.w );
 
     // The primary selection handle 'y' position in local coords.
     // If the handle exceeds the bottom of the decoration box,
@@ -890,18 +908,27 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     // Chooses between the released or pressed image. It checks whether the pressed image exists.
-    const HandleImageType imageType = ( handle.pressed ? ( mHandleImages[type][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
+    if( handle.actor )
+    {
+      const HandleImageType imageType = ( handle.pressed ? ( mHandleImages[type][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
 
-    handle.actor.SetImage( mHandleImages[type][imageType] );
+      handle.actor.SetImage( mHandleImages[type][imageType] );
+    }
 
     if( HANDLE_TYPE_COUNT != markerType )
     {
-      const HandleImageType markerImageType = ( handle.pressed ? ( mHandleImages[markerType][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
-      handle.markerActor.SetImage( mHandleImages[markerType][markerImageType] );
+      if( handle.markerActor )
+      {
+        const HandleImageType markerImageType = ( handle.pressed ? ( mHandleImages[markerType][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
+        handle.markerActor.SetImage( mHandleImages[markerType][markerImageType] );
+      }
     }
 
     // Whether to flip the handle vertically.
-    handle.actor.SetOrientation( handle.verticallyFlipped ? ANGLE_180 : ANGLE_0, Vector3::XAXIS );
+    if( handle.actor )
+    {
+      handle.actor.SetOrientation( handle.verticallyFlipped ? ANGLE_180 : ANGLE_0, Vector3::XAXIS );
+    }
   }
 
   void CreateHighlight()
@@ -1192,26 +1219,34 @@ struct Decorator::Impl : public ConnectionTracker
 
   float AlternatePopUpPositionRelativeToCursor()
   {
+    const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
+    const float BOTTOM_HANDLE_BOTTOM_OFFSET = 1.5; //todo Should be a property
+
     float alternativePosition=0.0f;;
 
-    if ( mPrimaryCursor ) // Secondary cursor not used for paste
+    if( mPrimaryCursor ) // Secondary cursor not used for paste
     {
-      Cursor cursor = PRIMARY_CURSOR;
-      alternativePosition = mCursor[cursor].position.y;
+      alternativePosition = mCursor[PRIMARY_CURSOR].position.y + popupHeight;
     }
 
-    const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
+    const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+    const HandleImpl& selectionPrimaryHandle = mHandle[LEFT_SELECTION_HANDLE];
+    const HandleImpl& selectionSecondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
 
-    if( mHandle[GRAB_HANDLE].active )
+    if( grabHandle.active )
     {
       // If grab handle enabled then position pop-up below the grab handle.
-      const Vector2 grabHandleSize( 59.0f, 56.0f ); // todo
-      const float BOTTOM_HANDLE_BOTTOM_OFFSET = 1.5; //todo Should be a property
-      alternativePosition +=  grabHandleSize.height  + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET ;
+      alternativePosition = grabHandle.position.y + grabHandle.size.height + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET;
+
     }
-    else
+    else if( selectionPrimaryHandle.active || selectionSecondaryHandle.active )
     {
-      alternativePosition += popupHeight;
+      const float maxHeight = std::max( selectionPrimaryHandle.size.height,
+                                        selectionSecondaryHandle.size.height );
+      const float maxY = std::max( selectionPrimaryHandle.position.y,
+                                   selectionSecondaryHandle.position.y );
+
+      alternativePosition = maxY + maxHeight + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET;
     }
 
     return alternativePosition;
@@ -1226,7 +1261,6 @@ struct Decorator::Impl : public ConnectionTracker
 
     mCopyPastePopup.actor.SetY( alternativeYPosition );
   }
-
 
   void SetUpPopupPositionNotifications( )
   {
@@ -1632,6 +1666,16 @@ void Decorator::GetPosition( HandleType handleType, float& x, float& y, float& h
 const Vector2& Decorator::GetPosition( HandleType handleType ) const
 {
   return mImpl->mHandle[handleType].position;
+}
+
+void Decorator::FlipHandleVertically( HandleType handleType, bool flip )
+{
+  mImpl->mHandle[handleType].verticallyFlippedPreferred = flip;
+}
+
+bool Decorator::IsHandleVerticallyFlipped( HandleType handleType ) const
+{
+  return mImpl->mHandle[handleType].verticallyFlippedPreferred;
 }
 
 void Decorator::FlipSelectionHandlesOnCrossEnabled( bool enable )
