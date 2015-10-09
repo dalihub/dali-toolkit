@@ -48,7 +48,6 @@ struct Internal::ControlRenderer::Impl
   };
 
   std::string mCachedRendererKey;  ///< The key to use for caching of the renderer. If it is empty then no caching will occur
-  RendererFactoryCache::CachedRendererPtr mCachedRenderer; ///< The current cached renderer from the Factory Cache. mCachedRenderer == null whilst this control render is offstage
   Renderer mRenderer;
 
   CustomShader* mCustomShader;

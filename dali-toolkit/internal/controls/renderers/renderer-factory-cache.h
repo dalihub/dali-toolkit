@@ -24,6 +24,9 @@
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/devel-api/rendering/shader.h>
 #include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/object/weak-handle.h>
+
 
 namespace Dali
 {
@@ -110,25 +113,13 @@ public:
   static Geometry CreateQuadGeometry();
 
 public:
-  struct CachedRenderer : RefObject
-  {
-    std::string mKey;
-    Renderer mRenderer;
-
-    CachedRenderer( const std::string& key, const Renderer& renderer )
-    : mKey( key ),
-      mRenderer( renderer )
-    {}
-  };
-
-  typedef IntrusivePtr< CachedRenderer > CachedRendererPtr;
 
   /**
    * @brief Request renderer from the url
    *
-   * @return The cached renderer if exist in the cache. Otherwise null is returned.
+   * @return The cached renderer if exist in the cache. Otherwise an empty handle is returned.
    */
-  CachedRendererPtr GetRenderer( const std::string& key ) const;
+  Renderer GetRenderer( const std::string& key ) const;
 
   /**
    * @brief Cache the renderer based on the given key.
@@ -138,17 +129,15 @@ public:
    *
    * @param[in] key The key to use for caching
    * @param[in] renderer The Renderer to be cached
-   *
-   * @return The cached renderer stored in the cache
    */
-  CachedRendererPtr SaveRenderer( const std::string& key, Renderer& renderer );
+  void SaveRenderer( const std::string& key, Renderer& renderer );
 
   /**
-   * @brief Removes the renderer from the cache based on the given key
+   * @brief Cleans the renderer cache by removing the renderer from the cache based on the given key if there are no longer any references to it
    *
    * @param[in] key The key used for caching
    */
-  void RemoveRenderer( const std::string& key );
+  void CleanRendererCache( const std::string& key );
 
 protected:
 
@@ -168,8 +157,19 @@ protected:
   RendererFactoryCache& operator=(const RendererFactoryCache& rhs);
 
 private:
+  struct CachedRenderer
+  {
+    std::string mKey;
+    WeakHandle< Renderer > mRenderer;
+
+    CachedRenderer( const std::string& key, Renderer& renderer )
+    : mKey( key ),
+      mRenderer( renderer)
+    {}
+  };
+
   typedef Dali::Vector< std::size_t > HashVector;
-  typedef std::vector< CachedRendererPtr > CachedRenderers;
+  typedef Dali::OwnerContainer< const CachedRenderer* > CachedRenderers;
 
   /**
    * @brief Finds the first index into the cached renderers from the url
