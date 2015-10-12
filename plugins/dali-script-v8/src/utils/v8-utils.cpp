@@ -390,7 +390,7 @@ Property::Value GetPropertyValueFromObject( bool& found, v8::Isolate* isolate, c
 {
   v8::HandleScope handleScope( isolate);
 
-  Property::Value  daliPropertyValue;// creates a property with Property::INVALID
+  Property::Value  daliPropertyValue;// creates a property with Property::NONE
 
   found = false;
 
@@ -445,11 +445,33 @@ Property::Map GetPropertyMapFromObject( v8::Isolate* isolate, const v8::Local<v8
 
     // Get the value
     v8::Local<v8::Value> value = object->Get( key );
-    std::string valueString = V8Utils::v8StringToStdString( value );
 
-    propertyMap[ keyString ] = valueString.c_str();
-
+    if( value->IsBoolean() )
+    {
+      v8::Local<v8::Boolean> v = value->ToBoolean();
+      propertyMap[ keyString ] = v->Value();
+    }
+    else if( value->IsNumber() )
+    {
+      v8::Local<v8::Number> v = value->ToNumber();
+      propertyMap[ keyString ] = static_cast<float>(v->Value());
+    }
+    else if( value->IsInt32() || value->IsUint32() )
+    {
+      v8::Local<v8::Int32> v = value->ToInt32();
+      propertyMap[ keyString ] = static_cast<int>(v->Value());
+    }
+    else if( value->IsString() )
+    {
+      std::string valueString = V8Utils::v8StringToStdString( value );
+      propertyMap[ keyString ] = valueString.c_str();
+    }
+    else if( value->IsArray() )
+    {
+      propertyMap[ keyString ] = PropertyValueWrapper::VectorOrMatrixFromV8Array( isolate, value);
+    }
   }
+
   return propertyMap;
 }
 
@@ -480,6 +502,7 @@ int GetIntegerParameter( unsigned int index, bool& found, v8::Isolate* isolate, 
     found = true;
     return args[ index ]->Int32Value();
   }
+  else
   {
     return defaultValue;
   }
@@ -498,6 +521,7 @@ float GetFloatParameter( unsigned int index, bool& found, v8::Isolate* isolate, 
     found = true;
     return args[ index ]->NumberValue();
   }
+  else
   {
     return defaultValue;
   }
@@ -542,6 +566,24 @@ bool GetBooleanParameter( unsigned int index, bool& found, v8::Isolate* isolate,
   else
   {
     return false;
+  }
+}
+
+void* GetArrayBufferViewParameter( unsigned int index, bool& found, v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args  )
+{
+  found = false;
+  unsigned int length = args.Length();
+  if( index < length && args[index]->IsArrayBufferView() )
+  {
+    found = true;
+    v8::ArrayBufferView* bufferView = v8::ArrayBufferView::Cast(*(args[index]));
+    v8::Handle<v8::ArrayBuffer> buffer = bufferView->Buffer();
+    v8::ArrayBuffer::Contents contents = buffer->Externalize();
+    return contents.Data();
+  }
+  else
+  {
+    return NULL;
   }
 }
 
@@ -765,6 +807,7 @@ Image GetImageParameter( unsigned int index, bool& found, v8::Isolate* isolate, 
   }
 
 }
+
 RenderTask GetRenderTaskParameter( unsigned int paramIndex, bool& found, v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   found = false;
@@ -780,7 +823,6 @@ RenderTask GetRenderTaskParameter( unsigned int paramIndex, bool& found, v8::Iso
     return RenderTask(); // empty handle
   }
 }
-
 
 BaseWrappedObject* GetWrappedDaliObjectParameter( unsigned int index,  BaseWrappedObject::Type type,  v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args )
 {

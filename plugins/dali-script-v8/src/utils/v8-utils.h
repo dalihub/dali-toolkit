@@ -195,7 +195,7 @@ Property::Value GetPropertyValueFromObject( bool& found, v8::Isolate* isolate, c
 /**
  * Given a JavaScript object with
  * @param [in] object JavaScrript object
- * @return DALi ProperyMap from the  JavaScript object
+ * @return DALi ProperyMap from the JavaScript object
  */
 Property::Map GetPropertyMapFromObject( v8::Isolate* isolate, const v8::Local<v8::Object>& object);
 
@@ -248,6 +248,13 @@ std::string GetStringParameter( unsigned int index, bool& found, v8::Isolate* is
  * @return boolean value from the JavaScript function arguments
  */
 bool GetBooleanParameter( unsigned int index, bool& found, v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args );
+
+/**
+ * @param [in] index parameter index, e.g. callMyFunc( index0, index1, index2).
+ * @param[out] found whether the parameter was found
+ * @return ArrayBufferView from the JavaScript function arguments
+ */
+void* GetArrayBufferViewParameter( unsigned int index, bool& found, v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args  );
 
 /**
  * @param [in] index parameter index, e.g. callMyFunc( index0, index1, index2).

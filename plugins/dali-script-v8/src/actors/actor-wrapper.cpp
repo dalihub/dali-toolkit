@@ -227,6 +227,11 @@ const ActorFunctions ActorFunctionTable[]=
     { "SetKeyboardFocusable", ActorApi::SetKeyboardFocusable,  ACTOR_API }, //-- should this be a property???
     { "IsKeyboardFocusable" , ActorApi::IsKeyboardFocusable,   ACTOR_API }, //-- should this be a property???
 
+    { "AddRenderer",          ActorApi::AddRenderer,           ACTOR_API },
+    { "GetRendererCount",     ActorApi::GetRendererCount,      ACTOR_API },
+    { "GetRendererAt" ,       ActorApi::GetRendererAt,         ACTOR_API },
+    { "RemoveRenderer" ,      ActorApi::RemoveRenderer,        ACTOR_API },
+
     /**************************************
      * Layer  API (in order of layer.h)
      **************************************/

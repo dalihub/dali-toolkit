@@ -70,6 +70,10 @@ namespace ActorApi
   void TranslateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void RotateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void ScaleBy( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void AddRenderer( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetRendererCount( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetRendererAt( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void RemoveRenderer( const v8::FunctionCallbackInfo< v8::Value >& args );
 
   // new function just for JavaScript API, to help developers know what type of actor
   // they're dealing with, returns actor name as a string

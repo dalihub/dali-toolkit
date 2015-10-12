@@ -33,6 +33,7 @@
 #include <image/image-wrapper.h>
 #include <animation/animation-wrapper.h>
 #include <shader-effects/shader-effect-wrapper.h>
+#include <rendering/shader-wrapper.h>
 
 
 namespace Dali
@@ -292,12 +293,16 @@ void BuilderApi::Create( const v8::FunctionCallbackInfo< v8::Value >& args )
     v8::Local<v8::Object> image = ImageWrapper::WrapImage(isolate, Image::DownCast(handle) );
     args.GetReturnValue().Set( image );
   }
+  if( typeName == "ShaderEffect")
+  {
+    v8::Local<v8::Object> shaderEffect = ShaderEffectWrapper::WrapShaderEffect(isolate, ShaderEffect::DownCast( handle ));
+    args.GetReturnValue().Set( shaderEffect );
+  }
   if( typeName == "Shader")
   {
-    v8::Local<v8::Object> shader = ShaderEffectWrapper::WrapShaderEffect(isolate, ShaderEffect::DownCast( handle ));
+    v8::Local<v8::Object> shader = ShaderWrapper::WrapShader(isolate, Shader::DownCast( handle ));
     args.GetReturnValue().Set( shader );
   }
-
 }
 void BuilderApi::ApplyStyle( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
