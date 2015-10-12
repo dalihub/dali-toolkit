@@ -85,8 +85,6 @@ Integration::Log::Filter* gLogFilter( Integration::Log::Filter::New(Debug::NoLog
 // Local Data
 namespace
 {
-const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
-
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 
@@ -242,14 +240,12 @@ struct Decorator::Impl : public ConnectionTracker
   struct PopupImpl
   {
     PopupImpl()
-    : position(),
-      offset( DEFAULT_POPUP_OFFSET )
+    : position()
     {
     }
 
     TextSelectionPopup actor;
     Vector3 position;
-    int offset;
   };
 
   Impl( ControllerInterface& controller,
@@ -459,32 +455,40 @@ struct Decorator::Impl : public ConnectionTracker
 
   void DeterminePositionPopup()
   {
-    if ( !mActiveCopyPastePopup )
+    if( !mActiveCopyPastePopup )
     {
       return;
     }
 
+    // Retrieves the popup's size after relayout.
+    const Vector3 popupSize = Vector3( mCopyPastePopup.actor.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
+
     if( mPopupSetNewPosition )
     {
-      if ( mHandle[LEFT_SELECTION_HANDLE].active || mHandle[RIGHT_SELECTION_HANDLE].active )
+      const HandleImpl& primaryHandle = mHandle[LEFT_SELECTION_HANDLE];
+      const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
+      const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+      const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
+
+      if( primaryHandle.active || secondaryHandle.active )
       {
-        float minHandleXPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
-        float maxHandleXPosition = std::max (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
+        // Calculates the popup's position if selection handles are active.
+        const float minHandleXPosition = std::min( primaryHandle.position.x, secondaryHandle.position.x );
+        const float maxHandleXPosition = std::max( primaryHandle.position.x, secondaryHandle.position.x );
+        const float maxHandleHeight = std::max( primaryHandle.size.height, secondaryHandle.size.height );
 
-        float minHandleYPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.y, mHandle[RIGHT_SELECTION_HANDLE].position.y );
-
-        mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) *0.5f );
-        mCopyPastePopup.position.y = minHandleYPosition + mCopyPastePopup.offset;
+        mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) * 0.5f );
+        mCopyPastePopup.position.y = -0.5f * popupSize.height - maxHandleHeight + std::min( primaryHandle.position.y, secondaryHandle.position.y );
       }
       else
       {
-        mCopyPastePopup.position = Vector3( mCursor[PRIMARY_CURSOR].position.x, mCursor[PRIMARY_CURSOR].position.y -100.0f , 0.0f ); //todo 100 to be an offset Property
+        // Calculates the popup's position if the grab handle is active.
+        mCopyPastePopup.position = Vector3( cursor.position.x, -0.5f * popupSize.height - grabHandle.size.height + cursor.position.y, 0.0f );
       }
     }
 
-    Vector3 popupSize = Vector3( mCopyPastePopup.actor.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
-
-    GetConstrainedPopupPosition( mCopyPastePopup.position, popupSize, AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
+    // Checks if there is enough space above the text control. If not it places the popup under it.
+    GetConstrainedPopupPosition( mCopyPastePopup.position, popupSize * AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
 
     SetUpPopupPositionNotifications();
 
@@ -1219,34 +1223,23 @@ struct Decorator::Impl : public ConnectionTracker
 
   float AlternatePopUpPositionRelativeToCursor()
   {
-    const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
-    const float BOTTOM_HANDLE_BOTTOM_OFFSET = 1.5; //todo Should be a property
+    float alternativePosition = 0.0f;
 
-    float alternativePosition=0.0f;;
+    const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT );
 
-    if( mPrimaryCursor ) // Secondary cursor not used for paste
-    {
-      alternativePosition = mCursor[PRIMARY_CURSOR].position.y + popupHeight;
-    }
-
+    const HandleImpl& primaryHandle = mHandle[LEFT_SELECTION_HANDLE];
+    const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
     const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
-    const HandleImpl& selectionPrimaryHandle = mHandle[LEFT_SELECTION_HANDLE];
-    const HandleImpl& selectionSecondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
+    const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
 
-    if( grabHandle.active )
+    if( primaryHandle.active || secondaryHandle.active )
     {
-      // If grab handle enabled then position pop-up below the grab handle.
-      alternativePosition = grabHandle.position.y + grabHandle.size.height + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET;
-
+      const float maxHandleHeight = std::max( primaryHandle.size.height, secondaryHandle.size.height );
+      alternativePosition = 0.5f * popupHeight + cursor.lineHeight + maxHandleHeight + std::min( primaryHandle.position.y, secondaryHandle.position.y );
     }
-    else if( selectionPrimaryHandle.active || selectionSecondaryHandle.active )
+    else
     {
-      const float maxHeight = std::max( selectionPrimaryHandle.size.height,
-                                        selectionSecondaryHandle.size.height );
-      const float maxY = std::max( selectionPrimaryHandle.position.y,
-                                   selectionSecondaryHandle.position.y );
-
-      alternativePosition = maxY + maxHeight + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET;
+      alternativePosition = 0.5f * popupHeight + cursor.lineHeight + grabHandle.size.height + cursor.position.y;
     }
 
     return alternativePosition;
@@ -1254,7 +1247,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void PopUpLeavesVerticalBoundary( PropertyNotification& source )
   {
-    float alternativeYPosition=0.0f;
+    float alternativeYPosition = 0.0f;
     // todo use AlternatePopUpPositionRelativeToSelectionHandles() if text is highlighted
     // if can't be positioned above, then position below row.
     alternativeYPosition = AlternatePopUpPositionRelativeToCursor();
@@ -1268,24 +1261,22 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Exceeding vertical boundary
 
-    float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT);
+    const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT );
 
     PropertyNotification verticalExceedNotification = mCopyPastePopup.actor.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
-                                                      OutsideCondition( mBoundingBox.y + popupHeight * 0.5f,
-                                                                        mBoundingBox.w - popupHeight * 0.5f ) );
+                                                                                                     OutsideCondition( mBoundingBox.y + popupHeight * 0.5f,
+                                                                                                                       mBoundingBox.w - popupHeight * 0.5f ) );
 
     verticalExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesVerticalBoundary );
   }
 
-  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, Vector3& popupSize, Vector3 anchorPoint, Actor& parent, const Vector4& boundingRectangleWorld )
+  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, const Vector3& popupDistanceFromAnchorPoint, Actor parent, const Vector4& boundingRectangleWorld )
   {
     DALI_ASSERT_DEBUG ( "Popup parent not on stage" && parent.OnStage() )
 
     // Parent must already by added to Stage for these Get calls to work
-    Vector3 parentAnchorPoint = parent.GetCurrentAnchorPoint();
-    Vector3 parentWorldPositionLeftAnchor = parent.GetCurrentWorldPosition() - parent.GetCurrentSize()*parentAnchorPoint;
-    Vector3 popupWorldPosition = parentWorldPositionLeftAnchor + requiredPopupPosition;  // Parent World position plus popup local position gives World Position
-    Vector3 popupDistanceFromAnchorPoint = popupSize*anchorPoint;
+    const Vector3 parentWorldPositionLeftAnchor = parent.GetCurrentWorldPosition() - parent.GetCurrentSize() * parent.GetCurrentAnchorPoint();
+    const Vector3 popupWorldPosition = parentWorldPositionLeftAnchor + requiredPopupPosition;  // Parent World position plus popup local position gives World Position
 
     // Calculate distance to move popup (in local space) so fits within the boundary
     float xOffSetToKeepWithinBounds = 0.0f;
@@ -1293,13 +1284,13 @@ struct Decorator::Impl : public ConnectionTracker
     {
       xOffSetToKeepWithinBounds = boundingRectangleWorld.x - ( popupWorldPosition.x - popupDistanceFromAnchorPoint.x );
     }
-    else if ( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x > boundingRectangleWorld.z )
+    else if( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x > boundingRectangleWorld.z )
     {
       xOffSetToKeepWithinBounds = boundingRectangleWorld.z - ( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x );
     }
 
     // Ensure initial display of Popup is in alternative position if can not fit above. As Property notification will be a frame behind.
-    if ( popupWorldPosition.y - popupDistanceFromAnchorPoint.y < boundingRectangleWorld.y )
+    if( popupWorldPosition.y - popupDistanceFromAnchorPoint.y < boundingRectangleWorld.y )
     {
       requiredPopupPosition.y = AlternatePopUpPositionRelativeToCursor();
     }
@@ -1307,8 +1298,8 @@ struct Decorator::Impl : public ConnectionTracker
     requiredPopupPosition.x = requiredPopupPosition.x + xOffSetToKeepWithinBounds;
 
     // Prevent pixel mis-alignment by rounding down.
-    requiredPopupPosition.x = static_cast<int>( requiredPopupPosition.x );
-    requiredPopupPosition.y = static_cast<int>( requiredPopupPosition.y );
+    requiredPopupPosition.x = floor( requiredPopupPosition.x );
+    requiredPopupPosition.y = floor( requiredPopupPosition.y );
   }
 
   void SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image )
