@@ -326,32 +326,6 @@ void GaussianBlurView::OnInitialize()
 }
 
 
-/**
- * ZrelativeToYconstraint
- *
- * f(current, property, scale) = Vector3(current.x, current.y, property.y * scale)
- */
-struct ZrelativeToYconstraint
-{
-  ZrelativeToYconstraint( float scale )
-    : mScale( scale )
-  {}
-
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& property)
-  {
-    Vector3 v;
-
-    v.x = current.x;
-    v.y = current.y;
-    v.z = property.GetVector3().y * mScale;
-
-    return v;
-  }
-
-  float mScale;
-};
-
 void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
