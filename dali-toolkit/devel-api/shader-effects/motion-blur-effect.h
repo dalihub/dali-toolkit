@@ -102,7 +102,7 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
   vertexSource =
       "precision mediump float;\n"
       "uniform mat4 uModelLastFrame;\n"
-      "uniform float uTimeDelta;\n"
+      "float timeDelta = 0.0167;\n"
 
       "uniform float uGeometryStretchFactor;\n"
       "uniform float uSpeedScalingFactor;\n"
@@ -118,7 +118,7 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
       " vec4 vertex = vec4(aPosition, 1.0);\n"
       " vec4 viewSpaceVertex = uModelView * vertex;\n"
       " vec4 viewSpaceVertexLastFrame = (uViewMatrix * uModelLastFrame) * vertex;\n"
-      " float reciprocalTimeDelta = 1.0 / ((uTimeDelta > 0.0) ? uTimeDelta : 0.01);\n"
+      " float reciprocalTimeDelta = 1.0 / timeDelta;\n"
 
       // work out vertex's last movement in view space
       " vec3 viewSpacePosDelta = viewSpaceVertex.xyz - viewSpaceVertexLastFrame.xyz;\n"
