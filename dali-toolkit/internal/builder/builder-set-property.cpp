@@ -102,7 +102,7 @@ Vector4 HexStringToVector4( const char* s )
 /**
  * A property value type can be forced when its unknown by a disambiguation convention in the json
  * ie  "myarray": [1,2,3,4] ; would be a vector but
- *     "myarray": {'type-cast':'array', 'value':[1,2,3,4]} would be an array
+ *     "myarray": {"type-cast":"array", "value":[1,2,3,4]} would be an array
  * @param child The node whos string to search for a disambiguated type
  * @param value The value to set
  * @param overrideMap The user overriding constant map
