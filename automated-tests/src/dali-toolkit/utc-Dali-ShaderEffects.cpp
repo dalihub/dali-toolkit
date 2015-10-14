@@ -198,12 +198,38 @@ int UtcDaliCreateDissolveLocalEffect(void)
   END_TEST;
 }
 
-int UtcDaliCreateDistanceFieldEffect(void)
+int UtcDaliCreateDissolveEffect(void)
 {
   ToolkitTestApplication application;
 
-  ShaderEffect effect = Toolkit::CreateDistanceFieldEffect();
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateDistanceFieldEffect();
+  DALI_TEST_CHECK( !effect.Empty() );
+
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  DALI_TEST_CHECK( !vertexShaderValue );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  DALI_TEST_CHECK( fragmentShaderValue );
+
+  std::string fragmentShader;
+  DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
+  DALI_TEST_CHECK( !fragmentShader.empty() );
+
+  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  DALI_TEST_CHECK( !gridXValue );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( hintsValue );
+
+  std::string hints;
+  DALI_TEST_CHECK( hintsValue->Get( hints ) );
+  DALI_TEST_CHECK( hints == "output-is-transparent" );
 
   END_TEST;
 }

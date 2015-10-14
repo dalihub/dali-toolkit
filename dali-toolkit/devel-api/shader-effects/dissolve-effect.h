@@ -150,7 +150,7 @@ inline void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position,
  *    "uPercentage" - This value is proportional to the distortion applied; a value of zero means no distortion.
  *
  *  @param[in] useHighPrecision True if using high precision in fragment shader for fully random noise, false otherwise
- *  @return A handle to a newly allocated ShaderEffect
+ *  @return The newly created Property::Map with the dissolve effect
  */
 
 inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
