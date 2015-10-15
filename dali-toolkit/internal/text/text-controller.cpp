@@ -1709,6 +1709,9 @@ void Controller::PasteText( const std::string& stringToPaste )
   InsertText( stringToPaste, Text::Controller::COMMIT );
   mImpl->ChangeState( EventData::EDITING );
   mImpl->RequestRelayout();
+
+  // Do this last since it provides callbacks into application code
+  mImpl->mControlInterface.TextChanged();
 }
 
 void Controller::PasteClipboardItemEvent()
