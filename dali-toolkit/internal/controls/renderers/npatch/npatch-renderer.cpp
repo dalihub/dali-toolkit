@@ -232,11 +232,11 @@ void NPatchRenderer::DoInitialize( const Property::Map& propertyMap )
     if( imageURLValue->Get( mImageUrl ) )
     {
       NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitialiseFromImage( nPatch );
+      InitializeFromImage( nPatch );
     }
     else
     {
-      CreateErrorImage();
+      InitializeFromBrokenImage();
       DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
     }
   }
@@ -248,17 +248,17 @@ void NPatchRenderer::GetNaturalSize( Vector2& naturalSize ) const
   {
     naturalSize.x = mImage.GetWidth();
     naturalSize.y = mImage.GetHeight();
-    return;
   }
   else if( !mImageUrl.empty() )
   {
     ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
     naturalSize.x = dimentions.GetWidth();
     naturalSize.y = dimentions.GetHeight();
-    return;
   }
-
-  naturalSize = Vector2::ZERO;
+  else
+  {
+    naturalSize = Vector2::ZERO;
+  }
 }
 
 void NPatchRenderer::SetClipRect( const Rect<int>& clipRect )
@@ -319,7 +319,7 @@ void NPatchRenderer::InitializeRenderer( Renderer& renderer )
   else
   {
     DALI_LOG_ERROR("The 9 patch image '%s' doesn't have any valid stretch borders and so is not a valid 9 patch image\n", mImageUrl.c_str() );
-    CreateErrorImage();
+    InitializeFromBrokenImage();
   }
 
   if( !renderer )
@@ -345,11 +345,11 @@ void NPatchRenderer::DoSetOnStage( Actor& actor )
     if( !mImageUrl.empty() )
     {
       NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitialiseFromImage( nPatch );
+      InitializeFromImage( nPatch );
     }
     else if( mImage )
     {
-      InitialiseFromImage( mImage );
+      InitializeFromImage( mImage );
     }
 
     InitializeRenderer( mImpl->mRenderer );
@@ -392,7 +392,7 @@ void NPatchRenderer::SetImage( const std::string& imageUrl, bool borderOnly )
 
   mImageUrl = imageUrl;
   NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-  InitialiseFromImage( nPatch );
+  InitializeFromImage( nPatch );
 
   if( mCroppedImage && mImpl->mIsOnStage )
   {
@@ -410,7 +410,7 @@ void NPatchRenderer::SetImage( NinePatchImage image, bool borderOnly )
   }
 
   mImage = image;
-  InitialiseFromImage( mImage );
+  InitializeFromImage( mImage );
 
   if( mCroppedImage && mImpl->mIsOnStage )
   {
@@ -418,13 +418,13 @@ void NPatchRenderer::SetImage( NinePatchImage image, bool borderOnly )
   }
 }
 
-void NPatchRenderer::InitialiseFromImage( NinePatchImage nPatch )
+void NPatchRenderer::InitializeFromImage( NinePatchImage nPatch )
 {
   mCroppedImage = nPatch.CreateCroppedBufferImage();
   if( !mCroppedImage )
   {
     DALI_LOG_ERROR("'%s' specify a valid 9 patch image\n", mImageUrl.c_str() );
-    CreateErrorImage();
+    InitializeFromBrokenImage();
     return;
   }
 
@@ -434,27 +434,15 @@ void NPatchRenderer::InitialiseFromImage( NinePatchImage nPatch )
   mStretchPixelsY = nPatch.GetStretchPixelsY();
 }
 
-void NPatchRenderer::CreateErrorImage()
+void NPatchRenderer::InitializeFromBrokenImage()
 {
-  mImageSize = ImageDimensions( 1, 1 );
-
-  BufferImage bufferImage = BufferImage::New( mImageSize.GetWidth(), mImageSize.GetHeight(), Pixel::RGBA8888 );
-  mCroppedImage = bufferImage;
-  PixelBuffer* pixbuf = bufferImage.GetBuffer();
-
-  for( size_t i = 0; i < mImageSize.GetWidth() * mImageSize.GetHeight() * 4u; )
-  {
-    pixbuf[ i++ ] = 0;
-    pixbuf[ i++ ] = 0;
-    pixbuf[ i++ ] = 0;
-    pixbuf[ i++ ] = 255;
-  }
+  mCroppedImage = RendererFactory::GetBrokenRendererImage();
+  mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );
 
   mStretchPixelsX.Clear();
   mStretchPixelsX.PushBack( Uint16Pair( 0, mImageSize.GetWidth() ) );
   mStretchPixelsY.Clear();
   mStretchPixelsY.PushBack( Uint16Pair( 0, mImageSize.GetHeight() ) );
-
 }
 
 void NPatchRenderer::ApplyImageToSampler()

@@ -729,7 +729,8 @@ int UtcDaliRendererFactoryGetNPatchRendererN1(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(), 1u );
+  //The testkit still has to load a bitmap for the broken renderer image
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -757,7 +758,8 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(), 1u );
+  //The testkit still has to load a bitmap for the broken renderer image
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;

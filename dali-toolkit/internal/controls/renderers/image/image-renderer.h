@@ -24,6 +24,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/images/resource-image.h>
 
 namespace Dali
 {
@@ -68,7 +69,7 @@ typedef IntrusivePtr< ImageRenderer > ImageRendererPtr;
  *   "default"
  *
  */
-class ImageRenderer: public ControlRenderer
+class ImageRenderer: public ControlRenderer, public ConnectionTracker
 {
 public:
 
@@ -174,6 +175,12 @@ private:
    * @brief Applies this renderer's image to the sampler to the material used for this renderer
    */
   void ApplyImageToSampler();
+
+  /**
+   * Callback function of image resource loading succeed
+   * @param[in] image The Image content that we attempted to load from mImageUrl
+   */
+  void OnImageLoaded( ResourceImage image );
 
 private:
   Image mImage;

@@ -94,6 +94,12 @@ public:
    */
   bool ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& image );
 
+public:
+  /**
+   * @brief Returns an image to be used when a renderer has failed to correctly render
+   */
+  static Image GetBrokenRendererImage();
+
 protected:
 
   /**
