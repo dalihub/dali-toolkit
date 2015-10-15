@@ -20,8 +20,6 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-#define MAKE_SHADER(A)#A
-
 namespace
 {
 
@@ -29,52 +27,42 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
 #endif
 
+#define MAKE_SHADER(A)#A
+
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
 attribute mediump vec2    aTexCoord;
+uniform   mediump vec2    uOffset;
 uniform   mediump mat4    uMvpMatrix;
 varying   mediump vec2    vTexCoord;
 
 void main()
 {
-  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  mediump vec4 position = vec4( aPosition.xy + uOffset, 0.0, 1.0 );
   gl_Position = uMvpMatrix * position;
   vTexCoord = aTexCoord;
 }
 );
 
-const char* FRAGMENT_SHADER = MAKE_SHADER(
+const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
+uniform lowp    vec4      uColor;
+uniform         sampler2D sTexture;
+varying mediump vec2      vTexCoord;
+
+void main()
+{
+  mediump vec4 color = texture2D( sTexture, vTexCoord );
+  gl_FragColor = vec4( uColor.rgb, uColor.a * color.r );
+}
+);
+
+const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 
 void main()
 {
   gl_FragColor = texture2D( sTexture, vTexCoord );
-}
-);
-
-const char* VERTEX_SHADER_SHADOW = MAKE_SHADER(
-attribute mediump vec2    aPosition;
-attribute mediump vec2    aTexCoord;
-varying   mediump vec2    vTexCoord;
-
-void main()
-{
-  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
-  gl_Position = position;
-  vTexCoord = aTexCoord;
-}
-);
-
-const char* FRAGMENT_SHADER_SHADOW = MAKE_SHADER(
-uniform         sampler2D sTexture;
-uniform lowp    vec4      uColor;
-varying mediump vec2      vTexCoord;
-
-void main()
-{
-  mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4(uColor.rgb, uColor.a*color.r);
 }
 );
 
@@ -91,9 +79,9 @@ namespace Internal
 
 AtlasGlyphManager::AtlasGlyphManager()
 {
+  mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
+  mShaderRgba = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RGBA );
   mAtlasManager = Dali::Toolkit::AtlasManager::New();
-  mEffectBufferShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-  mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW, Dali::Shader::HINT_MODIFIES_GEOMETRY );
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
@@ -102,7 +90,16 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Added glyph, font: %d index: %d\n", glyph.fontId, glyph.index );
 
-  mAtlasManager.Add( bitmap, slot );
+  if ( mAtlasManager.Add( bitmap, slot ) )
+  {
+    // A new atlas was created so set the material details for the atlas
+    Dali::Atlas atlas = mAtlasManager.GetAtlasContainer( slot.mAtlasId );
+    Pixel::Format pixelFormat = mAtlasManager.GetPixelFormat( slot.mAtlasId );
+    Material material = Material::New( pixelFormat == Pixel::L8 ? mShaderL8 : mShaderRgba );
+    material.AddTexture( atlas, "sTexture" );
+    material.SetBlendMode( BlendingMode::ON );
+    mAtlasManager.SetMaterial( slot.mAtlasId, material );
+  }
 
   GlyphRecordEntry record;
   record.mIndex = glyph.index;
@@ -140,13 +137,7 @@ void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
   mAtlasManager.GenerateMeshData( imageId, position, mesh, false );
 }
 
-void AtlasGlyphManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
-                                    const Toolkit::AtlasManager::Mesh2D& second )
-{
-  mAtlasManager.StitchMesh( first, second );
-}
-
-bool AtlasGlyphManager::Cached( Text::FontId fontId,
+bool AtlasGlyphManager::IsCached( Text::FontId fontId,
                                 Text::GlyphIndex index,
                                 Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
@@ -261,11 +252,6 @@ void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIn
 Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
 {
   return mAtlasManager.GetMaterial( atlasId );
-}
-
-Image AtlasGlyphManager::GetImage( uint32_t atlasId ) const
-{
-  return mAtlasManager.GetImage( atlasId );
 }
 
 AtlasGlyphManager::~AtlasGlyphManager()

@@ -84,17 +84,11 @@ void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
                                              mesh );
 }
 
-void AtlasGlyphManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
-                                    const Toolkit::AtlasManager::Mesh2D& second )
+bool AtlasGlyphManager::IsCached( Text::FontId fontId,
+                                  Text::GlyphIndex index,
+                                  AtlasManager::AtlasSlot& slot )
 {
-  GetImplementation(*this).StitchMesh( first, second );
-}
-
-bool AtlasGlyphManager::Cached( Text::FontId fontId,
-                                Text::GlyphIndex index,
-                                AtlasManager::AtlasSlot& slot )
-{
-  return GetImplementation(*this).Cached( fontId, index, slot );
+  return GetImplementation(*this).IsCached( fontId, index, slot );
 }
 
 void AtlasGlyphManager::SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight )
@@ -117,11 +111,6 @@ Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
   return GetImplementation(*this).GetMaterial( atlasId );
 }
 
-Image AtlasGlyphManager::GetImage( uint32_t atlasId ) const
-{
-  return GetImplementation(*this).GetImage( atlasId );
-}
-
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
   return GetImplementation(*this).GetMetrics();
@@ -130,16 +119,6 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta )
 {
   GetImplementation(*this).AdjustReferenceCount( fontId, index, delta );
-}
-
-Shader AtlasGlyphManager::GetEffectBufferShader() const
-{
-  return GetImplementation(*this).GetEffectBufferShader();
-}
-
-Shader AtlasGlyphManager::GetGlyphShadowShader() const
-{
-  return GetImplementation(*this).GetGlyphShadowShader();
 }
 
 } // namespace Toolkit
