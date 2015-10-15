@@ -81,17 +81,11 @@ public:
                          Toolkit::AtlasManager::Mesh2D& mesh );
 
   /**
-   * @copydoc Toolkit::AtlasGlyphManager::StitchMesh
+   * @copydoc Toolkit::AtlasGlyphManager::IsCached
    */
-  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
-                   const Toolkit::AtlasManager::Mesh2D& second );
-
-  /**
-   * @copydoc Toolkit::AtlasGlyphManager::Cached
-   */
-  bool Cached( Text::FontId fontId,
-               Text::GlyphIndex index,
-               Dali::Toolkit::AtlasManager::AtlasSlot& slot );
+  bool IsCached( Text::FontId fontId,
+                 Text::GlyphIndex index,
+                 Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetAtlasSize
@@ -119,30 +113,9 @@ public:
   Material GetMaterial( uint32_t atlasId ) const;
 
   /**
-   * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
-   */
-  Image GetImage( uint32_t atlasId ) const;
-
-  /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMetrics
    */
   const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
-
-  /**
-   * @copydoc Toolkit::AtlasGlyphManager::GetEffectBufferShader
-   */
-  Shader GetEffectBufferShader() const
-  {
-    return mEffectBufferShader;
-  }
-
-  /**
-   * @copydoc Toolkit::AtlasGlyphManager::GetGlyphShadowShader
-   */
-  Shader GetGlyphShadowShader() const
-  {
-    return mShadowShader;
-  }
 
 protected:
 
@@ -156,8 +129,9 @@ private:
   Dali::Toolkit::AtlasManager mAtlasManager;          ///> Atlas Manager created by GlyphManager
   std::vector< FontGlyphRecord > mFontGlyphRecords;
   Toolkit::AtlasGlyphManager::Metrics mMetrics;       ///> Metrics to pass back on GlyphManager status
-  Shader mEffectBufferShader;                         ///> Shader used to render drop shadow buffer textures
-  Shader mShadowShader;                               ///> Shader used to render drop shadow into buffer
+
+  Shader mShaderL8;
+  Shader mShaderRgba;
 };
 
 } // namespace Internal

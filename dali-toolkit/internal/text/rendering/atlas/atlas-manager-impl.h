@@ -23,7 +23,7 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-manager.h>
 
 namespace Dali
 {
@@ -65,7 +65,6 @@ public:
     BufferImage mHorizontalStrip;                                       // Image used to pad upload
     BufferImage mVerticalStrip;                                         // Image used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
-    Image mImage;
     SizeType mTotalBlocks;                                              // total number of blocks in atlas
     SizeType mAvailableBlocks;                                          // number of blocks available in atlas
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
@@ -77,7 +76,7 @@ public:
     SizeType mImageWidth;                                               // Width of image stored
     SizeType mImageHeight;                                              // Height of image stored
     AtlasId mAtlasId;                                                   // Image is stored in this Atlas
-    Dali::Vector< SizeType > mBlocksList;                               // List of blocks within atlas used for image
+    SizeType mBlock;                                                    // Block within atlas used for image
   };
 
   AtlasManager();
@@ -102,7 +101,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasManager::Add
    */
-  void Add( const BufferImage& image,
+  bool Add( const BufferImage& image,
             Toolkit::AtlasManager::AtlasSlot& slot,
             Toolkit::AtlasManager::AtlasId atlas );
 
@@ -113,13 +112,6 @@ public:
                          const Vector2& position,
                          Toolkit::AtlasManager::Mesh2D& mesh,
                          bool addReference );
-
-  /**
-   * @copydoc Toolkit::AtlasManager::StitchMesh
-   */
-  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
-                   const Toolkit::AtlasManager::Mesh2D& second,
-                   bool optimize );
 
   /**
    * @copydoc Toolkit::AtlasManager::Remove
@@ -176,43 +168,25 @@ public:
    */
   Material GetMaterial( AtlasId atlas ) const;
 
-/**
-   * @copydoc Toolkit::AtlasManager::GetImage
+  /**
+   * @copydoc Toolkit::AtlasManager::SetMaterial
    */
-  Image GetImage( AtlasId atlas ) const;
+  void SetMaterial( AtlasId atlas, Material& material );
 
 private:
 
   std::vector< AtlasDescriptor > mAtlasList;            // List of atlases created
-  std::vector< AtlasSlotDescriptor > mImageList;        // List of bitmaps store in atlases
+  Vector< AtlasSlotDescriptor > mImageList;             // List of bitmaps stored in atlases
   Toolkit::AtlasManager::AtlasSize mNewAtlasSize;       // Atlas size to use in next creation
   Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;  // Policy for faling to add an Image
 
   SizeType CheckAtlas( SizeType atlas,
                        SizeType width,
                        SizeType height,
-                       Pixel::Format pixelFormat,
-                       SizeType& blockArea );
-
-  void CreateMesh( SizeType atlas,
-                   SizeType imageWidth,
-                   SizeType imageHeight,
-                   const Vector2& position,
-                   SizeType widthInBlocks,
-                   SizeType heightInBlocks,
-                   Toolkit::AtlasManager::Mesh2D& mesh,
-                   AtlasSlotDescriptor& desc );
-
-  void OptimizeMesh( const Toolkit::AtlasManager::Mesh2D& in,
-                     Toolkit::AtlasManager::Mesh2D& out );
+                       Pixel::Format pixelFormat );
 
   void UploadImage( const BufferImage& image,
                     const AtlasSlotDescriptor& desc );
-
-  void PrintMeshData( const Toolkit::AtlasManager::Mesh2D& mesh );
-
-  Shader mShaderL8;
-  Shader mShaderRgba;
 
 };
 
