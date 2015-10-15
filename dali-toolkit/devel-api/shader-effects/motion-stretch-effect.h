@@ -29,25 +29,26 @@ namespace Toolkit
 {
 
 /**
+ * @brief Set the properties for the motion stretch
+ */
+inline void SetMotionStretchProperties( Actor& actor )
+{
+  actor.RegisterProperty( "uGeometryStretchFactor", 0.5f );
+  actor.RegisterProperty( "uSpeedScalingFactor", 0.5f );
+  actor.RegisterProperty( "uObjectFadeStart", Vector2( 0.25f, 0.25f ) );
+  actor.RegisterProperty( "uObjectFadeEnd", Vector2( 0.5f, 0.5f ) );
+  actor.RegisterProperty( "uAlphaScale", 0.75f );
+  Property::Index uModelProperty = actor.RegisterProperty( "uModelLastFrame", Matrix::IDENTITY );
+
+  Constraint constraint = Constraint::New<Matrix>( actor, uModelProperty, EqualToConstraint() );
+  constraint.AddSource( Source( actor , Actor::Property::WORLD_MATRIX ) );
+  constraint.Apply();
+}
+
+/**
  * @brief Creates a new MotionStretchEffect
  *
- * Motion stretch shader works on a per object basis. Objects will stretch in the direction of motion when they move, or if the camera moves. Can be applied
- * to ImageActor or TextActor only.
- *
- * Usage example:-
- *
- * // Create shader used for doing motion stretch\n
- * ShaderEffect MotionStretchEffect = CreateMotionStretchEffect();
- *
- * // set actor shader to the stretch one\n
- * Actor actor = Actor::New( ... );\n
- * actor.SetShaderEffect( MotionStretchEffect );
- *
- * // Constrain "uModelLastFrame" to be the same as the actor's world matrix\n
- * Dali::Property::Index uModelProperty = MotionBlurEffect.GetPropertyIndex( "uModelLastFrame" );
- * Constraint constraint = Constraint::New<Matrix>( MotionBlurEffect, uModelProperty, EqualToConstraint() );\n
- * constraint.AddSource( Source( actor , Actor::Property::WORLD_MATRIX ) );\n
- * constraint.Apply();\n
+ * Motion stretch shader works on a per object basis. Objects will stretch in the direction of motion when they move, or if the camera moves.
  *
  * Animatable/Constrainable uniforms:
  *  "uGeometryStretchFactor"  - This scales the amount the geometry stretches along the motion velocity vector.
@@ -68,25 +69,24 @@ namespace Toolkit
  *                              applied. Default 0.75.
  *  "uModelLastFrame"         - The model to world space transformation matrix of the actor in the previous frame.
  *
- * @return A handle to a newly allocated ShaderEffect
+ * @return The newly created Property::Map with the motion stretch effect
  */
-inline ShaderEffect CreateMotionStretchEffect()
+inline Property::Map CreateMotionStretchEffect()
 {
-  // Dali vertexSource prefix for reference:
-  // precision highp float;
-  // attribute vec3  aPosition;
-  // attribute vec2  aTexCoord;
-  // uniform   mat4  uMvpMatrix;
-  // uniform   mat4  uModelView;
-  // uniform   mat3  uNormalMatrix;
-  // uniform   mat4  uProjection;
-  // uniform   vec4  uColor;
-  // varying   vec2  vTexCoord;
   std::string vertexSource;
   vertexSource =
       "precision mediump float;\n"
+
+      "attribute vec2 aPosition;\n"
+
+      "uniform mat4 uMvpMatrix;\n"
+      "uniform mat4 uModelView;\n"
+      "uniform mat4 uViewMatrix;\n"
+      "uniform mat4 uProjection;\n"
+      "uniform vec3 uSize;\n"
+
       "uniform mat4  uModelLastFrame;\n"
-      "uniform float uTimeDelta;\n"
+      "float timeDelta = 0.0167;\n"
 
       "uniform float uGeometryStretchFactor;\n"
       "uniform float uSpeedScalingFactor;\n"
@@ -95,20 +95,23 @@ inline ShaderEffect CreateMotionStretchEffect()
       "varying vec2 vModelSpaceCenterToPos;\n"
       "varying vec2 vScreenSpaceVelocityVector;\n"
       "varying float vSpeed;\n"
+      "varying vec2 vTexCoord;\n"
 
       "void main()\n"
       "{\n"
       // get view space position of vertex this frame and last frame
-      " vec4 vertex = vec4(aPosition, 1.0);\n"
-      " vec4 viewSpaceVertex = uModelView * vertex;\n"
-      " vec4 viewSpaceVertexLastFrame = uViewMatrix * uModelLastFrame * vertex;\n"
+      " vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n"
+      " vertexPosition.xyz *= uSize;\n"
+
+      " vec4 viewSpaceVertex = uModelView * vertexPosition;\n"
+      " vec4 viewSpaceVertexLastFrame = uViewMatrix * uModelLastFrame * vertexPosition;\n"
 
       // work out vertex's last movement in view space
       " vec3 viewSpacePosDelta = viewSpaceVertex.xyz - viewSpaceVertexLastFrame.xyz;\n"
-      " float reciprocalTimeDelta = 1.0 / ((uTimeDelta > 0.0) ? uTimeDelta : 0.01);\n"
+      " float reciprocalTimeDelta = 1.0 / timeDelta;\n"
 
       // get clip space position of vertex this frame and last frame
-      " vec4 clipSpaceVertex = uMvpMatrix * vertex;\n"
+      " vec4 clipSpaceVertex = uMvpMatrix * vertexPosition;\n"
       " vec4 clipSpaceVertexLastFrame = uProjection * viewSpaceVertexLastFrame;\n"
 
       // decide how much this vertex is 'trailing', i.e. at the back of the object relative to its direction of motion. We do this
@@ -117,7 +120,7 @@ inline ShaderEffect CreateMotionStretchEffect()
       " float posDeltaLength = length(viewSpacePosDelta);\n"
       " if(posDeltaLength > 0.001)\n" // avoid div by 0 if object has barely moved
       " {\n"
-      "   vec4 viewSpaceCenterToPos = uModelView * vec4(aPosition, 0.0);\n"
+      "   vec4 viewSpaceCenterToPos = uModelView * vec4(aPosition, 0.0, 0.0);\n"
       "   float centerToVertexDist = length(viewSpaceCenterToPos);\n"
       "   if(centerToVertexDist > 0.001)\n" // avoid div by 0 if object has vertex at model space origin
       "   {\n"
@@ -143,21 +146,18 @@ inline ShaderEffect CreateMotionStretchEffect()
       " vSpeed = clamp(vSpeed, 0.0, 1.0);\n"
 
       // provide fragment shader with vector from center of object to pixel (assumes the objects model space origin is at its center and verts have same z)
-      " vModelSpaceCenterToPos = aPosition.xy;\n"
+      " vModelSpaceCenterToPos = viewSpaceVertex.xy;\n"
 
-      " vTexCoord = aTexCoord;\n"
+      " vec2 texCoord = aPosition + vec2(0.5);"
+      " vTexCoord = texCoord;\n"
       "}\n";
 
-
-  // Dali fragmentSource prefix for reference:
-  // precision highp     float;
-  // uniform   sampler2D sTexture;
-  // uniform   sampler2D sEffect;
-  // uniform   vec4      uColor;
-  // varying   vec2      vTexCoord;
   std::string fragmentSource;
   fragmentSource =
       "precision mediump float;\n"
+
+      "uniform sampler2D sTexture;\n"
+      "uniform vec4 uColor;\n"
 
       "uniform vec2 uObjectFadeStart;\n"
       "uniform vec2 uObjectFadeEnd;\n"
@@ -167,6 +167,7 @@ inline ShaderEffect CreateMotionStretchEffect()
       "varying vec2 vModelSpaceCenterToPos;\n"
       "varying vec2 vScreenSpaceVelocityVector;\n"
       "varying float vSpeed;\n"
+      "varying vec2 vTexCoord;\n"
 
       "void main()\n"
       "{\n"
@@ -184,24 +185,20 @@ inline ShaderEffect CreateMotionStretchEffect()
       " gl_FragColor *= uColor;\n"
       "}";
 
+  Property::Map map;
+
+  Property::Map customShader;
+  customShader[ "vertex-shader" ] = vertexSource;
+  customShader[ "fragment-shader" ] = fragmentSource;
+
+  customShader[ "subdivide-grid-x" ] = 10;
+  customShader[ "subdivide-grid-y" ] = 10;
+
   // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
-  ShaderEffect shaderEffect = ShaderEffect::New(
-      vertexSource, fragmentSource,
-      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ) );
+  customShader[ "hints" ] = "output-is-transparent";
 
-
-  //////////////////////////////////////
-  // Register uniform properties
-  //
-  //
-  shaderEffect.SetUniform( "uGeometryStretchFactor",  0.5f );
-  shaderEffect.SetUniform( "uSpeedScalingFactor",     0.5f );
-  shaderEffect.SetUniform( "uObjectFadeStart",        Vector2( 0.25f, 0.25f ) );
-  shaderEffect.SetUniform( "uObjectFadeEnd",          Vector2( 0.5f, 0.5f ) );
-  shaderEffect.SetUniform( "uAlphaScale",             0.75f );
-  shaderEffect.SetUniform( "uModelLastFrame",         Matrix::IDENTITY );
-
-  return shaderEffect;
+  map[ "shader" ] = customShader;
+  return map;
 }
 
 }
