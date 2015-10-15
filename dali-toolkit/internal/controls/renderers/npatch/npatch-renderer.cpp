@@ -217,7 +217,7 @@ NPatchRenderer::~NPatchRenderer()
 {
 }
 
-void NPatchRenderer::DoInitialize( const Property::Map& propertyMap )
+void NPatchRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
   if( imageURLValue )
@@ -272,10 +272,9 @@ void NPatchRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
-void NPatchRenderer::InitializeRenderer( Renderer& renderer )
+Geometry NPatchRenderer::CreateGeometry()
 {
   Geometry geometry;
-  Shader shader;
   if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
   {
     if( !mBorderOnly )
@@ -296,7 +295,21 @@ void NPatchRenderer::InitializeRenderer( Renderer& renderer )
         mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY, geometry );
       }
     }
+  }
+  else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+  {
+    Uint16Pair gridSize( 2 * mStretchPixelsX.Size() + 1,  2 * mStretchPixelsY.Size() + 1 );
+    geometry = !mBorderOnly ? CreateGeometry( gridSize ) : CreateGeometryBorder( gridSize );
+  }
 
+  return geometry;
+}
+
+Shader NPatchRenderer::CreateShader()
+{
+  Shader shader;
+  if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+  {
     shader = mFactoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
     if( !shader )
     {
@@ -306,9 +319,6 @@ void NPatchRenderer::InitializeRenderer( Renderer& renderer )
   }
   else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
   {
-    Uint16Pair gridSize( 2 * mStretchPixelsX.Size() + 1,  2 * mStretchPixelsY.Size() + 1 );
-    geometry = !mBorderOnly ? CreateGeometry( gridSize ) : CreateGeometryBorder( gridSize );
-
     std::stringstream vertexShader;
     vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
                  << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
@@ -316,27 +326,24 @@ void NPatchRenderer::InitializeRenderer( Renderer& renderer )
 
     shader = Shader::New( vertexShader.str(), FRAGMENT_SHADER );
   }
-  else
+  return shader;
+}
+
+void NPatchRenderer::InitializeRenderer()
+{
+  Geometry geometry = CreateGeometry();
+  Shader shader = CreateShader();
+
+  if( !geometry || !shader )
   {
     DALI_LOG_ERROR("The 9 patch image '%s' doesn't have any valid stretch borders and so is not a valid 9 patch image\n", mImageUrl.c_str() );
     InitializeFromBrokenImage();
   }
 
-  if( !renderer )
-  {
-    Material material = Material::New( shader );
-    renderer = Renderer::New( geometry, material );
-  }
-  else
-  {
-    mImpl->mRenderer.SetGeometry( geometry );
-    Material material = mImpl->mRenderer.GetMaterial();
-    if( material )
-    {
-      material.SetShader( shader );
-    }
-  }
+  Material material = Material::New( shader );
+  mImpl->mRenderer = Renderer::New( geometry, material );
 }
+
 
 void NPatchRenderer::DoSetOnStage( Actor& actor )
 {
@@ -351,9 +358,10 @@ void NPatchRenderer::DoSetOnStage( Actor& actor )
     {
       InitializeFromImage( mImage );
     }
-
-    InitializeRenderer( mImpl->mRenderer );
   }
+
+  //initialize the renderer after initializing from the image since we need to know the grid size from the image before creating the geometry
+  InitializeRenderer();
 
   if( mCroppedImage )
   {
@@ -381,8 +389,52 @@ void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( BORDER_ONLY, mBorderOnly );
 }
 
+void NPatchRenderer::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY )
+{
+  //check to see if the border style has changed
+
+  bool borderOnlyChanged = oldBorderOnly != mBorderOnly;
+  bool gridChanged = oldGridX != mStretchPixelsX.Size() || oldGridY != mStretchPixelsY.Size();
+
+  if( borderOnlyChanged || gridChanged )
+  {
+    Geometry geometry = CreateGeometry();
+    if( geometry )
+    {
+      mImpl->mRenderer.SetGeometry( geometry );
+    }
+    else
+    {
+      InitializeFromBrokenImage();
+    }
+  }
+
+  if( gridChanged )
+  {
+    Shader shader = CreateShader();
+    Material material;
+    if( shader )
+    {
+      material = mImpl->mRenderer.GetMaterial();
+      if( material )
+      {
+        material.SetShader( shader );
+      }
+    }
+
+    if( !material )
+    {
+      InitializeFromBrokenImage();
+    }
+  }
+}
+
 void NPatchRenderer::SetImage( const std::string& imageUrl, bool borderOnly )
 {
+  bool oldBorderOnly = mBorderOnly;
+  size_t oldGridX = mStretchPixelsX.Size();
+  size_t oldGridY = mStretchPixelsY.Size();
+
   mBorderOnly = borderOnly;
   mImage.Reset();
   if( mImageUrl == imageUrl )
@@ -391,17 +443,26 @@ void NPatchRenderer::SetImage( const std::string& imageUrl, bool borderOnly )
   }
 
   mImageUrl = imageUrl;
-  NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-  InitializeFromImage( nPatch );
-
-  if( mCroppedImage && mImpl->mIsOnStage )
+  if( mImpl->mRenderer )
   {
-    ApplyImageToSampler();
+    NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
+    InitializeFromImage( nPatch );
+
+    ChangeRenderer( oldBorderOnly, oldGridX, oldGridY );
+
+    if( mCroppedImage )
+    {
+      ApplyImageToSampler();
+    }
   }
 }
 
 void NPatchRenderer::SetImage( NinePatchImage image, bool borderOnly )
 {
+  bool oldBorderOnly = mBorderOnly;
+  size_t oldGridX = mStretchPixelsX.Size();
+  size_t oldGridY = mStretchPixelsY.Size();
+
   mBorderOnly = borderOnly;
   mImageUrl.empty();
   if( mImage == image )
@@ -410,11 +471,15 @@ void NPatchRenderer::SetImage( NinePatchImage image, bool borderOnly )
   }
 
   mImage = image;
-  InitializeFromImage( mImage );
-
-  if( mCroppedImage && mImpl->mIsOnStage )
+  if( mImpl->mRenderer )
   {
-    ApplyImageToSampler();
+    InitializeFromImage( mImage );
+    ChangeRenderer( oldBorderOnly, oldGridX, oldGridY );
+
+    if( mCroppedImage )
+    {
+      ApplyImageToSampler();
+    }
   }
 }
 

@@ -118,14 +118,19 @@ protected:
   /**
    * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoInitialize( const Property::Map& propertyMap );
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc ControlRenderer::InitializeRenderer
+   * @copydoc ControlRenderer::DoSetOnStage
    */
-  virtual void InitializeRenderer( Renderer& renderer );
+  virtual void DoSetOnStage( Actor& actor );
 
 private:
+
+  /**
+   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   */
+  void InitializeRenderer();
 
   /**
    * New a gradient object with the given property map.

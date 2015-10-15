@@ -35,6 +35,12 @@ namespace Internal
 
 struct Internal::ControlRenderer::Impl
 {
+  enum Flags
+  {
+    IS_ON_STAGE = 1,
+    IS_FROM_CACHE = 1 << 1
+  };
+
   struct CustomShader
   {
     std::string mVertexShader;
@@ -47,7 +53,6 @@ struct Internal::ControlRenderer::Impl
     void CreatePropertyMap( Property::Map& map ) const;
   };
 
-  std::string mCachedRendererKey;  ///< The key to use for caching of the renderer. If it is empty then no caching will occur
   Renderer mRenderer;
 
   CustomShader* mCustomShader;
@@ -56,7 +61,7 @@ struct Internal::ControlRenderer::Impl
   Vector2   mOffset;
   Rect<int> mClipRect;
   float     mDepthIndex;
-  bool      mIsOnStage;
+  int       mFlags;
 
   Impl();
   ~Impl();
