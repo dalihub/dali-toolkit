@@ -1716,8 +1716,14 @@ void Controller::PasteText( const std::string& stringToPaste )
 
 void Controller::PasteClipboardItemEvent()
 {
+  // Retrieve the clipboard contents first
   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
   std::string stringToPaste( notifier.GetContent() );
+
+  // Commit the current pre-edit text; the contents of the clipboard should be appended
+  mImpl->ResetImfManager();
+
+  // Paste
   PasteText( stringToPaste );
 }
 
