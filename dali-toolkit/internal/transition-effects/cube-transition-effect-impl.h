@@ -20,15 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
-
-#include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
-#include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-effect.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
@@ -42,93 +38,9 @@ namespace Internal
 {
 
 /**
- * Create a image with size of viewAreaSize
- * with the effect image as its center part and (0,0,0,1) at other parts
- */
-class FullAreaImageCreator : public ShaderEffect
-{
-
-public:
-
-  /**
-   * Create an uninitialized FullAreaImageCreator
-   * this can be initialized with FullAreaImageCreator::New()
-   */
-  FullAreaImageCreator(){}
-
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~FullAreaImageCreator(){}
-
-  /**
-   * Create an initialized FullAreaImageCreator.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static FullAreaImageCreator New()
-  {
-    std::string vertexShader(
-      "uniform mediump vec4 uRegion; \n"
-       "void main() \n"
-      "{\n"
-      "  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-      "  vTexCoord.s = (aTexCoord.s - uRegion.s) / uRegion.p;"
-      "  vTexCoord.t = ( 1.0 - aTexCoord.t - uRegion.t) / uRegion.q;"
-      "}\n"
-    );
-
-    std::string fragmentShader(
-      "uniform mediump vec4 uRegion; \n"
-      "void main() \n"
-      "{\n"
-      "  if( vTexCoord.s > 0.0 && vTexCoord.s < 1.0 && vTexCoord.t > 0.0 && vTexCoord.t < 1.0) \n"
-      "  { \n"
-      "    gl_FragColor = texture2D( sEffect, vTexCoord ) * uColor ; \n"
-      "  } \n"
-      "  else \n"
-      "  { \n"
-      "    gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 ); \n"
-      "  } \n"
-      "}\n"
-    );
-
-    ShaderEffect shaderEffectCustom = ShaderEffect::New(vertexShader, fragmentShader);
-    FullAreaImageCreator handle( shaderEffectCustom );
-
-    return handle;
-  }
-
-  /**
-   * Set up the position and size of the effect texture
-   * @param[in] viewArea the size of full-area image to create
-   * @param[in] size the size of effect texture
-   */
-  void SetRegionSize( const Vector2& viewArea, const Vector2& size )
-  {
-    Vector2 sizeRatio( std::min(1.f, size.x / viewArea.x), std::min(1.f, size.y / viewArea.y) );
-    Vector4 region( (1.f-sizeRatio.x)*0.5f,
-                    (1.f-sizeRatio.y)*0.5f,
-                    sizeRatio.x,
-                    sizeRatio.y  );
-    SetUniform( "uRegion", region );
-  }
-
-private:
-
-  FullAreaImageCreator( ShaderEffect handle )
-  : ShaderEffect( handle )
-  {}
-
-};
-
-
-
-/**
  * CubeTransitionEffect implementation class
  */
-class CubeTransitionEffect : public Dali::BaseObject, public ConnectionTracker
+class CubeTransitionEffect : public Control
 {
 
 public:
@@ -159,24 +71,19 @@ public:
   float GetCubeDisplacement() const;
 
   /**
-   * @copydoc Toolkit::CubeTransitionEffect::GetRoot
+   * @copydoc Toolkit::CubeTransitionEffect::IsTransitioning
    */
-  Actor GetRoot();
-
-  /**
-   * @copydoc Toolkit::CubeTransitionEffect::IsTransiting
-   */
-  bool IsTransiting();
+  bool IsTransitioning();
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::SetFirstImage
    */
-  void SetCurrentImage(ImageActor imageActor);
+  void SetCurrentImage( Image image );
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::SetTargetImage
    */
-  void SetTargetImage(ImageActor imageActor);
+  void SetTargetImage( Image image );
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::StartTransition(bool)
@@ -222,15 +129,25 @@ public: //Signal
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
 protected:
+  /**
+   * @copydoc CustomActorImpl::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
+
+protected:
 
   /**
    * Construct a new CubeTransitionEffect object
    * Called in the constructor of subclasses
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
-   * @param[in] viewAreaSize The size of view area for this transition effect
    */
-  CubeTransitionEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize );
+  CubeTransitionEffect( unsigned int numRows, unsigned int numColumns );
 
   /**
    * Initialization steps: creating a layer, two groups of tiles,
@@ -238,36 +155,14 @@ protected:
    */
   void Initialize();
 
+
+protected:
+  void SetTargetLeft( unsigned int idx );
+  void SetTargetRight( unsigned int idx );
+  void SetTargetTop( unsigned int idx );
+  void SetTargetBottom( unsigned int idx );
+
 private:
-
-  /**
-   * Create an image actor to serve as a face of the cube
-   * @param[in] image The image to display.
-   * @param[in] color The color to set to the actor
-   * @return The tile actor created
-   */
-  ImageActor CreateTile( Image image, const Vector4& color );
-
-  /**
-   * Set Image content to tiles
-   * As only when the image ready, can we get correct image attributes
-   * so inside this function, the process needs to be passed to callBack of image resource loading succeed.
-   * @param[in] imageActor The imageActor whose image content will be set to the tiles
-   */
-  void SetImage(ImageActor imageActor);
-
-  /**
-   * Callback function of image resource loading succeed
-   * Set image and pixelArea to tiles
-   * @param[in] image The image content of the imageActor for transition
-   */
-  void OnImageLoaded(ResourceImage image);
-
-  /**
-   * Set sub-image to each tile.
-   * @param[in] image The image content of the imageActor for transition
-   */
-  void PrepareTiles( Image image );
 
   /**
    * Callback function of transition animation finished
@@ -297,39 +192,39 @@ private:
    */
   virtual void OnStopTransition() {}
 
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+  void ResetToInitialState();
+
 
 protected:
+  typedef std::vector< Actor > ActorArray;
+  enum FACE { TOP, BOTTOM, LEFT, RIGHT };
 
-  unsigned int               mNumRows;
-  unsigned int               mNumColumns;
-  Size                       mViewAreaSize;
-  std::vector< Actor >       mBoxes;
-  std::vector< ImageActor >  mTiles[2];
-  int                        mRotateIndex;
-  Size                       mTileSize;
-  Actor                      mRoot;
+  ActorArray                 mBoxes;
+  Vector< FACE >             mBoxType;
+  ActorArray                 mCurrentTiles;
+  ActorArray                 mTargetTiles;
 
-  ImageActor                 mCurrentImage;
-  unsigned int               mContainerIndex;           //have the value 0 or 1, refer to mTiles[0] or mTiles[1]
+  Actor                      mBoxRoot;
 
-  bool                       mChangeTurningDirection;
-  bool                       mIsToNextImage;            //if true, cubes rotate counter-clockwise; else clockwise
-  bool                       mIsImageLoading;
+  unsigned int               mRows;
+  unsigned int               mColumns;
 
-  float                      mAnimationDuration;
+  Renderer                   mCurrentRenderer;
+  Renderer                   mTargetRenderer;
+
+  Image                      mCurrentImage;
+  Image                      mTargetImage;
   Animation                  mAnimation;
+
+  Vector2                    mTileSize;
+
   bool                       mIsAnimating;
   bool                       mIsPaused;
 
+  float                      mAnimationDuration;
   float                      mCubeDisplacement;
-
-  bool                       mFirstTransition;
-
-  RenderTask                 mOffScreenTask;
-  FrameBufferImage           mOffScreenBuffer[2];
-  ImageActor                 mEmptyImage;
-  FullAreaImageCreator       mFullImageCreator;
-  unsigned int               mBufferIndex;
 
   static const Vector4       FULL_BRIGHTNESS;
   static const Vector4       HALF_BRIGHTNESS;
@@ -348,7 +243,7 @@ inline Internal::CubeTransitionEffect& GetImpl(Dali::Toolkit::CubeTransitionEffe
 {
   DALI_ASSERT_ALWAYS(obj);
 
-  Dali::BaseObject& handle = obj.GetBaseObject();
+  Dali::RefObject& handle = obj.GetImplementation();
 
   return static_cast<Internal::CubeTransitionEffect&>(handle);
 }
@@ -357,7 +252,7 @@ inline const Internal::CubeTransitionEffect& GetImpl(const Dali::Toolkit::CubeTr
 {
   DALI_ASSERT_ALWAYS(obj);
 
-  const Dali::BaseObject& handle = obj.GetBaseObject();
+  const Dali::RefObject& handle = obj.GetImplementation();
 
   return static_cast<const Internal::CubeTransitionEffect&>(handle);
 }

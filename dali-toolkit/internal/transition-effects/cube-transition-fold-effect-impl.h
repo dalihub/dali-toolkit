@@ -45,7 +45,7 @@ public:
   /**
    * @copydoc Toolkit::CubeTransitionFoldEffect::New
    */
-  static Toolkit::CubeTransitionFoldEffect New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize);
+  static Toolkit::CubeTransitionFoldEffect New( unsigned int numRows, unsigned int numColumns );
 
 protected:
 
@@ -59,32 +59,21 @@ protected:
     */
    virtual void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement );
 
-   /**
-    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStopTransition
-    */
-   virtual void OnStopTransition();
 private:
 
    /**
     * Construct a new CubeTransitionFoldEffect object
     * @param[in] numRows How many rows of cubes
     * @param[in] numColumns How many columns of cubes
-    * @param[in] viewAreaSize The size of view area for this transition effect
     */
-   CubeTransitionFoldEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize );
+   CubeTransitionFoldEffect( unsigned int numRows, unsigned int numColumns );
 
    /**
     * Set up animation to an Actor
     * @param[in] actorIndex The index of the cube in the cube array
     * @param[in] angle The angle of the rotation animation
-    * @param[in] resetTranslation The translation used to reset the actor position before animation
     */
-
-   void SetupAnimation( unsigned int actorIndex, float angle, Vector3 resetTranslation );
-
-private:
-
-   static const float  mDisplacementRatio;
+   void SetupAnimation( unsigned int actorIndex, unsigned int x, float angle );
 
 }; //class CubeTransitionFoldEffect
 
@@ -92,22 +81,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::CubeTransitionFoldEffect& GetImpl(Dali::Toolkit::CubeTransitionFoldEffect& obj)
+inline Internal::CubeTransitionFoldEffect& GetImpl( Dali::Toolkit::CubeTransitionFoldEffect& obj )
 {
-  DALI_ASSERT_ALWAYS(obj);
+  DALI_ASSERT_ALWAYS( obj );
 
-  Dali::BaseObject& handle = obj.GetBaseObject();
+  Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast<Internal::CubeTransitionFoldEffect&>(handle);
+  return static_cast< Internal::CubeTransitionFoldEffect& >( handle );
 }
 
-inline const Internal::CubeTransitionFoldEffect& GetImpl(const Dali::Toolkit::CubeTransitionFoldEffect& obj)
+inline const Internal::CubeTransitionFoldEffect& GetImpl( const Dali::Toolkit::CubeTransitionFoldEffect& obj )
 {
-  DALI_ASSERT_ALWAYS(obj);
+  DALI_ASSERT_ALWAYS( obj );
 
-  const Dali::BaseObject& handle = obj.GetBaseObject();
+  const Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast<const Internal::CubeTransitionFoldEffect&>(handle);
+  return static_cast< const Internal::CubeTransitionFoldEffect& >( handle );
 }
 
 } // namespace Toolkit

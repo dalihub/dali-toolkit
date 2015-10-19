@@ -26,20 +26,18 @@ namespace Toolkit
 
 namespace Internal
 {
-const float CubeTransitionFoldEffect::mDisplacementRatio = 1.4142f; //sqrt(2)
-
-CubeTransitionFoldEffect::CubeTransitionFoldEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize )
-: CubeTransitionEffect( numRows, numColumns, viewAreaSize)
+CubeTransitionFoldEffect::CubeTransitionFoldEffect( unsigned int numRows, unsigned int numColumns )
+: CubeTransitionEffect( numRows, numColumns )
 {
 }
 
-Toolkit::CubeTransitionFoldEffect CubeTransitionFoldEffect::New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize)
+Toolkit::CubeTransitionFoldEffect CubeTransitionFoldEffect::New(unsigned int numRows, unsigned int numColumns )
 {
   // Create the implementation
-  CubeTransitionFoldEffect* internalCubeTransEffect = new CubeTransitionFoldEffect( numRows, numColumns, viewAreaSize );
+  IntrusivePtr< CubeTransitionFoldEffect > internalCubeTransEffect = new CubeTransitionFoldEffect( numRows, numColumns );
 
   // Pass ownership to CustomActor handle
-  Toolkit::CubeTransitionFoldEffect cubeTransEffect( internalCubeTransEffect );
+  Toolkit::CubeTransitionFoldEffect cubeTransEffect( *internalCubeTransEffect );
 
   //Initialization
   internalCubeTransEffect->Initialize();
@@ -49,43 +47,69 @@ Toolkit::CubeTransitionFoldEffect CubeTransitionFoldEffect::New(unsigned int num
 
 void CubeTransitionFoldEffect::OnInitialize()
 {
-  float offset = mTileSize.width*0.5f;
   unsigned int idx;
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  for( unsigned int y = 0; y < mRows; y++ )
   {
-    idx = y*mNumColumns;
-    for( unsigned int x = y%2; x < mNumColumns; x=x+2)
+    idx = y*mColumns;
+    for( unsigned int x = y%2; x < mColumns; x=x+2)
     {
-      mTiles[0][idx+x].SetZ( offset );
-      mTiles[1][idx+x].SetX( offset );
+      SetTargetLeft( idx + x );
     }
-    for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
+    for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
     {
-      mTiles[0][idx+x].SetZ( offset );
-      mTiles[1][idx+x].SetX( -offset );
+      SetTargetRight( idx + x );
     }
   }
 }
 
 void CubeTransitionFoldEffect::OnStartTransition( Vector2 panPosition, Vector2 panDisplacement )
 {
-  float angle = mRotateIndex * Math::PI_2 ;
-  Vector3 translation0 = mTiles[mContainerIndex][ 0 ].GetCurrentPosition()*(-2.f);
-  Vector3 translation1 = mTiles[mContainerIndex][ mNumColumns ].GetCurrentPosition()*(-2.f);
+  float angle = Math::PI_2;
 
   unsigned int idx;
-
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  if( panDisplacement.x < 0 )
   {
-    for( unsigned int x = y%2; x < mNumColumns; x=x+2)
+    for( unsigned int y = 0; y < mRows; y++ )
     {
-      idx = y*mNumColumns + x;
-      SetupAnimation( idx, -angle, translation0 );
+      idx = y*mColumns;
+      for( unsigned int x = y%2; x < mColumns; x=x+2)
+      {
+        SetTargetLeft( idx + x );
+      }
+      for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+      {
+        SetTargetRight( idx + x );
+      }
     }
-    for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
+  }
+  else
+  {
+    angle = -angle;
+
+    for( unsigned int y = 0; y < mRows; y++ )
     {
-      idx = y*mNumColumns + x;
-      SetupAnimation( idx, angle, translation1 );
+      idx = y*mColumns;
+      for( unsigned int x = y%2; x < mColumns; x=x+2)
+      {
+        SetTargetRight( idx + x );
+      }
+      for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+      {
+        SetTargetLeft( idx + x );
+      }
+    }
+  }
+
+  for( unsigned int y = 0; y < mRows; y++ )
+  {
+    idx = y*mColumns;
+    for( unsigned int x = y%2; x < mColumns; x=x+2)
+    {
+      SetupAnimation( idx + x, x, angle );
+    }
+    for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+    {
+      SetupAnimation( idx + x, x, -angle );
     }
   }
 
@@ -93,43 +117,27 @@ void CubeTransitionFoldEffect::OnStartTransition( Vector2 panPosition, Vector2 p
   mIsAnimating = true;
 }
 
-void CubeTransitionFoldEffect::OnStopTransition()
+void CubeTransitionFoldEffect::SetupAnimation( unsigned int actorIndex, unsigned int x, float angle )
 {
-  float angle = mRotateIndex * Math::PI_2 ;
-  unsigned int idx;
-  for( unsigned int y = 0; y < mNumRows; y++ )
-  {
-    idx = y*mNumColumns;
-    for( unsigned int x = y%2; x < mNumColumns; x=x+2)
-    {
-      mBoxes[idx+x].SetOrientation( Radian(angle), Vector3::YAXIS );
-    }
-    for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
-    {
-      mBoxes[idx+x].SetOrientation( Radian(-angle), Vector3::YAXIS );
-    }
-  }
-}
+  //rotate and translate the cube such that the edges remain in constant contact
+  //calculate the maximum distance the cube has to move when it the box has rotated 45 degrees
+  //ie distance from of centre of square to a vertex is given by:
+  //  distance = width / sqrt(2)
+  //therefore the delta distance the cube should move is given by:
+  //  delta_distance = ( width / 2 ) - distance
+  //re-arranging we get:
+  //  delta_distance = ( width / 2 ) * ( sqrt(2) - 1 )
+  //accumulating over the length of the row we get:
+  //  delta_distance_at_x = x * delta_distance;
 
-void CubeTransitionFoldEffect::SetupAnimation(unsigned int actorIndex, float angle, Vector3 resetTranslation)
-{
-  Actor currentCube = mBoxes[actorIndex];
-  ImageActor sideTile = mTiles[mContainerIndex][actorIndex];
-  ImageActor frontTile = mTiles[mContainerIndex^1][actorIndex];
-  if ( mFirstTransition && (!mIsToNextImage) ) // for the first transition, it is going to previous image
-  {
-    sideTile.SetOrientation( Radian( angle),   Vector3::YAXIS );
-  }
-  else if( !mChangeTurningDirection )   // reset rotation, translation and color
-  {
-    sideTile.TranslateBy( resetTranslation );
-    sideTile.SetOrientation( Radian( angle),   Vector3::YAXIS );
-  }
-  mAnimation.AnimateTo( Property( currentCube, Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), Vector3::YAXIS ), AlphaFunction::LINEAR );
-  Vector3 position(currentCube.GetCurrentPosition());
-  mAnimation.AnimateTo( Property( currentCube, Actor::Property::POSITION ), Vector3( position.x*mDisplacementRatio, position.y, position.z ), AlphaFunction::BOUNCE );
-  mAnimation.AnimateTo( Property( frontTile, Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
-  mAnimation.AnimateTo( Property( sideTile, Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
+  float delta = (float)x * mTileSize.x * ( 1.4142f - 1.0f );
+
+  Vector3 position( mBoxes[ actorIndex ].GetCurrentPosition() );
+  mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::ORIENTATION ), Quaternion( Radian( angle ), Vector3::YAXIS ), AlphaFunction::LINEAR );
+  mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::POSITION_X ), position.x + delta, AlphaFunction::BOUNCE );
+
+  mAnimation.AnimateTo( Property( mCurrentTiles[ actorIndex ], Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
+  mAnimation.AnimateTo( Property( mTargetTiles[ actorIndex ], Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
 }
 
 } // namespace Internal

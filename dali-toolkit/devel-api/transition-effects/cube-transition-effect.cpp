@@ -35,14 +35,20 @@ CubeTransitionEffect::~CubeTransitionEffect()
 {
 }
 
-CubeTransitionEffect::CubeTransitionEffect(Internal::CubeTransitionEffect* impl)
-: BaseHandle(impl)
+CubeTransitionEffect::CubeTransitionEffect( Internal::CubeTransitionEffect& implementation )
+: Control( implementation )
 {
+}
+
+CubeTransitionEffect::CubeTransitionEffect( Dali::Internal::CustomActor* internal )
+: Control( internal )
+{
+  VerifyCustomActorPointer<Internal::CubeTransitionEffect>(internal);
 }
 
 CubeTransitionEffect CubeTransitionEffect::DownCast( BaseHandle handle )
 {
-  return CubeTransitionEffect( dynamic_cast< Dali::Toolkit::Internal::CubeTransitionEffect* >( handle.GetObjectPtr() ) );
+  return Control::DownCast<CubeTransitionEffect, Internal::CubeTransitionEffect>( handle );
 }
 
 void CubeTransitionEffect::SetTransitionDuration( float duration )
@@ -65,24 +71,19 @@ float CubeTransitionEffect::GetCubeDisplacement() const
   return GetImpl(*this).GetCubeDisplacement();
 }
 
-Actor CubeTransitionEffect::GetRoot()
+bool CubeTransitionEffect::IsTransitioning()
 {
-  return GetImpl(*this).GetRoot();
+  return GetImpl(*this).IsTransitioning();
 }
 
-bool CubeTransitionEffect::IsTransiting()
+void CubeTransitionEffect::SetCurrentImage( Image image )
 {
-  return GetImpl(*this).IsTransiting();
+  GetImpl(*this).SetCurrentImage( image );
 }
 
-void CubeTransitionEffect::SetCurrentImage(ImageActor imageActor)
+void CubeTransitionEffect::SetTargetImage( Image image )
 {
-  GetImpl(*this).SetCurrentImage( imageActor );
-}
-
-void CubeTransitionEffect::SetTargetImage(ImageActor imageActor)
-{
-  GetImpl(*this).SetTargetImage( imageActor );
+  GetImpl(*this).SetTargetImage( image );
 }
 
 void CubeTransitionEffect::StartTransition( bool toNextImage )

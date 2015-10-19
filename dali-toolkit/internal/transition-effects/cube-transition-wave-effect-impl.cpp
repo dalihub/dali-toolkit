@@ -27,21 +27,21 @@ namespace Toolkit
 namespace Internal
 {
 
-CubeTransitionWaveEffect::CubeTransitionWaveEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize )
-: CubeTransitionEffect( numRows, numColumns, viewAreaSize),
+CubeTransitionWaveEffect::CubeTransitionWaveEffect( unsigned int numRows, unsigned int numColumns )
+: CubeTransitionEffect( numRows, numColumns ),
   mSaddleAA( 1.f ),
   mSaddleBB( 1.f ),
   mSaddleB( 1.f )
 {
 }
 
-Toolkit::CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize)
+Toolkit::CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int numRows, unsigned int numColumns )
 {
   // Create the implementation
-  CubeTransitionWaveEffect* internalCubeTransEffect = new CubeTransitionWaveEffect( numRows, numColumns, viewAreaSize );
+  IntrusivePtr< CubeTransitionWaveEffect > internalCubeTransEffect = new CubeTransitionWaveEffect( numRows, numColumns );
 
   // Pass ownership to CustomActor handle
-  Toolkit::CubeTransitionWaveEffect cubeTransEffect( internalCubeTransEffect );
+  Toolkit::CubeTransitionWaveEffect cubeTransEffect( *internalCubeTransEffect );
 
   //Initialization
   internalCubeTransEffect->Initialize();
@@ -51,59 +51,54 @@ Toolkit::CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int num
 
 void CubeTransitionWaveEffect::OnInitialize()
 {
-  float offset = -mTileSize.width * 0.5f;
-  unsigned int totalNum = mNumColumns* mNumRows;
-  for( unsigned int idx = 0; idx < totalNum; idx++ )
+  for( unsigned int idx = 0; idx < mTargetTiles.size(); idx++ )
   {
-    mTiles[ 0 ][idx].SetZ( -offset );
-    mTiles[ 1 ][idx].SetX( offset );
+    SetTargetRight( idx );
   }
 }
 
 void CubeTransitionWaveEffect::OnStartTransition( Vector2 panPosition, Vector2 panDisplacement )
 {
-  float direc = mIsToNextImage ? 1.f : -1.f;
-  CalculateSaddleSurfaceParameters( panPosition, panDisplacement*direc );
+  bool forward = panDisplacement.x < 0.0;
+  CalculateSaddleSurfaceParameters( panPosition, forward ? panDisplacement : -panDisplacement );
 
-  float angle = mRotateIndex * 90.0f ;
-  Vector3 translation = mTiles[mContainerIndex][ 0 ].GetCurrentPosition()*(-2.f);
+  float angle = Math::PI_2;
 
   unsigned int idx;
-  unsigned int totalNum = mNumColumns* mNumRows;
-  if( mFirstTransition && (!mIsToNextImage) ) // the first transition is transiting to previous image
+  if( forward )
   {
-    for( unsigned int idx = 0; idx < totalNum; idx++ )
+    for( idx = 0; idx < mTargetTiles.size(); idx++ )
     {
-      mTiles[mContainerIndex][idx].SetOrientation( Degree( angle),  Vector3::YAXIS );
+      SetTargetRight( idx );
     }
   }
-  else if(!mChangeTurningDirection)  // reset rotation, translation
+  else
   {
-    for( unsigned int idx = 0; idx < totalNum; idx++ )
+    angle = -angle;
+    for( idx = 0; idx < mTargetTiles.size(); idx++ )
     {
-      mTiles[mContainerIndex][idx].TranslateBy( translation );
-      mTiles[mContainerIndex][idx].SetOrientation( Degree( angle),  Vector3::YAXIS );
+      SetTargetLeft( idx );
     }
   }
 
   float thirdAnimationDuration = mAnimationDuration / 3.f;
-  unsigned int anotherIndex = mContainerIndex^1;
 
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  for( unsigned int y = 0; y < mRows; y++ )
   {
-    for( unsigned int x = 0; x < mNumColumns; x++)
+    idx = y * mColumns;
+    for( unsigned int x = 0; x < mColumns; x++, idx++)
     {
-      idx = y*mNumColumns + x;
       // the delay value is within 0.f ~ 2.f*thirdAnimationDuration
-      float delay = thirdAnimationDuration * CalculateDelay(x*mTileSize.width,y*mTileSize.height);
+      float delay = thirdAnimationDuration * CalculateDelay( x * mTileSize.width, y * mTileSize.height, forward );
 
-      mAnimation.AnimateTo( Property( mBoxes[idx], Actor::Property::ORIENTATION ), Quaternion( Radian( Degree( -angle ) ), Vector3::YAXIS ),
+      mAnimation.AnimateTo( Property( mBoxes[ idx ], Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), Vector3::YAXIS ),
                             AlphaFunction::EASE_OUT_SINE, TimePeriod( delay, thirdAnimationDuration ) );
       mAnimation.AnimateBy( Property( mBoxes[idx], Actor::Property::POSITION ), Vector3( 0.f, 0.f, -mCubeDisplacement ),
                          AlphaFunction::BOUNCE, TimePeriod( delay, thirdAnimationDuration ) );
-      mAnimation.AnimateTo( Property( mTiles[anotherIndex][idx], Actor::Property::COLOR ), HALF_BRIGHTNESS,
+
+      mAnimation.AnimateTo( Property( mCurrentTiles[ idx ], Actor::Property::COLOR ), HALF_BRIGHTNESS,
                           AlphaFunction::EASE_OUT, TimePeriod( delay, thirdAnimationDuration ) );
-      mAnimation.AnimateTo( Property( mTiles[mContainerIndex][idx], Actor::Property::COLOR ), FULL_BRIGHTNESS,
+      mAnimation.AnimateTo( Property( mTargetTiles[ idx ], Actor::Property::COLOR ), FULL_BRIGHTNESS,
                           AlphaFunction::EASE_IN, TimePeriod( delay, thirdAnimationDuration ) );
     }
   }
@@ -112,18 +107,9 @@ void CubeTransitionWaveEffect::OnStartTransition( Vector2 panPosition, Vector2 p
   mIsAnimating = true;
 }
 
-void CubeTransitionWaveEffect::OnStopTransition()
-{
-  float angle = - mRotateIndex * 90.0f ;
-  unsigned int totalNum = mNumRows * mNumColumns;
-  for( unsigned int idx = 0; idx < totalNum; idx++ )
-  {
-    mBoxes[idx].SetOrientation( Degree( angle ), Vector3::YAXIS );
-  }
-}
-
 void  CubeTransitionWaveEffect::CalculateSaddleSurfaceParameters( Vector2 position, Vector2 displacement )
 {
+  const Vector2& size = Self().GetCurrentSize().GetVectorXY();
   // the line passes through 'position' and has the direction of 'displacement'
   float coefA, coefB, coefC; //line equation: Ax+By+C=0;
   coefA = displacement.y;
@@ -139,31 +125,31 @@ void  CubeTransitionWaveEffect::CalculateSaddleSurfaceParameters( Vector2 positi
     //distance from (0,0) to the line
     float distanceTopLeft =  fabsf(coefC) * inversedSqrtAABB;
     //distance from (viewAreaSize.x, viewAreaSize.y) to the line
-    float distanceBottomRight = fabsf(coefA*mViewAreaSize.x+coefB*mViewAreaSize.y+coefC) * inversedSqrtAABB;
+    float distanceBottomRight = fabsf(coefA*size.x+coefB*size.y+coefC) * inversedSqrtAABB;
     saddleA = std::max( distanceTopLeft, distanceBottomRight );
 
     //foot of a perpendicular: (viewAreaSize.x,0) to the line
-    float footX1 = ( coefB*coefB*mViewAreaSize.x - coefA*coefC) * inversedAABB;
-    float footY1 = (-coefA*coefB*mViewAreaSize.x - coefB*coefC) * inversedAABB;
+    float footX1 = ( coefB*coefB*size.x - coefA*coefC) * inversedAABB;
+    float footY1 = (-coefA*coefB*size.x - coefB*coefC) * inversedAABB;
     //foot of a perpendicular: (0,viewAreaSize.y) to the line
-    float footX2 = (-coefA*coefB*mViewAreaSize.y - coefA*coefC) * inversedAABB;
-    float footY2 = ( coefA*coefA*mViewAreaSize.y - coefB*coefC) * inversedAABB;
+    float footX2 = (-coefA*coefB*size.y - coefA*coefC) * inversedAABB;
+    float footY2 = ( coefA*coefA*size.y - coefB*coefC) * inversedAABB;
     mSaddleBB = (footX1-footX2)*(footX1-footX2) + (footY1-footY2)*(footY1-footY2);
     mTranslation = Vector2(-footX2,-footY2);
   }
   else
   {
     //distance from(viewAreaSize.x,0) to the line
-    float distanceTopRight = fabsf(coefA*mViewAreaSize.x+coefC) * inversedSqrtAABB;
+    float distanceTopRight = fabsf(coefA*size.x+coefC) * inversedSqrtAABB;
     //distance from(0,viewAreaSize.y) to the line
-    float distanceBottomLeft = fabsf(coefB*mViewAreaSize.y+coefC) * inversedSqrtAABB;
+    float distanceBottomLeft = fabsf(coefB*size.y+coefC) * inversedSqrtAABB;
     saddleA = std::max( distanceTopRight, distanceBottomLeft );
     //foot of a perpendicular: (0,0) to the line
     float footX3 = (-coefA*coefC) * inversedAABB;
     float footY3 = (-coefB*coefC) * inversedAABB;
     //foot of a perpendicular: (viewAreaSize.x,viewAreaSize.y) to the line
-    float footX4 = ( coefB*coefB*mViewAreaSize.x - coefA*coefB*mViewAreaSize.y - coefA*coefC) * inversedAABB;
-    float footY4 = (-coefA*coefB*mViewAreaSize.x + coefA*coefA*mViewAreaSize.y - coefB*coefC) * inversedAABB;
+    float footX4 = ( coefB*coefB*size.x - coefA*coefB*size.y - coefA*coefC) * inversedAABB;
+    float footY4 = (-coefA*coefB*size.x + coefA*coefA*size.y - coefB*coefC) * inversedAABB;
     mSaddleBB = (footX3-footX4)*(footX3-footX4) + (footY3-footY4)*(footY3-footY4);
     mTranslation = Vector2(-footX3, -footY3);
   }
@@ -184,13 +170,13 @@ void  CubeTransitionWaveEffect::CalculateSaddleSurfaceParameters( Vector2 positi
   mRotation.Normalize();
 }
 
-float CubeTransitionWaveEffect::CalculateDelay(float x, float y)
+float CubeTransitionWaveEffect::CalculateDelay( float x, float y, bool forward )
 {
   float tx = x + mTranslation.x;
   float ty = y + mTranslation.y;
   float valueX = mRotation.x * tx - mRotation.y * ty;
   float valueY = mRotation.y * tx + mRotation.x * ty;
-  if(!mIsToNextImage) // to previous image
+  if( !forward ) // to previous image
   {
     valueX = mSaddleB - valueX;
   }

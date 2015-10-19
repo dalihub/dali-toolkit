@@ -45,7 +45,7 @@ public:
   /**
    * @copydoc Toolkit::CubeTransitionWaveEffect::New
    */
-  static Toolkit::CubeTransitionWaveEffect New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize);
+  static Toolkit::CubeTransitionWaveEffect New(unsigned int numRows, unsigned int numColumns );
 
 protected:
 
@@ -59,20 +59,14 @@ protected:
    */
   virtual void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement );
 
-  /**
-   * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStopTransition
-   */
-  virtual void OnStopTransition();
-
 private:
 
   /**
    * Construct a new CubeTransitionWaveEffect object
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
-   * @param[in] viewAreaSize The size of view area for this transition effect
    */
-  CubeTransitionWaveEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize );
+  CubeTransitionWaveEffect( unsigned int numRows, unsigned int numColumns );
 
   /**
    * The Saddle surface (Hyperbolic paraboloid)function is used to calculate the delay of rotating animation for each cube
@@ -81,7 +75,7 @@ private:
    * @param[in] position The press down position of panGesture
    * @param[in] displacement The displacement vector of panGesture
    */
-  void CalculateSaddleSurfaceParameters( Vector2 position, Vector2 displacement );
+  void CalculateSaddleSurfaceParameters( Vector2 position, Vector2 displacement);
 
   /**
    * Calculate the delay of the animation for each cube
@@ -89,7 +83,7 @@ private:
    * @param[in] y The Y coordinate of the cube
    * @return The delay time of the animation
    */
-  float CalculateDelay(float x, float y);
+  float CalculateDelay( float x, float y, bool forward );
 
 private:
 
@@ -108,22 +102,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::CubeTransitionWaveEffect& GetImpl(Dali::Toolkit::CubeTransitionWaveEffect& obj)
+inline Internal::CubeTransitionWaveEffect& GetImpl( Dali::Toolkit::CubeTransitionWaveEffect& obj )
 {
-  DALI_ASSERT_ALWAYS(obj);
+  DALI_ASSERT_ALWAYS( obj );
 
-  Dali::BaseObject& handle = obj.GetBaseObject();
+  Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast<Internal::CubeTransitionWaveEffect&>(handle);
+  return static_cast< Internal::CubeTransitionWaveEffect& >( handle );
 }
 
-inline const Internal::CubeTransitionWaveEffect& GetImpl(const Dali::Toolkit::CubeTransitionWaveEffect& obj)
+inline const Internal::CubeTransitionWaveEffect& GetImpl( const Dali::Toolkit::CubeTransitionWaveEffect& obj )
 {
-  DALI_ASSERT_ALWAYS(obj);
+  DALI_ASSERT_ALWAYS( obj );
 
-  const Dali::BaseObject& handle = obj.GetBaseObject();
+  const Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast<const Internal::CubeTransitionWaveEffect&>(handle);
+  return static_cast< const Internal::CubeTransitionWaveEffect& >( handle );
 }
 
 } // namespace Toolkit
