@@ -1184,7 +1184,10 @@ void ItemView::OnPan( const PanGesture& gesture )
 
       self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
 
-      if( (firstItemScrollPosition >= 0.0f && currentOvershoot < 1.0f) || (firstItemScrollPosition >= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) && currentOvershoot > -1.0f) )
+      if( ( firstItemScrollPosition >= 0.0f &&
+            currentOvershoot < 1.0f ) ||
+          ( firstItemScrollPosition <= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) &&
+            currentOvershoot > -1.0f ) )
       {
         mTotalPanDisplacement += gesture.displacement;
       }
