@@ -1438,7 +1438,6 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   // Get the glyphs per character table.
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
-  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
 
   // If the vector is void, there is no right to left characters.
   const bool hasRightToLeftCharacters = NULL != visualToLogicalBuffer;
@@ -1452,6 +1451,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   // Traverses glyphs in visual order. To do that use the visual to logical conversion table.
   CharacterIndex visualIndex = startCharacter;
+  Length numberOfCharacters = 0u;
   for( ; !matched && ( visualIndex < endCharacter ); ++visualIndex )
   {
     // The character in logical order.
@@ -1460,43 +1460,58 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     // Get the script of the character.
     const Script script = mLogicalModel->GetScript( characterLogicalOrderIndex );
 
-    // The first glyph for that character in logical order.
-    const GlyphIndex glyphLogicalOrderIndex = *( charactersToGlyphBuffer + characterLogicalOrderIndex );
     // The number of glyphs for that character
     const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterLogicalOrderIndex );
+    ++numberOfCharacters;
 
-    // Get the metrics for the group of glyphs.
-    GlyphMetrics glyphMetrics;
-    GetGlyphsMetrics( glyphLogicalOrderIndex,
-                      numberOfGlyphs,
-                      glyphMetrics,
-                      mVisualModel,
-                      mMetrics );
 
-    const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
-
-    // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ...
-    const Length numberOfCharactersInLigature = HasLigatureMustBreak( script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
-    const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfCharactersInLigature );
-
-    for( GlyphIndex index = 0u; !matched && ( index < numberOfCharactersInLigature ); ++index )
+    if( 0u != numberOfGlyphs )
     {
-      // Find the mid-point of the area containing the glyph
-      const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
+      // Get the first character/glyph of the group of glyphs.
+      const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfCharacters;
+      const CharacterIndex firstLogicalCharacterIndex = hasRightToLeftCharacters ? *( visualToLogicalBuffer + firstVisualCharacterIndex ) : firstVisualCharacterIndex;
+      const GlyphIndex firstLogicalGlyphIndex = *( charactersToGlyphBuffer + firstLogicalCharacterIndex );
 
-      if( visualX < glyphCenter )
+      // Get the metrics for the group of glyphs.
+      GlyphMetrics glyphMetrics;
+      GetGlyphsMetrics( firstLogicalGlyphIndex,
+                        numberOfGlyphs,
+                        glyphMetrics,
+                        mVisualModel,
+                        mMetrics );
+
+      // Get the position of the first glyph.
+      const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
+
+      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ. 
+      const bool isInterglyphIndex = ( numberOfCharacters > numberOfGlyphs ) && HasLigatureMustBreak( script );
+      const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
+      const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
+
+      GlyphIndex index = 0u;
+      for( ; !matched && ( index < numberOfBlocks ); ++index )
       {
-        visualIndex += index;
-        matched = true;
+        // Find the mid-point of the area containing the glyph
+        const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
+
+        if( visualX < glyphCenter )
+        {
+          matched = true;
+          break;
+        }
+      }
+
+      if( matched )
+      {
+        visualIndex = firstVisualCharacterIndex + index;
         break;
       }
+
+      numberOfCharacters = 0u;
     }
 
-    if( matched )
-    {
-      break;
-    }
   }
+
 
   // Return the logical position of the cursor in characters.
 
