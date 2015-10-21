@@ -447,6 +447,8 @@ Property::Value Model3dView::GetProperty( BaseObject* object, Property::Index in
 
 void Model3dView::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   CustomActor self = Self();
   self.AddRenderer( mRenderer );
 

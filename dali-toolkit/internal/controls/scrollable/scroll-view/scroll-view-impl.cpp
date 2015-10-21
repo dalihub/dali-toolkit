@@ -695,6 +695,8 @@ void ScrollView::OnInitialize()
 
 void ScrollView::OnStageConnection( int depth )
 {
+  ScrollBase::OnStageConnection( depth );
+
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
   if ( mSensitive )
@@ -714,6 +716,8 @@ void ScrollView::OnStageDisconnection()
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
   StopAnimation();
+
+  ScrollBase::OnStageDisconnection();
 }
 
 ScrollView::~ScrollView()

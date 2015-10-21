@@ -215,6 +215,8 @@ float ImageView::GetWidthForHeight( float height )
 
 void ImageView::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   if( mRenderer )
   {
     CustomActor self = Self();
@@ -229,6 +231,8 @@ void ImageView::OnStageDisconnection()
     CustomActor self = Self();
     mRenderer.SetOffStage( self );
   }
+
+  Control::OnStageDisconnection();
 }
 
 
