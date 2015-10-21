@@ -130,8 +130,6 @@ void ControlRenderer::SetOffStage( Actor& actor )
   if( GetIsOnStage() )
   {
     DoSetOffStage( actor );
-    actor.RemoveRenderer( mImpl->mRenderer );
-    mImpl->mRenderer.Reset();
 
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
@@ -143,6 +141,8 @@ void ControlRenderer::DoSetOnStage( Actor& actor )
 
 void ControlRenderer::DoSetOffStage( Actor& actor )
 {
+  actor.RemoveRenderer( mImpl->mRenderer );
+  mImpl->mRenderer.Reset();
 }
 
 void ControlRenderer::CreatePropertyMap( Property::Map& map ) const

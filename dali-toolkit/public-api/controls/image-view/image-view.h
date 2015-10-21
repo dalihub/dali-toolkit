@@ -21,6 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h>
+
 namespace Dali
 {
 
@@ -89,11 +92,17 @@ public:
   /**
    * @brief Create an initialized ImageView from an Image resource url
    *
+   * @note A valid size is preferable for efficiency.
+   *       However, do not set size that is bigger than the actual image size, as the up-scaling is not available,
+   *       the content of the area not covered by actual image is undefined, it will not be cleared.
+   *
    * If the string is empty, ImageView will display nothing
    * @param[in] url The url of the image resource to display.
+   * @param [in] size The width and height to fit the loaded image to.
    * @return A handle to a newly allocated ImageView.
    */
-  static ImageView New( const std::string& url );
+  static ImageView New( const std::string& url,
+                        ImageDimensions size = ImageDimensions() );
 
   /**
    * @brief Destructor
@@ -144,8 +153,10 @@ public:
    * @since DALi 1.1.4
    *
    * @param[in] url The Image resource to display.
+   * @param [in] size The width and height to fit the loaded image to.
    */
-  void SetImage( const std::string& url );
+  void SetImage( const std::string& url,
+                 ImageDimensions size = ImageDimensions() );
 
   /**
    * @deprecated Gets the Image

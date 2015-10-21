@@ -112,14 +112,14 @@ void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, co
   GetImplementation( *this ).ResetRenderer( renderer, actor, image );
 }
 
-ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+ControlRenderer RendererFactory::GetControlRenderer( const std::string& url, ImageDimensions size )
 {
-  return GetImplementation( *this ).GetControlRenderer( url );
+  return GetImplementation( *this ).GetControlRenderer( url, size );
 }
 
-void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
 {
-  GetImplementation( *this ).ResetRenderer( renderer, actor, url );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, url, size );
 }
 
 void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )

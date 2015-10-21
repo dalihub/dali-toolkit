@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
+#include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
@@ -76,9 +77,10 @@ public:
   /**
    * @brief Constructor.
    *
-   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   * @param[in] factoryCache The RendererFactoryCache object
+   * @param[in] atlasManager The atlasManager object
    */
-  ImageRenderer( RendererFactoryCache& factoryCache );
+  ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasManager& atlasManager );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -131,13 +133,10 @@ protected:
 public:
 
   /**
-   * @brief Sets the image of this renderer to the resource at imageUrl
-   * The renderer will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
-   *
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
-   * @param[in] imageUrl The URL to to image resource to use
+   * Get the standard image rendering shader.
+   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
    */
-  void SetImage( Actor& actor, const std::string& imageUrl );
+  static Shader GetImageShader( RendererFactoryCache& factoryCache );
 
   /**
    * @brief Sets the image of this renderer to the resource at imageUrl
@@ -145,12 +144,15 @@ public:
    *
    * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] imageUrl The URL to to image resource to use
-   * @param[in] desiredWidth The desired width of the resource to load
-   * @param[in] desiredHeight The desired height of the resource to load
+   * @param[in] size The width and height to fit the loaded image to.
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
-  void SetImage( Actor& actor, const std::string& imageUrl, int desiredWidth, int desiredHeight, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode );
+  void SetImage( Actor& actor,
+                 const std::string& imageUrl,
+                 ImageDimensions size=ImageDimensions(),
+                 FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                 Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
 
   /**
    * @brief Sets the image of this renderer to use
@@ -196,8 +198,21 @@ private:
    */
   void OnImageLoaded( ResourceImage image );
 
+  /**
+   * Set the value to the uTextureRect uniform
+   * @param[in] textureRect The texture rectangular area.
+   */
+  void SetTextureRectUniform( const Vector4& textureRect  );
+
+  /**
+   * Clean the renderer from cache, and remove the image from atlas if it is not used anymore
+   */
+  void CleanCache(const std::string& url);
+
 private:
   Image mImage;
+  ImageAtlasManager& mAtlasManager;
+  Vector4 mTextureRect;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;
