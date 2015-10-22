@@ -453,12 +453,12 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
       cursorIndex = oldCursorIndex + cursorOffset;
     }
 
-    if( (cursorIndex + numberOfChars) > currentText.Count() )
+    if( ( cursorIndex + numberOfChars ) > currentText.Count() )
     {
       numberOfChars = currentText.Count() - cursorIndex;
     }
 
-    if( (cursorIndex + numberOfChars) <= currentText.Count() )
+    if( ( cursorIndex + numberOfChars ) <= currentText.Count() )
     {
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
       Vector<Character>::Iterator last  = first + numberOfChars;
@@ -1520,7 +1520,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       else if( EventData::EDITING                  != mImpl->mEventData->mState &&
                EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState )
       {
-        if( mImpl->IsShowingPlaceholderText() &&  ! mImpl->IsFocusedPlaceholderAvailable() )
+        if( mImpl->IsShowingPlaceholderText() &&  !mImpl->IsFocusedPlaceholderAvailable() )
         {
           // Hide placeholder text
           ResetText();
@@ -1806,7 +1806,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
 
 ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
-  bool update( false );
+  bool update = false;
   bool requestRelayout = false;
 
   std::string text;
@@ -1934,17 +1934,15 @@ void Controller::NotifyImfManager()
 {
   if( mImpl->mEventData )
   {
-    ImfManager imfManager = ImfManager::Get();
-
-    if( imfManager )
+    if( mImpl->mEventData->mImfManager )
     {
       // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
       std::string text;
       GetText( text );
-      imfManager.SetSurroundingText( text );
+      mImpl->mEventData->mImfManager.SetSurroundingText( text );
 
-      imfManager.SetCursorPosition( GetLogicalCursorPosition() );
-      imfManager.NotifyCursorPosition();
+      mImpl->mEventData->mImfManager.SetCursorPosition( GetLogicalCursorPosition() );
+      mImpl->mEventData->mImfManager.NotifyCursorPosition();
     }
   }
 }

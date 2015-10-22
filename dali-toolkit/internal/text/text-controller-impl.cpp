@@ -106,6 +106,7 @@ void GetGlyphsMetrics( GlyphIndex glyphIndex,
 
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
+  mImfManager(),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
@@ -132,7 +133,9 @@ EventData::EventData( DecoratorPtr decorator )
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
   mAllTextSelected( false )
-{}
+{
+  mImfManager = ImfManager::Get();
+}
 
 EventData::~EventData()
 {}
@@ -575,6 +578,13 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
       mEventData->mUpdateCursorPosition = true;
       mEventData->mScrollAfterUpdatePosition = true;
+
+      // Notify the cursor position to the imf manager.
+      if( mEventData->mImfManager )
+      {
+        mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
+        mEventData->mImfManager.NotifyCursorPosition();
+      }
     }
   }
 }

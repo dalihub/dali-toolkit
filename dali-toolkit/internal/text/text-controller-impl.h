@@ -115,10 +115,11 @@ struct EventData
 
   ~EventData();
 
-  DecoratorPtr       mDecorator;               ///< Pointer to the decorator
-  std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus
-  std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive
-  Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color
+  DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
+  ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
+  std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
+  Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color.
 
   /**
    * This is used to delay handling events until after the model has been updated.
@@ -332,10 +333,9 @@ struct Controller::Impl
     if( mEventData )
     {
       // Reset incase we are in a pre-edit state.
-      ImfManager imfManager = ImfManager::Get();
-      if ( imfManager )
+      if( mEventData->mImfManager )
       {
-        imfManager.Reset(); // Will trigger a commit message
+        mEventData->mImfManager.Reset(); // Will trigger a message ( commit, get surrounding )
       }
 
       ClearPreEditFlag();
