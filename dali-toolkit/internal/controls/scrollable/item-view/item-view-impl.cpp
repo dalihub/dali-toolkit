@@ -1080,13 +1080,17 @@ void ItemView::OnItemsRemoved()
   }
 }
 
-float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout)
+float ItemView::ClampFirstItemPosition( float targetPosition, const Vector3& targetSize, ItemLayout& layout, bool updateOvershoot )
 {
   Actor self = Self();
   float minLayoutPosition = layout.GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), targetSize);
   float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, targetPosition));
-  mScrollOvershoot = targetPosition - clamppedPosition;
   self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector2(0.0f, -minLayoutPosition));
+
+  if( updateOvershoot )
+  {
+    mScrollOvershoot = targetPosition - clamppedPosition;
+  }
 
   return clamppedPosition;
 }
@@ -1442,9 +1446,9 @@ bool ItemView::IsLayoutScrollable(const Vector3& layoutSize)
 {
   Actor self = Self();
 
-  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout );
-  float forwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition + 1.0, layoutSize, *mActiveLayout);
-  float backwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition - 1.0, layoutSize, *mActiveLayout);
+  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout, false );
+  float forwardClampedPosition = ClampFirstItemPosition( currentLayoutPosition + 1.0, layoutSize, *mActiveLayout, false );
+  float backwardClampedPosition = ClampFirstItemPosition( currentLayoutPosition - 1.0, layoutSize, *mActiveLayout, false );
 
   return (fabs(forwardClampedPosition - backwardClampedPosition) > Math::MACHINE_EPSILON_0);
 }
