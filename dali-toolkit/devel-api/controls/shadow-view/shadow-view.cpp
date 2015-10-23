@@ -94,9 +94,9 @@ void ShadowView::Remove(Actor child)
   GetImpl(*this).Remove(child);
 }
 
-void ShadowView::SetShadowPlane(ImageActor shadowPlane)
+void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
 {
-  GetImpl(*this).SetShadowPlane(shadowPlane);
+  GetImpl(*this).SetShadowPlaneBackground(shadowPlaneBackground);
 }
 
 void ShadowView::SetPointLight(Actor pointLight)

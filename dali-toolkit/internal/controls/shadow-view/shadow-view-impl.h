@@ -25,9 +25,11 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 
@@ -80,9 +82,9 @@ public:
   void Remove(Actor child);
 
   /**
-   * @copydoc Dali::Toolkit::ShadowView::SetShadowPlane(Actor shadowPlane)
+   * @copydoc Dali::Toolkit::ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
    */
-  void SetShadowPlane(Actor shadowPlane);
+  void SetShadowPlaneBackground(Actor shadowPlaneBackground);
 
   /**
    * @copydoc Dali::Toolkit::ShadowView::SetPointLight(Actor pointLight)
@@ -137,7 +139,7 @@ private:
   void CreateBlurFilter();
 
 private:
-  ImageActor mShadowPlane; // Shadow renders into this actor
+  Toolkit::ImageView mShadowPlane; // Shadow renders into this actor
   Actor mShadowPlaneBg; // mShadowPlane renders directly in front of this actor
   Actor mPointLight;  // Shadow is cast from this point light
 
@@ -148,12 +150,11 @@ private:
 
   Actor mChildrenRoot; // Subtree for all user added child actors that should be rendered normally
   Actor mBlurRootActor; // Root actor for blur filter processing
-  ImageActor mShadowPlaneDrawable; // Positioned on top of mShadowPlane for drawing shadow image
   RenderTask mRenderSceneTask;
 
   CameraActor mCameraActor; // Constrained to same position as mPointLight and pointing at mShadowPlane
 
-  ShaderEffect mShadowRenderShader;
+  Property::Map mShadowRenderShader;
   BlurTwoPassFilter mBlurFilter;
 
   Vector4 mCachedShadowColor;                               ///< Cached Shadow color.
