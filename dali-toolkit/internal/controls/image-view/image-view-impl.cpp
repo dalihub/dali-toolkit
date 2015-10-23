@@ -173,7 +173,7 @@ Vector3 ImageView::GetNaturalSize()
   size.y = mImageSize.GetHeight();
   size.z = std::min(size.x, size.y);
 
-  if( size.x > 0 && size.x > 0 )
+  if( size.x > 0 && size.y > 0 )
   {
     return size;
   }
