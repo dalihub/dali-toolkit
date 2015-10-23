@@ -810,16 +810,6 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  unsigned int controlRendererCount = Self().GetRendererCount();
-  for( unsigned int i(0); i<controlRendererCount; ++i )
-  {
-    Renderer controlRenderer = Self().GetRendererAt(i);
-    if( controlRenderer )
-    {
-      controlRenderer.SetDepthIndex( CONTENT_DEPTH_INDEX+depth );
-    }
-  }
-
   if( mImpl->mBackgroundRenderer)
   {
     mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
