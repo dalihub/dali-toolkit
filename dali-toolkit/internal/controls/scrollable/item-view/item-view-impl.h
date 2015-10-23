@@ -561,58 +561,44 @@ private:
 
 private:
 
-  ItemFactory& mItemFactory;
-
   typedef std::map<unsigned int, Actor> ItemPool;
   typedef ItemPool::iterator            ItemPoolIter;
   typedef ItemPool::const_iterator      ConstItemPoolIter;
 
   ItemPool mItemPool;
-
-  std::vector< ItemLayoutPtr >  mLayouts;  ///<  Container of Dali::Toolkit::ItemLayout objects
-  ItemLayout* mActiveLayout;
-  Vector3 mActiveLayoutTargetSize;
-
+  ItemFactory& mItemFactory;
+  std::vector< ItemLayoutPtr > mLayouts;            ///< Container of Dali::Toolkit::ItemLayout objects
+  Actor mOvershootOverlay;                          ///< The overlay actor for overshoot effect
   Animation mResizeAnimation;
   Animation mScrollAnimation;
   Animation mScrollOvershootAnimation;
-  bool      mAnimatingOvershootOn;          ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
-  bool      mAnimateOvershootOff;         ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
-
-  bool mAnchoringEnabled;
-  float mAnchoringDuration;
-
-  float mRefreshIntervalLayoutPositions;  ///< Refresh item view when the layout position changes by this interval in both positive and negative directions.
-  PropertyNotification mRefreshNotification; // stores the property notification used for item view refresh
-  bool mRefreshOrderHint; ///< True if scrolling towards the last item
-
-  // Input handling
-
-  float mMinimumSwipeSpeed;
-  float mMinimumSwipeDistance;
-  float mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates for each wheel event received.
-
-  float mScrollDistance;
-  float mScrollSpeed;
-  Vector2 mTotalPanDisplacement;
-
-  float mScrollOvershoot;
-  bool mIsFlicking;
-
-  Timer mWheelEventFinishedTimer; ///< The timer to determine whether there is no wheel event received for a certain period of time.
-
-  Dali::Gesture::State mGestureState;
-
-  Actor mOvershootOverlay;           ///< The overlay actor for overshoot effect
-
-  bool mAddingItems;
-
-  bool mRefreshEnabled; ///< Whether to refresh the cache automatically
-
+  Timer mWheelEventFinishedTimer;                   ///< The timer to determine whether there is no wheel event received for a certain period of time.
+  PropertyNotification mRefreshNotification;        ///< Stores the property notification used for item view refresh
+  LayoutActivatedSignalType mLayoutActivatedSignal;
+  Vector3 mActiveLayoutTargetSize;
   Vector3 mItemsParentOrigin;
   Vector3 mItemsAnchorPoint;
+  Vector2 mTotalPanDisplacement;
+  ItemLayout* mActiveLayout;
 
-  LayoutActivatedSignalType mLayoutActivatedSignal;
+  float mAnchoringDuration;
+  float mRefreshIntervalLayoutPositions;            ///< Refresh item view when the layout position changes by this interval in both positive and negative directions.
+  float mMinimumSwipeSpeed;
+  float mMinimumSwipeDistance;
+  float mWheelScrollDistanceStep;                   ///< The step of scroll distance in actor coordinates for each wheel event received.
+  float mScrollDistance;
+  float mScrollSpeed;
+  float mScrollOvershoot;
+
+  Dali::Gesture::State mGestureState    : 3;
+  bool mAnimatingOvershootOn            : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
+  bool mAnimateOvershootOff             : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
+  bool mAnchoringEnabled                : 1;
+  bool mRefreshOrderHint                : 1;        ///< True if scrolling towards the last item
+  bool mIsFlicking                      : 1;
+  bool mAddingItems                     : 1;
+  bool mRefreshEnabled                  : 1;        ///< Whether to refresh the cache automatically
+  bool mInAnimation                     : 1;        ///< Keeps track of whether an animation is controlling the overshoot property.
 };
 
 } // namespace Internal
