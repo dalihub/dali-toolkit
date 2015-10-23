@@ -49,6 +49,32 @@ const char * const BORDER_ONLY("border-only");
 
 std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
+const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
+  uniform mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 fixedFactor  = vec2( uNinePatchFactorsX[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uNinePatchFactorsY[ int( ( aPosition.y + 1.0 ) * 0.5 ) ].x );\n
+    mediump vec2 stretch      = vec2( uNinePatchFactorsX[ int( ( aPosition.x       ) * 0.5 ) ].y, uNinePatchFactorsY[ int( ( aPosition.y       ) * 0.5 ) ].y );\n
+    \n
+    mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );\n
+    mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );\n
+    \n
+    mediump vec4 vertexPosition = vec4( ( fixedFactor + ( uSize.xy - fixedTotal ) * stretch / stretchTotal ), 0.0, 1.0 );\n
+    vertexPosition.xy -= uSize.xy * vec2( 0.5, 0.5 );\n
+    vertexPosition = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = ( fixedFactor + stretch ) / ( fixedTotal + stretchTotal );\n
+    \n
+    gl_Position = vertexPosition;\n
+  }\n
+);
+
 const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     attribute mediump vec2 aPosition;\n
     varying mediump vec2 vTexCoord;\n
@@ -146,6 +172,37 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
   vertices.PushBack( Vector2( x, y ) );
 }
 
+void RegisterStretchProperties( Material& material, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
+{
+  uint16_t prevEnd = 0;
+  uint16_t prevFix = 0;
+  uint16_t prevStretch = 0;
+  unsigned int i = 1;
+  for( NinePatchImage::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i )
+  {
+    uint16_t start = it->GetX();
+    uint16_t end = it->GetY();
+
+    uint16_t fix = prevFix + start - prevEnd;
+    uint16_t stretch = prevStretch + end - start;
+
+    std::stringstream uniform;
+    uniform << uniformName << "[" << i << "]";
+    material.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
+
+    prevEnd = end;
+    prevFix = fix;
+    prevStretch = stretch;
+  }
+
+  {
+    prevFix += imageExtent - prevEnd;
+    std::stringstream uniform;
+    uniform << uniformName << "[" << i << "]";
+    material.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
+  }
+}
+
 } //unnamed namespace
 
 /////////////////NPatchRenderer////////////////
@@ -175,11 +232,11 @@ void NPatchRenderer::DoInitialize( const Property::Map& propertyMap )
     if( imageURLValue->Get( mImageUrl ) )
     {
       NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitialiseFromImage( nPatch );
+      InitializeFromImage( nPatch );
     }
     else
     {
-      CreateErrorImage();
+      InitializeFromBrokenImage();
       DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
     }
   }
@@ -191,17 +248,17 @@ void NPatchRenderer::GetNaturalSize( Vector2& naturalSize ) const
   {
     naturalSize.x = mImage.GetWidth();
     naturalSize.y = mImage.GetHeight();
-    return;
   }
   else if( !mImageUrl.empty() )
   {
     ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
     naturalSize.x = dimentions.GetWidth();
     naturalSize.y = dimentions.GetHeight();
-    return;
   }
-
-  naturalSize = Vector2::ZERO;
+  else
+  {
+    naturalSize = Vector2::ZERO;
+  }
 }
 
 void NPatchRenderer::SetClipRect( const Rect<int>& clipRect )
@@ -218,30 +275,51 @@ void NPatchRenderer::SetOffset( const Vector2& offset )
 void NPatchRenderer::InitializeRenderer( Renderer& renderer )
 {
   Geometry geometry;
-  if( !mBorderOnly )
+  Shader shader;
+  if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
   {
-    geometry = mFactoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY );
-    if( !geometry )
+    if( !mBorderOnly )
     {
-      geometry = CreateGeometry( Uint16Pair( 3, 3 ) );
-      mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY, geometry );
+      geometry = mFactoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY );
+      if( !geometry )
+      {
+        geometry = CreateGeometry( Uint16Pair( 3, 3 ) );
+        mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_GEOMETRY, geometry );
+      }
     }
+    else
+    {
+      geometry = mFactoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY );
+      if( !geometry )
+      {
+        geometry = CreateGeometryBorder( Uint16Pair( 3, 3 ) );
+        mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY, geometry );
+      }
+    }
+
+    shader = mFactoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
+      mFactoryCache.SaveShader( RendererFactoryCache::NINE_PATCH_SHADER, shader );
+    }
+  }
+  else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+  {
+    Uint16Pair gridSize( 2 * mStretchPixelsX.Size() + 1,  2 * mStretchPixelsY.Size() + 1 );
+    geometry = !mBorderOnly ? CreateGeometry( gridSize ) : CreateGeometryBorder( gridSize );
+
+    std::stringstream vertexShader;
+    vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
+                 << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
+                 << VERTEX_SHADER;
+
+    shader = Shader::New( vertexShader.str(), FRAGMENT_SHADER );
   }
   else
   {
-    geometry = mFactoryCache.GetGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY );
-    if( !geometry )
-    {
-      geometry = CreateGeometryBorder( Uint16Pair( 3, 3 ) );
-      mFactoryCache.SaveGeometry( RendererFactoryCache::NINE_PATCH_BORDER_GEOMETRY, geometry );
-    }
-  }
-
-  Shader shader = mFactoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
-  if( !shader )
-  {
-    shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
-    mFactoryCache.SaveShader( RendererFactoryCache::NINE_PATCH_SHADER, shader );
+    DALI_LOG_ERROR("The 9 patch image '%s' doesn't have any valid stretch borders and so is not a valid 9 patch image\n", mImageUrl.c_str() );
+    InitializeFromBrokenImage();
   }
 
   if( !renderer )
@@ -267,12 +345,14 @@ void NPatchRenderer::DoSetOnStage( Actor& actor )
     if( !mImageUrl.empty() )
     {
       NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitialiseFromImage( nPatch );
+      InitializeFromImage( nPatch );
     }
     else if( mImage )
     {
-      InitialiseFromImage( mImage );
+      InitializeFromImage( mImage );
     }
+
+    InitializeRenderer( mImpl->mRenderer );
   }
 
   if( mCroppedImage )
@@ -312,7 +392,7 @@ void NPatchRenderer::SetImage( const std::string& imageUrl, bool borderOnly )
 
   mImageUrl = imageUrl;
   NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-  InitialiseFromImage( nPatch );
+  InitializeFromImage( nPatch );
 
   if( mCroppedImage && mImpl->mIsOnStage )
   {
@@ -330,7 +410,7 @@ void NPatchRenderer::SetImage( NinePatchImage image, bool borderOnly )
   }
 
   mImage = image;
-  InitialiseFromImage( mImage );
+  InitializeFromImage( mImage );
 
   if( mCroppedImage && mImpl->mIsOnStage )
   {
@@ -338,13 +418,13 @@ void NPatchRenderer::SetImage( NinePatchImage image, bool borderOnly )
   }
 }
 
-void NPatchRenderer::InitialiseFromImage( NinePatchImage nPatch )
+void NPatchRenderer::InitializeFromImage( NinePatchImage nPatch )
 {
   mCroppedImage = nPatch.CreateCroppedBufferImage();
   if( !mCroppedImage )
   {
     DALI_LOG_ERROR("'%s' specify a valid 9 patch image\n", mImageUrl.c_str() );
-    CreateErrorImage();
+    InitializeFromBrokenImage();
     return;
   }
 
@@ -354,21 +434,10 @@ void NPatchRenderer::InitialiseFromImage( NinePatchImage nPatch )
   mStretchPixelsY = nPatch.GetStretchPixelsY();
 }
 
-void NPatchRenderer::CreateErrorImage()
+void NPatchRenderer::InitializeFromBrokenImage()
 {
-  mImageSize = ImageDimensions( 1, 1 );
-
-  BufferImage bufferImage = BufferImage::New( mImageSize.GetWidth(), mImageSize.GetHeight(), Pixel::RGBA8888 );
-  mCroppedImage = bufferImage;
-  PixelBuffer* pixbuf = bufferImage.GetBuffer();
-
-  for( size_t i = 0; i < mImageSize.GetWidth() * mImageSize.GetHeight() * 4u; )
-  {
-    pixbuf[ i++ ] = 0;
-    pixbuf[ i++ ] = 0;
-    pixbuf[ i++ ] = 0;
-    pixbuf[ i++ ] = 255;
-  }
+  mCroppedImage = RendererFactory::GetBrokenRendererImage();
+  mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );
 
   mStretchPixelsX.Clear();
   mStretchPixelsX.PushBack( Uint16Pair( 0, mImageSize.GetWidth() ) );
@@ -381,35 +450,37 @@ void NPatchRenderer::ApplyImageToSampler()
   Material material = mImpl->mRenderer.GetMaterial();
   if( material )
   {
-    Sampler sampler;
-    for( std::size_t i = 0; i < material.GetNumberOfSamplers(); ++i )
+    int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
+    if( index > -1 )
     {
-      sampler = material.GetSamplerAt( i );
-      if( sampler.GetUniformName() == TEXTURE_UNIFORM_NAME )
-      {
-        sampler.SetImage( mCroppedImage );
-        break;
-      }
+      material.SetTextureImage( index, mCroppedImage );
     }
-    if( !sampler )
+    else
     {
-      sampler = Sampler::New( mCroppedImage, TEXTURE_UNIFORM_NAME );
-      material.AddSampler( sampler );
+      material.AddTexture(  mCroppedImage, TEXTURE_UNIFORM_NAME );
     }
 
-    if( mStretchPixelsX.Size() > 0 && mStretchPixelsY.Size() > 0 )
+    if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
     {
-      //only 9 patch supported for now
+      //special case for 9 patch
       Uint16Pair stretchX = mStretchPixelsX[ 0 ];
       Uint16Pair stretchY = mStretchPixelsY[ 0 ];
 
       uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
       uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
 
-      sampler.RegisterProperty( "uFixed[0]", Vector2::ZERO );
-      sampler.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
-      sampler.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
-      sampler.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
+      material.RegisterProperty( "uFixed[0]", Vector2::ZERO );
+      material.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
+      material.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
+      material.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
+    }
+    else
+    {
+      material.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
+      material.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
+
+      RegisterStretchProperties( material, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
+      RegisterStretchProperties( material, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
     }
   }
 }

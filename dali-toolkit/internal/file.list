@@ -1,8 +1,6 @@
 # Add local source files here
 
 toolkit_src_files = \
-   $(toolkit_src_dir)/atlas-manager/atlas-manager.cpp \
-   $(toolkit_src_dir)/atlas-manager/atlas-manager-impl.cpp \
    $(toolkit_src_dir)/builder/builder-actor.cpp \
    $(toolkit_src_dir)/builder/builder-animations.cpp \
    $(toolkit_src_dir)/builder/builder-impl.cpp \
@@ -99,6 +97,9 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-manager.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-manager-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-mesh-factory.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \

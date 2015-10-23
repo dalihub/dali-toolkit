@@ -85,8 +85,6 @@ Integration::Log::Filter* gLogFilter( Integration::Log::Filter::New(Debug::NoLog
 // Local Data
 namespace
 {
-const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
-
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 
@@ -242,14 +240,12 @@ struct Decorator::Impl : public ConnectionTracker
   struct PopupImpl
   {
     PopupImpl()
-    : position(),
-      offset( DEFAULT_POPUP_OFFSET )
+    : position()
     {
     }
 
     TextSelectionPopup actor;
     Vector3 position;
-    int offset;
   };
 
   Impl( ControllerInterface& controller,
@@ -298,6 +294,8 @@ struct Decorator::Impl : public ConnectionTracker
    */
   void Relayout( const Vector2& size )
   {
+    mControlSize = size;
+
     // TODO - Remove this if nothing is active
     CreateActiveLayer();
 
@@ -307,7 +305,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
-      mPrimaryCursorVisible = ( cursor.position.x + mCursorWidth <= size.width ) && ( cursor.position.x >= 0.f );
+      mPrimaryCursorVisible = ( cursor.position.x + mCursorWidth <= mControlSize.width ) && ( cursor.position.x >= 0.f );
       if( mPrimaryCursorVisible )
       {
         mPrimaryCursor.SetPosition( cursor.position.x,
@@ -319,7 +317,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( mSecondaryCursor )
     {
       const CursorImpl& cursor = mCursor[SECONDARY_CURSOR];
-      mSecondaryCursorVisible = ( cursor.position.x + mCursorWidth <= size.width ) && ( cursor.position.x >= 0.f );
+      mSecondaryCursorVisible = ( cursor.position.x + mCursorWidth <= mControlSize.width ) && ( cursor.position.x >= 0.f );
       if( mSecondaryCursorVisible )
       {
         mSecondaryCursor.SetPosition( cursor.position.x,
@@ -331,9 +329,10 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Show or hide the grab handle
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+    bool newGrabHandlePosition = false;
     if( grabHandle.active )
     {
-      const bool isVisible = ( grabHandle.position.x + floor( 0.5f * mCursorWidth ) <= size.width ) && ( grabHandle.position.x >= 0.f );
+      const bool isVisible = ( grabHandle.position.x + floor( 0.5f * mCursorWidth ) <= mControlSize.width ) && ( grabHandle.position.x >= 0.f );
 
       if( isVisible )
       {
@@ -344,6 +343,8 @@ struct Decorator::Impl : public ConnectionTracker
 
         // Sets the grab handle image according if it's pressed, flipped, etc.
         SetHandleImage( GRAB_HANDLE );
+
+        newGrabHandlePosition = true;
       }
 
       if( grabHandle.actor )
@@ -359,10 +360,12 @@ struct Decorator::Impl : public ConnectionTracker
     // Show or hide the selection handles/highlight
     HandleImpl& primary = mHandle[ LEFT_SELECTION_HANDLE ];
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
+    bool newPrimaryHandlePosition = false;
+    bool newSecondaryHandlePosition = false;
     if( primary.active || secondary.active )
     {
-      const bool isPrimaryVisible = ( primary.position.x <= size.width ) && ( primary.position.x >= 0.f );
-      const bool isSecondaryVisible = ( secondary.position.x <= size.width ) && ( secondary.position.x >= 0.f );
+      const bool isPrimaryVisible = ( primary.position.x <= mControlSize.width ) && ( primary.position.x >= 0.f );
+      const bool isSecondaryVisible = ( secondary.position.x <= mControlSize.width ) && ( secondary.position.x >= 0.f );
 
       if( isPrimaryVisible || isSecondaryVisible )
       {
@@ -376,6 +379,8 @@ struct Decorator::Impl : public ConnectionTracker
           SetHandleImage( LEFT_SELECTION_HANDLE );
 
           SetSelectionHandleMarkerSize( primary );
+
+          newPrimaryHandlePosition = true;
         }
 
         if( isSecondaryVisible )
@@ -386,6 +391,8 @@ struct Decorator::Impl : public ConnectionTracker
           SetHandleImage( RIGHT_SELECTION_HANDLE );
 
           SetSelectionHandleMarkerSize( secondary );
+
+          newSecondaryHandlePosition = true;
         }
       }
 
@@ -415,6 +422,14 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHighlightActor.Unparent();
       }
+    }
+
+    if( newGrabHandlePosition    ||
+        newPrimaryHandlePosition ||
+        newSecondaryHandlePosition )
+    {
+      // Setup property notifications to find whether the handles leave the boundaries of the current display.
+      SetupActiveLayerPropertyNotifications();
     }
 
     if( mActiveCopyPastePopup )
@@ -459,32 +474,40 @@ struct Decorator::Impl : public ConnectionTracker
 
   void DeterminePositionPopup()
   {
-    if ( !mActiveCopyPastePopup )
+    if( !mActiveCopyPastePopup )
     {
       return;
     }
 
+    // Retrieves the popup's size after relayout.
+    const Vector3 popupSize = Vector3( mCopyPastePopup.actor.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
+
     if( mPopupSetNewPosition )
     {
-      if ( mHandle[LEFT_SELECTION_HANDLE].active || mHandle[RIGHT_SELECTION_HANDLE].active )
+      const HandleImpl& primaryHandle = mHandle[LEFT_SELECTION_HANDLE];
+      const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
+      const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+      const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
+
+      if( primaryHandle.active || secondaryHandle.active )
       {
-        float minHandleXPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
-        float maxHandleXPosition = std::max (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
+        // Calculates the popup's position if selection handles are active.
+        const float minHandleXPosition = std::min( primaryHandle.position.x, secondaryHandle.position.x );
+        const float maxHandleXPosition = std::max( primaryHandle.position.x, secondaryHandle.position.x );
+        const float maxHandleHeight = std::max( primaryHandle.size.height, secondaryHandle.size.height );
 
-        float minHandleYPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.y, mHandle[RIGHT_SELECTION_HANDLE].position.y );
-
-        mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) *0.5f );
-        mCopyPastePopup.position.y = minHandleYPosition + mCopyPastePopup.offset;
+        mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) * 0.5f );
+        mCopyPastePopup.position.y = -0.5f * popupSize.height - maxHandleHeight + std::min( primaryHandle.position.y, secondaryHandle.position.y );
       }
       else
       {
-        mCopyPastePopup.position = Vector3( mCursor[PRIMARY_CURSOR].position.x, mCursor[PRIMARY_CURSOR].position.y -100.0f , 0.0f ); //todo 100 to be an offset Property
+        // Calculates the popup's position if the grab handle is active.
+        mCopyPastePopup.position = Vector3( cursor.position.x, -0.5f * popupSize.height - grabHandle.size.height + cursor.position.y, 0.0f );
       }
     }
 
-    Vector3 popupSize = Vector3( mCopyPastePopup.actor.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
-
-    GetConstrainedPopupPosition( mCopyPastePopup.position, popupSize, AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
+    // Checks if there is enough space above the text control. If not it places the popup under it.
+    GetConstrainedPopupPosition( mCopyPastePopup.position, popupSize * AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
 
     SetUpPopupPositionNotifications();
 
@@ -769,16 +792,14 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CalculateHandleWorldCoordinates( HandleImpl& handle, Vector2& position )
   {
-    // Get the world position of the active layer
+    // Gets the world position of the active layer. The active layer is where the handles are added.
     const Vector3 parentWorldPosition = mActiveLayer.GetCurrentWorldPosition();
 
-    // Get the size of the UI control.
-    Vector2 targetSize;
-    mController.GetTargetSize( targetSize );
-
     // The grab handle position in world coords.
-    position.x = parentWorldPosition.x - 0.5f * targetSize.width + handle.position.x;
-    position.y = parentWorldPosition.y - 0.5f * targetSize.height + handle.position.y + handle.lineHeight;
+    // The active layer's world position is the center of the active layer. The origin of the
+    // coord system of the handles is the top left of the active layer.
+    position.x = parentWorldPosition.x - 0.5f * mControlSize.width + handle.position.x;
+    position.y = parentWorldPosition.y - 0.5f * mControlSize.height + handle.position.y;
   }
 
   void SetGrabHandlePosition()
@@ -786,7 +807,12 @@ struct Decorator::Impl : public ConnectionTracker
     // Reference to the grab handle.
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
 
-    // The grab handle position in world coords.
+    // Transforms the handle position into world coordinates.
+    // @note This is not the same value as grabHandle.actor.GetCurrentWorldPosition()
+    // as it's transforming the handle's position set by the text-controller and not
+    // the final position set to the actor. Another difference is the GetCurrentWorldPosition()
+    // retrieves the position of the center of the actor but the handle's position set
+    // by the text controller is not the center of the actor.
     Vector2 grabHandleWorldPosition;
     CalculateHandleWorldCoordinates( grabHandle, grabHandleWorldPosition );
 
@@ -794,8 +820,8 @@ struct Decorator::Impl : public ConnectionTracker
     // At the moment only the height is checked for the grab handle.
 
     grabHandle.verticallyFlipped = ( grabHandle.verticallyFlippedPreferred &&
-                                     ( ( grabHandleWorldPosition.y - grabHandle.lineHeight - grabHandle.size.height ) > mBoundingBox.y ) ) ||
-                                   ( grabHandleWorldPosition.y + grabHandle.size.height > mBoundingBox.w );
+                                     ( ( grabHandleWorldPosition.y - grabHandle.size.height ) > mBoundingBox.y ) ) ||
+                                   ( grabHandleWorldPosition.y + grabHandle.lineHeight + grabHandle.size.height > mBoundingBox.w );
 
     // The grab handle 'y' position in local coords.
     // If the grab handle exceeds the bottom of the decoration box,
@@ -814,7 +840,12 @@ struct Decorator::Impl : public ConnectionTracker
     // Reference to the selection handle.
     HandleImpl& handle = mHandle[type];
 
-    // Get the world coordinates of the handle position.
+    // Transforms the handle position into world coordinates.
+    // @note This is not the same value as handle.actor.GetCurrentWorldPosition()
+    // as it's transforming the handle's position set by the text-controller and not
+    // the final position set to the actor. Another difference is the GetCurrentWorldPosition()
+    // retrieves the position of the center of the actor but the handle's position set
+    // by the text controller is not the center of the actor.
     Vector2 handleWorldPosition;
     CalculateHandleWorldCoordinates( handle, handleWorldPosition );
 
@@ -848,7 +879,6 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Check if the selection handle exceeds the boundaries of the decoration box.
     const bool exceedsLeftEdge = ( isPrimaryHandle ? !flipHandle : flipHandle ) && ( handleWorldPosition.x - handle.size.width < mBoundingBox.x );
-
     const bool exceedsRightEdge = ( isPrimaryHandle ? flipHandle : !flipHandle ) && ( handleWorldPosition.x + handle.size.width > mBoundingBox.z );
 
     // Does not flip if both conditions are true (double flip)
@@ -877,8 +907,8 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Whether to flip the handle vertically.
     handle.verticallyFlipped = ( verticallyFlippedPreferred &&
-                                 ( ( handleWorldPosition.y - handle.lineHeight - handle.size.height ) > mBoundingBox.y ) ) ||
-                               ( handleWorldPosition.y + handle.size.height > mBoundingBox.w );
+                                 ( ( handleWorldPosition.y - handle.size.height ) > mBoundingBox.y ) ) ||
+                               ( handleWorldPosition.y + handle.lineHeight + handle.size.height > mBoundingBox.w );
 
     // The primary selection handle 'y' position in local coords.
     // If the handle exceeds the bottom of the decoration box,
@@ -1215,38 +1245,234 @@ struct Decorator::Impl : public ConnectionTracker
     return true;
   }
 
+  void HandleResetPosition( PropertyNotification& source )
+  {
+    const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+
+    if( grabHandle.active )
+    {
+      // Sets the grab handle position and calculates if it needs to be vertically flipped if it exceeds the boundary box.
+      SetGrabHandlePosition();
+
+      // Sets the grab handle image according if it's pressed, flipped, etc.
+      SetHandleImage( GRAB_HANDLE );
+    }
+    else
+    {
+      // Sets the primary selection handle position and calculates if it needs to be vertically flipped if it exceeds the boundary box.
+      SetSelectionHandlePosition( LEFT_SELECTION_HANDLE );
+
+      // Sets the primary handle image according if it's pressed, flipped, etc.
+      SetHandleImage( LEFT_SELECTION_HANDLE );
+
+      // Sets the secondary selection handle position and calculates if it needs to be vertically flipped if it exceeds the boundary box.
+      SetSelectionHandlePosition( RIGHT_SELECTION_HANDLE );
+
+      // Sets the secondary handle image according if it's pressed, flipped, etc.
+      SetHandleImage( RIGHT_SELECTION_HANDLE );
+    }
+  }
+
+  void SetupActiveLayerPropertyNotifications()
+  {
+    if( !mActiveLayer )
+    {
+      return;
+    }
+
+    // Vertical notifications.
+
+    // Disconnect any previous connected callback.
+    if( mVerticalLessThanNotification )
+    {
+      mVerticalLessThanNotification.NotifySignal().Disconnect( this, &Decorator::Impl::HandleResetPosition );
+      mActiveLayer.RemovePropertyNotification( mVerticalLessThanNotification );
+    }
+
+    if( mVerticalGreaterThanNotification )
+    {
+      mVerticalGreaterThanNotification.NotifySignal().Disconnect( this, &Decorator::Impl::HandleResetPosition );
+      mActiveLayer.RemovePropertyNotification( mVerticalGreaterThanNotification );
+    }
+
+    const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+    const HandleImpl& primaryHandle = mHandle[LEFT_SELECTION_HANDLE];
+    const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
+
+    if( grabHandle.active )
+    {
+      if( grabHandle.verticallyFlipped )
+      {
+        // The grab handle is vertically flipped. Never is going to exceed the bottom edje of the display.
+        mVerticalGreaterThanNotification.Reset();
+
+        // The vertical distance from the center of the active layer to the top edje of the display.
+        const float topHeight = 0.5f * mControlSize.height - grabHandle.position.y + grabHandle.size.height;
+
+        mVerticalLessThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                                              LessThanCondition( mBoundingBox.y + topHeight ) );
+
+        // Notifies the change from false to true and from true to false.
+        mVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+        // Connects the signals with the callbacks.
+        mVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+      }
+      else
+      {
+        // The grab handle is not vertically flipped. Never is going to exceed the top edje of the display.
+        mVerticalLessThanNotification.Reset();
+
+        // The vertical distance from the center of the active layer to the bottom edje of the display.
+        const float bottomHeight = -0.5f * mControlSize.height + grabHandle.position.y + grabHandle.lineHeight + grabHandle.size.height;
+
+        mVerticalGreaterThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                                                 GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
+
+        // Notifies the change from false to true and from true to false.
+        mVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+        // Connects the signals with the callbacks.
+        mVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+      }
+    }
+    else // The selection handles are active
+    {
+      if( primaryHandle.verticallyFlipped && secondaryHandle.verticallyFlipped )
+      {
+        // Both selection handles are vertically flipped. Never are going to exceed the bottom edje of the display.
+        mVerticalGreaterThanNotification.Reset();
+
+        // The vertical distance from the center of the active layer to the top edje of the display.
+        const float topHeight = 0.5f * mControlSize.height + std::max( -primaryHandle.position.y + primaryHandle.size.height, -secondaryHandle.position.y + secondaryHandle.size.height );
+
+        mVerticalLessThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                                              LessThanCondition( mBoundingBox.y + topHeight ) );
+
+        // Notifies the change from false to true and from true to false.
+        mVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+        // Connects the signals with the callbacks.
+        mVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+      }
+      else if( !primaryHandle.verticallyFlipped && !secondaryHandle.verticallyFlipped )
+      {
+        // Both selection handles aren't vertically flipped. Never are going to exceed the top edje of the display.
+        mVerticalLessThanNotification.Reset();
+
+        // The vertical distance from the center of the active layer to the bottom edje of the display.
+        const float bottomHeight = -0.5f * mControlSize.height + std::max( primaryHandle.position.y + primaryHandle.lineHeight + primaryHandle.size.height,
+                                                                           secondaryHandle.position.y + secondaryHandle.lineHeight + secondaryHandle.size.height );
+
+        mVerticalGreaterThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                                                 GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
+
+        // Notifies the change from false to true and from true to false.
+        mVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+        // Connects the signals with the callbacks.
+        mVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+      }
+      else
+      {
+        // Only one of the selection handles is vertically flipped. Both vertical notifications are needed.
+
+        // The vertical distance from the center of the active layer to the top edje of the display.
+        const float topHeight = 0.5f * mControlSize.height + ( primaryHandle.verticallyFlipped                              ?
+                                                               -primaryHandle.position.y + primaryHandle.size.height        :
+                                                               -secondaryHandle.position.y + secondaryHandle.size.height );
+
+        mVerticalLessThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                                              LessThanCondition( mBoundingBox.y + topHeight ) );
+
+        // Notifies the change from false to true and from true to false.
+        mVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+        // Connects the signals with the callbacks.
+        mVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+
+        // The vertical distance from the center of the active layer to the bottom edje of the display.
+        const float bottomHeight = -0.5f * mControlSize.height + ( primaryHandle.verticallyFlipped                                                       ?
+                                                                   secondaryHandle.position.y + secondaryHandle.lineHeight + secondaryHandle.size.height :
+                                                                   primaryHandle.position.y + primaryHandle.lineHeight + primaryHandle.size.height );
+
+        mVerticalGreaterThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                                                 GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
+
+        // Notifies the change from false to true and from true to false.
+        mVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+        // Connects the signals with the callbacks.
+        mVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+      }
+    }
+
+    // Horizontal notifications.
+
+    // Disconnect any previous connected callback.
+    if( mHorizontalLessThanNotification )
+    {
+      mHorizontalLessThanNotification.NotifySignal().Disconnect( this, &Decorator::Impl::HandleResetPosition );
+      mActiveLayer.RemovePropertyNotification( mHorizontalLessThanNotification );
+    }
+
+    if( mHorizontalGreaterThanNotification )
+    {
+      mHorizontalGreaterThanNotification.NotifySignal().Disconnect( this, &Decorator::Impl::HandleResetPosition );
+      mActiveLayer.RemovePropertyNotification( mHorizontalGreaterThanNotification );
+    }
+
+    if( primaryHandle.active || secondaryHandle.active )
+    {
+      // The horizontal distance from the center of the active layer to the left edje of the display.
+      const float leftWidth = 0.5f * mControlSize.width + std::max( -primaryHandle.position.x + primaryHandle.size.width,
+                                                                    -secondaryHandle.position.x + secondaryHandle.size.width );
+
+      mHorizontalLessThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_X,
+                                                                              LessThanCondition( mBoundingBox.x + leftWidth ) );
+
+      // Notifies the change from false to true and from true to false.
+      mHorizontalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+      // Connects the signals with the callbacks.
+      mHorizontalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+
+      // The horizontal distance from the center of the active layer to the right edje of the display.
+      const float rightWidth = -0.5f * mControlSize.width + std::max( primaryHandle.position.x + primaryHandle.size.width,
+                                                                      secondaryHandle.position.x + secondaryHandle.size.width );
+
+      mHorizontalGreaterThanNotification = mActiveLayer.AddPropertyNotification( Actor::Property::WORLD_POSITION_X,
+                                                                                 GreaterThanCondition( mBoundingBox.z - rightWidth ) );
+
+      // Notifies the change from false to true and from true to false.
+      mHorizontalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+
+      // Connects the signals with the callbacks.
+      mHorizontalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
+    }
+  }
+
   // Popup
 
   float AlternatePopUpPositionRelativeToCursor()
   {
-    const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
-    const float BOTTOM_HANDLE_BOTTOM_OFFSET = 1.5; //todo Should be a property
+    float alternativePosition = 0.0f;
 
-    float alternativePosition=0.0f;;
+    const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT );
 
-    if( mPrimaryCursor ) // Secondary cursor not used for paste
-    {
-      alternativePosition = mCursor[PRIMARY_CURSOR].position.y + popupHeight;
-    }
-
+    const HandleImpl& primaryHandle = mHandle[LEFT_SELECTION_HANDLE];
+    const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
     const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
-    const HandleImpl& selectionPrimaryHandle = mHandle[LEFT_SELECTION_HANDLE];
-    const HandleImpl& selectionSecondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
+    const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
 
-    if( grabHandle.active )
+    if( primaryHandle.active || secondaryHandle.active )
     {
-      // If grab handle enabled then position pop-up below the grab handle.
-      alternativePosition = grabHandle.position.y + grabHandle.size.height + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET;
-
+      const float maxHandleHeight = std::max( primaryHandle.size.height, secondaryHandle.size.height );
+      alternativePosition = 0.5f * popupHeight + cursor.lineHeight + maxHandleHeight + std::min( primaryHandle.position.y, secondaryHandle.position.y );
     }
-    else if( selectionPrimaryHandle.active || selectionSecondaryHandle.active )
+    else
     {
-      const float maxHeight = std::max( selectionPrimaryHandle.size.height,
-                                        selectionSecondaryHandle.size.height );
-      const float maxY = std::max( selectionPrimaryHandle.position.y,
-                                   selectionSecondaryHandle.position.y );
-
-      alternativePosition = maxY + maxHeight + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET;
+      alternativePosition = 0.5f * popupHeight + cursor.lineHeight + grabHandle.size.height + cursor.position.y;
     }
 
     return alternativePosition;
@@ -1254,7 +1480,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void PopUpLeavesVerticalBoundary( PropertyNotification& source )
   {
-    float alternativeYPosition=0.0f;
+    float alternativeYPosition = 0.0f;
     // todo use AlternatePopUpPositionRelativeToSelectionHandles() if text is highlighted
     // if can't be positioned above, then position below row.
     alternativeYPosition = AlternatePopUpPositionRelativeToCursor();
@@ -1262,30 +1488,28 @@ struct Decorator::Impl : public ConnectionTracker
     mCopyPastePopup.actor.SetY( alternativeYPosition );
   }
 
-  void SetUpPopupPositionNotifications( )
+  void SetUpPopupPositionNotifications()
   {
     // Note Property notifications ignore any set anchor point so conditions must allow for this.  Default is Top Left.
 
     // Exceeding vertical boundary
 
-    float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT);
+    const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT );
 
     PropertyNotification verticalExceedNotification = mCopyPastePopup.actor.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
-                                                      OutsideCondition( mBoundingBox.y + popupHeight * 0.5f,
-                                                                        mBoundingBox.w - popupHeight * 0.5f ) );
+                                                                                                     OutsideCondition( mBoundingBox.y + popupHeight * 0.5f,
+                                                                                                                       mBoundingBox.w - popupHeight * 0.5f ) );
 
     verticalExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesVerticalBoundary );
   }
 
-  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, Vector3& popupSize, Vector3 anchorPoint, Actor& parent, const Vector4& boundingRectangleWorld )
+  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, const Vector3& popupDistanceFromAnchorPoint, Actor parent, const Vector4& boundingRectangleWorld )
   {
     DALI_ASSERT_DEBUG ( "Popup parent not on stage" && parent.OnStage() )
 
     // Parent must already by added to Stage for these Get calls to work
-    Vector3 parentAnchorPoint = parent.GetCurrentAnchorPoint();
-    Vector3 parentWorldPositionLeftAnchor = parent.GetCurrentWorldPosition() - parent.GetCurrentSize()*parentAnchorPoint;
-    Vector3 popupWorldPosition = parentWorldPositionLeftAnchor + requiredPopupPosition;  // Parent World position plus popup local position gives World Position
-    Vector3 popupDistanceFromAnchorPoint = popupSize*anchorPoint;
+    const Vector3 parentWorldPositionLeftAnchor = parent.GetCurrentWorldPosition() - parent.GetCurrentSize() * parent.GetCurrentAnchorPoint();
+    const Vector3 popupWorldPosition = parentWorldPositionLeftAnchor + requiredPopupPosition;  // Parent World position plus popup local position gives World Position
 
     // Calculate distance to move popup (in local space) so fits within the boundary
     float xOffSetToKeepWithinBounds = 0.0f;
@@ -1293,13 +1517,13 @@ struct Decorator::Impl : public ConnectionTracker
     {
       xOffSetToKeepWithinBounds = boundingRectangleWorld.x - ( popupWorldPosition.x - popupDistanceFromAnchorPoint.x );
     }
-    else if ( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x > boundingRectangleWorld.z )
+    else if( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x > boundingRectangleWorld.z )
     {
       xOffSetToKeepWithinBounds = boundingRectangleWorld.z - ( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x );
     }
 
     // Ensure initial display of Popup is in alternative position if can not fit above. As Property notification will be a frame behind.
-    if ( popupWorldPosition.y - popupDistanceFromAnchorPoint.y < boundingRectangleWorld.y )
+    if( popupWorldPosition.y - popupDistanceFromAnchorPoint.y < boundingRectangleWorld.y )
     {
       requiredPopupPosition.y = AlternatePopUpPositionRelativeToCursor();
     }
@@ -1307,8 +1531,8 @@ struct Decorator::Impl : public ConnectionTracker
     requiredPopupPosition.x = requiredPopupPosition.x + xOffSetToKeepWithinBounds;
 
     // Prevent pixel mis-alignment by rounding down.
-    requiredPopupPosition.x = static_cast<int>( requiredPopupPosition.x );
-    requiredPopupPosition.y = static_cast<int>( requiredPopupPosition.y );
+    requiredPopupPosition.x = floor( requiredPopupPosition.x );
+    requiredPopupPosition.y = floor( requiredPopupPosition.y );
   }
 
   void SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image )
@@ -1405,11 +1629,15 @@ struct Decorator::Impl : public ConnectionTracker
   Timer               mCursorBlinkTimer;          ///< Timer to signal cursor to blink
   Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
-  Layer               mActiveLayer;               ///< Layer for active handles and alike that ensures they are above all else.
-  ImageActor          mPrimaryCursor;
-  ImageActor          mSecondaryCursor;
+  Layer                mActiveLayer;                       ///< Layer for active handles and alike that ensures they are above all else.
+  PropertyNotification mVerticalLessThanNotification;      ///< Notifies when the 'y' coord of the active layer is less than a given value.
+  PropertyNotification mVerticalGreaterThanNotification;   ///< Notifies when the 'y' coord of the active layer is grater than a given value.
+  PropertyNotification mHorizontalLessThanNotification;    ///< Notifies when the 'x' coord of the active layer is less than a given value.
+  PropertyNotification mHorizontalGreaterThanNotification; ///< Notifies when the 'x' coord of the active layer is grater than a given value.
+  ImageActor           mPrimaryCursor;
+  ImageActor           mSecondaryCursor;
 
-  Actor               mHighlightActor;        ///< Actor to display highlight
+  Actor               mHighlightActor;            ///< Actor to display highlight
   Renderer            mHighlightRenderer;
   Material            mHighlightMaterial;         ///< Material used for highlight
   Property::Map       mQuadVertexFormat;
@@ -1432,6 +1660,7 @@ struct Decorator::Impl : public ConnectionTracker
   Vector4             mBoundingBox;               ///< The bounding box in world coords.
   Vector4             mHighlightColor;            ///< Color of the highlight
   Vector2             mHighlightPosition;         ///< The position of the highlight actor.
+  Vector2             mControlSize;               ///< The control's size. Set by the Relayout.
 
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;

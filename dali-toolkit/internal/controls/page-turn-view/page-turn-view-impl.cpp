@@ -359,6 +359,8 @@ void PageTurnView::SetupShadowView()
 
 void PageTurnView::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   SetupShadowView();
   mTurningPageLayer.Raise();
 }
@@ -385,6 +387,8 @@ void PageTurnView::OnStageDisconnection()
 
     SetSpineEffect( mPanActor, mIsTurnBack[mPanActor] );
   }
+
+  Control::OnStageDisconnection();
 }
 
 void PageTurnView::SetPageSize( const Vector2& pageSize )

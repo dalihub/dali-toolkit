@@ -16,7 +16,7 @@
 
 # Build the Dali Toolkit library
 
-toolkit_images_dir = ../../../dali-toolkit/images-common
+toolkit_images_dir = ../../../dali-toolkit/styles/images-common
 toolkit_sounds_dir = ../../../dali-toolkit/sounds
 toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
@@ -25,9 +25,9 @@ devel_api_src_dir  = ../../../dali-toolkit/devel-api
 toolkit_styles_dir = $(STYLE_DIR)
 toolkit_style_images_dir = $(STYLE_DIR)/images
 
-include ../../../dali-toolkit/images-common/file.list
 include ../../../dali-toolkit/sounds/file.list
 include ../../../dali-toolkit/styles/file.list
+include ../../../dali-toolkit/styles/images-common/file.list
 include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
 include ../../../dali-toolkit/devel-api/file.list

@@ -133,19 +133,15 @@ void ControlRenderer::SetCachedRendererKey( const std::string& cachedRendererKey
   }
   else
   {
-    //remove the cached renderer from the cache if we and the cache are the only things that hold a reference to it
-    if( mImpl->mCachedRenderer && mImpl->mCachedRenderer->ReferenceCount() == 2 )
-    {
-      mFactoryCache.RemoveRenderer( mImpl->mCachedRenderer->mKey );
-    }
-    mImpl->mCachedRenderer.Reset();
+    //clean the renderer from the cache since it may no longer be in use
+    mFactoryCache.CleanRendererCache( mImpl->mCachedRendererKey );
 
     //add the new renderer
     mImpl->mCachedRendererKey = cachedRendererKey;
     if( !mImpl->mCachedRendererKey.empty() && !mImpl->mCustomShader )
     {
       DALI_ASSERT_DEBUG( mImpl->mRenderer && "The control render is on stage but it doesn't have a valid renderer.");
-      mImpl->mCachedRenderer = mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
+      mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
     }
   }
 }
@@ -154,16 +150,11 @@ void ControlRenderer::SetOnStage( Actor& actor )
 {
   if( !mImpl->mCachedRendererKey.empty() && !mImpl->mCustomShader )
   {
-    mImpl->mCachedRenderer = mFactoryCache.GetRenderer( mImpl->mCachedRendererKey );
-    if( !mImpl->mCachedRenderer || !mImpl->mCachedRenderer->mRenderer )
+    mImpl->mRenderer = mFactoryCache.GetRenderer( mImpl->mCachedRendererKey );
+    if( !mImpl->mRenderer )
     {
       InitializeRenderer( mImpl->mRenderer );
-      mImpl->mCachedRenderer = mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
-    }
-
-    if( mImpl->mCachedRenderer && mImpl->mCachedRenderer->mRenderer )
-    {
-      mImpl->mRenderer = mImpl->mCachedRenderer->mRenderer;
+      mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
     }
   }
 
@@ -184,16 +175,11 @@ void ControlRenderer::SetOffStage( Actor& actor )
   if( mImpl->mIsOnStage )
   {
     DoSetOffStage( actor );
-
-    //remove the cached renderer from the cache if we and the cache are the only things that hold a reference to it
-    if( mImpl->mCachedRenderer && mImpl->mCachedRenderer->ReferenceCount() == 2 )
-    {
-      mFactoryCache.RemoveRenderer( mImpl->mCachedRenderer->mKey );
-    }
-    mImpl->mCachedRenderer.Reset();
-
     actor.RemoveRenderer( mImpl->mRenderer );
     mImpl->mRenderer.Reset();
+
+    //clean the renderer from the cache since it may no longer be in use
+    mFactoryCache.CleanRendererCache( mImpl->mCachedRendererKey );
 
     mImpl->mIsOnStage = false;
   }

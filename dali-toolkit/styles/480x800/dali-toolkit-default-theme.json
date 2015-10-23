@@ -117,7 +117,15 @@ distributing this software or its derivatives.
     },
     "scrollview":
     {
-      "overshoot-effect-color":"B018"
+      "overshoot-effect-color":"B018",
+      "overshoot-animation-speed":120.0,
+      "overshoot-size":[480.0,42.0]
+    },
+    "itemview":
+    {
+      "overshoot-effect-color":"B018",
+      "overshoot-animation-speed":120.0,
+      "overshoot-size":[480.0,42.0]
     }
   }
 }

@@ -41,6 +41,8 @@ const char * const BORDER_RENDERER("border-renderer");
 const char * const GRADIENT_RENDERER("gradient-renderer");
 const char * const IMAGE_RENDERER("image-renderer");
 const char * const N_PATCH_RENDERER("n-patch-renderer");
+
+const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }
 
 namespace Dali
@@ -305,6 +307,11 @@ bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const P
 
   GetImplementation( renderer ).Initialize( propertyMap );
   return false;
+}
+
+Image RendererFactory::GetBrokenRendererImage()
+{
+  return ResourceImage::New( BROKEN_RENDERER_IMAGE_URL );
 }
 
 } // namespace Internal

@@ -265,6 +265,7 @@ private:
 private:
 
   Actor mIndicator;                                                  ///< Image of scroll indicator.
+  float mIndicatorShowAlpha;                                         ///< The alpha value when the indicator is fully shown
   Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.
 
   Toolkit::ScrollBar::Direction mDirection;                          ///< The direction of scroll bar (vertical or horizontal)
@@ -282,7 +283,6 @@ private:
   float mScrollStart;                                                ///< Scroll Start position (start of drag)
   Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.
 
-  bool mIsPanning;                                                  ///< Whether the scroll bar is being panned.
   float mCurrentScrollPosition;                                     ///< The current scroll position updated by the pan gesture
 
   Toolkit::ScrollBar::IndicatorHeightPolicy mIndicatorHeightPolicy;  ///< The height policy of scroll indicator (variable or fixed)
@@ -300,6 +300,9 @@ private:
   Constraint mIndicatorPositionConstraint;
   Constraint mIndicatorSizeConstraint;
   Constraint mScrollPositionInCurrentAxisConstraint;
+
+  bool mIsPanning          : 1;                                      ///< Whether the scroll bar is being panned.
+  bool mIndicatorFirstShow : 1;                                      ///< True if the indicator has never been shown
 };
 
 } // namespace Internal

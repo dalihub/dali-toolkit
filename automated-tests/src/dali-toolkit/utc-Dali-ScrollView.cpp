@@ -882,6 +882,7 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
+  scrollView.SetOvershootEnabled(true);
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
@@ -1093,6 +1094,7 @@ int UtcDaliToolkitScrollViewOvershoot(void)
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
+  scrollView.SetOvershootEnabled(true);
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
@@ -2282,6 +2284,66 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
   scrollView.ScrollTo( target2 );
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Non-API test (so no P or N variant).
+int UtcDaliToolkitScrollViewGesturePageLimit(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliToolkitScrollViewGesturePageLimit" );
+
+  // Set up a scrollView.
+  ScrollView scrollView = ScrollView::New();
+
+  // Do not rely on stage size for UTC tests.
+  Vector2 pageSize( 720.0f, 1280.0f );
+  scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  scrollView.SetSize( pageSize );
+  scrollView.SetParentOrigin( ParentOrigin::CENTER );
+  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  // Position rulers.
+  // We set the X ruler to fixed to give us pages to snap to.
+  Dali::Toolkit::FixedRuler* rulerX = new Dali::Toolkit::FixedRuler( pageSize.width );
+  // Note: The 3x page width is arbitary, but we need enough to show that we are
+  // capping page movement by the page limiter, and not the domain.
+  rulerX->SetDomain( Dali::Toolkit::RulerDomain( 0.0f, pageSize.width * 3.0f, false ) );
+  Dali::Toolkit::RulerPtr rulerY = new Dali::Toolkit::DefaultRuler();
+  rulerY->Disable();
+  scrollView.SetRulerX( rulerX );
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.SetWrapMode( false );
+  scrollView.SetScrollSensitive( true );
+
+  Stage::GetCurrent().Add( scrollView );
+
+  // Set up a gesture to perform.
+  Vector2 startPos( 50.0f, 0.0f );
+  Vector2 direction( -5.0f, 0.0f );
+  int frames = 200;
+
+  // Force starting position.
+  scrollView.ScrollTo( startPos, 0.0f );
+  Wait( application );
+
+  // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
+  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+
+  // Confirm the final X coord has not moved more than one page from the start X position.
+  DALI_TEST_GREATER( ( startPos.x + pageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
+
+  // Finish the gesture and wait for the snap.
+  currentPos += direction;
+  SendPan( application, Gesture::Finished, currentPos );
+  // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
+  Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
+
+  // Confirm the final X coord has snapped to exactly one page ahead of the start page.
+  DALI_TEST_EQUALS( pageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }

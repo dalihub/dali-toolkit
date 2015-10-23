@@ -27,6 +27,8 @@ using namespace Dali::Toolkit;
 
 namespace
 {
+typedef NinePatchImage::StretchRanges StretchRanges;
+
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
 
@@ -63,27 +65,38 @@ void InitialiseRegionsToZeroAlpha( Integration::Bitmap* image, unsigned int imag
   }
 }
 
-void AddStretchRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, const Vector4& requiredStretchBorder, Pixel::Format pixelFormat )
+void AddStretchRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, const StretchRanges& stretchRangesX, const StretchRanges& stretchRangesY, Pixel::Format pixelFormat )
 {
   PixelBuffer* pixbuffer = image->GetBuffer();
   unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
 
-  for( unsigned int column = requiredStretchBorder.x; column < imageWidth - requiredStretchBorder.z; ++column )
+  for(StretchRanges::ConstIterator it = stretchRangesX.Begin(); it != stretchRangesX.End(); ++it)
   {
-    unsigned int pixelOffset = column * bytesPerPixel;
-    pixbuffer[ pixelOffset ] = 0x00;
-    pixbuffer[ pixelOffset + 1 ] = 0x00;
-    pixbuffer[ pixelOffset + 2 ] = 0x00;
-    pixbuffer[ pixelOffset + 3 ] = 0xFF;
+    const Uint16Pair& range = *it;
+    //since the stretch range is in the cropped image space, we need to offset by 1 to get it to the uncropped image space
+    for( unsigned int column = range.GetX() + 1u; column < range.GetY() + 1u; ++column )
+    {
+      unsigned int pixelOffset = column * bytesPerPixel;
+      pixbuffer[ pixelOffset ] = 0x00;
+      pixbuffer[ pixelOffset + 1 ] = 0x00;
+      pixbuffer[ pixelOffset + 2 ] = 0x00;
+      pixbuffer[ pixelOffset + 3 ] = 0xFF;
+    }
   }
 
-  for( unsigned int row = requiredStretchBorder.y; row < imageHeight - requiredStretchBorder.w; ++row )
+
+  for(StretchRanges::ConstIterator it = stretchRangesY.Begin(); it != stretchRangesY.End(); ++it)
   {
-    unsigned int pixelOffset = row * imageWidth * bytesPerPixel;
-    pixbuffer[ pixelOffset ] = 0x00;
-    pixbuffer[ pixelOffset + 1 ] = 0x00;
-    pixbuffer[ pixelOffset + 2 ] = 0x00;
-    pixbuffer[ pixelOffset + 3 ] = 0xFF;
+    const Uint16Pair& range = *it;
+    //since the stretch range is in the cropped image space, we need to offset by 1 to get it to the uncropped image space
+    for( unsigned int row = range.GetX() + 1u; row < range.GetY() + 1u; ++row )
+    {
+      unsigned int pixelOffset = row * imageWidth * bytesPerPixel;
+      pixbuffer[ pixelOffset ] = 0x00;
+      pixbuffer[ pixelOffset + 1 ] = 0x00;
+      pixbuffer[ pixelOffset + 2 ] = 0x00;
+      pixbuffer[ pixelOffset + 3 ] = 0xFF;
+    }
   }
 }
 
@@ -120,7 +133,8 @@ void AddChildRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth
 Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
                                                  unsigned int ninePatchImageWidth,
                                                  unsigned int ninePatchImageHeight,
-                                                 const Vector4& requiredStretchBorder,
+                                                 const StretchRanges& stretchRangesX,
+                                                 const StretchRanges& stretchRangesY,
                                                  bool addChildRegion = false,
                                                  Vector4 requiredChildRegion = Vector4::ZERO )
 {
@@ -136,7 +150,7 @@ Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
   InitialiseRegionsToZeroAlpha( bitmap, ninePatchImageWidth, ninePatchImageHeight, pixelFormat );
 
   tet_infoline("Add Stretch regions to Bitmap");
-  AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder, pixelFormat );
+  AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY, pixelFormat );
 
   if( addChildRegion )
   {
@@ -149,6 +163,40 @@ Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
   return resourcePtr;
+}
+
+void TestControlRendererRender( ToolkitTestApplication& application, Actor& actor, ControlRenderer& controlRenderer, Integration::ResourcePointer resourcePtr = Integration::ResourcePointer(), std::size_t expectedSamplers = 0)
+{
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == expectedSamplers );
+
+  application.SendNotification();
+  application.Render();
+
+  if( resourcePtr )
+  {
+    Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
+    if(request)
+    {
+      application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resourcePtr );
+    }
+  }
+
+  application.Render();
+  application.SendNotification();
+
+  if( resourcePtr )
+  {
+    DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+  }
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
 }
 
 } // namespace
@@ -234,19 +282,10 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  application.SendNotification();
-  application.Render(0);
+  TestControlRendererRender( application, actor, controlRenderer );
 
   Vector4 actualValue(Vector4::ZERO);
+  TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
@@ -266,19 +305,10 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  application.SendNotification();
-  application.Render(0);
+  TestControlRendererRender( application, actor, controlRenderer );
 
   Vector4 actualValue(Vector4::ZERO);
+  TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
@@ -402,20 +432,9 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
-  Actor actor = Actor::New();
-  Vector2 size(200.f, 200.f);
-  actor.SetSize(size);
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetOnStage( actor );
-  controlRenderer.SetSize(size);
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
   // A lookup texture is generated and pass to shader as sampler
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
-
-  application.SendNotification();
-  application.Render(0);
+  Actor actor = Actor::New();
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(), 1u );
 
   controlRenderer.SetOffStage( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -453,26 +472,15 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
-  Actor actor = Actor::New();
-  Vector2 size(200.f, 200.f);
-  actor.SetSize(size);
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize(size);
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
   // A lookup texture is generated and pass to shader as sampler
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render(0);
+  Actor actor = Actor::New();
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(), 1u );
 
   Matrix3 alignMatrix( radius, 0.f, 0.f, 0.f, radius, 0.f, center.x, center.y, 1.f );
   alignMatrix.Invert();
 
   Matrix3 actualValue( Matrix3::IDENTITY );
+  TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uAlignmentMatrix", actualValue ) );
   DALI_TEST_EQUALS( actualValue, alignMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
@@ -495,31 +503,9 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2(200.f, 200.f) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render();
-
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
-  }
-
-  application.Render();
-  application.SendNotification();
-
-  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
@@ -542,29 +528,9 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
   ControlRenderer controlRenderer = factory.GetControlRenderer( image );
 
   Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2(200.f, 200.f) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render();
-
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
-  }
-
-  application.Render();
-  application.SendNotification();
-
-  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
-
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
@@ -575,55 +541,50 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
 int UtcDaliRendererFactoryGetNPatchRenderer1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer1: Request n-patch renderer with a Property::Map" );
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer1: Request 9-patch renderer with a Property::Map" );
 
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
 
   const unsigned int ninePatchImageHeight = 18;
   const unsigned int ninePatchImageWidth = 28;
-  const Vector4 requiredStretchBorder( 3, 4, 5, 6 );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder );
+  StretchRanges stretchRangesX;
+  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
+  StretchRanges stretchRangesY;
+  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
   propertyMap.Insert( "renderer-type", "n-patch-renderer" );
   propertyMap.Insert( "image-url", TEST_NPATCH_FILE_NAME );
-
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2(200.f, 200.f) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render();
-
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
   {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, ninePatchResource );
+    tet_infoline( "whole grid" );
+    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    DALI_TEST_CHECK( controlRenderer );
+
+    Actor actor = Actor::New();
+    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    int textureUnit = -1;
+    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
   }
 
-  application.Render();
-  application.SendNotification();
+  propertyMap.Insert( "border-only", true );
+  {
+    tet_infoline( "border only" );
+    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    DALI_TEST_CHECK( controlRenderer );
 
-  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+    Actor actor = Actor::New();
+    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
 
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    int textureUnit = -1;
+    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  }
 
   END_TEST;
 }
@@ -631,43 +592,122 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
 int UtcDaliRendererFactoryGetNPatchRenderer2(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer2: Request n-patch renderer with an image url" );
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer2: Request n-patch renderer with a Property::Map" );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  const unsigned int ninePatchImageWidth = 18;
+  const unsigned int ninePatchImageHeight = 28;
+  StretchRanges stretchRangesX;
+  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
+  stretchRangesX.PushBack( Uint16Pair( 5, 7 ) );
+  stretchRangesX.PushBack( Uint16Pair( 12, 15 ) );
+  StretchRanges stretchRangesY;
+  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
+  stretchRangesY.PushBack( Uint16Pair( 8, 12 ) );
+  stretchRangesY.PushBack( Uint16Pair( 15, 16 ) );
+  stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( "renderer-type", "n-patch-renderer" );
+  propertyMap.Insert( "image-url", TEST_NPATCH_FILE_NAME );
+  {
+    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    DALI_TEST_CHECK( controlRenderer );
+
+    Actor actor = Actor::New();
+    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    int textureUnit = -1;
+    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+    controlRenderer.SetOffStage( actor );
+    DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  }
+
+  propertyMap.Insert( "border-only", true );
+  {
+    tet_infoline( "border only" );
+    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    DALI_TEST_CHECK( controlRenderer );
+
+    Actor actor = Actor::New();
+    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    int textureUnit = -1;
+    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+    controlRenderer.SetOffStage( actor );
+    DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryGetNPatchRenderer3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer3: Request 9-patch renderer with an image url" );
 
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
 
   const unsigned int ninePatchImageHeight = 18;
   const unsigned int ninePatchImageWidth = 28;
-  const Vector4 requiredStretchBorder( 3, 4, 5, 6 );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder );
+  StretchRanges stretchRangesX;
+  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
+  StretchRanges stretchRangesY;
+  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_NPATCH_FILE_NAME );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2(200.f, 200.f) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+  TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render();
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
 
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, ninePatchResource );
-  }
+  END_TEST;
+}
 
-  application.Render();
-  application.SendNotification();
+int UtcDaliRendererFactoryGetNPatchRenderer4(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetNPatchRenderer4: Request n-patch renderer with an image url" );
 
-  DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
 
+  const unsigned int ninePatchImageHeight = 18;
+  const unsigned int ninePatchImageWidth = 28;
+  StretchRanges stretchRangesX;
+  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
+  stretchRangesX.PushBack( Uint16Pair( 5, 7 ) );
+  stretchRangesX.PushBack( Uint16Pair( 12, 15 ) );
+  StretchRanges stretchRangesY;
+  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
+  stretchRangesY.PushBack( Uint16Pair( 8, 12 ) );
+  stretchRangesY.PushBack( Uint16Pair( 15, 16 ) );
+  stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_NPATCH_FILE_NAME );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
@@ -689,18 +729,10 @@ int UtcDaliRendererFactoryGetNPatchRendererN1(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2(200.f, 200.f) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+  //The testkit still has to load a bitmap for the broken renderer image
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render();
-
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
@@ -726,18 +758,10 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2(200.f, 200.f) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfSamplers() == 1u );
+  //The testkit still has to load a bitmap for the broken renderer image
+  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render();
-
   int textureUnit = -1;
   DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
   DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
@@ -750,23 +774,17 @@ int UtcDaliRendererFactoryResetRenderer1(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliRendererFactoryResetRenderer1" );
 
-  Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( Color::RED );
   DALI_TEST_CHECK( controlRenderer );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render(0);
+  Actor actor = Actor::New();
+  TestControlRendererRender( application, actor, controlRenderer );
+
   Vector4 actualValue(Vector4::ZERO);
+  TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
@@ -788,8 +806,6 @@ int UtcDaliRendererFactoryResetRenderer1(void)
   controlRenderer.SetOnStage( actor2 );
   application.SendNotification();
   application.Render(0);
-  Image samplerImage = actor2.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
-  DALI_TEST_CHECK( BufferImage::DownCast( samplerImage ) );
 
   END_TEST;
 }
@@ -814,16 +830,12 @@ int UtcDaliRendererFactoryResetRenderer2(void)
 
   application.SendNotification();
   application.Render(0);
-  Image samplerImage = actor.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
-  DALI_TEST_CHECK( ResourceImage::DownCast( samplerImage ) );
 
   Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   bool isNewRenderer = factory.ResetRenderer( controlRenderer, bufferImage );
   DALI_TEST_CHECK( !isNewRenderer );
   application.SendNotification();
   application.Render(0);
-  samplerImage = actor.GetRendererAt(0u).GetMaterial().GetSamplerAt(0u).GetImage();
-  DALI_TEST_CHECK( BufferImage::DownCast( samplerImage ) );
 
   isNewRenderer = factory.ResetRenderer( controlRenderer, Color::RED );
   DALI_TEST_CHECK( isNewRenderer );

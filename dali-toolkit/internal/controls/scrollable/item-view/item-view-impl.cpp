@@ -71,7 +71,6 @@ const float DEFAULT_ANCHORING_DURATION = 1.0f;  // 1 second
 
 const float MILLISECONDS_PER_SECONDS = 1000.0f;
 
-const Vector2 OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE( 720.0f, 42.0f );
 const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 const Vector4 OVERSHOOT_OVERLAY_NINE_PATCH_BORDER(0.0f, 0.0f, 1.0f, 12.0f);
 const float DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION = 0.2f;
@@ -90,23 +89,33 @@ float CalculateScrollDistance(Vector2 panDistance, Toolkit::ItemLayout& layout)
 }
 
 // Overshoot overlay constraints
-void OvershootOverlaySizeConstraint( Vector3& current, const PropertyInputContainer& inputs )
+struct OvershootOverlaySizeConstraint
 {
-  const Vector2& parentScrollDirection = inputs[0]->GetVector2();
-  const Toolkit::ControlOrientation::Type& layoutOrientation = static_cast<Toolkit::ControlOrientation::Type>(inputs[1]->GetInteger());
-  const Vector3& parentSize = inputs[2]->GetVector3();
-
-  if(Toolkit::IsVertical(layoutOrientation))
+  OvershootOverlaySizeConstraint( float height )
+  : mOvershootHeight( height )
   {
-    current.width = fabsf(parentScrollDirection.y) > Math::MACHINE_EPSILON_1 ? parentSize.x : parentSize.y;
-  }
-  else
-  {
-    current.width = fabsf(parentScrollDirection.x) > Math::MACHINE_EPSILON_1 ? parentSize.y : parentSize.x;
   }
 
-  current.height = ( current.width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD ) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height*0.5f;
-}
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
+  {
+    const Vector2& parentScrollDirection = inputs[0]->GetVector2();
+    const Toolkit::ControlOrientation::Type& layoutOrientation = static_cast<Toolkit::ControlOrientation::Type>(inputs[1]->GetInteger());
+    const Vector3& parentSize = inputs[2]->GetVector3();
+
+    if(Toolkit::IsVertical(layoutOrientation))
+    {
+      current.width = fabsf(parentScrollDirection.y) > Math::MACHINE_EPSILON_1 ? parentSize.x : parentSize.y;
+    }
+    else
+    {
+      current.width = fabsf(parentScrollDirection.x) > Math::MACHINE_EPSILON_1 ? parentSize.y : parentSize.x;
+    }
+
+    current.height = ( current.width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD ) ? mOvershootHeight : mOvershootHeight*0.5f;
+  }
+
+  float mOvershootHeight;
+};
 
 void OvershootOverlayRotationConstraint( Quaternion& current, const PropertyInputContainer& inputs )
 {
@@ -306,8 +315,6 @@ ItemView::ItemView(ItemFactory& factory)
 void ItemView::OnInitialize()
 {
   Actor self = Self();
-
-  SetOvershootEnabled(true);
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
@@ -1177,7 +1184,10 @@ void ItemView::OnPan( const PanGesture& gesture )
 
       self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
 
-      if( (firstItemScrollPosition >= 0.0f && currentOvershoot < 1.0f) || (firstItemScrollPosition >= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) && currentOvershoot > -1.0f) )
+      if( ( firstItemScrollPosition >= 0.0f &&
+            currentOvershoot < 1.0f ) ||
+          ( firstItemScrollPosition <= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) &&
+            currentOvershoot > -1.0f ) )
       {
         mTotalPanDisplacement += gesture.displacement;
       }
@@ -1483,13 +1493,13 @@ void ItemView::EnableScrollOvershoot( bool enable )
     mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
     self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint );
+    Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(mOvershootSize.height) );
     constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
     constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
     constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
     constraint.Apply();
 
-    mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
+    mOvershootOverlay.SetSize(mOvershootSize.width, mOvershootSize.height);
 
     constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
     constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );

@@ -73,7 +73,7 @@ int RendererFactoryCache::FindRenderer( const std::string& key ) const
     if( it != mRendererHashes.End() )
     {
       int index = it - mRendererHashes.Begin();
-      const CachedRendererPtr& cachedRenderer = mRenderers[ index ];
+      const CachedRenderer* cachedRenderer = mRenderers[ index ];
 
       if( cachedRenderer && cachedRenderer->mKey == key )
       {
@@ -90,47 +90,51 @@ int RendererFactoryCache::FindRenderer( const std::string& key ) const
   return -1;
 }
 
-RendererFactoryCache::CachedRendererPtr RendererFactoryCache::GetRenderer( const std::string& key ) const
+Renderer RendererFactoryCache::GetRenderer( const std::string& key ) const
 {
   int index = FindRenderer( key );
   if( index != -1 )
   {
-    return mRenderers[ index ];
+    return mRenderers[ index ]->mRenderer.GetHandle();
   }
   else
   {
-    return CachedRendererPtr();
+    return Renderer();
   }
 }
 
-RendererFactoryCache::CachedRendererPtr RendererFactoryCache::SaveRenderer( const std::string& key, Renderer& renderer )
+void RendererFactoryCache::SaveRenderer( const std::string& key, Renderer& renderer )
 {
   int hash = Dali::CalculateHash( key );
-  CachedRendererPtr newCachedRenderer = new CachedRenderer( key, renderer );
+  const CachedRenderer* cachedRenderer = new CachedRenderer( key, renderer );
 
-  CachedRenderers::iterator it = std::find(mRenderers.begin(), mRenderers.end(), CachedRendererPtr() );
-  if( it != mRenderers.end() )
+  CachedRenderers::Iterator it = std::find( mRenderers.Begin(), mRenderers.End(), static_cast< CachedRenderer* >( NULL ) );
+  if( it != mRenderers.End() )
   {
-    *it = newCachedRenderer;
-    int index = it - mRenderers.begin();
+    *it = cachedRenderer;
+    int index = it - mRenderers.Begin();
     mRendererHashes[ index ] = hash;
   }
   else
   {
     mRendererHashes.PushBack( hash );
-    mRenderers.push_back( newCachedRenderer );
+    mRenderers.PushBack( cachedRenderer );
   }
-
-  return newCachedRenderer;
 }
 
-void RendererFactoryCache::RemoveRenderer( const std::string& key )
+void RendererFactoryCache::CleanRendererCache( const std::string& key )
 {
   int index = FindRenderer( key );
   if( index != -1 )
   {
-    mRendererHashes[ index ] = Dali::CalculateHash( "" );
-    mRenderers[ index ].Reset();
+    const CachedRenderer*& cachedRenderer = mRenderers[ index ];
+    if( !cachedRenderer->mRenderer.GetHandle() )
+    {
+      mRendererHashes[ index ] = Dali::INITIAL_HASH_VALUE;
+
+      delete cachedRenderer;
+      cachedRenderer = NULL;
+    }
   }
 }
 

@@ -313,93 +313,132 @@ ScrollView::LockAxis GetLockAxis(const Vector2& panDelta, ScrollView::LockAxis c
  */
 struct InternalPrePositionConstraint
 {
-  InternalPrePositionConstraint(const Vector2& initialPanPosition,
-                                const Vector2& initialPanMask,
-                                bool axisAutoLock,
-                                float axisAutoLockGradient,
-                                ScrollView::LockAxis initialLockAxis,
-                                const Vector2& maxOvershoot,
-                                const RulerDomain& domainX, const RulerDomain& domainY)
-  : mLocalStart(initialPanPosition),
-    mInitialPanMask(initialPanMask),
-    mDomainMin( -domainX.min, -domainY.min ),
-    mDomainMax( -domainX.max, -domainY.max ),
-    mMaxOvershoot(maxOvershoot),
-    mAxisAutoLockGradient(axisAutoLockGradient),
-    mLockAxis(initialLockAxis),
-    mAxisAutoLock(axisAutoLock),
-    mWasPanning(false),
-    mClampX( domainX.enabled ),
-    mClampY( domainY.enabled )
+  InternalPrePositionConstraint( const Vector2& initialPanPosition,
+                                 const Vector2& initialPanMask,
+                                 bool axisAutoLock,
+                                 float axisAutoLockGradient,
+                                 ScrollView::LockAxis initialLockAxis,
+                                 const Vector2& maxOvershoot,
+                                 const RulerPtr& rulerX, const RulerPtr& rulerY )
+  : mLocalStart( initialPanPosition ),
+    mInitialPanMask( initialPanMask ),
+    mMaxOvershoot( maxOvershoot ),
+    mAxisAutoLockGradient( axisAutoLockGradient ),
+    mLockAxis( initialLockAxis ),
+    mAxisAutoLock( axisAutoLock ),
+    mWasPanning( false )
   {
+    const RulerDomain& rulerDomainX = rulerX->GetDomain();
+    const RulerDomain& rulerDomainY = rulerY->GetDomain();
+    mDomainMin = Vector2( rulerDomainX.min, -rulerDomainY.min );
+    mDomainMax = Vector2( -rulerDomainX.max, -rulerDomainY.max );
+    mClampX = rulerDomainX.enabled;
+    mClampY = rulerDomainY.enabled;
+    mFixedRulerX = rulerX->GetType() == Ruler::Fixed;
+    mFixedRulerY = rulerY->GetType() == Ruler::Fixed;
   }
 
   void operator()( Vector2& scrollPostPosition, const PropertyInputContainer& inputs )
   {
     const Vector2& panPosition = inputs[0]->GetVector2();
+    const bool& inGesture = inputs[1]->GetBoolean();
 
-    if(!mWasPanning)
+    // First check if we are within a gesture.
+    // The ScrollView may have received a start gesture from ::OnPan()
+    // while the finish gesture is received now in this constraint.
+    // This gesture must then be rejected as the value will be "old".
+    // Typically the last value from the end of the last gesture.
+    // If we are rejecting the gesture, we simply don't modify the constraint target.
+    if( inGesture )
     {
-      mPrePosition = scrollPostPosition;
-      mCurrentPanMask = mInitialPanMask;
-      mWasPanning = true;
-    }
-
-    // Calculate Deltas...
-    const Vector2& currentPosition = panPosition;
-    Vector2 panDelta( currentPosition - mLocalStart );
-
-    // Axis Auto Lock - locks the panning to the horizontal or vertical axis if the pan
-    // appears mostly horizontal or mostly vertical respectively...
-    if( mAxisAutoLock )
-    {
-      mLockAxis = GetLockAxis(panDelta, mLockAxis, mAxisAutoLockGradient);
-      if( mLockAxis == ScrollView::LockVertical )
+      if( !mWasPanning )
       {
-        mCurrentPanMask.y = 0.0f;
+        mPrePosition = scrollPostPosition;
+        mStartPosition = mPrePosition;
+        mCurrentPanMask = mInitialPanMask;
+        mWasPanning = true;
       }
-      else if( mLockAxis == ScrollView::LockHorizontal )
-      {
-        mCurrentPanMask.x = 0.0f;
-      }
-    }
 
-    // Restrict deltas based on ruler enable/disable and axis-lock state...
-    panDelta *= mCurrentPanMask;
+      // Calculate Deltas...
+      const Vector2& currentPosition = panPosition;
+      Vector2 panDelta( currentPosition - mLocalStart );
 
-    // Perform Position transform based on input deltas...
-    scrollPostPosition = mPrePosition;
-    scrollPostPosition += panDelta;
+      // Axis Auto Lock - locks the panning to the horizontal or vertical axis if the pan
+      // appears mostly horizontal or mostly vertical respectively...
+      if( mAxisAutoLock )
+      {
+        mLockAxis = GetLockAxis( panDelta, mLockAxis, mAxisAutoLockGradient );
+        if( mLockAxis == ScrollView::LockVertical )
+        {
+          mCurrentPanMask.y = 0.0f;
+        }
+        else if( mLockAxis == ScrollView::LockHorizontal )
+        {
+          mCurrentPanMask.x = 0.0f;
+        }
+      }
 
-    // if no wrapping then clamp preposition to maximum overshoot amount
-    const Vector3& size = inputs[1]->GetVector3();
-    if( mClampX )
-    {
-      float newXPosition = Clamp(scrollPostPosition.x, (mDomainMax.x + size.x) - mMaxOvershoot.x, mDomainMin.x + mMaxOvershoot.x );
-      if( (newXPosition < scrollPostPosition.x - Math::MACHINE_EPSILON_1)
-              || (newXPosition > scrollPostPosition.x + Math::MACHINE_EPSILON_1) )
+      // Restrict deltas based on ruler enable/disable and axis-lock state...
+      panDelta *= mCurrentPanMask;
+
+      // Perform Position transform based on input deltas...
+      scrollPostPosition = mPrePosition;
+      scrollPostPosition += panDelta;
+
+      // if no wrapping then clamp preposition to maximum overshoot amount
+      const Vector3& size = inputs[2]->GetVector3();
+      if( mClampX )
       {
-        mPrePosition.x = newXPosition;
-        mLocalStart.x = panPosition.x;
+        float newXPosition = Clamp( scrollPostPosition.x, ( mDomainMax.x + size.x ) - mMaxOvershoot.x, mDomainMin.x + mMaxOvershoot.x );
+        if( (newXPosition < scrollPostPosition.x - Math::MACHINE_EPSILON_1)
+          || (newXPosition > scrollPostPosition.x + Math::MACHINE_EPSILON_1) )
+        {
+          mPrePosition.x = newXPosition;
+          mLocalStart.x = panPosition.x;
+        }
+        scrollPostPosition.x = newXPosition;
       }
-      scrollPostPosition.x = newXPosition;
-    }
-    if( mClampY )
-    {
-      float newYPosition = Clamp(scrollPostPosition.y, (mDomainMax.y + size.y) - mMaxOvershoot.y, mDomainMin.y + mMaxOvershoot.y );
-      if( (newYPosition < scrollPostPosition.y - Math::MACHINE_EPSILON_1)
-              || (newYPosition > scrollPostPosition.y + Math::MACHINE_EPSILON_1) )
+      if( mClampY )
       {
-        mPrePosition.y = newYPosition;
-        mLocalStart.y = panPosition.y;
+        float newYPosition = Clamp( scrollPostPosition.y, ( mDomainMax.y + size.y ) - mMaxOvershoot.y, mDomainMin.y + mMaxOvershoot.y );
+        if( ( newYPosition < scrollPostPosition.y - Math::MACHINE_EPSILON_1 )
+          || ( newYPosition > scrollPostPosition.y + Math::MACHINE_EPSILON_1 ) )
+        {
+          mPrePosition.y = newYPosition;
+          mLocalStart.y = panPosition.y;
+        }
+        scrollPostPosition.y = newYPosition;
       }
-      scrollPostPosition.y = newYPosition;
+
+      // If we are using a fixed ruler in a particular axis, limit the maximum pages scrolled on that axis.
+      if( mFixedRulerX || mFixedRulerY )
+      {
+        // Here we limit the maximum amount that can be moved from the starting position of the gesture to one page.
+        // We do this only if we have a fixed ruler (on that axis) and the mode is enabled.
+        // Note: 1.0f is subtracted to keep the value within one page size (otherwise we stray on to the page after).
+        // Note: A further 1.0f is subtracted to handle a compensation that happens later within the flick handling code in SnapWithVelocity().
+        //       When a flick is completed, an adjustment of 1.0f is sometimes made to allow for the scenario where:
+        //       A flick finishes before the update thread has advanced the scroll position past the previous snap point.
+        Vector2 pageSizeLimit( size.x - ( 1.0f + 1.0f ), size.y - ( 1.0f - 1.0f ) );
+        Vector2 minPosition( mStartPosition.x - pageSizeLimit.x, mStartPosition.y - pageSizeLimit.y );
+        Vector2 maxPosition( mStartPosition.x + pageSizeLimit.x, mStartPosition.y + pageSizeLimit.y );
+
+        if( mFixedRulerX )
+        {
+          scrollPostPosition.x = Clamp( scrollPostPosition.x, minPosition.x, maxPosition.x );
+        }
+        if( mFixedRulerY )
+        {
+          scrollPostPosition.y = Clamp( scrollPostPosition.y, minPosition.y, maxPosition.y );
+        }
+      }
     }
   }
 
   Vector2 mPrePosition;
   Vector2 mLocalStart;
-  Vector2 mInitialPanMask;              ///< Initial pan mask (based on ruler settings)
+  Vector2 mStartPosition;               ///< The start position of the gesture - used to limit scroll amount (not modified by clamping).
+  Vector2 mInitialPanMask;              ///< Initial pan mask (based on ruler settings).
   Vector2 mCurrentPanMask;              ///< Current pan mask that can be altered by axis lock mode.
   Vector2 mDomainMin;
   Vector2 mDomainMax;
@@ -408,10 +447,12 @@ struct InternalPrePositionConstraint
   float mAxisAutoLockGradient;          ///< Set by ScrollView
   ScrollView::LockAxis mLockAxis;
 
-  bool mAxisAutoLock:1;                   ///< Set by ScrollView
+  bool mAxisAutoLock:1;                 ///< Set by ScrollView
   bool mWasPanning:1;
   bool mClampX:1;
   bool mClampY:1;
+  bool mFixedRulerX:1;
+  bool mFixedRulerY:1;
 };
 
 /**
@@ -600,7 +641,6 @@ ScrollView::ScrollView()
   mMaxFlickSpeed(DEFAULT_MAX_FLICK_SPEED),
   mWheelScrollDistanceStep(Vector2::ZERO),
   mInAccessibilityPan(false),
-  mInitialized(false),
   mScrolling(false),
   mScrollInterrupted(false),
   mPanning(false),
@@ -636,8 +676,6 @@ void ScrollView::OnInitialize()
 
   mWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
-  mInitialized = true;
-
   mGestureStackDepth = 0;
 
   EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
@@ -648,8 +686,6 @@ void ScrollView::OnInitialize()
   mRulerX = ruler;
   mRulerY = ruler;
 
-  SetOvershootEnabled(true);
-
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, mCanScrollVertical);
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, mCanScrollHorizontal);
 
@@ -659,6 +695,8 @@ void ScrollView::OnInitialize()
 
 void ScrollView::OnStageConnection( int depth )
 {
+  ScrollBase::OnStageConnection( depth );
+
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
   if ( mSensitive )
@@ -678,6 +716,8 @@ void ScrollView::OnStageDisconnection()
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
   StopAnimation();
+
+  ScrollBase::OnStageDisconnection();
 }
 
 ScrollView::~ScrollView()
@@ -1698,19 +1738,25 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
 
 void ScrollView::EnableScrollOvershoot(bool enable)
 {
-  if(enable && !mOvershootIndicator)
+  if (enable)
   {
-    mOvershootIndicator = ScrollOvershootIndicator::New();
-  }
-  if( enable )
-  {
+    if (!mOvershootIndicator)
+    {
+      mOvershootIndicator = ScrollOvershootIndicator::New();
+    }
+
     mOvershootIndicator->AttachToScrollable(*this);
   }
   else
   {
     mMaxOvershoot = mUserMaxOvershoot;
-    mOvershootIndicator->DetachFromScrollable(*this);
+
+    if (mOvershootIndicator)
+    {
+      mOvershootIndicator->DetachFromScrollable(*this);
+    }
   }
+
   UpdateMainInternalConstraint();
 }
 
@@ -2657,9 +2703,10 @@ void ScrollView::UpdateMainInternalConstraint()
                                                                                                         mAxisAutoLockGradient,
                                                                                                         mLockAxis,
                                                                                                         mMaxOvershoot,
-                                                                                                        mRulerX->GetDomain(),
-                                                                                                        mRulerY->GetDomain() ) );
+                                                                                                        mRulerX,
+                                                                                                        mRulerY ) );
     mScrollMainInternalPrePositionConstraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+    mScrollMainInternalPrePositionConstraint.AddSource( Source( detector, PanGestureDetector::Property::PANNING ) );
     mScrollMainInternalPrePositionConstraint.AddSource( Source( self, Actor::Property::SIZE ) );
     mScrollMainInternalPrePositionConstraint.Apply();
   }

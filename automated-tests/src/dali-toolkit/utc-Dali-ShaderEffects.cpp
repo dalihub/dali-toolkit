@@ -198,12 +198,38 @@ int UtcDaliCreateDissolveLocalEffect(void)
   END_TEST;
 }
 
-int UtcDaliCreateDistanceFieldEffect(void)
+int UtcDaliCreateDissolveEffect(void)
 {
   ToolkitTestApplication application;
 
-  ShaderEffect effect = Toolkit::CreateDistanceFieldEffect();
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateDistanceFieldEffect();
+  DALI_TEST_CHECK( !effect.Empty() );
+
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  DALI_TEST_CHECK( !vertexShaderValue );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  DALI_TEST_CHECK( fragmentShaderValue );
+
+  std::string fragmentShader;
+  DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
+  DALI_TEST_CHECK( !fragmentShader.empty() );
+
+  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  DALI_TEST_CHECK( !gridXValue );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( hintsValue );
+
+  std::string hints;
+  DALI_TEST_CHECK( hintsValue->Get( hints ) );
+  DALI_TEST_CHECK( hints == "output-is-transparent" );
 
   END_TEST;
 }
@@ -254,12 +280,61 @@ int UtcDaliCreateMotionBlurEffect(void)
 {
   ToolkitTestApplication application;
 
-  unsigned int sampleCount(4);
-  ShaderEffect effect = Toolkit::CreateMotionBlurEffect(sampleCount);
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateMotionBlurEffect();
+  DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value value = effect.GetProperty( effect.GetPropertyIndex("uNumSamples"));
-  DALI_TEST_EQUALS( value.Get<float>(), (float)sampleCount, TEST_LOCATION );
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  DALI_TEST_CHECK( vertexShaderValue );
+
+  std::string vertexShader;
+  DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
+  DALI_TEST_CHECK( !vertexShader.empty() );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  DALI_TEST_CHECK( fragmentShaderValue );
+
+  std::string fragmentShader;
+  DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
+  DALI_TEST_CHECK( !fragmentShader.empty() );
+
+  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  DALI_TEST_CHECK( gridXValue );
+
+  int gridX = 0;
+  DALI_TEST_CHECK( gridXValue->Get( gridX ) );
+  DALI_TEST_CHECK( gridX > 1 );
+
+  Property::Value* gridYValue = customShader.Find( "subdivide-grid-y" );
+  DALI_TEST_CHECK( gridYValue );
+
+  int gridY = 0;
+  DALI_TEST_CHECK( gridYValue->Get( gridY ) );
+  DALI_TEST_CHECK( gridY > 1 );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( hintsValue );
+
+  std::string hints;
+  DALI_TEST_CHECK( hintsValue->Get( hints ) );
+  DALI_TEST_CHECK( hints == "output-is-transparent" );
+
+  unsigned int sampleCount( 4 );
+  Actor actor = Actor::New();
+  Toolkit::SetMotionBlurProperties( actor, sampleCount );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uBlurTexCoordScale" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uGeometryStretchFactor" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uSpeedScalingFactor" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uObjectFadeStart" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uObjectFadeEnd" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uAlphaScale" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uNumSamples" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uModelLastFrame" ) != Property::INVALID_INDEX );
 
   END_TEST;
 }
@@ -268,8 +343,58 @@ int UtcDaliCreateMotionStretchEffect(void)
 {
   ToolkitTestApplication application;
 
-  ShaderEffect effect = Toolkit::CreateMotionStretchEffect();
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateMotionStretchEffect();
+  DALI_TEST_CHECK( !effect.Empty() );
+
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  DALI_TEST_CHECK( vertexShaderValue );
+
+  std::string vertexShader;
+  DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
+  DALI_TEST_CHECK( !vertexShader.empty() );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  DALI_TEST_CHECK( fragmentShaderValue );
+
+  std::string fragmentShader;
+  DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
+  DALI_TEST_CHECK( !fragmentShader.empty() );
+
+  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  DALI_TEST_CHECK( gridXValue );
+
+  int gridX = 0;
+  DALI_TEST_CHECK( gridXValue->Get( gridX ) );
+  DALI_TEST_CHECK( gridX > 1 );
+
+  Property::Value* gridYValue = customShader.Find( "subdivide-grid-y" );
+  DALI_TEST_CHECK( gridYValue );
+
+  int gridY = 0;
+  DALI_TEST_CHECK( gridYValue->Get( gridY ) );
+  DALI_TEST_CHECK( gridY > 1 );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( hintsValue );
+
+  std::string hints;
+  DALI_TEST_CHECK( hintsValue->Get( hints ) );
+  DALI_TEST_CHECK( hints == "output-is-transparent" );
+
+  Actor actor = Actor::New();
+  Toolkit::SetMotionStretchProperties( actor );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uGeometryStretchFactor" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uSpeedScalingFactor" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uObjectFadeStart" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uObjectFadeEnd" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uAlphaScale" ) != Property::INVALID_INDEX );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( "uModelLastFrame" ) != Property::INVALID_INDEX );
 
   END_TEST;
 }
