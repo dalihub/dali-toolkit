@@ -134,7 +134,7 @@ void BorderRenderer::InitializeRenderer( Renderer& renderer )
   if( !geometry )
   {
     geometry =  CreateBorderGeometry();
-    mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
+    mFactoryCache.SaveGeometry( RendererFactoryCache::BORDER_GEOMETRY, geometry );
   }
 
   Shader shader = mFactoryCache.GetShader( RendererFactoryCache::BORDER_SHADER );
