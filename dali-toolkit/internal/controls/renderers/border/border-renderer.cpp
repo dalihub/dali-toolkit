@@ -141,7 +141,7 @@ void BorderRenderer::InitializeRenderer( Renderer& renderer )
   if( !shader )
   {
     shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mFactoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, shader );
+    mFactoryCache.SaveShader( RendererFactoryCache::BORDER_SHADER, shader );
   }
 
   if( !renderer )
