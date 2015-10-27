@@ -48,19 +48,24 @@ public:
    * Create an initialized CubeTransitionWaveEffect
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
-   * @param[in] viewAreaSize The size of view area for this transition effect
    * @return The initialized CubeTransitionWaveEffect object
    */
-  static CubeTransitionWaveEffect New( unsigned int numRows, unsigned int numColumns, Size viewAreaSize );
+  static CubeTransitionWaveEffect New( unsigned int numRows, unsigned int numColumns );
 
 
 public: // Not intended for developer use
 
   /**
-   * This constructor is used by Dali New() methods.
-   * @param[in] impl A pointer to a newly allocated Dali resource
+   * Creates a handle using the Toolkit::Internal implementation.
+   * @param[in]  implementation  The Control implementation.
    */
-  explicit DALI_INTERNAL CubeTransitionWaveEffect( Internal::CubeTransitionWaveEffect* impl );
+  DALI_INTERNAL CubeTransitionWaveEffect( Internal::CubeTransitionWaveEffect& implementation );
+
+  /**
+   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @param[in]  internal  A pointer to the internal CustomActor.
+   */
+  DALI_INTERNAL CubeTransitionWaveEffect( Dali::Internal::CustomActor* internal );
 
 }; // class CubeTransitionWaveEffect
 

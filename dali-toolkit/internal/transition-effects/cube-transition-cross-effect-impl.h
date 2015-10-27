@@ -45,7 +45,7 @@ public:
   /**
    * @copydoc Toolkit::CubeTransitionCrossEffect::New
    */
-  static Toolkit::CubeTransitionCrossEffect New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize);
+  static Toolkit::CubeTransitionCrossEffect New( unsigned int numRows, unsigned int numColumns );
 
 protected:
 
@@ -59,34 +59,36 @@ protected:
     */
    virtual void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement );
 
-   /**
-    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStopTransition
-    */
-   virtual void OnStopTransition();
-
 private:
 
    /**
-    * Construct a new CubeTransitionCrossEffect object
+    * @brief Construct a new CubeTransitionCrossEffect object
+    *
     * @param[in] numRows How many rows of cubes
     * @param[in] numColumns How many columns of cubes
-    * @param[in] viewAreaSize The size of view area for this transition effect
     */
-   CubeTransitionCrossEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize );
+   CubeTransitionCrossEffect( unsigned int numRows, unsigned int numColumns );
 
    /**
-    * Set up animation to an Actor
+    * @brief Set up animation to an Actor
+    * This will also displace the cubes in the z direction by mCubeDisplacement and spread them apart on the xy plane
+    * given by the closeness of displacementCentre to the XY plane at 0.
+    *
     * @param[in] actorIndex The index of the cube in the cube array
     * @param[in] angle The angle of the rotation animation
-    * @param[in] axis The axis of the rotation animation
-    * @param[in] resetTranslation The translation used to reset the actor position before animation
+    * @param[in] the centre to "explode" the tiles outwards from
     */
-
-   void SetupAnimation( unsigned int actorIndex, float angle, const Vector3 axis, Vector3 resetTranslation );
+   void SetupAnimation( unsigned int actorIndex, unsigned int x, unsigned int y, float angle, const Vector3 axis, const Vector3& displacementCentre );
 
 private:
 
-   float  mDisplacementRatio;
+   /**
+    * The factor that determines how spread apart from each other the cubes will go
+    * when they are displaced during the transition animation.
+    * The larger the value the more the spread apart the cubes will be.
+    * it should be in the range (0.0, +infinity)
+    */
+   float  mDisplacementSpreadFactor;
 
 }; //class CubeTransitionCrossEffect
 
@@ -94,22 +96,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::CubeTransitionCrossEffect& GetImpl(Dali::Toolkit::CubeTransitionCrossEffect& obj)
+inline Internal::CubeTransitionCrossEffect& GetImpl( Dali::Toolkit::CubeTransitionCrossEffect& obj )
 {
-  DALI_ASSERT_ALWAYS(obj);
+  DALI_ASSERT_ALWAYS( obj );
 
-  Dali::BaseObject& handle = obj.GetBaseObject();
+  Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast<Internal::CubeTransitionCrossEffect&>(handle);
+  return static_cast< Internal::CubeTransitionCrossEffect& >( handle );
 }
 
-inline const Internal::CubeTransitionCrossEffect& GetImpl(const Dali::Toolkit::CubeTransitionCrossEffect& obj)
+inline const Internal::CubeTransitionCrossEffect& GetImpl( const Dali::Toolkit::CubeTransitionCrossEffect& obj )
 {
-  DALI_ASSERT_ALWAYS(obj);
+  DALI_ASSERT_ALWAYS( obj );
 
-  const Dali::BaseObject& handle = obj.GetBaseObject();
+  const Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast<const Internal::CubeTransitionCrossEffect&>(handle);
+  return static_cast< const Internal::CubeTransitionCrossEffect& >( handle );
 }
 
 } // namespace Toolkit
