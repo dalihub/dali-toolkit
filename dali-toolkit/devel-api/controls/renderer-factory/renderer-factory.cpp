@@ -92,9 +92,9 @@ ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
   return GetImplementation( *this ).GetControlRenderer( color );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Vector4& color )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, color );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, color );
 }
 
 ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
@@ -107,9 +107,9 @@ ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
   return GetImplementation( *this ).GetControlRenderer( image );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Image& image )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, image );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, image );
 }
 
 ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
@@ -117,14 +117,14 @@ ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
   return GetImplementation( *this ).GetControlRenderer( url );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const std::string& url )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, url );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, url );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Property::Map& propertyMap )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, propertyMap );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, propertyMap );
 }
 
 } // namespace Toolkit

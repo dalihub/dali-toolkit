@@ -77,7 +77,7 @@ ColorRenderer::~ColorRenderer()
 {
 }
 
-void ColorRenderer::DoInitialize( const Property::Map& propertyMap )
+void ColorRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( COLOR_NAME );
   if( !( color && color->Get(mBlendColor) ) )
@@ -105,6 +105,11 @@ void ColorRenderer::SetOffset( const Vector2& offset )
   //ToDo: renderer applies the offset
 }
 
+void ColorRenderer::DoSetOnStage( Actor& actor )
+{
+  InitializeRenderer();
+}
+
 void ColorRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
@@ -112,7 +117,7 @@ void ColorRenderer::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( COLOR_NAME, mBlendColor );
 }
 
-void ColorRenderer::InitializeRenderer( Renderer& renderer )
+void ColorRenderer::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
@@ -128,25 +133,13 @@ void ColorRenderer::InitializeRenderer( Renderer& renderer )
     mFactoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, shader );
   }
 
-  if( !renderer )
-  {
-    Material material = Material::New( shader );
-    renderer = Renderer::New( geometry, material );
-  }
-  else
-  {
-    mImpl->mRenderer.SetGeometry( geometry );
-    Material material = mImpl->mRenderer.GetMaterial();
-    if( material )
-    {
-      material.SetShader( shader );
-    }
-  }
+  Material material = Material::New( shader );
+  mImpl->mRenderer = Renderer::New( geometry, material );
 
-  mBlendColorIndex = renderer.RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
+  mBlendColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )
   {
-    renderer.GetMaterial().SetBlendMode( BlendingMode::ON );
+    mImpl->mRenderer.GetMaterial().SetBlendMode( BlendingMode::ON );
   }
 }
 
@@ -154,7 +147,7 @@ void ColorRenderer::SetColor(const Vector4& color)
 {
   mBlendColor = color;
 
-  if( mImpl->mIsOnStage )
+  if( mImpl->mRenderer )
   {
     (mImpl->mRenderer).SetProperty( mBlendColorIndex, color );
     if( color.a < 1.f &&  (mImpl->mRenderer).GetMaterial().GetBlendMode() != BlendingMode::ON)

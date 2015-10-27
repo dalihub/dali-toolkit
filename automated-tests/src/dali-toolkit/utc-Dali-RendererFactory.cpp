@@ -788,16 +788,14 @@ int UtcDaliRendererFactoryResetRenderer1(void)
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
-  bool isNewRenderer = factory.ResetRenderer( controlRenderer, Color::GREEN );
-  DALI_TEST_CHECK( !isNewRenderer );
+  factory.ResetRenderer( controlRenderer, actor, Color::GREEN );
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  isNewRenderer = factory.ResetRenderer( controlRenderer, bufferImage );
-  DALI_TEST_CHECK( isNewRenderer );
+  factory.ResetRenderer( controlRenderer, actor, bufferImage );
 
   Actor actor2 = Actor::New();
   actor2.SetSize(200.f, 200.f);
@@ -832,13 +830,11 @@ int UtcDaliRendererFactoryResetRenderer2(void)
   application.Render(0);
 
   Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  bool isNewRenderer = factory.ResetRenderer( controlRenderer, bufferImage );
-  DALI_TEST_CHECK( !isNewRenderer );
+  factory.ResetRenderer( controlRenderer, actor, bufferImage );
   application.SendNotification();
   application.Render(0);
 
-  isNewRenderer = factory.ResetRenderer( controlRenderer, Color::RED );
-  DALI_TEST_CHECK( isNewRenderer );
+  factory.ResetRenderer( controlRenderer, actor, Color::RED );
 
   Actor actor2 = Actor::New();
   actor2.SetSize(200.f, 200.f);

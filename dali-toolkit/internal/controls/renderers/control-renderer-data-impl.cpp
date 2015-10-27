@@ -88,7 +88,7 @@ Shader::ShaderHints HintFromString( std::string hintString )
 Internal::ControlRenderer::Impl::Impl()
 : mCustomShader(NULL),
   mDepthIndex( 0.0f ),
-  mIsOnStage( false )
+  mFlags( 0 )
 {
 }
 
