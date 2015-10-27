@@ -118,6 +118,13 @@ private: // From Control
    */
   const Dali::Vector2& GetPopupMaxSize() const;
 
+private: // Implementation
+
+  /**
+   * @copydoc Toolkit::TextSelectionToolbar::ConfigureScrollview()
+   */
+  void ConfigureScrollview( const Property::Map& properties );
+
   /**
    * @brief Set up scrollview to scroll Toolbar horizontally
    */
@@ -139,8 +146,6 @@ private: // From Control
    * @param[in] position current scroll view position
    */
   void OnScrollCompleted( const Vector2& position );
-
-private: // Implementation
 
   /**
    * Construct a new TextField.
