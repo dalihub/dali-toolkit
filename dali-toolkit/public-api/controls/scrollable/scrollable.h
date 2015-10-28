@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class Scrollable;
 }
+/**
+ * @addtogroup dali_toolkit_controls_scrollable
+ * @{
+ */
 
 /**
  * @brief Base class for derived Scrollables that contains actors that can be scrolled manually
@@ -229,6 +233,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL Scrollable( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

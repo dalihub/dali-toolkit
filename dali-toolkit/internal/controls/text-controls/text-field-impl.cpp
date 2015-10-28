@@ -19,21 +19,18 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <iostream>
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/text/rendering-backend.h>
-#include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -57,7 +54,6 @@ namespace // unnamed namespace
 #endif
 
   const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
-
 } // unnamed namespace
 
 namespace
@@ -149,6 +145,9 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 {
   Toolkit::TextField textField = Toolkit::TextField::DownCast( Dali::BaseHandle( object ) );
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField SetProperty\n");
+
+
   if( textField )
   {
     TextField& impl( GetImpl( textField ) );
@@ -207,26 +206,13 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           const std::string fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
-
-          if( impl.mController->GetDefaultFontFamily() != fontFamily )
-          {
-            impl.mController->SetDefaultFontFamily( fontFamily );
-          }
+          impl.mController->SetDefaultFontFamily( fontFamily );
         }
         break;
       }
       case Toolkit::TextField::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          const std::string fontStyle = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_STYLE %s\n", impl.mController.Get(), fontStyle.c_str() );
-
-          if( impl.mController->GetDefaultFontStyle() != fontStyle )
-          {
-            impl.mController->SetDefaultFontStyle( fontStyle );
-          }
-        }
+        SetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextField::Property::POINT_SIZE:
@@ -234,7 +220,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const float pointSize = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_STYLE %f\n", impl.mController.Get(), pointSize );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
 
           if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
           {
@@ -475,7 +461,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -486,7 +472,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -497,7 +483,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
           impl.RequestTextRelayout();
@@ -508,7 +494,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         const Image image = Scripting::NewImage( value );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
           impl.RequestTextRelayout();
@@ -518,7 +504,8 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
       {
         const Image image = Scripting::NewImage( value );
-        if( impl.mDecorator )
+
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -528,7 +515,8 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
       {
         const Image image = Scripting::NewImage( value );
-        if( impl.mDecorator )
+
+        if( impl.mDecorator && image )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
@@ -627,10 +615,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::FONT_STYLE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontStyle();
-        }
+        GetFontStyleProperty( impl.mController, value );
         break;
       }
       case Toolkit::TextField::Property::POINT_SIZE:
@@ -841,7 +826,9 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          value = impl.mDecorator->GetBoundingBox();
+          Rect<int> boundingBox;
+          impl.mDecorator->GetBoundingBox( boundingBox );
+          value = boundingBox;
         }
         break;
       }
@@ -903,17 +890,23 @@ void TextField::OnInitialize()
   mController->EnableTextInput( mDecorator );
 
   // Forward input events to controller
-  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan |Gesture::LongPress ) );
+  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
   self.TouchedSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
-  if ( mDecorator->GetBoundingBox().IsEmpty() )
+  Rect<int> boundingBox;
+  mDecorator->GetBoundingBox( boundingBox );
+
+  if( boundingBox.IsEmpty() )
   {
     Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
     mDecorator->SetBoundingBox( Rect<int>( 0.0f, 0.0f, stageSize.width, stageSize.height ) );
   }
+
+  // Flip vertically the 'left' selection handle
+  mDecorator->FlipHandleVertically( LEFT_SELECTION_HANDLE, true );
 
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
@@ -929,12 +922,10 @@ void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
    {
      case StyleChange::DEFAULT_FONT_CHANGE:
      {
-       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE\n");
-       if ( mController->GetDefaultFontFamily() == "" )
-       {
-         // Property system did not set the font so should update it.
-         // todo instruct text-controller to update model
-       }
+       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange DEFAULT_FONT_CHANGE\n");
+       std::string newFont = styleManager.GetDefaultFontFamily();
+       // Property system did not set the font so should update it.
+       mController->UpdateAfterFontChange( newFont );
        break;
      }
 
@@ -969,6 +960,8 @@ float TextField::GetHeightForWidth( float width )
 
 void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField OnRelayout\n");
+
   if( mController->Relayout( size ) ||
       !mRenderer )
   {
@@ -995,7 +988,7 @@ void TextField::RenderText()
   Actor renderableActor;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), self.GetHierarchyDepth() );
+    renderableActor = mRenderer->Render( mController->GetView(), TEXT_DEPTH_INDEX );
   }
 
   if( renderableActor != mRenderableActor )
@@ -1130,7 +1123,15 @@ void TextField::OnPan( const PanGesture& gesture )
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
 {
+  // Show the keyboard if it was hidden.
+  if (!VirtualKeyboard::IsVisible())
+  {
+    VirtualKeyboard::Show();
+  }
+
   mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
+
+  SetKeyInputFocus();
 }
 
 bool TextField::OnKeyEvent( const KeyEvent& event )

@@ -32,6 +32,10 @@ namespace Internal DALI_INTERNAL
 {
 class AccessibilityManager;
 }
+/**
+ * @addtogroup dali_toolkit_accessibility_manager
+ * @{
+ */
 
 /**
  * @brief Manages registration of actors in a accessibility focus chain and changing the
@@ -750,6 +754,9 @@ public:
 
 }; // class AccessibilityManager
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

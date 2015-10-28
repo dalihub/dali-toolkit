@@ -31,6 +31,10 @@ class PropertyInput;
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_scroll_view
+ * @{
+ */
 
 // Constraints ////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +56,9 @@ DALI_IMPORT_API void MoveActorConstraint( Vector3& current, const PropertyInputC
  */
 DALI_IMPORT_API void WrapActorConstraint( Vector3& position, const PropertyInputContainer& inputs );
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

@@ -77,7 +77,7 @@ std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRun)
     FontId id = fontRun[i].fontId;
     TextAbstraction::FontDescription fontDescription;
     fontClient.GetDescription( id, fontDescription );
-    o << "ID:" << id << ", " << fontDescription.family << " style:" << fontDescription.style << " size:" << (fontClient.GetPointSize(id) / 64);
+    o << "ID:" << id << ", " << fontDescription.family << " width: " << fontDescription.width << " weight: " << fontDescription.weight << " slant: " << fontDescription.slant <<  " size:" << (fontClient.GetPointSize(id) / 64);
 
     if( i+1 < fontRun.Count() )
     {

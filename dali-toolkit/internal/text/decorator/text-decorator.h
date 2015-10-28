@@ -179,9 +179,9 @@ public:
    * @brief Retrieve the bounding box origin and dimensions.
    *
    * default is set once control is added to stage, before this the return vector will be Vector4:ZERO
-   * @return Rect<int> the bounding box origin, width and height
+   * @param[out] boundingBox The bounding box origin, width and height.
    */
-  const Rect<int>& GetBoundingBox() const;
+  void GetBoundingBox( Rect<int>& boundingBox ) const;
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.
@@ -397,12 +397,42 @@ public:
   const Vector2& GetPosition( HandleType handleType ) const;
 
   /**
-   * @brief Swaps the selection handle's images.
+   * @brief Whether to flip vertically a handle.
    *
-   * This method is called by the text controller to swap the handles
-   * when the start index is bigger than the end one.
+   * @param[in] handleType The handle to flip vertically.
+   * @param[in] flip Whether to flip vertically.
    */
-  void SwapSelectionHandlesEnabled( bool enable );
+  void FlipHandleVertically( HandleType handleType, bool flip );
+
+  /**
+   * @brief Retrieves whether the handle is vertically flipped.
+   *
+   * @param[in] handleType The handle to query.
+   *
+   * @return @e ture if the handle is vertically flipped.
+   */
+  bool IsHandleVerticallyFlipped( HandleType handleType ) const;
+
+  /**
+   * @brief Whether to flip the selection handles as soon as they are crossed.
+   *
+   * By default they flip when the handle is released.
+   *
+   * @param[in] enable If @e true the selection handles will flip as soon as they are crossed.
+   */
+  void FlipSelectionHandlesOnCrossEnabled( bool enable );
+
+  /**
+   * @brief Sets info to calculate the handle flip state.
+   *
+   * Sets the character's direction where the handles are pointing.
+   * It resets the decorator internal flip state when there is a new selection.
+   *
+   * @param[in] indicesSwapped Whether the selection handle indices are swapped (start > end).
+   * @param[in] left The direction of the character pointed by the primary selection handle.
+   * @param[in] right The direction of the character pointed by the secondary selection handle.
+   */
+  void SetSelectionHandleFlipState( bool indicesSwapped, bool left, bool right );
 
   /**
    * @brief Adds a quad to the existing selection highlights.

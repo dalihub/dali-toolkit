@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDE
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/metrics.h>
 
 namespace Dali
 {
@@ -72,6 +73,13 @@ public:
    * @brief Virtual destructor.
    */
   ~LayoutEngine();
+
+  /**
+   * @brief Provide the wrapper around FontClient used to get metrics
+   *
+   * @param[in] metrics Used to get metrics
+   */
+  void SetMetrics( MetricsPtr& metrics );
 
   /**
    * @brief Choose the required layout.

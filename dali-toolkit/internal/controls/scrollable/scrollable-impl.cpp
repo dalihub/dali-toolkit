@@ -48,6 +48,8 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
+const int OVERSHOOT_SIZE = Dali::Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED + 1; // OVERSHOOT_SIZE is not public yet
+Dali::PropertyRegistration p1( typeRegistration, "overshoot-size", OVERSHOOT_SIZE, Property::VECTOR2, Dali::Toolkit::Internal::Scrollable::SetProperty, Dali::Toolkit::Internal::Scrollable::GetProperty );
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-relative-position", VECTOR2, SCROLL_RELATIVE_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-min",      VECTOR2, SCROLL_POSITION_MIN)
@@ -67,6 +69,7 @@ DALI_TYPE_REGISTRATION_END()
 
 const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
 const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
+const Vector2 OVERSHOOT_DEFAULT_SIZE( 720.0f, 42.0f );
 
 }
 
@@ -80,7 +83,8 @@ Scrollable::Scrollable()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | DISABLE_SIZE_NEGOTIATION ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
-  mOvershootEnabled(false)
+  mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
+  mOvershootEnabled(true)
 {
 }
 
@@ -88,7 +92,8 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | behaviourFlags ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
-  mOvershootEnabled(false)
+  mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
+  mOvershootEnabled(true)
 {
 }
 
@@ -121,6 +126,11 @@ float Scrollable::GetOvershootAnimationSpeed() const
 {
   return mOvershootAnimationSpeed;
 };
+
+const Vector2& Scrollable::GetOvershootSize() const
+{
+  return mOvershootSize;
+}
 
 Toolkit::Scrollable::ScrollStartedSignalType& Scrollable::ScrollStartedSignal()
 {
@@ -184,6 +194,16 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
         scrollableImpl.SetOvershootAnimationSpeed( value.Get<float>() );
         break;
       }
+      case OVERSHOOT_SIZE: // OVERSHOOT_SIZE is not public yet
+      {
+        Vector2 input;
+        if( value.Get( input ) )
+        {
+          scrollableImpl.mOvershootSize = input;
+        }
+        scrollableImpl.EnableScrollOvershoot( scrollableImpl.IsOvershootEnabled() );
+        break;
+      }
     }
   }
 }
@@ -207,6 +227,11 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED:
       {
         value = scrollableImpl.GetOvershootAnimationSpeed();
+        break;
+      }
+      case OVERSHOOT_SIZE: // OVERSHOOT_SIZE is not public yet
+      {
+        value = scrollableImpl.mOvershootSize;
         break;
       }
     }

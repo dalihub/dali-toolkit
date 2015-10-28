@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class ImageView;
 }
+/**
+ * @addtogroup dali_toolkit_controls_image_view
+ * @{
+ */
 
 /**
  *
@@ -55,7 +59,7 @@ public:
   {
     enum
     {
-      RESOURCE_URL = PROPERTY_START_INDEX, ///< name "resource-url", @see SetImage(), type string
+      IMAGE = PROPERTY_START_INDEX, ///< name "image", @see SetImage(), type string if it is a url, map otherwise
     };
   };
 
@@ -133,7 +137,18 @@ public:
   void SetImage( Image image );
 
   /**
-   * @brief Gets the Image
+   * @brief Sets this ImageView from an Image url
+   *
+   * If the handle is empty, ImageView will display nothing
+   *
+   * @since DALi 1.1.4
+   *
+   * @param[in] url The Image resource to display.
+   */
+  void SetImage( const std::string& url );
+
+  /**
+   * @deprecated Gets the Image
    *
    * @return The Image currently set to this ImageView
    */
@@ -157,6 +172,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

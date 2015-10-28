@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class Button;
 }
+/**
+ * @addtogroup dali_toolkit_controls_buttons
+ * @{
+ */
 
 /**
  * @brief Button is a base class for different kind of buttons.
@@ -322,31 +326,46 @@ public:
   // Deprecated API
 
   /**
-   * @deprecated Sets the label with an actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the label with an actor.
+   *
    * @param[in]  label The actor to use as a label
    */
   void SetLabel( Actor label );
 
   /**
-   * @deprecated Sets the button image.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the button image.
+   *
    * @param[in]  image The button image.
    */
   void SetButtonImage( Image image );
 
   /**
-   * @deprecated Sets the selected image.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the selected image.
+   *
    * @param[in]  image The selected image.
    */
   void SetSelectedImage( Image image );
 
   /**
-   * @deprecated Gets the button image.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Gets the button image.
+   *
    * @return     An actor with the button image.
    */
   Actor GetButtonImage() const;
 
   /**
-   * @deprecated Gets the selected image.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Gets the selected image.
+   *
    * @return     An actor with the selected image.
    */
   Actor GetSelectedImage() const;
@@ -420,6 +439,9 @@ public: // Not intended for application developers
   DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

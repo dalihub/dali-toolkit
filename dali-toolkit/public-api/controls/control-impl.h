@@ -35,11 +35,15 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls
+ * @{
+ */
+
 class StyleManager;
 
 namespace Internal
 {
-
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -96,6 +100,13 @@ public:
    * @copydoc Dali::Toolkit::Control::SetBackgroundImage
    */
   void SetBackgroundImage( Image image );
+
+  /**
+   * @brief Set the background with a property map.
+   *
+   * @param[in] map The background property map.
+   */
+  void SetBackground(const Property::Map& map);
 
   /**
    * @copydoc Dali::Toolkit::Control::ClearBackground
@@ -629,6 +640,9 @@ DALI_IMPORT_API const Internal::Control& GetImplementation( const Dali::Toolkit:
 
 } // namespace Internal
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

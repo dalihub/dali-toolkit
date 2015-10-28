@@ -34,6 +34,10 @@ namespace Internal DALI_INTERNAL
 {
 class ScrollView;
 }
+/**
+ * @addtogroup dali_toolkit_controls_scroll_view
+ * @{
+ */
 
 /**
  * @brief How axes/rotation or scale are clamped
@@ -1136,6 +1140,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL ScrollView( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

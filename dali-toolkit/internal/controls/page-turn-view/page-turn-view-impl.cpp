@@ -28,7 +28,6 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 
@@ -340,11 +339,11 @@ void PageTurnView::SetupShadowView()
   mShadowView.SetPointLightFieldOfView( Math::PI / 2.0f);
   mShadowView.SetShadowColor(DEFAULT_SHADOW_COLOR);
 
-  mShadowPlane = CreateSolidColorActor( Vector4 (0.0f, 0.0f, 0.0f, 0.0f) );
-  mShadowPlane.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  mShadowPlane.SetSize( mControlSize );
-  Self().Add( mShadowPlane );
-  mShadowView.SetShadowPlane( mShadowPlane );
+  mShadowPlaneBackground = Actor::New();
+  mShadowPlaneBackground.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  mShadowPlaneBackground.SetSize( mControlSize );
+  Self().Add( mShadowPlaneBackground );
+  mShadowView.SetShadowPlaneBackground( mShadowPlaneBackground );
 
   mPointLight = Actor::New();
   mPointLight.SetAnchorPoint( origin );
@@ -359,6 +358,8 @@ void PageTurnView::SetupShadowView()
 
 void PageTurnView::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   SetupShadowView();
   mTurningPageLayer.Raise();
 }
@@ -368,7 +369,7 @@ void PageTurnView::OnStageDisconnection()
   if(mShadowView)
   {
     mPointLight.Unparent();
-    mShadowPlane.Unparent();
+    mShadowPlaneBackground.Unparent();
     mShadowView.Unparent();
   }
 
@@ -385,6 +386,8 @@ void PageTurnView::OnStageDisconnection()
 
     SetSpineEffect( mPanActor, mIsTurnBack[mPanActor] );
   }
+
+  Control::OnStageDisconnection();
 }
 
 void PageTurnView::SetPageSize( const Vector2& pageSize )
@@ -416,9 +419,9 @@ void PageTurnView::SetPageSize( const Vector2& pageSize )
 
   OnPageTurnViewInitialize();
 
-  if( mShadowPlane )
+  if( mShadowPlaneBackground )
   {
-    mShadowPlane.SetSize( mControlSize );
+    mShadowPlaneBackground.SetSize( mControlSize );
   }
 }
 

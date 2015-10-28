@@ -120,9 +120,8 @@ private: // From Control
 
   /**
    * @brief Set up scrollview to scroll Toolbar horizontally
-   * @param[out] scrollView scrollview to setup
    */
-  void SetUpScrollView( Toolkit::ScrollView& scrollView );
+  void SetUpScrollView();
 
   /**
    * @brief Set up the parts that make the Toolbar

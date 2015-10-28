@@ -152,6 +152,7 @@ const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
 
 ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mIndicatorShowAlpha(1.0f),
   mDirection(direction),
   mScrollableObject(WeakHandleBase()),
   mPropertyScrollPosition(Property::INVALID_INDEX),
@@ -161,10 +162,11 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mIndicatorShowDuration(DEFAULT_INDICATOR_SHOW_DURATION),
   mIndicatorHideDuration(DEFAULT_INDICATOR_HIDE_DURATION),
   mScrollStart(0.0f),
-  mIsPanning(false),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
-  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT)
+  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),
+  mIsPanning(false),
+  mIndicatorFirstShow(true)
 {
 }
 
@@ -218,6 +220,7 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
   if( indicator )
   {
     mIndicator = indicator;
+    mIndicatorFirstShow = true;
     Self().Add(mIndicator);
 
     EnableGestureDetection(Gesture::Type(Gesture::Pan));
@@ -328,15 +331,22 @@ void ScrollBar::ShowIndicator()
     mAnimation.Reset();
   }
 
+  if( mIndicatorFirstShow )
+  {
+    // Preserve the alpha value from the stylesheet
+    mIndicatorShowAlpha = Self().GetCurrentColor().a;
+    mIndicatorFirstShow = false;
+  }
+
   if(mIndicatorShowDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorShowDuration );
-    mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
+    mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ), mIndicatorShowAlpha, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else
   {
-    mIndicator.SetOpacity(1.0f);
+    mIndicator.SetOpacity(mIndicatorShowAlpha);
   }
 }
 
@@ -664,11 +674,15 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
       {
         Property::Value value( Property::ARRAY );
         Property::Array* array = value.GetArray();
-        Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
-        size_t positionCount( array->Count() );
-        for( size_t i( 0 ); i != positionCount; ++i )
+
+        if( array )
         {
-          array->PushBack( positions[i] );
+          Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
+          size_t positionCount( array->Count() );
+          for( size_t i( 0 ); i != positionCount; ++i )
+          {
+            array->PushBack( positions[i] );
+          }
         }
         break;
       }

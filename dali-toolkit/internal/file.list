@@ -1,8 +1,6 @@
 # Add local source files here
 
 toolkit_src_files = \
-   $(toolkit_src_dir)/atlas-manager/atlas-manager.cpp \
-   $(toolkit_src_dir)/atlas-manager/atlas-manager-impl.cpp \
    $(toolkit_src_dir)/builder/builder-actor.cpp \
    $(toolkit_src_dir)/builder/builder-animations.cpp \
    $(toolkit_src_dir)/builder/builder-impl.cpp \
@@ -12,6 +10,18 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/json-parser-impl.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
+   $(toolkit_src_dir)/controls/renderers/control-renderer-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/control-renderer-data-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/renderer-factory-cache.cpp \
+   $(toolkit_src_dir)/controls/renderers/renderer-factory-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/border/border-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/color/color-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/image/image-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/npatch/npatch-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/gradient.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/linear-gradient.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/radial-gradient.cpp \
+   $(toolkit_src_dir)/controls/renderers/gradient/gradient-renderer.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
@@ -49,6 +59,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/super-blur-view/super-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/table-view/table-view-impl.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-field-impl.cpp \
+   $(toolkit_src_dir)/controls/text-controls/text-font-style.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-label-impl.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-selection-popup-impl.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-selection-toolbar-impl.cpp \
@@ -86,6 +97,9 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-manager.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-manager-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-mesh-factory.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \

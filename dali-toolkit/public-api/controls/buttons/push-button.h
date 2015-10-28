@@ -35,6 +35,10 @@ namespace Internal DALI_INTERNAL
 
 class PushButton;
 }
+/**
+ * @addtogroup dali_toolkit_controls_buttons
+ * @{
+ */
 
 /**
  * @brief A PushButton changes its appearance when is pressed and returns to its original when is released.
@@ -122,7 +126,10 @@ public:
   using Button::SetButtonImage;
 
   /**
-   * @deprecated Sets the unselected image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the unselected image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetButtonImage( Actor image );
@@ -130,7 +137,10 @@ public:
   using Button::SetBackgroundImage;
 
   /**
-   * @deprecated Sets the background image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the background image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetBackgroundImage( Actor image );
@@ -138,7 +148,10 @@ public:
   using Button::SetSelectedImage;
 
   /**
-   * @deprecated Sets the selected image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the selected image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetSelectedImage( Actor image );
@@ -146,7 +159,10 @@ public:
   using Button::SetSelectedBackgroundImage;
 
   /**
-   * @deprecated Sets the selected background image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the selected background image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetSelectedBackgroundImage( Actor image );
@@ -154,7 +170,10 @@ public:
   using Button::SetDisabledBackgroundImage;
 
   /**
-   * @deprecated Sets the disabled background image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the disabled background image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetDisabledBackgroundImage( Actor image );
@@ -162,7 +181,10 @@ public:
   using Button::SetDisabledImage;
 
   /**
-   * @deprecated Sets the disabled image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the disabled image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetDisabledImage( Actor image );
@@ -170,7 +192,10 @@ public:
   using Button::SetDisabledSelectedImage;
 
   /**
-   * @deprecated Sets the disabled selected image with an Actor.
+   * @deprecated DALi 1.0.50
+   *
+   * @brief Sets the disabled selected image with an Actor.
+   *
    * @param[in] image The Actor to use.
    */
   void SetDisabledSelectedImage( Actor image );
@@ -193,6 +218,9 @@ public: // Not intended for application developers
   DALI_INTERNAL PushButton( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

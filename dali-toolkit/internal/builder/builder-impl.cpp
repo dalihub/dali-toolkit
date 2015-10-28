@@ -717,9 +717,13 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
         if( SetPropertyFromNode( *image, Property::MAP, property, constant ) )
         {
           Property::Map* map = property.GetMap();
-          (*map)[ KEYNAME_TYPE ] = Property::Value(std::string("FrameBufferImage") );
-          ret = FrameBufferImage::DownCast( Dali::Scripting::NewImage( property ) );
-          mFrameBufferImageLut[ name ] = ret;
+
+          if( map )
+          {
+            (*map)[ KEYNAME_TYPE ] = Property::Value(std::string("FrameBufferImage") );
+            ret = FrameBufferImage::DownCast( Dali::Scripting::NewImage( property ) );
+            mFrameBufferImageLut[ name ] = ret;
+          }
         }
       }
     }
@@ -1359,6 +1363,7 @@ Builder::Builder()
   defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]  = DALI_IMAGE_DIR;
   defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]  = DALI_SOUND_DIR;
   defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ] = DALI_STYLE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_STYLE_IMAGE_DIR) ] = DALI_STYLE_IMAGE_DIR;
 
   AddConstants( defaultDirs );
 }

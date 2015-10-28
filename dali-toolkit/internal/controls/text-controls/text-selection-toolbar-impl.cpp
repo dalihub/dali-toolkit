@@ -52,6 +52,7 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "max-size", VECTOR2, MAX_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enable-overshoot", BOOLEAN, ENABLE_OVERSHOOT )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -87,7 +88,11 @@ void TextSelectionToolbar::SetProperty( BaseObject* object, Property::Index inde
        impl.SetPopupMaxSize( value.Get< Vector2 >() );
        break;
       }
-
+      case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
+      {
+        impl.mScrollView.SetOvershootEnabled( value.Get< bool >() );
+        break;
+      }
     } // switch
   } // TextSelectionToolbar
 }
@@ -107,6 +112,11 @@ Property::Value TextSelectionToolbar::GetProperty( BaseObject* object, Property:
       case Toolkit::TextSelectionToolbar::Property::MAX_SIZE:
       {
         value = impl.GetPopupMaxSize();
+        break;
+      }
+      case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
+      {
+        value = impl.mScrollView.IsOvershootEnabled();
         break;
       }
     } // switch
@@ -166,22 +176,24 @@ const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
   return mMaxSize;
 }
 
-void TextSelectionToolbar::SetUpScrollView( Toolkit::ScrollView& scrollView )
+void TextSelectionToolbar::SetUpScrollView()
 {
-  scrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  scrollView.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  scrollView.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  mScrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  mScrollView.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  mScrollView.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
 
-  scrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
-  scrollView.SetAxisAutoLock( true );
-  scrollView.ScrollStartedSignal().Connect( this, &TextSelectionToolbar::OnScrollStarted );
-  scrollView.ScrollCompletedSignal().Connect( this, &TextSelectionToolbar::OnScrollCompleted );
+  mScrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
+  mScrollView.SetAxisAutoLock( true );
+  mScrollView.ScrollStartedSignal().Connect( this, &TextSelectionToolbar::OnScrollStarted );
+  mScrollView.ScrollCompletedSignal().Connect( this, &TextSelectionToolbar::OnScrollCompleted );
 
   mRulerX = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
 
   RulerPtr rulerY = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
   rulerY->Disable();
-  scrollView.SetRulerY( rulerY );
+  mScrollView.SetRulerY( rulerY );
+
+  mScrollView.SetOvershootEnabled( true );
 }
 
 void TextSelectionToolbar::SetUp()
@@ -201,7 +213,7 @@ void TextSelectionToolbar::SetUp()
   stencil.SetParentOrigin( ParentOrigin::CENTER );
 
   mScrollView  = Toolkit::ScrollView::New();
-  SetUpScrollView( mScrollView );
+  SetUpScrollView();
 
   // Toolbar must start with at least one option, adding further options with increase it's size
   mTableOfButtons = Dali::Toolkit::TableView::New( 1, 1 );

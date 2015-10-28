@@ -102,7 +102,7 @@ Vector4 HexStringToVector4( const char* s )
 /**
  * A property value type can be forced when its unknown by a disambiguation convention in the json
  * ie  "myarray": [1,2,3,4] ; would be a vector but
- *     "myarray": {'type-cast':'array', 'value':[1,2,3,4]} would be an array
+ *     "myarray": {"type-cast":"array", "value":[1,2,3,4]} would be an array
  * @param child The node whos string to search for a disambiguated type
  * @param value The value to set
  * @param overrideMap The user overriding constant map
@@ -343,24 +343,29 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       {
         value = Property::Value(Property::ARRAY);
         Property::Array* array = value.GetArray();
+
         unsigned int i = 0;
         TreeNode::ConstIterator iter(node.CBegin());
-        for( ; i < node.Size(); ++i, ++iter)
-        {
-          Property::Value childValue;
-          if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
-          {
-            array->PushBack( childValue );
-          }
-        }
 
-        if( array->Count() == node.Size() )
+        if( array )
         {
-          done = true;
-        }
-        else
-        {
-          done = false;
+          for( ; i < node.Size(); ++i, ++iter)
+          {
+            Property::Value childValue;
+            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+            {
+              array->PushBack( childValue );
+            }
+          }
+
+          if( array->Count() == node.Size() )
+          {
+            done = true;
+          }
+          else
+          {
+            done = false;
+          }
         }
       }
       break;
@@ -375,24 +380,29 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       {
         value = Property::Value(Property::MAP);
         Property::Map* map = value.GetMap();
+
         unsigned int i = 0;
         TreeNode::ConstIterator iter(node.CBegin());
-        for( ; i < node.Size(); ++i, ++iter)
-        {
-          Property::Value childValue;
-          if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
-          {
-            map->Insert( (*iter).first, childValue );
-          }
-        }
 
-        if( map->Count() == node.Size() )
+        if( map )
         {
-          done = true;
-        }
-        else
-        {
-          done = false;
+          for( ; i < node.Size(); ++i, ++iter)
+          {
+            Property::Value childValue;
+            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+            {
+              map->Insert( (*iter).first, childValue );
+            }
+          }
+
+          if( map->Count() == node.Size() )
+          {
+            done = true;
+          }
+          else
+          {
+            done = false;
+          }
         }
       }
       break;
@@ -483,13 +493,16 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
           value = Property::Value(Property::ARRAY);
           Property::Array* array = value.GetArray();
 
-          for(TreeConstIter iter = node.CBegin(); iter != node.CEnd(); ++iter)
+          if( array )
           {
-            Property::Value childValue;
-            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+            for(TreeConstIter iter = node.CBegin(); iter != node.CEnd(); ++iter)
             {
-              array->PushBack( childValue );
-              done = true;
+              Property::Value childValue;
+              if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+              {
+                array->PushBack( childValue );
+                done = true;
+              }
             }
           }
         }
@@ -507,13 +520,17 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
         {
           value = Property::Value(Property::ARRAY);
           Property::Array* array = value.GetArray();
-          for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
+
+          if( array )
           {
-            Property::Value childValue;
-            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+            for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
             {
-              array->PushBack( childValue );
-              done = true;
+              Property::Value childValue;
+              if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+              {
+                array->PushBack( childValue );
+                done = true;
+              }
             }
           }
         }
@@ -521,13 +538,17 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
         {
           value = Property::Value(Property::MAP);
           Property::Map* map = value.GetMap();
-          for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
+
+          if( map )
           {
-            Property::Value childValue;
-            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+            for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
             {
-              map->Insert( (*iter).first, childValue );
-              done = true;
+              Property::Value childValue;
+              if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
+              {
+                map->Insert( (*iter).first, childValue );
+                done = true;
+              }
             }
           }
         }

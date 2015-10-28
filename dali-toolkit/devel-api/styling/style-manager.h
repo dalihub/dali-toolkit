@@ -115,6 +115,12 @@ public:
   Orientation GetOrientation();
 
   /**
+   * @brief Retrieves the default font family.
+   * @return The default font family.
+   */
+  std::string GetDefaultFontFamily() const;
+
+  /**
    * @brief Make a request to set the theme JSON file to one that exists in the Toolkit package.
    *
    * Multiple requests per event processing cycle can be made, but only the final one will be acted

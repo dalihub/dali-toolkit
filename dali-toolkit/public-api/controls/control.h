@@ -40,6 +40,10 @@ namespace Internal
 {
 class Control;
 }
+/**
+ * @addtogroup dali_toolkit_controls
+ * @{
+ */
 
 /**
  * @brief Control is the base class for all controls.
@@ -85,8 +89,7 @@ public:
     enum
     {
       STYLE_NAME = PROPERTY_START_INDEX,       ///< name "style-name",       @see SetStyleName,       type std::string
-      BACKGROUND_COLOR,                        ///< name "background-color", @see SetBackgroundColor, type Vector4
-      BACKGROUND_IMAGE,                        ///< name "background-image", @see SetBackgroundImage, type Map
+      BACKGROUND,                              ///< name "background",       @since DALi 1.1.4,       type Map
       KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
   };
@@ -267,14 +270,14 @@ public:
   /**
    * @brief Retrieves the background color of the control.
    *
+   * @deprecated DALi 1.1.3 API removed.
+   *
    * @return The background color of the control.
    */
   Vector4 GetBackgroundColor() const;
 
   /**
    * @brief Sets an image as the background of the control.
-   *
-   * The color of this image is blended with the background color @see SetBackgroundColor
    *
    * @param[in] image The image to set as the background.
    */
@@ -403,6 +406,9 @@ public: // Templates for Deriving Classes
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

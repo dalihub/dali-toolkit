@@ -26,6 +26,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_item_view
+ * @{
+ */
 
 namespace DefaultItemLayout
 {
@@ -49,6 +53,9 @@ DALI_IMPORT_API ItemLayoutPtr New( Type type );
 
 } // namespace DefaultItemLayout
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

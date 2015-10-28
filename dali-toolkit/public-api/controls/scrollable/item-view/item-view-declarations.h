@@ -28,6 +28,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_item_view
+ * @{
+ */
 
 typedef unsigned int ItemId; ///< Unique identity for each item in the view.
 
@@ -44,6 +48,9 @@ typedef ItemContainer::const_iterator ConstItemIter;
 class ItemView;
 class ItemLayout;
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

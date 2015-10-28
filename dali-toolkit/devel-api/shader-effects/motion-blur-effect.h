@@ -29,27 +29,33 @@ namespace Toolkit
 {
 
 /**
+ * @brief Set the properties for the motion blur
+ *
+ * @param numBlurSamples Number of samples used by the shader
+ */
+inline void SetMotionBlurProperties( Actor& actor, unsigned int numBlurSamples = 8 )
+{
+  actor.RegisterProperty( "uBlurTexCoordScale", 0.125f );
+  actor.RegisterProperty( "uGeometryStretchFactor", 0.05f );
+  actor.RegisterProperty( "uSpeedScalingFactor", 0.5f );
+  actor.RegisterProperty( "uObjectFadeStart", Vector2( 0.25f, 0.25f ) );
+  actor.RegisterProperty( "uObjectFadeEnd", Vector2( 0.5f, 0.5f ) );
+  actor.RegisterProperty( "uAlphaScale", 0.75f );
+  actor.RegisterProperty( "uNumSamples", static_cast<float>( numBlurSamples ) );
+  actor.RegisterProperty( "uRecipNumSamples", 1.0f / static_cast<float>( numBlurSamples ) );
+  actor.RegisterProperty( "uRecipNumSamplesMinusOne", 1.0f / static_cast<float>( numBlurSamples - 1.0f ) );
+  Property::Index uModelProperty = actor.RegisterProperty( "uModelLastFrame", Matrix::IDENTITY );
+
+  Constraint constraint = Constraint::New<Matrix>( actor, uModelProperty, EqualToConstraint() );
+  constraint.AddSource( Source( actor , Actor::Property::WORLD_MATRIX ) );
+  constraint.Apply();
+}
+
+/**
  * @brief Create a new MotionBlurEffect
  *
  * Motion blur shader works on a per object basis. Objects will
- * blur when they move, or if the camera moves. Can be applied to ImageActor or
- * TextActor only.
- *
- * Usage example:-
- *
- * // Create shader used for doing motion blur\n
- * ShaderEffect MotionBlurEffect = CreateMotionBlurEffect();
- *
- * // set actor shader to the blur one\n
- * Actor actor = Actor::New( ... );\n
- * actor.SetShaderEffect( MotionBlurEffect );
- *
- * // Constrain "uModelLastFrame" to be the same as the actor's world matrix\n
- * Dali::Property::Index uModelProperty = MotionBlurEffect.GetPropertyIndex( "uModelLastFrame" );
- * Constraint constraint = Constraint::New<Matrix>( MotionBlurEffect, uModelProperty, EqualToConstraint() );\n
- * constraint.AddSource( Source( actor , Actor::Property::WORLD_MATRIX ) );\n
- * constraint.Apply();\n
- *
+ * blur when they move, or if the camera moves.
  *
  * Animatable/Constrainable uniforms:
  *  "uBlurTexCoordScale"      - This scales the offset for texture samples along the motion velocity vector.
@@ -83,26 +89,24 @@ namespace Toolkit
  *                              at the cost of performance.
  *  "uModelLastFrame"         - The model to world space transformation matrix of the actor in the previous frame.
  *
- * @param numBlurSamples Number of samples used by the shader
- * @return A handle to a newly allocated ShaderEffect
+ * @return The newly created Property::Map with the motion blur effect
  */
-inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
+inline Property::Map CreateMotionBlurEffect()
 {
-  // Dali vertexSource prefix for reference:
-  // precision highp float;
-  // attribute vec3  aPosition;
-  // attribute vec2  aTexCoord;
-  // uniform   mat4  uMvpMatrix;
-  // uniform   mat4  uModelView;
-  // uniform   mat3  uNormalMatrix;
-  // uniform   mat4  uProjection;
-  // uniform   vec4  uColor;
-  // varying   vec2  vTexCoord;
   std::string vertexSource;
   vertexSource =
       "precision mediump float;\n"
+
+      "attribute vec2 aPosition;\n"
+
+      "uniform mat4 uMvpMatrix;\n"
+      "uniform mat4 uModelView;\n"
+      "uniform mat4 uViewMatrix;\n"
+      "uniform mat4 uProjection;\n"
+      "uniform vec3 uSize;\n"
+
       "uniform mat4 uModelLastFrame;\n"
-      "uniform float uTimeDelta;\n"
+      "float timeDelta = 0.0167;\n"
 
       "uniform float uGeometryStretchFactor;\n"
       "uniform float uSpeedScalingFactor;\n"
@@ -111,20 +115,23 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
       "varying vec2 vModelSpaceCenterToPos;\n"
       "varying vec2 vScreenSpaceVelocityVector;\n"
       "varying float vSpeed;\n"
+      "varying vec2 vTexCoord;\n"
 
       "void main()\n"
       "{\n"
       // get view space position of vertex this frame and last frame
-      " vec4 vertex = vec4(aPosition, 1.0);\n"
-      " vec4 viewSpaceVertex = uModelView * vertex;\n"
-      " vec4 viewSpaceVertexLastFrame = (uViewMatrix * uModelLastFrame) * vertex;\n"
-      " float reciprocalTimeDelta = 1.0 / ((uTimeDelta > 0.0) ? uTimeDelta : 0.01);\n"
+      " vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n"
+      " vertexPosition.xyz *= uSize;\n"
+
+      " vec4 viewSpaceVertex = uModelView * vertexPosition;\n"
+      " vec4 viewSpaceVertexLastFrame = (uViewMatrix * uModelLastFrame) * vertexPosition;\n"
+      " float reciprocalTimeDelta = 1.0 / timeDelta;\n"
 
       // work out vertex's last movement in view space
       " vec3 viewSpacePosDelta = viewSpaceVertex.xyz - viewSpaceVertexLastFrame.xyz;\n"
 
       // get clip space position of vertex this frame and last frame
-      " vec4 clipSpaceVertex = uMvpMatrix * vertex;\n"
+      " vec4 clipSpaceVertex = uMvpMatrix * vertexPosition;\n"
       " vec4 clipSpaceVertexLastFrame = uProjection * viewSpaceVertexLastFrame;\n"
 
       // decide how much this vertex is 'trailing', i.e. at the back of the object relative to its direction of motion. We do this
@@ -133,7 +140,7 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
       " float posDeltaLength = length(viewSpacePosDelta);\n"
       " if(posDeltaLength > 0.001)\n" // avoid div by 0 if object has barely moved
       " {\n"
-      "   vec4 viewSpaceCenterToPos = uModelView * vec4(aPosition, 0.0);\n"
+      "   vec4 viewSpaceCenterToPos = uModelView * vec4(vertexPosition.xy, 0.0, 0.0);\n"
       "   float centerToVertexDist = length(viewSpaceCenterToPos);\n"
       "   if(centerToVertexDist > 0.001)\n" // avoid div by 0 if object has vertex at model space origin
       "   {\n"
@@ -158,21 +165,20 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
       " vSpeed = clamp(vSpeed, 0.0, 1.0);\n"
 
       // provide fragment shader with vector from center of object to pixel (assumes the objects model space origin is at its center and verts have same z)
-      " vModelSpaceCenterToPos = aPosition.xy;\n"
+      " vModelSpaceCenterToPos = viewSpaceVertex.xy;\n"
 
-      " vTexCoord = aTexCoord;\n"
+      " vec2 texCoord = aPosition + vec2(0.5);"
+      " vTexCoord = texCoord;\n"
       "}\n";
 
 
-  // Dali fragmentSource prefix for reference:
-  // precision highp     float;
-  // uniform   sampler2D sTexture;
-  // uniform   sampler2D sEffect;
-  // uniform   vec4      uColor;
-  // varying   vec2      vTexCoord;
   std::string fragmentSource;
   fragmentSource =
       "precision mediump float;\n"
+
+      "uniform sampler2D sTexture;\n"
+      "uniform vec4 uColor;\n"
+
       "uniform vec2 uObjectFadeStart;\n"
       "uniform vec2 uObjectFadeEnd;\n"
       "uniform float uAlphaScale;\n"
@@ -184,6 +190,7 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
       "varying vec2 vModelSpaceCenterToPos;\n"
       "varying vec2 vScreenSpaceVelocityVector;\n"
       "varying float vSpeed;\n"
+      "varying vec2 vTexCoord;\n"
 
       "void main()\n"
       "{\n"
@@ -208,30 +215,25 @@ inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
       "   col += texture2D(sTexture, vTexCoord + (velocity * t)) * uRecipNumSamples;\n"
       " }\n"
       " gl_FragColor = mix(colActor, col, vSpeed);\n" // lerp blurred and non-blurred actor based on speed of motion
-      " gl_FragColor.a = colActor.a * fadeToEdgesScale;\n" // fade blurred actor to its edges based on speed of motion
+      " gl_FragColor.a = fadeToEdgesScale;//colActor.a * fadeToEdgesScale;\n" // fade blurred actor to its edges based on speed of motion
       " gl_FragColor *= uColor;\n"
       "}\n";
 
+
+  Property::Map map;
+
+  Property::Map customShader;
+  customShader[ "vertex-shader" ] = vertexSource;
+  customShader[ "fragment-shader" ] = fragmentSource;
+
+  customShader[ "subdivide-grid-x" ] = 10;
+  customShader[ "subdivide-grid-y" ] = 10;
+
   // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
-  ShaderEffect shader = ShaderEffect::New( vertexSource, fragmentSource,
-                                           ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID) );
+  customShader[ "hints" ] = "output-is-transparent";
 
-  //////////////////////////////////////
-  // Register uniform properties
-  //
-  //
-  shader.SetUniform( "uBlurTexCoordScale", 0.125f );
-  shader.SetUniform( "uGeometryStretchFactor", 0.05f );
-  shader.SetUniform( "uSpeedScalingFactor", 0.5f );
-  shader.SetUniform( "uObjectFadeStart", Vector2( 0.25f, 0.25f ) );
-  shader.SetUniform( "uObjectFadeEnd", Vector2( 0.5f, 0.5f ) );
-  shader.SetUniform( "uAlphaScale", 0.75f );
-  shader.SetUniform( "uNumSamples", static_cast<float>( numBlurSamples ) );
-  shader.SetUniform( "uRecipNumSamples", 1.0f / static_cast<float>( numBlurSamples ) );
-  shader.SetUniform( "uRecipNumSamplesMinusOne", 1.0f / static_cast<float>( numBlurSamples - 1.0f ) );
-  shader.SetUniform( "uModelLastFrame", Matrix::IDENTITY );
-
-  return shader;
+  map[ "shader" ] = customShader;
+  return map;
 }
 
 }

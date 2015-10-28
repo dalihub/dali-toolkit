@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-manager.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
@@ -99,15 +99,6 @@ public:
                          Toolkit::AtlasManager::Mesh2D& mesh );
 
   /**
-   * @brief Stitch Two Meshes together
-   *
-   * @param[in] first first mesh
-   * @param[in] second second mesh
-   */
-  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
-                   const Toolkit::AtlasManager::Mesh2D& second );
-
-  /**
    * @brief Check to see if a glyph is being cached
    *
    * @param[in] fontId The font that this glyph comes from
@@ -116,9 +107,9 @@ public:
    *
    * @return Whether glyph is cached or not ?
    */
-  bool Cached( Text::FontId fontId,
-               Text::GlyphIndex index,
-               AtlasManager::AtlasSlot& slot );
+  bool IsCached( Text::FontId fontId,
+                 Text::GlyphIndex index,
+                 AtlasManager::AtlasSlot& slot );
 
   /**
    * @brief Retrieve the size of an atlas
@@ -158,15 +149,6 @@ public:
   Material GetMaterial( uint32_t atlasId ) const;
 
   /**
-   * @brief Get the sampler used by an atlas
-   *
-   * @param[in] atlasId Id of an atlas
-   *
-   * @return The sampler used by the atlas
-   */
-  Sampler GetSampler( uint32_t atlasId ) const;
-
-  /**
    * @brief Get Glyph Manager metrics
    *
    * @return const reference to glyph manager metrics
@@ -181,20 +163,6 @@ public:
    * @param[in] delta The adjustment to make to the reference count
    */
   void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta );
-
-  /**
-   * @brief Get Shader used for rendering glyph effect buffers
-   *
-   * @return Handle of shader needed
-   */
-  Shader GetEffectBufferShader() const;
-
-  /**
-   * @brief Get Shader used rendering Glyph Shadows
-   *
-   * @return Handle of shader needed
-   */
-  Shader GetGlyphShadowShader() const;
 
 private:
 

@@ -35,6 +35,10 @@ namespace Internal DALI_INTERNAL
 {
 class TableView;
 }
+/**
+ * @addtogroup dali_toolkit_controls_table_view
+ * @{
+ */
 
 /**
  * @brief TableView is a layout container for aligning child actors in a grid like layout.
@@ -441,6 +445,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL TableView( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

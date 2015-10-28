@@ -37,6 +37,10 @@ namespace Internal DALI_INTERNAL
 class ScrollViewEffect;
 class ScrollViewWobbleEffect;
 }
+/**
+ * @addtogroup dali_toolkit_controls_scroll_view
+ * @{
+ */
 
 class ScrollView;
 class ScrollViewEffect;
@@ -73,6 +77,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

@@ -33,6 +33,10 @@ namespace Internal DALI_INTERNAL
 {
 class CheckBoxButton;
 }
+/**
+ * @addtogroup dali_toolkit_controls_buttons
+ * @{
+ */
 
 /**
  * CheckBoxButton provides a check box button which user can check or uncheck.
@@ -106,6 +110,9 @@ public: // Not intended for application developers
   DALI_INTERNAL CheckBoxButton( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

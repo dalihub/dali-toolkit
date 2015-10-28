@@ -65,11 +65,9 @@ distributing this software or its derivatives.
       "secondary-cursor-color":[0.0,0.72,0.9,1.0],
       "cursor-width":3,
       "selection-highlight-color":[0.75,0.96,1.0,1.0],
-      "grab-handle-image": { "filename":"{DALI_IMAGE_DIR}cursor_handler_center.png" },
-      "selection-handle-image-left" : {"filename":"{DALI_IMAGE_DIR}selection_handle_left.png" },
-      "selection-handle-image-right": {"filename":"{DALI_IMAGE_DIR}selection_handle_right.png" },
-      "selection-handle-marker-image-left":{ "filename":"{DALI_IMAGE_DIR}selection_marker_left.png" },
-      "selection-handle-marker-image-right":{ "filename":"{DALI_IMAGE_DIR}selection_marker_right.png" }
+      "grab-handle-image" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selection-handle-image-left" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selection-handle-image-right": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
     },
 
     "textfield-font-size-0":
@@ -99,7 +97,7 @@ distributing this software or its derivatives.
       "popup-divider-color":[0.23,0.72,0.8,0.11],
       "popup-icon-color":[1.0,1.0,1.0,1.0],
       "popup-pressed-color":[0.24,0.72,0.8,0.11],
-      "background-image": {
+      "background": {
         "filename": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
         },
       "popup-fade-in-duration":0.25,
@@ -110,12 +108,24 @@ distributing this software or its derivatives.
       "label":
       {
         "point-size":8,
-        "font-style":"Light"
+        "font-style":"{\"weight\":\"light\"}"
       }
+    },
+    "textselectiontoolbar":
+    {
+      "enable-overshoot":true
     },
     "scrollview":
     {
-      "overshoot-effect-color":"B018"
+      "overshoot-effect-color":"B018",
+      "overshoot-animation-speed":360.0,
+      "overshoot-size":[720.0,130.0]
+    },
+    "itemview":
+    {
+      "overshoot-effect-color":"B018",
+      "overshoot-animation-speed":360.0,
+      "overshoot-size":[720.0,130.0]
     }
   }
 }

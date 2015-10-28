@@ -86,18 +86,30 @@ const char* const BLUR_STRENGTH_PROPERTY_NAME = "BlurStrengthProperty";
 const char* const SHADOW_COLOR_PROPERTY_NAME = "ShadowColorProperty";
 
 const char* const RENDER_SHADOW_VERTEX_SOURCE =
+
+  " attribute mediump vec2 aPosition;\n"
+  " uniform mediump mat4 uMvpMatrix;\n"
+  " uniform mediump mat4 uModelMatrix;\n"
+  " uniform vec3 uSize;\n"
+  " varying vec2 vTexCoord;\n"
+
   " uniform mediump mat4 uLightCameraProjectionMatrix;\n"
   " uniform mediump mat4 uLightCameraViewMatrix;\n"
   "\n"
   "void main()\n"
   "{\n"
-    "  gl_Position = uProjection * uModelView * vec4(aPosition,1.0);\n"
-    "  vec4 textureCoords = uLightCameraProjectionMatrix * uLightCameraViewMatrix * uModelMatrix  * vec4(aPosition,1.0);\n"
+    "  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n"
+    "  vertexPosition.xyz *= uSize;\n"
+    "  gl_Position = uMvpMatrix * vertexPosition;\n"
+    "  vec4 textureCoords = uLightCameraProjectionMatrix * uLightCameraViewMatrix * uModelMatrix  * vertexPosition;\n"
     "  vTexCoord = 0.5 + 0.5 * (textureCoords.xy/textureCoords.w);\n"
   "}\n";
 
 const char* const RENDER_SHADOW_FRAGMENT_SOURCE =
+  "varying mediump vec2 vTexCoord;\n"
   "uniform lowp vec4 uShadowColor;\n"
+  "uniform sampler2D sTexture;\n"
+
   "void main()\n"
   "{\n"
   "  lowp float alpha;\n"
@@ -149,17 +161,18 @@ void ShadowView::Remove(Actor child)
   mChildrenRoot.Remove(child);
 }
 
-void ShadowView::SetShadowPlane(Actor shadowPlane)
+void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
 {
-  mShadowPlaneBg = shadowPlane;
+  mShadowPlaneBg = shadowPlaneBackground;
 
-  mShadowPlane = ImageActor::New();
+  mShadowPlane = Toolkit::ImageView::New();
   mShadowPlane.SetName( "SHADOW_PLANE" );
   mShadowPlane.SetParentOrigin(ParentOrigin::CENTER);
   mShadowPlane.SetAnchorPoint(AnchorPoint::CENTER);
 
   mShadowPlane.SetImage(mOutputImage);
-  mShadowPlane.SetShaderEffect(mShadowRenderShader);
+  mShadowPlane.SetProperty( Toolkit::ImageView::Property::IMAGE, mShadowRenderShader );
+  SetShaderConstants();
 
   // Rather than parent the shadow plane drawable and have constraints to move it to the same
   // position, instead parent the shadow plane drawable on the shadow plane passed in.
@@ -193,7 +206,10 @@ void ShadowView::SetShadowColor(Vector4 color)
   mCachedBackgroundColor.g = color.g;
   mCachedBackgroundColor.b = color.b;
 
-  Self().SetProperty( mShadowColorPropertyIndex, mCachedShadowColor );
+  if( mShadowPlane )
+  {
+    mShadowPlane.SetProperty( mShadowColorPropertyIndex, mCachedShadowColor );
+  }
   if(mRenderSceneTask)
   {
     mRenderSceneTask.SetClearColor( mCachedBackgroundColor );
@@ -239,8 +255,17 @@ void ShadowView::OnInitialize()
   mCameraActor.SetOrientation(Radian(Degree(180)), Vector3::YAXIS);
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
-  mShadowRenderShader = ShaderEffect::New( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE,
-                                           ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ));
+
+  Property::Map customShader;
+  customShader[ "vertex-shader" ] = RENDER_SHADOW_VERTEX_SOURCE;
+  customShader[ "fragment-shader" ] = RENDER_SHADOW_FRAGMENT_SOURCE;
+
+  customShader[ "subdivide-grid-x" ] = 20;
+  customShader[ "subdivide-grid-y" ] = 20;
+
+  customShader[ "hints" ] = "output-is-transparent";
+
+  mShadowRenderShader[ "shader" ] = customShader;
 
   // Create render targets needed for rendering from light's point of view
   mSceneFromLightRenderTarget = FrameBufferImage::New( stageSize.width, stageSize.height, Pixel::RGBA8888 );
@@ -273,7 +298,13 @@ void ShadowView::OnInitialize()
   mBlurFilter.SetRootActor(mBlurRootActor);
   mBlurFilter.SetBackgroundColor(Vector4::ZERO);
 
-  SetShaderConstants();
+  CustomActor self = Self();
+  // Register a property that the user can use to control the blur in the internal object
+  mBlurStrengthPropertyIndex = self.RegisterProperty(BLUR_STRENGTH_PROPERTY_NAME, BLUR_STRENGTH_DEFAULT);
+
+  Constraint blurStrengthConstraint = Constraint::New<float>( mBlurFilter.GetHandleForAnimateBlurStrength(), mBlurFilter.GetBlurStrengthPropertyIndex(), EqualToConstraint() );
+  blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
+  blurStrengthConstraint.Apply();
 }
 
 void ShadowView::OnSizeSet(const Vector3& targetSize)
@@ -332,38 +363,17 @@ void ShadowView::RemoveRenderTasks()
 
 void ShadowView::SetShaderConstants()
 {
-  CustomActor self = Self();
-
-  mShadowRenderShader.SetUniform( SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
-  mShadowRenderShader.SetUniform( SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
-  mShadowRenderShader.SetUniform( SHADER_SHADOW_COLOR_PROPERTY_NAME, mCachedShadowColor );
-
-  Property::Index lightCameraProjectionMatrixPropertyIndex = mShadowRenderShader.GetPropertyIndex(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME);
-  Property::Index lightCameraViewMatrixPropertyIndex = mShadowRenderShader.GetPropertyIndex(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME);
-
-  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( mShadowRenderShader, lightCameraProjectionMatrixPropertyIndex, EqualToConstraint() );
+  Property::Index lightCameraProjectionMatrixPropertyIndex = mShadowPlane.RegisterProperty( SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
+  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( mShadowPlane, lightCameraProjectionMatrixPropertyIndex, EqualToConstraint() );
   projectionMatrixConstraint.AddSource( Source( mCameraActor, CameraActor::Property::PROJECTION_MATRIX ) );
-
-  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( mShadowRenderShader, lightCameraViewMatrixPropertyIndex, EqualToConstraint() );
-  viewMatrixConstraint.AddSource( Source( mCameraActor, CameraActor::Property::VIEW_MATRIX ) );
-
   projectionMatrixConstraint.Apply();
+
+  Property::Index lightCameraViewMatrixPropertyIndex = mShadowPlane.RegisterProperty( SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME, Matrix::IDENTITY );
+  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( mShadowPlane, lightCameraViewMatrixPropertyIndex, EqualToConstraint() );
+  viewMatrixConstraint.AddSource( Source( mCameraActor, CameraActor::Property::VIEW_MATRIX ) );
   viewMatrixConstraint.Apply();
 
-  // Register a property that the user can use to control the blur in the internal object
-  mBlurStrengthPropertyIndex = self.RegisterProperty(BLUR_STRENGTH_PROPERTY_NAME, BLUR_STRENGTH_DEFAULT);
-
-  Constraint blurStrengthConstraint = Constraint::New<float>( mBlurFilter.GetHandleForAnimateBlurStrength(), mBlurFilter.GetBlurStrengthPropertyIndex(), EqualToConstraint() );
-  blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
-  blurStrengthConstraint.Apply();
-
-  //  Register a property that the user can use to control the color of the shadow.
-  Property::Index index = mShadowRenderShader.GetPropertyIndex(SHADER_SHADOW_COLOR_PROPERTY_NAME);
-  mShadowColorPropertyIndex = self.RegisterProperty(SHADOW_COLOR_PROPERTY_NAME, mCachedShadowColor);
-
-  Constraint shadowRenderShaderConstraint = Constraint::New<Dali::Vector4>( mShadowRenderShader, index, EqualToConstraint() );
-  shadowRenderShaderConstraint.AddSource( Source( self, mShadowColorPropertyIndex ) );
-  shadowRenderShaderConstraint.Apply();
+  mShadowColorPropertyIndex = mShadowPlane.RegisterProperty( SHADER_SHADOW_COLOR_PROPERTY_NAME, mCachedShadowColor );
 }
 
 } // namespace Internal

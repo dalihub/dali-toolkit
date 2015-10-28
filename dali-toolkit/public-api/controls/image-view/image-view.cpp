@@ -16,13 +16,14 @@
  */
 
 // CLASS HEADER
-
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
-
-// EXTERNAL INCLUDES
 
 namespace Dali
 {
@@ -61,19 +62,19 @@ ImageView ImageView::New( Image image )
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage( image );
-  return imageView;
+  return ImageView( imageView );
 }
 
 ImageView ImageView::New( const std::string& url )
 {
   ImageView imageView = Internal::ImageView::New();
-  imageView.SetProperty( ImageView::Property::RESOURCE_URL, Dali::Property::Value( url ) );
+  imageView.SetImage( url );
   return imageView;
 }
 
 ImageView ImageView::DownCast( BaseHandle handle )
 {
-  return Control::DownCast<ImageView, Internal::ImageView>(handle);
+  return Control::DownCast<ImageView, Internal::ImageView>( handle );
 }
 
 void ImageView::SetImage( Image image )
@@ -81,9 +82,14 @@ void ImageView::SetImage( Image image )
   Dali::Toolkit::GetImpl( *this ).SetImage( image );
 }
 
+void ImageView::SetImage( const std::string& url )
+{
+  Dali::Toolkit::GetImpl( *this ).SetImage( url );
+}
+
 Image ImageView::GetImage() const
 {
-  return Dali::Toolkit::GetImpl( *this ).GetImage();
+  return Image();
 }
 
 ImageView::ImageView( Internal::ImageView& implementation )

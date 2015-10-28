@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -49,6 +50,8 @@ class ImageView : public Control
    */
   virtual ~ImageView();
 
+
+
 public:
   /**
    * Create a new ImageView.
@@ -57,14 +60,22 @@ public:
   static Toolkit::ImageView New();
 
   /**
-   * @copydoc Dali::Toolkit::SetImage( Image image )
+   * @copydoc Dali::Toolkit::SetImage
    */
   void SetImage( Image image );
 
   /**
-   * @copydoc Dali::Toolkit::Image GetImage() const
+   * @brief Sets this ImageView from an Dali::Property::Map
+   *
+   * If the handle is empty, ImageView will display nothing
+   * @param[in] map The Dali::Property::Map to use for to display.
    */
-  Image GetImage() const;
+  void SetImage( Dali::Property::Map map );
+
+  /**
+   * @copydoc Dali::Toolkit::SetImage
+   */
+  void SetImage( const std::string& imageUrl );
 
   // Properties
   /**
@@ -86,14 +97,14 @@ public:
 private: // From Control
 
   /**
-   * @copydoc Toolkit::Control::OnRelayout()
-   */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
-
-  /**
    * @copydoc Toolkit::Control::OnStageConnect()
    */
   virtual void OnStageConnection( int depth );
+
+  /**
+   * @copydoc Toolkit::Control::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
@@ -119,13 +130,17 @@ private:
   void AttachImage();
 
 private:
+  // Undefined
+  ImageView( const ImageView& );
+  ImageView& operator=( const ImageView& );
 
-  Sampler mSampler;
-  Material mMaterial;
-  Geometry mMesh;
-  Renderer mRenderer;
-  Image mImage;
-  std::string mImageUrl;
+private:
+  Toolkit::ControlRenderer  mRenderer;
+  ImageDimensions  mImageSize;
+
+  std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
+  Image            mImage;        ///< the Image if the image came from a Image, null otherwise
+  Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
 };
 
 } // namespace Internal

@@ -104,7 +104,6 @@ struct EventData
     INACTIVE,
     INTERRUPTED,
     SELECTING,
-    SELECTION_CHANGED,
     EDITING,
     EDITING_WITH_POPUP,
     EDITING_WITH_GRAB_HANDLE,
@@ -174,9 +173,14 @@ struct ModifyEvent
 struct FontDefaults
 {
   FontDefaults()
-  : mDefaultPointSize(0.0f),
+  : mFontDescription(),
+    mFontStyle(),
+    mDefaultPointSize(0.0f),
     mFontId(0u)
   {
+    // Initially use the default platform font
+    TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+    fontClient.GetDefaultPlatformFontDescription( mFontDescription );
   }
 
   FontId GetFontId( TextAbstraction::FontClient& fontClient )
@@ -184,14 +188,14 @@ struct FontDefaults
     if( !mFontId )
     {
       Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
-      mFontId = fontClient.GetFontId( mDefaultFontFamily, mDefaultFontStyle, pointSize );
+      mFontId = fontClient.GetFontId( mFontDescription, pointSize );
     }
 
     return mFontId;
   }
 
-  std::string mDefaultFontFamily;
-  std::string mDefaultFontStyle;
+  TextAbstraction::FontDescription mFontDescription;
+  std::string mFontStyle;
   float mDefaultPointSize;
   FontId mFontId;
 };
@@ -207,13 +211,15 @@ struct Controller::Impl
     mFontClient(),
     mClipboard(),
     mView(),
+    mMetrics(),
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50 ),
-    mRecalculateNaturalSize( true )
+    mRecalculateNaturalSize( true ),
+    mUserDefinedFontFamily( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -222,6 +228,10 @@ struct Controller::Impl
     mClipboard = Clipboard::Get();
 
     mView.SetVisualModel( mVisualModel );
+
+    // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
+    mMetrics = Metrics::New( mFontClient );
+    mLayoutEngine.SetMetrics( mMetrics );
 
     // Set the text properties to default
     mVisualModel->SetUnderlineEnabled( false );
@@ -279,6 +289,14 @@ struct Controller::Impl
     return ( mEventData && mEventData->mIsShowingPlaceholderText );
   }
 
+  /**
+   * @brief Helper to check whether active place-holder text is available.
+   */
+  bool IsFocusedPlaceholderAvailable() const
+  {
+    return ( mEventData && !mEventData->mPlaceholderTextActive.empty() );
+  }
+
   bool IsShowingRealText() const
   {
     return ( !IsShowingPlaceholderText() &&
@@ -311,14 +329,17 @@ struct Controller::Impl
 
   void ResetImfManager()
   {
-    // Reset incase we are in a pre-edit state.
-    ImfManager imfManager = ImfManager::Get();
-    if ( imfManager )
+    if( mEventData )
     {
-      imfManager.Reset(); // Will trigger a commit message
-    }
+      // Reset incase we are in a pre-edit state.
+      ImfManager imfManager = ImfManager::Get();
+      if ( imfManager )
+      {
+        imfManager.Reset(); // Will trigger a commit message
+      }
 
-    ClearPreEditFlag();
+      ClearPreEditFlag();
+    }
   }
 
   bool IsClipboardEmpty()
@@ -368,7 +389,7 @@ struct Controller::Impl
 
   void GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString );
 
-  void RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd );
+  void RepositionSelectionHandles();
   void RepositionSelectionHandles( float visualX, float visualY );
 
   void SetPopupButtons();
@@ -416,18 +437,23 @@ struct Controller::Impl
   /**
    * @brief Updates the cursor position.
    *
-   * Retrieves the x,y position of the cursor logical position and sets it into the decorator.
+   * Sets the cursor's position into the decorator. It transforms the cursor's position into decorator's coords.
    * It sets the position of the secondary cursor if it's a valid one.
    * Sets which cursors are active.
+   *
+   * @param[in] cursorInfo Contains the selection handle position in Actor's coords.
+   *
    */
-  void UpdateCursorPosition();
+  void UpdateCursorPosition( const CursorInfo& cursorInfo );
 
   /**
-   * @brief Updates the position of the given selection handle.
+   * @brief Updates the position of the given selection handle. It transforms the handle's position into decorator's coords.
    *
    * @param[in] handleType One of the selection handles.
+   * @param[in] cursorInfo Contains the selection handle position in Actor's coords.
    */
-  void UpdateSelectionHandle( HandleType handleType );
+  void UpdateSelectionHandle( HandleType handleType,
+                              const CursorInfo& cursorInfo );
 
   /**
    * @biref Clamps the horizontal scrolling to get the control always filled with text.
@@ -460,7 +486,7 @@ struct Controller::Impl
    *
    * This method is called after deleting text.
    */
-  void ScrollTextToMatchCursor();
+  void ScrollTextToMatchCursor( const CursorInfo& cursorInfo);
 
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
@@ -468,15 +494,18 @@ struct Controller::Impl
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
   EventData* mEventData;                   ///< Avoid allocating everything for text input until EnableTextInput().
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
-  Clipboard mClipboard;                   ///< Handle to the system clipboard
+  Clipboard mClipboard;                    ///< Handle to the system clipboard
   View mView;                              ///< The view interface to the rendering back-end.
+  MetricsPtr mMetrics;                     ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
+
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
+  bool mUserDefinedFontFamily:1;           ///< Whether the Font family was set by the user instead of being left as sytem default.
 };
 
 } // namespace Text

@@ -22,7 +22,6 @@
 #include <cstring> // for strcmp
 #include <limits>
 #include <stack>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
@@ -34,11 +33,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 
 namespace Dali
 {
@@ -162,128 +164,7 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
-/**
- * Structure which holds information about the background of a control
- */
-struct Background
-{
-  Actor actor;   ///< Background actor
-  Vector4 color; ///< The color of the actor.
-
-  /**
-   * Constructor
-   */
-  Background()
-  : actor(),
-    color( Color::WHITE )
-  {
-  }
-};
-
-unsigned int gQuadIndex[6] = { 0, 2, 1, 1, 2, 3 };
-
-Vector2 gQuad[] = {
-                   Vector2( -0.5f, -0.5f ),
-                   Vector2(  0.5f, -0.5f ),
-                   Vector2( -0.5f,  0.5f ),
-                   Vector2(  0.5f,  0.5f )
-};
-
-
-const char* VERTEX_SHADER_COLOR = DALI_COMPOSE_SHADER(
-    attribute mediump vec2 aPosition;\n
-    uniform mediump mat4 uMvpMatrix;\n
-    void main()\n
-    {\n
-      gl_Position = uMvpMatrix * vec4( aPosition, 0.0, 1.0 );\n
-    }\n
-);
-
-const char* FRAGMENT_SHADER_COLOR = DALI_COMPOSE_SHADER(
-    uniform lowp vec4 uBackgroundColor;\n
-    uniform lowp vec4 uColor;\n
-    void main()\n
-    {\n
-      gl_FragColor = uBackgroundColor * uColor;\n
-    }\n
-);
-
-
-/**
- * @brief Create the background actor for the control.
- *
- * @param[in] actor The parent actor of the background
- * @param[in] color The background color
- * @param[in] image If a valid image is supplied this will be the texture used by the background
- *
- * @return An actor which will render the background
- *
- */
-Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image() )
-{
-  if( !image )
-  {
-    PropertyBuffer vertexBuffer;
-    Shader shader;
-    Material material;
-
-    Property::Map vertexFormat;
-    vertexFormat["aPosition"] = Property::VECTOR2;
-
-    //Create a vertex buffer for vertex positions
-    vertexBuffer = PropertyBuffer::New( vertexFormat, 4u );
-    vertexBuffer.SetData( gQuad );
-
-    shader = Shader::New( VERTEX_SHADER_COLOR, FRAGMENT_SHADER_COLOR );
-    material = Material::New( shader );
-
-    //Create the index buffer
-    Property::Map indexFormat;
-    indexFormat["indices"] = Property::INTEGER;
-    PropertyBuffer indexBuffer = PropertyBuffer::New( indexFormat, 6u );
-    indexBuffer.SetData(gQuadIndex);
-
-    //Create the geometry
-    Geometry mesh = Geometry::New();
-    mesh.AddVertexBuffer( vertexBuffer );
-    mesh.SetIndexBuffer( indexBuffer );
-
-    //Add uniforms to the shader
-    shader.RegisterProperty( "uBackgroundColor", color );
-
-    //Create the renderer
-    Renderer renderer = Renderer::New( mesh, material );
-    renderer.SetDepthIndex( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
-
-    //Create the actor
-    Actor meshActor = Actor::New();
-    meshActor.SetSize( Vector3::ONE );
-    meshActor.AddRenderer( renderer );
-    meshActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-    meshActor.SetColorMode( USE_PARENT_COLOR );
-
-    //Constraint scale of the mesh actor to the size of the control
-    Constraint constraint = Constraint::New<Vector3>( meshActor,
-                                                      Actor::Property::SCALE,
-                                                      EqualToConstraint() );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.Apply();
-
-    return meshActor;
-  }
-  else
-  {
-    ImageActor imageActor = ImageActor::New( image );
-    imageActor.SetColor( color );
-    imageActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-    imageActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-    imageActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    imageActor.SetSortModifier( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
-
-    return imageActor;
-  }
-
-}
+const char * const BACKGROUND_COLOR_NAME("color");
 
 } // unnamed namespace
 
@@ -298,7 +179,7 @@ public:
   Impl(Control& controlImpl)
 : mControlImpl( controlImpl ),
   mStyleName(""),
-  mBackground( NULL ),
+  mBackgroundRenderer(),
   mStartingPinchScale( NULL ),
   mKeyEventSignal(),
   mPinchGestureDetector(),
@@ -315,7 +196,6 @@ public:
   ~Impl()
   {
     // All gesture detectors will be destroyed so no need to disconnect.
-    delete mBackground;
     delete mStartingPinchScale;
   }
 
@@ -341,21 +221,6 @@ public:
     mControlImpl.OnLongPress(longPress);
   }
 
-  // Background Methods
-
-  /**
-   * Only creates an instance of the background if we actually use it.
-   * @return A reference to the Background structure.
-   */
-  Background& GetBackground()
-  {
-    if ( !mBackground )
-    {
-      mBackground = new Background;
-    }
-    return *mBackground;
-  }
-
   // Properties
 
   /**
@@ -379,25 +244,23 @@ public:
           controlImpl.SetStyleName( value.Get< std::string >() );
           break;
         }
-
-        case Toolkit::Control::Property::BACKGROUND_COLOR:
-        {
-          controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        case Toolkit::Control::Property::BACKGROUND:
         {
           Image image = Scripting::NewImage( value );
           if ( image )
           {
             controlImpl.SetBackgroundImage( image );
+            break;
           }
-          else
+          const Property::Map* map = value.GetMap();
+          if( map )
           {
-            // An empty map means the background is no longer required
-            controlImpl.ClearBackground();
+            controlImpl.SetBackground( *map );
+            break;
           }
+
+          // The background is neither a valid image nor a property map, so it is no longer required
+          controlImpl.ClearBackground();
           break;
         }
 
@@ -441,36 +304,12 @@ public:
           break;
         }
 
-        case Toolkit::Control::Property::BACKGROUND_COLOR:
-        {
-          value = controlImpl.GetBackgroundColor();
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
-
-          Background* back = controlImpl.mImpl->mBackground;
-          if ( back && back->actor )
+          if( controlImpl.mImpl->mBackgroundRenderer )
           {
-            if( back->actor.GetRendererCount() > 0 && back->actor.GetRendererAt(0).GetMaterial().GetNumberOfSamplers() > 0 )
-            {
-              Image image = back->actor.GetRendererAt(0).GetMaterial().GetSamplerAt(0).GetImage();
-              if ( image )
-              {
-                Scripting::CreatePropertyMap( image, map );
-              }
-            }
-            else
-            {
-              ImageActor imageActor = ImageActor::DownCast( back->actor );
-              if ( imageActor )
-              {
-                Image image = imageActor.GetImage();
-                Scripting::CreatePropertyMap( image, map );
-              }
-            }
+            (controlImpl.mImpl->mBackgroundRenderer).CreatePropertyMap( map );
           }
 
           value = map;
@@ -492,7 +331,7 @@ public:
 
   Control& mControlImpl;
   std::string mStyleName;
-  Background* mBackground;           ///< Only create the background if we use it
+  Toolkit::ControlRenderer mBackgroundRenderer;   ///< The control renderer to render the background
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
@@ -513,14 +352,12 @@ public:
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
   static PropertyRegistration PROPERTY_3;
-  static PropertyRegistration PROPERTY_4;
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "background-image", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",      Toolkit::Control::Property::STYLE_NAME,      Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "key-input-focus", Toolkit::Control::Property::KEY_INPUT_FOCUS, Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -564,78 +401,93 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  Background& background( mImpl->GetBackground() );
+  Actor self( Self() );
+  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
 
-  if ( background.actor )
+  if( mImpl->mBackgroundRenderer )
   {
-    if( background.actor.GetRendererCount() > 0 )
+    Toolkit::ControlRenderer currentRenderer( mImpl->mBackgroundRenderer );
+    // if ResetRenderer returns false, we continue to use the current renderer with a new color set to it.
+    if( ! factory.ResetRenderer( mImpl->mBackgroundRenderer, color ) )
     {
-      Shader shader = background.actor.GetRendererAt(0).GetMaterial().GetShader();
-      shader.SetProperty( shader.GetPropertyIndex("uBackgroundColor"), color );
+      return;
     }
-    else
-    {
-      background.actor.SetColor( color );
-    }
+    // ResetRenderer returns true, a new renderer is created. Remove the current renderer and reset.
+    currentRenderer.RemoveAndReset( self );
   }
   else
   {
-    // Create Mesh Actor
-    Actor actor = CreateBackground(Self(), color );
-    background.actor = actor;
-    mImpl->mAddRemoveBackgroundChild = true;
-    // The actor does not need to be inserted to guarantee order.
-    Self().Add( actor );
-    mImpl->mAddRemoveBackgroundChild = false;
+    mImpl->mBackgroundRenderer = factory.GetControlRenderer( color );
   }
 
-  background.color = color;
+  if( self.OnStage() )
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    mImpl->mBackgroundRenderer.SetOnStage( self );
+  }
 }
 
 Vector4 Control::GetBackgroundColor() const
 {
-  if ( mImpl->mBackground )
-  {
-    return mImpl->mBackground->color;
-  }
   return Color::TRANSPARENT;
+}
+
+void Control::SetBackground(const Property::Map& map)
+{
+  const Property::Value* colorValue = map.Find( BACKGROUND_COLOR_NAME );
+  Vector4 color;
+  if( colorValue && colorValue->Get(color))
+  {
+    SetBackgroundColor( color );
+    return;
+  }
+
+  Actor self( Self() );
+  mImpl->mBackgroundRenderer.RemoveAndReset( self );
+
+  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
+  mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
+
+  // mBackgroundRenderer might be empty, if an invalid map is provided, no background.
+  if( self.OnStage() && mImpl->mBackgroundRenderer)
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    mImpl->mBackgroundRenderer.SetOnStage( self );
+  }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
-  Background& background( mImpl->GetBackground() );
+  Actor self( Self() );
+  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
 
-   if ( background.actor )
-   {
-     // Remove Current actor, unset AFTER removal
-     mImpl->mAddRemoveBackgroundChild = true;
-     Self().Remove( background.actor );
-     mImpl->mAddRemoveBackgroundChild = false;
-     background.actor.Reset();
-   }
+  if(  mImpl->mBackgroundRenderer  )
+  {
+    Toolkit::ControlRenderer currentRenderer( mImpl->mBackgroundRenderer );
+    // if ResetRenderer returns false, we continue to use the current renderer with a new image set to it.
+    if( ! factory.ResetRenderer( mImpl->mBackgroundRenderer, image )  )
+    {
+      return;
+    }
+    // ResetRenderer returns true, a new renderer is created. Remove the current renderer and reset.
+    currentRenderer.RemoveAndReset( self );
+  }
+  else
+  {
+    mImpl->mBackgroundRenderer = factory.GetControlRenderer( image );
+  }
 
-   Actor actor = CreateBackground(Self(), background.color, image);
-
-   // Set the background actor before adding so that we do not inform derived classes
-   background.actor = actor;
-   mImpl->mAddRemoveBackgroundChild = true;
-   // The actor does not need to be inserted to guarantee order.
-   Self().Add( actor );
-   mImpl->mAddRemoveBackgroundChild = false;
+  if( self.OnStage() )
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    mImpl->mBackgroundRenderer.SetOnStage( self );
+  }
 }
 
 void Control::ClearBackground()
 {
-  if ( mImpl->mBackground )
-  {
-    Background& background( mImpl->GetBackground() );
-    mImpl->mAddRemoveBackgroundChild = true;
-    Self().Remove( background.actor );
-    mImpl->mAddRemoveBackgroundChild = false;
-
-    delete mImpl->mBackground;
-    mImpl->mBackground = NULL;
-  }
+  Actor self(Self());
+  mImpl->mBackgroundRenderer.RemoveAndReset( self );
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -958,40 +810,21 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  unsigned int controlRendererCount = Self().GetRendererCount();
-  for( unsigned int i(0); i<controlRendererCount; ++i )
+  if( mImpl->mBackgroundRenderer)
   {
-    Renderer controlRenderer = Self().GetRendererAt(i);
-    if( controlRenderer )
-    {
-      controlRenderer.SetDepthIndex( CONTENT_DEPTH_INDEX+depth );
-    }
-  }
-
-  if( mImpl->mBackground )
-  {
-    if(mImpl->mBackground->actor.GetRendererCount() > 0 )
-    {
-      Renderer backgroundRenderer = mImpl->mBackground->actor.GetRendererAt( 0 );
-      if(backgroundRenderer)
-      {
-        backgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX+depth );
-      }
-    }
-    else
-    {
-
-      ImageActor imageActor = ImageActor::DownCast( mImpl->mBackground->actor );
-      if ( imageActor )
-      {
-        imageActor.SetSortModifier( BACKGROUND_DEPTH_INDEX+depth );
-      }
-    }
+    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    Actor self(Self());
+    mImpl->mBackgroundRenderer.SetOnStage( self );
   }
 }
 
 void Control::OnStageDisconnection()
 {
+  if( mImpl->mBackgroundRenderer)
+  {
+    Actor self(Self());
+    mImpl->mBackgroundRenderer.SetOffStage( self );
+  }
 }
 
 void Control::OnKeyInputFocusGained()
@@ -1072,30 +905,13 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  //Control's natural size is the size of its background image if it has been set, or ZERO otherwise
-  Vector3 naturalSize = Vector3::ZERO;
-  if( mImpl->mBackground )
+  if( mImpl->mBackgroundRenderer )
   {
-    if( mImpl->mBackground->actor.GetRendererCount() > 0 )
-    {
-      Material backgroundMaterial = mImpl->mBackground->actor.GetRendererAt(0).GetMaterial();
-      if( backgroundMaterial.GetNumberOfSamplers() > 0 )
-      {
-        Image backgroundImage =  backgroundMaterial.GetSamplerAt(0).GetImage();
-        if( backgroundImage )
-        {
-          naturalSize.x = backgroundImage.GetWidth();
-          naturalSize.y = backgroundImage.GetHeight();
-        }
-      }
-    }
-    else
-    {
-      return mImpl->mBackground->actor.GetNaturalSize();
-    }
+    Vector2 naturalSize;
+    mImpl->mBackgroundRenderer.GetNaturalSize(naturalSize);
+    return Vector3(naturalSize);
   }
-
-  return naturalSize;
+  return Vector3::ZERO;
 }
 
 float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
@@ -1105,27 +921,11 @@ float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dim
 
 float Control::GetHeightForWidth( float width )
 {
-  if( mImpl->mBackground )
-  {
-    Actor actor = mImpl->mBackground->actor;
-    if( actor )
-    {
-      return actor.GetHeightForWidth( width );
-    }
-  }
   return GetHeightForWidthBase( width );
 }
 
 float Control::GetWidthForHeight( float height )
 {
-  if( mImpl->mBackground )
-  {
-    Actor actor = mImpl->mBackground->actor;
-    if( actor )
-    {
-      return actor.GetWidthForHeight( height );
-    }
-  }
   return GetWidthForHeightBase( height );
 }
 

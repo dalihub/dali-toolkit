@@ -139,6 +139,7 @@ private:
   Property::Index              mIndexInvertedMovementArea; ///< Index of the property mapping to uniform 'uInvertedMovementArea'
 
   unsigned int mNumBubble;  ///< How many groups of uniforms are used to control the bubble movement.
+  unsigned int mRandomSeed; ///< Seed to generate random number.
 };
 
 } // namespace Internal

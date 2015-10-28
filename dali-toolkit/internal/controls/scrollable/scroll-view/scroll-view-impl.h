@@ -900,8 +900,7 @@ private:
 
   Toolkit::ScrollView::SnapStartedSignalType mSnapStartedSignal;
 
-  bool mInAccessibilityPan : 1;           ///< With AccessibilityPan its easier to move between snap positions
-  bool mInitialized:1;
+  bool mInAccessibilityPan:1;             ///< With AccessibilityPan its easier to move between snap positions
   bool mScrolling:1;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
   bool mScrollInterrupted:1;              ///< Flag set for when a down event interrupts a scroll
   bool mPanning:1;                        ///< Whether scroll view is currently panning or not

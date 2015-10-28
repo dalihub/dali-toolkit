@@ -105,7 +105,6 @@ struct LayoutEngine::Impl
     mCursorWidth( CURSOR_WIDTH ),
     mEllipsisEnabled( false )
   {
-    mFontClient = TextAbstraction::FontClient::Get();
   }
 
   /**
@@ -117,7 +116,7 @@ struct LayoutEngine::Impl
   void UpdateLineHeight( FontId fontId, LineLayout& lineLayout )
   {
     Text::FontMetrics fontMetrics;
-    mFontClient.GetFontMetrics( fontId, fontMetrics );
+    mMetrics->GetFontMetrics( fontId, fontMetrics );
 
     // Sets the maximum ascender.
     if( fontMetrics.ascender > lineLayout.ascender )
@@ -452,7 +451,6 @@ struct LayoutEngine::Impl
 
     const GlyphInfo& glyph = *glyphsBuffer;
     float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-    penX += mCursorWidth; // Added to give some space to the cursor.
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -634,7 +632,7 @@ struct LayoutEngine::Impl
           const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
 
           Text::FontMetrics fontMetrics;
-          mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
+          mMetrics->GetFontMetrics( glyphInfo.fontId, fontMetrics );
 
           LineRun lineRun;
           lineRun.glyphRun.glyphIndex = 0u;
@@ -673,7 +671,6 @@ struct LayoutEngine::Impl
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
       float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-      penX += mCursorWidth; // Added to give some space to the cursor.
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
@@ -821,7 +818,7 @@ struct LayoutEngine::Impl
   LayoutEngine::VerticalAlignment mVerticalAlignment;
   float mCursorWidth;
 
-  TextAbstraction::FontClient mFontClient;
+  IntrusivePtr<Metrics> mMetrics;
 
   bool mEllipsisEnabled:1;
 };
@@ -835,6 +832,11 @@ LayoutEngine::LayoutEngine()
 LayoutEngine::~LayoutEngine()
 {
   delete mImpl;
+}
+
+void LayoutEngine::SetMetrics( MetricsPtr& metrics )
+{
+  mImpl->mMetrics = metrics;
 }
 
 void LayoutEngine::SetLayout( Layout layout )

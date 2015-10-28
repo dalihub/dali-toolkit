@@ -221,6 +221,11 @@ public:
       actor.SetParentOrigin( ParentOrigin::CENTER );
       actor.SetAnchorPoint( AnchorPoint::CENTER );
 
+      ImageActor backPageActor = CreateSolidColorImageActor(mApplication, Color::BLUE,IMAGE_WIDTH,IMAGE_HEIGHT);
+      backPageActor.SetParentOrigin( ParentOrigin::CENTER );
+      backPageActor.SetAnchorPoint( AnchorPoint::CENTER );
+      actor.Add( backPageActor );
+
       mSourceActors[pageId] = actor;
     }
 
@@ -274,7 +279,7 @@ int UtcDaliPageTurnPortraitViewNew(void)
   registry.ObjectCreatedSignal().Connect( &TestCallback );
   {
     TestPageFactory factory(application);
-    PageTurnView PortraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
+    PageTurnView portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
 
@@ -287,6 +292,7 @@ int UtcDaliPageTurnPortraitViewNew(void)
   handleView = portraitView;
   PageTurnView downCastView = PageTurnView::DownCast( handleView );
   DALI_TEST_CHECK( downCastView );
+
   END_TEST;
 }
 
@@ -325,6 +331,74 @@ int UtcDaliPageTurnLandscapeViewNew(void)
   Handle handleView;
   handleView = landscapeView;
   PageTurnView downCastView = PageTurnView::DownCast( handleView );
+  DALI_TEST_CHECK( downCastView );
+
+  END_TEST;
+}
+
+int UtcDaliPageTurnPortraitViewCopyConstructorAndAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliPageTurnPortraitViewCopyConstructorAndAssignment ");
+
+  // Test default constructor
+  PageTurnPortraitView portraitView;
+  DALI_TEST_CHECK( !portraitView );
+
+  // Test object creation
+  TestPageFactory factory(application);
+  portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
+  DALI_TEST_CHECK( portraitView );
+
+  // Test copy constructor
+  PageTurnPortraitView viewCopy( portraitView );
+  DALI_TEST_CHECK( viewCopy );
+
+  // Test assignment
+  PageTurnPortraitView portraitView2;
+  portraitView2 = portraitView;
+  DALI_TEST_CHECK( portraitView2 );
+  DALI_TEST_CHECK( portraitView == portraitView2);
+
+  // Test down cast
+  Handle handleView;
+  handleView = portraitView;
+  PageTurnPortraitView downCastView = PageTurnPortraitView::DownCast( handleView );
+  DALI_TEST_CHECK( downCastView );
+
+  END_TEST;
+}
+
+int UtcDaliPageTurnLandscapeViewCopyConstructorAndAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliPageTurnLandscapeViewCopyConstructorAndAssignment ");
+
+  // Test default constructor
+  PageTurnLandscapeView landscapeView;
+  DALI_TEST_CHECK( !landscapeView );
+
+  // Test object creation
+  TestPageFactory factory(application);
+  landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
+  DALI_TEST_CHECK( landscapeView );
+
+  // Test copy constructor
+  PageTurnLandscapeView viewCopy( landscapeView );
+  DALI_TEST_CHECK( viewCopy );
+
+  // Test assignment
+  PageTurnLandscapeView landscapeView2;
+  landscapeView2 = landscapeView;
+  DALI_TEST_CHECK( landscapeView2 );
+  DALI_TEST_CHECK( landscapeView == landscapeView2);
+
+  // Test down cast
+  Handle handleView;
+  handleView = landscapeView;
+  PageTurnLandscapeView downCastView = PageTurnLandscapeView::DownCast( handleView );
   DALI_TEST_CHECK( downCastView );
 
   END_TEST;
@@ -379,11 +453,11 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   END_TEST;
 }
 
-int UtcDaliPageTurnViewSignals(void)
+int UtcDaliPageTurnPortraitViewSignals(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliPageTurnViewSignals ");
+  tet_infoline(" UtcDaliPageTurnPortraitViewSignals ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
@@ -443,7 +517,7 @@ int UtcDaliPageTurnViewSignals(void)
 
   Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
-  // the page is turn over
+  // the page is turned over
   DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex+1, TEST_LOCATION );
 
   //---Test 2: pan from position( size*0.5f ) to position( size.width, size.height*0.5f ) to position( size * 0.75f ), page 1 will bent then slid back---
@@ -500,5 +574,136 @@ int UtcDaliPageTurnViewSignals(void)
 
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 9, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPageTurnLanscapeViewSignals(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliPageTurnLanscapeViewSignals ");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
+
+  /***
+   * -----------------
+   * |               |
+   * |---------------|
+   * |bookboo|bookboo|
+   * |kbookbo|kbookbo|
+   * |okbookb|okbookb|
+   * |ookbook|ookbook|
+   * |bookboo|bookboo|
+   * |---------------|
+   * |               |
+   * ----------------
+   */
+
+  TestPageFactory factory(application);
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  PageTurnView landscapeView = PageTurnLandscapeView::New( factory, Vector2(stageSize.x*0.5f, stageSize.x*0.8f) );
+  landscapeView.SetPositionInheritanceMode( USE_PARENT_POSITION );;
+  Stage::GetCurrent().Add( landscapeView );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+
+  // [0]: testing PageTurnStartedSignal;  [1]: testing PageTurnFinishedSignal
+  // [2]: testing PagePanStartedSignal;   [3]: testing PagePanFinishedSignal
+  bool signalVerified[4] = {false, false, false, false};
+  PageTurnView currentView;
+  unsigned int pageIndex;
+  bool isTurningForwards;
+
+  PageSignalCallback callbackTurnStarted( signalVerified[0], currentView, pageIndex, isTurningForwards );
+  landscapeView.PageTurnStartedSignal().Connect( &callbackTurnStarted, &PageSignalCallback::PageTurnSignalCallback );
+
+  PageSignalCallback callbackTurnFinished( signalVerified[1], currentView, pageIndex, isTurningForwards );
+  landscapeView.PageTurnFinishedSignal().Connect( &callbackTurnFinished, &PageSignalCallback::PageTurnSignalCallback );
+
+  PageSignalCallback callbackPanStarted( signalVerified[2], currentView, pageIndex, isTurningForwards );
+  landscapeView.PagePanStartedSignal().Connect( &callbackPanStarted, &PageSignalCallback::PagePanSignalCallback );
+
+  PageSignalCallback callbackPanFinished( signalVerified[3], currentView, pageIndex, isTurningForwards );
+  landscapeView.PagePanFinishedSignal().Connect( &callbackPanFinished, &PageSignalCallback::PagePanSignalCallback );
+
+  DALI_TEST_CHECK( !callbackTurnStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_CHECK( !callbackPanStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
+
+  currentView = landscapeView;
+
+  //-----Test 1: pan 10 frames from position(stageSize.x * 0.85f, stageSize.y*0.5) to position(stageSize.x * 0.45f, stageSize.y*0.5-stageSize.x * 0.3f), page 0 will be turned forward----
+  pageIndex = 0;
+  isTurningForwards = true;
+  // Do a pan to the left.
+  Vector2 start = Vector2(stageSize.x * 0.85f, stageSize.y*0.5);
+  Vector2 direction = Vector2(-stageSize.x*0.04f, -stageSize.x*0.03f);
+
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
+  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
+
+  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, false, true);
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
+
+  Wait(application, 1000);
+  DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
+  // the page is turned over
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex+1, TEST_LOCATION );
+
+  //---Test 2: pan from position(stageSize.x * 0.15f, stageSize.y*0.5) to position(stageSize.x * 0.45f, stageSize.y*0.5) page 4 will be turned back---
+  callbackTurnStarted.Reset();
+  callbackTurnFinished.Reset();
+  callbackPanStarted.Reset();
+  callbackPanFinished.Reset();
+  isTurningForwards = false;
+
+  //pan 10 frames from position( size.width, size.height*0.5f ) to position( size * 0.75f )
+  start = Vector2( stageSize.x * 0.15f, stageSize.y*0.5f );
+  direction = Vector2(stageSize.x * 0.03f, 0.f);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
+  DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
+
+  PerformGestureDiagonalSwipe( application, start + direction*5.f , direction, 5, false, true);
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
+
+  Wait(application, 1000);
+  DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION ); // the first page is turned back
+
+  // ----Test 3: pan 10 frames from position( size*0.55f ) to position( size.width*0.8f, size.height*0.5f ), no page turn will be started---
+  callbackTurnStarted.Reset();
+  callbackTurnFinished.Reset();
+  callbackPanStarted.Reset();
+  callbackPanFinished.Reset();
+  isTurningForwards = false;
+  start = stageSize*0.55f;
+  direction = Vector2(stageSize.x*0.025f, 0.f);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackTurnStarted.mSignalVerified );
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
+
+  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, false, true);
+  DALI_TEST_CHECK( !callbackTurnStarted.mSignalVerified );
+  DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+
+  Wait( application, 1000 );
+
+  DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
   END_TEST;
 }

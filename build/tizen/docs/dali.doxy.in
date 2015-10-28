@@ -758,9 +758,12 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @DOXYGEN_DOCS_DIR@/content \
+                         @prefix@/include/dali/doc/dali-core-doc.h \
+                         @prefix@/include/dali/doc/dali-adaptor-doc.h \
+                         ../../../../dali-toolkit/doc/dali-toolkit-doc.h \
+                         @prefix@/include/dali/public-api \
                          ../../../../dali-toolkit/dali-toolkit/public-api \
-                         ../../../automated-tests/README.md \
-                         @prefix@/include/dali
+                         ../../../automated-tests/README.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

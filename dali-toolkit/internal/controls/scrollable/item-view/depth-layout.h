@@ -214,6 +214,14 @@ protected:
 
 private:
 
+  // Undefined
+  DepthLayout( const DepthLayout& depthLayout );
+
+  // Undefined
+  DepthLayout& operator=( const DepthLayout& depthLayout );
+
+private:
+
   struct Impl;
   Impl* mImpl;
 };

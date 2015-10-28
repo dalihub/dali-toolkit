@@ -36,7 +36,9 @@ class Model3dView;
  *
  * All the geometry loaded with the control is automatically centered and scaled to fit
  * the size of all the other controls. So the max is (0.5,0.5) and the min is (-0.5,-0.5)
-*/
+ *
+ * @since DALi 1.1.4
+ */
 class DALI_IMPORT_API Model3dView : public Control
 {
 public:

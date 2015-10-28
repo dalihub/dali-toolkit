@@ -23,12 +23,15 @@
 
 namespace Dali
 {
-
 /**
  * @brief DALi Toolkit namespace.
  */
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls
+ * @{
+ */
 
 /**
  * @brief Control Orientation namespace.
@@ -65,6 +68,9 @@ DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
  */
 DALI_IMPORT_API bool IsHorizontal(ControlOrientation::Type orientation);
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

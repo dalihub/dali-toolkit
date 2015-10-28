@@ -51,22 +51,7 @@ console.log( field.text );
 
 ### Font Selection
 
-TextField will automatically select a suitable fonts, in the same was as TextLabel.
-The preferred font can also be selected from a JSON stylesheet:
-
-~~~{.json}
-{
-  "styles":
-  {
-    "textfield":
-    {
-      "font-family":"Arial",
-      "font-style":"Regular",
-      "point-size":8
-    }
-  }
-}
-~~~
+By default TextField will automatically select a suitable font from the platform. However, a different font could be selected. See the [Font Selection](@ref font-selection) section for more details.
 
 ### Text Alignment
 

@@ -26,6 +26,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_item_view
+ * @{
+ */
 
 /**
  * @brief ItemFactory is for providing actors to ItemView.
@@ -77,6 +81,9 @@ public:
   }
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

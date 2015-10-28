@@ -33,7 +33,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 /**
@@ -58,8 +58,6 @@ struct GlyphMetrics
   float xBearing;   ///< The x bearing of the first glyph.
 };
 
-const std::string EMPTY_STRING("");
-
 } // namespace
 
 namespace Dali
@@ -78,20 +76,20 @@ namespace Text
  * @param[in] numberOfGlyphs The number of glyphs.
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
  * @param[in] visualModel The visual model.
- * @param[in] fontClient The font client.
+ * @param[in] metrics Used to access metrics from FontClient.
  */
 void GetGlyphsMetrics( GlyphIndex glyphIndex,
                        Length numberOfGlyphs,
                        GlyphMetrics& glyphMetrics,
-                       VisualModelPtr visualModel,
-                       TextAbstraction::FontClient& fontClient )
+                       VisualModelPtr& visualModel,
+                       MetricsPtr& metrics )
 {
   const GlyphInfo* glyphsBuffer = visualModel->mGlyphs.Begin();
 
   const GlyphInfo& firstGlyph = *( glyphsBuffer + glyphIndex );
 
   Text::FontMetrics fontMetrics;
-  fontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
+  metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
 
   glyphMetrics.fontHeight = fontMetrics.height;
   glyphMetrics.advance = firstGlyph.advance;
@@ -202,62 +200,81 @@ bool Controller::Impl::ProcessInputEvents()
   if( mEventData->mUpdateCursorPosition )
   {
     // Updates the cursor position and scrolls the text to make it visible.
-
-    UpdateCursorPosition();
+    CursorInfo cursorInfo;
+    GetCursorPosition( mEventData->mPrimaryCursorPosition,
+                       cursorInfo );
 
     if( mEventData->mScrollAfterUpdatePosition )
     {
-      const Vector2& primaryCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
-
-      ScrollToMakePositionVisible( primaryCursorPosition );
+      ScrollToMakePositionVisible( cursorInfo.primaryPosition );
       mEventData->mScrollAfterUpdatePosition = false;
     }
+    else if( mEventData->mScrollAfterDelete )
+    {
+      ScrollTextToMatchCursor( cursorInfo );
+      mEventData->mScrollAfterDelete = false;
+    }
+
+    UpdateCursorPosition( cursorInfo );
 
     mEventData->mDecoratorUpdated = true;
     mEventData->mUpdateCursorPosition = false;
-  }
-  else if( mEventData->mScrollAfterDelete )
-  {
-    ScrollTextToMatchCursor();
-    mEventData->mDecoratorUpdated = true;
-    mEventData->mScrollAfterDelete = false;
   }
   else
   {
     bool leftScroll = false;
     bool rightScroll = false;
 
+    CursorInfo leftHandleInfo;
+    CursorInfo rightHandleInfo;
+
     if( mEventData->mUpdateLeftSelectionPosition )
     {
-      UpdateSelectionHandle( LEFT_SELECTION_HANDLE );
+      GetCursorPosition( mEventData->mLeftSelectionPosition,
+                         leftHandleInfo );
 
       if( mEventData->mScrollAfterUpdatePosition )
       {
-        const Vector2& leftHandlePosition = mEventData->mDecorator->GetPosition( LEFT_SELECTION_HANDLE );
-
-        ScrollToMakePositionVisible( leftHandlePosition );
+        ScrollToMakePositionVisible( leftHandleInfo.primaryPosition );
         leftScroll = true;
       }
-
-      SetPopupButtons();
-      mEventData->mDecoratorUpdated = true;
-      mEventData->mUpdateLeftSelectionPosition = false;
     }
 
     if( mEventData->mUpdateRightSelectionPosition )
     {
-      UpdateSelectionHandle( RIGHT_SELECTION_HANDLE );
+      GetCursorPosition( mEventData->mRightSelectionPosition,
+                         rightHandleInfo );
 
       if( mEventData->mScrollAfterUpdatePosition )
       {
-        const Vector2& rightHandlePosition = mEventData->mDecorator->GetPosition( RIGHT_SELECTION_HANDLE );
-
-        ScrollToMakePositionVisible( rightHandlePosition );
+        ScrollToMakePositionVisible( rightHandleInfo.primaryPosition );
         rightScroll = true;
       }
+    }
+
+    if( mEventData->mUpdateLeftSelectionPosition )
+    {
+      UpdateSelectionHandle( LEFT_SELECTION_HANDLE,
+                             leftHandleInfo );
 
       SetPopupButtons();
       mEventData->mDecoratorUpdated = true;
+    }
+
+    if( mEventData->mUpdateRightSelectionPosition )
+    {
+      UpdateSelectionHandle( RIGHT_SELECTION_HANDLE,
+                             rightHandleInfo );
+
+      SetPopupButtons();
+      mEventData->mDecoratorUpdated = true;
+    }
+
+    if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
+    {
+      RepositionSelectionHandles();
+
+      mEventData->mUpdateLeftSelectionPosition = false;
       mEventData->mUpdateRightSelectionPosition = false;
     }
 
@@ -279,6 +296,8 @@ bool Controller::Impl::ProcessInputEvents()
 
 void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::UpdateModel\n" );
+
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mOperationsPending & operationsRequired );
 
@@ -423,7 +442,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   if( GET_GLYPH_METRICS & operations )
   {
     GlyphInfo* glyphsBuffer = glyphs.Begin();
-    mFontClient.GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
+    mMetrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
 
     // Update the width and advance of all new paragraph characters.
     for( Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it )
@@ -463,6 +482,7 @@ void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfC
 {
   if( mFontDefaults )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::GetDefaultFonts font family(%s)\n", mFontDefaults->mFontDescription.family.c_str() );
     FontRun fontRun;
     fontRun.characterRun.characterIndex = 0;
     fontRun.characterRun.numberOfCharacters = numberOfCharacters;
@@ -478,8 +498,8 @@ float Controller::Impl::GetDefaultFontLineHeight()
   FontId defaultFontId = 0u;
   if( NULL == mFontDefaults )
   {
-    defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                           EMPTY_STRING );
+    TextAbstraction::FontDescription fontDescription;
+    defaultFontId = mFontClient.GetFontId( fontDescription );
   }
   else
   {
@@ -487,7 +507,7 @@ float Controller::Impl::GetDefaultFontLineHeight()
   }
 
   Text::FontMetrics fontMetrics;
-  mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+  mMetrics->GetFontMetrics( defaultFontId, fontMetrics );
 
   return( fontMetrics.ascender - fontMetrics.descender );
 }
@@ -645,9 +665,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       {
         mEventData->mLeftSelectionPosition = handleNewPosition;
 
-        RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                    mEventData->mRightSelectionPosition );
-
         mEventData->mUpdateLeftSelectionPosition = true;
       }
     }
@@ -659,9 +676,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
           ( handleNewPosition != mEventData->mLeftSelectionPosition ) )
       {
         mEventData->mRightSelectionPosition = handleNewPosition;
-
-        RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                    mEventData->mRightSelectionPosition );
 
         mEventData->mUpdateRightSelectionPosition = true;
       }
@@ -704,9 +718,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
         if( mEventData->mUpdateLeftSelectionPosition )
         {
           mEventData->mLeftSelectionPosition = handlePosition;
-
-          RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                      mEventData->mRightSelectionPosition );
         }
       }
     }
@@ -721,8 +732,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
         if( mEventData->mUpdateRightSelectionPosition )
         {
           mEventData->mRightSelectionPosition = handlePosition;
-          RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                      mEventData->mRightSelectionPosition );
         }
       }
     }
@@ -810,8 +819,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
       {
-        RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                    mEventData->mRightSelectionPosition );
+        RepositionSelectionHandles();
 
         mEventData->mScrollAfterUpdatePosition = true;
       }
@@ -834,17 +842,14 @@ void Controller::Impl::OnSelectEvent( const Event& event )
     const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
     const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
-    const CharacterIndex leftPosition = mEventData->mLeftSelectionPosition;
-    const CharacterIndex rightPosition = mEventData->mRightSelectionPosition;
-
+    // Calculates the logical position from the x,y coords.
     RepositionSelectionHandles( xPosition,
                                 yPosition );
 
-    mEventData->mUpdateLeftSelectionPosition = leftPosition != mEventData->mLeftSelectionPosition;
-    mEventData->mUpdateRightSelectionPosition = rightPosition != mEventData->mRightSelectionPosition;
+    mEventData->mUpdateLeftSelectionPosition = true;
+    mEventData->mUpdateRightSelectionPosition = true;
 
-    mEventData->mScrollAfterUpdatePosition = ( ( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition ) &&
-                                               ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition ) );
+    mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
 }
 
@@ -858,8 +863,8 @@ void Controller::Impl::OnSelectAllEvent()
 
   if( mEventData->mSelectionEnabled )
   {
-    RepositionSelectionHandles( 0u,
-                                mLogicalModel->mText.Count() );
+    mEventData->mLeftSelectionPosition = 0u;
+    mEventData->mRightSelectionPosition = mLogicalModel->mText.Count();
 
     mEventData->mScrollAfterUpdatePosition = true;
     mEventData->mUpdateLeftSelectionPosition = true;
@@ -876,12 +881,14 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
     return;
   }
 
+  const bool handlesCrossed = mEventData->mLeftSelectionPosition > mEventData->mRightSelectionPosition;
+
   //Get start and end position of selection
-  uint32_t startOfSelectedText = mEventData->mLeftSelectionPosition;
-  uint32_t lengthOfSelectedText =  mEventData->mRightSelectionPosition - startOfSelectedText;
+  uint32_t startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+  uint32_t lengthOfSelectedText =  ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
   // Validate the start and end selection points
-  if( ( startOfSelectedText >= 0 ) && (  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() ) )
+  if(  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() )
   {
     //Get text as a UTF8 string
     Vector<Character>& utf32Characters = mLogicalModel->mText;
@@ -896,9 +903,15 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       Vector<Character>::Iterator first = currentText.Begin() + startOfSelectedText;
       Vector<Character>::Iterator last  = first + lengthOfSelectedText;
       currentText.Erase( first, last );
+
+      // Scroll after delete.
+      mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+      mEventData->mScrollAfterDelete = true;
     }
-    mEventData->mPrimaryCursorPosition = mEventData->mLeftSelectionPosition;
-    mEventData->mScrollAfterDelete = true;
+    // Udpade the cursor position and the decorator.
+    // Scroll after the position is updated if is not scrolling after delete.
+    mEventData->mUpdateCursorPosition = true;
+    mEventData->mScrollAfterUpdatePosition = !mEventData->mScrollAfterDelete;
     mEventData->mDecoratorUpdated = true;
   }
 }
@@ -941,8 +954,11 @@ void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string
   }
 }
 
-void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd )
+void Controller::Impl::RepositionSelectionHandles()
 {
+  CharacterIndex selectionStart = mEventData->mLeftSelectionPosition;
+  CharacterIndex selectionEnd = mEventData->mRightSelectionPosition;
+
   if( selectionStart == selectionEnd )
   {
     // Nothing to select if handles are in the same place.
@@ -950,9 +966,6 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   }
 
   mEventData->mDecorator->ClearHighlights();
-
-  mEventData->mLeftSelectionPosition = selectionStart;
-  mEventData->mRightSelectionPosition = selectionEnd;
 
   const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
@@ -970,8 +983,16 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   const LineRun& firstLine = *lines.Begin();
   const float height = firstLine.ascender + -firstLine.descender;
 
+  const bool isLastCharacter = selectionEnd >= mLogicalModel->mText.Count();
+  const bool startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
+  const bool endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
+
   // Swap the indices if the start is greater than the end.
-  const bool indicesSwapped = ( selectionStart > selectionEnd );
+  const bool indicesSwapped = selectionStart > selectionEnd;
+
+  // Tell the decorator to flip the selection handles if needed.
+  mEventData->mDecorator->SetSelectionHandleFlipState( indicesSwapped, startDirection, endDirection );
+
   if( indicesSwapped )
   {
     std::swap( selectionStart, selectionEnd );
@@ -990,9 +1011,6 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   // Check if the last glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
   const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
   bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
-
-  // Tell the decorator to swap the selection handles if needed.
-  mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
@@ -1078,7 +1096,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
 
   // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
-  mEventData->mPrimaryCursorPosition = (indicesSwapped)?mEventData->mLeftSelectionPosition:mEventData->mRightSelectionPosition;
+  mEventData->mPrimaryCursorPosition = ( indicesSwapped ) ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
 
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
@@ -1120,7 +1138,8 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
     return;
   }
 
-  RepositionSelectionHandles( selectionStart, selectionEnd );
+  mEventData->mLeftSelectionPosition = selectionStart;
+  mEventData->mRightSelectionPosition = selectionEnd;
 }
 
 void Controller::Impl::SetPopupButtons()
@@ -1135,7 +1154,7 @@ void Controller::Impl::SetPopupButtons()
 
   TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::NONE;
 
-  if ( ( EventData::SELECTING == mEventData->mState ) || ( EventData::SELECTION_CHANGED == mEventData->mState ) )
+  if( EventData::SELECTING == mEventData->mState )
   {
     buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
 
@@ -1209,16 +1228,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
       if( mEventData->mGrabHandlePopupEnabled )
       {
         SetPopupButtons();
-        mEventData->mDecorator->SetPopupActive( true );
-      }
-      mEventData->mDecoratorUpdated = true;
-    }
-    else if ( EventData::SELECTION_CHANGED  == mEventData->mState )
-    {
-      if( mEventData->mGrabHandlePopupEnabled )
-      {
-        SetPopupButtons();
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
@@ -1429,7 +1438,6 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   // Get the glyphs per character table.
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
-  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
 
   // If the vector is void, there is no right to left characters.
   const bool hasRightToLeftCharacters = NULL != visualToLogicalBuffer;
@@ -1443,6 +1451,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   // Traverses glyphs in visual order. To do that use the visual to logical conversion table.
   CharacterIndex visualIndex = startCharacter;
+  Length numberOfCharacters = 0u;
   for( ; !matched && ( visualIndex < endCharacter ); ++visualIndex )
   {
     // The character in logical order.
@@ -1451,43 +1460,58 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     // Get the script of the character.
     const Script script = mLogicalModel->GetScript( characterLogicalOrderIndex );
 
-    // The first glyph for that character in logical order.
-    const GlyphIndex glyphLogicalOrderIndex = *( charactersToGlyphBuffer + characterLogicalOrderIndex );
     // The number of glyphs for that character
     const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterLogicalOrderIndex );
+    ++numberOfCharacters;
 
-    // Get the metrics for the group of glyphs.
-    GlyphMetrics glyphMetrics;
-    GetGlyphsMetrics( glyphLogicalOrderIndex,
-                      numberOfGlyphs,
-                      glyphMetrics,
-                      mVisualModel,
-                      mFontClient );
 
-    const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
-
-    // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ...
-    const Length numberOfCharactersInLigature = HasLigatureMustBreak( script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
-    const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfCharactersInLigature );
-
-    for( GlyphIndex index = 0u; !matched && ( index < numberOfCharactersInLigature ); ++index )
+    if( 0u != numberOfGlyphs )
     {
-      // Find the mid-point of the area containing the glyph
-      const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
+      // Get the first character/glyph of the group of glyphs.
+      const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfCharacters;
+      const CharacterIndex firstLogicalCharacterIndex = hasRightToLeftCharacters ? *( visualToLogicalBuffer + firstVisualCharacterIndex ) : firstVisualCharacterIndex;
+      const GlyphIndex firstLogicalGlyphIndex = *( charactersToGlyphBuffer + firstLogicalCharacterIndex );
 
-      if( visualX < glyphCenter )
+      // Get the metrics for the group of glyphs.
+      GlyphMetrics glyphMetrics;
+      GetGlyphsMetrics( firstLogicalGlyphIndex,
+                        numberOfGlyphs,
+                        glyphMetrics,
+                        mVisualModel,
+                        mMetrics );
+
+      // Get the position of the first glyph.
+      const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
+
+      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ. 
+      const bool isInterglyphIndex = ( numberOfCharacters > numberOfGlyphs ) && HasLigatureMustBreak( script );
+      const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
+      const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
+
+      GlyphIndex index = 0u;
+      for( ; !matched && ( index < numberOfBlocks ); ++index )
       {
-        visualIndex += index;
-        matched = true;
+        // Find the mid-point of the area containing the glyph
+        const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
+
+        if( visualX < glyphCenter )
+        {
+          matched = true;
+          break;
+        }
+      }
+
+      if( matched )
+      {
+        visualIndex = firstVisualCharacterIndex + index;
         break;
       }
+
+      numberOfCharacters = 0u;
     }
 
-    if( matched )
-    {
-      break;
-    }
   }
+
 
   // Return the logical position of the cursor in characters.
 
@@ -1509,22 +1533,63 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 {
   // TODO: Check for multiline with \n, etc...
 
-  // Check if the logical position is the first or the last one of the text.
-  const bool isFirstPosition = 0u == logical;
-  const bool isLastPosition = mLogicalModel->mText.Count() == logical;
-
-  if( isFirstPosition && isLastPosition )
+  const Length numberOfCharacters = mLogicalModel->mText.Count();
+  if( !IsShowingRealText() )
   {
-    // There is zero characters. Get the default font's line height.
+    // Do not want to use the place-holder text to set the cursor position.
+
+    // Use the line's height of the font's family set to set the cursor's size.
+    // If there is no font's family set, use the default font.
+    // Use the current alignment to place the cursor at the beginning, center or end of the box.
+
     cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
-    cursorInfo.primaryPosition.x = mEventData->mDecorator->GetCursorWidth();
-    cursorInfo.primaryPosition.y = 0.f;
+    switch( mLayoutEngine.GetHorizontalAlignment() )
+    {
+      case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
+      {
+        cursorInfo.primaryPosition.x = 0.f;
+        break;
+      }
+      case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
+      {
+        cursorInfo.primaryPosition.x = floorf( 0.5f * mVisualModel->mControlSize.width );
+        break;
+      }
+      case LayoutEngine::HORIZONTAL_ALIGN_END:
+      {
+        cursorInfo.primaryPosition.x = mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        break;
+      }
+    }
+
+    switch( mLayoutEngine.GetVerticalAlignment() )
+    {
+      case LayoutEngine::VERTICAL_ALIGN_TOP:
+      {
+        cursorInfo.primaryPosition.y = 0.f;
+        break;
+      }
+      case LayoutEngine::VERTICAL_ALIGN_CENTER:
+      {
+        cursorInfo.primaryPosition.y = floorf( 0.5f * ( mVisualModel->mControlSize.height - cursorInfo.lineHeight ) );
+        break;
+      }
+      case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
+      {
+        cursorInfo.primaryPosition.y = mVisualModel->mControlSize.height - cursorInfo.lineHeight;
+        break;
+      }
+    }
 
     // Nothing else to do.
     return;
   }
+
+  // Check if the logical position is the first or the last one of the text.
+  const bool isFirstPosition = 0u == logical;
+  const bool isLastPosition = numberOfCharacters == logical;
 
   // 'logical' is the logical 'cursor' index.
   // Get the next and current logical 'character' index.
@@ -1601,7 +1666,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                     primaryNumberOfGlyphs,
                     glyphMetrics,
                     mVisualModel,
-                    mFontClient );
+                    mMetrics );
 
   // Whether to add the glyph's advance to the cursor position.
   // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
@@ -1691,7 +1756,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                       secondaryNumberOfGlyphs,
                       glyphMetrics,
                       mVisualModel,
-                      mFontClient );
+                      mMetrics );
 
     // Set the secondary cursor's position.
     cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
@@ -1745,7 +1810,7 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex( CharacterIndex index )
   return cursorIndex;
 }
 
-void Controller::Impl::UpdateCursorPosition()
+void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::UpdateCursorPosition %p\n", this );
   if( NULL == mEventData )
@@ -1755,225 +1820,7 @@ void Controller::Impl::UpdateCursorPosition()
     return;
   }
 
-  if( IsShowingPlaceholderText() || ( 0u == mLogicalModel->mText.Count() ) )
-  {
-    // Do not want to use the place-holder text to set the cursor position.
-
-    // Use the line's height of the font's family set to set the cursor's size.
-    // If there is no font's family set, use the default font.
-    // Use the current alignment to place the cursor at the beginning, center or end of the box.
-
-    float lineHeight = 0.f;
-
-    FontId defaultFontId = 0u;
-    if( NULL == mFontDefaults )
-    {
-      defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                             EMPTY_STRING );
-    }
-    else
-    {
-      defaultFontId = mFontDefaults->GetFontId( mFontClient );
-    }
-
-    Text::FontMetrics fontMetrics;
-    mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
-
-    lineHeight = fontMetrics.ascender - fontMetrics.descender;
-
-
-    Vector2 cursorPosition;
-
-    switch( mLayoutEngine.GetHorizontalAlignment() )
-    {
-      case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
-      {
-        cursorPosition.x = mEventData->mDecorator->GetCursorWidth();
-        break;
-      }
-      case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
-      {
-        cursorPosition.x = floor( 0.5f * mVisualModel->mControlSize.width );
-        break;
-      }
-      case LayoutEngine::HORIZONTAL_ALIGN_END:
-      {
-        cursorPosition.x = mVisualModel->mControlSize.width;
-        break;
-      }
-    }
-
-    switch( mLayoutEngine.GetVerticalAlignment() )
-    {
-      case LayoutEngine::VERTICAL_ALIGN_TOP:
-      {
-        cursorPosition.y = 0.f;
-        break;
-      }
-      case LayoutEngine::VERTICAL_ALIGN_CENTER:
-      {
-        cursorPosition.y = floorf( 0.5f * ( mVisualModel->mControlSize.height - lineHeight ) );
-        break;
-      }
-      case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
-      {
-        cursorPosition.y = mVisualModel->mControlSize.height - lineHeight;
-        break;
-      }
-    }
-
-    mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
-                                         cursorPosition.x,
-                                         cursorPosition.y,
-                                         lineHeight,
-                                         lineHeight );
-  }
-  else
-  {
-    CursorInfo cursorInfo;
-    GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                       cursorInfo );
-
-    const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
-    const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
-
-    // Sets the cursor position.
-    mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
-                                         cursorPosition.x,
-                                         cursorPosition.y,
-                                         cursorInfo.primaryCursorHeight,
-                                         cursorInfo.lineHeight );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Primary cursor position: %f,%f\n", cursorPosition.x, cursorPosition.y );
-
-    // Sets the grab handle position.
-    mEventData->mDecorator->SetPosition( GRAB_HANDLE,
-                                         cursorPosition.x,
-                                         cursorPosition.y,
-                                         cursorInfo.lineHeight );
-
-    if( cursorInfo.isSecondaryCursor )
-    {
-      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
-      mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
-                                           cursorInfo.secondaryPosition.x + offset.x,
-                                           cursorInfo.secondaryPosition.y + offset.y,
-                                           cursorInfo.secondaryCursorHeight,
-                                           cursorInfo.lineHeight );
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
-    }
-    else
-    {
-      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-    }
-  }
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition\n" );
-}
-
-void Controller::Impl::UpdateSelectionHandle( HandleType handleType )
-{
-  if( ( LEFT_SELECTION_HANDLE != handleType ) &&
-      ( RIGHT_SELECTION_HANDLE != handleType ) )
-  {
-    return;
-  }
-
-  const bool leftSelectionHandle = LEFT_SELECTION_HANDLE == handleType;
-  const CharacterIndex index = leftSelectionHandle ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
-
-  CursorInfo cursorInfo;
-  GetCursorPosition( index,
-                     cursorInfo );
-
-  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
-  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
-
-  // Sets the grab handle position.
-  mEventData->mDecorator->SetPosition( handleType,
-                                       cursorPosition.x,
-                                       cursorPosition.y,
-                                       cursorInfo.lineHeight );
-
-  // If selection handle at start of the text and other at end of the text then all text is selected.
-  const CharacterIndex startOfSelection = std::min( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
-  const CharacterIndex endOfSelection = std::max ( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
-  mEventData->mAllTextSelected = ( startOfSelection == 0 ) && ( endOfSelection == mLogicalModel->mText.Count() );
-}
-
-void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
-{
-  // Clamp between -space & 0 (and the text alignment).
-  if( actualSize.width > mVisualModel->mControlSize.width )
-  {
-    const float space = ( actualSize.width - mVisualModel->mControlSize.width ) + mAlignmentOffset.x;
-    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
-    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
-
-    mEventData->mDecoratorUpdated = true;
-  }
-  else
-  {
-    mEventData->mScrollPosition.x = 0.f;
-  }
-}
-
-void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
-{
-  // Clamp between -space & 0 (and the text alignment).
-  if( actualSize.height > mVisualModel->mControlSize.height )
-  {
-    const float space = ( actualSize.height - mVisualModel->mControlSize.height ) + mAlignmentOffset.y;
-    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
-    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
-
-    mEventData->mDecoratorUpdated = true;
-  }
-  else
-  {
-    mEventData->mScrollPosition.y = 0.f;
-  }
-}
-
-void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
-{
-  Vector2 offset;
-  bool updateDecorator = false;
-  if( position.x < 0.f )
-  {
-    offset.x = -position.x;
-    mEventData->mScrollPosition.x += offset.x;
-    updateDecorator = true;
-  }
-  else if( position.x > mVisualModel->mControlSize.width )
-  {
-    offset.x = mVisualModel->mControlSize.width - position.x;
-    mEventData->mScrollPosition.x += offset.x;
-    updateDecorator = true;
-  }
-
-  if( updateDecorator && mEventData->mDecorator )
-  {
-    mEventData->mDecorator->UpdatePositions( offset );
-  }
-
-  // TODO : calculate the vertical scroll.
-}
-
-void Controller::Impl::ScrollTextToMatchCursor()
-{
-  // Get the current cursor position in decorator coords.
-  const Vector2& currentCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
-
-  // Calculate the new cursor position.
-  CursorInfo cursorInfo;
-  GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                     cursorInfo );
-
-  // Calculate the offset to match the cursor position before the character was deleted.
-  mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
-
-  ClampHorizontalScroll( mVisualModel->GetActualSize() );
-
-  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
+  const Vector2 offset = mEventData->mScrollPosition + ( IsShowingRealText() ? mAlignmentOffset : Vector2::ZERO );
   const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
 
   // Sets the cursor position.
@@ -1982,6 +1829,7 @@ void Controller::Impl::ScrollTextToMatchCursor()
                                        cursorPosition.y,
                                        cursorInfo.primaryCursorHeight,
                                        cursorInfo.lineHeight );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Primary cursor position: %f,%f\n", cursorPosition.x, cursorPosition.y );
 
   // Sets the grab handle position.
   mEventData->mDecorator->SetPosition( GRAB_HANDLE,
@@ -2018,6 +1866,97 @@ void Controller::Impl::ScrollTextToMatchCursor()
   {
     mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
   }
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition\n" );
+}
+
+void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
+                                              const CursorInfo& cursorInfo )
+{
+  if( ( LEFT_SELECTION_HANDLE != handleType ) &&
+      ( RIGHT_SELECTION_HANDLE != handleType ) )
+  {
+    return;
+  }
+
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + mEventData->mScrollPosition + mAlignmentOffset;
+
+  // Sets the grab handle position.
+  mEventData->mDecorator->SetPosition( handleType,
+                                       cursorPosition.x,
+                                       cursorPosition.y,
+                                       cursorInfo.lineHeight );
+
+  // If selection handle at start of the text and other at end of the text then all text is selected.
+  const CharacterIndex startOfSelection = std::min( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
+  const CharacterIndex endOfSelection = std::max ( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
+  mEventData->mAllTextSelected = ( startOfSelection == 0 ) && ( endOfSelection == mLogicalModel->mText.Count() );
+}
+
+void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
+{
+  // Clamp between -space & 0 (and the text alignment).
+
+  if( actualSize.width > mVisualModel->mControlSize.width )
+  {
+    const float space = ( actualSize.width - mVisualModel->mControlSize.width ) + mAlignmentOffset.x;
+    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
+    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
+
+    mEventData->mDecoratorUpdated = true;
+  }
+  else
+  {
+    mEventData->mScrollPosition.x = 0.f;
+  }
+}
+
+void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
+{
+  // Clamp between -space & 0 (and the text alignment).
+  if( actualSize.height > mVisualModel->mControlSize.height )
+  {
+    const float space = ( actualSize.height - mVisualModel->mControlSize.height ) + mAlignmentOffset.y;
+    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
+    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
+
+    mEventData->mDecoratorUpdated = true;
+  }
+  else
+  {
+    mEventData->mScrollPosition.y = 0.f;
+  }
+}
+
+void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
+{
+  // position is in actor's coords.
+  const float positionEnd = position.x + ( mEventData->mDecorator ? mEventData->mDecorator->GetCursorWidth() : 0.f );
+
+  // Transform the position to decorator coords.
+  const float offset = mEventData->mScrollPosition.x + mAlignmentOffset.x;
+  const float decoratorPositionBegin = position.x + offset;
+  const float decoratorPositionEnd = positionEnd + offset;
+
+  if( decoratorPositionBegin < 0.f )
+  {
+    mEventData->mScrollPosition.x = -position.x - mAlignmentOffset.x;
+  }
+  else if( decoratorPositionEnd > mVisualModel->mControlSize.width )
+  {
+    mEventData->mScrollPosition.x = mVisualModel->mControlSize.width - positionEnd - mAlignmentOffset.x;
+  }
+}
+
+void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
+{
+  // Get the current cursor position in decorator coords.
+  const Vector2& currentCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
+
+  // Calculate the offset to match the cursor position before the character was deleted.
+  mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
+
+  ClampHorizontalScroll( mVisualModel->GetActualSize() );
 }
 
 void Controller::Impl::RequestRelayout()

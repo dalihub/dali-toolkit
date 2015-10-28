@@ -187,6 +187,14 @@ protected:
 
 private:
 
+  // Undefined
+  SpiralLayout( const SpiralLayout& spiralLayout );
+
+  // Undefined
+  SpiralLayout& operator=( const SpiralLayout& spiralLayout );
+
+private:
+
   struct Impl;
   Impl* mImpl;
 };

@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class TextField;
 }
+/**
+ * @addtogroup dali_toolkit_controls_text_controls
+ * @{
+ */
 
 /**
  * @brief A control which provides a single-line editable text field.
@@ -67,7 +71,7 @@ public:
       PLACEHOLDER_TEXT,                         ///< name "placeholder-text",                    The text to display when the TextField is empty and inactive,             type STRING
       PLACEHOLDER_TEXT_FOCUSED,                 ///< name "placeholder-text-focused",            The text to display when the TextField is empty with key-input focus,     type STRING
       FONT_FAMILY,                              ///< name "font-family",                         The requested font family,                                                type STRING
-      FONT_STYLE,                               ///< name "font-style",                          The requested font style e.g. Regular/Italic,                             type STRING
+      FONT_STYLE,                               ///< name "font-style",                          The requested font style,                                                 type STRING
       POINT_SIZE,                               ///< name "point-size",                          The size of font in points,                                               type FLOAT
       MAX_LENGTH,                               ///< name "max-length"                           The maximum number of characters that can be inserted,                    type INTEGER
       EXCEED_POLICY,                            ///< name "exceed-policy"                        Specifies how the text is truncated when it does not fit,                 type INTEGER
@@ -201,6 +205,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL TextField( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

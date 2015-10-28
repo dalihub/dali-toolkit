@@ -16,17 +16,18 @@
 
 # Build the Dali Toolkit library
 
-toolkit_images_dir = ../../../dali-toolkit/images
+toolkit_images_dir = ../../../dali-toolkit/styles/images-common
 toolkit_sounds_dir = ../../../dali-toolkit/sounds
 toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
 devel_api_src_dir  = ../../../dali-toolkit/devel-api
 
 toolkit_styles_dir = $(STYLE_DIR)
+toolkit_style_images_dir = $(STYLE_DIR)/images
 
-include ../../../dali-toolkit/images/file.list
 include ../../../dali-toolkit/sounds/file.list
 include ../../../dali-toolkit/styles/file.list
+include ../../../dali-toolkit/styles/images-common/file.list
 include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
 include ../../../dali-toolkit/devel-api/file.list
@@ -37,6 +38,9 @@ daliimage_DATA = ${dali_toolkit_image_files}
 
 dalisounddir = ${dataReadOnlyDir}/toolkit/sounds/
 dalisound_DATA = ${dali_toolkit_sound_files}
+
+package_doxy_dir = ../../../doc
+include ../../../doc/file.list
 
 # The library
 lib_LTLIBRARIES = libdali-toolkit.la
@@ -49,12 +53,16 @@ libdali_toolkit_la_SOURCES = \
 dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
 dalistyle_DATA = ${dali_toolkit_style_files}
 
+dalistyleimagesdir = ${dataReadOnlyDir}/toolkit/styles/images/
+dalistyleimages_DATA = ${dali_toolkit_style_images}
+
 libdali_toolkit_la_DEPENDENCIES =
 
 libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
                       -DDALI_SOUND_DIR="\"${dalisounddir}\"" \
                       -DDALI_STYLE_DIR="\"${dalistyledir}\"" \
+                      -DDALI_STYLE_IMAGE_DIR="\"${dalistyleimagesdir}\"" \
                       -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                       -Werror -Wall \
                       -I../../../ \
@@ -85,6 +93,7 @@ develapibloomviewdir =          $(develapicontrolsdir)/bloom-view
 develapibubbleemitterdir =      $(develapicontrolsdir)/bubble-effect
 develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
+develapirendererfactorydir =    $(develapicontrolsdir)/renderer-factory
 develapipopupdir =              $(develapicontrolsdir)/popup
 develapisliderdir =             $(develapicontrolsdir)/slider
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
@@ -105,6 +114,7 @@ develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
 develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
 develapipopup_HEADERS =             $(devel_api_popup_header_files)
+develapirendererfactory_HEADERS =   $(devel_api_renderer_factory_header_files)
 develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
 develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
@@ -155,3 +165,6 @@ publicapitextcontrols_HEADERS =        $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =        $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS =    $(public_api_rendering_backend_header_files)
 
+# package doxygen file (contains doxygen grouping information)
+packagedoxydir = $(topleveldir)/doc
+packagedoxy_HEADERS = $(package_doxy_files)

@@ -20,10 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -32,6 +28,7 @@
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/glyph-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-mesh-factory.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 using namespace Dali;
@@ -47,11 +44,11 @@ namespace
 const float ZERO( 0.0f );
 const float HALF( 0.5f );
 const float ONE( 1.0f );
-const float TWO( 2.0f );
 const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
 const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
 }
-struct AtlasRenderer::Impl : public ConnectionTracker
+
+struct AtlasRenderer::Impl
 {
   enum Style
   {
@@ -151,9 +148,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   bool IsGlyphUnderlined( GlyphIndex index,
                           const Vector<GlyphRun>& underlineRuns )
   {
-    // TODO: At the moment it works because we always traverse the glyphs starting from the beginning
-    //       and there is only one glyph run! If there are more they should be ordered.
-
     for( Vector<GlyphRun>::ConstIterator it = underlineRuns.Begin(),
            endIt = underlineRuns.End();
            it != endIt;
@@ -267,7 +261,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           lastUnderlinedFontId = glyph.fontId;
         } // underline
 
-        if ( !mGlyphManager.Cached( glyph.fontId, glyph.index, slot ) )
+        if ( !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot ) )
         {
           // Select correct size for new atlas if needed....?
           if ( lastFontId != glyph.fontId )
@@ -331,6 +325,16 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         textCacheEntry.mIndex = glyph.index;
         newTextCache.PushBack( textCacheEntry );
 
+        // Adjust the vertices if the fixed-size font should be down-scaled
+        if( glyph.scaleFactor > 0 )
+        {
+          for( unsigned int i=0; i<newMesh.mVertices.Count(); ++i )
+          {
+            newMesh.mVertices[i].mPosition.x = position.x + ( ( newMesh.mVertices[i].mPosition.x - position.x ) * glyph.scaleFactor );
+            newMesh.mVertices[i].mPosition.y = position.y + ( ( newMesh.mVertices[i].mPosition.y - position.y ) * glyph.scaleFactor );
+          }
+        }
+
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
         StitchTextMesh( meshContainer,
                         newMesh,
@@ -365,9 +369,33 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         // Create an effect if necessary
         if ( style == STYLE_DROP_SHADOW )
         {
-          Actor shadowActor = GenerateShadow( *mIt, actorSize, shadowOffset, shadowColor );
-          shadowActor.Add( actor );
-          actor = shadowActor;
+          // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
+          Actor containerActor = Actor::New();
+          containerActor.SetParentOrigin( ParentOrigin::CENTER );
+          containerActor.SetSize( actorSize );
+
+          Actor shadowActor = Actor::New();
+#if defined(DEBUG_ENABLED)
+          shadowActor.SetName( "Text Shadow renderable actor" );
+#endif
+          // Offset shadow in x and y
+          shadowActor.RegisterProperty("uOffset", shadowOffset );
+          if ( actor.GetRendererCount() )
+          {
+            Dali::Renderer renderer( actor.GetRendererAt( 0 ) );
+            Geometry geometry = renderer.GetGeometry();
+            Material material = renderer.GetMaterial();
+
+            Dali::Renderer shadowRenderer = Dali::Renderer::New( geometry, material );
+            shadowRenderer.SetDepthIndex( renderer.GetDepthIndex() - 1 );
+            shadowActor.AddRenderer( shadowRenderer );
+            shadowActor.SetParentOrigin( ParentOrigin::CENTER );
+            shadowActor.SetSize( actorSize );
+            shadowActor.SetColor( shadowColor );
+            containerActor.Add( shadowActor );
+            containerActor.Add( actor );
+            actor = containerActor;
+          }
         }
 
         if( mActor )
@@ -435,6 +463,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
     actor.SetSize( actorSize );
     actor.SetColor( meshRecord.mColor );
+    actor.RegisterProperty("uOffset", Vector2::ZERO );
     return actor;
   }
 
@@ -462,8 +491,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       {
         if ( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
         {
-          // Stitch the mesh to the existing mesh and adjust any extents
-          mGlyphManager.StitchMesh( mIt->mMesh, newMesh );
+          // Append the mesh to the existing mesh and adjust any extents
+          Toolkit::Internal::AtlasMeshFactory::AppendMesh( mIt->mMesh, newMesh );
 
           if( underlineGlyph )
           {
@@ -636,7 +665,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
       if ( underlineColor == textColor )
       {
-        mGlyphManager.StitchMesh( meshRecords[ index ].mMesh, newMesh );
+        Toolkit::Internal::AtlasMeshFactory::AppendMesh( meshRecords[ index ].mMesh, newMesh );
       }
       else
       {
@@ -649,147 +678,14 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  Actor GenerateShadow( MeshRecord& meshRecord,
-                        const Vector2& actorSize,
-                        const Vector2& shadowOffset,
-                        const Vector4& shadowColor )
-  {
-    // Scan vertex buffer to determine width and height of effect buffer needed
-    const Vector< AtlasManager::Vertex2D >& verts = meshRecord.mMesh.mVertices;
-    float tlx = verts[ 0 ].mPosition.x;
-    float tly = verts[ 0 ].mPosition.y;
-    float brx = ZERO;
-    float bry = ZERO;
-
-    for ( uint32_t i = 0; i < verts.Size(); ++i )
-    {
-      if ( verts[ i ].mPosition.x < tlx )
-      {
-        tlx = verts[ i ].mPosition.x;
-      }
-      if ( verts[ i ].mPosition.y < tly )
-      {
-        tly = verts[ i ].mPosition.y;
-      }
-      if ( verts[ i ].mPosition.x > brx )
-      {
-        brx = verts[ i ].mPosition.x;
-      }
-      if ( verts[ i ].mPosition.y > bry )
-      {
-        bry = verts[ i ].mPosition.y;
-      }
-    }
-
-    float width = brx - tlx;
-    float height = bry - tly;
-    float divWidth = TWO / width;
-    float divHeight = TWO / height;
-
-    // Create a buffer to render to
-    meshRecord.mBuffer = FrameBufferImage::New( width, height );
-
-    // We will render a quad into this buffer
-    unsigned int indices[ 6 ] = { 1, 0, 2, 2, 3, 1 };
-    PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, 4u );
-    PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, sizeof(indices)/sizeof(indices[0]) );
-
-    AtlasManager::Vertex2D vertices[ 4 ] = {
-    { Vector2( tlx + shadowOffset.x, tly + shadowOffset.y ), Vector2( ZERO, ZERO ) },
-    { Vector2( brx + shadowOffset.x, tly + shadowOffset.y ), Vector2( ONE, ZERO ) },
-    { Vector2( tlx + shadowOffset.x, bry + shadowOffset.y ), Vector2( ZERO, ONE ) },
-    { Vector2( brx + shadowOffset.x, bry + shadowOffset.y ), Vector2( ONE, ONE ) } };
-
-    quadVertices.SetData( vertices );
-    quadIndices.SetData( indices );
-
-    Geometry quadGeometry = Geometry::New();
-    quadGeometry.AddVertexBuffer( quadVertices );
-    quadGeometry.SetIndexBuffer( quadIndices );
-
-    Sampler sampler = Sampler::New( meshRecord.mBuffer, "sTexture" );
-    Material material = Material::New( mGlyphManager.GetEffectBufferShader() );
-    material.AddSampler( sampler );
-
-    Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-
-    // Ensure shadow is behind the text...
-    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth );
-    Actor actor = Actor::New();
-    actor.AddRenderer( renderer );
-    actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
-    actor.SetSize( actorSize );
-
-    // Create a sub actor to render the source with normalized vertex positions
-    Vector< AtlasManager::Vertex2D > normVertexList;
-    for ( uint32_t i = 0; i < verts.Size(); ++i )
-    {
-      AtlasManager::Vertex2D vertex = verts[ i ];
-      vertex.mPosition.x = ( ( vertex.mPosition.x - tlx ) * divWidth ) - ONE;
-      vertex.mPosition.y = ( ( vertex.mPosition.y - tly ) * divHeight ) - ONE;
-      normVertexList.PushBack( vertex );
-    }
-
-    PropertyBuffer normVertices = PropertyBuffer::New( mQuadVertexFormat, normVertexList.Size() );
-    PropertyBuffer normIndices = PropertyBuffer::New( mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
-    normVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &normVertexList[ 0 ] ) );
-    normIndices.SetData( const_cast< unsigned int* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
-
-    Geometry normGeometry = Geometry::New();
-    normGeometry.AddVertexBuffer( normVertices );
-    normGeometry.SetIndexBuffer( normIndices );
-
-    Material normMaterial = Material::New( mGlyphManager.GetGlyphShadowShader() );
-    Sampler normSampler =  mGlyphManager.GetSampler( meshRecord.mAtlasId );
-    normMaterial.AddSampler( normSampler );
-    Dali::Renderer normRenderer = Dali::Renderer::New( normGeometry, normMaterial );
-    Actor subActor = Actor::New();
-    subActor.AddRenderer( normRenderer );
-    subActor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
-    subActor.SetSize( actorSize );
-    subActor.SetColor( shadowColor );
-
-    // Create a render task to render the effect
-    RenderTask task = Stage::GetCurrent().GetRenderTaskList().CreateTask();
-    task.SetTargetFrameBuffer( meshRecord.mBuffer );
-    task.SetSourceActor( subActor );
-    task.SetClearEnabled( true );
-    task.SetClearColor( Vector4::ZERO );
-    task.SetExclusive( true );
-    task.SetRefreshRate( RenderTask::REFRESH_ONCE );
-    task.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
-    actor.Add( subActor );
-
-    return actor;
-  }
-
-  void RenderComplete( RenderTask& renderTask )
-  {
-    // Disconnect and remove this single shot render task
-    renderTask.FinishedSignal().Disconnect( this, &AtlasRenderer::Impl::RenderComplete );
-    Stage::GetCurrent().GetRenderTaskList().RemoveTask( renderTask );
-
-    // Get the actor used for render to buffer and remove it from the parent
-    Actor renderActor = renderTask.GetSourceActor();
-    if ( renderActor )
-    {
-      Actor parent = renderActor.GetParent();
-      if ( parent )
-      {
-        parent.Remove( renderActor );
-      }
-    }
-  }
-
   Actor mActor;                                       ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
-  std::vector< uint32_t > mFace;                      ///> Face indices for a quad
-  Vector< TextCacheEntry > mTextCache;
-  Property::Map mQuadVertexFormat;
-  Property::Map mQuadIndexFormat;
-  int mDepth;
+  Vector< TextCacheEntry > mTextCache;                ///> Caches data from previous render
+  Property::Map mQuadVertexFormat;                    ///> Describes the vertex format for text
+  Property::Map mQuadIndexFormat;                     ///> Describes the index format for text
+  int mDepth;                                         ///> DepthIndex passed by control when connect to stage
 };
 
 Text::RendererPtr AtlasRenderer::New()

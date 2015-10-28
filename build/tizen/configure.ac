@@ -179,6 +179,7 @@ Configuration
   Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
-  Style Dir                         $STYLE_DIR
-  Style                             $dali_style
+  Style Dir:                        $STYLE_DIR
+  Style:                            $dali_style
+  i18n:                             $enable_i18n
 "

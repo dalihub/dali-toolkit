@@ -149,7 +149,6 @@ const ImageFunctions ImageFunctionTable[]=
     { "Reload",                  ResourceImageApi::Reload,              RESOURCE_IMAGE_API },
 
     // nine-patch API
-    { "GetStretchBorders",       NinePatchImageApi::GetStretchBorders,        NINE_PATCH_IMAGE_API },
     { "GetChildRectangle",       NinePatchImageApi::GetChildRectangle,        NINE_PATCH_IMAGE_API },
     { "CreateCroppedBufferImage",NinePatchImageApi::CreateCroppedBufferImage, NINE_PATCH_IMAGE_API },
 

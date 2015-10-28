@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class Alignment;
 }
+/**
+ * @addtogroup dali_toolkit_controls_alignment
+ * @{
+ */
 
 /**
  * @brief Alignment is a container which provides an easy way to align other actors inside its boundary.
@@ -229,6 +233,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL Alignment( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

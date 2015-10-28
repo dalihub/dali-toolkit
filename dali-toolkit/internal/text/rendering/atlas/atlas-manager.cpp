@@ -15,10 +15,10 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-manager.h>
 
- // INTERNAL INCLUDES
-#include <dali-toolkit/internal/atlas-manager/atlas-manager-impl.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-manager-impl.h>
 
 namespace Dali
 {
@@ -55,11 +55,11 @@ void AtlasManager::SetAddPolicy( AddFailPolicy policy )
   GetImplementation(*this).SetAddPolicy( policy );
 }
 
-void AtlasManager::Add( const BufferImage& image,
+bool AtlasManager::Add( const BufferImage& image,
                         AtlasManager::AtlasSlot& slot,
                         AtlasManager::AtlasId atlas )
 {
-  GetImplementation(*this).Add( image, slot, atlas );
+  return GetImplementation(*this).Add( image, slot, atlas );
 }
 
 bool AtlasManager::Remove( ImageId id )
@@ -76,13 +76,6 @@ void AtlasManager::GenerateMeshData( ImageId id,
                                              position,
                                              mesh,
                                              addReference );
-}
-
-void AtlasManager::StitchMesh( Mesh2D& first,
-                               const Mesh2D& second,
-                               bool optimize )
-{
-  GetImplementation(*this).StitchMesh( first, second, optimize );
 }
 
 Dali::Atlas AtlasManager::GetAtlasContainer( AtlasId atlas ) const
@@ -130,9 +123,9 @@ Material AtlasManager::GetMaterial( AtlasId atlas ) const
   return GetImplementation(*this).GetMaterial( atlas );
 }
 
-Sampler AtlasManager::GetSampler( AtlasId atlas ) const
+void AtlasManager::SetMaterial( AtlasId atlas, Material& material )
 {
-  return GetImplementation(*this).GetSampler( atlas );
+  GetImplementation(*this).SetMaterial( atlas, material );
 }
 
 } // namespace Toolkit
