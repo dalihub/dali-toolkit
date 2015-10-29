@@ -667,7 +667,7 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( width != mImpl->mVisualModel->mControlSize.width )
+  if( fabsf( width - mImpl->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |

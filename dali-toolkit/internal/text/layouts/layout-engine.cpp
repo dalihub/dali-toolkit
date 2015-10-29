@@ -766,10 +766,12 @@ struct LayoutEngine::Impl
       {
         if( isLastLine && !isRTL )
         {
+          // Add the length of the white saces at the end of the line.
           lineLength += line.extraLength;
           if( lineLength > boxWidth )
           {
-            lineLength = boxWidth;
+            // The line's length is longer than the box's width.
+            // Set the line's offset to 0 and nothing else to do.
             line.alignmentOffset = 0.f;
             break;
           }

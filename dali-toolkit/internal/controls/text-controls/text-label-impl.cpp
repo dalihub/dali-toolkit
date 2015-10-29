@@ -282,7 +282,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           float height = value.Get< float >();
-          if ( impl.mController->GetUnderlineHeight() != height )
+          if( fabsf( impl.mController->GetUnderlineHeight() - height ) > Math::MACHINE_EPSILON_1000 )
           {
             impl.mController->SetUnderlineHeight( height );
             impl.mRenderer.Reset();
