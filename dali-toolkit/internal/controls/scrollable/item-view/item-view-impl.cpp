@@ -289,26 +289,27 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 ItemView::ItemView(ItemFactory& factory)
 : Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
+  mItemsParentOrigin(ParentOrigin::CENTER),
+  mItemsAnchorPoint(AnchorPoint::CENTER),
+  mTotalPanDisplacement(Vector2::ZERO),
   mActiveLayout(NULL),
-  mAnimatingOvershootOn(false),
-  mAnimateOvershootOff(false),
-  mAnchoringEnabled(false),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
   mRefreshIntervalLayoutPositions(0.0f),
-  mRefreshOrderHint(true/*Refresh item 0 first*/),
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
   mWheelScrollDistanceStep(0.0f),
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
-  mTotalPanDisplacement(Vector2::ZERO),
   mScrollOvershoot(0.0f),
-  mIsFlicking(false),
   mGestureState(Gesture::Clear),
+  mAnimatingOvershootOn(false),
+  mAnimateOvershootOff(false),
+  mAnchoringEnabled(false),
+  mRefreshOrderHint(true/*Refresh item 0 first*/),
+  mIsFlicking(false),
   mAddingItems(false),
   mRefreshEnabled(true),
-  mItemsParentOrigin( ParentOrigin::CENTER),
-  mItemsAnchorPoint( AnchorPoint::CENTER)
+  mInAnimation(false)
 {
 }
 
@@ -1193,7 +1194,30 @@ void ItemView::OnPan( const PanGesture& gesture )
       }
 
       mScrollOvershoot = CalculateScrollOvershoot();
-      self.SetProperty( Toolkit::ItemView::Property::OVERSHOOT, mScrollOvershoot );
+
+      // If the view is moved in a direction against the overshoot indicator, then the indicator should be animated off.
+      // First make sure we are not in an animation, otherwise a previously started
+      // off-animation will be overwritten as the user continues scrolling.
+      if( !mInAnimation )
+      {
+        // Check if the movement is against the current overshoot amount (if we are currently displaying the indicator).
+        if( ( ( mScrollOvershoot > Math::MACHINE_EPSILON_0 ) && ( mScrollDistance < -Math::MACHINE_EPSILON_0 ) ) ||
+          ( ( mScrollOvershoot < Math::MACHINE_EPSILON_0 ) && ( mScrollDistance > Math::MACHINE_EPSILON_0 ) ) )
+        {
+          // The user has moved against the indicator direction.
+          // First, we reset the total displacement. This means the overshoot amount will become zero the next frame,
+          // and if the user starts dragging in the overshoot direction again, the indicator will appear once more.
+          mTotalPanDisplacement = Vector2::ZERO;
+          // Animate the overshoot indicator off.
+          AnimateScrollOvershoot( 0.0f, false );
+        }
+        else
+        {
+          // Only set the property directly if we are not animating the overshoot away,
+          // as otherwise this will overwrite the animation generated value.
+          self.SetProperty( Toolkit::ItemView::Property::OVERSHOOT, mScrollOvershoot );
+        }
+      }
     }
     break;
 
@@ -1331,6 +1355,7 @@ void ItemView::OnOvershootOnFinished(Animation& animation)
   {
     AnimateScrollOvershoot(0.0f);
   }
+  mInAnimation = false;
 }
 
 void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
@@ -1577,13 +1602,14 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
       duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
     }
 
+    // Mark the animation as in progress to prevent manual property sets overwriting it.
+    mInAnimation = true;
+    mAnimatingOvershootOn = animatingOn;
     RemoveAnimation(mScrollOvershootAnimation);
     mScrollOvershootAnimation = Animation::New(duration);
     mScrollOvershootAnimation.FinishedSignal().Connect(this, &ItemView::OnOvershootOnFinished);
     mScrollOvershootAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::OVERSHOOT), overshootAmount, TimePeriod(0.0f, duration) );
     mScrollOvershootAnimation.Play();
-
-    mAnimatingOvershootOn = animatingOn;
   }
   else
   {

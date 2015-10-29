@@ -226,6 +226,7 @@ See
 
 
  * @class Actor
+ * @extends Handle
  */
 
 

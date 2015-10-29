@@ -113,7 +113,12 @@ distributing this software or its derivatives.
     },
     "textselectiontoolbar":
     {
-      "enable-overshoot":true
+      "enable-overshoot":true,
+      "scroll-view":
+      {
+        "overshoot-animation-speed":360.0,
+        "overshoot-size":[720.0,130.0]
+      }
     },
     "scrollview":
     {

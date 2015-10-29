@@ -37,12 +37,24 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/image/resource-image-api.cpp \
    $(v8_plugin_dir)/image/nine-patch-image-api.cpp \
    $(v8_plugin_dir)/object/handle-wrapper.cpp \
+   $(v8_plugin_dir)/object/property-buffer-api.cpp \
+   $(v8_plugin_dir)/object/property-buffer-wrapper.cpp \
    $(v8_plugin_dir)/object/property-value-wrapper.cpp \
    $(v8_plugin_dir)/signals/signal-manager.cpp \
    $(v8_plugin_dir)/render-tasks/render-task-list-api.cpp \
    $(v8_plugin_dir)/render-tasks/render-task-list-wrapper.cpp \
    $(v8_plugin_dir)/render-tasks/render-task-api.cpp \
    $(v8_plugin_dir)/render-tasks/render-task-wrapper.cpp \
+   $(v8_plugin_dir)/rendering/geometry-api.cpp \
+   $(v8_plugin_dir)/rendering/geometry-wrapper.cpp \
+   $(v8_plugin_dir)/rendering/material-api.cpp \
+   $(v8_plugin_dir)/rendering/material-wrapper.cpp \
+   $(v8_plugin_dir)/rendering/renderer-api.cpp \
+   $(v8_plugin_dir)/rendering/renderer-wrapper.cpp \
+   $(v8_plugin_dir)/rendering/sampler-api.cpp \
+   $(v8_plugin_dir)/rendering/sampler-wrapper.cpp \
+   $(v8_plugin_dir)/rendering/shader-api.cpp \
+   $(v8_plugin_dir)/rendering/shader-wrapper.cpp \
    $(v8_plugin_dir)/toolkit/builder/builder-api.cpp \
    $(v8_plugin_dir)/toolkit/builder/builder-wrapper.cpp \
    $(v8_plugin_dir)/toolkit/focus-manager/keyboard-focus-manager-api.cpp \

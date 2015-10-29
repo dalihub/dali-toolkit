@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -518,7 +519,7 @@ void TextLabel::RenderText()
   Actor renderableActor;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), self.GetHierarchyDepth() );
+    renderableActor = mRenderer->Render( mController->GetView(), TEXT_DEPTH_INDEX );
   }
 
   if( renderableActor != mRenderableActor )

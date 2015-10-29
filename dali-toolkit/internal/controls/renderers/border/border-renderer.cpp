@@ -88,7 +88,7 @@ BorderRenderer::~BorderRenderer()
 {
 }
 
-void BorderRenderer::DoInitialize( const Property::Map& propertyMap )
+void BorderRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( COLOR_NAME );
   if( !( color && color->Get(mBorderColor) ) )
@@ -112,6 +112,8 @@ void BorderRenderer::SetClipRect( const Rect<int>& clipRect )
 
 void BorderRenderer::DoSetOnStage( Actor& actor )
 {
+  InitializeRenderer();
+
   mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_UNIFORM_NAME, mBorderColor );
   if( mBorderColor.a < 1.f )
   {
@@ -128,43 +130,31 @@ void BorderRenderer::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( SIZE_NAME, mBorderSize );
 }
 
-void BorderRenderer::InitializeRenderer( Renderer& renderer )
+void BorderRenderer::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::BORDER_GEOMETRY );
   if( !geometry )
   {
     geometry =  CreateBorderGeometry();
-    mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
+    mFactoryCache.SaveGeometry( RendererFactoryCache::BORDER_GEOMETRY, geometry );
   }
 
   Shader shader = mFactoryCache.GetShader( RendererFactoryCache::BORDER_SHADER );
   if( !shader )
   {
     shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mFactoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, shader );
+    mFactoryCache.SaveShader( RendererFactoryCache::BORDER_SHADER, shader );
   }
 
-  if( !renderer )
-  {
-    Material material = Material::New( shader );
-    renderer = Renderer::New( geometry, material );
-  }
-  else
-  {
-    mImpl->mRenderer.SetGeometry( geometry );
-    Material material = mImpl->mRenderer.GetMaterial();
-    if( material )
-    {
-      material.SetShader( shader );
-    }
-  }
+  Material material = Material::New( shader );
+  mImpl->mRenderer = Renderer::New( geometry, material );
 }
 
 void BorderRenderer::SetBorderColor(const Vector4& color)
 {
   mBorderColor = color;
 
-  if( mImpl->mIsOnStage )
+  if( mImpl->mRenderer )
   {
     (mImpl->mRenderer).SetProperty( mBorderColorIndex, color );
     if( color.a < 1.f &&  (mImpl->mRenderer).GetMaterial().GetBlendMode() != BlendingMode::ON)
@@ -178,7 +168,7 @@ void BorderRenderer::SetBorderSize( float size )
 {
   mBorderSize = size;
 
-  if( mImpl->mIsOnStage )
+  if( mImpl->mRenderer )
   {
     (mImpl->mRenderer).SetProperty( mBorderSizeIndex, size );
   }

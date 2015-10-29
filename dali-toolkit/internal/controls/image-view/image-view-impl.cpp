@@ -73,24 +73,8 @@ void ImageView::SetImage( Image image )
 
     mImage = image;
 
-    bool newRendererCreated = false;
-    if( mRenderer )
-    {
-      newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, image );
-    }
-    else
-    {
-      mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( image );
-      newRendererCreated = true;
-    }
-
-    //we need to inform any newly created renderers if it is on stage
-    if( newRendererCreated && Self().OnStage() )
-    {
-      CustomActor self = Self();
-      mRenderer.SetOnStage( self );
-    }
-
+    Actor self = Self();
+    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, image );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
   }
 }
@@ -99,23 +83,8 @@ void ImageView::SetImage( Property::Map map )
 {
   mPropertyMap = map;
 
-  bool newRendererCreated = false;
-  if( mRenderer )
-  {
-    newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, mPropertyMap );
-  }
-  else
-  {
-    mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mPropertyMap );
-    newRendererCreated = true;
-  }
-
-  //we need to inform any newly created renderers if it is on stage
-  CustomActor self = Self();
-  if( newRendererCreated && self.OnStage() )
-  {
-    mRenderer.SetOnStage( self );
-  }
+  Actor self = Self();
+  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mPropertyMap );
 
   int width = 0;
   Property::Value* widthValue = mPropertyMap.Find( "width" );
@@ -143,23 +112,8 @@ void ImageView::SetImage( const std::string& url )
 
     mUrl = url;
 
-    bool newRendererCreated = false;
-    if( mRenderer )
-    {
-      newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, mUrl );
-    }
-    else
-    {
-      mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mUrl );
-      newRendererCreated = true;
-    }
-
-    //we need to inform any newly created renderers if it is on stage
-    if( newRendererCreated && Self().OnStage() )
-    {
-      CustomActor self = Self();
-      mRenderer.SetOnStage( self );
-    }
+    Actor self = Self();
+    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl );
 
     mImageSize = ResourceImage::GetImageSize( mUrl );
   }
@@ -173,7 +127,7 @@ Vector3 ImageView::GetNaturalSize()
   size.y = mImageSize.GetHeight();
   size.z = std::min(size.x, size.y);
 
-  if( size.x > 0 && size.x > 0 )
+  if( size.x > 0 && size.y > 0 )
   {
     return size;
   }

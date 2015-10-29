@@ -109,10 +109,10 @@ public:
    * else the renderer would be a handle to a newly created internal color renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] color The color to be rendered.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const Vector4& color );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color );
 
   /**
    * @brief Request the control renderer to renderer the border with the given size and color.
@@ -138,10 +138,10 @@ public:
    * else the renderer would be a handle to a newly created internal image renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] image The Image to be rendered.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const Image& image );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image );
 
   /**
    * @brief Request the control renderer to render the given resource at the url.
@@ -158,10 +158,10 @@ public:
    * else the renderer would be a handle to a newly created internal image renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] url The URL to the resource to be rendered.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const std::string& url );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url );
 
 
   /**
@@ -170,11 +170,12 @@ public:
    * if the current renderer is capable of merging with the property map the reset the renderer with the merged properties
    * else the renderer would be a handle to a newly created internal renderer.
    *
+   * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] propertyMap The map contains the properties required by the control renderer
    *            Depends on the content of the map, different kind of renderer would be returned.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const Property::Map& propertyMap );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap );
 
 private:
 

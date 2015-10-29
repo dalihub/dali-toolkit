@@ -754,6 +754,16 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
       daliPropertyValue = ArrayFromV8Array( isolate, v8Value );
       break;
     }
+    case Dali::Property::MAP:
+    {
+      if( v8Value->IsObject() )
+      {
+        v8::Local<v8::Object> object = v8::Handle<v8::Object>::Cast(v8Value);
+        Dali::Property::Map propertyMap = V8Utils::GetPropertyMapFromObject(isolate, object);
+        daliPropertyValue = Dali::Property::Value( propertyMap );
+      }
+      break;
+    }
     case Dali::Property::NONE:
     default:
     {

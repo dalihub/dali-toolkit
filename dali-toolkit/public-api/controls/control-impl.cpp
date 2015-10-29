@@ -406,24 +406,17 @@ void Control::SetBackgroundColor( const Vector4& color )
 
   if( mImpl->mBackgroundRenderer )
   {
-    Toolkit::ControlRenderer currentRenderer( mImpl->mBackgroundRenderer );
-    // if ResetRenderer returns false, we continue to use the current renderer with a new color set to it.
-    if( ! factory.ResetRenderer( mImpl->mBackgroundRenderer, color ) )
-    {
-      return;
-    }
-    // ResetRenderer returns true, a new renderer is created. Remove the current renderer and reset.
-    currentRenderer.RemoveAndReset( self );
+    factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
   }
   else
   {
     mImpl->mBackgroundRenderer = factory.GetControlRenderer( color );
-  }
 
-  if( self.OnStage() )
-  {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
+    if( self.OnStage() )
+    {
+      mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+      mImpl->mBackgroundRenderer.SetOnStage( self );
+    }
   }
 }
 
@@ -463,30 +456,23 @@ void Control::SetBackgroundImage( Image image )
 
   if(  mImpl->mBackgroundRenderer  )
   {
-    Toolkit::ControlRenderer currentRenderer( mImpl->mBackgroundRenderer );
-    // if ResetRenderer returns false, we continue to use the current renderer with a new image set to it.
-    if( ! factory.ResetRenderer( mImpl->mBackgroundRenderer, image )  )
-    {
-      return;
-    }
-    // ResetRenderer returns true, a new renderer is created. Remove the current renderer and reset.
-    currentRenderer.RemoveAndReset( self );
+    factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
   }
   else
   {
     mImpl->mBackgroundRenderer = factory.GetControlRenderer( image );
-  }
 
-  if( self.OnStage() )
-  {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
+    if( self.OnStage() )
+    {
+      mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+      mImpl->mBackgroundRenderer.SetOnStage( self );
+    }
   }
 }
 
 void Control::ClearBackground()
 {
-  Actor self(Self());
+  Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
 }
 
@@ -810,16 +796,6 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  unsigned int controlRendererCount = Self().GetRendererCount();
-  for( unsigned int i(0); i<controlRendererCount; ++i )
-  {
-    Renderer controlRenderer = Self().GetRendererAt(i);
-    if( controlRenderer )
-    {
-      controlRenderer.SetDepthIndex( CONTENT_DEPTH_INDEX+depth );
-    }
-  }
-
   if( mImpl->mBackgroundRenderer)
   {
     mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );

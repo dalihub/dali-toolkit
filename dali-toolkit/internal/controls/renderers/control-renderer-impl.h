@@ -67,9 +67,10 @@ public:
    *  request the geometry and shader from the cache, if not available, create and save to the cache for sharing;
    *  record the property values.
    *
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  void Initialize( const Property::Map& propertyMap );
+  void Initialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::ControlRenderer::SetSize
@@ -156,17 +157,10 @@ protected:
   /**
    * @brief Called by Initialize() allowing sub classes to respond to the Initialize event
    *
-   * @param[in] factoryCache A pointer pointing to the RendererFactoryCache object
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  virtual void DoInitialize( const Property::Map& propertyMap ) = 0;
-
-  /**
-   * @brief Initialises a renderer ready to be put on stage.
-   *
-   * @param[inout] renderer The Renderer to initialise. If the renderer is not empty then re-initialise the renderer
-   */
-  virtual void InitializeRenderer( Renderer& renderer ) = 0;
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) = 0;
 
 protected:
 
@@ -185,13 +179,19 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
 protected:
+  /**
+   * @brief Gets the on stage state for this ControlRenderer
+   *
+   * @return Returns true if this ControlRenderer is on stage, false if it is off the stage
+   */
+  bool GetIsOnStage() const;
 
   /**
-   * @brief Sets the key to use for caching the renderer. If this is empty then no caching will occur
+   * @brief Gets whether the Dali::Renderer is from a shared cache (and therefore any modifications will affect other users of that renderer)
    *
-   * @param[in] cachedRendererKey The key to use for caching the renderer.
+   * @return Returns true if the renderer is from shared cache, false otherwise
    */
-  void SetCachedRendererKey( const std::string& cachedRendererKey );
+  bool GetIsFromCache() const;
 
 private:
 

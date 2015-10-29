@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/events/key-event-integ.h>
 
 namespace Dali
 {
@@ -51,10 +50,10 @@ public:
   bool RestoreAfterFocusLost() const;
   void SetRestoreAfterFocusLost( bool toggle );
   void NotifyCursorPosition();
-  int GetCursorPosition();
   void SetCursorPosition( unsigned int cursorPosition );
-  void SetSurroundingText( std::string text );
-  std::string GetSurroundingText();
+  unsigned int GetCursorPosition() const;
+  void SetSurroundingText( const std::string& text );
+  const std::string& GetSurroundingText() const;
 
 public:  // Signals
   ImfManagerSignalType& ActivatedSignal() { return mActivatedSignal; }
@@ -78,7 +77,6 @@ private:
   bool mRestoreAfterFocusLost:1;             ///< Whether the keyboard needs to be restored (activated ) after focus regained.
   bool mIdleCallbackConnected:1;             ///< Whether the idle callback is already connected.
 
-  std::vector<Dali::Integration::KeyEvent> mKeyEvents; ///< Stores key events to be sent from idle call-back.
   ImfManagerSignalType      mActivatedSignal;
   ImfEventSignalType        mEventSignal;
 
@@ -120,10 +118,9 @@ Dali::ImfManager ImfManager::Get()
 
 ImfManager::ImfManager( /*Ecore_X_Window ecoreXwin*/ )
 : mIMFCursorPosition( 0 ),
-  mSurroundingText(""),
+  mSurroundingText(),
   mRestoreAfterFocusLost( false ),
-  mIdleCallbackConnected( false ),
-  mKeyEvents()
+  mIdleCallbackConnected( false )
 {
   CreateContext( /*ecoreXwin*/ );
   ConnectCallbacks();
@@ -178,22 +175,22 @@ void ImfManager::NotifyCursorPosition()
 {
 }
 
-int ImfManager::GetCursorPosition()
-{
-  return mIMFCursorPosition;
-}
-
 void ImfManager::SetCursorPosition( unsigned int cursorPosition )
 {
-  mIMFCursorPosition = ( int )cursorPosition;
+  mIMFCursorPosition = static_cast< int >( cursorPosition );
 }
 
-void ImfManager::SetSurroundingText( std::string text )
+unsigned int ImfManager::GetCursorPosition() const
+{
+  return static_cast<unsigned int>( mIMFCursorPosition );
+}
+
+void ImfManager::SetSurroundingText( const std::string& text )
 {
   mSurroundingText = text;
 }
 
-std::string ImfManager::GetSurroundingText()
+const std::string& ImfManager::GetSurroundingText() const
 {
   return mSurroundingText;
 }
@@ -218,11 +215,6 @@ ImfManager::~ImfManager()
 ImfManager ImfManager::Get()
 {
   return Internal::Adaptor::ImfManager::Get();
-}
-
-ImfContext ImfManager::GetContext()
-{
-  return NULL;
 }
 
 void ImfManager::Activate()
@@ -260,17 +252,17 @@ void ImfManager::SetCursorPosition( unsigned int SetCursorPosition )
   Internal::Adaptor::ImfManager::GetImplementation(*this).SetCursorPosition( SetCursorPosition );
 }
 
-int ImfManager::GetCursorPosition()
+unsigned int ImfManager::GetCursorPosition() const
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).GetCursorPosition();
 }
 
-void ImfManager::SetSurroundingText( std::string text )
+void ImfManager::SetSurroundingText( const std::string& text )
 {
   Internal::Adaptor::ImfManager::GetImplementation(*this).SetSurroundingText( text );
 }
 
-std::string ImfManager::GetSurroundingText()
+const std::string& ImfManager::GetSurroundingText() const
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).GetSurroundingText();
 }

@@ -116,7 +116,7 @@ protected:
   /**
    * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoInitialize( const Property::Map& propertyMap );
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::DoSetOnStage
@@ -128,53 +128,67 @@ protected:
    */
   virtual void DoSetOffStage( Actor& actor );
 
-  /**
-   * @copydoc ControlRenderer::InitializeRenderer
-   */
-  virtual void InitializeRenderer( Renderer& renderer );
-
 public:
 
   /**
    * @brief Sets the image of this renderer to the resource at imageUrl
    * The renderer will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] imageUrl The URL to to image resource to use
    */
-  void SetImage( const std::string& imageUrl );
+  void SetImage( Actor& actor, const std::string& imageUrl );
 
   /**
    * @brief Sets the image of this renderer to the resource at imageUrl
    * The renderer will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] imageUrl The URL to to image resource to use
    * @param[in] desiredWidth The desired width of the resource to load
    * @param[in] desiredHeight The desired height of the resource to load
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
-  void SetImage( const std::string& imageUrl, int desiredWidth, int desiredHeight, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode );
+  void SetImage( Actor& actor, const std::string& imageUrl, int desiredWidth, int desiredHeight, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode );
 
   /**
    * @brief Sets the image of this renderer to use
    *
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] image The image to use
    */
-  void SetImage( Image image );
-
-  /**
-   * @brief Gets the image this renderer uses
-   *
-   * @return The image this renderer uses, which may be null if the image is set from a URL string and the renderer is not set as onstage
-   */
-  Image GetImage() const;
+  void SetImage( Actor& actor, const Image& image );
 
 private:
 
   /**
-   * @brief Applies this renderer's image to the sampler to the material used for this renderer
+   * @brief Applies the image to the material used for this renderer
+   *
+   * @param[in] image The Image to apply to the material used for this renderer
    */
-  void ApplyImageToSampler();
+  void ApplyImageToSampler( const Image& image );
+
+  /**
+   * @brief Initializes the Dali::Renderer from an image url string
+   *
+   * @param[in] imageUrl The image url string to intialize this ImageRenderer from
+   */
+  void InitializeRenderer( const std::string& imageUrl );
+
+  /**
+   * @brief Initializes the Dali::Renderer from an image handle
+   *
+   * @param[in] image The image handle to intialize this ImageRenderer from
+   */
+  void InitializeRenderer( const Image& image );
+
+  /**
+   * @brief Creates the Dali::Renderer (potentially from the renderer cache), initializing it
+   *
+   * @return Returns the created Dali::Renderer
+   */
+  Renderer CreateRenderer() const;
 
   /**
    * Callback function of image resource loading succeed

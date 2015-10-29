@@ -146,6 +146,7 @@ void ScrollOvershootEffectRipple::Apply()
   mOvershootProperty = IsVertical() ? Toolkit::ScrollView::Property::OVERSHOOT_Y : Toolkit::ScrollView::Property::OVERSHOOT_X;
 
   // make sure height is set, since we only create a constraint for image width
+  mOvershootSize = mAttachedScrollView.GetOvershootSize();
   mOvershootOverlay.SetSize( mOvershootSize );
 
   mAttachedScrollView.AddOverlay(mOvershootOverlay);

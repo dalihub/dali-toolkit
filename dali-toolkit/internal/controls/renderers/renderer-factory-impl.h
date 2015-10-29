@@ -55,9 +55,9 @@ public:
   Toolkit::ControlRenderer GetControlRenderer( const Property::Map& propertyMap );
 
   /**
-   * @copydoc Toolkit::RenderFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Property::Map& propertyMap )
+   * @copydoc Toolkit::RenderFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
    */
-  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Property::Map& propertyMap );
+  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Vector4& )
@@ -65,9 +65,9 @@ public:
   Toolkit::ControlRenderer GetControlRenderer( const Vector4& color );
 
   /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, const Vector4& )
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const Vector4& )
    */
-  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color );
+  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color );
 
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( float, const Vector4& )
@@ -80,9 +80,9 @@ public:
   Toolkit::ControlRenderer GetControlRenderer( const Image& image );
 
   /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, const Image& )
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const Image& )
    */
-  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image );
+  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Image& image );
 
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const std::string& )
@@ -90,9 +90,9 @@ public:
   Toolkit::ControlRenderer GetControlRenderer( const std::string& image );
 
   /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, const std::string& )
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const std::string& )
    */
-  bool ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& image );
+  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& image );
 
 public:
   /**

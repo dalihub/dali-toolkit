@@ -26,6 +26,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <cfloat>
 
@@ -40,7 +41,6 @@ namespace Internal
 
 namespace
 {
-const Dali::Vector2 DEFAULT_MAX_SIZE( 400.0f, 65.0f ); ///< The maximum size of the Toolbar.
 
 BaseHandle Create()
 {
@@ -53,6 +53,7 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, C
 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "max-size", VECTOR2, MAX_SIZE )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enable-overshoot", BOOLEAN, ENABLE_OVERSHOOT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scroll-view", MAP, SCROLL_VIEW )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -90,7 +91,21 @@ void TextSelectionToolbar::SetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
       {
+        if( !impl.mScrollView )
+        {
+          impl.mScrollView  = Toolkit::ScrollView::New();
+        }
         impl.mScrollView.SetOvershootEnabled( value.Get< bool >() );
+        break;
+      }
+      case Toolkit::TextSelectionToolbar::Property::SCROLL_VIEW:
+      {
+        // Get a Property::Map from the property if possible.
+        Property::Map setPropertyMap;
+        if( value.Get( setPropertyMap ) )
+        {
+          impl.ConfigureScrollview( setPropertyMap );
+        }
         break;
       }
     } // switch
@@ -212,7 +227,10 @@ void TextSelectionToolbar::SetUp()
   stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   stencil.SetParentOrigin( ParentOrigin::CENTER );
 
-  mScrollView  = Toolkit::ScrollView::New();
+  if ( !mScrollView )
+  {
+    mScrollView  = Toolkit::ScrollView::New();
+  }
   SetUpScrollView();
 
   // Toolbar must start with at least one option, adding further options with increase it's size
@@ -220,7 +238,6 @@ void TextSelectionToolbar::SetUp()
   mTableOfButtons.SetFitHeight( 0 );
   mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   mTableOfButtons.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-
 
   mStencilLayer.Add( stencil );
   mStencilLayer.Add( mScrollView );
@@ -265,6 +282,27 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
 {
   mStencilLayer.RaiseAbove( target );
 }
+
+void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )
+{
+  // Set any properties specified for the label by iterating through all property key-value pairs.
+  for( unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i )
+  {
+    const StringValuePair& propertyPair( properties.GetPair( i ) );
+
+    // Convert the property string to a property index.
+    Property::Index setPropertyIndex = mScrollView.GetPropertyIndex( propertyPair.first );
+    if( setPropertyIndex != Property::INVALID_INDEX )
+    {
+      // If the conversion worked, we have a valid property index,
+      // Set the property to the new value.
+      mScrollView.SetProperty( setPropertyIndex, propertyPair.second );
+    }
+  }
+
+  RelayoutRequest();
+}
+
 
 TextSelectionToolbar::TextSelectionToolbar()
 : Control( ControlBehaviour( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ) ),

@@ -27,14 +27,20 @@ namespace Dali
 namespace Toolkit
 {
 
-CubeTransitionWaveEffect::CubeTransitionWaveEffect(Internal::CubeTransitionWaveEffect* impl)
-: CubeTransitionEffect(impl)
+CubeTransitionWaveEffect::CubeTransitionWaveEffect( Internal::CubeTransitionWaveEffect& implementation )
+: CubeTransitionEffect( implementation )
 {
 }
 
-CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize)
+CubeTransitionWaveEffect::CubeTransitionWaveEffect( Dali::Internal::CustomActor* internal )
+: CubeTransitionEffect( internal )
 {
-  return Internal::CubeTransitionWaveEffect::New( numRows, numColumns, viewAreaSize );
+  VerifyCustomActorPointer< Internal::CubeTransitionWaveEffect >( internal );
+}
+
+CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int numRows, unsigned int numColumns )
+{
+  return Internal::CubeTransitionWaveEffect::New( numRows, numColumns );
 }
 
 } // namespace Toolkit

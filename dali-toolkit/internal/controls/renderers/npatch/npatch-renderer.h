@@ -92,12 +92,7 @@ protected:
   /**
    * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoInitialize( const Property::Map& propertyMap );
-
-  /**
-   * @copydoc ControlRenderer::InitializeRenderer
-   */
-  virtual void InitializeRenderer( Renderer& renderer );
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::DoSetOnStage
@@ -131,9 +126,28 @@ public:
 private:
 
   /**
+   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   */
+  void InitializeRenderer();
+
+  /**
+   * @brief Creates a geometry for this renderer's grid size
+   *
+   * @return Returns the created geometry for this renderer's grid size
+   */
+  Geometry CreateGeometry();
+
+  /**
+   * @brief Creates a shader for this renderer's grid size
+   *
+   * @return Returns the created shader for this renderer's grid size
+   */
+  Shader CreateShader();
+
+  /**
    * @brief Creates a geometry for the grid size to be used by this renderers' shaders
    *
-   * @param gridSize The grid size of the solid geometry to create
+   * @param[in] gridSize The grid size of the solid geometry to create
    * @return Returns the created geometry for the grid size
    */
   Geometry CreateGeometry( Uint16Pair gridSize );
@@ -156,7 +170,7 @@ private:
    *   |/  |/  |/  |/  |/  |
    *   ---------------------
    *
-   * @param gridSize The grid size of the solid geometry to create
+   * @param[in] gridSize The grid size of the solid geometry to create
    * @return Returns the created geometry for the grid size
    */
   Geometry CreateGeometryBorder( Uint16Pair gridSize );
@@ -164,7 +178,7 @@ private:
   /**
    * @brief Creates Image from the image url and parses the image for the stretch borders. Will create a error image if the n patch image is invalid
    *
-   * @param nPatchImage The NinePatchImage to base our cropped images and stretch borders from
+   * @param[in] nPatchImage The NinePatchImage to base our cropped images and stretch borders from
    */
   void InitializeFromImage( NinePatchImage nPatchImage );
 
@@ -178,6 +192,15 @@ private:
    * @brief Applies this renderer's image to the sampler to the material used for this renderer
    */
   void ApplyImageToSampler();
+
+  /**
+   * @brief Changes the current renderer if the n-patch meta data has changed
+   *
+   * @param[in] oldBorderOnly The old flag indicating if the image should omit the centre of the n-patch and only render the border
+   * @param[in] oldGridX The old horizontal grid size of the solid geometry
+   * @param[in] oldGridY The old vertical grid size of the solid geometry
+   */
+  void ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY );
 
 private:
 

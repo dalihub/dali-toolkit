@@ -178,15 +178,15 @@ public:
   void Remove(Actor child);
 
   /**
-   * Set the Shadow Plane for the shadow effect.
+   * Set the Shadow Plane Background for the shadow effect.
    *
-   * @param[in] shadowPlane An actor representing the shadow
+   * @param[in] shadowPlaneBackground An actor representing the shadow
    * plane. The position of the actor represents the origin of the
    * plane, and the orientation of the actor represents the direction
    * of the plane normal. Make the plane sufficiently large if the shadows are
    * clipped.
    */
-  void SetShadowPlane(ImageActor shadowPlane);
+  void SetShadowPlaneBackground(Actor shadowPlaneBackground);
 
   /**
    * Set the Point Light for the shadow effect. This is usually NOT a renderable actor.

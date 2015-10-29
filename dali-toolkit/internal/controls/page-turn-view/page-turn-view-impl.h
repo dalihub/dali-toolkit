@@ -311,7 +311,7 @@ protected:
   Vector2                        mControlSize;             ///< The size of the control, it is decided by the page size, the SetSize from application can not change it
   Layer                          mTurningPageLayer;        ///< The layer for the turning page, to avoid possible depth conflict
   Toolkit::ShadowView            mShadowView;              ///< The shadow view control for shadow casting
-  ImageActor                     mShadowPlane;             ///< The plane for the shadow to cast on
+  Actor                          mShadowPlaneBackground;   ///< The plane for the shadow to cast on
   Actor                          mPointLight;              ///< The point light used for shadow casting
 
   PageFactory&                   mPageFactory;             ///< The page factory which provides the page actors

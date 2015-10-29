@@ -262,7 +262,8 @@ int UtcDaliControlRendererGetPropertyMap1(void)
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLUE );
 
   // change the blend color
-  factory.ResetRenderer( colorRenderer, Color::CYAN );
+  Actor actor;
+  factory.ResetRenderer( colorRenderer, actor, Color::CYAN );
   colorRenderer.CreatePropertyMap( resultMap );
 
   colorValue = resultMap.Find( "blend-color", Property::VECTOR4 );
