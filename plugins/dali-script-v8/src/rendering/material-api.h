@@ -64,7 +64,6 @@ namespace MaterialApi
    void SetTextureImage( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetTextureSampler( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetTextureUniformName( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetTextureAffectsTransparency( const v8::FunctionCallbackInfo< v8::Value >& args );
    void GetTextureIndex( const v8::FunctionCallbackInfo< v8::Value >& args );
    void GetNumberOfTextures( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetFaceCullingMode( const v8::FunctionCallbackInfo< v8::Value >& args );

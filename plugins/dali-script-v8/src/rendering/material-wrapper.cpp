@@ -52,7 +52,6 @@ const ApiFunction MaterialFunctionTable[]=
    { "SetTextureImage"                 , MaterialApi::SetTextureImage },
    { "SetTextureSampler"               , MaterialApi::SetTextureSampler },
    { "SetTextureUniformName"           , MaterialApi::SetTextureUniformName },
-   { "SetTextureAffectsTransparency"   , MaterialApi::SetTextureAffectsTransparency },
    { "GetTextureIndex"                 , MaterialApi::GetTextureIndex },
    { "GetNumberOfTextures"             , MaterialApi::GetNumberOfTextures },
    { "SetFaceCullingMode"              , MaterialApi::SetFaceCullingMode },

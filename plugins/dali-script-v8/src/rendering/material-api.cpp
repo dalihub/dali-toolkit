@@ -326,40 +326,6 @@ void MaterialApi::SetTextureUniformName( const v8::FunctionCallbackInfo< v8::Val
 }
 
 /**
- * Establish if a given texture will affect the transparency of the material ( true by default )
- * @method setTextureAffectsTransparency
- * @for Material
- * @param {integer} index The index of the texture in the array of textures
- * @param {string} affectsTransparency True if the texture affects transparency, false otherwise
- */
-void MaterialApi::SetTextureAffectsTransparency( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  Material material = GetMaterial( isolate, args );
-
-  bool found( false );
-  int index = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0 /* default */);
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "invalid index parameter" );
-    return;
-  }
-
-  found = false;
-  bool affectsTransparency = V8Utils::GetBooleanParameter( PARAMETER_1, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "invalid affectsTransparency parameter" );
-  }
-  else
-  {
-    material.SetTextureAffectsTransparency(index, affectsTransparency);
-  }
-}
-
-/**
  * Retrive the index of a texture given its uniform name
  * @method getTextureIndex
  * @for Material

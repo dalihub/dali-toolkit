@@ -629,8 +629,7 @@ void Model3dView::LoadTextures()
     Image tex0 = ResourceImage::New( imgUrl );
     if( tex0 )
     {
-      size_t index = mMaterial.AddTexture( tex0, "sDiffuse" );
-      mMaterial.SetTextureAffectsTransparency(index, false );
+      mMaterial.AddTexture( tex0, "sDiffuse" );
     }
   }
 
@@ -642,8 +641,7 @@ void Model3dView::LoadTextures()
     Image tex1 = ResourceImage::New( imgUrl );
     if (tex1)
     {
-      size_t index = mMaterial.AddTexture( tex1, "sNormal" );
-      mMaterial.SetTextureAffectsTransparency(index, false );
+      mMaterial.AddTexture( tex1, "sNormal" );
     }
   }
 
@@ -655,8 +653,7 @@ void Model3dView::LoadTextures()
     Image tex2 = ResourceImage::New( imgUrl );
     if( tex2 )
     {
-      size_t index = mMaterial.AddTexture( tex2, "sGloss" );
-      mMaterial.SetTextureAffectsTransparency(index, false );
+      mMaterial.AddTexture( tex2, "sGloss" );
     }
   }
 }
