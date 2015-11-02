@@ -43,11 +43,11 @@ class Scrollable;
  * Scrollables such as ScrollView and ItemView can be derived from this class.
  *
  * Signals
- * | %Signal Name      | Method                       |
- * |-------------------|------------------------------|
- * | scroll-started    | @ref ScrollStartedSignal()   |
- * | scroll-completed  | @ref ScrollUpdatedSignal()   |
- * | scroll-updated    | @ref ScrollCompletedSignal() |
+ * | %Signal Name     | Method                       |
+ * |------------------|------------------------------|
+ * | scrollStarted    | @ref ScrollStartedSignal()   |
+ * | scrollCompleted  | @ref ScrollUpdatedSignal()   |
+ * | scrollUpdated    | @ref ScrollCompletedSignal() |
  */
 class DALI_IMPORT_API Scrollable : public Control
 {
@@ -73,19 +73,19 @@ public:
     enum
     {
       // Event side properties
-      OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshoot-effect-color",    @see SetOvershootEffectColor(),    type Vector4
-      OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshoot-animation-speed", @see SetOvershootAnimationSpeed(), type float
+      OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshootEffectColor",      @see SetOvershootEffectColor(),    type Vector4
+      OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshootAnimationSpeed",   @see SetOvershootAnimationSpeed(), type float
 
       // Animatable properties
-      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-relative-position", type Vector2
-      SCROLL_POSITION_MIN,                                        ///< Property, name "scroll-position-min",      type Vector2
-      SCROLL_POSITION_MIN_X,                                      ///< Property, name "scroll-position-min-x",    type float
-      SCROLL_POSITION_MIN_Y,                                      ///< Property, name "scroll-position-min-y",    type float
-      SCROLL_POSITION_MAX,                                        ///< Property, name "scroll-position-max",      type Vector2
-      SCROLL_POSITION_MAX_X,                                      ///< Property, name "scroll-position-max-x",    type float
-      SCROLL_POSITION_MAX_Y,                                      ///< Property, name "scroll-position-max-y",    type float
-      CAN_SCROLL_VERTICAL,                                        ///< Property, name "can-scroll-vertical",      type bool
-      CAN_SCROLL_HORIZONTAL                                       ///< Property, name "can-scroll-horizontal",    type bool
+      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollRelativePosition",   type Vector2
+      SCROLL_POSITION_MIN,                                        ///< Property, name "scrollPositionMin",        type Vector2
+      SCROLL_POSITION_MIN_X,                                      ///< Property, name "scrollPositionMinX",       type float
+      SCROLL_POSITION_MIN_Y,                                      ///< Property, name "scrollPositionMinY",       type float
+      SCROLL_POSITION_MAX,                                        ///< Property, name "scrollPositionMax",        type Vector2
+      SCROLL_POSITION_MAX_X,                                      ///< Property, name "scrollPositionMaxX",       type float
+      SCROLL_POSITION_MAX_Y,                                      ///< Property, name "scrollPositionMaxY",       type float
+      CAN_SCROLL_VERTICAL,                                        ///< Property, name "canScrollVertical",        type bool
+      CAN_SCROLL_HORIZONTAL                                       ///< Property, name "canScrollHorizontal",      type bool
     };
   };
 

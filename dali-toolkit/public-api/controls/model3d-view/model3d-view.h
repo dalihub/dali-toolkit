@@ -62,15 +62,15 @@ public:
   {
     enum
     {
-      GEOMETRY_URL = PROPERTY_START_INDEX,  ///< name "geometry-url",      The path to the geometry file,    type STRING
-      MATERIAL_URL,                         ///< name "material-url",      The path to the material file,    type STRING
-      IMAGES_URL,                           ///< name "images-url",        The path to the images directory, type STRING
-      ILLUMINATION_TYPE,                    ///< name "illumination-type", The type of illumination,         type INTEGER
-      TEXTURE0_URL,                         ///< name "texture0-url",      The path to first texture,        type STRING
-      TEXTURE1_URL,                         ///< name "texture1-url",      The path to second texture,       type STRING
-      TEXTURE2_URL,                         ///< name "texture2-url",      The path to third texture,        type STRING
+      GEOMETRY_URL = PROPERTY_START_INDEX,  ///< name "geometryUrl",       The path to the geometry file,    type STRING
+      MATERIAL_URL,                         ///< name "materialUrl",       The path to the material file,    type STRING
+      IMAGES_URL,                           ///< name "imagesUrl",         The path to the images directory, type STRING
+      ILLUMINATION_TYPE,                    ///< name "illuminationType",  The type of illumination,         type INTEGER
+      TEXTURE0_URL,                         ///< name "texture0Url",       The path to first texture,        type STRING
+      TEXTURE1_URL,                         ///< name "texture1Url",       The path to second texture,       type STRING
+      TEXTURE2_URL,                         ///< name "texture2Url",       The path to third texture,        type STRING
 
-      LIGHT_POSITION = ANIMATABLE_PROPERTY_START_INDEX    ///< name "light-position",    The coordinates of the light,     type Vector3
+      LIGHT_POSITION = ANIMATABLE_PROPERTY_START_INDEX    ///< name "lightPosition",     The coordinates of the light,     type Vector3
     };
   };
 

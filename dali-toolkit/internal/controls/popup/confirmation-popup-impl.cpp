@@ -52,8 +52,8 @@ struct ControlDetailType
  *  the app-developer      | which will provide   | app developer choose which signal
  *  can connect to.        | the signal.          | within the control to connect to.    */
 const ControlDetailType ControlDetails[] = {
-  { "control-signal-ok",     "control-ok",          "connect-signal-ok-selected"     },
-  { "control-signal-cancel", "control-cancel",      "connect-signal-cancel-selected" },
+  { "controlSignalOk",       "controlOk",           "connectSignalOkSelected"     },
+  { "controlSignalCancel",   "controlCancel",       "connectSignalCancelSelected" },
 };
 const unsigned int ControlDetailsCount = sizeof( ControlDetails ) / sizeof( ControlDetails[0] );
 

@@ -46,12 +46,12 @@ class KeyboardFocusManager;
  * is changed.
  *
  * Signals
- * | %Signal Name                     | Method                             |
- * |----------------------------------|------------------------------------|
- * | keyboard-pre-focus-change        | @ref PreFocusChangeSignal()        |
- * | keyboard-focus-changed           | @ref FocusChangedSignal()          |
- * | keyboard-focus-group-changed     | @ref FocusGroupChangedSignal()     |
- * | keyboard-focused-actor-enter-key | @ref FocusedActorEnterKeySignal()  |
+ * | %Signal Name                  | Method                             |
+ * |-------------------------------|------------------------------------|
+ * | keyboardPreFocusChange        | @ref PreFocusChangeSignal()        |
+ * | keyboardFocusChanged          | @ref FocusChangedSignal()          |
+ * | keyboardFocusGroupChanged     | @ref FocusGroupChangedSignal()     |
+ * | keyboardFocusedActorAenterKey | @ref FocusedActorEnterKeySignal()  |
  */
 class DALI_IMPORT_API KeyboardFocusManager : public BaseHandle
 {

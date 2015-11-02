@@ -257,7 +257,7 @@ void BuilderApi::Create( const v8::FunctionCallbackInfo< v8::Value >& args )
 
   // options =
   // {
-  //    template: "my-temppalte",
+  //    template: "myTemplate",
   //    constants: {  IMAGE_DIR: "/usr/apps" ,  SHADER_DIR: "/usr/apps/.."}
   // }
   //

@@ -40,31 +40,31 @@ class Gradient;
  *
  * The following properties are essential for create a LINEAR GradientRender
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | gradient-start-position   | VECTOR2          |
- * | gradient-end-position     | VECTOR2          |
- * | gradient-stop-offset      | ARRAY of FLOAT   |
- * | gradient-stop-color       | ARRAY of VECTOR4 |
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | gradientStartPosition   | VECTOR2          |
+ * | gradientEndPosition     | VECTOR2          |
+ * | gradientStopOffset      | ARRAY of FLOAT   |
+ * | gradientStopColor       | ARRAY of VECTOR4 |
  *
  * The following properties are essential for create a RADIAL GradientRender
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | gradient-center           | VECTOR2          |
- * | gradient-radius           | FLOAT            |
- * | gradient-stop-offset      | ARRAY of FLOAT   |
- * | gradient-stop-color       | ARRAY of VECTOR4 |
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | gradientCenter          | VECTOR2          |
+ * | gradientRadius          | FLOAT            |
+ * | gradientStopOffset      | ARRAY of FLOAT   |
+ * | gradientStopColor       | ARRAY of VECTOR4 |
  *
  * The following properties are optional for both LINEAR and RADIAL GradientRender.
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | gradient-units            | STRING           |
- * | gradient-spread-method    | STRING           |
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | gradientUnits           | STRING           |
+ * | gradientSpreadMethod    | STRING           |
  *
- * Valid values for gradient-units are 'user-space' and 'object-bounding-box'.
- * Valid values for gradient-spread-method are 'pad', 'repeat' and 'reflect.'
+ * Valid values for gradientUnits are 'userSpace' and 'objectBoundingBox'.
+ * Valid values for gradientSpreadMethod are 'pad', 'repeat' and 'reflect.'
  * If not provided, 'objectBoundingBox' is used as default gradient units, and 'pad' is used as default spread method.
  */
 class GradientRenderer: public ControlRenderer

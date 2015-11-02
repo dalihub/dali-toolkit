@@ -165,8 +165,8 @@ inline Dali::Property::Map CreateDistanceFieldEffect()
   fragmentShaderString.append( fragmentShaderPrefix );
   fragmentShaderString.append( fragmentShader );
 
-  customShader[ "fragment-shader" ] = fragmentShaderString;
-  customShader[ "hints" ] = "output-is-transparent";
+  customShader[ "fragmentShader" ] = fragmentShaderString;
+  customShader[ "hints" ] = "outputIsTransparent";
 
   map[ "shader" ] = customShader;
   return map;

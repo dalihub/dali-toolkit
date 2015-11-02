@@ -161,28 +161,28 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   Actor footerActor = Actor::New();
 
   // The confirmation popup can use any control type for the ok or cancel buttons.
-  // It requires that the name is "control-ok" to provide the "control-signal-ok" signal.
+  // It requires that the name is "controlOk" to provide the "controlSignalOk" signal.
   PushButton buttonOK = PushButton::New();
-  buttonOK.SetName( "control-ok" );
+  buttonOK.SetName( "controlOk" );
   footerActor.Add( buttonOK );
 
   PushButton buttonCancel = PushButton::New();
-  buttonCancel.SetName( "control-cancel" );
+  buttonCancel.SetName( "controlCancel" );
   footerActor.Add( buttonCancel );
 
   popup.SetFooter( footerActor );
 
-  // Tell the confirmation popup to connect to the signal in our button called "on-stage".
-  popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "on-stage" );
+  // Tell the confirmation popup to connect to the signal in our button called "onStage".
+  popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onStage" );
   std::string resultProperty;
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED ).Get( resultProperty ) );
-  DALI_TEST_EQUALS( resultProperty, "on-stage", TEST_LOCATION );
+  DALI_TEST_EQUALS( resultProperty, "onStage",  TEST_LOCATION );
 
   // Connect to the confirmation popup's OK signal. This signal is dynamically created upon connection.
   gSignalReceivedOK = false;
   gSignalReceivedCancel = false;
   TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
-  popup.ConnectSignal( testTracker, "control-signal-ok", ConfirmationPopupOKTestFunctor() );
+  popup.ConnectSignal( testTracker, "controlSignalOk",   ConfirmationPopupOKTestFunctor() );
 
   // Check no signal has occurred yet.
   DALI_TEST_CHECK( !gSignalReceivedOK );
@@ -197,11 +197,11 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 
   // Remove the popup from the stage, and connect the cancel signal.
   popup.Unparent();
-  popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "on-stage" );
+  popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "onStage" );
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED ).Get( resultProperty ) );
-  DALI_TEST_EQUALS( resultProperty, "on-stage", TEST_LOCATION );
+  DALI_TEST_EQUALS( resultProperty, "onStage",  TEST_LOCATION );
 
-  popup.ConnectSignal( testTracker, "control-signal-cancel", ConfirmationPopupCancelTestFunctor() );
+  popup.ConnectSignal( testTracker, "controlSignalCancel",   ConfirmationPopupCancelTestFunctor() );
 
   // Check the cancel signal has not occurred yet.
   DALI_TEST_CHECK( gSignalReceivedOK );
@@ -233,18 +233,18 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
    Actor footerActor = Actor::New();
 
    PushButton buttonOK = PushButton::New();
-   buttonOK.SetName( "control-ok-misnamed" );
+   buttonOK.SetName( "controlOkMisnamed" );
    popup.SetFooter( buttonOK );
 
-   // Tell the confirmation popup to connect to the signal in our button called "on-stage".
-   popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "on-stage" );
+   // Tell the confirmation popup to connect to the signal in our button called "onStage".
+   popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onStage" );
 
    // Connect to the confirmation popup's OK signal.
    gSignalReceivedOK = false;
 
-   // The connection will fail at this point as no actor with the name "control-ok" will be located.
+   // The connection will fail at this point as no actor with the name "controlOk" will be located.
    TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
-   popup.ConnectSignal( testTracker, "control-signal-ok", ConfirmationPopupOKTestFunctor() );
+   popup.ConnectSignal( testTracker, "controlSignalOk",   ConfirmationPopupOKTestFunctor() );
 
    // Check no signal has occurred yet.
    DALI_TEST_CHECK( !gSignalReceivedOK );

@@ -116,8 +116,7 @@ bool GetApplyParameters( const v8::FunctionCallbackInfo< v8::Value >& args, Acto
       targetPropertyIndex = targetActor.GetPropertyIndex( propertyName );
       if( targetPropertyIndex == Property::INVALID_INDEX )
       {
-        std::string convertedName = V8Utils::JavaScriptNameToPropertyName( propertyName );
-        targetPropertyIndex = targetActor.GetPropertyIndex( convertedName );
+        targetPropertyIndex = targetActor.GetPropertyIndex( propertyName );
 
         if( targetPropertyIndex == Property::INVALID_INDEX )
         {
@@ -140,8 +139,7 @@ bool GetApplyParameters( const v8::FunctionCallbackInfo< v8::Value >& args, Acto
       sourcePropertyIndex = targetActor.GetPropertyIndex( propertyName );
       if( sourcePropertyIndex == Property::INVALID_INDEX )
       {
-        std::string convertedName = V8Utils::JavaScriptNameToPropertyName( propertyName );
-        sourcePropertyIndex = targetActor.GetPropertyIndex( convertedName );
+        sourcePropertyIndex = targetActor.GetPropertyIndex( propertyName );
 
         if( sourcePropertyIndex == Property::INVALID_INDEX )
         {
@@ -210,7 +208,7 @@ bool GetApplyParameters( const v8::FunctionCallbackInfo< v8::Value >& args, Acto
  *        var constraintPosition = {  "target":targetActor,
  *                                    "targetProperty":"position",
  *                                    "source":sourceActor,
- *                                    "sourceProperty":"color-alpha",
+ *                                    "sourceProperty":"colorAlpha",
  *                                    "range":range
  *                                    "wrap":wrap
  *                                 };

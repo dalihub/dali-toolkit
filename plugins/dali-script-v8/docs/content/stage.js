@@ -27,7 +27,7 @@ dali.stage.remove( imageActor );
 
 ### Key Events
 
-Key events are received through the key-event callback.
+Key events are received through the keyEvent callback.
 
 ```
 daliApp.myCallback = function (keyEvent)
@@ -48,7 +48,7 @@ daliApp.myCallback = function (keyEvent)
   }
 }
 
-dali.stage.connect("key-event", daliApp.myCallback);
+dali.stage.connect("keyEvent", daliApp.myCallback);
 ```
 
 The key event object has the following properties

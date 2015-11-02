@@ -46,16 +46,16 @@ namespace // unnamed namespace
 
 // Signals
 
-const char* const SIGNAL_FOCUS_CHANGED =           "focus-changed";
-const char* const SIGNAL_FOCUS_OVERSHOT =          "focus-overshot";
-const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "focused-actor-activated";
+const char* const SIGNAL_FOCUS_CHANGED =           "focusChanged";
+const char* const SIGNAL_FOCUS_OVERSHOT =          "focusOvershot";
+const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "focusedActorActivated";
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FOCUS_MANAGER");
 #endif
 
 const char* const ACTOR_FOCUSABLE("focusable");
-const char* const IS_FOCUS_GROUP("is-focus-group");
+const char* const IS_FOCUS_GROUP("isFocusGroup");
 
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);

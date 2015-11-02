@@ -70,7 +70,7 @@ const Vector3      DEFAULT_TOAST_BOTTOM_PARENT_ORIGIN( 0.5f, 0.94f, 0.5f );     
 const Vector3      DEFAULT_TOAST_WIDTH_OF_STAGE_RATIO( 0.75f, 0.75f, 0.75f );               ///< Amount of the stage's width that the toast popup will take up.
 
 /**
- * Creation function for named type "popup-toast".
+ * Creation function for named type "popupToast".
  * @return Handle to the new toast popup object.
  */
 BaseHandle CreateToast()
@@ -111,32 +111,32 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Popup, Toolkit::Control, Create )
 DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "title",                             MAP,              TITLE                  )
 DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "content",                           MAP,              CONTENT                )
 DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "footer",                            MAP,              FOOTER                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "display-state",                     STRING,           DISPLAY_STATE          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "touch-transparent",                 BOOLEAN,          TOUCH_TRANSPARENT      )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "displayState",                      STRING,           DISPLAY_STATE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "touchTransparent",                  BOOLEAN,          TOUCH_TRANSPARENT      )
 
 // Contextual related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-visibility",                   BOOLEAN,          TAIL_VISIBILITY        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-position",                     VECTOR3,          TAIL_POSITION          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "contextual-mode",                   STRING,           CONTEXTUAL_MODE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailVisibility",                    BOOLEAN,          TAIL_VISIBILITY        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailPosition",                      VECTOR3,          TAIL_POSITION          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "contextualMode",                    STRING,           CONTEXTUAL_MODE        )
 
 // Animation related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animation-duration",                FLOAT,            ANIMATION_DURATION     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animation-mode",                    STRING,           ANIMATION_MODE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "entry-animation",                   MAP,              ENTRY_ANIMATION        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "exit-animation",                    MAP,              EXIT_ANIMATION         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "auto-hide-delay",                   INTEGER,          AUTO_HIDE_DELAY        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationDuration",                 FLOAT,            ANIMATION_DURATION     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationMode",                     STRING,           ANIMATION_MODE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "entryAnimation",                    MAP,              ENTRY_ANIMATION        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "exitAnimation",                     MAP,              EXIT_ANIMATION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "autoHideDelay",                     INTEGER,          AUTO_HIDE_DELAY        )
 
 // Style related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backing-enabled",                   BOOLEAN,          BACKING_ENABLED        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backing-color",                     VECTOR4,          BACKING_COLOR          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popup-background-image",            STRING,           POPUP_BACKGROUND_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-up-image",                     STRING,           TAIL_UP_IMAGE          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-down-image",                   STRING,           TAIL_DOWN_IMAGE        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-left-image",                   STRING,           TAIL_LEFT_IMAGE        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-right-image",                  STRING,           TAIL_RIGHT_IMAGE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingEnabled",                    BOOLEAN,          BACKING_ENABLED        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingColor",                      VECTOR4,          BACKING_COLOR          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popupBackgroundImage",              STRING,           POPUP_BACKGROUND_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailUpImage",                       STRING,           TAIL_UP_IMAGE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailDownImage",                     STRING,           TAIL_DOWN_IMAGE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailLeftImage",                     STRING,           TAIL_LEFT_IMAGE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailRightImage",                    STRING,           TAIL_RIGHT_IMAGE       )
 
 // Signals.
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "touched-outside",                                     SIGNAL_TOUCHED_OUTSIDE )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "touchedOutside",                                      SIGNAL_TOUCHED_OUTSIDE )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "showing",                                             SIGNAL_SHOWING         )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "shown",                                               SIGNAL_SHOWN           )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "hiding",                                              SIGNAL_HIDING          )
@@ -147,7 +147,7 @@ DALI_TYPE_REGISTRATION_END()
 // Named type registration.
 
 // Toast Popup: Non-modal popup that displays information at the bottom of the screen.
-TypeRegistration typeRegistrationToast( "popup-toast", typeid( Toolkit::Popup ), CreateToast );
+TypeRegistration typeRegistrationToast( "PopupToast",  typeid( Toolkit::Popup ), CreateToast );
 
 // Enumeration to / from string conversion tables
 
@@ -259,7 +259,7 @@ void Popup::OnInitialize()
 
   // Create a new layer so all Popup components can appear above all other actors.
   mLayer = Layer::New();
-  mLayer.SetName( "popup-layer" );
+  mLayer.SetName( "popupLayer" );
 
   mLayer.SetParentOrigin( ParentOrigin::CENTER );
   mLayer.SetAnchorPoint( AnchorPoint::CENTER );
@@ -277,7 +277,7 @@ void Popup::OnInitialize()
   mLayer.Add( mBacking );
 
   mPopupContainer = Actor::New();
-  mPopupContainer.SetName( "popup-container" );
+  mPopupContainer.SetName( "popupContainer" );
   mPopupContainer.SetParentOrigin( ParentOrigin::CENTER );
   mPopupContainer.SetAnchorPoint( AnchorPoint::CENTER );
   mPopupContainer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
@@ -289,7 +289,7 @@ void Popup::OnInitialize()
   // Adds the default background image.
   SetPopupBackgroundImage( ImageActor::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
 
-  mPopupLayout.SetName( "popup-layout-table" );
+  mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
   mPopupLayout.SetAnchorPoint( AnchorPoint::CENTER );
 
@@ -557,7 +557,7 @@ void Popup::SetPopupBackgroundImage( Actor image )
 
   // Adds new background to the dialog.
   mPopupBackgroundImage = image;
-  mPopupBackgroundImage.SetName( "popup-background-image" );
+  mPopupBackgroundImage.SetName( "popupBackgroundImage" );
   mPopupBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
   mPopupBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
 
@@ -625,7 +625,7 @@ void Popup::SetContent( Actor content )
 
   if( mContent )
   {
-    mContent.SetName( "popup-content" );
+    mContent.SetName( "popupContent" );
 
     mPopupLayout.AddChild( mContent, Toolkit::TableView::CellPosition( 1, 0 ) );
   }
@@ -832,7 +832,7 @@ void Popup::LayoutTail()
     // Adds the tail actor.
     Image tail = ResourceImage::New( image );
     mTailImage = ImageActor::New( tail );
-    mTailImage.SetName( "tail-image" );
+    mTailImage.SetName( "tailImage" );
     const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
     mTailImage.SetParentOrigin( position );
     mTailImage.SetAnchorPoint( anchorPoint );
@@ -856,7 +856,7 @@ Toolkit::Control Popup::CreateBacking()
 {
   Toolkit::Control backing = Control::New();
   backing.SetBackgroundColor( Vector4( mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f ) );
-  backing.SetName( "popup-backing" );
+  backing.SetName( "popupBacking" );
 
   // Must always be positioned top-left of stage, regardless of parent.
   backing.SetPositionInheritanceMode( DONT_INHERIT_POSITION );

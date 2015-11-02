@@ -459,7 +459,7 @@ struct SignalConnector<PropertyNotification>
 template <typename T>
 void SetActionOnSignal(const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder, SignalConnector<T>& connector)
 {
-  OptionalString childActorName(IsString( IsChild(&child, "child-actor")) );
+  OptionalString childActorName(IsString( IsChild(&child, "childActor")) );
   OptionalString actorName(IsString( IsChild(&child, "actor")) );
   OptionalString propertyName(IsString( IsChild(&child, "property")) );
   OptionalChild  valueChild( IsChild(&child, "value") );

@@ -77,29 +77,29 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Button, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled",                     BOOLEAN, DISABLED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "auto-repeating",               BOOLEAN, AUTO_REPEATING               )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initial-auto-repeating-delay", FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "next-auto-repeating-delay",    FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "autoRepeating",                BOOLEAN, AUTO_REPEATING               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initialAutoRepeatingDelay",    FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "nextAutoRepeatingDelay",       FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                     BOOLEAN, SELECTED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-state-image",       STRING,  UNSELECTED_STATE_IMAGE       )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-state-image",         STRING,  SELECTED_STATE_IMAGE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled-state-image",         STRING,  DISABLED_STATE_IMAGE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-color",             VECTOR4, UNSELECTED_COLOR             )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-color",               VECTOR4, SELECTED_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedStateImage",         STRING,  UNSELECTED_STATE_IMAGE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedStateImage",           STRING,  SELECTED_STATE_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledStateImage",           STRING,  DISABLED_STATE_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedColor",              VECTOR4, UNSELECTED_COLOR             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedColor",                VECTOR4, SELECTED_COLOR               )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                        MAP,     LABEL                        )
 
 // Deprecated properties:
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label-text",                   STRING,  LABEL_TEXT                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelText",                    STRING,  LABEL_TEXT                   )
 
 // Signals:
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "released",                              SIGNAL_RELEASED              )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "clicked",                               SIGNAL_CLICKED               )
-DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "stateChanged",                          SIGNAL_STATE_CHANGED         )
 
 // Actions:
-DALI_ACTION_REGISTRATION(   Toolkit, Button, "button-click",                          ACTION_BUTTON_CLICK          )
+DALI_ACTION_REGISTRATION(   Toolkit, Button, "buttonClick",                           ACTION_BUTTON_CLICK          )
 
 DALI_TYPE_REGISTRATION_END()
 

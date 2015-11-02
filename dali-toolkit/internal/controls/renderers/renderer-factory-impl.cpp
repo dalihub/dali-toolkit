@@ -34,13 +34,13 @@
 
 namespace
 {
-const char * const RENDERER_TYPE_NAME( "renderer-type" );
+const char * const RENDERER_TYPE_NAME( "rendererType" );
 
-const char * const COLOR_RENDERER("color-renderer");
-const char * const BORDER_RENDERER("border-renderer");
-const char * const GRADIENT_RENDERER("gradient-renderer");
-const char * const IMAGE_RENDERER("image-renderer");
-const char * const N_PATCH_RENDERER("n-patch-renderer");
+const char * const COLOR_RENDERER("colorRenderer");
+const char * const BORDER_RENDERER("borderRenderer");
+const char * const GRADIENT_RENDERER("gradientRenderer");
+const char * const IMAGE_RENDERER("imageRenderer");
+const char * const N_PATCH_RENDERER("nPatchRenderer");
 
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }

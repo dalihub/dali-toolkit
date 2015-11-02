@@ -111,7 +111,7 @@ Here is the code to produce the above example:
   
 C++
 ~~~{.cpp}
-TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "popup-toast" );
+TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "PopupToast" );
 if( typeInfo )
 {
   BaseHandle baseHandle = typeInfo.CreateInstance();
@@ -185,22 +185,22 @@ These signals are dynamically created. The controls (typically PushButtons) must
 ## Step 1 {#popupconfirmationstep1}
 Name your controls.
   
-- Name your first control, or OK control:      "control-ok"
-- Name your second control, or Cancel control: "control-cancel"
+- Name your first control, or OK control:      "controlOk"
+- Name your second control, or Cancel control: "controlCancel"
   
 ## Step 2 {#popupconfirmationstep2}
 Tell the ConfirmationPopup the names of the signals to connect to for each control.
 For example, if we are using PushButtons as controls, the signal name would be "clicked".
 This allows us to use different control types.
   
-- Set property "connect-signal-ok-selected" with the name of the signal to connect to within the first control.
-- Set property "connect-signal-cancel-selected" with the name of the signal to connect to within the second control.
+- Set property "connectSignalOkSelected" with the name of the signal to connect to within the first control.
+- Set property "connectSignalCancelSelected" with the name of the signal to connect to within the second control.
   
 ## Step 3 {#popupconfirmationstep3}
 Connect to the following respective signals within ConfirmationPopup:
   
-- Connect to signal "control-signal-ok" to be signalled for the first control.
-- Connect to signal "control-signal-cancel" to be signalled for the second control.
+- Connect to signal "controlSignalOk" to be signalled for the first control.
+- Connect to signal "controlSignalCancel" to be signalled for the second control.
   
 The ConfirmationPopup will dynamically make the connection between the signalling control, and your signal handler.
   
@@ -307,77 +307,77 @@ This time without an image around the buttons. This could be added in the same w
   "stage": [
     {
       "type": "ConfirmationPopup",
-      "name": "confirmation-popup",
-      "parent-origin": [0.5, 0.55, 0.5],
-      "anchor-point": "CENTER",
-      "width-resize-policy": "SIZE_RELATIVE_TO_PARENT",
-      "height-resize-policy": "USE_NATURAL_SIZE",
-      "size-mode-factor": [0.65, 1.0, 1.0],
-      "tail-visibility": false,
-      "display-change-animation-duration": 1.0,
-      "contextual-mode": "NON_CONTEXTUAL",
-      "animation-mode": "ZOOM",
-      "connect-signal-ok-selected": "clicked",
-      "connect-signal-cancel-selected": "clicked",
+      "name": "confirmationPopup",
+      "parentOrigin": [0.5, 0.55, 0.5],
+      "anchorPoint": "CENTER",
+      "widthResizePolicy": "SIZE_RELATIVE_TO_PARENT",
+      "heightResizePolicy": "USE_NATURAL_SIZE",
+      "sizeModeFactor": [0.65, 1.0, 1.0],
+      "tailVisibility": false,
+      "displayChangeAnimationDuration": 1.0,
+      "contextualMode": "NON_CONTEXTUAL",
+      "animationMode": "ZOOM",
+      "connectSignalOkSelected": "clicked",
+      "connectSignalCancelSelected": "clicked",
       "title": {
         "type": "TextLabel",
         "text": "Title text",
-        "text-color": [1, 1, 1, 1]
+        "textColor": [1, 1, 1, 1]
       },
       "content": {
         "type": "TextLabel",
         "text": "Content text",
         "padding": [20, 20, 20, 0],
-        "text-color": [1, 1, 1, 1]
+        "textColor": [1, 1, 1, 1]
       },
       "footer": {
         "type": "Control",
         "size": [0, 80, 0],
-        "width-resize-policy": "FILL_TO_PARENT",
-        "height-resize-policy": "FIXED",
-        "parent-origin": "CENTER",
-        "anchor-point": "CENTER",
+        "widthResizePolicy": "FILL_TO_PARENT",
+        "heightResizePolicy": "FIXED",
+        "parentOrigin": "CENTER",
+        "anchorPoint": "CENTER",
         "actors": [
           {
             "type": "PushButton",
-            "name": "control-ok",
-            "parent-origin": "CENTER_LEFT",
-            "anchor-point": "CENTER_LEFT",
+            "name": "controlOk",
+            "parentOrigin": "CENTER_LEFT",
+            "anchorPoint": "CENTER_LEFT",
             "position": [20, 0, 0],
             "size": [0, 0, 0],
-            "label-text": "OK"
+            "labelText": "OK"
           },
           {
             "type": "PushButton",
-            "name": "control-cancel",
-            "parent-origin": "CENTER_RIGHT",
-            "anchor-point": "CENTER_RIGHT",
+            "name": "controlCancel",
+            "parentOrigin": "CENTER_RIGHT",
+            "anchorPoint": "CENTER_RIGHT",
             "position": [-20, 0, 0],
             "size": [0, 0, 0],
-            "label-text": "Cancel"
+            "labelText": "Cancel"
           }
         ]
       },
       "signals": [
         {
-          "name": "control-signal-ok",
+          "name": "controlSignalOk",
           "action": "set",
-          "actor": "confirmation-popup",
-          "property": "display-state",
+          "actor": "confirmationPopup",
+          "property": "displayState",
           "value": "HIDDEN"
         },
         {
-          "name": "control-signal-cancel",
+          "name": "controlSignalCancel",
           "action": "set",
-          "actor": "confirmation-popup",
-          "property": "display-state",
+          "actor": "confirmationPopup",
+          "property": "displayState",
           "value": "HIDDEN"
         },
         {
-          "name": "touched-outside",
+          "name": "touchedOutside",
           "action": "set",
-          "actor": "confirmation-popup",
-          "property": "display-state",
+          "actor": "confirmationPopup",
+          "property": "displayState",
           "value": "HIDDEN"
         }
       ]

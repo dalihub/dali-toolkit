@@ -52,9 +52,9 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
  * Actors are provided from an external ItemFactory, to display the currently visible items.
  *
  * Signals
- * | %Signal Name                     | Method                                     |
- * |----------------------------------|--------------------------------------------|
- * | layout-activated                 | @ref LayoutActivatedSignal()               |
+ * | %Signal Name                    | Method                                     |
+ * |---------------------------------|--------------------------------------------|
+ * | layoutActivated                 | @ref LayoutActivatedSignal()               |
  */
 
 class DALI_IMPORT_API ItemView : public Scrollable
@@ -74,12 +74,12 @@ public:
   {
     enum
     {
-      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "layout-position",       type float
-      SCROLL_SPEED,                                      ///< Property, name "scroll-speed",          type float
+      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "layoutPosition",        type float
+      SCROLL_SPEED,                                      ///< Property, name "scrollSpeed",           type float
       OVERSHOOT,                                         ///< Property, name "overshoot",             type float
-      SCROLL_DIRECTION,                                  ///< Property, name "scroll-direction",      type Vector2
-      LAYOUT_ORIENTATION,                                ///< Property, name "layout-orientation",    type integer
-      SCROLL_CONTENT_SIZE                                ///< Property, name "scroll-content-size",   type float
+      SCROLL_DIRECTION,                                  ///< Property, name "scrollDirection",       type Vector2
+      LAYOUT_ORIENTATION,                                ///< Property, name "layoutOrientation",     type integer
+      SCROLL_CONTENT_SIZE                                ///< Property, name "scrollContentSize",     type float
     };
   };
 

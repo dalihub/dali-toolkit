@@ -43,10 +43,10 @@ namespace Internal
  *
  * The following properties are optional
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | image-url                 | STRING           |
- * | border-only               | BOOLEAN
+ * | %Property Name           | Type             |
+ * |--------------------------|------------------|
+ * | imageUrl                 | STRING           |
+ * | borderOnly               | BOOLEAN
  *
  */
 class NPatchRenderer: public ControlRenderer

@@ -29,10 +29,10 @@ namespace
 {
 //custom shader
 const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertex-shader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragment-shader" );
-const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivide-grid-x" );
-const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivide-grid-y" );
+const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
+const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
+const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
+const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hints
 }
 

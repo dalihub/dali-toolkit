@@ -55,30 +55,30 @@ class TableView;
  *
  * These properties are registered dynamically to the child and is non-animatable.
  *
- * | %Property Name            | Type        |
- * |---------------------------|-------------|
- * | cell-index                | Vector2     |
- * | row-span                  | float       |
- * | column-span               | float       |
- * | cell-horizontal-alignment | string      |
- * | cell-vertical-alignment   | string      |
+ * | %Property Name          | Type        |
+ * |-------------------------|-------------|
+ * | cellIndex               | Vector2     |
+ * | rowSpan                 | float       |
+ * | columnSpan              | float       |
+ * | cellHorizontalAlignment | string      |
+ * | cellVerticalAlignment   | string      |
  *
  * The row-span or column span has integer value, but its type is float here due to the limitation of the builder's ability to differentiate integer and float from Json string.
- * The available values for cell-horizontal-alignment are: left, center, right.
- * The available values for cell-vertical-alignment are: top, center, bottom.
+ * The available values for cellHorizontalAlignment are: left, center, right.
+ * The available values for cellVerticalAlignment are: top, center, bottom.
  *
  * @code
- * "name":"gallery-1",
+ * "name":"gallery1",
  * "type":"ImageActor",
  * "image": {
  *    "filename": "{DALI_IMAGE_DIR}gallery-small-1.jpg"
  *  },
- *  "custom-properties": {
- *     "cell-index":[1,1],  // property to specify the top-left cell this child occupies, if not set, the first available cell is used
- *     "row-span":3,        // property to specify how many rows this child occupies, if not set, default value is 1
- *     "column-span": 2,    // property to specify how many columns this child occupies, if nor set, default value is 1
- *     "cell-horizontal-alignment": "left", // property to specify how to align horizontally inside the cells, if not set, default value is 'left'
- *     "cell-vertical-alignment": "center"  // property to specify how to align vertically inside the cells, if not set, default value is 'top'
+ *  "customProperties": {
+ *     "cellIndex":[1,1],  // property to specify the top-left cell this child occupies, if not set, the first available cell is used
+ *     "rowSpan":3,        // property to specify how many rows this child occupies, if not set, default value is 1
+ *     "columnSpan": 2,    // property to specify how many columns this child occupies, if nor set, default value is 1
+ *     "cellHorizontalAlignment": "left", // property to specify how to align horizontally inside the cells, if not set, default value is 'left'
+ *     "cellVerticalAlignment": "center"  // property to specify how to align vertically inside the cells, if not set, default value is 'top'
  *   }
  * @endcode
  */
@@ -101,7 +101,7 @@ public:
    * LayoutRows: set the height of the rows.
    * It has the format as follows in script:
    * @code
-   * "layout-rows":
+   * "layoutRows":
       {
         "0": { "policy": "fixed", "value": 40 },       //@see SetFixedHight
         "2": { "policy": "relative", "value": 0.33 },  //@see SetRelativeHeight
@@ -112,7 +112,7 @@ public:
    * LayoutColumns: set the height of the rows.
    * It has the format as follows in script:
    * @code
-   * "layout-columns":
+   * "layoutColumns":
       {
         "0": { "policy": "fixed", "value": 40 },       //@see SetFixedWidth
         "1": { "policy": "fit", "value":0.0 }          //@see SetFitHeight, the value is not used, its width is decided by the children in this column
@@ -126,9 +126,9 @@ public:
     {
       ROWS = PROPERTY_START_INDEX, ///< name "rows",           type unsigned int
       COLUMNS,                     ///< name "columns",        type unsigned int
-      CELL_PADDING,                ///< name "cell-padding",   type Vector2
-      LAYOUT_ROWS,                 ///< name "layout-rows",    type Map
-      LAYOUT_COLUMNS,              ///< name "layout-columns", type Map
+      CELL_PADDING,                ///< name "cellPadding",    type Vector2
+      LAYOUT_ROWS,                 ///< name "layoutRows",     type Map
+      LAYOUT_COLUMNS,              ///< name "layoutColumns",  type Map
     };
   };
 

@@ -72,13 +72,13 @@ Note that since DALi is a 3D toolkit, this behaviour is the result of a default 
 
 The actor provides the following call back events
 
-| Name              | Description                            | Parameters passed to call back |
-|-------------------|----------------------------------------|--------------------------|
-|touched            | touch event                            | (actor, touchEvent )     |
-|hovered            | mouse or pointer hovering over actor   | (actor, hoverEvent)      |
-|mouse-wheel-event  | mouse wheel events                     | (actor, wheelEvent)      |
-|on-stage           | actor has been moved on stage          | (actor)                  |
-|off-stage          | actor has been moved off stage         | (actor)                  |
+| Name            | Description                            | Parameters passed to call back |
+|-----------------|----------------------------------------|--------------------------|
+|touched          | touch event                            | (actor, touchEvent )     |
+|hovered          | mouse or pointer hovering over actor   | (actor, hoverEvent)      |
+|mouseWheelEvent  | mouse wheel events                     | (actor, wheelEvent)      |
+|onStage          | actor has been moved on stage          | (actor)                  |
+|offStage         | actor has been moved off stage         | (actor)                  |
 
 
 #### Touch event
@@ -162,7 +162,7 @@ mouseWheelEvent = {
 }
   
 // connect to touch events
-myActor.connect( "mouse-wheel-event", onMouseWheel );
+myActor.connect( "mouseWheelEvent", onMouseWheel );
 ```
 #### Key events
 

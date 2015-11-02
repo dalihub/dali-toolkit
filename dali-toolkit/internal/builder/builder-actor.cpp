@@ -47,32 +47,32 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
   // we allow enums strings for parent-origin and anchor-point but as with the current json
   // strings always succeed if they exist then check its not vector. If they are Vec3s then
   // this has already been set as a generic property.
-  if( !IsVector3( child, "parent-origin") )
+  if( !IsVector3( child, "parentOrigin") )
   {
-    if( OptionalVector3 v = constant.IsVector3( IsChild(child, "parent-origin") ) )
+    if( OptionalVector3 v = constant.IsVector3( IsChild(child, "parentOrigin") ) )
     {
       actor.SetParentOrigin( *v );
     }
-    else if( OptionalString origin = constant.IsString( IsChild(child, "parent-origin") ) )
+    else if( OptionalString origin = constant.IsString( IsChild(child, "parentOrigin") ) )
     {
       actor.SetParentOrigin( GetAnchorConstant(*origin) );
     }
   }
 
-  if( !IsVector3(child, "anchor-point") )
+  if( !IsVector3(child, "anchorPoint") )
   {
-    if( OptionalVector3 v = constant.IsVector3( IsChild(child, "anchor-point") ) )
+    if( OptionalVector3 v = constant.IsVector3( IsChild(child, "anchorPoint") ) )
     {
       actor.SetAnchorPoint( *v );
     }
-    else if( OptionalString anchor = constant.IsString( IsChild(child, "anchor-point") ) )
+    else if( OptionalString anchor = constant.IsString( IsChild(child, "anchorPoint") ) )
     {
       actor.SetAnchorPoint( GetAnchorConstant(*anchor) );
     }
   }
 
   // Add custom properties
-  if( OptionalChild customPropertiesChild = IsChild(child,  "custom-properties") )
+  if( OptionalChild customPropertiesChild = IsChild(child,  "customProperties") )
   {
     const TreeNode& customPropertiesNode = *customPropertiesChild;
     const TreeConstIter endIter = customPropertiesNode.CEnd();

@@ -52,15 +52,15 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Model3dView, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "geometry-url", STRING, GEOMETRY_URL)
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "material-url", STRING, MATERIAL_URL)
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "images-url", STRING, IMAGES_URL)
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "illumination-type", INTEGER, ILLUMINATION_TYPE)
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture0-url", STRING, TEXTURE0_URL)
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture1-url", STRING, TEXTURE1_URL)
-DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture2-url", STRING, TEXTURE2_URL)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "geometryUrl",  STRING, GEOMETRY_URL)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "materialUrl",  STRING, MATERIAL_URL)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "imagesUrl",  STRING, IMAGES_URL)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "illuminationType",  INTEGER, ILLUMINATION_TYPE)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture0Url",  STRING, TEXTURE0_URL)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture1Url",  STRING, TEXTURE1_URL)
+DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture2Url",  STRING, TEXTURE2_URL)
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Model3dView, "light-position", VECTOR3, LIGHT_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Model3dView, "lightPosition",  VECTOR3, LIGHT_POSITION)
 
 DALI_TYPE_REGISTRATION_END()
 

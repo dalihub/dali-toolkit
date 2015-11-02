@@ -92,9 +92,7 @@ void HandleWrapper::PropertyGet( v8::Local<v8::String> propertyName,
   Handle handle =  handleWrapper->mHandle;
 
   // get the property index
-  // convert from camel case to dali property style with hyphens
-  std::string daliPropertyName = V8Utils::JavaScriptNameToPropertyName(name);
-  Dali::Property::Index index = handle.GetPropertyIndex( daliPropertyName );
+  Dali::Property::Index index = handle.GetPropertyIndex( name );
 
   if(index != Dali::Property::INVALID_INDEX)
   {
@@ -149,9 +147,7 @@ void HandleWrapper::PropertySet( v8::Local<v8::String> propertyName,
  // DALI_ASSERT_DEBUG( handleWrapper && "not a dali object");
   Handle handle =  handleWrapper->mHandle;
 
-  // convert from camel case to dali property style with hyphens
-  std::string daliPropertyName = V8Utils::JavaScriptNameToPropertyName(name);
-  Dali::Property::Index index = handle.GetPropertyIndex( daliPropertyName );
+  Dali::Property::Index index = handle.GetPropertyIndex( name );
 
   if(index != Dali::Property::INVALID_INDEX)
   {

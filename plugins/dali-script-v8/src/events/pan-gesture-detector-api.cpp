@@ -61,7 +61,7 @@ PanGestureDetector PanGestureDetectorApi::New( const v8::FunctionCallbackInfo< v
 /**
  * Attaches an actor to the pan gesture.
  *
- * The pan-detected signal will be dispatched when the pan gesture occurs on
+ * The panDetected signal will be dispatched when the pan gesture occurs on
  * the attached actor. You can attach several actors to a pan gesture detector.
  * @method attach
  * @for PanGestureDetector

@@ -36,20 +36,20 @@ void dali_textlabel_cleanup(void)
 namespace
 {
 
-const char* const PROPERTY_NAME_RENDERING_BACKEND = "rendering-backend";
+const char* const PROPERTY_NAME_RENDERING_BACKEND = "renderingBackend";
 const char* const PROPERTY_NAME_TEXT = "text";
-const char* const PROPERTY_NAME_FONT_FAMILY = "font-family";
-const char* const PROPERTY_NAME_FONT_STYLE = "font-style";
-const char* const PROPERTY_NAME_POINT_SIZE = "point-size";
-const char* const PROPERTY_NAME_MULTI_LINE =  "multi-line";
-const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
-const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "vertical-alignment";
-const char* const PROPERTY_NAME_TEXT_COLOR = "text-color";
-const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadow-offset";
-const char* const PROPERTY_NAME_SHADOW_COLOR = "shadow-color";
-const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underline-enabled";
-const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underline-color";
-const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underline-height";
+const char* const PROPERTY_NAME_FONT_FAMILY = "fontFamily";
+const char* const PROPERTY_NAME_FONT_STYLE = "fontStyle";
+const char* const PROPERTY_NAME_POINT_SIZE = "pointSize";
+const char* const PROPERTY_NAME_MULTI_LINE =  "multiLine";
+const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "verticalAlignment";
+const char* const PROPERTY_NAME_TEXT_COLOR = "textColor";
+const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadowOffset";
+const char* const PROPERTY_NAME_SHADOW_COLOR = "shadowColor";
+const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underlineEnabled";
+const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underlineColor";
+const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underlineHeight";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 

@@ -416,8 +416,8 @@ int UtcDaliPageTurnViewSetGetProperty(void)
 
   Stage::GetCurrent().Add( landscapeView );
 
-  // Test "page-size" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("page-size") == PageTurnView::Property::PAGE_SIZE  );
+  // Test "pageSize" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("pageSize") == PageTurnView::Property::PAGE_SIZE  );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), PAGE_SIZE, TEST_LOCATION );
 
   Vector2 newSize( PAGE_SIZE.x*0.75, PAGE_SIZE.y*0.5f );
@@ -431,8 +431,8 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   Wait( application);
   DALI_TEST_EQUALS( Vector2(landscapeView.GetTargetSize()), Vector2(newSize.x*3.f, newSize.y*1.5f), TEST_LOCATION);
 
-  // Test "current-page-id" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("current-page-id") == PageTurnView::Property::CURRENT_PAGE_ID );
+  // Test "currentPageId" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("currentPageId") == PageTurnView::Property::CURRENT_PAGE_ID );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
 
   int pageId = static_cast<int>(TOTAL_PAGE_NUMBER)/3;
@@ -442,8 +442,8 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   landscapeView.SetProperty( PageTurnView::Property::CURRENT_PAGE_ID, pageId*2 );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageId*2, TEST_LOCATION );
 
-  // Test "spin-shadow" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex( "spine-shadow" ) == PageTurnView::Property::SPINE_SHADOW );
+  // Test "spinShadow" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex( "spineShadow" ) == PageTurnView::Property::SPINE_SHADOW );
   landscapeView.SetProperty( PageTurnView::Property::SPINE_SHADOW, SPINE_SHADOW_PARAMETER );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::SPINE_SHADOW).Get<Vector2>(), SPINE_SHADOW_PARAMETER, TEST_LOCATION );
 

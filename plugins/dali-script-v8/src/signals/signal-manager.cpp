@@ -55,22 +55,22 @@ namespace // un-named namespace
 {
 const char* const SIGNAL_TOUCHED = "touched";
 const char* const SIGNAL_HOVERED = "hovered";
-const char* const SIGNAL_WHEEL_EVENT = "wheel-event";
-const char* const SIGNAL_ON_STAGE = "on-stage";
-const char* const SIGNAL_OFF_STAGE = "off-stage";
+const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
+const char* const SIGNAL_ON_STAGE = "onStage";
+const char* const SIGNAL_OFF_STAGE = "offStage";
 const char* const ANIMATION_SIGNAL_FINISHED = "finished";
-const char* const SIGNAL_PAN_DETECTED = "pan-detected";
+const char* const SIGNAL_PAN_DETECTED = "panDetected";
 
-const char* const STAGE_SIGNAL_KEY_EVENT = "key-event";
-const char* const STAGE_SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
+const char* const STAGE_SIGNAL_KEY_EVENT = "keyEvent";
+const char* const STAGE_SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
 const char* const STAGE_SIGNAL_TOUCHED = "touched";
-const char* const SIGNAL_IMAGE_LOADING_FINISHED = "image-loading-finished";
+const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
 const char* const SIGNAL_IMAGE_UPLOADED = "uploaded";
 
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_PRE_FOCUS_CHANGE = "keyboard-pre-focus-change";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_CHANGED = "keyboard-focus-changed";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_GROUP_CHANGED = "keyboard-focus-group-changed";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ENTER_KEY = "keyboard-focused-actor-enter-key";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_PRE_FOCUS_CHANGE = "keyboardPreFocusChange";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_CHANGED = "keyboardFocusChanged";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_GROUP_CHANGED = "keyboardFocusGroupChanged";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ENTER_KEY = "keyboardFocusedActorEnterKey";
 const unsigned int MAX_SIGNAL_NAME_LENGTH = 64;
 
 } // un-named name space
