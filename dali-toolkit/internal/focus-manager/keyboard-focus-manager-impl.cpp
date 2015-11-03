@@ -132,9 +132,9 @@ bool KeyboardFocusManager::SetCurrentFocusActor(Actor actor)
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
 
-  if(actor)
+  if( actor )
   {
-    return DoSetCurrentFocusActor(actor.GetId());
+    return DoSetCurrentFocusActor( actor.GetId() );
   }
 
   return false;
@@ -695,8 +695,12 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
 void KeyboardFocusManager::OnTouched(const TouchEvent& touchEvent)
 {
-  // Clear the focus when user touch the screen
-  ClearFocus();
+  // Clear the focus when user touch the screen.
+  // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
+  if( ( touchEvent.GetPointCount() < 1 ) || ( touchEvent.GetPoint( 0 ).state == TouchPoint::Down ) )
+  {
+    ClearFocus();
+  }
 }
 
 Toolkit::KeyboardFocusManager::PreFocusChangeSignalType& KeyboardFocusManager::PreFocusChangeSignal()
