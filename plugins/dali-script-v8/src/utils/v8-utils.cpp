@@ -434,6 +434,14 @@ Property::Map GetPropertyMapFromObject( v8::Isolate* isolate, const v8::Local<v8
     {
       propertyMap[ keyString ] = PropertyValueWrapper::VectorOrMatrixFromV8Array( isolate, value);
     }
+    else if( value->IsObject() )
+    {
+      Dali::Property::Map map = V8Utils::GetPropertyMapFromObject(isolate, value->ToObject());
+      if( !map.Empty() )
+      {
+        propertyMap[ keyString ] = Dali::Property::Value( map );
+      }
+    }
   }
 
   return propertyMap;
