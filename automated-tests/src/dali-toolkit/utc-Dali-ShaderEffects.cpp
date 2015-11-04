@@ -136,28 +136,28 @@ int UtcDaliCreateDissolveEffect( bool highPrecision )
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
   DALI_TEST_CHECK( gridXValue );
 
   int gridX = 0;
   DALI_TEST_CHECK( gridXValue->Get( gridX ) );
   DALI_TEST_CHECK( gridX > 1 );
 
-  Property::Value* gridYValue = customShader.Find( "subdivide-grid-y" );
+  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
   DALI_TEST_CHECK( gridYValue );
 
   int gridY = 0;
@@ -169,7 +169,7 @@ int UtcDaliCreateDissolveEffect( bool highPrecision )
 
   std::string hints;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "output-is-transparent" );
+  DALI_TEST_CHECK( hints == "outputIsTransparent" );
 
   Actor actor = Actor::New();
   Toolkit::DissolveEffectSetCentralLine( actor, Vector2::ONE, Vector2::ONE, 0.0f );
@@ -211,17 +211,17 @@ int UtcDaliCreateDissolveEffect(void)
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
   DALI_TEST_CHECK( !vertexShaderValue );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
   DALI_TEST_CHECK( !gridXValue );
 
   Property::Value* hintsValue = customShader.Find( "hints" );
@@ -229,7 +229,7 @@ int UtcDaliCreateDissolveEffect(void)
 
   std::string hints;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "output-is-transparent" );
+  DALI_TEST_CHECK( hints == "outputIsTransparent" );
 
   END_TEST;
 }
@@ -289,28 +289,28 @@ int UtcDaliCreateMotionBlurEffect(void)
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
   DALI_TEST_CHECK( gridXValue );
 
   int gridX = 0;
   DALI_TEST_CHECK( gridXValue->Get( gridX ) );
   DALI_TEST_CHECK( gridX > 1 );
 
-  Property::Value* gridYValue = customShader.Find( "subdivide-grid-y" );
+  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
   DALI_TEST_CHECK( gridYValue );
 
   int gridY = 0;
@@ -322,7 +322,7 @@ int UtcDaliCreateMotionBlurEffect(void)
 
   std::string hints;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "output-is-transparent" );
+  DALI_TEST_CHECK( hints == "outputIsTransparent" );
 
   unsigned int sampleCount( 4 );
   Actor actor = Actor::New();
@@ -352,28 +352,28 @@ int UtcDaliCreateMotionStretchEffect(void)
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertex-shader" );
+  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragment-shader" );
+  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivide-grid-x" );
+  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
   DALI_TEST_CHECK( gridXValue );
 
   int gridX = 0;
   DALI_TEST_CHECK( gridXValue->Get( gridX ) );
   DALI_TEST_CHECK( gridX > 1 );
 
-  Property::Value* gridYValue = customShader.Find( "subdivide-grid-y" );
+  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
   DALI_TEST_CHECK( gridYValue );
 
   int gridY = 0;
@@ -385,7 +385,7 @@ int UtcDaliCreateMotionStretchEffect(void)
 
   std::string hints;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "output-is-transparent" );
+  DALI_TEST_CHECK( hints == "outputIsTransparent" );
 
   Actor actor = Actor::New();
   Toolkit::SetMotionStretchProperties( actor );

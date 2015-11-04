@@ -43,29 +43,29 @@ typedef IntrusivePtr< ImageRenderer > ImageRendererPtr;
  *
  * The following properties are optional
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | image-url                 | STRING           |
- * | image-fitting-mode        | STRING           |
- * | image-sampling-mode       | STRING           |
- * | image-desired-width       | INT              |
- * | image-desired-height      | INT              |
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | imageUrl                | STRING           |
+ * | imageFittingMode        | STRING           |
+ * | imageSamplingMode       | STRING           |
+ * | imageDesiredWidth       | INT              |
+ * | imageDesiredHeight      | INT              |
  *
- * where image-fitting-mode should be one of the following fitting modes:
- *   "shrink-to-fit"
- *   "scale-to-fill"
- *   "fit-width"
- *   "fit-height"
+ * where imageFittingMode should be one of the following fitting modes:
+ *   "shrinkToFit"
+ *   "scaleToFill"
+ *   "fitWidth"
+ *   "fitHeight"
  *   "default"
  *
- * where image-sampling-mode should be one of the following sampling modes:
+ * where imageSamplingMode should be one of the following sampling modes:
  *   "box"
  *   "nearest"
  *   "linear"
- *   "box-then-nearest"
- *   "box-then-linear"
- *   "no-filter"
- *   "dont-care"
+ *   "boxThenNearest"
+ *   "boxThenLinear"
+ *   "noFilter"
+ *   "dontCare"
  *   "default"
  *
  */

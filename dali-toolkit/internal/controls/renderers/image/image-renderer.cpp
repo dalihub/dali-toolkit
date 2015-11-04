@@ -39,31 +39,31 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("image-renderer");
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("imageRenderer");
 
 // property names
-const char * const IMAGE_URL_NAME( "image-url" );
-const char * const IMAGE_FITTING_MODE( "image-fitting-mode" );
-const char * const IMAGE_SAMPLING_MODE( "image-sampling-mode" );
-const char * const IMAGE_DESIRED_WIDTH( "image-desired-width" );
-const char * const IMAGE_DESIRED_HEIGHT( "image-desired-height" );
+const char * const IMAGE_URL_NAME( "imageUrl" );
+const char * const IMAGE_FITTING_MODE( "imageFittingMode" );
+const char * const IMAGE_SAMPLING_MODE( "imageSamplingMode" );
+const char * const IMAGE_DESIRED_WIDTH( "imageDesiredWidth" );
+const char * const IMAGE_DESIRED_HEIGHT( "imageDesiredHeight" );
 
 // fitting modes
-const char * const SHRINK_TO_FIT("shrink-to-fit");
-const char * const SCALE_TO_FILL("scale-to-fill");
-const char * const FIT_WIDTH("fit-width");
-const char * const FIT_HEIGHT("fit-height");
+const char * const SHRINK_TO_FIT("shrinkToFit");
+const char * const SCALE_TO_FILL("scaleToFill");
+const char * const FIT_WIDTH("fitWidth");
+const char * const FIT_HEIGHT("fitHeight");
 const char * const DEFAULT("default");
 
 // sampling modes
 const char * const BOX("box");
 const char * const NEAREST("nearest");
 const char * const LINEAR("linear");
-const char * const BOX_THEN_NEAREST("box-then-nearest");
-const char * const BOX_THEN_LINEAR("box-then-linear");
-const char * const NO_FILTER("no-filter");
-const char * const DONT_CARE("dont-care");
+const char * const BOX_THEN_NEAREST("boxThenNearest");
+const char * const BOX_THEN_LINEAR("boxThenLinear");
+const char * const NO_FILTER("noFilter");
+const char * const DONT_CARE("dontCare");
 
 std::string TEXTURE_UNIFORM_NAME = "sTexture";
 

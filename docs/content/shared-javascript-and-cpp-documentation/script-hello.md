@@ -12,7 +12,7 @@
    "name": "text-label",
    "type": "TextLabel",
    "text": "Hello World",
-   "parent-origin": "CENTER"
+   "parentOrigin": "CENTER"
  }]
 }
 ~~~

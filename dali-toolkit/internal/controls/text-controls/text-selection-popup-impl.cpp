@@ -80,10 +80,10 @@ const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0
 
 const char* const OPTION_SELECT_WORD = "option-select_word";                       // "Select Word" popup option.
 const char* const OPTION_SELECT_ALL("option-select_all");                          // "Select All" popup option.
-const char* const OPTION_CUT("option-cut");                                        // "Cut" popup option.
-const char* const OPTION_COPY("option-copy");                                      // "Copy" popup option.
-const char* const OPTION_PASTE("option-paste");                                    // "Paste" popup option.
-const char* const OPTION_CLIPBOARD("option-clipboard");                            // "Clipboard" popup option.
+const char* const OPTION_CUT("optionCut");                                        // "Cut" popup option.
+const char* const OPTION_COPY("optionCopy");                                      // "Copy" popup option.
+const char* const OPTION_PASTE("optionPaste");                                    // "Paste" popup option.
+const char* const OPTION_CLIPBOARD("optionClipboard");                            // "Clipboard" popup option.
 
 BaseHandle Create()
 {
@@ -94,23 +94,23 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionPopup, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-max-size", VECTOR2,   POPUP_MAX_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-min-size", VECTOR2,   POPUP_MIN_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "option-max-size", VECTOR2,   OPTION_MAX_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "option-min-size", VECTOR2,   OPTION_MIN_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "option-divider-size", VECTOR2,   OPTION_DIVIDER_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-clipboard-button-image", STRING, POPUP_CLIPBOARD_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-cut-button-image", STRING, POPUP_CUT_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-copy-button-image", STRING, POPUP_COPY_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-paste-button-image", STRING, POPUP_PASTE_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-select-button-image", STRING, POPUP_SELECT_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-select-all-button-image", STRING, POPUP_SELECT_ALL_BUTTON_ICON_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-divider-color", VECTOR4, POPUP_DIVIDER_COLOR )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-icon-color", VECTOR4, POPUP_ICON_COLOR )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-color", VECTOR4, POPUP_PRESSED_COLOR )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-image", STRING, POPUP_PRESSED_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-fade-in-duration", FLOAT, POPUP_FADE_IN_DURATION )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-fade-out-duration", FLOAT, POPUP_FADE_OUT_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupMaxSize", VECTOR2,   POPUP_MAX_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupMinSize", VECTOR2,   POPUP_MIN_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "optionMaxSize", VECTOR2,   OPTION_MAX_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "optionMinSize", VECTOR2,   OPTION_MIN_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "optionDividerSize", VECTOR2,   OPTION_DIVIDER_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupClipboardButtonImage", STRING, POPUP_CLIPBOARD_BUTTON_ICON_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupCutButtonImage", STRING, POPUP_CUT_BUTTON_ICON_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupCopyButtonImage", STRING, POPUP_COPY_BUTTON_ICON_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPasteButtonImage", STRING, POPUP_PASTE_BUTTON_ICON_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupSelectButtonImage", STRING, POPUP_SELECT_BUTTON_ICON_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupSelectAllButtonImage", STRING, POPUP_SELECT_ALL_BUTTON_ICON_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupDividerColor", VECTOR4, POPUP_DIVIDER_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupIconColor", VECTOR4, POPUP_ICON_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPressedColor", VECTOR4, POPUP_PRESSED_COLOR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPressedImage", STRING, POPUP_PRESSED_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupFadeInDuration", FLOAT, POPUP_FADE_IN_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupFadeOutDuration", FLOAT, POPUP_FADE_OUT_DURATION )
 
 DALI_TYPE_REGISTRATION_END()
 

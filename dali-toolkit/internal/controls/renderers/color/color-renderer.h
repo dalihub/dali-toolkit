@@ -35,9 +35,9 @@ namespace Internal
  *
  * The following properties are required for create a ColorRender
  *
- * | %Property Name   | Type        |
- * |------------------|-------------|
- * | blend-color      | VECTOR4     |
+ * | %Property Name  | Type        |
+ * |-----------------|-------------|
+ * | blendColor      | VECTOR4     |
  */
 class ColorRenderer: public ControlRenderer
 {

@@ -66,7 +66,7 @@ BaseHandle Create()
  * @param[in] attributes The attributes with which to perfrom this action.
  * @return true if action has been accepted by this control
  */
-const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibility-activated";
+const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibilityActivated";
 static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
@@ -93,13 +93,13 @@ static bool DoAction( BaseObject* object, const std::string& actionName, const P
  * @return True if the signal was connected.
  * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
  */
-const char* SIGNAL_KEY_EVENT = "key-event";
-const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "key-input-focus-gained";
-const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "key-input-focus-lost";
+const char* SIGNAL_KEY_EVENT = "keyEvent";
+const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "keyInputFocusGained";
+const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "keyInputFocusLost";
 const char* SIGNAL_TAPPED = "tapped";
 const char* SIGNAL_PANNED = "panned";
 const char* SIGNAL_PINCHED = "pinched";
-const char* SIGNAL_LONG_PRESSED = "long-pressed";
+const char* SIGNAL_LONG_PRESSED = "longPressed";
 static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -355,9 +355,9 @@ public:
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",      Toolkit::Control::Property::STYLE_NAME,      Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",       Toolkit::Control::Property::STYLE_NAME,      Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "key-input-focus", Toolkit::Control::Property::KEY_INPUT_FOCUS, Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS, Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {

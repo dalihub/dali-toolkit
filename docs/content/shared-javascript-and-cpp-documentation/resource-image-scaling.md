@@ -39,8 +39,8 @@ var image = new dali.ResourceImage( {
   url: "gallery-large-12.jpg",
   width: stageX,
   height: stageY,
-  fitting-mode: "SCALE_TO_FILL",
-  sampling-mode: "BOX_THEN_LINEAR"
+  fittingMode: "SCALE_TO_FILL",
+  samplingMode: "BOX_THEN_LINEAR"
 });
 ~~~
 
@@ -231,22 +231,22 @@ ResourceImage image4 = ResourceImage::New( "flower.png",
 // JavaScript
 var image1 = new dali.ResourceImage( {
   url:"flower.png", width:240, height:240,
-  fitting-mode:"SCALE_TO_FILL", sampling-mode:"NEAREST"
+  fittingMode:"SCALE_TO_FILL", samplingMode:"NEAREST"
 } );
 
 var image2 = new dali.ResourceImage( {
   url:"flower.png", width:240, height:240,
-  fitting-mode:"SCALE_TO_FILL", sampling-mode:"NO_FILTER"
+  fittingMode:"SCALE_TO_FILL", samplingMode:"NO_FILTER"
 } );
 
 var image3 = new dali.ResourceImage( {
   url:"flower.png", width:240, height:240,
-  fitting-mode:"SCALE_TO_FILL", sampling-mode:"BOX"
+  fittingMode:"SCALE_TO_FILL", samplingMode:"BOX"
 } );
 
 var image4 = new dali.ResourceImage( {
   url:"flower.png", width:240, height:240,
-  fitting-mode:"SCALE_TO_FILL", sampling-mode:"BOX_THEN_LINEAR"
+  fittingMode:"SCALE_TO_FILL", samplingMode:"BOX_THEN_LINEAR"
 } );
 ~~~
 

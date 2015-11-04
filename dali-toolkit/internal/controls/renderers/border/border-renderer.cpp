@@ -37,12 +37,12 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("border-renderer");
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("borderRenderer");
 
-const char * const COLOR_NAME("border-color");
+const char * const COLOR_NAME("borderColor");
 const char * const COLOR_UNIFORM_NAME("uBorderColor");
-const char * const SIZE_NAME("border-size");
+const char * const SIZE_NAME("borderSize");
 const char * const SIZE_UNIFORM_NAME("uBorderSize");
 
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");

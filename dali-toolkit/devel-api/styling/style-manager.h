@@ -138,7 +138,7 @@ public:
   /**
    * @brief Set a constant for use when building styles
    *
-   * A constant is used in JSON files e.g. "my-image":"{ROOT_PATH}/mypath/image.jpg"
+   * A constant is used in JSON files e.g. "myImage":"{ROOT_PATH}/mypath/image.jpg"
    * where the string "{ROOT_PATH}" is substituted with the value.
    *
    * @param[in] key The key of the constant

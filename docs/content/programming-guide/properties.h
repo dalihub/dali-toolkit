@@ -39,10 +39,10 @@ struct Property
 {
   enum
   {
-    PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixel-area",  type Rect<int>
+    PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixelArea",   type Rect<int>
     STYLE,                                                   ///< name "style",       type std::string
     BORDER,                                                  ///< name "border",      type Vector4
-    IMAGE,                                                   ///< name "image",       type Map {"filename":"", "load-policy":...}
+    IMAGE,                                                   ///< name "image",       type Map {"filename":"", "loadPolicy":...}
   };
 };
 @endcode
@@ -63,7 +63,7 @@ namespace // Unnamed namespace
 
 //              Name           Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "pixel-area",   RECTANGLE, true,    false,   true,    Dali::ImageActor::Property::PIXEL_AREA )
+DALI_PROPERTY( "pixelArea",    RECTANGLE, true,    false,   true,    Dali::ImageActor::Property::PIXEL_AREA )
 DALI_PROPERTY( "style",        STRING,    true,    false,   true,    Dali::ImageActor::Property::STYLE      )
 DALI_PROPERTY( "border",       VECTOR4,   true,    false,   true,    Dali::ImageActor::Property::BORDER     )
 DALI_PROPERTY( "image",        MAP,       true,    false,   false,   Dali::ImageActor::Property::IMAGE      )
@@ -117,15 +117,15 @@ Note that the “PropertyRange” contents “PROPERTY_START_INDEX” is also us
     enum
     {
       DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool
-      AUTO_REPEATING,                  ///< name "auto-repeating",               @see SetAutoRepeating(),             type bool
-      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type float
-      NEXT_AUTO_REPEATING_DELAY,       ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type float
+      AUTO_REPEATING,                  ///< name "autoRepeating",                @see SetAutoRepeating(),             type bool
+      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initialAutoRepeatingDelay",    @see SetInitialAutoRepeatingDelay(), type float
+      NEXT_AUTO_REPEATING_DELAY,       ///< name "nextAutoRepeatingDelay",       @see SetNextAutoRepeatingDelay(),    type float
       TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool
       SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool
-      NORMAL_STATE_ACTOR,              ///< name "normal-state-actor",           @see SetButtonImage(),               type Map
-      SELECTED_STATE_ACTOR,            ///< name "selected-state-actor",         @see SetSelectedImage(),             type Map
-      DISABLED_STATE_ACTOR,            ///< name "disabled-state-actor",         @see SetDisabledImage(),             type Map
-      LABEL_ACTOR,                     ///< name "label-actor",                  @see SetLabel(),                     type Map
+      NORMAL_STATE_ACTOR,              ///< name "normalStateActor",             @see SetButtonImage(),               type Map
+      SELECTED_STATE_ACTOR,            ///< name "selectedStateActor",           @see SetSelectedImage(),             type Map
+      DISABLED_STATE_ACTOR,            ///< name "disabledStateActor",           @see SetDisabledImage(),             type Map
+      LABEL_ACTOR,                     ///< name "labelActor",                   @see SetLabel(),                     type Map
     };
   };
 @endcode
@@ -227,23 +227,23 @@ This is a basic example of a button defined in JSON by setting the default prope
     // First Button
     {
       "type": "PushButton",
-      "parent-origin": "TOP_CENTER",
-      "anchor-point": "TOP_CENTER",
+      "parentOrigin": "TOP_CENTER",
+      "anchorPoint": "TOP_CENTER",
       "position": [0, 0, 0],
       "size": [0, 200, 0],
-      "normal-state-actor": {
+      "normalStateActor": {
         "type": "ImageActor",
         "image": {
           "filename": "{DALI_IMAGE_DIR}blocks-brick-1.png"
         }
       },
-      "selected-state-actor": {
+      "selectedStateActor": {
         "type": "ImageActor",
         "image": {
           "filename": "{DALI_IMAGE_DIR}blocks-brick-2.png"
         }
       },
-      "label-actor": {
+      "labelActor": {
         "type": "TextLabel",
         "text": "Normal"
       }

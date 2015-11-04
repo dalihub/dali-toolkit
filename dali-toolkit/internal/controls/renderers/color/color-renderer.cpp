@@ -37,9 +37,9 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("color-renderer");
-const char * const COLOR_NAME("blend-color");
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("colorRenderer");
+const char * const COLOR_NAME("blendColor");
 const char * const COLOR_UNIFORM_NAME("uBlendColor");
 
 

@@ -40,40 +40,40 @@ void dali_textfield_cleanup(void)
 namespace
 {
 
-const char* const PROPERTY_NAME_RENDERING_BACKEND                    = "rendering-backend";
+const char* const PROPERTY_NAME_RENDERING_BACKEND                    = "renderingBackend";
 const char* const PROPERTY_NAME_TEXT                                 = "text";
-const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placeholder-text";
-const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_FOCUSED             = "placeholder-text-focused";
-const char* const PROPERTY_NAME_FONT_FAMILY                          = "font-family";
-const char* const PROPERTY_NAME_FONT_STYLE                           = "font-style";
-const char* const PROPERTY_NAME_POINT_SIZE                           = "point-size";
-const char* const PROPERTY_NAME_MAX_LENGTH                           = "max-length";
-const char* const PROPERTY_NAME_EXCEED_POLICY                        = "exceed-policy";
-const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT                 = "horizontal-alignment";
-const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT                   = "vertical-alignment";
-const char* const PROPERTY_NAME_TEXT_COLOR                           = "text-color";
-const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholder-text-color";
-const char* const PROPERTY_NAME_SHADOW_OFFSET                        = "shadow-offset";
-const char* const PROPERTY_NAME_SHADOW_COLOR                         = "shadow-color";
-const char* const PROPERTY_NAME_PRIMARY_CURSOR_COLOR                 = "primary-cursor-color";
-const char* const PROPERTY_NAME_SECONDARY_CURSOR_COLOR               = "secondary-cursor-color";
-const char* const PROPERTY_NAME_ENABLE_CURSOR_BLINK                  = "enable-cursor-blink";
-const char* const PROPERTY_NAME_CURSOR_BLINK_INTERVAL                = "cursor-blink-interval";
-const char* const PROPERTY_NAME_CURSOR_BLINK_DURATION                = "cursor-blink-duration";
-const char* const PROPERTY_NAME_CURSOR_WIDTH                         = "cursor-width";
-const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE                    = "grab-handle-image";
-const char* const PROPERTY_NAME_GRAB_HANDLE_PRESSED_IMAGE            = "grab-handle-pressed-image";
-const char* const PROPERTY_NAME_SCROLL_THRESHOLD                     = "scroll-threshold";
-const char* const PROPERTY_NAME_SCROLL_SPEED                         = "scroll-speed";
-const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_LEFT          = "selection-handle-image-left";
-const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_RIGHT         = "selection-handle-image-right";
-const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_LEFT  = "selection-handle-pressed-image-left";
-const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_RIGHT = "selection-handle-pressed-image-right";
-const char* const PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_LEFT   = "selection-handle-marker-image-left";
-const char* const PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_RIGHT  = "selection-handle-marker-image-right";
-const char* const PROPERTY_NAME_SELECTION_HIGHLIGHT_COLOR            = "selection-highlight-color";
-const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX              = "decoration-bounding-box";
-const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "input-method-settings";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placeholderText";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_FOCUSED             = "placeholderTextFocused";
+const char* const PROPERTY_NAME_FONT_FAMILY                          = "fontFamily";
+const char* const PROPERTY_NAME_FONT_STYLE                           = "fontStyle";
+const char* const PROPERTY_NAME_POINT_SIZE                           = "pointSize";
+const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
+const char* const PROPERTY_NAME_EXCEED_POLICY                        = "exceedPolicy";
+const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT                 = "horizontalAlignment";
+const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT                   = "verticalAlignment";
+const char* const PROPERTY_NAME_TEXT_COLOR                           = "textColor";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
+const char* const PROPERTY_NAME_SHADOW_OFFSET                        = "shadowOffset";
+const char* const PROPERTY_NAME_SHADOW_COLOR                         = "shadowColor";
+const char* const PROPERTY_NAME_PRIMARY_CURSOR_COLOR                 = "primaryCursorColor";
+const char* const PROPERTY_NAME_SECONDARY_CURSOR_COLOR               = "secondaryCursorColor";
+const char* const PROPERTY_NAME_ENABLE_CURSOR_BLINK                  = "enableCursorBlink";
+const char* const PROPERTY_NAME_CURSOR_BLINK_INTERVAL                = "cursorBlinkInterval";
+const char* const PROPERTY_NAME_CURSOR_BLINK_DURATION                = "cursorBlinkDuration";
+const char* const PROPERTY_NAME_CURSOR_WIDTH                         = "cursorWidth";
+const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE                    = "grabHandleImage";
+const char* const PROPERTY_NAME_GRAB_HANDLE_PRESSED_IMAGE            = "grabHandlePressedImage";
+const char* const PROPERTY_NAME_SCROLL_THRESHOLD                     = "scrollThreshold";
+const char* const PROPERTY_NAME_SCROLL_SPEED                         = "scrollSpeed";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_LEFT          = "selectionHandleImageLeft";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_IMAGE_RIGHT         = "selectionHandleImageRight";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_LEFT  = "selectionHandlePressedImageLeft";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_PRESSED_IMAGE_RIGHT = "selectionHandlePressedImageRight";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_LEFT   = "selectionHandleMarkerImageLeft";
+const char* const PROPERTY_NAME_SELECTION_HANDLE_MARKER_IMAGE_RIGHT  = "selectionHandleMarkerImageRight";
+const char* const PROPERTY_NAME_SELECTION_HIGHLIGHT_COLOR            = "selectionHighlightColor";
+const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX              = "decorationBoundingBox";
+const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -422,7 +422,7 @@ int utcDaliTextFieldAtlasRenderP(void)
   END_TEST;
 }
 
-// Positive test for the text-changed signal.
+// Positive test for the textChanged signal.
 int utcDaliTextFieldTextChangedP(void)
 {
   ToolkitTestApplication application;
@@ -449,7 +449,7 @@ int utcDaliTextFieldTextChangedP(void)
   END_TEST;
 }
 
-// Negative test for the text-changed signal.
+// Negative test for the textChanged signal.
 int utcDaliTextFieldTextChangedN(void)
 {
   ToolkitTestApplication application;

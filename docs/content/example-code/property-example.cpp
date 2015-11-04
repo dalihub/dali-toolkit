@@ -25,7 +25,7 @@ namespace
 {
 
 // The name we will use to register our custom property by.
-const char* const TAG_PROPERTY_NAME = "tag-identifier";
+const char* const TAG_PROPERTY_NAME = "tagIdentifier";
 
 const char* const PUSHBUTTON_PRESS_IMAGE =  DALI_IMAGE_DIR "button-down.9.png";
 const char* const PUSHBUTTON_BUTTON_IMAGE = DALI_IMAGE_DIR "button-up.9.png";

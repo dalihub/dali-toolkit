@@ -34,103 +34,103 @@ distributing this software or its derivatives.
   {
     "textlabel":
     {
-      "point-size":18
+      "pointSize":18
     },
 
-    "textlabel-font-size-0":
+    "textlabelFontSize0":
     {
-      "point-size":8
+      "pointSize":8
     },
-    "textlabel-font-size-1":
+    "textlabelFontSize1":
     {
-      "point-size":10
+      "pointSize":10
     },
-    "textlabel-font-size-2":
+    "textlabelFontSize2":
     {
-      "point-size":15
+      "pointSize":15
     },
-    "textlabel-font-size-3":
+    "textlabelFontSize3":
     {
-      "point-size":19
+      "pointSize":19
     },
-    "textlabel-font-size-4":
+    "textlabelFontSize4":
     {
-      "point-size":25
+      "pointSize":25
     },
 
     "textfield":
     {
-      "point-size":18,
-      "primary-cursor-color":[0.0,0.72,0.9,1.0],
-      "secondary-cursor-color":[0.0,0.72,0.9,1.0],
-      "cursor-width":1,
-      "selection-highlight-color":[0.75,0.96,1.0,1.0],
-      "grab-handle-image" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
-      "selection-handle-image-left" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
-      "selection-handle-image-right": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+      "pointSize":18,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":1,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
     },
 
-    "textfield-font-size-0":
+    "textfieldFontSize0":
     {
-      "point-size":10
+      "pointSize":10
     },
-    "textfield-font-size-1":
+    "textfieldFontSize1":
     {
-      "point-size":10
+      "pointSize":10
     },
-    "textfield-font-size-2":
+    "textfieldFontSize2":
     {
-      "point-size":10
+      "pointSize":10
     },
-    "textfield-font-size-3":
+    "textfieldFontSize3":
     {
-      "point-size":10
+      "pointSize":10
     },
-    "textfield-font-size-4":
+    "textfieldFontSize4":
     {
-      "point-size":10
+      "pointSize":10
     },
     "textselectionpopup":
     {
-      "popup-max-size":[400,100],
-      "option-divider-size":[2,0],
-      "popup-divider-color":[0.23,0.72,0.8,0.11],
-      "popup-icon-color":[1.0,1.0,1.0,1.0],
-      "popup-pressed-color":[0.24,0.72,0.8,0.11],
+      "popupMaxSize":[400,100],
+      "optionDividerSize":[2,0],
+      "popupDividerColor":[0.23,0.72,0.8,0.11],
+      "popupIconColor":[1.0,1.0,1.0,1.0],
+      "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "filename": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
         },
-      "popup-fade-in-duration":0.25,
-      "popup-fade-out-duration":0.25
+      "popupFadeInDuration":0.25,
+      "popupFadeOutDuration":0.25
     },
     "textselectionpopupbutton":
     {
       "label":
       {
-        "point-size":8,
-        "font-style":"{\"weight\":\"light\"}"
+        "pointSize":8,
+        "fontStyle":"{\"weight\":\"light\"}"
       }
     },
     "textselectiontoolbar":
     {
-      "enable-overshoot":true,
-      "scroll-view":
+      "enableOvershoot":true,
+      "scrollView":
       {
-        "overshoot-animation-speed":120.0,
-        "overshoot-size":[480.0,42.0]
+        "overshootAnimationSpeed":120.0,
+        "overshootSize":[480.0,42.0]
       }
     },
     "scrollview":
     {
-      "overshoot-effect-color":"B018",
-      "overshoot-animation-speed":120.0,
-      "overshoot-size":[480.0,42.0]
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":120.0,
+      "overshootSize":[480.0,42.0]
     },
     "itemview":
     {
-      "overshoot-effect-color":"B018",
-      "overshoot-animation-speed":120.0,
-      "overshoot-size":[480.0,42.0]
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":120.0,
+      "overshootSize":[480.0,42.0]
     }
   }
 }

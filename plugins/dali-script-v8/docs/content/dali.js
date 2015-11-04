@@ -38,7 +38,7 @@ mScript.ExecuteFile( mScriptFileName);
 
 A DALi application uses a hierachy of Dali::Actor objects to position visible content.  An actor inherits a position relative to its parent, and can be moved relative to this point.  UI controls can be built by combining multiple actors.
 
-To display the contents of an actor, it must be connected to the Dali::Stage.  This provides an invisible root (top-level) actor, to which all other actors are added.  A direct or indirect child of the root actor is considered "on-stage".  Multi-touch events are received through signals emitted by on-stage actors.
+To display the contents of an actor, it must be connected to the Dali::Stage.  This provides an invisible root (top-level) actor, to which all other actors are added.  A direct or indirect child of the root actor is considered "onStage".  Multi-touch events are received through signals emitted by on-stage actors.
 
 The following example shows how to connect a new actor to the stage:
 ```

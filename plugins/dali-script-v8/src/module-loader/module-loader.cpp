@@ -105,7 +105,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
 }
 
 /**
- * ### var module = require("module-name");
+ * ### var module = require("moduleName");
  *
  *
  * There is no standard for modules or the 'require' keyword in JavaScript.<br />
@@ -161,7 +161,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  * from an object literal with name-value pairs (exports object) to a function.
  *
  *     // my_first_module.js
- *     module.exports = function() {  log("hello-world"); }
+ *     module.exports = function() {  log("helloWorld"); }
  *
  * <br />
  *

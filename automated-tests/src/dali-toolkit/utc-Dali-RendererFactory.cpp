@@ -275,8 +275,8 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
 
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
-  propertyMap.Insert("renderer-type", "color-renderer");
-  propertyMap.Insert("blend-color", testColor);
+  propertyMap.Insert("rendererType",  "colorRenderer");
+  propertyMap.Insert("blendColor",  testColor);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -329,9 +329,9 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   float testSize = 5.f;
-  propertyMap.Insert("renderer-type", "border-renderer");
-  propertyMap.Insert("border-color", testColor);
-  propertyMap.Insert("border-size", testSize);
+  propertyMap.Insert("rendererType",  "borderRenderer");
+  propertyMap.Insert("borderColor",  testColor);
+  propertyMap.Insert("borderSize",  testSize);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -411,23 +411,23 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("renderer-type", "gradient-renderer");
+  propertyMap.Insert("rendererType",  "gradientRenderer");
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("gradient-start-position", start);
-  propertyMap.Insert("gradient-end-position", end);
-  propertyMap.Insert("gradient-spread-method", "repeat");
+  propertyMap.Insert("gradientStartPosition",   start);
+  propertyMap.Insert("gradientEndPosition",   end);
+  propertyMap.Insert("gradientSpreadMethod",   "repeat");
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.2f );
   stopOffsets.PushBack( 0.8f );
-  propertyMap.Insert("gradient-stop-offset", stopOffsets);
+  propertyMap.Insert("gradientStopOffset",   stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradient-stop-color", stopColors);
+  propertyMap.Insert("gradientStopColor",   stopColors);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -451,23 +451,23 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("renderer-type", "gradient-renderer");
+  propertyMap.Insert("rendererType",  "gradientRenderer");
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
-  propertyMap.Insert("gradient-units", "user-space");
-  propertyMap.Insert("gradient-center", center);
-  propertyMap.Insert("gradient-radius", radius);
+  propertyMap.Insert("gradientUnits",  "userSpace");
+  propertyMap.Insert("gradientCenter",  center);
+  propertyMap.Insert("gradientRadius",  radius);
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.0f );
   stopOffsets.PushBack( 1.f );
-  propertyMap.Insert("gradient-stop-offset", stopOffsets);
+  propertyMap.Insert("gradientStopOffset",   stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradient-stop-color", stopColors);
+  propertyMap.Insert("gradientStopColor",   stopColors);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -496,8 +496,8 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "renderer-type", "image-renderer" );
-  propertyMap.Insert( "image-url", TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "imageRenderer" );
+  propertyMap.Insert( "imageUrl",  TEST_IMAGE_FILE_NAME );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
@@ -555,8 +555,8 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "renderer-type", "n-patch-renderer" );
-  propertyMap.Insert( "image-url", TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "nPatchRenderer" );
+  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
@@ -571,7 +571,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
     DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
   }
 
-  propertyMap.Insert( "border-only", true );
+  propertyMap.Insert( "borderOnly",  true );
   {
     tet_infoline( "border only" );
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
@@ -611,8 +611,8 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "renderer-type", "n-patch-renderer" );
-  propertyMap.Insert( "image-url", TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "nPatchRenderer" );
+  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
   {
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
@@ -629,7 +629,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   }
 
-  propertyMap.Insert( "border-only", true );
+  propertyMap.Insert( "borderOnly",  true );
   {
     tet_infoline( "border only" );
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
@@ -751,8 +751,8 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "renderer-type", "n-patch-renderer" );
-  propertyMap.Insert( "image-url", 111 );
+  propertyMap.Insert( "rendererType",  "nPatchRenderer" );
+  propertyMap.Insert( "imageUrl",  111 );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );

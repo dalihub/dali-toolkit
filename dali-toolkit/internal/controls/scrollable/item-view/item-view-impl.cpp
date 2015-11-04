@@ -46,14 +46,14 @@ namespace // Unnamed namespace
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL)
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-position",     FLOAT,    LAYOUT_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-speed",        FLOAT,    SCROLL_SPEED)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollSpeed",         FLOAT,    SCROLL_SPEED)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "overshoot",           FLOAT,    OVERSHOOT)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-direction",    VECTOR2,  SCROLL_DIRECTION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-orientation",  INTEGER,  LAYOUT_ORIENTATION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-content-size", FLOAT,    SCROLL_CONTENT_SIZE)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollDirection",     VECTOR2,  SCROLL_DIRECTION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutOrientation",   INTEGER,  LAYOUT_ORIENTATION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollContentSize",   FLOAT,    SCROLL_CONTENT_SIZE)
 
-DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layout-activated",    LAYOUT_ACTIVATED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",     LAYOUT_ACTIVATED_SIGNAL )
 
 DALI_TYPE_REGISTRATION_END()
 

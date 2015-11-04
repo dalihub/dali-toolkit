@@ -525,7 +525,7 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnChildRemove(Actor& child);
 
   /**
-   * From CustomActorImpl; called after a touch-signal is received by the owning actor.
+   * From CustomActorImpl; called after a touchSignal is received by the owning actor.
    *
    * We don't listen to these events as content within the contain may consume events.
    *
@@ -535,7 +535,7 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual bool OnTouchEvent(const TouchEvent& event);
 
   /**
-   * From CustomActorImpl; called after a wheel-event is received by the owning actor.
+   * From CustomActorImpl; called after a wheelEvent is received by the owning actor.
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
@@ -653,8 +653,8 @@ private:
 
   /**
    * This is called internally whenever the Scroll Rulers are
-   * modified. This will update the properties: 'scroll-position-min'
-   * and 'scroll-position-max' to reflect the changes.
+   * modified. This will update the properties: 'scrollPositionMin'
+   * and 'scrollPositionMax' to reflect the changes.
    */
   void UpdatePropertyDomain();
 

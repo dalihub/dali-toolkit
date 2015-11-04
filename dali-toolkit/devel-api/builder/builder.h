@@ -47,17 +47,17 @@ class Builder;
  *  {
  *    "templates": // are named instantiable actor trees
  *    {
- *      "default-text":
+ *      "defaultText":
  *      {
  *        "type":"TextActor",
  *        "font":"",
- *        "parent-origin":[0.5,0.5,0],
+ *        "parentOrigin":[0.5,0.5,0],
  *        "scale": [50,50,1]
  *      }
  *    },
  *    "styles": // are named property sets applied to actor trees
  *    {
- *     "my-style":
+ *     "myStyle":
  *      {
  *        "size": [10,10,1] // root properties applied to a given root actor
  *        "actors":         // properties applied to actors found by name from root
@@ -76,7 +76,7 @@ class Builder;
  *    "stage":
  *    [
  *      {
- *        "type":"default-text",
+ *        "type":"defaultText",
  *        "text":"Hello World",
  *        "position":[0,0,0]
  *      },
@@ -99,12 +99,12 @@ class Builder;
  *
  * - Create an actor tree from the "templates" section
  * @code
- * TextActor actor = TextActor::DownCast( builder.Create( "default-text" ) );
+ * TextActor actor = TextActor::DownCast( builder.Create( "defaultText" ) );
  * @endcode
  *
  * - Style an actor tree from the "styles" section
  * @code
- * builder.ApplyStyle( "my-style", actor );
+ * builder.ApplyStyle( "myStyle",  actor );
  * @endcode
  *
  * - Create an actor tree from json
@@ -253,7 +253,7 @@ class DALI_IMPORT_API Builder : public BaseHandle
    *
    * The animation is applied to a specific actor.
    * e.g.
-   *   Actor myInstance = builder.Create( "template-actor-tree" )
+   *   Actor myInstance = builder.Create( "templateActorTree" )
    *   Animation a = builder.CreateAnimation( "wobble", myInstance );
    *
    * @pre The Builder has been initialized.
@@ -272,7 +272,7 @@ class DALI_IMPORT_API Builder : public BaseHandle
    * e.g.
    *   Property::Map map;
    *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
-   *   Actor myInstance = builder.Create( "template-actor-tree" )
+   *   Actor myInstance = builder.Create( "templateActorTree" )
    *   Animation a = builder.CreateAnimation( "wobble", myInstance);
    *
    * @pre The Builder has been initialized.
@@ -290,7 +290,7 @@ class DALI_IMPORT_API Builder : public BaseHandle
    * @brief Creates an object (e.g. an actor) from the set of known style templates
    *
    * e.g.
-   *   mActor.Add( Actor::DownCast(builder.Create( "default-text")) );
+   *   mActor.Add( Actor::DownCast(builder.Create( "defaultText")) );
    *
    * @pre The Builder has been initialized.
    * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
@@ -307,7 +307,7 @@ class DALI_IMPORT_API Builder : public BaseHandle
    * e.g.
    *   Property::Map map;
    *   map["IMAGE_DIR"] = "/usr/share/images"; // replaces '{IMAGE_DIR} in the template
-   *   mActor.Add( Actor::DownCast(builder.Create( "default-image", map) ) );
+   *   mActor.Add( Actor::DownCast(builder.Create( "defaultImage",  map) ) );
    *
    * @pre The Builder has been initialized.
    * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
@@ -413,7 +413,7 @@ class DALI_IMPORT_API Builder : public BaseHandle
   /**
    * Get or create a PathConstrainer from the set of known PathConstrainers
    * e.g.
-   *   PathConstrainer a = builder.GetPathConstrainer( "my-path-constrainer");
+   *   PathConstrainer a = builder.GetPathConstrainer( "myPathConstrainer");
    *
    * @pre The Builder has been initialized.
    * @pre The pathConstrainerName exists in the Constrainers section of the data representation
@@ -425,7 +425,7 @@ class DALI_IMPORT_API Builder : public BaseHandle
   /**
    * Get or create a LinearConstrainer from the set of known LinearConstrainers
    * e.g.
-   *   LinearConstrainer a = builder.GetLinearConstrainer( "my-linear-constrainer");
+   *   LinearConstrainer a = builder.GetLinearConstrainer( "myLinearConstrainer");
    *
    * @pre The Builder has been initialized.
    * @pre The linearConstrainerName exists in the Constrainers section of the data representation

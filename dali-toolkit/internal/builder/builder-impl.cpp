@@ -301,7 +301,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
         if( !SetPropertyFromNode( keyChild.second, type, value, constant ) )
         {
           // verbose as this might not be a problem
-          // eg parent-origin can be a string which is picked up later
+          // eg parentOrigin can be a string which is picked up later
           DALI_SCRIPT_VERBOSE("Could not convert property:%s\n", key.c_str());
         }
         else
@@ -547,7 +547,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
   const Stage& stage = Stage::GetCurrent();
   Layer root  = stage.GetRootLayer();
 
-  if( OptionalString s = constant.IsString( IsChild(node, "source-actor") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "sourceActor") ) )
   {
     Actor actor = root.FindChildByName(*s);
     if(actor)
@@ -560,7 +560,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
     }
   }
 
-  if( OptionalString s = constant.IsString( IsChild(node, "camera-actor") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "cameraActor") ) )
   {
     CameraActor actor = CameraActor::DownCast( root.FindChildByName(*s) );
     if(actor)
@@ -573,7 +573,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
     }
   }
 
-  if( OptionalString s = constant.IsString( IsChild(node, "target-frame-buffer") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "targetFrameBuffer") ) )
   {
     FrameBufferImage fb = GetFrameBufferImage( *s, constant );
     if(fb)
@@ -586,7 +586,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
     }
   }
 
-  if( OptionalString s = constant.IsString( IsChild(node, "screen-to-frame-buffer-function") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "screenToFrameBufferFunction") ) )
   {
     if("DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION" == *s)
     {
@@ -603,8 +603,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
   }
 
   // other setup is via the property system
-  SetProperties( node, task, constant ); // @ todo, remove 'source-actor', 'camera-actor'?
-
+  SetProperties( node, task, constant );
 }
 
 void Builder::CreateRenderTask( const std::string &name )
@@ -615,7 +614,7 @@ void Builder::CreateRenderTask( const std::string &name )
 
   const Stage& stage = Stage::GetCurrent();
 
-  OptionalChild tasks = IsChild(*mParser.GetRoot(), "render-tasks");
+  OptionalChild tasks = IsChild(*mParser.GetRoot(), "renderTasks");
 
   if(tasks)
   {
@@ -673,7 +672,7 @@ ShaderEffect Builder::GetShaderEffect( const std::string &name, const Replacemen
   }
   else
   {
-    if( OptionalChild effects = IsChild( *mParser.GetRoot(), "shader-effects") )
+    if( OptionalChild effects = IsChild( *mParser.GetRoot(), "shaderEffects") )
     {
       if( OptionalChild effect = IsChild( *effects, name ) )
       {
@@ -709,7 +708,7 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
   }
   else
   {
-    if( OptionalChild images = IsChild( *mParser.GetRoot(), "frame-buffer-images") )
+    if( OptionalChild images = IsChild( *mParser.GetRoot(), "frameBufferImages") )
     {
       if( OptionalChild image = IsChild( *images, name ) )
       {
@@ -758,8 +757,8 @@ Path Builder::GetPath( const std::string& name )
             ret = Path::New();
             ret.SetProperty( Path::Property::POINTS, points);
 
-            //control-points property
-            if( OptionalChild pointsProperty = IsChild( *path, "control-points") )
+            //controlPoints property
+            if( OptionalChild pointsProperty = IsChild( *path, "controlPoints") )
             {
               Dali::Property::Value points(Property::ARRAY);
               if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
@@ -832,8 +831,8 @@ PathConstrainer Builder::GetPathConstrainer( const std::string& name )
             ret = PathConstrainer::New();
             ret.SetProperty( PathConstrainer::Property::POINTS, points);
 
-            //control-points property
-            if( OptionalChild pointsProperty = IsChild( *pathConstrainer, "control-points") )
+            //controlPoints property
+            if( OptionalChild pointsProperty = IsChild( *pathConstrainer, "controlPoints") )
             {
               Dali::Property::Value points(Property::ARRAY);
               if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
@@ -941,7 +940,7 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer( const std::string& name )
             ret = Dali::LinearConstrainer::New();
             ret.SetProperty( LinearConstrainer::Property::VALUE, points);
 
-            //control-points property
+            //controlPoints property
             if( OptionalChild pointsProperty = IsChild( *linearConstrainer, "progress") )
             {
               Dali::Property::Value points(Property::ARRAY);
@@ -1043,7 +1042,7 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
     // to add automatically
     if( "stage" == sectionName )
     {
-      if( OptionalChild renderTasks = IsChild(*mParser.GetRoot(), "render-tasks") )
+      if( OptionalChild renderTasks = IsChild(*mParser.GetRoot(), "renderTasks") )
       {
         if( OptionalChild tasks = IsChild(*renderTasks, "stage") )
         {

@@ -51,9 +51,9 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "max-size", VECTOR2, MAX_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enable-overshoot", BOOLEAN, ENABLE_OVERSHOOT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scroll-view", MAP, SCROLL_VIEW )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "maxSize",  VECTOR2, MAX_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enableOvershoot",  BOOLEAN, ENABLE_OVERSHOOT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scrollView",  MAP, SCROLL_VIEW )
 
 DALI_TYPE_REGISTRATION_END()
 

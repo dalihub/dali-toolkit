@@ -37,10 +37,10 @@ namespace Internal
  *
  * The following properties are required for create a BorderRender
  *
- * | %Property Name   | Type        |
- * |------------------|-------------|
- * | border-color     | VECTOR4     |
- * | border-size      | FLOAT       |
+ * | %Property Name  | Type        |
+ * |-----------------|-------------|
+ * | borderColor     | VECTOR4     |
+ * | borderSize      | FLOAT       |
  */
 
 class BorderRenderer : public ControlRenderer

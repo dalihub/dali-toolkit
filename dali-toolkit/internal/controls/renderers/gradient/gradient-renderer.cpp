@@ -43,26 +43,26 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("gradient-renderer");
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("gradientRenderer");
 
 // properties: linear gradient
-const char * const GRADIENT_START_POSITION_NAME("gradient-start-position"); // Property::VECTOR2
-const char * const GRADIENT_END_POSITION_NAME("gradient-end-position"); // Property::VECTOR2
+const char * const GRADIENT_START_POSITION_NAME("gradientStartPosition"); // Property::VECTOR2
+const char * const GRADIENT_END_POSITION_NAME("gradientEndPosition"); // Property::VECTOR2
 
 // properties: radial gradient
-const char * const GRADIENT_CENTER_NAME("gradient-center"); // Property::VECTOR2
-const char * const GRADIENT_RADIUS_NAME("gradient-radius"); // Property::FLOAT
+const char * const GRADIENT_CENTER_NAME("gradientCenter"); // Property::VECTOR2
+const char * const GRADIENT_RADIUS_NAME("gradientRadius"); // Property::FLOAT
 
 // properties: linear&radial gradient
-const char * const GRADIENT_STOP_OFFSET_NAME("gradient-stop-offset"); // Property::Array FLOAT
-const char * const GRADIENT_STOP_COLOR_NAME("gradient-stop-color"); // Property::Array VECTOR4
-const char * const GRADIENT_UNITS_NAME("gradient-units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
-const char * const GRADIENT_SPREAD_METHOD_NAME("gradient-spread-method"); // Property::String  "pad | reflect | repeat"
+const char * const GRADIENT_STOP_OFFSET_NAME("gradientStopOffset"); // Property::Array FLOAT
+const char * const GRADIENT_STOP_COLOR_NAME("gradientStopColor"); // Property::Array VECTOR4
+const char * const GRADIENT_UNITS_NAME("gradientUnits"); // Property::String  "userSpaceOnUse | objectBoundingBox"
+const char * const GRADIENT_SPREAD_METHOD_NAME("gradientSpreadMethod"); // Property::String  "pad | reflect | repeat"
 
 // string values
-const char * const UNIT_USER_SPACE("user-space");
-const char * const UNIT_BOUNDING_BOX("object-bounding-box");
+const char * const UNIT_USER_SPACE("userSpace");
+const char * const UNIT_BOUNDING_BOX("objectBoundingBox");
 const char * const SPREAD_PAD("pad");
 const char * const SPREAD_REFLECT("reflect");
 const char * const SPREAD_REPEAT("repeat");
