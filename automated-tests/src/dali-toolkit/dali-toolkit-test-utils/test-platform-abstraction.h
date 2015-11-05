@@ -21,14 +21,12 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <cstring>
-#include <dali/public-api/images/image-operations.h>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/integration-api/platform-abstraction.h>
 
 #include "test-trace-call-stack.h"
-
 
 namespace Dali
 {
@@ -76,9 +74,9 @@ public:
   virtual ~TestPlatformAbstraction();
 
   /**
-   * @copydoc PlatformAbstraction::GetTimeMicroseconds()
+   * @copydoc PlatformAbstraction::GetTimeNanoseconds()
    */
-  virtual void GetTimeMicroseconds(unsigned int &seconds, unsigned int &microSeconds);
+  virtual void GetTimeNanoseconds( uint64_t& seconds, uint64_t& nanoseconds );
 
   /**
    * @copydoc PlatformAbstraction::Suspend()
@@ -156,15 +154,17 @@ public:
   /**
    * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
    */
-  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer
-) const;
-
-  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return true; }
+  virtual bool LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const;
 
   /**
    * @copydoc PlatformAbstraction::SaveFile()
    */
-  virtual bool SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes) const;
+  virtual bool SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const;
+
+ /**
+  * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
+  */
+  virtual bool SaveShaderBinaryFile( const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const { return true; }
 
   virtual void JoinLoaderThreads();
 
@@ -173,7 +173,7 @@ public: // TEST FUNCTIONS
   // Enumeration of Platform Abstraction methods
   typedef enum
   {
-    GetTimeMicrosecondsFunc,
+    GetTimeNanosecondsFunc,
     SuspendFunc,
     ResumeFunc,
     LoadResourceFunc,
@@ -185,7 +185,7 @@ public: // TEST FUNCTIONS
     GetResourcesFunc,
     IsLoadingFunc,
     SetDpiFunc,
-    JoinLoaderThreadsFunc
+    JoinLoaderThreadsFunc,
   } TestFuncEnum;
 
   /** Call this every test */
@@ -197,17 +197,13 @@ public: // TEST FUNCTIONS
 
   bool WasCalled(TestFuncEnum func);
 
-  void SetGetTimeMicrosecondsResult(size_t sec, size_t usec);
+  void SetGetTimeNanosecondsResult(size_t sec, size_t nsec);
 
   void IncrementGetTimeResult(size_t milliseconds);
 
   void SetIsLoadingResult(bool result);
 
-  void SetGetDefaultFontFamilyResult(std::string result);
-
   void SetGetDefaultFontSizeResult(float result);
-
-  void SetGetFontPathResult(std::string& result);
 
   void ClearReadyResources();
 
@@ -230,9 +226,10 @@ public: // TEST FUNCTIONS
 
 private:
   mutable TraceCallStack        mTrace;
-  size_t                        mSeconds;
-  size_t                        mMicroSeconds;
+  uint64_t                      mSeconds;
+  uint64_t                      mNanoSeconds;
   bool                          mIsLoadingResult;
+  int                           mGetDefaultFontSizeResult;
   Resources                     mResources;
   Integration::ResourceRequest* mRequest;
   Vector2                       mSize;
