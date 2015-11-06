@@ -412,7 +412,7 @@ void TableView::DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed )
       else if( row >= rowIndex )    // If below of or at the inserted row, decrease row index
       {
         // Decrement index
-        if( position.rowIndex > 1 )
+        if( position.rowIndex > 0 )
         {
           position.rowIndex--;
         }
