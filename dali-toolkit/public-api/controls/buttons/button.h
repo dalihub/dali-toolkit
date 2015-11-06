@@ -69,17 +69,17 @@ class Button;
  * Is not mandatory set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e selected images.
  *
  * Signals
- * | %Signal Name      | Method                      |
- * |-------------------|-----------------------------|
- * | pressed           | @ref PressedSignal()        |
- * | released          | @ref ReleasedSignal()       |
- * | clicked           | @ref ClickedSignal()        |
- * | state-changed     | @ref StateChangedSignal()   |
+ * | %Signal Name     | Method                      |
+ * |------------------|-----------------------------|
+ * | pressed          | @ref PressedSignal()        |
+ * | released         | @ref ReleasedSignal()       |
+ * | clicked          | @ref ClickedSignal()        |
+ * | stateChanged     | @ref StateChangedSignal()   |
  *
  * Actions
- * | %Action Name      | %Button method called       |
- * |-------------------|-----------------------------|
- * | button-click      | %DoClickAction()            |
+ * | %Action Name     | %Button method called       |
+ * |------------------|-----------------------------|
+ * | buttonClick      | %DoClickAction()            |
  */
 class DALI_IMPORT_API Button : public Control
 {
@@ -102,20 +102,20 @@ public:
     enum
     {
       DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool
-      AUTO_REPEATING,                  ///< name "auto-repeating",               @see SetAutoRepeating(),             type bool
-      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type float
-      NEXT_AUTO_REPEATING_DELAY,       ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type float
+      AUTO_REPEATING,                  ///< name "autoRepeating",                @see SetAutoRepeating(),             type bool
+      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initialAutoRepeatingDelay",    @see SetInitialAutoRepeatingDelay(), type float
+      NEXT_AUTO_REPEATING_DELAY,       ///< name "nextAutoRepeatingDelay",       @see SetNextAutoRepeatingDelay(),    type float
       TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool
       SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool
-      UNSELECTED_STATE_IMAGE,          ///< name "unselected-state-image",       @see SetUnselectedImage(),           type std::string
-      SELECTED_STATE_IMAGE,            ///< name "selected-state-image",         @see SetSelectedImage(),             type std::string
-      DISABLED_STATE_IMAGE,            ///< name "disabled-state-image",         @see SetDisabledImage(),             type std::string
-      UNSELECTED_COLOR,                ///< name "unselected-color",                                                  type Vector4
-      SELECTED_COLOR,                  ///< name "selected-color",                                                    type Vector4
+      UNSELECTED_STATE_IMAGE,          ///< name "unselectedStateImage",         @see SetUnselectedImage(),           type std::string
+      SELECTED_STATE_IMAGE,            ///< name "selectedStateImage",           @see SetSelectedImage(),             type std::string
+      DISABLED_STATE_IMAGE,            ///< name "disabledStateImage",           @see SetDisabledImage(),             type std::string
+      UNSELECTED_COLOR,                ///< name "unselectedColor",                                                   type Vector4
+      SELECTED_COLOR,                  ///< name "selectedColor",                                                     type Vector4
       LABEL,                           ///< name "label",                                                             type Property::Map
 
       // Deprecated properties:
-      LABEL_TEXT,                      ///< name "label-text",                   @see SetLabelText(),                 type std::string
+      LABEL_TEXT,                      ///< name "labelText",                    @see SetLabelText(),                 type std::string
     };
   };
 

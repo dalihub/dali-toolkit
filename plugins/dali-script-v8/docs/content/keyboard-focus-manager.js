@@ -18,7 +18,7 @@ The application is required to help the manager when moving focus.
 Connect to the pre-focus-change call back as follows:
 ```
 // listen for pre-focus change events
-dali.keyboardFocusManager.connect("keyboard-pre-focus-change", this.preFocusChanged);
+dali.keyboardFocusManager.connect("keyboardPreFocusChange", this.preFocusChanged);
   
 // example call back handler
   
@@ -39,7 +39,7 @@ myApp.preFocusChanged = function( currentFocusedActor, proposedActorToFocus, dir
   }
 }
   
-dali.keyboardFocusManager.connect("keyboard-pre-focus-change", myCallback)
+dali.keyboardFocusManager.connect("keyboardPreFocusChange", myCallback)
 ```
 
 KeyboardFocusManager makes the best guess for which actor to focus towards the given direction, but applications might want to change that.
@@ -58,7 +58,7 @@ myCallback( originalFocusedActor, currentFocusedActor)
 {
 }
   
-dali.keyboardFocusManager.connect("keyboard-focus-change", myCallback)
+dali.keyboardFocusManager.connect("keyboardFocusChange", myCallback)
 ```
 
 @class KeyboardFocusManager

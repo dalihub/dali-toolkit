@@ -45,18 +45,18 @@ namespace Internal
  *
  * The following properties are optional
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | custom-shader             | MAP              |
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | customShader            | MAP              |
  *
  * where custom-shader is a map with the following properties:
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | vertex-shader             | STRING           |
- * | fragment-shader           | STRING           |
- * | subdivide-grid-x          | INT              |
- * | subdivide-grid-y          | INT              |
- * | shader-hints              | INT              |
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | vertexShader            | STRING           |
+ * | fragmentShader          | STRING           |
+ * | subdivideGridX          | INT              |
+ * | subdivideGridY          | INT              |
+ * | shaderHints             | INT              |
  */
 class ControlRenderer : public BaseObject
 {

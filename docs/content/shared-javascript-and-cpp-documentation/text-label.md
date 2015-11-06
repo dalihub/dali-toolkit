@@ -33,7 +33,7 @@ dali.stage.add( label );
 ~~~
 
 The label must also be added to the stage, or to an actor which is on the stage.  
-The position of the label on-screen is dependent on the parent-origin and anchor-point properties.  
+The position of the label on-screen is dependent on the parentOrigin and anchorPoint properties.  
 
 |  |  |
 |--|--|

@@ -62,9 +62,9 @@ public:
   {
     enum
     {
-      MAX_SIZE =  PROPERTY_START_INDEX, ///< name "max-size",                The maximum size the Popup can be,              type VECTOR2
-      ENABLE_OVERSHOOT,                 ///< name "enable-overshoot",        Whether the overshoot image is enabled,         type BOOLEAN
-      SCROLL_VIEW,                      ///< name "scroll-view",             Properties to set on scroll view                type Property::Map
+      MAX_SIZE =  PROPERTY_START_INDEX, ///< name "maxSize",                 The maximum size the Popup can be,              type VECTOR2
+      ENABLE_OVERSHOOT,                 ///< name "enableOvershoot",         Whether the overshoot image is enabled,         type BOOLEAN
+      SCROLL_VIEW,                      ///< name "scrollView",              Properties to set on scroll view                type Property::Map
     };
   };
 

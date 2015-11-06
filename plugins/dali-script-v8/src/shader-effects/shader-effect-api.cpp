@@ -120,7 +120,7 @@ ShaderEffect GetShaderEffect( v8::Isolate* isolate, const v8::FunctionCallbackIn
  * @for ShaderEffect
  * @method ShaderEffect
  * @param {Object} shaderOptions
- * @param {String} [shaderOptions.geometryType] Type of geometry to be rendered with the effect. "image", "text", "mesh", "textured-mesh", default is image.
+ * @param {String} [shaderOptions.geometryType] Type of geometry to be rendered with the effect. "image", "text", "mesh", "texturedMesh",  default is image.
  * @param {String} [shaderOptions.vertexShaderPrefix] This string will be inserted before the default uniforms for the vertex shader(ideal for #defines)
  * @param {String} [shaderOptions.vertexShader] VertexShader code for the effect. If not defined, the default version will be used
  * @param {String} [shaderOptions.fragmentShaderPrefix] This string will be inserted before the default uniforms for the fragment shader(ideal for #defines)

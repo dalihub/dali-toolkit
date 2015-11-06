@@ -464,9 +464,10 @@ private:
    * @param[in] targetPosition The target position of the drag etc.
    * @param[in] targetSize The target ItemView & layout size.
    * @param[in] layout The current layout.
+   * @param[in] updateOvershoot False stops the current overshoot value from being clamped also.
    * @return The clamped first-item position.
    */
-  float ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout);
+  float ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout, bool updateOvershoot = true);
 
   /**
    * Called upon pan gesture event.

@@ -133,15 +133,15 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollBar, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scroll-direction",                  STRING, SCROLL_DIRECTION          )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-height-policy",           STRING, INDICATOR_HEIGHT_POLICY   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-fixed-height",            FLOAT,  INDICATOR_FIXED_HEIGHT    )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-show-duration",           FLOAT,  INDICATOR_SHOW_DURATION   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-hide-duration",           FLOAT,  INDICATOR_HIDE_DURATION   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scroll-position-intervals",         ARRAY,  SCROLL_POSITION_INTERVALS )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollDirection",                   STRING, SCROLL_DIRECTION          )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHeightPolicy",             STRING, INDICATOR_HEIGHT_POLICY   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorFixedHeight",              FLOAT,  INDICATOR_FIXED_HEIGHT    )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorShowDuration",             FLOAT,  INDICATOR_SHOW_DURATION   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHideDuration",             FLOAT,  INDICATOR_HIDE_DURATION   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollPositionIntervals",           ARRAY,  SCROLL_POSITION_INTERVALS )
 
-DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "pan-finished",                      PAN_FINISHED_SIGNAL )
-DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scroll-position-interval-reached",  SCROLL_POSITION_INTERVAL_REACHED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "panFinished",                       PAN_FINISHED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scrollPositionIntervalReached",     SCROLL_POSITION_INTERVAL_REACHED_SIGNAL )
 
 DALI_TYPE_REGISTRATION_END()
 

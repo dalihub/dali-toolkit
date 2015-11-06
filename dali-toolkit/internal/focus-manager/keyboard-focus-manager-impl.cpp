@@ -53,7 +53,7 @@ namespace // Unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
 
-const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "is-keyboard-focus-group"; // This property will be replaced by a flag in Control.
+const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "isKeyboardFocusGroup"; // This property will be replaced by a flag in Control.
 
 const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
@@ -78,10 +78,10 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::KeyboardFocusManager, Dali::BaseHandle, Create, true )
 
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-pre-focus-change",        SIGNAL_PRE_FOCUS_CHANGE        )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-changed",           SIGNAL_FOCUS_CHANGED           )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-group-changed",     SIGNAL_FOCUS_GROUP_CHANGED     )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focused-actor-enter-key", SIGNAL_FOCUSED_ACTOR_ENTER_KEY )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardPreFocusChange",           SIGNAL_PRE_FOCUS_CHANGE        )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusChanged",             SIGNAL_FOCUS_CHANGED           )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusGroupChanged",        SIGNAL_FOCUS_GROUP_CHANGED     )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusedActorEnterKey",     SIGNAL_FOCUSED_ACTOR_ENTER_KEY )
 
 DALI_TYPE_REGISTRATION_END()
 

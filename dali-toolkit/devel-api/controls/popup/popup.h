@@ -46,7 +46,7 @@ class Popup;
  * Signals
  * | %Signal Name      | Method                       |
  * |-------------------|------------------------------|
- * | touched-outside   | @ref OutsideTouchedSignal()  |
+ * | touchedOutside    | @ref OutsideTouchedSignal()  |
  * | showing           | @ref ShowingSignal()         |
  * | shown             | @ref ShownSignal()           |
  * | hiding            | @ref HidingSignal()          |
@@ -76,23 +76,23 @@ public:
       TITLE = PROPERTY_START_INDEX, ///< name "title",                  type Property::Map
       CONTENT,                      ///< name "content",                type Property::Map
       FOOTER,                       ///< name "footer",                 type Property::Map
-      DISPLAY_STATE,                ///< name "display-state",          type std::string
-      TOUCH_TRANSPARENT,            ///< name "touch-transparent",      type bool
-      TAIL_VISIBILITY,              ///< name "tail-visibility",        type bool
-      TAIL_POSITION,                ///< name "tail-position",          type Vector3
-      CONTEXTUAL_MODE,              ///< name "contextual-mode",        type std::string
-      ANIMATION_DURATION,           ///< name "animation-duration",     type float
-      ANIMATION_MODE,               ///< name "animation-mode",         type std::string
-      ENTRY_ANIMATION,              ///< name "entry-animation",        type Property::Map
-      EXIT_ANIMATION,               ///< name "exit-animation",         type Property::Map
-      AUTO_HIDE_DELAY,              ///< name "auto-hide-delay",        type int
-      BACKING_ENABLED,              ///< name "backing-enabled",        type bool
-      BACKING_COLOR,                ///< name "backing-color",          type Vector4
-      POPUP_BACKGROUND_IMAGE,       ///< name "popup-background-image", type std::string
-      TAIL_UP_IMAGE,                ///< name "tail-up-image",          type std::string
-      TAIL_DOWN_IMAGE,              ///< name "tail-down-image",        type std::string
-      TAIL_LEFT_IMAGE,              ///< name "tail-left-image",        type std::string
-      TAIL_RIGHT_IMAGE,             ///< name "tail-right-image",       type std::string
+      DISPLAY_STATE,                ///< name "displayState",           type std::string
+      TOUCH_TRANSPARENT,            ///< name "touchTransparent",       type bool
+      TAIL_VISIBILITY,              ///< name "tailVisibility",         type bool
+      TAIL_POSITION,                ///< name "tailPosition",           type Vector3
+      CONTEXTUAL_MODE,              ///< name "contextualMode",         type std::string
+      ANIMATION_DURATION,           ///< name "animationDuration",      type float
+      ANIMATION_MODE,               ///< name "animationMode",          type std::string
+      ENTRY_ANIMATION,              ///< name "entryAnimation",         type Property::Map
+      EXIT_ANIMATION,               ///< name "exitAnimation",          type Property::Map
+      AUTO_HIDE_DELAY,              ///< name "autoHideDelay",          type int
+      BACKING_ENABLED,              ///< name "backingEnabled",         type bool
+      BACKING_COLOR,                ///< name "backingColor",           type Vector4
+      POPUP_BACKGROUND_IMAGE,       ///< name "popupBackgroundImage",   type std::string
+      TAIL_UP_IMAGE,                ///< name "tailUpImage",            type std::string
+      TAIL_DOWN_IMAGE,              ///< name "tailDownImage",          type std::string
+      TAIL_LEFT_IMAGE,              ///< name "tailLeftImage",          type std::string
+      TAIL_RIGHT_IMAGE,             ///< name "tailRightImage",         type std::string
     };
   };
 

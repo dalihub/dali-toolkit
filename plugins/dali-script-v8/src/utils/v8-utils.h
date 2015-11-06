@@ -133,14 +133,6 @@ std::string GetJavaScriptFunctionName(  const char* functionName );
  std::string PropertyNameToJavaScriptName(const std::string& hyphenatedName);
 
 /**
- * Convert camelCase to hyphenated to (Wrapper property name to Dali property)
- * E.g. anchorPoint to "anchor-point"
- * @param[in] camelCase a std::string camelCase
- * @return a hyphenated std::string conversion
- */
- std::string JavaScriptNameToPropertyName(const std::string& camelCase);
-
-/**
  * Script error, throws an exception
  */
 void ScriptError( const char* function, v8::Isolate* isolate, std::string errorString );

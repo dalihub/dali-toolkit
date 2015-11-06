@@ -41,11 +41,11 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("n-patch-renderer");
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("nPatchRenderer");
 
-const char * const IMAGE_URL_NAME("image-url");
-const char * const BORDER_ONLY("border-only");
+const char * const IMAGE_URL_NAME("imageUrl");
+const char * const BORDER_ONLY("borderOnly");
 
 std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
@@ -222,7 +222,7 @@ void NPatchRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMa
   Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
   if( imageURLValue )
   {
-    //Read the border-only property first since InitialiseFromImage relies on mBorderOnly to be properly set
+    //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
     Property::Value* borderOnlyValue = propertyMap.Find( BORDER_ONLY );
     if( borderOnlyValue )
     {

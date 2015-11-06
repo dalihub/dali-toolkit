@@ -39,11 +39,11 @@ namespace
  *
  * These non-animatable properties should be registered to the child which would be added to the table
  */
-const char * const CELL_INDEX_PROPERTY_NAME("cell-index");
-const char * const ROW_SPAN_PROPERTY_NAME("row-span");
-const char * const COLUMN_SPAN_PROPERTY_NAME("column-span");
-const char * const CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME("cell-horizontal-alignment");
-const char * const CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME("cell-vertical-alignment");
+const char * const CELL_INDEX_PROPERTY_NAME("cellIndex");
+const char * const ROW_SPAN_PROPERTY_NAME("rowSpan");
+const char * const COLUMN_SPAN_PROPERTY_NAME("columnSpan");
+const char * const CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME("cellHorizontalAlignment");
+const char * const CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME("cellVerticalAlignment");
 
 /**
  * @brief Should the tableview fit around the given actor
@@ -144,9 +144,9 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TableView, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "rows",           INTEGER, ROWS           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "columns",        INTEGER, COLUMNS        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cell-padding",   VECTOR2, CELL_PADDING   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-rows",    MAP,     LAYOUT_ROWS    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-columns", MAP,     LAYOUT_COLUMNS )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cellPadding",    VECTOR2, CELL_PADDING   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layoutRows",     MAP,     LAYOUT_ROWS    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layoutColumns",  MAP,     LAYOUT_COLUMNS )
 
 DALI_TYPE_REGISTRATION_END()
 

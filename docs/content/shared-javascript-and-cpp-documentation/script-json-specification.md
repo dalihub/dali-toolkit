@@ -178,7 +178,7 @@ an optional actor sub hierarchy.
      {                                  //  }
      "filename":"{IMAGES}/b.jpg"        //
      },                                 //
-     "parent-origin": "CENTER"          //
+     "parentOrigin": "CENTER"           //
      ...                                //
      "actors":                          //  A tree of sub actors
      [                                  //
@@ -186,7 +186,7 @@ an optional actor sub hierarchy.
      "type":"TextView"                  //
      "name":"text",                     //
      "text":"Hello World",              //
-     "parent-origin": "CENTER",         //
+     "parentOrigin": "CENTER",          //
      }                                  //
      ]                                  //
    }                                    //
@@ -280,9 +280,9 @@ They can also be created automatically from JSON in an actor signal.
      {                                   //
      "duration": 10,                     // Duration in seconds
      "loop": false,                      // Whether to loop.
-     "end-action": "Bake",               // Whether to set final value(bake) or
+     "endAction": "Bake",                // Whether to set final value(bake) or
                                          // reset
-     "disconnect-aciton": "Discard",     // Whether 'Bake' or 'Discard' when disconnected
+     "disconnectAction": "Discard",      // Whether 'Bake' or 'Discard' when disconnected
      "properties":
      [
                                          // Properties changed in this animation
@@ -290,9 +290,9 @@ They can also be created automatically from JSON in an actor signal.
      "actor":"image",                    // Actor found by name from the stage
      "property":"rotation",              // Property to change
      "value":[0, 0.1, 0, 0],             // Value to set
-     "alpha-function": "EASE\_IN\_OUT",  // Interpolation function
+     "alphaFunction": "EASE\_IN\_OUT",   // Interpolation function
                                          //
-     "time-period":                      // Time period for change
+     "timePeriod":                       // Time period for change
      {"delay": 0,
       "duration": 3
       }
@@ -323,15 +323,15 @@ animation property.
        [190.0,-150.0,0.0]
       ],
                                          // curvature automatically creates
-     "curvature":0.35,                   // control-points
+     "curvature":0.35,                   // controlPoints
                                          //
-     "control-points": [...]             // Otherwise control-points can be
+     "controlPoints": [...]              // Otherwise controlPoints can be
                                          // directly specified.
      }                                   //
      },                                  //
     "animations":                        //
     {                                    //
-     "path-animation":
+     "pathAnimation":
      {
      "duration": 3.0,
      "properties":
@@ -342,8 +342,8 @@ animation property.
      "path":"path0",                     // animation.
      "forward":[1,0,0],                  // Forward vector specifies orientation
                                          // whilst travelling along the path
-     "alpha-function": "EASE\_IN\_OUT",  // (optional)
-     "time-period":
+     "alphaFunction": "EASE\_IN\_OUT",   // (optional)
+     "timePeriod":
      {
      "delay": 0,
      "duration": 3
@@ -373,7 +373,7 @@ be animated by one animation.
 
 ~~~
     {                                             //
-    "shader-effects":                             // Shader Effect section
+    "shaderEffects":                              // Shader Effect section
     {                                             //
       "myshader1":                                // Shader  instance  name
       {                                           //
@@ -383,10 +383,10 @@ be animated by one animation.
          "vertex":"",                             // Glsl vertex program
          "fragmentPrefix": "",
          "fragment": "",                          // Glsl fragment program.
-         "geometry-type": "GEOMETRY_TYPE_IMAGE",  // Geometry type(see DALi documentation)
+         "geometryType": "GEOMETRY_TYPE_IMAGE",   // Geometry type(see DALi documentation)
        },
-       "geometry-hints": "HINT_NONE":             // Geometry hints (see DALi documentation)
-       "grid-density": 0,                         // Grid density(see DALi documentation)
+       "geometryHints": "HINT_NONE":              // Geometry hints (see DALi documentation)
+       "gridDensity": 0,                          // Grid density(see DALi documentation)
        "image":
        {
          "filename": ""                           // Effect image available as a second texture unit.
@@ -440,7 +440,7 @@ uniforms with 'u'.
      ...
      ]
      },
-     "shader-effects":
+     "shaderEffects":
      {
      "myshader1":
      {

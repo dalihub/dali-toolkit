@@ -20,7 +20,7 @@ dali.stage.add(actor);
 panGestureDetector.attach(actor);
 
 // Connect the detected signal
-panGestureDetector.connect("pan-detected", onPan);
+panGestureDetector.connect("panDetected", onPan);
 
 onPan = function(actor, panGesture)
 {

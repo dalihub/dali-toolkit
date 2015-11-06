@@ -74,9 +74,9 @@ class CubeTransitionEffect;
  * @endcode
  *
  * Signals
- * | %Signal Name         | Method                           |
- * |----------------------|----------------------------------|
- * | transition-completed | @ref TransitionCompletedSignal() |
+ * | %Signal Name        | Method                           |
+ * |---------------------|----------------------------------|
+ * | transitionCompleted | @ref TransitionCompletedSignal() |
  */
 class DALI_IMPORT_API CubeTransitionEffect : public Control
 {

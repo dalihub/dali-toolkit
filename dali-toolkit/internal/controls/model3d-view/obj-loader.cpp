@@ -548,7 +548,6 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   }
 
   surface.SetRequiresDepthTesting(true);
-  //surface.SetProperty(Geometry::Property::GEOMETRY_HALF_EXTENTS, GetSize() * 0.5);
 
   vertices.Clear();
   verticesExt.Clear();

@@ -762,6 +762,13 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
         Dali::Property::Map propertyMap = V8Utils::GetPropertyMapFromObject(isolate, object);
         daliPropertyValue = Dali::Property::Value( propertyMap );
       }
+      else if( V8Utils::IsStringPrimitiveOrObject( v8Value) )
+      {
+        // There are special cases where a property with property map type can accept a string value,
+        // so we do the additional check here.
+        daliPropertyValue = Dali::Property::Value( V8Utils::GetStringValue( isolate, v8Value) );
+      }
+
       break;
     }
     case Dali::Property::NONE:
@@ -769,9 +776,9 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
     {
       break;
     }
-   } // switch type
+  } // switch type
 
-   return daliPropertyValue;
+  return daliPropertyValue;
 }
 
 void PropertyValueWrapper::NewRotation( const v8::FunctionCallbackInfo< v8::Value >& args)

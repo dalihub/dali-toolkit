@@ -245,13 +245,13 @@ inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
   vertexShaderString.append( vertexShader );
   fragmentShaderString.append( fragmentShader );
 
-  customShader[ "vertex-shader" ] = vertexShaderString;
-  customShader[ "fragment-shader" ] = fragmentShaderString;
+  customShader[ "vertexShader" ] = vertexShaderString;
+  customShader[ "fragmentShader" ] = fragmentShaderString;
 
-  customShader[ "subdivide-grid-x" ] = 20;
-  customShader[ "subdivide-grid-y" ] = 20;
+  customShader[ "subdivideGridX" ] = 20;
+  customShader[ "subdivideGridY" ] = 20;
 
-  customShader[ "hints" ] = "output-is-transparent";
+  customShader[ "hints" ] = "outputIsTransparent";
 
   map[ "shader" ] = customShader;
   return map;

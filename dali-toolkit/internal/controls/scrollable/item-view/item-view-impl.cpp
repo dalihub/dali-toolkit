@@ -46,14 +46,14 @@ namespace // Unnamed namespace
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL)
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-position",     FLOAT,    LAYOUT_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-speed",        FLOAT,    SCROLL_SPEED)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollSpeed",         FLOAT,    SCROLL_SPEED)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "overshoot",           FLOAT,    OVERSHOOT)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-direction",    VECTOR2,  SCROLL_DIRECTION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-orientation",  INTEGER,  LAYOUT_ORIENTATION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-content-size", FLOAT,    SCROLL_CONTENT_SIZE)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollDirection",     VECTOR2,  SCROLL_DIRECTION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutOrientation",   INTEGER,  LAYOUT_ORIENTATION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollContentSize",   FLOAT,    SCROLL_CONTENT_SIZE)
 
-DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layout-activated",    LAYOUT_ACTIVATED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",     LAYOUT_ACTIVATED_SIGNAL )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -1080,13 +1080,17 @@ void ItemView::OnItemsRemoved()
   }
 }
 
-float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout)
+float ItemView::ClampFirstItemPosition( float targetPosition, const Vector3& targetSize, ItemLayout& layout, bool updateOvershoot )
 {
   Actor self = Self();
   float minLayoutPosition = layout.GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), targetSize);
   float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, targetPosition));
-  mScrollOvershoot = targetPosition - clamppedPosition;
   self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector2(0.0f, -minLayoutPosition));
+
+  if( updateOvershoot )
+  {
+    mScrollOvershoot = targetPosition - clamppedPosition;
+  }
 
   return clamppedPosition;
 }
@@ -1442,9 +1446,9 @@ bool ItemView::IsLayoutScrollable(const Vector3& layoutSize)
 {
   Actor self = Self();
 
-  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout );
-  float forwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition + 1.0, layoutSize, *mActiveLayout);
-  float backwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition - 1.0, layoutSize, *mActiveLayout);
+  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout, false );
+  float forwardClampedPosition = ClampFirstItemPosition( currentLayoutPosition + 1.0, layoutSize, *mActiveLayout, false );
+  float backwardClampedPosition = ClampFirstItemPosition( currentLayoutPosition - 1.0, layoutSize, *mActiveLayout, false );
 
   return (fabs(forwardClampedPosition - backwardClampedPosition) > Math::MACHINE_EPSILON_0);
 }

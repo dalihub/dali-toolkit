@@ -150,7 +150,7 @@ createColorShiftAndZoomEffect = function() {
     }"
   
   // Shader API
-  // geometryType = "image", "text", "mesh", "textured-mesh"
+  // geometryType = "image", "text", "mesh", "texturedMesh"
   // fragmentPrefex ="" // prefix             ( optional)
   // fragmentShader = ""  // fragment shader   ( optional)
   // geometryHints = [ "gridX", "gridY", "grid","depthBuffer","blending" ]   ( optional)

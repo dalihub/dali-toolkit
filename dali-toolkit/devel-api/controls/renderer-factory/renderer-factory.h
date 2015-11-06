@@ -41,9 +41,9 @@ class RendererFactory;
  *
  * The renderer type is required in the property map for requesting a control renderer.
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | renderer-type             | STRING           |
+ * | %Property Name           | Type             |
+ * |--------------------------|------------------|
+ * | rendererType             | STRING           |
  */
 class DALI_IMPORT_API RendererFactory : public BaseHandle
 {

@@ -137,7 +137,7 @@ Toolkit::SuperBlurView SuperBlurView::New( unsigned int blurLevels )
 
 void SuperBlurView::OnInitialize()
 {
-  mBlurStrengthPropertyIndex = Self().RegisterProperty( "blur-strength",0.f );
+  mBlurStrengthPropertyIndex = Self().RegisterProperty( "blurStrength", 0.f );
 
   DALI_ASSERT_ALWAYS( mImageActors.size() == mBlurLevels+1 && "must synchronize the ImageActor group if blur levels got changed " );
   for(unsigned int i=0; i<=mBlurLevels;i++)

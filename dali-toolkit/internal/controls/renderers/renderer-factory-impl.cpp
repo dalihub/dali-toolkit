@@ -34,13 +34,13 @@
 
 namespace
 {
-const char * const RENDERER_TYPE_NAME( "renderer-type" );
+const char * const RENDERER_TYPE_NAME( "rendererType" );
 
-const char * const COLOR_RENDERER("color-renderer");
-const char * const BORDER_RENDERER("border-renderer");
-const char * const GRADIENT_RENDERER("gradient-renderer");
-const char * const IMAGE_RENDERER("image-renderer");
-const char * const N_PATCH_RENDERER("n-patch-renderer");
+const char * const COLOR_RENDERER("colorRenderer");
+const char * const BORDER_RENDERER("borderRenderer");
+const char * const GRADIENT_RENDERER("gradientRenderer");
+const char * const IMAGE_RENDERER("imageRenderer");
+const char * const N_PATCH_RENDERER("nPatchRenderer");
 
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }
@@ -140,20 +140,22 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& col
 
 void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color )
 {
-  ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
-  if( rendererPtr )
+  if( renderer )
   {
-    rendererPtr->SetColor( color );
-  }
-  else
-  {
-    renderer.RemoveAndReset( actor );
-    renderer = GetControlRenderer( color );
-
-    if( actor.OnStage() )
+    ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
     {
-      renderer.SetOnStage( actor );
+      rendererPtr->SetColor( color );
+      return;
     }
+
+    renderer.RemoveAndReset( actor );
+  }
+
+  renderer = GetControlRenderer( color );
+  if( actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
   }
 }
 
@@ -224,11 +226,12 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
         return;
       }
     }
+
+    renderer.RemoveAndReset( actor );
   }
 
-  renderer.RemoveAndReset( actor );
   renderer = GetControlRenderer( image );
-  if( actor.OnStage() )
+  if( actor && actor.OnStage() )
   {
     renderer.SetOnStage( actor );
   }
@@ -280,11 +283,12 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
         return;
       }
     }
+
+    renderer.RemoveAndReset( actor );
   }
 
-  renderer.RemoveAndReset( actor );
   renderer = GetControlRenderer( url );
-  if( actor.OnStage() )
+  if( actor && actor.OnStage() )
   {
     renderer.SetOnStage( actor );
   }
@@ -294,45 +298,31 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 {
   if( renderer )
   {
+    ControlRenderer& controlRenderer = GetImplementation( renderer );
+
     Property::Value* type = propertyMap.Find( RENDERER_TYPE_NAME );
     std::string typeValue ;
-    if( type && type->Get( typeValue ))
+
+    //If there's no renderer type specified or if there hasn't been a renderer type change then we can reuse the renderer
+    if( !type || !type->Get( typeValue ) ||
+        ( typeValue ==  IMAGE_RENDERER    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
+        ( typeValue ==  N_PATCH_RENDERER  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
+        ( typeValue ==  COLOR_RENDERER    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
+        ( typeValue ==  GRADIENT_RENDERER && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
+        ( typeValue ==  BORDER_RENDERER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) )
     {
-      //If there's been a renderer type change then we have to return a new shader
-      if( typeValue ==  COLOR_RENDERER && typeid( renderer ) != typeid( ColorRenderer ) )
-      {
-        renderer = GetControlRenderer( propertyMap );
-        return;
-      }
-      else if( typeValue ==  GRADIENT_RENDERER && typeid( renderer ) != typeid( GradientRenderer ) )
-      {
-        renderer = GetControlRenderer( propertyMap );
-        return;
-      }
-      else if( typeValue ==  IMAGE_RENDERER && typeid( renderer ) != typeid( ImageRenderer ) )
-      {
-        renderer = GetControlRenderer( propertyMap );
-        return;
-      }
-      else if( typeValue ==  N_PATCH_RENDERER && typeid( renderer ) != typeid( NPatchRenderer ) )
-      {
-        renderer = GetControlRenderer( propertyMap );
-        return;
-      }
-      else if( typeValue ==  BORDER_RENDERER && typeid( renderer ) != typeid( BorderRenderer ) )
-      {
-        renderer = GetControlRenderer( propertyMap );
-        return;
-      }
+      controlRenderer.Initialize( actor, propertyMap );
+      return;
     }
 
-    GetImplementation( renderer ).Initialize( actor, propertyMap );
-  }
-  else
-  {
-    renderer = GetControlRenderer( propertyMap );
+    renderer.RemoveAndReset( actor );
   }
 
+  renderer = GetControlRenderer( propertyMap );
+  if( actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
+  }
 }
 
 Image RendererFactory::GetBrokenRendererImage()

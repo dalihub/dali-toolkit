@@ -232,7 +232,7 @@ struct AtlasRenderer::Impl
           currentUnderlinePosition = ceil( fabsf( fontMetrics.underlinePosition ) );
           const float descender = ceil( fabsf( fontMetrics.descender ) );
 
-          if ( underlineHeight == ZERO )
+          if( fabsf( underlineHeight ) < Math::MACHINE_EPSILON_1000 )
           {
             currentUnderlineThickness = fontMetrics.underlineThickness;
 
@@ -252,7 +252,7 @@ struct AtlasRenderer::Impl
           {
             currentUnderlinePosition = descender;
           }
-          if ( ZERO == currentUnderlinePosition )
+          if( fabsf( currentUnderlinePosition ) < Math::MACHINE_EPSILON_1000 )
           {
             // Move offset down by one ( EFL behavior )
             currentUnderlinePosition = ONE;

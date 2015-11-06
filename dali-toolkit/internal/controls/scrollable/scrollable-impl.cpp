@@ -46,24 +46,24 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
+DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEffectColor",      VECTOR4, OVERSHOOT_EFFECT_COLOR    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootAnimationSpeed",   FLOAT,   OVERSHOOT_ANIMATION_SPEED )
 const int OVERSHOOT_SIZE = Dali::Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED + 1; // OVERSHOOT_SIZE is not public yet
-Dali::PropertyRegistration p1( typeRegistration, "overshoot-size", OVERSHOOT_SIZE, Property::VECTOR2, Dali::Toolkit::Internal::Scrollable::SetProperty, Dali::Toolkit::Internal::Scrollable::GetProperty );
+Dali::PropertyRegistration p1( typeRegistration, "overshootSize",  OVERSHOOT_SIZE, Property::VECTOR2, Dali::Toolkit::Internal::Scrollable::SetProperty, Dali::Toolkit::Internal::Scrollable::GetProperty );
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-relative-position", VECTOR2, SCROLL_RELATIVE_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-min",      VECTOR2, SCROLL_POSITION_MIN)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-min-x", SCROLL_POSITION_MIN_X, SCROLL_POSITION_MIN, 0)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-min-y", SCROLL_POSITION_MIN_Y, SCROLL_POSITION_MIN, 1)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-max",      VECTOR2, SCROLL_POSITION_MAX)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-max-x", SCROLL_POSITION_MAX_X, SCROLL_POSITION_MAX, 0)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-max-y", SCROLL_POSITION_MAX_Y, SCROLL_POSITION_MAX, 1)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-vertical",      BOOLEAN, CAN_SCROLL_VERTICAL)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-horizontal",    BOOLEAN, CAN_SCROLL_HORIZONTAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollRelativePosition",   VECTOR2, SCROLL_RELATIVE_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollPositionMin",        VECTOR2, SCROLL_POSITION_MIN)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMinX",    SCROLL_POSITION_MIN_X, SCROLL_POSITION_MIN, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMinY",    SCROLL_POSITION_MIN_Y, SCROLL_POSITION_MIN, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollPositionMax",        VECTOR2, SCROLL_POSITION_MAX)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMaxX",    SCROLL_POSITION_MAX_X, SCROLL_POSITION_MAX, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMaxY",    SCROLL_POSITION_MAX_Y, SCROLL_POSITION_MAX, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "canScrollVertical",        BOOLEAN, CAN_SCROLL_VERTICAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "canScrollHorizontal",      BOOLEAN, CAN_SCROLL_HORIZONTAL)
 
-DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-started",                    SIGNAL_SCROLL_STARTED    )
-DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-completed",                  SIGNAL_SCROLL_COMPLETED  )
-DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-updated",                    SIGNAL_SCROLL_UPDATED    )
+DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scrollStarted",                     SIGNAL_SCROLL_STARTED    )
+DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scrollCompleted",                   SIGNAL_SCROLL_COMPLETED  )
+DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scrollUpdated",                     SIGNAL_SCROLL_UPDATED    )
 
 DALI_TYPE_REGISTRATION_END()
 

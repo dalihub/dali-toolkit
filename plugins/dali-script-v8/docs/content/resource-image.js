@@ -33,7 +33,7 @@ var options = {
 }
 var image = new dali.ResourceImage( options );
 
-image.connect("image-loading-finished", finished );
+image.connect("imageLoadingFinished", finished );
 
 var imageActor = new dali.ImageActor( image );
 

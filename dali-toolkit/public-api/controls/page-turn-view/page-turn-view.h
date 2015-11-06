@@ -54,12 +54,12 @@ class PageTurnView;
  * page turning.
  *
  *  Signals
- * | %Signal Name       | Method                        |
- * |--------------------|-------------------------------|
- * | page-turn-started  | @ref PageTurnStartedSignal()  |
- * | page-turn-finished | @ref PageTurnFinishedSignal() |
- * | page-pan-started   | @ref PagePanStartedSignal()   |
- * | page-pan-finished  | @ref PagePanFinishedSignal()  |
+ * | %Signal Name     | Method                        |
+ * |------------------|-------------------------------|
+ * | pageTurnStarted  | @ref PageTurnStartedSignal()  |
+ * | pageTurnFinished | @ref PageTurnFinishedSignal() |
+ * | pagePanStarted   | @ref PagePanStartedSignal()   |
+ * | pagePanFinished  | @ref PagePanFinishedSignal()  |
  *
  * @since DALi 1.1.4
  */
@@ -80,14 +80,14 @@ public:
   {
     enum
     {
-      PAGE_SIZE = PROPERTY_START_INDEX, ///< name "page-size",       type Vector2
-      CURRENT_PAGE_ID,                  ///< name "current-page-id", type Integer
+      PAGE_SIZE = PROPERTY_START_INDEX, ///< name "pageSize",        type Vector2
+      CURRENT_PAGE_ID,                  ///< name "currentPageId",   type Integer
 
       /**
        * The two values are the major&minor radius (in pixels) to form an ellipse shape.
        * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow.
        */
-      SPINE_SHADOW,                     ///< name "spine-shadow",    type Vector2
+      SPINE_SHADOW,                     ///< name "spineShadow",     type Vector2
     };
   };
 

@@ -79,20 +79,20 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextLabel, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "rendering-backend",    INTEGER, RENDERING_BACKEND    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "renderingBackend",     INTEGER, RENDERING_BACKEND    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "text",                 STRING,  TEXT                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "font-family",          STRING,  FONT_FAMILY          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "font-style",           STRING,  FONT_STYLE           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "point-size",           FLOAT,   POINT_SIZE           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "multi-line",           BOOLEAN, MULTI_LINE           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "horizontal-alignment", STRING,  HORIZONTAL_ALIGNMENT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "vertical-alignment",   STRING,  VERTICAL_ALIGNMENT   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "text-color",           VECTOR4, TEXT_COLOR           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow-offset",        VECTOR2, SHADOW_OFFSET        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow-color",         VECTOR4, SHADOW_COLOR         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline-enabled",    BOOLEAN, UNDERLINE_ENABLED    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline-color",      VECTOR4, UNDERLINE_COLOR      )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline-height",     FLOAT,   UNDERLINE_HEIGHT     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontFamily",           STRING,  FONT_FAMILY          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",            STRING,  FONT_STYLE           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pointSize",            FLOAT,   POINT_SIZE           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "multiLine",            BOOLEAN, MULTI_LINE           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "horizontalAlignment",  STRING,  HORIZONTAL_ALIGNMENT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "verticalAlignment",    STRING,  VERTICAL_ALIGNMENT   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "textColor",            VECTOR4, TEXT_COLOR           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowOffset",         VECTOR2, SHADOW_OFFSET        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowColor",          VECTOR4, SHADOW_COLOR         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineEnabled",     BOOLEAN, UNDERLINE_ENABLED    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineColor",       VECTOR4, UNDERLINE_COLOR      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineHeight",      FLOAT,   UNDERLINE_HEIGHT     )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -282,7 +282,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           float height = value.Get< float >();
-          if ( impl.mController->GetUnderlineHeight() != height )
+          if( fabsf( impl.mController->GetUnderlineHeight() - height ) > Math::MACHINE_EPSILON_1000 )
           {
             impl.mController->SetUnderlineHeight( height );
             impl.mRenderer.Reset();

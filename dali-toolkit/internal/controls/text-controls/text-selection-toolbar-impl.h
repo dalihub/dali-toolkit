@@ -36,11 +36,6 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace
-{
-
-} // namespace
-
 class TextSelectionToolbar : public Control
 {
 public:

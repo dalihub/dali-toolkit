@@ -268,42 +268,6 @@ std::string PropertyNameToJavaScriptName(const std::string& hyphenatedName)
 
 
 
-std::string JavaScriptNameToPropertyName(const std::string& camelCase)
-{
-  std::string ret;
-
-  int countUpper = 0;
-  for(unsigned int i = 0; i < camelCase.size(); ++i)
-  {
-    if(std::isupper(camelCase[i]))
-    {
-      countUpper++;
-    }
-  }
-
-  if(countUpper)
-  {
-    ret.reserve(camelCase.size() + countUpper);
-
-    for(unsigned int i = 0; i < camelCase.size(); ++i)
-    {
-      char c = camelCase[i];
-      if(std::isupper(c))
-      {
-        ret.push_back('-');
-      }
-
-      ret.push_back(std::tolower(c));
-    }
-  }
-  else
-  {
-    return camelCase ;
-  }
-
-  return ret;
-}
-
 void ScriptError( const char* function, v8::Isolate* isolate, std::string errorString )
 {
   v8::EscapableHandleScope scope( isolate);
@@ -469,6 +433,14 @@ Property::Map GetPropertyMapFromObject( v8::Isolate* isolate, const v8::Local<v8
     else if( value->IsArray() )
     {
       propertyMap[ keyString ] = PropertyValueWrapper::VectorOrMatrixFromV8Array( isolate, value);
+    }
+    else if( value->IsObject() )
+    {
+      Dali::Property::Map map = V8Utils::GetPropertyMapFromObject(isolate, value->ToObject());
+      if( !map.Empty() )
+      {
+        propertyMap[ keyString ] = Dali::Property::Value( map );
+      }
     }
   }
 

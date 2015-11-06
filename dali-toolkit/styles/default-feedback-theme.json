@@ -12,7 +12,7 @@
       [
         {
           "type": "clicked",
-          "sound-feedback-pattern": "FEEDBACK_PATTERN_TAP"
+          "soundFeedbackPattern": "FEEDBACK_PATTERN_TAP"
         }
       ]
     }

@@ -49,11 +49,11 @@ class AccessibilityManager;
  * focused actor and emits a signal when the focus is changed.
  *
  * Signals
- * | %Signal Name            | Method                             |
- * |-------------------------|------------------------------------|
- * | focus-changed           | @ref FocusChangedSignal()          |
- * | focus-overshot          | @ref FocusOvershotSignal()         |
- * | focused-actor-activated | @ref FocusedActorActivatedSignal() |
+ * | %Signal Name          | Method                             |
+ * |-----------------------|------------------------------------|
+ * | focusChanged          | @ref FocusChangedSignal()          |
+ * | focusOvershot         | @ref FocusOvershotSignal()         |
+ * | focusedActorActivated | @ref FocusedActorActivatedSignal() |
  */
 class DALI_IMPORT_API AccessibilityManager : public BaseHandle
 {

@@ -38,7 +38,7 @@ JSON file contains different sections:
 - **Templates** actor & control tree creation
 - **Styles** used to style actor & control trees
 - **Animations**
-- **Instances** of objects for path, shader-effects, render-tasks, frame-buffers
+- **Instances** of objects for path, shaderEffects, renderTasks, frameBuffers
 - **Stage**. A list of actors / controls that can be added to the stage
 - **Constants**  (e.g. positions / colors, that can be references by other parts of the JSON file);
 - **Actions**
@@ -53,27 +53,27 @@ JSON file contains different sections:
     {
       "name":"users",
       "type":"Actor",
-      "parent-origin":"TOP_CENTER",
-      "anchor-point":"TOP_CENTER",
+      "parentOrigin":"TOP_CENTER",
+      "anchorPoint":"TOP_CENTER",
       "size":"{DEFAULT_MENU_USER_SIZE}",
-      "color-mode":"USE_OWN_COLOR",
+      "colorMode":"USE_OWN_COLOR",
       "actors":
       [
         {
           "name":"usersBackground",
           "type":"ImageActor",
-          "parent-origin":"CENTER",
-          "anchor-point":"CENTER",
+          "parentOrigin":"CENTER",
+          "anchorPoint":"CENTER",
           "size":"{DEFAULT_MENU_USER_SIZE}",
-          "color-mode":"USE_OWN_COLOR",
+          "colorMode":"USE_OWN_COLOR",
           "image":{ "filename":"{IMAGE_PATH}white-pixel.png" },
           "color":"{DEFAULT_MENU_BACKGROUND_COLOR}"
         },
         {
           "name":"icon",
           "type":"ImageActor",
-          "parent-origin":"TOP_CENTER",
-          "anchor-point":"TOP_CENTER",
+          "parentOrigin":"TOP_CENTER",
+          "anchorPoint":"TOP_CENTER",
           "position":[0,41,1],
           "image":{ "filename":"{IMAGE_PATH}ico_man_nor.png" }
         },
@@ -128,7 +128,7 @@ Actor userActorTree = builder.Create("users");
         },
         "label":
         {
-          "color-alpha":1,
+          "colorAlpha":1,
           "text":"<font size='20' weight='bold'><b>LIVE</b></font>"
         }
       }
@@ -160,23 +160,23 @@ builder.ApplyStyle( "live-tv-focus", tvIcon );
       [
         {
           "actor":"background",
-          "property":"position-x",
+          "property":"positionX",
           "value":30,
-          "alpha-function":"EASE_IN_OUT"
+          "alphaFunction":"EASE_IN_OUT"
         },
         {
           "actor":"itemsBackground",
-          "property":"color-alpha",
+          "property":"colorAlpha",
           "value":0.85,
-          "time-period": {"delay": 0.25, "duration": 0.25 },
-          "alpha-function":"EASE_IN_OUT"
+          "timePeriod": {"delay": 0.25, "duration": 0.25 },
+          "alphaFunction":"EASE_IN_OUT"
         },
         {
           "actor":"usersBackground",
-          "property":"color-alpha",
+          "property":"colorAlpha",
           "value":0.85,
-          "time-period": {"delay": 0.25, "duration": 0.25 },
-          "alpha-function":"EASE_IN_OUT"
+          "timePeriod": {"delay": 0.25, "duration": 0.25 },
+          "alphaFunction":"EASE_IN_OUT"
         }
       ]
     },
@@ -203,19 +203,19 @@ Animation anim = builder.createAnimation( "animate-show", propertyMap );
 “stage": [{
       "name":"simple-table",
       "type":"TableView",
-      "background-color": [0.5,0.5,0,1],
-      "parent-origin": "CENTER",
+      "backgroundColor": [0.5,0.5,0,1],
+      "parentOrigin": "CENTER",
       "size":[400,500,1],
       "rows": 4,
       "columns":4,
-      "cell-padding": [10, 5],
-      "layout-animation-duration": 0.5,
-      "layout-rows": {  // set the height of the rows
+      "cellPadding": [10, 5],
+      "layoutAnimationDuration": 0.5,
+      "layoutRows": {  // set the height of the rows
         "0": { "policy": "fixed", "value": 40 },
         "1": { "policy": "relative", "value": 0.33 },
         "2": { "policy": "fixed", "value": 120 }
       },
-      "layout-columns": { // set the widths of the columns
+      "layoutColumns": { // set the widths of the columns
         "1": { "policy": "fixed", "value": 150 },
         "2": { "policy": "relative", "value": 0.35 },
         "3": { "policy": "relative", "value": 0.15 }
@@ -226,10 +226,10 @@ Animation anim = builder.createAnimation( "animate-show", propertyMap );
           "image": {
             "filename": "{DALI_IMAGE_DIR}gallery-large-1.jpg"
           },
-          "custom-properties": { // properties registered dynamically
-            "cell-indices": [0,0],// property to specify the top-left cell this child occupies
-            "row-span":4, // property to specify how many rows this child occupies, if not set, default value is 1
-            "column-spam":1 // property to specify how many columns this child occupies
+          "customProperties": { // properties registered dynamically
+            "cellIndices": [0,0],// property to specify the top-left cell this child occupies
+            "rowSpan":4, // property to specify how many rows this child occupies, if not set, default value is 1
+            "columnSpan":1 // property to specify how many columns this child occupies
             ....
 ~~~
 

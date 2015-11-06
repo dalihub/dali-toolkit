@@ -459,27 +459,27 @@ public:
   {
     enum
     {
-      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-position",           type Vector2
-      SCROLL_PRE_POSITION,                               ///< Property, name "scroll-pre-position",       type Vector2
-      SCROLL_PRE_POSITION_X,                             ///< Property, name "scroll-pre-position-x",     type float
-      SCROLL_PRE_POSITION_Y,                             ///< Property, name "scroll-pre-position-y",     type float
-      SCROLL_PRE_POSITION_MAX,                           ///< Property, name "scroll-pre-position-max",   type Vector2
-      SCROLL_PRE_POSITION_MAX_X,                         ///< Property, name "scroll-pre-position-max-x", type float
-      SCROLL_PRE_POSITION_MAX_Y,                         ///< Property, name "scroll-pre-position-max-y", type float
-      OVERSHOOT_X,                                       ///< Property, name "overshoot-x",               type float
-      OVERSHOOT_Y,                                       ///< Property, name "overshoot-y",               type float
-      SCROLL_FINAL,                                      ///< Property, name "scroll-final",              type Vector2
-      SCROLL_FINAL_X,                                    ///< Property, name "scroll-final-x",            type float
-      SCROLL_FINAL_Y,                                    ///< Property, name "scroll-final-y",            type float
+      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollPosition",            type Vector2
+      SCROLL_PRE_POSITION,                               ///< Property, name "scrollPrePosition",         type Vector2
+      SCROLL_PRE_POSITION_X,                             ///< Property, name "scrollPrePositionX",        type float
+      SCROLL_PRE_POSITION_Y,                             ///< Property, name "scrollPrePositionY",        type float
+      SCROLL_PRE_POSITION_MAX,                           ///< Property, name "scrollPrePositionMax",      type Vector2
+      SCROLL_PRE_POSITION_MAX_X,                         ///< Property, name "scrollPrePositionMaxX",     type float
+      SCROLL_PRE_POSITION_MAX_Y,                         ///< Property, name "scrollPrePositionMaxY",     type float
+      OVERSHOOT_X,                                       ///< Property, name "overshootX",                type float
+      OVERSHOOT_Y,                                       ///< Property, name "overshootY",                type float
+      SCROLL_FINAL,                                      ///< Property, name "scrollFinal",               type Vector2
+      SCROLL_FINAL_X,                                    ///< Property, name "scrollFinalX",              type float
+      SCROLL_FINAL_Y,                                    ///< Property, name "scrollFinalY",              type float
       WRAP,                                              ///< Property, name "wrap",                      type bool
       PANNING,                                           ///< Property, name "panning",                   type bool
       SCROLLING,                                         ///< Property, name "scrolling",                 type bool
-      SCROLL_DOMAIN_SIZE,                                ///< Property, name "scroll-domain-size"         type Vector2
-      SCROLL_DOMAIN_SIZE_X,                              ///< Property, name "scroll-domain-size-x"       type float
-      SCROLL_DOMAIN_SIZE_Y,                              ///< Property, name "scroll-domain-size-y"       type float
-      SCROLL_DOMAIN_OFFSET,                              ///< Property, name "scroll-domain-offset"       type Vector2
-      SCROLL_POSITION_DELTA,                             ///< Property, name "scroll-position-delta"      type Vector2
-      START_PAGE_POSITION                                ///< Property, name "start-page-position"        type Vector3
+      SCROLL_DOMAIN_SIZE,                                ///< Property, name "scrollDomainSize",          type Vector2
+      SCROLL_DOMAIN_SIZE_X,                              ///< Property, name "scrollDomainSizeX",         type float
+      SCROLL_DOMAIN_SIZE_Y,                              ///< Property, name "scrollDomainSizeY",         type float
+      SCROLL_DOMAIN_OFFSET,                              ///< Property, name "scrollDomainOffset",        type Vector2
+      SCROLL_POSITION_DELTA,                             ///< Property, name "scrollPositionDelta",       type Vector2
+      START_PAGE_POSITION                                ///< Property, name "startPagePosition",         type Vector3
     };
   };
 

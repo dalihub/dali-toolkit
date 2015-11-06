@@ -65,11 +65,11 @@ public:
     enum
     {
       // Event side properties
-      FRAME_VISIBILITY = PROPERTY_START_INDEX,           ///< name "frame-visibility",      Whether a frame is visible or not,         type boolean
-      MAGNIFICATION_FACTOR,                              ///< name "magnification-factor",  Larger value means greater magnification,  type float
+      FRAME_VISIBILITY = PROPERTY_START_INDEX,           ///< name "frameVisibility",       Whether a frame is visible or not,         type boolean
+      MAGNIFICATION_FACTOR,                              ///< name "magnificationFactor",   Larger value means greater magnification,  type float
 
       // Animatable properties
-      SOURCE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< name "source-position", The position of the source,  type Vector3
+      SOURCE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< name "sourcePosition",  The position of the source,  type Vector3
     };
   };
 
