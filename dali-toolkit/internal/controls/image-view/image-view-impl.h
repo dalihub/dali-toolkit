@@ -75,7 +75,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::SetImage
    */
-  void SetImage( const std::string& imageUrl );
+  void SetImage( const std::string& imageUrl, ImageDimensions size );
 
   // Properties
   /**

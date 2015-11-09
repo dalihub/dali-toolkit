@@ -136,8 +136,10 @@ public:
    * @brief Cleans the renderer cache by removing the renderer from the cache based on the given key if there are no longer any references to it
    *
    * @param[in] key The key used for caching
+   *
+   * @return True if the renderer is no longer used anywhere, false otherwise
    */
-  void CleanRendererCache( const std::string& key );
+  bool CleanRendererCache( const std::string& key );
 
 protected:
 

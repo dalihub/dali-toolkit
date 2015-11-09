@@ -19,6 +19,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
+  $(devel_api_src_dir)/image-atlas/image-atlas.cpp \
   $(devel_api_src_dir)/styling/style-manager.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
@@ -61,6 +62,9 @@ devel_api_slider_header_files = \
 
 devel_api_focus_manager_header_files = \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h
+
+devel_api_image_atlas_header_files = \
+  $(devel_api_src_dir)/image-atlas/image-atlas.h
 
 devel_api_styling_header_files = \
   $(devel_api_src_dir)/styling/style-manager.h

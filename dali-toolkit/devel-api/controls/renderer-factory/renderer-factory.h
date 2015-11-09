@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/images/image-operations.h>
 
 // INTERNAK INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
@@ -147,9 +148,11 @@ public:
    * @brief Request the control renderer to render the given resource at the url.
    *
    * @param[in] url The URL to the resource to be rendered.
+   * @param[in] size The width and height to fit the loaded image to.
    * @return The pointer pointing to the control renderer
    */
-  ControlRenderer GetControlRenderer( const std::string& url );
+  ControlRenderer GetControlRenderer( const std::string& url,
+                                      ImageDimensions size = ImageDimensions() );
 
   /**
    * @brief Request the current control renderer to render the given resource at the url
@@ -160,8 +163,10 @@ public:
    * @param[in] renderer The ControlRenderer to reset
    * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] url The URL to the resource to be rendered.
+   * @param[in] size The width and height to fit the loaded image to.
    */
-  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url,
+                      ImageDimensions size = ImageDimensions() );
 
 
   /**

@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
 
 namespace
 {
@@ -41,6 +42,8 @@ const char * const BORDER_RENDERER("borderRenderer");
 const char * const GRADIENT_RENDERER("gradientRenderer");
 const char * const IMAGE_RENDERER("imageRenderer");
 const char * const N_PATCH_RENDERER("nPatchRenderer");
+
+const std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }
@@ -100,7 +103,8 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     }
     else if( typeValue ==  IMAGE_RENDERER )
     {
-      rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
+      CreateAtlasManager();
+      rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     }
     else if( typeValue ==  N_PATCH_RENDERER )
     {
@@ -195,7 +199,8 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
   }
   else
   {
-    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
+    CreateAtlasManager();
+    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     Actor actor;
     rendererPtr->SetImage( actor, image );
 
@@ -237,7 +242,7 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
   }
 }
 
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url, ImageDimensions size )
 {
   if( !mFactoryCache )
   {
@@ -253,15 +258,16 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string&
   }
   else
   {
-    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
+    CreateAtlasManager();
+    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     Actor actor;
-    rendererPtr->SetImage( actor, url );
+    rendererPtr->SetImage( actor, url, size );
 
     return Toolkit::ControlRenderer( rendererPtr );
   }
 }
 
-void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& url )
+void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
 {
   if( renderer )
   {
@@ -279,7 +285,7 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
       ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
       if( rendererPtr )
       {
-        rendererPtr->SetImage( actor, url );
+        rendererPtr->SetImage( actor, url, size );
         return;
       }
     }
@@ -287,7 +293,7 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
     renderer.RemoveAndReset( actor );
   }
 
-  renderer = GetControlRenderer( url );
+  renderer = GetControlRenderer( url, size );
   if( actor && actor.OnStage() )
   {
     renderer.SetOnStage( actor );
@@ -328,6 +334,16 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 Image RendererFactory::GetBrokenRendererImage()
 {
   return ResourceImage::New( BROKEN_RENDERER_IMAGE_URL );
+}
+
+void RendererFactory::CreateAtlasManager()
+{
+  if( !mAtlasManager )
+  {
+    Shader shader = ImageRenderer::GetImageShader( *( mFactoryCache.Get() ) );
+    mAtlasManager = new ImageAtlasManager(shader, TEXTURE_UNIFORM_NAME);
+    mAtlasManager->SetBrokenImage( BROKEN_RENDERER_IMAGE_URL );
+  }
 }
 
 } // namespace Internal
