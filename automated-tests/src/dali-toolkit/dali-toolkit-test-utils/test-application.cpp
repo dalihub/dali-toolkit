@@ -48,6 +48,7 @@ TestApplication::TestApplication( bool   initialize,
   mSurfaceHeight( surfaceHeight ),
   mFrame( 0u ),
   mDpi( horizontalDpi, verticalDpi ),
+  mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
   if ( initialize )
@@ -152,16 +153,12 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
 
 void TestApplication::DoUpdate( unsigned int intervalMilliseconds )
 {
-  uint64_t seconds(0u), nanoseconds(0u);
-  mPlatformAbstraction.GetTimeNanoseconds( seconds, nanoseconds );
-  mLastVSyncTime = ( seconds * 1e3 ) + ( nanoseconds / 1e6 );
-  unsigned int nextVSyncTime = mLastVSyncTime + 16;
-
-  // Update Time values
-  mPlatformAbstraction.IncrementGetTimeResult( intervalMilliseconds );
-
+  unsigned int nextVSyncTime = mLastVSyncTime + intervalMilliseconds;
   float elapsedSeconds = intervalMilliseconds / 1e3f;
+
   mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus );
+
+  mLastVSyncTime = nextVSyncTime;
 }
 
 bool TestApplication::Render( unsigned int intervalMilliseconds  )
