@@ -107,6 +107,7 @@ struct EventData
     EDITING,
     EDITING_WITH_POPUP,
     EDITING_WITH_GRAB_HANDLE,
+    EDITING_WITH_PASTE_POPUP,
     GRAB_HANDLE_PANNING,
     SELECTION_HANDLE_PANNING
   };
@@ -114,6 +115,11 @@ struct EventData
   EventData( DecoratorPtr decorator );
 
   ~EventData();
+
+  static bool IsEditingState( State stateToCheck )
+  {
+    return ( stateToCheck == EDITING || stateToCheck == EDITING_WITH_POPUP || stateToCheck == EDITING_WITH_GRAB_HANDLE || stateToCheck == EDITING_WITH_PASTE_POPUP );
+  }
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
   ImfManager         mImfManager;              ///< The Input Method Framework Manager.
@@ -506,6 +512,7 @@ struct Controller::Impl
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mUserDefinedFontFamily:1;           ///< Whether the Font family was set by the user instead of being left as sytem default.
+
 };
 
 } // namespace Text
