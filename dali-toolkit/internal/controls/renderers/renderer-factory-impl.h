@@ -49,8 +49,10 @@ public:
 
   /**
    * @brief Constructor
+   *
+   * @param[in] debugEnabled If true, use debug renderer to replace all the concrete renderer.
    */
-  RendererFactory();
+  RendererFactory( bool debugEnabled );
 
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Property::Map& )
@@ -130,7 +132,8 @@ private:
 private:
 
   RendererFactoryCachePtr mFactoryCache;
-  ImageAtlasManagerPtr mAtlasManager;
+  ImageAtlasManagerPtr    mAtlasManager;
+  bool                    mDebugEnabled;
 };
 
 } // namespace Internal

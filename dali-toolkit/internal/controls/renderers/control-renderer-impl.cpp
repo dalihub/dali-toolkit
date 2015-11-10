@@ -147,11 +147,12 @@ void ControlRenderer::DoSetOffStage( Actor& actor )
 
 void ControlRenderer::CreatePropertyMap( Property::Map& map ) const
 {
+  DoCreatePropertyMap( map );
+
   if( mImpl->mCustomShader )
   {
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
-  DoCreatePropertyMap( map );
 }
 
 bool ControlRenderer::GetIsOnStage() const
