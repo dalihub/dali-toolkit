@@ -22,43 +22,58 @@
 #include <string.h>
 #include <dali/devel-api/rendering/shader.h>
 
-namespace
-{
-  template < typename T>
-  void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value )
-  {
-    Dali::Property::Index index = actor.GetPropertyIndex( name );
-    if ( Dali::Property::INVALID_INDEX == index )
-    {
-      index = actor.RegisterProperty( name, value );
-    }
-    else
-    {
-      actor.SetProperty( index, value );
-    }
-  }
-
-  template < typename T>
-  void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value, Dali::Property::AccessMode accessMode )
-  {
-    Dali::Property::Index index = actor.GetPropertyIndex( name );
-    if ( Dali::Property::INVALID_INDEX == index )
-    {
-      index = actor.RegisterProperty( name, value, accessMode );
-    }
-    else
-    {
-      actor.SetProperty( index, value );
-    }
-  }
-
-};
-
 namespace Dali
 {
 
 namespace Toolkit
 {
+
+/**
+ * @brief Only registers the required property if it has not registered it before.
+ *
+ * @tparam  T  The type of the property.
+ *
+ * @param[in]  actor  The actor to register the property with.
+ * @param[in]  name   The name of the property.
+ * @param[in]  value  The value the property should be set to.
+ */
+template < typename T>
+DALI_INTERNAL void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value )
+{
+  Dali::Property::Index index = actor.GetPropertyIndex( name );
+  if ( Dali::Property::INVALID_INDEX == index )
+  {
+    index = actor.RegisterProperty( name, value );
+  }
+  else
+  {
+    actor.SetProperty( index, value );
+  }
+}
+
+/**
+ * @brief Only registers the required property if it has not registered it before.
+ *
+ * @tparam  T  The type of the property.
+ *
+ * @param[in]  actor       The actor to register the property with.
+ * @param[in]  name        The name of the property.
+ * @param[in]  value       The value the property should be set to.
+ * @param[in]  accessMode  The accessMode required for the property.
+ */
+template < typename T>
+DALI_INTERNAL void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value, Dali::Property::AccessMode accessMode )
+{
+  Dali::Property::Index index = actor.GetPropertyIndex( name );
+  if ( Dali::Property::INVALID_INDEX == index )
+  {
+    index = actor.RegisterProperty( name, value, accessMode );
+  }
+  else
+  {
+    actor.SetProperty( index, value );
+  }
+}
 
 /**
  * @brief Set the dissolve central line.
