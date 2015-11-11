@@ -36,12 +36,7 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace
-{
-
 #define MAXIMUM_NUMBER_OF_CONTROLS 2
-
-}
 
 /**
  * ConfirmationPopup implementation class.
