@@ -436,6 +436,7 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
         else // big image, atlasing is not applied
         {
           mImpl->mRenderer = CreateRenderer();
+          SetTextureRectUniform(FULL_TEXTURE_RECT);
 
           ResourceImage image = Dali::ResourceImage::New( imageUrl );
           image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
