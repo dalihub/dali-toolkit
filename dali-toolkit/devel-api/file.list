@@ -89,7 +89,6 @@ devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/mirror-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h \
-  $(devel_api_src_dir)/shader-effects/nine-patch-mask-effect.h \
   $(devel_api_src_dir)/shader-effects/overlay-effect.h \
   $(devel_api_src_dir)/shader-effects/quadratic-bezier.h \
   $(devel_api_src_dir)/shader-effects/ripple-effect.h \

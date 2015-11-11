@@ -40,7 +40,6 @@ SET(TC_SOURCES
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
    utc-Dali-Magnifier.cpp
-   utc-Dali-NinePatchMaskEffect.cpp
    utc-Dali-Popup.cpp
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp

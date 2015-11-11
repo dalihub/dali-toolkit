@@ -35,7 +35,6 @@
 #include <dali-toolkit/devel-api/shader-effects/mirror-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/motion-blur-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/motion-stretch-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/nine-patch-mask-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/overlay-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/quadratic-bezier.h>
 #include <dali-toolkit/devel-api/shader-effects/ripple-effect.h>
