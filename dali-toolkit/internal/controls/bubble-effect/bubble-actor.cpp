@@ -35,7 +35,15 @@ namespace Internal
 
 BubbleActor::BubbleActor( unsigned int numberOfBubble,
                           const Vector2& movementArea)
-: mMovementArea( movementArea ),
+: mActor(),
+  mRenderer(),
+  mMovementArea( movementArea ),
+  mIndicesOffset(),
+  mIndiceStartEndPos(),
+  mIndicesPercentage(),
+  mIndexGravity( Property::INVALID_INDEX ),
+  mIndexDynamicScale( Property::INVALID_INDEX ),
+  mIndexInvertedMovementArea( Property::INVALID_INDEX ),
   mNumBubble( numberOfBubble ),
   mRandomSeed( 0 )
 {

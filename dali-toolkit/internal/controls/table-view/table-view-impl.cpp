@@ -1197,8 +1197,8 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
       if( childMap )
       {
         Property::Value* policy = childMap->Find( "policy" );
-        Property::Value* value = childMap->Find( "value" );
-        if( policy && value )
+        Property::Value* childMapValue = childMap->Find( "value" );
+        if( policy && childMapValue )
         {
           std::string policyValue;
           policy->Get( policyValue );
@@ -1210,11 +1210,11 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
           {
             if( policy == Toolkit::TableView::FIXED  )
             {
-              (tableViewImpl.*funcFixed)( index, value->Get<float>() );
+              (tableViewImpl.*funcFixed)( index, childMapValue->Get<float>() );
             }
             else if( policy == Toolkit::TableView::RELATIVE )
             {
-              (tableViewImpl.*funcRelative)( index, value->Get<float>() );
+              (tableViewImpl.*funcRelative)( index, childMapValue->Get<float>() );
             }
             else if( policy == Toolkit::TableView::FIT )
             {

@@ -744,10 +744,10 @@ void ImageRenderer::OnImageLoaded( ResourceImage image )
 {
   if( image.GetLoadingState() == Dali::ResourceLoadingFailed )
   {
-    Image image = RendererFactory::GetBrokenRendererImage();
+    Image brokenImage = RendererFactory::GetBrokenRendererImage();
     if( mImpl->mRenderer )
     {
-      ApplyImageToSampler( image );
+      ApplyImageToSampler( brokenImage );
     }
   }
 }
