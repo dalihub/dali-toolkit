@@ -1514,42 +1514,45 @@ void ItemView::EnableScrollOvershoot( bool enable )
   Actor self = Self();
   if( enable )
   {
-    Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
-    mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
-    mOvershootOverlay.SetColor(mOvershootEffectColor);
-    mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
-    mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-    mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
-    self.Add(mOvershootOverlay);
+    if( !mOvershootOverlay )
+    {
+      Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
+      mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
+      mOvershootOverlay.SetColor(mOvershootEffectColor);
+      mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
+      mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+      mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
+      self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(mOvershootSize.height) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.Apply();
+      Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(mOvershootSize.height) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+      constraint.Apply();
 
-    mOvershootOverlay.SetSize(mOvershootSize.width, mOvershootSize.height);
+      mOvershootOverlay.SetSize(mOvershootSize.width, mOvershootSize.height);
 
-    constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
-    constraint.Apply();
+      constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
+      constraint.Apply();
 
-    constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::POSITION, OvershootOverlayPositionConstraint );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
-    constraint.Apply();
+      constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::POSITION, OvershootOverlayPositionConstraint );
+      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
+      constraint.Apply();
 
-    constraint = Constraint::New<bool>( mOvershootOverlay, Actor::Property::VISIBLE, OvershootOverlayVisibilityConstraint );
-    constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ) );
-    constraint.Apply();
+      constraint = Constraint::New<bool>( mOvershootOverlay, Actor::Property::VISIBLE, OvershootOverlayVisibilityConstraint );
+      constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ) );
+      constraint.Apply();
 
-    constraint = Constraint::New<float>( mOvershootOverlay, effectOvershootPropertyIndex, EqualToConstraint() );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
-    constraint.Apply();
+      constraint = Constraint::New<float>( mOvershootOverlay, effectOvershootPropertyIndex, EqualToConstraint() );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
+      constraint.Apply();
+    }
   }
   else
   {
