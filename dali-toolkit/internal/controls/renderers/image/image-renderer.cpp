@@ -756,15 +756,8 @@ void ImageRenderer::SetTextureRectUniform( const Vector4& textureRect )
 {
   if( mImpl->mRenderer )
   {
-    Property::Index index = mImpl->mRenderer.GetPropertyIndex( TEXTURE_RECT_UNIFORM_NAME );
-    if( index == Property::INVALID_INDEX )
-    {
-      index = mImpl->mRenderer.RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
-    }
-    else
-    {
-      mImpl->mRenderer.SetProperty( index, textureRect );
-    }
+    // Register/Set property.
+    mImpl->mRenderer.RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
   }
 }
 

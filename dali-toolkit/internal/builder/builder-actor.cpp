@@ -81,18 +81,11 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
       const TreeNode::KeyNodePair& keyChild = *iter;
       std::string key( keyChild.first );
 
-      Property::Index index = actor.GetPropertyIndex( key );
       Property::Value value;
       if( SetPropertyFromNode( keyChild.second, value, constant ))
       {
-        if( Property::INVALID_INDEX == index )
-        {
-          actor.RegisterProperty( key, value, Property::READ_WRITE );
-        }
-        else
-        {
-          actor.SetProperty( index, value );
-        }
+        // Register/Set property.
+        actor.RegisterProperty( key, value, Property::READ_WRITE );
       }
     }
   }
