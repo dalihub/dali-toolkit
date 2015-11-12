@@ -1,35 +1,86 @@
 /*! \page shader-intro Shader Effects
  *
-
-<h2 class="pg">Introduction</h2>
-
-The shader effects allow the developer to apply visual deformations on the actors.
-They can affect the geometry, the colors and textures of the actor.
-
-
-<br>
-<br>
-<h2 class="pg">Custom Shader Effects</h2>
-The \ref Dali::ShaderEffect "ShaderEffect" lets the developers create their own shader effects by specifying the vertex and pixel shaders.
-
-A custom shader effect can be created like this:
-@code
-String myVertexShader; // This variable would contain the code for a vertex shader.
-Dali::ShaderEffect myEffect = Dali::ShaderEffect::New( myVertexShader,
-                                                       "" // use default pixel shader
-                                                     );
-@endcode
-
-The value of a uniform can be set like this:
-@code
-// if the uniform was declared like this in the shader: uniform float myUniform;
-myEffect.SetUniform( "myUniform", 0.5f );
-@endcode
-
-The custom shader effect can be applied to an actor like any other shader:
-@code
-actor.SetShaderEffect( myEffect );
-@endcode
-
+ *
+ * <h2 class="pg">Introduction</h2>
+ *
+ * The shader effects allow the developer to apply visual deformations on Image Views.
+ * They can affect the geometry, the colors and textures of the Image View.
+ *
+ * <br>
+ * <br>
+ * <h2 class="pg">Custom Shader Effects</h2>
+ * The custom shader lets the developers create their own shader effects by specifying the vertex and pixel shaders.
+ *
+ * To set a custom shader to ImageRenderer you have to pass it through as a Property::Map
+ * @code
+ * //an example vertex shader
+ * const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+ *   attribute mediump vec2 aPosition;\n
+ *   varying mediump vec2 vTexCoord;\n
+ *   uniform mediump mat4 uMvpMatrix;\n
+ *   uniform mediump vec3 uSize;\n
+ *   \n
+ *   void main()\n
+ *   {\n
+ *     mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+ *     vertexPosition.xyz *= uSize;\n
+ *     vertexPosition = uMvpMatrix * vertexPosition;\n
+ *     \n
+ *     vTexCoord = aPosition + vec2(0.5);\n
+ *     gl_Position = vertexPosition;\n
+ *   }\n
+ * );
+ *
+ * //an example fragment shader
+ * const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+ *   varying mediump vec2 vTexCoord;\n
+ *   uniform sampler2D sTexture;\n
+ *   uniform lowp vec4 uColor;\n
+ *   \n
+ *   void main()\n
+ *   {\n
+ *     gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+ *   }\n
+ * );
+ *
+ * Property::Map customShader;
+ *
+ * customShader.Insert(“vertex-shader”, VERTEX_SHADER); //if this is not set then the default ImageView vertex shader will be used
+ * customShader.Insert(“fragment-shader”, FRAGMENT_SHADER); //if this is not set then the default ImageView fragment shader will be used
+ *
+ * Property::Map map;
+ * map.Insert(“shader”, customShader);
+ *
+ * ImageView imageView = ImageView::New("image-url.png")
+ * imageView.SetProperty(ImageView::Property::IMAGE, map);
+ * @endcode
+ *
+ * Optionally, you can subdivide the grid horizontally or vertically before you add it to the map but you should not do this if a quad is used.
+ * @code
+ * int X_SUB_DIVISIONS = 20;
+ * int Y_SUB_DIVISIONS = 20;
+ * customShader.Insert(“subdivide-grid-x”, X_SUB_DIVISIONS); //optional number of times to subdivide the grid horizontally, don’t add if you just want to use a quad
+ * customShader.Insert(“subdivide-grid-y”, Y_SUB_DIVISIONS); //optional number of times to subdivide the grid vertically, don’t add if you just want to use a quad
+ *
+ * //shader hints can be an array or a string
+ * optional array of shader hints
+ *
+ * Property::Array shaderHints;
+ * shaderHints.PushBack(“requires-self-depth-test”);
+ * shaderHints.PushBack(“output-is-transparent”);
+ * shaderHints.PushBack(“output-is-opaque”);
+ * shaderHints.PushBack(“modifies-geometry”);
+ * customShader.Insert(“hints”, shaderHints);
+ *
+ * //or optional single shader hint as a string
+ * //customShader.Insert(“hints”, “output-is-transparent”);
+ * @endcode
+ *
+ * The value of a uniform can be set on the imageView
+ * @code
+ * // if the uniform was declared like this in the shader: uniform float myUniform;
+ * imageView.RegisterProperty( "myUniform", 0.5f );
+ * @endcode
+ *
  *
  */

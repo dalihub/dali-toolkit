@@ -57,5 +57,24 @@ then the above image will look like:
 </td>
 </table>
 
+@section background-renderer Background Renderer
+
+The background can be set to use a specified renderer, e.g the border renderer
+@code
+Property::Map renderer;
+renderer.Insert("rendererType","borderRenderer");
+renderer.Insert("borderColor",COLOR::RED);
+renderer.Insert("borderSize",20.f);
+
+control.SetProperty( Control::Property::BACKGROUND, renderer);
+@endcode
+
+then the above image will look like:
+<table border=0 cellpadding=10><tr>
+<td>
+\image html BackgroundBorder.png
+</td>
+</table>
+
 *
 */

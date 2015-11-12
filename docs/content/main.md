@@ -30,6 +30,7 @@
   + [Event Handling](@ref event-system)
   + [Layouting](@ref size-negotiation)
   + [Image Actor](@ref image-actor)
+  + [Image View](@ref image-view)
  + [Animation](@ref animation)
   + [Basic Framework](@ref animation-basics)
   + [Key Frame Animations](@ref animation-key-frame)
