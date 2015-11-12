@@ -191,12 +191,8 @@ void AccessibilityManager::SetFocusOrder(Actor actor, const unsigned int order)
     // Firstly delete the actor from the focus chain if it's already there with a different focus order.
     mFocusIDContainer.erase(GetFocusOrder(actor));
 
-    // Create actor focusable property if not already created.
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
-    if(propertyActorFocusable == Property::INVALID_INDEX)
-    {
-      propertyActorFocusable = actor.RegisterProperty( ACTOR_FOCUSABLE, true, Property::READ_WRITE );
-    }
+    // Create/retrieve actor focusable property
+    Property::Index propertyActorFocusable = actor.RegisterProperty( ACTOR_FOCUSABLE, true, Property::READ_WRITE );
 
     if(order == 0)
     {
@@ -512,16 +508,8 @@ void AccessibilityManager::SetFocusGroup(Actor actor, bool isFocusGroup)
 {
   if(actor)
   {
-    // Create focus group property if not already created.
-    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP);
-    if(propertyIsFocusGroup == Property::INVALID_INDEX)
-    {
-      actor.RegisterProperty( IS_FOCUS_GROUP, isFocusGroup, Property::READ_WRITE );
-    }
-    else
-    {
-      actor.SetProperty(propertyIsFocusGroup, isFocusGroup);
-    }
+    // Create/Set focus group property.
+    actor.RegisterProperty( IS_FOCUS_GROUP, isFocusGroup, Property::READ_WRITE );
   }
 }
 
@@ -667,16 +655,8 @@ void AccessibilityManager::SetFocusable(Actor actor, bool focusable)
 {
   if(actor)
   {
-    // Create actor focusable property if not already created.
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
-    if(propertyActorFocusable == Property::INVALID_INDEX)
-    {
-      actor.RegisterProperty( ACTOR_FOCUSABLE, focusable, Property::READ_WRITE );
-    }
-    else
-    {
-      actor.SetProperty(propertyActorFocusable, focusable);
-    }
+    // Create/Set actor focusable property.
+    actor.RegisterProperty( ACTOR_FOCUSABLE, focusable, Property::READ_WRITE );
   }
 }
 
