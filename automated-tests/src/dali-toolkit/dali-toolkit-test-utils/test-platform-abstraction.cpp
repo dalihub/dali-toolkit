@@ -22,43 +22,29 @@
 namespace Dali
 {
 
-/**
- * Constructor
- */
 TestPlatformAbstraction::TestPlatformAbstraction()
-: mRequest(0)
+: mTrace(),
+  mIsLoadingResult( false ),
+  mGetDefaultFontSizeResult( 0 ),
+  mResources(),
+  mRequest( NULL ),
+  mSize(),
+  mClosestSize(),
+  mLoadFileResult(),
+  mSaveFileResult( false )
 {
   Initialize();
 }
 
-/**
- * Destructor
- */
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
 }
 
-/**
- * @copydoc PlatformAbstraction::GetTimeMicroseconds()
- */
-void TestPlatformAbstraction::GetTimeMicroseconds(unsigned int &seconds, unsigned int &microSeconds)
-{
-  seconds = mSeconds;
-  microSeconds = mMicroSeconds;
-  mTrace.PushCall("GetTimeMicroseconds", "");
-}
-
-/**
- * @copydoc PlatformAbstraction::Suspend()
- */
 void TestPlatformAbstraction::Suspend()
 {
   mTrace.PushCall("Suspend", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::Resume()
- */
 void TestPlatformAbstraction::Resume()
 {
   mTrace.PushCall("Resume", "");
@@ -86,9 +72,6 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::Resou
   return closestSize;
 }
 
-/**
- * @copydoc PlatformAbstraction::LoadResource()
- */
 void TestPlatformAbstraction::LoadResource(const Integration::ResourceRequest& request)
 {
   std::ostringstream out;
@@ -115,17 +98,11 @@ Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration:
   return Integration::BitmapPtr();
 }
 
-/**
- * @copydoc PlatformAbstraction::CancelLoad()
- */
 void TestPlatformAbstraction::CancelLoad(Integration::ResourceId id, Integration::ResourceTypeId typeId)
 {
   mTrace.PushCall("CancelLoad", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::GetResources()
- */
 void TestPlatformAbstraction::GetResources(Integration::ResourceCache& cache)
 {
   mTrace.PushCall("GetResources", "");
@@ -140,35 +117,23 @@ void TestPlatformAbstraction::GetResources(Integration::ResourceCache& cache)
   }
 }
 
-/**
- * @copydoc PlatformAbstraction::IsLoading()
- */
 bool TestPlatformAbstraction::IsLoading()
 {
   mTrace.PushCall("IsLoading", "");
   return mIsLoadingResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::GetDefaultFontSize()
- */
 int TestPlatformAbstraction::GetDefaultFontSize() const
 {
-  // TODO
-  return int();
+  mTrace.PushCall("GetDefaultFontSize", "");
+  return mGetDefaultFontSizeResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::SetDpi()
- */
 void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical)
 {
   mTrace.PushCall("SetDpi", "");
 }
 
-/**
- * @copydoc PlatformAbstraction::LoadFile()
- */
 bool TestPlatformAbstraction::LoadFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
   mTrace.PushCall("LoadFile", "");
@@ -180,9 +145,6 @@ bool TestPlatformAbstraction::LoadFile( const std::string& filename, Dali::Vecto
   return mLoadFileResult.loadResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
- */
 bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
   mTrace.PushCall("LoadShaderBinaryFile", "");
@@ -194,10 +156,7 @@ bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename,
   return mLoadFileResult.loadResult;
 }
 
-/**
- * @copydoc PlatformAbstraction::SaveFile()
- */
-bool TestPlatformAbstraction::SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes) const
+bool TestPlatformAbstraction::SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes ) const
 {
   mTrace.PushCall("SaveFile", "");
   return false;
@@ -214,8 +173,6 @@ void TestPlatformAbstraction::Initialize()
   mTrace.Reset();
   mTrace.Enable(true);
   memset(&mResources, 0, sizeof(Resources));
-  mSeconds=0;
-  mMicroSeconds=0;
   mIsLoadingResult=false;
 
   if(mRequest)
@@ -225,12 +182,10 @@ void TestPlatformAbstraction::Initialize()
   }
 }
 
-
 bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
 {
   switch(func)
   {
-    case GetTimeMicrosecondsFunc:             return mTrace.FindMethod("GetTimeMicroseconds");
     case SuspendFunc:                         return mTrace.FindMethod("Suspend");
     case ResumeFunc:                          return mTrace.FindMethod("Resume");
     case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
@@ -245,21 +200,6 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case JoinLoaderThreadsFunc:               return mTrace.FindMethod("JoinLoaderThreads");
   }
   return false;
-}
-
-void TestPlatformAbstraction::SetGetTimeMicrosecondsResult(size_t sec, size_t usec)
-{
-  mSeconds = sec;
-  mMicroSeconds = usec;
-}
-
-void TestPlatformAbstraction::IncrementGetTimeResult(size_t milliseconds)
-{
-  mMicroSeconds += milliseconds * 1000u;
-  unsigned int additionalSeconds = mMicroSeconds / 1000000u;
-
-  mSeconds += additionalSeconds;
-  mMicroSeconds -= additionalSeconds * 1000000u;
 }
 
 void TestPlatformAbstraction::SetIsLoadingResult(bool result)

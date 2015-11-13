@@ -25,6 +25,7 @@
 #include "test-gl-abstraction.h"
 #include "test-render-controller.h"
 #include <dali/public-api/common/dali-common.h>
+#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -51,20 +52,18 @@ public:
                    size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                    float  verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   ResourcePolicy::DataRetention resourcePolicy = ResourcePolicy::DALI_DISCARDS_ALL_DATA );
-
-
+                   ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA);
 
   TestApplication( bool   initialize,
                    size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
                    size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                    float  verticalDpi   = DEFAULT_VERTICAL_DPI,
-                   ResourcePolicy::DataRetention resourcePolicy = ResourcePolicy::DALI_DISCARDS_ALL_DATA );
+                   ResourcePolicy::DataRetention policy = ResourcePolicy::DALI_DISCARDS_ALL_DATA);
 
   void Initialize();
   virtual ~TestApplication();
-  static void LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
+  static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController& GetRenderController();

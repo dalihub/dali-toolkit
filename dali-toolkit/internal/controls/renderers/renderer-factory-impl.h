@@ -36,6 +36,9 @@ namespace Internal
 class RendererFactoryCache;
 typedef IntrusivePtr<RendererFactoryCache> RendererFactoryCachePtr;
 
+class ImageAtlasManager;
+typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
+
 /**
  * @copydoc Toolkit::RendererFactory
  */
@@ -85,14 +88,14 @@ public:
   void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Image& image );
 
   /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const std::string& )
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const std::string&, ImageDimensions )
    */
-  Toolkit::ControlRenderer GetControlRenderer( const std::string& image );
+  Toolkit::ControlRenderer GetControlRenderer( const std::string& image, ImageDimensions size );
 
   /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const std::string& )
+   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const std::string&, ImageDimensions )
    */
-  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& image );
+  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& image, ImageDimensions size );
 
 public:
   /**
@@ -110,6 +113,11 @@ protected:
 private:
 
   /**
+   * Prepare the atlas manager
+   */
+  void CreateAtlasManager();
+
+  /**
    * Undefined copy constructor.
    */
   RendererFactory(const RendererFactory&);
@@ -122,6 +130,7 @@ private:
 private:
 
   RendererFactoryCachePtr mFactoryCache;
+  ImageAtlasManagerPtr mAtlasManager;
 };
 
 } // namespace Internal

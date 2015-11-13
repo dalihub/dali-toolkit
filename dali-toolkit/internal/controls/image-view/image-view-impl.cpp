@@ -103,7 +103,7 @@ void ImageView::SetImage( Property::Map map )
   mImageSize = ImageDimensions( width, height );
 }
 
-void ImageView::SetImage( const std::string& url )
+void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
   if( mUrl != url )
   {
@@ -112,10 +112,17 @@ void ImageView::SetImage( const std::string& url )
 
     mUrl = url;
 
-    Actor self = Self();
-    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl );
+    if( size.GetWidth() == 0u && size.GetHeight() == 0u )
+    {
+      mImageSize = ResourceImage::GetImageSize( mUrl );
+    }
+    else
+    {
+      mImageSize = size;
+    }
 
-    mImageSize = ResourceImage::GetImageSize( mUrl );
+    Actor self = Self();
+    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl, mImageSize );
   }
 }
 
@@ -209,7 +216,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( value.Get( imageUrl ) )
         {
           ImageView& impl = GetImpl( imageView );
-          impl.SetImage( imageUrl );
+          impl.SetImage( imageUrl, ImageDimensions() );
         }
 
         // if its not a string then get a Property::Map from the property if possible.

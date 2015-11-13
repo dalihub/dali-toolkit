@@ -195,7 +195,7 @@ const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo( const string& type ) const
 
 void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali::StyleChange::Type styleChange )
 {
-  if( StyleChange::THEME_CHANGE )
+  if( styleChange == StyleChange::THEME_CHANGE )
   {
     string userDefinedTheme;
 

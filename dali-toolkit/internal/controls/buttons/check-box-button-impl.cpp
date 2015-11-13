@@ -40,6 +40,8 @@ namespace
 
 const float DISTANCE_BETWEEN_IMAGE_AND_LABEL( 5.0f );
 const float ANIMATION_TIME( 0.26f );  // EFL checkbox tick time
+// Required for the UV reveal shader to render the tick on top of the rest of the checkbox.
+const float SHADER_DEPTH_OFFSET = 1.0f;
 
 BaseHandle Create()
 {
@@ -166,11 +168,13 @@ void CheckBoxButton::PrepareForTranstionIn( Actor actor )
     {
       mTickUVEffect = CreateImageRegionEffect();
     }
-    mTickUVEffect.SetUniform("uBottomRight", Vector2( 0.0f, 1.0f ) );
+    mTickUVEffect.SetUniform( "uBottomRight", Vector2( 0.0f, 1.0f ) );
 
     ImageActor imageActor = ImageActor::DownCast( actor );
     if( imageActor )
     {
+      // Ensure the tick effect is rendered above the reset of the checkbox.
+      imageActor.SetSortModifier( SHADER_DEPTH_OFFSET );
       imageActor.SetShaderEffect( mTickUVEffect );
     }
   }
@@ -185,9 +189,9 @@ void CheckBoxButton::PrepareForTranstionOut( Actor actor )
 
     if( !mTickUVEffect )
     {
-        mTickUVEffect = CreateImageRegionEffect();
+      mTickUVEffect = CreateImageRegionEffect();
     }
-    mTickUVEffect.SetUniform("uBottomRight", Vector2::ONE );
+    mTickUVEffect.SetUniform( "uBottomRight", Vector2::ONE );
 
     ImageActor imageActor = ImageActor::DownCast( actor );
     if( imageActor )
@@ -223,7 +227,7 @@ void CheckBoxButton::OnTransitionIn( Actor actor )
       actor.SetScale( Vector3::ONE );
       if( mTickUVEffect )
       {
-    	mTickUVEffect.SetUniform("uBottomRight", Vector2::ONE );
+        mTickUVEffect.SetUniform( "uBottomRight", Vector2::ONE );
       }
     }
   }

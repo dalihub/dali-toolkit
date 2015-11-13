@@ -36,16 +36,10 @@ namespace
 const char* PLUGIN_FILE = "libdali-script-plugin-v8.so";
 }
 
-Script::Script(void) : mPlugin(NULL)
+Script::Script()
+: mPlugin( NULL )
 {
   ScriptPluginProxy *plugin = new ScriptPluginProxy( PLUGIN_FILE );
-
-  if( mPlugin )
-  {
-    DALI_LOG_WARNING("Reloading script plugin %s, is this what you wanted to do?",PLUGIN_FILE);
-    delete mPlugin;
-    mPlugin = NULL;
-  }
 
   if( plugin->IsInitialized() )
   {
@@ -55,7 +49,6 @@ Script::Script(void) : mPlugin(NULL)
   {
     delete plugin;
   }
-
 }
 
 bool Script::ExecuteFile( const std::string& filename )

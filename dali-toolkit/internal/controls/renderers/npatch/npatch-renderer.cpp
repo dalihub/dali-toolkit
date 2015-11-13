@@ -372,6 +372,8 @@ void NPatchRenderer::DoSetOnStage( Actor& actor )
 void NPatchRenderer::DoSetOffStage( Actor& actor )
 {
   mCroppedImage.Reset();
+  actor.RemoveRenderer( mImpl->mRenderer );
+  mImpl->mRenderer.Reset();
 }
 
 void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
