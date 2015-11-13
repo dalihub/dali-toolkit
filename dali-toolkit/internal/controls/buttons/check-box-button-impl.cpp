@@ -19,11 +19,12 @@
 #include "check-box-button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/images/resource-image.h>
 
 //INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
 #include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 namespace Dali
@@ -40,8 +41,6 @@ namespace
 
 const float DISTANCE_BETWEEN_IMAGE_AND_LABEL( 5.0f );
 const float ANIMATION_TIME( 0.26f );  // EFL checkbox tick time
-// Required for the UV reveal shader to render the tick on top of the rest of the checkbox.
-const float SHADER_DEPTH_OFFSET = 1.0f;
 
 BaseHandle Create()
 {
@@ -83,6 +82,21 @@ CheckBoxButton::~CheckBoxButton()
 {
 }
 
+void CheckBoxButton::SetTickUVEffect()
+{
+  Toolkit::ImageView imageView = Toolkit::ImageView::DownCast( mSelectedImage );
+  if( imageView )
+  {
+    imageView.RegisterProperty( "uTextureRect", Vector4(0.f, 0.f, 1.f, 1.f ) );
+    imageView.RegisterProperty( "uTopLeft", Vector2::ZERO );
+
+    Property::Map shaderMap = CreateImageRegionEffect();
+    imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, shaderMap );
+
+    GetImpl( imageView ).SetDepthIndex( DECORATION_DEPTH_INDEX );
+  }
+}
+
 void CheckBoxButton::OnButtonInitialize()
 {
   // Wrap around all children
@@ -92,6 +106,9 @@ void CheckBoxButton::OnButtonInitialize()
   SetSelectedImage( SELECTED_BUTTON_IMAGE_DIR );
   SetDisabledImage( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR );
   SetDisabledSelectedImage( DISABLED_SELECTED_BUTTON_IMAGE_DIR );
+
+  mSelectedImage = GetSelectedImage();
+  SetTickUVEffect();
 }
 
 void CheckBoxButton::OnLabelSet( bool noPadding )
@@ -163,19 +180,12 @@ void CheckBoxButton::PrepareForTranstionIn( Actor actor )
   if( actor == selectedImage )
   {
     actor.SetScale( Vector3( 0.0f, 1.0f, 1.0f ) );
+    actor.RegisterProperty( "uBottomRight", Vector2( 0.0f, 1.0f ) );
 
-    if( !mTickUVEffect )
+    if( mSelectedImage != selectedImage )
     {
-      mTickUVEffect = CreateImageRegionEffect();
-    }
-    mTickUVEffect.SetUniform( "uBottomRight", Vector2( 0.0f, 1.0f ) );
-
-    ImageActor imageActor = ImageActor::DownCast( actor );
-    if( imageActor )
-    {
-      // Ensure the tick effect is rendered above the reset of the checkbox.
-      imageActor.SetSortModifier( SHADER_DEPTH_OFFSET );
-      imageActor.SetShaderEffect( mTickUVEffect );
+      mSelectedImage = selectedImage;
+      SetTickUVEffect();
     }
   }
 }
@@ -186,17 +196,12 @@ void CheckBoxButton::PrepareForTranstionOut( Actor actor )
   if( actor == selectedImage )
   {
     actor.SetScale( Vector3::ONE );
+    actor.RegisterProperty( "uBottomRight", Vector2::ONE );
 
-    if( !mTickUVEffect )
+    if( mSelectedImage != selectedImage )
     {
-      mTickUVEffect = CreateImageRegionEffect();
-    }
-    mTickUVEffect.SetUniform( "uBottomRight", Vector2::ONE );
-
-    ImageActor imageActor = ImageActor::DownCast( actor );
-    if( imageActor )
-    {
-      imageActor.SetShaderEffect( mTickUVEffect );
+      mSelectedImage = selectedImage;
+      SetTickUVEffect();
     }
   }
 }
@@ -211,12 +216,9 @@ void CheckBoxButton::OnTransitionIn( Actor actor )
       Dali::Animation transitionAnimation = GetTransitionAnimation();
       if( transitionAnimation )
       {
-        DALI_ASSERT_DEBUG( mTickUVEffect );
-        if( mTickUVEffect )
-        {
-          // UV anim
-          transitionAnimation.AnimateTo( Property( mTickUVEffect, "uBottomRight" ), Vector2::ONE );
-        }
+        // UV anim
+        transitionAnimation.AnimateTo( Property( actor, "uBottomRight" ), Vector2::ONE );
+
         // Actor size anim
         transitionAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );
       }
@@ -225,9 +227,9 @@ void CheckBoxButton::OnTransitionIn( Actor actor )
     {
       //explicitly end the swipe animation
       actor.SetScale( Vector3::ONE );
-      if( mTickUVEffect )
+      if( mSelectedImage == selectedImage  )
       {
-        mTickUVEffect.SetUniform( "uBottomRight", Vector2::ONE );
+        actor.RegisterProperty( "uBottomRight", Vector2::ONE );
       }
     }
   }

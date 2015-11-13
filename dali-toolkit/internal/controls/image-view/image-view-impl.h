@@ -94,6 +94,15 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
+  /**
+   * @brief Set the depth index of this image renderer
+   *
+   * Renderer with higher depth indices are rendered in front of other renderers with smaller values
+   *
+   * @param[in] depthIndex The depth index of this renderer
+   */
+  void SetDepthIndex( int depthIndex );
+
 private: // From Control
 
   /**

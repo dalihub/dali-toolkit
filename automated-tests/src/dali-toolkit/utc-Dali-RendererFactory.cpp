@@ -165,8 +165,19 @@ Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
   return resourcePtr;
 }
 
-void TestControlRendererRender( ToolkitTestApplication& application, Actor& actor, ControlRenderer& controlRenderer, Integration::ResourcePointer resourcePtr = Integration::ResourcePointer(), std::size_t expectedSamplers = 0)
+void TestControlRendererRender( ToolkitTestApplication& application,
+                                Actor& actor,
+                                ControlRenderer& controlRenderer,
+                                std::size_t expectedSamplers = 0,
+                                ImageDimensions imageDimensions = ImageDimensions(),
+                                Integration::ResourcePointer resourcePtr = Integration::ResourcePointer())
 {
+  if( resourcePtr )
+  {
+    // set the image size, for test case, this needs to be set before loading started
+    application.GetPlatform().SetClosestImageSize(  Vector2(imageDimensions.GetWidth(), imageDimensions.GetHeight()) );
+  }
+
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
   controlRenderer.SetSize( Vector2(200.f, 200.f) );
@@ -434,7 +445,7 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 
   // A lookup texture is generated and pass to shader as sampler
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(), 1u );
+  TestControlRendererRender( application, actor, controlRenderer, 1u );
 
   controlRenderer.SetOffStage( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -474,7 +485,7 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
 
   // A lookup texture is generated and pass to shader as sampler
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(), 1u );
+  TestControlRendererRender( application, actor, controlRenderer, 1u );
 
   Matrix3 alignMatrix( radius, 0.f, 0.f, 0.f, radius, 0.f, center.x, center.y, 1.f );
   alignMatrix.Invert();
@@ -503,7 +514,11 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+  TestControlRendererRender( application, actor, controlRenderer, 1u,
+                             ImageDimensions(512, 513),
+                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -528,7 +543,11 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
   ControlRenderer controlRenderer = factory.GetControlRenderer( image );
 
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+  TestControlRendererRender( application, actor, controlRenderer, 1u,
+                             ImageDimensions(512, 513),
+                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -563,7 +582,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
-    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+    TestControlRendererRender( application, actor, controlRenderer, 1u,
+                               ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
+                               ninePatchResource );
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
     int textureUnit = -1;
@@ -578,7 +599,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
-    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+    TestControlRendererRender( application, actor, controlRenderer, 1u,
+                               ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
+                               ninePatchResource );
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
     int textureUnit = -1;
@@ -618,7 +641,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
-    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+    TestControlRendererRender( application, actor, controlRenderer, 1u,
+                               ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
+                               ninePatchResource );
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
     int textureUnit = -1;
@@ -636,7 +661,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
-    TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+    TestControlRendererRender( application, actor, controlRenderer, 1u,
+                               ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
+                               ninePatchResource );
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
     int textureUnit = -1;
@@ -670,7 +697,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer3(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+  TestControlRendererRender( application, actor, controlRenderer, 1u,
+                             ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
+                             ninePatchResource );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -705,7 +734,9 @@ int UtcDaliRendererFactoryGetNPatchRenderer4(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer, ninePatchResource, 1u );
+  TestControlRendererRender( application, actor, controlRenderer, 1u,
+                             ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
+                             ninePatchResource );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -730,7 +761,9 @@ int UtcDaliRendererFactoryGetNPatchRendererN1(void)
 
   Actor actor = Actor::New();
   //The testkit still has to load a bitmap for the broken renderer image
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
+  TestControlRendererRender( application, actor, controlRenderer, 1u,
+                             ImageDimensions(),
+                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -759,7 +792,9 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
 
   Actor actor = Actor::New();
   //The testkit still has to load a bitmap for the broken renderer image
-  TestControlRendererRender( application, actor, controlRenderer, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)), 1u );
+  TestControlRendererRender( application, actor, controlRenderer, 1u,
+                             ImageDimensions(),
+                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
