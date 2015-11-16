@@ -505,3 +505,49 @@ int UtcDaliImageViewSetImageN(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewSetImageTypeChangesP(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+
+
+  std::string url;
+  Property::Map map;
+
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+
+  // Set a URL
+  imageView.SetImage( "TEST_URL" );
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  DALI_TEST_CHECK( value.Get( url ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+
+  // Set an empty Image
+  imageView.SetImage( Image() );
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+
+  // Set an Image
+  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
+  imageView.SetImage( image1 );
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+
+  // Set an empty URL
+  imageView.SetImage( "" );
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+
+  END_TEST;
+}

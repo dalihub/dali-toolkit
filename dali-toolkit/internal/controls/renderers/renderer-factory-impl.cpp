@@ -212,6 +212,13 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 {
   if( renderer )
   {
+    if( ! image )
+    {
+      // If the image is empty, then reset the renderer and return
+      renderer.RemoveAndReset( actor );
+      return;
+    }
+
     NinePatchImage npatchImage = NinePatchImage::DownCast( image );
     if( npatchImage )
     {
@@ -271,7 +278,13 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 {
   if( renderer )
   {
-    if( NinePatchImage::IsNinePatchUrl( url ) )
+    if( url.empty() )
+    {
+      // If the URL is empty, then reset the renderer and return
+      renderer.RemoveAndReset( actor );
+      return;
+    }
+    else if( NinePatchImage::IsNinePatchUrl( url ) )
     {
       NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
       if( rendererPtr )
