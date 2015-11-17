@@ -88,16 +88,16 @@ daliApp.createActors = function() {
         for (x = 0; x < VIDEO_WALL_COLUMNS; ++x) {
 
             var actorIndex = daliApp.getWallActorIndex(x, y);
-            var imageActor = new dali.ImageActor();
+            var imageView = new dali.Control("ImageView");
 
             // wrap image index between 0 and NUMBER_OF_IMAGES
             var imageIndex = actorIndex % NUMBER_OF_IMAGES;
 
-            imageActor.setImage(DEMO_IMAGES[imageIndex]);
+            imageView.image = DEMO_IMAGES[imageIndex];
 
-            imageActor.parentOrigin = dali.CENTER;
-            imageActor.anchorPoint = dali.CENTER;
-            imageActor.size = [VIDEO_WALL_ITEM_SIZE_NO_BORDER, VIDEO_WALL_ITEM_SIZE_NO_BORDER, 1.0]; // start with zero size so it zooms up
+            imageView.parentOrigin = dali.CENTER;
+            imageView.anchorPoint = dali.CENTER;
+            imageView.size = [VIDEO_WALL_ITEM_SIZE_NO_BORDER, VIDEO_WALL_ITEM_SIZE_NO_BORDER, 1.0]; // start with zero size so it zooms up
 
             var xPosition = x * VIDEO_WALL_ITEM_SIZE;
             //  as the middle the wall is at zero (relative to wallRootActor), we need to subtract half the wall width.
@@ -107,15 +107,15 @@ daliApp.createActors = function() {
             var yPosition = y * VIDEO_WALL_ITEM_SIZE;
             yPosition = yPosition - (VIDEO_WALL_HEIGHT / 2) + (VIDEO_WALL_ITEM_SIZE / 2);
 
-            imageActor.position = [0,0,0];
+            imageView.position = [0,0,0];
 
             animOptions.delay+=0.25;
-            anim.animateTo( imageActor,"position",[xPosition, yPosition, 0.0],animOptions);
+            anim.animateTo( imageView,"position",[xPosition, yPosition, 0.0],animOptions);
             // store the actor
-            VIDEO_WALL_ACTORS[actorIndex] = imageActor;
+            VIDEO_WALL_ACTORS[actorIndex] = imageView;
 
             // Add to the video wall root actor.
-            wallRootActor.add(imageActor);
+            wallRootActor.add(imageView);
         }
     }
     anim.play();

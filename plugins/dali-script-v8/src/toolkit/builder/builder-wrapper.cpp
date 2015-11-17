@@ -51,7 +51,6 @@ const ApiFunction BuilderFunctionTable[]=
     { "ApplyFromJson"           , BuilderApi::ApplyFromJson            },
     { "AddActors"               , BuilderApi::AddActors                },
     { "CreateRenderTask"        , BuilderApi::CreateRenderTask         },
-    { "GetShaderEffect"         , BuilderApi::GetShaderEffect          },
     { "GetFrameBufferImage"     , BuilderApi::GetFrameBufferImage      }
 };
 

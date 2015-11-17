@@ -71,7 +71,7 @@ public:
 
   /**
    * @brief Creates a new Actor wrapped inside a Javascript Object.
-   * @note: the actor type ie 'ImageActor' is expected to be the name of the callee function.
+   * @note: the actor type ie 'CameraActor' is expected to be the name of the callee function.
    * @param[in] args v8 function call arguments interpreted
    */
   static void NewActor( const v8::FunctionCallbackInfo< v8::Value >& args);
@@ -95,7 +95,6 @@ public:
 
   // The Actor ObjectTemplates.
   static v8::Persistent<v8::ObjectTemplate> mActorTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mImageActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mCameraActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mLayerActorTemplate;
 

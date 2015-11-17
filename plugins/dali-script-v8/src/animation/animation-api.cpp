@@ -245,7 +245,7 @@ bool GetAnimationParameters(  v8::Isolate* isolate,
                               AnimationParameters& animParams,
                               AnimationApi::AnimationParameterType type)
 {
-  // used for things like anim.AnimateBy(  myImageActor, property-name,  property-value (or Javascript number array));
+  // used for things like anim.AnimateBy(  myImageView, property-name,  property-value (or Javascript number array));
   // 1 extract property handle from param1.
   // 2 extract property name from param2  ( in the format "uColor" )
   // 3 extract PropertyValue from param3

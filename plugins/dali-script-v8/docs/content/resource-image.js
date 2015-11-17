@@ -5,18 +5,18 @@
 A resource image extends the basic {{#crossLink "image"}}Image class{{/crossLink}} with
 the ability to load an image from a file.
 
-ResourceImage supports two types of load policies
-
-- dali.IMAGE_LOAD_POLICY_IMMEDIATE //  load image once it is created (default)
-- dali.IMAGE_LOAD_POLICY_ON_DEMAND // delay loading until the image is being used (a related actor is added to Stage)
-  
 ### Simple example
 ```
 
-var image = new dali.ResourceImage( { url:"my_image.png" } );
-
-var imageActor = new dali.ImageActor( image );
-
+// Create a resource image with a given URL
+var image = new dali.ResourceImage( {url: "my_image.png"} );
+  
+// Create a material that specifies the visual properties of the renderer.
+var material = new dali.Material();
+  
+// Add the image as texture to be used by the material
+material.addTexture( image, "sTexture" );
+  
 ```
 ### Advanced example
 ```
@@ -25,17 +25,14 @@ function imageLoaded( image )
 {
   log("image loaded " +image.url + "\n");
 }
-
-var options = {
-  url:"my_image.png",
-  loadPolicy:dali.IMAGE_LOAD_POLICY_IMMEDIATE,
-  releasePolicy: dali.IMAGE_RELEASE_POLICY_UNUSED
-}
-var image = new dali.ResourceImage( options );
-
+  
+var image = new dali.ResourceImage( {url: "my_image.png"} );
+  
 image.connect("imageLoadingFinished", finished );
-
-var imageActor = new dali.ImageActor( image );
+  
+// Create a material and add the image as texture to be used by the material.
+var material = new dali.Material();
+material.addTexture( image, "sTexture" );
 
 ```
 @class ResourceImage

@@ -115,7 +115,7 @@ anim.play();
 
 The example below does the following with a single animation object:
 
- - rotates the image actor
+ - rotates the image view
  - magnifies and color shifts the image using a fragment shader
   
 ![ ](../assets/img/shaders/shader-animation.png)
@@ -123,15 +123,14 @@ The example below does the following with a single animation object:
   
 
 ```
-// create an image actor in the centre of the stage
-createImageActor = function() {
+// Creates an image view in the centre of the stage
+createImageView = function() {
   
-  var image = new dali.ResourceImage({ url:getImageDirectory()+"gallery-medium-50.jpg"});
-  var imageActor = new dali.ImageActor( image );
-  imageActor.parentOrigin = dali.CENTER;
-  dali.stage.add( imageActor );
+  var imageView = new dali.Control("ImageView");
+  imageView.parentOrigin = dali.CENTER;
+  dali.stage.add( imageView );
   
-  return imageActor;
+  return imageView;
 }
   
 // Creates a simple fragment shader that has 2 uniforms.
@@ -140,77 +139,82 @@ createImageActor = function() {
   
 createColorShiftAndZoomEffect = function() {
   
-    var fragShader =
-  " uniform lowp vec4 uColorShift; \
-    uniform lowp vec2 uScale;    \
-                     \
-    void main() \
-    {           \
-      gl_FragColor = texture2D( sTexture, vTexCoord * uScale ) * uColor + uColorShift; \
-    }"
+  var fragShader =
+      "varying vec2 vTexCoord;\
+       uniform sampler2D sTexture;\
+       uniform vec4 uColor;\
+       uniform lowp vec4 uColorShift;\
+       uniform lowp vec2 uScale;\
+       void main() \
+       {           \
+         gl_FragColor = texture2D( sTexture, vTexCoord * uScale ) * uColor + uColorShift; \
+       }";
   
-  // Shader API
-  // geometryType = "image", "text", "mesh", "texturedMesh"
-  // fragmentPrefex ="" // prefix             ( optional)
-  // fragmentShader = ""  // fragment shader   ( optional)
-  // geometryHints = [ "gridX", "gridY", "grid","depthBuffer","blending" ]   ( optional)
-  //
-  var shaderOptions = {
-      geometryType: "image",
-      fragmentShader: fragShader,
-      geometryHints: ["blending"]
+  // vertexShader = "";  // vertex shader   ( optional)
+  // fragmentShader = "";  // fragment shader   ( optional)
+  // hints =   // shader hints   ( optional)
+  //       [ "requiresSelfDepthTest",  // Expects depth testing enabled
+  //         "outputIsTransparent",    // Might generate transparent alpha from opaque inputs
+  //         "outputIsOpaque",         // Outputs opaque colors even if the inputs are transparent
+  //         "modifiesGeometry" ];     // Might change position of vertices, this option disables any culling optimizations
+  
+  var shader = {
+      "fragmentShader": fragShader,
+      "hints" : "outputIsTransparent"
   };
-  
-  // create a new shader effect
-  var shader = new dali.ShaderEffect(shaderOptions);
-  
-  // add the color shift uniform so we can animate it
-  // default the color shift to zero, so it has no effect
-  shader.setUniform("uColorShift", [0, 0, 0, 0]);
-  
-  // add the zoom uniform so we can animate it
-  // default to 1,1 so no zoom is applied
-  var scale = new dali.Vector2([1, 1]);
-  shader.setUniform("uScale", scale);
   
   return shader;
 }
 
-createShaderAnimation = function( shader, color, zoom, duration, delay )
+createShaderAnimation = function( imageView, color, zoom, duration, delay )
 {
-    var shaderAnim = new dali.Animation(duration+delay);
+  var shaderAnim = new dali.Animation(duration+delay);
 
-    var animOptions = {
-        alpha: "doubleEaseInOutSine60",
-        delay: delay,
-        duration: duration,
-    };
+  var animOptions = {
+     alpha: "doubleEaseInOutSine60",
+     delay: delay,
+     duration: duration,
+  };
 
-    // animate the color uniform
-    shaderAnim.animateTo( shader, "uColorShift", color, animOptions);
+  // animate the color uniform
+  shaderAnim.animateTo( imageView, "uColorShift", color, animOptions);
 
-    // zoom in and out of the image while applying the color shift
-    shaderAnim.animateTo( shader, "uScale", zoom, animOptions);
+  // zoom in and out of the image while applying the color shift
+  shaderAnim.animateTo( imageView, "uScale", zoom, animOptions);
 
-    return shaderAnim;
+  return shaderAnim;
 }
   
-var imageActor = createImageActor();
-var shaderEffect = createColorShiftAndZoomEffect();
+var imageView = createImageView();
   
-// assign the shader effect to the actor ( it can be assigned to multiple actors).
-imageActor.setShaderEffect( shaderEffect );
+var shader = createColorShiftAndZoomEffect();
+  
+var image = {
+    "rendererType" : "imageRenderer",
+    "imageUrl" : getImageDirectory()+"gallery-medium-50.jpg",
+    "shader" : shader
+};
+  
+imageView.image = image; // assign the shader to imageView
+  
+// register the color shift property so we can animate it
+// default the color shift to zero, so it has no effect
+imageView.registerAnimatableProperty("uColorShift", [0, 0, 0, 0]);
+  
+// register the zoom property so we can animate it
+// default to 1,1 so no zoom is applied
+imageView.registerAnimatableProperty("uScale", [1, 1]);
   
 // create the shader animation
 var zoom = [0.5,0.5];  // zoom into the image by 2
 var color = dali.COLOR_BLUE; // color shift the image to blue
 var duration = 5; // 5 seconds
 var delay = 5; // wait 1 second before starting
-var shaderAnim = createShaderAnimation( shaderEffect, color,zoom, duration, delay);
+var shaderAnim = createShaderAnimation( imageView, color,zoom, duration, delay);
   
-// also rotate the imageActor 90 degrees at the same time.
+// also rotate the imageView 90 degrees at the same time.
 var rotation = new dali.Rotation(90,0,0,1);
-shaderAnim.animateTo(imageActor, "orientation", rotation, { alpha:"linear", duration:duration, delay:delay });
+shaderAnim.animateTo(imageView, "orientation", rotation, { alpha:"linear", duration:duration, delay:delay });
 
 
 shaderAnim.play();

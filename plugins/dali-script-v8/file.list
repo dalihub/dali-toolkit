@@ -12,7 +12,6 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/actors/actor-wrapper.cpp \
    $(v8_plugin_dir)/actors/actor-api.cpp \
    $(v8_plugin_dir)/actors/layer-api.cpp \
-   $(v8_plugin_dir)/actors/image-actor-api.cpp \
    $(v8_plugin_dir)/actors/camera-actor-api.cpp \
    $(v8_plugin_dir)/constants/constants-wrapper.cpp \
    $(v8_plugin_dir)/animation/animation-api.cpp \
@@ -27,15 +26,11 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/events/pan-gesture-detector-api.cpp \
    $(v8_plugin_dir)/events/pan-gesture-detector-wrapper.cpp \
    $(v8_plugin_dir)/stage/stage-api.cpp \
-   $(v8_plugin_dir)/shader-effects/shader-effect-api.cpp \
-   $(v8_plugin_dir)/shader-effects/shader-effect-wrapper.cpp \
    $(v8_plugin_dir)/image/image-wrapper.cpp \
    $(v8_plugin_dir)/image/image-api.cpp \
    $(v8_plugin_dir)/image/buffer-image-api.cpp \
-   $(v8_plugin_dir)/image/native-image-api.cpp \
    $(v8_plugin_dir)/image/frame-buffer-image-api.cpp \
    $(v8_plugin_dir)/image/resource-image-api.cpp \
-   $(v8_plugin_dir)/image/nine-patch-image-api.cpp \
    $(v8_plugin_dir)/object/handle-wrapper.cpp \
    $(v8_plugin_dir)/object/property-buffer-api.cpp \
    $(v8_plugin_dir)/object/property-buffer-wrapper.cpp \

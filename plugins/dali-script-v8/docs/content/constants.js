@@ -62,9 +62,6 @@ Constants accessible under the dali global object.
 |DRAW_MODE_STENCIL                        | integer value |
 
 |**Image load policy  **| |
-|IMAGE_LOAD_POLICY_IMMEDIATE              | integer value |
-|IMAGE_LOAD_POLICY_ON_DEMAND              | integer value |
-
 |**actor.SetBlendFunc() ** | |
 |BLEND_FACTOR_ZERO                        | integer value |
 |BLEND_FACTOR_ONE                         | integer value |

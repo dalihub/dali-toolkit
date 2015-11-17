@@ -45,7 +45,6 @@ namespace ResourceImageApi
   /**
    * Resource Image API see resource-image.h for a description
    */
-  void GetLoadPolicy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetLoadingState( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetUrl( const v8::FunctionCallbackInfo< v8::Value >& args );
   void Reload( const v8::FunctionCallbackInfo< v8::Value >& args );

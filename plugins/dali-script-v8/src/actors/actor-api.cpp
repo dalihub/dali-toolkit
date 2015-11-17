@@ -488,7 +488,7 @@ void ActorApi::IsKeyboardFocusable( const v8::FunctionCallbackInfo<v8::Value>& a
  *
  * @for Actor
  * @method getActorType
- * @return {String} Actor, ImageActor, MeshActor, Layer, CameraActor ...
+ * @return {String} Actor, Layer, CameraActor ...
  */
 void ActorApi::GetActorType( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
