@@ -308,24 +308,53 @@ Geometry NPatchRenderer::CreateGeometry()
 Shader NPatchRenderer::CreateShader()
 {
   Shader shader;
-  if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+  if( !mImpl->mCustomShader )
   {
-    shader = mFactoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
-    if( !shader )
+    if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
     {
-      shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
-      mFactoryCache.SaveShader( RendererFactoryCache::NINE_PATCH_SHADER, shader );
+      shader = mFactoryCache.GetShader( RendererFactoryCache::NINE_PATCH_SHADER );
+      if( !shader )
+      {
+        shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
+        mFactoryCache.SaveShader( RendererFactoryCache::NINE_PATCH_SHADER, shader );
+      }
+    }
+    else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+    {
+      std::stringstream vertexShader;
+      vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
+                   << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
+                   << VERTEX_SHADER;
+
+      shader = Shader::New( vertexShader.str(), FRAGMENT_SHADER );
     }
   }
-  else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+  else
   {
-    std::stringstream vertexShader;
-    vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
-                 << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
-                 << VERTEX_SHADER;
+    const char* fragmentShader = FRAGMENT_SHADER;
+    Dali::Shader::ShaderHints hints = Dali::Shader::HINT_NONE;
 
-    shader = Shader::New( vertexShader.str(), FRAGMENT_SHADER );
+    if( !mImpl->mCustomShader->mFragmentShader.empty() )
+    {
+      fragmentShader = mImpl->mCustomShader->mFragmentShader.c_str();
+    }
+    hints = mImpl->mCustomShader->mHints;
+
+    if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+    {
+      shader = Shader::New( VERTEX_SHADER_3X3, fragmentShader, hints );
+    }
+    else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+    {
+      std::stringstream vertexShader;
+      vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
+                   << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
+                   << VERTEX_SHADER;
+
+      shader = Shader::New( vertexShader.str(), fragmentShader, hints );
+    }
   }
+
   return shader;
 }
 

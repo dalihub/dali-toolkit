@@ -35,15 +35,19 @@ namespace Toolkit
  *
  * Usage example:
  *
- *   ImageActor actor = ImageActor::New( Image( EXAMPLE_IMAGE_PATH ) );
- *   ShaderEffect alphaDiscardEffect = CreateAlphaDiscardEffect();
- *   actor.SetShaderEffect( alphaDiscardEffect );
+ *   ImageView actor = ImageView::New( EXAMPLE_IMAGE_PATH );
+ *   Property::Map alphaDiscardEffect = CreateAlphaDiscardEffect();
+ *   actor.SetProperty( ImageView::Property::IMAGE, alphaDiscardEffect );
  *
  * @return A handle to a newly allocated ShaderEffect.
  */
-inline ShaderEffect CreateAlphaDiscardEffect()
+inline Property::Map CreateAlphaDiscardEffect()
 {
   const char* ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE =
+      "varying mediump vec2 vTexCoord;                                \n"
+      "                                                               \n"
+      "uniform sampler2D sTexture;                                    \n"
+      "uniform lowp vec4 uColor;                                      \n"
       "void main()                                                    \n"
       "{                                                              \n"
       "  mediump vec4 color = texture2D( sTexture, vTexCoord );       \n"
@@ -54,9 +58,13 @@ inline ShaderEffect CreateAlphaDiscardEffect()
       "  gl_FragColor = color * uColor;                               \n"
       "}                                                              \n";
 
-  return ShaderEffect::New( "", // Use default
-                            ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE );
-}
+  Property::Map map;
+
+  Property::Map customShader;
+  customShader[ "fragmentShader" ] = ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE;
+
+  map[ "shader" ] = customShader;
+  return map;}
 
 } // namespace Toolkit
 
