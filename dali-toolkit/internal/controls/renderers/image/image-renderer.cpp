@@ -312,35 +312,23 @@ void ImageRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
   }
 
+  // remove old renderer if exit
   if( mImpl->mRenderer )
   {
-    //remove old renderer
-    if( actor )
+    if( actor ) //remove old renderer from actor
     {
       actor.RemoveRenderer( mImpl->mRenderer );
     }
-
-    //clean the cache
-    if( !oldImageUrl.empty() )
+    if( !oldImageUrl.empty() ) //clean old renderer from cache
     {
       CleanCache( oldImageUrl );
     }
+  }
 
-    //Initialize the renderer
-    if( !mImageUrl.empty() )
-    {
-      InitializeRenderer( mImageUrl );
-    }
-    else if( mImage )
-    {
-      InitializeRenderer( mImage );
-    }
-
-    //add the new renderer to the actor
-    if( actor && mImpl->mRenderer )
-    {
-      actor.AddRenderer( mImpl->mRenderer );
-    }
+  // if actor is on stage, create new renderer and apply to actor
+  if( actor && actor.OnStage() )
+  {
+    SetOnStage( actor );
   }
 }
 
@@ -414,37 +402,39 @@ Renderer ImageRenderer::CreateRenderer() const
 
 void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
 {
-  if( mImageUrl.empty() )
+  if( imageUrl.empty() )
   {
-    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     return;
   }
 
+  mImageUrl = imageUrl;
   mImpl->mRenderer.Reset();
+
   if( !mImpl->mCustomShader )
   {
     mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
     if( !mImpl->mRenderer )
     {
-        Material material = mAtlasManager.Add(mTextureRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-        if( material )
-        {
-          Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-          mImpl->mRenderer = Renderer::New( geometry, material );
-          SetTextureRectUniform(mTextureRect);
-        }
-        else // big image, atlasing is not applied
-        {
-          mImpl->mRenderer = CreateRenderer();
-          SetTextureRectUniform(FULL_TEXTURE_RECT);
+      Material material = mAtlasManager.Add(mTextureRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      if( material )
+      {
+        Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+        mImpl->mRenderer = Renderer::New( geometry, material );
+        SetTextureRectUniform(mTextureRect);
+      }
+      else // big image, atlasing is not applied
+      {
+        mImpl->mRenderer = CreateRenderer();
+        mTextureRect = FULL_TEXTURE_RECT;
+        SetTextureRectUniform(mTextureRect);
 
-          ResourceImage image = Dali::ResourceImage::New( imageUrl );
-          image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-          Material material = mImpl->mRenderer.GetMaterial();
-          material.AddTexture( image, TEXTURE_UNIFORM_NAME );
-        }
+        ResourceImage image = Dali::ResourceImage::New( imageUrl );
+        image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+        Material material = mImpl->mRenderer.GetMaterial();
+        material.AddTexture( image, TEXTURE_UNIFORM_NAME );
+      }
 
-        mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
+      mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
     }
     else
     {
@@ -457,9 +447,16 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
   {
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     mImpl->mRenderer = CreateRenderer();
-    ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-    image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-    ApplyImageToSampler( image );
+    ResourceImage resourceImage = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+    resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+    ApplyImageToSampler( resourceImage );
+
+    // custom shader with the default image vertex shader
+    if( mImpl->mCustomShader->mVertexShader.empty() )
+    {
+      mTextureRect = FULL_TEXTURE_RECT;
+      SetTextureRectUniform( mTextureRect );
+    }
   }
 }
 
@@ -474,7 +471,13 @@ void ImageRenderer::InitializeRenderer( const Image& image )
 
   mImpl->mRenderer = CreateRenderer();
   ApplyImageToSampler( image );
-  SetTextureRectUniform( FULL_TEXTURE_RECT );
+
+  // default shader or custom shader with the default image vertex shader
+  if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty() )
+  {
+    mTextureRect = FULL_TEXTURE_RECT;
+    SetTextureRectUniform( mTextureRect );
+  }
 }
 
 
@@ -487,22 +490,6 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
   else if( mImage )
   {
     InitializeRenderer( mImage );
-  }
-
-  if( !GetIsFromCache() )
-  {
-    Image image = mImage;
-    if( !mImageUrl.empty() )
-    {
-      ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-      resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-      image = resourceImage;
-
-      // Set value to the uTextureRect uniform
-      SetTextureRectUniform( FULL_TEXTURE_RECT );
-    }
-
-    ApplyImageToSampler( image );
   }
 }
 
@@ -632,15 +619,18 @@ Shader ImageRenderer::GetImageShader( RendererFactoryCache& factoryCache )
 
 void ImageRenderer::SetImage( Actor& actor, const std::string& imageUrl, ImageDimensions size, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode )
 {
-  mDesiredSize = size;
-  mFittingMode = fittingMode;
-  mSamplingMode = samplingMode;
-
   if( mImageUrl != imageUrl )
   {
+    std::string oldImageUrl = mImageUrl;
+    mImageUrl = imageUrl;
+    mDesiredSize = size;
+    mFittingMode = fittingMode;
+    mSamplingMode = samplingMode;
+    mImage.Reset();
+
     if( mImpl->mRenderer )
     {
-      if( GetIsFromCache() )
+      if( GetIsFromCache() ) // if renderer is from cache, remove the old one
       {
         //remove old renderer
         if( actor )
@@ -649,31 +639,23 @@ void ImageRenderer::SetImage( Actor& actor, const std::string& imageUrl, ImageDi
         }
 
         //clean the cache
-        if( !mImageUrl.empty() )
+        if( !oldImageUrl.empty() )
         {
-          CleanCache(mImageUrl);
+          CleanCache(oldImageUrl);
         }
 
-        //Initialize the renderer
-        InitializeRenderer( imageUrl );
-
-        //add the new renderer to the actor
-        if( actor && mImpl->mRenderer )
+        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
         {
-          actor.AddRenderer( mImpl->mRenderer );
+          SetOnStage(actor);
         }
       }
-      else
+      else // if renderer is not from cache, reuse the same renderer and only change the texture
       {
         ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
         image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
         ApplyImageToSampler( image );
       }
     }
-
-    mImageUrl = imageUrl;
-
-    mImage.Reset();
   }
 }
 
@@ -681,9 +663,11 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
 {
   if( mImage != image )
   {
+    mImage = image;
+
     if( mImpl->mRenderer )
     {
-      if( GetIsFromCache() )
+      if( GetIsFromCache() ) // if renderer is from cache, remove the old one
       {
         //remove old renderer
         if( actor )
@@ -696,24 +680,19 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
         {
           CleanCache(mImageUrl);
         }
+        mImageUrl.clear();
 
-        //Initialize the renderer
-        InitializeRenderer( image );
-
-        //add the new renderer to the actor
-        if( actor && mImpl->mRenderer )
+        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
         {
-          actor.AddRenderer( mImpl->mRenderer );
+          SetOnStage(actor);
         }
       }
-      else
+      else // if renderer is not from cache, reuse the same renderer and only change the texture
       {
         ApplyImageToSampler( image );
       }
     }
-    SetTextureRectUniform( FULL_TEXTURE_RECT );
 
-    mImage = image;
     mImageUrl.clear();
     mDesiredSize = ImageDimensions();
     mFittingMode = FittingMode::DEFAULT;
