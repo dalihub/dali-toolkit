@@ -300,7 +300,12 @@ int UtcDaliControlSignalConnectDisconnect(void)
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
     Toolkit::Internal::Control& control = Toolkit::Internal::GetImplementation( dummy );
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
-    DALI_TEST_CHECK( dummyImpl );
+
+    if( dummyImpl == NULL )
+    {
+      tet_result( TET_FAIL );
+      END_TEST;
+    }
 
     actor.OnStageSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
@@ -329,7 +334,12 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
     DummyControl dummy = DummyControlImpl::New();
     Toolkit::Internal::Control& control = Toolkit::Internal::GetImplementation( dummy );
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
-    DALI_TEST_CHECK( dummyImpl );
+
+    if( dummyImpl == NULL )
+    {
+      tet_result( TET_FAIL );
+      END_TEST;
+    }
 
     actor.OnStageSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
