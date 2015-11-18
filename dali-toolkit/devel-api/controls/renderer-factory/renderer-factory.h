@@ -40,6 +40,8 @@ class RendererFactory;
 /**
  * @brief RendererFactory is a singleton object that provides and shares renderers for controls
  *
+ * By setting environment variable 'DALI_DEBUG_RENDERING', all concrete renderer is replaced with the debug renderer which renders a quad wireframe.
+ *
  * The renderer type is required in the property map for requesting a control renderer.
  *
  * | %Property Name           | Type             |

@@ -27,6 +27,7 @@
 // Internal HEADER
 #include <dali-toolkit/internal/controls/renderers/border/border-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/debug/debug-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
@@ -72,7 +73,8 @@ DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
-RendererFactory::RendererFactory()
+RendererFactory::RendererFactory( bool debugEnabled )
+:mDebugEnabled( debugEnabled )
 {
 }
 
@@ -91,6 +93,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     if( !mFactoryCache )
     {
       mFactoryCache = new RendererFactoryCache();
+    }
+
+    if( mDebugEnabled )
+    {
+      return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
     }
 
     if( typeValue ==  COLOR_RENDERER )
@@ -136,6 +143,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& col
     mFactoryCache = new RendererFactoryCache();
   }
 
+  if( mDebugEnabled )
+  {
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
+  }
+
   ColorRenderer* rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
   rendererPtr->SetColor( color );
 
@@ -144,6 +156,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& col
 
 void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color )
 {
+  if( mDebugEnabled && renderer )
+  {
+    return;
+  }
+
   if( renderer )
   {
     ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
@@ -169,12 +186,13 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, 
   {
     mFactoryCache = new RendererFactoryCache();
   }
-  BorderRenderer* rendererPtr = new BorderRenderer( *mFactoryCache.Get() );
 
-  if( !mFactoryCache )
+  if( mDebugEnabled )
   {
-    mFactoryCache = new RendererFactoryCache();
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
   }
+
+  BorderRenderer* rendererPtr = new BorderRenderer( *mFactoryCache.Get() );
 
   rendererPtr->SetBorderSize( borderSize );
   rendererPtr->SetBorderColor( borderColor );
@@ -187,6 +205,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
   if( !mFactoryCache )
   {
     mFactoryCache = new RendererFactoryCache();
+  }
+
+  if( mDebugEnabled )
+  {
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
   }
 
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
@@ -210,6 +233,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
 
 void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Image& image )
 {
+  if( mDebugEnabled && renderer )
+  {
+    return;
+  }
+
   if( renderer )
   {
     if( ! image )
@@ -256,6 +284,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string&
     mFactoryCache = new RendererFactoryCache();
   }
 
+  if( mDebugEnabled )
+  {
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
+  }
+
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
     NPatchRenderer* rendererPtr = new NPatchRenderer( *( mFactoryCache.Get() ) );
@@ -276,6 +309,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string&
 
 void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
 {
+  if( mDebugEnabled && renderer )
+  {
+    return;
+  }
+
   if( renderer )
   {
     if( url.empty() )
@@ -315,6 +353,11 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 
 void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
 {
+  if( mDebugEnabled && renderer )
+  {
+    return;
+  }
+
   if( renderer )
   {
     ControlRenderer& controlRenderer = GetImplementation( renderer );

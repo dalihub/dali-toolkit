@@ -140,6 +140,16 @@ bool RendererFactoryCache::CleanRendererCache( const std::string& key )
   return false;
 }
 
+void RendererFactoryCache::CacheDebugRenderer( Renderer& renderer )
+{
+  mDebugRenderer = renderer;
+}
+
+Renderer RendererFactoryCache::GetDebugRenderer()
+{
+  return mDebugRenderer;
+}
+
 Geometry RendererFactoryCache::CreateQuadGeometry()
 {
   const float halfWidth = 0.5f;

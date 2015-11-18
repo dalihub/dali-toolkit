@@ -20,16 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
-
 
 namespace Dali
 {
 
 namespace Toolkit
 {
+
+namespace
+{
+  const char * const DALI_DEBUG_RENDERING("DALI_DEBUG_RENDERING");
+}
 
 RendererFactory RendererFactory::Get()
 {
@@ -46,10 +51,17 @@ RendererFactory RendererFactory::Get()
       factory = RendererFactory( dynamic_cast<Internal::RendererFactory*>(handle.GetObjectPtr()) );
     }
 
-    if( !factory )
+    if( !factory )// If not, create the RendererFactory and register it as a singleton
     {
-      // If not, create the RendererFactory and register it as a singleton
-      factory = RendererFactory( new Internal::RendererFactory() );
+      // Check whether debug rendering is required
+      if( EnvironmentVariable::GetEnvironmentVariable( DALI_DEBUG_RENDERING ) )
+      {
+        factory = RendererFactory( new Internal::RendererFactory(true) );
+      }
+      else
+      {
+        factory = RendererFactory( new Internal::RendererFactory(false) );
+      }
       singletonService.Register( typeid(RendererFactory), factory );
 
     }
