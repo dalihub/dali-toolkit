@@ -19,6 +19,7 @@
 #include "image-renderer.h"
 
 // EXTERNAL HEADER
+#include <cstring> // for strncasecmp
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -40,6 +41,9 @@ namespace Internal
 
 namespace
 {
+const char HTTP_URL[] = "http://";
+const char HTTPS_URL[] = "https://";
+
 const char * const RENDERER_TYPE("rendererType");
 const char * const RENDERER_TYPE_VALUE("imageRenderer");
 
@@ -410,7 +414,9 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
   mImageUrl = imageUrl;
   mImpl->mRenderer.Reset();
 
-  if( !mImpl->mCustomShader )
+  if( !mImpl->mCustomShader &&
+      ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // ignore remote images
+      ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
   {
     mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
     if( !mImpl->mRenderer )
@@ -445,18 +451,22 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
   }
   else
   {
+    // for custom shader or remote image, renderer is not cached and atlas is not applied
+
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     mImpl->mRenderer = CreateRenderer();
     ResourceImage resourceImage = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
     resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
     ApplyImageToSampler( resourceImage );
 
-    // custom shader with the default image vertex shader
-    if( mImpl->mCustomShader->mVertexShader.empty() )
+    // custom vertex shader does not need texture rect uniform
+    if( mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty() )
     {
-      mTextureRect = FULL_TEXTURE_RECT;
-      SetTextureRectUniform( mTextureRect );
+      return;
     }
+
+    mTextureRect = FULL_TEXTURE_RECT;
+    SetTextureRectUniform( mTextureRect );
   }
 }
 
