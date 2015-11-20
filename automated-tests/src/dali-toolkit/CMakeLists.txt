@@ -40,7 +40,6 @@ SET(TC_SOURCES
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
    utc-Dali-Magnifier.cpp
-   utc-Dali-NinePatchMaskEffect.cpp
    utc-Dali-Popup.cpp
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp
@@ -51,6 +50,7 @@ SET(TC_SOURCES
    utc-Dali-Model3dView.cpp
    utc-Dali-ControlRenderer.cpp
    utc-Dali-RendererFactory.cpp
+   utc-Dali-DebugRenderer.cpp
    utc-Dali-ImageAtlas.cpp
 )
 
@@ -61,6 +61,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-application.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
    dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
+   dali-toolkit-test-utils/toolkit-environment-variable.cpp
    dali-toolkit-test-utils/toolkit-imf-manager.cpp
    dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    dali-toolkit-test-utils/toolkit-style-monitor.cpp

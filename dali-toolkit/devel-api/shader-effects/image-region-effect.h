@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
@@ -40,14 +40,23 @@ namespace Toolkit
  *
  * @return A handle to a newly allocated ShaderEffect
  */
-inline ShaderEffect CreateImageRegionEffect()
+inline Property::Map CreateImageRegionEffect()
 {
   std::string vertexShader(
+      "attribute mediump vec2 aPosition;\n"
+      "\n"
+      "uniform mediump mat4 uMvpMatrix;\n"
+      "uniform vec3 uSize;\n"
+      "uniform vec4 uTextureRect;"
+      "\n"
+      "varying vec2 vTexCoord;\n"
+
       "uniform mediump vec2 uTopLeft;\n"
       "uniform mediump vec2 uBottomRight;\n"
       "void main()\n"
       "{\n"
-      "  mediump vec4 position = vec4(aPosition,1.0);\n"
+      "  mediump vec4 position = vec4(aPosition, 0.0, 1.0);\n"
+      "  position.xyz *= uSize;\n"
       "  gl_Position = uMvpMatrix * position;\n"
       // The line below is doing the same as the following commented lines:
       //"  vec2 imageSize = sTextureRect.zw - sTextureRect.xy;\n"
@@ -55,15 +64,19 @@ inline ShaderEffect CreateImageRegionEffect()
       //"  vec2 bottomRight = sTextureRect.xy + uBottomRight * imageSize;\n"
       //"  vec2 texCoord = (aTexCoord - sTextureRect.xy) / imageSize;\n"
       //"  vTexCoord = topLeft + texCoord * ( bottomRight - topLeft );\n"
-      "  vTexCoord = sTextureRect.xy + uTopLeft * ( sTextureRect.zw - sTextureRect.xy ) + ( aTexCoord - sTextureRect.xy ) * ( uBottomRight - uTopLeft );\n"
+
+      "  vec2 texCoord = aPosition + vec2(0.5);\n"
+      "  vTexCoord = uTextureRect.xy + uTopLeft * ( uTextureRect.zw - uTextureRect.xy ) + ( texCoord - uTextureRect.xy ) * ( uBottomRight - uTopLeft );\n"
       "}\n"
   );
 
-  Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( vertexShader, "" );
-  shaderEffect.SetUniform( "uTopLeft", Vector2( 0.f, 0.f ) );
-  shaderEffect.SetUniform( "uBottomRight", Vector2( 1.f, 1.f ) );
+  Property::Map map;
 
-  return shaderEffect;
+  Property::Map customShader;
+  customShader[ "vertexShader" ] = vertexShader;
+
+  map[ "shader" ] = customShader;
+  return map;
 }
 
 } // namespace Toolkit

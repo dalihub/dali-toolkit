@@ -720,6 +720,13 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
                       positions,
                       glyphs,
                       depth );
+
+    /* In the case where AddGlyphs does not create a renderable Actor for example when glyphs are all whitespace create a new Actor.  */
+    /* This renderable actor is used to position the text, other "decorations" can rely on there always being an Actor regardless of it is whitespace or regular text*/
+    if ( !mImpl->mActor )
+    {
+      mImpl->mActor = Actor::New();
+    }
   }
 
   return mImpl->mActor;

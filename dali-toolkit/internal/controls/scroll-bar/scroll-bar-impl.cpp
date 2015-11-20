@@ -31,14 +31,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 using namespace Dali;
 
 namespace
 {
 
-const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.png";
-const Vector4 DEFAULT_INDICATOR_NINE_PATCH_BORDER(4.0f, 9.0f, 7.0f, 11.0f);
+const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.9.png";
 const float MINIMUM_INDICATOR_HEIGHT(20.0f); // The minimum indicator height for the nine patch border
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float DEFAULT_INDICATOR_SHOW_DURATION(0.5f);
@@ -204,10 +204,7 @@ void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index property
 
 void ScrollBar::CreateDefaultIndicatorActor()
 {
-  Image indicatorImage = ResourceImage::New( DEFAULT_INDICATOR_IMAGE_PATH );
-  ImageActor indicator = ImageActor::New( indicatorImage );
-  indicator.SetNinePatchBorder( DEFAULT_INDICATOR_NINE_PATCH_BORDER );
-  indicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
+  Toolkit::ImageView indicator = Toolkit::ImageView::New( DEFAULT_INDICATOR_IMAGE_PATH );
   indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
   indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 

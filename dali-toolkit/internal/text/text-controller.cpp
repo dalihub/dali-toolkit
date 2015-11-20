@@ -90,7 +90,8 @@ void Controller::SetText( const std::string& text )
     // If popup shown then hide it by switching to Editing state
     if( ( EventData::SELECTING == mImpl->mEventData->mState )          ||
         ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
-        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
@@ -843,9 +844,7 @@ void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
     mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
 
     // Update the cursor if it's in editing mode.
-    if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
-        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
-        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+    if ( EventData::IsEditingState( mImpl->mEventData->mState )  )
     {
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
@@ -898,9 +897,7 @@ void Controller::TextInsertedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
-      ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
-      ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+  if ( EventData::IsEditingState( mImpl->mEventData->mState )  )
   {
     mImpl->mEventData->mUpdateCursorPosition = true;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
@@ -1505,33 +1502,48 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
   if( NULL != mImpl->mEventData )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TapEvent state:%d \n", mImpl->mEventData->mState );
+
     if( 1u == tapCount )
     {
       // This is to avoid unnecessary relayouts when tapping an empty text-field
       bool relayoutNeeded( false );
 
-      if( mImpl->IsShowingRealText() &&
-          EventData::EDITING == mImpl->mEventData->mState )
+      if ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState || EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState )
       {
-        // Show grab handle on second tap
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE);  // If Popup shown hide it here so can be shown again if required.
+      }
+
+      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE !=  mImpl->mEventData->mState ) )
+      {
+        // Already in an active state so show a popup
+        if ( !mImpl->IsClipboardEmpty() )
+        {
+          // Shows Paste popup but could show full popup with Selection options. ( EDITING_WITH_POPUP )
+          mImpl->ChangeState( EventData::EDITING_WITH_PASTE_POPUP );
+        }
+        else
+        {
+          mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        }
         relayoutNeeded = true;
       }
-      else if( EventData::EDITING                  != mImpl->mEventData->mState &&
-               EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState )
+      else
       {
         if( mImpl->IsShowingPlaceholderText() &&  !mImpl->IsFocusedPlaceholderAvailable() )
         {
           // Hide placeholder text
           ResetText();
         }
-        // Show cursor on first tap
-        mImpl->ChangeState( EventData::EDITING );
-        relayoutNeeded = true;
-      }
-      else if( mImpl->IsShowingRealText() )
-      {
-        // Move the cursor
+
+        if ( EventData::INACTIVE == mImpl->mEventData->mState )
+        {
+          mImpl->ChangeState( EventData::EDITING );
+        }
+        else if ( !mImpl->IsClipboardEmpty() )
+        {
+          mImpl->ChangeState( EventData::EDITING_WITH_POPUP );
+        }
         relayoutNeeded = true;
       }
 
@@ -1562,6 +1574,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
+        // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
 
@@ -1619,6 +1632,8 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 
 void Controller::SelectEvent( float x, float y, bool selectAll )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
+
   if( mImpl->mEventData )
   {
     mImpl->ChangeState( EventData::SELECTING );

@@ -399,6 +399,23 @@ const std::string& Control::GetStyleName() const
   return mImpl->mStyleName;
 }
 
+void Control::UpdateBackgroundState()
+{
+  // Set the depth of the background renderer after creating/modifying it.
+  // We do this regardless of whether or not it is on stage as the index
+  // is relative and still valid if this control is re-parented.
+  if( mImpl->mBackgroundRenderer )
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+
+    Actor self( Self() );
+    if( self.OnStage() )
+    {
+      mImpl->mBackgroundRenderer.SetOnStage( self );
+    }
+  }
+}
+
 void Control::SetBackgroundColor( const Vector4& color )
 {
   Actor self( Self() );
@@ -411,13 +428,9 @@ void Control::SetBackgroundColor( const Vector4& color )
   else
   {
     mImpl->mBackgroundRenderer = factory.GetControlRenderer( color );
-
-    if( self.OnStage() )
-    {
-      mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-      mImpl->mBackgroundRenderer.SetOnStage( self );
-    }
   }
+
+  UpdateBackgroundState();
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -441,12 +454,7 @@ void Control::SetBackground(const Property::Map& map)
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
   mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
 
-  // mBackgroundRenderer might be empty, if an invalid map is provided, no background.
-  if( self.OnStage() && mImpl->mBackgroundRenderer)
-  {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
-  }
+  UpdateBackgroundState();
 }
 
 void Control::SetBackgroundImage( Image image )
@@ -461,13 +469,9 @@ void Control::SetBackgroundImage( Image image )
   else
   {
     mImpl->mBackgroundRenderer = factory.GetControlRenderer( image );
-
-    if( self.OnStage() )
-    {
-      mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-      mImpl->mBackgroundRenderer.SetOnStage( self );
-    }
   }
+
+  UpdateBackgroundState();
 }
 
 void Control::ClearBackground()
@@ -798,17 +802,16 @@ void Control::OnStageConnection( int depth )
 {
   if( mImpl->mBackgroundRenderer)
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    Actor self(Self());
+    Actor self( Self() );
     mImpl->mBackgroundRenderer.SetOnStage( self );
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundRenderer)
+  if( mImpl->mBackgroundRenderer )
   {
-    Actor self(Self());
+    Actor self( Self() );
     mImpl->mBackgroundRenderer.SetOffStage( self );
   }
 }

@@ -35,7 +35,6 @@
 #include <dali-toolkit/devel-api/shader-effects/mirror-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/motion-blur-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/motion-stretch-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/nine-patch-mask-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/overlay-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/quadratic-bezier.h>
 #include <dali-toolkit/devel-api/shader-effects/ripple-effect.h>
@@ -52,8 +51,33 @@ int UtcDaliCreateAlphaDiscardEffect(void)
 {
   ToolkitTestApplication application;
 
-  ShaderEffect effect = Toolkit::CreateAlphaDiscardEffect();
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateAlphaDiscardEffect();
+  DALI_TEST_CHECK( !effect.Empty() );
+
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  DALI_TEST_CHECK( !vertexShaderValue );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  DALI_TEST_CHECK( fragmentShaderValue );
+
+  std::string fragmentShader;
+  DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
+  DALI_TEST_CHECK( !fragmentShader.empty() );
+
+  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  DALI_TEST_CHECK( !gridXValue );
+
+  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  DALI_TEST_CHECK( !gridYValue );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( !hintsValue );
 
   END_TEST;
 }
@@ -238,8 +262,33 @@ int UtcDaliCreateImageRegionEffect(void)
 {
   ToolkitTestApplication application;
 
-  ShaderEffect effect = Toolkit::CreateImageRegionEffect();
-  DALI_TEST_CHECK( effect );
+  Property::Map effect = Toolkit::CreateImageRegionEffect();
+  DALI_TEST_CHECK( !effect.Empty() );
+
+  Property::Value* customShaderValue = effect.Find( "shader" );
+  DALI_TEST_CHECK( customShaderValue );
+
+  Property::Map customShader;
+  DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
+
+  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  DALI_TEST_CHECK( vertexShaderValue );
+
+  std::string vertexShader;
+  DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
+  DALI_TEST_CHECK( !vertexShader.empty() );
+
+  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  DALI_TEST_CHECK( !fragmentShaderValue );
+
+  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  DALI_TEST_CHECK( !gridXValue );
+
+  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  DALI_TEST_CHECK( !gridYValue );
+
+  Property::Value* hintsValue = customShader.Find( "hints" );
+  DALI_TEST_CHECK( !hintsValue );
 
   END_TEST;
 }

@@ -64,6 +64,11 @@ private:
    */
   virtual ~CheckBoxButton();
 
+  /**
+   * Setup the ticking effect to the selected image.
+   */
+  void SetTickUVEffect();
+
 private: // From Button
 
 
@@ -106,7 +111,7 @@ private:
   CheckBoxButton& operator=( const CheckBoxButton& );
 
 private:
-  ShaderEffect              mTickUVEffect;         ///< ImageRegionEffect to expand the tick across
+  Actor         mSelectedImage;
 };
 
 } // namespace Internal

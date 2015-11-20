@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
@@ -145,7 +146,7 @@ void PushButton::OnButtonInitialize()
 void PushButton::SetIcon( DecorationState state, const std::string iconFilename )
 {
   mIconName[ state ] = iconFilename;
-  SetDecoration( state, ImageActor::New( Dali::ResourceImage::New( iconFilename ) ) );
+  SetDecoration( state, Toolkit::ImageView::New( iconFilename  ) );
   ConfigureSizeNegotiation();
 }
 

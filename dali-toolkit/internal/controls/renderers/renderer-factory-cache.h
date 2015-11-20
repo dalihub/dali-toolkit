@@ -141,6 +141,16 @@ public:
    */
   bool CleanRendererCache( const std::string& key );
 
+  /**
+   * @brief Cache the debug renderer
+   */
+  void CacheDebugRenderer( Renderer& renderer );
+
+  /**
+   * @brief Request the debug renderer;
+   */
+  Renderer GetDebugRenderer();
+
 protected:
 
   /**
@@ -189,6 +199,8 @@ private:
 
   HashVector mRendererHashes;
   CachedRenderers mRenderers;
+
+  Renderer mDebugRenderer;
 };
 
 } // namespace Internal

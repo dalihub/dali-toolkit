@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
@@ -400,35 +401,35 @@ private:
    *
    * @return The backing actor
    */
-  ImageActor CreateBacking();
+  Toolkit::ImageView CreateBacking();
 
   /**
    * Create the progress backing for the slider
    *
    * @return The backing actor
    */
-  ImageActor CreateProgress();
+  Toolkit::ImageView CreateProgress();
 
   /**
    * Create the handle for the slider
    *
    * @return The created image handle
    */
-  ImageActor CreateHandle();
+  Toolkit::ImageView CreateHandle();
 
   /**
    * Create the popup arrow
    *
    * @return The created image handle
    */
-  ImageActor CreatePopupArrow();
+  Toolkit::ImageView CreatePopupArrow();
 
   /**
    * Create the popup
    *
    * @return The created image handle
    */
-  ImageActor CreatePopup();
+  Toolkit::ImageView CreatePopup();
 
   /**
    * Create the textview for the popup
@@ -681,15 +682,15 @@ private:
   Domain mDomain;                           ///< Current domain of the handle
 
   Actor mHitArea;                           ///< The input handler
-  ImageActor mBacking;                      ///< Backing image
-  ImageActor mHandle;                       ///< Slider handle
-  ImageActor mProgress;                     ///< Progress backing
   Actor mValueDisplay;                      ///< Display of the value
-  ImageActor mPopup;                        ///< Popup backing
-  ImageActor mPopupArrow;                   ///< Popup arrow backing
+  Toolkit::ImageView mBacking;              ///< Backing image
+  Toolkit::ImageView mHandle;               ///< Slider handle
+  Toolkit::ImageView mProgress;             ///< Progress backing
+  Toolkit::ImageView mPopup;                ///< Popup backing
+  Toolkit::ImageView mPopupArrow;           ///< Popup arrow backing
 
-  Toolkit::TextLabel mValueTextLabel;         //< The text value in popup
-  Toolkit::TextLabel mHandleValueTextLabel;   ///< The text value on handle
+  Toolkit::TextLabel mValueTextLabel;       //< The text value in popup
+  Toolkit::TextLabel mHandleValueTextLabel; ///< The text value on handle
   Vector2 mHandleLastTouchPoint;            ///< The last touch point for the handle
   Timer mValueTimer;                        ///< Timer used to hide value view
 
@@ -705,6 +706,9 @@ private:
 
   std::string mPopupImageName;      ///< Image name for popup image
   std::string mPopupArrowImageName; ///< Image name for popup arrow
+  std::string mBackingImageName;    ///< Image name for backing image
+  std::string mHandleImageName;     ///< Image name for handle image
+  std::string mProgressImageName;   ///< Image name for progress image
 
   Vector4 mDisableColor;    ///< The color to tint the slider when disabled
   Vector4 mPopupTextColor;  ///< The color of the popup text

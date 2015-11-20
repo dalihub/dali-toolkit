@@ -160,7 +160,7 @@ protected:
    * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] propertyMap The properties for the requested ControlRenderer object.
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) = 0;
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) {};
 
 protected:
 

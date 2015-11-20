@@ -37,6 +37,7 @@
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
@@ -305,7 +306,7 @@ void Popup::OnInitialize()
   mPopupLayout = Toolkit::TableView::New( 3, 1 );
 
   // Adds the default background image.
-  SetPopupBackgroundImage( ImageActor::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
+  SetPopupBackgroundImage( Toolkit::ImageView::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
 
   mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
@@ -849,7 +850,7 @@ void Popup::LayoutTail()
   {
     // Adds the tail actor.
     Image tail = ResourceImage::New( image );
-    mTailImage = ImageActor::New( tail );
+    mTailImage = Toolkit::ImageView::New( tail );
     mTailImage.SetName( "tailImage" );
     const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
     mTailImage.SetParentOrigin( position );
@@ -1227,7 +1228,7 @@ void Popup::SetProperty( BaseObject* object, Property::Index propertyIndex, cons
           Image image = ResourceImage::New( valueString );
           if( image )
           {
-            ImageActor actor = ImageActor::New( image );
+            Toolkit::ImageView actor = Toolkit::ImageView::New( image );
             popupImpl.SetPopupBackgroundImage( actor );
           }
         }

@@ -66,7 +66,9 @@ Toolkit::ImageView ImageView::New()
 
 void ImageView::SetImage( Image image )
 {
-  if( mImage != image )
+  if( ( mImage != image ) ||
+      ! mUrl.empty()      ||   // If we're changing from a URL type to an Image type
+      ! mPropertyMap.Empty() ) // If we're changing from a property map type to an Image type
   {
     mUrl.clear();
     mPropertyMap.Clear();
@@ -76,36 +78,48 @@ void ImageView::SetImage( Image image )
     Actor self = Self();
     Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, image );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
+
+    RelayoutRequest();
   }
 }
 
 void ImageView::SetImage( Property::Map map )
 {
+  mUrl.clear();
+  mImage.Reset();
   mPropertyMap = map;
 
   Actor self = Self();
   Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mPropertyMap );
 
-  int width = 0;
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
   {
-    widthValue->Get( width );
+    int width;
+    if( widthValue->Get( width ) )
+    {
+      mImageSize = ImageDimensions( width, mImageSize.GetHeight() );
+    }
   }
 
-  int height = 0;
   Property::Value* heightValue = mPropertyMap.Find( "height" );
   if( heightValue )
   {
-    heightValue->Get( height );
+    int height;
+    if( heightValue->Get( height ) )
+    {
+      mImageSize = ImageDimensions( mImageSize.GetWidth(), height );
+    }
   }
 
-  mImageSize = ImageDimensions( width, height );
+  RelayoutRequest();
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
-  if( mUrl != url )
+  if( ( mUrl != url ) ||
+      mImage          ||       // If we're changing from an Image type to a URL type
+      ! mPropertyMap.Empty() ) // If we're changing from a property map type to a URL type
   {
     mImage.Reset();
     mPropertyMap.Clear();
@@ -123,7 +137,14 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
     Actor self = Self();
     Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl, mImageSize );
+
+    RelayoutRequest();
   }
+}
+
+void ImageView::SetDepthIndex( int depthIndex )
+{
+  mRenderer.SetDepthIndex( depthIndex );
 }
 
 Vector3 ImageView::GetNaturalSize()

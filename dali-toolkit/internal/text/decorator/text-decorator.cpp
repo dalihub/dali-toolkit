@@ -435,6 +435,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( mActiveCopyPastePopup )
     {
       ShowPopup();
+      mPopupSetNewPosition = true;
     }
     else
     {
@@ -1872,7 +1873,7 @@ const Vector4& Decorator::GetHandleColor() const
 
 void Decorator::SetPosition( HandleType handleType, float x, float y, float height )
 {
-  // Adjust grab handle displacement
+  // Adjust handle's displacement
   Impl::HandleImpl& handle = mImpl->mHandle[handleType];
 
   handle.grabDisplacementX -= x - handle.position.x;
