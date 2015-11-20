@@ -159,15 +159,9 @@ const IntegerPair EnumTable[] =
     { "DRAW_MODE_OVERLAY_2D",                               DrawMode::OVERLAY_2D },
     { "DRAW_MODE_STENCIL",                                  DrawMode::STENCIL    },
 
-    { "IMAGE_LOAD_POLICY_IMMEDIATE",                        ResourceImage::IMMEDIATE },
-    { "IMAGE_LOAD_POLICY_ON_DEMAND",                        ResourceImage::ON_DEMAND  },
-
-    { "IMAGE_RELEASE_POLICY_UNUSED",                        Image::UNUSED },
-    { "IMAGE_RELEASE_POLICY_NEVER",                         Image::NEVER  },
-
     { "RESOURCE_LOADING",                                   Dali::ResourceLoading },
     { "RESOURCE_LOADING_SUCCEEDED",                         Dali::ResourceLoadingSucceeded  },
-    { "RESOUCE_LOADING_FAILED",                             Dali::ResourceLoadingFailed  },
+    { "RESOURCE_LOADING_FAILED",                            Dali::ResourceLoadingFailed  },
 
     { "FITTING_MODE_SHRINK_TO_FIT",     FittingMode::SHRINK_TO_FIT },
     { "FITTING_MODE_SCALE_TO_FILL",     FittingMode::SCALE_TO_FILL },
@@ -210,10 +204,6 @@ const IntegerPair EnumTable[] =
     { "CAMERA_LOOK_AT_TARGET"        ,      Camera::LOOK_AT_TARGET              },
     { "CAMERA_PERSPECTIVE_PROJECTION" ,     Camera::PERSPECTIVE_PROJECTION      },
     { "CAMERA_ORTHOGRAPHIC_PROJECTION",     Camera::ORTHOGRAPHIC_PROJECTION     },
-
-    {"IMAGE_ACTOR_STYLE_QUAD",                ImageActor::STYLE_QUAD},
-    {"IMAGE_ACTOR_STYLE_NINE_PATCH",          ImageActor::STYLE_NINE_PATCH},
-    {"IMAGE_ACTOR_STYLE_NINE_PATCH_NO_CENTER",ImageActor::STYLE_NINE_PATCH_NO_CENTER },
 
     { "FILTER_MODE_NONE",                     FilterMode::NONE           },
     { "FILTER_MODE_DEFAULT",                  FilterMode::DEFAULT        },

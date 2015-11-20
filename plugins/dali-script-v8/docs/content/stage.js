@@ -14,12 +14,12 @@ dali.stage.setBackgroundColor( dali.COLOR_WHITE);
   
 var stageSize = dali.stage.getSize();
   
-var imageActor = new dali.ImageActor( );
+var actor = new dali.Actor( );
   
-dali.stage.add( imageActor );
+dali.stage.add( actor );
   
 // when the actor is no longer required
-dali.stage.remove( imageActor );
+dali.stage.remove( actor );
 ```
 
 ![ ](../assets/img/stage.png)
