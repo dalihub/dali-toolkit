@@ -84,6 +84,7 @@ Length View::GetNumberOfGlyphs() const
 
 Length View::GetGlyphs( GlyphInfo* glyphs,
                         Vector2* glyphPositions,
+                        Vector4* glyphColors,
                         GlyphIndex glyphIndex,
                         Length numberOfGlyphs ) const
 {
