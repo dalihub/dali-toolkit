@@ -171,8 +171,10 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns01;
   ScriptRun scriptRun0100 =
   {
-    0u,
-    11u,
+    {
+      0u,
+      11u,
+    },
     TextAbstraction::LATIN
   };
   scriptRuns01.PushBack( scriptRun0100 );
@@ -181,14 +183,18 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns02;
   ScriptRun scriptRun0200 =
   {
-    0u,
-    12u,
+    {
+      0u,
+      12u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun0201 =
   {
-    12u,
-    13u,
+    {
+      12u,
+      13u,
+    },
     TextAbstraction::ARABIC
   };
   scriptRuns02.PushBack( scriptRun0200 );
@@ -198,14 +204,18 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns03;
   ScriptRun scriptRun0300 =
   {
-    0u,
-    14u,
+    {
+      0u,
+      14u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun0301 =
   {
-    14u,
-    11u,
+    {
+      14u,
+      11u,
+    },
     TextAbstraction::LATIN
   };
   scriptRuns03.PushBack( scriptRun0300 );
@@ -215,8 +225,10 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns04;
   ScriptRun scriptRun0400 =
   {
-    0u,
-    16u,
+    {
+      0u,
+      16u,
+    },
     TextAbstraction::LATIN
   };
   scriptRuns04.PushBack( scriptRun0400 );
@@ -225,8 +237,10 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns05;
   ScriptRun scriptRun0500 =
   {
-    0u,
-    16u,
+    {
+      0u,
+      16u,
+    },
     TextAbstraction::LATIN
   };
   scriptRuns05.PushBack( scriptRun0500 );
@@ -235,8 +249,10 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns06;
   ScriptRun scriptRun0600 =
   {
-    0u,
-    16u,
+    {
+      0u,
+      16u,
+    },
     TextAbstraction::LATIN
   };
   scriptRuns06.PushBack( scriptRun0600 );
@@ -245,14 +261,18 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns07;
   ScriptRun scriptRun0700 =
   {
-    0u,
-    8u,
+    {
+      0u,
+      8u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun0701 =
   {
-    8u,
-    5u,
+    {
+      8u,
+      5u,
+    },
     TextAbstraction::HANGUL
   };
   scriptRuns07.PushBack( scriptRun0700 );
@@ -262,20 +282,26 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns08;
   ScriptRun scriptRun0800 =
   {
-    0u,
-    18u,
+    {
+      0u,
+      18u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun0801 =
   {
-    18u,
-    14u,
+    {
+      18u,
+      14u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun0802 =
   {
-    32u,
-    18u,
+    {
+      32u,
+      18u,
+    },
     TextAbstraction::HANGUL
   };
   scriptRuns08.PushBack( scriptRun0800 );
@@ -286,26 +312,34 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns09;
   ScriptRun scriptRun0900 =
   {
-    0u,
-    21u,
+    {
+      0u,
+      21u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun0901 =
   {
-    21u,
-    16u,
+    {
+      21u,
+      16u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun0902 =
   {
-    37u,
-    10u,
+    {
+      37u,
+      10u,
+    },
     TextAbstraction::HANGUL
   };
   ScriptRun scriptRun0903 =
   {
-    47u,
-    20u,
+    {
+      47u,
+      20u,
+    },
     TextAbstraction::ARABIC
   };
   scriptRuns09.PushBack( scriptRun0900 );
@@ -317,68 +351,90 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns10;
   ScriptRun scriptRun1000 =
   {
-    0u,
-    20u,
+    {
+      0u,
+      20u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun1001 =
   {
-    20u,
-    12u,
+    {
+      20u,
+      12u,
+    },
     TextAbstraction::HEBREW
   };
   ScriptRun scriptRun1002 =
   {
-    32u,
-    17u,
+    {
+      32u,
+      17u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun1003 =
   {
-    49u,
-    18u,
+    {
+      49u,
+      18u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun1004 =
   {
-    67u,
-    14u,
+    {
+      67u,
+      14u,
+    },
     TextAbstraction::HANGUL
   };
   ScriptRun scriptRun1005 =
   {
-    81u,
-    19u,
+    {
+      81u,
+      19u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun1006 =
   {
-    100u,
-    13u,
+    {
+      100u,
+      13u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun1007 =
   {
-    113u,
-    16u,
+    {
+      113u,
+      16u,
+    },
     TextAbstraction::HEBREW
   };
   ScriptRun scriptRun1008 =
   {
-    129u,
-    20u,
+    {
+      129u,
+      20u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun1009 =
   {
-    149u,
-    14u,
+    {
+      149u,
+      14u,
+    },
     TextAbstraction::ARABIC
   };
   ScriptRun scriptRun1010 =
   {
-    163u,
-    35u,
+    {
+      163u,
+      35u,
+    },
     TextAbstraction::HANGUL
   };
   scriptRuns10.PushBack( scriptRun1000 );
@@ -397,14 +453,18 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns11;
   ScriptRun scriptRun1100 =
   {
-    0u,
-    31u,
+    {
+      0u,
+      31u,
+    },
     TextAbstraction::LATIN
   };
   ScriptRun scriptRun1101 =
   {
-    31u,
-    21u,
+    {
+      31u,
+      21u,
+    },
     TextAbstraction::HEBREW
   };
   scriptRuns11.PushBack( scriptRun1100 );
@@ -414,8 +474,10 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   Vector<ScriptRun> scriptRuns12;
   ScriptRun scriptRun1200 =
   {
-    0u,
-    11u,
+    {
+      0u,
+      11u,
+    },
     TextAbstraction::LATIN
   };
   scriptRuns12.PushBack( scriptRun1200 );

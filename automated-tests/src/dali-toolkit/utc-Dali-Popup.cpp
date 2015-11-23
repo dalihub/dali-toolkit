@@ -1057,9 +1057,9 @@ int UtcDaliPopupPropertyCustomAnimation(void)
 
   Property::Map resultMap;
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::ENTRY_ANIMATION ).Get( resultMap ) );
-  DALI_TEST_EQUALS( resultMap.Count(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap.Count(), 0u, TEST_LOCATION );
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::EXIT_ANIMATION ).Get( resultMap ) );
-  DALI_TEST_EQUALS( resultMap.Count(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap.Count(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( popup );
   popup.SetDisplayState( Popup::SHOWN );
