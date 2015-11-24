@@ -22,6 +22,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
 
+#include <test-native-image.h>
+#include <sstream>
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -37,6 +40,35 @@ void utc_dali_toolkit_image_view_cleanup(void)
 
 namespace
 {
+
+const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    vertexPosition = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = aPosition + vec2(0.5);\n
+    gl_Position = vertexPosition;\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+  }\n
+);
+
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_IMAGE_FILE_NAME2 =  "gallery_image_02.jpg";
 
@@ -561,6 +593,293 @@ int UtcDaliImageViewResourceUrlP(void)
 
   imageView.SetProperty( ImageView::Property::RESOURCE_URL, "TestString" );
   DALI_TEST_EQUALS( imageView.GetProperty( ImageView::Property::RESOURCE_URL ).Get< std::string >(), "TestString", TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Scenarios 1: ImageView from regular image
+int UtcDaliImageViewSetImageBufferImage(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Stage::GetCurrent().Add( imageView );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace( true );
+
+  std::vector< GLuint > ids;
+  ids.push_back( 23 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  int width = 300;
+  int height = 400;
+  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
+
+  imageView.SetImage( image );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream params;
+  params << GL_TEXTURE_2D << ", " << 23;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
+
+  END_TEST;
+}
+
+// Scenarios 2: ImageView from Native image
+int UtcDaliImageViewSetImageNativeImage(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Stage::GetCurrent().Add( imageView );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace( true );
+
+  std::vector< GLuint > ids;
+  ids.push_back( 23 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  int width = 200;
+  int height = 500;
+  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
+  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
+
+  imageView.SetImage( nativeImage );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream params;
+  params << GL_TEXTURE_2D << ", " << 23;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
+
+  END_TEST;
+}
+
+// Scenarios 3: ImageView initially from regular image but then SetImage called with Native image
+int UtcDaliImageViewSetImageBufferImageToNativeImage(void)
+{
+  ToolkitTestApplication application;
+
+  int width = 300;
+  int height = 400;
+  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
+
+  ImageView imageView = ImageView::New( image );
+  Stage::GetCurrent().Add( imageView );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace( true );
+
+  std::vector< GLuint > ids;
+  ids.push_back( 23 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream params;
+  params << GL_TEXTURE_2D << ", " << 23;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
+
+  width = 200;
+  height = 500;
+  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
+  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
+  imageView.SetImage( nativeImage );
+
+  ids.clear();
+  ids.push_back( 24 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream nextTextureParams;
+  nextTextureParams << GL_TEXTURE_2D << ", " << 24;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nextTextureParams.str()) );
+
+  END_TEST;
+}
+
+// Scenarios 4: ImageView initially from Native image but then SetImage called with regular image
+int UtcDaliImageViewSetImageNativeImageToBufferImage(void)
+{
+  ToolkitTestApplication application;
+
+  int width = 300;
+  int height = 400;
+  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
+  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
+
+  ImageView imageView = ImageView::New( nativeImage );
+  Stage::GetCurrent().Add( imageView );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace( true );
+
+  std::vector< GLuint > ids;
+  ids.push_back( 23 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream params;
+  params << GL_TEXTURE_2D << ", " << 23;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
+
+  width = 200;
+  height = 500;
+  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
+  imageView.SetImage( image );
+
+  ids.clear();
+  ids.push_back( 24 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream nextTextureParams;
+  nextTextureParams << GL_TEXTURE_2D << ", " << 24;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nextTextureParams.str()) );
+
+  END_TEST;
+}
+
+// Scenarios 5: ImageView from Native image with custom shader
+int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
+{
+  ToolkitTestApplication application;
+
+  int width = 300;
+  int height = 400;
+
+  Property::Map customShader;
+  customShader.Insert( "vertexShader", VERTEX_SHADER );
+  customShader.Insert( "fragmentShader", FRAGMENT_SHADER );
+
+  Property::Array shaderHints;
+  shaderHints.PushBack( "requiresSelfDepthTest" );
+  shaderHints.PushBack( "outputIsTransparent" );
+  shaderHints.PushBack( "outputIsOpaque" );
+  shaderHints.PushBack( "modifiesGeometry" );
+
+  customShader.Insert( "hints", shaderHints );
+
+  Property::Map map;
+  map.Insert( "rendererType", "imageRenderer" );
+  map.Insert( "shader", customShader );
+
+  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
+  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
+
+  ImageView imageView = ImageView::New( nativeImage );
+  imageView.SetProperty( ImageView::Property::IMAGE, map );
+  Stage::GetCurrent().Add( imageView );
+
+  imageView.SetProperty( ImageView::Property::IMAGE, map );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace( true );
+
+  std::vector< GLuint > ids;
+  ids.push_back( 23 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream params;
+  params << GL_TEXTURE_2D << ", " << 23;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
+
+  END_TEST;
+}
+
+// Scenarios 6: ImageView initially from regular image with custom shader but then SetImage called with Native
+int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
+{
+  ToolkitTestApplication application;
+
+  int width = 300;
+  int height = 400;
+
+  Property::Map customShader;
+  customShader.Insert( "vertexShader", VERTEX_SHADER );
+  customShader.Insert( "fragmentShader", FRAGMENT_SHADER );
+
+  Property::Array shaderHints;
+  shaderHints.PushBack( "requiresSelfDepthTest" );
+  shaderHints.PushBack( "outputIsTransparent" );
+  shaderHints.PushBack( "outputIsOpaque" );
+  shaderHints.PushBack( "modifiesGeometry" );
+
+  customShader.Insert( "hints", shaderHints );
+
+  Property::Map map;
+  map.Insert( "rendererType", "imageRenderer" );
+  map.Insert( "shader", customShader );
+
+  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
+
+  ImageView imageView = ImageView::New( image );
+  imageView.SetProperty( ImageView::Property::IMAGE, map );
+  Stage::GetCurrent().Add( imageView );
+
+  imageView.SetProperty( ImageView::Property::IMAGE, map );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  gl.EnableTextureCallTrace( true );
+
+  std::vector< GLuint > ids;
+  ids.push_back( 23 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream params;
+  params << GL_TEXTURE_2D << ", " << 23;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
+
+  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
+  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
+  imageView.SetImage( nativeImage );
+
+  ids.clear();
+  ids.push_back( 24 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
+
+  std::stringstream nativeImageParams;
+  nativeImageParams << GL_TEXTURE_2D << ", " << 24;
+  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nativeImageParams.str()) );
+
 
   END_TEST;
 }
