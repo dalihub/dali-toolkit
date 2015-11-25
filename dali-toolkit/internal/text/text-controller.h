@@ -114,6 +114,24 @@ public:
   void EnableTextInput( DecoratorPtr decorator );
 
   /**
+   * @brief Enables/disables the mark-up processor.
+   *
+   * By default is disabled.
+   *
+   * @param[in] enable Whether to enable the mark-up processor.
+   */
+  void SetMarkupProcessorEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the mark-up processor is enabled.
+   *
+   * By default is disabled.
+   *
+   * @return @e true if the mark-up processor is enabled, otherwise returns @e false.
+   */
+  bool IsMarkupProcessorEnabled() const;
+
+  /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.

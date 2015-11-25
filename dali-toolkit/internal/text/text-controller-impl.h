@@ -182,8 +182,8 @@ struct FontDefaults
   FontDefaults()
   : mFontDescription(),
     mFontStyle(),
-    mDefaultPointSize(0.0f),
-    mFontId(0u)
+    mDefaultPointSize( 0.f ),
+    mFontId( 0u )
   {
     // Initially use the default platform font
     TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -226,7 +226,8 @@ struct Controller::Impl
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
-    mUserDefinedFontFamily( false )
+    mUserDefinedFontFamily( false ),
+    mMarkupProcessorEnabled( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -512,7 +513,7 @@ struct Controller::Impl
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mUserDefinedFontFamily:1;           ///< Whether the Font family was set by the user instead of being left as sytem default.
-
+  bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
 };
 
 } // namespace Text

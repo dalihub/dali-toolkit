@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 
 namespace
@@ -73,6 +74,16 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
   }
 }
 
+void Controller::SetMarkupProcessorEnabled( bool enable )
+{
+  mImpl->mMarkupProcessorEnabled = enable;
+}
+
+bool Controller::IsMarkupProcessorEnabled() const
+{
+  return mImpl->mMarkupProcessorEnabled;
+}
+
 void Controller::SetText( const std::string& text )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
@@ -99,20 +110,37 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
+    MarkupProcessData markupProcessData;
+
+    Length textSize = 0u;
+    const uint8_t* utf8 = NULL;
+    if( mImpl->mMarkupProcessorEnabled )
+    {
+      ProcessMarkupString( text, markupProcessData );
+      textSize = markupProcessData.markupProcessedText.size();
+
+      // This is a bit horrible but std::string returns a (signed) char*
+      utf8 = reinterpret_cast<const uint8_t*>( markupProcessData.markupProcessedText.c_str() );
+    }
+    else
+    {
+      textSize = text.size();
+
+      // This is a bit horrible but std::string returns a (signed) char*
+      utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+    }
+
     //  Convert text into UTF-32
     Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-    utf32Characters.Resize( text.size() );
-
-    // This is a bit horrible but std::string returns a (signed) char*
-    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+    utf32Characters.Resize( textSize );
 
     // Transform a text array encoded in utf8 into an array encoded in utf32.
     // It returns the actual number of characters.
-    Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+    Length characterCount = Utf8ToUtf32( utf8, textSize, utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
 
-    DALI_ASSERT_DEBUG( text.size() >= characterCount && "Invalid UTF32 conversion length" );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, text.size(), mImpl->mLogicalModel->mText.Count() );
+    DALI_ASSERT_DEBUG( textSize >= characterCount && "Invalid UTF32 conversion length" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, textSize, mImpl->mLogicalModel->mText.Count() );
 
     // To reset the cursor position
     lastCursorIndex = characterCount;
