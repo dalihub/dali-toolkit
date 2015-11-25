@@ -57,10 +57,14 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
+                                          const Vector<FontDescriptionRun>& fontDescriptions,
+                                          FontId defaultFontId,
                                           Vector<FontRun>& fonts )
 {
   GetImplementation( *this ).ValidateFonts( text,
                                             scripts,
+                                            fontDescriptions,
+                                            defaultFontId,
                                             fonts );
 }
 

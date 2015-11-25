@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-run.h>
+#include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
@@ -97,8 +98,6 @@ public:
   /**
    * @brief Validates the character's font of the whole text.
    *
-   * It may update fonts set by application developers.
-   *
    * This method ensures all characters are going to be rendered using an appropriate font. Provided a valid font
    * exists in the platform.
    *
@@ -109,10 +108,14 @@ public:
    *
    * @param[in] text Vector of UTF-32 characters.
    * @param[in] scripts Vector containing the script runs for the whole text.
-   * @param[in,out] fonts Initially contains the fonts set by the application developers. Returns the validated fonts.
+   * @param[in] fontDescriptions The fonts set by the application developers.
+   * @param[in] defaultFontId The default font's id.
+   * @param[out] fonts The validated fonts.
    */
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
+                      const Vector<FontDescriptionRun>& fontDescriptions,
+                      FontId defaultFontId,
                       Vector<FontRun>& fonts );
 };
 

@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_FONT_RUN_H__
-#define __DALI_TOOLKIT_TEXT_FONT_RUN_H__
+#ifndef __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_FONT_H__
+#define __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_FONT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
-
 namespace Dali
 {
 
@@ -30,14 +27,16 @@ namespace Toolkit
 namespace Text
 {
 
+struct Tag;
+struct FontDescriptionRun;
+
 /**
- * @brief Run of characters with the same font.
+ * @brief Retrieves the font attributes from the tag and sets it to the font run.
+ *
+ * @param[in] tag The font tag and its attributes.
+ * @param[in,out] fontRun The font description run.
  */
-struct FontRun
-{
-  CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
-  FontId       fontId;       ///< Font id of the run.
-};
+void ProcessFontTag( const Tag& tag, FontDescriptionRun& fontRun );
 
 } // namespace Text
 
@@ -45,4 +44,4 @@ struct FontRun
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_FONT_RUN_H__
+#endif // __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_FONT_H__

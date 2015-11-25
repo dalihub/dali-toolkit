@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_TEXT_FONT_STYLE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,20 +34,6 @@ namespace Toolkit
 namespace Text
 {
 
-const Scripting::StringEnum FONT_WIDTH_STRING_TABLE[] =
-{
-  { "ultraCondensed", TextAbstraction::FontWidth::ULTRA_CONDENSED },
-  { "extraCondensed", TextAbstraction::FontWidth::EXTRA_CONDENSED },
-  { "condensed", TextAbstraction::FontWidth::CONDENSED },
-  { "semiCondensed", TextAbstraction::FontWidth::SEMI_CONDENSED },
-  { "normal", TextAbstraction::FontWidth::NORMAL },
-  { "semiExpanded", TextAbstraction::FontWidth::SEMI_EXPANDED },
-  { "expanded", TextAbstraction::FontWidth::EXPANDED },
-  { "extraExpanded", TextAbstraction::FontWidth::EXTRA_EXPANDED },
-  { "ultraExpanded", TextAbstraction::FontWidth::ULTRA_EXPANDED },
-};
-const unsigned int FONT_WIDTH_STRING_TABLE_COUNT = sizeof( FONT_WIDTH_STRING_TABLE ) / sizeof( FONT_WIDTH_STRING_TABLE[0] );
-
 const Scripting::StringEnum FONT_WEIGHT_STRING_TABLE[] =
 {
   { "thin", TextAbstraction::FontWeight::THIN },
@@ -71,6 +57,20 @@ const Scripting::StringEnum FONT_WEIGHT_STRING_TABLE[] =
 };
 const unsigned int FONT_WEIGHT_STRING_TABLE_COUNT = sizeof( FONT_WEIGHT_STRING_TABLE ) / sizeof( FONT_WEIGHT_STRING_TABLE[0] );
 
+const Scripting::StringEnum FONT_WIDTH_STRING_TABLE[] =
+{
+  { "ultraCondensed", TextAbstraction::FontWidth::ULTRA_CONDENSED },
+  { "extraCondensed", TextAbstraction::FontWidth::EXTRA_CONDENSED },
+  { "condensed", TextAbstraction::FontWidth::CONDENSED },
+  { "semiCondensed", TextAbstraction::FontWidth::SEMI_CONDENSED },
+  { "normal", TextAbstraction::FontWidth::NORMAL },
+  { "semiExpanded", TextAbstraction::FontWidth::SEMI_EXPANDED },
+  { "expanded", TextAbstraction::FontWidth::EXPANDED },
+  { "extraExpanded", TextAbstraction::FontWidth::EXTRA_EXPANDED },
+  { "ultraExpanded", TextAbstraction::FontWidth::ULTRA_EXPANDED },
+};
+const unsigned int FONT_WIDTH_STRING_TABLE_COUNT = sizeof( FONT_WIDTH_STRING_TABLE ) / sizeof( FONT_WIDTH_STRING_TABLE[0] );
+
 const Scripting::StringEnum FONT_SLANT_STRING_TABLE[] =
 {
   { "normal", TextAbstraction::FontSlant::NORMAL },
@@ -80,6 +80,15 @@ const Scripting::StringEnum FONT_SLANT_STRING_TABLE[] =
 };
 const unsigned int FONT_SLANT_STRING_TABLE_COUNT = sizeof( FONT_SLANT_STRING_TABLE ) / sizeof( FONT_SLANT_STRING_TABLE[0] );
 
+namespace FontStyle
+{
+  enum Type
+  {
+    DEFAULT, ///< The default font's style.
+    INPUT    ///< The input font's style.
+  };
+};
+
 /**
  * @brief Sets the font's style property.
  *
@@ -87,7 +96,7 @@ const unsigned int FONT_SLANT_STRING_TABLE_COUNT = sizeof( FONT_SLANT_STRING_TAB
  * @param[in] value The value of the font's style.
  *
  */
-void SetFontStyleProperty( ControllerPtr controller, const Property::Value& value );
+void SetFontStyleProperty( ControllerPtr controller, const Property::Value& value, FontStyle::Type type );
 
 /**
  * @brief Retrieves the font's style property.
@@ -95,8 +104,34 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
  * @param[in] controller The text's controller.
  * @param[out] value The value of the font's style.
  */
-void GetFontStyleProperty( ControllerPtr controller, Property::Value& value );
+void GetFontStyleProperty( ControllerPtr controller, Property::Value& value, FontStyle::Type type );
 
+/**
+ * @brief Converts a weight string into @e FontWeight.
+ *
+ * @param[in] weightStr The weight string. Must end with '\0'.
+ *
+ * @return The @e FontWeight value corresponding to the string.
+ */
+FontWeight StringToWeight( const char* const weightStr );
+
+/**
+ * @brief Converts a width string into @e FontWidth.
+ *
+ * @param[in] widthStr The width string. Must end with '\0'.
+ *
+ * @return The @e FontWidth value corresponding to the string.
+ */
+FontWidth StringToWidth( const char* const widthStr );
+
+/**
+ * @brief Converts a slant string into @e FontSlant.
+ *
+ * @param[in] slantStr The slant string. Must end with '\0'.
+ *
+ * @return The @e FontSlant value corresponding to the string.
+ */
+FontSlant StringToSlant( const char* const slantStr );
 } // namespace Text
 
 } // namespace Toolkit
