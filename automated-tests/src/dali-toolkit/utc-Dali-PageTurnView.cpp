@@ -21,6 +21,7 @@
 #include <sstream>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
@@ -193,7 +194,6 @@ public:
   TestPageFactory(ToolkitTestApplication& application)
   : mApplication( application )
   {
-    mSourceActors.resize(TOTAL_PAGE_NUMBER);
     mTotalPageNumber = TOTAL_PAGE_NUMBER;
   }
 
@@ -207,40 +207,17 @@ public:
   }
 
   /**
-   * Create an image actor to represent a page.
+   * Create an image to represent a page content.
    * @param[in] pageId The ID of the page to create.
-   * @return An image actor, or an uninitialized pointer if the ID is out of range.
+   * @return An image, or an empty handle if the ID is out of range.
    */
-  virtual Actor NewPage( unsigned int pageId )
+  virtual Image NewPage( unsigned int pageId )
   {
-    if(!mSourceActors[pageId])
-    {
-      Actor actor = CreateSolidColorImageActor(mApplication, Color::BLUE,IMAGE_WIDTH,IMAGE_HEIGHT);
-      actor.SetName( static_cast<std::ostringstream*>( &(std::ostringstream() << pageId) )->str()  );
-
-      actor.SetParentOrigin( ParentOrigin::CENTER );
-      actor.SetAnchorPoint( AnchorPoint::CENTER );
-
-      ImageActor backPageActor = CreateSolidColorImageActor(mApplication, Color::BLUE,IMAGE_WIDTH,IMAGE_HEIGHT);
-      backPageActor.SetParentOrigin( ParentOrigin::CENTER );
-      backPageActor.SetAnchorPoint( AnchorPoint::CENTER );
-      actor.Add( backPageActor );
-
-      mSourceActors[pageId] = actor;
-    }
-
-    return mSourceActors[pageId];
-  }
-
-  void DeletePage( unsigned int pageId )
-  {
-    mSourceActors.erase( mSourceActors.begin() + pageId );
-    mTotalPageNumber--;
+    return BufferImage::WHITE();
   }
 
 private:
   ToolkitTestApplication& mApplication;
-  std::vector<Actor>      mSourceActors;
   unsigned int            mTotalPageNumber;
 };
 
@@ -704,5 +681,13 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
 
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPageImageFactoryGetExtention(void)
+{
+  ToolkitTestApplication application;
+  TestPageFactory factory(application);
+  DALI_TEST_CHECK( factory.GetExtension() == NULL );
   END_TEST;
 }

@@ -34,7 +34,6 @@ namespace Internal
 
 namespace
 {
-using namespace Dali;
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnLandscapeView, Toolkit::PageTurnView, NULL )
 DALI_TYPE_REGISTRATION_END()
@@ -66,33 +65,22 @@ Toolkit::PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFact
 
 void PageTurnLandscapeView::OnPageTurnViewInitialize()
 {
+  mTurnEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 2.f );
+  mSpineEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 2.f );
+
   mControlSize = Vector2( mPageSize.width * 2.f,  mPageSize.height  );
   Self().SetSize( mControlSize );
   mTurningPageLayer.SetParentOrigin( ParentOrigin::CENTER );
 }
 
-void PageTurnLandscapeView::OnAddPage( ImageActor newPage, bool isLeftSide )
+void PageTurnLandscapeView::OnAddPage( Actor newPage, bool isLeftSide )
 {
   newPage.SetParentOrigin( ParentOrigin::CENTER );
-  SetCullFace( newPage, CullBack );
-
-  if( 0 < newPage.GetChildCount() )
-  {
-     ImageActor backImage = ImageActor::DownCast( newPage.GetChildAt( 0 ) );
-     backImage.SetParentOrigin( ParentOrigin::CENTER );
-     backImage.SetSize( mPageSize );
-     SetCullFace( backImage, CullFront );
-     backImage.SetZ( 0.25f * STATIC_PAGE_INTERVAL_DISTANCE );
-  }
-  if( isLeftSide )
-  {
-    SetShaderEffect( newPage, mSpineEffectBack );
-  }
 }
 
 Vector2 PageTurnLandscapeView::SetPanPosition( const Vector2& gesturePosition )
 {
-  if( mIsTurnBack[mPanActor] )
+  if( mPages[mIndex].isTurnBack )
   {
     return Vector2( mPageSize.width - gesturePosition.x, gesturePosition.y );
   }
@@ -104,31 +92,17 @@ Vector2 PageTurnLandscapeView::SetPanPosition( const Vector2& gesturePosition )
 
 void PageTurnLandscapeView::SetPanActor( const Vector2& panPosition )
 {
-  if( panPosition.x > mPageSize.width  && mCurrentPageIndex < mTotalPageCount-1 )
+  if( panPosition.x > mPageSize.width  && mCurrentPageIndex < mTotalPageCount )
   {
-    mPanActor = mPageActors[mCurrentPageIndex%NUMBER_OF_CACHED_PAGES]; // right side page
     mTurningPageIndex = mCurrentPageIndex;
   }
   else if( panPosition.x <= mPageSize.width && mCurrentPageIndex > 0 )
   {
-    mPanActor = mPageActors[ (mCurrentPageIndex-1)%NUMBER_OF_CACHED_PAGES ]; // left side page
     mTurningPageIndex = mCurrentPageIndex - 1;
   }
   else
   {
-    mPanActor.Reset();
-  }
-}
-
-void PageTurnLandscapeView::SetSpineEffect(ImageActor actor, bool isLeftSide)
-{
-  if(isLeftSide)
-  {
-    SetShaderEffect( actor, mSpineEffectBack );
-  }
-  else
-  {
-    SetShaderEffect( actor, mSpineEffectFront );
+    mTurningPageIndex = -1;
   }
 }
 
