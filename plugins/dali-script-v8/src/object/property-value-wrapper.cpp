@@ -562,7 +562,7 @@ Dali::Property::Value PropertyValueWrapper::VectorOrMatrixFromV8Array( v8::Isola
   }
   if(16 == len )
   {
-    ret = Dali::Matrix( out[0] );
+    ret = Dali::Matrix( out );
   }
   else if ( 9 == len )
   {
