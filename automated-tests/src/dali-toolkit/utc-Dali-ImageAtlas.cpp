@@ -153,8 +153,8 @@ int UtcDaliImageAtlasSetBrokenImage(void)
   atlas.Upload( textureRect, gImageNonExist );
 
   Rect<int> pixelArea = TextureCoordinateToPixelArea(textureRect, size);
-  DALI_TEST_EQUALS( pixelArea.width, 34.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( pixelArea.height, 34.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 34, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 34, TEST_LOCATION );
 
   END_TEST;
 }
@@ -231,8 +231,8 @@ int UtcDaliImageAtlasRemove(void)
 
   // one pixel gap
   Rect<int> pixelArea = TextureCoordinateToPixelArea(textureRect2, size);
-  DALI_TEST_EQUALS( pixelArea.x, 0.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( pixelArea.y, 0.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.x, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.y, 0, TEST_LOCATION );
 
   END_TEST;
 }

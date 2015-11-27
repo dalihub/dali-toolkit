@@ -45,7 +45,6 @@ namespace ImageApi
   /**
    * Image API see image.h for a description
    */
-  void GetReleasePolicy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetWidth( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetHeight( const v8::FunctionCallbackInfo< v8::Value >& args );
 

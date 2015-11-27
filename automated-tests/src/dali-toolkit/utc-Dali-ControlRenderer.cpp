@@ -92,11 +92,11 @@ int UtcDaliControlRendererSetGetDepthIndex(void)
   Stage::GetCurrent().Add( actor );
   controlRenderer.SetOnStage( actor );
 
-  DALI_TEST_EQUALS( actor.GetRendererAt(0u).GetDepthIndex(), 1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0u).GetDepthIndex(), 1, TEST_LOCATION );
   DALI_TEST_EQUALS( controlRenderer.GetDepthIndex(), 1.f, TEST_LOCATION );
 
   controlRenderer.SetDepthIndex( -1.f );
-  DALI_TEST_EQUALS( actor.GetRendererAt(0u).GetDepthIndex(), -1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0u).GetDepthIndex(), -1, TEST_LOCATION );
   DALI_TEST_EQUALS( controlRenderer.GetDepthIndex(), -1.f, TEST_LOCATION );
 
   END_TEST;

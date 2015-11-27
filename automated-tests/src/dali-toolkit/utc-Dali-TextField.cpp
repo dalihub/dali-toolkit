@@ -296,7 +296,7 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the render backend property.
   field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Text::RenderingType)field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check text property.
   field.SetProperty( TextField::Property::TEXT, "Setting Text" );

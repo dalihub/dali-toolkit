@@ -24,9 +24,7 @@
 #include <image/image-api.h>
 #include <image/frame-buffer-image-api.h>
 #include <image/resource-image-api.h>
-#include <image/nine-patch-image-api.h>
 #include <image/buffer-image-api.h>
-#include <image/native-image-api.h>
 #include <shared/api-function.h>
 #include <shared/object-template-helper.h>
 
@@ -38,10 +36,8 @@ namespace V8Plugin
 
 v8::Persistent<v8::ObjectTemplate> ImageWrapper::mImageTemplate;
 v8::Persistent<v8::ObjectTemplate> ImageWrapper::mResourceImageTemplate;
-v8::Persistent<v8::ObjectTemplate> ImageWrapper::mNinePatchImageTemplate;
 v8::Persistent<v8::ObjectTemplate> ImageWrapper::mBufferImageTemplate;
 v8::Persistent<v8::ObjectTemplate> ImageWrapper::mFrameBufferImageTemplate;
-v8::Persistent<v8::ObjectTemplate> ImageWrapper::mNativeImageTemplate;
 
 /**
  * pointer to a persistent template handle
@@ -58,10 +54,8 @@ const ImageTemplate ImageTemplateLookup[]=
 {
     { &ImageWrapper::mImageTemplate },              // IMAGE
     { &ImageWrapper::mResourceImageTemplate },      // RESOURCE_IMAGE
-    { &ImageWrapper::mNinePatchImageTemplate },     // NINE PATCH IMAGE
     { &ImageWrapper::mBufferImageTemplate  },       // BITMAP_IMAGE
     { &ImageWrapper::mFrameBufferImageTemplate },   // FRAME_BUFFER_IMAGE
-    { &ImageWrapper::mNativeImageTemplate },        // NATIVE_IMAGE
 
 };
 
@@ -77,9 +71,7 @@ enum ImageApiBitMask
   IMAGE_API              = 1 << 0,
   BITMAP_IMAGE_API       = 1 << 1,
   RESOURCE_IMAGE_API     = 1 << 2,
-  NINE_PATCH_IMAGE_API   = 1 << 3,
-  FRAME_BUFFER_IMAGE_API = 1 << 4,
-  NATIVE_IMAGE_API       = 1 << 5,
+  FRAME_BUFFER_IMAGE_API = 1 << 3,
 
 };
 
@@ -101,11 +93,8 @@ const ImageApiStruct ImageApiLookup[]=
 {
   {"Image",           ImageWrapper::IMAGE,              ImageApi::New,            IMAGE_API },
   {"ResourceImage",   ImageWrapper::RESOURCE_IMAGE,     ResourceImageApi::New,    IMAGE_API | RESOURCE_IMAGE_API },
-  {"NinePatchImage",  ImageWrapper::NINE_PATCH_IMAGE,   NinePatchImageApi::New,   IMAGE_API | RESOURCE_IMAGE_API | NINE_PATCH_IMAGE_API },
   {"BufferImage",     ImageWrapper::BITMAP_IMAGE,       BufferImageApi::New,      IMAGE_API | BITMAP_IMAGE_API },
   {"FrameBufferImage",ImageWrapper::FRAME_BUFFER_IMAGE, FrameBufferImageApi::New, IMAGE_API | FRAME_BUFFER_IMAGE_API },
-  {"NativeImage",     ImageWrapper::NATIVE_IMAGE,       NativeImageApi::New,      IMAGE_API | NATIVE_IMAGE_API },
-
 };
 
 const unsigned int ImageApiLookupCount = sizeof(ImageApiLookup)/sizeof(ImageApiLookup[0]);
@@ -140,17 +129,11 @@ const ImageFunctions ImageFunctionTable[]=
     **************************************/
     { "GetWidth",                ImageApi::GetWidth , IMAGE_API },
     { "GetHeight",               ImageApi::GetHeight, IMAGE_API },
-    { "GetReleasePolicy",        ImageApi::GetReleasePolicy, IMAGE_API },
 
     // resource-image API
     { "GetLoadingState",         ResourceImageApi::GetLoadingState,     RESOURCE_IMAGE_API },
     { "GetUrl",                  ResourceImageApi::GetUrl,              RESOURCE_IMAGE_API },
-    { "GetLoadPolicy",           ResourceImageApi::GetLoadPolicy,       RESOURCE_IMAGE_API },
     { "Reload",                  ResourceImageApi::Reload,              RESOURCE_IMAGE_API },
-
-    // nine-patch API
-    { "GetChildRectangle",       NinePatchImageApi::GetChildRectangle,        NINE_PATCH_IMAGE_API },
-    { "CreateCroppedBufferImage",NinePatchImageApi::CreateCroppedBufferImage, NINE_PATCH_IMAGE_API },
 
     // buffer image API
     { "GetBuffer",              BufferImageApi::GetBuffer,           BITMAP_IMAGE_API },
@@ -232,8 +215,7 @@ v8::Handle<v8::ObjectTemplate> ImageWrapper::MakeImageTemplate( v8::Isolate* iso
 
   // add intercepts for Signals on ResourceImage, we can't use HandleWrapper::AddIntercepts because Image doesn't inherit
   // from Handle ( just baseHandle)
-  if (( imageType == RESOURCE_IMAGE ) ||
-      ( imageType == NINE_PATCH_IMAGE ))
+  if ( imageType == RESOURCE_IMAGE )
   {
      ObjectTemplateHelper::AddSignalConnectAndDisconnect( isolate, objTemplate );
   }

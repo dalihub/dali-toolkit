@@ -31,7 +31,7 @@ namespace V8Plugin
 
 /**
  * ## BufferImage
- * Bitmap represents an image resource that can be added to ImageActors.
+ * Bitmap represents an image resource that can be added to Material.
  * Its pixel buffer data is provided by the application developer.
  *
  * If the pixel format of the pixel buffer contains an alpha channel,

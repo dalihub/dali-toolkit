@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <semaphore.h>
 #include <math.h>
+#include <climits>
 
 namespace Dali
 {
@@ -43,7 +44,7 @@ EventThreadCallback::EventThreadCallback( CallbackBase* callback )
 {
   mImpl->callback = callback;
   mImpl->triggeredCount = 0u;
-  mImpl->expectedCount = INFINITY;
+  mImpl->expectedCount = UINT_MAX;
   sem_init( &(mImpl->mySemaphore), 0, 0 );
   gEventThreadCallback = this;
 }

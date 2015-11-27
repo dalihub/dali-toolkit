@@ -163,7 +163,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
   label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Text::RenderingType)label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );

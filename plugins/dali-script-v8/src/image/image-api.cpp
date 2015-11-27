@@ -55,22 +55,6 @@ Image ImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
 }
 
 /**
- * Return the image release policy
- * @method getReleasePolicy
- * @return dali.IMAGE_RELEASE_POLICY_UNUSED or dali.IMAGE_RELEASE_POLICY_NEVER
- * @for Image
- */
-void ImageApi::GetReleasePolicy( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  Image image = GetImage( isolate, args );
-
-  args.GetReturnValue().Set( v8::Integer::New( isolate, image.GetReleasePolicy() ) );
-}
-
-/**
  * Return the image width in pixels
  * @method getWidth
  * @for Image

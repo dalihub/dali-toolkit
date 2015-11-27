@@ -39,9 +39,14 @@ void utc_dali_toolkit_alignment_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-
 namespace
 {
+/// Compare an int (Or'd Alignment::Type) with an Alignment::Type value
+void DALI_TEST_EQUALS( int value1, Alignment::Type value2, const char* location )
+{
+  ::DALI_TEST_EQUALS< Alignment::Type >( static_cast< Alignment::Type >( value1 ), value2, location );
+}
+
 static bool gObjectCreatedCallBackCalled;
 
 static void TestCallback(BaseHandle handle)

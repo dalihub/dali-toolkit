@@ -53,11 +53,11 @@ void TestImage( ImageView imageView, BufferImage image )
 
   int width = 0;
   DALI_TEST_CHECK( map[ "width" ].Get( width ) );
-  DALI_TEST_EQUALS( width, image.GetWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( (unsigned int)width, image.GetWidth(), TEST_LOCATION );
 
   int height = 0;
   DALI_TEST_CHECK( map[ "height" ].Get( height ) );
-  DALI_TEST_EQUALS( height, image.GetHeight(), TEST_LOCATION );
+  DALI_TEST_EQUALS( (unsigned int)height, image.GetHeight(), TEST_LOCATION );
 
   std::string type;
   DALI_TEST_CHECK( map[ "type" ].Get( type ) );
@@ -75,14 +75,14 @@ void TestImage( ImageView imageView, ResourceImage image )
   {
     int width = 0;
     DALI_TEST_CHECK( map[ "width" ].Get( width ) );
-    DALI_TEST_EQUALS( width, image.GetWidth(), TEST_LOCATION );
+    DALI_TEST_EQUALS( (unsigned int)width, image.GetWidth(), TEST_LOCATION );
   }
 
   if( map.Find( "height" ) )
   {
     int height = 0;
     DALI_TEST_CHECK( map[ "height" ].Get( height ) );
-    DALI_TEST_EQUALS( height, image.GetHeight(), TEST_LOCATION );
+    DALI_TEST_EQUALS( (unsigned int)height, image.GetHeight(), TEST_LOCATION );
   }
 
   DALI_TEST_CHECK( map.Find( "type" ) );
@@ -238,7 +238,7 @@ int UtcDaliImageViewSetGetProperty01(void)
   ImageView imageView = ImageView::New();
 
   Property::Index idx = imageView.GetPropertyIndex( "image" );
-  DALI_TEST_EQUALS( idx, ImageView::Property::IMAGE, TEST_LOCATION );
+  DALI_TEST_EQUALS( idx, (Property::Index)ImageView::Property::IMAGE, TEST_LOCATION );
 
   imageView.SetProperty( idx, TEST_IMAGE_FILE_NAME );
   TestUrl( imageView, TEST_IMAGE_FILE_NAME );
@@ -260,8 +260,8 @@ int UtcDaliImageViewSizeWithBackground(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().width, width, TEST_LOCATION );
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().height, height, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentSize().width, (float)width, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentSize().height, (float)height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -285,8 +285,8 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().width, width, TEST_LOCATION );
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().height, height, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentSize().width, (float)width, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentSize().height, (float)height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -333,8 +333,8 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( imageView.GetHeightForWidth( width ), height, TEST_LOCATION );
-  DALI_TEST_EQUALS( imageView.GetWidthForHeight( height ), width, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetHeightForWidth( width ), (float)height, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetWidthForHeight( height ), (float)width, TEST_LOCATION );
 
   END_TEST;
 }

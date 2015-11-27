@@ -87,13 +87,13 @@ CompleteQueue::~CompleteQueue()
 
 LoadingTask* CompleteQueue::NextTask()
 {
-  while( mTasks.Empty() )
+  // Lock while popping task out from the queue
+  Mutex::ScopedLock lock( mMutex );
+
+  if( mTasks.Empty() )
   {
     return NULL;
   }
-
-  // Lock while popping task out from the queue
-  Mutex::ScopedLock lock( mMutex );
 
   Vector< LoadingTask* >::Iterator next = mTasks.Begin();
   LoadingTask* nextTask = *next;
