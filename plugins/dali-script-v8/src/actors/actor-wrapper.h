@@ -49,9 +49,8 @@ public:
   {
     UNKNOWN_ACTOR = -1,
     ACTOR        = 0,
-    IMAGE_ACTOR  = 1,
-    LAYER_ACTOR  = 2,
-    CAMERA_ACTOR = 3
+    LAYER_ACTOR  = 1,
+    CAMERA_ACTOR = 2
   };
 
   /**

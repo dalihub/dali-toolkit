@@ -119,8 +119,8 @@ PropertyBuffer PropertyBufferApi::GetPropertyBufferFromParams( int paramIndex,
  * @constructor
  * @for PropertyBuffer
  * @method PropertyBuffer
- * @param {Object} bufferFormat
- * @param {integer} size
+ * @param {Object} bufferFormat Map of names and types that describes the components of the buffer
+ * @param {integer} size The number of elements in the property buffer
  * @return {Object} PropertyBuffer
  * @example
  *```
@@ -165,7 +165,7 @@ PropertyBuffer PropertyBufferApi::New( v8::Isolate* isolate, const v8::FunctionC
  *
  * @method setData
  * @for PropertyBuffer
- * @param {Object} data The data that will be copied to the buffer.
+ * @param {Float32Array} data The data that will be copied to the buffer.
  * @example
  *```
  *   var vertexData = [    0,     1,
