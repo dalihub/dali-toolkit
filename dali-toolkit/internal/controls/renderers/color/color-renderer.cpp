@@ -40,8 +40,6 @@ namespace
 const char * const RENDERER_TYPE("rendererType");
 const char * const RENDERER_TYPE_VALUE("colorRenderer");
 const char * const COLOR_NAME("blendColor");
-const char * const COLOR_UNIFORM_NAME("uBlendColor");
-
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -58,11 +56,11 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
-  uniform lowp vec4 uBlendColor;\n
+  uniform lowp vec4 blendColor;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = uBlendColor*uColor;\n
+    gl_FragColor = blendColor*uColor;\n
   }\n
 );
 }
@@ -136,7 +134,7 @@ void ColorRenderer::InitializeRenderer()
   Material material = Material::New( shader );
   mImpl->mRenderer = Renderer::New( geometry, material );
 
-  mBlendColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_UNIFORM_NAME, mBlendColor );
+  mBlendColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )
   {
     mImpl->mRenderer.GetMaterial().SetBlendMode( BlendingMode::ON );

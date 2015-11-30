@@ -41,9 +41,7 @@ const char * const RENDERER_TYPE("rendererType");
 const char * const RENDERER_TYPE_VALUE("borderRenderer");
 
 const char * const COLOR_NAME("borderColor");
-const char * const COLOR_UNIFORM_NAME("uBorderColor");
 const char * const SIZE_NAME("borderSize");
-const char * const SIZE_UNIFORM_NAME("uBorderSize");
 
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
@@ -55,22 +53,22 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aDrift;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump float uBorderSize;\n
+  uniform mediump float borderSize;\n
   \n
   void main()\n
   {\n
-    vec2 position = aPosition*uSize.xy + aDrift*uBorderSize;\n
+    vec2 position = aPosition*uSize.xy + aDrift*borderSize;\n
     gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n
   }\n
 );
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
-  uniform lowp vec4 uBorderColor;\n
+  uniform lowp vec4 borderColor;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = uBorderColor*uColor;\n
+    gl_FragColor = borderColor*uColor;\n
   }\n
 );
 }
@@ -114,12 +112,12 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
 
-  mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_UNIFORM_NAME, mBorderColor );
+  mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_NAME, mBorderColor );
   if( mBorderColor.a < 1.f )
   {
     (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
   }
-  mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_UNIFORM_NAME, mBorderSize );
+  mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
 }
 
 void BorderRenderer::DoCreatePropertyMap( Property::Map& map ) const
