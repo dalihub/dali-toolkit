@@ -280,3 +280,44 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelVectorBasedP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelVectorBasedP");
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableTextureCallTrace( true );
+
+  TextLabel label = TextLabel::New();
+  label.SetParentOrigin( ParentOrigin::CENTER );
+  label.SetSize( Stage::GetCurrent().GetSize() );
+  label.SetProperty( TextLabel::Property::TEXT, "Hello World" );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 10.0f );
+  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Toolkit::Text::RENDERING_VECTOR_BASED );
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  // Test that the vector data is uploaded to atlas
+  DALI_TEST_CHECK( glAbstraction.GetTextureTrace().FindMethod("TexSubImage2D") );
+  glAbstraction.GetTextureTrace().Reset();
+
+  // Add another label with the same text in a different point-size
+  TextLabel label2 = TextLabel::New();
+  label2.SetProperty( TextLabel::Property::TEXT, "Hello World" );
+  label2.SetProperty( TextLabel::Property::POINT_SIZE, 13.0f );
+  label2.SetProperty( TextLabel::Property::RENDERING_BACKEND, Toolkit::Text::RENDERING_VECTOR_BASED );
+  Stage::GetCurrent().Add( label2 );
+
+  application.SendNotification();
+  application.Render();
+
+  // Test that no additional vector data was uploaded to atlas
+  // i.e. the same vector data can be used to render any point-size
+  DALI_TEST_CHECK( ! glAbstraction.GetTextureTrace().FindMethod("TexSubImage2D") );
+
+  END_TEST;
+}
+

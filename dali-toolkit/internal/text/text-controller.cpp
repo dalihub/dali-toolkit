@@ -107,6 +107,20 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
   }
 }
 
+void Controller::SetGlyphType( TextAbstraction::GlyphType glyphType )
+{
+  // Metrics for bitmap & vector based glyphs are different
+  mImpl->mMetrics->SetGlyphType( glyphType );
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->RequestRelayout();
+}
+
 void Controller::SetMarkupProcessorEnabled( bool enable )
 {
   mImpl->mMarkupProcessorEnabled = enable;
@@ -2556,7 +2570,10 @@ void Controller::ClearModelData()
 
 void Controller::ClearFontData()
 {
-  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  if( mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  }
   mImpl->mLogicalModel->mFontRuns.Clear();
   mImpl->mVisualModel->mGlyphs.Clear();
   mImpl->mVisualModel->mGlyphsToCharacters.Clear();

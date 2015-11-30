@@ -115,6 +115,13 @@ public:
   void EnableTextInput( DecoratorPtr decorator );
 
   /**
+   * @brief Used to switch between bitmap & vector based glyphs
+   *
+   * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
+   */
+  void SetGlyphType( TextAbstraction::GlyphType glyphType );
+
+  /**
    * @brief Enables/disables the mark-up processor.
    *
    * By default is disabled.

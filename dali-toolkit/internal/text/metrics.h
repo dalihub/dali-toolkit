@@ -50,6 +50,16 @@ public:
   }
 
   /**
+   * @brief Used to switch between bitmap & vector based glyphs
+   *
+   * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
+   */
+  void SetGlyphType( TextAbstraction::GlyphType glyphType )
+  {
+    mGlyphType = glyphType;
+  }
+
+  /**
    * @brief Set the maximum Emoji size.
    *
    * @param[in] emojiSize Emoticons will be scaled to fit this size in pixels.
@@ -91,7 +101,7 @@ public:
    */
   bool GetGlyphMetrics( GlyphInfo* array, uint32_t size )
   {
-    return mFontClient.GetGlyphMetrics( array, size, true, mEmojiSize ); // inline for performance
+    return mFontClient.GetGlyphMetrics( array, size, mGlyphType, true, mEmojiSize ); // inline for performance
   }
 
 protected:
@@ -108,6 +118,7 @@ private:
    */
   Metrics( TextAbstraction::FontClient& fontClient )
   : mFontClient( fontClient ),
+    mGlyphType( TextAbstraction::BITMAP_GLYPH ),
     mEmojiSize( 0 )
   {
   }
@@ -121,7 +132,7 @@ private:
 private:
 
   TextAbstraction::FontClient mFontClient;
-
+  TextAbstraction::GlyphType mGlyphType;
   int mEmojiSize;
 };
 
