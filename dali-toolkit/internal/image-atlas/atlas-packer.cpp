@@ -176,12 +176,12 @@ void AtlasPacker::MergeToNonOccupied( Node* node )
   node->occupied = false;
   Node* parent = node->parent;
   // both child are not occupied, merge the space to parent
-  if( parent !=NULL && parent->child[0]->occupied == false && parent->child[1]->occupied == false)
+  if( parent != NULL && parent->child[0]->occupied == false && parent->child[1]->occupied == false)
   {
     delete parent->child[0];
     parent->child[0] = NULL;
     delete parent->child[1];
-    parent->child[0] = NULL;
+    parent->child[1] = NULL;
 
     MergeToNonOccupied( parent );
   }
