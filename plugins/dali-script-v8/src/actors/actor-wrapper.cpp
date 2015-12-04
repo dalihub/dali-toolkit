@@ -67,9 +67,8 @@ const ActorTemplate ActorTemplateLookup[]=
 enum ActorApiBitMask
 {
   ACTOR_API              = 1 << 0,
-  IMAGE_ACTOR_API        = 1 << 1,
-  LAYER_API              = 1 << 2,
-  CAMERA_ACTOR_API       = 1 << 3,
+  LAYER_API              = 1 << 1,
+  CAMERA_ACTOR_API       = 1 << 2,
 };
 
 /**

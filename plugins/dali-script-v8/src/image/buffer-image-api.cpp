@@ -31,7 +31,7 @@ namespace V8Plugin
 
 /**
  * ## BufferImage
- * Bitmap represents an image resource that can be added to Material.
+ * Bitmap represents an image resource as a pixel data buffer.
  * Its pixel buffer data is provided by the application developer.
  *
  * If the pixel format of the pixel buffer contains an alpha channel,
@@ -53,41 +53,60 @@ BufferImage BufferImageApi::GetBufferImage( v8::Isolate* isolate, const v8::Func
 }
 
 /**
- * Create a new buffer image object ** ( work in progress, will currently only work with no parameters ) **
- * If no parameters are passed in, a single pixel white buffer image is created.
- *
+ * Create a new buffer image object using an external data source.
  *
  * For better performance and portability use power of two dimensions.
  * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
  *
- * @note in case releasePolicy is "Unused", application has to call
- * BufferImage::Update() whenever image is re-added to the stage
- *
- * Example of creating a Uint32Array buffer
+ * Example of creating a buffer image from a pixel buffer
  * ```
- * "var ab = new ArrayBuffer(256 x 256 );"
- *  var pixelBuffer = new Uint32Array(ab );
+ *  var pixelBufferData = [255, 0, 0, 255,   // red
+ *                         0, 255, 0, 255,   // green
+ *                         0, 0, 255, 255,   // blue
+ *                         255, 0, 0, 255];  // red
+ *
+ *  var pixelBuffer = new Uint8Array(pixelBufferData.length);
+ *  pixelBuffer.set(pixelBufferData, 0);
+ *
+ *  var option = {
+ *                 width       : 2,
+ *                 height      : 2,
+ *                 pixelFormat : dali.PIXEL_FORMAT_RGBA888,  // optional
+ *                 stride      : 2                           // optional
+ *               }
+ *
+ *  var bufferImage = new dali.BufferImage(pixelBuffer, option);
  * ```
  * @constructor
  * @method BufferImage
  * @for BufferImage
+ * @param {Uint8Array} pixelBuffer Array of RGBA pixel data
  * @param {Object} options
- * @param {Uint32Array} options.pixelBuffer Array of RGBA pixel data
  * @param {Integer} options.width image width
  * @param {Integer} options.height image height
- * @param {Integer} options.pixelFormat pixel format ( see dali constants, e.g. dali.PIXEL_FORMAT_RGB8888)
- * @param {Integer} [options.stride the] internal stride of the pixelbuffer in pixels (normally the width)
- * @param {Integer} [options.releasePolicy] optionally release memory when image is not visible on screen.
+ * @param {Integer} [options.pixelFormat] pixel format (see dali constants, the default value is dali.PIXEL_FORMAT_RGBA8888)
+ * @param {Integer} [options.stride] the internal stride of the pixelbuffer in pixels (the default value is the image width)
  * @return {Object} Image
  */
 Image BufferImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
-  v8::Local<v8::Value> options( args[0] );
+
+  bool found( false );
+
+  PixelBuffer* pixelBuffer = static_cast<PixelBuffer*>(V8Utils::GetArrayBufferViewParameter( PARAMETER_0, found, isolate, args));
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid pixelBuffer parameter" );
+    return BufferImage();
+  }
+
+  v8::Local<v8::Value> options( args[1] );
   if( !options->IsObject() )
   {
-    return BufferImage::WHITE();
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid option parameters" );
+    return BufferImage();
   }
 
   v8::Local<v8::Object> obj = options->ToObject();
@@ -109,27 +128,12 @@ Image BufferImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
     return BufferImage();
   }
 
-  Pixel::Format  pixelFormat = Pixel::RGB8888;
+  Pixel::Format  pixelFormat = Pixel::RGBA8888;
   v8::Local<v8::Value> pixelFormatValue = obj->Get( v8::String::NewFromUtf8( isolate, "pixelFormat" ) );
   if( pixelFormatValue->IsUint32() )
   {
      pixelFormat = static_cast<Pixel::Format>( pixelFormatValue->ToUint32()->Value() );
   }
-  else
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "Pixel format not specified");
-    return BufferImage();
-  }
-
-  v8::Local<v8::Value> pixelArray= obj->Get( v8::String::NewFromUtf8( isolate, "pixelBuffer" ) );
-  if( pixelArray->IsUint32Array() )
-  {
-    //v8::Local<v8::Uint32Array> v8Array = v8::Local<v8::Uint32Array>::Cast( pixelArray );
-   // uint32_t elementCount = v8Array->Length();
-    DALI_SCRIPT_EXCEPTION( isolate, "pixel buffer currently not supported \n");
-    return BufferImage::WHITE();
-   }
-
 
   unsigned int stride = width;
   v8::Local<v8::Value> strideValue = obj->Get( v8::String::NewFromUtf8( isolate, "stride" ) );
@@ -138,23 +142,15 @@ Image BufferImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
     stride = strideValue->ToUint32()->Value();
   }
 
-  Image::ReleasePolicy releasePolicy =  Dali::Image::NEVER;
-  v8::Local<v8::Value> releasePolicyValue = obj->Get( v8::String::NewFromUtf8( isolate, "releasePolicy" ) );
-  if( releasePolicyValue->IsUint32() )
-  {
-    releasePolicy = static_cast<Image::ReleasePolicy>( releasePolicyValue->ToUint32()->Value() );
-  }
-
-  DALI_SCRIPT_EXCEPTION( isolate, "pixel buffer currently not supported \n");
-
-  return BufferImage::New( NULL, width, height, pixelFormat, stride, releasePolicy);
-
+  return BufferImage::New( pixelBuffer, width, height, pixelFormat, stride);
 }
 /**
- * @brief Returns the pixel buffer of the Image **( currently not supported ) **
+ * Returns the pixel buffer of the Image
+ * The application can write to the buffer to modify its contents.
+ *
  * @method getBuffer
  * @for BufferImage
- * @return {Object}
+ * @return {Object} The pixel buffer
  */
 void BufferImageApi::GetBuffer( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
@@ -163,15 +159,14 @@ void BufferImageApi::GetBuffer( const v8::FunctionCallbackInfo< v8::Value >& arg
 
   BufferImage image = GetBufferImage( isolate, args );
 
-  //@todo figure out what the best thing to do here is...
-  // we could copy the data into a javascript array
+  args.GetReturnValue().Set( v8::ArrayBuffer::New( isolate, static_cast<void*>( image.GetBuffer() ), image.GetBufferSize() ) );
 }
 
 /**
- * @brief Returns buffer size in bytes.
+ * Returns buffer size in bytes.
  * @method getBufferSize
  * @for BufferImage
- * @return {Object} buffer
+ * @return {Integer} buffer size
  */
 void BufferImageApi::GetBufferSize( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
@@ -181,10 +176,10 @@ void BufferImageApi::GetBufferSize( const v8::FunctionCallbackInfo< v8::Value >&
   BufferImage image = GetBufferImage( isolate, args );
 
   args.GetReturnValue().Set( v8::Integer::New( isolate, image.GetBufferSize() ) );
-
 }
+
 /**
- * @brief Returns buffer stride in bytes.
+ * Returns buffer stride in bytes.
  * @method getBufferStride
  * @for BufferImage
  * @return {Object}
@@ -197,10 +192,10 @@ void BufferImageApi::GetBufferStride( const v8::FunctionCallbackInfo< v8::Value 
   BufferImage image = GetBufferImage( isolate, args );
 
   args.GetReturnValue().Set( v8::Integer::New( isolate, image.GetBufferStride() ) );
-
 }
+
 /**
- * @brief Returns pixel format
+ * Returns pixel format
  * @method getPixelFormat
  * @for BufferImage
  * @return {Integer} pixel format
@@ -213,12 +208,24 @@ void BufferImageApi::GetPixelFormat( const v8::FunctionCallbackInfo< v8::Value >
   BufferImage image = GetBufferImage( isolate, args );
 
   args.GetReturnValue().Set( v8::Integer::New( isolate, image.GetPixelFormat() ) );
-
 }
 
 /**
- * @brief  Inform Dali that the contents of the buffer have changed
- * @todo support update an area
+ * Inform Dali that the contents of the buffer have changed
+ *
+ * Example of updating the pixel buffer in the buffer image
+ * ```
+ *  var newPixelBufferData = [0, 255, 0, 255,   // green
+ *                            255, 0, 0, 255,   // red
+ *                            255, 0, 0, 255,   // red
+ *                            0, 0, 255, 255];  // blue
+ *
+ *  var pixelBuffer = bufferImage.getBuffer();
+ *  var pixelBufferDataArray = new Uint8Array(pixelBuffer);
+ *  pixelBufferDataArray.set(newPixelBufferData, 0);
+ *
+ *  bufferImage.update();
+ * ```
  * @method update
  * @for BufferImage
  */
@@ -230,10 +237,10 @@ void BufferImageApi::Update( const v8::FunctionCallbackInfo< v8::Value >& args )
   BufferImage image = GetBufferImage( isolate, args );
 
   image.Update();
-
 }
+
 /**
- * @brief  returns whether BufferImage uses external data source or not.
+ * Return whether BufferImage uses external data source or not.
  * @method isDataExternal
  * @for BufferImage
  * @return {Boolean} true if data is external
@@ -246,7 +253,6 @@ void BufferImageApi::IsDataExternal( const v8::FunctionCallbackInfo< v8::Value >
   BufferImage image = GetBufferImage( isolate, args );
 
   args.GetReturnValue().Set( v8::Boolean::New( isolate, image.IsDataExternal() ) );
-
 }
 } // namespace V8Plugin
 

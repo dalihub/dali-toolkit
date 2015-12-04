@@ -297,7 +297,7 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
 
   Vector4 actualValue(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
   END_TEST;
@@ -320,7 +320,7 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
 
   Vector4 actualValue(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
   controlRenderer.SetOffStage( actor );
@@ -361,11 +361,11 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   application.Render(0);
 
   Vector4 actualColor(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBorderColor", actualColor ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "borderColor", actualColor ) );
   DALI_TEST_EQUALS( actualColor, testColor, TEST_LOCATION );
 
   float actualSize = 0.f;
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uBorderSize", actualSize ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "borderSize", actualSize ) );
   DALI_TEST_EQUALS( actualSize, testSize, TEST_LOCATION );
 
   controlRenderer.SetOffStage( actor );
@@ -402,11 +402,11 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   application.Render(0);
 
   Vector4 actualColor(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBorderColor", actualColor ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "borderColor", actualColor ) );
   DALI_TEST_EQUALS( actualColor, testColor, TEST_LOCATION );
 
   float actualSize = 0.f;
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uBorderSize", actualSize ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "borderSize", actualSize ) );
   DALI_TEST_EQUALS( actualSize, testSize, TEST_LOCATION );
 
   END_TEST;
@@ -820,13 +820,13 @@ int UtcDaliRendererFactoryResetRenderer1(void)
 
   Vector4 actualValue(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
   factory.ResetRenderer( controlRenderer, actor, Color::GREEN );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
@@ -880,7 +880,7 @@ int UtcDaliRendererFactoryResetRenderer2(void)
   application.SendNotification();
   application.Render(0);
   Vector4 actualValue(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uBlendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
   END_TEST;
