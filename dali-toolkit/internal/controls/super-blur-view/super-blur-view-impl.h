@@ -22,6 +22,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 namespace Dali
 {
@@ -51,6 +52,12 @@ public:
    * @copydoc Dali::Toolkit::SuperBlurView::SetImage
    */
   void SetImage(Image inputImage);
+
+  /**
+   * Get the image for blurring.
+   * @return The image for blurring.
+   */
+  Image GetImage();
 
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::GetBlurStrengthPropertyIndex
@@ -119,6 +126,21 @@ private: // from Control
    */
   virtual void OnSizeSet(const Vector3& targetSize);
 
+  /**
+   * @copydoc CustomActorImpl::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
+
+  /**
+   * @copydoc CustomActorImpl::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize();
+
 private:
 
   /**
@@ -140,18 +162,17 @@ private:
   void ClearBlurResource();
 
 private:
-
-  unsigned int                           mBlurLevels;
-
-  Property::Index                        mBlurStrengthPropertyIndex;
-
   std::vector<Toolkit::GaussianBlurView> mGaussianBlurView;
   std::vector<FrameBufferImage>          mBlurredImage;
-  std::vector<ImageActor>                mImageActors;
-  bool                                   mResourcesCleared;
-
+  std::vector<Toolkit::ControlRenderer>  mRenderers;
+  Image                                  mInputImage;
   Vector2                                mTargetSize;
+
   Toolkit::SuperBlurView::SuperBlurViewSignal mBlurFinishedSignal; ///< Signal emitted when blur has completed.
+
+  Property::Index                        mBlurStrengthPropertyIndex;
+  unsigned int                           mBlurLevels;
+  bool                                   mResourcesCleared;
 };
 
 }

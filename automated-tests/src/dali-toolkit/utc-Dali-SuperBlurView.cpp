@@ -146,13 +146,17 @@ int UtcDaliSuperBlurViewSetImage(void)
   tet_infoline(" UtcDaliSuperBlurViewSetImage ");
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  // create image actors for the original image and each blurred image
-  DALI_TEST_CHECK( blurView.GetChildCount() == BLUR_LEVELS+1 );
+  blurView.SetSize( 100.f, 100.f );
 
   Image inputImage = CreateSolidColorImage( application, Color::GREEN, 50, 50 );
   blurView.SetImage( inputImage );
   // start multiple guassian blur call, each guassian blur creates two render tasks
-  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() ==  BLUR_LEVELS*2 + 1);
+  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+
+  // create image actors for the original image and each blurred image
+  Stage::GetCurrent().Add( blurView );
+  Wait(application);
+  DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
   END_TEST;
 }
 
@@ -212,7 +216,7 @@ int UtcDaliSuperBlurViewGetBlurredImage(void)
   DALI_TEST_EQUALS( image2.GetHeight(), 25u, TEST_LOCATION );
 
   Image image3 = blurView.GetBlurredImage( 3 );
-  DALI_TEST_CHECK( FrameBufferImage::DownCast( image2 ) );
+  DALI_TEST_CHECK( FrameBufferImage::DownCast( image3 ) );
 
   END_TEST;
 }

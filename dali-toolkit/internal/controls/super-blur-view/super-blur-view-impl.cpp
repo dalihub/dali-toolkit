@@ -23,7 +23,9 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -37,9 +39,23 @@ const unsigned int GAUSSIAN_BLUR_DEFAULT_NUM_SAMPLES = 11;
 const unsigned int GAUSSIAN_BLUR_NUM_SAMPLES_INCREMENTATION = 10;
 const float GAUSSIAN_BLUR_BELL_CURVE_WIDTH = 4.5f;
 const float GAUSSIAN_BLUR_BELL_CURVE_WIDTH_INCREMENTATION = 5.f;
-const Pixel::Format GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT = Pixel::RGB888;
+const Pixel::Format GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT = Pixel::RGBA8888;
 const float GAUSSIAN_BLUR_DOWNSAMPLE_WIDTH_SCALE = 0.5f;
 const float GAUSSIAN_BLUR_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
+
+const char* ALPHA_UNIFORM_NAME( "uAlpha" );
+const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp float uAlpha;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+    gl_FragColor.a *= uAlpha;
+  }\n
+);
 
 /**
  * The constraint is used to blend the group of blurred images continuously with a unified blur strength property value which ranges from zero to one.
@@ -56,17 +72,17 @@ struct ActorOpacityConstraint
   void operator()( float& current, const PropertyInputContainer& inputs )
   {
     float blurStrength = inputs[0]->GetFloat();
-    if(blurStrength <= mRange.x)
-    {
-      current = 1.f;
-    }
-    else if(blurStrength > mRange.y)
+    if(blurStrength < mRange.x)
     {
       current = 0.f;
     }
+    else if(blurStrength > mRange.y)
+    {
+      current = 1.f;
+    }
     else
     {
-      current = ( mRange.y - blurStrength) / ( mRange.y - mRange.x );
+      current = ( blurStrength - mRange.x) / ( mRange.y - mRange.x );
     }
   }
 
@@ -105,15 +121,15 @@ DALI_TYPE_REGISTRATION_END()
 
 SuperBlurView::SuperBlurView( unsigned int blurLevels )
 : Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),
-  mBlurLevels( blurLevels ),
+  mTargetSize( Vector2::ZERO ),
   mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
-  mResourcesCleared( true ),
-  mTargetSize( Vector2::ZERO )
+  mBlurLevels( blurLevels ),
+  mResourcesCleared( true )
 {
   DALI_ASSERT_ALWAYS( mBlurLevels > 0 && " Minimal blur level is one, otherwise no blur is needed" );
-  mGaussianBlurView.assign( blurLevels, NULL );
+  mGaussianBlurView.assign( blurLevels, Toolkit::GaussianBlurView() );
   mBlurredImage.assign( blurLevels, FrameBufferImage() );
-  mImageActors.assign( blurLevels + 1, ImageActor() );
+  mRenderers.assign( blurLevels+1, Toolkit::ControlRenderer() );
 }
 
 SuperBlurView::~SuperBlurView()
@@ -139,48 +155,47 @@ void SuperBlurView::OnInitialize()
 {
   mBlurStrengthPropertyIndex = Self().RegisterProperty( "blurStrength", 0.f );
 
-  DALI_ASSERT_ALWAYS( mImageActors.size() == mBlurLevels+1 && "must synchronize the ImageActor group if blur levels got changed " );
-  for(unsigned int i=0; i<=mBlurLevels;i++)
-  {
-    mImageActors[i] = ImageActor::New(  );
-    mImageActors[i].SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    mImageActors[i].SetParentOrigin( ParentOrigin::CENTER );
-    mImageActors[i].SetZ(-static_cast<float>(i)*0.01f);
-    mImageActors[i].SetColorMode( USE_OWN_MULTIPLY_PARENT_ALPHA );
-    Self().Add( mImageActors[i] );
-  }
+  Property::Map rendererMap;
+  rendererMap.Insert( "rendererType", "imageRenderer");
 
-  for(unsigned int i=0; i < mBlurLevels; i++)
-  {
-    Constraint constraint = Constraint::New<float>( mImageActors[i], Actor::Property::COLOR_ALPHA, ActorOpacityConstraint(mBlurLevels, i) );
-    constraint.AddSource( ParentSource( mBlurStrengthPropertyIndex ) );
-    constraint.Apply();
-  }
+  Property::Map shaderMap;
+  std::stringstream verterShaderString;
+  shaderMap[ "fragmentShader" ] = FRAGMENT_SHADER;
+  rendererMap.Insert( "shader", shaderMap );
 
-  Self().SetSize(Stage::GetCurrent().GetSize());
+  Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+  for(unsigned int i=0; i<=mBlurLevels; i++)
+  {
+    mRenderers[i] = rendererFactory.GetControlRenderer( rendererMap );
+    mRenderers[i].SetDepthIndex(i);
+  }
 }
 
 void SuperBlurView::SetImage(Image inputImage)
 {
-  DALI_ASSERT_ALWAYS( mImageActors.size() == mBlurLevels+1 && "must synchronize the ImageActor group if blur levels got changed " );
-  DALI_ASSERT_ALWAYS( mBlurredImage.size() == mBlurLevels && "must synchronize the blurred image group if blur levels got changed " );
+  if( mTargetSize == Vector2::ZERO || mInputImage == inputImage)
+  {
+    return;
+  }
 
   ClearBlurResource();
 
-  mImageActors[0].SetImage( inputImage );
-
-  for(unsigned int i=1; i<=mBlurLevels;i++)
-  {
-    mImageActors[i].SetImage( mBlurredImage[i-1] );
-  }
+  mInputImage = inputImage;
+  Actor self = Self();
+  Toolkit::RendererFactory::Get().ResetRenderer( mRenderers[0], self, mInputImage );
 
   BlurImage( 0,  inputImage);
   for(unsigned int i=1; i<mBlurLevels;i++)
   {
-    BlurImage( i,  mBlurredImage[i-1]);
+    BlurImage( i, mBlurredImage[i-1]);
   }
 
   mResourcesCleared = false;
+}
+
+Image SuperBlurView::GetImage()
+{
+  return mInputImage;
 }
 
 Property::Index SuperBlurView::GetBlurStrengthPropertyIndex() const
@@ -221,13 +236,13 @@ void SuperBlurView::BlurImage( unsigned int idx, Image image )
                                                            GAUSSIAN_BLUR_DOWNSAMPLE_WIDTH_SCALE, GAUSSIAN_BLUR_DOWNSAMPLE_HEIGHT_SCALE, true );
   mGaussianBlurView[idx].SetParentOrigin(ParentOrigin::CENTER);
   mGaussianBlurView[idx].SetSize(mTargetSize);
+  Stage::GetCurrent().Add( mGaussianBlurView[idx] );
   mGaussianBlurView[idx].SetUserImageAndOutputRenderTarget( image, mBlurredImage[idx] );
+  mGaussianBlurView[idx].ActivateOnce();
   if( idx == mBlurLevels-1 )
   {
     mGaussianBlurView[idx].FinishedSignal().Connect( this, &SuperBlurView::OnBlurViewFinished );
   }
-  Stage::GetCurrent().Add( mGaussianBlurView[idx] );
-  mGaussianBlurView[idx].ActivateOnce();
 }
 
 void SuperBlurView::OnBlurViewFinished( Toolkit::GaussianBlurView blurView )
@@ -246,7 +261,6 @@ void SuperBlurView::ClearBlurResource()
     {
       Stage::GetCurrent().Remove( mGaussianBlurView[i] );
       mGaussianBlurView[i].Deactivate();
-      mGaussianBlurView[i].Reset();
     }
     mResourcesCleared = true;
   }
@@ -258,13 +272,77 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
   {
     mTargetSize = Vector2(targetSize);
 
-    for(unsigned int i=0; i<mBlurLevels;i++)
+    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+    Actor self = Self();
+    for(unsigned int i=1; i<=mBlurLevels;i++)
     {
-      float exponent = static_cast<float>(i+1);
-      mBlurredImage[i] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
+      float exponent = static_cast<float>(i);
+      mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
+      rendererFactory.ResetRenderer( mRenderers[i], self, mBlurredImage[i-1] );
+    }
+
+    if( mInputImage )
+    {
+      SetImage( mInputImage );
+    }
+
+    if( self.OnStage() )
+    {
+      for(unsigned int i=0; i<=mBlurLevels;i++)
+      {
+        mRenderers[i].SetOnStage( self );
+      }
     }
   }
+}
+
+void SuperBlurView::OnStageConnection( int depth )
+{
+  Control::OnStageConnection( depth );
+
+  if( mTargetSize == Vector2::ZERO )
+  {
+    return;
+  }
+
+  Actor self = Self();
+  mRenderers[0].SetOnStage( self );
+  for(unsigned int i=1; i<=mBlurLevels;i++)
+  {
+    mRenderers[i].SetOnStage( self );
+
+    Renderer renderer = self.GetRendererAt( i );
+    Property::Index index = renderer.RegisterProperty( ALPHA_UNIFORM_NAME, 0.f );
+    Constraint constraint = Constraint::New<float>( renderer, index, ActorOpacityConstraint(mBlurLevels, i-1) );
+    constraint.AddSource( Source( self, mBlurStrengthPropertyIndex ) );
+    constraint.Apply();
+  }
+}
+
+void SuperBlurView::OnStageDisconnection( )
+{
+  if( mTargetSize == Vector2::ZERO )
+  {
+    return;
+  }
+
+  Actor self = Self();
+  for(unsigned int i=0; i<mBlurLevels+1;i++)
+  {
+    mRenderers[i].SetOffStage( self );
+  }
+
+  Control::OnStageDisconnection();
+}
+
+Vector3 SuperBlurView::GetNaturalSize()
+{
+  if( mInputImage )
+  {
+    return Vector3( mInputImage.GetWidth(), mInputImage.GetHeight(), 0.f );
+  }
+  return Vector3::ZERO;
 }
 
 void SuperBlurView::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
@@ -294,18 +372,19 @@ Property::Value SuperBlurView::GetProperty( BaseObject* object, Property::Index 
 {
   Property::Value value;
 
-  Toolkit::SuperBlurView pushButton = Toolkit::SuperBlurView::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::SuperBlurView blurView = Toolkit::SuperBlurView::DownCast( Dali::BaseHandle( object ) );
 
-  if( pushButton )
+  if( blurView )
   {
-    SuperBlurView& superBlurViewImpl( GetImpl( pushButton ) );
+    SuperBlurView& superBlurViewImpl( GetImpl( blurView ) );
 
     if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE )
     {
       Property::Map map;
-      if( !superBlurViewImpl.mImageActors.empty() && superBlurViewImpl.mImageActors[0] )
+      Image inputImage = superBlurViewImpl.GetImage();
+      if( !inputImage )
       {
-        Scripting::CreatePropertyMap( superBlurViewImpl.mImageActors[0], map );
+        Scripting::CreatePropertyMap( inputImage, map );
       }
       value = Property::Value( map );
     }

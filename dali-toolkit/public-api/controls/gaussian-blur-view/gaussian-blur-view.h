@@ -20,11 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>

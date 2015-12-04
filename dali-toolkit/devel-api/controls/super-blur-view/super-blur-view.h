@@ -44,7 +44,7 @@ class SuperBlurView;
  *  Stage::GetCurrent().Add(blurView);\n
  *
  *  // Set the input image
- *  Image image = Image::New(...);\n
+ *  ResourceImage image = ResourceImage::New(...);\n
  *  blurView.SetImage(image);\n
  *
  *  // animate the strength of the blur - this can fade between no blur and full blur. .\n
