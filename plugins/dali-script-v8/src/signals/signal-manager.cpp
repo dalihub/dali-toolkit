@@ -430,6 +430,7 @@ void ActorConnection( v8::Isolate* isolate,
   else
   {
     delete callback;
+    DALI_SCRIPT_EXCEPTION( isolate, "the signal is not available in this object.");
   }
 }
 

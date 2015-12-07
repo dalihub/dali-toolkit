@@ -139,7 +139,7 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  grabHandleImage                   | GRAB_HANDLE_IMAGE                    |  STRING      | O            | X
  grabHandlePressedImage            | GRAB_HANDLE_PRESSED_IMAGE            |  STRING      | O            | X
  scrollThreshold                   | SCROLL_THRESHOLD                     |  FLOAT       | O            | X
- scrollSpreed                      | SCROLL_SPEED                         |  FLOAT       | O            | X
+ scrollSpeed                       | SCROLL_SPEED                         |  FLOAT       | O            | X
  selectionHandleImageLeft          | SELECTION_HANDLE_IMAGE_LEFT          |  STRING      | O            | X
  selectionHandleImageRight         | SELECTION_HANDLE_IMAGE_RIGHT         |  STRING      | O            | X
  selectionHandlePressedImageLeft   | SELECTION_HANDLE_PRESSED_IMAGE_LEFT  |  STRING      | O            | X
