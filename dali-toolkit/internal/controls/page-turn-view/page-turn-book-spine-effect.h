@@ -51,14 +51,6 @@ namespace Internal
  **/
 inline ShaderEffect CreatePageTurnBookSpineEffect()
 {
-  std::string vertexSource = DALI_COMPOSE_SHADER(
-      precision mediump float;\n
-      void main()\n
-      {\n
-          gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n
-          vTexCoord = aTexCoord;\n
-      }\n);
-
   // the simplified version of the fragment shader of page turn effect
   std::string fragmentSource = DALI_COMPOSE_SHADER(
       precision mediump float;\n
@@ -69,11 +61,11 @@ inline ShaderEffect CreatePageTurnBookSpineEffect()
       {\n
       // flip the image horizontally by changing the x component of the texture coordinate
         if( uIsBackImageVisible == 1.0 )\n
-          gl_FragColor = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) ) * uColor; \n
+          gl_FragColor = texture2D( sTexture, vec2( uTextureRect.p+uTextureRect.s-vTexCoord.x, vTexCoord.y ) ) * uColor; \n
         else\n
         gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
       // display book spine, a stripe of shadowed texture
-        float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageWidth; \n
+        float pixelPos = (vTexCoord.x-uTextureRect.s)*uPageWidth; \n
         if(pixelPos < uSpineShadowParameter.x) \n
         {\n
           float x = pixelPos - uSpineShadowParameter.x;\n
@@ -85,7 +77,7 @@ inline ShaderEffect CreatePageTurnBookSpineEffect()
 
   const Vector2 DEFAULT_SPINE_SHADOW_PARAMETER(50.0f, 20.0f);
 
-  ShaderEffect shaderEffect = ShaderEffect::New( vertexSource, fragmentSource );
+  ShaderEffect shaderEffect = ShaderEffect::New( "", fragmentSource );
 
   shaderEffect.SetUniform( "uIsBackImageVisible", -1.f );
   shaderEffect.SetUniform( "uSpineShadowParameter", DEFAULT_SPINE_SHADOW_PARAMETER );

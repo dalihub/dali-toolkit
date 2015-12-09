@@ -63,14 +63,14 @@ inline ShaderEffect CreateCarouselEffect()
                 "\n"
                 "void main()\n"
                 "{\n"
-                "    mediump vec4 world = uModelView * vec4(aPosition,1.0);\n"
+                "    mediump vec4 world = uModelView * vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
                 "    mediump vec2 d = (world.xy - uCenter) * uAnglePerUnit;\n"
                 "    mediump float a = length(d);\n"
                 "    mediump float cs = cos(radians(a));\n"
                 "    world.z -= cs * uRadius;\n"
                 "    gl_Position = uProjection * world;\n"
                 "    \n"
-                "    vTexCoord = aTexCoord;\n"
+                "    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
                 "}\n");
 
     ShaderEffect shaderEffect = ShaderEffect::New(
