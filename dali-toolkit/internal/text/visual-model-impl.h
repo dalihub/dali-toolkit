@@ -88,19 +88,6 @@ public:
                   GlyphIndex glyphIndex,
                   Length numberOfGlyphs ) const;
 
-  // Character <--> Glyph conversion
-
-  /**
-   * @brief Retrieves for each character the number of glyphs the character is shaped.
-   *
-   * @param[out] glyphsPerCharacter Pointer to a buffer where the number of glyphs for each character are copied.
-   * @param[in] characterIndex Index to the first character.
-   * @param[in] numberOfCharacters The number of characters.
-   */
-  void GetGlyphsPerCharacterMap( Length* glyphsPerCharacter,
-                                 CharacterIndex characterIndex,
-                                 Length numberOfCharacters ) const;
-
   // Position interface
 
   /**

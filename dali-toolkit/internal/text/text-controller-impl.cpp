@@ -889,30 +889,30 @@ void Controller::Impl::OnSelectAllEvent()
   }
 }
 
-void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival )
+void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval )
 {
-  if( mEventData->mLeftSelectionPosition ==  mEventData->mRightSelectionPosition )
+  if( mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition )
   {
     // Nothing to select if handles are in the same place.
-    selectedText="";
+    selectedText.clear();
     return;
   }
 
   const bool handlesCrossed = mEventData->mLeftSelectionPosition > mEventData->mRightSelectionPosition;
 
   //Get start and end position of selection
-  uint32_t startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
-  uint32_t lengthOfSelectedText =  ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
+  const CharacterIndex startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+  const Length lengthOfSelectedText = ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
   // Validate the start and end selection points
-  if(  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() )
+  if( ( startOfSelectedText + lengthOfSelectedText ) <= mLogicalModel->mText.Count() )
   {
     //Get text as a UTF8 string
     Vector<Character>& utf32Characters = mLogicalModel->mText;
 
     Utf32ToUtf8( &utf32Characters[startOfSelectedText], lengthOfSelectedText, selectedText );
 
-    if ( deleteAfterRetreival  ) // Only delete text if copied successfully
+    if( deleteAfterRetrieval ) // Only delete text if copied successfully
     {
       // Delete text between handles
       Vector<Character>& currentText = mLogicalModel->mText;
@@ -963,11 +963,11 @@ void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
   ChangeState( EventData::EDITING );
 }
 
-void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString )
+void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString )
 {
   if ( mClipboard )
   {
-    retreivedString =  mClipboard.GetItem( itemIndex );
+    retrievedString =  mClipboard.GetItem( itemIndex );
   }
 }
 
@@ -1534,7 +1534,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
       // Get the position of the first glyph.
       const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
 
-      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ. 
+      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ.
       const bool isInterglyphIndex = ( numberOfCharacters > numberOfGlyphs ) && HasLigatureMustBreak( script );
       const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
       const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
