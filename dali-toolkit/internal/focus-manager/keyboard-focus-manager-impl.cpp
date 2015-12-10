@@ -458,8 +458,7 @@ void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the keyboard focusable actors
   Toolkit::ImageView focusIndicator = Toolkit::ImageView::New(FOCUS_BORDER_IMAGE_PATH);
-  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
+  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   // Apply size constraint to the focus indicator
   focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
