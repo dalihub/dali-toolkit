@@ -35,7 +35,7 @@ function finished( animation )
   log("Animation finished \n");
 }
   
-anim.connect("finished", finished );
+anim.on("finished", finished );
   
 anim.play();
 ```

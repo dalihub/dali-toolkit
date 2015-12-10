@@ -28,7 +28,7 @@ function imageLoaded( image )
   
 var image = new dali.ResourceImage( {url: "my_image.png"} );
   
-image.connect("imageLoadingFinished", finished );
+image.on("imageLoadingFinished", finished );
   
 // Create a material and add the image as texture to be used by the material.
 var material = new dali.Material();
