@@ -84,6 +84,7 @@ public:
   {
     Vector2 mPosition;        ///< Vertex posiiton
     Vector2 mTexCoords;       ///< Vertex texture co-ordinates
+    Vector4 mColor;           ///< Vertex color
   };
 
   struct Mesh2D

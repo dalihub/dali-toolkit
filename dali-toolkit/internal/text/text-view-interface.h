@@ -78,7 +78,8 @@ public:
    * @note The returned number of glyphs may be less than @p numberOfGlyphs if a line has ellipsis.
    *
    * @param[out] glyphs Pointer to a buffer where the glyphs are copied.
-   * @param[out] glyphPositions Pointer to a buffer where the glyph positions are copied.
+   * @param[out] glyphPositions Pointer to a buffer where the glyph's positions are copied.
+   * @param[out] colors Pointer to a buffer where the glyph's colors are copied.
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs Number of glyphs to be copied.
    *
@@ -86,6 +87,7 @@ public:
    */
   virtual Length GetGlyphs( GlyphInfo* glyphs,
                             Vector2* glyphPositions,
+                            Vector4* glyphColors,
                             GlyphIndex glyphIndex,
                             Length numberOfGlyphs ) const = 0;
 

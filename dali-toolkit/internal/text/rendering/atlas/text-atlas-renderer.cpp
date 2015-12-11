@@ -59,12 +59,10 @@ struct AtlasRenderer::Impl
   struct MeshRecord
   {
     MeshRecord()
-    : mColor( Color::BLACK ),
-      mAtlasId( 0 )
+    : mAtlasId( 0u )
     {
     }
 
-    Vector4 mColor;
     uint32_t mAtlasId;
     AtlasManager::Mesh2D mMesh;
     FrameBufferImage mBuffer;
@@ -82,7 +80,7 @@ struct AtlasRenderer::Impl
       mRight( 0.0f ),
       mUnderlinePosition( 0.0f ),
       mUnderlineThickness( 0.0f ),
-      mMeshRecordIndex( 0 )
+      mMeshRecordIndex( 0u )
     {
     }
 
@@ -142,6 +140,7 @@ struct AtlasRenderer::Impl
 
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
+    mQuadVertexFormat[ "aColor" ] = Property::VECTOR4;
     mQuadIndexFormat[ "indices" ] = Property::INTEGER;
   }
 
@@ -167,6 +166,7 @@ struct AtlasRenderer::Impl
   void AddGlyphs( Text::ViewInterface& view,
                   const Vector<Vector2>& positions,
                   const Vector<GlyphInfo>& glyphs,
+                  const Vector<Vector4>& colors,
                   int depth )
   {
     AtlasManager::AtlasSlot slot;
@@ -177,7 +177,6 @@ struct AtlasRenderer::Impl
 
     const Vector2& actorSize( view.GetControlSize() );
     const Vector2 halfActorSize( actorSize * 0.5f );
-    const Vector4& textColor( view.GetTextColor() );
     const Vector2& shadowOffset( view.GetShadowOffset() );
     const Vector4& shadowColor( view.GetShadowColor() );
     const bool underlineEnabled( view.IsUnderlineEnabled() );
@@ -212,6 +211,7 @@ struct AtlasRenderer::Impl
     Vector< TextCacheEntry > newTextCache;
     const GlyphInfo* const glyphsBuffer = glyphs.Begin();
     const Vector2* const positionsBuffer = positions.Begin();
+    const Vector4* const colorsBuffer = colors.Begin();
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
@@ -350,11 +350,23 @@ struct AtlasRenderer::Impl
           }
         }
 
+        // Get the color of the character.
+        const Vector4& color = *( colorsBuffer + i );
+
+        for( unsigned int index = 0u, size = newMesh.mVertices.Count();
+             index < size;
+             ++index )
+        {
+          AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+
+          // Set the color of the vertex.
+          vertex.mColor = color;
+        }
+
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
         StitchTextMesh( meshContainer,
                         newMesh,
                         extents,
-                        textColor,
                         position.y + glyph.yBearing,
                         underlineGlyph,
                         currentUnderlinePosition,
@@ -371,7 +383,7 @@ struct AtlasRenderer::Impl
     if( thereAreUnderlinedGlyphs )
     {
       // Check to see if any of the text needs an underline
-      GenerateUnderlines( meshContainer, extents, underlineColor, textColor );
+      GenerateUnderlines( meshContainer, extents, underlineColor );
     }
 
     // For each MeshData object, create a mesh actor and add to the renderable actor
@@ -388,12 +400,23 @@ struct AtlasRenderer::Impl
         // Create an effect if necessary
         if( style == STYLE_DROP_SHADOW )
         {
+          // Change the color of the vertices.
+          for( Vector<AtlasManager::Vertex2D>::Iterator vIt =  meshRecord.mMesh.mVertices.Begin(),
+                 vEndIt = meshRecord.mMesh.mVertices.End();
+               vIt != vEndIt;
+               ++vIt )
+          {
+            AtlasManager::Vertex2D& vertex = *vIt;
+
+            vertex.mColor = shadowColor;
+          }
+
           // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
           Actor containerActor = Actor::New();
           containerActor.SetParentOrigin( ParentOrigin::CENTER );
           containerActor.SetSize( actorSize );
 
-          Actor shadowActor = Actor::New();
+          Actor shadowActor = CreateMeshActor( meshRecord, actorSize );
 #if defined(DEBUG_ENABLED)
           shadowActor.SetName( "Text Shadow renderable actor" );
 #endif
@@ -401,16 +424,10 @@ struct AtlasRenderer::Impl
           shadowActor.RegisterProperty("uOffset", shadowOffset );
           if( actor.GetRendererCount() )
           {
-            Dali::Renderer renderer( actor.GetRendererAt( 0 ) );
-            Geometry geometry = renderer.GetGeometry();
-            Material material = renderer.GetMaterial();
-
-            Dali::Renderer shadowRenderer = Dali::Renderer::New( geometry, material );
-            shadowRenderer.SetDepthIndex( renderer.GetDepthIndex() - 1 );
-            shadowActor.AddRenderer( shadowRenderer );
+            Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
+            renderer.SetDepthIndex( renderer.GetDepthIndex() - 1 );
             shadowActor.SetParentOrigin( ParentOrigin::CENTER );
             shadowActor.SetSize( actorSize );
-            shadowActor.SetColor( shadowColor );
             containerActor.Add( shadowActor );
             containerActor.Add( actor );
             actor = containerActor;
@@ -481,7 +498,6 @@ struct AtlasRenderer::Impl
     actor.AddRenderer( renderer );
     actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
     actor.SetSize( actorSize );
-    actor.SetColor( meshRecord.mColor );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
     return actor;
   }
@@ -489,7 +505,6 @@ struct AtlasRenderer::Impl
   void StitchTextMesh( std::vector< MeshRecord >& meshContainer,
                        AtlasManager::Mesh2D& newMesh,
                        Vector< Extent >& extents,
-                       const Vector4& color,
                        float baseLine,
                        bool underlineGlyph,
                        float underlinePosition,
@@ -508,7 +523,7 @@ struct AtlasRenderer::Impl
             mIt != mEndIt;
             ++mIt, ++index )
       {
-        if( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
+        if( slot.mAtlasId == mIt->mAtlasId )
         {
           // Append the mesh to the existing mesh and adjust any extents
           Toolkit::Internal::AtlasMeshFactory::AppendMesh( mIt->mMesh, newMesh );
@@ -533,7 +548,6 @@ struct AtlasRenderer::Impl
       MeshRecord meshRecord;
       meshRecord.mAtlasId = slot.mAtlasId;
       meshRecord.mMesh = newMesh;
-      meshRecord.mColor = color;
       meshContainer.push_back( meshRecord );
 
       if( underlineGlyph )
@@ -640,8 +654,7 @@ struct AtlasRenderer::Impl
 
   void GenerateUnderlines( std::vector< MeshRecord >& meshRecords,
                            Vector< Extent >& extents,
-                           const Vector4& underlineColor,
-                           const Vector4& textColor )
+                           const Vector4& underlineColor )
   {
     AtlasManager::Mesh2D newMesh;
     unsigned short faceIndex = 0;
@@ -693,18 +706,9 @@ struct AtlasRenderer::Impl
       newMesh.mIndices.PushBack( faceIndex + 1u );
       faceIndex += 4;
 
-      if( underlineColor == textColor )
-      {
-        Toolkit::Internal::AtlasMeshFactory::AppendMesh( meshRecords[ index ].mMesh, newMesh );
-      }
-      else
-      {
-        MeshRecord record;
-        record.mMesh = newMesh;
-        record.mAtlasId = meshRecords[ index ].mAtlasId;
-        record.mColor = underlineColor;
-        meshRecords.push_back( record );
-      }
+      vert.mColor = underlineColor;
+
+      Toolkit::Internal::AtlasMeshFactory::AppendMesh( meshRecords[ index ].mMesh, newMesh );
     }
   }
 
@@ -739,16 +743,23 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
     Vector<Vector2> positions;
     positions.Resize( numberOfGlyphs );
 
+    Vector<Vector4> colors;
+    colors.Resize( numberOfGlyphs, view.GetTextColor() );
+
     numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
                                      positions.Begin(),
+                                     colors.Begin(),
                                      0u,
                                      numberOfGlyphs );
+
     glyphs.Resize( numberOfGlyphs );
     positions.Resize( numberOfGlyphs );
+    colors.Resize( numberOfGlyphs );
 
     mImpl->AddGlyphs( view,
                       positions,
                       glyphs,
+                      colors,
                       depth );
 
     /* In the case where AddGlyphs does not create a renderable Actor for example when glyphs are all whitespace create a new Actor. */
