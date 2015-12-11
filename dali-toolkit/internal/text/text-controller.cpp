@@ -784,22 +784,33 @@ bool Controller::Relayout( const Size& size )
 
 void Controller::ProcessModifyEvents()
 {
-  std::vector<ModifyEvent>& events = mImpl->mModifyEvents;
+  Vector<ModifyEvent>& events = mImpl->mModifyEvents;
 
-  for( unsigned int i=0; i<events.size(); ++i )
+  if( 0u == events.Count() )
   {
-    if( ModifyEvent::TEXT_REPLACED == events[i].type )
+    // Nothing to do.
+    return;
+  }
+
+  for( Vector<ModifyEvent>::ConstIterator it = events.Begin(),
+         endIt = events.End();
+       it != endIt;
+       ++it )
+  {
+    const ModifyEvent& event = *it;
+
+    if( ModifyEvent::TEXT_REPLACED == event.type )
     {
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
-      DALI_ASSERT_DEBUG( 0 == i && "Unexpected TEXT_REPLACED event" );
+      DALI_ASSERT_DEBUG( it == events.Begin() && "Unexpected TEXT_REPLACED event" );
 
       TextReplacedEvent();
     }
-    else if( ModifyEvent::TEXT_INSERTED == events[i].type )
+    else if( ModifyEvent::TEXT_INSERTED == event.type )
     {
       TextInsertedEvent();
     }
-    else if( ModifyEvent::TEXT_DELETED == events[i].type )
+    else if( ModifyEvent::TEXT_DELETED == event.type )
     {
       // Placeholder-text cannot be deleted
       if( !mImpl->IsShowingPlaceholderText() )
@@ -809,15 +820,14 @@ void Controller::ProcessModifyEvents()
     }
   }
 
-  if( mImpl->mEventData &&
-      0 != events.size() )
+  if( mImpl->mEventData )
   {
     // When the text is being modified, delay cursor blinking
     mImpl->mEventData->mDecorator->DelayCursorBlink();
   }
 
   // Discard temporary text
-  events.clear();
+  events.Clear();
 }
 
 void Controller::ResetText()
@@ -1432,9 +1442,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
     maxLengthReached = ( characterCount > maxSizeOfNewText );
 
-    // Insert at current cursor position
+    // The cursor position.
     CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
+    // Insert at current cursor position.
     Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
 
     if( cursorIndex < numberOfCharactersInModel )

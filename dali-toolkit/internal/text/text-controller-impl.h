@@ -162,7 +162,7 @@ struct EventData
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
-  bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text
+  bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
 };
 
 struct ModifyEvent
@@ -194,7 +194,7 @@ struct FontDefaults
   {
     if( !mFontId )
     {
-      Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
+      const PointSize26Dot6 pointSize = static_cast<PointSize26Dot6>( mDefaultPointSize * 64.f );
       mFontId = fontClient.GetFontId( mFontDescription, pointSize );
     }
 
@@ -224,7 +224,7 @@ struct Controller::Impl
     mTextColor( Color::BLACK ),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
-    mMaximumNumberOfCharacters( 50 ),
+    mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
     mUserDefinedFontFamily( false )
   {
@@ -264,12 +264,12 @@ struct Controller::Impl
     if( ModifyEvent::TEXT_REPLACED == type)
     {
       // Cancel previously queued inserts etc.
-      mModifyEvents.clear();
+      mModifyEvents.Clear();
     }
 
     ModifyEvent event;
     event.type = type;
-    mModifyEvents.push_back( event );
+    mModifyEvents.PushBack( event );
 
     // The event will be processed during relayout
     RequestRelayout();
@@ -383,7 +383,7 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
-  void RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival );
+  void RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval );
 
   void ShowClipboard();
 
@@ -393,7 +393,7 @@ struct Controller::Impl
 
   void SendSelectionToClipboard( bool deleteAfterSending );
 
-  void GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString );
+  void GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString );
 
   void RepositionSelectionHandles();
   void RepositionSelectionHandles( float visualX, float visualY );
@@ -504,7 +504,7 @@ struct Controller::Impl
   View mView;                              ///< The view interface to the rendering back-end.
   MetricsPtr mMetrics;                     ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
-  std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
+  Vector<ModifyEvent> mModifyEvents;       ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.

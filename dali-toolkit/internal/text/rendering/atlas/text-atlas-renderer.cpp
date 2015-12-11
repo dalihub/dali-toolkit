@@ -221,10 +221,10 @@ struct AtlasRenderer::Impl
       thereAreUnderlinedGlyphs = thereAreUnderlinedGlyphs || underlineGlyph;
 
       // No operation for white space
-      if ( glyph.width && glyph.height )
+      if( glyph.width && glyph.height )
       {
         // Are we still using the same fontId as previous
-        if ( underlineGlyph && ( glyph.fontId != lastUnderlinedFontId ) )
+        if( underlineGlyph && ( glyph.fontId != lastUnderlinedFontId ) )
         {
           // We need to fetch fresh font underline metrics
           FontMetrics fontMetrics;
@@ -248,10 +248,11 @@ struct AtlasRenderer::Impl
           }
 
           // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
-          if ( currentUnderlinePosition > descender )
+          if( currentUnderlinePosition > descender )
           {
             currentUnderlinePosition = descender;
           }
+
           if( fabsf( currentUnderlinePosition ) < Math::MACHINE_EPSILON_1000 )
           {
             // Move offset down by one ( EFL behavior )
@@ -261,47 +262,54 @@ struct AtlasRenderer::Impl
           lastUnderlinedFontId = glyph.fontId;
         } // underline
 
-        if ( !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot ) )
+        if( !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot ) )
         {
           // Select correct size for new atlas if needed....?
-          if ( lastFontId != glyph.fontId )
+          if( lastFontId != glyph.fontId )
           {
-            for ( uint32_t j = 0; j < mBlockSizes.size(); ++j )
+            uint32_t index = 0u;
+            for( std::vector<MaxBlockSize>::const_iterator it = mBlockSizes.begin(),
+                   endIt = mBlockSizes.end();
+                 it != endIt;
+                 ++it, ++index )
             {
-              if ( mBlockSizes[ j ].mFontId == glyph.fontId )
+              const MaxBlockSize& blockSize = *it;
+              if( blockSize.mFontId == glyph.fontId )
               {
-                currentBlockSize = j;
+                currentBlockSize = index;
                 mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
                                                DEFAULT_ATLAS_HEIGHT,
-                                               mBlockSizes[ j ].mNeededBlockWidth,
-                                               mBlockSizes[ j ].mNeededBlockHeight );
+                                               blockSize.mNeededBlockWidth,
+                                               blockSize.mNeededBlockHeight );
               }
             }
           }
 
           // Create a new image for the glyph
           BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
-          if ( bitmap )
+          if( bitmap )
           {
+            MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
+
             // Ensure that the next image will fit into the current block size
             bool setSize = false;
-            if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
+            if( bitmap.GetWidth() > blockSize.mNeededBlockWidth )
             {
               setSize = true;
-              mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
+              blockSize.mNeededBlockWidth = bitmap.GetWidth();
             }
-            if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
+            if( bitmap.GetHeight() > blockSize.mNeededBlockHeight )
             {
               setSize = true;
-              mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
+              blockSize.mNeededBlockHeight = bitmap.GetHeight();
             }
 
-            if ( setSize )
+            if( setSize )
             {
               mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
                                              DEFAULT_ATLAS_HEIGHT,
-                                             mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
-                                             mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
+                                             blockSize.mNeededBlockWidth,
+                                             blockSize.mNeededBlockHeight );
             }
 
             // Locate a new slot for our glyph
@@ -315,7 +323,7 @@ struct AtlasRenderer::Impl
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor
-        Vector2 position = *( positionsBuffer + i ) - halfActorSize;
+        const Vector2 position = *( positionsBuffer + i ) - halfActorSize;
 
         // Generate mesh data for this quad, plugging in our supplied position
         AtlasManager::Mesh2D newMesh;
@@ -325,13 +333,20 @@ struct AtlasRenderer::Impl
         textCacheEntry.mIndex = glyph.index;
         newTextCache.PushBack( textCacheEntry );
 
+        AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
+
         // Adjust the vertices if the fixed-size font should be down-scaled
         if( glyph.scaleFactor > 0 )
         {
-          for( unsigned int i=0; i<newMesh.mVertices.Count(); ++i )
+          for( unsigned int index = 0u, size = newMesh.mVertices.Count();
+               index < size;
+               ++index )
           {
-            newMesh.mVertices[i].mPosition.x = position.x + ( ( newMesh.mVertices[i].mPosition.x - position.x ) * glyph.scaleFactor );
-            newMesh.mVertices[i].mPosition.y = position.y + ( ( newMesh.mVertices[i].mPosition.y - position.y ) * glyph.scaleFactor );
+            AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+
+            // Set the position of the vertex.
+            vertex.mPosition.x = position.x + ( ( vertex.mPosition.x - position.x ) * glyph.scaleFactor );
+            vertex.mPosition.y = position.y + ( ( vertex.mPosition.y - position.y ) * glyph.scaleFactor );
           }
         }
 
@@ -360,14 +375,18 @@ struct AtlasRenderer::Impl
     }
 
     // For each MeshData object, create a mesh actor and add to the renderable actor
-    if ( meshContainer.size() )
+    if( !meshContainer.empty() )
     {
-      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt )
+      for( std::vector< MeshRecord >::iterator it = meshContainer.begin(),
+              endIt = meshContainer.end();
+            it != endIt; ++it )
       {
-        Actor actor = CreateMeshActor( *mIt, actorSize );
+        MeshRecord& meshRecord = *it;
+
+        Actor actor = CreateMeshActor( meshRecord, actorSize );
 
         // Create an effect if necessary
-        if ( style == STYLE_DROP_SHADOW )
+        if( style == STYLE_DROP_SHADOW )
         {
           // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
           Actor containerActor = Actor::New();
@@ -380,7 +399,7 @@ struct AtlasRenderer::Impl
 #endif
           // Offset shadow in x and y
           shadowActor.RegisterProperty("uOffset", shadowOffset );
-          if ( actor.GetRendererCount() )
+          if( actor.GetRendererCount() )
           {
             Dali::Renderer renderer( actor.GetRendererAt( 0 ) );
             Geometry geometry = renderer.GetGeometry();
@@ -417,7 +436,7 @@ struct AtlasRenderer::Impl
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%s\n", metrics.mVerboseGlyphCounts.c_str() );
 
-    for ( uint32_t i = 0; i < metrics.mAtlasMetrics.mAtlasCount; ++i )
+    for( uint32_t i = 0; i < metrics.mAtlasMetrics.mAtlasCount; ++i )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "   Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n",
                                                  i + 1, i > 8 ? "" : " ",
@@ -434,7 +453,7 @@ struct AtlasRenderer::Impl
 
   void RemoveText()
   {
-    for ( Vector< TextCacheEntry >::Iterator oldTextIter = mTextCache.Begin(); oldTextIter != mTextCache.End(); ++oldTextIter )
+    for( Vector< TextCacheEntry >::Iterator oldTextIter = mTextCache.Begin(); oldTextIter != mTextCache.End(); ++oldTextIter )
     {
       mGlyphManager.AdjustReferenceCount( oldTextIter->mFontId, oldTextIter->mIndex, -1/*decrement*/ );
     }
@@ -489,7 +508,7 @@ struct AtlasRenderer::Impl
             mIt != mEndIt;
             ++mIt, ++index )
       {
-        if ( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
+        if( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
         {
           // Append the mesh to the existing mesh and adjust any extents
           Toolkit::Internal::AtlasMeshFactory::AppendMesh( mIt->mMesh, newMesh );
@@ -584,25 +603,36 @@ struct AtlasRenderer::Impl
 
   void CalculateBlocksSize( const Vector<GlyphInfo>& glyphs )
   {
-    MaxBlockSize maxBlockSize;
-    for ( uint32_t i = 0; i < glyphs.Size(); ++i )
+    for( Vector<GlyphInfo>::ConstIterator glyphIt = glyphs.Begin(),
+           glyphEndIt = glyphs.End();
+         glyphIt != glyphEndIt;
+         ++glyphIt )
     {
-      FontId fontId = glyphs[ i ].fontId;
+      const FontId fontId = (*glyphIt).fontId;
       bool foundFont = false;
-      for ( uint32_t j = 0; j < mBlockSizes.size(); ++j )
+
+      for( std::vector< MaxBlockSize >::const_iterator blockIt = mBlockSizes.begin(),
+             blockEndIt = mBlockSizes.end();
+           blockIt != blockEndIt;
+           ++blockIt )
       {
-        if ( mBlockSizes[ j ].mFontId == fontId )
+        if( (*blockIt).mFontId == fontId )
         {
           foundFont = true;
+          break;
         }
       }
+
       if ( !foundFont )
       {
         FontMetrics fontMetrics;
         mFontClient.GetFontMetrics( fontId, fontMetrics );
+
+        MaxBlockSize maxBlockSize;
         maxBlockSize.mNeededBlockWidth = static_cast< uint32_t >( fontMetrics.height );
-        maxBlockSize.mNeededBlockHeight = static_cast< uint32_t >( fontMetrics.height );
+        maxBlockSize.mNeededBlockHeight = maxBlockSize.mNeededBlockWidth;
         maxBlockSize.mFontId = fontId;
+
         mBlockSizes.push_back( maxBlockSize );
       }
     }
@@ -663,7 +693,7 @@ struct AtlasRenderer::Impl
       newMesh.mIndices.PushBack( faceIndex + 1u );
       faceIndex += 4;
 
-      if ( underlineColor == textColor )
+      if( underlineColor == textColor )
       {
         Toolkit::Internal::AtlasMeshFactory::AppendMesh( meshRecords[ index ].mMesh, newMesh );
       }
@@ -721,8 +751,8 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
                       glyphs,
                       depth );
 
-    /* In the case where AddGlyphs does not create a renderable Actor for example when glyphs are all whitespace create a new Actor.  */
-    /* This renderable actor is used to position the text, other "decorations" can rely on there always being an Actor regardless of it is whitespace or regular text*/
+    /* In the case where AddGlyphs does not create a renderable Actor for example when glyphs are all whitespace create a new Actor. */
+    /* This renderable actor is used to position the text, other "decorations" can rely on there always being an Actor regardless of it is whitespace or regular text. */
     if ( !mImpl->mActor )
     {
       mImpl->mActor = Actor::New();
