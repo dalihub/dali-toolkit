@@ -17,7 +17,11 @@
     'view-mode': viewMode,
  }
 
-var dali = require('./build/Release/dali')( options );
+// desktop
+//var dali = require('./build/Release/dali')( options );
+
+// target
+var dali = require('dali')( options );
 
 var daliApp = {};
 
