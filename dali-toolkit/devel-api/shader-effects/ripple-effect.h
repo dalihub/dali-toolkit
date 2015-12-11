@@ -52,7 +52,7 @@ inline ShaderEffect CreateRippleEffect()
       "{\n"
       "float lighting = uAmplitude * 0.02;\n"
       "float waveLength = uAmplitude * 0.0016;\n"
-      "vec4 world = uModelView * vec4(aPosition,1.0);\n"
+      "vec4 world = uModelView * vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
       "vec2 d = vec2(world.x - uCenter.x, world.y - uCenter.y);\n"
       "float dist = length(d);\n"
       "float amplitude = cos(uTime - dist*waveLength);\n"
@@ -67,7 +67,7 @@ inline ShaderEffect CreateRippleEffect()
       "}\n"
       "vShade = 1.0 - (dot * slope);\n"
       "vLight = max(0.0, dot * -slope);\n"
-      "vTexCoord = aTexCoord;\n"
+      "vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
       "}" );
 
   // append the default version

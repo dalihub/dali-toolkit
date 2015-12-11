@@ -49,14 +49,14 @@ inline ShaderEffect CreateShearEffect()
       "\n"
       "void main()\n"
       "{\n"
-      "mediump vec4 world = uModelView * vec4(aPosition,1.0);\n"
+      "mediump vec4 world = uModelView * vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
       "\n"
       "world.x = world.x + tan(radians(uAngleXAxis)) * (world.y - uCenter.y * world.w);\n"
       "world.y = world.y + tan(radians(uAngleYAxis)) * (world.x - uCenter.x * world.w);\n"
       "\n"
       "gl_Position = uProjection * world;\n"
       "\n"
-      "vTexCoord = aTexCoord;\n"
+      "vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
       "}" );
 
   // Create the implementation, temporarily owned on stack,
