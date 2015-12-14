@@ -21,9 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
@@ -156,22 +157,6 @@ void TextSelectionToolbar::OnStageConnection( int depth )
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
-  // Traverse the dividers and set the depth.
-  for( unsigned int i = 0; i < mDividerIndexes.Count(); ++i )
-  {
-    Actor divider = mTableOfButtons.GetChildAt( Toolkit::TableView::CellPosition( 0, mDividerIndexes[ i ] ) );
-
-    ImageActor dividerImageActor = ImageActor::DownCast( divider );
-    if( dividerImageActor )
-    {
-      dividerImageActor.SetSortModifier( DECORATION_DEPTH_INDEX + depth );
-    }
-    else
-    {
-      // TODO at the moment divider are image actors.
-    }
-  }
-
   // Texts are controls, they have their own OnStageConnection() implementation.
   // Icons are inside a TableView. It has it's own OnStageConnection() implementation.
 }
@@ -221,7 +206,8 @@ void TextSelectionToolbar::SetUp()
   mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
 
-  ImageActor stencil = CreateSolidColorActor( Color::RED );
+  BufferImage stencilImage = BufferImage::WHITE(); // ImageView needs an Image or does nothing
+  Toolkit::ImageView stencil = Toolkit::ImageView::New(stencilImage);
   stencil.SetDrawMode( DrawMode::STENCIL );
   stencil.SetVisible( true );
   stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );

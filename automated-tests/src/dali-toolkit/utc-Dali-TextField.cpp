@@ -668,7 +668,7 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 2u, TEST_LOCATION ); // The camera actor and the renderer
 
-  ImageActor cursor = ImageActor::DownCast( layer.GetChildAt( 0u ) );
+  Control cursor = Control::DownCast( layer.GetChildAt( 0u ) );
   DALI_TEST_CHECK( cursor );
 
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
