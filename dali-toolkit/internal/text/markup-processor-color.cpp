@@ -1,6 +1,3 @@
-#ifndef __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
-#define __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
-
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -18,12 +15,15 @@
  *
  */
 
+// FILE HEADER
+#include <dali-toolkit/internal/text/markup-processor-color.h>
+
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 
 namespace Dali
 {
@@ -34,33 +34,28 @@ namespace Toolkit
 namespace Text
 {
 
-/**
- * @brief Keeps the plain text and references to vectors from the model which stores runs with text styles.
- */
-struct MarkupProcessData
+namespace
 {
-  MarkupProcessData( Vector<ColorRun>& colorRuns )
-  : colorRuns( colorRuns ),
-    markupProcessedText()
-  {}
+const std::string XHTML_VALUE_ATTRIBUTE("value");
+}
 
-  Vector<ColorRun>&           colorRuns;
-
-  std::string                 markupProcessedText;
-};
-
-/**
- * @brief Process the mark-up string.
- *
- * @param[in] markupString The mark-up string.
- * @param[out] markupProcessData The plain text and the style.
- */
-void ProcessMarkupString( const std::string& markupString, MarkupProcessData& markupProcessData );
+void ProcessColorTag( const Tag& tag, ColorRun& colorRun )
+{
+  for( Vector<Attribute>::ConstIterator it = tag.attributes.Begin(),
+         endIt = tag.attributes.End();
+       it != endIt;
+       ++it )
+  {
+    const Attribute& attribute( *it );
+    if( TokenComparison( XHTML_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    {
+      ColorStringToVector4( attribute.valueBuffer, attribute.valueLength, colorRun.color );
+    }
+  }
+}
 
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
-
-#endif // __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__

@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/color-run.h>
 
 namespace Dali
 {
@@ -301,6 +302,7 @@ public:
   Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
   Vector<LineRun>        mLines;                ///< The laid out lines.
   Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
+  Vector<ColorGlyphRun>  mColorRuns;            ///< Runs of glyphs with the same color.
 
   Vector2                mControlSize;           ///< The size of the UI control the decorator is adding it's decorations to.
   Vector4                mTextColor;            ///< The text color

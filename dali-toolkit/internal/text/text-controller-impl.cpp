@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -132,7 +133,8 @@ EventData::EventData( DecoratorPtr decorator )
   mUpdateRightSelectionPosition( false ),
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
-  mAllTextSelected( false )
+  mAllTextSelected( false ),
+  mUpdateInputStyle( false )
 {
   mImfManager = ImfManager::Get();
 }
@@ -285,6 +287,20 @@ bool Controller::Impl::ProcessInputEvents()
     {
       mEventData->mScrollAfterUpdatePosition = false;
     }
+  }
+
+  if( mEventData->mUpdateInputStyle )
+  {
+    // Set the default style first.
+    RetrieveDefaultInputStyle( mEventData->mInputStyle );
+
+    // Get the character index from the cursor index.
+    const CharacterIndex styleIndex = ( mEventData->mPrimaryCursorPosition > 0u ) ? mEventData->mPrimaryCursorPosition - 1u : 0u;
+
+    // Retrieve the style from the style runs stored in the logical model.
+    mLogicalModel->RetrieveStyle( styleIndex, mEventData->mInputStyle );
+
+    mEventData->mUpdateInputStyle = false;
   }
 
   mEventData->mEventQueue.clear();
@@ -481,6 +497,30 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   }
 }
 
+bool Controller::Impl::UpdateModelStyle( OperationsMask operationsRequired )
+{
+  bool updated = false;
+
+  if( COLOR & operationsRequired )
+  {
+    // Set the color runs in glyphs.
+    SetColorSegmentationInfo( mLogicalModel->mColorRuns,
+                              mVisualModel->mCharactersToGlyph,
+                              mVisualModel->mGlyphsPerCharacter,
+                              mVisualModel->mColorRuns );
+
+    updated = true;
+  }
+
+  return updated;
+}
+
+void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
+{
+  // Set the default text's color.
+  inputStyle.textColor = mTextColor;
+}
+
 void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
 {
   if( mFontDefaults )
@@ -549,6 +589,7 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
   }
 
   mEventData->mUpdateCursorPosition = true;
+  mEventData->mUpdateInputStyle = true;
   mEventData->mScrollAfterUpdatePosition = true;
 }
 
@@ -578,6 +619,7 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
       mEventData->mUpdateCursorPosition = true;
       mEventData->mScrollAfterUpdatePosition = true;
+      mEventData->mUpdateInputStyle = true;
 
       // Notify the cursor position to the imf manager.
       if( mEventData->mImfManager )
@@ -709,6 +751,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     if( Event::GRAB_HANDLE_EVENT == event.type )
     {
       mEventData->mUpdateCursorPosition = true;
+      mEventData->mUpdateInputStyle = true;
 
       if ( !IsClipboardEmpty() )
       {
@@ -795,6 +838,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
       mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
       mEventData->mPrimaryCursorPosition = handlePosition;
+      mEventData->mUpdateInputStyle = mEventData->mUpdateCursorPosition;
     }
     else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
     {
@@ -914,6 +958,11 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
     if( deleteAfterRetrieval ) // Only delete text if copied successfully
     {
+      // Set as input style the style of the first deleted character.
+      mLogicalModel->RetrieveStyle( startOfSelectedText, mEventData->mInputStyle );
+
+      mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
+
       // Delete text between handles
       Vector<Character>& currentText = mLogicalModel->mText;
 

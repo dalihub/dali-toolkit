@@ -79,6 +79,7 @@ public:
       VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",                   The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
       TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                           type VECTOR4
       PLACEHOLDER_TEXT_COLOR,                   ///< name "placeholderTextColor",                The placeholder-text color,                                               type VECTOR4
+      INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                          type VECTOR4
       SHADOW_OFFSET,                            ///< name "shadowOffset",                        The drop shadow offset 0 indicates no shadow,                             type VECTOR2
       SHADOW_COLOR,                             ///< name "shadowColor",                         The color of a drop shadow,                                               type VECTOR4
       PRIMARY_CURSOR_COLOR,                     ///< name "primaryCursorColor",                  The color to apply to the primary cursor,                                 type VECTOR4

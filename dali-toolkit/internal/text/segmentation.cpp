@@ -15,7 +15,7 @@
  *
  */
 
-// CLASS HEADER
+// FILE HEADER
 #include <dali-toolkit/internal/text/segmentation.h>
 
 // EXTERNAL INCLUDES

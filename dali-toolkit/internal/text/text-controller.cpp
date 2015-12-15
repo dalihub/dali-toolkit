@@ -91,8 +91,11 @@ void Controller::SetText( const std::string& text )
   // Reset keyboard as text changed
   mImpl->ResetImfManager();
 
-  // Remove the previously set text
+  // Remove the previously set text and style.
   ResetText();
+
+  // Remove the style.
+  ClearStyleData();
 
   CharacterIndex lastCursorIndex = 0u;
 
@@ -110,7 +113,7 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
-    MarkupProcessData markupProcessData;
+    MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns );
 
     Length textSize = 0u;
     const uint8_t* utf8 = NULL;
@@ -489,6 +492,20 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
 
     if( ( cursorIndex + numberOfChars ) <= currentText.Count() )
     {
+      // Update the input style and remove the text's style before removing the text.
+      if( mImpl->mEventData )
+      {
+        // Set first the default input style.
+        mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
+
+        // Update the input style.
+        mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+
+        // Remove the text's style before removing the text.
+        mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfChars );
+      }
+
+      // Remove the characters.
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
       Vector<Character>::Iterator last  = first + numberOfChars;
 
@@ -587,6 +604,48 @@ void Controller::SetUnderlineHeight( float height )
 float Controller::GetUnderlineHeight() const
 {
   return mImpl->mVisualModel->GetUnderlineHeight();
+}
+
+void Controller::SetInputColor( const Vector4& color )
+{
+  if( mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.textColor = color;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
+
+      // Get start and end position of selection
+      const CharacterIndex startOfSelectedText = handlesCrossed ? mImpl->mEventData->mRightSelectionPosition : mImpl->mEventData->mLeftSelectionPosition;
+      const Length lengthOfSelectedText = ( handlesCrossed ? mImpl->mEventData->mLeftSelectionPosition : mImpl->mEventData->mRightSelectionPosition ) - startOfSelectedText;
+
+      // Add the color run.
+      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mColorRuns.Count();
+      mImpl->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
+
+      ColorRun& colorRun = *( mImpl->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
+      colorRun.color = color;
+      colorRun.characterRun.characterIndex = startOfSelectedText;
+      colorRun.characterRun.numberOfCharacters = lengthOfSelectedText;
+
+      // Request to relayout.
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | COLOR );
+      mImpl->RequestRelayout();
+    }
+  }
+}
+
+const Vector4& Controller::GetInputColor() const
+{
+  if( mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.textColor;
+  }
+
+  // Return the default text's color if there is no EventData.
+  return mImpl->mTextColor;
+
 }
 
 void Controller::SetEnableCursorBlink( bool enable )
@@ -759,7 +818,7 @@ bool Controller::Relayout( const Size& size )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mVisualModel->mControlSize.width, mImpl->mVisualModel->mControlSize.height );
 
-    // Operations that need to be done if the size changes.
+    // Layout operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
                                                              ALIGN                     |
@@ -769,14 +828,28 @@ bool Controller::Relayout( const Size& size )
     mImpl->mVisualModel->mControlSize = size;
   }
 
-  // Make sure the model is up-to-date before layouting
+  // Whether there are modify events.
+  const bool isModifyEventsEmpty = 0u == mImpl->mModifyEvents.Count();
+
+  // Make sure the model is up-to-date before layouting.
   ProcessModifyEvents();
   mImpl->UpdateModel( mImpl->mOperationsPending );
 
+  // Style operations that need to be done if the text is modified.
+  if( !isModifyEventsEmpty )
+  {
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             COLOR );
+  }
+
+  // Apply the style runs if text is modified.
+  bool updated = mImpl->UpdateModelStyle( mImpl->mOperationsPending );
+
+  // Layout the text.
   Size layoutSize;
-  bool updated = DoRelayout( mImpl->mVisualModel->mControlSize,
-                             mImpl->mOperationsPending,
-                             layoutSize );
+  updated = DoRelayout( mImpl->mVisualModel->mControlSize,
+                        mImpl->mOperationsPending,
+                        layoutSize ) || updated;
 
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
@@ -1473,6 +1546,35 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // The cursor position.
     CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
+    // Update the text's style.
+    if( mImpl->mEventData )
+    {
+      // Updates the text style runs.
+      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, maxSizeOfNewText );
+
+      // Get the character index from the cursor index.
+      const CharacterIndex styleIndex = ( cursorIndex > 0u ) ? cursorIndex - 1u : 0u;
+
+      // Retrieve the text's style for the given index.
+      InputStyle style;
+      mImpl->mLogicalModel->RetrieveStyle( styleIndex, style );
+
+      // Whether to add a new text color run.
+      const bool addColorRun = style.textColor != mImpl->mEventData->mInputStyle.textColor;
+
+      // Add style runs.
+      if( addColorRun )
+      {
+        const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mColorRuns.Count();
+        mImpl->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
+
+        ColorRun& colorRun = *( mImpl->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
+        colorRun.color = mImpl->mEventData->mInputStyle.textColor;
+        colorRun.characterRun.characterIndex = cursorIndex;
+        colorRun.characterRun.numberOfCharacters = maxSizeOfNewText;
+      }
+    }
+
     // Insert at current cursor position.
     Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
 
@@ -2080,6 +2182,7 @@ void Controller::ClearModelData()
   mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
   mImpl->mVisualModel->mGlyphPositions.Clear();
   mImpl->mVisualModel->mLines.Clear();
+  mImpl->mVisualModel->mColorRuns.Clear();
   mImpl->mVisualModel->ClearCaches();
 }
 
@@ -2095,6 +2198,11 @@ void Controller::ClearFontData()
   mImpl->mVisualModel->mGlyphPositions.Clear();
   mImpl->mVisualModel->mLines.Clear();
   mImpl->mVisualModel->ClearCaches();
+}
+
+void Controller::ClearStyleData()
+{
+  mImpl->mLogicalModel->mColorRuns.Clear();
 }
 
 Controller::Controller( ControlInterface& controlInterface )

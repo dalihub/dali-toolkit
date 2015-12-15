@@ -23,6 +23,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
@@ -133,6 +134,8 @@ struct EventData
    */
   std::vector<Event> mEventQueue;              ///< The queue of touch events etc.
 
+  InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
+
   /**
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
@@ -163,6 +166,7 @@ struct EventData
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
   bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
+  bool mUpdateInputStyle                : 1;   ///< Whether to update the input style after moving the cursor.
 };
 
 struct ModifyEvent
@@ -355,7 +359,33 @@ struct Controller::Impl
     return !result; // // If NumberOfItems greater than 0, return false
   }
 
+  /**
+   * @brief Updates the logical and visual models.
+   *
+   * When text or style changes the model is set with some operations pending.
+   * When i.e. the text's size or a relayout is required this method is called
+   * with a given @p operationsRequired parameter. The operations required are
+   * matched with the operations pending to perform the minimum number of operations.
+   *
+   * @param[in] operationsRequired The operations required.
+   */
   void UpdateModel( OperationsMask operationsRequired );
+
+  /**
+   * @brief Updates the style runs in the visual model when the text's styles changes.
+   *
+   * @param[in] operationsRequired The operations required.
+   *
+   * @return @e true if the model has been modified.
+   */
+  bool UpdateModelStyle( OperationsMask operationsRequired );
+
+  /**
+   * @brief Retreieves the default style.
+   *
+   * @param[out] inputStyle The default style.
+   */
+  void RetrieveDefaultInputStyle( InputStyle& inputStyle );
 
   /**
    * @brief Retrieve the default fonts.

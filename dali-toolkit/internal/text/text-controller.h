@@ -85,6 +85,7 @@ public:
     UPDATE_ACTUAL_SIZE = 0x0200,
     REORDER            = 0x0400,
     ALIGN              = 0x0800,
+    COLOR              = 0x1000,
     ALL_OPERATIONS     = 0xFFFF
   };
 
@@ -383,6 +384,20 @@ public:
   float GetUnderlineHeight() const;
 
   /**
+   * @brief Sets the input text's color.
+   *
+   * @param[in] color The input text's color.
+   */
+  void SetInputColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the input text's color.
+   *
+   * @return The input text's color.
+   */
+  const Vector4& GetInputColor() const;
+
+  /**
    * @brief Called to enable/disable cursor blink.
    *
    * @note Only editable controls should calls this.
@@ -678,6 +693,11 @@ private:
    * @brief Helper to clear font-specific data (only).
    */
   void ClearFontData();
+
+  /**
+   * @brief Helper to clear text's style data.
+   */
+  void ClearStyleData();
 
   /**
    * @brief Private constructor.

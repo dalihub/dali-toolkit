@@ -28,6 +28,8 @@
 namespace Dali
 {
 
+struct Vector4;
+
 namespace Toolkit
 {
 
@@ -81,6 +83,35 @@ bool TokenComparison( const std::string& string1, const char* const stringBuffer
  */
 void SkipWhiteSpace( const char*& markupStringBuffer,
                      const char* const markupStringEndBuffer );
+
+/**
+ * @brief Converts a string into an hexadecimal unsigned int.
+ *
+ * @param[in] uintStr An hexadecimal unsigned int packed inside a string.
+ *
+ * @return The hexadecimal value.
+ */
+unsigned int StringToHex( const char* const uintStr );
+
+/**
+ * @brief Converts an ARGB color packed in 4 byte unsigned int into a Vector4 color used in Dali.
+ *
+ * @param[in] color An ARGB color packed in an unsigned int.
+ * @param[out] retColor A Vector4 with the converted color.
+ */
+void UintColorToVector4( unsigned int color, Vector4& retColor );
+
+/**
+ * @brief Converts a color packed inside a string into an ARGB Vector4 color.
+ *
+ * The string color could be in hexadecimal ( 0xFF0000FF ), webcolor ( #0000FF or #00F ) or some constant values:
+ * black, white, red, green, blue, yellow, magenta, cyan, transparent.
+ *
+ * @param[in] colorStr A color packed inside a string.
+ * @param[in] length The length of the color string.
+ * @param[out] retColor A color packed inside a Vector4.
+ */
+void ColorStringToVector4( const char* const colorStr, Length length, Vector4& retColor );
 
 } // namespace Text
 

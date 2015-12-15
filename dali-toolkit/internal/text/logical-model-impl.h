@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
+#include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
@@ -40,6 +41,7 @@ namespace Text
 
 class LogicalModel;
 typedef IntrusivePtr<LogicalModel> LogicalModelPtr;
+struct InputStyle;
 
 /**
  * @brief A logical text model contains layout independent information.
@@ -106,6 +108,22 @@ public:
    */
   CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
 
+  /**
+   * @brief Updates the text's style runs with the added or removed text.
+   *
+   * @param[in] index The character's index.
+   * @param[in] numberOfCharacters The number of characters added or removed. If the value is negative the characters are removed.
+   */
+  void UpdateTextStyleRuns( CharacterIndex index, int numberOfCharacters );
+
+  /**
+   * @brief Retrieves the text's style for the given character index.
+   *
+   * @param[in] index The character index.
+   * @param[out] style The text's style in the given style.
+   */
+  void RetrieveStyle( CharacterIndex index, InputStyle& style );
+
 protected:
 
   /**
@@ -131,6 +149,7 @@ public:
   Vector<Character>                     mText;
   Vector<ScriptRun>                     mScriptRuns;
   Vector<FontRun>                       mFontRuns;
+  Vector<ColorRun>                      mColorRuns;
   Vector<LineBreakInfo>                 mLineBreakInfo;
   Vector<WordBreakInfo>                 mWordBreakInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;

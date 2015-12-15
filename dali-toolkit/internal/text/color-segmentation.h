@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
-#define __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
+#ifndef __DALI_TOOLKIT_TEXT_COLOR_SEGMENTATION_H__
+#define __DALI_TOOLKIT_TEXT_COLOR_SEGMENTATION_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
@@ -34,28 +33,20 @@ namespace Toolkit
 namespace Text
 {
 
-/**
- * @brief Keeps the plain text and references to vectors from the model which stores runs with text styles.
- */
-struct MarkupProcessData
-{
-  MarkupProcessData( Vector<ColorRun>& colorRuns )
-  : colorRuns( colorRuns ),
-    markupProcessedText()
-  {}
-
-  Vector<ColorRun>&           colorRuns;
-
-  std::string                 markupProcessedText;
-};
+class LogicalModel;
 
 /**
- * @brief Process the mark-up string.
+ * @brief Creates color glyph runs.
  *
- * @param[in] markupString The mark-up string.
- * @param[out] markupProcessData The plain text and the style.
+ * @param[in] characterColorRuns The color runs in characters (set in the mark-up string).
+ * @param[in] charactersToGlyph Conversion table from characters to glyphs.
+ * @param[in] glyphsPerCharacter Table with the number of glyphs for each character.
+ * @param[out] glyphColorRuns The color runs in glyphs.
  */
-void ProcessMarkupString( const std::string& markupString, MarkupProcessData& markupProcessData );
+void SetColorSegmentationInfo( const Vector<ColorRun>& characterColorRuns,
+                               const Vector<GlyphIndex>& charactersToGlyph,
+                               const Vector<Length>& glyphsPerCharacter,
+                               Vector<ColorGlyphRun>& glyphColorRuns );
 
 } // namespace Text
 
@@ -63,4 +54,4 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
+#endif // __DALI_TOOLKIT_TEXT_COLOR_SEGMENTATION_H__

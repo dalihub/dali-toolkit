@@ -122,6 +122,30 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
                                                 glyphIndex,
                                                 numberOfLaidOutGlyphs );
 
+        // Set the colors.
+        const GlyphIndex lastLaidOutGlyphIndex = glyphIndex + numberOfLaidOutGlyphs;
+
+        for( Vector<ColorGlyphRun>::ConstIterator it = mImpl->mVisualModel->mColorRuns.Begin(),
+               endIt = mImpl->mVisualModel->mColorRuns.End();
+             it != endIt;
+             ++it )
+        {
+          const ColorGlyphRun& colorGlyphRun = *it;
+          const GlyphIndex lastGlyphIndex = colorGlyphRun.glyphRun.glyphIndex + colorGlyphRun.glyphRun.numberOfGlyphs;
+
+          if( ( colorGlyphRun.glyphRun.glyphIndex < lastLaidOutGlyphIndex ) &&
+              ( glyphIndex < lastGlyphIndex ) )
+          {
+            for( GlyphIndex index = glyphIndex < colorGlyphRun.glyphRun.glyphIndex ? colorGlyphRun.glyphRun.glyphIndex : glyphIndex,
+                   endIndex = lastLaidOutGlyphIndex < lastGlyphIndex ? lastLaidOutGlyphIndex : lastGlyphIndex;
+                 index < endIndex;
+                 ++index )
+            {
+              *( glyphColors + index - glyphIndex ) = colorGlyphRun.color;
+            }
+          }
+        }
+
         // Get the lines for the given range of glyphs.
         // The lines contain the alignment offset which needs to be added to the glyph's position.
         LineIndex firstLine = 0u;

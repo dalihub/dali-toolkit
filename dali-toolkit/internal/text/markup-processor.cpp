@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/markup-processor-color.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 
 namespace Dali
@@ -57,6 +58,50 @@ const char BACK_SLASH        = '\\';
 const char WHITE_SPACE       = 0x20; // ASCII value of the white space.
 
 const unsigned int MAX_NUM_OF_ATTRIBUTES =  5u; ///< The font tag has the 'family', 'size' 'weight', 'width' and 'slant' attrubutes.
+
+const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
+
+/**
+ * @brief Struct used to retrieve the style runs from the mark-up string.
+ */
+struct StyleStack
+{
+  typedef VectorBase::SizeType RunIndex;
+
+  Vector<RunIndex>  stack;    ///< Use a vector as a style stack. Stores the indices pointing where the run is stored inside the logical model.
+  unsigned int topIndex; ///< Points the top of the stack.
+
+  StyleStack()
+  : stack(),
+    topIndex( 0u )
+  {
+    stack.Resize( DEFAULT_VECTOR_SIZE );
+  }
+
+  void Push( RunIndex index )
+  {
+    // Check if there is space inside the style stack.
+    const VectorBase::SizeType size = stack.Count();
+    if( topIndex >= size )
+    {
+      // Resize the style stack.
+      stack.Resize( 2u * size );
+    }
+
+    // Set the run index in the top of the stack.
+    *( stack.Begin() + topIndex ) = index;
+
+    // Reposition the pointer to the top of the stack.
+    ++topIndex;
+  }
+
+  RunIndex Pop()
+  {
+    // Pop the top of the stack.
+    --topIndex;
+    return *( stack.Begin() + topIndex );
+  }
+};
 
 /**
  * @brief Splits the tag string into the tag name and its attributes.
@@ -297,6 +342,15 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
   const Length markupStringSize = markupString.size();
   markupProcessData.markupProcessedText.reserve( markupStringSize );
 
+  // Stores a struct with the index to the first character of the run, the type of run and its parameters.
+  StyleStack styleStack;
+
+  // Points the next free position in the vector of runs.
+  StyleStack::RunIndex colorRunIndex = 0u;
+
+  // Give an initial default value to the model's vectors.
+  markupProcessData.colorRuns.Reserve( DEFAULT_VECTOR_SIZE );
+
   // Get the mark-up string buffer.
   const char* markupStringBuffer = markupString.c_str();
   const char* const markupStringEndBuffer = markupStringBuffer + markupStringSize;
@@ -314,10 +368,29 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         if( !tag.isEndTag )
         {
           // Create a new color run.
+          ColorRun colorRun;
+          colorRun.characterRun.numberOfCharacters = 0u;
+
+          // Set the start character index.
+          colorRun.characterRun.characterIndex = characterIndex;
+
+          // Fill the run with the attributes.
+          ProcessColorTag( tag, colorRun );
+
+          // Push the color run in the logical model.
+          markupProcessData.colorRuns.PushBack( colorRun );
+
+          // Push the index of the run into the stack.
+          styleStack.Push( colorRunIndex );
+
+          // Point the next color run.
+          ++colorRunIndex;
         }
         else
         {
           // Pop the top of the stack and set the number of characters of the run.
+          ColorRun& colorRun = *( markupProcessData.colorRuns.Begin() + styleStack.Pop() );
+          colorRun.characterRun.numberOfCharacters = characterIndex - colorRun.characterRun.characterIndex;
         }
       } // <color></color>
       else if( TokenComparison( XHTML_I_TAG, tag.buffer, tag.length ) )
@@ -437,6 +510,14 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
   }
 
   // Resize the model's vectors.
+  if( 0u == colorRunIndex )
+  {
+    markupProcessData.colorRuns.Clear();
+  }
+  else
+  {
+    markupProcessData.colorRuns.Resize( colorRunIndex );
+  }
 }
 
 } // namespace Text
