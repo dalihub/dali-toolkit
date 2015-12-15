@@ -232,9 +232,9 @@ const ActorFunctions ActorFunctionTable[]=
     { "Raise",              LayerApi::Raise,                    LAYER_API  },
     { "Lower",              LayerApi::Lower,                    LAYER_API  },
     { "RaiseAbove",         LayerApi::RaiseAbove,               LAYER_API  },
-    { "RaiseBelow",         LayerApi::LowerBelow,               LAYER_API  },
+    { "LowerBelow",         LayerApi::LowerBelow,               LAYER_API  },
     { "RaiseToTop",         LayerApi::RaiseToTop,               LAYER_API  },
-    { "LowerToBottom",      LayerApi::ToBottom,                 LAYER_API  },
+    { "LowerToBottom",      LayerApi::LowerToBottom,            LAYER_API  },
     { "MoveAbove",          LayerApi::MoveAbove,                LAYER_API  },
     { "MoveBelow",          LayerApi::MoveBelow,                LAYER_API  },
     // ignore SetClipping, use layer.clippingEnable

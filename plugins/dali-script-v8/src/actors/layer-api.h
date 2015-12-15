@@ -44,7 +44,7 @@ namespace LayerApi
   void RaiseAbove( const v8::FunctionCallbackInfo< v8::Value >& args );
   void LowerBelow( const v8::FunctionCallbackInfo< v8::Value >& args );
   void RaiseToTop( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void ToBottom( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void LowerToBottom( const v8::FunctionCallbackInfo< v8::Value >& args );
   void MoveBelow( const v8::FunctionCallbackInfo< v8::Value >& args );
   void MoveAbove( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetDepthTestDisabled( const v8::FunctionCallbackInfo< v8::Value >& args );
