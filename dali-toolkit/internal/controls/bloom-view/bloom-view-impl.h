@@ -24,11 +24,11 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
 
 namespace Dali
@@ -132,8 +132,7 @@ private:
   // for extracting bright parts of image to an offscreen target
   FrameBufferImage mBloomExtractTarget; // for rendering bright parts of image into separate texture, also used as target for gaussian blur
   RenderTask mBloomExtractTask;
-  ShaderEffect mBloomExtractShader;
-  ImageActor mBloomExtractImageActor;
+  Toolkit::ImageView mBloomExtractImageActor;
 
   /////////////////////////////////////////////////////////////
   // for blurring extracted bloom
@@ -142,13 +141,13 @@ private:
   /////////////////////////////////////////////////////////////
   // for compositing bloom and children renders to offscreen target
   RenderTask mCompositeTask;
-  ShaderEffect mCompositeShader;
-  ImageActor mCompositeImageActor;
+
+  Toolkit::ImageView mCompositeImageActor;
 
   /////////////////////////////////////////////////////////////
   // for holding blurred result
   FrameBufferImage mOutputRenderTarget;
-  ImageActor mTargetImageActor;
+  Toolkit::ImageView mTargetImageActor;
 
   /////////////////////////////////////////////////////////////
   // Properties for setting by user, e.g. by animations
@@ -158,6 +157,8 @@ private:
   Property::Index mBloomSaturationPropertyIndex;
   Property::Index mImageIntensityPropertyIndex;
   Property::Index mImageSaturationPropertyIndex;
+
+  bool mActivated:1;
 
 private:
 
