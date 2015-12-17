@@ -27,9 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
-EffectsView EffectsView::New()
+EffectsView EffectsView::New( EffectType type )
 {
-  return Internal::EffectsView::New();
+  EffectsView effectsView = Internal::EffectsView::New();
+  GetImpl(effectsView).SetType( type );
+  return effectsView;
 }
 
 EffectsView::EffectsView()
@@ -59,24 +61,9 @@ EffectsView::~EffectsView()
 {
 }
 
-void EffectsView::SetType( EffectsView::EffectType type )
-{
-  GetImpl(*this).SetType( type );
-}
-
 EffectsView::EffectType EffectsView::GetType() const
 {
   return GetImpl(*this).GetType();
-}
-
-void EffectsView::Enable()
-{
-  GetImpl(*this).Enable();
-}
-
-void EffectsView::Disable()
-{
-  GetImpl(*this).Disable();
 }
 
 void EffectsView::Refresh()
@@ -92,36 +79,6 @@ void EffectsView::SetRefreshOnDemand( bool onDemand )
 void EffectsView::SetPixelFormat( Pixel::Format pixelFormat )
 {
   GetImpl(*this).SetPixelFormat( pixelFormat );
-}
-
-void EffectsView::SetOutputImage( FrameBufferImage image )
-{
-  GetImpl(*this).SetOutputImage( image );
-}
-
-FrameBufferImage EffectsView::GetOutputImage()
-{
-  return GetImpl(*this).GetOutputImage();
-}
-
-Property::Index EffectsView::GetEffectSizePropertyIndex() const
-{
-  return GetImpl(*this).GetEffectSizePropertyIndex();
-}
-
-Property::Index EffectsView::GetEffectStrengthPropertyIndex() const
-{
-  return GetImpl(*this).GetEffectStrengthPropertyIndex();
-}
-
-Property::Index EffectsView::GetEffectOffsetPropertyIndex() const
-{
-  return GetImpl(*this).GetEffectOffsetPropertyIndex();
-}
-
-Property::Index EffectsView::GetEffectColorPropertyIndex() const
-{
-  return GetImpl(*this).GetEffectColorPropertyIndex();
 }
 
 void EffectsView::SetBackgroundColor( const Vector4& color )

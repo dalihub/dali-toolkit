@@ -19,10 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali/public-api/actors/image-actor.h>
 
 // INTERNAL INCLUDES
 #include "image-filter.h"
@@ -79,10 +78,6 @@ public: // From ImageFilter
   Handle GetHandleForAnimateBlurStrength();
 
 private:
-  /**
-   * Setup position and parameters for camera
-   */
-  void SetupCamera();
 
   /**
    * Setup render tasks for blur
@@ -95,26 +90,21 @@ private:
 
 private: // Attributes
 
-  CameraActor      mCameraForBlur;
-
   // To perform horizontal blur from mInputImage to mImageForHorz
-  RenderTask       mRenderTaskForHorz;
-  ImageActor       mActorForInput;
-  FrameBufferImage mImageForHorz;
-  ShaderEffect     mShaderForHorz;
+  RenderTask         mRenderTaskForHorz;
+  Toolkit::ImageView mActorForInput;
+  FrameBufferImage   mImageForHorz;
 
   // To perform vertical blur from mImageForHorz to mOutputImage
-  RenderTask       mRenderTaskForVert;
-  ImageActor       mActorForHorz;
-  ShaderEffect     mShaderForVert;
-  FrameBufferImage mBlurredImage;
+  RenderTask         mRenderTaskForVert;
+  Toolkit::ImageView mActorForHorz;
+  FrameBufferImage   mBlurredImage;
 
   // To blend the blurred image and input image according to the blur strength
-  RenderTask       mRenderTaskForBlending;
-  ImageActor       mActorForBlending;
-  Actor            mRootActorForBlending;
-  ShaderEffect     mShaderForBlending;
-  Property::Index  mBlurStrengthPropertyIndex;
+  RenderTask         mRenderTaskForBlending;
+  Toolkit::ImageView mActorForBlending;
+  Actor              mRootActorForBlending;
+  Property::Index    mBlurStrengthPropertyIndex;
 
 }; // class BlurTwoPassFilter
 

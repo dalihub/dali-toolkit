@@ -19,9 +19,9 @@
 #include "spread-filter.h"
 
 // EXTERNAL INCLUDES
-#include <sstream>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
@@ -38,37 +38,28 @@ namespace Internal
 namespace
 {
 
-const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
-
 const char* const SPREAD_FRAGMENT_SOURCE =
 {
  "precision highp float;\n"
- "uniform float uSpread;\n"
+ "varying mediump vec2 vTexCoord;\n"
+ "uniform sampler2D sTexture;\n"
+ "uniform int uSpread;\n"
  "uniform vec2 uTexScale;\n"
  "void main()\n"
  "{\n"
  "  vec4 color = texture2D( sTexture, vTexCoord);\n"
- "# ifdef DEBUG_RENDER\n"
- "  if( vTexCoord.s < 0.495 )\n"
+ "  for( int i = 1; i <= uSpread; ++i )\n"
  "  {\n"
- "# endif //def DEBUG_RENDER\n"
- "    int spread = int(uSpread);\n"
- "    for( int i = 1; i <= spread; ++i )\n"
- "    {\n"
- "      vec2 offset = uTexScale * float(i);\n"
- "      color = max( texture2D( sTexture, vTexCoord + offset), color );\n"
- "      color = max( texture2D( sTexture, vTexCoord - offset), color );\n"
- "    }\n"
- "# ifdef DEBUG_RENDER\n"
+ "    vec2 offset = uTexScale * float(i);\n"
+ "    color = max( texture2D( sTexture, vTexCoord + offset), color );\n"
+ "    color = max( texture2D( sTexture, vTexCoord - offset), color );\n"
  "  }\n"
- "  else if( vTexCoord.s <= 0.505 )\n"
- "  {\n"
- "    color = vec4( 1.0, 0.0, 0.0, 1.0 );\n"
- "  }\n"
- "# endif //def DEBUG_RENDER\n"
  "  gl_FragColor = color;\n"
  "}\n"
 };
+
+const char* const SPREAD_UNIFORM_NAME( "uSpread" );
+const char* const TEX_SCALE_UNIFORM_NAME( "uTexScale" );
 
 } // namespace
 
@@ -90,44 +81,35 @@ void SpreadFilter::SetSpread( float spread )
 
 void SpreadFilter::Enable()
 {
-  mCameraActor = CameraActor::New();
-  mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
-
   // create actor to render input with applied emboss effect
-  mActorForInput = ImageActor::New( mInputImage );
+  mActorForInput = Toolkit::ImageView::New( mInputImage );
   mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput.SetSize(mTargetSize);
-  mActorForInput.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
+  // register properties as shader uniforms
+  mActorForInput.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
+  mActorForInput.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 1.0f / mTargetSize.width, 0.0f ) );
 
   // create internal offscreen for result of horizontal pass
   mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
-
   // create an actor to render mImageForHorz for vertical blur pass
-  mActorForHorz = ImageActor::New( mImageForHorz );
+  mActorForHorz = Toolkit::ImageView::New( mImageForHorz );
   mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
   mActorForHorz.SetSize(mTargetSize);
-  mActorForHorz.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
+  // register properties as shader uniforms
+  mActorForHorz.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
+  mActorForHorz.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 0.0f, 1.0f / mTargetSize.height ) );
+
+  Property::Map customShader;
+  customShader[ "fragmentShader" ] = SPREAD_FRAGMENT_SOURCE;
+  Property::Map rendererMap;
+  rendererMap.Insert( "shader", customShader );
+
+  // set SPREAD custom shader
+  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   mRootActor.Add( mActorForInput );
   mRootActor.Add( mActorForHorz );
-  mRootActor.Add( mCameraActor );
-
-  std::ostringstream fragmentSource;
-  if( mDebugRender )
-  {
-    fragmentSource << "#define DEBUG_RENDER\n";
-  }
-  fragmentSource << SPREAD_FRAGMENT_SOURCE;
-
-  mShaderForHorz = ShaderEffect::New( "", fragmentSource.str() );
-  mActorForInput.SetShaderEffect( mShaderForHorz );
-  mShaderForHorz.SetUniform( "uSpread", mSpread );
-  mShaderForHorz.SetUniform( "uTexScale", Vector2( 1.0f / mTargetSize.width, 0.0f ) );
-
-  mShaderForVert = ShaderEffect::New( "", fragmentSource.str() );
-  mActorForHorz.SetShaderEffect( mShaderForVert );
-  mShaderForVert.SetUniform( "uSpread", mSpread );
-  mShaderForVert.SetUniform( "uTexScale", Vector2( 0.0f, 1.0f / mTargetSize.height ) );
 
   SetupCamera();
   CreateRenderTasks();
@@ -194,16 +176,6 @@ void SpreadFilter::SetSize( const Vector2& size )
   {
     mActorForHorz.SetSize(mTargetSize);
   }
-}
-
-void SpreadFilter::SetupCamera()
-{
-  // Create and place a camera for the embossing render, corresponding to its render target size
-  mCameraActor.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
-  mCameraActor.SetNearClippingPlane(1.0f);
-  mCameraActor.SetAspectRatio(mTargetSize.width / mTargetSize.height);
-  mCameraActor.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-  mCameraActor.SetPosition(0.0f, 0.0f, ((mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
 }
 
 void SpreadFilter::CreateRenderTasks()
