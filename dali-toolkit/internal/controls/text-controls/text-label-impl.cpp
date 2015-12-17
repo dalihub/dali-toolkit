@@ -93,6 +93,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowColor",          VECTOR4,
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineEnabled",     BOOLEAN, UNDERLINE_ENABLED    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineColor",       VECTOR4, UNDERLINE_COLOR      )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineHeight",      FLOAT,   UNDERLINE_HEIGHT     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableMarkup",         BOOLEAN, ENABLE_MARKUP        )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -290,6 +291,15 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextLabel::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          const bool enableMarkup = value.Get<bool>();
+          impl.mController->SetMarkupProcessorEnabled( enableMarkup );
+        }
+        break;
+      }
     }
   }
 }
@@ -422,6 +432,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetUnderlineHeight();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsMarkupProcessorEnabled();
         }
         break;
       }

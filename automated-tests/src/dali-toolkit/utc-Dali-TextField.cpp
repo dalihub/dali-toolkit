@@ -75,6 +75,7 @@ const char* const PROPERTY_NAME_SELECTION_HIGHLIGHT_COLOR            = "selectio
 const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX              = "decorationBoundingBox";
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
 const char* const PROPERTY_NAME_INPUT_COLOR                          = "inputColor";
+const char* const PROPERTY_NAME_ENABLE_MARKUP                        = "enableMarkup";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -264,6 +265,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_DECORATION_BOUNDING_BOX ) == TextField::Property::DECORATION_BOUNDING_BOX );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == TextField::Property::INPUT_METHOD_SETTINGS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_COLOR ) == TextField::Property::INPUT_COLOR );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP ) == TextField::Property::ENABLE_MARKUP );
   END_TEST;
 }
 
@@ -394,6 +396,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Input color
   field.SetProperty( TextField::Property::INPUT_COLOR, Color::YELLOW );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::INPUT_COLOR ), Color::YELLOW, TEST_LOCATION );
+
+  // Check the enable markup property.
+  DALI_TEST_CHECK( !field.GetProperty<bool>( TextField::Property::ENABLE_MARKUP ) );
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  DALI_TEST_CHECK( field.GetProperty<bool>( TextField::Property::ENABLE_MARKUP ) );
 
   END_TEST;
 }

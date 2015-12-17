@@ -119,6 +119,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHighlightColor",      
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decorationBoundingBox",                RECTANGLE, DECORATION_BOUNDING_BOX              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputColor",                           VECTOR4,   INPUT_COLOR                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableMarkup",                         BOOLEAN,   ENABLE_MARKUP                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -566,6 +567,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          const bool enableMarkup = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_MARKUP %d\n", impl.mController.Get(), enableMarkup );
+
+          impl.mController->SetMarkupProcessorEnabled( enableMarkup );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -855,6 +867,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
       {
+        break;
+      }
+      case Toolkit::TextField::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsMarkupProcessorEnabled();
+        }
         break;
       }
     } //switch
