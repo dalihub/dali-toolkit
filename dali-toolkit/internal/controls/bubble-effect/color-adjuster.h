@@ -18,7 +18,9 @@
  *
  */
 #include <dali/public-api/math/vector3.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-map.h>
+
+#define DALI_COMPOSE_SHADER(STR) #STR
 
 namespace Dali
 {
@@ -29,6 +31,12 @@ namespace Toolkit
 namespace Internal
 {
 
+inline void SetColorAdjusterProperties( Actor& actor, const Vector3& hsvDelta, bool ignoreAlpha = false )
+{
+  actor.RegisterProperty( "uHSVDelta", hsvDelta );
+  actor.RegisterProperty( "uIgnoreAlpha", ignoreAlpha ? 1.f : 0.f );
+}
+
 /**
 * Creates a new ColorAdjuster effect.
 * ColorAdjuster is a custom shader effect to adjust the image color in HSV space.
@@ -36,12 +44,14 @@ namespace Internal
 * @param[in] ignoreAlpha If true, the result color will be opaque even though source has alpha value
 * @return A handle to a newly allocated Dali resource.
 */
-inline ShaderEffect CreateColorAdjuster( const Vector3& hsvDelta, bool ignoreAlpha = false )
+inline Property::Map CreateColorAdjuster()
 {
   std::string fragmentShader = DALI_COMPOSE_SHADER(
     precision highp float;\n
     uniform vec3 uHSVDelta;\n
     uniform float uIgnoreAlpha;\n
+    varying mediump vec2 vTexCoord;\n
+    uniform sampler2D sTexture;\n
     float rand(vec2 co) \n
     {\n
       return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); \n}
@@ -78,11 +88,13 @@ inline ShaderEffect CreateColorAdjuster( const Vector3& hsvDelta, bool ignoreAlp
     }\n
   );
 
-  ShaderEffect shaderEffect = ShaderEffect::New("", fragmentShader);
-  shaderEffect.SetUniform( "uHSVDelta", hsvDelta );
-  shaderEffect.SetUniform( "uIgnoreAlpha", ignoreAlpha?1.0f:0.0f );
+  Property::Map customShader;
+  customShader[ "fragmentShader" ] = fragmentShader;
 
-  return shaderEffect;
+  Property::Map map;
+  map[ "shader" ] = customShader;
+
+  return map;
 }
 
 } // namespace Internal

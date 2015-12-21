@@ -22,9 +22,7 @@
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/buttons/button-impl.h>
-
-// EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
@@ -202,14 +200,14 @@ void Button::SetLabel( Actor label )
 
 void Button::SetButtonImage( Image image )
 {
-  Actor imageActor = ImageActor::New( image );
+  Actor imageActor = Toolkit::ImageView::New( image );
   imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
 }
 
 void Button::SetSelectedImage( Image image )
 {
-  Actor imageActor = ImageActor::New( image );
+  Actor imageActor = Toolkit::ImageView::New( image );
   imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageActor );
 }

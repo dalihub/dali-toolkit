@@ -27,7 +27,6 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 

@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
-
 namespace Dali
 {
 

@@ -24,11 +24,9 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -541,7 +539,9 @@ void Button::SetUnselectedColor( const Vector4& color )
   else
   {
     // If there is no existing content, create a new actor to use for flat color.
-    SetupContent( mUnselectedContent, CreateSolidColorActor( mUnselectedColor ) );
+    Toolkit::Control unselectedContentActor = Toolkit::Control::New();
+    unselectedContentActor.SetBackgroundColor( mUnselectedColor );
+    SetupContent( mUnselectedContent, unselectedContentActor );
     mUnselectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   }
 }
@@ -563,7 +563,9 @@ void Button::SetSelectedColor( const Vector4& color )
   else
   {
     // If there is no existing content, create a new actor to use for flat color.
-    SetupContent( mSelectedContent, CreateSolidColorActor( mSelectedColor ) );
+    Toolkit::Control selectedContentActor = Toolkit::Control::New();
+    selectedContentActor.SetBackgroundColor( mSelectedColor );
+    SetupContent( mSelectedContent, selectedContentActor );
     mSelectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   }
 }

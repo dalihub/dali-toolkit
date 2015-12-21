@@ -812,7 +812,7 @@ int UtcDaliToolkitScrollViewSignalsUpdate(void)
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
 
-  ImageActor image = CreateSolidColorActor( Color::RED );
+  Actor image = Actor::New();
   image.SetSize(stageSize);
   image.SetParentOrigin(ParentOrigin::TOP_LEFT);
   image.SetAnchorPoint(AnchorPoint::TOP_LEFT);

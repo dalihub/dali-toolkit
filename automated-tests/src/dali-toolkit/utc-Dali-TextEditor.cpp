@@ -545,8 +545,7 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
 
   Actor offscreenImage = editor.GetChildAt( 2u );
-  ImageActor imageActor = ImageActor::DownCast( offscreenImage );
-  DALI_TEST_CHECK( imageActor );
+  DALI_TEST_CHECK( offscreenImage );
 
   // Create a tap event to touch the text editor.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );

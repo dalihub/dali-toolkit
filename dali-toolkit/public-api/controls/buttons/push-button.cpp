@@ -22,7 +22,6 @@
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/buttons/push-button-impl.h>
-#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
