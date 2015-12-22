@@ -91,6 +91,7 @@ exit 0
 # Files in Binary Packages
 ##############################
 %files
+%manifest dali-addon.manifest
 %defattr(-,root,root,-)
 %{installPath}
 
