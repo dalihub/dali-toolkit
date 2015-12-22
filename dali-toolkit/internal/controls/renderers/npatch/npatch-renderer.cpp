@@ -329,6 +329,8 @@ void NPatchRenderer::InitializeRenderer( Renderer& renderer )
   }
   else
   {
+    DALI_ASSERT_ALWAYS( geometry && "Geometry handle is empty" );
+
     mImpl->mRenderer.SetGeometry( geometry );
     Material material = mImpl->mRenderer.GetMaterial();
     if( material )
