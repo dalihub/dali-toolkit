@@ -268,15 +268,6 @@ public:
    */
   DALI_INTERNAL bool EmitKeyEventSignal( const KeyEvent& event );
 
-private:
-
-  /**
-   * Sets up the background image/color based on the current state.
-   * This will set the depth index (always), and add to stage if the control is on stage.
-   *
-   */
-  void UpdateBackgroundState();
-
 protected: // For derived classes to call
 
   /**

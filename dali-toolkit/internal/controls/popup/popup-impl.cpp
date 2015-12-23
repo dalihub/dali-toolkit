@@ -326,8 +326,6 @@ void Popup::OnInitialize()
   // Any content after this point which is added to Self() will be re-parented to mContent.
   mAlterAddedChild = true;
 
-  // Make self keyboard focusable and a focus group.
-  self.SetKeyboardFocusable( true );
   SetAsKeyboardFocusGroup( true );
 }
 
@@ -719,7 +717,6 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
 
     // Allow the popup to catch events.
     mPopupLayout.SetSensitive( true );
-    SetKeyInputFocus();
 
     // Handle the keyboard focus when popup is shown.
     Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
@@ -727,14 +724,30 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
     {
       mPreviousFocusedActor = keyboardFocusManager.GetCurrentFocusActor();
 
-      if( mContent && mContent.IsKeyboardFocusable() )
+      if( Self().IsKeyboardFocusable() )
       {
-        // If content is focusable, move the focus to content.
-        keyboardFocusManager.SetCurrentFocusActor( mContent );
-      }
-      else
-      {
-        DALI_LOG_WARNING( "There is no focusable in popup\n" );
+        // Setup the actgor to start focus from.
+        Actor focusActor;
+        if( mContent && mContent.IsKeyboardFocusable() )
+        {
+          // If the content is focusable, move the focus to the content.
+          focusActor = mContent;
+        }
+        else if( mFooter && mFooter.IsKeyboardFocusable() )
+        {
+          // If the footer is focusable, move the focus to the footer.
+          focusActor = mFooter;
+        }
+        else
+        {
+          DALI_LOG_WARNING( "There is no focusable in popup\n" );
+        }
+
+        if( focusActor )
+        {
+          SetKeyInputFocus();
+          keyboardFocusManager.SetCurrentFocusActor( focusActor );
+        }
       }
     }
   }
@@ -1732,120 +1745,152 @@ bool Popup::OnKeyEvent( const KeyEvent& event )
   return consumed;
 }
 
+void Popup::AddFocusableChildrenRecursive( Actor parent, std::vector< Actor >& focusableActors )
+{
+  if( parent )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( parent );
+    bool layoutControl = control && GetImplementation( control ).IsKeyboardNavigationSupported();
+
+    if( parent.IsKeyboardFocusable() || layoutControl )
+    {
+      focusableActors.push_back( parent );
+
+      if( !layoutControl )
+      {
+        for( unsigned int i = 0, numberChildren = parent.GetChildCount(); i < numberChildren; ++i )
+        {
+          Actor child( parent.GetChildAt( i ) );
+          AddFocusableChildrenRecursive( child, focusableActors );
+        }
+      }
+    }
+  }
+}
+
+void Popup::AddFocusableChildren( Actor parent, std::vector< Actor >& focusableActors )
+{
+  if( parent )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( parent );
+    if( !GetImplementation( control ).IsKeyboardNavigationSupported() )
+    {
+      for( unsigned int i = 0, numberChildren = parent.GetChildCount(); i < numberChildren; ++i )
+      {
+        Actor child( parent.GetChildAt( i ) );
+        AddFocusableChildrenRecursive( child, focusableActors );
+      }
+    }
+    else
+    {
+      focusableActors.push_back( parent );
+    }
+  }
+}
+
 Actor Popup::GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled )
 {
+  std::string currentStr;
+  if( currentFocusedActor )
+  {
+    currentStr = currentFocusedActor.GetName();
+  }
+
   Actor nextFocusableActor( currentFocusedActor );
+  Actor currentFocusGroup;
+  if( currentFocusedActor )
+  {
+    currentFocusGroup = KeyboardFocusManager::Get().GetFocusGroup( currentFocusedActor );
+  }
 
   // TODO: Needs to be optimised
-  if( !currentFocusedActor || ( currentFocusedActor && KeyboardFocusManager::Get().GetFocusGroup( currentFocusedActor ) != Self() ) )
+  // The following statement checks that if we have a current focused actor, then the current focus group is not the popup content or footer.
+  // This is to detect if the focus is currently outside the popup, and if so, move it inside.
+  if( !currentFocusedActor ||
+    ( currentFocusedActor && ( ( !mContent || ( currentFocusGroup != mContent ) ) && ( !mFooter || ( currentFocusGroup != mFooter ) ) ) ) )
   {
-    // The current focused actor is not within popup
+    // The current focused actor is not within popup.
     if( mContent && mContent.IsKeyboardFocusable() )
     {
-      // If content is focusable, move the focus to content
+      // If the content is focusable, move the focus to the content.
       nextFocusableActor = mContent;
+    }
+    else if( mFooter && mFooter.IsKeyboardFocusable() )
+    {
+      // If the footer is focusable, move the focus to the footer.
+      nextFocusableActor = mFooter;
     }
   }
   else
   {
     // Rebuild the focus chain because controls or content can be added or removed dynamically
     std::vector< Actor > focusableActors;
-    if( mContent && mContent.IsKeyboardFocusable() )
+
+    AddFocusableChildren( mContent, focusableActors );
+    AddFocusableChildren( mFooter, focusableActors );
+
+    std::vector< Actor >::iterator endIterator = focusableActors.end();
+    std::vector< Actor >::iterator currentIterator = focusableActors.begin();
+    for( std::vector< Actor >::iterator iterator = focusableActors.begin(); iterator != endIterator; ++iterator )
     {
-      focusableActors.push_back( mContent );
+      if( currentFocusedActor == *iterator )
+      {
+        currentIterator = iterator;
+      }
     }
 
-    for( std::vector< Actor >::iterator iter = focusableActors.begin(), end = focusableActors.end(); iter != end; ++iter )
+    if( currentIterator != endIterator )
     {
-      if( currentFocusedActor == *iter )
+      switch( direction )
       {
-        switch( direction )
+        case Toolkit::Control::KeyboardFocus::LEFT:
         {
-          case Toolkit::Control::KeyboardFocus::LEFT:
+          if( currentIterator == focusableActors.begin() )
           {
-            if( iter == focusableActors.begin() )
-            {
-              nextFocusableActor = *( focusableActors.end() - 1 );
-            }
-            else
-            {
-              nextFocusableActor = *( iter - 1 );
-            }
-            break;
+            nextFocusableActor = *( endIterator - 1 );
           }
-          case Toolkit::Control::KeyboardFocus::RIGHT:
+          else
           {
-            if( iter == focusableActors.end() - 1 )
-            {
-              nextFocusableActor = *( focusableActors.begin() );
-            }
-            else
-            {
-              nextFocusableActor = *( iter + 1 );
-            }
-            break;
+            nextFocusableActor = *( currentIterator - 1 );
           }
-
-          case Toolkit::Control::KeyboardFocus::UP:
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::RIGHT:
+        {
+          if( currentIterator == endIterator - 1 )
           {
-            if( mContent && *iter == mContent )
-            {
-              nextFocusableActor = *( focusableActors.end() - 1 );
-            }
-            else
-            {
-              if( mContent && mContent.IsKeyboardFocusable() )
-              {
-                nextFocusableActor = mContent;
-              }
-              else
-              {
-                if ( iter == focusableActors.begin() )
-                {
-                  nextFocusableActor = *( focusableActors.end() - 1 );
-                }
-                else
-                {
-                  nextFocusableActor = *( iter - 1 );
-                }
-              }
-            }
-            break;
+            nextFocusableActor = *( focusableActors.begin() );
           }
-
-          case Toolkit::Control::KeyboardFocus::DOWN:
+          else
           {
-            if( mContent && mContent.IsKeyboardFocusable() )
-            {
-              nextFocusableActor = mContent;
-            }
-            else
-            {
-              if( iter == focusableActors.end() - 1 )
-              {
-                nextFocusableActor = *( focusableActors.begin() );
-              }
-              else
-              {
-                nextFocusableActor = *( iter + 1 );
-              }
-            }
-            break;
+            nextFocusableActor = *( currentIterator + 1 );
           }
+          break;
         }
 
-        if( !nextFocusableActor )
+        case Toolkit::Control::KeyboardFocus::UP:
         {
-          DALI_LOG_WARNING( "Can not decide next focusable actor\n" );
+          nextFocusableActor = *(  focusableActors.begin() );
+          break;
         }
 
-        break;
+        case Toolkit::Control::KeyboardFocus::DOWN:
+        {
+          nextFocusableActor = *( endIterator - 1 );
+          break;
+        }
+      }
+
+      if( !nextFocusableActor )
+      {
+        DALI_LOG_WARNING( "Can not decide next focusable actor\n" );
       }
     }
   }
 
   return nextFocusableActor;
 }
+
 
 } // namespace Internal
 

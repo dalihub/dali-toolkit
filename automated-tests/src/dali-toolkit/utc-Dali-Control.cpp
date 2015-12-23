@@ -400,12 +400,16 @@ int UtcDaliControlBackgroundColor(void)
   DALI_TEST_CHECK( resultMap->Find( "blendColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" )->Get<Vector4>() == Color::RED );
 
+  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
+
   control.SetBackgroundColor( Color::YELLOW );
 
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "blendColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" )->Get<Vector4>() == Color::YELLOW );
+
+  DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::YELLOW, TEST_LOCATION );
 
   END_TEST;
 }

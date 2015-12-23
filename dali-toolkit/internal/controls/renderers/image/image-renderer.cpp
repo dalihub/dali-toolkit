@@ -474,13 +474,12 @@ void ImageRenderer::InitializeRenderer( const Image& image )
 {
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
 
-  if( !image )
-  {
-    return;
-  }
-
   mImpl->mRenderer = CreateRenderer();
-  ApplyImageToSampler( image );
+
+  if( image )
+  {
+    ApplyImageToSampler( image );
+  }
 
   // default shader or custom shader with the default image vertex shader
   if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty() )
@@ -497,7 +496,7 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer( mImageUrl );
   }
-  else if( mImage )
+  else
   {
     InitializeRenderer( mImage );
   }

@@ -70,6 +70,7 @@ public:
    */
   virtual Length GetGlyphs( GlyphInfo* glyphs,
                             Vector2* glyphPositions,
+                            Vector4* glyphColors,
                             GlyphIndex glyphIndex,
                             Length numberOfGlyphs ) const;
 

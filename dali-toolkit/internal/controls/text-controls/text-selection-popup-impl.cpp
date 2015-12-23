@@ -736,14 +736,13 @@ std::string TextSelectionPopup::GetPressedImage() const
    {
      const Size size( mOptionDividerSize.width, 0.0f ); // Height FILL_TO_PARENT
 
-     ImageActor divider = Toolkit::CreateSolidColorActor( Color::WHITE );
+     Toolkit::Control divider = Toolkit::Control::New();
 #ifdef DECORATOR_DEBUG
      divider.SetName("Text's popup divider");
 #endif
      divider.SetSize( size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
-     divider.SetColor( mDividerColor );
-     divider.SetSortModifier( DECORATION_DEPTH_INDEX );
+     divider.SetBackgroundColor( mDividerColor  );
      mToolbar.AddDivider( divider );
    }
  }

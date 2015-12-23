@@ -59,10 +59,10 @@ inline Property::Map CreateImageRegionEffect()
       "  position.xyz *= uSize;\n"
       "  gl_Position = uMvpMatrix * position;\n"
       // The line below is doing the same as the following commented lines:
-      //"  vec2 imageSize = sTextureRect.zw - sTextureRect.xy;\n"
-      //"  vec2 topLeft = sTextureRect.xy + uTopLeft * imageSize;\n"
-      //"  vec2 bottomRight = sTextureRect.xy + uBottomRight * imageSize;\n"
-      //"  vec2 texCoord = (aTexCoord - sTextureRect.xy) / imageSize;\n"
+      //"  vec2 imageSize = uTextureRect.zw - uTextureRect.xy;\n"
+      //"  vec2 topLeft = uTextureRect.xy + uTopLeft * imageSize;\n"
+      //"  vec2 bottomRight = uTextureRect.xy + uBottomRight * imageSize;\n"
+      //"  vec2 texCoord = (aTexCoord - uTextureRect.xy) / imageSize;\n"
       //"  vTexCoord = topLeft + texCoord * ( bottomRight - topLeft );\n"
 
       "  vec2 texCoord = aPosition + vec2(0.5);\n"

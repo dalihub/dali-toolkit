@@ -128,7 +128,7 @@ KeyboardFocusManager::~KeyboardFocusManager()
 {
 }
 
-bool KeyboardFocusManager::SetCurrentFocusActor(Actor actor)
+bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
 
@@ -140,41 +140,42 @@ bool KeyboardFocusManager::SetCurrentFocusActor(Actor actor)
   return false;
 }
 
-bool KeyboardFocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
+bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
 {
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
-  Actor actor = rootActor.FindChildById(actorID);
+  Actor actor = rootActor.FindChildById( actorID );
+  bool success = false;
 
-  // Check whether the actor is in the stage
-  if(actor)
+  // Check whether the actor is in the stage and is keyboard focusable.
+  if( actor && actor.IsKeyboardFocusable() )
   {
-    // Set the focus only when the actor is keyboard focusable
-    if(actor.IsKeyboardFocusable())
+    mIsFocusIndicatorEnabled = true;
+    // Draw the focus indicator upon the focused actor
+    if( mFocusIndicatorActor )
     {
-      // Draw the focus indicator upon the focused actor
-      if(mIsFocusIndicatorEnabled && mFocusIndicatorActor)
-      {
-        actor.Add(mFocusIndicatorActor);
-      }
-
-      // Send notification for the change of focus actor
-      if( !mFocusChangedSignal.Empty() )
-      {
-        mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
-      }
-
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
-
-      // Save the current focused actor
-      mCurrentFocusActor = actorID;
-
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
-      return true;
+      actor.Add( mFocusIndicatorActor );
     }
+
+    // Send notification for the change of focus actor
+    if( !mFocusChangedSignal.Empty() )
+    {
+      mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
+    }
+
+    DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
+
+    // Save the current focused actor
+    mCurrentFocusActor = actorID;
+
+    DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
+    success = true;
+  }
+  else
+  {
+    DALI_LOG_WARNING("[%s:%d] FAILED\n", __FUNCTION__, __LINE__);
   }
 
-  DALI_LOG_WARNING("[%s:%d] FAILED\n", __FUNCTION__, __LINE__);
-  return false;
+  return success;
 }
 
 Actor KeyboardFocusManager::GetCurrentFocusActor()
@@ -458,8 +459,7 @@ void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the keyboard focusable actors
   Toolkit::ImageView focusIndicator = Toolkit::ImageView::New(FOCUS_BORDER_IMAGE_PATH);
-  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
+  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   // Apply size constraint to the focus indicator
   focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );

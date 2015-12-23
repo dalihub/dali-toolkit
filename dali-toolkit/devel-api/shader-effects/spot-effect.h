@@ -48,7 +48,7 @@ inline ShaderEffect CreateSpotEffect()
       "\n"
       "void main()\n"
       "{\n"
-      "  mediump vec4 world = vec4(aPosition, 1.0);\n"
+      "  mediump vec4 world = vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
       "  \n"
       "  mediump vec2 d = vec2(world.xy - uCenter);\n"
       "  mediump float dist = length(d);\n"
@@ -57,7 +57,7 @@ inline ShaderEffect CreateSpotEffect()
       "  vRange = max(0.1, range);\n"
       "  \n"
       "  gl_Position = uMvpMatrix * world;\n"
-      "  vTexCoord = aTexCoord;\n"
+      "  vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
       "}");
 
   std::string fragmentShader(

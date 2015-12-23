@@ -124,7 +124,7 @@ function OnPressed( actor, touchEvent )
 }
   
 // connect to touch events
-myActor.connect( "touched", onPressed );
+myActor.on( "touched", onPressed );
 
 ```
 
@@ -143,7 +143,7 @@ hoverEvent = {
 }
 ```
       // connect to touch events
-      myActor.connect( "hovered", onHover);
+      myActor.on( "hovered", onHover);
 
 #### Mouse wheel event
 
@@ -161,7 +161,7 @@ mouseWheelEvent = {
 }
   
 // connect to touch events
-myActor.connect( "mouseWheelEvent", onMouseWheel );
+myActor.on( "mouseWheelEvent", onMouseWheel );
 ```
 #### Key events
 

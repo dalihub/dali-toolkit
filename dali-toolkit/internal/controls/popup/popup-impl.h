@@ -478,6 +478,25 @@ private:
 
 private:
 
+  /**
+   * Recursively add any focusable actors or layout containers to the provided vector.
+   * Include the top level actor if it is a layout container.
+   *
+   * @param[in]     parent          The actor to start from
+   * @param[in/out] focusableActors The vector to add focusable actors to
+   */
+  void AddFocusableChildren( Actor parent, std::vector< Actor >& focusableActors );
+
+  /**
+   * Recursively add any focusable actors or layout containers to the provided vector.
+   *
+   * @param[in]     parent          The actor to start from
+   * @param[in/out] focusableActors The vector to add focusable actors to
+   */
+  void AddFocusableChildrenRecursive( Actor parent, std::vector< Actor >& focusableActors );
+
+private:
+
   // Undefined.
   Popup(const Popup&);
 

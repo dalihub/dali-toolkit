@@ -48,7 +48,7 @@ daliApp.myCallback = function (keyEvent)
   }
 }
 
-dali.stage.connect("keyEvent", daliApp.myCallback);
+dali.stage.on("keyEvent", daliApp.myCallback);
 ```
 
 The key event object has the following properties

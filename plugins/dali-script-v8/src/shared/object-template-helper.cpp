@@ -34,12 +34,12 @@ namespace ObjectTemplateHelper
 
 void AddSignalConnectAndDisconnect( v8::Isolate* isolate,  v8::Local<v8::ObjectTemplate>& objTemplate )
 {
-  objTemplate->Set( v8::String::NewFromUtf8( isolate, "connect"),
+  objTemplate->Set( v8::String::NewFromUtf8( isolate, "on"),
                      v8::FunctionTemplate::New( isolate, SignalManager::SignalConnect) );
 
 
 
-  objTemplate->Set( v8::String::NewFromUtf8( isolate, "disconnect"),
+  objTemplate->Set( v8::String::NewFromUtf8( isolate, "off"),
                      v8::FunctionTemplate::New( isolate, SignalManager::SignalDisconnect) );
 }
 

@@ -71,6 +71,11 @@ namespace
   };
 } // namespace
 
+uint8_t GetUtf8Length( uint8_t utf8LeadByte )
+{
+  return UTF8_LENGTH[utf8LeadByte];
+}
+
 uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, uint32_t length )
 {
   uint32_t numberOfCharacters = 0u;

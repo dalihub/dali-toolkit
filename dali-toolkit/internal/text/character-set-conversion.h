@@ -32,6 +32,15 @@ namespace Text
 {
 
 /**
+ * @brief Retrieves the number of bytes of a utf8 character.
+ *
+ * @param[in] utf8LeadByte The lead byte of the utf8 character.
+ *
+ * @return The number of bytes of the character.
+ */
+uint8_t GetUtf8Length( uint8_t utf8LeadByte );
+
+/**
  * @brief Retrieves the number of characters of the text array encoded in UTF8
  *
  * @param[in] utf8 The pointer to the UTF8 array.

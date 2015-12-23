@@ -97,6 +97,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontalAlignment",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "textColor",                            VECTOR4,   TEXT_COLOR                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextColor",                 VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputColor",                           VECTOR4,   INPUT_COLOR                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadowOffset",                         VECTOR2,   SHADOW_OFFSET                        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadowColor",                          VECTOR4,   SHADOW_COLOR                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primaryCursorColor",                   VECTOR4,   PRIMARY_CURSOR_COLOR                 )
@@ -291,6 +292,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           if( impl.mController->GetTextColor() != textColor )
           {
             impl.mController->SetTextColor( textColor );
+            impl.mController->SetInputColor( textColor );
             impl.mRenderer.Reset();
           }
         }
@@ -308,6 +310,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
             impl.mController->SetPlaceholderTextColor( textColor );
             impl.mRenderer.Reset();
           }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_COLOR:
+      {
+        if( impl.mController )
+        {
+          const Vector4 inputColor = value.Get< Vector4 >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p INPUT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), inputColor.r, inputColor.g, inputColor.b, inputColor.a );
+
+          impl.mController->SetInputColor( inputColor );
         }
         break;
       }
@@ -680,6 +693,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetPlaceholderTextColor();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_COLOR:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetInputColor();
         }
         break;
       }

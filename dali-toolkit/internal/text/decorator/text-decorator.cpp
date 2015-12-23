@@ -35,6 +35,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
@@ -220,9 +222,9 @@ struct Decorator::Impl : public ConnectionTracker
     {
     }
 
-    ImageActor actor;
+    ImageView actor;
     Actor grabArea;
-    ImageActor markerActor;
+    ImageView markerActor;
 
     Vector2 position;
     Size    size;
@@ -523,10 +525,10 @@ struct Decorator::Impl : public ConnectionTracker
     DeterminePositionPopup();
   }
 
-  void CreateCursor( ImageActor& cursor, const Vector4& color )
+  void CreateCursor( Control& cursor, const Vector4& color )
   {
-    cursor = CreateSolidColorActor( color );
-    cursor.SetSortModifier( DECORATION_DEPTH_INDEX );
+    cursor = Control::New();
+    cursor.SetBackgroundColor( color );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
     cursor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   }
@@ -657,15 +659,17 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( !grabHandle.actor )
     {
-      grabHandle.actor = ImageActor::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
-      grabHandle.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
+      grabHandle.actor = ImageView::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
+      GetImpl( grabHandle.actor).SetDepthIndex( DECORATION_DEPTH_INDEX );
       grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
       grabHandle.actor.SetName( "GrabHandleActor" );
       if ( Dali::Internal::gLogFilter->IsEnabledFor( Debug::Verbose ) )
       {
-        grabHandle.grabArea = Toolkit::CreateSolidColorActor( Vector4(0.0f, 0.0f, 0.0f, 0.0f), true, Color::RED, 1 );
+        grabHandle.grabArea = Control::New();
+        Toolkit::Control control = Toolkit::Control::DownCast( grabHandle.grabArea );
+        control.SetBackgroundColor( Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) );
         grabHandle.grabArea.SetName( "GrabArea" );
       }
       else
@@ -701,7 +705,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( image )
     {
-      handle.markerActor = ImageActor::New( image );
+      handle.markerActor = ImageView::New( image );
       handle.markerActor.SetColor( mHandleColor );
       handle.actor.Add( handle.markerActor );
 
@@ -725,12 +729,12 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& primary = mHandle[ LEFT_SELECTION_HANDLE ];
     if( !primary.actor )
     {
-      primary.actor = ImageActor::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
+      primary.actor = ImageView::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
       primary.actor.SetName("SelectionHandleOne");
 #endif
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
-      primary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
+      GetImpl( primary.actor ).SetDepthIndex( DECORATION_DEPTH_INDEX );
       primary.actor.SetColor( mHandleColor );
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -759,12 +763,12 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( !secondary.actor )
     {
-      secondary.actor = ImageActor::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
+      secondary.actor = ImageView::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
       secondary.actor.SetName("SelectionHandleTwo");
 #endif
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
-      secondary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
+      GetImpl( secondary.actor ).SetDepthIndex( DECORATION_DEPTH_INDEX );
       secondary.actor.SetColor( mHandleColor );
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -1635,8 +1639,8 @@ struct Decorator::Impl : public ConnectionTracker
   PropertyNotification mVerticalGreaterThanNotification;   ///< Notifies when the 'y' coord of the active layer is grater than a given value.
   PropertyNotification mHorizontalLessThanNotification;    ///< Notifies when the 'x' coord of the active layer is less than a given value.
   PropertyNotification mHorizontalGreaterThanNotification; ///< Notifies when the 'x' coord of the active layer is grater than a given value.
-  ImageActor           mPrimaryCursor;
-  ImageActor           mSecondaryCursor;
+  Control              mPrimaryCursor;
+  Control              mSecondaryCursor;
 
   Actor               mHighlightActor;            ///< Actor to display highlight
   Renderer            mHighlightRenderer;
@@ -1837,10 +1841,10 @@ void Decorator::SetHandleActive( HandleType handleType, bool active )
     // state when the power button is pressed and the application goes to background.
     mImpl->mHandle[handleType].pressed = false;
     Image imageReleased = mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED];
-    ImageActor imageActor = mImpl->mHandle[handleType].actor;
-    if( imageReleased && imageActor )
+    ImageView imageView = mImpl->mHandle[handleType].actor;
+    if( imageReleased && imageView )
     {
-       imageActor.SetImage( imageReleased );
+      imageView.SetImage( imageReleased );
     }
   }
 

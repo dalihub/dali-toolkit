@@ -261,6 +261,8 @@ public:
   /**
    * @brief Sets the background color of the control.
    *
+   * @note if SetBackgroundImage is called later, this background color is removed.
+   *
    * @param[in] color The required background color of the control
    *
    * @note The background color fully blends with the actor color.

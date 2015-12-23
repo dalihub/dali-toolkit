@@ -40,7 +40,6 @@
 #include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
-#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 
 namespace Dali
 {
@@ -165,6 +164,7 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 DALI_TYPE_REGISTRATION_END()
 
 const char * const BACKGROUND_COLOR_NAME("color");
+const char * const COLOR_RENDERER_COLOR_NAME("blendColor");
 
 } // unnamed namespace
 
@@ -399,42 +399,28 @@ const std::string& Control::GetStyleName() const
   return mImpl->mStyleName;
 }
 
-void Control::UpdateBackgroundState()
-{
-  // Set the depth of the background renderer after creating/modifying it.
-  // We do this regardless of whether or not it is on stage as the index
-  // is relative and still valid if this control is re-parented.
-  if( mImpl->mBackgroundRenderer )
-  {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-
-    Actor self( Self() );
-    if( self.OnStage() )
-    {
-      mImpl->mBackgroundRenderer.SetOnStage( self );
-    }
-  }
-}
-
 void Control::SetBackgroundColor( const Vector4& color )
 {
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-
-  if( mImpl->mBackgroundRenderer )
-  {
-    factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
-  }
-  else
-  {
-    mImpl->mBackgroundRenderer = factory.GetControlRenderer( color );
-  }
-
-  UpdateBackgroundState();
+  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
+  mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
 }
 
 Vector4 Control::GetBackgroundColor() const
 {
+  if( mImpl->mBackgroundRenderer && ( &typeid( GetImplementation(mImpl->mBackgroundRenderer) ) == &typeid( ColorRenderer ) ) )
+  {
+     Property::Map map;
+     mImpl->mBackgroundRenderer.CreatePropertyMap( map );
+     const Property::Value* colorValue = map.Find( COLOR_RENDERER_COLOR_NAME );
+     Vector4 color;
+     if( colorValue && colorValue->Get(color))
+     {
+       return color;
+     }
+  }
+
   return Color::TRANSPARENT;
 }
 
@@ -450,28 +436,21 @@ void Control::SetBackground(const Property::Map& map)
 
   Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
-
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
   mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
-
-  UpdateBackgroundState();
+  if( mImpl->mBackgroundRenderer  && self.OnStage() ) // Request control renderer with a property map might return an empty handle
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    mImpl->mBackgroundRenderer.SetOnStage( self );
+  }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-
-  if(  mImpl->mBackgroundRenderer  )
-  {
-    factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
-  }
-  else
-  {
-    mImpl->mBackgroundRenderer = factory.GetControlRenderer( image );
-  }
-
-  UpdateBackgroundState();
+  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
+  mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
 }
 
 void Control::ClearBackground()

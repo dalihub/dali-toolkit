@@ -1,3 +1,6 @@
+#ifndef __DALI_TOOLKIT_TEXT_INPUT_STYLE_H__
+#define __DALI_TOOLKIT_TEXT_INPUT_STYLE_H__
+
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -15,13 +18,8 @@
  *
  */
 
-// HEADER
-#include <dali-toolkit/public-api/dali-toolkit-version.h>
-
 // EXTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <iostream>
-#endif
+#include <dali/public-api/math/vector4.h>
 
 namespace Dali
 {
@@ -29,26 +27,21 @@ namespace Dali
 namespace Toolkit
 {
 
-const unsigned int TOOLKIT_MAJOR_VERSION = 1;
-const unsigned int TOOLKIT_MINOR_VERSION = 1;
-const unsigned int TOOLKIT_MICRO_VERSION = 15;
-const char * const TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
+namespace Text
+{
 
-#ifdef DEBUG_ENABLED
-namespace
+/**
+ * The input text's style.
+ */
+struct InputStyle
 {
-/// Allows the printing of the version number ONLY when debug is enabled
-struct PrintVersion
-{
-  PrintVersion()
-  {
-    std::cout << "DALi Toolkit:   " << TOOLKIT_MAJOR_VERSION << "." << TOOLKIT_MINOR_VERSION << "." << TOOLKIT_MICRO_VERSION << " (" << TOOLKIT_BUILD_DATE << ")" << std::endl;
-  }
+Vector4 textColor;
 };
-PrintVersion TOOLKIT_VERSION;
-} // unnamed namespace
-#endif
+
+} // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // __DALI_TOOLKIT_TEXT_INPUT_STYLE_H__

@@ -62,7 +62,7 @@ ImageView ImageView::New( Image image )
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage( image );
-  return ImageView( imageView );
+  return imageView;
 }
 
 ImageView ImageView::New( const std::string& url )
