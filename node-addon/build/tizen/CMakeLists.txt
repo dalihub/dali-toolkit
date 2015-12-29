@@ -110,7 +110,8 @@ set_source_files_properties(${builddir}/lib.${TOOLSET}/dali.node PROPERTIES GENE
 set_target_properties(dali_addon PROPERTIES EXCLUDE_FROM_ALL "FALSE")
 
 
-SET(PKG_LIST dali
+SET(PKG_LIST dali-core
+             dali-adaptor-uv
              dali-toolkit)
 
 INCLUDE(FindPkgConfig)

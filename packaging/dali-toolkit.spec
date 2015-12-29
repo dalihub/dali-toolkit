@@ -9,12 +9,15 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires:       dali
-# Do NOT put an adaptor here - it is an application choice which adaptor to use
+
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
-BuildRequires:  pkgconfig(dali)
 BuildRequires:  pkgconfig(dali-core)
+
+# dali-toolkit only need to know the interfaces(APIs) of dali-adaptor(the devel package).
+# It doesn't need to know which adaptor will be used by applications.
+# Applications or dali-addon will decide which one they will use.
+BuildRequires:  dali-adaptor-devel
 
 #############################
 # profile setup

@@ -66,7 +66,7 @@
       'cflags': [
             '-fPIC',
             '-frtti',
-            '<!@(pkg-config --cflags dali dali-toolkit)'
+            '<!@(pkg-config --cflags dali-core dali-adaptor-uv dali-toolkit)'
         ],
 
     'cflags_cc': [
@@ -74,10 +74,10 @@
             '-frtti'    # needed for typeinfo with dali-any
         ],
       'ldflags': [
-            '<!@(pkg-config --libs-only-L --libs-only-other dali dali-toolkit)'
+            '<!@(pkg-config --libs-only-L --libs-only-other dali-core dali-adaptor-uv dali-toolkit)'
         ],
       'libraries': [
-        '<!@(pkg-config --libs-only-l dali dali-toolkit)'
+        '<!@(pkg-config --libs-only-l dali-core dali-adaptor-uv dali-toolkit)'
       ]
     }]
 }

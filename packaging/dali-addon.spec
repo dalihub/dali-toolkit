@@ -7,16 +7,16 @@ License:    Apache License, Version 2.0
 URL:        https://review.tizen.org/gerrit/#/q/project:platform/core/uifw/dali-toolkit
 Distribution: Tizen
 Source0:    %{name}-%{version}.tar.gz
-Requires:   dali
 
-# Do NOT put an adaptor here - it is an application choice which adaptor to use
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  cmake
-BuildRequires:  pkgconfig(dali)
 BuildRequires:  pkgconfig(dali-core)
 BuildRequires:  pkgconfig(dali-toolkit)
 BuildRequires:  nodejs-devel
+
+# DALi JS applications using dali-addon always run on dali-adaptor-uv.
+BuildRequires:  pkgconfig(dali-adaptor-uv)
 
 %description
 DALi Node.JS addon
