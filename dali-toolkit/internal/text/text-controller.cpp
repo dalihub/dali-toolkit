@@ -1349,12 +1349,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   bool maxLengthReached( false );
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
-
-  if( mImpl->mEventData == NULL )
-  {
-    return;
-  }
-
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPrimaryCursorPosition %d mPreEditFlag %d mPreEditStartPosition %d mPreEditLength %d\n",
                  this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"),
                  mImpl->mEventData->mPrimaryCursorPosition, mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
