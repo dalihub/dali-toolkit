@@ -79,7 +79,6 @@ public:
       VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",                   The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
       TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                           type VECTOR4
       PLACEHOLDER_TEXT_COLOR,                   ///< name "placeholderTextColor",                The placeholder-text color,                                               type VECTOR4
-      INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                          type VECTOR4
       SHADOW_OFFSET,                            ///< name "shadowOffset",                        The drop shadow offset 0 indicates no shadow,                             type VECTOR2
       SHADOW_COLOR,                             ///< name "shadowColor",                         The color of a drop shadow,                                               type VECTOR4
       PRIMARY_CURSOR_COLOR,                     ///< name "primaryCursorColor",                  The color to apply to the primary cursor,                                 type VECTOR4
@@ -100,7 +99,8 @@ public:
       SELECTION_HANDLE_MARKER_IMAGE_RIGHT,      ///< name "selectionHandleMarkerImageRight",     The image to display for the right selection handle marker,               type MAP
       SELECTION_HIGHLIGHT_COLOR,                ///< name "selectionHighlightColor",             The color of the selection highlight,                                     type VECTOR4
       DECORATION_BOUNDING_BOX,                  ///< name "decorationBoundingBox",               The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
-      INPUT_METHOD_SETTINGS                     ///< name "inputMethodSettings",                 The settings to relating to the System's Input Method, Key and Value      type MAP
+      INPUT_METHOD_SETTINGS,                    ///< name "inputMethodSettings",                 The settings to relating to the System's Input Method, Key and Value      type MAP
+      INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                          type VECTOR4
     };
   };
 
