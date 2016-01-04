@@ -244,6 +244,43 @@ public:
           controlImpl.SetStyleName( value.Get< std::string >() );
           break;
         }
+
+        case Toolkit::Control::Property::BACKGROUND_COLOR:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
+          controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
+          break;
+        }
+
+        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
+          Image image = Scripting::NewImage( value );
+          if ( image )
+          {
+            controlImpl.SetBackgroundImage( image );
+          }
+          else
+          {
+            // An empty map means the background is no longer required
+            controlImpl.ClearBackground();
+          }
+          break;
+        }
+
+        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
+        {
+          if ( value.Get< bool >() )
+          {
+            controlImpl.SetKeyInputFocus();
+          }
+          else
+          {
+            controlImpl.ClearKeyInputFocus();
+          }
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND:
         {
           Image image = Scripting::NewImage( value );
@@ -261,19 +298,6 @@ public:
 
           // The background is neither a valid image nor a property map, so it is no longer required
           controlImpl.ClearBackground();
-          break;
-        }
-
-        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
-        {
-          if ( value.Get< bool >() )
-          {
-            controlImpl.SetKeyInputFocus();
-          }
-          else
-          {
-            controlImpl.ClearKeyInputFocus();
-          }
           break;
         }
       }
@@ -304,6 +328,31 @@ public:
           break;
         }
 
+        case Toolkit::Control::Property::BACKGROUND_COLOR:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
+          value = controlImpl.GetBackgroundColor();
+          break;
+        }
+
+        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
+          Property::Map map;
+          if( controlImpl.mImpl->mBackgroundRenderer )
+          {
+            controlImpl.mImpl->mBackgroundRenderer.CreatePropertyMap( map );
+          }
+          value = map;
+          break;
+        }
+
+        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
+        {
+          value = controlImpl.HasKeyInputFocus();
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
@@ -316,11 +365,6 @@ public:
           break;
         }
 
-        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
-        {
-          value = controlImpl.HasKeyInputFocus();
-          break;
-        }
       }
     }
 
@@ -349,15 +393,19 @@ public:
   bool mAddRemoveBackgroundChild:1;        ///< Flag to know when we are adding or removing our own actor to avoid call to OnControlChildAdd
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
-  static PropertyRegistration PROPERTY_1;
-  static PropertyRegistration PROPERTY_2;
-  static PropertyRegistration PROPERTY_3;
+  static const PropertyRegistration PROPERTY_1;
+  static const PropertyRegistration PROPERTY_2;
+  static const PropertyRegistration PROPERTY_3;
+  static const PropertyRegistration PROPERTY_4;
+  static const PropertyRegistration PROPERTY_5;
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",       Toolkit::Control::Property::STYLE_NAME,      Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS, Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgroundColor", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
