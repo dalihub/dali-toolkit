@@ -25,7 +25,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/glyph-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-mesh-factory.h>
@@ -490,7 +490,7 @@ struct AtlasRenderer::Impl
 
     Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth );
+    renderer.SetDepthIndex( DepthIndex::CONTENT + mDepth );
     Actor actor = Actor::New();
 #if defined(DEBUG_ENABLED)
     actor.SetName( "Text renderable actor" );

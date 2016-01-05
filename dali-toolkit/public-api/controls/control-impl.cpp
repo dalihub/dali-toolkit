@@ -32,11 +32,11 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
-#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
@@ -452,7 +452,7 @@ void Control::SetBackgroundColor( const Vector4& color )
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
   factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
-  mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -488,7 +488,7 @@ void Control::SetBackground(const Property::Map& map)
   mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
   if( mImpl->mBackgroundRenderer  && self.OnStage() ) // Request control renderer with a property map might return an empty handle
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
     mImpl->mBackgroundRenderer.SetOnStage( self );
   }
 }
@@ -498,7 +498,7 @@ void Control::SetBackgroundImage( Image image )
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
   factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
-  mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
 }
 
 void Control::ClearBackground()

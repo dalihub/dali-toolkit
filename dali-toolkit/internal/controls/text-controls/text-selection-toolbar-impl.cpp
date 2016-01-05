@@ -18,18 +18,18 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
-
 // EXTERNAL INCLUDES
+#include <cfloat>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <cfloat>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 
 namespace Dali
 {

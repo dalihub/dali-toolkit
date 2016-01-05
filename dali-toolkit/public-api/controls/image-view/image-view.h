@@ -62,7 +62,8 @@ public:
   {
     enum
     {
-      IMAGE = PROPERTY_START_INDEX, ///< name "image", @see SetImage(), type string if it is a url, map otherwise
+      RESOURCE_URL = PROPERTY_START_INDEX, ///< name "resourceUrl",  @deprecated DALi 1.1.16 Use IMAGE instead.  type string
+      IMAGE,                               ///< name "image",        @see SetImage(),                            type string if it is a url, map otherwise
     };
   };
 

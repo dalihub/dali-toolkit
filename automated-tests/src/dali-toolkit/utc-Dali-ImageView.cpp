@@ -551,3 +551,16 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewResourceUrlP(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  DALI_TEST_CHECK( imageView.GetProperty( ImageView::Property::RESOURCE_URL ).Get< std::string >().empty() );
+
+  imageView.SetProperty( ImageView::Property::RESOURCE_URL, "TestString" );
+  DALI_TEST_EQUALS( imageView.GetProperty( ImageView::Property::RESOURCE_URL ).Get< std::string >(), "TestString", TEST_LOCATION );
+
+  END_TEST;
+}
