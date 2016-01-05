@@ -23,8 +23,8 @@
 #include <dali/public-api/images/resource-image.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 namespace Dali
@@ -93,7 +93,7 @@ void CheckBoxButton::SetTickUVEffect()
     Property::Map shaderMap = CreateImageRegionEffect();
     imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, shaderMap );
 
-    GetImpl( imageView ).SetDepthIndex( DECORATION_DEPTH_INDEX );
+    GetImpl( imageView ).SetDepthIndex( DepthIndex::DECORATION );
   }
 }
 

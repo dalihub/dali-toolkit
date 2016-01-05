@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_CONTROL_DEPTH_INDEX_RANGES_H__
-#define __DALI_TOOLKIT_CONTROL_DEPTH_INDEX_RANGES_H__
+#ifndef __DALI_TOOLKIT_DEVEL_CONTROL_DEPTH_INDEX_RANGES_H__
+#define __DALI_TOOLKIT_DEVEL_CONTROL_DEPTH_INDEX_RANGES_H__
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -23,30 +23,25 @@
 
 namespace Dali
 {
+
 namespace Toolkit
 {
-/**
- * @addtogroup dali_toolkit_controls
- * @{
- */
 
-/**
- * @deprecated DALi 1.1.16
- *
- * @brief These depth indices should not be used.
- */
-enum DepthIndexRanges
+namespace DepthIndex
 {
-    BACKGROUND_DEPTH_INDEX    = static_cast<int>( -Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f ), ///< @deprecated DALi 1.1.16
-    CONTENT_DEPTH_INDEX       = 0,                                                              ///< @deprecated DALi 1.1.16
-    DECORATION_DEPTH_INDEX    = static_cast<int>( Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f )   ///< @deprecated DALi 1.1.16
+
+enum Ranges
+{
+    BACKGROUND    = -Dali::Layer::TREE_DEPTH_MULTIPLIER / 10,
+    CONTENT       = 0,
+    TEXT          = Dali::Layer::TREE_DEPTH_MULTIPLIER / 100,
+    DECORATION    = Dali::Layer::TREE_DEPTH_MULTIPLIER / 10
 };
 
-/**
- * @}
- */
-}
+} // namespace DepthIndex
 
-}
+} // namespace Toolkit
 
-#endif
+} // namespace Dali
+
+#endif // __DALI_TOOLKIT_DEVEL_CONTROL_DEPTH_INDEX_RANGES_H__

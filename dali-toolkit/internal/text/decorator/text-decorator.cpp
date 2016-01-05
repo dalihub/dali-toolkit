@@ -33,9 +33,9 @@
 #include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
 
 #ifdef DEBUG_ENABLED
@@ -660,7 +660,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( !grabHandle.actor )
     {
       grabHandle.actor = ImageView::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
-      GetImpl( grabHandle.actor).SetDepthIndex( DECORATION_DEPTH_INDEX );
+      GetImpl( grabHandle.actor).SetDepthIndex( DepthIndex::DECORATION );
       grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
@@ -734,7 +734,7 @@ struct Decorator::Impl : public ConnectionTracker
       primary.actor.SetName("SelectionHandleOne");
 #endif
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
-      GetImpl( primary.actor ).SetDepthIndex( DECORATION_DEPTH_INDEX );
+      GetImpl( primary.actor ).SetDepthIndex( DepthIndex::DECORATION );
       primary.actor.SetColor( mHandleColor );
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -768,7 +768,7 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.actor.SetName("SelectionHandleTwo");
 #endif
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
-      GetImpl( secondary.actor ).SetDepthIndex( DECORATION_DEPTH_INDEX );
+      GetImpl( secondary.actor ).SetDepthIndex( DepthIndex::DECORATION );
       secondary.actor.SetColor( mHandleColor );
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move

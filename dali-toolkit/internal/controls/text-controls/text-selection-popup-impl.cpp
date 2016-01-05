@@ -18,13 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-
 // EXTERNAL INCLUDES
+#include <libintl.h>
+#include <cfloat>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/resource-image.h>
@@ -34,8 +30,11 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
-#include <libintl.h>
-#include <cfloat>
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 
 namespace Dali
 {
