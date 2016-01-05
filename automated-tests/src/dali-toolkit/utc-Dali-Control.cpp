@@ -485,6 +485,18 @@ int UtcDaliControlBackgroundProperties(void)
   control.SetProperty( Control::Property::BACKGROUND, emptyMap );
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND ).Get< Property::Map >().Empty() );
 
+  // Deprecated Properties
+  control.SetProperty( Control::Property::BACKGROUND_COLOR, Color::YELLOW );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >() == Color::YELLOW );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >() == control.GetBackgroundColor() );
+  control.ClearBackground();
+  control.SetProperty( Control::Property::BACKGROUND_IMAGE, imageMap );
+  propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
+  resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get< std::string >() == "TestImage" );
+  control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
+
   END_TEST;
 }
 
