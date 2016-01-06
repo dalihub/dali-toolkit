@@ -7,7 +7,7 @@ T.O.C.
  2.   Building for Ubuntu desktop
  2.1. Minimum Requirements
  2.2. Building the Repository
-
+ 2.3. Building and executing test cases
 
 
 1. GBS Builds
@@ -50,3 +50,7 @@ Then run the following commands:
  ./configure --prefix=$DESKTOP_PREFIX
  make install -j8
 
+2.3. Building and executing test cases
+--------------------------------------
+
+See the README.md in dali-toolkit/automated-tests.
