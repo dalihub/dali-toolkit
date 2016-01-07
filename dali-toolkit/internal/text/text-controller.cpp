@@ -1464,7 +1464,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     mImpl->mControlInterface.TextChanged();
   }
 
-  return false;
+  return true;
 }
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
