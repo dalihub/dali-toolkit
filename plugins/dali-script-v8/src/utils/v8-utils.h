@@ -96,6 +96,14 @@ void GetFileName( const std::string& fullPathName, std::string& fileName);
 void GetModuleName( const std::string& fileName, std::string& moduleName );
 
 /**
+ * Compare whether two DALi property maps are identical
+ * @param[in] map1 The first property map to be compared
+ * @param[in] map2 The second property map to be compared
+ * @return true if the two specified property maps are identical or false if not.
+ */
+bool IsPropertyMapIdentical(Property::Map map1, Property::Map map2);
+
+/**
  * Report an exception by writing as a warning to the Dali Log
  *
  * @param[in] try_catch The v8 TryCatch exception object

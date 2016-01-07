@@ -69,7 +69,7 @@ rm -rf %{buildroot}
 
 cd "%{addonBuildDir}"
 %make_install
-cp %{addonDir}/line-mesh.js %{installDir}/line-mesh.js
+cp -R %{addonDir}/examples %{installDir}/examples
 
 
 %clean

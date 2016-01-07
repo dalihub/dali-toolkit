@@ -184,6 +184,13 @@ Constants accessible under the dali global object.
 |PROPERTY_ARRAY                       | integer value  |
 |PROPERTY_MAP                         | integer value  |
 |PROPERTY_INVALID_INDEX               | integer value  |
+|PROPERTY_READ_ONLY                   | integer value  |
+|PROPERTY_READ_WRITE                  | integer value  |
+|PROPERTY_ANIMATABLE                  | integer value  |
+
+|**Item layout type ** | |
+|ITEM_LAYOUT_LIST                     | integer value  |
+|ITEM_LAYOUT_GRID                     | integer value  |
 
  * @class Constants
  */

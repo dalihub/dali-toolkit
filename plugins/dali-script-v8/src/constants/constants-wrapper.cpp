@@ -35,6 +35,7 @@
 #include <dali/public-api/common/loading-state.h>
 #include <dali/devel-api/rendering/material.h>
 #include <dali/devel-api/rendering/geometry.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 
 namespace Dali
 {
@@ -243,6 +244,12 @@ const IntegerPair EnumTable[] =
     { "PROPERTY_ARRAY",                       Property::ARRAY          },
     { "PROPERTY_MAP",                         Property::MAP            },
     { "PROPERTY_INVALID_INDEX",               Property::INVALID_INDEX  },
+    { "PROPERTY_READ_ONLY",                   Property::READ_ONLY      },
+    { "PROPERTY_READ_WRITE",                  Property::READ_WRITE     },
+    { "PROPERTY_ANIMATABLE",                  Property::ANIMATABLE     },
+
+    { "ITEM_LAYOUT_LIST",                     Toolkit::DefaultItemLayout::LIST     },
+    { "ITEM_LAYOUT_GRID",                     Toolkit::DefaultItemLayout::GRID     },
 
 };
 const unsigned int EnumTableCount = sizeof(EnumTable)/sizeof(EnumTable[0]);

@@ -80,6 +80,8 @@ public:
       IMAGE_ATTRIBUTES,
       ACTOR,
       ACTOR_PROPERTY,
+      ITEMVIEW,
+      ITEMFACTORY,
       RENDER_TASK,
       RENDER_TASK_LIST,
       TIMER,
