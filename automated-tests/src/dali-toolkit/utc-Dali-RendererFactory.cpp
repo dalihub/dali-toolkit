@@ -354,6 +354,7 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   controlRenderer.SetOnStage( actor );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_EQUALS( actor.GetRendererAt(0).GetMaterial().GetBlendMode(), BlendingMode::ON, TEST_LOCATION );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -382,10 +383,10 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
+  Vector4 testColor( 1.f, 0.5f, 0.3f, 1.f );
   float testSize = 5.f;
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(testSize, testColor);
+  ControlRenderer controlRenderer = factory.GetControlRenderer(testSize, testColor );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -401,6 +402,8 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   application.SendNotification();
   application.Render(0);
 
+  DALI_TEST_EQUALS( actor.GetRendererAt(0).GetMaterial().GetBlendMode(), BlendingMode::AUTO, TEST_LOCATION );
+
   Vector4 actualColor(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "borderColor", actualColor ) );
   DALI_TEST_EQUALS( actualColor, testColor, TEST_LOCATION );
@@ -409,9 +412,19 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   DALI_TEST_CHECK( gl.GetUniformValue<float>( "borderSize", actualSize ) );
   DALI_TEST_EQUALS( actualSize, testSize, TEST_LOCATION );
 
+  controlRenderer.SetOffStage( actor );
+
+  // enable the anti-aliasing
+  controlRenderer = factory.GetControlRenderer(testSize, testColor, true );
+  controlRenderer.SetOnStage( actor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetRendererAt(0).GetMaterial().GetBlendMode(), BlendingMode::ON, TEST_LOCATION );
+
+
   END_TEST;
 }
-
 
 int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 {

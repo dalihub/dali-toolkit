@@ -180,7 +180,7 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
   }
 }
 
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing )
 {
   if( !mFactoryCache )
   {
@@ -196,6 +196,7 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, 
 
   rendererPtr->SetBorderSize( borderSize );
   rendererPtr->SetBorderColor( borderColor );
+  rendererPtr->RequireAntiAliasing( antiAliasing );
 
   return Toolkit::ControlRenderer( rendererPtr );
 }
@@ -381,7 +382,7 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
   }
 
   renderer = GetControlRenderer( propertyMap );
-  if( actor && actor.OnStage() )
+  if( renderer && actor && actor.OnStage() )
   {
     renderer.SetOnStage( actor );
   }

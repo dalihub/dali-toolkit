@@ -41,6 +41,7 @@ namespace Internal
  * |-----------------|-------------|
  * | borderColor     | VECTOR4     |
  * | borderSize      | FLOAT       |
+ * | antiAliasing    | BOOLEAN     |
  */
 
 class BorderRenderer : public ControlRenderer
@@ -97,12 +98,24 @@ public:
    */
   void SetBorderSize( float size );
 
+  /**
+   * Enable/Disable the anti-aliasing.
+   * @param[in] enable Whether the anti-aliasing be enabled or not.
+   */
+  void RequireAntiAliasing( bool antiAliasing );
+
 private:
 
   /**
    * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
    */
   void InitializeRenderer();
+
+  /**
+   * Request the border shader from the factory cache. If fail, create tha shader and add it to cache.
+   * @return The border shader.
+   */
+  Shader GetBorderShader();
 
   /**
    * Create the geometry which presents the border.
@@ -123,6 +136,8 @@ private:
 
   Property::Index mBorderColorIndex;
   Property::Index mBorderSizeIndex;
+
+  bool mAntiAliasing;
 };
 
 } // namespace Internal
