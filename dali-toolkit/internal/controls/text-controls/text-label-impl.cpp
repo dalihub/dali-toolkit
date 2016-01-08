@@ -23,8 +23,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
@@ -93,6 +93,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowColor",          VECTOR4,
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineEnabled",     BOOLEAN, UNDERLINE_ENABLED    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineColor",       VECTOR4, UNDERLINE_COLOR      )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineHeight",      FLOAT,   UNDERLINE_HEIGHT     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableMarkup",         BOOLEAN, ENABLE_MARKUP        )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -290,6 +291,15 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextLabel::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          const bool enableMarkup = value.Get<bool>();
+          impl.mController->SetMarkupProcessorEnabled( enableMarkup );
+        }
+        break;
+      }
     }
   }
 }
@@ -425,6 +435,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextLabel::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsMarkupProcessorEnabled();
+        }
+        break;
+      }
     }
   }
 
@@ -519,7 +537,7 @@ void TextLabel::RenderText()
   Actor renderableActor;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), TEXT_DEPTH_INDEX );
+    renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
   }
 
   if( renderableActor != mRenderableActor )

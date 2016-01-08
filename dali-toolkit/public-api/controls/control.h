@@ -88,9 +88,11 @@ public:
   {
     enum
     {
-      STYLE_NAME = PROPERTY_START_INDEX,       ///< name "styleName",        @see SetStyleName,       type std::string
-      BACKGROUND,                              ///< name "background",       @since DALi 1.1.4,       type Map
-      KEY_INPUT_FOCUS,                         ///< name "keyInputFocus",    @see SetKeyInputFocus,   type bool
+      STYLE_NAME = PROPERTY_START_INDEX, ///< name "styleName",        @see SetStyleName,                                                             type std::string
+      BACKGROUND_COLOR,                  ///< name "background-color", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
+      BACKGROUND_IMAGE,                  ///< name "background-image", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
+      KEY_INPUT_FOCUS,                   ///< name "keyInputFocus",    @see SetKeyInputFocus,                                                         type bool
+      BACKGROUND,                        ///< name "background",       @since DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map
     };
   };
 

@@ -263,7 +263,7 @@ void BloomView::OnInitialize()
   // Create shader used to composite bloom and original image to output render target
   customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
   rendererMap[ "shader" ] = customShader;
-  mCompositeImageActor.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );;
+  mCompositeImageActor.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
   mTargetImageActor = Toolkit::ImageView::New();

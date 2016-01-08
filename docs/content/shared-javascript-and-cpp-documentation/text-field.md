@@ -53,6 +53,20 @@ console.log( field.text );
 
 By default TextField will automatically select a suitable font from the platform. However, a different font could be selected. See the [Font Selection](@ref font-selection) section for more details.
 
+### Mark-up Style
+
+Mark-up tags can be used to change the style of the text. See the [Mark-up Style](@ref markup-style) section for more details.
+
+### Input Style
+
+The input style can be changed through the control properties. Current supported input style properties are:
+
+#### INPUT_COLOR
+
+Sets the input color. All subsequent characters added will be rendered with the input color.
+
+Note the input color may change if the cursor is updated by tapping in a new position.
+
 ### Text Alignment
 
 TextField displays a single-line of text, which will scroll if there is not enough room for the text displayed.
@@ -129,6 +143,7 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  horizontalAlignment               | HORIZONTAL_ALIGNMENT                 |  STRING      | O            | X
  verticalAlignment                 | VERTICAL_ALIGNMENT                   |  STRING      | O            | X
  textColor                         | TEXT_COLOR                           |  VECTOR4     | O            | X
+ placeholderTextColor              | PLACEHOLDER_TEXT_COLOR               |  VECTOR4     | O            | X
  shadowOffset                      | SHADOW_OFFSET                        |  VECTOR2     | O            | X
  shadowColor                       | SHADOW_COLOR                         |  VECTOR4     | O            | X
  primaryCursorColor                | PRIMARY_CURSOR_COLOR                 |  VECTOR4     | O            | X
@@ -136,6 +151,7 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  enableCursorBlink                 | ENABLE_CURSOR_BLINK                  |  BOOLEAN     | O            | X
  cursorBlinkInterval               | CURSOR_BLINK_INTERVAL                |  FLOAT       | O            | X
  cursorBlinkDuration               | CURSOR_BLINK_DURATION                |  FLOAT       | O            | X
+ cursorWidth                       | CURSOR_WIDTH                         |  INTEGER     | O            | X
  grabHandleImage                   | GRAB_HANDLE_IMAGE                    |  STRING      | O            | X
  grabHandlePressedImage            | GRAB_HANDLE_PRESSED_IMAGE            |  STRING      | O            | X
  scrollThreshold                   | SCROLL_THRESHOLD                     |  FLOAT       | O            | X
@@ -144,9 +160,13 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  selectionHandleImageRight         | SELECTION_HANDLE_IMAGE_RIGHT         |  STRING      | O            | X
  selectionHandlePressedImageLeft   | SELECTION_HANDLE_PRESSED_IMAGE_LEFT  |  STRING      | O            | X
  selectionHandlePressedImageRight  | SELECTION_HANDLE_PRESSED_IMAGE_RIGHT |  STRING      | O            | X
+ selectionHandleMarkerImageLeft    | SELECTION_HANDLE_MARKER_IMAGE_LEFT   |  MAP         | O            | X
+ selectionHandleMarkerImageRight   | SELECTION_HANDLE_MARKER_IMAGE_RIGHT  |  MAP         | O            | X
  selectionHighlightColor           | SELECTION_HIGHLIGHT_COLOR            |  VECTOR4     | O            | X
  decorationBoundingBox             | DECORATION_BOUNDING_BOX              |  RECTANGLE   | O            | X
  inputMethodSettings               | INPUT_METHOD_SETTINGS                |  MAP         | O            | X
+ inputColor                        | INPUT_COLOR                          |  VECTOR4     | O            | X
+ enableMarkup                      | ENABLE_MARKUP                        |  BOOLEAN     | O            | X
 
 @class TextField
 

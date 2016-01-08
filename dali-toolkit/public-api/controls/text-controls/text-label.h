@@ -68,13 +68,14 @@ public:
       POINT_SIZE,                               ///< name "pointSize",            The size of font in points,                       type FLOAT
       MULTI_LINE,                               ///< name "multiLine",            The single-line or multi-line layout option,      type BOOLEAN
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",  The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END"
-      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",    The line vertical alignment,                      type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
+      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",    The line vertical alignment,                      type STRING,  values "TOP",   "CENTER", "BOTTOM"
       TEXT_COLOR,                               ///< name "textColor",            The text color,                                   type VECTOR4
       SHADOW_OFFSET,                            ///< name "shadowOffset",         The drop shadow offset 0 indicates no shadow,     type VECTOR2
       SHADOW_COLOR,                             ///< name "shadowColor",          The color of a drop shadow,                       type VECTOR4
       UNDERLINE_ENABLED,                        ///< name "underlineEnabled",     The underline enabled flag,                       type BOOLEAN
       UNDERLINE_COLOR,                          ///< name "underlineColor",       The color of the underline,                       type VECTOR4
-      UNDERLINE_HEIGHT                          ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT
+      UNDERLINE_HEIGHT,                         ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT
+      ENABLE_MARKUP                             ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN
     };
   };
 

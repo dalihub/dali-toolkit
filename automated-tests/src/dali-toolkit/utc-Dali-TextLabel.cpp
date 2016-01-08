@@ -50,6 +50,7 @@ const char* const PROPERTY_NAME_SHADOW_COLOR = "shadowColor";
 const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underlineEnabled";
 const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underlineColor";
 const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underlineHeight";
+const char* const PROPERTY_NAME_ENABLE_MARKUP = "enableMarkup";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -150,6 +151,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_ENABLED ) == TextLabel::Property::UNDERLINE_ENABLED );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP) == TextLabel::Property::ENABLE_MARKUP );
 
   END_TEST;
 }
@@ -210,6 +212,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   TextLabel label2 = TextLabel::New( "New text" );
   DALI_TEST_CHECK( label2 );
   DALI_TEST_EQUALS( label2.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("New text"), TEST_LOCATION );
+
+  // Check the enable markup property.
+  DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ENABLE_MARKUP ) );
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ENABLE_MARKUP ) );
 
   END_TEST;
 }

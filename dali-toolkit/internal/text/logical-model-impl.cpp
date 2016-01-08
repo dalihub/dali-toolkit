@@ -285,9 +285,6 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
   {
     style.textColor = ( *( mColorRuns.Begin() + lastRunIndex ) ).color;
   }
-
-  runIndex = 0u;
-  overriden = false;
 }
 
 LogicalModel::~LogicalModel()
