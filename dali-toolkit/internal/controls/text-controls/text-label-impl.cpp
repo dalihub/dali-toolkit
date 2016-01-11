@@ -25,8 +25,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
@@ -156,7 +156,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
       {
-        SetFontStyleProperty( impl.mController, value );
+        SetFontStyleProperty( impl.mController, value, Text::FontStyle::DEFAULT );
         break;
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:
@@ -340,7 +340,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
       {
-        GetFontStyleProperty( impl.mController, value );
+        GetFontStyleProperty( impl.mController, value, Text::FontStyle::DEFAULT );
         break;
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:

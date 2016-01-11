@@ -101,7 +101,10 @@ public:
       DECORATION_BOUNDING_BOX,                  ///< name "decorationBoundingBox",               The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
       INPUT_METHOD_SETTINGS,                    ///< name "inputMethodSettings",                 The settings to relating to the System's Input Method, Key and Value      type MAP
       INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                          type VECTOR4
-      ENABLE_MARKUP                             ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                type BOOLEAN
+      ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                type BOOLEAN
+      INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                  type STRING
+      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                   type STRING
+      INPUT_POINT_SIZE                          ///< name "inputPointSize",                      The font's size of the new input text in points,                          type FLOAT
     };
   };
 

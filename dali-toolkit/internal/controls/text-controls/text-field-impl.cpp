@@ -30,8 +30,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
@@ -120,6 +120,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decorationBoundingBox",        
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputColor",                           VECTOR4,   INPUT_COLOR                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableMarkup",                         BOOLEAN,   ENABLE_MARKUP                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontFamily",                      STRING,    INPUT_FONT_FAMILY                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontStyle",                       STRING,    INPUT_FONT_STYLE                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputPointSize",                       FLOAT,     INPUT_POINT_SIZE                     )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -214,7 +217,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::FONT_STYLE:
       {
-        SetFontStyleProperty( impl.mController, value );
+        SetFontStyleProperty( impl.mController, value, Text::FontStyle::DEFAULT );
         break;
       }
       case Toolkit::TextField::Property::POINT_SIZE:
@@ -578,6 +581,31 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::INPUT_FONT_FAMILY:
+      {
+        if( impl.mController )
+        {
+          const std::string fontFamily = value.Get< std::string >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
+          impl.mController->SetInputFontFamily( fontFamily );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_FONT_STYLE:
+      {
+        SetFontStyleProperty( impl.mController, value, Text::FontStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_POINT_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float pointSize = value.Get< float >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p INPUT_POINT_SIZE %f\n", impl.mController.Get(), pointSize );
+          impl.mController->SetInputFontPointSize( pointSize );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -640,7 +668,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::FONT_STYLE:
       {
-        GetFontStyleProperty( impl.mController, value );
+        GetFontStyleProperty( impl.mController, value, Text::FontStyle::DEFAULT );
         break;
       }
       case Toolkit::TextField::Property::POINT_SIZE:
@@ -705,14 +733,6 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetPlaceholderTextColor();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::INPUT_COLOR:
-      {
-        if( impl.mController )
-        {
-          value = impl.mController->GetInputColor();
         }
         break;
       }
@@ -869,11 +889,40 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         break;
       }
+      case Toolkit::TextField::Property::INPUT_COLOR:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetInputColor();
+        }
+        break;
+      }
       case Toolkit::TextField::Property::ENABLE_MARKUP:
       {
         if( impl.mController )
         {
           value = impl.mController->IsMarkupProcessorEnabled();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_FONT_FAMILY:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetInputFontFamily();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_FONT_STYLE:
+      {
+        GetFontStyleProperty( impl.mController, value, Text::FontStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_POINT_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetInputFontPointSize();
         }
         break;
       }
