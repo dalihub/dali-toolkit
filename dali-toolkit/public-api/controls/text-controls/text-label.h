@@ -40,6 +40,30 @@ class TextLabel;
  * @brief A control which renders a short text string.
  *
  * Text labels are lightweight, non-editable and do not respond to user input.
+ *
+ * @section TextLabelProperties Properties
+ * |%Property enum                    |String name          |Type          |Writable|Animatable|
+ * |----------------------------------|---------------------|--------------|--------|----------|
+ * | Property::RENDERING_BACKEND      | renderingBackend    |  INTEGER     | O      | X        |
+ * | Property::TEXT                   | text                |  STRING      | O      | X        |
+ * | Property::FONT_FAMILY            | fontFamily          |  STRING      | O      | X        |
+ * | Property::FONT_STYLE             | fontStyle           |  STRING      | O      | X        |
+ * | Property::POINT_SIZE             | pointSize           |  FLOAT       | O      | X        |
+ * | Property::MULTI_LINE             | multiLine           |  BOOLEAN     | O      | X        |
+ * | Property::HORIZONTAL_ALIGNMENT   | horizontalAlignment |  STRING      | O      | X        |
+ * | Property::VERTICAL_ALIGNMENT     | verticalAlignment   |  STRING      | O      | X        |
+ * | Property::TEXT_COLOR             | textColor           |  VECTOR4     | O      | X        |
+ * | Property::SHADOW_OFFSET          | shadowOffset        |  VECTOR2     | O      | X        |
+ * | Property::SHADOW_COLOR           | shadowColor         |  VECTOR4     | O      | X        |
+ * | Property::UNDERLINE_ENABLED      | underlineEnabled    |  BOOLEAN     | O      | X        |
+ * | Property::UNDERLINE_COLOR        | underlineColor      |  VECTOR4     | O      | X        |
+ * | Property::UNDERLINE_HEIGHT       | underlineHeight     |  FLOAT       | O      | X        |
+ * | Property::ENABLE_MARKUP          | enableMarkup        |  BOOLEAN     | O      | X        |
+ * | Property::ENABLE_AUTO_SCROLL     | enableAutoScroll    |  BOOLEAN     | O      | X        |
+ * | Property::AUTO_SCROLL_SPEED      | autoScrollSpeed     |  INTEGER     | O      | X        |
+ * | Property::AUTO_SCROLL_LOOP_COUNT | autoScrollLoopCount |  INTEGER     | O      | X        |
+ * | Property::AUTO_SCROLL_GAP        | autoScrollGap       |  INTEGER     | O      | X        |
+ *
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API TextLabel : public Control
@@ -64,25 +88,138 @@ public:
   {
     enum
     {
-      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",     The type or rendering e.g. bitmap-based,          type INT @SINCE_1_0.0
-      TEXT,                                     ///< name "text",                 The text to display in UTF-8 format,              type STRING @SINCE_1_0.0
-      FONT_FAMILY,                              ///< name "fontFamily",           The requested font family,                        type STRING @SINCE_1_0.0
-      FONT_STYLE,                               ///< name "fontStyle",            The requested font style,                         type STRING @SINCE_1_0.0
-      POINT_SIZE,                               ///< name "pointSize",            The size of font in points,                       type FLOAT @SINCE_1_0.0
-      MULTI_LINE,                               ///< name "multiLine",            The single-line or multi-line layout option,      type BOOLEAN @SINCE_1_0.0
-      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",  The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_0.0
-      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",    The line vertical alignment,                      type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0
-      TEXT_COLOR,                               ///< name "textColor",            The text color,                                   type VECTOR4 @SINCE_1_0.0
-      SHADOW_OFFSET,                            ///< name "shadowOffset",         The drop shadow offset 0 indicates no shadow,     type VECTOR2 @SINCE_1_0.0
-      SHADOW_COLOR,                             ///< name "shadowColor",          The color of a drop shadow,                       type VECTOR4 @SINCE_1_0.0
-      UNDERLINE_ENABLED,                        ///< name "underlineEnabled",     The underline enabled flag,                       type BOOLEAN @SINCE_1_0.0
-      UNDERLINE_COLOR,                          ///< name "underlineColor",       The color of the underline,                       type VECTOR4 @SINCE_1_0.0
-      UNDERLINE_HEIGHT,                         ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT @SINCE_1_0.0
-      ENABLE_MARKUP,                            ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN @SINCE_1_0.0
-      ENABLE_AUTO_SCROLL,                       ///< name "enableAutoScroll",     Whether to start auto text scrolling              type BOOLEAN @SINCE_1_1.35
-      AUTO_SCROLL_SPEED,                        ///< name "autoScrollSpeed",      Speed at which text should auto scroll            type INT @SINCE_1_1.35
-      AUTO_SCROLL_LOOP_COUNT,                   ///< name "autoScrollLoopCount",  Number of times the text should scroll (loop)     type INT @SINCE_1_1.35
-      AUTO_SCROLL_GAP                           ///< name "autoScrollGap",        Gap before text wraps around when scrolling       type FLOAT @SINCE_1_1.35
+      /**
+       * @brief The type of rendering e.g. bitmap-based
+       * @details name "renderingBackend", type INT, default RENDERING_SHARED_ATLAS
+       * @SINCE_1_0.0
+       */
+      RENDERING_BACKEND = PROPERTY_START_INDEX,
+
+      /**
+       * @brief The text to display in UTF-8 format,
+       * @details name "text", type STRING
+       * @SINCE_1_0.0
+       */
+      TEXT,
+
+      /**
+       * @brief The requested font family to use,
+       * @details name "fontFamily", type STRING
+       * @SINCE_1_0.0
+       */
+      FONT_FAMILY,
+
+      /**
+       * @brief The requested font style to use,
+       * @details name "fontStyle", type STRING
+       * @SINCE_1_0.0
+       */
+      FONT_STYLE,
+
+      /**
+       * @brief The size of font in points
+       * @details name "pointSize", type FLOAT
+       * @SINCE_1_0.0
+       */
+      POINT_SIZE,
+
+      /**
+       * @brief The single-line or multi-line layout option
+       * @details name "multiLine", type FLOAT, default SINGLE_LINE_BOX
+       * @SINCE_1_0.0
+       */
+      MULTI_LINE,
+
+      /**
+       * @brief The line horizontal alignment
+       * @details name "horizontalAlignment", type STRING,  values "BEGIN", "CENTER", "END", default BEGIN
+       * @SINCE_1_0.0
+       */
+      HORIZONTAL_ALIGNMENT,
+
+      /**
+       * @brief The line vertical alignment
+       * @details name "verticalAlignment", type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0, default TOP
+       * @SINCE_1_0.0
+       */
+      VERTICAL_ALIGNMENT,
+
+      /**
+       * @brief The color of the text
+       * @details name "textColor", type VECTOR4
+       * @SINCE_1_0.0
+       */
+      TEXT_COLOR,
+
+      /**
+       * @brief The drop shadow offset 0 indicates no shadow
+       * @details name "shadowOffset", type VECTOR4
+       * @SINCE_1_0.0
+       */
+      SHADOW_OFFSET,
+
+      /**
+       * @brief The color of a drop shadow
+       * @details name "shadowColor", type VECTOR4
+       * @SINCE_1_0.0
+       */
+      SHADOW_COLOR,
+
+      /**
+       * @brief The underline enabled flag
+       * @details name "underlineEnabled", type BOOLEAN
+       * @SINCE_1_0.0
+       */
+      UNDERLINE_ENABLED,
+
+      /**
+       * @brief The color of the underline
+       * @details name "underlineColor", type VECTOR4
+       * @SINCE_1_0.0
+       */
+      UNDERLINE_COLOR,
+
+      /**
+       * @brief Overrides the underline height from font metrics
+       * @details name "underlineHeight", type FLOAT
+       * @SINCE_1_0.0
+       */
+      UNDERLINE_HEIGHT,
+
+      /**
+       * @brief  Whether the mark-up processing is enabled
+       * @details name "enableMarkup", type BOOLEAN
+       * @SINCE_1_0.0
+       */
+      ENABLE_MARKUP,
+
+      /**
+       * @brief  Start or stop auto scrolling,
+       * @details name "enableMarkup", type BOOLEAN, default is false
+       * @SINCE_1_1.35
+       */
+      ENABLE_AUTO_SCROLL,
+
+      /**
+       * @brief  Start or stop auto scrolling,
+       * @details name "autoScrollSpeed", type INT, default in style sheet
+       * @SINCE_1_1.35
+       */
+      AUTO_SCROLL_SPEED,
+
+      /**
+       * @brief  Number of complete loops when scrolling enabled
+       * @details name "autoScrollLoopCount", type INT, default in style sheet
+       * @SINCE_1_1.35
+       */
+      AUTO_SCROLL_LOOP_COUNT,
+
+      /**
+       * @brief  Gap before before scrolling wraps
+       * @details name "autoScrollGap", type INT, default in style sheet but can be overridden to prevent same text being show at start and end.
+       * @SINCE_1_1.35
+       */
+      AUTO_SCROLL_GAP
     };
   };
 
