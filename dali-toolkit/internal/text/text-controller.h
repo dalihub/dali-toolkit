@@ -184,7 +184,7 @@ public:
    *
    * @param[in] maxCharacters maximum number of characters to be accepted
    */
-  void SetMaximumNumberOfCharacters( int maxCharacters );
+  void SetMaximumNumberOfCharacters( Length maxCharacters );
 
   /**
    * @brief Sets the maximum number of characters that can be inserted into the TextModel

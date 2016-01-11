@@ -58,6 +58,7 @@
  + [Popup](@ref popup)
  + [Scroll View](@ref scroll-view)
  + TableView
+ + [Text Editor](@ref text-editor)
  + [Text Field](@ref text-field)
  + [Text Label](@ref text-label)
 

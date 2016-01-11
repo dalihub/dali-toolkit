@@ -27,6 +27,7 @@ SET(TC_SOURCES
    utc-Dali-ShadowView.cpp
    utc-Dali-Slider.cpp
    utc-Dali-TableView.cpp
+   utc-Dali-TextEditor.cpp
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
    utc-Dali-TextSelectionPopup.cpp

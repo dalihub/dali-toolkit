@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H__
+#define __DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-field.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-editor.h>
 #include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
@@ -40,16 +40,16 @@ namespace Internal
 {
 
 /**
- * @brief A control which renders a short text string.
+ * @brief A control which renders a long text string with styles.
  */
-class TextField : public Control, public Text::ControlInterface
+class TextEditor : public Control, public Text::ControlInterface
 {
 public:
 
   /**
-   * @copydoc Dali::Toollkit::TextField::New()
+   * @copydoc Dali::Toollkit::TextEditor::New()
    */
-  static Toolkit::TextField New();
+  static Toolkit::TextEditor New();
 
   // Properties
 
@@ -83,14 +83,9 @@ public:
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
   /**
-   * @copydoc TextField::TextChangedSignal()
+   * @copydoc TextEditor::TextChangedSignal()
    */
-  Toolkit::TextField::TextChangedSignalType&  TextChangedSignal();
-
-  /**
-   * @copydoc TextField::MaxLengthReachedSignal()
-   */
-  Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
+  Toolkit::TextEditor::TextChangedSignalType&  TextChangedSignal();
 
 private: // From Control
 
@@ -213,51 +208,49 @@ private: // Implementation
   void KeyboardStatusChanged( bool keyboardShown );
 
   /**
-   * @brief Callback when TextField is touched
+   * @brief Callback when TextEditor is touched
    *
-   * @param[in] actor TextField touched
+   * @param[in] actor TextEditor touched
    * @param[in] event TouchEvent information
    */
   bool OnTouched( Actor actor, const TouchEvent& event );
 
   /**
-   * Construct a new TextField.
+   * Construct a new TextEditor.
    */
-  TextField();
+  TextEditor();
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~TextField();
+  virtual ~TextEditor();
 
   // Undefined copy constructor and assignment operators
-  TextField(const TextField&);
-  TextField& operator=(const TextField& rhs);
+  TextEditor(const TextEditor&);
+  TextEditor& operator=(const TextEditor& rhs);
 
   /**
-   * @brief Render view, create and attach actor(s) to this Text Field.
+   * @brief Render view, create and attach actor(s) to this text editor.
    */
   void RenderText();
 
-  // Connection needed to re-render text, when a Text Field returns to the stage.
+  // Connection needed to re-render text, when a text editor returns to the stage.
   void OnStageConnect( Dali::Actor actor );
 
 private: // Data
 
   // Signals
-  Toolkit::TextField::TextChangedSignalType mTextChangedSignal;
-  Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
+  Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
-  Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
+  Text::ClipperPtr mClipper;
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
 
   int mRenderingBackend;
-  int mExceedPolicy;
   bool mHasBeenStaged:1;
 };
 
@@ -265,26 +258,26 @@ private: // Data
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::TextField& GetImpl( Toolkit::TextField& textField )
+inline Toolkit::Internal::TextEditor& GetImpl( Toolkit::TextEditor& textEditor )
 {
-  DALI_ASSERT_ALWAYS(textField);
+  DALI_ASSERT_ALWAYS(textEditor);
 
-  Dali::RefObject& handle = textField.GetImplementation();
+  Dali::RefObject& handle = textEditor.GetImplementation();
 
-  return static_cast<Toolkit::Internal::TextField&>(handle);
+  return static_cast<Toolkit::Internal::TextEditor&>(handle);
 }
 
-inline const Toolkit::Internal::TextField& GetImpl( const Toolkit::TextField& textField )
+inline const Toolkit::Internal::TextEditor& GetImpl( const Toolkit::TextEditor& textEditor )
 {
-  DALI_ASSERT_ALWAYS(textField);
+  DALI_ASSERT_ALWAYS(textEditor);
 
-  const Dali::RefObject& handle = textField.GetImplementation();
+  const Dali::RefObject& handle = textEditor.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::TextField&>(handle);
+  return static_cast<const Toolkit::Internal::TextEditor&>(handle);
 }
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#endif // __DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H__
