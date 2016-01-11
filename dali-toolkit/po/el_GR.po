@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Επιλογή όλων"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Αντιγραφή"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Επιλογή"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Αποκοπή"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Επικόλληση"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Πρόχειρο"
+

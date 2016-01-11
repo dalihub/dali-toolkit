@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Roghnaigh gach"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Cóipeáil"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Roghnaigh"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Gearr"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Greamaigh"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Gearrthaisce"
+

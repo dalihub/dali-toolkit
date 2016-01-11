@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Pasirinkti visus"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopijuoti"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Rinktis"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Iškirpti"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Įklijuoti"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Iškarpinė"
+

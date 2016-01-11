@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Ընտրել բոլորը"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Պատճենել"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Ընտրել"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Կտրել"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Տեղադրել"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Գզրոց"
+

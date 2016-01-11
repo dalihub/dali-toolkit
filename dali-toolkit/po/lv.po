@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Izv. visu"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopēt"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Atlasīt"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Izgriezt"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Ielīmēt"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Starpliktuve"
+

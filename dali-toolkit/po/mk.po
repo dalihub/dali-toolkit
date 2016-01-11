@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Избери ги сите"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Копирај"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Избери"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Исечи"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Пресликај"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Посредна меморија"
+
