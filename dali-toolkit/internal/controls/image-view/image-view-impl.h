@@ -38,7 +38,7 @@ namespace Internal
 {
 class ImageView : public Control
 {
- protected:
+protected:
 
   /**
    * Construct a new ImageView.
@@ -49,8 +49,6 @@ class ImageView : public Control
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~ImageView();
-
-
 
 public:
   /**
@@ -129,14 +127,6 @@ private: // From Control
    * @copydoc Toolkit::Control::GetWidthForHeight()
    */
   virtual float GetWidthForHeight( float height );
-
-private:
-  /**
-   * Attaches mImage member to the renderer, creating the renderers, samplers, meshes and materials if needed
-   *
-   * @pre mImage has been initialised
-   */
-  void AttachImage();
 
 private:
   // Undefined

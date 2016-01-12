@@ -246,6 +246,44 @@ int UtcDaliImageViewSetGetProperty01(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSetGetProperty02(void)
+{
+  ToolkitTestApplication application;
+
+  Image image = CreateBufferImage( 10, 10, Color::WHITE );
+  ImageView imageView = ImageView::New(image);
+  Vector4 fullImageRect( 0.f, 0.f, 1.f, 1.f );
+
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelAreaUniform, fullImageRect, TEST_LOCATION );
+
+  Property::Value value = imageView.GetProperty( ImageView::Property::PIXEL_AREA );
+  Vector4 pixelAreaValue;
+  DALI_TEST_CHECK( value.Get(pixelAreaValue) );
+  DALI_TEST_EQUALS( pixelAreaValue, fullImageRect, TEST_LOCATION );
+
+  Vector4 pixelAreaSet( 0.2f, 0.2f, 0.3f, 0.3f );
+  imageView.SetProperty( ImageView::Property::PIXEL_AREA, pixelAreaSet);
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView.GetProperty( ImageView::Property::PIXEL_AREA );
+  value.Get(pixelAreaValue);
+  DALI_TEST_EQUALS( pixelAreaValue, pixelAreaSet, TEST_LOCATION );
+
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelAreaUniform, pixelAreaSet, TEST_LOCATION );
+
+  END_TEST;
+}
 int UtcDaliImageViewSizeWithBackground(void)
 {
   ToolkitTestApplication application;
