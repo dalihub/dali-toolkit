@@ -117,7 +117,6 @@ StyleManager::StyleManager()
 
   // Sound & haptic style
   mFeedbackStyle = new FeedbackStyle();
-
 }
 
 StyleManager::~StyleManager()
@@ -156,14 +155,14 @@ void StyleManager::SetOrientation( Orientation orientation )
   }
 }
 
-std::string StyleManager::GetDefaultFontFamily() const
-{
-  return mDefaultFontFamily;
-}
-
 Orientation StyleManager::GetOrientation()
 {
   return mOrientation;
+}
+
+std::string StyleManager::GetDefaultFontFamily() const
+{
+  return mDefaultFontFamily;
 }
 
 void StyleManager::SetStyleConstant( const std::string& key, const Property::Value& value )
@@ -183,12 +182,112 @@ bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& va
   return false;
 }
 
-void StyleManager::OnOrientationChanged( Orientation orientation )
+void StyleManager::RequestThemeChange( const std::string& themeFile )
 {
-  mOrientation = orientation;
-  // TODO: if orientation changed, apply the new style to all controls
-  // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
+  mThemeFile = themeFile;
+
+  // need to do style change synchronously as app might create a UI control on the next line
   SetTheme();
+}
+
+void StyleManager::RequestDefaultTheme()
+{
+  RequestThemeChange( DEFAULT_THEME );
+}
+
+void StyleManager::ApplyThemeStyle( Toolkit::Control control )
+{
+  if( !mThemeBuilder )
+  {
+    RequestDefaultTheme();
+  }
+
+  if( mThemeBuilder )
+  {
+    ApplyStyle( mThemeBuilder, control );
+  }
+}
+
+void StyleManager::ApplyThemeStyleAtInit( Toolkit::Control control )
+{
+  ApplyThemeStyle( control );
+
+  if(mFeedbackStyle)
+  {
+    mFeedbackStyle->ObjectCreated( control );
+  }
+}
+
+void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName )
+{
+  bool builderReady = false;
+
+  // First look in the cache
+  Toolkit::Builder builder = FindCachedBuilder( jsonFileName );
+  if( builder )
+  {
+    builderReady = true;
+  }
+  else
+  {
+    // Merge theme and style constants
+    Property::Map constants( mThemeBuilderConstants );
+    constants.Merge( mStyleBuilderConstants );
+
+    // Create it
+    builder = CreateBuilder( constants );
+
+    if( LoadJSON( builder, jsonFileName ) )
+    {
+      CacheBuilder( builder, jsonFileName );
+      builderReady = true;
+    }
+  }
+
+  // Apply the style to the control
+  if( builderReady )
+  {
+    builder.ApplyStyle( styleName, control );
+  }
+}
+
+Toolkit::StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
+{
+  return mStyleChangeSignal;
+}
+
+
+void StyleManager::SetTheme()
+{
+  mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
+
+  if( LoadJSON( mThemeBuilder, mThemeFile ) )
+  {
+    if(mFeedbackStyle)
+    {
+      mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
+    }
+
+    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
+  }
+  else
+  {
+    mThemeBuilder.Reset();
+  }
+}
+
+bool StyleManager::LoadFile( const std::string& filename, std::string& stringOut )
+{
+  DALI_ASSERT_DEBUG( 0 != filename.length());
+
+  // as toolkit is platform agnostic, it cannot load files from filesystem
+  // ask style monitor to load the style sheet
+  if( mStyleMonitor )
+  {
+    return mStyleMonitor.LoadThemeFile( filename, stringOut );
+  }
+
+  return false;
 }
 
 Toolkit::Builder StyleManager::CreateBuilder( const Property::Map& constants )
@@ -294,112 +393,14 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
   }
 }
 
-void StyleManager::ApplyThemeStyle( Toolkit::Control control )
+void StyleManager::OnOrientationChanged( Orientation orientation )
 {
-  if( !mThemeBuilder )
-  {
-    RequestDefaultTheme();
-  }
-
-  if( mThemeBuilder )
-  {
-    ApplyStyle( mThemeBuilder, control );
-  }
-}
-
-void StyleManager::ApplyThemeStyleAtInit( Toolkit::Control control )
-{
-  ApplyThemeStyle( control );
-
-  if(mFeedbackStyle)
-  {
-    mFeedbackStyle->ObjectCreated( control );
-  }
-}
-
-void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName )
-{
-  bool builderReady = false;
-
-  // First look in the cache
-  Toolkit::Builder builder = FindCachedBuilder( jsonFileName );
-  if( builder )
-  {
-    builderReady = true;
-  }
-  else
-  {
-    // Merge theme and style constants
-    Property::Map constants( mThemeBuilderConstants );
-    constants.Merge( mStyleBuilderConstants );
-
-    // Create it
-    builder = CreateBuilder( constants );
-
-    if( LoadJSON( builder, jsonFileName ) )
-    {
-      CacheBuilder( builder, jsonFileName );
-      builderReady = true;
-    }
-  }
-
-  // Apply the style to the control
-  if( builderReady )
-  {
-    builder.ApplyStyle( styleName, control );
-  }
-}
-
-bool StyleManager::LoadFile( const std::string& filename, std::string& stringOut )
-{
-  DALI_ASSERT_DEBUG( 0 != filename.length());
-
-  // as toolkit is platform agnostic, it cannot load files from filesystem
-  // ask style monitor to load the style sheet
-  if( mStyleMonitor )
-  {
-    return mStyleMonitor.LoadThemeFile( filename, stringOut );
-  }
-
-  return false;
-}
-
-Toolkit::StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
-{
-  return mStyleChangeSignal;
-}
-
-void StyleManager::RequestThemeChange( const std::string& themeFile )
-{
-  mThemeFile = themeFile;
-
-  // need to do style change synchronously as app might create a UI control on the next line
+  mOrientation = orientation;
+  // TODO: if orientation changed, apply the new style to all controls
+  // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
   SetTheme();
 }
 
-void StyleManager::RequestDefaultTheme()
-{
-  RequestThemeChange( DEFAULT_THEME );
-}
-
-void StyleManager::SetTheme()
-{
-  mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
-
-  if( LoadJSON( mThemeBuilder, mThemeFile ) )
-  {
-    if(mFeedbackStyle)
-    {
-      mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
-    }
-
-    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
-  }
-  else
-  {
-    mThemeBuilder.Reset();
-  }
-}
 
 Toolkit::Builder StyleManager::FindCachedBuilder( const std::string& key )
 {
