@@ -291,6 +291,19 @@ void TreeNodeManipulator::SetType( TreeNode::NodeType type)
       }
     }
   }
+  else if( TreeNode::ARRAY == mNode->mType )
+  {
+    if( mNode->mFirstChild != NULL )
+    {
+      TreeNode::NodeType type = mNode->mFirstChild->GetType();
+
+      if( TreeNode::FLOAT == type || TreeNode::INTEGER == type )
+      {
+        // Arrays of numbers should be replaced, not appended to.
+        RemoveChildren();
+      }
+    }
+  }
 }
 
 void TreeNodeManipulator::SetName( const char* name )

@@ -318,8 +318,13 @@ TreeNode* JsonParserState::NewNode(const char* name, TreeNode::NodeType type)
       TreeNodeManipulator modify(node);
 
       modify.SetName(name);
-      // Set the type of the existing node, this may remove children where necessary
-      // (changing from container type to value type)
+
+      // Set the type of the existing node.
+      // Where the new type is different, then any children of this node will
+      // be deleted.
+      // When the type is an array of numbers, then this will also remove any children
+      // When the type is an object or other array, then the children will not be removed,
+      // but will instead follow these replace rules.
       modify.SetType(type);
 
       mCurrent = modify;

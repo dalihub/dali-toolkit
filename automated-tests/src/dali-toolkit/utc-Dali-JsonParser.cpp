@@ -722,3 +722,37 @@ int UtcDaliJsonParserMethod11(void)
   tet_result(TET_PASS);
   END_TEST;
 }
+
+
+int UtcDaliJsonParserMerge1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("JSON tree merge");
+
+  std::string s1( ReplaceQuotes("                                       \
+{                                                                       \
+  'styles':                                                             \
+  {                                                                     \
+    'button':                                                           \
+    {                                                                   \
+      'backgroundColor':[0.8, 0.0, 1.0, 1.0],                           \
+      'foregroundColor':[1, 1, 1, 1]                                    \
+    }                                                                   \
+  }                                                                     \
+}                                                                       \
+"));
+
+  JsonParser parser = JsonParser::New();
+  JsonParser testParser = JsonParser::New();
+
+  testParser.Parse( s1 );
+
+  parser.Parse( s1 );
+  parser.Parse( s1 ); // Merge the tree into itself. The value array should not grow.
+
+  DALI_TEST_CHECK(parser.GetRoot());
+
+  CompareTrees( *parser.GetRoot(), *testParser.GetRoot() );
+
+  END_TEST;
+}
