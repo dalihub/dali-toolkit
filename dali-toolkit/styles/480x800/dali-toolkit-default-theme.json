@@ -30,7 +30,11 @@
   {
     "textlabel":
     {
-      "pointSize":18
+      "pointSize":18,
+      "enableAutoScroll":false,
+      "autoScrollLoopCount":2,
+      "autoScrollGap":50,
+      "autoScrollSpeed":80
     },
 
     "textlabelFontSize0":

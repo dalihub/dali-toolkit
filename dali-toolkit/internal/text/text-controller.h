@@ -86,6 +86,7 @@ public:
     REORDER            = 0x0400,
     ALIGN              = 0x0800,
     COLOR              = 0x1000,
+    UPDATE_DIRECTION   = 0x2000,
     ALL_OPERATIONS     = 0xFFFF
   };
 
@@ -147,6 +148,30 @@ public:
    * @return @e true if the mark-up processor is enabled, otherwise returns @e false.
    */
   bool IsMarkupProcessorEnabled() const;
+
+  /**
+   * @brief Enables/disables the auto text scrolling
+   *
+   * By default is disabled.
+   *
+   * @param[in] enable Whether to enable the auto scrolling
+   */
+  void SetAutoScrollEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether auto text scrolling is enabled.
+   *
+   * By default is disabled.
+   *
+   * @return @e true if auto scrolling is enabled, otherwise returns @e false.
+   */
+  bool IsAutoScrollEnabled() const;
+
+  /**
+   * @brief Get direction of the text from the first line of text,
+   * @return bool rtl (right to left) is true
+   */
+  CharacterDirection GetAutoScrollDirection() const;
 
   /**
    * @brief Replaces any text previously set.

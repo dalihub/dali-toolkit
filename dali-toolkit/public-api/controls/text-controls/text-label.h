@@ -78,7 +78,11 @@ public:
       UNDERLINE_ENABLED,                        ///< name "underlineEnabled",     The underline enabled flag,                       type BOOLEAN @SINCE_1_0.0
       UNDERLINE_COLOR,                          ///< name "underlineColor",       The color of the underline,                       type VECTOR4 @SINCE_1_0.0
       UNDERLINE_HEIGHT,                         ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT @SINCE_1_0.0
-      ENABLE_MARKUP                             ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN @SINCE_1_0.0
+      ENABLE_MARKUP,                            ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN @SINCE_1_0.0
+      ENABLE_AUTO_SCROLL,                       ///< name "enableAutoScroll",     Whether to start auto text scrolling              type BOOLEAN @SINCE_1_1.35
+      AUTO_SCROLL_SPEED,                        ///< name "autoScrollSpeed",      Speed at which text should auto scroll            type INT @SINCE_1_1.35
+      AUTO_SCROLL_LOOP_COUNT,                   ///< name "autoScrollLoopCount",  Number of times the text should scroll (loop)     type INT @SINCE_1_1.35
+      AUTO_SCROLL_GAP                           ///< name "autoScrollGap",        Gap before text wraps around when scrolling       type FLOAT @SINCE_1_1.35
     };
   };
 

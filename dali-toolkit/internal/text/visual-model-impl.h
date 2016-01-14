@@ -332,7 +332,6 @@ public:
 
   bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
   bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
-
 };
 
 } // namespace Text

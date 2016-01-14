@@ -301,7 +301,9 @@ struct Controller::Impl
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
     mMarkupProcessorEnabled( false ),
-    mClipboardHideEnabled( true )
+    mClipboardHideEnabled( true ),
+    mAutoScrollEnabled( false ),
+    mAutoScrollDirectionRTL( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -658,7 +660,10 @@ public:
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
-  bool mClipboardHideEnabled:1;           ///< Whether the ClipboardHide function work or not
+  bool mClipboardHideEnabled:1;            ///< Whether the ClipboardHide function work or not
+  bool mAutoScrollEnabled:1;               ///< Whether auto text scrolling is enabled.
+  CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
+
 };
 
 } // namespace Text

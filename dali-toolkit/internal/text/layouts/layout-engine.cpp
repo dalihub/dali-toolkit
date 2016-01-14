@@ -1242,11 +1242,13 @@ void LayoutEngine::SetLayout( Layout layout )
 
 LayoutEngine::Layout LayoutEngine::GetLayout() const
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetLayout[%d]\n", mImpl->mLayout);
   return mImpl->mLayout;
 }
 
 void LayoutEngine::SetTextEllipsisEnabled( bool enabled )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "-->LayoutEngine::SetTextEllipsisEnabled[%s]\n", (enabled)?"true":"false" );
   mImpl->mEllipsisEnabled = enabled;
 }
 
