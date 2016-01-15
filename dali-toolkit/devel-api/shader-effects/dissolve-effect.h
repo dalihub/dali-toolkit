@@ -22,38 +22,6 @@
 #include <string.h>
 #include <dali/devel-api/rendering/shader.h>
 
-namespace
-{
-  template < typename T>
-  void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value )
-  {
-    Dali::Property::Index index = actor.GetPropertyIndex( name );
-    if ( Dali::Property::INVALID_INDEX == index )
-    {
-      index = actor.RegisterProperty( name, value );
-    }
-    else
-    {
-      actor.SetProperty( index, value );
-    }
-  }
-
-  template < typename T>
-  void SafeSetCustomProperty( Dali::Actor& actor, const std::string& name, const T& value, Dali::Property::AccessMode accessMode )
-  {
-    Dali::Property::Index index = actor.GetPropertyIndex( name );
-    if ( Dali::Property::INVALID_INDEX == index )
-    {
-      index = actor.RegisterProperty( name, value, accessMode );
-    }
-    else
-    {
-      actor.SetProperty( index, value );
-    }
-  }
-
-};
-
 namespace Dali
 {
 
@@ -74,72 +42,72 @@ namespace Toolkit
 inline void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress )
 {
   // the line passes through 'position' and has the direction of 'displacement'
-    float coefA, coefB, coefC; //line equation: Ax+By+C=0;
-    coefA = displacement.y;
-    coefB = -displacement.x;
-    coefC = -displacement.y*position.x + displacement.x*position.y;
+  float coefA, coefB, coefC; //line equation: Ax+By+C=0;
+  coefA = displacement.y;
+  coefB = -displacement.x;
+  coefC = -displacement.y*position.x + displacement.x*position.y;
 
-    float inversedAABB = 1.f / (coefA*coefA+coefB*coefB);
-    float inversedSqrtAABB = sqrtf(inversedAABB);
-    float saddleA;
+  float inversedAABB = 1.f / (coefA*coefA+coefB*coefB);
+  float inversedSqrtAABB = sqrtf(inversedAABB);
+  float saddleA;
 
-    //saddle surface(Hyperbolic paraboloid)function, used to calculate the dissolve starting time
-    //z = y*y/a/a - x*x/b/b
-    //with our selection of parameters(a and b), this value for any texture coordinate is between -1.0 and 1.0
+  //saddle surface(Hyperbolic paraboloid)function, used to calculate the dissolve starting time
+  //z = y*y/a/a - x*x/b/b
+  //with our selection of parameters(a and b), this value for any texture coordinate is between -1.0 and 1.0
 
-    Vector3 saddleParam; // [0]: a*a, [1]: b*b, [2] b
-    Vector2 translation;
-    Vector2 rotation;
-    float toNext = -1.f;
-    if( displacement.x > 0.f || (EqualsZero(displacement.x) && displacement.y > 0.f) )
-    {
-      toNext = 1.f;
-    }
+  Vector3 saddleParam; // [0]: a*a, [1]: b*b, [2] b
+  Vector2 translation;
+  Vector2 rotation;
+  float toNext = -1.f;
+  if( displacement.x > 0.f || (EqualsZero(displacement.x) && displacement.y > 0.f) )
+  {
+    toNext = 1.f;
+  }
 
-    if( (displacement.y * displacement.x < 0.0f) )
-    {
-      //distance from (0,0) to the line
-      float distanceTopLeft =  fabsf(coefC) * inversedSqrtAABB;
-      //distance from (1, 1 ) to the line
-      float distanceBottomRight = fabsf(coefA+coefB+coefC) * inversedSqrtAABB;
-      saddleA = std::max( distanceTopLeft, distanceBottomRight );
+  if( (displacement.y * displacement.x < 0.0f) )
+  {
+    //distance from (0,0) to the line
+    float distanceTopLeft =  fabsf(coefC) * inversedSqrtAABB;
+    //distance from (1, 1 ) to the line
+    float distanceBottomRight = fabsf(coefA+coefB+coefC) * inversedSqrtAABB;
+    saddleA = std::max( distanceTopLeft, distanceBottomRight );
 
-      //foot of a perpendicular: (1,0) to the line
-      float footX1 = ( coefB*coefB - coefA*coefC) * inversedAABB;
-      float footY1 = (-coefA*coefB - coefB*coefC) * inversedAABB;
-      //foot of a perpendicular: (0,1) to the line
-      float footX2 = (-coefA*coefB - coefA*coefC) * inversedAABB;
-      float footY2 = ( coefA*coefA - coefB*coefC) * inversedAABB;
-      saddleParam[1] = (footX1-footX2)*(footX1-footX2) + (footY1-footY2)*(footY1-footY2);
-      translation = Vector2(-footX2,-footY2);
-    }
-    else
-    {
-      //distance from(1,0) to the line
-      float distanceTopRight = fabsf(coefA+coefC) * inversedSqrtAABB;
-      //distance from(0,1) to the line
-      float distanceBottomLeft = fabsf(coefB+coefC) * inversedSqrtAABB;
-      saddleA = std::max( distanceTopRight, distanceBottomLeft );
-      //foot of a perpendicular: (0,0) to the line
-      float footX3 = (-coefA*coefC) * inversedAABB;
-      float footY3 = (-coefB*coefC) * inversedAABB;
-      //foot of a perpendicular: (1.0,1.0) to the line
-      float footX4 = ( coefB*coefB - coefA*coefB - coefA*coefC) * inversedAABB;
-      float footY4 = (-coefA*coefB + coefA*coefA- coefB*coefC) * inversedAABB;
-      saddleParam[1] = (footX3-footX4)*(footX3-footX4) + (footY3-footY4)*(footY3-footY4);
-      translation = Vector2(-footX3, -footY3);
-    }
+    //foot of a perpendicular: (1,0) to the line
+    float footX1 = ( coefB*coefB - coefA*coefC) * inversedAABB;
+    float footY1 = (-coefA*coefB - coefB*coefC) * inversedAABB;
+    //foot of a perpendicular: (0,1) to the line
+    float footX2 = (-coefA*coefB - coefA*coefC) * inversedAABB;
+    float footY2 = ( coefA*coefA - coefB*coefC) * inversedAABB;
+    saddleParam[1] = (footX1-footX2)*(footX1-footX2) + (footY1-footY2)*(footY1-footY2);
+    translation = Vector2(-footX2,-footY2);
+  }
+  else
+  {
+    //distance from(1,0) to the line
+    float distanceTopRight = fabsf(coefA+coefC) * inversedSqrtAABB;
+    //distance from(0,1) to the line
+    float distanceBottomLeft = fabsf(coefB+coefC) * inversedSqrtAABB;
+    saddleA = std::max( distanceTopRight, distanceBottomLeft );
+    //foot of a perpendicular: (0,0) to the line
+    float footX3 = (-coefA*coefC) * inversedAABB;
+    float footY3 = (-coefB*coefC) * inversedAABB;
+    //foot of a perpendicular: (1.0,1.0) to the line
+    float footX4 = ( coefB*coefB - coefA*coefB - coefA*coefC) * inversedAABB;
+    float footY4 = (-coefA*coefB + coefA*coefA- coefB*coefC) * inversedAABB;
+    saddleParam[1] = (footX3-footX4)*(footX3-footX4) + (footY3-footY4)*(footY3-footY4);
+    translation = Vector2(-footX3, -footY3);
+  }
 
-    saddleParam[2] = sqrtf(saddleParam[1]);
-    saddleParam[0] = saddleA*saddleA;
-    rotation = Vector2(-displacement.x, displacement.y);
-    rotation.Normalize();
+  saddleParam[2] = sqrtf(saddleParam[1]);
+  saddleParam[0] = saddleA*saddleA;
+  rotation = Vector2(-displacement.x, displacement.y);
+  rotation.Normalize();
 
-    SafeSetCustomProperty( actor, "uSaddleParam", saddleParam );
-    SafeSetCustomProperty( actor, "uTranslation", translation );
-    SafeSetCustomProperty( actor, "uRotation", rotation );
-    SafeSetCustomProperty( actor, "uToNext", toNext );
-    SafeSetCustomProperty( actor, "uPercentage", initialProgress, Dali::Property::ANIMATABLE );
+  actor.RegisterProperty( "uSaddleParam", saddleParam );
+  actor.RegisterProperty( "uTranslation", translation );
+  actor.RegisterProperty( "uRotation", rotation );
+  actor.RegisterProperty( "uToNext", toNext );
+  actor.RegisterProperty( "uPercentage", initialProgress, Dali::Property::ANIMATABLE );
 }
 /**
  * @brief Create a new Dissolve effect
@@ -245,13 +213,13 @@ inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
   vertexShaderString.append( vertexShader );
   fragmentShaderString.append( fragmentShader );
 
-  customShader[ "vertex-shader" ] = vertexShaderString;
-  customShader[ "fragment-shader" ] = fragmentShaderString;
+  customShader[ "vertexShader" ] = vertexShaderString;
+  customShader[ "fragmentShader" ] = fragmentShaderString;
 
-  customShader[ "subdivide-grid-x" ] = 20;
-  customShader[ "subdivide-grid-y" ] = 20;
+  customShader[ "subdivideGridX" ] = 20;
+  customShader[ "subdivideGridY" ] = 20;
 
-  customShader[ "hints" ] = "output-is-transparent";
+  customShader[ "hints" ] = "outputIsTransparent";
 
   map[ "shader" ] = customShader;
   return map;

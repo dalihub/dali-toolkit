@@ -28,8 +28,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/text-controls/text-font-style.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
@@ -84,43 +84,45 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextField, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "rendering-backend",                    INTEGER,   RENDERING_BACKEND                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "renderingBackend",                     INTEGER,   RENDERING_BACKEND                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                                 STRING,    TEXT                                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text",                     STRING,    PLACEHOLDER_TEXT                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text-focused",             STRING,    PLACEHOLDER_TEXT_FOCUSED             )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-family",                          STRING,    FONT_FAMILY                          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-style",                           STRING,    FONT_STYLE                           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "point-size",                           FLOAT,     POINT_SIZE                           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "max-length",                           INTEGER,   MAX_LENGTH                           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceed-policy",                        INTEGER,   EXCEED_POLICY                        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontal-alignment",                 STRING,    HORIZONTAL_ALIGNMENT                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "vertical-alignment",                   STRING,    VERTICAL_ALIGNMENT                   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text-color",                           VECTOR4,   TEXT_COLOR                           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text-color",               VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow-offset",                        VECTOR2,   SHADOW_OFFSET                        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow-color",                         VECTOR4,   SHADOW_COLOR                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primary-cursor-color",                 VECTOR4,   PRIMARY_CURSOR_COLOR                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondary-cursor-color",               VECTOR4,   SECONDARY_CURSOR_COLOR               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",                  BOOLEAN,   ENABLE_CURSOR_BLINK                  )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",                FLOAT,     CURSOR_BLINK_INTERVAL                )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",                FLOAT,     CURSOR_BLINK_DURATION                )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-width",                         INTEGER,   CURSOR_WIDTH                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",                    STRING,    GRAB_HANDLE_IMAGE                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-speed",                         FLOAT,     SCROLL_SPEED                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          MAP,       SELECTION_HANDLE_IMAGE_LEFT          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         MAP,       SELECTION_HANDLE_IMAGE_RIGHT         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  MAP,       SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", MAP,       SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-marker-image-left",   MAP,       SELECTION_HANDLE_MARKER_IMAGE_LEFT   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-marker-image-right",  MAP,       SELECTION_HANDLE_MARKER_IMAGE_RIGHT  )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            VECTOR4,   SELECTION_HIGHLIGHT_COLOR            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderText",                      STRING,    PLACEHOLDER_TEXT                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextFocused",               STRING,    PLACEHOLDER_TEXT_FOCUSED             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "fontFamily",                           STRING,    FONT_FAMILY                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "fontStyle",                            STRING,    FONT_STYLE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "pointSize",                            FLOAT,     POINT_SIZE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "maxLength",                            INTEGER,   MAX_LENGTH                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceedPolicy",                         INTEGER,   EXCEED_POLICY                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontalAlignment",                  STRING,    HORIZONTAL_ALIGNMENT                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "textColor",                            VECTOR4,   TEXT_COLOR                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextColor",                 VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadowOffset",                         VECTOR2,   SHADOW_OFFSET                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadowColor",                          VECTOR4,   SHADOW_COLOR                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primaryCursorColor",                   VECTOR4,   PRIMARY_CURSOR_COLOR                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondaryCursorColor",                 VECTOR4,   SECONDARY_CURSOR_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableCursorBlink",                    BOOLEAN,   ENABLE_CURSOR_BLINK                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursorBlinkInterval",                  FLOAT,     CURSOR_BLINK_INTERVAL                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursorBlinkDuration",                  FLOAT,     CURSOR_BLINK_DURATION                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursorWidth",                          INTEGER,   CURSOR_WIDTH                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grabHandleImage",                      STRING,    GRAB_HANDLE_IMAGE                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grabHandlePressedImage",               STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scrollThreshold",                      FLOAT,     SCROLL_THRESHOLD                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scrollSpeed",                          FLOAT,     SCROLL_SPEED                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHandleImageLeft",             MAP,       SELECTION_HANDLE_IMAGE_LEFT          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHandleImageRight",            MAP,       SELECTION_HANDLE_IMAGE_RIGHT         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHandlePressedImageLeft",      MAP,       SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHandlePressedImageRight",     MAP,       SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHandleMarkerImageLeft",       MAP,       SELECTION_HANDLE_MARKER_IMAGE_LEFT   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHandleMarkerImageRight",      MAP,       SELECTION_HANDLE_MARKER_IMAGE_RIGHT  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selectionHighlightColor",              VECTOR4,   SELECTION_HIGHLIGHT_COLOR            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decorationBoundingBox",                RECTANGLE, DECORATION_BOUNDING_BOX              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputColor",                           VECTOR4,   INPUT_COLOR                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableMarkup",                         BOOLEAN,   ENABLE_MARKUP                        )
 
-DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "text-changed",       SIGNAL_TEXT_CHANGED )
-DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "max-length-reached", SIGNAL_MAX_LENGTH_REACHED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -291,6 +293,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           if( impl.mController->GetTextColor() != textColor )
           {
             impl.mController->SetTextColor( textColor );
+            impl.mController->SetInputColor( textColor );
             impl.mRenderer.Reset();
           }
         }
@@ -553,6 +556,28 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         VirtualKeyboard::ApplySettings( map );
         break;
       }
+      case Toolkit::TextField::Property::INPUT_COLOR:
+      {
+        if( impl.mController )
+        {
+          const Vector4 inputColor = value.Get< Vector4 >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p INPUT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), inputColor.r, inputColor.g, inputColor.b, inputColor.a );
+
+          impl.mController->SetInputColor( inputColor );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          const bool enableMarkup = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_MARKUP %d\n", impl.mController.Get(), enableMarkup );
+
+          impl.mController->SetMarkupProcessorEnabled( enableMarkup );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -680,6 +705,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetPlaceholderTextColor();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_COLOR:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetInputColor();
         }
         break;
       }
@@ -836,6 +869,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         break;
       }
+      case Toolkit::TextField::Property::ENABLE_MARKUP:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsMarkupProcessorEnabled();
+        }
+        break;
+      }
     } //switch
   }
 
@@ -988,7 +1029,7 @@ void TextField::RenderText()
   Actor renderableActor;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), TEXT_DEPTH_INDEX );
+    renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
   }
 
   if( renderableActor != mRenderableActor )

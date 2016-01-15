@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
@@ -53,11 +54,11 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PushButton, Toolkit::Button, Create )
 
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "unselected-icon", STRING, UNSELECTED_ICON )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "selected-icon", STRING, SELECTED_ICON )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "icon-alignment", STRING, ICON_ALIGNMENT )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "label-padding", STRING, LABEL_PADDING )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "icon-padding", STRING, ICON_PADDING )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "unselectedIcon",  STRING, UNSELECTED_ICON )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "selectedIcon",  STRING, SELECTED_ICON )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "iconAlignment",  STRING, ICON_ALIGNMENT )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "labelPadding",  STRING, LABEL_PADDING )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "iconPadding",  STRING, ICON_PADDING )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -145,7 +146,7 @@ void PushButton::OnButtonInitialize()
 void PushButton::SetIcon( DecorationState state, const std::string iconFilename )
 {
   mIconName[ state ] = iconFilename;
-  SetDecoration( state, ImageActor::New( Dali::ResourceImage::New( iconFilename ) ) );
+  SetDecoration( state, Toolkit::ImageView::New( iconFilename  ) );
   ConfigureSizeNegotiation();
 }
 

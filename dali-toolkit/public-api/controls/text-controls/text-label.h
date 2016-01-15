@@ -61,20 +61,21 @@ public:
   {
     enum
     {
-      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",    The type or rendering e.g. bitmap-based,          type INT
+      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",     The type or rendering e.g. bitmap-based,          type INT
       TEXT,                                     ///< name "text",                 The text to display in UTF-8 format,              type STRING
-      FONT_FAMILY,                              ///< name "font-family",          The requested font family,                        type STRING
-      FONT_STYLE,                               ///< name "font-style",           The requested font style,                         type STRING
-      POINT_SIZE,                               ///< name "point-size",           The size of font in points,                       type FLOAT
-      MULTI_LINE,                               ///< name "multi-line",           The single-line or multi-line layout option,      type BOOLEAN
-      HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment", The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END"
-      VERTICAL_ALIGNMENT,                       ///< name "vertical-alignment",   The line vertical alignment,                      type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
-      TEXT_COLOR,                               ///< name "text-color",           The text color,                                   type VECTOR4
-      SHADOW_OFFSET,                            ///< name "shadow-offset",        The drop shadow offset 0 indicates no shadow,     type VECTOR2
-      SHADOW_COLOR,                             ///< name "shadow-color",         The color of a drop shadow,                       type VECTOR4
-      UNDERLINE_ENABLED,                        ///< name "underline-enabled",    The underline enabled flag,                       type BOOLEAN
-      UNDERLINE_COLOR,                          ///< name "underline-color",      The color of the underline,                       type VECTOR4
-      UNDERLINE_HEIGHT                          ///< name "underline-height",     Overrides the underline height from font metrics, type FLOAT
+      FONT_FAMILY,                              ///< name "fontFamily",           The requested font family,                        type STRING
+      FONT_STYLE,                               ///< name "fontStyle",            The requested font style,                         type STRING
+      POINT_SIZE,                               ///< name "pointSize",            The size of font in points,                       type FLOAT
+      MULTI_LINE,                               ///< name "multiLine",            The single-line or multi-line layout option,      type BOOLEAN
+      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",  The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END"
+      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",    The line vertical alignment,                      type STRING,  values "TOP",   "CENTER", "BOTTOM"
+      TEXT_COLOR,                               ///< name "textColor",            The text color,                                   type VECTOR4
+      SHADOW_OFFSET,                            ///< name "shadowOffset",         The drop shadow offset 0 indicates no shadow,     type VECTOR2
+      SHADOW_COLOR,                             ///< name "shadowColor",          The color of a drop shadow,                       type VECTOR4
+      UNDERLINE_ENABLED,                        ///< name "underlineEnabled",     The underline enabled flag,                       type BOOLEAN
+      UNDERLINE_COLOR,                          ///< name "underlineColor",       The color of the underline,                       type VECTOR4
+      UNDERLINE_HEIGHT,                         ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT
+      ENABLE_MARKUP                             ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN
     };
   };
 

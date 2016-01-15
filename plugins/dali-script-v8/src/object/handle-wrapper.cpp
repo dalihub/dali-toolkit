@@ -33,6 +33,24 @@ namespace Dali
 namespace V8Plugin
 {
 
+namespace // un-named name space
+{
+
+/**
+ * Contains a list of all functions that can be called
+ */
+const ApiFunction HandleFunctionTable[]=
+{
+  { "RegisterAnimatableProperty",            HandleWrapper::RegisterAnimatableProperty },
+};
+
+const unsigned int HandleFunctionTableCount = sizeof(HandleFunctionTable)/sizeof(HandleFunctionTable[0]);
+} //un-named space
+
+/**
+ * @class Handle
+ */
+
 HandleWrapper::HandleWrapper( BaseWrappedObject::Type type,
     Handle handle,
     GarbageCollectorInterface& gc ) :
@@ -74,9 +92,7 @@ void HandleWrapper::PropertyGet( v8::Local<v8::String> propertyName,
   Handle handle =  handleWrapper->mHandle;
 
   // get the property index
-  // convert from camel case to dali property style with hyphens
-  std::string daliPropertyName = V8Utils::JavaScriptNameToPropertyName(name);
-  Dali::Property::Index index = handle.GetPropertyIndex( daliPropertyName );
+  Dali::Property::Index index = handle.GetPropertyIndex( name );
 
   if(index != Dali::Property::INVALID_INDEX)
   {
@@ -131,9 +147,7 @@ void HandleWrapper::PropertySet( v8::Local<v8::String> propertyName,
  // DALI_ASSERT_DEBUG( handleWrapper && "not a dali object");
   Handle handle =  handleWrapper->mHandle;
 
-  // convert from camel case to dali property style with hyphens
-  std::string daliPropertyName = V8Utils::JavaScriptNameToPropertyName(name);
-  Dali::Property::Index index = handle.GetPropertyIndex( daliPropertyName );
+  Dali::Property::Index index = handle.GetPropertyIndex( name );
 
   if(index != Dali::Property::INVALID_INDEX)
   {
@@ -175,10 +189,67 @@ void HandleWrapper::AddInterceptsToTemplate( v8::Isolate* isolate, v8::Local<v8:
 
   objTemplate->SetNamedPropertyHandler( HandleWrapper::PropertyGet, HandleWrapper::PropertySet);
 
+  // add function properties
+  ObjectTemplateHelper::InstallFunctions( isolate, objTemplate, HandleFunctionTable, HandleFunctionTableCount );
+
   ObjectTemplateHelper::AddSignalConnectAndDisconnect( isolate, objTemplate );
 
 }
 
+/**
+ * Register a new animatable property.
+ *
+ * The object should support dynamic properties.
+ * Property names are expected to be unique, but this is not enforced.
+ * Property indices are unique to each registered custom property in a given object.
+ * returns dali.PROPERTY_INVALID_INDEX if registration failed. This can happen if you try
+ * to register animatable property on an object that does not have scene graph object.
+ *
+ * @method registerAnimatableProperty
+ * @for Handle
+ * @param {string} name The name of the property.
+ * @param {Object} propertyValue The new value of the property.
+ * @return {integer} The index of the property or dali.PROPERTY_INVALID_INDEX if registration failed
+ * @example
+ *
+ *     var morphPropertyIdex = actor.registerAnimatableProperty("uMorphAmount", 0.0f);
+ *     var fadeColorPropertyIdex = handle.registerAnimatableProperty("uFadeColor", [1.0, 0.0, 0.0, 1.0]);
+ *
+ */
+void HandleWrapper::RegisterAnimatableProperty( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  // unwrap the object
+  HandleWrapper* handleWrapper = Unwrap( isolate, args.This() );
+  if( !handleWrapper )
+  {
+    return;
+  }
+
+  Handle handle =  handleWrapper->mHandle;
+
+  bool found( false );
+  std::string propertyName = V8Utils::GetStringParameter( PARAMETER_0, found, isolate, args );
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad property name parameter" );
+    return;
+  }
+
+  found = false;
+  Dali::Property::Value daliPropertyValue = V8Utils::GetPropertyValueParameter(PARAMETER_1, found, isolate, args );
+  if( !found || Dali::Property::NONE == daliPropertyValue.GetType() )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad property value parameter" );
+    return;
+  }
+  else
+  {
+    args.GetReturnValue().Set( v8::Integer::New( isolate, handle.RegisterProperty(propertyName, daliPropertyValue) ) );
+  }
+}
 
 } // namespace V8Plugin
 

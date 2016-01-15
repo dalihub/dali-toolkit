@@ -47,13 +47,13 @@ ControlRenderer& ControlRenderer::operator=( const ControlRenderer& handle )
 }
 
 ControlRenderer::ControlRenderer(Internal::ControlRenderer *impl)
-: BaseHandle(impl)
+: BaseHandle( impl )
 {
 }
 
 void ControlRenderer::SetSize( const Vector2& size )
 {
-  GetImplementation( *this ).SetSize(size);
+  GetImplementation( *this ).SetSize( size );
 }
 
 const Vector2& ControlRenderer::GetSize() const
@@ -68,7 +68,7 @@ void ControlRenderer::GetNaturalSize(Vector2& naturalSize ) const
 
 void ControlRenderer::SetDepthIndex( float index )
 {
-  GetImplementation( *this ).SetDepthIndex(index);
+  GetImplementation( *this ).SetDepthIndex( index );
 }
 
 float ControlRenderer::GetDepthIndex() const
@@ -78,12 +78,12 @@ float ControlRenderer::GetDepthIndex() const
 
 void ControlRenderer::SetOnStage( Actor& actor )
 {
-  GetImplementation( *this ).SetOnStage(actor);
+  GetImplementation( *this ).SetOnStage( actor );
 }
 
 void ControlRenderer::SetOffStage( Actor& actor )
 {
-  GetImplementation( *this ).SetOffStage(actor);
+  GetImplementation( *this ).SetOffStage( actor );
 }
 
 void ControlRenderer::RemoveAndReset( Actor& actor )

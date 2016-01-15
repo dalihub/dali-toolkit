@@ -941,7 +941,7 @@ int UtcDaliPopupPropertyBacking(void)
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
   Stage::GetCurrent().Add( popup );
 
-  Actor backing = popup.FindChildByName( "popup-backing" );
+  Actor backing = popup.FindChildByName( "popupBacking" );
   DALI_TEST_CHECK( backing );
 
   DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 1.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -1022,44 +1022,44 @@ int UtcDaliPopupPropertyCustomAnimation(void)
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 1.0f );
   popup.SetProperty( Popup::Property::ANIMATION_MODE, "CUSTOM" );
 
-  Actor popupContainer = popup.FindChildByName( "popup-container" );
+  Actor popupContainer = popup.FindChildByName( "popupContainer" );
   DALI_TEST_CHECK( popupContainer );
 
   Vector3 entryAnimationDestination( 300.0f, 200.0f, 0.0f );
   Vector3 exitAnimationDestination( -300.0f, -200.0f, 0.0f );
 
   Property::Map animationMapEntry;
-  animationMapEntry.Insert( "actor", "custom-animation-popup" );
+  animationMapEntry.Insert( "actor", "customAnimationPopup" );
   animationMapEntry.Insert( "property", "position" );
   animationMapEntry.Insert( "value", entryAnimationDestination );
-  animationMapEntry.Insert( "alpha-function", "EASE_OUT" );
+  animationMapEntry.Insert( "alphaFunction",  "EASE_OUT" );
 
   Property::Array timePeriodMapEntry;
   timePeriodMapEntry.PushBack( 0.0f );
   timePeriodMapEntry.PushBack( 1.0f );
 
-  animationMapEntry.Insert( "time-period", timePeriodMapEntry );
+  animationMapEntry.Insert( "timePeriod",  timePeriodMapEntry );
 
   Property::Map animationMapExit;
-  animationMapExit.Insert( "actor", "custom-animation-popup" );
+  animationMapExit.Insert( "actor", "customAnimationPopup" );
   animationMapExit.Insert( "property", "position" );
   animationMapExit.Insert( "value", exitAnimationDestination );
-  animationMapExit.Insert( "alpha-function", "EASE_IN" );
+  animationMapExit.Insert( "alphaFunction",  "EASE_IN" );
 
   Property::Array timePeriodMapExit;
   timePeriodMapExit.PushBack( 0.0f );
   timePeriodMapExit.PushBack( 1.0f );
 
-  animationMapExit.Insert( "time-period", timePeriodMapExit );
+  animationMapExit.Insert( "timePeriod",  timePeriodMapExit );
 
   popup.SetProperty( Toolkit::Popup::Property::ENTRY_ANIMATION, animationMapEntry );
   popup.SetProperty( Toolkit::Popup::Property::EXIT_ANIMATION, animationMapExit );
 
   Property::Map resultMap;
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::ENTRY_ANIMATION ).Get( resultMap ) );
-  DALI_TEST_EQUALS( resultMap.Count(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap.Count(), 0u, TEST_LOCATION );
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::EXIT_ANIMATION ).Get( resultMap ) );
-  DALI_TEST_EQUALS( resultMap.Count(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap.Count(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( popup );
   popup.SetDisplayState( Popup::SHOWN );
@@ -1217,7 +1217,7 @@ int UtcDaliPopupPropertyTail(void)
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
   application.Render();
-  tailActor = popup.FindChildByName( "tail-image" );
+  tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
 
   float baseValX = tailActor.GetCurrentWorldPosition().x;
@@ -1234,7 +1234,7 @@ int UtcDaliPopupPropertyTail(void)
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
   application.Render();
-  tailActor = popup.FindChildByName( "tail-image" );
+  tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
 
   float baseValY = tailActor.GetCurrentWorldPosition().y;
@@ -1250,7 +1250,7 @@ int UtcDaliPopupPropertyTail(void)
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
   application.Render();
-  tailActor = popup.FindChildByName( "tail-image" );
+  tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
   DALI_TEST_EQUALS( tailActor.GetCurrentWorldPosition().x, baseValX, TEST_LOCATION );
   DALI_TEST_GREATER( tailActor.GetCurrentWorldPosition().y, baseValY, TEST_LOCATION );
@@ -1265,7 +1265,7 @@ int UtcDaliPopupPropertyTail(void)
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
   application.Render();
-  tailActor = popup.FindChildByName( "tail-image" );
+  tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
   DALI_TEST_GREATER( tailActor.GetCurrentWorldPosition().x, baseValX, TEST_LOCATION );
   DALI_TEST_EQUALS( tailActor.GetCurrentWorldPosition().y, baseValY, TEST_LOCATION );
@@ -1282,7 +1282,7 @@ int UtcDaliPopupTypeToast(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliPopupTypeToast" );
 
-  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "popup-toast" );
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "PopupToast" );
   DALI_TEST_CHECK( typeInfo )
 
   BaseHandle baseHandle = typeInfo.CreateInstance();
@@ -1365,7 +1365,7 @@ int UtcDaliPopupPropertyTypeRegistryConnectSignal(void)
 
   TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
   // Note: The emmision of this signals has already been tested in other tests.
-  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "touched-outside", PopupTestFunctor() ) );
+  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "touchedOutside",  PopupTestFunctor() ) );
   DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "showing", PopupTestFunctor() ) );
   DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "shown", PopupTestFunctor() ) );
   DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "hiding", PopupTestFunctor() ) );

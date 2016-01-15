@@ -25,6 +25,8 @@
 #include <v8-utils.h>
 #include <actors/actor-wrapper.h>
 #include <animation/path-constrainer-wrapper.h>
+#include <rendering/renderer-wrapper.h>
+#include <rendering/renderer-api.h>
 
 namespace Dali
 {
@@ -486,7 +488,7 @@ void ActorApi::IsKeyboardFocusable( const v8::FunctionCallbackInfo<v8::Value>& a
  *
  * @for Actor
  * @method getActorType
- * @return {String} Actor, ImageActor, MeshActor, Layer, CameraActor ...
+ * @return {String} Actor, Layer, CameraActor ...
  */
 void ActorApi::GetActorType( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
@@ -696,6 +698,130 @@ void ActorApi::ScaleBy( const v8::FunctionCallbackInfo<v8::Value>& args )
   }
   actor.ScaleBy( vector );
 }
+
+/**
+ * Add a renderer to this actor.
+ * @example
+ *
+ *     var renderer = new dali.Renderer( geometry, material );
+ *     actor.addRenderer( renderer );
+ *
+ * @for Actor
+ * @method addRenderer
+ * @param {object} renderer Renderer to add to the actor
+ * @return {integer} The index of the Renderer that was added
+ */
+void ActorApi::AddRenderer( const v8::FunctionCallbackInfo<v8::Value>& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+  Actor actor = GetActor( isolate, args );
+
+  unsigned int index = 0;
+
+  bool found( false );
+  Renderer renderer = RendererApi::GetRendererFromParams( 0, found, isolate, args );
+  if( found )
+  {
+    index = actor.AddRenderer(renderer);
+  }
+  else
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "Renderer parameter missing" );
+    return;
+  }
+
+  args.GetReturnValue().Set( v8::Integer::New( isolate, index ) );
+}
+
+/**
+ * Get the number of renderers on this actor.
+ * @example
+ *
+ *     var count = actor.getRendererCount();
+ *
+ * @for Actor
+ * @method getRendererCount
+ * @return {integer} the number of renderers on this actor
+ */
+void ActorApi::GetRendererCount( const v8::FunctionCallbackInfo<v8::Value>& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  Actor actor = GetActor( isolate, args );
+  args.GetReturnValue().Set( v8::Integer::New( isolate, actor.GetRendererCount() ) );
+}
+
+/**
+ * Get a Renderer by index.
+ * @example
+ *
+ *     var renderer = actor.getRendererAt( 0 );
+ *
+ * @for Actor
+ * @method getRendererAt
+ * @param {integer} index The index of the renderer to fetch, which must be between 0 and getRendererCount()-1
+ * @return {object} The renderer at the specified index
+ */
+void ActorApi::GetRendererAt( const v8::FunctionCallbackInfo<v8::Value>& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+  Actor actor = GetActor( isolate, args );
+
+  Renderer renderer;
+
+  bool found( false );
+  int index = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0);
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid index parameter" );
+    return;
+  }
+  else
+  {
+    renderer = actor.GetRendererAt(static_cast<unsigned int>(index));
+    if( !renderer )
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "renderer not found" );
+      return;
+    }
+  }
+
+  // Wrap the renderer
+  v8::Local<v8::Object> localObject = RendererWrapper::WrapRenderer( isolate, renderer );
+  args.GetReturnValue().Set( localObject );
+}
+
+/**
+ * Remove an renderer from the actor by index.
+ * @example
+ *
+ *     actor.removeRenderer( 0 );
+ *
+ * @for Actor
+ * @method removeRenderer
+ * @param {integer} index Index of the renderer to be removed, which must be between 0 and getRendererCount()-1
+ */
+void ActorApi::RemoveRenderer( const v8::FunctionCallbackInfo<v8::Value>& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+  Actor actor = GetActor( isolate, args );
+
+  bool found( false );
+  int index = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0);
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid index parameter" );
+  }
+  else
+  {
+    actor.RemoveRenderer(static_cast<unsigned int>(index));
+  }
+}
+
 
 } // namespace V8Plugin
 

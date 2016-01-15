@@ -23,6 +23,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
@@ -107,6 +108,7 @@ struct EventData
     EDITING,
     EDITING_WITH_POPUP,
     EDITING_WITH_GRAB_HANDLE,
+    EDITING_WITH_PASTE_POPUP,
     GRAB_HANDLE_PANNING,
     SELECTION_HANDLE_PANNING
   };
@@ -115,16 +117,24 @@ struct EventData
 
   ~EventData();
 
-  DecoratorPtr       mDecorator;               ///< Pointer to the decorator
-  std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus
-  std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive
-  Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color
+  static bool IsEditingState( State stateToCheck )
+  {
+    return ( stateToCheck == EDITING || stateToCheck == EDITING_WITH_POPUP || stateToCheck == EDITING_WITH_GRAB_HANDLE || stateToCheck == EDITING_WITH_PASTE_POPUP );
+  }
+
+  DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
+  ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
+  std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
+  Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color.
 
   /**
    * This is used to delay handling events until after the model has been updated.
    * The number of updates to the model is minimized to improve performance.
    */
   std::vector<Event> mEventQueue;              ///< The queue of touch events etc.
+
+  InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
 
   /**
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
@@ -155,7 +165,8 @@ struct EventData
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
-  bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text
+  bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
+  bool mUpdateInputStyle                : 1;   ///< Whether to update the input style after moving the cursor.
 };
 
 struct ModifyEvent
@@ -175,8 +186,8 @@ struct FontDefaults
   FontDefaults()
   : mFontDescription(),
     mFontStyle(),
-    mDefaultPointSize(0.0f),
-    mFontId(0u)
+    mDefaultPointSize( 0.f ),
+    mFontId( 0u )
   {
     // Initially use the default platform font
     TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -187,7 +198,7 @@ struct FontDefaults
   {
     if( !mFontId )
     {
-      Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
+      const PointSize26Dot6 pointSize = static_cast<PointSize26Dot6>( mDefaultPointSize * 64.f );
       mFontId = fontClient.GetFontId( mFontDescription, pointSize );
     }
 
@@ -217,9 +228,10 @@ struct Controller::Impl
     mTextColor( Color::BLACK ),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
-    mMaximumNumberOfCharacters( 50 ),
+    mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
-    mUserDefinedFontFamily( false )
+    mUserDefinedFontFamily( false ),
+    mMarkupProcessorEnabled( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -257,12 +269,12 @@ struct Controller::Impl
     if( ModifyEvent::TEXT_REPLACED == type)
     {
       // Cancel previously queued inserts etc.
-      mModifyEvents.clear();
+      mModifyEvents.Clear();
     }
 
     ModifyEvent event;
     event.type = type;
-    mModifyEvents.push_back( event );
+    mModifyEvents.PushBack( event );
 
     // The event will be processed during relayout
     RequestRelayout();
@@ -332,10 +344,9 @@ struct Controller::Impl
     if( mEventData )
     {
       // Reset incase we are in a pre-edit state.
-      ImfManager imfManager = ImfManager::Get();
-      if ( imfManager )
+      if( mEventData->mImfManager )
       {
-        imfManager.Reset(); // Will trigger a commit message
+        mEventData->mImfManager.Reset(); // Will trigger a message ( commit, get surrounding )
       }
 
       ClearPreEditFlag();
@@ -348,7 +359,33 @@ struct Controller::Impl
     return !result; // // If NumberOfItems greater than 0, return false
   }
 
+  /**
+   * @brief Updates the logical and visual models.
+   *
+   * When text or style changes the model is set with some operations pending.
+   * When i.e. the text's size or a relayout is required this method is called
+   * with a given @p operationsRequired parameter. The operations required are
+   * matched with the operations pending to perform the minimum number of operations.
+   *
+   * @param[in] operationsRequired The operations required.
+   */
   void UpdateModel( OperationsMask operationsRequired );
+
+  /**
+   * @brief Updates the style runs in the visual model when the text's styles changes.
+   *
+   * @param[in] operationsRequired The operations required.
+   *
+   * @return @e true if the model has been modified.
+   */
+  bool UpdateModelStyle( OperationsMask operationsRequired );
+
+  /**
+   * @brief Retreieves the default style.
+   *
+   * @param[out] inputStyle The default style.
+   */
+  void RetrieveDefaultInputStyle( InputStyle& inputStyle );
 
   /**
    * @brief Retrieve the default fonts.
@@ -377,7 +414,7 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
-  void RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival );
+  void RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval );
 
   void ShowClipboard();
 
@@ -387,7 +424,7 @@ struct Controller::Impl
 
   void SendSelectionToClipboard( bool deleteAfterSending );
 
-  void GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString );
+  void GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString );
 
   void RepositionSelectionHandles();
   void RepositionSelectionHandles( float visualX, float visualY );
@@ -498,7 +535,7 @@ struct Controller::Impl
   View mView;                              ///< The view interface to the rendering back-end.
   MetricsPtr mMetrics;                     ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
-  std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
+  Vector<ModifyEvent> mModifyEvents;       ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
@@ -506,6 +543,7 @@ struct Controller::Impl
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mUserDefinedFontFamily:1;           ///< Whether the Font family was set by the user instead of being left as sytem default.
+  bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
 };
 
 } // namespace Text

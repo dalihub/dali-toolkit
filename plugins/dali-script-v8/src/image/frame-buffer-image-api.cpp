@@ -37,7 +37,7 @@ namespace FrameBufferImageApi
 /**
  * FrameBufferImage represents a GLES Frame Buffer Object and contains the result
  * of an 'off screen' render pass of a RenderTask.
- * The FrameBufferImage can then be used with an ImageActor (with optional shader
+ * The FrameBufferImage can then be used with a Material (with optional shader
  * effects) and rendered to the screen.
  * @class FrameBufferImage
  * @extends Image

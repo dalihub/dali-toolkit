@@ -19,6 +19,7 @@
 #include "image-renderer.h"
 
 // EXTERNAL HEADER
+#include <cstring> // for strncasecmp
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -27,6 +28,7 @@
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
+#include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
 
 namespace Dali
 {
@@ -39,39 +41,45 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("image-renderer");
+const char HTTP_URL[] = "http://";
+const char HTTPS_URL[] = "https://";
+
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("imageRenderer");
 
 // property names
-const char * const IMAGE_URL_NAME( "image-url" );
-const char * const IMAGE_FITTING_MODE( "image-fitting-mode" );
-const char * const IMAGE_SAMPLING_MODE( "image-sampling-mode" );
-const char * const IMAGE_DESIRED_WIDTH( "image-desired-width" );
-const char * const IMAGE_DESIRED_HEIGHT( "image-desired-height" );
+const char * const IMAGE_URL_NAME( "imageUrl" );
+const char * const IMAGE_FITTING_MODE( "imageFittingMode" );
+const char * const IMAGE_SAMPLING_MODE( "imageSamplingMode" );
+const char * const IMAGE_DESIRED_WIDTH( "imageDesiredWidth" );
+const char * const IMAGE_DESIRED_HEIGHT( "imageDesiredHeight" );
 
 // fitting modes
-const char * const SHRINK_TO_FIT("shrink-to-fit");
-const char * const SCALE_TO_FILL("scale-to-fill");
-const char * const FIT_WIDTH("fit-width");
-const char * const FIT_HEIGHT("fit-height");
+const char * const SHRINK_TO_FIT("shrinkToFit");
+const char * const SCALE_TO_FILL("scaleToFill");
+const char * const FIT_WIDTH("fitWidth");
+const char * const FIT_HEIGHT("fitHeight");
 const char * const DEFAULT("default");
 
 // sampling modes
 const char * const BOX("box");
 const char * const NEAREST("nearest");
 const char * const LINEAR("linear");
-const char * const BOX_THEN_NEAREST("box-then-nearest");
-const char * const BOX_THEN_LINEAR("box-then-linear");
-const char * const NO_FILTER("no-filter");
-const char * const DONT_CARE("dont-care");
+const char * const BOX_THEN_NEAREST("boxThenNearest");
+const char * const BOX_THEN_LINEAR("boxThenLinear");
+const char * const NO_FILTER("noFilter");
+const char * const DONT_CARE("dontCare");
 
-std::string TEXTURE_UNIFORM_NAME = "sTexture";
+const std::string TEXTURE_UNIFORM_NAME = "sTexture";
+const std::string TEXTURE_RECT_UNIFORM_NAME = "uTextureRect";
+const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
+  uniform mediump vec4 uTextureRect;\n
   \n
   void main()\n
   {\n
@@ -79,7 +87,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vertexPosition.xyz *= uSize;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
-    vTexCoord = aPosition + vec2(0.5);\n
+    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5));\n
     gl_Position = vertexPosition;\n
   }\n
 );
@@ -186,8 +194,10 @@ Geometry CreateGeometry( RendererFactoryCache& factoryCache, ImageDimensions gri
 
 } //unnamed namespace
 
-ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache )
+ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
 : ControlRenderer( factoryCache ),
+  mAtlasManager( atlasManager ),
+  mTextureRect( FULL_TEXTURE_RECT ),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT )
@@ -198,15 +208,16 @@ ImageRenderer::~ImageRenderer()
 {
 }
 
-void ImageRenderer::DoInitialize( const Property::Map& propertyMap )
+void ImageRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
+  std::string oldImageUrl = mImageUrl;
+
   Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
   if( imageURLValue )
   {
     imageURLValue->Get( mImageUrl );
     if( !mImageUrl.empty() )
     {
-      SetCachedRendererKey( mImageUrl );
       mImage.Reset();
     }
 
@@ -304,6 +315,25 @@ void ImageRenderer::DoInitialize( const Property::Map& propertyMap )
 
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
   }
+
+  // remove old renderer if exit
+  if( mImpl->mRenderer )
+  {
+    if( actor ) //remove old renderer from actor
+    {
+      actor.RemoveRenderer( mImpl->mRenderer );
+    }
+    if( !oldImageUrl.empty() ) //clean old renderer from cache
+    {
+      CleanCache( oldImageUrl );
+    }
+  }
+
+  // if actor is on stage, create new renderer and apply to actor
+  if( actor && actor.OnStage() )
+  {
+    SetOnStage( actor );
+  }
 }
 
 void ImageRenderer::SetSize( const Vector2& size )
@@ -345,33 +375,22 @@ void ImageRenderer::SetOffset( const Vector2& offset )
 {
 }
 
-void ImageRenderer::InitializeRenderer( Renderer& renderer )
+Renderer ImageRenderer::CreateRenderer() const
 {
   Geometry geometry;
   Shader shader;
+
   if( !mImpl->mCustomShader )
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-
-    shader = mFactoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
-    if( !shader )
-    {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-      mFactoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, shader );
-    }
+    shader = GetImageShader(mFactoryCache);
   }
   else
   {
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
-
     if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
     {
-      shader = mFactoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
-      if( !shader )
-      {
-        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-        mFactoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, shader );
-      }
+      shader = GetImageShader(mFactoryCache);
     }
     else
     {
@@ -381,33 +400,106 @@ void ImageRenderer::InitializeRenderer( Renderer& renderer )
     }
   }
 
-  if( !renderer )
+  Material material = Material::New( shader );
+  return Renderer::New( geometry, material );
+}
+
+void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
+{
+  if( imageUrl.empty() )
   {
-    Material material = Material::New( shader );
-    renderer = Renderer::New( geometry, material );
+    return;
+  }
+
+  mImageUrl = imageUrl;
+  mImpl->mRenderer.Reset();
+
+  if( !mImpl->mCustomShader &&
+      ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // ignore remote images
+      ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
+  {
+    mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
+    if( !mImpl->mRenderer )
+    {
+      Material material = mAtlasManager.Add(mTextureRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      if( material )
+      {
+        Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+        mImpl->mRenderer = Renderer::New( geometry, material );
+        SetTextureRectUniform(mTextureRect);
+      }
+      else // big image, atlasing is not applied
+      {
+        mImpl->mRenderer = CreateRenderer();
+        mTextureRect = FULL_TEXTURE_RECT;
+        SetTextureRectUniform(mTextureRect);
+
+        ResourceImage image = Dali::ResourceImage::New( imageUrl );
+        image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+        Material material = mImpl->mRenderer.GetMaterial();
+        material.AddTexture( image, TEXTURE_UNIFORM_NAME );
+      }
+
+      mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
+    }
+    else
+    {
+      Property::Value textureRect = mImpl->mRenderer.GetProperty( mImpl->mRenderer.GetPropertyIndex(TEXTURE_RECT_UNIFORM_NAME) );
+      textureRect.Get( mTextureRect );
+    }
+    mImpl->mFlags |= Impl::IS_FROM_CACHE;
   }
   else
   {
-    renderer.SetGeometry( geometry );
-    Material material = renderer.GetMaterial();
-    if( material )
+    // for custom shader or remote image, renderer is not cached and atlas is not applied
+
+    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
+    mImpl->mRenderer = CreateRenderer();
+    ResourceImage resourceImage = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+    resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+    ApplyImageToSampler( resourceImage );
+
+    // custom vertex shader does not need texture rect uniform
+    if( mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty() )
     {
-      material.SetShader( shader );
+      return;
     }
+
+    mTextureRect = FULL_TEXTURE_RECT;
+    SetTextureRectUniform( mTextureRect );
   }
 }
 
-void ImageRenderer::DoSetOnStage( Actor& actor )
+void ImageRenderer::InitializeRenderer( const Image& image )
 {
-  if( !mImageUrl.empty() && !mImage )
-  {
-    Dali::ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-    resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+  mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
 
-    mImage = resourceImage;
+  mImpl->mRenderer = CreateRenderer();
+
+  if( image )
+  {
+    ApplyImageToSampler( image );
   }
 
-  ApplyImageToSampler();
+  // default shader or custom shader with the default image vertex shader
+  if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty() )
+  {
+    mTextureRect = FULL_TEXTURE_RECT;
+    SetTextureRectUniform( mTextureRect );
+  }
+}
+
+
+void ImageRenderer::DoSetOnStage( Actor& actor )
+{
+  if( !mImageUrl.empty() )
+  {
+    InitializeRenderer( mImageUrl );
+  }
+  else
+  {
+    InitializeRenderer( mImage );
+  }
 }
 
 void ImageRenderer::DoSetOffStage( Actor& actor )
@@ -415,7 +507,15 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   //If we own the image then make sure we release it when we go off stage
   if( !mImageUrl.empty() )
   {
+    actor.RemoveRenderer( mImpl->mRenderer );
+    CleanCache(mImageUrl);
+
     mImage.Reset();
+  }
+  else
+  {
+    actor.RemoveRenderer( mImpl->mRenderer );
+    mImpl->mRenderer.Reset();
   }
 }
 
@@ -515,73 +615,115 @@ void ImageRenderer::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
-void ImageRenderer::SetImage( const std::string& imageUrl )
+Shader ImageRenderer::GetImageShader( RendererFactoryCache& factoryCache )
 {
-  SetImage( imageUrl, 0, 0, Dali::FittingMode::DEFAULT, Dali::SamplingMode::DEFAULT );
+  Shader shader = factoryCache.GetShader( RendererFactoryCache::IMAGE_SHADER );
+  if( !shader )
+  {
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, shader );
+  }
+  return shader;
 }
 
-void ImageRenderer::SetImage( const std::string& imageUrl, int desiredWidth, int desiredHeight, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode )
+void ImageRenderer::SetImage( Actor& actor, const std::string& imageUrl, ImageDimensions size, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode )
 {
   if( mImageUrl != imageUrl )
   {
+    std::string oldImageUrl = mImageUrl;
     mImageUrl = imageUrl;
-    SetCachedRendererKey( mImageUrl );
-    mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+    mDesiredSize = size;
     mFittingMode = fittingMode;
     mSamplingMode = samplingMode;
+    mImage.Reset();
 
-    if( !mImageUrl.empty() && mImpl->mIsOnStage )
+    if( mImpl->mRenderer )
     {
-      Dali::ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-      resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-      mImage = resourceImage;
+      if( GetIsFromCache() ) // if renderer is from cache, remove the old one
+      {
+        //remove old renderer
+        if( actor )
+        {
+          actor.RemoveRenderer( mImpl->mRenderer );
+        }
 
-      ApplyImageToSampler();
-    }
-    else
-    {
-      mImage.Reset();
+        //clean the cache
+        if( !oldImageUrl.empty() )
+        {
+          CleanCache(oldImageUrl);
+        }
+
+        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
+        {
+          SetOnStage(actor);
+        }
+      }
+      else // if renderer is not from cache, reuse the same renderer and only change the texture
+      {
+        ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+        image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+        ApplyImageToSampler( image );
+      }
     }
   }
 }
 
-void ImageRenderer::SetImage( Image image )
+void ImageRenderer::SetImage( Actor& actor, const Image& image )
 {
   if( mImage != image )
   {
+    mImage = image;
+
+    if( mImpl->mRenderer )
+    {
+      if( GetIsFromCache() ) // if renderer is from cache, remove the old one
+      {
+        //remove old renderer
+        if( actor )
+        {
+          actor.RemoveRenderer( mImpl->mRenderer );
+        }
+
+        //clean the cache
+        if( !mImageUrl.empty() )
+        {
+          CleanCache(mImageUrl);
+        }
+        mImageUrl.clear();
+
+        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
+        {
+          SetOnStage(actor);
+        }
+      }
+      else // if renderer is not from cache, reuse the same renderer and only change the texture
+      {
+        ApplyImageToSampler( image );
+      }
+    }
+
     mImageUrl.clear();
     mDesiredSize = ImageDimensions();
     mFittingMode = FittingMode::DEFAULT;
     mSamplingMode = SamplingMode::DEFAULT;
-    mImage = image;
-
-    if( mImage && mImpl->mIsOnStage )
-    {
-      ApplyImageToSampler();
-    }
   }
 }
 
-Image ImageRenderer::GetImage() const
+void ImageRenderer::ApplyImageToSampler( const Image& image )
 {
-  return mImage;
-}
-
-void ImageRenderer::ApplyImageToSampler()
-{
-  if( mImage )
+  if( image )
   {
     Material material = mImpl->mRenderer.GetMaterial();
     if( material )
     {
-      int index = material.GetTextureIndex(TEXTURE_UNIFORM_NAME);
+      int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
       if( index != -1 )
       {
-        material.SetTextureImage( index, mImage );
+        material.SetTextureImage( index, image );
         return;
       }
 
-      material.AddTexture( mImage,TEXTURE_UNIFORM_NAME );
+      material.AddTexture( image, TEXTURE_UNIFORM_NAME );
     }
   }
 }
@@ -590,11 +732,30 @@ void ImageRenderer::OnImageLoaded( ResourceImage image )
 {
   if( image.GetLoadingState() == Dali::ResourceLoadingFailed )
   {
-    mImage = RendererFactory::GetBrokenRendererImage();
-    if( mImpl->mIsOnStage )
+    Image brokenImage = RendererFactory::GetBrokenRendererImage();
+    if( mImpl->mRenderer )
     {
-      ApplyImageToSampler();
+      ApplyImageToSampler( brokenImage );
     }
+  }
+}
+
+void ImageRenderer::SetTextureRectUniform( const Vector4& textureRect )
+{
+  if( mImpl->mRenderer )
+  {
+    // Register/Set property.
+    mImpl->mRenderer.RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
+  }
+}
+
+void ImageRenderer::CleanCache(const std::string& url)
+{
+  Material material = mImpl->mRenderer.GetMaterial();
+  mImpl->mRenderer.Reset();
+  if( mFactoryCache.CleanRendererCache( url ) )
+  {
+    mAtlasManager.Remove( material, mTextureRect );
   }
 }
 

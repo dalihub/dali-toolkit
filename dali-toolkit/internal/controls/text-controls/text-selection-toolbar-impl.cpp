@@ -18,16 +18,18 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/resource-image.h>
+#include <cfloat>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <cfloat>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 
 namespace Dali
 {
@@ -40,7 +42,6 @@ namespace Internal
 
 namespace
 {
-const Dali::Vector2 DEFAULT_MAX_SIZE( 400.0f, 65.0f ); ///< The maximum size of the Toolbar.
 
 BaseHandle Create()
 {
@@ -51,8 +52,9 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "max-size", VECTOR2, MAX_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enable-overshoot", BOOLEAN, ENABLE_OVERSHOOT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "maxSize",  VECTOR2, MAX_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enableOvershoot",  BOOLEAN, ENABLE_OVERSHOOT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scrollView",  MAP, SCROLL_VIEW )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -90,7 +92,21 @@ void TextSelectionToolbar::SetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
       {
+        if( !impl.mScrollView )
+        {
+          impl.mScrollView  = Toolkit::ScrollView::New();
+        }
         impl.mScrollView.SetOvershootEnabled( value.Get< bool >() );
+        break;
+      }
+      case Toolkit::TextSelectionToolbar::Property::SCROLL_VIEW:
+      {
+        // Get a Property::Map from the property if possible.
+        Property::Map setPropertyMap;
+        if( value.Get( setPropertyMap ) )
+        {
+          impl.ConfigureScrollview( setPropertyMap );
+        }
         break;
       }
     } // switch
@@ -141,22 +157,6 @@ void TextSelectionToolbar::OnStageConnection( int depth )
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
-  // Traverse the dividers and set the depth.
-  for( unsigned int i = 0; i < mDividerIndexes.Count(); ++i )
-  {
-    Actor divider = mTableOfButtons.GetChildAt( Toolkit::TableView::CellPosition( 0, mDividerIndexes[ i ] ) );
-
-    ImageActor dividerImageActor = ImageActor::DownCast( divider );
-    if( dividerImageActor )
-    {
-      dividerImageActor.SetSortModifier( DECORATION_DEPTH_INDEX + depth );
-    }
-    else
-    {
-      // TODO at the moment divider are image actors.
-    }
-  }
-
   // Texts are controls, they have their own OnStageConnection() implementation.
   // Icons are inside a TableView. It has it's own OnStageConnection() implementation.
 }
@@ -206,13 +206,17 @@ void TextSelectionToolbar::SetUp()
   mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
 
-  ImageActor stencil = CreateSolidColorActor( Color::RED );
+  BufferImage stencilImage = BufferImage::WHITE(); // ImageView needs an Image or does nothing
+  Toolkit::ImageView stencil = Toolkit::ImageView::New(stencilImage);
   stencil.SetDrawMode( DrawMode::STENCIL );
   stencil.SetVisible( true );
   stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   stencil.SetParentOrigin( ParentOrigin::CENTER );
 
-  mScrollView  = Toolkit::ScrollView::New();
+  if ( !mScrollView )
+  {
+    mScrollView  = Toolkit::ScrollView::New();
+  }
   SetUpScrollView();
 
   // Toolbar must start with at least one option, adding further options with increase it's size
@@ -220,7 +224,6 @@ void TextSelectionToolbar::SetUp()
   mTableOfButtons.SetFitHeight( 0 );
   mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   mTableOfButtons.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-
 
   mStencilLayer.Add( stencil );
   mStencilLayer.Add( mScrollView );
@@ -265,6 +268,27 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
 {
   mStencilLayer.RaiseAbove( target );
 }
+
+void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )
+{
+  // Set any properties specified for the label by iterating through all property key-value pairs.
+  for( unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i )
+  {
+    const StringValuePair& propertyPair( properties.GetPair( i ) );
+
+    // Convert the property string to a property index.
+    Property::Index setPropertyIndex = mScrollView.GetPropertyIndex( propertyPair.first );
+    if( setPropertyIndex != Property::INVALID_INDEX )
+    {
+      // If the conversion worked, we have a valid property index,
+      // Set the property to the new value.
+      mScrollView.SetProperty( setPropertyIndex, propertyPair.second );
+    }
+  }
+
+  RelayoutRequest();
+}
+
 
 TextSelectionToolbar::TextSelectionToolbar()
 : Control( ControlBehaviour( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ) ),

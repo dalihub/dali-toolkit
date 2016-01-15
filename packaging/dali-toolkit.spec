@@ -1,9 +1,9 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.1.7
+Version:    1.1.16
 Release:    1
 Group:      System/Libraries
-License:    Apache-2.0, BSD-2.0, MIT
+License:    Apache-2.0 and BSD-2-Clause and MIT
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 

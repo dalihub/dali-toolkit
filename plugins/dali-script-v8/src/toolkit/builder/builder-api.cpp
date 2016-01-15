@@ -32,7 +32,7 @@
 #include <actors/actor-wrapper.h>
 #include <image/image-wrapper.h>
 #include <animation/animation-wrapper.h>
-#include <shader-effects/shader-effect-wrapper.h>
+#include <rendering/shader-wrapper.h>
 
 
 namespace Dali
@@ -256,7 +256,7 @@ void BuilderApi::Create( const v8::FunctionCallbackInfo< v8::Value >& args )
 
   // options =
   // {
-  //    template: "my-temppalte",
+  //    template: "myTemplate",
   //    constants: {  IMAGE_DIR: "/usr/apps" ,  SHADER_DIR: "/usr/apps/.."}
   // }
   //
@@ -294,10 +294,9 @@ void BuilderApi::Create( const v8::FunctionCallbackInfo< v8::Value >& args )
   }
   if( typeName == "Shader")
   {
-    v8::Local<v8::Object> shader = ShaderEffectWrapper::WrapShaderEffect(isolate, ShaderEffect::DownCast( handle ));
+    v8::Local<v8::Object> shader = ShaderWrapper::WrapShader(isolate, Shader::DownCast( handle ));
     args.GetReturnValue().Set( shader );
   }
-
 }
 void BuilderApi::ApplyStyle( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
@@ -418,26 +417,6 @@ void BuilderApi::CreateRenderTask( const v8::FunctionCallbackInfo< v8::Value >& 
   else
   {
      DALI_SCRIPT_EXCEPTION( isolate, "render task name");
-  }
-}
-
-void BuilderApi::GetShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  Dali::Toolkit::Builder builder = GetBuilder( isolate, args );
-
-  bool found(false);
-  std::string str = V8Utils::GetStringParameter( 0, found, isolate, args );
-  if( found )
-  {
-    ShaderEffect handle = builder.GetShaderEffect( str );
-    v8::Local<v8::Object> shader = ShaderEffectWrapper::WrapShaderEffect(isolate, handle);
-    args.GetReturnValue().Set( shader );
-  }
-  else
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "missing shader name");
   }
 }
 

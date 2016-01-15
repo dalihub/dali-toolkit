@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
@@ -153,23 +154,20 @@ private:
   FrameBufferImage mRenderTarget1;
   FrameBufferImage mRenderTarget2;
 
-  ShaderEffect mHorizBlurShader;
-  ShaderEffect mVertBlurShader;
-
-  ImageActor mImageActorHorizBlur;
-  ImageActor mImageActorVertBlur;
+  Toolkit::ImageView mImageActorHorizBlur;
+  Toolkit::ImageView mImageActorVertBlur;
 
   RenderTask mHorizBlurTask;
   RenderTask mVertBlurTask;
 
   /////////////////////////////////////////////////////////////
   // for compositing blur and children renders to offscreen target
-  ImageActor mImageActorComposite;
+  Toolkit::ImageView mImageActorComposite;
   RenderTask mCompositeTask;
 
   /////////////////////////////////////////////////////////////
   // for holding blurred result
-  ImageActor mTargetActor;
+  Toolkit::ImageView mTargetActor;
 
   /////////////////////////////////////////////////////////////
   // for animating fade in / out of blur, hiding internal implementation but allowing user to set via GaussianBlurView interface
@@ -181,6 +179,8 @@ private:
   FrameBufferImage mUserOutputRenderTarget;
 
   Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal mFinishedSignal; ///< Signal emitted when blur has completed.
+
+  bool mActivated:1;
 private:
 
   // Undefined copy constructor.

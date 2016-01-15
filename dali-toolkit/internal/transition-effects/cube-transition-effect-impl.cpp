@@ -20,11 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -41,30 +40,90 @@ namespace
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::CubeTransitionEffect, Dali::BaseHandle, NULL );
 
-DALI_SIGNAL_REGISTRATION( Toolkit, CubeTransitionEffect, "transition-completed", SIGNAL_TRANSITION_COMPLETED )
+DALI_SIGNAL_REGISTRATION( Toolkit, CubeTransitionEffect, "transitionCompleted",  SIGNAL_TRANSITION_COMPLETED )
 
 DALI_TYPE_REGISTRATION_END()
+
+const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump vec4 uTextureRect;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    vertexPosition = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = aPosition + vec2(0.5);\n
+    vTexCoord = mix(uTextureRect.xy, uTextureRect.zw, vTexCoord);\n
+
+    gl_Position = vertexPosition;\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec4 uSamplerRect;
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+  }\n
+);
+
+Actor CreateTile( const Vector4& samplerRect )
+{
+ Actor tile = Actor::New();
+  tile.SetAnchorPoint( AnchorPoint::CENTER );
+  tile.RegisterProperty( "uTextureRect", samplerRect );
+  return tile;
+}
+
+
+Geometry CreateQuadGeometry()
+{
+  const float halfWidth = 0.5f;
+  const float halfHeight = 0.5f;
+  struct QuadVertex { Vector2 position;};
+  QuadVertex quadVertexData[4] =
+  {
+      { Vector2(-halfWidth, -halfHeight) },
+      { Vector2( halfWidth, -halfHeight) },
+      { Vector2(-halfWidth, halfHeight)  },
+      { Vector2( halfWidth, halfHeight)  }
+  };
+
+  Property::Map quadVertexFormat;
+  quadVertexFormat["aPosition"] = Property::VECTOR2;
+  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat, 4 );
+  quadVertices.SetData(quadVertexData);
+
+  // Create the geometry object
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( quadVertices );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
+
+  return geometry;
+}
 
 }
 
 const Vector4 CubeTransitionEffect::FULL_BRIGHTNESS( 1.0f, 1.0f, 1.0f, 1.0f );
 const Vector4 CubeTransitionEffect::HALF_BRIGHTNESS( 0.5f, 0.5f, 0.5f, 1.0f );
 
-CubeTransitionEffect::CubeTransitionEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize )
-: mNumRows( numRows ),
-  mNumColumns( numColumns ),
-  mViewAreaSize( viewAreaSize ),
-  mRotateIndex( 0 ),
-  mContainerIndex( 0 ),
-  mChangeTurningDirection( false ),
-  mIsToNextImage( true ),
-  mIsImageLoading( false ),
-  mAnimationDuration( 1.f ),
+CubeTransitionEffect::CubeTransitionEffect( unsigned int rows, unsigned int columns )
+: Control( ControlBehaviour( 0 ) ),
+  mRows( rows ),
+  mColumns( columns ),
   mIsAnimating( false ),
   mIsPaused( false ),
-  mCubeDisplacement( 0.f ),
-  mFirstTransition( true ),
-  mBufferIndex( 0 )
+  mAnimationDuration( 1.f ),
+  mCubeDisplacement( 0.f )
 {
 }
 
@@ -72,81 +131,181 @@ CubeTransitionEffect::~CubeTransitionEffect()
 {
 }
 
-void CubeTransitionEffect::Initialize()
+void CubeTransitionEffect::SetTargetRight( unsigned int idx )
 {
-  //create root actor for the cube transition effect, only visible during the transition
-  mRoot = Actor::New();
-  mRoot.SetParentOrigin( ParentOrigin::CENTER );
-  mRoot.SetAnchorPoint( AnchorPoint::CENTER );
-  mRoot.SetVisible(false);
+  mBoxType[ idx ] = RIGHT;
 
-  // create two groups of tiles,
-  // and one group of actors (cubes) serving as parents of every two tiles (one from each image).
-  unsigned int totalNum = mNumColumns* mNumRows;
-  mBoxes.resize( totalNum );
-  mTiles[0].resize( totalNum );
-  mTiles[1].resize( totalNum );
-  mTileSize = Vector2( mViewAreaSize.width / mNumColumns, mViewAreaSize.height / mNumRows );
-  const Vector3 basePosition( (-mViewAreaSize.width + mTileSize.width) * 0.5f,
-                              (-mViewAreaSize.height + mTileSize.height) * 0.5f,
-                              -mTileSize.width * 0.5f );
+  mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
 
-  Image placeHolder = BufferImage::WHITE();
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  mTargetTiles[ idx ].SetParentOrigin( Vector3( 1.f, 0.5f, 0.5f) );
+  mTargetTiles[ idx ].SetOrientation( Degree( 90.f ), Vector3::YAXIS );
+}
+
+void CubeTransitionEffect::SetTargetLeft( unsigned int idx )
+{
+  mBoxType[ idx ] = LEFT;
+
+  mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
+
+  mTargetTiles[ idx ].SetParentOrigin( Vector3( 0.f, 0.5f, 0.5f) );
+  mTargetTiles[ idx ].SetOrientation( Degree( -90.f ), Vector3::YAXIS );
+}
+
+void CubeTransitionEffect::SetTargetBottom( unsigned int idx )
+{
+  mBoxType[ idx ] = BOTTOM;
+
+  mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
+
+  mTargetTiles[ idx ].SetParentOrigin( Vector3( 0.5f, 0.f, 0.5f) );
+  mTargetTiles[ idx ].SetOrientation( Degree( 90.f ), Vector3::XAXIS );
+}
+
+void CubeTransitionEffect::SetTargetTop( unsigned int idx )
+{
+  mBoxType[ idx ] = TOP;
+
+  mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
+
+  mTargetTiles[ idx ].SetParentOrigin( Vector3( 0.5f, 1.f, 0.5f) );
+  mTargetTiles[ idx ].SetOrientation( Degree( -90.f ), Vector3::XAXIS );
+}
+
+void CubeTransitionEffect::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  mTileSize = Vector2( size.x / mColumns, size.y / mRows );
+
+  mBoxRoot.SetProperty( Actor::Property::SIZE_WIDTH, size.x );
+  mBoxRoot.SetProperty( Actor::Property::SIZE_HEIGHT, size.y );
+  mBoxRoot.SetProperty( Actor::Property::SIZE_DEPTH, 1.0f );
+
+  for( size_t i = 0; i < mBoxes.size(); ++i )
   {
-    float positionY = y * mTileSize.height + basePosition.y;
-    for( unsigned int x = 0; x < mNumColumns; x++)
+    mBoxes[ i ].SetProperty( Actor::Property::SIZE_WIDTH, mTileSize.x );
+    mBoxes[ i ].SetProperty( Actor::Property::SIZE_HEIGHT, mTileSize.y );
+
+    switch( mBoxType[i] )
     {
-      unsigned int idx = y*mNumColumns + x;
-      Actor actor( Actor::New() );
-      mBoxes[idx] = actor;
-      actor.SetParentOrigin( ParentOrigin::CENTER );
-      actor.SetAnchorPoint( AnchorPoint::CENTER );
-      actor.SetPosition( x * mTileSize.width + basePosition.x,
-                         positionY,
-                         basePosition.z );
-      mRoot.Add( actor );
-
-      mTiles[ 0 ][idx] = CreateTile( placeHolder, FULL_BRIGHTNESS );
-      actor.Add( mTiles[ 0 ][idx] );
-
-      mTiles[ 1 ][idx] = CreateTile( placeHolder, HALF_BRIGHTNESS );
-      actor.Add( mTiles[ 1 ][idx] );
+      case LEFT:
+      case RIGHT:
+      {
+        mBoxes[ i ].SetProperty( Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
+        mBoxes[ i ].SetProperty( Actor::Property::SIZE_DEPTH, mTileSize.x );
+        break;
+      }
+      case BOTTOM:
+      case TOP:
+      {
+        mBoxes[ i ].SetProperty( Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
+        mBoxes[ i ].SetProperty( Actor::Property::SIZE_DEPTH, mTileSize.y );
+        break;
+      }
     }
   }
 
-  // helper actor to create a off-screen image using shader effect
-  mEmptyImage = ImageActor::New( placeHolder );
-  mEmptyImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  mEmptyImage.SetParentOrigin( ParentOrigin::CENTER );
-  mEmptyImage.SetAnchorPoint( AnchorPoint::CENTER );
-  mFullImageCreator = FullAreaImageCreator::New();
-  mEmptyImage.SetShaderEffect( mFullImageCreator );
-  Stage::GetCurrent().Add(mEmptyImage);
+  for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
+  {
+    it->SetProperty( Actor::Property::SIZE_WIDTH, mTileSize.x );
+    it->SetProperty( Actor::Property::SIZE_HEIGHT, mTileSize.y );
+  }
+  for( ActorArray::iterator it = mTargetTiles.begin(); it != mTargetTiles.end(); ++it )
+  {
+    it->SetProperty( Actor::Property::SIZE_WIDTH, mTileSize.x );
+    it->SetProperty( Actor::Property::SIZE_HEIGHT, mTileSize.y );
+  }
+}
 
-  // set up off-screen render task
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  mOffScreenTask = taskList.CreateTask();
-  mOffScreenTask.SetSourceActor(mEmptyImage);
-  mOffScreenTask.SetExclusive(true);
-  mOffScreenBuffer[0] = FrameBufferImage::New(mViewAreaSize.x, mViewAreaSize.y);
-  mOffScreenBuffer[1] = FrameBufferImage::New(mViewAreaSize.x, mViewAreaSize.y);
-  mOffScreenTask.SetTargetFrameBuffer(mOffScreenBuffer[mBufferIndex]);
-  mOffScreenTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+void CubeTransitionEffect::Initialize()
+{
+  Self().RegisterProperty( "uTextureRect", Vector4( 0.0f, 0.0f, 1.0f, 1.0f ) );
+
+  mBoxType.Resize(mColumns * mRows);
+
+  //create the box parents
+  mBoxRoot = Actor::New();
+  mBoxRoot.SetParentOrigin( ParentOrigin::CENTER );
+  mBoxRoot.SetAnchorPoint( AnchorPoint::CENTER );
+
+  mCurrentTiles.clear();
+  mTargetTiles.clear();
+
+  mCurrentTiles.reserve( mColumns * mRows );
+  mTargetTiles.reserve( mColumns * mRows );
+
+  Vector2 gridSizeInv( 1.0f / mColumns, 1.0f / mRows );
+  Vector3 offset( 0.5f * gridSizeInv.x, 0.5f * gridSizeInv.y, 0.0f );
+
+  Vector3 anchor;
+  for( unsigned int y = 0; y < mRows; ++y, anchor.y += 1.0f / mRows )
+  {
+    anchor.x = 0.0f;
+    for( unsigned int x = 0; x <mColumns; ++x, anchor.x += 1.0f / mColumns )
+    {
+      Vector4 textureRect( anchor.x, anchor.y, anchor.x + gridSizeInv.x, anchor.y + gridSizeInv.y );
+
+      Actor currentTile = CreateTile( textureRect );
+      currentTile.SetProperty( Actor::Property::COLOR, FULL_BRIGHTNESS );
+      currentTile.SetParentOrigin( ParentOrigin::CENTER );
+      mCurrentTiles.push_back( currentTile );
+
+      Actor targetTile = CreateTile( textureRect );
+      targetTile.SetProperty( Actor::Property::COLOR, HALF_BRIGHTNESS );
+      mTargetTiles.push_back( targetTile );
+
+      Actor box = Actor::New();
+      box.SetParentOrigin( anchor + offset );
+      box.SetAnchorPoint( AnchorPoint::CENTER );
+
+      box.Add( currentTile );
+      box.Add( targetTile );
+
+      mBoxRoot.Add( box );
+
+      mBoxes.push_back( box );
+    }
+  }
 
   OnInitialize();
 }
 
-ImageActor CubeTransitionEffect::CreateTile( Image image, const Vector4& color )
+void CubeTransitionEffect::OnStageConnection( int depth )
 {
-  ImageActor tile = ImageActor::New( image );
-  tile.SetParentOrigin( ParentOrigin::CENTER );
-  tile.SetAnchorPoint( AnchorPoint::CENTER );
-  tile.SetSize( mTileSize );
-  tile.SetColorMode( Dali::USE_OWN_COLOR );
-  tile.SetColor( color );
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
-  return tile;
+  Material material = Material::New( shader );
+
+  if( mCurrentImage )
+  {
+    material.AddTexture( mCurrentImage, "sTexture" );
+  }
+  mCurrentRenderer = Renderer::New( geometry, material );
+
+  mCurrentRenderer.SetDepthIndex( depth );
+  Self().AddRenderer( mCurrentRenderer );
+}
+
+void CubeTransitionEffect::OnStageDisconnection()
+{
+  if( mCurrentRenderer )
+  {
+    Self().RemoveRenderer( mCurrentRenderer );
+
+    for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
+    {
+      it->RemoveRenderer( mCurrentRenderer );
+    }
+    mCurrentRenderer.Reset();
+  }
+
+  if( mTargetRenderer )
+  {
+    for( ActorArray::iterator it = mTargetTiles.begin(); it != mTargetTiles.end(); ++it )
+    {
+      it->RemoveRenderer( mTargetRenderer );
+    }
+    mTargetRenderer.Reset();
+  }
 }
 
 void CubeTransitionEffect::SetTransitionDuration( float duration )
@@ -169,92 +328,101 @@ float CubeTransitionEffect::GetCubeDisplacement() const
   return mCubeDisplacement;
 }
 
-Actor CubeTransitionEffect::GetRoot()
+bool CubeTransitionEffect::IsTransitioning()
 {
-  return mRoot;
+  return mIsAnimating;
 }
 
-bool CubeTransitionEffect::IsTransiting()
+void CubeTransitionEffect::SetCurrentImage( Image image )
 {
-  return mIsImageLoading || mIsAnimating;
-}
+  mCurrentImage = image;
 
-void CubeTransitionEffect::SetCurrentImage( ImageActor imageActor )
-{
-  mContainerIndex = std::abs(mRotateIndex) % 2;
-  SetImage( imageActor );
-}
-
-void CubeTransitionEffect::SetTargetImage( ImageActor imageActor )
-{
-  mContainerIndex = std::abs( mRotateIndex+1 ) % 2;
-  SetImage( imageActor );
-}
-
-void CubeTransitionEffect::SetImage( ImageActor imageActor )
-{
-  mCurrentImage = imageActor;
-
-  Image image = imageActor.GetImage();
-  ResourceImage resourceImage = ResourceImage::DownCast( image );
-  mBufferIndex = mBufferIndex^1;
-
-  //must make sure the image is already loaded before using its attributes
-  if( resourceImage && resourceImage.GetLoadingState() != ResourceLoadingSucceeded )
+  if( mCurrentRenderer )
   {
-    mIsImageLoading = true;
-    resourceImage.LoadingFinishedSignal().Connect( this, &CubeTransitionEffect::OnImageLoaded );
+    Material material = mCurrentRenderer.GetMaterial();
+
+    int index = material.GetTextureIndex("sTexture" );
+    if( index != -1 )
+    {
+      material.SetTextureImage( index, mCurrentImage );
+    }
+    else
+    {
+      material.AddTexture( mCurrentImage, "sTexture" );
+    }
   }
-  else
+}
+
+void CubeTransitionEffect::SetTargetImage( Image image )
+{
+  mTargetImage = image;
+
+  if( mTargetRenderer )
   {
-    mIsImageLoading = false;
-    PrepareTiles( image );
+    Material material = mTargetRenderer.GetMaterial();
+    material.AddTexture( mTargetImage, "sTexture" );
   }
 }
 
 void CubeTransitionEffect::StartTransition( bool toNextImage )
 {
+  Vector3 size = Self().GetCurrentSize();
   if( toNextImage )
   {
-    StartTransition( Vector2( mViewAreaSize.width, mViewAreaSize.height*0.5f ), Vector2( -10.f, 0.f ) );
+    StartTransition( Vector2(size.x* 0.5f, size.y*0.5f), Vector2( -10.f, 0.f ) );
   }
   else
   {
-    StartTransition( Vector2( 0, mViewAreaSize.height*0.5f ), Vector2( 10.f, 0.f ));
+    StartTransition( Vector2(size.x* 0.5f, size.y*0.5f), Vector2( 10.f, 0.f ));
   }
 }
 
 void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisplacement )
 {
-  mRoot.SetVisible( true );
-  mCurrentImage.SetVisible( false );
-  bool toNextImage = ( panDisplacement.x < 0 ) ? true : false;
-  if( mIsToNextImage != toNextImage )
+  if( !mCurrentRenderer )
   {
-    mChangeTurningDirection = true;
+    DALI_LOG_ERROR( "Trying to transition a cube transition without an image set" );
+    return;
   }
-  else
-  {
-    mChangeTurningDirection = false;
-  }
-  mIsToNextImage = toNextImage;
 
-  if( mIsToNextImage )
+  //create the target renderer
+  Material material = Material::New( mCurrentRenderer.GetMaterial().GetShader() );
+  if( mTargetImage )
   {
-    mRotateIndex += 1.f;
+    material.AddTexture( mTargetImage, "sTexture" );
   }
-  else
+  Geometry geometry = mCurrentRenderer.GetGeometry();
+  mTargetRenderer = Renderer::New( geometry, material );
+
+  mTargetRenderer.SetDepthIndex( mCurrentRenderer.GetDepthIndex() );
+
+  for( size_t i = 0; i < mBoxes.size(); ++i )
   {
-    mRotateIndex -= 1.f;
+    mBoxes[ i ].SetProperty( Actor::Property::ORIENTATION, Quaternion( Radian( 0.0f ), Vector3::XAXIS ) );
   }
+
+  for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
+  {
+    it->SetParentOrigin( Vector3( 0.5f, 0.5f, 1.0f) );
+    it->SetProperty( Actor::Property::ORIENTATION, Quaternion( Radian( 0.0f ), Vector3::XAXIS ) );
+    it->AddRenderer( mCurrentRenderer );
+  }
+  for( ActorArray::iterator it = mTargetTiles.begin(); it != mTargetTiles.end(); ++it )
+  {
+    it->AddRenderer( mTargetRenderer );
+  }
+
+  Self().RemoveRenderer( mCurrentRenderer );
+  Self().Add( mBoxRoot );
 
   if(mAnimation)
   {
     mAnimation.Clear();
     mAnimation.Reset();
   }
+
   mAnimation = Animation::New( mAnimationDuration );
-  mAnimation.FinishedSignal().Connect(this, &CubeTransitionEffect::OnTransitionFinished);
+  mAnimation.FinishedSignal().Connect( this, &CubeTransitionEffect::OnTransitionFinished );
 
   OnStartTransition( panPosition, panDisplacement );
 }
@@ -279,90 +447,61 @@ void CubeTransitionEffect::ResumeTransition()
 
 void CubeTransitionEffect::StopTransition()
 {
-  if( mIsAnimating )
+  ResetToInitialState();
+}
+
+void CubeTransitionEffect::ResetToInitialState()
+{
+  mAnimation.Clear();
+  mAnimation.Reset();
+  mIsAnimating = false;
+
+  Self().Remove( mBoxRoot );
+
+  for( size_t i = 0; i < mBoxes.size(); ++i )
   {
-    mAnimation.Clear();
-    mAnimation.Reset();
-    mIsPaused = false;
-
-    //reset the position of the cubes
-    //reset the color of the tiles
-    //all these status should be the same as the final state when the transition animation is finished completely
-    const Vector3 basePosition( (-mViewAreaSize.width + mTileSize.width) * 0.5f,
-                                (-mViewAreaSize.height + mTileSize.height) * 0.5f,
-                                 -mTileSize.width * 0.5f );
-    unsigned int anotherIndex = mContainerIndex^1;
-    for( unsigned int y = 0; y < mNumRows; y++ )
-    {
-      float positionY = y * mTileSize.height + basePosition.y;
-      for( unsigned int x = 0; x < mNumColumns; x++)
-      {
-        unsigned int idx = y*mNumColumns + x;
-        mBoxes[idx].SetPosition( x * mTileSize.width + basePosition.x,
-                                 positionY,
-                                 basePosition.z );
-        mTiles[mContainerIndex][idx].SetColor( FULL_BRIGHTNESS );
-        mTiles[anotherIndex][idx].SetColor( HALF_BRIGHTNESS);
-      }
-    }
-
-    // reset the rotation of the cubes, which is different process for different derived classes
-    OnStopTransition();
-
-    mRoot.SetVisible(false);
-    mCurrentImage.SetVisible(true);
-    mIsAnimating = false;
-    mFirstTransition = false;
+    mBoxes[ i ].SetProperty( Actor::Property::ORIENTATION, Quaternion( Radian( 0.0f ), Vector3::XAXIS ) );
   }
-}
 
-void CubeTransitionEffect::OnImageLoaded(ResourceImage image)
-{
-  mIsImageLoading = false;
-  PrepareTiles( image );
-}
-
-/**
- * Set sub-image to each tile.
- * @param[in] image The image content of the imageActor for transition
- */
-void CubeTransitionEffect::PrepareTiles( Image image )
-{
-  // Fit the image to view area, while keeping the aspect; FitKeepAspectRatio(imageSize, viewAreaSize)
-  float scale = std::min(  mViewAreaSize.width / image.GetWidth(), mViewAreaSize.height / image.GetHeight() );
-  Vector2 imageSize(image.GetWidth()*scale, image.GetHeight()*scale);
-
-  mFullImageCreator.SetEffectImage(image);
-  mFullImageCreator.SetRegionSize(mViewAreaSize, imageSize);
-
-  mOffScreenTask.SetTargetFrameBuffer(mOffScreenBuffer[mBufferIndex]);
-  mOffScreenTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-
-  ImageActor::PixelArea pixelArea( 0, 0, mViewAreaSize.x / mNumColumns, mViewAreaSize.y / mNumRows);
-
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
   {
-    pixelArea.y = y * pixelArea.height;
-    for( unsigned int x = 0; x < mNumColumns; x++)
+    it->SetParentOrigin( Vector3( 0.5f, 0.5f, 1.0f) );
+    it->SetProperty( Actor::Property::ORIENTATION, Quaternion( Radian( 0.0f ), Vector3::XAXIS ) );
+    it->SetProperty( Actor::Property::COLOR, FULL_BRIGHTNESS );
+  }
+  if( mCurrentRenderer )
+  {
+    for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
     {
-      pixelArea.x = x * pixelArea.width;
-      unsigned int idx = y*mNumColumns + x;
-      mTiles[mContainerIndex][idx].SetImage( mOffScreenBuffer[mBufferIndex]);
-      mTiles[mContainerIndex][idx].SetPixelArea( pixelArea );
+      it->RemoveRenderer( mCurrentRenderer );
+    }
+    Self().AddRenderer( mCurrentRenderer );
+  }
+
+  for( ActorArray::iterator it = mTargetTiles.begin(); it != mTargetTiles.end(); ++it )
+  {
+    it->SetProperty( Actor::Property::COLOR, HALF_BRIGHTNESS );
+  }
+  if( mTargetRenderer )
+  {
+    for( ActorArray::iterator it = mTargetTiles.begin(); it != mTargetTiles.end(); ++it )
+    {
+      it->RemoveRenderer( mTargetRenderer );
     }
   }
 }
-
 
 void CubeTransitionEffect::OnTransitionFinished(Animation& source)
 {
-  mRoot.SetVisible(false);
-  mCurrentImage.SetVisible(true);
-  mIsAnimating = false;
-  mFirstTransition = false;
+
+  std::swap( mCurrentTiles, mTargetTiles );
+  std::swap( mCurrentRenderer, mTargetRenderer );
+  std::swap( mCurrentImage, mTargetImage );
+
+  ResetToInitialState();
 
   //Emit signal
-  Toolkit::CubeTransitionEffect handle( this );
+  Toolkit::CubeTransitionEffect handle( GetOwner() );
   mTransitionCompletedSignal.Emit( handle, mCurrentImage );
 }
 

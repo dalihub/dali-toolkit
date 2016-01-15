@@ -34,6 +34,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
@@ -53,10 +54,9 @@ namespace // Unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
 
-const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "is-keyboard-focus-group"; // This property will be replaced by a flag in Control.
+const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "isKeyboardFocusGroup"; // This property will be replaced by a flag in Control.
 
-const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.png";
-const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
+const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.9.png";
 
 BaseHandle Create()
 {
@@ -78,10 +78,10 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::KeyboardFocusManager, Dali::BaseHandle, Create, true )
 
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-pre-focus-change",        SIGNAL_PRE_FOCUS_CHANGE        )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-changed",           SIGNAL_FOCUS_CHANGED           )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-group-changed",     SIGNAL_FOCUS_GROUP_CHANGED     )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focused-actor-enter-key", SIGNAL_FOCUSED_ACTOR_ENTER_KEY )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardPreFocusChange",           SIGNAL_PRE_FOCUS_CHANGE        )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusChanged",             SIGNAL_FOCUS_CHANGED           )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusGroupChanged",        SIGNAL_FOCUS_GROUP_CHANGED     )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusedActorEnterKey",     SIGNAL_FOCUSED_ACTOR_ENTER_KEY )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -128,53 +128,54 @@ KeyboardFocusManager::~KeyboardFocusManager()
 {
 }
 
-bool KeyboardFocusManager::SetCurrentFocusActor(Actor actor)
+bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
 
-  if(actor)
+  if( actor )
   {
-    return DoSetCurrentFocusActor(actor.GetId());
+    return DoSetCurrentFocusActor( actor.GetId() );
   }
 
   return false;
 }
 
-bool KeyboardFocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
+bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
 {
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
-  Actor actor = rootActor.FindChildById(actorID);
+  Actor actor = rootActor.FindChildById( actorID );
+  bool success = false;
 
-  // Check whether the actor is in the stage
-  if(actor)
+  // Check whether the actor is in the stage and is keyboard focusable.
+  if( actor && actor.IsKeyboardFocusable() )
   {
-    // Set the focus only when the actor is keyboard focusable
-    if(actor.IsKeyboardFocusable())
+    mIsFocusIndicatorEnabled = true;
+    // Draw the focus indicator upon the focused actor
+    if( mFocusIndicatorActor )
     {
-      // Draw the focus indicator upon the focused actor
-      if(mIsFocusIndicatorEnabled && mFocusIndicatorActor)
-      {
-        actor.Add(mFocusIndicatorActor);
-      }
-
-      // Send notification for the change of focus actor
-      if( !mFocusChangedSignal.Empty() )
-      {
-        mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
-      }
-
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
-
-      // Save the current focused actor
-      mCurrentFocusActor = actorID;
-
-      DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
-      return true;
+      actor.Add( mFocusIndicatorActor );
     }
+
+    // Send notification for the change of focus actor
+    if( !mFocusChangedSignal.Empty() )
+    {
+      mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
+    }
+
+    DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
+
+    // Save the current focused actor
+    mCurrentFocusActor = actorID;
+
+    DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
+    success = true;
+  }
+  else
+  {
+    DALI_LOG_WARNING("[%s:%d] FAILED\n", __FUNCTION__, __LINE__);
   }
 
-  DALI_LOG_WARNING("[%s:%d] FAILED\n", __FUNCTION__, __LINE__);
-  return false;
+  return success;
 }
 
 Actor KeyboardFocusManager::GetCurrentFocusActor()
@@ -393,16 +394,8 @@ void KeyboardFocusManager::SetAsFocusGroup(Actor actor, bool isFocusGroup)
 {
   if(actor)
   {
-    // Create focus group property if not already created.
-    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP_PROPERTY_NAME);
-    if(propertyIsFocusGroup == Property::INVALID_INDEX)
-    {
-      actor.RegisterProperty(IS_FOCUS_GROUP_PROPERTY_NAME, isFocusGroup, Property::READ_WRITE );
-    }
-    else
-    {
-      actor.SetProperty(propertyIsFocusGroup, isFocusGroup);
-    }
+    // Create/Set focus group property.
+    actor.RegisterProperty( IS_FOCUS_GROUP_PROPERTY_NAME, isFocusGroup, Property::READ_WRITE );
   }
 }
 
@@ -465,13 +458,8 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
 void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the keyboard focusable actors
-  Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
-
-  ImageActor focusIndicator = ImageActor::New(borderImage);
-  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  focusIndicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
-  focusIndicator.SetNinePatchBorder(FOCUS_BORDER_IMAGE_BORDER);
-  focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
+  Toolkit::ImageView focusIndicator = Toolkit::ImageView::New(FOCUS_BORDER_IMAGE_PATH);
+  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   // Apply size constraint to the focus indicator
   focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
@@ -695,8 +683,12 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
 void KeyboardFocusManager::OnTouched(const TouchEvent& touchEvent)
 {
-  // Clear the focus when user touch the screen
-  ClearFocus();
+  // Clear the focus when user touch the screen.
+  // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
+  if( ( touchEvent.GetPointCount() < 1 ) || ( touchEvent.GetPoint( 0 ).state == TouchPoint::Down ) )
+  {
+    ClearFocus();
+  }
 }
 
 Toolkit::KeyboardFocusManager::PreFocusChangeSignalType& KeyboardFocusManager::PreFocusChangeSignal()

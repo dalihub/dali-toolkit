@@ -43,10 +43,10 @@ class ConfirmationPopup;
  * Please see the programming guide for a detailed description of the ConfirmationPopup including examples.
  *
  * Signals (these are dynamically created upon connect).
- * | %Signal Name          | Actor name to connect to | Property to set signal type (eg clicked) |
- * |-----------------------|--------------------------|------------------------------------------|
- * | control-signal-ok     | control-ok               | connect-signal-ok-selected               |
- * | control-signal-cancel | control-cancel           | connect-signal-cancel-selected           |
+ * | %Signal Name        | Actor name to connect to | Property to set signal type (eg clicked) |
+ * |---------------------|--------------------------|------------------------------------------|
+ * | controlSignalOk     | controlOk                | connectSignalOkSelected                  |
+ * | controlSignalCancel | controlCancel            | connectSignalCancelSelected              |
  */
 class DALI_IMPORT_API ConfirmationPopup : public Popup
 {
@@ -68,8 +68,8 @@ public:
   {
     enum
     {
-      CONNECT_SIGNAL_OK_SELECTED = PROPERTY_START_INDEX, ///< name "connect-signal-ok-selected",     type std::string
-      CONNECT_SIGNAL_CANCEL_SELECTED                     ///< name "connect-signal-cancel-selected", type std::string
+      CONNECT_SIGNAL_OK_SELECTED = PROPERTY_START_INDEX, ///< name "connectSignalOkSelected",        type std::string
+      CONNECT_SIGNAL_CANCEL_SELECTED                     ///< name "connectSignalCancelSelected",    type std::string
     };
   };
 

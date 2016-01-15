@@ -416,8 +416,8 @@ int UtcDaliPageTurnViewSetGetProperty(void)
 
   Stage::GetCurrent().Add( landscapeView );
 
-  // Test "page-size" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("page-size") == PageTurnView::Property::PAGE_SIZE  );
+  // Test "pageSize" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("pageSize") == PageTurnView::Property::PAGE_SIZE  );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), PAGE_SIZE, TEST_LOCATION );
 
   Vector2 newSize( PAGE_SIZE.x*0.75, PAGE_SIZE.y*0.5f );
@@ -431,8 +431,8 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   Wait( application);
   DALI_TEST_EQUALS( Vector2(landscapeView.GetTargetSize()), Vector2(newSize.x*3.f, newSize.y*1.5f), TEST_LOCATION);
 
-  // Test "current-page-id" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("current-page-id") == PageTurnView::Property::CURRENT_PAGE_ID );
+  // Test "currentPageId" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("currentPageId") == PageTurnView::Property::CURRENT_PAGE_ID );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
 
   int pageId = static_cast<int>(TOTAL_PAGE_NUMBER)/3;
@@ -442,8 +442,8 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   landscapeView.SetProperty( PageTurnView::Property::CURRENT_PAGE_ID, pageId*2 );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageId*2, TEST_LOCATION );
 
-  // Test "spin-shadow" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex( "spine-shadow" ) == PageTurnView::Property::SPINE_SHADOW );
+  // Test "spinShadow" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex( "spineShadow" ) == PageTurnView::Property::SPINE_SHADOW );
   landscapeView.SetProperty( PageTurnView::Property::SPINE_SHADOW, SPINE_SHADOW_PARAMETER );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::SPINE_SHADOW).Get<Vector2>(), SPINE_SHADOW_PARAMETER, TEST_LOCATION );
 
@@ -518,7 +518,7 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   // the page is turned over
-  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex+1, TEST_LOCATION );
+  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), (int)(pageIndex+1), TEST_LOCATION );
 
   //---Test 2: pan from position( size*0.5f ) to position( size.width, size.height*0.5f ) to position( size * 0.75f ), page 1 will bent then slid back---
   callbackTurnStarted.Reset();
@@ -547,7 +547,7 @@ int UtcDaliPageTurnPortraitViewSignals(void)
 
   Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
-  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex, TEST_LOCATION ); // the page is not turned over
+  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), (int)pageIndex, TEST_LOCATION ); // the page is not turned over
 
   // ----Test 3: pan 10 frames from position( size*0.25f ) to position( size.width*0.75f, size.height*0.25f ), the previous page will be turned backwards---
   callbackTurnStarted.Reset();
@@ -656,7 +656,7 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   // the page is turned over
-  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex+1, TEST_LOCATION );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), (int)(pageIndex+1), TEST_LOCATION );
 
   //---Test 2: pan from position(stageSize.x * 0.15f, stageSize.y*0.5) to position(stageSize.x * 0.45f, stageSize.y*0.5) page 4 will be turned back---
   callbackTurnStarted.Reset();

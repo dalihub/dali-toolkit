@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -106,6 +107,7 @@ void GetGlyphsMetrics( GlyphIndex glyphIndex,
 
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
+  mImfManager(),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
@@ -131,8 +133,11 @@ EventData::EventData( DecoratorPtr decorator )
   mUpdateRightSelectionPosition( false ),
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
-  mAllTextSelected( false )
-{}
+  mAllTextSelected( false ),
+  mUpdateInputStyle( false )
+{
+  mImfManager = ImfManager::Get();
+}
 
 EventData::~EventData()
 {}
@@ -282,6 +287,20 @@ bool Controller::Impl::ProcessInputEvents()
     {
       mEventData->mScrollAfterUpdatePosition = false;
     }
+  }
+
+  if( mEventData->mUpdateInputStyle )
+  {
+    // Set the default style first.
+    RetrieveDefaultInputStyle( mEventData->mInputStyle );
+
+    // Get the character index from the cursor index.
+    const CharacterIndex styleIndex = ( mEventData->mPrimaryCursorPosition > 0u ) ? mEventData->mPrimaryCursorPosition - 1u : 0u;
+
+    // Retrieve the style from the style runs stored in the logical model.
+    mLogicalModel->RetrieveStyle( styleIndex, mEventData->mInputStyle );
+
+    mEventData->mUpdateInputStyle = false;
   }
 
   mEventData->mEventQueue.clear();
@@ -456,7 +475,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     }
   }
 
-  if( mEventData &&
+  if( ( NULL != mEventData ) &&
       mEventData->mPreEditFlag &&
       ( 0u != mVisualModel->mCharactersToGlyph.Count() ) )
   {
@@ -478,11 +497,35 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   }
 }
 
+bool Controller::Impl::UpdateModelStyle( OperationsMask operationsRequired )
+{
+  bool updated = false;
+
+  if( COLOR & operationsRequired )
+  {
+    // Set the color runs in glyphs.
+    SetColorSegmentationInfo( mLogicalModel->mColorRuns,
+                              mVisualModel->mCharactersToGlyph,
+                              mVisualModel->mGlyphsPerCharacter,
+                              mVisualModel->mColorRuns );
+
+    updated = true;
+  }
+
+  return updated;
+}
+
+void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
+{
+  // Set the default text's color.
+  inputStyle.textColor = mTextColor;
+}
+
 void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
 {
   if( mFontDefaults )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::GetDefaultFonts font family(%s)\n", mFontDefaults->mFontDescription.family.c_str() );
+    DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::GetDefaultFonts font family(%s)\n", mFontDefaults->mFontDescription.family.c_str() );
     FontRun fontRun;
     fontRun.characterRun.characterIndex = 0;
     fontRun.characterRun.numberOfCharacters = numberOfCharacters;
@@ -546,6 +589,7 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
   }
 
   mEventData->mUpdateCursorPosition = true;
+  mEventData->mUpdateInputStyle = true;
   mEventData->mScrollAfterUpdatePosition = true;
 }
 
@@ -575,6 +619,14 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
       mEventData->mUpdateCursorPosition = true;
       mEventData->mScrollAfterUpdatePosition = true;
+      mEventData->mUpdateInputStyle = true;
+
+      // Notify the cursor position to the imf manager.
+      if( mEventData->mImfManager )
+      {
+        mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
+        mEventData->mImfManager.NotifyCursorPosition();
+      }
     }
   }
 }
@@ -620,7 +672,9 @@ void Controller::Impl::OnPanEvent( const Event& event )
 
 void Controller::Impl::OnLongPressEvent( const Event& event )
 {
-  if  ( EventData::EDITING == mEventData->mState )
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::OnLongPressEvent\n" );
+
+  if( EventData::EDITING == mEventData->mState )
   {
     ChangeState ( EventData::EDITING_WITH_POPUP );
     mEventData->mDecoratorUpdated = true;
@@ -697,8 +751,12 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     if( Event::GRAB_HANDLE_EVENT == event.type )
     {
       mEventData->mUpdateCursorPosition = true;
+      mEventData->mUpdateInputStyle = true;
 
-      ChangeState( EventData::EDITING_WITH_POPUP );
+      if( !IsClipboardEmpty() )
+      {
+        ChangeState( EventData::EDITING_WITH_PASTE_POPUP ); // Moving grabhandle will show Paste Popup
+      }
 
       if( handleStopScrolling )
       {
@@ -780,6 +838,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
       mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
       mEventData->mPrimaryCursorPosition = handlePosition;
+      mEventData->mUpdateInputStyle = mEventData->mUpdateCursorPosition;
     }
     else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
     {
@@ -855,6 +914,8 @@ void Controller::Impl::OnSelectEvent( const Event& event )
 
 void Controller::Impl::OnSelectAllEvent()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "OnSelectAllEvent mEventData->mSelectionEnabled%s \n", mEventData->mSelectionEnabled?"true":"false");
+
   if( NULL == mEventData )
   {
     // Nothing to do if there is no text.
@@ -872,31 +933,36 @@ void Controller::Impl::OnSelectAllEvent()
   }
 }
 
-void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival )
+void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval )
 {
-  if( mEventData->mLeftSelectionPosition ==  mEventData->mRightSelectionPosition )
+  if( mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition )
   {
     // Nothing to select if handles are in the same place.
-    selectedText="";
+    selectedText.clear();
     return;
   }
 
   const bool handlesCrossed = mEventData->mLeftSelectionPosition > mEventData->mRightSelectionPosition;
 
   //Get start and end position of selection
-  uint32_t startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
-  uint32_t lengthOfSelectedText =  ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
+  const CharacterIndex startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
+  const Length lengthOfSelectedText = ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
   // Validate the start and end selection points
-  if(  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() )
+  if( ( startOfSelectedText + lengthOfSelectedText ) <= mLogicalModel->mText.Count() )
   {
     //Get text as a UTF8 string
     Vector<Character>& utf32Characters = mLogicalModel->mText;
 
     Utf32ToUtf8( &utf32Characters[startOfSelectedText], lengthOfSelectedText, selectedText );
 
-    if ( deleteAfterRetreival  ) // Only delete text if copied successfully
+    if( deleteAfterRetrieval ) // Only delete text if copied successfully
     {
+      // Set as input style the style of the first deleted character.
+      mLogicalModel->RetrieveStyle( startOfSelectedText, mEventData->mInputStyle );
+
+      mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
+
       // Delete text between handles
       Vector<Character>& currentText = mLogicalModel->mText;
 
@@ -918,7 +984,7 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
 void Controller::Impl::ShowClipboard()
 {
-  if ( mClipboard )
+  if( mClipboard )
   {
     mClipboard.ShowClipboard();
   }
@@ -926,7 +992,7 @@ void Controller::Impl::ShowClipboard()
 
 void Controller::Impl::HideClipboard()
 {
-  if ( mClipboard )
+  if( mClipboard )
   {
     mClipboard.HideClipboard();
   }
@@ -946,11 +1012,11 @@ void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
   ChangeState( EventData::EDITING );
 }
 
-void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString )
+void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString )
 {
   if ( mClipboard )
   {
-    retreivedString =  mClipboard.GetItem( itemIndex );
+    retrievedString =  mClipboard.GetItem( itemIndex );
   }
 }
 
@@ -1118,8 +1184,8 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
 
   const Length numberOfGlyphs = mVisualModel->mGlyphs.Count();
   const Length numberOfLines  = mVisualModel->mLines.Count();
-  if( 0 == numberOfGlyphs ||
-      0 == numberOfLines )
+  if( ( 0 == numberOfGlyphs ) ||
+      ( 0 == numberOfLines ) )
   {
     // Nothing to do if there is no text.
     return;
@@ -1158,24 +1224,32 @@ void Controller::Impl::SetPopupButtons()
   {
     buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
 
-    if ( !IsClipboardEmpty() )
+    if( !IsClipboardEmpty() )
     {
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
     }
 
-    if ( !mEventData->mAllTextSelected )
+    if( !mEventData->mAllTextSelected )
     {
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::SELECT_ALL ) );
     }
   }
-  else if  ( EventData::EDITING_WITH_POPUP == mEventData->mState )
+  else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
   {
-    if ( mLogicalModel->mText.Count() && !IsShowingPlaceholderText())
+    if( mLogicalModel->mText.Count() && !IsShowingPlaceholderText() )
     {
       buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
     }
 
+    if( !IsClipboardEmpty() )
+    {
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
+    }
+  }
+  else if( EventData::EDITING_WITH_PASTE_POPUP == mEventData->mState )
+  {
     if ( !IsClipboardEmpty() )
     {
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
@@ -1194,6 +1268,8 @@ void Controller::Impl::ChangeState( EventData::State newState )
     return;
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::General, "ChangeState state:%d  newstate:%d\n", mEventData->mState, newState );
+
   if( mEventData->mState != newState )
   {
     mEventData->mState = newState;
@@ -1209,7 +1285,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecoratorUpdated = true;
       HideClipboard();
     }
-    else if ( EventData::INTERRUPTED  == mEventData->mState)
+    else if( EventData::INTERRUPTED  == mEventData->mState)
     {
       mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
       mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
@@ -1218,7 +1294,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecoratorUpdated = true;
       HideClipboard();
     }
-    else if ( EventData::SELECTING == mEventData->mState )
+    else if( EventData::SELECTING == mEventData->mState )
     {
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
       mEventData->mDecorator->StopCursorBlink();
@@ -1252,6 +1328,8 @@ void Controller::Impl::ChangeState( EventData::State newState )
     }
     else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState );
+
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
       if( mEventData->mCursorBlinkEnabled )
       {
@@ -1276,6 +1354,8 @@ void Controller::Impl::ChangeState( EventData::State newState )
     }
     else if( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState );
+
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
       if( mEventData->mCursorBlinkEnabled )
       {
@@ -1292,7 +1372,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecoratorUpdated = true;
       HideClipboard();
     }
-    else if ( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
+    else if( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
     {
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
       mEventData->mDecorator->StopCursorBlink();
@@ -1305,8 +1385,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
       }
       mEventData->mDecoratorUpdated = true;
     }
-    else if ( EventData::GRAB_HANDLE_PANNING == mEventData->mState )
+    else if( EventData::GRAB_HANDLE_PANNING == mEventData->mState )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState );
+
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
       if( mEventData->mCursorBlinkEnabled )
       {
@@ -1319,6 +1401,28 @@ void Controller::Impl::ChangeState( EventData::State newState )
       {
         mEventData->mDecorator->SetPopupActive( false );
       }
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING_WITH_PASTE_POPUP == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
+      }
+      HideClipboard();
       mEventData->mDecoratorUpdated = true;
     }
   }
@@ -1355,7 +1459,7 @@ void Controller::Impl::FindSelectionIndices( float visualX, float visualY, Chara
   CharacterIndex hitCharacter = GetClosestCursorIndex( visualX, visualY );
   DALI_ASSERT_DEBUG( hitCharacter <= mLogicalModel->mText.Count() && "GetClosestCursorIndex returned out of bounds index" );
 
-  if ( mLogicalModel->mText.Count() == 0 )
+  if( mLogicalModel->mText.Count() == 0 )
   {
     return;  // if model empty
   }
@@ -1363,7 +1467,7 @@ void Controller::Impl::FindSelectionIndices( float visualX, float visualY, Chara
   if( hitCharacter >= mLogicalModel->mText.Count() )
   {
     // Closest hit character is the last character.
-    if ( hitCharacter ==  mLogicalModel->mText.Count() )
+    if( hitCharacter ==  mLogicalModel->mText.Count() )
     {
       hitCharacter--; //Hit character index set to last character in logical model
     }
@@ -1376,26 +1480,22 @@ void Controller::Impl::FindSelectionIndices( float visualX, float visualY, Chara
 
   startIndex = hitCharacter;
   endIndex = hitCharacter;
+  bool isHitCharacterWhitespace = TextAbstraction::IsWhiteSpace( mLogicalModel->mText[hitCharacter] );
 
-  if( !TextAbstraction::IsWhiteSpace( mLogicalModel->mText[hitCharacter] ) )
+  // Find the start and end of the text
+  for( startIndex = hitCharacter; startIndex > 0; --startIndex )
   {
-    // Find the start and end of the text
-    for( startIndex = hitCharacter; startIndex > 0; --startIndex )
+    if( isHitCharacterWhitespace != TextAbstraction::IsWhiteSpace( mLogicalModel->mText[ startIndex-1 ] ) )
     {
-      Character charCode = mLogicalModel->mText[ startIndex-1 ];
-      if( TextAbstraction::IsWhiteSpace( charCode ) )
-      {
-        break;
-      }
+      break;
     }
-    const CharacterIndex pastTheEnd = mLogicalModel->mText.Count();
-    for( endIndex = hitCharacter + 1u; endIndex < pastTheEnd; ++endIndex )
+  }
+  const CharacterIndex pastTheEnd = mLogicalModel->mText.Count();
+  for( endIndex = hitCharacter + 1u; endIndex < pastTheEnd; ++endIndex )
+  {
+    if( isHitCharacterWhitespace != TextAbstraction::IsWhiteSpace( mLogicalModel->mText[ endIndex ] ) )
     {
-      Character charCode = mLogicalModel->mText[ endIndex ];
-      if( TextAbstraction::IsWhiteSpace( charCode ) )
-      {
-        break;
-      }
+      break;
     }
   }
 }
@@ -1415,8 +1515,8 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   const Length numberOfGlyphs = mVisualModel->mGlyphs.Count();
   const Length numberOfLines  = mVisualModel->mLines.Count();
-  if( 0 == numberOfGlyphs ||
-      0 == numberOfLines )
+  if( ( 0 == numberOfGlyphs ) ||
+      ( 0 == numberOfLines ) )
   {
     return logicalIndex;
   }
@@ -1483,7 +1583,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
       // Get the position of the first glyph.
       const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
 
-      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ. 
+      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ.
       const bool isInterglyphIndex = ( numberOfCharacters > numberOfGlyphs ) && HasLigatureMustBreak( script );
       const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
       const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
@@ -1848,10 +1948,7 @@ void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
   }
 
   // Set which cursors are active according the state.
-  if( ( EventData::EDITING == mEventData->mState )                  ||
-      ( EventData::EDITING_WITH_POPUP == mEventData->mState )       ||
-      ( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState ) ||
-      ( EventData::GRAB_HANDLE_PANNING == mEventData->mState ) )
+  if( EventData::IsEditingState( mEventData->mState ) || ( EventData::GRAB_HANDLE_PANNING == mEventData->mState ) )
   {
     if( cursorInfo.isSecondaryCursor )
     {
@@ -1881,7 +1978,7 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
 
   const Vector2 cursorPosition = cursorInfo.primaryPosition + mEventData->mScrollPosition + mAlignmentOffset;
 
-  // Sets the grab handle position.
+  // Sets the handle's position.
   mEventData->mDecorator->SetPosition( handleType,
                                        cursorPosition.x,
                                        cursorPosition.y,

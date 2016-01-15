@@ -36,20 +36,21 @@ void dali_textlabel_cleanup(void)
 namespace
 {
 
-const char* const PROPERTY_NAME_RENDERING_BACKEND = "rendering-backend";
+const char* const PROPERTY_NAME_RENDERING_BACKEND = "renderingBackend";
 const char* const PROPERTY_NAME_TEXT = "text";
-const char* const PROPERTY_NAME_FONT_FAMILY = "font-family";
-const char* const PROPERTY_NAME_FONT_STYLE = "font-style";
-const char* const PROPERTY_NAME_POINT_SIZE = "point-size";
-const char* const PROPERTY_NAME_MULTI_LINE =  "multi-line";
-const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
-const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "vertical-alignment";
-const char* const PROPERTY_NAME_TEXT_COLOR = "text-color";
-const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadow-offset";
-const char* const PROPERTY_NAME_SHADOW_COLOR = "shadow-color";
-const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underline-enabled";
-const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underline-color";
-const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underline-height";
+const char* const PROPERTY_NAME_FONT_FAMILY = "fontFamily";
+const char* const PROPERTY_NAME_FONT_STYLE = "fontStyle";
+const char* const PROPERTY_NAME_POINT_SIZE = "pointSize";
+const char* const PROPERTY_NAME_MULTI_LINE =  "multiLine";
+const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "verticalAlignment";
+const char* const PROPERTY_NAME_TEXT_COLOR = "textColor";
+const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadowOffset";
+const char* const PROPERTY_NAME_SHADOW_COLOR = "shadowColor";
+const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underlineEnabled";
+const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underlineColor";
+const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underlineHeight";
+const char* const PROPERTY_NAME_ENABLE_MARKUP = "enableMarkup";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -150,6 +151,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_ENABLED ) == TextLabel::Property::UNDERLINE_ENABLED );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP) == TextLabel::Property::ENABLE_MARKUP );
 
   END_TEST;
 }
@@ -163,7 +165,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
   label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  DALI_TEST_EQUALS( (Text::RenderingType)label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );
@@ -210,6 +212,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   TextLabel label2 = TextLabel::New( "New text" );
   DALI_TEST_CHECK( label2 );
   DALI_TEST_EQUALS( label2.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("New text"), TEST_LOCATION );
+
+  // Check the enable markup property.
+  DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ENABLE_MARKUP ) );
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ENABLE_MARKUP ) );
 
   END_TEST;
 }

@@ -105,7 +105,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
 }
 
 /**
- * ### var module = require("module-name");
+ * ### var module = require("moduleName");
  *
  *
  * There is no standard for modules or the 'require' keyword in JavaScript.<br />
@@ -161,7 +161,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  * from an object literal with name-value pairs (exports object) to a function.
  *
  *     // my_first_module.js
- *     module.exports = function() {  log("hello-world"); }
+ *     module.exports = function() {  log("helloWorld"); }
  *
  * <br />
  *
@@ -173,23 +173,24 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  * #### Exporting as a constructor
  *
  *
- *     // ImageActor.js
- *     function ImageActor( position, orientation, image, name )
+ *     // ImageView.js
+ *     function ImageView( position, orientation, image, name )
  *     {
- *         this = new dali.ImageActor( image );
+ *         this = new dali.Control("ImageView");
+ *         this.image = image;
  *         this.position = position;
  *         this.orientation = orientation;
  *         this.name = name;
  *     }
- *     module.exports = ImageActor;
+ *     module.exports = ImageView;
  *
  * <br />
  *
  *     // main.js
  *
- *     var ImageActor = require(" ImageActor.js");
+ *     var ImageView = require(" ImageView.js");
  *
- *     var imageActor = new ImageActor( position, orientation, image, "my first image actor");
+ *     var imageView = new ImageView( position, orientation, image, "my first image actor");
  *
  * #### Exporting as a singleton
  *

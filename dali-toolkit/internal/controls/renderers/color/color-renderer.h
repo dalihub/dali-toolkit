@@ -35,9 +35,9 @@ namespace Internal
  *
  * The following properties are required for create a ColorRender
  *
- * | %Property Name   | Type        |
- * |------------------|-------------|
- * | blend-color      | VECTOR4     |
+ * | %Property Name  | Type        |
+ * |-----------------|-------------|
+ * | blendColor      | VECTOR4     |
  */
 class ColorRenderer: public ControlRenderer
 {
@@ -82,12 +82,12 @@ protected:
   /**
    * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoInitialize( const Property::Map& propertyMap );
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc ControlRenderer::InitializeRenderer
+   * @copydoc ControlRenderer::DoSetOnStage
    */
-  virtual void InitializeRenderer( Renderer& renderer );
+  virtual void DoSetOnStage( Actor& actor );
 
 public:
 
@@ -96,6 +96,12 @@ public:
    * @param[in] color The color to be rendered.
    */
   void SetColor( const Vector4& color );
+
+private:
+  /**
+   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   */
+  void InitializeRenderer();
 
 private:
 

@@ -83,6 +83,12 @@ public:
       RENDER_TASK,
       RENDER_TASK_LIST,
       TIMER,
+      SHADER,
+      SAMPLER,
+      MATERIAL,
+      GEOMETRY,
+      RENDERER,
+      PROPERTY_BUFFER,
       TAP_GESTURE,
       SHADER_EFFECT,
       PAN_GESTURE,
@@ -136,7 +142,7 @@ public:
   void SetJavascriptObject( v8::Isolate* isolate, v8::Local<v8::Object>& object );
 
   /**
-   * @return true if the object is of a certain wrapped type (e.g. ImageActor )
+   * @return true if the object is of a certain wrapped type (e.g. Animation )
    */
   static bool IsWrappedType( v8::Isolate* isolate, const v8::Local<v8::Object>& object,  BaseWrappedObject::Type type);
 

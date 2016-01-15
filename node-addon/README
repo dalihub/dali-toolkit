@@ -1,0 +1,23 @@
+Building dali node addon for GBS
+
+Ensure node-devel (0.12.4) rpm is install into gbs. The addon expects /usr/lib/node/node.h to exists
+in the gbs environment
+
+sudo gbs  build -A armv7l --include-all --ccache --keep-packs --spec dali-addon.spec
+
+Building for Ubuntu desktop:
+
+2 options:
+
+option 1 (easy):  in node-addon folder type
+
+$ node-gyp build
+
+option 2 (harder)
+Ensure node-js source has been downloaded and built from source.
+It doesn't have to be installed anywhere (make sure node executable is in your PATH).
+
+In node-addon/build/tizen direction, run cmake, with the source directory of node
+
+cmake -DDesktopNodePath:String=/home/my-user/Downloads/node-v0.12.4 .
+make

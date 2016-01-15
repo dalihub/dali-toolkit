@@ -41,8 +41,8 @@ namespace
 
 // Signals
 
-const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "key-input-focus-changed";
-const char* const SIGNAL_UNHANDLED_KEY_EVENT =     "unhandled-key-event";
+const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "keyInputFocusChanged";
+const char* const SIGNAL_UNHANDLED_KEY_EVENT =     "unhandledKeyEvent";
 
 }
 

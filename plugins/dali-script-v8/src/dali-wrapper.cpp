@@ -30,7 +30,12 @@
 #include <animation/path-wrapper.h>
 #include <animation/animation-wrapper.h>
 #include <events/pan-gesture-detector-wrapper.h>
-#include <shader-effects/shader-effect-wrapper.h>
+#include <object/property-buffer-wrapper.h>
+#include <rendering/geometry-wrapper.h>
+#include <rendering/material-wrapper.h>
+#include <rendering/renderer-wrapper.h>
+#include <rendering/shader-wrapper.h>
+#include <rendering/sampler-wrapper.h>
 #include <shared/object-template-helper.h>
 #include <constants/constants-wrapper.h>
 #include <toolkit/builder/builder-wrapper.h>
@@ -63,16 +68,19 @@ const ApiFunction ConstructorFunctionTable[]=
     { "PathConstrainer",    PathConstrainerWrapper::NewPathConstrainer},
     { "LinearConstrainer",  LinearConstrainerWrapper::NewLinearConstrainer},
     { "Actor",              ActorWrapper::NewActor },
-    { "ImageActor",         ActorWrapper::NewActor },
     { "CameraActor",        ActorWrapper::NewActor },
     { "Layer",              ActorWrapper::NewActor },
     { "Control",            ActorWrapper::NewControl },
     { "ResourceImage",      ImageWrapper::NewImage },
     { "BufferImage",        ImageWrapper::NewImage },
-    { "NinePatchImage",     ImageWrapper::NewImage },
     { "FrameBufferImage",   ImageWrapper::NewImage },
     { "Animation",          AnimationWrapper::NewAnimation},
-    { "ShaderEffect",       ShaderEffectWrapper::NewShaderEffect},
+    { "Shader",             ShaderWrapper::NewShader},
+    { "Sampler",            SamplerWrapper::NewSampler},
+    { "Material",           MaterialWrapper::NewMaterial},
+    { "Geometry",           GeometryWrapper::NewGeometry},
+    { "Renderer",           RendererWrapper::NewRenderer},
+    { "PropertyBuffer",     PropertyBufferWrapper::NewPropertyBuffer},
     { "Builder",            BuilderWrapper::NewBuilder},
     { "PanGestureDetector", PanGestureDetectorWrapper::NewPanGestureDetector},
 

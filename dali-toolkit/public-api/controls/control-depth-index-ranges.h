@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONTROL_DEPTH_INDEX_RANGES_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -28,12 +30,16 @@ namespace Toolkit
  * @{
  */
 
-enum ControlDepthIndexRanges
+/**
+ * @deprecated DALi 1.1.16
+ *
+ * @brief These depth indices should not be used.
+ */
+enum DepthIndexRanges
 {
-    BACKGROUND_DEPTH_INDEX    = -Dali::Layer::TREE_DEPTH_MULTIPLIER / 10,
-    CONTENT_DEPTH_INDEX       = 0,
-    TEXT_DEPTH_INDEX          = Dali::Layer::TREE_DEPTH_MULTIPLIER / 100,
-    DECORATION_DEPTH_INDEX    = Dali::Layer::TREE_DEPTH_MULTIPLIER / 10
+    BACKGROUND_DEPTH_INDEX    = static_cast<int>( -Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f ), ///< @deprecated DALi 1.1.16
+    CONTENT_DEPTH_INDEX       = 0,                                                              ///< @deprecated DALi 1.1.16
+    DECORATION_DEPTH_INDEX    = static_cast<int>( Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f )   ///< @deprecated DALi 1.1.16
 };
 
 /**
@@ -42,6 +48,5 @@ enum ControlDepthIndexRanges
 }
 
 }
-
 
 #endif

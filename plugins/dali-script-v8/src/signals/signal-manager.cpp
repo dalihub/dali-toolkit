@@ -30,6 +30,7 @@
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/pan-gesture.h>
+#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <v8-utils.h>
@@ -55,22 +56,22 @@ namespace // un-named namespace
 {
 const char* const SIGNAL_TOUCHED = "touched";
 const char* const SIGNAL_HOVERED = "hovered";
-const char* const SIGNAL_WHEEL_EVENT = "wheel-event";
-const char* const SIGNAL_ON_STAGE = "on-stage";
-const char* const SIGNAL_OFF_STAGE = "off-stage";
+const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
+const char* const SIGNAL_ON_STAGE = "onStage";
+const char* const SIGNAL_OFF_STAGE = "offStage";
 const char* const ANIMATION_SIGNAL_FINISHED = "finished";
-const char* const SIGNAL_PAN_DETECTED = "pan-detected";
+const char* const SIGNAL_PAN_DETECTED = "panDetected";
 
-const char* const STAGE_SIGNAL_KEY_EVENT = "key-event";
-const char* const STAGE_SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
+const char* const STAGE_SIGNAL_KEY_EVENT = "keyEvent";
+const char* const STAGE_SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
 const char* const STAGE_SIGNAL_TOUCHED = "touched";
-const char* const SIGNAL_IMAGE_LOADING_FINISHED = "image-loading-finished";
+const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
 const char* const SIGNAL_IMAGE_UPLOADED = "uploaded";
 
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_PRE_FOCUS_CHANGE = "keyboard-pre-focus-change";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_CHANGED = "keyboard-focus-changed";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_GROUP_CHANGED = "keyboard-focus-group-changed";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ENTER_KEY = "keyboard-focused-actor-enter-key";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_PRE_FOCUS_CHANGE = "keyboardPreFocusChange";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_CHANGED = "keyboardFocusChanged";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_GROUP_CHANGED = "keyboardFocusGroupChanged";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ENTER_KEY = "keyboardFocusedActorEnterKey";
 const unsigned int MAX_SIGNAL_NAME_LENGTH = 64;
 
 } // un-named name space
@@ -179,8 +180,9 @@ class ActorCallback :  public BaseCallBack
 {
 public:
 
-  ActorCallback(v8::Isolate* isolate,  const v8::Local<v8::Function>& callback ,const std::string& signalName )
-  : BaseCallBack( isolate, callback, signalName )
+  ActorCallback(v8::Isolate* isolate,  const v8::Local<v8::Function>& callback ,const std::string& signalName, Actor actor )
+  : BaseCallBack( isolate, callback, signalName ),
+    mActor(actor)
   {
   }
   bool OnTouch( Actor actor, const TouchEvent& event)
@@ -231,8 +233,22 @@ public:
     CallJavaScript( returnValue, arguments );
   }
 
-private:
+  WeakHandle< Actor > mActor;
 
+};
+
+struct ActorGenericCallbackFunctor
+{
+  ActorGenericCallbackFunctor(ActorCallback& callback) : callback(callback) { }
+  void operator()()
+  {
+    std::vector< Dali::Any > arguments;
+    Dali::Any returnValue;          //no return
+    arguments.push_back(callback.mActor.GetHandle()); //pass the actor handle as the parameter
+    callback.CallJavaScript( returnValue, arguments );
+  }
+
+  ActorCallback& callback;
 };
 
 
@@ -380,7 +396,7 @@ void ActorConnection( v8::Isolate* isolate,
 {
   bool connected(true);
 
-  ActorCallback* callback =new ActorCallback( isolate, javaScriptCallback, signalName );
+  ActorCallback* callback =new ActorCallback( isolate, javaScriptCallback, signalName, actor );
 
   if( strcmp( signalName.c_str(), SIGNAL_TOUCHED ) == 0 )
   {
@@ -404,7 +420,7 @@ void ActorConnection( v8::Isolate* isolate,
   }
   else
   {
-    connected = false;
+    connected = actor.ConnectSignal( callback, signalName, ActorGenericCallbackFunctor(*callback) );
   }
 
   if( connected )
@@ -414,6 +430,7 @@ void ActorConnection( v8::Isolate* isolate,
   else
   {
     delete callback;
+    DALI_SCRIPT_EXCEPTION( isolate, "the signal is not available in this object.");
   }
 }
 
@@ -619,47 +636,47 @@ void SignalManager::SignalConnect( const v8::FunctionCallbackInfo< v8::Value >& 
   // see if we're connecting to an Actor
   switch( baseObject->GetType() )
   {
-  case BaseWrappedObject::ACTOR:
-  {
-    ActorWrapper* actorWrapper = static_cast< ActorWrapper*>( baseObject );
-    ActorConnection( isolate, func, actorWrapper, signal,  actorWrapper->GetActor() );
-    break;
-  }
-  case BaseWrappedObject::ANIMATION:
-  {
-    AnimationWrapper* animWrapper = static_cast< AnimationWrapper*>( baseObject );
-    AnimationConnection( isolate, func, animWrapper, signal, animWrapper->GetAnimation() );
-    break;
-  }
-  case BaseWrappedObject::IMAGE:
-  {
-    ImageWrapper* imageWrapper = static_cast< ImageWrapper*>( baseObject );
-    ImageConnection( isolate, func, imageWrapper, signal, imageWrapper->GetImage() );
-    break;
-  }
-  case BaseWrappedObject::STAGE:
-  {
-    StageWrapper* stageWrapper = static_cast< StageWrapper*>( baseObject );
-    StageConnection( isolate, func, stageWrapper, signal, stageWrapper->GetStage() );
-    break;
-  }
-  case BaseWrappedObject::KEYBOARD_FOCUS_MANAGER:
-  {
-    KeyboardFocusManagerWrapper* keyboardFocusWrapper = static_cast< KeyboardFocusManagerWrapper*>( baseObject );
-    KeyboardFocusManagerConnection( isolate, func, keyboardFocusWrapper, signal, keyboardFocusWrapper->GetKeyboardFocusManager() );
-    break;
-  }
-  case BaseWrappedObject::PAN_GESTURE_DETECTOR:
-  {
-    PanGestureDetectorWrapper* panGestureDetectorWrapper = static_cast< PanGestureDetectorWrapper*>( baseObject );
-    PanGestureDetectorConnection( isolate, func, panGestureDetectorWrapper, signal, panGestureDetectorWrapper->GetPanGestureDetector() );
-    break;
-  }
-  default:
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "object does not support connections");
-    break;
-  }
+    case BaseWrappedObject::ACTOR:
+    {
+      ActorWrapper* actorWrapper = static_cast< ActorWrapper*>( baseObject );
+      ActorConnection( isolate, func, actorWrapper, signal,  actorWrapper->GetActor() );
+      break;
+    }
+    case BaseWrappedObject::ANIMATION:
+    {
+      AnimationWrapper* animWrapper = static_cast< AnimationWrapper*>( baseObject );
+      AnimationConnection( isolate, func, animWrapper, signal, animWrapper->GetAnimation() );
+      break;
+    }
+    case BaseWrappedObject::IMAGE:
+    {
+      ImageWrapper* imageWrapper = static_cast< ImageWrapper*>( baseObject );
+      ImageConnection( isolate, func, imageWrapper, signal, imageWrapper->GetImage() );
+      break;
+    }
+    case BaseWrappedObject::STAGE:
+    {
+      StageWrapper* stageWrapper = static_cast< StageWrapper*>( baseObject );
+      StageConnection( isolate, func, stageWrapper, signal, stageWrapper->GetStage() );
+      break;
+    }
+    case BaseWrappedObject::KEYBOARD_FOCUS_MANAGER:
+    {
+      KeyboardFocusManagerWrapper* keyboardFocusWrapper = static_cast< KeyboardFocusManagerWrapper*>( baseObject );
+      KeyboardFocusManagerConnection( isolate, func, keyboardFocusWrapper, signal, keyboardFocusWrapper->GetKeyboardFocusManager() );
+      break;
+    }
+    case BaseWrappedObject::PAN_GESTURE_DETECTOR:
+    {
+      PanGestureDetectorWrapper* panGestureDetectorWrapper = static_cast< PanGestureDetectorWrapper*>( baseObject );
+      PanGestureDetectorConnection( isolate, func, panGestureDetectorWrapper, signal, panGestureDetectorWrapper->GetPanGestureDetector() );
+      break;
+    }
+    default:
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "object does not support connections");
+      break;
+    }
   }
 
 }

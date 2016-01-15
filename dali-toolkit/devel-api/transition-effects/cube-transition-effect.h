@@ -18,9 +18,8 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/actors/image-actor.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
 {
@@ -39,7 +38,7 @@ class CubeTransitionEffect;
 } // namespace Internal
 
 /**
- * CubeTransitionEffect is a base class of custom transition effect on Image actors
+ * CubeTransitionEffect is a base class of custom transition effect on Images
  * The two images are partitioned into tiles and serves as two perpendicular faces of cubes
  * By rotating these cubes to transit from one image to another
  *
@@ -49,7 +48,7 @@ class CubeTransitionEffect;
  *
  * //create a new CubeTransitionEffect
  * //use the New funtion of subclass ( CubeTransitionWaveEffect or CubeTransitionCrossEffect )
- * CubeTransitionEffect cubeEffect = CubeTransitionWaveEffect::New(numRows, numColumns, viewAreaSize);
+ * CubeTransitionEffect cubeEffect = CubeTransitionWaveEffect::New(numRows, numColumns);
  *
  * //set the duration of transition animation
  * cubeEffect.SetTransitionDuration( animationDuration );
@@ -58,14 +57,14 @@ class CubeTransitionEffect;
  * cubeEffect.SetCubeDisplacement( cubeDisplacement  );
  *
  * // Add to stage
- * stage.Add( cubeEffect.GetRoot() );
+ * stage.Add( cubeEffect );
  *
  * // Set the current image,
- * // only need to set at beginning or when the current image was transited to with no effect or other effect
- * cubeEffect.SetCurrentImage( firstImageActor );
+ * // only need to set at beginning or when the current image was transitioned to with no effect or other effect
+ * cubeEffect.SetCurrentImage( firstImage );
  *
  * // Set target image, paired with startTransition. These two steps would be repeated as needed
- * cubeEffect.SetTargetimage( secondImageActor );
+ * cubeEffect.SetTargetimage( secondImage );
  * // Activate the effect
  * //   no param / param ture: default horizontally left panGesture
  * //   or param false:  default horizontally right panGesture
@@ -75,11 +74,11 @@ class CubeTransitionEffect;
  * @endcode
  *
  * Signals
- * | %Signal Name         | Method                           |
- * |----------------------|----------------------------------|
- * | transition-completed | @ref TransitionCompletedSignal() |
+ * | %Signal Name        | Method                           |
+ * |---------------------|----------------------------------|
+ * | transitionCompleted | @ref TransitionCompletedSignal() |
  */
-class DALI_IMPORT_API CubeTransitionEffect : public BaseHandle
+class DALI_IMPORT_API CubeTransitionEffect : public Control
 {
 public:
 
@@ -124,40 +123,34 @@ public:
   void SetCubeDisplacement( float displacement );
 
   /**
-   * Getet the displacement of bouncing animation during cube's rotation
+   * Get the displacement of bouncing animation during cube's rotation
    * @return displacement The displacement of bouncing animation
    */
   float GetCubeDisplacement() const;
 
   /**
-   * Return the transition effect root actor, should then be added to stage
-   * @return The transition effect root actor
-   */
-  Actor GetRoot();
-
-  /**
    * Return the transition status
    * @return True if the transition is under processing; false if finished
    */
-  bool IsTransiting();
+  bool IsTransitioning();
 
   /**
-   * Set the current image to transite from
-   * if using this same effect continuely, only need to set once
-   * @param[in] imageActor The current imageActor
+   * Set the current image to transition from
+   * if using this same effect continually, only need to set once
+   * @param[in] image The current image
    */
-  void SetCurrentImage(ImageActor imageActor);
+  void SetCurrentImage(Image image);
 
   /**
    * Set the target image to transit to
-   * @param[in] imageActor The new imageActor showing on stage
+   * @param[in] image The new Image showing on stage
    */
-  void SetTargetImage(ImageActor imageActor);
+  void SetTargetImage(Image image);
 
   /**
    * Activate the transition animation with horizontally left/right panGesture
    * @pre target image is set
-   * @param[in] toNextImage Horizontally left panGesture if ture, horizontally right if false
+   * @param[in] toNextImage Horizontally left panGesture if true, horizontally right if false
    */
   void StartTransition( bool toNextImage = true );
 
@@ -183,7 +176,7 @@ public:
 
   /**
    * Inactivate the transition animation if it is running.
-   * Also set the rotation and position of cubes, colors of tile to the same as the final state when the animation if finished completely
+   * Also set the rotation and position of cubes, colors of tile to the same as the start state when the animation if finished completely
    * It does nothing if the animation is not running.
    */
   void StopTransition();
@@ -191,7 +184,7 @@ public:
 public: //Signal
 
   //Transition animation completed signal
-  typedef Signal< void ( CubeTransitionEffect, ImageActor ) > TransitionCompletedSignalType;
+  typedef Signal< void ( CubeTransitionEffect, Image ) > TransitionCompletedSignalType;
 
   /**
    * Signal emitted when the transition has completed animation
@@ -205,7 +198,19 @@ public: //Signal
 
 public: // Not intended for developer use
 
-  explicit DALI_INTERNAL CubeTransitionEffect( Internal::CubeTransitionEffect* impl );
+  /**
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
+   * @param[in]  implementation  The Control implementation.
+   */
+  DALI_INTERNAL CubeTransitionEffect( Internal::CubeTransitionEffect& implementation );
+
+  /**
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
+   * @param[in]  internal  A pointer to the internal CustomActor.
+   */
+  DALI_INTERNAL CubeTransitionEffect( Dali::Internal::CustomActor* internal );
 
 }; //class CubeTransitionEffect
 

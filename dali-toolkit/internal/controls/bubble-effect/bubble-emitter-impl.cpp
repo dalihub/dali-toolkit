@@ -32,16 +32,19 @@ namespace
 {
 struct Vertex
 {
-  float index;
-  Dali::Vector2 position;
-  Dali::Vector2 textureCoord;
-
   Vertex()
-  {}
+  : index( 0.0f ), position(), textureCoord()
+  {
+  }
 
   Vertex( float index, const Dali::Vector2& position, const Dali::Vector2& textureCoord )
   : index( index ), position( position ), textureCoord( textureCoord )
-  {}
+  {
+  }
+
+  float index;
+  Dali::Vector2 position;
+  Dali::Vector2 textureCoord;
 };
 
 /**

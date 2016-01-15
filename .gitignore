@@ -4,6 +4,8 @@
 .directory
 Makefile.in
 Makefile
+CMakeCache.txt
+dali.node
 dali.doxy
 *~
 *.o

@@ -23,17 +23,16 @@ myPath.generateControlPoints( 0.25 );
 function begin()
 {
   
-  var image = new dali.ResourceImage( {url:"gallery-small-45.jpg"} );
+  var imageView = new dali.Control("ImageView");
+  imageView.image = "gallery-small-45.jpg";
   
-  var actor = new dali.ImageActor(image);
-  
-  actor.position = [100,100,0];
-  dali.stage.add( actor );
+  imageView.position = [100,100,0];
+  dali.stage.add( imageView );
   
   var animation = new dali.Animation(2.0);
   var animOptions = { alpha:"easeInOutSine", delay:0.5, duration:1.5 };
   var forward = new dali.Vector3(1,0,0);
-  animation.animate( actor, myPath, forward, animOptions );
+  animation.animate( imageView, myPath, forward, animOptions );
   
   animation.setLooping( true );
   animation.play();

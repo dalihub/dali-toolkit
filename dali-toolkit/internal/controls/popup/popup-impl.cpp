@@ -37,6 +37,7 @@
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
@@ -70,7 +71,7 @@ const Vector3      DEFAULT_TOAST_BOTTOM_PARENT_ORIGIN( 0.5f, 0.94f, 0.5f );     
 const Vector3      DEFAULT_TOAST_WIDTH_OF_STAGE_RATIO( 0.75f, 0.75f, 0.75f );               ///< Amount of the stage's width that the toast popup will take up.
 
 /**
- * Creation function for named type "popup-toast".
+ * Creation function for named type "popupToast".
  * @return Handle to the new toast popup object.
  */
 BaseHandle CreateToast()
@@ -111,32 +112,32 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Popup, Toolkit::Control, Create )
 DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "title",                             MAP,              TITLE                  )
 DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "content",                           MAP,              CONTENT                )
 DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "footer",                            MAP,              FOOTER                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "display-state",                     STRING,           DISPLAY_STATE          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "touch-transparent",                 BOOLEAN,          TOUCH_TRANSPARENT      )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "displayState",                      STRING,           DISPLAY_STATE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "touchTransparent",                  BOOLEAN,          TOUCH_TRANSPARENT      )
 
 // Contextual related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-visibility",                   BOOLEAN,          TAIL_VISIBILITY        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-position",                     VECTOR3,          TAIL_POSITION          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "contextual-mode",                   STRING,           CONTEXTUAL_MODE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailVisibility",                    BOOLEAN,          TAIL_VISIBILITY        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailPosition",                      VECTOR3,          TAIL_POSITION          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "contextualMode",                    STRING,           CONTEXTUAL_MODE        )
 
 // Animation related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animation-duration",                FLOAT,            ANIMATION_DURATION     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animation-mode",                    STRING,           ANIMATION_MODE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "entry-animation",                   MAP,              ENTRY_ANIMATION        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "exit-animation",                    MAP,              EXIT_ANIMATION         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "auto-hide-delay",                   INTEGER,          AUTO_HIDE_DELAY        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationDuration",                 FLOAT,            ANIMATION_DURATION     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationMode",                     STRING,           ANIMATION_MODE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "entryAnimation",                    MAP,              ENTRY_ANIMATION        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "exitAnimation",                     MAP,              EXIT_ANIMATION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "autoHideDelay",                     INTEGER,          AUTO_HIDE_DELAY        )
 
 // Style related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backing-enabled",                   BOOLEAN,          BACKING_ENABLED        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backing-color",                     VECTOR4,          BACKING_COLOR          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popup-background-image",            STRING,           POPUP_BACKGROUND_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-up-image",                     STRING,           TAIL_UP_IMAGE          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-down-image",                   STRING,           TAIL_DOWN_IMAGE        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-left-image",                   STRING,           TAIL_LEFT_IMAGE        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tail-right-image",                  STRING,           TAIL_RIGHT_IMAGE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingEnabled",                    BOOLEAN,          BACKING_ENABLED        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingColor",                      VECTOR4,          BACKING_COLOR          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popupBackgroundImage",              STRING,           POPUP_BACKGROUND_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailUpImage",                       STRING,           TAIL_UP_IMAGE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailDownImage",                     STRING,           TAIL_DOWN_IMAGE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailLeftImage",                     STRING,           TAIL_LEFT_IMAGE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailRightImage",                    STRING,           TAIL_RIGHT_IMAGE       )
 
 // Signals.
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "touched-outside",                                     SIGNAL_TOUCHED_OUTSIDE )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "touchedOutside",                                      SIGNAL_TOUCHED_OUTSIDE )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "showing",                                             SIGNAL_SHOWING         )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "shown",                                               SIGNAL_SHOWN           )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "hiding",                                              SIGNAL_HIDING          )
@@ -147,7 +148,7 @@ DALI_TYPE_REGISTRATION_END()
 // Named type registration.
 
 // Toast Popup: Non-modal popup that displays information at the bottom of the screen.
-TypeRegistration typeRegistrationToast( "popup-toast", typeid( Toolkit::Popup ), CreateToast );
+TypeRegistration typeRegistrationToast( "PopupToast",  typeid( Toolkit::Popup ), CreateToast );
 
 // Enumeration to / from string conversion tables
 
@@ -221,21 +222,39 @@ Dali::Toolkit::Popup Popup::New()
 
 Popup::Popup()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
-  // Main variables:
+  mTouchedOutsideSignal(),
+  mShowingSignal(),
+  mShownSignal(),
+  mHidingSignal(),
+  mHiddenSignal(),
+  mLayer(),
+  mPopupLayout(),
+  mBacking(),
+  mPreviousFocusedActor(),
+  mTailImage(),
+  mPopupContainer(),
+  mAnimation(),
   mAlterAddedChild( false ),
   mLayoutDirty( true ),
+  mAutoHideTimer(),
   mTouchTransparent( false ),
-
-  // Property variables:
+  mTitle(),
+  mContent(),
+  mFooter(),
   mDisplayState( Toolkit::Popup::HIDDEN ), // Hidden until shown with SetDisplayState()
   mTailVisible( false ),
   mTailPosition( DEFAULT_TAIL_POSITION ),
   mContextualMode( Toolkit::Popup::NON_CONTEXTUAL ),
   mAnimationDuration( DEFAULT_POPUP_ANIMATION_DURATION ),
   mAnimationMode( Toolkit::Popup::FADE ),
+  mEntryAnimationData(),
+  mExitAnimationData(),
   mAutoHideDelay( 0 ),
   mBackingEnabled( true ),
   mBackingColor( DEFAULT_BACKING_COLOR ),
+  mPopupBackgroundImage(),
+  mBackgroundOuterBorder(),
+  mMargin(),
   mTailUpImage( DEFAULT_TAIL_UP_IMAGE_PATH ),
   mTailDownImage( DEFAULT_TAIL_DOWN_IMAGE_PATH ),
   mTailLeftImage( DEFAULT_TAIL_LEFT_IMAGE_PATH ),
@@ -259,7 +278,7 @@ void Popup::OnInitialize()
 
   // Create a new layer so all Popup components can appear above all other actors.
   mLayer = Layer::New();
-  mLayer.SetName( "popup-layer" );
+  mLayer.SetName( "popupLayer" );
 
   mLayer.SetParentOrigin( ParentOrigin::CENTER );
   mLayer.SetAnchorPoint( AnchorPoint::CENTER );
@@ -277,7 +296,7 @@ void Popup::OnInitialize()
   mLayer.Add( mBacking );
 
   mPopupContainer = Actor::New();
-  mPopupContainer.SetName( "popup-container" );
+  mPopupContainer.SetName( "popupContainer" );
   mPopupContainer.SetParentOrigin( ParentOrigin::CENTER );
   mPopupContainer.SetAnchorPoint( AnchorPoint::CENTER );
   mPopupContainer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
@@ -287,9 +306,9 @@ void Popup::OnInitialize()
   mPopupLayout = Toolkit::TableView::New( 3, 1 );
 
   // Adds the default background image.
-  SetPopupBackgroundImage( ImageActor::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
+  SetPopupBackgroundImage( Toolkit::ImageView::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
 
-  mPopupLayout.SetName( "popup-layout-table" );
+  mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
   mPopupLayout.SetAnchorPoint( AnchorPoint::CENTER );
 
@@ -307,8 +326,6 @@ void Popup::OnInitialize()
   // Any content after this point which is added to Self() will be re-parented to mContent.
   mAlterAddedChild = true;
 
-  // Make self keyboard focusable and a focus group.
-  self.SetKeyboardFocusable( true );
   SetAsKeyboardFocusGroup( true );
 }
 
@@ -557,7 +574,7 @@ void Popup::SetPopupBackgroundImage( Actor image )
 
   // Adds new background to the dialog.
   mPopupBackgroundImage = image;
-  mPopupBackgroundImage.SetName( "popup-background-image" );
+  mPopupBackgroundImage.SetName( "popupBackgroundImage" );
   mPopupBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
   mPopupBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
 
@@ -625,7 +642,7 @@ void Popup::SetContent( Actor content )
 
   if( mContent )
   {
-    mContent.SetName( "popup-content" );
+    mContent.SetName( "popupContent" );
 
     mPopupLayout.AddChild( mContent, Toolkit::TableView::CellPosition( 1, 0 ) );
   }
@@ -700,7 +717,6 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
 
     // Allow the popup to catch events.
     mPopupLayout.SetSensitive( true );
-    SetKeyInputFocus();
 
     // Handle the keyboard focus when popup is shown.
     Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
@@ -708,14 +724,30 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
     {
       mPreviousFocusedActor = keyboardFocusManager.GetCurrentFocusActor();
 
-      if( mContent && mContent.IsKeyboardFocusable() )
+      if( Self().IsKeyboardFocusable() )
       {
-        // If content is focusable, move the focus to content.
-        keyboardFocusManager.SetCurrentFocusActor( mContent );
-      }
-      else
-      {
-        DALI_LOG_WARNING( "There is no focusable in popup\n" );
+        // Setup the actgor to start focus from.
+        Actor focusActor;
+        if( mContent && mContent.IsKeyboardFocusable() )
+        {
+          // If the content is focusable, move the focus to the content.
+          focusActor = mContent;
+        }
+        else if( mFooter && mFooter.IsKeyboardFocusable() )
+        {
+          // If the footer is focusable, move the focus to the footer.
+          focusActor = mFooter;
+        }
+        else
+        {
+          DALI_LOG_WARNING( "There is no focusable in popup\n" );
+        }
+
+        if( focusActor )
+        {
+          SetKeyInputFocus();
+          keyboardFocusManager.SetCurrentFocusActor( focusActor );
+        }
       }
     }
   }
@@ -831,8 +863,8 @@ void Popup::LayoutTail()
   {
     // Adds the tail actor.
     Image tail = ResourceImage::New( image );
-    mTailImage = ImageActor::New( tail );
-    mTailImage.SetName( "tail-image" );
+    mTailImage = Toolkit::ImageView::New( tail );
+    mTailImage.SetName( "tailImage" );
     const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
     mTailImage.SetParentOrigin( position );
     mTailImage.SetAnchorPoint( anchorPoint );
@@ -856,7 +888,7 @@ Toolkit::Control Popup::CreateBacking()
 {
   Toolkit::Control backing = Control::New();
   backing.SetBackgroundColor( Vector4( mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f ) );
-  backing.SetName( "popup-backing" );
+  backing.SetName( "popupBacking" );
 
   // Must always be positioned top-left of stage, regardless of parent.
   backing.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
@@ -1209,7 +1241,7 @@ void Popup::SetProperty( BaseObject* object, Property::Index propertyIndex, cons
           Image image = ResourceImage::New( valueString );
           if( image )
           {
-            ImageActor actor = ImageActor::New( image );
+            Toolkit::ImageView actor = Toolkit::ImageView::New( image );
             popupImpl.SetPopupBackgroundImage( actor );
           }
         }
@@ -1713,120 +1745,152 @@ bool Popup::OnKeyEvent( const KeyEvent& event )
   return consumed;
 }
 
+void Popup::AddFocusableChildrenRecursive( Actor parent, std::vector< Actor >& focusableActors )
+{
+  if( parent )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( parent );
+    bool layoutControl = control && GetImplementation( control ).IsKeyboardNavigationSupported();
+
+    if( parent.IsKeyboardFocusable() || layoutControl )
+    {
+      focusableActors.push_back( parent );
+
+      if( !layoutControl )
+      {
+        for( unsigned int i = 0, numberChildren = parent.GetChildCount(); i < numberChildren; ++i )
+        {
+          Actor child( parent.GetChildAt( i ) );
+          AddFocusableChildrenRecursive( child, focusableActors );
+        }
+      }
+    }
+  }
+}
+
+void Popup::AddFocusableChildren( Actor parent, std::vector< Actor >& focusableActors )
+{
+  if( parent )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( parent );
+    if( !GetImplementation( control ).IsKeyboardNavigationSupported() )
+    {
+      for( unsigned int i = 0, numberChildren = parent.GetChildCount(); i < numberChildren; ++i )
+      {
+        Actor child( parent.GetChildAt( i ) );
+        AddFocusableChildrenRecursive( child, focusableActors );
+      }
+    }
+    else
+    {
+      focusableActors.push_back( parent );
+    }
+  }
+}
+
 Actor Popup::GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled )
 {
+  std::string currentStr;
+  if( currentFocusedActor )
+  {
+    currentStr = currentFocusedActor.GetName();
+  }
+
   Actor nextFocusableActor( currentFocusedActor );
+  Actor currentFocusGroup;
+  if( currentFocusedActor )
+  {
+    currentFocusGroup = KeyboardFocusManager::Get().GetFocusGroup( currentFocusedActor );
+  }
 
   // TODO: Needs to be optimised
-  if( !currentFocusedActor || ( currentFocusedActor && KeyboardFocusManager::Get().GetFocusGroup( currentFocusedActor ) != Self() ) )
+  // The following statement checks that if we have a current focused actor, then the current focus group is not the popup content or footer.
+  // This is to detect if the focus is currently outside the popup, and if so, move it inside.
+  if( !currentFocusedActor ||
+    ( currentFocusedActor && ( ( !mContent || ( currentFocusGroup != mContent ) ) && ( !mFooter || ( currentFocusGroup != mFooter ) ) ) ) )
   {
-    // The current focused actor is not within popup
+    // The current focused actor is not within popup.
     if( mContent && mContent.IsKeyboardFocusable() )
     {
-      // If content is focusable, move the focus to content
+      // If the content is focusable, move the focus to the content.
       nextFocusableActor = mContent;
+    }
+    else if( mFooter && mFooter.IsKeyboardFocusable() )
+    {
+      // If the footer is focusable, move the focus to the footer.
+      nextFocusableActor = mFooter;
     }
   }
   else
   {
     // Rebuild the focus chain because controls or content can be added or removed dynamically
     std::vector< Actor > focusableActors;
-    if( mContent && mContent.IsKeyboardFocusable() )
+
+    AddFocusableChildren( mContent, focusableActors );
+    AddFocusableChildren( mFooter, focusableActors );
+
+    std::vector< Actor >::iterator endIterator = focusableActors.end();
+    std::vector< Actor >::iterator currentIterator = focusableActors.begin();
+    for( std::vector< Actor >::iterator iterator = focusableActors.begin(); iterator != endIterator; ++iterator )
     {
-      focusableActors.push_back( mContent );
+      if( currentFocusedActor == *iterator )
+      {
+        currentIterator = iterator;
+      }
     }
 
-    for( std::vector< Actor >::iterator iter = focusableActors.begin(), end = focusableActors.end(); iter != end; ++iter )
+    if( currentIterator != endIterator )
     {
-      if( currentFocusedActor == *iter )
+      switch( direction )
       {
-        switch( direction )
+        case Toolkit::Control::KeyboardFocus::LEFT:
         {
-          case Toolkit::Control::KeyboardFocus::LEFT:
+          if( currentIterator == focusableActors.begin() )
           {
-            if( iter == focusableActors.begin() )
-            {
-              nextFocusableActor = *( focusableActors.end() - 1 );
-            }
-            else
-            {
-              nextFocusableActor = *( iter - 1 );
-            }
-            break;
+            nextFocusableActor = *( endIterator - 1 );
           }
-          case Toolkit::Control::KeyboardFocus::RIGHT:
+          else
           {
-            if( iter == focusableActors.end() - 1 )
-            {
-              nextFocusableActor = *( focusableActors.begin() );
-            }
-            else
-            {
-              nextFocusableActor = *( iter + 1 );
-            }
-            break;
+            nextFocusableActor = *( currentIterator - 1 );
           }
-
-          case Toolkit::Control::KeyboardFocus::UP:
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::RIGHT:
+        {
+          if( currentIterator == endIterator - 1 )
           {
-            if( mContent && *iter == mContent )
-            {
-              nextFocusableActor = *( focusableActors.end() - 1 );
-            }
-            else
-            {
-              if( mContent && mContent.IsKeyboardFocusable() )
-              {
-                nextFocusableActor = mContent;
-              }
-              else
-              {
-                if ( iter == focusableActors.begin() )
-                {
-                  nextFocusableActor = *( focusableActors.end() - 1 );
-                }
-                else
-                {
-                  nextFocusableActor = *( iter - 1 );
-                }
-              }
-            }
-            break;
+            nextFocusableActor = *( focusableActors.begin() );
           }
-
-          case Toolkit::Control::KeyboardFocus::DOWN:
+          else
           {
-            if( mContent && mContent.IsKeyboardFocusable() )
-            {
-              nextFocusableActor = mContent;
-            }
-            else
-            {
-              if( iter == focusableActors.end() - 1 )
-              {
-                nextFocusableActor = *( focusableActors.begin() );
-              }
-              else
-              {
-                nextFocusableActor = *( iter + 1 );
-              }
-            }
-            break;
+            nextFocusableActor = *( currentIterator + 1 );
           }
+          break;
         }
 
-        if( !nextFocusableActor )
+        case Toolkit::Control::KeyboardFocus::UP:
         {
-          DALI_LOG_WARNING( "Can not decide next focusable actor\n" );
+          nextFocusableActor = *(  focusableActors.begin() );
+          break;
         }
 
-        break;
+        case Toolkit::Control::KeyboardFocus::DOWN:
+        {
+          nextFocusableActor = *( endIterator - 1 );
+          break;
+        }
+      }
+
+      if( !nextFocusableActor )
+      {
+        DALI_LOG_WARNING( "Can not decide next focusable actor\n" );
       }
     }
   }
 
   return nextFocusableActor;
 }
+
 
 } // namespace Internal
 

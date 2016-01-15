@@ -30,9 +30,11 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/common/loading-state.h>
-
+#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/geometry.h>
 
 namespace Dali
 {
@@ -157,15 +159,9 @@ const IntegerPair EnumTable[] =
     { "DRAW_MODE_OVERLAY_2D",                               DrawMode::OVERLAY_2D },
     { "DRAW_MODE_STENCIL",                                  DrawMode::STENCIL    },
 
-    { "IMAGE_LOAD_POLICY_IMMEDIATE",                        ResourceImage::IMMEDIATE },
-    { "IMAGE_LOAD_POLICY_ON_DEMAND",                        ResourceImage::ON_DEMAND  },
-
-    { "IMAGE_RELEASE_POLICY_UNUSED",                        Image::UNUSED },
-    { "IMAGE_RELEASE_POLICY_NEVER",                         Image::NEVER  },
-
     { "RESOURCE_LOADING",                                   Dali::ResourceLoading },
     { "RESOURCE_LOADING_SUCCEEDED",                         Dali::ResourceLoadingSucceeded  },
-    { "RESOUCE_LOADING_FAILED",                             Dali::ResourceLoadingFailed  },
+    { "RESOURCE_LOADING_FAILED",                            Dali::ResourceLoadingFailed  },
 
     { "FITTING_MODE_SHRINK_TO_FIT",     FittingMode::SHRINK_TO_FIT },
     { "FITTING_MODE_SCALE_TO_FILL",     FittingMode::SCALE_TO_FILL },
@@ -209,10 +205,44 @@ const IntegerPair EnumTable[] =
     { "CAMERA_PERSPECTIVE_PROJECTION" ,     Camera::PERSPECTIVE_PROJECTION      },
     { "CAMERA_ORTHOGRAPHIC_PROJECTION",     Camera::ORTHOGRAPHIC_PROJECTION     },
 
-    {"IMAGE_ACTOR_STYLE_QUAD",                ImageActor::STYLE_QUAD},
-    {"IMAGE_ACTOR_STYLE_NINE_PATCH",          ImageActor::STYLE_NINE_PATCH},
-    {"IMAGE_ACTOR_STYLE_NINE_PATCH_NO_CENTER",ImageActor::STYLE_NINE_PATCH_NO_CENTER }
+    { "FILTER_MODE_NONE",                     FilterMode::NONE           },
+    { "FILTER_MODE_DEFAULT",                  FilterMode::DEFAULT        },
+    { "FILTER_MODE_NEAREST",                  FilterMode::NEAREST        },
+    { "FILTER_MODE_LINEAR",                   FilterMode::LINEAR         },
 
+    { "WRAP_MODE_DEFAULT",                    WrapMode::DEFAULT          },
+    { "WRAP_MODE_CLAMP_TO_EDGE",              WrapMode::CLAMP_TO_EDGE    },
+    { "WRAP_MODE_REPEAT",                     WrapMode::REPEAT           },
+    { "WRAP_MODE_MIRRORED_REPEAT",            WrapMode::MIRRORED_REPEAT  },
+
+    { "MATERIAL_NONE",                        Material::NONE                      },
+    { "MATERIAL_CULL_BACK",                   Material::CULL_BACK                 },
+    { "MATERIAL_CULL_FRONT",                  Material::CULL_FRONT                },
+    { "MATERIAL_CULL_BACK_AND_FRONT",         Material::CULL_BACK_AND_FRONT       },
+
+    { "GEOMETRY_POINTS",                      Geometry::POINTS          },
+    { "GEOMETRY_LINES",                       Geometry::LINES           },
+    { "GEOMETRY_LINE_LOOP",                   Geometry::LINE_LOOP       },
+    { "GEOMETRY_LINE_STRIP",                  Geometry::LINE_STRIP      },
+    { "GEOMETRY_TRIANGLES",                   Geometry::TRIANGLES       },
+    { "GEOMETRY_TRIANGLE_FAN",                Geometry::TRIANGLE_FAN    },
+    { "GEOMETRY_TRIANGLE_STRIP",              Geometry::TRIANGLE_STRIP  },
+
+    { "PROPERTY_NONE",                        Property::NONE           },
+    { "PROPERTY_BOOLEAN",                     Property::BOOLEAN        },
+    { "PROPERTY_FLOAT",                       Property::FLOAT          },
+    { "PROPERTY_INTEGER",                     Property::INTEGER        },
+    { "PROPERTY_VECTOR2",                     Property::VECTOR2        },
+    { "PROPERTY_VECTOR3",                     Property::VECTOR3        },
+    { "PROPERTY_VECTOR4",                     Property::VECTOR4        },
+    { "PROPERTY_MATRIX3",                     Property::MATRIX3        },
+    { "PROPERTY_MATRIX",                      Property::MATRIX         },
+    { "PROPERTY_RECTANGLE",                   Property::RECTANGLE      },
+    { "PROPERTY_ROTATION",                    Property::ROTATION       },
+    { "PROPERTY_STRING",                      Property::STRING         },
+    { "PROPERTY_ARRAY",                       Property::ARRAY          },
+    { "PROPERTY_MAP",                         Property::MAP            },
+    { "PROPERTY_INVALID_INDEX",               Property::INVALID_INDEX  },
 
 };
 const unsigned int EnumTableCount = sizeof(EnumTable)/sizeof(EnumTable[0]);

@@ -62,7 +62,7 @@ actor.connect( "touched", onPressed );
           "actor":"image",
           "property":"position",
           "value":[200,-100,0],
-          "alpha-function": "BOUNCE"
+          "alphaFunction": "BOUNCE"
         }
       ]
     }
@@ -72,8 +72,8 @@ actor.connect( "touched", onPressed );
     {
       "name":"image",
       "type":"Actor",
-      "anchor-point": "CENTER",
-      "parent-origin": "CENTER",
+      "anchorPoint": "CENTER",
+      "parentOrigin": "CENTER",
       "signals" :
       [
         { "name" : "touched", "action": "play", "animation": "move" }

@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 
 namespace
@@ -67,10 +68,20 @@ ControllerPtr Controller::New( ControlInterface& controlInterface )
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
 {
-  if( !mImpl->mEventData )
+  if( NULL == mImpl->mEventData )
   {
     mImpl->mEventData = new EventData( decorator );
   }
+}
+
+void Controller::SetMarkupProcessorEnabled( bool enable )
+{
+  mImpl->mMarkupProcessorEnabled = enable;
+}
+
+bool Controller::IsMarkupProcessorEnabled() const
+{
+  return mImpl->mMarkupProcessorEnabled;
 }
 
 void Controller::SetText( const std::string& text )
@@ -80,17 +91,21 @@ void Controller::SetText( const std::string& text )
   // Reset keyboard as text changed
   mImpl->ResetImfManager();
 
-  // Remove the previously set text
+  // Remove the previously set text and style.
   ResetText();
+
+  // Remove the style.
+  ClearStyleData();
 
   CharacterIndex lastCursorIndex = 0u;
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     // If popup shown then hide it by switching to Editing state
     if( ( EventData::SELECTING == mImpl->mEventData->mState )          ||
         ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
-        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
@@ -98,20 +113,37 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
+    MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns );
+
+    Length textSize = 0u;
+    const uint8_t* utf8 = NULL;
+    if( mImpl->mMarkupProcessorEnabled )
+    {
+      ProcessMarkupString( text, markupProcessData );
+      textSize = markupProcessData.markupProcessedText.size();
+
+      // This is a bit horrible but std::string returns a (signed) char*
+      utf8 = reinterpret_cast<const uint8_t*>( markupProcessData.markupProcessedText.c_str() );
+    }
+    else
+    {
+      textSize = text.size();
+
+      // This is a bit horrible but std::string returns a (signed) char*
+      utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+    }
+
     //  Convert text into UTF-32
     Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-    utf32Characters.Resize( text.size() );
-
-    // This is a bit horrible but std::string returns a (signed) char*
-    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+    utf32Characters.Resize( textSize );
 
     // Transform a text array encoded in utf8 into an array encoded in utf32.
     // It returns the actual number of characters.
-    Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+    Length characterCount = Utf8ToUtf32( utf8, textSize, utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
 
-    DALI_ASSERT_DEBUG( text.size() >= characterCount && "Invalid UTF32 conversion length" );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, text.size(), mImpl->mLogicalModel->mText.Count() );
+    DALI_ASSERT_DEBUG( textSize >= characterCount && "Invalid UTF32 conversion length" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, textSize, mImpl->mLogicalModel->mText.Count() );
 
     // To reset the cursor position
     lastCursorIndex = characterCount;
@@ -138,7 +170,7 @@ void Controller::SetText( const std::string& text )
 
   mImpl->RequestRelayout();
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     // Cancel previously queued events
     mImpl->mEventData->mEventQueue.clear();
@@ -153,7 +185,7 @@ void Controller::SetText( const std::string& text )
 
 void Controller::GetText( std::string& text ) const
 {
-  if( ! mImpl->IsShowingPlaceholderText() )
+  if( !mImpl->IsShowingPlaceholderText() )
   {
     Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
 
@@ -170,7 +202,7 @@ void Controller::GetText( std::string& text ) const
 
 unsigned int Controller::GetLogicalCursorPosition() const
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     return mImpl->mEventData->mPrimaryCursorPosition;
   }
@@ -180,7 +212,7 @@ unsigned int Controller::GetLogicalCursorPosition() const
 
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     if( PLACEHOLDER_TYPE_INACTIVE == type )
     {
@@ -193,7 +225,7 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
 
     // Update placeholder if there is no text
     if( mImpl->IsShowingPlaceholderText() ||
-        0u == mImpl->mLogicalModel->mText.Count() )
+        ( 0u == mImpl->mLogicalModel->mText.Count() ) )
     {
       ShowPlaceholderText();
     }
@@ -202,7 +234,7 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
 
 void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) const
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     if( PLACEHOLDER_TYPE_INACTIVE == type )
     {
@@ -217,7 +249,7 @@ void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) c
 
 void Controller::SetMaximumNumberOfCharacters( int maxCharacters )
 {
-  if ( maxCharacters >= 0 )
+  if( maxCharacters >= 0 )
   {
     mImpl->mMaximumNumberOfCharacters = maxCharacters;
   }
@@ -230,7 +262,7 @@ int Controller::GetMaximumNumberOfCharacters()
 
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 {
-  if( !mImpl->mFontDefaults )
+  if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
@@ -250,7 +282,7 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 
 const std::string& Controller::GetDefaultFontFamily() const
 {
-  if( mImpl->mFontDefaults )
+  if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.family;
   }
@@ -260,7 +292,7 @@ const std::string& Controller::GetDefaultFontFamily() const
 
 void Controller::SetDefaultFontStyle( const std::string& style )
 {
-  if( !mImpl->mFontDefaults )
+  if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
@@ -270,7 +302,7 @@ void Controller::SetDefaultFontStyle( const std::string& style )
 
 const std::string& Controller::GetDefaultFontStyle() const
 {
-  if( mImpl->mFontDefaults )
+  if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontStyle;
   }
@@ -280,7 +312,7 @@ const std::string& Controller::GetDefaultFontStyle() const
 
 void Controller::SetDefaultFontWidth( FontWidth width )
 {
-  if( !mImpl->mFontDefaults )
+  if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
@@ -298,7 +330,7 @@ void Controller::SetDefaultFontWidth( FontWidth width )
 
 FontWidth Controller::GetDefaultFontWidth() const
 {
-  if( mImpl->mFontDefaults )
+  if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.width;
   }
@@ -308,7 +340,7 @@ FontWidth Controller::GetDefaultFontWidth() const
 
 void Controller::SetDefaultFontWeight( FontWeight weight )
 {
-  if( !mImpl->mFontDefaults )
+  if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
@@ -326,7 +358,7 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
 
 FontWeight Controller::GetDefaultFontWeight() const
 {
-  if( mImpl->mFontDefaults )
+  if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.weight;
   }
@@ -336,7 +368,7 @@ FontWeight Controller::GetDefaultFontWeight() const
 
 void Controller::SetDefaultFontSlant( FontSlant slant )
 {
-  if( !mImpl->mFontDefaults )
+  if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
@@ -354,7 +386,7 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
 
 FontSlant Controller::GetDefaultFontSlant() const
 {
-  if( mImpl->mFontDefaults )
+  if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.slant;
   }
@@ -364,7 +396,7 @@ FontSlant Controller::GetDefaultFontSlant() const
 
 void Controller::SetDefaultPointSize( float pointSize )
 {
-  if( !mImpl->mFontDefaults )
+  if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
@@ -391,7 +423,7 @@ void Controller::SetDefaultPointSize( float pointSize )
 
 float Controller::GetDefaultPointSize() const
 {
-  if( mImpl->mFontDefaults )
+  if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mDefaultPointSize;
   }
@@ -403,7 +435,7 @@ void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
 
-  if ( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
+  if( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
     ClearFontData();
@@ -434,7 +466,12 @@ const Vector4& Controller::GetTextColor() const
 
 bool Controller::RemoveText( int cursorOffset, int numberOfChars )
 {
-  bool removed( false );
+  bool removed = false;
+
+  if( NULL == mImpl->mEventData )
+  {
+    return removed;
+  }
 
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfChars %d\n",
                  this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfChars );
@@ -453,13 +490,25 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
       cursorIndex = oldCursorIndex + cursorOffset;
     }
 
-    if( (cursorIndex + numberOfChars) > currentText.Count() )
+    if( ( cursorIndex + numberOfChars ) > currentText.Count() )
     {
       numberOfChars = currentText.Count() - cursorIndex;
     }
 
-    if( (cursorIndex + numberOfChars) <= currentText.Count() )
+    if( ( cursorIndex + numberOfChars ) <= currentText.Count() )
     {
+      // Update the input style and remove the text's style before removing the text.
+
+      // Set first the default input style.
+      mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
+
+      // Update the input style.
+      mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+
+      // Remove the text's style before removing the text.
+      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfChars );
+
+      // Remove the characters.
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
       Vector<Character>::Iterator last  = first + numberOfChars;
 
@@ -478,7 +527,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
 
 void Controller::SetPlaceholderTextColor( const Vector4& textColor )
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mPlaceholderTextColor = textColor;
   }
@@ -492,7 +541,7 @@ void Controller::SetPlaceholderTextColor( const Vector4& textColor )
 
 const Vector4& Controller::GetPlaceholderTextColor() const
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     return mImpl->mEventData->mPlaceholderTextColor;
   }
@@ -560,11 +609,53 @@ float Controller::GetUnderlineHeight() const
   return mImpl->mVisualModel->GetUnderlineHeight();
 }
 
+void Controller::SetInputColor( const Vector4& color )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.textColor = color;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
+
+      // Get start and end position of selection
+      const CharacterIndex startOfSelectedText = handlesCrossed ? mImpl->mEventData->mRightSelectionPosition : mImpl->mEventData->mLeftSelectionPosition;
+      const Length lengthOfSelectedText = ( handlesCrossed ? mImpl->mEventData->mLeftSelectionPosition : mImpl->mEventData->mRightSelectionPosition ) - startOfSelectedText;
+
+      // Add the color run.
+      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mColorRuns.Count();
+      mImpl->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
+
+      ColorRun& colorRun = *( mImpl->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
+      colorRun.color = color;
+      colorRun.characterRun.characterIndex = startOfSelectedText;
+      colorRun.characterRun.numberOfCharacters = lengthOfSelectedText;
+
+      // Request to relayout.
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | COLOR );
+      mImpl->RequestRelayout();
+    }
+  }
+}
+
+const Vector4& Controller::GetInputColor() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.textColor;
+  }
+
+  // Return the default text's color if there is no EventData.
+  return mImpl->mTextColor;
+
+}
+
 void Controller::SetEnableCursorBlink( bool enable )
 {
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "TextInput disabled" );
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mCursorBlinkEnabled = enable;
 
@@ -578,7 +669,7 @@ void Controller::SetEnableCursorBlink( bool enable )
 
 bool Controller::GetEnableCursorBlink() const
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     return mImpl->mEventData->mCursorBlinkEnabled;
   }
@@ -588,7 +679,7 @@ bool Controller::GetEnableCursorBlink() const
 
 const Vector2& Controller::GetScrollPosition() const
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     return mImpl->mEventData->mScrollPosition;
   }
@@ -667,7 +758,7 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( width != mImpl->mVisualModel->mControlSize.width )
+  if( fabsf( width - mImpl->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
@@ -730,7 +821,7 @@ bool Controller::Relayout( const Size& size )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mVisualModel->mControlSize.width, mImpl->mVisualModel->mControlSize.height );
 
-    // Operations that need to be done if the size changes.
+    // Layout operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
                                                              ALIGN                     |
@@ -740,21 +831,38 @@ bool Controller::Relayout( const Size& size )
     mImpl->mVisualModel->mControlSize = size;
   }
 
-  // Make sure the model is up-to-date before layouting
+  // Whether there are modify events.
+  const bool isModifyEventsEmpty = 0u == mImpl->mModifyEvents.Count();
+
+  // Make sure the model is up-to-date before layouting.
   ProcessModifyEvents();
   mImpl->UpdateModel( mImpl->mOperationsPending );
 
+  // Style operations that need to be done if the text is modified.
+  if( !isModifyEventsEmpty )
+  {
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             COLOR );
+  }
+
+  // Apply the style runs if text is modified.
+  bool updated = mImpl->UpdateModelStyle( mImpl->mOperationsPending );
+
+  // Layout the text.
   Size layoutSize;
-  bool updated = DoRelayout( mImpl->mVisualModel->mControlSize,
-                             mImpl->mOperationsPending,
-                             layoutSize );
+  updated = DoRelayout( mImpl->mVisualModel->mControlSize,
+                        mImpl->mOperationsPending,
+                        layoutSize ) || updated;
 
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
 
+  // Whether the text control is editable
+  const bool isEditable = NULL != mImpl->mEventData;
+
   // Keep the current offset and alignment as it will be used to update the decorator's positions (if the size changes).
   Vector2 offset;
-  if( newSize && mImpl->mEventData )
+  if( newSize && isEditable )
   {
     offset = mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition;
   }
@@ -762,7 +870,7 @@ bool Controller::Relayout( const Size& size )
   // After doing the text layout, the alignment offset to place the actor in the desired position can be calculated.
   CalculateTextAlignment( size );
 
-  if( mImpl->mEventData )
+  if( isEditable )
   {
     if( newSize )
     {
@@ -783,22 +891,33 @@ bool Controller::Relayout( const Size& size )
 
 void Controller::ProcessModifyEvents()
 {
-  std::vector<ModifyEvent>& events = mImpl->mModifyEvents;
+  Vector<ModifyEvent>& events = mImpl->mModifyEvents;
 
-  for( unsigned int i=0; i<events.size(); ++i )
+  if( 0u == events.Count() )
   {
-    if( ModifyEvent::TEXT_REPLACED == events[i].type )
+    // Nothing to do.
+    return;
+  }
+
+  for( Vector<ModifyEvent>::ConstIterator it = events.Begin(),
+         endIt = events.End();
+       it != endIt;
+       ++it )
+  {
+    const ModifyEvent& event = *it;
+
+    if( ModifyEvent::TEXT_REPLACED == event.type )
     {
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
-      DALI_ASSERT_DEBUG( 0 == i && "Unexpected TEXT_REPLACED event" );
+      DALI_ASSERT_DEBUG( it == events.Begin() && "Unexpected TEXT_REPLACED event" );
 
       TextReplacedEvent();
     }
-    else if( ModifyEvent::TEXT_INSERTED == events[i].type )
+    else if( ModifyEvent::TEXT_INSERTED == event.type )
     {
       TextInsertedEvent();
     }
-    else if( ModifyEvent::TEXT_DELETED == events[i].type )
+    else if( ModifyEvent::TEXT_DELETED == event.type )
     {
       // Placeholder-text cannot be deleted
       if( !mImpl->IsShowingPlaceholderText() )
@@ -808,15 +927,14 @@ void Controller::ProcessModifyEvents()
     }
   }
 
-  if( mImpl->mEventData &&
-      0 != events.size() )
+  if( NULL != mImpl->mEventData )
   {
     // When the text is being modified, delay cursor blinking
     mImpl->mEventData->mDecorator->DelayCursorBlink();
   }
 
   // Discard temporary text
-  events.clear();
+  events.Clear();
 }
 
 void Controller::ResetText()
@@ -843,9 +961,7 @@ void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
     mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
 
     // Update the cursor if it's in editing mode.
-    if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
-        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
-        ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+    if( EventData::IsEditingState( mImpl->mEventData->mState )  )
     {
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
@@ -883,6 +999,11 @@ void Controller::TextInsertedEvent()
 {
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextInsertedEvent" );
 
+  if( NULL == mImpl->mEventData )
+  {
+    return;
+  }
+
   // TODO - Optimize this
   ClearModelData();
 
@@ -898,9 +1019,7 @@ void Controller::TextInsertedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  if( ( EventData::EDITING == mImpl->mEventData->mState )            ||
-      ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
-      ( EventData::EDITING_WITH_GRAB_HANDLE == mImpl->mEventData->mState ) )
+  if( EventData::IsEditingState( mImpl->mEventData->mState ) )
   {
     mImpl->mEventData->mUpdateCursorPosition = true;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
@@ -910,6 +1029,11 @@ void Controller::TextInsertedEvent()
 void Controller::TextDeletedEvent()
 {
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextDeletedEvent" );
+
+  if( NULL == mImpl->mEventData )
+  {
+    return;
+  }
 
   // TODO - Optimize this
   ClearModelData();
@@ -1225,7 +1349,7 @@ void Controller::KeyboardFocusGainEvent()
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyboardFocusGainEvent" );
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     if( ( EventData::INACTIVE == mImpl->mEventData->mState ) ||
         ( EventData::INTERRUPTED == mImpl->mEventData->mState ) )
@@ -1248,9 +1372,9 @@ void Controller::KeyboardFocusLostEvent()
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyboardFocusLostEvent" );
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
-    if ( EventData::INTERRUPTED != mImpl->mEventData->mState )
+    if( EventData::INTERRUPTED != mImpl->mEventData->mState )
     {
       mImpl->ChangeState( EventData::INACTIVE );
 
@@ -1270,8 +1394,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
   bool textChanged( false );
 
-  if( mImpl->mEventData &&
-      keyEvent.state == KeyEvent::Down )
+  if( ( NULL != mImpl->mEventData ) &&
+      ( keyEvent.state == KeyEvent::Down ) )
   {
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
@@ -1282,10 +1406,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Escape key is a special case which causes focus loss
       KeyboardFocusLostEvent();
     }
-    else if( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ||
-             Dali::DALI_KEY_CURSOR_RIGHT == keyCode ||
-             Dali::DALI_KEY_CURSOR_UP    == keyCode ||
-             Dali::DALI_KEY_CURSOR_DOWN  == keyCode )
+    else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
+             ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
+             ( Dali::DALI_KEY_CURSOR_UP    == keyCode ) ||
+             ( Dali::DALI_KEY_CURSOR_DOWN  == keyCode ) )
     {
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
@@ -1295,13 +1419,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       textChanged = BackspaceKeyEvent();
     }
-    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) )
+    else if( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) )
     {
       mImpl->ChangeState( EventData::INTERRUPTED ); // State is not INACTIVE as expect to return to edit mode.
       // Avoids calling the InsertText() method which can delete selected text
     }
-    else if ( IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
-              IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
+    else if( IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
+             IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
     {
       mImpl->ChangeState( EventData::INACTIVE );
       // Menu/Home key behaviour does not allow edit mode to resume like Power key
@@ -1325,8 +1449,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
-         ( mImpl->mEventData->mState != EventData::INACTIVE ) )
+    if( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
+        ( mImpl->mEventData->mState != EventData::INACTIVE ) )
     {
       mImpl->ChangeState( EventData::EDITING );
     }
@@ -1349,6 +1473,12 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   bool maxLengthReached( false );
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
+
+  if( NULL == mImpl->mEventData )
+  {
+    return;
+  }
+
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPrimaryCursorPosition %d mPreEditFlag %d mPreEditStartPosition %d mPreEditLength %d\n",
                  this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"),
                  mImpl->mEventData->mPrimaryCursorPosition, mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
@@ -1360,9 +1490,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   Length characterCount( 0u );
 
   // Remove the previous IMF pre-edit (predicitive text)
-  if( mImpl->mEventData &&
-      mImpl->mEventData->mPreEditFlag &&
-      0 != mImpl->mEventData->mPreEditLength )
+  if( mImpl->mEventData->mPreEditFlag &&
+      ( 0 != mImpl->mEventData->mPreEditLength ) )
   {
     CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
 
@@ -1405,28 +1534,25 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->ChangeState( EventData::EDITING );
 
     // Handle the IMF (predicitive text) state changes
-    if( mImpl->mEventData )
+    if( COMMIT == type )
     {
-      if( COMMIT == type )
+      // IMF manager is no longer handling key-events
+      mImpl->ClearPreEditFlag();
+    }
+    else // PRE_EDIT
+    {
+      if( !mImpl->mEventData->mPreEditFlag )
       {
-        // IMF manager is no longer handling key-events
-        mImpl->ClearPreEditFlag();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state" );
+
+        // Record the start of the pre-edit text
+        mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
       }
-      else // PRE_EDIT
-      {
-        if( !mImpl->mEventData->mPreEditFlag )
-        {
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state" );
 
-          // Record the start of the pre-edit text
-          mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
-        }
+      mImpl->mEventData->mPreEditLength = utf32Characters.Count();
+      mImpl->mEventData->mPreEditFlag = true;
 
-        mImpl->mEventData->mPreEditLength = utf32Characters.Count();
-        mImpl->mEventData->mPreEditFlag = true;
-
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
-      }
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
     }
 
     const Length numberOfCharactersInModel = mImpl->mLogicalModel->mText.Count();
@@ -1435,9 +1561,35 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
     maxLengthReached = ( characterCount > maxSizeOfNewText );
 
-    // Insert at current cursor position
+    // The cursor position.
     CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
+    // Updates the text style runs.
+    mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, maxSizeOfNewText );
+
+    // Get the character index from the cursor index.
+    const CharacterIndex styleIndex = ( cursorIndex > 0u ) ? cursorIndex - 1u : 0u;
+
+    // Retrieve the text's style for the given index.
+    InputStyle style;
+    mImpl->mLogicalModel->RetrieveStyle( styleIndex, style );
+
+    // Whether to add a new text color run.
+    const bool addColorRun = style.textColor != mImpl->mEventData->mInputStyle.textColor;
+
+    // Add style runs.
+    if( addColorRun )
+    {
+      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mColorRuns.Count();
+      mImpl->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
+
+      ColorRun& colorRun = *( mImpl->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
+      colorRun.color = mImpl->mEventData->mInputStyle.textColor;
+      colorRun.characterRun.characterIndex = cursorIndex;
+      colorRun.characterRun.numberOfCharacters = maxSizeOfNewText;
+    }
+
+    // Insert at current cursor position.
     Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
 
     if( cursorIndex < numberOfCharactersInModel )
@@ -1454,7 +1606,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  if( 0u == mImpl->mLogicalModel->mText.Count() &&
+  if( ( 0u == mImpl->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
     // Show place-holder if empty after removing the pre-edit text
@@ -1463,7 +1615,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->ClearPreEditFlag();
   }
   else if( removedPrevious ||
-           0 != utf32Characters.Count() )
+           ( 0 != utf32Characters.Count() ) )
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
@@ -1505,33 +1657,49 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
   if( NULL != mImpl->mEventData )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TapEvent state:%d \n", mImpl->mEventData->mState );
+
     if( 1u == tapCount )
     {
       // This is to avoid unnecessary relayouts when tapping an empty text-field
       bool relayoutNeeded( false );
 
-      if( mImpl->IsShowingRealText() &&
-          EventData::EDITING == mImpl->mEventData->mState )
+      if( ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) ||
+          ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) )
       {
-        // Show grab handle on second tap
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE);  // If Popup shown hide it here so can be shown again if required.
+      }
+
+      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != mImpl->mEventData->mState ) )
+      {
+        // Already in an active state so show a popup
+        if( !mImpl->IsClipboardEmpty() )
+        {
+          // Shows Paste popup but could show full popup with Selection options. ( EDITING_WITH_POPUP )
+          mImpl->ChangeState( EventData::EDITING_WITH_PASTE_POPUP );
+        }
+        else
+        {
+          mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        }
         relayoutNeeded = true;
       }
-      else if( EventData::EDITING                  != mImpl->mEventData->mState &&
-               EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState )
+      else
       {
-        if( mImpl->IsShowingPlaceholderText() &&  ! mImpl->IsFocusedPlaceholderAvailable() )
+        if( mImpl->IsShowingPlaceholderText() && !mImpl->IsFocusedPlaceholderAvailable() )
         {
           // Hide placeholder text
           ResetText();
         }
-        // Show cursor on first tap
-        mImpl->ChangeState( EventData::EDITING );
-        relayoutNeeded = true;
-      }
-      else if( mImpl->IsShowingRealText() )
-      {
-        // Move the cursor
+
+        if( EventData::INACTIVE == mImpl->mEventData->mState )
+        {
+          mImpl->ChangeState( EventData::EDITING );
+        }
+        else if( !mImpl->IsClipboardEmpty() )
+        {
+          mImpl->ChangeState( EventData::EDITING_WITH_POPUP );
+        }
         relayoutNeeded = true;
       }
 
@@ -1562,10 +1730,11 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
+        // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     Event event( Event::PAN_EVENT );
     event.p1.mInt = state;
@@ -1581,10 +1750,10 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
 
-  if( state == Gesture::Started &&
-      mImpl->mEventData )
+  if( ( state == Gesture::Started ) &&
+      ( NULL != mImpl->mEventData ) )
   {
-    if( ! mImpl->IsShowingRealText() )
+    if( !mImpl->IsShowingRealText() )
     {
       Event event( Event::LONG_PRESS_EVENT );
       event.p1.mInt = state;
@@ -1619,7 +1788,9 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 
 void Controller::SelectEvent( float x, float y, bool selectAll )
 {
-  if( mImpl->mEventData )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
+
+  if( NULL != mImpl->mEventData )
   {
     mImpl->ChangeState( EventData::SELECTING );
 
@@ -1654,7 +1825,7 @@ void Controller::DecorationEvent( HandleType handleType, HandleState state, floa
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
 
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
     switch( handleType )
     {
@@ -1747,7 +1918,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
         NotifyImfManager();
       }
 
-      if( 0u != mImpl->mLogicalModel->mText.Count() ||
+      if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
           !mImpl->IsPlaceholderAvailable() )
       {
         mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
@@ -1778,7 +1949,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     {
       const Vector2& currentCursorPosition = mImpl->mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
 
-      if( mImpl->mEventData->mSelectionEnabled  )
+      if( mImpl->mEventData->mSelectionEnabled )
       {
         // Creates a SELECT event.
         SelectEvent( currentCursorPosition.x, currentCursorPosition.y, false );
@@ -1806,18 +1977,18 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
 
 ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
-  bool update( false );
+  bool update = false;
   bool requestRelayout = false;
 
   std::string text;
-  unsigned int cursorPosition( 0 );
+  unsigned int cursorPosition = 0u;
 
-  switch ( imfEvent.eventName )
+  switch( imfEvent.eventName )
   {
     case ImfManager::COMMIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
-      update=true;
+      update = true;
       requestRelayout = true;
       break;
     }
@@ -1834,7 +2005,7 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
       if( update )
       {
-        if( 0u != mImpl->mLogicalModel->mText.Count() ||
+        if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
             !mImpl->IsPlaceholderAvailable() )
         {
           mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
@@ -1893,10 +2064,15 @@ bool Controller::BackspaceKeyEvent()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
 
+  bool removed = false;
+
+  if( NULL == mImpl->mEventData )
+  {
+    return removed;
+  }
+
   // IMF manager is no longer handling key-events
   mImpl->ClearPreEditFlag();
-
-  bool removed( false );
 
   if( EventData::SELECTING == mImpl->mEventData->mState )
   {
@@ -1915,7 +2091,7 @@ bool Controller::BackspaceKeyEvent()
     // Automatic  Upper-case and restarting prediction on an existing word require this.
     NotifyImfManager();
 
-    if( 0u != mImpl->mLogicalModel->mText.Count() ||
+    if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
         !mImpl->IsPlaceholderAvailable() )
     {
       mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
@@ -1932,19 +2108,17 @@ bool Controller::BackspaceKeyEvent()
 
 void Controller::NotifyImfManager()
 {
-  if( mImpl->mEventData )
+  if( NULL != mImpl->mEventData )
   {
-    ImfManager imfManager = ImfManager::Get();
-
-    if( imfManager )
+    if( mImpl->mEventData->mImfManager )
     {
       // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
       std::string text;
       GetText( text );
-      imfManager.SetSurroundingText( text );
+      mImpl->mEventData->mImfManager.SetSurroundingText( text );
 
-      imfManager.SetCursorPosition( GetLogicalCursorPosition() );
-      imfManager.NotifyCursorPosition();
+      mImpl->mEventData->mImfManager.SetCursorPosition( GetLogicalCursorPosition() );
+      mImpl->mEventData->mImfManager.NotifyCursorPosition();
     }
   }
 }
@@ -1954,6 +2128,11 @@ void Controller::ShowPlaceholderText()
   if( mImpl->IsPlaceholderAvailable() )
   {
     DALI_ASSERT_DEBUG( mImpl->mEventData && "No placeholder text available" );
+
+    if( NULL == mImpl->mEventData )
+    {
+      return;
+    }
 
     mImpl->mEventData->mIsShowingPlaceholderText = true;
 
@@ -1966,8 +2145,8 @@ void Controller::ShowPlaceholderText()
     size_t size( 0 );
 
     // TODO - Switch placeholder text styles when changing state
-    if( EventData::INACTIVE != mImpl->mEventData->mState &&
-        0u != mImpl->mEventData->mPlaceholderTextActive.c_str() )
+    if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
+        ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
     {
       text = mImpl->mEventData->mPlaceholderTextActive.c_str();
       size = mImpl->mEventData->mPlaceholderTextActive.size();
@@ -2028,6 +2207,7 @@ void Controller::ClearModelData()
   mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
   mImpl->mVisualModel->mGlyphPositions.Clear();
   mImpl->mVisualModel->mLines.Clear();
+  mImpl->mVisualModel->mColorRuns.Clear();
   mImpl->mVisualModel->ClearCaches();
 }
 
@@ -2043,6 +2223,11 @@ void Controller::ClearFontData()
   mImpl->mVisualModel->mGlyphPositions.Clear();
   mImpl->mVisualModel->mLines.Clear();
   mImpl->mVisualModel->ClearCaches();
+}
+
+void Controller::ClearStyleData()
+{
+  mImpl->mLogicalModel->mColorRuns.Clear();
 }
 
 Controller::Controller( ControlInterface& controlInterface )

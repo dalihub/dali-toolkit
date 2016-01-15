@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/input-style.h>
+#include <dali-toolkit/internal/text/text-style-run-container.h>
+
 namespace Dali
 {
 
@@ -239,6 +243,48 @@ CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualChar
   }
 
   return *( mVisualToLogicalMap.Begin() + visualCharacterIndex );
+}
+
+void LogicalModel::UpdateTextStyleRuns( CharacterIndex index, int numberOfCharacters )
+{
+  const Length totalNumberOfCharacters = mText.Count();
+
+  // Process the color runs.
+  Vector<ColorRun> removedColorRuns;
+  UpdateCharacterRuns<ColorRun>( index,
+                                 numberOfCharacters,
+                                 totalNumberOfCharacters,
+                                 mColorRuns,
+                                 removedColorRuns );
+}
+
+void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
+{
+  unsigned int runIndex = 0u;
+  unsigned int lastRunIndex = 0u;
+  bool overriden = false;
+
+  // Set the text color.
+  for( Vector<ColorRun>::ConstIterator it = mColorRuns.Begin(),
+         endIt = mColorRuns.End();
+       it != endIt;
+       ++it, ++runIndex )
+  {
+    const ColorRun& colorRun = *it;
+
+    if( ( colorRun.characterRun.characterIndex <= index ) &&
+        ( index < colorRun.characterRun.characterIndex + colorRun.characterRun.numberOfCharacters ) )
+    {
+      lastRunIndex = runIndex;
+      overriden = true;
+    }
+  }
+
+  // Set the text's color if it's overriden.
+  if( overriden )
+  {
+    style.textColor = ( *( mColorRuns.Begin() + lastRunIndex ) ).color;
+  }
 }
 
 LogicalModel::~LogicalModel()

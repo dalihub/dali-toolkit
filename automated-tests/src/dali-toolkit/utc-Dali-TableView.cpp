@@ -39,9 +39,9 @@ namespace
 
 const char* const PROPERTY_NAME_ROWS = "rows";
 const char* const PROPERTY_NAME_COLUMNS = "columns";
-const char* const PROPERTY_NAME_CELL_PADDING = "cell-padding";
-const char* const PROPERTY_NAME_LAYOUT_ROWS = "layout-rows";
-const char* const PROPERTY_NAME_LAYOUT_COLUMNS = "layout-columns";
+const char* const PROPERTY_NAME_CELL_PADDING = "cellPadding";
+const char* const PROPERTY_NAME_LAYOUT_ROWS = "layoutRows";
+const char* const PROPERTY_NAME_LAYOUT_COLUMNS = "layoutColumns";
 const Vector2 CELL_SIZE( 10, 10 );
 
 static bool gObjectCreatedCallBackCalled;
@@ -608,7 +608,7 @@ int UtcDaliTableViewSetGetProperty(void)
   DALI_TEST_CHECK( tableView.GetColumns() == 5u );
   DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::COLUMNS).Get<int>() == 5 );
 
-  // Test "cell-padding" property
+  // Test "cellPadding" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_CELL_PADDING ) == TableView::Property::CELL_PADDING );
 
   tableView.SetProperty( TableView::Property::CELL_PADDING, Size( 6.f, 8.f ) );
@@ -625,11 +625,11 @@ int UtcDaliTableViewSetGetProperty(void)
   item2[ "policy" ] = "relative";
   item2[ "value" ] = 0.2f;
 
-  // Test "layout-rows" property
+  // Test "layoutRows" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex(PROPERTY_NAME_LAYOUT_ROWS) == TableView::Property::LAYOUT_ROWS );
 
   /*
-   * "layout-rows":
+   * "layoutRows":
    *  {
    *    "1": { "policy": "fixed", "value": 30 },
    *    "3": { "policy": "relative", "value": 0.2 }
@@ -655,11 +655,11 @@ int UtcDaliTableViewSetGetProperty(void)
   DALI_TEST_CHECK( childMap->Find( "policy" )->Get<std::string>().compare("relative") == 0 );
   DALI_TEST_EQUALS( childMap->Find( "value" )->Get<float>(), 0.2f, TEST_LOCATION );
 
-  // Test "layout-columns" property
+  // Test "layoutColumns" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_LAYOUT_COLUMNS ) == TableView::Property::LAYOUT_COLUMNS );
 
   /*
-   * "layout-columns":
+   * "layoutColumns":
    *  {
    *    "2": { "policy": "relative", "value": 0.2 },
    *    "3": { "policy": "fixed", "value": 30 }
@@ -700,7 +700,7 @@ int UtcDaliTableViewCustomProperties(void)
 
   // Create a child actor with the custom properties
   Actor child1 = Actor::New();
-  child1.RegisterProperty( "cell-index", Vector2( 3, 4 ), Property::READ_WRITE );
+  child1.RegisterProperty( "cellIndex",  Vector2( 3, 4 ), Property::READ_WRITE );
   tableView.Add( child1 );
   // Check for actors at actual positions.
   DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(3,4)) == child1);
@@ -709,9 +709,9 @@ int UtcDaliTableViewCustomProperties(void)
   Actor child2 = Actor::New();
   float rowSpan = 3.f;
   float columnSpan = 2.f;
-  child2.RegisterProperty( "cell-index", Vector2( 6, 1 ), Property::READ_WRITE );
-  child2.RegisterProperty( "row-span", rowSpan, Property::READ_WRITE );
-  child2.RegisterProperty( "column-span", columnSpan, Property::READ_WRITE );
+  child2.RegisterProperty( "cellIndex",  Vector2( 6, 1 ), Property::READ_WRITE );
+  child2.RegisterProperty( "rowSpan",  rowSpan, Property::READ_WRITE );
+  child2.RegisterProperty( "columnSpan",  columnSpan, Property::READ_WRITE );
   tableView.Add( child2 );
   // Check for actors at actual positions.
   for( int i=0; i<rowSpan; i++ )
@@ -725,8 +725,8 @@ int UtcDaliTableViewCustomProperties(void)
   // Create a third child actor with the cell alignment properties
   Actor child3 = Actor::New();
   child3.SetSize( 5.f,5.f );
-  child3.RegisterProperty( "cell-horizontal-alignment", "center", Property::READ_WRITE );
-  child3.RegisterProperty( "cell-vertical-alignment", "bottom", Property::READ_WRITE );
+  child3.RegisterProperty( "cellHorizontalAlignment",   "center", Property::READ_WRITE );
+  child3.RegisterProperty( "cellVerticalAlignment",   "bottom", Property::READ_WRITE );
   tableView.Add( child3 );
 
   // store the actor in the first available cell

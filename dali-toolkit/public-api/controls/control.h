@@ -54,18 +54,18 @@ class Control;
  * Signals
  * | %Signal Name           | Method                                              |
  * |------------------------|-----------------------------------------------------|
- * | key-event              | @ref KeyEventSignal()                               |
- * | key-input-focus-gained | @ref KeyInputFocusGainedSignal()                    |
- * | key-input-focus-lost   | @ref KeyInputFocusLostSignal()                      |
+ * | keyEvent               | @ref KeyEventSignal()                               |
+ * | keyInputFocusGained    | @ref KeyInputFocusGainedSignal()                    |
+ * | keyInputFocusLost      | @ref KeyInputFocusLostSignal()                      |
  * | tapped                 | @ref GetTapGestureDetector().DetectedSignal()       |
  * | panned                 | @ref GetPanGestureDetector().DetectedSignal()       |
  * | pinched                | @ref GetPinchGestureDetector().DetectedSignal()     |
- * | long-pressed           | @ref GetLongPressGestureDetector().DetectedSignal() |
+ * | longPressed            | @ref GetLongPressGestureDetector().DetectedSignal() |
  *
  * Actions
- * | %Action Name            | %Control method called                             |
- * |-------------------------|----------------------------------------------------|
- * | accessibility-activated | %OnAccessibilityActivated()                        |
+ * | %Action Name           | %Control method called                             |
+ * |------------------------|----------------------------------------------------|
+ * | accessibilityActivated | %OnAccessibilityActivated()                        |
  */
 class DALI_IMPORT_API Control : public CustomActor
 {
@@ -88,9 +88,11 @@ public:
   {
     enum
     {
-      STYLE_NAME = PROPERTY_START_INDEX,       ///< name "style-name",       @see SetStyleName,       type std::string
-      BACKGROUND,                              ///< name "background",       @since DALi 1.1.4,       type Map
-      KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
+      STYLE_NAME = PROPERTY_START_INDEX, ///< name "styleName",        @see SetStyleName,                                                             type std::string
+      BACKGROUND_COLOR,                  ///< name "background-color", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
+      BACKGROUND_IMAGE,                  ///< name "background-image", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
+      KEY_INPUT_FOCUS,                   ///< name "keyInputFocus",    @see SetKeyInputFocus,                                                         type bool
+      BACKGROUND,                        ///< name "background",       @since DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map
     };
   };
 
@@ -260,6 +262,8 @@ public:
 
   /**
    * @brief Sets the background color of the control.
+   *
+   * @note if SetBackgroundImage is called later, this background color is removed.
    *
    * @param[in] color The required background color of the control
    *

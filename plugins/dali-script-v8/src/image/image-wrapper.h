@@ -52,10 +52,8 @@ public:
     UNKNOWN_IMAGE_TYPE = -1,
     IMAGE               = 0,
     RESOURCE_IMAGE      = 1,
-    NINE_PATCH_IMAGE    = 2,
-    BITMAP_IMAGE        = 3,
-    FRAME_BUFFER_IMAGE  = 4,
-    NATIVE_IMAGE        = 5
+    BITMAP_IMAGE        = 2,
+    FRAME_BUFFER_IMAGE  = 3
    };
 
   /**
@@ -102,10 +100,8 @@ public:
   // keep generating them everytime we want to create an Image
   static v8::Persistent<v8::ObjectTemplate> mImageTemplate;
   static v8::Persistent<v8::ObjectTemplate> mResourceImageTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mNinePatchImageTemplate;
   static v8::Persistent<v8::ObjectTemplate> mBufferImageTemplate;
   static v8::Persistent<v8::ObjectTemplate> mFrameBufferImageTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mNativeImageTemplate;
 
 private:
 

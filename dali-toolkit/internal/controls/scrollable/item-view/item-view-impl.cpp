@@ -46,14 +46,14 @@ namespace // Unnamed namespace
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL)
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-position",     FLOAT,    LAYOUT_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-speed",        FLOAT,    SCROLL_SPEED)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollSpeed",         FLOAT,    SCROLL_SPEED)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "overshoot",           FLOAT,    OVERSHOOT)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-direction",    VECTOR2,  SCROLL_DIRECTION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-orientation",  INTEGER,  LAYOUT_ORIENTATION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-content-size", FLOAT,    SCROLL_CONTENT_SIZE)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollDirection",     VECTOR2,  SCROLL_DIRECTION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutOrientation",   INTEGER,  LAYOUT_ORIENTATION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollContentSize",   FLOAT,    SCROLL_CONTENT_SIZE)
 
-DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layout-activated",    LAYOUT_ACTIVATED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",     LAYOUT_ACTIVATED_SIGNAL )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -289,26 +289,27 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 ItemView::ItemView(ItemFactory& factory)
 : Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
+  mItemsParentOrigin(ParentOrigin::CENTER),
+  mItemsAnchorPoint(AnchorPoint::CENTER),
+  mTotalPanDisplacement(Vector2::ZERO),
   mActiveLayout(NULL),
-  mAnimatingOvershootOn(false),
-  mAnimateOvershootOff(false),
-  mAnchoringEnabled(false),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
   mRefreshIntervalLayoutPositions(0.0f),
-  mRefreshOrderHint(true/*Refresh item 0 first*/),
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
   mWheelScrollDistanceStep(0.0f),
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
-  mTotalPanDisplacement(Vector2::ZERO),
   mScrollOvershoot(0.0f),
-  mIsFlicking(false),
   mGestureState(Gesture::Clear),
+  mAnimatingOvershootOn(false),
+  mAnimateOvershootOff(false),
+  mAnchoringEnabled(false),
+  mRefreshOrderHint(true/*Refresh item 0 first*/),
+  mIsFlicking(false),
   mAddingItems(false),
   mRefreshEnabled(true),
-  mItemsParentOrigin( ParentOrigin::CENTER),
-  mItemsAnchorPoint( AnchorPoint::CENTER)
+  mInAnimation(false)
 {
 }
 
@@ -1079,13 +1080,17 @@ void ItemView::OnItemsRemoved()
   }
 }
 
-float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout)
+float ItemView::ClampFirstItemPosition( float targetPosition, const Vector3& targetSize, ItemLayout& layout, bool updateOvershoot )
 {
   Actor self = Self();
   float minLayoutPosition = layout.GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), targetSize);
   float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, targetPosition));
-  mScrollOvershoot = targetPosition - clamppedPosition;
   self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector2(0.0f, -minLayoutPosition));
+
+  if( updateOvershoot )
+  {
+    mScrollOvershoot = targetPosition - clamppedPosition;
+  }
 
   return clamppedPosition;
 }
@@ -1193,7 +1198,30 @@ void ItemView::OnPan( const PanGesture& gesture )
       }
 
       mScrollOvershoot = CalculateScrollOvershoot();
-      self.SetProperty( Toolkit::ItemView::Property::OVERSHOOT, mScrollOvershoot );
+
+      // If the view is moved in a direction against the overshoot indicator, then the indicator should be animated off.
+      // First make sure we are not in an animation, otherwise a previously started
+      // off-animation will be overwritten as the user continues scrolling.
+      if( !mInAnimation )
+      {
+        // Check if the movement is against the current overshoot amount (if we are currently displaying the indicator).
+        if( ( ( mScrollOvershoot > Math::MACHINE_EPSILON_0 ) && ( mScrollDistance < -Math::MACHINE_EPSILON_0 ) ) ||
+          ( ( mScrollOvershoot < Math::MACHINE_EPSILON_0 ) && ( mScrollDistance > Math::MACHINE_EPSILON_0 ) ) )
+        {
+          // The user has moved against the indicator direction.
+          // First, we reset the total displacement. This means the overshoot amount will become zero the next frame,
+          // and if the user starts dragging in the overshoot direction again, the indicator will appear once more.
+          mTotalPanDisplacement = Vector2::ZERO;
+          // Animate the overshoot indicator off.
+          AnimateScrollOvershoot( 0.0f, false );
+        }
+        else
+        {
+          // Only set the property directly if we are not animating the overshoot away,
+          // as otherwise this will overwrite the animation generated value.
+          self.SetProperty( Toolkit::ItemView::Property::OVERSHOOT, mScrollOvershoot );
+        }
+      }
     }
     break;
 
@@ -1331,6 +1359,7 @@ void ItemView::OnOvershootOnFinished(Animation& animation)
   {
     AnimateScrollOvershoot(0.0f);
   }
+  mInAnimation = false;
 }
 
 void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
@@ -1417,9 +1446,9 @@ bool ItemView::IsLayoutScrollable(const Vector3& layoutSize)
 {
   Actor self = Self();
 
-  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout );
-  float forwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition + 1.0, layoutSize, *mActiveLayout);
-  float backwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition - 1.0, layoutSize, *mActiveLayout);
+  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout, false );
+  float forwardClampedPosition = ClampFirstItemPosition( currentLayoutPosition + 1.0, layoutSize, *mActiveLayout, false );
+  float backwardClampedPosition = ClampFirstItemPosition( currentLayoutPosition - 1.0, layoutSize, *mActiveLayout, false );
 
   return (fabs(forwardClampedPosition - backwardClampedPosition) > Math::MACHINE_EPSILON_0);
 }
@@ -1485,42 +1514,45 @@ void ItemView::EnableScrollOvershoot( bool enable )
   Actor self = Self();
   if( enable )
   {
-    Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
-    mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
-    mOvershootOverlay.SetColor(mOvershootEffectColor);
-    mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
-    mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-    mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
-    self.Add(mOvershootOverlay);
+    if( !mOvershootOverlay )
+    {
+      Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
+      mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
+      mOvershootOverlay.SetColor(mOvershootEffectColor);
+      mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
+      mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+      mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
+      self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(mOvershootSize.height) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.Apply();
+      Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(mOvershootSize.height) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+      constraint.Apply();
 
-    mOvershootOverlay.SetSize(mOvershootSize.width, mOvershootSize.height);
+      mOvershootOverlay.SetSize(mOvershootSize.width, mOvershootSize.height);
 
-    constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
-    constraint.Apply();
+      constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
+      constraint.Apply();
 
-    constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::POSITION, OvershootOverlayPositionConstraint );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
-    constraint.Apply();
+      constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::POSITION, OvershootOverlayPositionConstraint );
+      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
+      constraint.Apply();
 
-    constraint = Constraint::New<bool>( mOvershootOverlay, Actor::Property::VISIBLE, OvershootOverlayVisibilityConstraint );
-    constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ) );
-    constraint.Apply();
+      constraint = Constraint::New<bool>( mOvershootOverlay, Actor::Property::VISIBLE, OvershootOverlayVisibilityConstraint );
+      constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ) );
+      constraint.Apply();
 
-    constraint = Constraint::New<float>( mOvershootOverlay, effectOvershootPropertyIndex, EqualToConstraint() );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
-    constraint.Apply();
+      constraint = Constraint::New<float>( mOvershootOverlay, effectOvershootPropertyIndex, EqualToConstraint() );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
+      constraint.Apply();
+    }
   }
   else
   {
@@ -1577,13 +1609,14 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
       duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
     }
 
+    // Mark the animation as in progress to prevent manual property sets overwriting it.
+    mInAnimation = true;
+    mAnimatingOvershootOn = animatingOn;
     RemoveAnimation(mScrollOvershootAnimation);
     mScrollOvershootAnimation = Animation::New(duration);
     mScrollOvershootAnimation.FinishedSignal().Connect(this, &ItemView::OnOvershootOnFinished);
     mScrollOvershootAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::OVERSHOOT), overshootAmount, TimePeriod(0.0f, duration) );
     mScrollOvershootAnimation.Play();
-
-    mAnimatingOvershootOn = animatingOn;
   }
   else
   {

@@ -257,13 +257,13 @@ void ShadowView::OnInitialize()
 
 
   Property::Map customShader;
-  customShader[ "vertex-shader" ] = RENDER_SHADOW_VERTEX_SOURCE;
-  customShader[ "fragment-shader" ] = RENDER_SHADOW_FRAGMENT_SOURCE;
+  customShader[ "vertexShader" ] = RENDER_SHADOW_VERTEX_SOURCE;
+  customShader[ "fragmentShader" ] = RENDER_SHADOW_FRAGMENT_SOURCE;
 
-  customShader[ "subdivide-grid-x" ] = 20;
-  customShader[ "subdivide-grid-y" ] = 20;
+  customShader[ "subdivideGridX" ] = 20;
+  customShader[ "subdivideGridY" ] = 20;
 
-  customShader[ "hints" ] = "output-is-transparent";
+  customShader[ "hints" ] = "outputIsTransparent";
 
   mShadowRenderShader[ "shader" ] = customShader;
 

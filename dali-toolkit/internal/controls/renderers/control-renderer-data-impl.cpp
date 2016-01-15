@@ -38,19 +38,19 @@ namespace
 {
 //custom shader
 const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertex-shader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragment-shader" );
-const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivide-grid-x" );
-const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivide-grid-y" );
+const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
+const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
+const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
+const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type STRING for a hint from the below hint strings or an ARRAY of of hint strings
 
 /**
  * where hints should be contain strings of the following shader hints:
- *   "none"                       | corresponds to HINT_NONE
- *   "requires-self-depth-test"   | corresponds to HINT_REQUIRES_SELF_DEPTH_TEST
- *   "output-is-transparent"      | corresponds to HINT_OUTPUT_IS_TRANSPARENT
- *   "output-is-opaque"           | corresponds to HINT_OUTPUT_IS_OPAQUE
- *   "modifies-geometry"          | corresponds to HINT_MODIFIES_GEOMETRY
+ *   "none"                    | corresponds to HINT_NONE
+ *   "requiresSelfDepthTest"   | corresponds to HINT_REQUIRES_SELF_DEPTH_TEST
+ *   "outputIsTransparent"     | corresponds to HINT_OUTPUT_IS_TRANSPARENT
+ *   "outputIsOpaque"          | corresponds to HINT_OUTPUT_IS_OPAQUE
+ *   "modifiesGeometry"        | corresponds to HINT_MODIFIES_GEOMETRY
  */
 
 Shader::ShaderHints HintFromString( std::string hintString )
@@ -59,19 +59,19 @@ Shader::ShaderHints HintFromString( std::string hintString )
   {
     return Shader::HINT_NONE;
   }
-  else if( hintString == "requires-self-depth-test" )
+  else if( hintString == "requiresSelfDepthTest" )
   {
     return Shader::HINT_REQUIRES_SELF_DEPTH_TEST;
   }
-  else if( hintString == "output-is-transparent" )
+  else if( hintString == "outputIsTransparent" )
   {
     return Shader::HINT_OUTPUT_IS_TRANSPARENT;
   }
-  else if( hintString == "output-is-opaque" )
+  else if( hintString == "outputIsOpaque" )
   {
     return Shader::HINT_OUTPUT_IS_OPAQUE;
   }
-  else if( hintString == "modifies-geometry" )
+  else if( hintString == "modifiesGeometry" )
   {
     return Shader::HINT_MODIFIES_GEOMETRY;
   }
@@ -88,7 +88,7 @@ Shader::ShaderHints HintFromString( std::string hintString )
 Internal::ControlRenderer::Impl::Impl()
 : mCustomShader(NULL),
   mDepthIndex( 0.0f ),
-  mIsOnStage( false )
+  mFlags( 0 )
 {
 }
 

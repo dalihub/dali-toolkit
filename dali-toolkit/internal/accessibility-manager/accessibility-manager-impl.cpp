@@ -46,16 +46,16 @@ namespace // unnamed namespace
 
 // Signals
 
-const char* const SIGNAL_FOCUS_CHANGED =           "focus-changed";
-const char* const SIGNAL_FOCUS_OVERSHOT =          "focus-overshot";
-const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "focused-actor-activated";
+const char* const SIGNAL_FOCUS_CHANGED =           "focusChanged";
+const char* const SIGNAL_FOCUS_OVERSHOT =          "focusOvershot";
+const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "focusedActorActivated";
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FOCUS_MANAGER");
 #endif
 
 const char* const ACTOR_FOCUSABLE("focusable");
-const char* const IS_FOCUS_GROUP("is-focus-group");
+const char* const IS_FOCUS_GROUP("isFocusGroup");
 
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
@@ -191,12 +191,8 @@ void AccessibilityManager::SetFocusOrder(Actor actor, const unsigned int order)
     // Firstly delete the actor from the focus chain if it's already there with a different focus order.
     mFocusIDContainer.erase(GetFocusOrder(actor));
 
-    // Create actor focusable property if not already created.
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
-    if(propertyActorFocusable == Property::INVALID_INDEX)
-    {
-      propertyActorFocusable = actor.RegisterProperty( ACTOR_FOCUSABLE, true, Property::READ_WRITE );
-    }
+    // Create/retrieve actor focusable property
+    Property::Index propertyActorFocusable = actor.RegisterProperty( ACTOR_FOCUSABLE, true, Property::READ_WRITE );
 
     if(order == 0)
     {
@@ -512,16 +508,8 @@ void AccessibilityManager::SetFocusGroup(Actor actor, bool isFocusGroup)
 {
   if(actor)
   {
-    // Create focus group property if not already created.
-    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP);
-    if(propertyIsFocusGroup == Property::INVALID_INDEX)
-    {
-      actor.RegisterProperty( IS_FOCUS_GROUP, isFocusGroup, Property::READ_WRITE );
-    }
-    else
-    {
-      actor.SetProperty(propertyIsFocusGroup, isFocusGroup);
-    }
+    // Create/Set focus group property.
+    actor.RegisterProperty( IS_FOCUS_GROUP, isFocusGroup, Property::READ_WRITE );
   }
 }
 
@@ -667,16 +655,8 @@ void AccessibilityManager::SetFocusable(Actor actor, bool focusable)
 {
   if(actor)
   {
-    // Create actor focusable property if not already created.
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
-    if(propertyActorFocusable == Property::INVALID_INDEX)
-    {
-      actor.RegisterProperty( ACTOR_FOCUSABLE, focusable, Property::READ_WRITE );
-    }
-    else
-    {
-      actor.SetProperty(propertyActorFocusable, focusable);
-    }
+    // Create/Set actor focusable property.
+    actor.RegisterProperty( ACTOR_FOCUSABLE, focusable, Property::READ_WRITE );
   }
 }
 

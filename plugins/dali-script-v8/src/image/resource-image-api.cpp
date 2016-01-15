@@ -51,8 +51,8 @@ ResourceImage ResourceImageApi::GetResourceImage( v8::Isolate* isolate, const v8
  * @for ResourceImage
  * @param {Object} options
  * @param {String} options.url The URL of the image file to use.
- * @param {Integer} [options.loadPolicy] The LoadPolicy to apply when loading the image resource.
- * @param {Integer} [options.releasePolicy] optionally release memory when image is not visible on screen.
+ * @param {Float} options.width The width to fit the loaded image to
+ * @param {Float} options.height The height to fit the loaded image to
  * @return {Object} Image
  */
 Image ResourceImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
@@ -62,12 +62,6 @@ Image ResourceImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
 
   std::string url;
   ImageDimensions dimensions;
-  FittingMode::Type fittingMode = FittingMode::DEFAULT;
-  SamplingMode::Type samplingMode = SamplingMode::DEFAULT;
-  bool orientationCorrection = true;
-  ResourceImage::LoadPolicy loadPolicy( ResourceImage::IMMEDIATE );
-  Image::ReleasePolicy releasePolicy( Image::NEVER);
-
   v8::Local<v8::Value> options( args[0] );
 
   if( !options->IsObject() )
@@ -103,54 +97,7 @@ Image ResourceImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
     dimensions = ImageDimensions( dimensions.GetWidth(), height );
   }
 
-  v8::Local<v8::Value> fittingModeValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "fittingMode" ) );
-  if( fittingModeValue->IsUint32() )
-  {
-    fittingMode = static_cast<FittingMode::Type>( fittingModeValue->ToUint32()->Value() );
-  }
-
-  v8::Local<v8::Value> samplingModeValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "samplingMode" ) );
-  if( samplingModeValue->IsUint32() )
-  {
-    samplingMode = static_cast<SamplingMode::Type>( samplingModeValue->ToUint32()->Value() );
-  }
-
-  v8::Local<v8::Value> orientationCorrectionValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "orientationCorrection" ) );
-  if( orientationCorrectionValue->IsBoolean() )
-  {
-    orientationCorrection = orientationCorrectionValue->ToBoolean()->Value();
-  }
-
-  v8::Local<v8::Value> releasePolicyValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "releasePolicy" ) );
-  if( releasePolicyValue->IsUint32() )
-  {
-    releasePolicy = static_cast<Image::ReleasePolicy>( releasePolicyValue->ToUint32()->Value() );
-  }
-
-  v8::Local<v8::Value> loadPolicyValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "loadPolicy" ) );
-  if( loadPolicyValue->IsUint32() )
-  {
-    loadPolicy = static_cast< ResourceImage::LoadPolicy >( loadPolicyValue->ToUint32()->Value());
-  }
-
-  return ResourceImage::New( url, loadPolicy, releasePolicy, dimensions, fittingMode, samplingMode, orientationCorrection );
-}
-
-/**
- * Get the load policy
- *
- * @method getLoadPolicy
- * @for ResourceImage
- * @return {Integer} load policy either dali.IMAGE_LOAD_POLICY_ON_DEMAND or dali.IMAGE_LOAD_POLICY_IMMEDIATE
- */
-void ResourceImageApi::GetLoadPolicy( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  ResourceImage image = GetResourceImage( isolate, args );
-
-  args.GetReturnValue().Set( v8::Integer::New( isolate, image.GetLoadPolicy() ) );
+  return ResourceImage::New( url, dimensions );
 }
 
 /**

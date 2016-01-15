@@ -122,7 +122,7 @@ void RendererFactoryCache::SaveRenderer( const std::string& key, Renderer& rende
   }
 }
 
-void RendererFactoryCache::CleanRendererCache( const std::string& key )
+bool RendererFactoryCache::CleanRendererCache( const std::string& key )
 {
   int index = FindRenderer( key );
   if( index != -1 )
@@ -134,8 +134,20 @@ void RendererFactoryCache::CleanRendererCache( const std::string& key )
 
       delete cachedRenderer;
       cachedRenderer = NULL;
+      return true;
     }
   }
+  return false;
+}
+
+void RendererFactoryCache::CacheDebugRenderer( Renderer& renderer )
+{
+  mDebugRenderer = renderer;
+}
+
+Renderer RendererFactoryCache::GetDebugRenderer()
+{
+  return mDebugRenderer;
 }
 
 Geometry RendererFactoryCache::CreateQuadGeometry()

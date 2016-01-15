@@ -62,13 +62,20 @@ ImageView ImageView::New( Image image )
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage( image );
-  return ImageView( imageView );
+  return imageView;
 }
 
 ImageView ImageView::New( const std::string& url )
 {
   ImageView imageView = Internal::ImageView::New();
-  imageView.SetImage( url );
+  imageView.SetImage( url, ImageDimensions() );
+  return imageView;
+}
+
+ImageView ImageView::New( const std::string& url, ImageDimensions size )
+{
+  ImageView imageView = Internal::ImageView::New();
+  imageView.SetImage( url, size );
   return imageView;
 }
 
@@ -84,7 +91,12 @@ void ImageView::SetImage( Image image )
 
 void ImageView::SetImage( const std::string& url )
 {
-  Dali::Toolkit::GetImpl( *this ).SetImage( url );
+  Dali::Toolkit::GetImpl( *this ).SetImage( url, ImageDimensions() );
+}
+
+void ImageView::SetImage( const std::string& url, ImageDimensions size )
+{
+  Dali::Toolkit::GetImpl( *this ).SetImage( url, size );
 }
 
 Image ImageView::GetImage() const

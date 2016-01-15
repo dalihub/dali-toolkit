@@ -38,7 +38,7 @@ class Slider;
  * Signals
  * | %Signal Name      | Method                      |
  * |-------------------|-----------------------------|
- * | value-changed     | @ref ValueChangedSignal()   |
+ * | valueChanged      | @ref ValueChangedSignal()   |
  * | mark              | @ref MarkSignal()           |
  */
 class DALI_IMPORT_API Slider : public Control
@@ -61,26 +61,26 @@ public:
   {
     enum
     {
-      LOWER_BOUND = PROPERTY_START_INDEX, ///< Property, name "lower-bound",            type float
-      UPPER_BOUND,                        ///< Property, name "upper-bound",            type float
+      LOWER_BOUND = PROPERTY_START_INDEX, ///< Property, name "lowerBound",             type float
+      UPPER_BOUND,                        ///< Property, name "upperBound",             type float
       VALUE,                              ///< Property, name "value",                  type float
-      HIT_REGION,                         ///< Property, name "hit-region",             type Vector2
-      BACKING_REGION,                     ///< Property, name "backing-region",         type Vector2
-      HANDLE_REGION,                      ///< Property, name "handle-region",          type Vector2
-      BACKING_IMAGE_NAME,                 ///< Property, name "backing-image-name",     type std::string
-      HANDLE_IMAGE_NAME,                  ///< Property, name "handle-image-name",      type std::string
-      PROGRESS_IMAGE_NAME,                ///< Property, name "progress-image-name",    type std::string
-      POPUP_IMAGE_NAME,                   ///< Property, name "popup-image-name",       type std::string
-      POPUP_ARROW_IMAGE_NAME,             ///< Property, name "popup-arrow-image-name", type std::string
-      DISABLE_COLOR,                      ///< Property, name "disable-color",          type Vector4
-      POPUP_TEXT_COLOR,                   ///< Property, name "popup-text-color",       type Vector4
-      VALUE_PRECISION,                    ///< Property, name "value-precision",        type int
-      SHOW_POPUP,                         ///< Property, name "show-popup",             type bool
-      SHOW_VALUE,                         ///< Property, name "show-value",             type bool
+      HIT_REGION,                         ///< Property, name "hitRegion",              type Vector2
+      BACKING_REGION,                     ///< Property, name "backingRegion",          type Vector2
+      HANDLE_REGION,                      ///< Property, name "handleRegion",           type Vector2
+      BACKING_IMAGE_NAME,                 ///< Property, name "backingImageName",       type std::string
+      HANDLE_IMAGE_NAME,                  ///< Property, name "handleImageName",        type std::string
+      PROGRESS_IMAGE_NAME,                ///< Property, name "progressImageName",      type std::string
+      POPUP_IMAGE_NAME,                   ///< Property, name "popupImageName",         type std::string
+      POPUP_ARROW_IMAGE_NAME,             ///< Property, name "popupArrowImageName",    type std::string
+      DISABLE_COLOR,                      ///< Property, name "disableColor",           type Vector4
+      POPUP_TEXT_COLOR,                   ///< Property, name "popupTextColor",         type Vector4
+      VALUE_PRECISION,                    ///< Property, name "valuePrecision",         type int
+      SHOW_POPUP,                         ///< Property, name "showPopup",              type bool
+      SHOW_VALUE,                         ///< Property, name "showValue",              type bool
       ENABLED,                            ///< Property, name "enabled",                type bool
       MARKS,                              ///< Property, name "marks",                  type Property::Array<float>
-      SNAP_TO_MARKS,                      ///< Property, name "snap-to-marks",          type bool
-      MARK_TOLERANCE,                     ///< Property, name "mark-tolerance",         type float
+      SNAP_TO_MARKS,                      ///< Property, name "snapToMarks",            type bool
+      MARK_TOLERANCE,                     ///< Property, name "markTolerance",          type float
     };
   };
 

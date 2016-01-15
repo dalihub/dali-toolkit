@@ -259,7 +259,7 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
   std::string line;
   std::getline(ss, line);
 
-   while (std::getline(ss, line))
+  while (std::getline(ss, line))
   {
     std::istringstream isline(line, std::istringstream::in);
     std::string tag;
@@ -419,16 +419,8 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
 
   if (iniObj)
   {
-    pntAcum += (int)mPoints.Size();
-    texAcum += (int)mTextures.Size();
-    nrmAcum += (int)mNormals.Size();
-
     CenterAndScale(true, mPoints);
-
-    face = 0;
-
     mSceneLoaded = true;
-
     return true;
   }
 
@@ -548,7 +540,6 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   }
 
   surface.SetRequiresDepthTesting(true);
-  //surface.SetProperty(Geometry::Property::GEOMETRY_HALF_EXTENTS, GetSize() * 0.5);
 
   vertices.Clear();
   verticesExt.Clear();

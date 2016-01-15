@@ -26,6 +26,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/devel-api/rendering/cull-face.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
@@ -224,14 +225,14 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnView, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "page-size",       VECTOR2, PAGE_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "current-page-id", INTEGER, CURRENT_PAGE_ID )
-DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "spine-shadow",    VECTOR2, SPINE_SHADOW )
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "pageSize",        VECTOR2, PAGE_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "currentPageId",   INTEGER, CURRENT_PAGE_ID )
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "spineShadow",     VECTOR2, SPINE_SHADOW )
 
-DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-turn-started",  SIGNAL_PAGE_TURN_STARTED )
-DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-turn-finished", SIGNAL_PAGE_TURN_FINISHED )
-DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-pan-started",   SIGNAL_PAGE_PAN_STARTED )
-DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "page-pan-finished",  SIGNAL_PAGE_PAN_FINISHED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "pageTurnStarted",    SIGNAL_PAGE_TURN_STARTED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "pageTurnFinished",   SIGNAL_PAGE_TURN_FINISHED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "pagePanStarted",     SIGNAL_PAGE_PAN_STARTED )
+DALI_SIGNAL_REGISTRATION( Toolkit, PageTurnView, "pagePanFinished",    SIGNAL_PAGE_PAN_FINISHED )
 
 DALI_TYPE_REGISTRATION_END()
 

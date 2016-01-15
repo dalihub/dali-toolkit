@@ -68,11 +68,11 @@ public:
   {
     enum
     {
-      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselected-icon", type std::string
-      SELECTED_ICON,                          ///< Property, name "selected-icon",   type std::string
-      ICON_ALIGNMENT,                         ///< Property, name "icon-alignment",  type std::string
-      LABEL_PADDING,                          ///< Property, name "label-padding",   type Vector4
-      ICON_PADDING,                           ///< Property, name "icon-padding",    type Vector4
+      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string
+      SELECTED_ICON,                          ///< Property, name "selectedIcon",    type std::string
+      ICON_ALIGNMENT,                         ///< Property, name "iconAlignment",   type std::string
+      LABEL_PADDING,                          ///< Property, name "labelPadding",    type Vector4
+      ICON_PADDING,                           ///< Property, name "iconPadding",     type Vector4
     };
   };
 

@@ -75,7 +75,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::SetImage
    */
-  void SetImage( const std::string& imageUrl );
+  void SetImage( const std::string& imageUrl, ImageDimensions size );
 
   // Properties
   /**
@@ -93,6 +93,15 @@ public:
    * @return The current value of the property.
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+
+  /**
+   * @brief Set the depth index of this image renderer
+   *
+   * Renderer with higher depth indices are rendered in front of other renderers with smaller values
+   *
+   * @param[in] depthIndex The depth index of this renderer
+   */
+  void SetDepthIndex( int depthIndex );
 
 private: // From Control
 

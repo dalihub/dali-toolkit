@@ -62,9 +62,6 @@ Constants accessible under the dali global object.
 |DRAW_MODE_STENCIL                        | integer value |
 
 |**Image load policy  **| |
-|IMAGE_LOAD_POLICY_IMMEDIATE              | integer value |
-|IMAGE_LOAD_POLICY_ON_DEMAND              | integer value |
-
 |**actor.SetBlendFunc() ** | |
 |BLEND_FACTOR_ZERO                        | integer value |
 |BLEND_FACTOR_ONE                         | integer value |
@@ -143,6 +140,50 @@ Constants accessible under the dali global object.
 | PIXEL_FORMAT_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC            | integer value  |
 | PIXEL_FORMAT_COMPRESSED_RGB8_ETC1                        | integer value  |
 | PIXEL_FORMAT_COMPRESSED_RGB_PVRTC_4BPPV1                 | integer value  |
+
+|**Texture filtering mode ** | |
+|FILTER_MODE_NONE                     | integer value  |
+|FILTER_MODE_DEFAULT                  | integer value  |
+|FILTER_MODE_NEAREST                  | integer value  |
+|FILTER_MODE_LINEAR                   | integer value  |
+
+|**Sampler wrap mode ** | |
+|WRAP_MODE_DEFAULT                    | integer value  |
+|WRAP_MODE_CLAMP_TO_EDGE              | integer value  |
+|WRAP_MODE_REPEAT                     | integer value  |
+|WRAP_MODE_MIRRORED_REPEAT            | integer value  |
+
+|**Material face culling mode ** | |
+|MATERIAL_NONE                        | integer value  |
+|MATERIAL_CULL_BACK                   | integer value  |
+|MATERIAL_CULL_FRONT                  | integer value  |
+|MATERIAL_CULL_BACK_AND_FRONT         | integer value  |
+
+|**Geometry primitives type ** | |
+|GEOMETRY_POINTS                      | integer value  |
+|GEOMETRY_LINES                       | integer value  |
+|GEOMETRY_LINE_LOOP                   | integer value  |
+|GEOMETRY_LINE_STRIP                  | integer value  |
+|GEOMETRY_TRIANGLES                   | integer value  |
+|GEOMETRY_TRIANGLE_FAN                | integer value  |
+|GEOMETRY_TRIANGLE_STRIP              | integer value  |
+
+|**Property type ** | |
+|PROPERTY_NONE                        | integer value  |
+|PROPERTY_BOOLEAN                     | integer value  |
+|PROPERTY_FLOAT                       | integer value  |
+|PROPERTY_INTEGER                     | integer value  |
+|PROPERTY_VECTOR2                     | integer value  |
+|PROPERTY_VECTOR3                     | integer value  |
+|PROPERTY_VECTOR4                     | integer value  |
+|PROPERTY_MATRIX3                     | integer value  |
+|PROPERTY_MATRIX                      | integer value  |
+|PROPERTY_RECTANGLE                   | integer value  |
+|PROPERTY_ROTATION                    | integer value  |
+|PROPERTY_STRING                      | integer value  |
+|PROPERTY_ARRAY                       | integer value  |
+|PROPERTY_MAP                         | integer value  |
+|PROPERTY_INVALID_INDEX               | integer value  |
 
  * @class Constants
  */

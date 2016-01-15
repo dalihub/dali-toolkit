@@ -1,0 +1,90 @@
+<!--
+/**-->
+
+# Mark-up Style {#markup-style}
+
+Mark-up tags can be used within the text to set styles.
+
+By default the text controls don't process the mark-up string. To enable the mark-up string processing the property *ENABLE_MARKUP* must be set to *true*.
+
+~~~{.cpp}
+// C++
+
+TextField field = TextField::New();
+field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+
+Stage::GetCurrent().Add( field );
+~~~
+
+~~~{.js}
+// JavaScript
+
+var field = new dali.TextField();
+field.enableMarkup = true;
+
+dali.stage.add( field );
+~~~
+
+Note the mark-up processor doesn't check the correctness of the mark-up string. This may cause the text to be badly rendered.
+
+The table below describes the priorities when styles are applied while rendering text.
+|  |  |  |  |
+|--|--|--|--|
+| Priority 1 | Style set by markup string. | Will override the style set through the control properties. | i.e The \<color\> tag will override the *TEXT_COLOR* property. |
+| Priority 2 | Style set through the control properties. | Will override the default platform style. |  |
+| Priority 3 | Default platform style. |  |  |
+
+Current supported tags are:
+
+## \<color\>
+
+Sets the color of the characters inside the tag. The *color* tag has a *value* attribute used to set the color. Possible values are: 'red', 'green', 'blue', 'yellow', 'magenta',
+ 'cyan', 'white', 'black' and 'transparent'. Web color and 32 bits hexadecimal 0xAARRGGBB formats are also supported.
+
+Examples below are equivalent, render the text in red. Second example codes the color in 0xAARRGGBB, third and fourth in web color with 3 and 6 characters.
+
+~~~{.cpp}
+// C++
+field.SetProperty( TextLabel::Property::TEXT, "<color value='red'>Red Text</color>" ); // Color coded with a text constant.
+~~~
+
+~~~{.js}
+// JavaScript
+
+field.text = "<color value='red'>Red Text</color>"; // Color coded with a text constant.
+~~~
+
+~~~{.cpp}
+// C++
+field.SetProperty( TextLabel::Property::TEXT, "<color value='0xFFFF0000'>Red Text</color>" ); // Color packed inside an ARGB hexadecimal value.
+~~~
+
+~~~{.js}
+// JavaScript
+
+field.text = "<color value='0xFFFF0000'>Red Text</color>"; // Color packed inside an ARGB hexadecimal value.
+~~~
+
+~~~{.cpp}
+// C++
+field.SetProperty( TextLabel::Property::TEXT, "<color value='#F00'>Red Text</color>" ); // Color packed with the web color format (3 characters).
+~~~
+
+~~~{.js}
+// JavaScript
+
+field.text = "<color value='#F00'>Red Text</color>"; // Color packed with the web color format (3 characters).
+~~~
+
+~~~{.cpp}
+// C++
+field.SetProperty( TextLabel::Property::TEXT, "<color value='#FF0000'>Red Text</color>" ); // Color packed with the web color format (6 characters).
+~~~
+
+~~~{.js}
+// JavaScript
+
+field.text = "<color value='#FF0000'>Red Text</color>"; // Color packed with the web color format (6 characters).
+~~~
+
+*/

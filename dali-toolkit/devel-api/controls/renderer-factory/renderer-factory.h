@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/images/image-operations.h>
 
 // INTERNAK INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
@@ -39,11 +40,13 @@ class RendererFactory;
 /**
  * @brief RendererFactory is a singleton object that provides and shares renderers for controls
  *
+ * By setting environment variable 'DALI_DEBUG_RENDERING', all concrete renderer is replaced with the debug renderer which renders a quad wireframe.
+ *
  * The renderer type is required in the property map for requesting a control renderer.
  *
- * | %Property Name            | Type             |
- * |---------------------------|------------------|
- * | renderer-type             | STRING           |
+ * | %Property Name           | Type             |
+ * |--------------------------|------------------|
+ * | rendererType             | STRING           |
  */
 class DALI_IMPORT_API RendererFactory : public BaseHandle
 {
@@ -109,10 +112,10 @@ public:
    * else the renderer would be a handle to a newly created internal color renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] color The color to be rendered.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const Vector4& color );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color );
 
   /**
    * @brief Request the control renderer to renderer the border with the given size and color.
@@ -138,18 +141,20 @@ public:
    * else the renderer would be a handle to a newly created internal image renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] image The Image to be rendered.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const Image& image );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image );
 
   /**
    * @brief Request the control renderer to render the given resource at the url.
    *
    * @param[in] url The URL to the resource to be rendered.
+   * @param[in] size The width and height to fit the loaded image to.
    * @return The pointer pointing to the control renderer
    */
-  ControlRenderer GetControlRenderer( const std::string& url );
+  ControlRenderer GetControlRenderer( const std::string& url,
+                                      ImageDimensions size = ImageDimensions() );
 
   /**
    * @brief Request the current control renderer to render the given resource at the url
@@ -158,10 +163,12 @@ public:
    * else the renderer would be a handle to a newly created internal image renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] url The URL to the resource to be rendered.
-   * @return Whether a new internal control renderer is created.
+   * @param[in] size The width and height to fit the loaded image to.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const std::string& url );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url,
+                      ImageDimensions size = ImageDimensions() );
 
 
   /**
@@ -170,11 +177,12 @@ public:
    * if the current renderer is capable of merging with the property map the reset the renderer with the merged properties
    * else the renderer would be a handle to a newly created internal renderer.
    *
+   * @param[in] renderer The ControlRenderer to reset
+   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] propertyMap The map contains the properties required by the control renderer
    *            Depends on the content of the map, different kind of renderer would be returned.
-   * @return Whether a new internal control renderer is created.
    */
-  bool ResetRenderer( ControlRenderer& renderer, const Property::Map& propertyMap );
+  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap );
 
 private:
 

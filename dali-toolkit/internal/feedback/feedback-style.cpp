@@ -195,7 +195,7 @@ const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo( const string& type ) const
 
 void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali::StyleChange::Type styleChange )
 {
-  if( StyleChange::THEME_CHANGE )
+  if( styleChange == StyleChange::THEME_CHANGE )
   {
     string userDefinedTheme;
 
@@ -289,19 +289,19 @@ void FeedbackStyle::LoadFromString( const string& data )
             DALI_ASSERT_ALWAYS(type && TreeNode::STRING == type->GetType() && "Signal must have a type");
             signalFeedbackInfo.mSignalName = type->GetString();
 
-            GetIfString( (*signalIter).second, "haptic-feedback-pattern",
+            GetIfString( (*signalIter).second, "hapticFeedbackPattern",
                          signalFeedbackInfo.mHasHapticFeedbackInfo,
                          signalFeedbackInfo.mHapticFeedbackPattern );
 
-            GetIfString( (*signalIter).second, "haptic-feedback-file",
+            GetIfString( (*signalIter).second, "hapticFeedbackFile",
                          signalFeedbackInfo.mHasHapticFeedbackInfo,
                          signalFeedbackInfo.mHapticFeedbackFile );
 
-            GetIfString( (*signalIter).second, "sound-feedback-pattern",
+            GetIfString( (*signalIter).second, "soundFeedbackPattern",
                          signalFeedbackInfo.mHasSoundFeedbackInfo,
                          signalFeedbackInfo.mSoundFeedbackPattern );
 
-            GetIfString( (*signalIter).second, "haptic-feedback-file",
+            GetIfString( (*signalIter).second, "hapticFeedbackFile",
                          signalFeedbackInfo.mHasSoundFeedbackInfo,
                          signalFeedbackInfo.mSoundFeedbackFile );
 

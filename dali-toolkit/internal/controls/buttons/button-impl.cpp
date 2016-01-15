@@ -30,6 +30,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 /**
  * Button states and contents
@@ -77,29 +78,29 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Button, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled",                     BOOLEAN, DISABLED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "auto-repeating",               BOOLEAN, AUTO_REPEATING               )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initial-auto-repeating-delay", FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "next-auto-repeating-delay",    FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "autoRepeating",                BOOLEAN, AUTO_REPEATING               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initialAutoRepeatingDelay",    FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "nextAutoRepeatingDelay",       FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                     BOOLEAN, SELECTED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-state-image",       STRING,  UNSELECTED_STATE_IMAGE       )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-state-image",         STRING,  SELECTED_STATE_IMAGE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled-state-image",         STRING,  DISABLED_STATE_IMAGE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-color",             VECTOR4, UNSELECTED_COLOR             )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-color",               VECTOR4, SELECTED_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedStateImage",         STRING,  UNSELECTED_STATE_IMAGE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedStateImage",           STRING,  SELECTED_STATE_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledStateImage",           STRING,  DISABLED_STATE_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedColor",              VECTOR4, UNSELECTED_COLOR             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedColor",                VECTOR4, SELECTED_COLOR               )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                        MAP,     LABEL                        )
 
 // Deprecated properties:
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label-text",                   STRING,  LABEL_TEXT                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelText",                    STRING,  LABEL_TEXT                   )
 
 // Signals:
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "released",                              SIGNAL_RELEASED              )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "clicked",                               SIGNAL_CLICKED               )
-DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "stateChanged",                          SIGNAL_STATE_CHANGED         )
 
 // Actions:
-DALI_ACTION_REGISTRATION(   Toolkit, Button, "button-click",                          ACTION_BUTTON_CLICK          )
+DALI_ACTION_REGISTRATION(   Toolkit, Button, "buttonClick",                           ACTION_BUTTON_CLICK          )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -574,18 +575,14 @@ const Vector4 Button::GetSelectedColor() const
 
 void Button::SetUnselectedImage( const std::string& filename )
 {
-  ImageActor newContent;
+  Toolkit::ImageView newContent;
   if( !filename.empty() )
   {
-    Image resourceimage = Dali::ResourceImage::New( filename );
-    if( resourceimage )
-    {
-      newContent = ImageActor::New( resourceimage );
-    }
+    newContent = Toolkit::ImageView::New( filename );
   }
   else
   {
-    newContent = ImageActor::New();
+    newContent = Toolkit::ImageView::New();
   }
 
   if( newContent )
@@ -606,18 +603,14 @@ Actor& Button::GetUnselectedImage()
 
 void Button::SetSelectedImage( const std::string& filename )
 {
-  ImageActor newContent;
+  Toolkit::ImageView newContent;
   if( !filename.empty() )
   {
-    Image resourceimage = Dali::ResourceImage::New( filename );
-    if( resourceimage )
-    {
-      newContent = ImageActor::New( resourceimage );
-    }
+   newContent = Toolkit::ImageView::New( filename );
   }
   else
   {
-    newContent = ImageActor::New();
+    newContent = Toolkit::ImageView::New();
   }
 
   if( newContent )
@@ -638,14 +631,10 @@ Actor& Button::GetSelectedImage()
 
 void Button::SetBackgroundImage( const std::string& filename )
 {
-  Image resourceimage = Dali::ResourceImage::New( filename );
-  if( resourceimage )
-  {
-    SetupContent( mBackgroundContent, ImageActor::New( resourceimage ) );
+  SetupContent( mBackgroundContent, Toolkit::ImageView::New( filename ) );
 
-    OnBackgroundImageSet();
-    RelayoutRequest();
-  }
+  OnBackgroundImageSet();
+  RelayoutRequest();
 }
 
 Actor& Button::GetBackgroundImage()
@@ -655,14 +644,10 @@ Actor& Button::GetBackgroundImage()
 
 void Button::SetSelectedBackgroundImage( const std::string& filename )
 {
-  Image resourceimage = Dali::ResourceImage::New( filename );
-  if( resourceimage )
-  {
-    SetupContent( mSelectedBackgroundContent, ImageActor::New( resourceimage ) );
+  SetupContent( mSelectedBackgroundContent, Toolkit::ImageView::New( filename ) );
 
-    OnSelectedBackgroundImageSet();
-    RelayoutRequest();
-  }
+  OnSelectedBackgroundImageSet();
+  RelayoutRequest();
 }
 
 Actor& Button::GetSelectedBackgroundImage()
@@ -672,14 +657,10 @@ Actor& Button::GetSelectedBackgroundImage()
 
 void Button::SetDisabledImage( const std::string& filename )
 {
-  Image resourceimage = Dali::ResourceImage::New( filename );
-  if( resourceimage )
-  {
-    SetupContent( mDisabledContent, ImageActor::New( resourceimage ) );
+  SetupContent( mDisabledContent, Toolkit::ImageView::New( filename ) );
 
-    OnDisabledImageSet();
-    RelayoutRequest();
-  }
+  OnDisabledImageSet();
+  RelayoutRequest();
 }
 
 Actor& Button::GetDisabledImage()
@@ -689,14 +670,10 @@ Actor& Button::GetDisabledImage()
 
 void Button::SetDisabledSelectedImage( const std::string& filename )
 {
-  Image resourceimage = Dali::ResourceImage::New( filename );
-  if( resourceimage )
-  {
-    SetupContent( mDisabledSelectedContent, ImageActor::New( resourceimage ) );
+  SetupContent( mDisabledSelectedContent, Toolkit::ImageView::New( filename ) );
 
-    OnDisabledSelectedImageSet();
-    RelayoutRequest();
-  }
+  OnDisabledSelectedImageSet();
+  RelayoutRequest();
 }
 
 Actor& Button::GetDisabledSelectedImage()
@@ -706,14 +683,10 @@ Actor& Button::GetDisabledSelectedImage()
 
 void Button::SetDisabledBackgroundImage( const std::string& filename )
 {
-  Image resourceimage = Dali::ResourceImage::New( filename );
-  if( resourceimage )
-  {
-    SetupContent( mDisabledBackgroundContent, ImageActor::New( resourceimage ) );
+  SetupContent( mDisabledBackgroundContent, Toolkit::ImageView::New( filename ) );
 
-    OnDisabledBackgroundImageSet();
-    RelayoutRequest();
-  }
+  OnDisabledBackgroundImageSet();
+  RelayoutRequest();
 }
 
 Actor& Button::GetDisabledBackgroundImage()
@@ -1198,7 +1171,6 @@ void Button::PrepareAddButtonImage( Actor& actor )
 {
   if( actor )
   {
-    actor.Unparent();
     Self().Add( actor );
     PrepareForTranstionOut( actor );
   }
@@ -1221,7 +1193,6 @@ void Button::AddButtonImage( Actor& actor )
 {
   if( actor )
   {
-    actor.Unparent();
     Self().Add( actor );
   }
 }

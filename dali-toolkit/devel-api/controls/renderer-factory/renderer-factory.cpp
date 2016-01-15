@@ -20,16 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
-
 
 namespace Dali
 {
 
 namespace Toolkit
 {
+
+namespace
+{
+  const char * const DALI_DEBUG_RENDERING("DALI_DEBUG_RENDERING");
+}
 
 RendererFactory RendererFactory::Get()
 {
@@ -46,10 +51,17 @@ RendererFactory RendererFactory::Get()
       factory = RendererFactory( dynamic_cast<Internal::RendererFactory*>(handle.GetObjectPtr()) );
     }
 
-    if( !factory )
+    if( !factory )// If not, create the RendererFactory and register it as a singleton
     {
-      // If not, create the RendererFactory and register it as a singleton
-      factory = RendererFactory( new Internal::RendererFactory() );
+      // Check whether debug rendering is required
+      if( EnvironmentVariable::GetEnvironmentVariable( DALI_DEBUG_RENDERING ) )
+      {
+        factory = RendererFactory( new Internal::RendererFactory(true) );
+      }
+      else
+      {
+        factory = RendererFactory( new Internal::RendererFactory(false) );
+      }
       singletonService.Register( typeid(RendererFactory), factory );
 
     }
@@ -92,9 +104,9 @@ ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
   return GetImplementation( *this ).GetControlRenderer( color );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Vector4& color )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, color );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, color );
 }
 
 ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
@@ -107,24 +119,24 @@ ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
   return GetImplementation( *this ).GetControlRenderer( image );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Image& image )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, image );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, image );
 }
 
-ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+ControlRenderer RendererFactory::GetControlRenderer( const std::string& url, ImageDimensions size )
 {
-  return GetImplementation( *this ).GetControlRenderer( url );
+  return GetImplementation( *this ).GetControlRenderer( url, size );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const std::string& url )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, url );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, url, size );
 }
 
-bool RendererFactory::ResetRenderer( ControlRenderer& renderer, const Property::Map& propertyMap )
+void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
 {
-  return GetImplementation( *this ).ResetRenderer( renderer, propertyMap );
+  GetImplementation( *this ).ResetRenderer( renderer, actor, propertyMap );
 }
 
 } // namespace Toolkit

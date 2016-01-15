@@ -43,26 +43,26 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("renderer-type");
-const char * const RENDERER_TYPE_VALUE("gradient-renderer");
+const char * const RENDERER_TYPE("rendererType");
+const char * const RENDERER_TYPE_VALUE("gradientRenderer");
 
 // properties: linear gradient
-const char * const GRADIENT_START_POSITION_NAME("gradient-start-position"); // Property::VECTOR2
-const char * const GRADIENT_END_POSITION_NAME("gradient-end-position"); // Property::VECTOR2
+const char * const GRADIENT_START_POSITION_NAME("gradientStartPosition"); // Property::VECTOR2
+const char * const GRADIENT_END_POSITION_NAME("gradientEndPosition"); // Property::VECTOR2
 
 // properties: radial gradient
-const char * const GRADIENT_CENTER_NAME("gradient-center"); // Property::VECTOR2
-const char * const GRADIENT_RADIUS_NAME("gradient-radius"); // Property::FLOAT
+const char * const GRADIENT_CENTER_NAME("gradientCenter"); // Property::VECTOR2
+const char * const GRADIENT_RADIUS_NAME("gradientRadius"); // Property::FLOAT
 
 // properties: linear&radial gradient
-const char * const GRADIENT_STOP_OFFSET_NAME("gradient-stop-offset"); // Property::Array FLOAT
-const char * const GRADIENT_STOP_COLOR_NAME("gradient-stop-color"); // Property::Array VECTOR4
-const char * const GRADIENT_UNITS_NAME("gradient-units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
-const char * const GRADIENT_SPREAD_METHOD_NAME("gradient-spread-method"); // Property::String  "pad | reflect | repeat"
+const char * const GRADIENT_STOP_OFFSET_NAME("gradientStopOffset"); // Property::Array FLOAT
+const char * const GRADIENT_STOP_COLOR_NAME("gradientStopColor"); // Property::Array VECTOR4
+const char * const GRADIENT_UNITS_NAME("gradientUnits"); // Property::String  "userSpaceOnUse | objectBoundingBox"
+const char * const GRADIENT_SPREAD_METHOD_NAME("gradientSpreadMethod"); // Property::String  "pad | reflect | repeat"
 
 // string values
-const char * const UNIT_USER_SPACE("user-space");
-const char * const UNIT_BOUNDING_BOX("object-bounding-box");
+const char * const UNIT_USER_SPACE("userSpace");
+const char * const UNIT_BOUNDING_BOX("objectBoundingBox");
 const char * const SPREAD_PAD("pad");
 const char * const SPREAD_REFLECT("reflect");
 const char * const SPREAD_REPEAT("repeat");
@@ -188,7 +188,7 @@ GradientRenderer::~GradientRenderer()
 {
 }
 
-void GradientRenderer::DoInitialize( const Property::Map& propertyMap )
+void GradientRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Gradient::GradientUnits gradientUnits = Gradient::OBJECT_BOUNDING_BOX;
   Property::Value* unitsValue = propertyMap.Find( GRADIENT_UNITS_NAME );
@@ -232,6 +232,11 @@ void GradientRenderer::SetClipRect( const Rect<int>& clipRect )
 void GradientRenderer::SetOffset( const Vector2& offset )
 {
   //ToDo: renderer applies the offset
+}
+
+void GradientRenderer::DoSetOnStage( Actor& actor )
+{
+  InitializeRenderer();
 }
 
 void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
@@ -289,7 +294,7 @@ void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
-void GradientRenderer::InitializeRenderer( Dali::Renderer& renderer )
+void GradientRenderer::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
@@ -308,20 +313,8 @@ void GradientRenderer::InitializeRenderer( Dali::Renderer& renderer )
   }
 
   Material material;
-  if( !renderer )
-  {
-    material = Material::New( shader );
-    renderer = Renderer::New( geometry, material );
-  }
-  else
-  {
-    mImpl->mRenderer.SetGeometry( geometry );
-    material = mImpl->mRenderer.GetMaterial();
-    if( material )
-    {
-      material.SetShader( shader );
-    }
-  }
+  material = Material::New( shader );
+  mImpl->mRenderer = Renderer::New( geometry, material );
 
   Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
   Sampler sampler = Sampler::New();
@@ -330,7 +323,7 @@ void GradientRenderer::InitializeRenderer( Dali::Renderer& renderer )
 
   material.AddTexture( lookupTexture, UNIFORM_TEXTULRE_NAME, sampler );
 
-  renderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
+  mImpl->mRenderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 }
 
 bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& propertyMap)

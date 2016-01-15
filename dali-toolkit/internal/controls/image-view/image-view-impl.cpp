@@ -33,6 +33,7 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
+DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "resourceUrl", STRING, RESOURCE_URL )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
 DALI_TYPE_REGISTRATION_END()
 
@@ -66,103 +67,85 @@ Toolkit::ImageView ImageView::New()
 
 void ImageView::SetImage( Image image )
 {
-  if( mImage != image )
+  if( ( mImage != image ) ||
+      ! mUrl.empty()      ||   // If we're changing from a URL type to an Image type
+      ! mPropertyMap.Empty() ) // If we're changing from a property map type to an Image type
   {
     mUrl.clear();
     mPropertyMap.Clear();
 
     mImage = image;
 
-    bool newRendererCreated = false;
-    if( mRenderer )
-    {
-      newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, image );
-    }
-    else
-    {
-      mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( image );
-      newRendererCreated = true;
-    }
-
-    //we need to inform any newly created renderers if it is on stage
-    if( newRendererCreated && Self().OnStage() )
-    {
-      CustomActor self = Self();
-      mRenderer.SetOnStage( self );
-    }
-
+    Actor self = Self();
+    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, image );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
+
+    RelayoutRequest();
   }
 }
 
 void ImageView::SetImage( Property::Map map )
 {
+  mUrl.clear();
+  mImage.Reset();
   mPropertyMap = map;
 
-  bool newRendererCreated = false;
-  if( mRenderer )
-  {
-    newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, mPropertyMap );
-  }
-  else
-  {
-    mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mPropertyMap );
-    newRendererCreated = true;
-  }
+  Actor self = Self();
+  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mPropertyMap );
 
-  //we need to inform any newly created renderers if it is on stage
-  CustomActor self = Self();
-  if( newRendererCreated && self.OnStage() )
-  {
-    mRenderer.SetOnStage( self );
-  }
-
-  int width = 0;
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
   {
-    widthValue->Get( width );
+    int width;
+    if( widthValue->Get( width ) )
+    {
+      mImageSize = ImageDimensions( width, mImageSize.GetHeight() );
+    }
   }
 
-  int height = 0;
   Property::Value* heightValue = mPropertyMap.Find( "height" );
   if( heightValue )
   {
-    heightValue->Get( height );
+    int height;
+    if( heightValue->Get( height ) )
+    {
+      mImageSize = ImageDimensions( mImageSize.GetWidth(), height );
+    }
   }
 
-  mImageSize = ImageDimensions( width, height );
+  RelayoutRequest();
 }
 
-void ImageView::SetImage( const std::string& url )
+void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
-  if( mUrl != url )
+  if( ( mUrl != url ) ||
+      mImage          ||       // If we're changing from an Image type to a URL type
+      ! mPropertyMap.Empty() ) // If we're changing from a property map type to a URL type
   {
     mImage.Reset();
     mPropertyMap.Clear();
 
     mUrl = url;
 
-    bool newRendererCreated = false;
-    if( mRenderer )
+    if( size.GetWidth() == 0u && size.GetHeight() == 0u )
     {
-      newRendererCreated = Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, mUrl );
+      mImageSize = ResourceImage::GetImageSize( mUrl );
     }
     else
     {
-      mRenderer = Toolkit::RendererFactory::Get().GetControlRenderer( mUrl );
-      newRendererCreated = true;
+      mImageSize = size;
     }
 
-    //we need to inform any newly created renderers if it is on stage
-    if( newRendererCreated && Self().OnStage() )
-    {
-      CustomActor self = Self();
-      mRenderer.SetOnStage( self );
-    }
+    Actor self = Self();
+    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl, mImageSize );
 
-    mImageSize = ResourceImage::GetImageSize( mUrl );
+    RelayoutRequest();
   }
+}
+
+void ImageView::SetDepthIndex( int depthIndex )
+{
+  mRenderer.SetDepthIndex( depthIndex );
 }
 
 Vector3 ImageView::GetNaturalSize()
@@ -173,7 +156,7 @@ Vector3 ImageView::GetNaturalSize()
   size.y = mImageSize.GetHeight();
   size.z = std::min(size.x, size.y);
 
-  if( size.x > 0 && size.x > 0 )
+  if( size.x > 0 && size.y > 0 )
   {
     return size;
   }
@@ -249,13 +232,23 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
   {
     switch ( index )
     {
+      case Toolkit::ImageView::Property::RESOURCE_URL:
+      {
+        std::string imageUrl;
+        if( value.Get( imageUrl ) )
+        {
+          GetImpl( imageView ).SetImage( imageUrl, ImageDimensions() );
+        }
+        break;
+      }
+
       case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
         if( value.Get( imageUrl ) )
         {
           ImageView& impl = GetImpl( imageView );
-          impl.SetImage( imageUrl );
+          impl.SetImage( imageUrl, ImageDimensions() );
         }
 
         // if its not a string then get a Property::Map from the property if possible.
@@ -282,6 +275,16 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
   {
     switch ( propertyIndex )
     {
+      case Toolkit::ImageView::Property::RESOURCE_URL:
+      {
+        ImageView& impl = GetImpl( imageview );
+        if ( !impl.mUrl.empty() )
+        {
+          value = impl.mUrl;
+        }
+        break;
+      }
+
       case Toolkit::ImageView::Property::IMAGE:
       {
         ImageView& impl = GetImpl( imageview );

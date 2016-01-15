@@ -27,20 +27,24 @@
 // Internal HEADER
 #include <dali-toolkit/internal/controls/renderers/border/border-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/debug/debug-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
 
 namespace
 {
-const char * const RENDERER_TYPE_NAME( "renderer-type" );
+const char * const RENDERER_TYPE_NAME( "rendererType" );
 
-const char * const COLOR_RENDERER("color-renderer");
-const char * const BORDER_RENDERER("border-renderer");
-const char * const GRADIENT_RENDERER("gradient-renderer");
-const char * const IMAGE_RENDERER("image-renderer");
-const char * const N_PATCH_RENDERER("n-patch-renderer");
+const char * const COLOR_RENDERER("colorRenderer");
+const char * const BORDER_RENDERER("borderRenderer");
+const char * const GRADIENT_RENDERER("gradientRenderer");
+const char * const IMAGE_RENDERER("imageRenderer");
+const char * const N_PATCH_RENDERER("nPatchRenderer");
+
+const std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }
@@ -69,7 +73,8 @@ DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
-RendererFactory::RendererFactory()
+RendererFactory::RendererFactory( bool debugEnabled )
+:mDebugEnabled( debugEnabled )
 {
 }
 
@@ -90,6 +95,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
       mFactoryCache = new RendererFactoryCache();
     }
 
+    if( mDebugEnabled )
+    {
+      return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
+    }
+
     if( typeValue ==  COLOR_RENDERER )
     {
       rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
@@ -100,7 +110,8 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     }
     else if( typeValue ==  IMAGE_RENDERER )
     {
-      rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
+      CreateAtlasManager();
+      rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     }
     else if( typeValue ==  N_PATCH_RENDERER )
     {
@@ -114,7 +125,8 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
 
   if( rendererPtr )
   {
-    rendererPtr->Initialize( propertyMap );
+    Actor actor;
+    rendererPtr->Initialize( actor, propertyMap );
   }
   else
   {
@@ -131,24 +143,40 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& col
     mFactoryCache = new RendererFactoryCache();
   }
 
+  if( mDebugEnabled )
+  {
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
+  }
+
   ColorRenderer* rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
   rendererPtr->SetColor( color );
 
   return Toolkit::ControlRenderer( rendererPtr );
 }
 
-bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Vector4& color )
+void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color )
 {
-  ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
-  if( rendererPtr )
+  if( mDebugEnabled && renderer )
   {
-    rendererPtr->SetColor( color );
-    return false;
+    return;
   }
-  else
+
+  if( renderer )
   {
-    renderer = GetControlRenderer( color );
-    return true;
+    ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
+    if( rendererPtr )
+    {
+      rendererPtr->SetColor( color );
+      return;
+    }
+
+    renderer.RemoveAndReset( actor );
+  }
+
+  renderer = GetControlRenderer( color );
+  if( actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
   }
 }
 
@@ -158,12 +186,13 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, 
   {
     mFactoryCache = new RendererFactoryCache();
   }
-  BorderRenderer* rendererPtr = new BorderRenderer( *mFactoryCache.Get() );
 
-  if( !mFactoryCache )
+  if( mDebugEnabled )
   {
-    mFactoryCache = new RendererFactoryCache();
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
   }
+
+  BorderRenderer* rendererPtr = new BorderRenderer( *mFactoryCache.Get() );
 
   rendererPtr->SetBorderSize( borderSize );
   rendererPtr->SetBorderColor( borderColor );
@@ -178,6 +207,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
     mFactoryCache = new RendererFactoryCache();
   }
 
+  if( mDebugEnabled )
+  {
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
+  }
+
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
   if( npatchImage )
   {
@@ -188,44 +222,71 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
   }
   else
   {
-    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
-    rendererPtr->SetImage( image );
+    CreateAtlasManager();
+    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    Actor actor;
+    rendererPtr->SetImage( actor, image );
 
     return Toolkit::ControlRenderer( rendererPtr );
   }
 }
 
-bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Image& image )
+void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Image& image )
 {
-  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
-  if( npatchImage )
+  if( mDebugEnabled && renderer )
   {
-    NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
-    if( rendererPtr )
-    {
-      rendererPtr->SetImage( npatchImage );
-      return false;
-    }
+    return;
   }
-  else
+
+  if( renderer )
   {
-    ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
-    if( rendererPtr )
+    if( ! image )
     {
-      rendererPtr->SetImage( image );
-      return false;
+      // If the image is empty, then reset the renderer and return
+      renderer.RemoveAndReset( actor );
+      return;
     }
+
+    NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+    if( npatchImage )
+    {
+      NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
+      if( rendererPtr )
+      {
+        rendererPtr->SetImage( npatchImage );
+        return;
+      }
+    }
+    else
+    {
+      ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+      if( rendererPtr )
+      {
+        rendererPtr->SetImage( actor, image );
+        return;
+      }
+    }
+
+    renderer.RemoveAndReset( actor );
   }
 
   renderer = GetControlRenderer( image );
-  return true;
+  if( actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
+  }
 }
 
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url )
+Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url, ImageDimensions size )
 {
   if( !mFactoryCache )
   {
     mFactoryCache = new RendererFactoryCache();
+  }
+
+  if( mDebugEnabled )
+  {
+    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
   }
 
   if( NinePatchImage::IsNinePatchUrl( url ) )
@@ -237,81 +298,108 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string&
   }
   else
   {
-    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ) );
-    rendererPtr->SetImage( url );
+    CreateAtlasManager();
+    ImageRenderer* rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    Actor actor;
+    rendererPtr->SetImage( actor, url, size );
 
     return Toolkit::ControlRenderer( rendererPtr );
   }
 }
 
-bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const std::string& url )
+void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
 {
-  if( NinePatchImage::IsNinePatchUrl( url ) )
+  if( mDebugEnabled && renderer )
   {
-    NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
-    if( rendererPtr )
-    {
-      rendererPtr->SetImage( url );
-      return false;
-    }
-  }
-  else
-  {
-    ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
-    if( rendererPtr )
-    {
-      rendererPtr->SetImage( url );
-      return false;
-    }
+    return;
   }
 
+  if( renderer )
   {
-    renderer = GetControlRenderer( url );
-    return true;
+    if( url.empty() )
+    {
+      // If the URL is empty, then reset the renderer and return
+      renderer.RemoveAndReset( actor );
+      return;
+    }
+    else if( NinePatchImage::IsNinePatchUrl( url ) )
+    {
+      NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
+      if( rendererPtr )
+      {
+        rendererPtr->SetImage( url );
+        return;
+      }
+    }
+    else
+    {
+      ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
+      if( rendererPtr )
+      {
+        rendererPtr->SetImage( actor, url, size );
+        return;
+      }
+    }
+
+    renderer.RemoveAndReset( actor );
+  }
+
+  renderer = GetControlRenderer( url, size );
+  if( actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
   }
 }
 
-bool RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, const Property::Map& propertyMap )
+void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* type = propertyMap.Find( RENDERER_TYPE_NAME );
-  std::string typeValue ;
-  if( type && type->Get( typeValue ))
+  if( mDebugEnabled && renderer )
   {
-    //If there's been a renderer type change then we have to return a new shader
-    if( typeValue ==  COLOR_RENDERER && typeid( renderer ) != typeid( ColorRenderer ) )
-    {
-      renderer = GetControlRenderer( propertyMap );
-      return true;
-    }
-    else if( typeValue ==  GRADIENT_RENDERER && typeid( renderer ) != typeid( GradientRenderer ) )
-    {
-      renderer = GetControlRenderer( propertyMap );
-      return true;
-    }
-    else if( typeValue ==  IMAGE_RENDERER && typeid( renderer ) != typeid( ImageRenderer ) )
-    {
-      renderer = GetControlRenderer( propertyMap );
-      return true;
-    }
-    else if( typeValue ==  N_PATCH_RENDERER && typeid( renderer ) != typeid( NPatchRenderer ) )
-    {
-      renderer = GetControlRenderer( propertyMap );
-      return true;
-    }
-    else if( typeValue ==  BORDER_RENDERER && typeid( renderer ) != typeid( BorderRenderer ) )
-    {
-      renderer = GetControlRenderer( propertyMap );
-      return true;
-    }
+    return;
   }
 
-  GetImplementation( renderer ).Initialize( propertyMap );
-  return false;
+  if( renderer )
+  {
+    ControlRenderer& controlRenderer = GetImplementation( renderer );
+
+    Property::Value* type = propertyMap.Find( RENDERER_TYPE_NAME );
+    std::string typeValue ;
+
+    //If there's no renderer type specified or if there hasn't been a renderer type change then we can reuse the renderer
+    if( !type || !type->Get( typeValue ) ||
+        ( typeValue ==  IMAGE_RENDERER    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
+        ( typeValue ==  N_PATCH_RENDERER  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
+        ( typeValue ==  COLOR_RENDERER    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
+        ( typeValue ==  GRADIENT_RENDERER && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
+        ( typeValue ==  BORDER_RENDERER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) )
+    {
+      controlRenderer.Initialize( actor, propertyMap );
+      return;
+    }
+
+    renderer.RemoveAndReset( actor );
+  }
+
+  renderer = GetControlRenderer( propertyMap );
+  if( actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
+  }
 }
 
 Image RendererFactory::GetBrokenRendererImage()
 {
   return ResourceImage::New( BROKEN_RENDERER_IMAGE_URL );
+}
+
+void RendererFactory::CreateAtlasManager()
+{
+  if( !mAtlasManager )
+  {
+    Shader shader = ImageRenderer::GetImageShader( *( mFactoryCache.Get() ) );
+    mAtlasManager = new ImageAtlasManager(shader, TEXTURE_UNIFORM_NAME);
+    mAtlasManager->SetBrokenImage( BROKEN_RENDERER_IMAGE_URL );
+  }
 }
 
 } // namespace Internal

@@ -184,7 +184,7 @@ void LayerApi::RaiseToTop( const v8::FunctionCallbackInfo<v8::Value>& args )
  * @for Layer
  * @method lowerToBottom
  */
-void LayerApi::ToBottom( const v8::FunctionCallbackInfo<v8::Value>& args )
+void LayerApi::LowerToBottom( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );

@@ -52,7 +52,6 @@ namespace BuilderApi
   void ApplyFromJson(const v8::FunctionCallbackInfo< v8::Value >& args);
   void AddActors( const v8::FunctionCallbackInfo< v8::Value >& args );
   void CreateRenderTask( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void GetShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetFrameBufferImage( const v8::FunctionCallbackInfo< v8::Value >& args );
 }; // namespace BuilderApi
 

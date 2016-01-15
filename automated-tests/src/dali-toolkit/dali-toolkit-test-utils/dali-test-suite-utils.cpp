@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 // CLASS HEADER
 #include "dali-test-suite-utils.h"
 
@@ -53,28 +54,12 @@ void tet_printf(const char *format, ...)
   va_end(arg);
 }
 
-/**
- * DALI_TEST_CHECK is a wrapper for tet_result.
- * If the condition evaluates to false, then the function & line number is printed.
- * @param[in] The boolean expression to check
- */
-#define DALI_TEST_CHECK(condition)                                                        \
-if ( (condition) )                                                                        \
-{                                                                                         \
-  tet_result(TET_PASS);                                                                   \
-}                                                                                         \
-else                                                                                      \
-{                                                                                         \
-  fprintf(stderr, "%s Failed in %s at line %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);    \
-  tet_result(TET_FAIL);                                                                   \
-}
-
 bool operator==(TimePeriod a, TimePeriod b)
 {
   return Equals(a.durationSeconds, b.durationSeconds) && Equals(a.delaySeconds, b.delaySeconds) ;
 }
 
-std::ostream& operator<< (std::ostream& ostream, const TimePeriod value)
+std::ostream& operator<<( std::ostream& ostream, TimePeriod value )
 {
   return ostream << "( Duration:" << value.durationSeconds << " Delay:" << value.delaySeconds << ")";
 }
@@ -91,6 +76,21 @@ std::ostream& operator<<( std::ostream& ostream, Degree angle )
   return ostream;
 }
 
+void DALI_TEST_EQUALS( const BaseHandle& baseHandle1, const BaseHandle& baseHandle2, const char* location )
+{
+  DALI_TEST_EQUALS< const BaseHandle& >( baseHandle1, baseHandle2, location );
+}
+
+void DALI_TEST_EQUALS( const size_t value1, const unsigned int value2, const char* location )
+{
+  DALI_TEST_EQUALS< unsigned int>( ( unsigned int )( value1 ), value2, location );
+}
+
+void DALI_TEST_EQUALS( const unsigned int value1, const size_t value2, const char* location )
+{
+  DALI_TEST_EQUALS< unsigned int >( value1, ( unsigned int )( value2 ), location );
+}
+
 void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const char* location)
 {
   const float* m1 = matrix1.AsFloat();
@@ -99,10 +99,13 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const cha
 
   for (int i=0;i<9;++i)
   {
-    equivalent &= (m1[i] != m2[i]);
+    if( ! (fabsf(m1[i] - m2[i])< GetRangedEpsilon(m1[i], m2[i])) )
+    {
+      equivalent = false;
+    }
   }
 
-  if (!equivalent)
+  if( !equivalent )
   {
     fprintf(stderr, "%s, checking\n"
                "(%f, %f, %f)    (%f, %f, %f)\n"
@@ -239,47 +242,6 @@ void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* lo
 void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* location)
 {
   DALI_TEST_EQUALS(str1, str2.c_str(), location);
-}
-
-
-/**
- * Test whether one unsigned integer value is greater than another.
- * Test succeeds if value1 > value2
- * @param[in] value1 The first value
- * @param[in] value2 The second value
- * @param[in] location The TEST_LOCATION macro should be used here
- */
-void DALI_TEST_GREATER(unsigned int value1, unsigned int value2, const char* location)
-{
-  if (!(value1 > value2))
-  {
-    fprintf(stderr, "%s, checking %d > %d\n", location, value1, value2);
-    tet_result(TET_FAIL);
-  }
-  else
-  {
-    tet_result(TET_PASS);
-  }
-}
-
-/**
- * Test whether one float value is greater than another.
- * Test succeeds if value1 > value2
- * @param[in] value1 The first value
- * @param[in] value2 The second value
- * @param[in] location The TEST_LOCATION macro should be used here
- */
-void DALI_TEST_GREATER( float value1, float value2, const char* location)
-{
-  if (!(value1 > value2))
-  {
-    fprintf(stderr, "%s, checking %f > %f\n", location, value1, value2);
-    tet_result(TET_FAIL);
-  }
-  else
-  {
-    tet_result(TET_PASS);
-  }
 }
 
 void DALI_TEST_ASSERT( DaliException& e, std::string conditionSubString, const char* location )

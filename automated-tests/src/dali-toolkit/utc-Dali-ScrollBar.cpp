@@ -265,15 +265,15 @@ int UtcDaliToolkitScrollBarSetScrollPropertySourceP(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 100.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 500.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   100.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   500.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
@@ -343,15 +343,15 @@ int UtcDaliToolkitScrollBarSetScrollPropertySourceP(void)
   Stage::GetCurrent().Add( newSourceActor );
 
   // Register the scroll properties
-  Property::Index newPropertyScrollPosition = newSourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index newPropertyMinScrollPosition = newSourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index newPropertyMaxScrollPosition = newSourceActor.RegisterProperty( "source-position-max", 200.0f );
-  Property::Index newPropertyScrollContentSize = newSourceActor.RegisterProperty( "source-content-size", 400.0f );
+  Property::Index newPropertyScrollPosition = newSourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index newPropertyMinScrollPosition = newSourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index newPropertyMaxScrollPosition = newSourceActor.RegisterProperty( "sourcePositionMax",   200.0f );
+  Property::Index newPropertyScrollContentSize = newSourceActor.RegisterProperty( "sourceContentSize",   400.0f );
 
-  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "source-position" ), newPropertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "source-position-min" ), newPropertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "source-position-max" ), newPropertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "source-content-size" ), newPropertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "sourcePosition" ), newPropertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "sourcePositionMin" ), newPropertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "sourcePositionMax" ), newPropertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( newSourceActor.GetPropertyIndex( "sourceContentSize" ), newPropertyScrollContentSize, TEST_LOCATION );
 
   // Change the source of the scroll position properties to be the new source actor.
   scrollBar.SetScrollPropertySource(newSourceActor, newPropertyScrollPosition, newPropertyMinScrollPosition, newPropertyMaxScrollPosition, newPropertyScrollContentSize);
@@ -513,15 +513,15 @@ int UtcDaliToolkitScrollBarSetScrollPositionIntervalsP(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 800.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 2000.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   800.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   2000.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
@@ -675,15 +675,15 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 100.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 500.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   100.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   500.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
@@ -1355,15 +1355,15 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 100.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 500.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   100.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   500.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
@@ -1413,15 +1413,15 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 100.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 500.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   100.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   500.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
@@ -1467,15 +1467,15 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 800.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 2000.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   800.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   2000.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
@@ -1575,15 +1575,15 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
   Stage::GetCurrent().Add( sourceActor );
 
   // Register the scroll properties
-  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "source-position", 0.0f );
-  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "source-position-min", 0.0f );
-  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "source-position-max", 800.0f );
-  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "source-content-size", 2000.0f );
+  Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
+  Property::Index propertyMinScrollPosition = sourceActor.RegisterProperty( "sourcePositionMin",   0.0f );
+  Property::Index propertyMaxScrollPosition = sourceActor.RegisterProperty( "sourcePositionMax",   800.0f );
+  Property::Index propertyScrollContentSize = sourceActor.RegisterProperty( "sourceContentSize",   2000.0f );
 
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position" ), propertyScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-min" ), propertyMinScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-position-max" ), propertyMaxScrollPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "source-content-size" ), propertyScrollContentSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePosition" ), propertyScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMin" ), propertyMinScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourcePositionMax" ), propertyMaxScrollPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( sourceActor.GetPropertyIndex( "sourceContentSize" ), propertyScrollContentSize, TEST_LOCATION );
 
   // Set the source of the scroll position properties.
   scrollBar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);

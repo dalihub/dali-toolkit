@@ -40,7 +40,6 @@ SET(TC_SOURCES
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
    utc-Dali-Magnifier.cpp
-   utc-Dali-NinePatchMaskEffect.cpp
    utc-Dali-Popup.cpp
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp
@@ -51,6 +50,8 @@ SET(TC_SOURCES
    utc-Dali-Model3dView.cpp
    utc-Dali-ControlRenderer.cpp
    utc-Dali-RendererFactory.cpp
+   utc-Dali-DebugRenderer.cpp
+   utc-Dali-ImageAtlas.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
@@ -59,6 +60,8 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
+   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
+   dali-toolkit-test-utils/toolkit-environment-variable.cpp
    dali-toolkit-test-utils/toolkit-imf-manager.cpp
    dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    dali-toolkit-test-utils/toolkit-style-monitor.cpp
@@ -84,7 +87,9 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-toolkit
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror=return-type")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror")
+
+ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
@@ -99,6 +104,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
+    -lpthread
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

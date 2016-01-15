@@ -14,12 +14,12 @@ dali.stage.setBackgroundColor( dali.COLOR_WHITE);
   
 var stageSize = dali.stage.getSize();
   
-var imageActor = new dali.ImageActor( );
+var actor = new dali.Actor( );
   
-dali.stage.add( imageActor );
+dali.stage.add( actor );
   
 // when the actor is no longer required
-dali.stage.remove( imageActor );
+dali.stage.remove( actor );
 ```
 
 ![ ](../assets/img/stage.png)
@@ -27,7 +27,7 @@ dali.stage.remove( imageActor );
 
 ### Key Events
 
-Key events are received through the key-event callback.
+Key events are received through the keyEvent callback.
 
 ```
 daliApp.myCallback = function (keyEvent)
@@ -48,7 +48,7 @@ daliApp.myCallback = function (keyEvent)
   }
 }
 
-dali.stage.connect("key-event", daliApp.myCallback);
+dali.stage.on("keyEvent", daliApp.myCallback);
 ```
 
 The key event object has the following properties

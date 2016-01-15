@@ -33,7 +33,7 @@ dali.stage.add( label );
 ~~~
 
 The label must also be added to the stage, or to an actor which is on the stage.  
-The position of the label on-screen is dependent on the parent-origin and anchor-point properties.  
+The position of the label on-screen is dependent on the parentOrigin and anchorPoint properties.  
 
 |  |  |
 |--|--|
@@ -42,6 +42,10 @@ The position of the label on-screen is dependent on the parent-origin and anchor
 ### Font Selection
 
 By default TextLabel will automatically select a suitable font from the platform. However, a different font could be selected. See the [Font Selection](@ref font-selection) section for more details.
+
+### Mark-up Style
+
+Mark-up tags can be used to change the style of the text. See the [Mark-up Style](@ref markup-style) section for more details.
 
 ### Text Alignment
 
@@ -312,22 +316,23 @@ label1.underlineHeight = 1;
 
 ### Text Label Properties
 
- Name (JavaScript)   |  Name (C++)         |  Type        | Writable     | Animatable
----------------------|---------------------|--------------|--------------|-----------
- renderingBackend    | RENDERING_BACKEND   |  INTEGER     | O            | X
- text                | TEXT                |  STRING      | O            | X
- fontFamily          | FONT_FAMILY         |  STRING      | O            | X
- fontStyle           | FONT_STYLE          |  STRING      | O            | X
- pointSize           | POINT_SIZE          |  FLOAT       | O            | X
- multiLine           | MULTI_LINE          |  BOOLEAN     | O            | X
- horizontalAlignment | HORIZONTAL_ALIGNMENT|  STRING      | O            | X
- verticalAlignment   | VERTICAL_ALIGNMENT  |  STRING      | O            | X
- textColor           | TEXT_COLOR          |  VECTOR4     | O            | X
- shadowOffset        | SHADOW_OFFSET       |  VECTOR2     | O            | X
- shadowColor         | SHADOW_COLOR        |  VECTOR4     | O            | X
- underlineEnabled    | UNDERLINE_ENABLED   |  BOOLEAN     | O            | X
- underlineColor      | UNDERLINE_COLOR     |  VECTOR4     | O            | X
- underlineHeight     | UNDERLINE_HEIGHT    |  FLOAT       | O            | X
+ Name (JavaScript)   |  Name (C++)          |  Type        | Writable     | Animatable
+---------------------|----------------------|--------------|--------------|-----------
+ renderingBackend    | RENDERING_BACKEND    |  INTEGER     | O            | X
+ text                | TEXT                 |  STRING      | O            | X
+ fontFamily          | FONT_FAMILY          |  STRING      | O            | X
+ fontStyle           | FONT_STYLE           |  STRING      | O            | X
+ pointSize           | POINT_SIZE           |  FLOAT       | O            | X
+ multiLine           | MULTI_LINE           |  BOOLEAN     | O            | X
+ horizontalAlignment | HORIZONTAL_ALIGNMENT |  STRING      | O            | X
+ verticalAlignment   | VERTICAL_ALIGNMENT   |  STRING      | O            | X
+ textColor           | TEXT_COLOR           |  VECTOR4     | O            | X
+ shadowOffset        | SHADOW_OFFSET        |  VECTOR2     | O            | X
+ shadowColor         | SHADOW_COLOR         |  VECTOR4     | O            | X
+ underlineEnabled    | UNDERLINE_ENABLED    |  BOOLEAN     | O            | X
+ underlineColor      | UNDERLINE_COLOR      |  VECTOR4     | O            | X
+ underlineHeight     | UNDERLINE_HEIGHT     |  FLOAT       | O            | X
+ enableMarkup        | ENABLE_MARKUP        |  BOOLEAN     | O            | X
 
 
 

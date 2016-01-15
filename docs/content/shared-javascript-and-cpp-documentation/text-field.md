@@ -53,6 +53,20 @@ console.log( field.text );
 
 By default TextField will automatically select a suitable font from the platform. However, a different font could be selected. See the [Font Selection](@ref font-selection) section for more details.
 
+### Mark-up Style
+
+Mark-up tags can be used to change the style of the text. See the [Mark-up Style](@ref markup-style) section for more details.
+
+### Input Style
+
+The input style can be changed through the control properties. Current supported input style properties are:
+
+#### INPUT_COLOR
+
+Sets the input color. All subsequent characters added will be rendered with the input color.
+
+Note the input color may change if the cursor is updated by tapping in a new position.
+
 ### Text Alignment
 
 TextField displays a single-line of text, which will scroll if there is not enough room for the text displayed.
@@ -69,6 +83,28 @@ field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN" ); // "CEN
 
 field.HorizontalAlignment = "BEGIN"; // "CENTER" or "END"
 ~~~
+
+### Copy and Paste  (Selection)
+
+Text can be selected by a long press or double tapping it.   Depending on certain conditions a popup could be shown giving options including [CUT][COPY][PASTE], [SELECT ALL] or [CLIPBOARD]. Below these conditions will be explained.
+
+[CUT] or [COPY] send the selected text to the clipboard ready to be pasted directly or via the clipboard UI.   Pressing [PASTE] will paste the top item from the clipboard (what has just been copied, possibly from another application).  If the system supports a clipboard UI this can be displayed by pressing the [CLIPBOARD] button.
+
+Empty text means the user has not inputted any text, a TextField containing special characters or purely whitespace is not empty.
+
+Below shows how the popup will look depending on the state of the TextField
+
+|  |  |
+|--|--|
+| Condition: Long press/double tap when empty text but clipboard has content  |  Condition: Long press/double tap when TextField contains text |
+|[PASTE][CLIPBOARD] buttons shown| [CUT][COPY], [SELECT ALL] unless all text selected and [PASTE][CLIPBOARD] if content to paste. |
+|    ![ ](../assets/img/text-controls/EmptyTextClipboardHasContent.png) ![ ](./EmptyTextClipboardHasContent.png) |   ![ ](../assets/img/text-controls/SelectingText.png) ![ ](./SelectingText.png) |
+| Condition: Long press/double tap popup when TextField contains just whitespace | Condition: Empty text & clipboard empty |
+| Whitespace treated as regular text, [CUT][COPY] shown and [PASTE][CLIPBOARD] if content to paste. As all text is selected there is no need for [SELECT ALL] |  No popup shown after longpress/double tap|
+|  ![ ](../assets/img/text-controls/SelectAllWhitespace.png) ![ ](./SelectAllWhitespace.png) | ![ ](../assets/img/text-controls/EmptyTextAndNoContentToPaste.png) ![ ](./EmptyTextAndNoContentToPaste.png)|
+| Condition: Longpress/(double tap) on whitespace which is following text | Condition: Tapping text or panning grab handle |
+| [PASTE][CLIPBOARD] shown if something to paste. [SELECT ALL] as more text to select | If content in clipboard [PASTE][CLIPBOARD] popup will be shown. |
+| ![ ](../assets/img/text-controls/SelectWhitespaceAfterText.png) ![ ](./SelectWhitespaceAfterText.png) | ![ ](../assets/img/text-controls/TapAfterCopyingText.png) ![ ](./TapAfterCopyingText.png) |
 
 ### TextField Decorations
 
@@ -107,6 +143,7 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  horizontalAlignment               | HORIZONTAL_ALIGNMENT                 |  STRING      | O            | X
  verticalAlignment                 | VERTICAL_ALIGNMENT                   |  STRING      | O            | X
  textColor                         | TEXT_COLOR                           |  VECTOR4     | O            | X
+ placeholderTextColor              | PLACEHOLDER_TEXT_COLOR               |  VECTOR4     | O            | X
  shadowOffset                      | SHADOW_OFFSET                        |  VECTOR2     | O            | X
  shadowColor                       | SHADOW_COLOR                         |  VECTOR4     | O            | X
  primaryCursorColor                | PRIMARY_CURSOR_COLOR                 |  VECTOR4     | O            | X
@@ -114,17 +151,22 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  enableCursorBlink                 | ENABLE_CURSOR_BLINK                  |  BOOLEAN     | O            | X
  cursorBlinkInterval               | CURSOR_BLINK_INTERVAL                |  FLOAT       | O            | X
  cursorBlinkDuration               | CURSOR_BLINK_DURATION                |  FLOAT       | O            | X
+ cursorWidth                       | CURSOR_WIDTH                         |  INTEGER     | O            | X
  grabHandleImage                   | GRAB_HANDLE_IMAGE                    |  STRING      | O            | X
  grabHandlePressedImage            | GRAB_HANDLE_PRESSED_IMAGE            |  STRING      | O            | X
  scrollThreshold                   | SCROLL_THRESHOLD                     |  FLOAT       | O            | X
- scrollSpreed                      | SCROLL_SPEED                         |  FLOAT       | O            | X
+ scrollSpeed                       | SCROLL_SPEED                         |  FLOAT       | O            | X
  selectionHandleImageLeft          | SELECTION_HANDLE_IMAGE_LEFT          |  STRING      | O            | X
  selectionHandleImageRight         | SELECTION_HANDLE_IMAGE_RIGHT         |  STRING      | O            | X
  selectionHandlePressedImageLeft   | SELECTION_HANDLE_PRESSED_IMAGE_LEFT  |  STRING      | O            | X
  selectionHandlePressedImageRight  | SELECTION_HANDLE_PRESSED_IMAGE_RIGHT |  STRING      | O            | X
+ selectionHandleMarkerImageLeft    | SELECTION_HANDLE_MARKER_IMAGE_LEFT   |  MAP         | O            | X
+ selectionHandleMarkerImageRight   | SELECTION_HANDLE_MARKER_IMAGE_RIGHT  |  MAP         | O            | X
  selectionHighlightColor           | SELECTION_HIGHLIGHT_COLOR            |  VECTOR4     | O            | X
  decorationBoundingBox             | DECORATION_BOUNDING_BOX              |  RECTANGLE   | O            | X
  inputMethodSettings               | INPUT_METHOD_SETTINGS                |  MAP         | O            | X
+ inputColor                        | INPUT_COLOR                          |  VECTOR4     | O            | X
+ enableMarkup                      | ENABLE_MARKUP                        |  BOOLEAN     | O            | X
 
 @class TextField
 

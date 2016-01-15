@@ -29,10 +29,10 @@ namespace
 {
 //custom shader
 const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertex-shader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragment-shader" );
-const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivide-grid-x" );
-const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivide-grid-y" );
+const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
+const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
+const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
+const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hints
 }
 
@@ -56,7 +56,7 @@ ControlRenderer::~ControlRenderer()
   delete mImpl;
 }
 
-void ControlRenderer::Initialize( const Property::Map& propertyMap )
+void ControlRenderer::Initialize( Actor& actor, const Property::Map& propertyMap )
 {
   if( mImpl->mCustomShader )
   {
@@ -74,12 +74,7 @@ void ControlRenderer::Initialize( const Property::Map& propertyMap )
       }
     }
   }
-  DoInitialize( propertyMap );
-
-  if( mImpl->mIsOnStage )
-  {
-    InitializeRenderer( mImpl->mRenderer );
-  }
+  DoInitialize( actor, propertyMap );
 }
 
 void ControlRenderer::SetSize( const Vector2& size )
@@ -121,67 +116,22 @@ float ControlRenderer::GetDepthIndex() const
   return mImpl->mDepthIndex;
 }
 
-void ControlRenderer::SetCachedRendererKey( const std::string& cachedRendererKey )
-{
-  if( mImpl->mCachedRendererKey == cachedRendererKey )
-  {
-    return;
-  }
-  if( !mImpl->mIsOnStage )
-  {
-    mImpl->mCachedRendererKey = cachedRendererKey;
-  }
-  else
-  {
-    //clean the renderer from the cache since it may no longer be in use
-    mFactoryCache.CleanRendererCache( mImpl->mCachedRendererKey );
-
-    //add the new renderer
-    mImpl->mCachedRendererKey = cachedRendererKey;
-    if( !mImpl->mCachedRendererKey.empty() && !mImpl->mCustomShader )
-    {
-      DALI_ASSERT_DEBUG( mImpl->mRenderer && "The control render is on stage but it doesn't have a valid renderer.");
-      mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
-    }
-  }
-}
-
 void ControlRenderer::SetOnStage( Actor& actor )
 {
-  if( !mImpl->mCachedRendererKey.empty() && !mImpl->mCustomShader )
-  {
-    mImpl->mRenderer = mFactoryCache.GetRenderer( mImpl->mCachedRendererKey );
-    if( !mImpl->mRenderer )
-    {
-      InitializeRenderer( mImpl->mRenderer );
-      mFactoryCache.SaveRenderer( mImpl->mCachedRendererKey, mImpl->mRenderer );
-    }
-  }
-
-  if( !mImpl->mRenderer )
-  {
-    InitializeRenderer( mImpl->mRenderer );
-  }
+  DoSetOnStage( actor );
 
   mImpl->mRenderer.SetDepthIndex( mImpl->mDepthIndex );
   actor.AddRenderer( mImpl->mRenderer );
-  mImpl->mIsOnStage = true;
-
-  DoSetOnStage( actor );
+  mImpl->mFlags |= Impl::IS_ON_STAGE;
 }
 
 void ControlRenderer::SetOffStage( Actor& actor )
 {
-  if( mImpl->mIsOnStage )
+  if( GetIsOnStage() )
   {
     DoSetOffStage( actor );
-    actor.RemoveRenderer( mImpl->mRenderer );
-    mImpl->mRenderer.Reset();
 
-    //clean the renderer from the cache since it may no longer be in use
-    mFactoryCache.CleanRendererCache( mImpl->mCachedRendererKey );
-
-    mImpl->mIsOnStage = false;
+    mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
 }
 
@@ -191,15 +141,28 @@ void ControlRenderer::DoSetOnStage( Actor& actor )
 
 void ControlRenderer::DoSetOffStage( Actor& actor )
 {
+  actor.RemoveRenderer( mImpl->mRenderer );
+  mImpl->mRenderer.Reset();
 }
 
 void ControlRenderer::CreatePropertyMap( Property::Map& map ) const
 {
+  DoCreatePropertyMap( map );
+
   if( mImpl->mCustomShader )
   {
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
-  DoCreatePropertyMap( map );
+}
+
+bool ControlRenderer::GetIsOnStage() const
+{
+  return mImpl->mFlags & Impl::IS_ON_STAGE;
+}
+
+bool ControlRenderer::GetIsFromCache() const
+{
+  return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }
 
 } // namespace Internal

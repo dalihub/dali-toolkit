@@ -34,7 +34,7 @@ namespace
 
 const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
-const char* FONT_SIZE_QUALIFIER = "font-size-";
+const char* FONT_SIZE_QUALIFIER = "FontSize";
 
 const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
@@ -289,7 +289,7 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
   {
     // Apply the style for logical font size
     std::stringstream fontSizeQualifier;
-    fontSizeQualifier << styleName << "-" << FONT_SIZE_QUALIFIER << mDefaultFontSize;
+    fontSizeQualifier << styleName << FONT_SIZE_QUALIFIER << mDefaultFontSize;
     builder.ApplyStyle( fontSizeQualifier.str(), control );
   }
 }

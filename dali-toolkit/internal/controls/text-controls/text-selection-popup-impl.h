@@ -38,9 +38,6 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace
-{
-
 enum PopupCustomisations
 {
   POPUP_MAXIMUM_SIZE,
@@ -48,8 +45,6 @@ enum PopupCustomisations
   OPTION_MINIMUM_SIZE,
   OPTION_DIVIDER_SIZE
 };
-
-} // namespace
 
 class TextSelectionPopup : public Control
 {

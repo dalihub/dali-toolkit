@@ -37,10 +37,10 @@ namespace Internal
  *
  * The following properties are required for create a BorderRender
  *
- * | %Property Name   | Type        |
- * |------------------|-------------|
- * | border-color     | VECTOR4     |
- * | border-size      | FLOAT       |
+ * | %Property Name  | Type        |
+ * |-----------------|-------------|
+ * | borderColor     | VECTOR4     |
+ * | borderSize      | FLOAT       |
  */
 
 class BorderRenderer : public ControlRenderer
@@ -71,12 +71,7 @@ protected:
   /**
    * @copydoc ControlRenderer::DoInitialize
    */
-  virtual void DoInitialize( const Property::Map& propertyMap );
-
-  /**
-   * @copydoc ControlRenderer::InitializeRenderer
-   */
-  virtual void InitializeRenderer( Renderer& renderer );
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
    * @copydoc ControlRenderer::DoSetOnStage
@@ -103,6 +98,11 @@ public:
   void SetBorderSize( float size );
 
 private:
+
+  /**
+   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   */
+  void InitializeRenderer();
 
   /**
    * Create the geometry which presents the border.

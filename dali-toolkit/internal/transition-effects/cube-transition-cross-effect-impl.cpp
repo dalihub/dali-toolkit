@@ -27,19 +27,19 @@ namespace Toolkit
 namespace Internal
 {
 
-CubeTransitionCrossEffect::CubeTransitionCrossEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize )
-: CubeTransitionEffect( numRows, numColumns, viewAreaSize),
-  mDisplacementRatio( 1.f )
+CubeTransitionCrossEffect::CubeTransitionCrossEffect( unsigned int numRows, unsigned int numColumns )
+: CubeTransitionEffect( numRows, numColumns ),
+  mDisplacementSpreadFactor( 0.008f )
 {
 }
 
-Toolkit::CubeTransitionCrossEffect CubeTransitionCrossEffect::New(unsigned int numRows, unsigned int numColumns, Size viewAreaSize)
+Toolkit::CubeTransitionCrossEffect CubeTransitionCrossEffect::New(unsigned int numRows, unsigned int numColumns )
 {
   // Create the implementation
-  CubeTransitionCrossEffect* internalCubeTransEffect = new CubeTransitionCrossEffect( numRows, numColumns, viewAreaSize );
+  IntrusivePtr< CubeTransitionCrossEffect > internalCubeTransEffect = new CubeTransitionCrossEffect( numRows, numColumns );
 
   // Pass ownership to CustomActor handle
-  Toolkit::CubeTransitionCrossEffect cubeTransEffect( internalCubeTransEffect );
+  Toolkit::CubeTransitionCrossEffect cubeTransEffect( *internalCubeTransEffect );
 
   //Initialization
   internalCubeTransEffect->Initialize();
@@ -49,46 +49,78 @@ Toolkit::CubeTransitionCrossEffect CubeTransitionCrossEffect::New(unsigned int n
 
 void CubeTransitionCrossEffect::OnInitialize()
 {
-  float offsetX = -mTileSize.width*0.5f;
-  float offsetY = -mTileSize.height*0.5f;
   unsigned int idx;
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  for( unsigned int y = 0; y < mRows; y++ )
   {
-    idx = y*mNumColumns;
-    for( unsigned int x = y%2; x < mNumColumns; x=x+2)
+    for( unsigned int x = y % 2; x < mColumns; x += 2 )
     {
-      mBoxes[idx+x].SetZ( offsetY );
-      mTiles[0][idx+x].SetZ( -offsetY );
-      mTiles[1][idx+x].SetY( offsetY );
+      idx = y * mColumns + x;
+      SetTargetTop( idx );
     }
-    for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
+    for( unsigned int x = ( y + 1 ) % 2; x < mColumns; x += 2 )
     {
-      mTiles[0][idx+x].SetZ( -offsetX );
-      mTiles[1][idx+x].SetX( offsetX );
+      idx = y * mColumns + x;
+      SetTargetRight( idx );
     }
   }
 }
 
 void CubeTransitionCrossEffect::OnStartTransition( Vector2 panPosition, Vector2 panDisplacement )
 {
-  float angle = mRotateIndex * Math::PI_2 ;
-  Vector3 translation0 = mTiles[mContainerIndex][ 0 ].GetCurrentPosition()*(-2.f);
-  Vector3 translation1 = mTiles[mContainerIndex][ mNumColumns ].GetCurrentPosition()*(-2.f);
-
+  float angle = Math::PI_2;
   unsigned int idx;
-  mDisplacementRatio = 1.f + mCubeDisplacement / (mTileSize.width + mTileSize.height);
 
-  for( unsigned int y = 0; y < mNumRows; y++ )
+  if( panDisplacement.x < 0 )
   {
-    for( unsigned int x = y%2; x < mNumColumns; x=x+2) // rotate vertically
+    for( unsigned int y = 0; y < mRows; y++ )
     {
-      idx = y*mNumColumns + x;
-      SetupAnimation( idx, -angle, Vector3::XAXIS, translation0 );
+      for( unsigned int x = y % 2; x < mColumns; x += 2 )
+      {
+        idx = y * mColumns + x;
+        SetTargetTop( idx );
+      }
+      for( unsigned int x = ( y + 1 ) % 2; x < mColumns; x += 2 )
+      {
+        idx = y * mColumns + x;
+        SetTargetRight( idx );
+      }
     }
-    for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2) // rotate horizontally
+  }
+  else
+  {
+    angle = -angle;
+
+    for( unsigned int y = 0; y < mRows; y++ )
     {
-      idx = y*mNumColumns + x;
-      SetupAnimation( idx, angle, Vector3::YAXIS, translation1 );
+      for( unsigned int x = y % 2; x < mColumns; x += 2 )
+      {
+        idx = y * mColumns + x;
+        SetTargetBottom( idx );
+      }
+      for( unsigned int x = ( y + 1 ) % 2; x < mColumns; x += 2 )
+      {
+        idx = y * mColumns + x;
+        SetTargetLeft( idx );
+      }
+    }
+  }
+
+  const Vector2& size = Self().GetCurrentSize().GetVectorXY();
+  Vector2 halfSize = size * 0.5f;
+  //the centre to "explode" the tiles outwards from
+  Vector3 centre( halfSize.x, halfSize.y, -1.0f / mDisplacementSpreadFactor );
+
+  for( unsigned int y = 0; y < mRows; y++ )
+  {
+    for( unsigned int x = y%2; x < mColumns; x=x+2) // rotate vertically
+    {
+      idx = y*mColumns + x;
+      SetupAnimation( idx, x, y, -angle, Vector3::XAXIS, centre );
+    }
+    for( unsigned int x = (y+1)%2; x < mColumns; x=x+2) // rotate horizontally
+    {
+      idx = y*mColumns + x;
+      SetupAnimation( idx, x, y, angle, Vector3::YAXIS, centre );
     }
   }
 
@@ -96,42 +128,28 @@ void CubeTransitionCrossEffect::OnStartTransition( Vector2 panPosition, Vector2 
   mIsAnimating = true;
 }
 
-void CubeTransitionCrossEffect::OnStopTransition()
+void CubeTransitionCrossEffect::SetupAnimation( unsigned int actorIndex, unsigned int x, unsigned int y, float angle, const Vector3 axis, const Vector3& displacementCentre )
 {
-  float angle = mRotateIndex * Math::PI_2 ;
-  unsigned int idx;
-  for( unsigned int y = 0; y < mNumRows; y++ )
-  {
-    for( unsigned int x = y%2; x < mNumColumns; x=x+2)
-    {
-      idx = y*mNumColumns + x;
-      mBoxes[idx].SetOrientation( Radian(angle), Vector3::XAXIS );
-    }
-    for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
-    {
-      idx = y*mNumColumns + x;
-      mBoxes[idx].SetOrientation( Radian(-angle), Vector3::YAXIS );
-    }
-  }
-}
+  const Vector2& size = Self().GetCurrentSize().GetVectorXY();
+  Vector2 halfSize = size * 0.5f;
 
-void CubeTransitionCrossEffect::SetupAnimation(unsigned int actorIndex, float angle,
-                                               const Vector3 axis, Vector3 resetTranslation)
-{
-  if ( mFirstTransition && (!mIsToNextImage) ) // for the first transition and it is going to previous image
-  {
-    mTiles[mContainerIndex][actorIndex].SetOrientation( Radian( angle),  axis );
-  }
-  else if( !mChangeTurningDirection )   // reset rotation, translation and color
-  {
-    mTiles[mContainerIndex][actorIndex].TranslateBy( resetTranslation );
-    mTiles[mContainerIndex][actorIndex].SetOrientation( Radian( angle),  axis );
-  }
-  mAnimation.AnimateTo( Property( mBoxes[actorIndex], Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), axis ), AlphaFunction::EASE_IN_OUT_SINE );
-  Vector3 position(mBoxes[actorIndex].GetCurrentPosition());
-  mAnimation.AnimateTo( Property( mBoxes[actorIndex], Actor::Property::POSITION ), position * mDisplacementRatio + Vector3( 0.f, 0.f, mCubeDisplacement ), AlphaFunction::BOUNCE );
-  mAnimation.AnimateTo( Property( mTiles[mContainerIndex^1][actorIndex], Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
-  mAnimation.AnimateTo( Property( mTiles[mContainerIndex][actorIndex], Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
+  //the position of the centre of the front face tile
+  Vector3 position( halfSize.x * (2.0f * x + 1.0f) / mColumns, halfSize.y * (2.0f * y + 1.0f ) / mRows, 0.0f );
+
+  Vector3 direction = position - displacementCentre;
+  float length = direction.Length();
+  direction.Normalize();
+
+  float deltaLength = mCubeDisplacement / direction.z; //the length along the direction vector such that the projected direction onto the z axis is equal to mCubeDisplacement
+
+  Vector3 newPosition = ( direction * (length + deltaLength ) ) + displacementCentre;
+  Vector3 newLocalPosition = newPosition - position;
+
+  mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), axis ), AlphaFunction::EASE_IN_OUT_SINE );
+  mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::POSITION ), newLocalPosition, AlphaFunction::BOUNCE );
+
+  mAnimation.AnimateTo( Property( mCurrentTiles[ actorIndex ], Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
+  mAnimation.AnimateTo( Property( mTargetTiles[ actorIndex ], Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
 }
 
 } // namespace Internal

@@ -41,10 +41,10 @@ class KeyInputFocusManager;
  * UnhandledKeyEventSignal() is emitted.
  *
  * Signals
- * | %Signal Name            | Method                            |
- * |-------------------------|-----------------------------------|
- * | key-input-focus-changed | @ref KeyInputFocusChangedSignal() |
- * | unhandled-key-event     | @ref UnhandledKeyEventSignal()    |
+ * | %Signal Name         | Method                            |
+ * |----------------------|-----------------------------------|
+ * | keyInputFocusChanged | @ref KeyInputFocusChangedSignal() |
+ * | unhandledKeyEvent    | @ref UnhandledKeyEventSignal()    |
  */
 class DALI_IMPORT_API KeyInputFocusManager : public BaseHandle
 {

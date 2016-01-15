@@ -32,15 +32,14 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
-#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
-#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 
 namespace Dali
 {
@@ -66,7 +65,7 @@ BaseHandle Create()
  * @param[in] attributes The attributes with which to perfrom this action.
  * @return true if action has been accepted by this control
  */
-const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibility-activated";
+const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibilityActivated";
 static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
@@ -93,13 +92,13 @@ static bool DoAction( BaseObject* object, const std::string& actionName, const P
  * @return True if the signal was connected.
  * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
  */
-const char* SIGNAL_KEY_EVENT = "key-event";
-const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "key-input-focus-gained";
-const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "key-input-focus-lost";
+const char* SIGNAL_KEY_EVENT = "keyEvent";
+const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "keyInputFocusGained";
+const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "keyInputFocusLost";
 const char* SIGNAL_TAPPED = "tapped";
 const char* SIGNAL_PANNED = "panned";
 const char* SIGNAL_PINCHED = "pinched";
-const char* SIGNAL_LONG_PRESSED = "long-pressed";
+const char* SIGNAL_LONG_PRESSED = "longPressed";
 static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -165,6 +164,7 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 DALI_TYPE_REGISTRATION_END()
 
 const char * const BACKGROUND_COLOR_NAME("color");
+const char * const COLOR_RENDERER_COLOR_NAME("blendColor");
 
 } // unnamed namespace
 
@@ -244,6 +244,43 @@ public:
           controlImpl.SetStyleName( value.Get< std::string >() );
           break;
         }
+
+        case Toolkit::Control::Property::BACKGROUND_COLOR:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
+          controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
+          break;
+        }
+
+        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
+          Image image = Scripting::NewImage( value );
+          if ( image )
+          {
+            controlImpl.SetBackgroundImage( image );
+          }
+          else
+          {
+            // An empty map means the background is no longer required
+            controlImpl.ClearBackground();
+          }
+          break;
+        }
+
+        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
+        {
+          if ( value.Get< bool >() )
+          {
+            controlImpl.SetKeyInputFocus();
+          }
+          else
+          {
+            controlImpl.ClearKeyInputFocus();
+          }
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND:
         {
           Image image = Scripting::NewImage( value );
@@ -261,19 +298,6 @@ public:
 
           // The background is neither a valid image nor a property map, so it is no longer required
           controlImpl.ClearBackground();
-          break;
-        }
-
-        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
-        {
-          if ( value.Get< bool >() )
-          {
-            controlImpl.SetKeyInputFocus();
-          }
-          else
-          {
-            controlImpl.ClearKeyInputFocus();
-          }
           break;
         }
       }
@@ -304,6 +328,31 @@ public:
           break;
         }
 
+        case Toolkit::Control::Property::BACKGROUND_COLOR:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
+          value = controlImpl.GetBackgroundColor();
+          break;
+        }
+
+        case Toolkit::Control::Property::BACKGROUND_IMAGE:
+        {
+          DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
+          Property::Map map;
+          if( controlImpl.mImpl->mBackgroundRenderer )
+          {
+            controlImpl.mImpl->mBackgroundRenderer.CreatePropertyMap( map );
+          }
+          value = map;
+          break;
+        }
+
+        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
+        {
+          value = controlImpl.HasKeyInputFocus();
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
@@ -316,11 +365,6 @@ public:
           break;
         }
 
-        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
-        {
-          value = controlImpl.HasKeyInputFocus();
-          break;
-        }
       }
     }
 
@@ -349,15 +393,19 @@ public:
   bool mAddRemoveBackgroundChild:1;        ///< Flag to know when we are adding or removing our own actor to avoid call to OnControlChildAdd
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
-  static PropertyRegistration PROPERTY_1;
-  static PropertyRegistration PROPERTY_2;
-  static PropertyRegistration PROPERTY_3;
+  static const PropertyRegistration PROPERTY_1;
+  static const PropertyRegistration PROPERTY_2;
+  static const PropertyRegistration PROPERTY_3;
+  static const PropertyRegistration PROPERTY_4;
+  static const PropertyRegistration PROPERTY_5;
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",      Toolkit::Control::Property::STYLE_NAME,      Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "key-input-focus", Toolkit::Control::Property::KEY_INPUT_FOCUS, Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgroundColor", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -403,32 +451,24 @@ void Control::SetBackgroundColor( const Vector4& color )
 {
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-
-  if( mImpl->mBackgroundRenderer )
-  {
-    Toolkit::ControlRenderer currentRenderer( mImpl->mBackgroundRenderer );
-    // if ResetRenderer returns false, we continue to use the current renderer with a new color set to it.
-    if( ! factory.ResetRenderer( mImpl->mBackgroundRenderer, color ) )
-    {
-      return;
-    }
-    // ResetRenderer returns true, a new renderer is created. Remove the current renderer and reset.
-    currentRenderer.RemoveAndReset( self );
-  }
-  else
-  {
-    mImpl->mBackgroundRenderer = factory.GetControlRenderer( color );
-  }
-
-  if( self.OnStage() )
-  {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
-  }
+  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
+  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
 }
 
 Vector4 Control::GetBackgroundColor() const
 {
+  if( mImpl->mBackgroundRenderer && ( &typeid( GetImplementation(mImpl->mBackgroundRenderer) ) == &typeid( ColorRenderer ) ) )
+  {
+     Property::Map map;
+     mImpl->mBackgroundRenderer.CreatePropertyMap( map );
+     const Property::Value* colorValue = map.Find( COLOR_RENDERER_COLOR_NAME );
+     Vector4 color;
+     if( colorValue && colorValue->Get(color))
+     {
+       return color;
+     }
+  }
+
   return Color::TRANSPARENT;
 }
 
@@ -444,14 +484,11 @@ void Control::SetBackground(const Property::Map& map)
 
   Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
-
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
   mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
-
-  // mBackgroundRenderer might be empty, if an invalid map is provided, no background.
-  if( self.OnStage() && mImpl->mBackgroundRenderer)
+  if( mImpl->mBackgroundRenderer  && self.OnStage() ) // Request control renderer with a property map might return an empty handle
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
     mImpl->mBackgroundRenderer.SetOnStage( self );
   }
 }
@@ -460,33 +497,13 @@ void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-
-  if(  mImpl->mBackgroundRenderer  )
-  {
-    Toolkit::ControlRenderer currentRenderer( mImpl->mBackgroundRenderer );
-    // if ResetRenderer returns false, we continue to use the current renderer with a new image set to it.
-    if( ! factory.ResetRenderer( mImpl->mBackgroundRenderer, image )  )
-    {
-      return;
-    }
-    // ResetRenderer returns true, a new renderer is created. Remove the current renderer and reset.
-    currentRenderer.RemoveAndReset( self );
-  }
-  else
-  {
-    mImpl->mBackgroundRenderer = factory.GetControlRenderer( image );
-  }
-
-  if( self.OnStage() )
-  {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
-  }
+  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
+  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
 }
 
 void Control::ClearBackground()
 {
-  Actor self(Self());
+  Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
 }
 
@@ -812,17 +829,16 @@ void Control::OnStageConnection( int depth )
 {
   if( mImpl->mBackgroundRenderer)
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
-    Actor self(Self());
+    Actor self( Self() );
     mImpl->mBackgroundRenderer.SetOnStage( self );
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundRenderer)
+  if( mImpl->mBackgroundRenderer )
   {
-    Actor self(Self());
+    Actor self( Self() );
     mImpl->mBackgroundRenderer.SetOffStage( self );
   }
 }

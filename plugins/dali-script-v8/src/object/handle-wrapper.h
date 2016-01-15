@@ -74,6 +74,12 @@ public:
    */
   static void AddInterceptsToTemplate( v8::Isolate* isolate, v8::Local<v8::ObjectTemplate>& objTemplate );
 
+  /**
+   * @brief Register an animatable property for a JavaScript object that
+   * contains a Dali Handle.
+   * @param[in] args v8 function call arguments interpreted
+   */
+  static void RegisterAnimatableProperty( const v8::FunctionCallbackInfo< v8::Value >& args );
 
   Handle GetHandle() { return mHandle; }
   Handle mHandle;

@@ -32,27 +32,30 @@ namespace
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
 attribute mediump vec2    aTexCoord;
+attribute mediump vec4    aColor;
 uniform   mediump vec2    uOffset;
 uniform   mediump mat4    uMvpMatrix;
 varying   mediump vec2    vTexCoord;
+varying   mediump vec4    vColor;
 
 void main()
 {
   mediump vec4 position = vec4( aPosition.xy + uOffset, 0.0, 1.0 );
   gl_Position = uMvpMatrix * position;
   vTexCoord = aTexCoord;
+  vColor = aColor;
 }
 );
 
 const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
-uniform lowp    vec4      uColor;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
+varying mediump vec4      vColor;
 
 void main()
 {
   mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4( uColor.rgb, uColor.a * color.r );
+  gl_FragColor = vec4( vColor.rgb, vColor.a * color.r );
 }
 );
 

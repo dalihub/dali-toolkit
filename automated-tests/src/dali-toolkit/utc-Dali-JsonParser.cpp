@@ -332,8 +332,8 @@ int UtcDaliJsonParserMethod04(void)
           'actor':'bump-image',                                         \
           'property':'uLightPosition',                                  \
           'value':[0.8, 0.0, -1.5],                                     \
-          'alpha-function': 'BOUNCE',                                   \
-          'time-period': { 'duration': 2.5 }                            \
+          'alphaFunction': 'BOUNCE',                                    \
+          'timePeriod': { 'duration': 2.5 }                            \
         }                                                               \
       ]                                                                 \
     }                                                                   \
@@ -349,7 +349,7 @@ int UtcDaliJsonParserMethod04(void)
     {                                                                   \
       'duration': 5.0,                                                  \
       'loop': true,                                                     \
-      'end-action':'DISCARD'                                            \
+      'endAction':'DISCARD'                                            \
     }                                                                   \
   }                                                                     \
 }                                                                       \
@@ -411,8 +411,8 @@ int UtcDaliJsonParserMethod05(void)
           'actor':'bump-image',                                         \
           'property':'uLightPosition',                                  \
           'value':[0.8, 0.0, -1.5],                                     \
-          'alpha-function': 'BOUNCE',                                   \
-          'time-period': { 'duration': 2.5 }                            \
+          'alphaFunction': 'BOUNCE',                                    \
+          'timePeriod': { 'duration': 2.5 }                            \
         }                                                               \
       ]                                                                 \
     }                                                                   \
@@ -699,8 +699,8 @@ int UtcDaliJsonParserMethod11(void)
           'actor':'bump-image',                                         \
           'property':'uLightPosition',                                  \
           'value':[0.8, 0.0, -1.5],                                     \
-          'alpha-function': 'BOUNCE',                                   \
-          'time-period': { 'duration': 2.5 }                            \
+          'alphaFunction': 'BOUNCE',                                    \
+          'timePeriod': { 'duration': 2.5 }                            \
         }                                                               \
       ]                                                                 \
     }                                                                   \

@@ -25,7 +25,6 @@
 // INTERNAL INCLUDES
 #include <actors/layer-api.h>
 #include <actors/actor-api.h>
-#include <actors/image-actor-api.h>
 #include <actors/camera-actor-api.h>
 #include <v8-utils.h>
 #include <dali-wrapper.h>
@@ -37,7 +36,6 @@ namespace V8Plugin
 {
 
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mActorTemplate;
-v8::Persistent<v8::ObjectTemplate> ActorWrapper::mImageActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mCameraActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mLayerActorTemplate;
 
@@ -59,7 +57,6 @@ struct ActorTemplate
 const ActorTemplate ActorTemplateLookup[]=
 {
     { &ActorWrapper::mActorTemplate },        // ACTOR
-    { &ActorWrapper::mImageActorTemplate },   // IMAGE_ACTOR
     { &ActorWrapper::mLayerActorTemplate },   // LAYER_ACTOR
     { &ActorWrapper::mCameraActorTemplate}    // CAMERA_ACTOR
 };
@@ -70,9 +67,8 @@ const ActorTemplate ActorTemplateLookup[]=
 enum ActorApiBitMask
 {
   ACTOR_API              = 1 << 0,
-  IMAGE_ACTOR_API        = 1 << 1,
-  LAYER_API              = 1 << 2,
-  CAMERA_ACTOR_API       = 1 << 3,
+  LAYER_API              = 1 << 1,
+  CAMERA_ACTOR_API       = 1 << 2,
 };
 
 /**
@@ -93,7 +89,6 @@ struct ActorApiStruct
 const ActorApiStruct ActorApiLookup[]=
 {
   {"Actor",      ActorWrapper::ACTOR,        ActorApi::New,       ACTOR_API },
-  {"ImageActor", ActorWrapper::IMAGE_ACTOR,  ImageActorApi::New,  ACTOR_API | IMAGE_ACTOR_API   },
   {"Layer",      ActorWrapper::LAYER_ACTOR,  LayerApi::New,       ACTOR_API | LAYER_API                                },
   {"CameraActor",ActorWrapper::CAMERA_ACTOR, CameraActorApi::New, ACTOR_API | CAMERA_ACTOR_API                         },
 };
@@ -122,7 +117,7 @@ Actor CreateActor( const v8::FunctionCallbackInfo< v8::Value >& args,
   else
   {
     // run the constructor for this type of actor so it can pull out
-    // custom parameters, e.g. new ImageActor( MyImage );
+    // custom parameters;
     actor = (ActorApiLookup[actorType].constructor)( args );
   }
   return actor;
@@ -215,8 +210,6 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore SetColorMode() use Actor.colorMode
     // ignore GetColorMode() use Actor.colorMode
     // ignore GetCurrentWorldColor() use Actor.worldColor
-    // ignore SetInheritShaderEffect() use Actor.inheritShaderEffect
-    // ignore GetInheritShaderEffect() use Actor.inheritShaderEffect
     // ignore SetDrawMode() use Actor.drawMode
     // ignore GetDrawMode() use Actor.drawMode
     // ignore SetSensitive() use Actor.sensitve
@@ -227,6 +220,11 @@ const ActorFunctions ActorFunctionTable[]=
     { "SetKeyboardFocusable", ActorApi::SetKeyboardFocusable,  ACTOR_API }, //-- should this be a property???
     { "IsKeyboardFocusable" , ActorApi::IsKeyboardFocusable,   ACTOR_API }, //-- should this be a property???
 
+    { "AddRenderer",          ActorApi::AddRenderer,           ACTOR_API },
+    { "GetRendererCount",     ActorApi::GetRendererCount,      ACTOR_API },
+    { "GetRendererAt" ,       ActorApi::GetRendererAt,         ACTOR_API },
+    { "RemoveRenderer" ,      ActorApi::RemoveRenderer,        ACTOR_API },
+
     /**************************************
      * Layer  API (in order of layer.h)
      **************************************/
@@ -234,9 +232,9 @@ const ActorFunctions ActorFunctionTable[]=
     { "Raise",              LayerApi::Raise,                    LAYER_API  },
     { "Lower",              LayerApi::Lower,                    LAYER_API  },
     { "RaiseAbove",         LayerApi::RaiseAbove,               LAYER_API  },
-    { "RaiseBelow",         LayerApi::LowerBelow,               LAYER_API  },
+    { "LowerBelow",         LayerApi::LowerBelow,               LAYER_API  },
     { "RaiseToTop",         LayerApi::RaiseToTop,               LAYER_API  },
-    { "LowerToBottom",      LayerApi::ToBottom,                 LAYER_API  },
+    { "LowerToBottom",      LayerApi::LowerToBottom,            LAYER_API  },
     { "MoveAbove",          LayerApi::MoveAbove,                LAYER_API  },
     { "MoveBelow",          LayerApi::MoveBelow,                LAYER_API  },
     // ignore SetClipping, use layer.clippingEnable
@@ -245,42 +243,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "SetDepthTestDisabled", LayerApi::SetDepthTestDisabled,   LAYER_API },
     { "IsDepthTestDisabled",  LayerApi::IsDepthTestDisabled,    LAYER_API },
     // @todo SetSortFunction
-
-    /**************************************
-     * Image Actor API (in order of image-actor.h)
-     **************************************/
-
-    { "SetImage",           ImageActorApi::SetImage,              IMAGE_ACTOR_API },
-    { "GetImage",           ImageActorApi::GetImage,              IMAGE_ACTOR_API },
-    // ignore SetPixelArea, use imageActor.pixelArea
-    // ignore GetPixelArea, use imageActor.pixelArea
-    // ignore SetStyle, use imageActor.style
-    // ignore GetStyle, use imageActor.style
-    // ignore SetNinePatchBorder use imageActor.border
-    // ignore GetNinePatchBorder use imageActor.border
-    { "SetSortModifier",    ImageActorApi::SetSortModifier,   IMAGE_ACTOR_API  },
-    { "GetSortModifier",    ImageActorApi::GetSortModifier,   IMAGE_ACTOR_API  },
-    { "SetBlendMode",       ImageActorApi::SetBlendMode,      IMAGE_ACTOR_API  },
-    { "GetBlendMode",       ImageActorApi::GetBlendMode,      IMAGE_ACTOR_API  },
-    { "SetBlendFunc",       ImageActorApi::SetBlendFunc,      IMAGE_ACTOR_API  },
-    { "GetBlendFunc",       ImageActorApi::GetBlendFunc,      IMAGE_ACTOR_API  },
-    { "SetShaderEffect",    ImageActorApi::SetShaderEffect,   IMAGE_ACTOR_API  },
-    { "GetShaderEffect",    ImageActorApi::GetShaderEffect,   IMAGE_ACTOR_API  },
-    { "RemoveShaderEffect", ImageActorApi::RemoveShaderEffect,IMAGE_ACTOR_API  },
-    // ignore SetFadeIn use imageActor.fadeIn
-    // ignore GetFadeIn use imageActor.fadeIn
-    // ignore SetFadeInDuration use imageActor.fadeInDuration
-    // ignore GetFadeInDuration use imageActor.fadeInDuration
-    //{ "GetCurrentImageSize", ImageActorApi::GetCurrentImageSize,  IMAGE_ACTOR_API },
-
-    /**************************************
-     * Mesh Actor API (in order of mesh-actor.h)
-     **************************************/
-    // @todo a version of MeshActor::New( mesh )
-    // @todo a version of MeshActor::New( AnimatableMesh )
-    // @todo SetMaterial
-    // @todo GetMaterial
-    // @todo BindBonesToMesh
 
     /**************************************
      * Camera Actor API (in order of camera.h)
@@ -389,7 +351,7 @@ v8::Handle<v8::ObjectTemplate> ActorWrapper::MakeDaliActorTemplate( v8::Isolate*
     const ActorFunctions property =  ActorFunctionTable[i];
 
     // check to see if the actor supports a certain type of API
-    // e.g. ImageActor will support ACTOR_API, RENDERABLE_API and IMAGE_ACTOR_API
+    // e.g. Layer will support ACTOR_API and LAYER_API
     if( supportApis &  property.api )
     {
       std::string funcName = V8Utils::GetJavaScriptFunctionName( property.name);
@@ -417,7 +379,7 @@ void ActorWrapper::NewActor( const v8::FunctionCallbackInfo< v8::Value >& args)
     return;
   }
 
-  // find out the callee function name...e.g. ImageActor, MeshActor
+  // find out the callee function name...e.g. CameraActor
   v8::Local<v8::Function> callee = args.Callee();
   v8::Local<v8::Value> v8String = callee->GetName();
   std::string typeName = V8Utils::v8StringToStdString( v8String );
@@ -467,7 +429,7 @@ void ActorWrapper::NewControl( const v8::FunctionCallbackInfo< v8::Value >& args
 
 
 /**
- * given an actor type name, e.g. ImageActor returns the type, e.g. ActorWrapper::IMAGE_ACTOR
+ * given an actor type name, e.g. CameraActor returns the type, e.g. ActorWrapper::CAMERA_ACTOR
  */
 ActorWrapper::ActorType ActorWrapper::GetActorType( const std::string& name )
 {

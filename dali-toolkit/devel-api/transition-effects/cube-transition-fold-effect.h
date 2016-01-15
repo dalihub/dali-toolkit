@@ -37,7 +37,7 @@ namespace Internal DALI_INTERNAL
 
 /**
  * SubClass of CubeTransitionEffect
- * Rotate the neighboring cubes in opposite directions to transite from one image to another
+ * Rotate the neighboring cubes in opposite directions to transition from one image to another
  */
 class DALI_IMPORT_API CubeTransitionFoldEffect : public CubeTransitionEffect
 {
@@ -48,19 +48,24 @@ public:
    * Create an initialized CubeTransitionFoldEffect
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
-   * @param[in] viewAreaSize The size of view area for this transition effect
    * @return The initialized CubeTransitionFoldEffect object
    */
-  static CubeTransitionFoldEffect New( unsigned int numRows, unsigned int numColumns, Size viewAreaSize );
+  static CubeTransitionFoldEffect New( unsigned int numRows, unsigned int numColumns );
 
 
 public: // Not intended for developer use
 
   /**
-   * This constructor is used by Dali New() methods.
-   * @param [in] impl A pointer to a newly allocated Dali resource
+   * Creates a handle using the Toolkit::Internal implementation.
+   * @param[in]  implementation  The Control implementation.
    */
-  explicit DALI_INTERNAL CubeTransitionFoldEffect( Internal::CubeTransitionFoldEffect* impl );
+  DALI_INTERNAL CubeTransitionFoldEffect( Internal::CubeTransitionFoldEffect& implementation );
+
+  /**
+   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @param[in]  internal  A pointer to the internal CustomActor.
+   */
+  DALI_INTERNAL CubeTransitionFoldEffect( Dali::Internal::CustomActor* internal );
 
 }; // class CubeTransitionFoldEffect
 

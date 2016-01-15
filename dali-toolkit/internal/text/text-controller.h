@@ -85,6 +85,7 @@ public:
     UPDATE_ACTUAL_SIZE = 0x0200,
     REORDER            = 0x0400,
     ALIGN              = 0x0800,
+    COLOR              = 0x1000,
     ALL_OPERATIONS     = 0xFFFF
   };
 
@@ -112,6 +113,24 @@ public:
    * @param[in] decorator Used to create cursor, selection handle decorations etc.
    */
   void EnableTextInput( DecoratorPtr decorator );
+
+  /**
+   * @brief Enables/disables the mark-up processor.
+   *
+   * By default is disabled.
+   *
+   * @param[in] enable Whether to enable the mark-up processor.
+   */
+  void SetMarkupProcessorEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the mark-up processor is enabled.
+   *
+   * By default is disabled.
+   *
+   * @return @e true if the mark-up processor is enabled, otherwise returns @e false.
+   */
+  bool IsMarkupProcessorEnabled() const;
 
   /**
    * @brief Replaces any text previously set.
@@ -363,6 +382,20 @@ public:
    * @return The height of the underline, or 0 if height is not overrided.
    */
   float GetUnderlineHeight() const;
+
+  /**
+   * @brief Sets the input text's color.
+   *
+   * @param[in] color The input text's color.
+   */
+  void SetInputColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the input text's color.
+   *
+   * @return The input text's color.
+   */
+  const Vector4& GetInputColor() const;
 
   /**
    * @brief Called to enable/disable cursor blink.
@@ -660,6 +693,11 @@ private:
    * @brief Helper to clear font-specific data (only).
    */
   void ClearFontData();
+
+  /**
+   * @brief Helper to clear text's style data.
+   */
+  void ClearStyleData();
 
   /**
    * @brief Private constructor.

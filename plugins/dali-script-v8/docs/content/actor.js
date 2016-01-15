@@ -9,7 +9,6 @@
 
 ```
 var actor = new dali.Actor();
-var imageActor = new dali.ImageActor();
 var textActor = new dali.TextActor("hello world");
 var camera = new dali.CameraActor();
 var layer = new dali.Layer();
@@ -72,13 +71,13 @@ Note that since DALi is a 3D toolkit, this behaviour is the result of a default 
 
 The actor provides the following call back events
 
-| Name              | Description                            | Parameters passed to call back |
-|-------------------|----------------------------------------|--------------------------|
-|touched            | touch event                            | (actor, touchEvent )     |
-|hovered            | mouse or pointer hovering over actor   | (actor, hoverEvent)      |
-|mouse-wheel-event  | mouse wheel events                     | (actor, wheelEvent)      |
-|on-stage           | actor has been moved on stage          | (actor)                  |
-|off-stage          | actor has been moved off stage         | (actor)                  |
+| Name            | Description                            | Parameters passed to call back |
+|-----------------|----------------------------------------|--------------------------|
+|touched          | touch event                            | (actor, touchEvent )     |
+|hovered          | mouse or pointer hovering over actor   | (actor, hoverEvent)      |
+|mouseWheelEvent  | mouse wheel events                     | (actor, wheelEvent)      |
+|onStage          | actor has been moved on stage          | (actor)                  |
+|offStage         | actor has been moved off stage         | (actor)                  |
 
 
 #### Touch event
@@ -125,7 +124,7 @@ function OnPressed( actor, touchEvent )
 }
   
 // connect to touch events
-myActor.connect( "touched", onPressed );
+myActor.on( "touched", onPressed );
 
 ```
 
@@ -144,7 +143,7 @@ hoverEvent = {
 }
 ```
       // connect to touch events
-      myActor.connect( "hovered", onHover);
+      myActor.on( "hovered", onHover);
 
 #### Mouse wheel event
 
@@ -162,7 +161,7 @@ mouseWheelEvent = {
 }
   
 // connect to touch events
-myActor.connect( "mouse-wheel-event", onMouseWheel );
+myActor.on( "mouseWheelEvent", onMouseWheel );
 ```
 #### Key events
 
@@ -226,6 +225,7 @@ See
 
 
  * @class Actor
+ * @extends Handle
  */
 
 

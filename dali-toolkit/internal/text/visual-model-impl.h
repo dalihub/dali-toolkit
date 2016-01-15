@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/color-run.h>
 
 namespace Dali
 {
@@ -87,19 +88,6 @@ public:
   void GetGlyphs( GlyphInfo* glyphs,
                   GlyphIndex glyphIndex,
                   Length numberOfGlyphs ) const;
-
-  // Character <--> Glyph conversion
-
-  /**
-   * @brief Retrieves for each character the number of glyphs the character is shaped.
-   *
-   * @param[out] glyphsPerCharacter Pointer to a buffer where the number of glyphs for each character are copied.
-   * @param[in] characterIndex Index to the first character.
-   * @param[in] numberOfCharacters The number of characters.
-   */
-  void GetGlyphsPerCharacterMap( Length* glyphsPerCharacter,
-                                 CharacterIndex characterIndex,
-                                 Length numberOfCharacters ) const;
 
   // Position interface
 
@@ -314,6 +302,7 @@ public:
   Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
   Vector<LineRun>        mLines;                ///< The laid out lines.
   Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
+  Vector<ColorGlyphRun>  mColorRuns;            ///< Runs of glyphs with the same color.
 
   Vector2                mControlSize;           ///< The size of the UI control the decorator is adding it's decorations to.
   Vector4                mTextColor;            ///< The text color

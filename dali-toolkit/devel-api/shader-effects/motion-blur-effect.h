@@ -223,14 +223,14 @@ inline Property::Map CreateMotionBlurEffect()
   Property::Map map;
 
   Property::Map customShader;
-  customShader[ "vertex-shader" ] = vertexSource;
-  customShader[ "fragment-shader" ] = fragmentSource;
+  customShader[ "vertexShader" ] = vertexSource;
+  customShader[ "fragmentShader" ] = fragmentSource;
 
-  customShader[ "subdivide-grid-x" ] = 10;
-  customShader[ "subdivide-grid-y" ] = 10;
+  customShader[ "subdivideGridX" ] = 10;
+  customShader[ "subdivideGridY" ] = 10;
 
   // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
-  customShader[ "hints" ] = "output-is-transparent";
+  customShader[ "hints" ] = "outputIsTransparent";
 
   map[ "shader" ] = customShader;
   return map;

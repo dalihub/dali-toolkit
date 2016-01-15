@@ -159,7 +159,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
 
   Animation animation( Animation::New( 0.f ) );
 
-  // duration needs to be set before AnimateTo calls for correct operation when AnimateTo has no "time-period".
+  // duration needs to be set before AnimateTo calls for correct operation when AnimateTo has no "timePeriod".
   OptionalFloat duration = constant.IsFloat( IsChild(child, "duration" ) );
 
   if( duration )
@@ -172,7 +172,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
     animation.SetLooping( *looping );
   }
 
-  if( OptionalString endAction = constant.IsString(  IsChild(child, "end-action" ) ) )
+  if( OptionalString endAction = constant.IsString(  IsChild(child, "endAction" ) ) )
   {
     if("BAKE" == *endAction)
     {
@@ -188,7 +188,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
     }
   }
 
-  if( OptionalString endAction = constant.IsString(  IsChild(child, "disconnect-action" ) ) )
+  if( OptionalString endAction = constant.IsString(  IsChild(child, "disconnectAction" ) ) )
   {
     if("BAKE" == *endAction)
     {
@@ -267,7 +267,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
       AlphaFunction alphaFunction( AlphaFunction::DEFAULT );
       TimePeriod timePeriod( 0.f );
 
-      OptionalChild timeChild = IsChild( pKeyChild.second, "time-period" );
+      OptionalChild timeChild = IsChild( pKeyChild.second, "timePeriod" );
 
       if( timeChild )
       {
@@ -276,12 +276,12 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
 
       durationSum = std::max( durationSum, timePeriod.delaySeconds + timePeriod.durationSeconds );
 
-      if( OptionalString alphaChild = constant.IsString( IsChild(pKeyChild.second, "alpha-function" ) ) )
+      if( OptionalString alphaChild = constant.IsString( IsChild(pKeyChild.second, "alphaFunction" ) ) )
       {
         alphaFunction = GetAlphaFunction( *alphaChild );
       }
 
-      if( OptionalChild keyFrameChild = IsChild(pKeyChild.second, "key-frames") )
+      if( OptionalChild keyFrameChild = IsChild(pKeyChild.second, "keyFrames") )
       {
         DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
         Property prop = Property( targetHandle, propIndex );
@@ -313,7 +313,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
           }
 
           AlphaFunction kfAlphaFunction( AlphaFunction::DEFAULT );
-          if( OptionalString alphaFuncStr = constant.IsString( IsChild(pKeyChild.second, "alpha-function") ) )
+          if( OptionalString alphaFuncStr = constant.IsString( IsChild(pKeyChild.second, "alphaFunction") ) )
           {
             kfAlphaFunction = GetAlphaFunction( *alphaFuncStr );
           }

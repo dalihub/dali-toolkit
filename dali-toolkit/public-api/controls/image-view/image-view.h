@@ -21,6 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h>
+
 namespace Dali
 {
 
@@ -59,7 +62,8 @@ public:
   {
     enum
     {
-      IMAGE = PROPERTY_START_INDEX, ///< name "image", @see SetImage(), type string if it is a url, map otherwise
+      RESOURCE_URL = PROPERTY_START_INDEX, ///< name "resourceUrl",  @deprecated DALi 1.1.16 Use IMAGE instead.  type string
+      IMAGE,                               ///< name "image",        @see SetImage(),                            type string if it is a url, map otherwise
     };
   };
 
@@ -74,26 +78,47 @@ public:
    * @brief Create an initialized ImageView.
    *
    * @return A handle to a newly allocated Dali ImageView.
+   *
+   * @note ImageView will not display anything.
    */
   static ImageView New();
 
   /**
    * @brief Create an initialized ImageView from an Image.
    *
-   * If the handle is empty, ImageView will display nothing
+   * If the handle is empty, ImageView will not display anything.
+   *
    * @param[in] image The Image to display.
    * @return A handle to a newly allocated ImageView.
    */
   static ImageView New( Image image );
 
   /**
-   * @brief Create an initialized ImageView from an Image resource url
+   * @brief Create an initialized ImageView from an Image resource URL
    *
-   * If the string is empty, ImageView will display nothing
+   * If the string is empty, ImageView will not display anything.
+   *
    * @param[in] url The url of the image resource to display.
    * @return A handle to a newly allocated ImageView.
    */
   static ImageView New( const std::string& url );
+
+  /**
+   * @brief Create an initialized ImageView from an Image resource URL
+   *
+   * If the string is empty, ImageView will not display anything.
+   *
+   * @since DALi 1.1.10
+   *
+   * @param[in] url The url of the image resource to display.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @return A handle to a newly allocated ImageView.
+   *
+   * @note A valid size is preferable for efficiency.
+   *       However, do not set a size that is bigger than the actual image size, as up-scaling is not available.
+   *       The content of the area not covered by the actual image is undefined and will not be cleared.
+   */
+  static ImageView New( const std::string& url, ImageDimensions size );
 
   /**
    * @brief Destructor
@@ -137,15 +162,27 @@ public:
   void SetImage( Image image );
 
   /**
-   * @brief Sets this ImageView from an Image url
+   * @brief Sets this ImageView from an Image URL
    *
-   * If the handle is empty, ImageView will display nothing
+   * If the URL is empty, ImageView will not display anything.
    *
    * @since DALi 1.1.4
    *
    * @param[in] url The Image resource to display.
    */
   void SetImage( const std::string& url );
+
+  /**
+   * @brief Sets this ImageView from an Image URL
+   *
+   * If the URL is empty, ImageView will not display anything.
+   *
+   * @since DALi 1.1.10
+   *
+   * @param[in] url A URL to the image resource to display.
+   * @param [in] size The width and height to fit the loaded image to.
+   */
+  void SetImage( const std::string& url, ImageDimensions size );
 
   /**
    * @deprecated Gets the Image

@@ -37,9 +37,9 @@ struct StereoInfo
 };
 StereoInfo StereoModeTable[] = {
     { "mono",                 Dali::MONO},
-    { "stereo-horizontal",    Dali::STEREO_HORIZONTAL },
-    { "stereo-vertical",      Dali::STEREO_VERTICAL },
-    { "stereo-interlaced",    Dali::STEREO_INTERLACED },
+    { "stereoHorizontal",     Dali::STEREO_HORIZONTAL },
+    { "stereoVertical",       Dali::STEREO_VERTICAL },
+    { "stereoInterlaced",     Dali::STEREO_INTERLACED },
 };
 
 const unsigned int numberViewModes = sizeof( StereoModeTable ) / sizeof( StereoModeTable[0] );
@@ -114,8 +114,8 @@ bool ParseStereoScopicOptions( v8::Isolate* isolate, const v8::Local<v8::Object>
 {
   v8::HandleScope scope(isolate);
 
-  v8::Local<v8::Value> modeValue = stereoObject->Get( v8::String::NewFromUtf8( isolate, "stereoscopic-mode" ) );
-  v8::Local<v8::Value> stereoBaseValue = stereoObject->Get( v8::String::NewFromUtf8( isolate, "stereo-base" ) );
+  v8::Local<v8::Value> modeValue = stereoObject->Get( v8::String::NewFromUtf8( isolate, "stereoscopicMode" ) );
+  v8::Local<v8::Value> stereoBaseValue = stereoObject->Get( v8::String::NewFromUtf8( isolate, "stereoBase" ) );
 
   if( !modeValue->IsString() )
   {
@@ -163,7 +163,7 @@ bool GetApplicationOptions(const v8::FunctionCallbackInfo<v8::Value>& args, Appl
   }
 
   // get the stereoscopic settings
-  v8::Local<v8::Value> stereoValue= object->Get( v8::String::NewFromUtf8( isolate, "view-mode" ) );
+  v8::Local<v8::Value> stereoValue= object->Get( v8::String::NewFromUtf8( isolate, "viewMode" ) );
   if( stereoValue->IsObject() )
   {
     ok = ParseStereoScopicOptions( isolate,  stereoValue->ToObject(), options.stereo );
@@ -174,7 +174,7 @@ bool GetApplicationOptions(const v8::FunctionCallbackInfo<v8::Value>& args, Appl
   }
 
   // get the style sheet
-  v8::Local<v8::Value> stylesheetValue= object->Get( v8::String::NewFromUtf8( isolate, "style-sheet" ) );
+  v8::Local<v8::Value> stylesheetValue= object->Get( v8::String::NewFromUtf8( isolate, "styleSheet" ) );
   if( stylesheetValue->IsString() )
   {
     options.stylesheet = Dali::V8Plugin::V8Utils::v8StringToStdString( stylesheetValue );
