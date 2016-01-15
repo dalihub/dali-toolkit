@@ -48,6 +48,7 @@ void main()
 );
 
 const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
+uniform lowp    vec4      uColor;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 varying mediump vec4      vColor;
@@ -55,7 +56,7 @@ varying mediump vec4      vColor;
 void main()
 {
   mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4( vColor.rgb, vColor.a * color.r );
+  gl_FragColor = vec4( vColor.rgb * uColor.rgb, vColor.a * uColor.a * color.r );
 }
 );
 
