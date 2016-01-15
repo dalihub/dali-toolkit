@@ -75,6 +75,20 @@ public:
    */
   void SetImage( const std::string& imageUrl, ImageDimensions size );
 
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha( bool preMultipled );
+
+  /**
+   * @brief Query whether alpha is pre-multiplied.
+   *
+   * @return True is alpha is pre-multiplied, false otherwise.
+   */
+  bool IsPreMultipliedAlphaEnabled() const;
+
   // Properties
   /**
    * Called when a property of an object of this type is set.
@@ -140,6 +154,8 @@ private:
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise
   Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
+
+  bool             mPremultipledAlphaEnabled; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace Internal
