@@ -76,6 +76,9 @@ const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX              = "decorati
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
 const char* const PROPERTY_NAME_INPUT_COLOR                          = "inputColor";
 const char* const PROPERTY_NAME_ENABLE_MARKUP                        = "enableMarkup";
+const char* const PROPERTY_NAME_INPUT_FONT_FAMILY                    = "inputFontFamily";
+const char* const PROPERTY_NAME_INPUT_FONT_STYLE                     = "inputFontStyle";
+const char* const PROPERTY_NAME_INPUT_POINT_SIZE                     = "inputPointSize";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -266,6 +269,9 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == TextField::Property::INPUT_METHOD_SETTINGS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_COLOR ) == TextField::Property::INPUT_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP ) == TextField::Property::ENABLE_MARKUP );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_FONT_FAMILY ) == TextField::Property::INPUT_FONT_FAMILY );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_FONT_STYLE ) == TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_POINT_SIZE ) == TextField::Property::INPUT_POINT_SIZE );
   END_TEST;
 }
 
@@ -393,7 +399,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::DECORATION_BOUNDING_BOX, Rect<int>( 0, 0, 1, 1 ) );
   DALI_TEST_EQUALS( field.GetProperty<Rect <int > >( TextField::Property::DECORATION_BOUNDING_BOX ), Rect<int>( 0, 0, 1, 1 ), TEST_LOCATION );
 
-  // Input color
+  // Check input color property.
   field.SetProperty( TextField::Property::INPUT_COLOR, Color::YELLOW );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::INPUT_COLOR ), Color::YELLOW, TEST_LOCATION );
 
@@ -401,6 +407,14 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_CHECK( !field.GetProperty<bool>( TextField::Property::ENABLE_MARKUP ) );
   field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
   DALI_TEST_CHECK( field.GetProperty<bool>( TextField::Property::ENABLE_MARKUP ) );
+
+  // Check input font properties.
+  field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "Setting input font style" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "Setting input font style", TEST_LOCATION );
+  field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
+  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }

@@ -224,20 +224,6 @@ public:
   const std::string& GetDefaultFontStyle() const;
 
   /**
-   * @brief Sets the default font width.
-   *
-   * @param[in] width The font width.
-   */
-  void SetDefaultFontWidth( FontWidth width );
-
-  /**
-   * @brief Retrieves the default font width.
-   *
-   * @return The default font width.
-   */
-  FontWidth GetDefaultFontWidth() const;
-
-  /**
    * @brief Sets the default font weight.
    *
    * @param[in] weight The font weight.
@@ -250,6 +236,20 @@ public:
    * @return The default font weight.
    */
   FontWeight GetDefaultFontWeight() const;
+
+  /**
+   * @brief Sets the default font width.
+   *
+   * @param[in] width The font width.
+   */
+  void SetDefaultFontWidth( FontWidth width );
+
+  /**
+   * @brief Retrieves the default font width.
+   *
+   * @return The default font width.
+   */
+  FontWidth GetDefaultFontWidth() const;
 
   /**
    * @brief Sets the default font slant.
@@ -396,6 +396,90 @@ public:
    * @return The input text's color.
    */
   const Vector4& GetInputColor() const;
+
+  /**
+   * @brief Sets the input text's font family name.
+   *
+   * @param[in] fontFamily The text's font family name.
+   */
+  void SetInputFontFamily( const std::string& fontFamily );
+
+  /**
+   * @brief Retrieves the input text's font family name.
+   *
+   * @return The input text's font family name.
+   */
+  const std::string& GetInputFontFamily() const;
+
+  /**
+   * @brief Sets the input text's font style.
+   *
+   * @param[in] fontStyle The input text's font style.
+   */
+  void SetInputFontStyle( const std::string& fontStyle );
+
+  /**
+   * @brief Retrieves the input text's font style.
+   *
+   * @return The input text's font style.
+   */
+  const std::string& GetInputFontStyle() const;
+
+  /**
+   * @brief Sets the input font's weight.
+   *
+   * @param[in] weight The input font's weight.
+   */
+  void SetInputFontWeight( FontWeight weight );
+
+  /**
+   * @brief Retrieves the input font's weight.
+   *
+   * @return The input font's weight.
+   */
+  FontWeight GetInputFontWeight() const;
+
+  /**
+   * @brief Sets the input font's width.
+   *
+   * @param[in] width The input font's width.
+   */
+  void SetInputFontWidth( FontWidth width );
+
+  /**
+   * @brief Retrieves the input font's width.
+   *
+   * @return The input font's width.
+   */
+  FontWidth GetInputFontWidth() const;
+
+  /**
+   * @brief Sets the input font's slant.
+   *
+   * @param[in] slant The input font's slant.
+   */
+  void SetInputFontSlant( FontSlant slant );
+
+  /**
+   * @brief Retrieves the input font's slant.
+   *
+   * @return The input font's slant.
+   */
+  FontSlant GetInputFontSlant() const;
+
+  /**
+   * @brief Sets the input font's point size.
+   *
+   * @param[in] size The input font's point size.
+   */
+  void SetInputFontPointSize( float size );
+
+  /**
+   * @brief Retrieves the input font's point size.
+   *
+   * @return The input font's point size.
+   */
+  float GetInputFontPointSize() const;
 
   /**
    * @brief Called to enable/disable cursor blink.

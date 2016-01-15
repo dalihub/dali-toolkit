@@ -75,9 +75,9 @@ public:
   void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color );
 
   /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( float, const Vector4& )
+   * @copydoc Toolkit::RenderFactory::GetControlRenderer( float, const Vector4&, bool )
    */
-  Toolkit::ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor );
+  Toolkit::ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing );
 
   /**
    * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Image& )

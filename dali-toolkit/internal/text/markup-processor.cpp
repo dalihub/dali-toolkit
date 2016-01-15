@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/markup-processor-color.h>
+#include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 
 namespace Dali
@@ -46,19 +47,16 @@ const std::string XHTML_SHADOW_TAG("shadow");
 const std::string XHTML_GLOW_TAG("glow");
 const std::string XHTML_OUTLINE_TAG("outline");
 
-const char LESS_THAN         = '<';
-const char GREATER_THAN      = '>';
-const char EQUAL             = '=';
-const char QUOTATION_MARK    = '\'';
-const char LINE_SEPARATOR_CR = 0x0D; // Carriage return character  CR
-const char LINE_SEPARATOR_LF = 0x0A; // New line character         LF
-const char SLASH             = '/';
-const char BACK_SLASH        = '\\';
+const char LESS_THAN      = '<';
+const char GREATER_THAN   = '>';
+const char EQUAL          = '=';
+const char QUOTATION_MARK = '\'';
+const char SLASH          = '/';
+const char BACK_SLASH     = '\\';
 
-const char WHITE_SPACE       = 0x20; // ASCII value of the white space.
+const char WHITE_SPACE    = 0x20; // ASCII value of the white space.
 
 const unsigned int MAX_NUM_OF_ATTRIBUTES =  5u; ///< The font tag has the 'family', 'size' 'weight', 'width' and 'slant' attrubutes.
-
 const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
 
 /**
@@ -347,9 +345,11 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
   // Points the next free position in the vector of runs.
   StyleStack::RunIndex colorRunIndex = 0u;
+  StyleStack::RunIndex fontRunIndex = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve( DEFAULT_VECTOR_SIZE );
+  markupProcessData.fontRuns.Reserve( DEFAULT_VECTOR_SIZE );
 
   // Get the mark-up string buffer.
   const char* markupStringBuffer = markupString.c_str();
@@ -398,10 +398,34 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         if( !tag.isEndTag )
         {
           // Create a new font run.
+          FontDescriptionRun fontRun;
+          fontRun.characterRun.numberOfCharacters = 0u;
+
+          // Fill the run with the parameters.
+          fontRun.characterRun.characterIndex = characterIndex;
+          fontRun.slant = TextAbstraction::FontSlant::ITALIC;
+
+          fontRun.familyName = NULL;
+          fontRun.familyDefined = false;
+          fontRun.weightDefined = false;
+          fontRun.widthDefined = false;
+          fontRun.slantDefined = true;
+          fontRun.sizeDefined = false;
+
+          // Push the font run in the logical model.
+          markupProcessData.fontRuns.PushBack( fontRun );
+
+          // Push the index of the run into the stack.
+          styleStack.Push( fontRunIndex );
+
+          // Point the next free font run.
+          ++fontRunIndex;
         }
         else
         {
           // Pop the top of the stack and set the number of characters of the run.
+          FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
+          fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
         }
       } // <i></i>
       else if( TokenComparison( XHTML_U_TAG, tag.buffer, tag.length ) )
@@ -420,10 +444,35 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         if( !tag.isEndTag )
         {
           // Create a new font run.
+          FontDescriptionRun fontRun;
+          fontRun.characterRun.numberOfCharacters = 0u;
+
+          // Fill the run with the parameters.
+          fontRun.characterRun.characterIndex = characterIndex;
+
+          fontRun.weight = TextAbstraction::FontWeight::BOLD;
+
+          fontRun.familyName = NULL;
+          fontRun.familyDefined = false;
+          fontRun.weightDefined = true;
+          fontRun.widthDefined = false;
+          fontRun.slantDefined = false;
+          fontRun.sizeDefined = false;
+
+          // Push the font run in the logical model.
+          markupProcessData.fontRuns.PushBack( fontRun );
+
+          // Push the index of the run into the stack.
+          styleStack.Push( fontRunIndex );
+
+          // Point the next free font run.
+          ++fontRunIndex;
         }
         else
         {
           // Pop the top of the stack and set the number of characters of the run.
+          FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
+          fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
         }
       } // <b></b>
       else if( TokenComparison( XHTML_FONT_TAG, tag.buffer, tag.length ) )
@@ -431,10 +480,35 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         if( !tag.isEndTag )
         {
           // Create a new font run.
+          FontDescriptionRun fontRun;
+          fontRun.characterRun.numberOfCharacters = 0u;
+
+          // Fill the run with the parameters.
+          fontRun.characterRun.characterIndex = characterIndex;
+
+          fontRun.familyName = NULL;
+          fontRun.familyDefined = false;
+          fontRun.weightDefined = false;
+          fontRun.widthDefined = false;
+          fontRun.slantDefined = false;
+          fontRun.sizeDefined = false;
+
+          ProcessFontTag( tag, fontRun );
+
+          // Push the font run in the logical model.
+          markupProcessData.fontRuns.PushBack( fontRun );
+
+          // Push the index of the run into the stack.
+          styleStack.Push( fontRunIndex );
+
+          // Point the next free font run.
+          ++fontRunIndex;
         }
         else
         {
           // Pop the top of the stack and set the number of characters of the run.
+          FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
+          fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
         }
       } // <font></font>
       else if( TokenComparison( XHTML_SHADOW_TAG, tag.buffer, tag.length ) )
@@ -485,15 +559,6 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
           ++markupStringBuffer;
         }
       }
-      else if( ( LINE_SEPARATOR_CR == character ) && ( markupStringBuffer + 1u < markupStringEndBuffer ) )
-      {
-        // Replacing CR+LF end line by LF.
-        if( LINE_SEPARATOR_LF == *( markupStringBuffer + 1u ) )
-        {
-          character = LINE_SEPARATOR_LF;
-          ++markupStringBuffer;
-        }
-      }
 
       const unsigned char numberOfBytes = GetUtf8Length( character );
 
@@ -510,6 +575,15 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
   }
 
   // Resize the model's vectors.
+  if( 0u == fontRunIndex )
+  {
+    markupProcessData.fontRuns.Clear();
+  }
+  else
+  {
+    markupProcessData.fontRuns.Resize( fontRunIndex );
+  }
+
   if( 0u == colorRunIndex )
   {
     markupProcessData.colorRuns.Clear();

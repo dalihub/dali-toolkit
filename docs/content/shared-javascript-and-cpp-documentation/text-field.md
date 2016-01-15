@@ -11,7 +11,9 @@ The Dali::Toolkit::TextField is a control which provides a single-line editable 
 
 Before any text has been entered, the TextField can display some placeholder text.
 An alternative placeholder can be displayed when the TextField has keyboard focus.
-For example a TextField used to enter a username could initially show "Unknown Name", and then show "Enter Name." when the cursor is shown. 
+For example a TextField used to enter a username could initially show "Unknown Name", and then show "Enter Name." when the cursor is shown.
+
+Note *CR+LF* new line characters are replaced by a *LF* one.
 
 ~~~{.cpp}
 // C++
@@ -59,13 +61,16 @@ Mark-up tags can be used to change the style of the text. See the [Mark-up Style
 
 ### Input Style
 
-The input style can be changed through the control properties. Current supported input style properties are:
+The input style can be changed through the control properties. All subsequent characters added will be rendered with the new input style.
 
-#### INPUT_COLOR
+Note the input style may change if the cursor is updated by tapping in a new position.
 
-Sets the input color. All subsequent characters added will be rendered with the input color.
+Current supported input style properties are:
 
-Note the input color may change if the cursor is updated by tapping in a new position.
+- *INPUT_COLOR* Sets the input color. The property expects a Vector4 with the red, green, blue and alpha values clamped between 0 and 1.
+- *INPUT_FONT_FAMILY* Sets the input font's family name. The property expects the name of the font. If the new text is not supported by the given font a suitable one will be set.
+- *INPUT_FONT_STYLE* Sets the input font's style. The property expects a json formatted string with the font's style. See the [Font Selection](@ref font-selection) section for more details.
+- *INPUT_POINT_SIZE* Sets the input font's size. The property expects a float with the font's size in points. See the [Font Selection](@ref font-selection) section for more details.
 
 ### Text Alignment
 
@@ -167,6 +172,9 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  inputMethodSettings               | INPUT_METHOD_SETTINGS                |  MAP         | O            | X
  inputColor                        | INPUT_COLOR                          |  VECTOR4     | O            | X
  enableMarkup                      | ENABLE_MARKUP                        |  BOOLEAN     | O            | X
+ inputFontFamily                   | INPUT_FONT_FAMILY                    |  STRING      | O            | X
+ inputFontStyle                    | INPUT_FONT_STYLE                     |  STRING      | O            | X
+ inputPointSize                    | INPUT_POINT_SIZE                     |  FLOAT       | O            | X
 
 @class TextField
 

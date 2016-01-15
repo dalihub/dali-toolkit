@@ -81,6 +81,7 @@ struct CursorInfo
   CursorInfo()
   : primaryPosition(),
     secondaryPosition(),
+    lineOffset( 0.f ),
     lineHeight( 0.f ),
     primaryCursorHeight( 0.f ),
     secondaryCursorHeight( 0.f ),
@@ -92,6 +93,7 @@ struct CursorInfo
 
   Vector2 primaryPosition;       ///< The primary cursor's position.
   Vector2 secondaryPosition;     ///< The secondary cursor's position.
+  float   lineOffset;            ///< The vertical offset where the line containing the cursor starts.
   float   lineHeight;            ///< The height of the line where the cursor is placed.
   float   primaryCursorHeight;   ///< The primary cursor's height.
   float   secondaryCursorHeight; ///< The secondary cursor's height.
@@ -187,7 +189,12 @@ struct FontDefaults
   : mFontDescription(),
     mFontStyle(),
     mDefaultPointSize( 0.f ),
-    mFontId( 0u )
+    mFontId( 0u ),
+    familyDefined( false ),
+    weightDefined( false ),
+    widthDefined( false ),
+    slantDefined( false ),
+    sizeDefined( false )
   {
     // Initially use the default platform font
     TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -205,10 +212,15 @@ struct FontDefaults
     return mFontId;
   }
 
-  TextAbstraction::FontDescription mFontDescription;
-  std::string mFontStyle;
-  float mDefaultPointSize;
-  FontId mFontId;
+  TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
+  std::string                      mFontStyle;        ///< The font's style string set through the property system.
+  float                            mDefaultPointSize; ///< The default font's point size.
+  FontId                           mFontId;           ///< The font's id of the default font.
+  bool familyDefined:1; ///< Whether the default font's family name is defined.
+  bool weightDefined:1; ///< Whether the default font's weight is defined.
+  bool  widthDefined:1; ///< Whether the default font's width is defined.
+  bool  slantDefined:1; ///< Whether the default font's slant is defined.
+  bool   sizeDefined:1; ///< Whether the default font's point size is defined.
 };
 
 struct Controller::Impl
@@ -230,7 +242,6 @@ struct Controller::Impl
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
-    mUserDefinedFontFamily( false ),
     mMarkupProcessorEnabled( false )
   {
     mLogicalModel = LogicalModel::New();
@@ -388,14 +399,6 @@ struct Controller::Impl
   void RetrieveDefaultInputStyle( InputStyle& inputStyle );
 
   /**
-   * @brief Retrieve the default fonts.
-   *
-   * @param[out] fonts The default font family, style and point sizes.
-   * @param[in] numberOfCharacters The number of characters in the logical model.
-   */
-  void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
-
-  /**
    * @brief Retrieve the line height of the default font.
    */
   float GetDefaultFontLineHeight();
@@ -542,7 +545,6 @@ struct Controller::Impl
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
-  bool mUserDefinedFontFamily:1;           ///< Whether the Font family was set by the user instead of being left as sytem default.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
 };
 

@@ -87,4 +87,28 @@ field.SetProperty( TextLabel::Property::TEXT, "<color value='#FF0000'>Red Text</
 field.text = "<color value='#FF0000'>Red Text</color>"; // Color packed with the web color format (6 characters).
 ~~~
 
+## \<font\>
+
+Sets the font values of the characters inside the tag.
+
+Supported attributes are:
+- *family* The name of the font.
+- *size* The size of the font in points.
+- *weight* The weight of the font.
+- *width* The width of the font
+- *slant* The slant of the font.
+
+See the [Font Selection](@ref font-selection) to have a view of the possible values for the *weight*, *width* and *slant* attributes.
+
+~~~{.cpp}
+// C++
+field.SetProperty( TextLabel::Property::TEXT, "<font family='SamsungSans' weight='bold'>Hello world</font>" );
+~~~
+
+~~~{.js}
+// JavaScript
+
+field.text = "<font family='SamsungSans' weight='bold'>Hello world</font>";
+~~~
+
 */

@@ -86,6 +86,11 @@ unsigned int StringToHex( const char* const uintStr )
   return static_cast<unsigned int>( strtoul( uintStr, NULL, 16 ) );
 }
 
+float StringToFloat( const char* const floatStr )
+{
+  return static_cast<float>( strtod( floatStr, NULL ) );
+}
+
 void UintColorToVector4( unsigned int color, Vector4& retColor )
 {
   retColor.a = static_cast<float>( ( color & 0xFF000000 ) >> 24u ) / 255.f;

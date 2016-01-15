@@ -94,6 +94,15 @@ void SkipWhiteSpace( const char*& markupStringBuffer,
 unsigned int StringToHex( const char* const uintStr );
 
 /**
+ * @brief Converts a string into a float value.
+ *
+ * @param[in] floatStr A float packed inside a string.
+ *
+ * @return The float value.
+ */
+float StringToFloat( const char* const floatStr );
+
+/**
  * @brief Converts an ARGB color packed in 4 byte unsigned int into a Vector4 color used in Dali.
  *
  * @param[in] color An ARGB color packed in an unsigned int.

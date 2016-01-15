@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/font-description-run.h>
 
 namespace Dali
 {
@@ -39,14 +40,17 @@ namespace Text
  */
 struct MarkupProcessData
 {
-  MarkupProcessData( Vector<ColorRun>& colorRuns )
+MarkupProcessData( Vector<ColorRun>& colorRuns,
+                   Vector<FontDescriptionRun>& fontRuns )
   : colorRuns( colorRuns ),
+    fontRuns( fontRuns ),
     markupProcessedText()
   {}
 
-  Vector<ColorRun>&           colorRuns;
+  Vector<ColorRun>&           colorRuns;           ///< The color runs.
+  Vector<FontDescriptionRun>& fontRuns;            ///< The font description runs.
 
-  std::string                 markupProcessedText;
+  std::string                 markupProcessedText; ///< The mark-up string.
 };
 
 /**

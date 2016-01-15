@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/font-run.h>
+#include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
@@ -124,6 +125,11 @@ public:
    */
   void RetrieveStyle( CharacterIndex index, InputStyle& style );
 
+  /**
+   * @brief Clears the font description runs.
+   */
+  void ClearFontDescriptionRuns();
+
 protected:
 
   /**
@@ -150,6 +156,7 @@ public:
   Vector<ScriptRun>                     mScriptRuns;
   Vector<FontRun>                       mFontRuns;
   Vector<ColorRun>                      mColorRuns;
+  Vector<FontDescriptionRun>            mFontDescriptionRuns;
   Vector<LineBreakInfo>                 mLineBreakInfo;
   Vector<WordBreakInfo>                 mWordBreakInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;

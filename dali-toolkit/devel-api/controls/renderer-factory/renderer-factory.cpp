@@ -111,7 +111,13 @@ void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, co
 
 ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
 {
-  return GetImplementation( *this ).GetControlRenderer( borderSize, borderColor );
+  return GetImplementation( *this ).GetControlRenderer( borderSize, borderColor, false );
+}
+
+
+ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing )
+{
+  return GetImplementation( *this ).GetControlRenderer( borderSize, borderColor, antiAliasing );
 }
 
 ControlRenderer RendererFactory::GetControlRenderer( const Image& image )

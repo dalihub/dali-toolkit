@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
+#include <memory.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
@@ -60,6 +61,39 @@ namespace Toolkit
 
 namespace Text
 {
+
+/**
+ * @brief Adds a new font description run for the selected text.
+ *
+ * The new font parameters are added after the call to this method.
+ *
+ * @param[in] eventData The event data pointer.
+ * @param[in] logicalModel The logical model where to add the new font description run.
+ */
+FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
+                                                 LogicalModelPtr logicalModel )
+{
+  const bool handlesCrossed = eventData->mLeftSelectionPosition > eventData->mRightSelectionPosition;
+
+  // Get start and end position of selection
+  const CharacterIndex startOfSelectedText = handlesCrossed ? eventData->mRightSelectionPosition : eventData->mLeftSelectionPosition;
+  const Length lengthOfSelectedText = ( handlesCrossed ? eventData->mLeftSelectionPosition : eventData->mRightSelectionPosition ) - startOfSelectedText;
+
+  // Add the font run.
+  const VectorBase::SizeType numberOfRuns = logicalModel->mFontDescriptionRuns.Count();
+  logicalModel->mFontDescriptionRuns.Resize( numberOfRuns + 1u );
+
+  FontDescriptionRun& fontDescriptionRun = *( logicalModel->mFontDescriptionRuns.Begin() + numberOfRuns );
+
+  fontDescriptionRun.characterRun.characterIndex = startOfSelectedText;
+  fontDescriptionRun.characterRun.numberOfCharacters = lengthOfSelectedText;
+
+  // Recalculate the selection highlight as the metrics may have changed.
+  eventData->mUpdateLeftSelectionPosition = true;
+  eventData->mUpdateRightSelectionPosition = true;
+
+  return fontDescriptionRun;
+}
 
 ControllerPtr Controller::New( ControlInterface& controlInterface )
 {
@@ -113,7 +147,8 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
-    MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns );
+    MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns,
+                                         mImpl->mLogicalModel->mFontDescriptionRuns );
 
     Length textSize = 0u;
     const uint8_t* utf8 = NULL;
@@ -269,7 +304,7 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 
   mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
-  mImpl->mUserDefinedFontFamily = true;
+  mImpl->mFontDefaults->familyDefined = true;
 
   // Clear the font-specific data
   ClearFontData();
@@ -310,34 +345,6 @@ const std::string& Controller::GetDefaultFontStyle() const
   return EMPTY_STRING;
 }
 
-void Controller::SetDefaultFontWidth( FontWidth width )
-{
-  if( NULL == mImpl->mFontDefaults )
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
-
-  mImpl->mFontDefaults->mFontDescription.width = width;
-
-  // Clear the font-specific data
-  ClearFontData();
-
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
-
-  mImpl->RequestRelayout();
-}
-
-FontWidth Controller::GetDefaultFontWidth() const
-{
-  if( NULL != mImpl->mFontDefaults )
-  {
-    return mImpl->mFontDefaults->mFontDescription.width;
-  }
-
-  return TextAbstraction::FontWidth::NORMAL;
-}
-
 void Controller::SetDefaultFontWeight( FontWeight weight )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -346,6 +353,7 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
   }
 
   mImpl->mFontDefaults->mFontDescription.weight = weight;
+  mImpl->mFontDefaults->weightDefined = true;
 
   // Clear the font-specific data
   ClearFontData();
@@ -366,6 +374,35 @@ FontWeight Controller::GetDefaultFontWeight() const
   return TextAbstraction::FontWeight::NORMAL;
 }
 
+void Controller::SetDefaultFontWidth( FontWidth width )
+{
+  if( NULL == mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mFontDescription.width = width;
+  mImpl->mFontDefaults->widthDefined = true;
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->RequestRelayout();
+}
+
+FontWidth Controller::GetDefaultFontWidth() const
+{
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mFontDescription.width;
+  }
+
+  return TextAbstraction::FontWidth::NORMAL;
+}
+
 void Controller::SetDefaultFontSlant( FontSlant slant )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -374,6 +411,7 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
   }
 
   mImpl->mFontDefaults->mFontDescription.slant = slant;
+  mImpl->mFontDefaults->slantDefined = true;
 
   // Clear the font-specific data
   ClearFontData();
@@ -402,6 +440,7 @@ void Controller::SetDefaultPointSize( float pointSize )
   }
 
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
+  mImpl->mFontDefaults->sizeDefined = true;
 
   unsigned int horizontalDpi( 0u );
   unsigned int verticalDpi( 0u );
@@ -435,7 +474,7 @@ void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
 
-  if( !mImpl->mUserDefinedFontFamily ) // If user defined font then should not update when system font changes
+  if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
     ClearFontData();
@@ -649,6 +688,220 @@ const Vector4& Controller::GetInputColor() const
   // Return the default text's color if there is no EventData.
   return mImpl->mTextColor;
 
+}
+
+void Controller::SetInputFontFamily( const std::string& fontFamily )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.familyName = fontFamily;
+    mImpl->mEventData->mInputStyle.familyDefined = true;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                            mImpl->mLogicalModel );
+
+      fontDescriptionRun.familyLength = fontFamily.size();
+      fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
+      memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
+      fontDescriptionRun.familyDefined = true;
+
+      // The memory allocated for the font family name is freed when the font description is removed from the logical model.
+
+      // Request to relayout.
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mRecalculateNaturalSize = true;
+      mImpl->RequestRelayout();
+
+      // As the font changes, recalculate the handle positions is needed.
+      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
+  }
+}
+
+const std::string& Controller::GetInputFontFamily() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.familyName;
+  }
+
+  // Return the default font's family if there is no EventData.
+  return GetDefaultFontFamily();
+}
+
+void Controller::SetInputFontStyle( const std::string& fontStyle )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.fontStyle = fontStyle;
+  }
+}
+
+const std::string& Controller::GetInputFontStyle() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.fontStyle;
+  }
+
+  // Return the default font's style if there is no EventData.
+  return GetDefaultFontStyle();
+}
+
+void Controller::SetInputFontWeight( FontWeight weight )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.weight = weight;
+    mImpl->mEventData->mInputStyle.weightDefined = true;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                            mImpl->mLogicalModel );
+
+      fontDescriptionRun.weight = weight;
+      fontDescriptionRun.weightDefined = true;
+
+      // Request to relayout.
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mRecalculateNaturalSize = true;
+      mImpl->RequestRelayout();
+
+      // As the font might change, recalculate the handle positions is needed.
+      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
+  }
+}
+
+FontWeight Controller::GetInputFontWeight() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.weight;
+  }
+
+  return GetDefaultFontWeight();
+}
+
+void Controller::SetInputFontWidth( FontWidth width )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.width = width;
+    mImpl->mEventData->mInputStyle.widthDefined = true;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                            mImpl->mLogicalModel );
+
+      fontDescriptionRun.width = width;
+      fontDescriptionRun.widthDefined = true;
+
+      // Request to relayout.
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mRecalculateNaturalSize = true;
+      mImpl->RequestRelayout();
+
+      // As the font might change, recalculate the handle positions is needed.
+      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
+  }
+}
+
+FontWidth Controller::GetInputFontWidth() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.width;
+  }
+
+  return GetDefaultFontWidth();
+}
+
+void Controller::SetInputFontSlant( FontSlant slant )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.slant = slant;
+    mImpl->mEventData->mInputStyle.slantDefined = true;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                            mImpl->mLogicalModel );
+
+      fontDescriptionRun.slant = slant;
+      fontDescriptionRun.slantDefined = true;
+
+      // Request to relayout.
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mRecalculateNaturalSize = true;
+      mImpl->RequestRelayout();
+
+      // As the font might change, recalculate the handle positions is needed.
+      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
+  }
+}
+
+FontSlant Controller::GetInputFontSlant() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.slant;
+  }
+
+  return GetDefaultFontSlant();
+}
+
+void Controller::SetInputFontPointSize( float size )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.size = size;
+
+    if( EventData::SELECTING == mImpl->mEventData->mState )
+    {
+      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                            mImpl->mLogicalModel );
+
+      fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * 64.f );
+      fontDescriptionRun.sizeDefined = true;
+
+      // Request to relayout.
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mRecalculateNaturalSize = true;
+      mImpl->RequestRelayout();
+
+      // As the font might change, recalculate the handle positions is needed.
+      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
+  }
+}
+
+float Controller::GetInputFontPointSize() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.size;
+  }
+
+  // Return the default font's point size if there is no EventData.
+  return GetDefaultPointSize();
 }
 
 void Controller::SetEnableCursorBlink( bool enable )
@@ -1464,7 +1717,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     mImpl->mControlInterface.TextChanged();
   }
 
-  return false;
+  return true;
 }
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
@@ -1564,7 +1817,9 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // The cursor position.
     CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
-    // Updates the text style runs.
+    // Update the text's style.
+
+    // Updates the text style runs by adding characters.
     mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, maxSizeOfNewText );
 
     // Get the character index from the cursor index.
@@ -1577,6 +1832,13 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Whether to add a new text color run.
     const bool addColorRun = style.textColor != mImpl->mEventData->mInputStyle.textColor;
 
+    // Whether to add a new font run.
+    const bool addFontNameRun = style.familyName != mImpl->mEventData->mInputStyle.familyName;
+    const bool addFontWeightRun = style.weight != mImpl->mEventData->mInputStyle.weight;
+    const bool addFontWidthRun = style.width != mImpl->mEventData->mInputStyle.width;
+    const bool addFontSlantRun = style.slant != mImpl->mEventData->mInputStyle.slant;
+    const bool addFontSizeRun = style.size != mImpl->mEventData->mInputStyle.size;
+
     // Add style runs.
     if( addColorRun )
     {
@@ -1587,6 +1849,55 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       colorRun.color = mImpl->mEventData->mInputStyle.textColor;
       colorRun.characterRun.characterIndex = cursorIndex;
       colorRun.characterRun.numberOfCharacters = maxSizeOfNewText;
+    }
+
+    if( addFontNameRun   ||
+        addFontWeightRun ||
+        addFontWidthRun  ||
+        addFontSlantRun  ||
+        addFontSizeRun )
+    {
+      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mFontDescriptionRuns.Count();
+      mImpl->mLogicalModel->mFontDescriptionRuns.Resize( numberOfRuns + 1u );
+
+      FontDescriptionRun& fontDescriptionRun = *( mImpl->mLogicalModel->mFontDescriptionRuns.Begin() + numberOfRuns );
+
+      if( addFontNameRun )
+      {
+        fontDescriptionRun.familyLength = mImpl->mEventData->mInputStyle.familyName.size();
+        fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
+        memcpy( fontDescriptionRun.familyName, mImpl->mEventData->mInputStyle.familyName.c_str(), fontDescriptionRun.familyLength );
+        fontDescriptionRun.familyDefined = true;
+
+        // The memory allocated for the font family name is freed when the font description is removed from the logical model.
+      }
+
+      if( addFontWeightRun )
+      {
+        fontDescriptionRun.weight = mImpl->mEventData->mInputStyle.weight;
+        fontDescriptionRun.weightDefined = true;
+      }
+
+      if( addFontWidthRun )
+      {
+        fontDescriptionRun.width = mImpl->mEventData->mInputStyle.width;
+        fontDescriptionRun.widthDefined = true;
+      }
+
+      if( addFontSlantRun )
+      {
+        fontDescriptionRun.slant = mImpl->mEventData->mInputStyle.slant;
+        fontDescriptionRun.slantDefined = true;
+      }
+
+      if( addFontSizeRun )
+      {
+        fontDescriptionRun.size = static_cast<PointSize26Dot6>( mImpl->mEventData->mInputStyle.size * 64.f );
+        fontDescriptionRun.sizeDefined = true;
+      }
+
+      fontDescriptionRun.characterRun.characterIndex = cursorIndex;
+      fontDescriptionRun.characterRun.numberOfCharacters = maxSizeOfNewText;
     }
 
     // Insert at current cursor position.
@@ -2228,6 +2539,7 @@ void Controller::ClearFontData()
 void Controller::ClearStyleData()
 {
   mImpl->mLogicalModel->mColorRuns.Clear();
+  mImpl->mLogicalModel->ClearFontDescriptionRuns();
 }
 
 Controller::Controller( ControlInterface& controlInterface )

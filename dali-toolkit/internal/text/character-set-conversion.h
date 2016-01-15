@@ -65,6 +65,11 @@ uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCha
  *
  * The @p utf32 buffer needs to be big enough to store all the characters.
  *
+ * If the text contains a single 'CR' character or a pair 'CR'+'LF', they are replaced by a 'LF'.
+ *
+ * @note GetNumberOfUtf8Characters() does not convert 'CR' or 'CR'+'LF' to 'LF' so the return number
+ * of characters of that method may be higher than the number of characters returned by this one.
+ *
  * @param[in] utf8 The pointer to the UTF8 array.
  * @param[in] length The length of the UTF8 array.
  * @param[out] utf32 The pointer to the UTF32 array.
