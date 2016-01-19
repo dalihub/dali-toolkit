@@ -42,6 +42,7 @@ namespace // un-named name space
 const ApiFunction HandleFunctionTable[]=
 {
   { "RegisterAnimatableProperty",            HandleWrapper::RegisterAnimatableProperty },
+  { "RegisterCustomProperty",                HandleWrapper::RegisterCustomProperty     },
 };
 
 const unsigned int HandleFunctionTableCount = sizeof(HandleFunctionTable)/sizeof(HandleFunctionTable[0]);
@@ -212,8 +213,8 @@ void HandleWrapper::AddInterceptsToTemplate( v8::Isolate* isolate, v8::Local<v8:
  * @return {integer} The index of the property or dali.PROPERTY_INVALID_INDEX if registration failed
  * @example
  *
- *     var morphPropertyIdex = actor.registerAnimatableProperty("uMorphAmount", 0.0f);
- *     var fadeColorPropertyIdex = handle.registerAnimatableProperty("uFadeColor", [1.0, 0.0, 0.0, 1.0]);
+ *     var morphPropertyIndex = actor.registerAnimatableProperty("uMorphAmount", 0.0f);
+ *     var fadeColorPropertyIndex = handle.registerAnimatableProperty("uFadeColor", [1.0, 0.0, 0.0, 1.0]);
  *
  */
 void HandleWrapper::RegisterAnimatableProperty( const v8::FunctionCallbackInfo< v8::Value >& args )
@@ -248,6 +249,75 @@ void HandleWrapper::RegisterAnimatableProperty( const v8::FunctionCallbackInfo< 
   else
   {
     args.GetReturnValue().Set( v8::Integer::New( isolate, handle.RegisterProperty(propertyName, daliPropertyValue) ) );
+  }
+}
+
+/**
+ * Register a new custom property.
+ *
+ * The object should support dynamic properties.
+ * Property names must be unused.
+ * Property indices are unique to each registered custom property in a given object.
+ * Properties can be set as non animatable using property attributes.
+ * returns dali.PROPERTY_INVALID_INDEX if registration failed.
+ *
+ * @method registerCustomProperty
+ * @for Handle
+ * @param {string} name The name of the property.
+ * @param {Object} propertyValue The new value of the property.
+ * @param {integer} accessMode The property access mode (writable, animatable etc).
+ * @return {integer} The index of the property or dali.PROPERTY_INVALID_INDEX if registration failed
+ * @example
+ *
+ *     // access mode is one of the following
+ *     dali.PROPERTY_READ_ONLY
+ *     dali.PROPERTY_READ_WRITE
+ *     dali.PROPERTY_ANIMATABLE
+ *
+ *     var cellIndexPropertyIndex = actor.registerCustomProperty("cellIndex", 2, dali.PROPERTY_READ_WRITE);
+ *     var myCustomPropertyIndex = handle.registerCustomProperty("myCustomProperty", [10.0, 25.0, 0.0], dali.PROPERTY_READ_ONLY);
+ *
+ */
+void HandleWrapper::RegisterCustomProperty( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  // unwrap the object
+  HandleWrapper* handleWrapper = Unwrap( isolate, args.This() );
+  if( !handleWrapper )
+  {
+    return;
+  }
+
+  Handle handle =  handleWrapper->mHandle;
+
+  bool found( false );
+  std::string propertyName = V8Utils::GetStringParameter( PARAMETER_0, found, isolate, args );
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad property name parameter" );
+    return;
+  }
+
+  found = false;
+  Dali::Property::Value daliPropertyValue = V8Utils::GetPropertyValueParameter(PARAMETER_1, found, isolate, args );
+  if( !found || Dali::Property::NONE == daliPropertyValue.GetType() )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad property value parameter" );
+    return;
+  }
+
+  found = false;
+  int accessMode = V8Utils::GetIntegerParameter( PARAMETER_2, found, isolate, args, 0 /* default */);
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid access mode parameter" );
+    return;
+  }
+  else
+  {
+    args.GetReturnValue().Set( v8::Integer::New( isolate, handle.RegisterProperty( propertyName, daliPropertyValue, static_cast<Property::AccessMode>(accessMode) ) ) );
   }
 }
 

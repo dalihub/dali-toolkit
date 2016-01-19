@@ -84,7 +84,7 @@ struct ActorApiStruct
 
 /**
  * Lookup table to match a actor type with a constructor and supported API's.
- * HandleWrapper::ActorType is used to index this table
+ * ActorWrapper::ActorType is used to index this table
  */
 const ActorApiStruct ActorApiLookup[]=
 {
@@ -305,7 +305,7 @@ v8::Handle<v8::Object> ActorWrapper::WrapActor( v8::Isolate* isolate, Actor acto
   // create an instance of the template
   v8::Local<v8::Object> localObject = objectTemplate->NewInstance();
 
-  // create teh actor object
+  // create the actor object
   ActorWrapper* pointer = new ActorWrapper( actor, Dali::V8Plugin::DaliWrapper::Get().GetDaliGarbageCollector() );
 
   // assign the JavaScript object to the wrapper.
@@ -392,42 +392,6 @@ void ActorWrapper::NewActor( const v8::FunctionCallbackInfo< v8::Value >& args)
   args.GetReturnValue().Set( localObject );
 }
 
-void ActorWrapper::NewControl( const v8::FunctionCallbackInfo< v8::Value >& args)
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  if( !args.IsConstructCall() )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "constructor called without 'new" );
-    return;
-  }
-
-  bool found( false );
-  std::string controlName = V8Utils::GetStringParameter( PARAMETER_0, found, isolate,  args );
-
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "missing control name" );
-    return;
-  }
-  Actor control;
-  Dali::TypeInfo typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( controlName );
-  if( typeInfo ) // handle, check if it has a value
-  {
-    Dali::BaseHandle handle = typeInfo.CreateInstance();
-    if( handle )
-    {
-      control = Actor::DownCast( handle );
-    }
-  }
-
-  v8::Local<v8::Object> localObject = WrapActor( isolate, control, ACTOR );
-
-  args.GetReturnValue().Set( localObject );
-}
-
-
 /**
  * given an actor type name, e.g. CameraActor returns the type, e.g. ActorWrapper::CAMERA_ACTOR
  */
@@ -442,8 +406,6 @@ ActorWrapper::ActorType ActorWrapper::GetActorType( const std::string& name )
   }
   return ActorWrapper::UNKNOWN_ACTOR;
 }
-
-
 
 } // namespace V8Plugin
 

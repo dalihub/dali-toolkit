@@ -28,14 +28,6 @@ namespace Dali
 namespace V8Plugin
 {
 
-namespace TextLabelApi
-{
-  /**
-   * Temporary TextView constructor
-   */
-  Actor New( const v8::FunctionCallbackInfo< v8::Value >& args );
-}
-
 namespace ActorApi
 {
 

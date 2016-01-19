@@ -149,6 +149,118 @@ void GetModuleName( const std::string& fileName, std::string& moduleName )
   }
 }
 
+bool IsPropertyMapIdentical(Property::Map map1, Property::Map map2)
+{
+  bool dirty = false;
+
+  // Compare number of properties
+  if ( map1.Count() != map2.Count() )
+  {
+    dirty = true;
+  }
+  else
+  {
+    for ( unsigned int i = 0, count = map1.Count(); i < count; ++i )
+    {
+      // Compare the key first
+      if(map1.GetKey(i) != map2.GetKey(i))
+      {
+        dirty = true;
+      }
+      else
+      {
+        Property::Value& value = map1.GetValue(i);
+        Property::Value& newValue = map2.GetValue(i);
+
+        // Compare the value type
+        if(value.GetType() != newValue.GetType())
+        {
+          dirty = true;
+        }
+        else
+        {
+          // Compare the value
+          switch( value.GetType() )
+          {
+            case Property::BOOLEAN:
+            {
+              dirty = ( value.Get<bool>() != newValue.Get<bool>() );
+              break;
+            }
+            case Property::FLOAT:
+            {
+              dirty = ( value.Get<float>() != newValue.Get<float>() );
+              break;
+            }
+            case Property::INTEGER:
+            {
+              dirty = ( value.Get<int>() != newValue.Get<int>() );
+              break;
+            }
+            case Property::RECTANGLE:
+            {
+              dirty = ( value.Get< Rect<int> >() != newValue.Get< Rect<int> >() );
+              break;
+            }
+            case Property::VECTOR2:
+            {
+              dirty = ( value.Get<Vector2>() != newValue.Get<Vector2>() );
+              break;
+            }
+            case Property::VECTOR3:
+            {
+              dirty = ( value.Get<Vector3>() != newValue.Get<Vector3>() );
+              break;
+            }
+            case Property::VECTOR4:
+            {
+              dirty = ( value.Get<Vector4>() != newValue.Get<Vector4>() );
+              break;
+            }
+            case Property::MATRIX3:
+            {
+              dirty = ( value.Get<Matrix3>() != newValue.Get<Matrix3>() );
+              break;
+            }
+            case Property::MATRIX:
+            {
+              dirty = ( value.Get<Matrix>() != newValue.Get<Matrix>() );
+              break;
+            }
+            case Property::ROTATION:
+            {
+              dirty = ( value.Get<Quaternion>() != newValue.Get<Quaternion>() );
+              break;
+            }
+            case Property::STRING:
+            {
+              dirty = ( value.Get<std::string>() != newValue.Get<std::string>() );
+              break;
+            }
+            case Property::MAP:
+            {
+              dirty = ( !IsPropertyMapIdentical( value.Get<Property::Map>(), newValue.Get<Property::Map>() ) );
+              break;
+            }
+            default:
+            {
+              break;
+            }
+          }
+        }
+      }
+
+      if(dirty)
+      {
+        // Different already, no need any further comparison
+        break;
+      }
+    }
+  }
+
+  return !dirty;
+}
+
 void ReportException(  v8::Isolate* isolate, v8::TryCatch* tryCatch)
 {
   v8::HandleScope handleScope( isolate );
@@ -879,7 +991,7 @@ void CreatePropertyMap( v8::Isolate* isolate, const Property::Map& map, v8::Loca
     return;
   }
 
-  for( unsigned int index = 0; index < map.Count() - 1; ++index )
+  for( unsigned int index = 0; index < map.Count(); ++index )
   {
     const std::string& key = map.GetKey( index );
     Property::Value& value = map.GetValue( index );

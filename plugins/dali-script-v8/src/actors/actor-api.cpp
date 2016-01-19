@@ -36,21 +36,14 @@ namespace V8Plugin
 
 namespace  // unanmed namespace
 {
+
 Actor GetActor( v8::Isolate* isolate, const v8::FunctionCallbackInfo<v8::Value>& args )
 {
   HandleWrapper* handleWrapper = HandleWrapper::Unwrap( isolate, args.This() );
   return Actor::DownCast( handleWrapper->mHandle );
 }
+
 } //unanmed namespace
-
-
-namespace TextLabelApi
-{
- Actor New( const v8::FunctionCallbackInfo< v8::Value >& args )
- {
-   return Dali::Toolkit::TextLabel::New();
- }
-}
 
 /***************************************
  * ACTOR API FUNCTIONS
@@ -279,7 +272,7 @@ void ActorApi::GetChildCount( const v8::FunctionCallbackInfo<v8::Value>& args )
 }
 
 /**
- * Retrieve and child actor by index.
+ * Retrieve a child actor by index.
  *
  * @for Actor
  * @method getChildAt

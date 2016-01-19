@@ -63,6 +63,9 @@ public:
 
   enum PropertyRange
   {
+    PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1,                        ///< @since DALi 1.1.18
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,                                        ///< Reserve property indices, @since DALi 1.1.18
+
     ANIMATABLE_PROPERTY_START_INDEX = Toolkit::Scrollable::ANIMATABLE_PROPERTY_END_INDEX + 1,
     ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000                   ///< Reserve animatable property indices
   };
@@ -74,12 +77,20 @@ public:
   {
     enum
     {
-      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "layoutPosition",        type float
-      SCROLL_SPEED,                                      ///< Property, name "scrollSpeed",           type float
-      OVERSHOOT,                                         ///< Property, name "overshoot",             type float
-      SCROLL_DIRECTION,                                  ///< Property, name "scrollDirection",       type Vector2
-      LAYOUT_ORIENTATION,                                ///< Property, name "layoutOrientation",     type integer
-      SCROLL_CONTENT_SIZE                                ///< Property, name "scrollContentSize",     type float
+      // Event side properties
+      MINIMUM_SWIPE_SPEED = PROPERTY_START_INDEX,        ///< Property, name "minimumSwipeSpeed",        @see SetMinimumSwipeSpeed(),       type float,    @since DALi 1.1.18
+      MINIMUM_SWIPE_DISTANCE,                            ///< Property, name "minimumSwipeDistance",     @see SetMinimumSwipeDistance(),    type float,    @since DALi 1.1.18
+      WHELL_SCROLL_DISTANCE_SPEED,                       ///< Property, name "wheelScrollDistanceStep",  @see SetWheelScrollDistanceStep(), type float,    @since DALi 1.1.18
+      SNAP_TO_ITEM_ENABLED,                              ///< Property, name "snapToItemEnabled",        @see SetAnchoring(),               type bool,     @since DALi 1.1.18
+      REFRESH_INTERVAL,                                  ///< Property, name "refreshInterval",          @see SetRefreshInterval(),         type float,    @since DALi 1.1.18
+
+      // Animatable properties
+      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "layoutPosition",           type float
+      SCROLL_SPEED,                                      ///< Property, name "scrollSpeed",              type float
+      OVERSHOOT,                                         ///< Property, name "overshoot",                type float
+      SCROLL_DIRECTION,                                  ///< Property, name "scrollDirection",          type Vector2
+      LAYOUT_ORIENTATION,                                ///< Property, name "layoutOrientation",        type integer
+      SCROLL_CONTENT_SIZE                                ///< Property, name "scrollContentSize",        type float
     };
   };
 

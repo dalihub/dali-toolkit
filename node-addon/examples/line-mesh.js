@@ -18,7 +18,7 @@
  }
 
 // desktop
-//var dali = require('./build/Release/dali')( options );
+//var dali = require('../build/Release/dali')( options );
 
 // target
 var dali = require('dali')( options );
