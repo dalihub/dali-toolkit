@@ -247,7 +247,7 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL)
 
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "minimumSwipeSpeed",          FLOAT,     MINIMUM_SWIPE_SPEED          )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "minimumSwipeDistance",       FLOAT,     MINIMUM_SWIPE_DISTANCE       )
-DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "wheelScrollDistanceStep",    FLOAT,     WHELL_SCROLL_DISTANCE_SPEED  )
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "wheelScrollDistanceStep",    FLOAT,     WHEEL_SCROLL_DISTANCE_STEP   )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "snapToItemEnabled",          BOOLEAN,   SNAP_TO_ITEM_ENABLED         )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "refreshInterval",            FLOAT,     REFRESH_INTERVAL             )
 
@@ -1717,7 +1717,7 @@ void ItemView::SetProperty( BaseObject* object, Property::Index index, const Pro
         itemViewImpl.SetMinimumSwipeDistance( value.Get<float>() );
         break;
       }
-      case Toolkit::ItemView::Property::WHELL_SCROLL_DISTANCE_SPEED:
+      case Toolkit::ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP:
       {
         itemViewImpl.SetWheelScrollDistanceStep( value.Get<float>() );
         break;
@@ -1757,7 +1757,7 @@ Property::Value ItemView::GetProperty( BaseObject* object, Property::Index index
         value = itemViewImpl.GetMinimumSwipeDistance();
         break;
       }
-      case Toolkit::ItemView::Property::WHELL_SCROLL_DISTANCE_SPEED:
+      case Toolkit::ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP:
       {
         value = itemViewImpl.GetWheelScrollDistanceStep();
         break;

@@ -80,7 +80,7 @@ public:
       // Event side properties
       MINIMUM_SWIPE_SPEED = PROPERTY_START_INDEX,        ///< Property, name "minimumSwipeSpeed",        @see SetMinimumSwipeSpeed(),       type float,    @since DALi 1.1.18
       MINIMUM_SWIPE_DISTANCE,                            ///< Property, name "minimumSwipeDistance",     @see SetMinimumSwipeDistance(),    type float,    @since DALi 1.1.18
-      WHELL_SCROLL_DISTANCE_SPEED,                       ///< Property, name "wheelScrollDistanceStep",  @see SetWheelScrollDistanceStep(), type float,    @since DALi 1.1.18
+      WHEEL_SCROLL_DISTANCE_STEP,                        ///< Property, name "wheelScrollDistanceStep",  @see SetWheelScrollDistanceStep(), type float,    @since DALi 1.1.18
       SNAP_TO_ITEM_ENABLED,                              ///< Property, name "snapToItemEnabled",        @see SetAnchoring(),               type bool,     @since DALi 1.1.18
       REFRESH_INTERVAL,                                  ///< Property, name "refreshInterval",          @see SetRefreshInterval(),         type float,    @since DALi 1.1.18
 
