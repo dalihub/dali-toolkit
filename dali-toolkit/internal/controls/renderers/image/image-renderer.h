@@ -162,6 +162,13 @@ public:
    */
   void SetImage( Actor& actor, const Image& image );
 
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha(  bool preMultipled );
+
 private:
 
   /**
@@ -217,6 +224,8 @@ private:
   Dali::ImageDimensions mDesiredSize;
   Dali::FittingMode::Type mFittingMode;
   Dali::SamplingMode::Type mSamplingMode;
+  bool mIsAlphaPreMultiplied;
+
 };
 
 } // namespace Internal

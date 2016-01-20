@@ -73,6 +73,10 @@ const char * const DONT_CARE("dontCare");
 const std::string TEXTURE_UNIFORM_NAME = "sTexture";
 const std::string ATLAS_RECT_UNIFORM_NAME = "uAtlasRect";
 const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
+
+// Set this uniform to 1.0 for conventional alpha blending; if pre-multiplied alpha blending, set this uniform to 0.0
+const std::string ALPHA_BLENDING_UNIFORM_NAME = "uAlphaBlending";
+
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
@@ -98,10 +102,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
+  uniform lowp float uAlphaBlending; // Set to 1.0 for conventional alpha blending; if pre-multiplied alpha blending, set to 0.0
   \n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * vec4( uColor.rgb*max( uAlphaBlending, uColor.a ), uColor.a );\n
   }\n
 );
 
@@ -201,7 +206,8 @@ ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasMana
   mAtlasManager( atlasManager ),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
-  mSamplingMode( SamplingMode::DEFAULT )
+  mSamplingMode( SamplingMode::DEFAULT ),
+  mIsAlphaPreMultiplied( false )
 {
 }
 
@@ -402,6 +408,7 @@ Renderer ImageRenderer::CreateRenderer() const
       {
         shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
         shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+        shader.RegisterProperty( ALPHA_BLENDING_UNIFORM_NAME, 1.f );
       }
     }
   }
@@ -485,6 +492,8 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer( mImage );
   }
+
+  EnablePreMultipliedAlpha( mIsAlphaPreMultiplied );
 }
 
 void ImageRenderer::DoSetOffStage( Actor& actor )
@@ -609,6 +618,7 @@ Shader ImageRenderer::GetImageShader( RendererFactoryCache& factoryCache )
     factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, shader );
     shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
     shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    shader.RegisterProperty( ALPHA_BLENDING_UNIFORM_NAME, 1.f );
   }
   return shader;
 }
@@ -693,6 +703,37 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
     mDesiredSize = ImageDimensions();
     mFittingMode = FittingMode::DEFAULT;
     mSamplingMode = SamplingMode::DEFAULT;
+  }
+}
+
+void ImageRenderer::EnablePreMultipliedAlpha( bool preMultipled )
+{
+  mIsAlphaPreMultiplied = preMultipled;
+  if( mImpl->mRenderer )
+  {
+    Material material = mImpl->mRenderer.GetMaterial();
+
+    if( preMultipled )
+    {
+      material.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                             BlendingFactor::ONE, BlendingFactor::ONE );
+      if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty())
+      {
+        material.RegisterProperty( ALPHA_BLENDING_UNIFORM_NAME, 0.f );
+      }
+    }
+    else
+    {
+      // using default blend func
+      material.SetBlendFunc( BlendingFactor::SRC_ALPHA, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                              BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA );
+
+      Property::Index index = material.GetPropertyIndex( ALPHA_BLENDING_UNIFORM_NAME );
+      if( index != Property::INVALID_INDEX ) // only set value when the property already exist on the Material
+      {
+        material.SetProperty( index, 1.f );
+      }
+    }
   }
 }
 

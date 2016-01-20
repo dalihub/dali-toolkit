@@ -68,6 +68,7 @@ public:
       // Event side properties
       RESOURCE_URL = PROPERTY_START_INDEX, ///< name "resourceUrl",  @deprecated DALi 1.1.16 Use IMAGE instead.  type string
       IMAGE,                               ///< name "image",        @see SetImage(),                            type string if it is a url, map otherwise
+      PRE_MULTIPLIED_ALPHA,                ///< name "preMultipliedAlpha", @since DALi 1.1.18                    type Boolean @pre image must be initialized.
 
       // Animatable properties
       PIXEL_AREA = ANIMATABLE_PROPERTY_START_INDEX,  ///< name "pixelArea", @since DALi 1.1.18                   type Vector4, Pixel area is a relative value with the whole image area as [0.0, 0.0, 1.0, 1.0].

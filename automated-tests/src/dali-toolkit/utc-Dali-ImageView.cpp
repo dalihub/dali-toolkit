@@ -21,6 +21,8 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -284,6 +286,52 @@ int UtcDaliImageViewSetGetProperty02(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewSetGetProperty03(void)
+{
+  ToolkitTestApplication application;
+
+  Image image = CreateBufferImage( 10, 10, Color::WHITE );
+  ImageView imageView = ImageView::New(image);
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render();
+
+ // conventional alpha blending
+  Material material = imageView.GetRendererAt( 0 ).GetMaterial();
+  BlendingFactor::Type srcFactorRgb;
+  BlendingFactor::Type destFactorRgb;
+  BlendingFactor::Type srcFactorAlpha;
+  BlendingFactor::Type destFactorAlpha;
+  material.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
+  DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendingFactor::ONE_MINUS_SRC_ALPHA );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  float alphaBlendingUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uAlphaBlending", alphaBlendingUniform ) );
+  DALI_TEST_EQUALS( alphaBlendingUniform, 1.f, TEST_LOCATION );
+
+  // pre-multiplied alpha blending
+  imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );
+  application.SendNotification();
+  application.Render();
+
+  material.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
+  DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::ONE );
+  DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendingFactor::ONE );
+
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uAlphaBlending", alphaBlendingUniform ) );
+  DALI_TEST_EQUALS( alphaBlendingUniform, 0.f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliImageViewSizeWithBackground(void)
 {
   ToolkitTestApplication application;
