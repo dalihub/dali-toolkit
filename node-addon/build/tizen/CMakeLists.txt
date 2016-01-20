@@ -56,6 +56,9 @@ add_library(dali_addon SHARED
   ${PLUGING_SRC_DIR}/actors/actor-api.cpp
   ${PLUGING_SRC_DIR}/actors/layer-api.cpp
   ${PLUGING_SRC_DIR}/actors/camera-actor-api.cpp
+  ${PLUGING_SRC_DIR}/controls/control-wrapper.cpp
+  ${PLUGING_SRC_DIR}/controls/item-factory-wrapper.cpp
+  ${PLUGING_SRC_DIR}/controls/item-view-api.cpp
   ${PLUGING_SRC_DIR}/constants/constants-wrapper.cpp
   ${PLUGING_SRC_DIR}/animation/animation-api.cpp
   ${PLUGING_SRC_DIR}/animation/animation-wrapper.cpp
