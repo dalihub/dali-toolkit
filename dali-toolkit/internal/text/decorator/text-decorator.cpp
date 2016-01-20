@@ -659,43 +659,47 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( !grabHandle.actor )
     {
-      grabHandle.actor = ImageView::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
-      GetImpl( grabHandle.actor).SetDepthIndex( DepthIndex::DECORATION );
-      grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      // Area that Grab handle responds to, larger than actual handle so easier to move
+      if( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] )
+      {
+        grabHandle.actor = ImageView::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
+        GetImpl( grabHandle.actor).SetDepthIndex( DepthIndex::DECORATION );
+        grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+
+        // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-      grabHandle.actor.SetName( "GrabHandleActor" );
-      if ( Dali::Internal::gLogFilter->IsEnabledFor( Debug::Verbose ) )
-      {
-        grabHandle.grabArea = Control::New();
-        Toolkit::Control control = Toolkit::Control::DownCast( grabHandle.grabArea );
-        control.SetBackgroundColor( Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) );
-        grabHandle.grabArea.SetName( "GrabArea" );
-      }
-      else
-      {
-        grabHandle.grabArea = Actor::New();
-        grabHandle.grabArea.SetName( "GrabArea" );
-      }
+        grabHandle.actor.SetName( "GrabHandleActor" );
+        if ( Dali::Internal::gLogFilter->IsEnabledFor( Debug::Verbose ) )
+        {
+          grabHandle.grabArea = Control::New();
+          Toolkit::Control control = Toolkit::Control::DownCast( grabHandle.grabArea );
+          control.SetBackgroundColor( Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) );
+          grabHandle.grabArea.SetName( "GrabArea" );
+        }
+        else
+        {
+          grabHandle.grabArea = Actor::New();
+          grabHandle.grabArea.SetName( "GrabArea" );
+        }
 #else
-      grabHandle.grabArea = Actor::New();
+        grabHandle.grabArea = Actor::New();
 #endif
 
-      grabHandle.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-      grabHandle.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      grabHandle.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
-      grabHandle.grabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
-      grabHandle.actor.Add( grabHandle.grabArea );
-      grabHandle.actor.SetColor( mHandleColor );
+        grabHandle.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+        grabHandle.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        grabHandle.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
+        grabHandle.grabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
+        grabHandle.actor.Add( grabHandle.grabArea );
+        grabHandle.actor.SetColor( mHandleColor );
 
-      grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
-      mTapDetector.Attach( grabHandle.grabArea );
-      mPanGestureDetector.Attach( grabHandle.grabArea );
+        grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
+        mTapDetector.Attach( grabHandle.grabArea );
+        mPanGestureDetector.Attach( grabHandle.grabArea );
 
-      mActiveLayer.Add( grabHandle.actor );
+        mActiveLayer.Add( grabHandle.actor );
+      }
     }
 
-    if( !grabHandle.actor.GetParent() )
+    if( grabHandle.actor && !grabHandle.actor.GetParent() )
     {
       mActiveLayer.Add( grabHandle.actor );
     }
@@ -729,33 +733,36 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& primary = mHandle[ LEFT_SELECTION_HANDLE ];
     if( !primary.actor )
     {
-      primary.actor = ImageView::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
+      if( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
+      {
+        primary.actor = ImageView::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
-      primary.actor.SetName("SelectionHandleOne");
+        primary.actor.SetName("SelectionHandleOne");
 #endif
-      primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
-      GetImpl( primary.actor ).SetDepthIndex( DepthIndex::DECORATION );
-      primary.actor.SetColor( mHandleColor );
+        primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
+        GetImpl( primary.actor ).SetDepthIndex( DepthIndex::DECORATION );
+        primary.actor.SetColor( mHandleColor );
 
-      primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+        primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-      primary.grabArea.SetName("SelectionHandleOneGrabArea");
+        primary.grabArea.SetName("SelectionHandleOneGrabArea");
 #endif
-      primary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
-      primary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-      primary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
+        primary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
+        primary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+        primary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-      mTapDetector.Attach( primary.grabArea );
-      mPanGestureDetector.Attach( primary.grabArea );
-      primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
+        mTapDetector.Attach( primary.grabArea );
+        mPanGestureDetector.Attach( primary.grabArea );
+        primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
-      primary.actor.Add( primary.grabArea );
+        primary.actor.Add( primary.grabArea );
 
-      CreateHandleMarker( primary, mHandleImages[LEFT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], LEFT_SELECTION_HANDLE );
+        CreateHandleMarker( primary, mHandleImages[LEFT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], LEFT_SELECTION_HANDLE );
+      }
     }
 
-    if( !primary.actor.GetParent() )
+    if( primary.actor && !primary.actor.GetParent() )
     {
       mActiveLayer.Add( primary.actor );
     }
@@ -763,33 +770,36 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( !secondary.actor )
     {
-      secondary.actor = ImageView::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
+      if( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
+      {
+        secondary.actor = ImageView::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
-      secondary.actor.SetName("SelectionHandleTwo");
+        secondary.actor.SetName("SelectionHandleTwo");
 #endif
-      secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
-      GetImpl( secondary.actor ).SetDepthIndex( DepthIndex::DECORATION );
-      secondary.actor.SetColor( mHandleColor );
+        secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
+        GetImpl( secondary.actor ).SetDepthIndex( DepthIndex::DECORATION );
+        secondary.actor.SetColor( mHandleColor );
 
-      secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+        secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-      secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
+        secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
 #endif
-      secondary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
-      secondary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-      secondary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
+        secondary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
+        secondary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+        secondary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-      mTapDetector.Attach( secondary.grabArea );
-      mPanGestureDetector.Attach( secondary.grabArea );
-      secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
+        mTapDetector.Attach( secondary.grabArea );
+        mPanGestureDetector.Attach( secondary.grabArea );
+        secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
-      secondary.actor.Add( secondary.grabArea );
+        secondary.actor.Add( secondary.grabArea );
 
-      CreateHandleMarker( secondary, mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], RIGHT_SELECTION_HANDLE  );
+        CreateHandleMarker( secondary, mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], RIGHT_SELECTION_HANDLE  );
+      }
     }
 
-    if( !secondary.actor.GetParent() )
+    if( secondary.actor && !secondary.actor.GetParent() )
     {
       mActiveLayer.Add( secondary.actor );
     }
@@ -834,8 +844,11 @@ struct Decorator::Impl : public ConnectionTracker
     // The SetGrabHandleImage() method will change the orientation.
     const float yLocalPosition = grabHandle.verticallyFlipped ? grabHandle.position.y : grabHandle.position.y + grabHandle.lineHeight;
 
-    grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ),
-                                  yLocalPosition ); // TODO : Fix for multiline.
+    if( grabHandle.actor )
+    {
+      grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ),
+                                    yLocalPosition ); // TODO : Fix for multiline.
+    }
   }
 
   void SetSelectionHandlePosition( HandleType type )
@@ -891,7 +904,7 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( flipHandle )
     {
-      if( !handle.horizontallyFlipped )
+      if( handle.actor && !handle.horizontallyFlipped )
       {
         // Change the anchor point to flip the image.
         handle.actor.SetAnchorPoint( isPrimaryHandle ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
@@ -901,7 +914,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
     else
     {
-      if( handle.horizontallyFlipped )
+      if( handle.actor && handle.horizontallyFlipped )
       {
         // Reset the anchor point.
         handle.actor.SetAnchorPoint( isPrimaryHandle ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
@@ -921,8 +934,11 @@ struct Decorator::Impl : public ConnectionTracker
     // The SetHandleImage() method will change the orientation.
     const float yLocalPosition = handle.verticallyFlipped ? handle.position.y : handle.position.y + handle.lineHeight;
 
-    handle.actor.SetPosition( handle.position.x,
-                              yLocalPosition ); // TODO : Fix for multiline.
+    if( handle.actor )
+    {
+      handle.actor.SetPosition( handle.position.x,
+                                yLocalPosition ); // TODO : Fix for multiline.
+    }
   }
 
   void SetHandleImage( HandleType type )
@@ -1144,7 +1160,10 @@ struct Decorator::Impl : public ConnectionTracker
         mController.DecorationEvent( type, HANDLE_RELEASED, x, y );
       }
 
-      handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
+      if( handle.actor )
+      {
+        handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
+      }
       handle.pressed = false;
 
       mHandlePanning = false;
