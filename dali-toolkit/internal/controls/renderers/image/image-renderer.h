@@ -212,13 +212,11 @@ private:
 private:
   Image mImage;
   ImageAtlasManager& mAtlasManager;
-  Vector4 mTextureRect;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;
   Dali::FittingMode::Type mFittingMode;
   Dali::SamplingMode::Type mSamplingMode;
-
 };
 
 } // namespace Internal

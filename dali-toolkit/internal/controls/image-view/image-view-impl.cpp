@@ -35,6 +35,8 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "resourceUrl", STRING, RESOURCE_URL )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
+
+DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, ImageView, "pixelArea", Vector4(0.f, 0.f, 1.f, 1.f), PIXEL_AREA )
 DALI_TYPE_REGISTRATION_END()
 
 } // anonymous namespace
@@ -145,7 +147,10 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
 void ImageView::SetDepthIndex( int depthIndex )
 {
-  mRenderer.SetDepthIndex( depthIndex );
+  if( mRenderer )
+  {
+    mRenderer.SetDepthIndex( depthIndex );
+  }
 }
 
 Vector3 ImageView::GetNaturalSize()
@@ -154,10 +159,10 @@ Vector3 ImageView::GetNaturalSize()
 
   size.x = mImageSize.GetWidth();
   size.y = mImageSize.GetHeight();
-  size.z = std::min(size.x, size.y);
 
   if( size.x > 0 && size.y > 0 )
   {
+    size.z = std::min(size.x, size.y);
     return size;
   }
   else
@@ -191,6 +196,7 @@ float ImageView::GetWidthForHeight( float height )
   }
 }
 
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -217,7 +223,6 @@ void ImageView::OnStageDisconnection()
 
   Control::OnStageDisconnection();
 }
-
 
 ///////////////////////////////////////////////////////////
 //
@@ -273,11 +278,11 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
 
   if ( imageview )
   {
+    ImageView& impl = GetImpl( imageview );
     switch ( propertyIndex )
     {
       case Toolkit::ImageView::Property::RESOURCE_URL:
       {
-        ImageView& impl = GetImpl( imageview );
         if ( !impl.mUrl.empty() )
         {
           value = impl.mUrl;
@@ -287,7 +292,6 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
 
       case Toolkit::ImageView::Property::IMAGE:
       {
-        ImageView& impl = GetImpl( imageview );
         if ( !impl.mUrl.empty() )
         {
           value = impl.mUrl;
