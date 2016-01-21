@@ -188,9 +188,34 @@ Constants accessible under the dali global object.
 |PROPERTY_READ_WRITE                  | integer value  |
 |PROPERTY_ANIMATABLE                  | integer value  |
 
+|**Layout dimensions ** | |
+|DIMENSION_WIDTH                      | integer value  |
+|DIMENSION_HEIGHT                     | integer value  |
+
 |**Item layout type ** | |
 |ITEM_LAYOUT_LIST                     | integer value  |
 |ITEM_LAYOUT_GRID                     | integer value  |
+
+|**Scroll direction bias ** | |
+|DIRECTION_BIAS_NONE                  | integer value  |
+|DIRECTION_BIAS_LEFT                  | integer value  |
+|DIRECTION_BIAS_RIGHT                 | integer value  |
+
+|**Animation alpha function ** | |
+|ALPHA_FUNCTION_DEFAULT               | integer value  |
+|ALPHA_FUNCTION_LINEAR                | integer value  |
+|ALPHA_FUNCTION_REVERSE               | integer value  |
+|ALPHA_FUNCTION_EASE_IN_SQUARE        | integer value  |
+|ALPHA_FUNCTION_EASE_OUT_SQUARE       | integer value  |
+|ALPHA_FUNCTION_EASE_IN               | integer value  |
+|ALPHA_FUNCTION_EASE_OUT              | integer value  |
+|ALPHA_FUNCTION_EASE_IN_OUT           | integer value  |
+|ALPHA_FUNCTION_EASE_IN_SINE          | integer value  |
+|ALPHA_FUNCTION_EASE_OUT_SINE         | integer value  |
+|ALPHA_FUNCTION_EASE_IN_OUT_SINE      | integer value  |
+|ALPHA_FUNCTION_BOUNCE                | integer value  |
+|ALPHA_FUNCTION_SIN                   | integer value  |
+|ALPHA_FUNCTION_EASE_OUT_BACK         | integer value  |
 
  * @class Constants
  */

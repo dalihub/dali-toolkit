@@ -78,7 +78,7 @@ function createAnimation() {
   var anim = new dali.Animation(1); // default duration is increased if length of all animations is greater than it.
   
   var animOptions = {
-      alpha: "linear",
+      alpha: dali.ALPHA_FUNCTION_LINEAR,
       delay: 0.5,     // used to delay the start of the animation
       duration: 3,    // duration of the animation
       };
@@ -89,16 +89,16 @@ function createAnimation() {
   //  rotate back to correct orientation
   var endRotation = new dali.Rotation(0,0,0);
   
-  animOptions.alpha = "easeInOutSine";
+  animOptions.alpha = dali.ALPHA_FUNCTION_EASE_IN_OUT_SINE;
   anim.animateTo(myActor1, "orientation", endRotation, animOptions);
   
   // Delay the myActor2  by  a second
   animOptions.delay = 0.0;
-  animOptions.alpha = "linear";
+  animOptions.alpha = dali.ALPHA_FUNCTION_LINEAR;
   anim.animateTo(myActor2, "positionZ", 0, animOptions);
   
   //  rotate back to correct orientation
-  animOptions.alpha = "easeInOutSine";
+  animOptions.alpha = dali.ALPHA_FUNCTION_EASE_IN_OUT_SINE;
   anim.animateTo(myActor2, "orientation", endRotation, animOptions);
 
   return anim;
@@ -171,7 +171,7 @@ createShaderAnimation = function( imageView, color, zoom, duration, delay )
   var shaderAnim = new dali.Animation(duration+delay);
 
   var animOptions = {
-     alpha: "doubleEaseInOutSine60",
+     alpha: dali.ALPHA_FUNCTION_EASE_IN_OUT_SINE,
      delay: delay,
      duration: duration,
   };
@@ -214,7 +214,7 @@ var shaderAnim = createShaderAnimation( imageView, color,zoom, duration, delay);
   
 // also rotate the imageView 90 degrees at the same time.
 var rotation = new dali.Rotation(90,0,0,1);
-shaderAnim.animateTo(imageView, "orientation", rotation, { alpha:"linear", duration:duration, delay:delay });
+shaderAnim.animateTo(imageView, "orientation", rotation, { alpha:dali.ALPHA_FUNCTION_LINEAR, duration:duration, delay:delay });
 
 
 shaderAnim.play();
@@ -224,36 +224,22 @@ shaderAnim.play();
 
 ### Animation alpha functions
 
-| Name               | Description  |
-|--------------------|--------------|
-|default             |Linear          |
-|linear              |Linear          |
-|square              |Square (x^2)    |
-|reverse             |Reverse linear  |
-|easeIn              |Speeds up and comes to a sudden stop |
-|easeOut             |Sudden start and slows to a gradual stop|
-|easeInOut           |Speeds up and slows to a gradual stop|
-|easeInSine          |Speeds up and comes to a sudden stop|
-|easeOutSine         |Sudden start and slows to a gradual stop|
-|easeInOutSine       |Speeds up and slows to a gradual stop |
-|easeInSine33        |Speeds up and comes to a sudden stop  |
-|easeOutSine33       |Sudden start and slows to a gradual stop |
-|easeInOutSine33     |Speeds up and slows to a gradual stop |
-|easeInOutSine50     |Speeds up and slows to a gradual stop |
-|easeInOutSine60     |Speeds up and slows to a gradual stop |
-|easeInOutSine70     |Speeds up and slows to a gradual stop |
-|easeInOutSine80     |Speeds up and slows to a gradual stop |
-|easeInOutSine90     |Speeds up and slows to a gradual stop |
-|doubleEaseInOutSine6|Speeds up and slows to a gradual stop, then speeds up again and slows to a gradual stop |
-|easeOutQuint50      |Sudden start and slows to a gradual stop  |
-|easeOutQuint80      |Sudden start and slows to a gradual stop  |
-|bounce              |Sudden start, loses momentum and ** Returns to start position ** |
-|bounceBack          |Sudden start, loses momentum and returns to exceed start position ** Returns to start position ** |
-|easeInBack          |Slow start, exceed start position and quickly reach destination |
-|easeOutBack         |Sudden start, exceed end position and return to a gradual stop|
-|easeInOutBack       |Slow start, exceed start position, fast middle, exceed end position and return to a gradual stop|
-|sin                 |full 360 revolution ** Returns to start position ** |
-|sin2x               |full 720 revolution ** Returns to start position ** |
+| Name                             | Description    |
+|----------------------------------|----------------|
+|ALPHA_FUNCTION_DEFAULT            |Linear          |
+|ALPHA_FUNCTION_LINEAR             |Linear          |
+|ALPHA_FUNCTION_REVERSE            |Reverse linear  |
+|ALPHA_FUNCTION_EASE_IN_SQUARE     |Speeds up and comes to a sudden stop (Square) |
+|ALPHA_FUNCTION_EASE_OUT_SQUARE    |Sudden start and slows to a gradual stop (Square) |
+|ALPHA_FUNCTION_EASE_IN            |Speeds up and comes to a sudden stop |
+|ALPHA_FUNCTION_EASE_OUT           |Sudden start and slows to a gradual stop|
+|ALPHA_FUNCTION_EASE_IN_OUT        |Speeds up and slows to a gradual stop|
+|ALPHA_FUNCTION_EASE_IN_SINE       |Speeds up and comes to a sudden stop|
+|ALPHA_FUNCTION_EASE_OUT_SINE      |Sudden start and slows to a gradual stop|
+|ALPHA_FUNCTION_EASE_IN_OUT_SINE   |Speeds up and slows to a gradual stop |
+|ALPHA_FUNCTION_BOUNCE             |Sudden start, loses momentum and ** Returns to start position ** |
+|ALPHA_FUNCTION_SIN                |full 360 revolution ** Returns to start position ** |
+|ALPHA_FUNCTION_EASE_OUT_BACK      |Sudden start, exceed end position and return to a gradual stop|
 
 
 

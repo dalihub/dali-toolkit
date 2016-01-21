@@ -518,6 +518,31 @@ void ActorApi::GetNaturalSize( const v8::FunctionCallbackInfo<v8::Value>& args )
 }
 
 /**
+ * Return the value of negotiated dimension for the given dimension
+ *
+ * @for Actor
+ * @method getRelayoutSize
+ * @param {Integer} dimension The dimension of layout to retrieve (either dali.DIMENSION_WIDTH or dali.DIMENSION_HEIGHT)
+ * @return {Number} The value of the negotiated dimension
+ */
+void ActorApi::GetRelayoutSize( const v8::FunctionCallbackInfo<v8::Value>& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+  Actor actor = GetActor( isolate, args );
+
+  bool found;
+  int dimension = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0 );
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "missing dimension parameter");
+    return;
+  }
+
+  args.GetReturnValue().Set( v8::Number::New( isolate, actor.GetRelayoutSize( static_cast<Dimension::Type>(dimension) ) ) );
+}
+
+/**
  *  Calculate the width of the actor given a height
  *
  * The natural size is used for default calculation.

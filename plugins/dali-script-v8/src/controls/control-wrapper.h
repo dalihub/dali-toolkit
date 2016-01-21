@@ -50,7 +50,8 @@ public:
   {
     UNKNOWN_CONTROL = -1,
     CONTROL         = 0,
-    ITEMVIEW        = 1
+    ITEMVIEW        = 1,
+    SCROLLVIEW      = 2
   };
 
   /**
