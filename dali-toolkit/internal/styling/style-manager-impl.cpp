@@ -101,7 +101,6 @@ StyleManager::StyleManager()
 : mOrientationDegrees( 0 ),  // Portrait
   mDefaultFontSize( -1 ),
   mDefaultFontFamily(""),
-  mThemeFile( DEFAULT_THEME ),
   mFeedbackStyle( NULL )
 {
   // Add theme builder constants
@@ -131,7 +130,7 @@ void StyleManager::SetOrientationValue( int orientation )
     mOrientationDegrees = orientation;
     // TODO: if orientation changed, apply the new style to all controls
     // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
-    SetTheme();
+    SetTheme( mThemeFile );
   }
 }
 
@@ -184,15 +183,13 @@ bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& va
 
 void StyleManager::RequestThemeChange( const std::string& themeFile )
 {
-  mThemeFile = themeFile;
-
-  // need to do style change synchronously as app might create a UI control on the next line
-  SetTheme();
+  SetTheme( themeFile );
 }
 
 void StyleManager::RequestDefaultTheme()
 {
-  RequestThemeChange( DEFAULT_THEME );
+  std::string empty;
+  SetTheme( empty );
 }
 
 void StyleManager::ApplyThemeStyle( Toolkit::Control control )
@@ -256,12 +253,22 @@ Toolkit::StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
   return mStyleChangeSignal;
 }
 
-
-void StyleManager::SetTheme()
+void StyleManager::SetTheme( const std::string& themeFile )
 {
+  bool themeLoaded = false;
+
   mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
 
-  if( LoadJSON( mThemeBuilder, mThemeFile ) )
+  // Always load the default theme first, then merge in the custom theme if present
+  themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
+
+  if( ! themeFile.empty() )
+  {
+    mThemeFile = themeFile;
+    themeLoaded = LoadJSON( mThemeBuilder, mThemeFile );
+  }
+
+  if( themeLoaded )
   {
     if(mFeedbackStyle)
     {
@@ -398,7 +405,7 @@ void StyleManager::OnOrientationChanged( Orientation orientation )
   mOrientation = orientation;
   // TODO: if orientation changed, apply the new style to all controls
   // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
-  SetTheme();
+  SetTheme( mThemeFile );
 }
 
 
@@ -436,17 +443,7 @@ void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::T
 
     case StyleChange::THEME_CHANGE:
     {
-      const std::string& newTheme = styleMonitor.GetTheme();
-      if( ! newTheme.empty() )
-      {
-        mThemeFile = newTheme;
-      }
-      else
-      {
-        mThemeFile = DEFAULT_THEME;
-      }
-
-      SetTheme();
+      SetTheme( styleMonitor.GetTheme() );
       break;
     }
   }

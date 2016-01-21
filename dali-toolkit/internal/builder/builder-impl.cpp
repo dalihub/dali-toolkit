@@ -1117,7 +1117,6 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
                       parser.GetErrorDescription().c_str() );
 
     DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
-
   }
   else
   {
@@ -1155,7 +1154,6 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
   }
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
-
 }
 
 void Builder::AddConstants( const Property::Map& map )
@@ -1359,9 +1357,9 @@ Builder::Builder()
   mParser = Dali::Toolkit::JsonParser::New();
 
   Property::Map defaultDirs;
-  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]  = DALI_IMAGE_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]  = DALI_SOUND_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ] = DALI_STYLE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]       = DALI_IMAGE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]       = DALI_SOUND_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ]       = DALI_STYLE_DIR;
   defaultDirs[ TOKEN_STRING(DALI_STYLE_IMAGE_DIR) ] = DALI_STYLE_IMAGE_DIR;
 
   AddConstants( defaultDirs );

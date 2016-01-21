@@ -144,8 +144,9 @@ private:
 
   /**
    * @brief Set the current theme. Called only once per event processing cycle.
+   * @param[in] themeFile The name of the theme file to read.
    */
-  void SetTheme();
+  void SetTheme( const std::string& themeFile );
 
   /**
    * @brief Internal helper method to read a file from file system.
@@ -248,9 +249,7 @@ private:
   int mOrientationDegrees;            ///< Directly set value of orientation
 
   int mDefaultFontSize;               ///< Logical size, not a point-size
-
   std::string mDefaultFontFamily;
-
   std::string mThemeFile;             ///< The full path of the current theme file
 
   Property::Map mThemeBuilderConstants;   ///< Contants to give the theme builder

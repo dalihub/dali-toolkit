@@ -142,6 +142,14 @@ distributing this software or its derivatives.
       "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
       "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+    },
+    "popup":
+    {
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
+    },
+    "confirmationpopup":
+    {
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
     }
   }
 }
