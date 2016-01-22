@@ -837,3 +837,92 @@ int UtcDaliItemViewLayoutActivatedSignalP(void)
 
   END_TEST;
 }
+
+int UtcDaliItemViewSetGetProperty(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+  DALI_TEST_CHECK(view);
+
+  // Event side properties
+
+  // Test "minimumSwipeSpeed" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("minimumSwipeSpeed") == ItemView::Property::MINIMUM_SWIPE_SPEED  );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED).Get<float>(), view.GetMinimumSwipeSpeed(), TEST_LOCATION );
+  view.SetProperty( ItemView::Property::MINIMUM_SWIPE_SPEED, 2.5f );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_SPEED).Get<float>(), 2.5f, TEST_LOCATION );
+
+  // Test "minimumSwipeDistance" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("minimumSwipeDistance") == ItemView::Property::MINIMUM_SWIPE_DISTANCE  );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE).Get<float>(), view.GetMinimumSwipeDistance(), TEST_LOCATION );
+  view.SetProperty( ItemView::Property::MINIMUM_SWIPE_DISTANCE, 8.725f );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::MINIMUM_SWIPE_DISTANCE).Get<float>(), 8.725f, TEST_LOCATION );
+
+  // Test "wheelScrollDistanceStep" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("wheelScrollDistanceStep") == ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP  );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<float>(), view.GetWheelScrollDistanceStep(), TEST_LOCATION );
+  view.SetProperty( ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP, 5.0f );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<float>(), 5.0f, TEST_LOCATION );
+
+  // Test "snapToItemEnabled" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("snapToItemEnabled") == ItemView::Property::SNAP_TO_ITEM_ENABLED  );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED).Get<bool>(), view.GetAnchoring(), TEST_LOCATION );
+  view.SetProperty( ItemView::Property::SNAP_TO_ITEM_ENABLED, true );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SNAP_TO_ITEM_ENABLED).Get<bool>(), true, TEST_LOCATION );
+
+  // Test "refreshInterval" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("refreshInterval") == ItemView::Property::REFRESH_INTERVAL  );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), view.GetRefreshInterval(), TEST_LOCATION );
+  view.SetProperty( ItemView::Property::REFRESH_INTERVAL, 11.0f );
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), 11.0f, TEST_LOCATION );
+
+  // Test "overshootEnabled" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("overshootEnabled") == Scrollable::Property::OVERSHOOT_ENABLED  );
+  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), view.IsOvershootEnabled(), TEST_LOCATION );
+  view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, false );
+  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), false, TEST_LOCATION );
+
+  // Animatable properties
+
+  // Test "layoutPosition" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("layoutPosition") == ItemView::Property::LAYOUT_POSITION  );
+  view.SetProperty( ItemView::Property::LAYOUT_POSITION, 20.5f );
+  Wait(application);
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::LAYOUT_POSITION).Get<float>(), 20.5f, TEST_LOCATION );
+
+  // Test "scrollSpeed" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("scrollSpeed") == ItemView::Property::SCROLL_SPEED  );
+  view.SetProperty( ItemView::Property::SCROLL_SPEED, 3.35f );
+  Wait(application);
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SCROLL_SPEED).Get<float>(), 3.35f, TEST_LOCATION );
+
+  // Test "overshoot" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("overshoot") == ItemView::Property::OVERSHOOT  );
+  view.SetProperty( ItemView::Property::OVERSHOOT, 0.15f );
+  Wait(application);
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::OVERSHOOT).Get<float>(), 0.15f, TEST_LOCATION );
+
+  // Test "scrollDirection" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("scrollDirection") == ItemView::Property::SCROLL_DIRECTION  );
+  view.SetProperty( ItemView::Property::SCROLL_DIRECTION, Vector2(0.85f, 0.5f) );
+  Wait(application);
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SCROLL_DIRECTION).Get<Vector2>(), Vector2(0.85f, 0.5f), TEST_LOCATION );
+
+  // Test "layoutOrientation" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("layoutOrientation") == ItemView::Property::LAYOUT_ORIENTATION  );
+  view.SetProperty( ItemView::Property::LAYOUT_ORIENTATION, 2 );
+  Wait(application);
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::LAYOUT_ORIENTATION).Get<int>(), 2, TEST_LOCATION );
+
+  // Test "scrollContentSize" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("scrollContentSize") == ItemView::Property::SCROLL_CONTENT_SIZE  );
+  view.SetProperty( ItemView::Property::SCROLL_CONTENT_SIZE, 250.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::SCROLL_CONTENT_SIZE).Get<float>(), 250.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+

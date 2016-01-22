@@ -31,7 +31,7 @@ namespace Toolkit
 
 const unsigned int TOOLKIT_MAJOR_VERSION = 1;
 const unsigned int TOOLKIT_MINOR_VERSION = 1;
-const unsigned int TOOLKIT_MICRO_VERSION = 17;
+const unsigned int TOOLKIT_MICRO_VERSION = 18;
 const char * const TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED
@@ -42,7 +42,7 @@ struct PrintVersion
 {
   PrintVersion()
   {
-    std::cout << "DALi Toolkit:   " << TOOLKIT_MAJOR_VERSION << "." << TOOLKIT_MINOR_VERSION << "." << TOOLKIT_MICRO_VERSION << " (" << TOOLKIT_BUILD_DATE << ")" << std::endl;
+    std::cerr << "DALi Toolkit:   " << TOOLKIT_MAJOR_VERSION << "." << TOOLKIT_MINOR_VERSION << "." << TOOLKIT_MICRO_VERSION << " (" << TOOLKIT_BUILD_DATE << ")" << std::endl;
   }
 };
 PrintVersion TOOLKIT_VERSION;

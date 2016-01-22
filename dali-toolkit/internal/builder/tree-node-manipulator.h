@@ -191,7 +191,7 @@ private:
   /*
    * Do write to string stream
    */
-  void DoWrite(const TreeNode *value, std::ostream& output, int ident) const;
+  void DoWrite(const TreeNode *value, std::ostream& output, int level, int ident, bool groupChildren) const;
 
 };
 

@@ -154,6 +154,8 @@ private: // From Control
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
 
+// From ControlInterface
+
   /**
    * @copydoc Text::ControlInterface::AddDecoration()
    */
@@ -174,6 +176,8 @@ private: // From Control
    */
   virtual void MaxLengthReached();
 
+private: // Implementation
+
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
    */
@@ -184,8 +188,6 @@ private: // From Control
    * @param[in] clipboard handle to Clipboard Event Notifier
    */
   void OnClipboardTextSelected( ClipboardEventNotifier& clipboard );
-
-private: // Implementation
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image
@@ -211,7 +213,7 @@ private: // Implementation
   void KeyboardStatusChanged( bool keyboardShown );
 
   /**
-   * @brief Callback when Textfield is touched
+   * @brief Callback when TextField is touched
    *
    * @param[in] actor TextField touched
    * @param[in] event TouchEvent information

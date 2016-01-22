@@ -448,6 +448,9 @@ public:
    */
   enum PropertyRange
   {
+    PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1,                        ///< @since DALi 1.1.18
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,                                        ///< Reserve property indices, @since DALi 1.1.18
+
     ANIMATABLE_PROPERTY_START_INDEX = Toolkit::Scrollable::ANIMATABLE_PROPERTY_END_INDEX + 1,
     ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000                   ///< Reserve animatable property indices
   };
@@ -459,6 +462,12 @@ public:
   {
     enum
     {
+      // Event side properties
+      WRAP_ENABLED = PROPERTY_START_INDEX,               ///< Property, name "wrapEnabled",              @see SetWrapMode(),                 type bool,     @since DALi 1.1.18
+      PANNING_ENABLED,                                   ///< Property, name "panningEnabled",           @see SetScrollSensitive(),          type bool,     @since DALi 1.1.18
+      AXIS_AUTO_LOCK_ENABLED,                            ///< Property, name "axisAutoLockEnabled",      @see SetAxisAutoLock(),             type bool,     @since DALi 1.1.18
+      WHEEL_SCROLL_DISTANCE_STEP,                        ///< Property, name "wheelScrollDistanceStep",  @see SetWheelScrollDistanceStep(),  type Vector2,  @since DALi 1.1.18
+
       SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollPosition",            type Vector2
       SCROLL_PRE_POSITION,                               ///< Property, name "scrollPrePosition",         type Vector2
       SCROLL_PRE_POSITION_X,                             ///< Property, name "scrollPrePositionX",        type float

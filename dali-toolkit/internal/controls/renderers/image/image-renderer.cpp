@@ -71,15 +71,21 @@ const char * const NO_FILTER("noFilter");
 const char * const DONT_CARE("dontCare");
 
 const std::string TEXTURE_UNIFORM_NAME = "sTexture";
-const std::string TEXTURE_RECT_UNIFORM_NAME = "uTextureRect";
+const std::string ATLAS_RECT_UNIFORM_NAME = "uAtlasRect";
+const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
+
+// Set this uniform to 1.0 for conventional alpha blending; if pre-multiplied alpha blending, set this uniform to 0.0
+const std::string ALPHA_BLENDING_UNIFORM_NAME = "uAlphaBlending";
+
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump vec4 uTextureRect;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform mediump vec4 pixelArea;
+  varying mediump vec2 vTexCoord;\n
   \n
   void main()\n
   {\n
@@ -87,7 +93,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vertexPosition.xyz *= uSize;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
-    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5));\n
+    vTexCoord = mix( uAtlasRect.xy, uAtlasRect.zw, pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) ) );\n
     gl_Position = vertexPosition;\n
   }\n
 );
@@ -96,10 +102,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
+  uniform lowp float uAlphaBlending; // Set to 1.0 for conventional alpha blending; if pre-multiplied alpha blending, set to 0.0
   \n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * vec4( uColor.rgb*max( uAlphaBlending, uColor.a ), uColor.a );\n
   }\n
 );
 
@@ -197,10 +204,10 @@ Geometry CreateGeometry( RendererFactoryCache& factoryCache, ImageDimensions gri
 ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
 : ControlRenderer( factoryCache ),
   mAtlasManager( atlasManager ),
-  mTextureRect( FULL_TEXTURE_RECT ),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
-  mSamplingMode( SamplingMode::DEFAULT )
+  mSamplingMode( SamplingMode::DEFAULT ),
+  mIsAlphaPreMultiplied( false )
 {
 }
 
@@ -397,6 +404,12 @@ Renderer ImageRenderer::CreateRenderer() const
       shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
                              mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER : mImpl->mCustomShader->mFragmentShader,
                              mImpl->mCustomShader->mHints );
+      if( mImpl->mCustomShader->mVertexShader.empty() )
+      {
+        shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+        shader.RegisterProperty( ALPHA_BLENDING_UNIFORM_NAME, 1.f );
+      }
     }
   }
 
@@ -421,20 +434,19 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
     mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
     if( !mImpl->mRenderer )
     {
-      Material material = mAtlasManager.Add(mTextureRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      Vector4 atlasRect;
+      Material material = mAtlasManager.Add(atlasRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
       if( material )
       {
         Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
         mImpl->mRenderer = Renderer::New( geometry, material );
-        SetTextureRectUniform(mTextureRect);
+        mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       }
       else // big image, atlasing is not applied
       {
         mImpl->mRenderer = CreateRenderer();
-        mTextureRect = FULL_TEXTURE_RECT;
-        SetTextureRectUniform(mTextureRect);
 
-        ResourceImage image = Dali::ResourceImage::New( imageUrl );
+        ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
         image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
         Material material = mImpl->mRenderer.GetMaterial();
         material.AddTexture( image, TEXTURE_UNIFORM_NAME );
@@ -442,11 +454,7 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
 
       mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
     }
-    else
-    {
-      Property::Value textureRect = mImpl->mRenderer.GetProperty( mImpl->mRenderer.GetPropertyIndex(TEXTURE_RECT_UNIFORM_NAME) );
-      textureRect.Get( mTextureRect );
-    }
+
     mImpl->mFlags |= Impl::IS_FROM_CACHE;
   }
   else
@@ -458,15 +466,6 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
     ResourceImage resourceImage = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
     resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
     ApplyImageToSampler( resourceImage );
-
-    // custom vertex shader does not need texture rect uniform
-    if( mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty() )
-    {
-      return;
-    }
-
-    mTextureRect = FULL_TEXTURE_RECT;
-    SetTextureRectUniform( mTextureRect );
   }
 }
 
@@ -479,13 +478,6 @@ void ImageRenderer::InitializeRenderer( const Image& image )
   if( image )
   {
     ApplyImageToSampler( image );
-  }
-
-  // default shader or custom shader with the default image vertex shader
-  if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty() )
-  {
-    mTextureRect = FULL_TEXTURE_RECT;
-    SetTextureRectUniform( mTextureRect );
   }
 }
 
@@ -500,6 +492,8 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer( mImage );
   }
+
+  EnablePreMultipliedAlpha( mIsAlphaPreMultiplied );
 }
 
 void ImageRenderer::DoSetOffStage( Actor& actor )
@@ -622,6 +616,9 @@ Shader ImageRenderer::GetImageShader( RendererFactoryCache& factoryCache )
   {
     shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, shader );
+    shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    shader.RegisterProperty( ALPHA_BLENDING_UNIFORM_NAME, 1.f );
   }
   return shader;
 }
@@ -709,6 +706,37 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
   }
 }
 
+void ImageRenderer::EnablePreMultipliedAlpha( bool preMultipled )
+{
+  mIsAlphaPreMultiplied = preMultipled;
+  if( mImpl->mRenderer )
+  {
+    Material material = mImpl->mRenderer.GetMaterial();
+
+    if( preMultipled )
+    {
+      material.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                             BlendingFactor::ONE, BlendingFactor::ONE );
+      if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty())
+      {
+        material.RegisterProperty( ALPHA_BLENDING_UNIFORM_NAME, 0.f );
+      }
+    }
+    else
+    {
+      // using default blend func
+      material.SetBlendFunc( BlendingFactor::SRC_ALPHA, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                              BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA );
+
+      Property::Index index = material.GetPropertyIndex( ALPHA_BLENDING_UNIFORM_NAME );
+      if( index != Property::INVALID_INDEX ) // only set value when the property already exist on the Material
+      {
+        material.SetProperty( index, 1.f );
+      }
+    }
+  }
+}
+
 void ImageRenderer::ApplyImageToSampler( const Image& image )
 {
   if( image )
@@ -740,22 +768,22 @@ void ImageRenderer::OnImageLoaded( ResourceImage image )
   }
 }
 
-void ImageRenderer::SetTextureRectUniform( const Vector4& textureRect )
-{
-  if( mImpl->mRenderer )
-  {
-    // Register/Set property.
-    mImpl->mRenderer.RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
-  }
-}
-
 void ImageRenderer::CleanCache(const std::string& url)
 {
   Material material = mImpl->mRenderer.GetMaterial();
-  mImpl->mRenderer.Reset();
-  if( mFactoryCache.CleanRendererCache( url ) )
+
+  Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
+  Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+  if( index != Property::INVALID_INDEX )
   {
-    mAtlasManager.Remove( material, mTextureRect );
+    Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
+    atlasRectValue.Get( atlasRect );
+  }
+
+  mImpl->mRenderer.Reset();
+  if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
+  {
+    mAtlasManager.Remove( material, atlasRect );
   }
 }
 

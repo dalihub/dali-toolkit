@@ -282,12 +282,9 @@ void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) c
   }
 }
 
-void Controller::SetMaximumNumberOfCharacters( int maxCharacters )
+void Controller::SetMaximumNumberOfCharacters( Length maxCharacters )
 {
-  if( maxCharacters >= 0 )
-  {
-    mImpl->mMaximumNumberOfCharacters = maxCharacters;
-  }
+  mImpl->mMaximumNumberOfCharacters = maxCharacters;
 }
 
 int Controller::GetMaximumNumberOfCharacters()

@@ -75,6 +75,7 @@ public:
       // Event side properties
       OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshootEffectColor",      @see SetOvershootEffectColor(),    type Vector4
       OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshootAnimationSpeed",   @see SetOvershootAnimationSpeed(), type float
+      OVERSHOOT_ENABLED,                             ///< Property, name "overshootEnabled",          @see SetOvershootEnabled(),        type bool,    @since DALi 1.1.18
 
       // Animatable properties
       SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollRelativePosition",   type Vector2

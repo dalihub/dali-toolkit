@@ -23,12 +23,14 @@
 #include <object/property-value-wrapper.h>
 #include <dali/integration-api/debug.h>
 #include <actors/actor-wrapper.h>
+#include <controls/control-wrapper.h>
 #include <stage/stage-wrapper.h>
 #include <image/image-wrapper.h>
 #include <animation/linear-constrainer-wrapper.h>
 #include <animation/path-constrainer-wrapper.h>
 #include <animation/path-wrapper.h>
 #include <animation/animation-wrapper.h>
+#include <controls/item-factory-wrapper.h>
 #include <events/pan-gesture-detector-wrapper.h>
 #include <object/property-buffer-wrapper.h>
 #include <rendering/geometry-wrapper.h>
@@ -70,11 +72,12 @@ const ApiFunction ConstructorFunctionTable[]=
     { "Actor",              ActorWrapper::NewActor },
     { "CameraActor",        ActorWrapper::NewActor },
     { "Layer",              ActorWrapper::NewActor },
-    { "Control",            ActorWrapper::NewControl },
+    { "Control",            ControlWrapper::NewControl },
     { "ResourceImage",      ImageWrapper::NewImage },
     { "BufferImage",        ImageWrapper::NewImage },
     { "FrameBufferImage",   ImageWrapper::NewImage },
     { "Animation",          AnimationWrapper::NewAnimation},
+    { "ItemFactory",        ItemFactoryWrapper::NewItemFactory},
     { "Shader",             ShaderWrapper::NewShader},
     { "Sampler",            SamplerWrapper::NewSampler},
     { "Material",           MaterialWrapper::NewMaterial},

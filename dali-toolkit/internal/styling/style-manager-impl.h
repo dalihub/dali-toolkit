@@ -47,7 +47,6 @@ class FeedbackStyle;
 class StyleManager : public Dali::BaseObject, public ConnectionTracker
 {
 public:
-
   /**
    * Singleton access
    *
@@ -59,6 +58,14 @@ public:
    * Construct a new StyleManager.
    */
   StyleManager();
+
+protected:
+  /**
+   * @brief Destructor
+   */
+  virtual ~StyleManager();
+
+public: // Public API
 
   /**
    * @copydoc Toolkit::StyleManager::SetOrientationValue
@@ -106,12 +113,6 @@ public:
   void RequestDefaultTheme();
 
   /**
-   * Determine if a theme change has been requested
-   * @return Whether a theme request is pending
-   */
-  bool IsThemeRequestPending();
-
-  /**
    * @brief Apply the theme style to a control.
    *
    * @param[in] control The control to apply style.
@@ -138,24 +139,14 @@ public:
    */
   Toolkit::StyleManager::StyleChangeSignalType& StyleChangeSignal();
 
-protected:
-
-  /**
-   * @brief Destructor
-   */
-  virtual ~StyleManager();
-
-
-public:
+private:
+  typedef std::vector<std::string> StringList;
 
   /**
    * @brief Set the current theme. Called only once per event processing cycle.
+   * @param[in] themeFile The name of the theme file to read.
    */
-  void SetTheme();
-
-private:
-
-  typedef std::vector<std::string> StringList;
+  void SetTheme( const std::string& themeFile );
 
   /**
    * @brief Internal helper method to read a file from file system.
@@ -258,9 +249,7 @@ private:
   int mOrientationDegrees;            ///< Directly set value of orientation
 
   int mDefaultFontSize;               ///< Logical size, not a point-size
-
   std::string mDefaultFontFamily;
-
   std::string mThemeFile;             ///< The full path of the current theme file
 
   Property::Map mThemeBuilderConstants;   ///< Contants to give the theme builder
@@ -299,4 +288,3 @@ inline const Internal::StyleManager& GetImpl( const Dali::Toolkit::StyleManager&
 } // namespace Dali
 
 #endif // __DALI_TOOLKIT_INTERNAL_STYLE_MANAGER_H__
-
