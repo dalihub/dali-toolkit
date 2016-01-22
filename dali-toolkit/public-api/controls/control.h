@@ -91,11 +91,36 @@ public:
   {
     enum
     {
-      STYLE_NAME = PROPERTY_START_INDEX, ///< name "styleName",        @see SetStyleName,                                                             type std::string @SINCE_1_0.0
-      BACKGROUND_COLOR,                  ///< name "background-color", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4 @SINCE_1_0.0
-      BACKGROUND_IMAGE,                  ///< name "background-image", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map @SINCE_1_0.0
-      KEY_INPUT_FOCUS,                   ///< name "keyInputFocus",    @see SetKeyInputFocus,                                                         type bool @SINCE_1_0.0
-      BACKGROUND,                        ///< name "background",       mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE,                   type Map @SINCE_1_1.3
+      /**
+       * @brief name "styleName", type std::string
+       * @SINCE_1_0.0
+       * @see SetStyleName
+       */
+      STYLE_NAME = PROPERTY_START_INDEX,
+      /**
+       * @DEPRECATED_1_1.3
+       * @brief name "background-color", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
+       * @SINCE_1_0.0
+       * @see SetStyleName
+       */
+      BACKGROUND_COLOR,
+      /**
+       * @DEPRECATED_1_1.3
+       * @brief name "background-image", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
+       * @SINCE_1_0.0
+       */
+      BACKGROUND_IMAGE,
+      /**
+       * @brief name "keyInputFocus", type bool
+       * @SINCE_1_0.0
+       * @see SetKeyInputFocus
+       */
+      KEY_INPUT_FOCUS,
+      /**
+       * @brief name "background",       mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE,                   type Map
+       * @SINCE_1_1.3
+       */
+      BACKGROUND,
     };
   };
 
@@ -271,7 +296,6 @@ public:
 
   /**
    * @brief Retrieves the name of the style to be applied to the control (if any).
-   *
    * @SINCE_1_0.0
    * @return A string matching a style or an empty string.
    */
@@ -292,7 +316,7 @@ public:
   void SetBackgroundColor( const Vector4& color );
 
   /**
-   * @deprecated DALi 1.1.3 API removed.
+   * @DEPRECATED_1_1.3
    *
    * @brief Retrieves the background color of the control.
    *

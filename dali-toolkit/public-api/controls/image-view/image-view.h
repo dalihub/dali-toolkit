@@ -69,12 +69,34 @@ public:
     enum
     {
       // Event side properties
-      RESOURCE_URL = PROPERTY_START_INDEX, ///< name "resourceUrl",  @deprecated DALi 1.1.16 Use IMAGE instead.  type string @SINCE_1_0.0
-      IMAGE,                               ///< name "image",        @see SetImage(),                            type string if it is a url, map otherwise @SINCE_1_0.0
-      PRE_MULTIPLIED_ALPHA,                ///< name "preMultipliedAlpha",                                       type Boolean @pre image must be initialized. @SINCE_1_1.18
+
+      /**
+       * @DEPRECATED_1_1.16. Use IMAGE instead.
+       * @brief name "resourceUrl", type string
+       * @SINCE_1_0.0
+       */
+      RESOURCE_URL = PROPERTY_START_INDEX,
+      /**
+       * @brief name "image", type string if it is a url, map otherwise
+       * @SINCE_1_0.0
+       */
+      IMAGE,
+      /**
+       * @brief name "preMultipliedAlpha", type Boolean
+       * @SINCE_1_1.18
+       * @pre image must be initialized.
+       */
+      PRE_MULTIPLIED_ALPHA,
 
       // Animatable properties
-      PIXEL_AREA = ANIMATABLE_PROPERTY_START_INDEX,  ///< name "pixelArea",                                      type Vector4, Pixel area is a relative value with the whole image area as [0.0, 0.0, 1.0, 1.0]. @SINCE_1_1.18
+
+
+      /**
+       * @brief name "pixelArea", type Vector4
+       * @details Pixel area is a relative value with the whole image area as [0.0, 0.0, 1.0, 1.0].
+       * @SINCE_1_0.18
+       */
+      PIXEL_AREA = ANIMATABLE_PROPERTY_START_INDEX,
     };
   };
 
@@ -202,7 +224,8 @@ public:
   void SetImage( const std::string& url, ImageDimensions size );
 
   /**
-   * @deprecated Gets the Image
+   * @DEPRECATED_1_1.4
+   * @brief Gets the Image
    *
    * @SINCE_1_0.0
    * @return The Image currently set to this ImageView

@@ -31,16 +31,16 @@ namespace Toolkit
  */
 
 /**
- * @deprecated DALi 1.1.16
+ * @DEPRECATED_1_1.16
  *
  * @brief These depth indices should not be used.
  * @SINCE_1_0.0
  */
 enum DepthIndexRanges
 {
-    BACKGROUND_DEPTH_INDEX    = static_cast<int>( -Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f ), ///< @deprecated DALi 1.1.16 @SINCE_1_0.0
-    CONTENT_DEPTH_INDEX       = 0,                                                              ///< @deprecated DALi 1.1.16 @SINCE_1_0.0
-    DECORATION_DEPTH_INDEX    = static_cast<int>( Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f )   ///< @deprecated DALi 1.1.16 @SINCE_1_0.0
+    BACKGROUND_DEPTH_INDEX    = static_cast<int>( -Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f ), ///< @DEPRECATED_1_1.16 @SINCE_1_0.0
+    CONTENT_DEPTH_INDEX       = 0,                                                              ///< @DEPRECATED_1_1.16 @SINCE_1_0.0
+    DECORATION_DEPTH_INDEX    = static_cast<int>( Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f )   ///< @DEPRECATED_1_1.16 @SINCE_1_0.0
 };
 
 /**
