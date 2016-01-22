@@ -116,13 +116,8 @@ bool GetApplyParameters( const v8::FunctionCallbackInfo< v8::Value >& args, Acto
       targetPropertyIndex = targetActor.GetPropertyIndex( propertyName );
       if( targetPropertyIndex == Property::INVALID_INDEX )
       {
-        targetPropertyIndex = targetActor.GetPropertyIndex( propertyName );
-
-        if( targetPropertyIndex == Property::INVALID_INDEX )
-        {
-          DALI_SCRIPT_EXCEPTION( isolate, "Target property not found" );
-          return false;
-        }
+        DALI_SCRIPT_EXCEPTION( isolate, "Target property not found" );
+        return false;
       }
     }
     else
@@ -139,14 +134,9 @@ bool GetApplyParameters( const v8::FunctionCallbackInfo< v8::Value >& args, Acto
       sourcePropertyIndex = targetActor.GetPropertyIndex( propertyName );
       if( sourcePropertyIndex == Property::INVALID_INDEX )
       {
-        sourcePropertyIndex = targetActor.GetPropertyIndex( propertyName );
-
-        if( sourcePropertyIndex == Property::INVALID_INDEX )
-        {
-          DALI_SCRIPT_EXCEPTION( isolate, "Source property not found" );
-          return false;
+        DALI_SCRIPT_EXCEPTION( isolate, "Source property not found" );
+        return false;
         }
-      }
     }
     else
     {

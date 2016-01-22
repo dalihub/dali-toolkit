@@ -36,6 +36,7 @@
 #include <dali/devel-api/rendering/material.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 namespace Dali
 {
@@ -248,8 +249,30 @@ const IntegerPair EnumTable[] =
     { "PROPERTY_READ_WRITE",                  Property::READ_WRITE     },
     { "PROPERTY_ANIMATABLE",                  Property::ANIMATABLE     },
 
+    { "DIMENSION_WIDTH",                      Dimension::WIDTH   },
+    { "DIMENSION_HEIGHT",                     Dimension::HEIGHT  },
+
     { "ITEM_LAYOUT_LIST",                     Toolkit::DefaultItemLayout::LIST     },
     { "ITEM_LAYOUT_GRID",                     Toolkit::DefaultItemLayout::GRID     },
+
+    { "DIRECTION_BIAS_NONE",                  Toolkit::DirectionBiasNone   },
+    { "DIRECTION_BIAS_LEFT",                  Toolkit::DirectionBiasLeft   },
+    { "DIRECTION_BIAS_RIGHT",                 Toolkit::DirectionBiasRight  },
+
+    { "ALPHA_FUNCTION_DEFAULT",               AlphaFunction::DEFAULT              },
+    { "ALPHA_FUNCTION_LINEAR",                AlphaFunction::LINEAR               },
+    { "ALPHA_FUNCTION_REVERSE",               AlphaFunction::REVERSE              },
+    { "ALPHA_FUNCTION_EASE_IN_SQUARE",        AlphaFunction::EASE_IN_SQUARE       },
+    { "ALPHA_FUNCTION_EASE_OUT_SQUARE",       AlphaFunction::EASE_OUT_SQUARE      },
+    { "ALPHA_FUNCTION_EASE_IN",               AlphaFunction::EASE_IN              },
+    { "ALPHA_FUNCTION_EASE_OUT",              AlphaFunction::EASE_OUT             },
+    { "ALPHA_FUNCTION_EASE_IN_OUT",           AlphaFunction::EASE_IN_OUT          },
+    { "ALPHA_FUNCTION_EASE_IN_SINE",          AlphaFunction::EASE_IN_SINE         },
+    { "ALPHA_FUNCTION_EASE_OUT_SINE",         AlphaFunction::EASE_OUT_SINE        },
+    { "ALPHA_FUNCTION_EASE_IN_OUT_SINE",      AlphaFunction::EASE_IN_OUT_SINE     },
+    { "ALPHA_FUNCTION_BOUNCE",                AlphaFunction::BOUNCE               },
+    { "ALPHA_FUNCTION_SIN",                   AlphaFunction::SIN                  },
+    { "ALPHA_FUNCTION_EASE_OUT_BACK",         AlphaFunction::EASE_OUT_BACK        },
 
 };
 const unsigned int EnumTableCount = sizeof(EnumTable)/sizeof(EnumTable[0]);
