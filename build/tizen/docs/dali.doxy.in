@@ -236,6 +236,137 @@ ALIASES                =
 # Shows all lines between public and private *inclusive*.
 ALIASES += clip{3}="\dontinclude \1 \n \skip \2 \n \until \3"
 
+# <DALi Doxygen Tagging Rule>
+#
+# Use @SINCE_1_0, @SINCE_1_1, ... instead of @since,
+# and use @DEPRECATED_1_0, @DEPRECATED_1_1, ... instead of @deprecated.
+# It enables integrated management of version tagging between
+# the open source DALi API reference and Tizen API reference.
+# Using those tags with different ALIASES settings in each doxygen config file allows us
+# to generate two versions of "Since" and "Deprecated" generated output
+# from one set of public header files.
+#
+# If you need a newer version number like @SINCE_1_5 or @SINCE_2_0, just add new ALIASES for it.
+#
+# ##################################################3
+# # Guide for Open Source DALi API Reference
+#
+# ### @SINCE example:
+#   [some-public-header.h]
+#   /**
+#    * ...
+#    * @SINCE_1_0.1
+#    */
+#   void SomeFunction();
+#
+#   [generated html file]
+#   void SomeFunction()
+#   ...
+#   Since:
+#       1.0.1
+#
+# ### @DEPRECATED example 1:
+#   [some-public-header.h]
+#   /**
+#    * @DEPRECATED_1_0.3
+#    * ...
+#    */
+#   void SomeFunction();
+#
+#   [generated html file]
+#   void SomeFunction()
+#   Deprecated:
+#       Deprecated since 1.0.3
+#   ...
+#
+# ### @DEPRECATED example 2:
+#   [some-public-header.h]
+#   ...
+#   /**
+#    * @DEPRECATED_1_0.3. Use SomeFunction2() instead.
+#    * ...
+#    */
+#   void SomeFunction();
+#
+#   [generated html file]
+#   void SomeFunction()
+#   Deprecated:
+#       Deprecated since 1.0.3. Use SomeFunction2() instead.
+#   ...
+#
+# ##################################################3
+# # Guide for Tizen Native API Reference
+#
+# ### @SINCE example:
+#   [some-public-header.h]
+#   /**
+#    * ...
+#    * @SINCE_1_0.1
+#    */
+#   void SomeFunction();
+#
+#   [generated html file]
+#   void SomeFunction()
+#   ...
+#   Since:
+#       2.4, DALi Version 1.0.1
+#
+# ### @DEPRECATED example 1:
+#   [some-public-header.h]
+#   /**
+#    * @DEPRECATED_1_0.3
+#    * ...
+#    */
+#   void SomeFunction();
+#
+#   [generated html file]
+#   void SomeFunction()
+#   Deprecated:
+#       Deprecated since 3.0, DALi version 1.0.3
+#   ...
+#
+# ### @DEPRECATED example 2:
+#   [some-public-header.h]
+#   ...
+#   /**
+#    * @DEPRECATED_1_0.3. Use SomeFunction2() instead.
+#    * ...
+#    */
+#   void SomeFunction();
+#
+#   [generated html file]
+#   void SomeFunction()
+#   Deprecated:
+#       Deprecated since 3.0, DALi version 1.0.3. Use SomeFunction2() instead.
+#   ...
+
+###########################################
+# For Open Source DALi API Reference
+ALIASES += SINCE_1_0="@since 1.0"
+ALIASES += SINCE_1_1="@since 1.1"
+
+ALIASES += DEPRECATED_1_0="@deprecated Deprecated since 1.0"
+ALIASES += DEPRECATED_1_1="@deprecated Deprecated since 1.1"
+
+ALIASES += PLATFORM=""
+ALIASES += PRIVLEVEL_PLATFORM=""
+ALIASES += PRIVILEGE_KEYGRAB=""
+
+############################################
+## For Tizen Native API Reference
+#ALIASES += SINCE_1_0="\par Since:\n 2.4, DALi version 1.0"
+#ALIASES += SINCE_1_1="\par Since:\n 3.0, DALi version 1.1"
+
+## DALi has no deprecated API in Tizen 2.4 because it's DALi's first release.
+## Thus deprecated APIs in DALi 1.0.xx will be deprecated in Tizen 3.0.
+#ALIASES += DEPRECATED_1_0="@deprecated Deprecated since 3.0, DALi version 1.0"
+#ALIASES += DEPRECATED_1_1="@deprecated Deprecated since 3.0, DALi version 1.1"
+
+#ALIASES += PLATFORM="@platform"
+#ALIASES += PRIVLEVEL_PLATFORM="\par Privilege Level:\n platform"
+#ALIASES += PRIVILEGE_KEYGRAB="\par Privilege:\n http://tizen.org/privilege/keygrab"
+
+
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
 # will allow you to use the command class in the itcl::class meaning.
