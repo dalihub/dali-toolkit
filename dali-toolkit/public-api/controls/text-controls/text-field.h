@@ -45,6 +45,7 @@ class TextField;
  * | textChanged          | @ref TextChangedSignal()                            |
  * | maxLengthReached     | @ref MaxLengthReachedSignal()                       |
  *
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API TextField : public Control
 {
@@ -52,59 +53,61 @@ public:
 
   /**
    * @brief The start and end property ranges for this control.
+   * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
   };
 
   /**
    * @brief An enumeration of properties belonging to the TextField class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",                    The type or rendering e.g. bitmap-based,                                           type INT
-      TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                               type STRING
-      PLACEHOLDER_TEXT,                         ///< name "placeholderText",                     The text to display when the TextField is empty and inactive,                      type STRING
-      PLACEHOLDER_TEXT_FOCUSED,                 ///< name "placeholderTextFocused",              The text to display when the TextField is empty with key-input focus,              type STRING
-      FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                         type STRING
-      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                          type STRING
-      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                        type FLOAT
-      MAX_LENGTH,                               ///< name "maxLength"                            The maximum number of characters that can be inserted,                             type INTEGER
-      EXCEED_POLICY,                            ///< name "exceedPolicy"                         Specifies how the text is truncated when it does not fit,                          type INTEGER
-      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The line horizontal alignment,                                                     type STRING,  values "BEGIN", "CENTER", "END"
-      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",                   The line vertical alignment,                                                       type STRING,  values "TOP",   "CENTER", "BOTTOM"
-      TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                    type VECTOR4
-      PLACEHOLDER_TEXT_COLOR,                   ///< name "placeholderTextColor",                The placeholder-text color,                                                        type VECTOR4
-      SHADOW_OFFSET,                            ///< name "shadowOffset",                        The drop shadow offset 0 indicates no shadow,                                      type VECTOR2
-      SHADOW_COLOR,                             ///< name "shadowColor",                         The color of a drop shadow,                                                        type VECTOR4
-      PRIMARY_CURSOR_COLOR,                     ///< name "primaryCursorColor",                  The color to apply to the primary cursor,                                          type VECTOR4
-      SECONDARY_CURSOR_COLOR,                   ///< name "secondaryCursorColor",                The color to apply to the secondary cursor,                                        type VECTOR4
-      ENABLE_CURSOR_BLINK,                      ///< name "enableCursorBlink",                   Whether the cursor should blink or not,                                            type BOOLEAN
-      CURSOR_BLINK_INTERVAL,                    ///< name "cursorBlinkInterval",                 The time interval in seconds between cursor on/off states,                         type FLOAT
-      CURSOR_BLINK_DURATION,                    ///< name "cursorBlinkDuration",                 The cursor will stop blinking after this number of seconds (if non-zero),          type FLOAT
-      CURSOR_WIDTH,                             ///< name "cursorWidth",                         The cursor width,                                                                  type INTEGER
-      GRAB_HANDLE_IMAGE,                        ///< name "grabHandleImage",                     The image to display for the grab handle,                                          type STRING
-      GRAB_HANDLE_PRESSED_IMAGE,                ///< name "grabHandlePressedImage",              The image to display when the grab handle is pressed,                              type STRING
-      SCROLL_THRESHOLD,                         ///< name "scrollThreshold"                      Horizontal scrolling will occur if the cursor is this close to the control border, type FLOAT
-      SCROLL_SPEED,                             ///< name "scrollSpeed"                          The scroll speed in pixels per second,                                             type FLOAT
-      SELECTION_HANDLE_IMAGE_LEFT,              ///< name "selectionHandleImageLeft",            The image to display for the left selection handle,                                type MAP
-      SELECTION_HANDLE_IMAGE_RIGHT,             ///< name "selectionHandleImageRight",           The image to display for the right selection handle,                               type MAP
-      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selectionHandlePressedImageLeft",     The image to display when the left selection handle is pressed,                    type MAP
-      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selectionHandlePressedImageRight",    The image to display when the right selection handle is pressed,                   type MAP
-      SELECTION_HANDLE_MARKER_IMAGE_LEFT,       ///< name "selectionHandleMarkerImageLeft",      The image to display for the left selection handle marker,                         type MAP
-      SELECTION_HANDLE_MARKER_IMAGE_RIGHT,      ///< name "selectionHandleMarkerImageRight",     The image to display for the right selection handle marker,                        type MAP
-      SELECTION_HIGHLIGHT_COLOR,                ///< name "selectionHighlightColor",             The color of the selection highlight,                                              type VECTOR4
-      DECORATION_BOUNDING_BOX,                  ///< name "decorationBoundingBox",               The decorations (handles etc) will positioned within this area on-screen,          type RECTANGLE
-      INPUT_METHOD_SETTINGS,                    ///< name "inputMethodSettings",                 The settings to relating to the System's Input Method, Key and Value               type MAP
-      INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                                   type VECTOR4
-      ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                         type BOOLEAN
-      INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                           type STRING
-      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                            type STRING
-      INPUT_POINT_SIZE                          ///< name "inputPointSize",                      The font's size of the new input text in points,                                   type FLOAT
+      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",                    The type or rendering e.g. bitmap-based,                                           type INT @SINCE_1_0.0
+      TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                               type STRING @SINCE_1_0.0
+      PLACEHOLDER_TEXT,                         ///< name "placeholderText",                     The text to display when the TextField is empty and inactive,                      type STRING @SINCE_1_0.0
+      PLACEHOLDER_TEXT_FOCUSED,                 ///< name "placeholderTextFocused",              The text to display when the TextField is empty with key-input focus,              type STRING @SINCE_1_0.0
+      FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                         type STRING @SINCE_1_0.0
+      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                          type STRING @SINCE_1_0.0
+      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                        type FLOAT @SINCE_1_0.0
+      MAX_LENGTH,                               ///< name "maxLength"                            The maximum number of characters that can be inserted,                             type INTEGER @SINCE_1_0.0
+      EXCEED_POLICY,                            ///< name "exceedPolicy"                         Specifies how the text is truncated when it does not fit,                          type INTEGER @SINCE_1_0.0
+      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The line horizontal alignment,                                                     type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_0.0
+      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",                   The line vertical alignment,                                                       type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0
+      TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                    type VECTOR4 @SINCE_1_0.0
+      PLACEHOLDER_TEXT_COLOR,                   ///< name "placeholderTextColor",                The placeholder-text color,                                                        type VECTOR4 @SINCE_1_0.0
+      SHADOW_OFFSET,                            ///< name "shadowOffset",                        The drop shadow offset 0 indicates no shadow,                                      type VECTOR2 @SINCE_1_0.0
+      SHADOW_COLOR,                             ///< name "shadowColor",                         The color of a drop shadow,                                                        type VECTOR4 @SINCE_1_0.0
+      PRIMARY_CURSOR_COLOR,                     ///< name "primaryCursorColor",                  The color to apply to the primary cursor,                                          type VECTOR4 @SINCE_1_0.0
+      SECONDARY_CURSOR_COLOR,                   ///< name "secondaryCursorColor",                The color to apply to the secondary cursor,                                        type VECTOR4 @SINCE_1_0.0
+      ENABLE_CURSOR_BLINK,                      ///< name "enableCursorBlink",                   Whether the cursor should blink or not,                                            type BOOLEAN @SINCE_1_0.0
+      CURSOR_BLINK_INTERVAL,                    ///< name "cursorBlinkInterval",                 The time interval in seconds between cursor on/off states,                         type FLOAT @SINCE_1_0.0
+      CURSOR_BLINK_DURATION,                    ///< name "cursorBlinkDuration",                 The cursor will stop blinking after this number of seconds (if non-zero),          type FLOAT @SINCE_1_0.0
+      CURSOR_WIDTH,                             ///< name "cursorWidth",                         The cursor width,                                                                  type INTEGER @SINCE_1_0.0
+      GRAB_HANDLE_IMAGE,                        ///< name "grabHandleImage",                     The image to display for the grab handle,                                          type STRING @SINCE_1_0.0
+      GRAB_HANDLE_PRESSED_IMAGE,                ///< name "grabHandlePressedImage",              The image to display when the grab handle is pressed,                              type STRING @SINCE_1_0.0
+      SCROLL_THRESHOLD,                         ///< name "scrollThreshold"                      Horizontal scrolling will occur if the cursor is this close to the control border, type FLOAT @SINCE_1_0.0
+      SCROLL_SPEED,                             ///< name "scrollSpeed"                          The scroll speed in pixels per second,                                             type FLOAT @SINCE_1_0.0
+      SELECTION_HANDLE_IMAGE_LEFT,              ///< name "selectionHandleImageLeft",            The image to display for the left selection handle,                                type MAP @SINCE_1_0.0
+      SELECTION_HANDLE_IMAGE_RIGHT,             ///< name "selectionHandleImageRight",           The image to display for the right selection handle,                               type MAP @SINCE_1_0.0
+      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selectionHandlePressedImageLeft",     The image to display when the left selection handle is pressed,                    type MAP @SINCE_1_0.0
+      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selectionHandlePressedImageRight",    The image to display when the right selection handle is pressed,                   type MAP @SINCE_1_0.0
+      SELECTION_HANDLE_MARKER_IMAGE_LEFT,       ///< name "selectionHandleMarkerImageLeft",      The image to display for the left selection handle marker,                         type MAP @SINCE_1_0.0
+      SELECTION_HANDLE_MARKER_IMAGE_RIGHT,      ///< name "selectionHandleMarkerImageRight",     The image to display for the right selection handle marker,                        type MAP @SINCE_1_0.0
+      SELECTION_HIGHLIGHT_COLOR,                ///< name "selectionHighlightColor",             The color of the selection highlight,                                              type VECTOR4 @SINCE_1_0.0
+      DECORATION_BOUNDING_BOX,                  ///< name "decorationBoundingBox",               The decorations (handles etc) will positioned within this area on-screen,          type RECTANGLE @SINCE_1_0.0
+      INPUT_METHOD_SETTINGS,                    ///< name "inputMethodSettings",                 The settings to relating to the System's Input Method, Key and Value               type MAP @SINCE_1_0.0
+      INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                                   type VECTOR4 @SINCE_1_0.0
+      ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                         type BOOLEAN @SINCE_1_0.0
+      INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                           type STRING @SINCE_1_0.0
+      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                            type STRING @SINCE_1_0.0
+      INPUT_POINT_SIZE                          ///< name "inputPointSize",                      The font's size of the new input text in points,                                   type FLOAT @SINCE_1_0.0
     };
   };
 
@@ -112,11 +115,12 @@ public:
    * @brief Specifies how the text is truncated when it does not fit
    *
    * The default value is \e EXCEED_POLICY_CLIP.
+   * @SINCE_1_0.0
    */
   enum ExceedPolicy
   {
-    EXCEED_POLICY_ORIGINAL,        ///< The text will be display at original size, and may exceed the TextField boundary.
-    EXCEED_POLICY_CLIP             ///< The end of text will be clipped to fit within the TextField.
+    EXCEED_POLICY_ORIGINAL,        ///< The text will be display at original size, and may exceed the TextField boundary. @SINCE_1_0.0
+    EXCEED_POLICY_CLIP             ///< The end of text will be clipped to fit within the TextField. @SINCE_1_0.0
   };
 
   // Type Defs
@@ -128,18 +132,21 @@ public:
 
   /**
    * @brief Create the TextField control.
+   * @SINCE_1_0.0
    * @return A handle to the TextField control.
    */
   static TextField New();
 
   /**
    * @brief Creates an empty handle.
+   * @SINCE_1_0.0
    */
   TextField();
 
   /**
    * @brief Copy constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] handle The handle to copy from.
    */
   TextField( const TextField& handle );
@@ -147,6 +154,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] handle The handle to copy from.
    * @return A reference to this.
    */
@@ -156,6 +164,7 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~TextField();
 
@@ -165,6 +174,7 @@ public:
    * If the BaseHandle points is a TextField the downcast returns a valid handle.
    * If not the returned handle is left empty.
    *
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object.
    * @return handle to a TextField or an empty handle.
    */
@@ -179,6 +189,7 @@ public:
    * @code
    *   void YourCallbackName( TextField textField );
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   TextChangedSignalType& TextChangedSignal();
@@ -190,6 +201,7 @@ public:
    * @code
    *   void YourCallbackName( TextField textField );
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   MaxLengthReachedSignalType& MaxLengthReachedSignal();
@@ -199,6 +211,7 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
+   * @SINCE_1_0.0
    * @param[in] implementation The Control implementation.
    */
   DALI_INTERNAL TextField( Internal::TextField& implementation );
@@ -206,6 +219,7 @@ public: // Not intended for application developers
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
+   * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL TextField( Dali::Internal::CustomActor* internal );

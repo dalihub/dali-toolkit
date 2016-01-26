@@ -34,24 +34,28 @@ class PageTurnLandscapeView;
 }
 
 /**
- * PageTurnLandscapeView provides a page turn view in landscape mode
+ * @brief PageTurnLandscapeView provides a page turn view in landscape mode
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API PageTurnLandscapeView : public PageTurnView
 {
 public:
   /**
-   * Create an uninitialized PageTurnLandscapeView; this can be initialized with PageTurnLandscapeView::New()
+   * @brief Create an uninitialized PageTurnLandscapeView; this can be initialized with PageTurnLandscapeView::New()
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   PageTurnLandscapeView();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   * @SINCE_1_0.0
    */
   PageTurnLandscapeView( const PageTurnLandscapeView& pageTurnLandscapeView );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   * @SINCE_1_0.0
    */
   PageTurnLandscapeView& operator=( const PageTurnLandscapeView& pageTurnLandscapeView );
 
@@ -59,11 +63,13 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~PageTurnLandscapeView();
 
   /**
-   * Create an initialized PageTurnLandscapeView control
+   * @brief Create an initialized PageTurnLandscapeView control
+   * @SINCE_1_0.0
    * @param[in] pageFactory The factory which provides PageTurnView with pages.
    * @param[in] pageSize The size of the page
    * @return A handle to the PageTurnLandscapeView control.
@@ -71,8 +77,9 @@ public:
   static PageTurnLandscapeView New( PageFactory& pageFactory, const Vector2& pageSize );
 
   /**
-   * Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnLandscapeView the
+   * @brief Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnLandscapeView the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a PageTurnLandscapeView or an uninitialized handle
    */
@@ -81,13 +88,15 @@ public:
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   * @SINCE_1_0.0
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL PageTurnLandscapeView( Internal::PageTurnLandscapeView& implementation );
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL PageTurnLandscapeView( Dali::Internal::CustomActor* internal );

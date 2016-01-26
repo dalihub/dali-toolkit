@@ -32,6 +32,7 @@ namespace Toolkit
  *
  * If the \e border parameter is set to \e true, the Dali::ImageActor's style is set to Dali::ImageActor::STYLE_NINE_PATCH.
  *
+ * @SINCE_1_0.0
  * @param[in] color The ImageActor's color.
  * @param[in] border If \e true, a border is created. By default, the value is set to \e false.
  * @param[in] borderColor The color for the ImageActor's border. By default, the value is set to Color::WHITE.
