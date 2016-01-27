@@ -30,6 +30,9 @@ devel_api_src_files = \
 
 # Add devel header files here
 
+devel_api_controls_header_files = \
+  $(devel_api_src_dir)/controls/control-depth-index-ranges.h
+
 devel_api_bloom_view_header_files = \
   $(devel_api_src_dir)/controls/bloom-view/bloom-view.h
 
