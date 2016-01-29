@@ -56,6 +56,7 @@ class RadioButton;
  * When \e selected RadioButton is set to \e unselected no other RadioButtons in his group is set to \e selected.
  *
  * A Button::StateChangedSignal() is emitted when the RadioButton change its state to \e selected or \e unselected.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API RadioButton: public Button
 {
@@ -64,16 +65,19 @@ class DALI_IMPORT_API RadioButton: public Button
    * @brief Create an uninitialized RadioButton; this can be initialized with RadioButton::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   RadioButton();
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_0.0
    */
   RadioButton( const RadioButton& radioButton );
 
   /**
    * @brief Assignment operator.
+   * @SINCE_1_0.0
    */
   RadioButton& operator=( const RadioButton& radioButton );
 
@@ -81,12 +85,14 @@ class DALI_IMPORT_API RadioButton: public Button
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~RadioButton();
 
   /**
    * @brief Create an initialized RadioButton.
    *
+   * @SINCE_1_0.0
    * @return A handle to a newly allocated Dali resource.
    */
   static RadioButton New();
@@ -94,6 +100,7 @@ class DALI_IMPORT_API RadioButton: public Button
   /**
    * @brief Create an initialized RadioButton with given label.
    *
+   * @SINCE_1_0.0
    * @param[in] label The button label.
    *
    * @return A handle to a newly allocated Dali resource.
@@ -106,6 +113,7 @@ class DALI_IMPORT_API RadioButton: public Button
    * If handle points to a RadioButton the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a RadioButton or an uninitialized handle
    */
@@ -116,6 +124,7 @@ class DALI_IMPORT_API RadioButton: public Button
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
+   * @SINCE_1_0.0
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL RadioButton( Internal::RadioButton& implementation );
@@ -123,6 +132,7 @@ class DALI_IMPORT_API RadioButton: public Button
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
+   * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL RadioButton( Dali::Internal::CustomActor* internal );

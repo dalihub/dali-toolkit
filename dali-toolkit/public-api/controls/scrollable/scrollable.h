@@ -48,6 +48,7 @@ class Scrollable;
  * | scrollStarted    | @ref ScrollStartedSignal()   |
  * | scrollCompleted  | @ref ScrollUpdatedSignal()   |
  * | scrollUpdated    | @ref ScrollCompletedSignal() |
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Scrollable : public Control
 {
@@ -55,51 +56,54 @@ public:
 
   /**
    * @brief The start and end property ranges for this control.
+   * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
     ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices
+    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices @SINCE_1_0.0
   };
 
   /**
    * @brief An enumeration of properties belonging to the Scrollable class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
       // Event side properties
-      OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshootEffectColor",      @see SetOvershootEffectColor(),    type Vector4
-      OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshootAnimationSpeed",   @see SetOvershootAnimationSpeed(), type float
-      OVERSHOOT_ENABLED,                             ///< Property, name "overshootEnabled",          @see SetOvershootEnabled(),        type bool,    @since DALi 1.1.18
+      OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshootEffectColor",      @see SetOvershootEffectColor(),    type Vector4 @SINCE_1_0.0
+      OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshootAnimationSpeed",   @see SetOvershootAnimationSpeed(), type float @SINCE_1_0.0
+      OVERSHOOT_ENABLED,                             ///< Property, name "overshootEnabled",          @see SetOvershootEnabled(),        type bool,    @SINCE_1_1.18
 
       // Animatable properties
-      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollRelativePosition",   type Vector2
-      SCROLL_POSITION_MIN,                                        ///< Property, name "scrollPositionMin",        type Vector2
-      SCROLL_POSITION_MIN_X,                                      ///< Property, name "scrollPositionMinX",       type float
-      SCROLL_POSITION_MIN_Y,                                      ///< Property, name "scrollPositionMinY",       type float
-      SCROLL_POSITION_MAX,                                        ///< Property, name "scrollPositionMax",        type Vector2
-      SCROLL_POSITION_MAX_X,                                      ///< Property, name "scrollPositionMaxX",       type float
-      SCROLL_POSITION_MAX_Y,                                      ///< Property, name "scrollPositionMaxY",       type float
-      CAN_SCROLL_VERTICAL,                                        ///< Property, name "canScrollVertical",        type bool
-      CAN_SCROLL_HORIZONTAL                                       ///< Property, name "canScrollHorizontal",      type bool
+      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollRelativePosition",   type Vector2 @SINCE_1_0.0
+      SCROLL_POSITION_MIN,                                        ///< Property, name "scrollPositionMin",        type Vector2 @SINCE_1_0.0
+      SCROLL_POSITION_MIN_X,                                      ///< Property, name "scrollPositionMinX",       type float @SINCE_1_0.0
+      SCROLL_POSITION_MIN_Y,                                      ///< Property, name "scrollPositionMinY",       type float @SINCE_1_0.0
+      SCROLL_POSITION_MAX,                                        ///< Property, name "scrollPositionMax",        type Vector2 @SINCE_1_0.0
+      SCROLL_POSITION_MAX_X,                                      ///< Property, name "scrollPositionMaxX",       type float @SINCE_1_0.0
+      SCROLL_POSITION_MAX_Y,                                      ///< Property, name "scrollPositionMaxY",       type float @SINCE_1_0.0
+      CAN_SCROLL_VERTICAL,                                        ///< Property, name "canScrollVertical",        type bool @SINCE_1_0.0
+      CAN_SCROLL_HORIZONTAL                                       ///< Property, name "canScrollHorizontal",      type bool @SINCE_1_0.0
     };
   };
 
   // Typedefs
 
-  typedef Signal< void ( const Vector2& ) > ScrollStartedSignalType;   ///< ScrollStarted signal type
-  typedef Signal< void ( const Vector2& ) > ScrollCompletedSignalType; ///< ScrollCompleted signal type
-  typedef Signal< void ( const Vector2& ) > ScrollUpdatedSignalType;   ///< Scroll updated signal type
+  typedef Signal< void ( const Vector2& ) > ScrollStartedSignalType;   ///< ScrollStarted signal type @SINCE_1_0.0
+  typedef Signal< void ( const Vector2& ) > ScrollCompletedSignalType; ///< ScrollCompleted signal type @SINCE_1_0.0
+  typedef Signal< void ( const Vector2& ) > ScrollUpdatedSignalType;   ///< Scroll updated signal type @SINCE_1_0.0
 
 public:
 
   /**
    * @brief Creates an uninitialized Scrollable handle.
+   * @SINCE_1_0.0
    */
   Scrollable();
 
@@ -108,6 +112,7 @@ public:
    *
    * Creates another handle that points to the same real object
    *
+   * @SINCE_1_0.0
    * @param handle to copy from
    */
   Scrollable( const Scrollable& handle );
@@ -116,6 +121,7 @@ public:
    * @brief Assignment operator.
    *
    * Changes this handle to point to another real object
+   * @SINCE_1_0.0
    * @param[in] handle to copy from
    * @return A reference to this
    */
@@ -125,6 +131,7 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~Scrollable();
 
@@ -134,6 +141,7 @@ public:
    * If handle points to a Scrollable the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a Scrollable or an uninitialized handle
    */
@@ -142,6 +150,7 @@ public:
   /**
    * @brief Checks if scroll overshoot has been enabled or not.
    *
+   * @SINCE_1_0.0
    * @return Whether the scroll obvershoot is enabled
    */
   bool IsOvershootEnabled() const;
@@ -149,6 +158,7 @@ public:
   /**
    * @brief Sets whether to enables or disable scroll overshoot.
    *
+   * @SINCE_1_0.0
    * @param[in] enable Whether to enable the scroll obvershoot or not
    */
   void SetOvershootEnabled(bool enable);
@@ -156,12 +166,14 @@ public:
   /**
    * @brief Set the color of the overshoot effect.
    *
+   * @SINCE_1_0.0
    * @param[in] color The color of the overshoot effect.
    */
   void SetOvershootEffectColor( const Vector4& color );
 
   /**
    * @brief Get the color of the overshoot effect.
+   * @SINCE_1_0.0
    * @return The color of the overshoot effect.
    */
   Vector4 GetOvershootEffectColor() const;
@@ -169,12 +181,14 @@ public:
   /**
    * @brief Set the speed of overshoot animation in pixels per second.
    * When the speed is not greater than 0, the overshoot is set instantly with no animation.
+   * @SINCE_1_0.0
    * @param[in] pixelsPerSecond The speed of the overshoot animation.
    */
   void SetOvershootAnimationSpeed( float pixelsPerSecond );
 
   /**
    * @brief Get the speed of overshoot animation in pixels per second.
+   * @SINCE_1_0.0
    * @return The speed of the overshoot animation.
    */
   float GetOvershootAnimationSpeed() const;
@@ -188,8 +202,9 @@ public: // Signals
    * @code
    *   void YourCallbackName(const Vector2& currentScrollPosition);
    * @endcode
-   * @pre The Object has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Object has been initialized.
    */
   ScrollStartedSignalType& ScrollStartedSignal();
 
@@ -200,8 +215,9 @@ public: // Signals
    * @code
    *   void YourCallbackName(const Vector2& currentScrollPosition);
    * @endcode
-   * @pre The Object has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Object has been initialized.
    */
   ScrollUpdatedSignalType& ScrollUpdatedSignal();
 
@@ -212,8 +228,9 @@ public: // Signals
    * @code
    *   void YourCallbackName(const Vector2& currentScrollPosition);
    * @endcode
-   * @pre The Object has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Object has been initialized.
    */
   ScrollCompletedSignalType& ScrollCompletedSignal();
 
@@ -222,6 +239,7 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
+   * @SINCE_1_0.0
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL Scrollable(Internal::Scrollable& implementation);
@@ -229,6 +247,7 @@ public: // Not intended for application developers
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
+   * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL Scrollable( Dali::Internal::CustomActor* internal );

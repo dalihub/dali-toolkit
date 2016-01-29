@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <controls/item-view-api.h>
+#include <controls/scroll-view-api.h>
 #include <v8-utils.h>
 #include <dali-wrapper.h>
 
@@ -35,6 +36,7 @@ namespace V8Plugin
 
 v8::Persistent<v8::ObjectTemplate> ControlWrapper::mControlTemplate;
 v8::Persistent<v8::ObjectTemplate> ControlWrapper::mItemViewTemplate;
+v8::Persistent<v8::ObjectTemplate> ControlWrapper::mScrollViewTemplate;
 
 Vector< void* > ControlWrapper::mControlGarbageContainer;
 
@@ -56,7 +58,8 @@ struct ControlTemplate
 const ControlTemplate ControlTemplateLookup[]=
 {
     { &ControlWrapper::mControlTemplate },        // CONTROL
-    { &ControlWrapper::mItemViewTemplate }        // ITEMVIEW
+    { &ControlWrapper::mItemViewTemplate },       // ITEMVIEW
+    { &ControlWrapper::mScrollViewTemplate }      // SCROLLVIEW
 };
 
 /**
@@ -65,7 +68,8 @@ const ControlTemplate ControlTemplateLookup[]=
 enum ControlApiBitMask
 {
   CONTROL_API             = 1 << 0,
-  ITEMVIEW_API            = 1 << 1
+  ITEMVIEW_API            = 1 << 1,
+  SCROLLVIEW_API          = 1 << 2
 };
 
 /**
@@ -87,6 +91,7 @@ const ControlApiStruct ControlApiLookup[]=
 {
   {"Control",      ControlWrapper::CONTROL,      NULL,                 CONTROL_API },
   {"ItemView",     ControlWrapper::ITEMVIEW,     ItemViewApi::New,     CONTROL_API | ITEMVIEW_API },
+  {"ScrollView",   ControlWrapper::SCROLLVIEW,   ScrollViewApi::New,   CONTROL_API | SCROLLVIEW_API }
 };
 
 const unsigned int ControlApiLookupCount = sizeof(ControlApiLookup)/sizeof(ControlApiLookup[0]);
@@ -170,6 +175,19 @@ const ControlFunctions ControlFunctionTable[]=
     { "GetItem",                         ItemViewApi::GetItem,                          ITEMVIEW_API  },
     { "GetItemId",                       ItemViewApi::GetItemId,                        ITEMVIEW_API  },
     { "GetItemsRange",                   ItemViewApi::GetItemsRange,                    ITEMVIEW_API  },
+
+    /**************************************
+     * ScrollView  API
+     **************************************/
+    { "SetScrollMode",                   ScrollViewApi::SetScrollMode,                  SCROLLVIEW_API },
+    { "GetCurrentPage",                  ScrollViewApi::GetCurrentPage,                 SCROLLVIEW_API },
+    { "ScrollToPosition",                ScrollViewApi::ScrollToPosition,               SCROLLVIEW_API },
+    { "ScrollToPage",                    ScrollViewApi::ScrollToPage,                   SCROLLVIEW_API },
+    { "ScrollToActor",                   ScrollViewApi::ScrollToActor,                  SCROLLVIEW_API },
+    { "ScrollToSnapInterval",            ScrollViewApi::ScrollToSnapInterval,           SCROLLVIEW_API },
+    { "SetScrollFlickAlphaFunction",     ScrollViewApi::SetScrollFlickAlphaFunction,    SCROLLVIEW_API },
+    { "SetScrollSnapAlphaFunction",      ScrollViewApi::SetScrollSnapAlphaFunction,     SCROLLVIEW_API },
+    { "SetSnapOvershootAlphaFunction",   ScrollViewApi::SetSnapOvershootAlphaFunction,  SCROLLVIEW_API },
 
 };
 

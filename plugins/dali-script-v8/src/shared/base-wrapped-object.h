@@ -82,6 +82,7 @@ public:
       ACTOR_PROPERTY,
       ITEMVIEW,
       ITEMFACTORY,
+      SCROLLVIEW,
       RENDER_TASK,
       RENDER_TASK_LIST,
       TIMER,

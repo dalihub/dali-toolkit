@@ -50,6 +50,7 @@ namespace Internal
  * It will provide some common functionality required by all controls.
  * Implements ConnectionTrackerInterface so that signals (typically connected to member functions) will
  * be disconnected automatically when the control is destroyed.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
 {
@@ -63,12 +64,14 @@ public:
    * @brief Create a new ControlImpl instance that does not require touch by default.
    *
    * If touch is required then the user can connect to this class' touch signal.
+   * @SINCE_1_0.0
    * @return A handle to the ControlImpl instance.
    */
   static Toolkit::Control New();
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   virtual ~Control();
 
@@ -104,6 +107,7 @@ public:
   /**
    * @brief Set the background with a property map.
    *
+   * @SINCE_1_0.0
    * @param[in] map The background property map.
    */
   void SetBackground(const Property::Map& map);
@@ -122,6 +126,7 @@ public:
    * @code
    * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
    * @endcode
+   * @SINCE_1_0.0
    * @param[in]  type  The gesture type(s) to enable.
    */
   void EnableGestureDetection( Gesture::Type type );
@@ -130,6 +135,7 @@ public:
    * @brief Allows deriving classes to disable any of the gesture detectors.
    *
    * Like EnableGestureDetection, this can also be called using bitwise or.
+   * @SINCE_1_0.0
    * @param[in]  type  The gesture type(s) to disable.
    * @see EnableGetureDetection
    */
@@ -140,6 +146,7 @@ public:
    * detection then they can access the gesture detector through this
    * API and modify the detection.
    *
+   * @SINCE_1_0.0
    * @return The pinch gesture detector.
    * @pre Pinch detection should have been enabled via EnableGestureDetection().
    * @see EnableGestureDetection
@@ -151,6 +158,7 @@ public:
    * detection then they can access the gesture detector through this
    * API and modify the detection.
    *
+   * @SINCE_1_0.0
    * @return The pan gesture detector.
    * @pre Pan detection should have been enabled via EnableGestureDetection().
    * @see EnableGestureDetection
@@ -162,6 +170,7 @@ public:
    * detection then they can access the gesture detector through this
    * API and modify the detection.
    *
+   * @SINCE_1_0.0
    * @return The tap gesture detector.
    * @pre Tap detection should have been enabled via EnableGestureDetection().
    * @see EnableGestureDetection
@@ -173,6 +182,7 @@ public:
    * detection then they can access the gesture detector through this
    * API and modify the detection.
    *
+   * @SINCE_1_0.0
    * @return The long press gesture detector.
    * @pre Long press detection should have been enabled via EnableGestureDetection().
    * @see EnableGestureDetection
@@ -187,6 +197,7 @@ public:
    * keyboard focus movement between its child actors).
    *
    * The control doesn't support it by default.
+   * @SINCE_1_0.0
    * @param[in] isSupported Whether this control supports two dimensional keyboard navigation.
    */
   void SetKeyboardNavigationSupport( bool isSupported );
@@ -194,6 +205,7 @@ public:
   /**
    * @brief Gets whether this control supports two dimensional keyboard navigation.
    *
+   * @SINCE_1_0.0
    * @return true if this control supports two dimensional keyboard navigation.
    */
   bool IsKeyboardNavigationSupported();
@@ -222,6 +234,7 @@ public:
    *
    * (i.e. the scope of keyboard focus movement
    * can be limitied to its child actors). The control is not a focus group by default.
+   * @SINCE_1_0.0
    * @param[in] isFocusGroup Whether this control is set as a focus group for keyboard navigation.
    */
   void SetAsKeyboardFocusGroup( bool isFocusGroup );
@@ -229,17 +242,20 @@ public:
   /**
    * @brief Gets whether this control is a focus group for keyboard navigation.
    *
+   * @SINCE_1_0.0
    * @return true if this control is set as a focus group for keyboard navigation.
    */
   bool IsKeyboardFocusGroup();
 
   /**
    * @brief Called by the AccessibilityManager to activate the Control.
+   * @SINCE_1_0.0
    */
   DALI_INTERNAL void AccessibilityActivate();
 
   /**
    * @brief Called by the KeyboardFocusManager.
+   * @SINCE_1_0.0
    */
   DALI_INTERNAL void KeyboardEnter();
 
@@ -263,6 +279,7 @@ public:
   /**
    * @brief Called by the KeyInputFocusManager to emit key event signals.
    *
+   * @SINCE_1_0.0
    * @param[in] event The key event.
    * @return True if the event was consumed.
    */
@@ -275,6 +292,7 @@ protected: // For derived classes to call
    *
    * Should be called last by the control after it acts on the Input Focus change.
    *
+   * @SINCE_1_0.0
    * @param[in] focusGained True if gained, False if lost
    */
   void EmitKeyInputFocusSignal( bool focusGained );
@@ -383,8 +401,8 @@ protected: // Helpers for deriving classes
   // Flags for the constructor
   enum ControlBehaviour
   {
-    REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change
-    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if needs to support keyboard navigation
+    REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change @SINCE_1_0.0
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if needs to support keyboard navigation @SINCE_1_0.0
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
@@ -394,12 +412,14 @@ protected: // Helpers for deriving classes
   /**
    * @brief Control constructor
    *
+   * @SINCE_1_0.0
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
    */
   Control( ControlBehaviour behaviourFlags );
 
   /**
    * @brief Second phase initialization.
+   * @SINCE_1_0.0
    */
   void Initialize();
 
@@ -411,6 +431,7 @@ public: // API for derived classes to override
    * @brief This method is called after the Control has been initialized.
    *
    * Derived classes should do any second phase initialization by overriding this method.
+   * @SINCE_1_0.0
    */
   virtual void OnInitialize();
 
@@ -419,6 +440,7 @@ public: // API for derived classes to override
    *
    * Could be overridden by derived classes.
    *
+   * @SINCE_1_0.0
    * @param[in] child The added actor.
    */
   virtual void OnControlChildAdd( Actor& child );
@@ -428,6 +450,7 @@ public: // API for derived classes to override
    *
    * Could be overridden by derived classes.
    *
+   * @SINCE_1_0.0
    * @param[in] child The removed actor.
    */
   virtual void OnControlChildRemove( Actor& child );
@@ -437,6 +460,7 @@ public: // API for derived classes to override
   /**
    * @brief This method should be overridden by deriving classes requiring notifications when the style changes.
    *
+   * @SINCE_1_0.0
    * @param[in] styleManager  The StyleManager object.
    * @param[in] change  Information denoting what has changed.
    */
@@ -448,6 +472,7 @@ public: // API for derived classes to override
    * @brief This method is called when the control is accessibility activated.
    *
    * Derived classes should override this to perform custom accessibility activation.
+   * @SINCE_1_0.0
    * @return true if this control can perform accessibility activation.
    */
   virtual bool OnAccessibilityActivated();
@@ -456,6 +481,7 @@ public: // API for derived classes to override
    * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
    * pan gesture.
    *
+   * @SINCE_1_0.0
    * @param[in] gesture The pan gesture.
    * @return true if the pan gesture has been consumed by this control
    */
@@ -465,6 +491,7 @@ public: // API for derived classes to override
    * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
    * touch event.
    *
+   * @SINCE_1_0.0
    * @param[in] touchEvent The touch event.
    * @return true if the touch event has been consumed by this control
    */
@@ -474,6 +501,7 @@ public: // API for derived classes to override
    * @brief This method should be overridden by deriving classes when they wish to respond
    * the accessibility up and down action (i.e. value change of slider control).
    *
+   * @SINCE_1_0.0
    * @param[in] isIncrease Whether the value should be increased or decreased
    * @return true if the value changed action has been consumed by this control
    */
@@ -483,6 +511,7 @@ public: // API for derived classes to override
    * @brief This method should be overridden by deriving classes when they wish to respond
    * the accessibility zoom action
    *
+   * @SINCE_1_0.0
    * @return true if the zoom action has been consumed by this control
    */
   virtual bool OnAccessibilityZoom();
@@ -493,6 +522,7 @@ public: // API for derived classes to override
    * @brief Called when the control gains key input focus.
    *
    * Should be overridden by derived classes if they need to customize what happens when focus is gained.
+   * @SINCE_1_0.0
    */
   virtual void OnKeyInputFocusGained();
 
@@ -500,6 +530,7 @@ public: // API for derived classes to override
    * @brief Called when the control loses key input focus.
    *
    * Should be overridden by derived classes if they need to customize what happens when focus is lost.
+   * @SINCE_1_0.0
    */
   virtual void OnKeyInputFocusLost();
 
@@ -507,6 +538,7 @@ public: // API for derived classes to override
    * @brief Gets the next keyboard focusable actor in this control towards the given direction.
    *
    * A control needs to override this function in order to support two dimensional keyboard navigation.
+   * @SINCE_1_0.0
    * @param[in] currentFocusedActor The current focused actor.
    * @param[in] direction The direction to move the focus towards.
    * @param[in] loopEnabled Whether the focus movement should be looped within the control.
@@ -520,6 +552,7 @@ public: // API for derived classes to override
    * This allows the application to preform any actions if wishes
    * before the focus is actually moved to the chosen actor.
    *
+   * @SINCE_1_0.0
    * @param[in] commitedFocusableActor The commited focusable actor.
    */
   virtual void OnKeyboardFocusChangeCommitted( Actor commitedFocusableActor );
@@ -528,6 +561,7 @@ public: // API for derived classes to override
    * @brief This method is called when the control has enter pressed on it.
    *
    * Derived classes should override this to perform custom actions.
+   * @SINCE_1_0.0
    * @return true if this control supported this action.
    */
   virtual bool OnKeyboardEnter();
@@ -541,9 +575,10 @@ public: // API for derived classes to override
    * is enabled.  The default behaviour is to scale the control by the
    * pinch scale.
    *
+   * @SINCE_1_0.0
+   * @param[in]  pinch  The pinch gesture.
    * @note If overridden, then the default behaviour will not occur.
    * @note Pinch detection should be enabled via EnableGestureDetection().
-   * @param[in]  pinch  The pinch gesture.
    * @see EnableGestureDetection
    */
   virtual void OnPinch( const PinchGesture& pinch );
@@ -554,9 +589,10 @@ public: // API for derived classes to override
    * This should be overridden by deriving classes when pan detection
    * is enabled.
    *
+   * @SINCE_1_0.0
+   * @param[in]  pan  The pan gesture.
    * @note There is no default behaviour with panning.
    * @note Pan detection should be enabled via EnableGestureDetection().
-   * @param[in]  pan  The pan gesture.
    * @see EnableGestureDetection
    */
   virtual void OnPan( const PanGesture& pan );
@@ -567,9 +603,10 @@ public: // API for derived classes to override
    * This should be overridden by deriving classes when tap detection
    * is enabled.
    *
+   * @SINCE_1_0.0
+   * @param[in]  tap  The tap gesture.
    * @note There is no default behaviour with a tap.
    * @note Tap detection should be enabled via EnableGestureDetection().
-   * @param[in]  tap  The tap gesture.
    * @see EnableGestureDetection
    */
   virtual void OnTap( const TapGesture& tap );
@@ -580,9 +617,10 @@ public: // API for derived classes to override
    * This should be overridden by deriving classes when long press
    * detection is enabled.
    *
+   * @SINCE_1_0.0
+   * @param[in]  longPress  The long press gesture.
    * @note There is no default behaviour associated with a long press.
    * @note Long press detection should be enabled via EnableGestureDetection().
-   * @param[in]  longPress  The long press gesture.
    * @see EnableGestureDetection
    */
   virtual void OnLongPress( const LongPressGesture& longPress );
@@ -600,8 +638,9 @@ public: // API for derived classes to override
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
 
   /**
-   * Retrieve the extension for this control
+   * @brief Retrieve the extension for this control
    *
+   * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
    */
   virtual Extension* GetControlExtension()
@@ -623,18 +662,20 @@ private:
 /**
  * @brief Get implementation from the handle
  *
- * @pre handle is initialized and points to a control
+ * @SINCE_1_0.0
  * @param handle
  * @return implementation
+ * @pre handle is initialized and points to a control
  */
 DALI_IMPORT_API Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
 
 /**
  * @brief Get implementation from the handle
  *
- * @pre handle is initialized and points to a control
+ * @SINCE_1_0.0
  * @param handle
  * @return implementation
+ * @pre handle is initialized and points to a control
  */
 DALI_IMPORT_API const Internal::Control& GetImplementation( const Dali::Toolkit::Control& handle );
 

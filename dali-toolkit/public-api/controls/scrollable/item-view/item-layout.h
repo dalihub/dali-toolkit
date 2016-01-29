@@ -37,16 +37,18 @@ namespace Toolkit
 
 class ItemLayout;
 
-typedef IntrusivePtr<ItemLayout> ItemLayoutPtr; ///< Pointer to a Dali::Toolkit::ItemLayout object
+typedef IntrusivePtr<ItemLayout> ItemLayoutPtr; ///< Pointer to a Dali::Toolkit::ItemLayout object @SINCE_1_0.0
 
 /**
  * @brief A support class for managing ranges of items.
+ * @SINCE_1_0.0
  */
 struct ItemRange
 {
   /**
    * @brief Create a range of item identifiers.
    *
+   * @SINCE_1_0.0
    * @param[in] beginItem The first item within the range.
    * @param[in] endItem The past-the-end item.
    */
@@ -59,6 +61,7 @@ struct ItemRange
   /**
    * @brief Copy Constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] copy ItemRange we should copy from.
    */
   ItemRange(const ItemRange& copy)
@@ -70,6 +73,7 @@ struct ItemRange
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] range The Range to assign from.
    * @return The updated range.
    */
@@ -83,6 +87,7 @@ struct ItemRange
   /**
    * @brief Test whether an item is within the range.
    *
+   * @SINCE_1_0.0
    * @param[in] itemId The item identifier.
    * @return True if the item is within the range.
    */
@@ -95,6 +100,7 @@ struct ItemRange
   /**
    * @brief Create the intersection of two ranges.
    *
+   * @SINCE_1_0.0
    * @param[in] second The second range.
    * @return The intersection.
    */
@@ -125,6 +131,7 @@ struct ItemRange
  *
  * An ItemLayout also describes the direction of input gestures, used to scroll through the layout.
  * Whilst scrolling, the layout provides a range of items that are within a layout-area (3D bounding volume).
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ItemLayout : public RefObject
 {
@@ -134,12 +141,14 @@ public:
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   DALI_IMPORT_API virtual ~ItemLayout();
 
   /**
    * @brief Set the orientation of the layout.
    *
+   * @SINCE_1_0.0
    * @param[in] orientation The orientation of the layout.
    */
   DALI_IMPORT_API void SetOrientation(ControlOrientation::Type orientation);
@@ -147,6 +156,7 @@ public:
   /**
    * @brief Query the orientation of the layout.
    *
+   * @SINCE_1_0.0
    * @return the orientation of the layout.
    */
   DALI_IMPORT_API ControlOrientation::Type GetOrientation() const;
@@ -156,17 +166,19 @@ public:
    *
    * This will return the default size for the layout unless overridden by calling SetItemSize().
    *
-   * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
-   * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
+   * @SINCE_1_0.0
    * @param[in] itemId The ID of an item in the layout.
    * @param[in] layoutSize The layout size
    * @param[out] itemSize The target size of an item.
+   * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
+   * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
    */
   DALI_IMPORT_API void GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
 
   /**
    * @brief Overrides the default size for the layout.
    *
+   * @SINCE_1_0.0
    * @param[in] itemSize The size of each item.
    */
   DALI_IMPORT_API void SetItemSize( const Vector3& itemSize );
@@ -175,6 +187,7 @@ public:
    * @brief Query the minimum valid layout position; this is a negative value.
    *
    * When scrolling, the first item will move within the range 0 to GetMinimumLayoutPosition().
+   * @SINCE_1_0.0
    * @param[in] numberOfItems The current number of items in the layout.
    * @param[in] layoutSize The size of the layout area.
    * @return The minimum layout position.
@@ -186,6 +199,7 @@ public:
    *
    * This anchor position is the position where all the items in the layout are aligned to
    * their rounded layout positions in integer.
+   * @SINCE_1_0.0
    * @param[in] layoutPosition The layout position.
    * @return The closest anchor position for the given layout position.
    */
@@ -195,6 +209,7 @@ public:
    * @brief Query the layout position for the first item in the layout to move to when the layout
    * needs to scroll to a particular item.
    *
+   * @SINCE_1_0.0
    * @param[in] itemId The ID of an item in the layout.
    * @return The layout position for the first item in the layout to move to.
    */
@@ -203,6 +218,7 @@ public:
   /**
    * @brief Query the items within a given layout-area.
    *
+   * @SINCE_1_0.0
    * @param[in] firstItemPosition The layout-position of the first item in the layout.
    * @param[in] layoutSize The size of the layout area.
    * @return The ID of the first & last visible item.
@@ -220,6 +236,7 @@ public:
    * implementations should provide their own version of this function
    * to ensure proper functionality of internal toolkit systems.
    *
+   * @SINCE_1_0.0
    * @param[in] itemID id of the item to bring within the viewable screen area
    * @param[in] currentLayoutPosition the current layout position of the item view instance
    * @param[in] layoutSize the current size of the item view instance
@@ -230,6 +247,7 @@ public:
   /**
    * @brief Query the number of items that should be reserved, for scrolling purposes.
    *
+   * @SINCE_1_0.0
    * @param[in] layoutSize The size of the layout area.
    * @return The number of extra items. ItemView will populate itself with actors within the layout-area
    * (see GetItemsWithinArea), plus this number of additional items on either-side.
@@ -239,11 +257,12 @@ public:
   /**
    * @brief Retrieve the default size of an item in the layout.
    *
-   * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
-   * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
+   * @SINCE_1_0.0
    * @param[in] itemId The ID of an item in the layout.
    * @param[in] layoutSize The layout size
    * @param[out] itemSize The target size of an item.
+   * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
+   * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
    */
   virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const = 0;
 
@@ -252,6 +271,7 @@ public:
    *
    * When an input gesture follows this direction, the layout-position of items will be increased.
    * If the input gesture points in the opposite direction, then the layout-positions will decrease.
+   * @SINCE_1_0.0
    * @return The scroll direction in degrees.
    */
   virtual Degree GetScrollDirection() const = 0;
@@ -266,6 +286,7 @@ public:
    * position of actors will be moved by 1.
    * Therefore, the bigger the factor is, the faster the scroll speed will be.
    *
+   * @SINCE_1_0.0
    * @return The scroll speed factor of the layout.
    */
   virtual float GetScrollSpeedFactor() const = 0;
@@ -274,6 +295,7 @@ public:
    * @brief Query the maximum swipe speed in pixels per second.
    *
    * Swipe gestures will be clamped when exceeding this speed limit.
+   * @SINCE_1_0.0
    * @return speed The maximum swipe speed.
    */
   virtual float GetMaximumSwipeSpeed() const = 0;
@@ -284,6 +306,7 @@ public:
    * This is the time taken to animate each
    * item to its next layout position (e.g. from 1.0 to 2.0) when a flick animation is triggered
    * by a swipe gesture.
+   * @SINCE_1_0.0
    * @return The duration of the flick animation.
    */
   virtual float GetItemFlickAnimationDuration() const = 0;
@@ -291,6 +314,7 @@ public:
   /**
    * @brief Gets the id of the next item for KeyboardFocusManager to focus on depending on the inputted item ID.
    *
+   * @SINCE_1_0.0
    * @param[in] itemID The current focused item
    * @param[in] maxItems The maximum number of items in the list
    * @param[in] direction The directional key pressed on the keyboard
@@ -309,6 +333,7 @@ public:
    * position of actors will be moved by 1.
    * Therefore, the bigger the factor is, the faster the flick speed will be.
    *
+   * @SINCE_1_0.0
    * @return The scroll speed factor of the layout.
    */
   DALI_IMPORT_API virtual float GetFlickSpeedFactor() const;
@@ -326,6 +351,7 @@ public:
   /**
    * @brief Gets the position of a given item
    *
+   * @SINCE_1_0.0
    * @param[in] itemID id of the item we want to get its position
    * @param[in] currentLayoutPosition the current layout position of the item view instance
    * @param[in] layoutSize the current size of the item view instance
@@ -334,8 +360,9 @@ public:
   DALI_IMPORT_API virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const = 0;
 
   /**
-   * Retrieve the extension for this layout.
+   * @brief Retrieve the extension for this layout.
    *
+   * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
    */
   virtual Extension* GetExtension()
@@ -347,18 +374,21 @@ protected:
 
   /**
    * @brief Create a new ItemLayout; Only derived versions are instantiatable.
+   * @SINCE_1_0.0
    */
   DALI_IMPORT_API ItemLayout();
 
 private:
 
   /**
-   * Don't allow copy constructor
+   * @brief Don't allow copy constructor
+   * @SINCE_1_0.0
    */
   ItemLayout( const ItemLayout& handle );
 
   /**
-   * Don't allow copy operator
+   * @brief Don't allow copy operator
+   * @SINCE_1_0.0
    */
   ItemLayout& operator=( const ItemLayout& handle );
 

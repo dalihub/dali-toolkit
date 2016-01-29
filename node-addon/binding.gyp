@@ -21,6 +21,7 @@
       '<(DALI_JS_DIR)/controls/control-wrapper.cpp',
       '<(DALI_JS_DIR)/controls/item-factory-wrapper.cpp',
       '<(DALI_JS_DIR)/controls/item-view-api.cpp',
+      '<(DALI_JS_DIR)/controls/scroll-view-api.cpp',
       '<(DALI_JS_DIR)/animation/animation-api.cpp',
       '<(DALI_JS_DIR)/animation/animation-wrapper.cpp',
       '<(DALI_JS_DIR)/animation/constrainer-api.cpp',

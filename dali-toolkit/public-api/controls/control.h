@@ -49,6 +49,7 @@ class Control;
  * @brief Control is the base class for all controls.
  *
  * The implementation of the control must be supplied; see Internal::Control for more details.
+ * @SINCE_1_0.0
  * @see Internal::Control
  *
  * Signals
@@ -73,40 +74,68 @@ public:
 
   /**
    * @brief The start and end property ranges for control.
+   * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,        ///< Start index is used by the property registration macro.
-    CONTROL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,             ///< Start index of Control properties.
-    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices.
+    PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,        ///< Start index is used by the property registration macro. @SINCE_1_0.0
+    CONTROL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,             ///< Start index of Control properties. @SINCE_1_0.0
+    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices. @SINCE_1_0.0
   };
 
   /**
    * @brief An enumeration of properties belonging to the Control class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      STYLE_NAME = PROPERTY_START_INDEX, ///< name "styleName",        @see SetStyleName,                                                             type std::string
-      BACKGROUND_COLOR,                  ///< name "background-color", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
-      BACKGROUND_IMAGE,                  ///< name "background-image", @deprecated DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
-      KEY_INPUT_FOCUS,                   ///< name "keyInputFocus",    @see SetKeyInputFocus,                                                         type bool
-      BACKGROUND,                        ///< name "background",       @since DALi 1.1.3 mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map
+      /**
+       * @brief name "styleName", type std::string
+       * @SINCE_1_0.0
+       * @see SetStyleName
+       */
+      STYLE_NAME = PROPERTY_START_INDEX,
+      /**
+       * @DEPRECATED_1_1.3
+       * @brief name "background-color", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
+       * @SINCE_1_0.0
+       * @see SetStyleName
+       */
+      BACKGROUND_COLOR,
+      /**
+       * @DEPRECATED_1_1.3
+       * @brief name "background-image", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
+       * @SINCE_1_0.0
+       */
+      BACKGROUND_IMAGE,
+      /**
+       * @brief name "keyInputFocus", type bool
+       * @SINCE_1_0.0
+       * @see SetKeyInputFocus
+       */
+      KEY_INPUT_FOCUS,
+      /**
+       * @brief name "background",       mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE,                   type Map
+       * @SINCE_1_1.3
+       */
+      BACKGROUND,
     };
   };
 
   /**
    * @brief Describes the direction to move the keyboard focus towards.
+   * @SINCE_1_0.0
    */
   struct KeyboardFocus
   {
     enum Direction
     {
-      LEFT,   ///< Move keyboard focus towards the left direction
-      RIGHT,  ///< Move keyboard focus towards the right direction
-      UP,     ///< Move keyboard focus towards the up direction
-      DOWN    ///< Move keyboard focus towards the down direction
+      LEFT,   ///< Move keyboard focus towards the left direction @SINCE_1_0.0
+      RIGHT,  ///< Move keyboard focus towards the right direction @SINCE_1_0.0
+      UP,     ///< Move keyboard focus towards the up direction @SINCE_1_0.0
+      DOWN    ///< Move keyboard focus towards the down direction @SINCE_1_0.0
     };
   };
 
@@ -123,6 +152,7 @@ public: // Creation & Destruction
   /**
    * @brief Create a new instance of a Control.
    *
+   * @SINCE_1_0.0
    * @return A handle to a new Control.
    */
   static Control New();
@@ -132,6 +162,7 @@ public: // Creation & Destruction
    *
    * Only derived versions can be instantiated.  Calling member
    * functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   Control();
 
@@ -139,6 +170,7 @@ public: // Creation & Destruction
    * @brief Copy constructor.
    *
    * Creates another handle that points to the same real object
+   * @SINCE_1_0.0
    * @param[in] uiControl Handle to copy
    */
   Control(const Control& uiControl);
@@ -147,6 +179,7 @@ public: // Creation & Destruction
    * @brief Dali::Control is intended as a base class
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~Control();
 
@@ -156,6 +189,7 @@ public: // operators
    * @brief Assignment operator.
    *
    * Changes this handle to point to another real object
+   * @SINCE_1_0.0
    * @param[in] handle Object to assign this to
    * @return reference to this
    */
@@ -169,6 +203,7 @@ public:
    * If handle points to a Control the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a Control or an uninitialized handle
    */
@@ -180,9 +215,10 @@ public:
    * @brief This sets the control to receive key events.
    *
    * The key event can originate from a virtual or physical keyboard.
+   * @SINCE_1_0.0
+   * @return True if the control has foucs, False otherwise.
    * @pre The Control has been initialized.
    * @pre The Control should be on the stage before setting keyboard focus.
-   * @return True if the control has foucs, False otherwise.
    */
   void SetKeyInputFocus();
 
@@ -194,9 +230,10 @@ public:
    * unhandled events to the controls below in the stack. A control in the stack will regain key input focus when there are no more
    * controls above it in the focus stack.
    * To query for the conrol which is on top of the focus stack use Dali::Toolkit::KeyInputFocusManager::GetCurrentKeyboardFocusActor()
+   * @SINCE_1_0.0
+   * @return true if this control has keyboard input focus
    * @pre The Control has been initialized.
    * @pre The Control should be on the stage before setting keyboard focus.
-   * @return true if this control has keyboard input focus
    */
   bool HasKeyInputFocus();
 
@@ -204,6 +241,7 @@ public:
    * @brief Once an actor is Set to receive key input focus this function is called to stop it receiving key events.
    *
    * A check is performed to ensure it was previously set, if this check fails then nothing is done.
+   * @SINCE_1_0.0
    * @pre The Actor has been initialized.
    */
   void ClearKeyInputFocus();
@@ -213,6 +251,7 @@ public:
   /**
    * @brief Retrieves the pinch gesture detector of the control.
    *
+   * @SINCE_1_0.0
    * @return The pinch gesture detector.
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
@@ -221,6 +260,7 @@ public:
   /**
    * @brief Retrieves the pan gesture detector of the control.
    *
+   * @SINCE_1_0.0
    * @return The pan gesture detector.
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
@@ -229,6 +269,7 @@ public:
   /**
    * @brief Retrieves the tap gesture detector of the control.
    *
+   * @SINCE_1_0.0
    * @return The tap gesture detector.
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
@@ -237,6 +278,7 @@ public:
   /**
    * @brief Retrieves the long press gesture detector of the control.
    *
+   * @SINCE_1_0.0
    * @return The long press gesture detector.
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
@@ -247,13 +289,14 @@ public:
   /**
    * @brief Sets the name of the style to be applied to the control.
    *
+   * @SINCE_1_0.0
    * @param[in] styleName A string matching a style described in a stylesheet.
    */
   void SetStyleName( const std::string& styleName );
 
   /**
    * @brief Retrieves the name of the style to be applied to the control (if any).
-   *
+   * @SINCE_1_0.0
    * @return A string matching a style or an empty string.
    */
   const std::string& GetStyleName() const;
@@ -263,19 +306,21 @@ public:
   /**
    * @brief Sets the background color of the control.
    *
-   * @note if SetBackgroundImage is called later, this background color is removed.
-   *
+   * @SINCE_1_0.0
    * @param[in] color The required background color of the control
+   *
+   * @note if SetBackgroundImage is called later, this background color is removed.
    *
    * @note The background color fully blends with the actor color.
    */
   void SetBackgroundColor( const Vector4& color );
 
   /**
+   * @DEPRECATED_1_1.3
+   *
    * @brief Retrieves the background color of the control.
    *
-   * @deprecated DALi 1.1.3 API removed.
-   *
+   * @SINCE_1_0.0
    * @return The background color of the control.
    */
   Vector4 GetBackgroundColor() const;
@@ -283,12 +328,14 @@ public:
   /**
    * @brief Sets an image as the background of the control.
    *
+   * @SINCE_1_0.0
    * @param[in] image The image to set as the background.
    */
   void SetBackgroundImage( Image image );
 
   /**
    * @brief Clears the background.
+   * @SINCE_1_0.0
    */
   void ClearBackground();
 
@@ -303,8 +350,9 @@ public:
    * @endcode
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.
-   * @pre The Control has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Control has been initialized.
    */
   KeyEventSignalType& KeyEventSignal();
 
@@ -317,8 +365,9 @@ public:
    * @endcode
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.
-   * @pre The Control has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Control has been initialized.
    */
   KeyInputFocusSignalType& KeyInputFocusGainedSignal();
 
@@ -333,8 +382,9 @@ public:
    * @endcode
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.
-   * @pre The Control has been initialized.
+   * @SINCE_1_0.0
    * @return The signal to connect to.
+   * @pre The Control has been initialized.
    */
   KeyInputFocusSignalType& KeyInputFocusLostSignal();
 
@@ -343,6 +393,7 @@ public: // Intended for control developers
   /**
    * @brief Create an initialised Control.
    *
+   * @SINCE_1_0.0
    * @param[in] implementation The implementation for this control.
    * @return A handle to a newly allocated Dali resource.
    *
@@ -354,6 +405,7 @@ public: // Intended for control developers
    * @brief This constructor is used by CustomActor within Dali core to create additional Control handles
    * using an Internal CustomActor pointer.
    *
+   * @SINCE_1_0.0
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   explicit Control(Dali::Internal::CustomActor* internal);
@@ -365,6 +417,7 @@ public: // Templates for Deriving Classes
    *
    * @tparam     T       The handle class
    * @tparam     I       The implementation class
+   * @SINCE_1_0.0
    * @param[in]  handle  Handle to an object
    * @return Handle to a class T or an uninitialized handle.
    * @see DownCast(BaseHandle)
@@ -395,6 +448,7 @@ public: // Templates for Deriving Classes
    * implementation of their class.
    *
    * @tparam     I         The implementation class
+   * @SINCE_1_0.0
    * @param[in]  internal  Pointer to the Internal::CustomActor
    */
   template<typename I>

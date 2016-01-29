@@ -53,6 +53,7 @@ class ScrollViewEffect;
  * properties that can be used with visual effects.  Such as creating
  * constraints that are applied to ShaderEffects or Actors using these
  * properties as inputs.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ScrollViewEffect : public Dali::BaseHandle
 {
@@ -63,6 +64,7 @@ public:
    * @brief Create an uninitialized ScrollViewEffect; this can only be initialized with derived classes.
    *
    * Calling member functions with an uninitialized Toolkit::BaseObject is not allowed.
+   * @SINCE_1_0.0
    */
   ScrollViewEffect();
 
@@ -71,6 +73,7 @@ public: // Not intended for application developers
   /**
    * @brief This constructor is used by Dali New() methods.
    *
+   * @SINCE_1_0.0
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL ScrollViewEffect(Internal::ScrollViewEffect *impl);

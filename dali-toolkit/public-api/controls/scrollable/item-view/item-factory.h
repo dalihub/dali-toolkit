@@ -34,6 +34,7 @@ namespace Toolkit
 /**
  * @brief ItemFactory is for providing actors to ItemView.
  * Each actor is identified by a unique ID, and has a linear order from 0 to GetNumberOfItems()-1.
+ * @SINCE_1_0.0
  */
 class ItemFactory
 {
@@ -43,6 +44,7 @@ public:
 
   /**
    * @brief Virtual destructor.
+   * @SINCE_1_0.0
    */
   DALI_EXPORT_API virtual ~ItemFactory() {};
 
@@ -50,6 +52,7 @@ public:
    * @brief Query the number of items available from the factory.
    *
    * The maximum available item has an ID of GetNumberOfItems() - 1.
+   * @SINCE_1_0.0
    * @return the number of items
    */
   virtual unsigned int GetNumberOfItems() = 0;
@@ -57,6 +60,7 @@ public:
   /**
    * @brief Create an Actor to represent a visible item.
    *
+   * @SINCE_1_0.0
    * @param[in] itemId The ID of the newly visible item.
    * @return An actor, or an uninitialized pointer if the ID is out of range.
    */
@@ -65,14 +69,16 @@ public:
   /**
    * @brief Notify the factory the actor representing the item is removed from ItemView.
    *
+   * @SINCE_1_0.0
    * @param[in] itemId The ID of the released item.
    * @param[in] actor The actor that represents the released item.
    */
   virtual void ItemReleased(unsigned int itemId, Actor actor) {};
 
   /**
-   * Retrieve the extension for this control
+   * @brief Retrieve the extension for this control
    *
+   * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise
    */
   virtual Extension* GetExtension()

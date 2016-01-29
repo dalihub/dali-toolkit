@@ -33,7 +33,7 @@ namespace Toolkit
  * @{
  */
 
-typedef unsigned int ItemId; ///< Unique identity for each item in the view.
+typedef unsigned int ItemId; ///< Unique identity for each item in the view. @SINCE_1_0.0
 
 typedef std::vector<ItemId> ItemIdContainer;
 typedef ItemIdContainer::iterator ItemIdIter;

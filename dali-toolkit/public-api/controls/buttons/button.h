@@ -80,6 +80,7 @@ class Button;
  * | %Action Name     | %Button method called       |
  * |------------------|-----------------------------|
  * | buttonClick      | %DoClickAction()            |
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Button : public Control
 {
@@ -87,35 +88,37 @@ public:
 
   /**
    * @brief The start and end property ranges for this control.
+   * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
   };
 
   /**
    * @brief An enumeration of properties belonging to the Button class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool
-      AUTO_REPEATING,                  ///< name "autoRepeating",                @see SetAutoRepeating(),             type bool
-      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initialAutoRepeatingDelay",    @see SetInitialAutoRepeatingDelay(), type float
-      NEXT_AUTO_REPEATING_DELAY,       ///< name "nextAutoRepeatingDelay",       @see SetNextAutoRepeatingDelay(),    type float
-      TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool
-      SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool
-      UNSELECTED_STATE_IMAGE,          ///< name "unselectedStateImage",         @see SetUnselectedImage(),           type std::string
-      SELECTED_STATE_IMAGE,            ///< name "selectedStateImage",           @see SetSelectedImage(),             type std::string
-      DISABLED_STATE_IMAGE,            ///< name "disabledStateImage",           @see SetDisabledImage(),             type std::string
-      UNSELECTED_COLOR,                ///< name "unselectedColor",                                                   type Vector4
-      SELECTED_COLOR,                  ///< name "selectedColor",                                                     type Vector4
-      LABEL,                           ///< name "label",                                                             type Property::Map
+      DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool @SINCE_1_0.0
+      AUTO_REPEATING,                  ///< name "autoRepeating",                @see SetAutoRepeating(),             type bool @SINCE_1_0.0
+      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initialAutoRepeatingDelay",    @see SetInitialAutoRepeatingDelay(), type float @SINCE_1_0.0
+      NEXT_AUTO_REPEATING_DELAY,       ///< name "nextAutoRepeatingDelay",       @see SetNextAutoRepeatingDelay(),    type float @SINCE_1_0.0
+      TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool @SINCE_1_0.0
+      SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool @SINCE_1_0.0
+      UNSELECTED_STATE_IMAGE,          ///< name "unselectedStateImage",         @see SetUnselectedImage(),           type std::string @SINCE_1_0.0
+      SELECTED_STATE_IMAGE,            ///< name "selectedStateImage",           @see SetSelectedImage(),             type std::string @SINCE_1_0.0
+      DISABLED_STATE_IMAGE,            ///< name "disabledStateImage",           @see SetDisabledImage(),             type std::string @SINCE_1_0.0
+      UNSELECTED_COLOR,                ///< name "unselectedColor",                                                   type Vector4 @SINCE_1_0.0
+      SELECTED_COLOR,                  ///< name "selectedColor",                                                     type Vector4 @SINCE_1_0.0
+      LABEL,                           ///< name "label",                                                             type Property::Map @SINCE_1_0.0
 
       // Deprecated properties:
-      LABEL_TEXT,                      ///< name "labelText",                    @see SetLabelText(),                 type std::string
+      LABEL_TEXT,                      ///< name "labelText",                    @see SetLabelText(),                 type std::string @SINCE_1_0.0
     };
   };
 
@@ -126,16 +129,19 @@ public:
    *
    * Only derived versions can be instantiated.  Calling member
    * functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_0.0
    */
   Button();
 
   /**
    * @brief Copy constructor.
+   * @SINCE_1_0.0
    */
   Button( const Button& button );
 
   /**
    * @brief Assignment operator.
+   * @SINCE_1_0.0
    */
   Button& operator=( const Button& button );
 
@@ -145,6 +151,7 @@ public:
    * If handle points to a Button the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a Button or an uninitialized handle
    */
@@ -154,6 +161,7 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~Button();
 
@@ -162,11 +170,13 @@ public:
    *
    * No signals are emitted when the \e disabled property is set.
    *
+   * @SINCE_1_0.0
    * @param[in] disabled property.
    */
   void SetDisabled( bool disabled );
 
   /**
+   * @SINCE_1_0.0
    * @return \e true if the button is \e disabled.
    */
   bool IsDisabled() const;
@@ -177,11 +187,13 @@ public:
    * If the \e autorepeating property is set to \e true, then the \e togglable property is set to false
    * but no signal is emitted.
    *
+   * @SINCE_1_0.0
    * @param[in] autoRepeating \e autorepeating property.
    */
   void SetAutoRepeating( bool autoRepeating );
 
   /**
+   * @SINCE_1_0.0
    * @return \e true if the \e autorepeating property is set.
    */
   bool IsAutoRepeating() const;
@@ -191,12 +203,14 @@ public:
    *
    * By default this value is set to 0.15 seconds.
    *
-   * @pre initialAutoRepeatingDelay must be greater than zero.
+   * @SINCE_1_0.0
    * @param[in] initialAutoRepeatingDelay in seconds.
+   * @pre initialAutoRepeatingDelay must be greater than zero.
    */
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
 
   /**
+   * @SINCE_1_0.0
    * @return the initial autorepeating delay in seconds.
    */
   float GetInitialAutoRepeatingDelay() const;
@@ -206,12 +220,14 @@ public:
    *
    * By default this value is set to 0.05 seconds.
    *
-   * @pre nextAutoRepeatingDelay must be greater than zero.
+   * @SINCE_1_0.0
    * @param[in] nextAutoRepeatingDelay in seconds.
+   * @pre nextAutoRepeatingDelay must be greater than zero.
    */
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
 
   /**
+   * @SINCE_1_0.0
    * @return the next autorepeating delay in seconds.
    */
   float GetNextAutoRepeatingDelay() const;
@@ -221,27 +237,31 @@ public:
    *
    * If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
    *
+   * @SINCE_1_0.0
    * @param[in] togglable property.
    */
   void SetTogglableButton( bool togglable );
 
   /**
+   * @SINCE_1_0.0
    * @return \e true if the \e togglable property is set.
    */
   bool IsTogglableButton() const;
 
   /**
-   * Sets the button as selected or unselected.
+   * @brief Sets the button as selected or unselected.
    *
    * \e togglable property must be set to \e true.
    *
    * Emits a Button::StateChangedSignal() signal.
    *
+   * @SINCE_1_0.0
    * @param[in] selected property.
    */
   void SetSelected( bool selected );
 
   /**
+   * @SINCE_1_0.0
    * @return \e true if the \e selected property is set and the button is togglable.
    */
   bool IsSelected() const;
@@ -249,6 +269,7 @@ public:
   /**
    * @brief Sets the animation time.
    *
+   * @SINCE_1_0.0
    * @param[in] animationTime The animation time in seconds.
    */
   void SetAnimationTime( float animationTime );
@@ -256,6 +277,7 @@ public:
   /**
    * @brief Retrieves button's animation time.
    *
+   * @SINCE_1_0.0
    * @return The animation time in seconds.
    */
   float GetAnimationTime() const;
@@ -263,6 +285,7 @@ public:
   /**
    * @brief Sets the button's label.
    *
+   * @SINCE_1_0.0
    * @param[in] label The label text.
    */
   void SetLabelText( const std::string& label );
@@ -270,6 +293,7 @@ public:
   /**
    * @brief Gets the label.
    *
+   * @SINCE_1_0.0
    * @return The label text.
    */
   std::string GetLabelText() const;
@@ -277,6 +301,7 @@ public:
   /**
    * @brief Sets the unselected button image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The button image.
    */
   void SetUnselectedImage( const std::string& filename );
@@ -284,6 +309,7 @@ public:
   /**
    * @brief Sets the background image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The background image.
    */
   void SetBackgroundImage( const std::string& filename );
@@ -291,6 +317,7 @@ public:
   /**
    * @brief Sets the selected image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The selected image.
    */
   void SetSelectedImage( const std::string& filename );
@@ -298,6 +325,7 @@ public:
   /**
    * @brief Sets the selected background image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The selected background image.
    */
   void SetSelectedBackgroundImage( const std::string& filename );
@@ -305,6 +333,7 @@ public:
   /**
    * @brief Sets the disabled background image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The disabled background image.
    */
   void SetDisabledBackgroundImage( const std::string& filename );
@@ -312,6 +341,7 @@ public:
   /**
    * @brief Sets the disabled button image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The disabled button image.
    */
   void SetDisabledImage( const std::string& filename );
@@ -319,6 +349,7 @@ public:
   /**
    * @brief Sets the disabled selected button image.
    *
+   * @SINCE_1_0.0
    * @param[in] filename The disabled selected button image.
    */
   void SetDisabledSelectedImage( const std::string& filename );
@@ -326,46 +357,51 @@ public:
   // Deprecated API
 
   /**
-   * @deprecated DALi 1.0.50
+   * @DEPRECATED_1_0.50
    *
    * @brief Sets the label with an actor.
    *
+   * @SINCE_1_0.0
    * @param[in]  label The actor to use as a label
    */
   void SetLabel( Actor label );
 
   /**
-   * @deprecated DALi 1.0.50
+   * @DEPRECATED_1_0.50
    *
    * @brief Sets the button image.
    *
+   * @SINCE_1_0.0
    * @param[in]  image The button image.
    */
   void SetButtonImage( Image image );
 
   /**
-   * @deprecated DALi 1.0.50
+   * @DEPRECATED_1_0.50
    *
    * @brief Sets the selected image.
    *
+   * @SINCE_1_0.0
    * @param[in]  image The selected image.
    */
   void SetSelectedImage( Image image );
 
   /**
-   * @deprecated DALi 1.0.50
+   * @DEPRECATED_1_0.50
    *
    * @brief Gets the button image.
    *
+   * @SINCE_1_0.0
    * @return     An actor with the button image.
    */
   Actor GetButtonImage() const;
 
   /**
-   * @deprecated DALi 1.0.50
+   * @DEPRECATED_1_0.50
    *
    * @brief Gets the selected image.
    *
+   * @SINCE_1_0.0
    * @return     An actor with the selected image.
    */
   Actor GetSelectedImage() const;
@@ -374,6 +410,7 @@ public: //Signals
 
   /**
    * @brief Button signal type
+   * @SINCE_1_0.0
    */
   typedef Signal< bool ( Button ) > ButtonSignalType;
 
@@ -384,6 +421,7 @@ public: //Signals
    * @code
    *   bool YourCallbackName( Button button );
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   ButtonSignalType& PressedSignal();
@@ -395,6 +433,7 @@ public: //Signals
    * @code
    *   bool YourCallbackName( Button button );
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   ButtonSignalType& ReleasedSignal();
@@ -406,6 +445,7 @@ public: //Signals
    * @code
    *   bool YourCallbackName( Button button );
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   ButtonSignalType& ClickedSignal();
@@ -418,6 +458,7 @@ public: //Signals
    * @code
    *   bool YourCallbackName( Button button );
    * @endcode
+   * @SINCE_1_0.0
    * @return The signal to connect to.
    */
   ButtonSignalType& StateChangedSignal();
@@ -427,6 +468,7 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
+   * @SINCE_1_0.0
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL Button( Internal::Button& implementation );
@@ -434,6 +476,7 @@ public: // Not intended for application developers
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
+   * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );

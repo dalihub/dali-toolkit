@@ -179,6 +179,7 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore. SetSize() use Actor.size
     // ignore. GetCurrentSize() use Actor.size
     { "GetNaturalSize",   ActorApi::GetNaturalSize,    ACTOR_API },
+    { "GetRelayoutSize",  ActorApi::GetRelayoutSize,   ACTOR_API },
     { "GetWidthForHeight",ActorApi::GetWidthForHeight, ACTOR_API },
     { "GetHeightForWidth",ActorApi::GetHeightForWidth, ACTOR_API },
     // ignore. SetPosition(....) use Actor.position

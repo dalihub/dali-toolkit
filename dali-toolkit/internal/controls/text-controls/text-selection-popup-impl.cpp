@@ -355,7 +355,8 @@ void TextSelectionPopup::RaiseAbove( Layer target )
 
 void TextSelectionPopup::ShowPopup()
 {
-  if ( !mPopupShowing || mButtonsChanged )
+  if( ( !mPopupShowing || mButtonsChanged ) &&
+      ( Toolkit::TextSelectionPopup::NONE != mEnabledButtons ) )
   {
     Actor self = Self();
     AddPopupOptionsToToolbar( mShowIcons, mShowCaptions );

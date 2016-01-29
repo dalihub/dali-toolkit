@@ -169,7 +169,7 @@ JSON_TEMPLATE_FILE
  *                          "title_text" : "Item 1" }
  *                     ];
  *
- *    itemFactory.data = itemViewData; // ItemFactory will look for the template from this JSON file
+ *    itemFactory.data = itemViewData; // ItemFactory will create items from this data
  *
  * @type Array
  * @property data

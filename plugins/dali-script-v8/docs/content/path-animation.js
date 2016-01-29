@@ -30,7 +30,7 @@ function begin()
   dali.stage.add( imageView );
   
   var animation = new dali.Animation(2.0);
-  var animOptions = { alpha:"easeInOutSine", delay:0.5, duration:1.5 };
+  var animOptions = { alpha:dali.ALPHA_FUNCTION_EASE_IN_OUT_SINE, delay:0.5, duration:1.5 };
   var forward = new dali.Vector3(1,0,0);
   animation.animate( imageView, myPath, forward, animOptions );
   
