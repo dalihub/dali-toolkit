@@ -101,7 +101,6 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
     Pixel::Format pixelFormat = mAtlasManager.GetPixelFormat( slot.mAtlasId );
     Material material = Material::New( pixelFormat == Pixel::L8 ? mShaderL8 : mShaderRgba );
     material.AddTexture( atlas, "sTexture" );
-    material.SetBlendMode( BlendingMode::ON );
     mAtlasManager.SetMaterial( slot.mAtlasId, material );
   }
 

@@ -54,13 +54,6 @@ const ApiFunction MaterialFunctionTable[]=
    { "SetTextureUniformName"           , MaterialApi::SetTextureUniformName },
    { "GetTextureIndex"                 , MaterialApi::GetTextureIndex },
    { "GetNumberOfTextures"             , MaterialApi::GetNumberOfTextures },
-   { "SetFaceCullingMode"              , MaterialApi::SetFaceCullingMode },
-   { "SetBlendMode"                    , MaterialApi::SetBlendMode },
-   { "GetBlendMode"                    , MaterialApi::GetBlendMode },
-   { "SetBlendFunc"                    , MaterialApi::SetBlendFunc },
-   { "GetBlendFunc"                    , MaterialApi::GetBlendFunc },
-   { "SetBlendEquation"                , MaterialApi::SetBlendEquation },
-   { "GetBlendEquation"                , MaterialApi::GetBlendEquation },
 };
 
 const unsigned int MaterialFunctionTableCount = sizeof(MaterialFunctionTable)/sizeof(MaterialFunctionTable[0]);

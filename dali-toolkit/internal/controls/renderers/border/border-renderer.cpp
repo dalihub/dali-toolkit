@@ -152,7 +152,7 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
   mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_NAME, mBorderColor );
   if( mBorderColor.a < 1.f || mAntiAliasing)
   {
-    (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
   }
   mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
 }
@@ -187,7 +187,7 @@ void BorderRenderer::SetBorderColor(const Vector4& color)
     (mImpl->mRenderer).SetProperty( mBorderColorIndex, color );
     if( color.a < 1.f )
     {
-      (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
     }
   }
 }
@@ -214,7 +214,7 @@ void BorderRenderer::RequireAntiAliasing( bool antiAliasing )
       material.SetShader( shader );
       if( mAntiAliasing )
       {
-        material.SetBlendMode( BlendingMode::ON );
+        mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
       }
     }
   }

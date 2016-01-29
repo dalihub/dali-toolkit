@@ -33,7 +33,7 @@
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/common/loading-state.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
@@ -217,10 +217,10 @@ const IntegerPair EnumTable[] =
     { "WRAP_MODE_REPEAT",                     WrapMode::REPEAT           },
     { "WRAP_MODE_MIRRORED_REPEAT",            WrapMode::MIRRORED_REPEAT  },
 
-    { "MATERIAL_NONE",                        Material::NONE                      },
-    { "MATERIAL_CULL_BACK",                   Material::CULL_BACK                 },
-    { "MATERIAL_CULL_FRONT",                  Material::CULL_FRONT                },
-    { "MATERIAL_CULL_BACK_AND_FRONT",         Material::CULL_BACK_AND_FRONT       },
+    { "MATERIAL_NONE",                        Renderer::NONE                      },
+    { "MATERIAL_CULL_BACK",                   Renderer::CULL_BACK                 },
+    { "MATERIAL_CULL_FRONT",                  Renderer::CULL_FRONT                },
+    { "MATERIAL_CULL_BACK_AND_FRONT",         Renderer::CULL_BACK_AND_FRONT       },
 
     { "GEOMETRY_POINTS",                      Geometry::POINTS          },
     { "GEOMETRY_LINES",                       Geometry::LINES           },

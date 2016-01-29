@@ -606,11 +606,10 @@ void Model3dView::CreateMaterial()
 
   mMaterial = Material::New( mShader );
 
-  mMaterial.SetFaceCullingMode(Material::NONE);
-
   if( mRenderer )
   {
     mRenderer.SetMaterial( mMaterial );
+    mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, Renderer::NONE);
   }
 
   UpdateShaderUniforms();

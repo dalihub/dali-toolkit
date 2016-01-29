@@ -1091,7 +1091,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       if( mHighlightRenderer )
       {
-        mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
+        mHighlightRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mTextDepth - 2 ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
       }
     }
   }

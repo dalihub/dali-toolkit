@@ -66,13 +66,6 @@ namespace MaterialApi
    void SetTextureUniformName( const v8::FunctionCallbackInfo< v8::Value >& args );
    void GetTextureIndex( const v8::FunctionCallbackInfo< v8::Value >& args );
    void GetNumberOfTextures( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetFaceCullingMode( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void GetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void GetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void GetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args );
 
 }; // namespace MaterialApi
 
