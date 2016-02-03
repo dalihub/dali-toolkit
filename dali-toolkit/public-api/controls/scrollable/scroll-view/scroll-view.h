@@ -544,7 +544,7 @@ public:
   /**
    * @brief Copy constructor.
    *
-   * Creates another handle that points to the same real object
+   * Creates another handle that points to the same real object.
    *
    * @SINCE_1_0.0
    * @param[in] handle to copy from
@@ -554,7 +554,7 @@ public:
   /**
    * @brief Assignment operator.
    *
-   * Changes this handle to point to another real object
+   * Changes this handle to point to another real object.
    * @SINCE_1_0.0
    * @param[in] handle The handle to copy from
    * @return A reference to this
@@ -578,14 +578,14 @@ public:
   static ScrollView New();
 
   /**
-   * @brief Downcast an Object handle to ScrollView.
+   * @brief Downcast a handle to ScrollView handle.
    *
    * If handle points to a ScrollView the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a ScrollView or an uninitialized handle
+   * @return A handle to a ScrollView or an uninitialized handle
    */
   static ScrollView DownCast( BaseHandle handle );
 
@@ -686,11 +686,11 @@ public:
   void SetRulerY(RulerPtr ruler);
 
   /**
-   * @brief Set Scroll's touch sensitivity.
+   * @brief Set scroll sensibility of pan gesture.
    *
    * @SINCE_1_0.0
    * @param[in] sensitive true to enable scroll, false to disable scrolling
-   * @note Unlike SetSensitive(), this determines whether this ScrollView
+   * @note Unlike Actor::SetSensitive(), this determines whether this ScrollView
    * should react (e.g. pan), without disrupting the sensitivity of it's children.
    *
    */
@@ -702,11 +702,11 @@ public:
    * The final overshoot value is within 0.0f to 1.0f, but the maximum
    * overshoot is in pixels (e.g. if you scroll 75 pixels beyond the
    * edge of a scrollable area and the maximum overshoot is 100 then
-   * the final overshoot value will be 0.75f)
+   * the final overshoot value will be 0.75f).
    *
    * @SINCE_1_0.0
-   * @param[in] overshootX the maximum number of horizontally scrolled pixels before overshoot X reaches 1.0f
-   * @param[in] overshootY the maximum number of vertically scrolled pixels before overshoot Y reaches 1.0f
+   * @param[in] overshootX The maximum number of horizontally scrolled pixels before overshoot X reaches 1.0f
+   * @param[in] overshootY The maximum number of vertically scrolled pixels before overshoot Y reaches 1.0f
    */
   void SetMaxOvershoot(float overshootX, float overshootY);
 
@@ -754,7 +754,7 @@ public:
   void SetWrapMode(bool enable);
 
   /**
-   * @brief Gets the current distance needed to scroll for ScrollUpdatedSignal to be emitted
+   * @brief Gets the current distance needed to scroll for ScrollUpdatedSignal to be emitted.
    *
    * @SINCE_1_0.0
    * @return Current scroll update distance
@@ -762,10 +762,10 @@ public:
   int GetScrollUpdateDistance() const;
 
   /**
-   * @brief Sets the distance needed to scroll for ScrollUpdatedSignal to be emitted
+   * @brief Sets the distance needed to scroll for ScrollUpdatedSignal to be emitted.
    *
    * The scroll update distance tells ScrollView how far to move before ScrollUpdatedSignal the informs application.
-   * Each time the ScrollView crosses this distance the signal will be emitted
+   * Each time the ScrollView crosses this distance the signal will be emitted.
    *
    * @SINCE_1_0.0
    * @param[in] distance The distance for ScrollView to move before emitting update signal
@@ -808,11 +808,11 @@ public:
    * By default this is 0.36 (0.36:1) which means angles less than 20
    * degrees to an axis will lock to that axis.
    *
-   * @note: Specifying a value of 1.0 (the maximum value accepted) indicates that
-   * all panning gestures will auto-lock. Either to the horizontal or vertical axis.
-   *
    * @SINCE_1_0.0
    * @param[in] gradient A value between 0.0 and 1.0 (auto-lock for all angles)
+   * @note Specifying a value of 1.0 (the maximum value accepted) indicates that
+   * all panning gestures will auto-lock. Either to the horizontal or vertical axis.
+   *
    */
   void SetAxisAutoLockGradient(float gradient);
 
@@ -867,7 +867,7 @@ public:
   void SetFlickSpeedCoefficient(float speed);
 
   /**
-   * @brief Returns the minimum pan distance required for a flick gesture in pixels
+   * @brief Returns the minimum pan distance required for a flick gesture in pixels.
    *
    * @SINCE_1_0.0
    * @return Minimum pan distance vector with separate x and y distance
@@ -875,9 +875,9 @@ public:
   Vector2 GetMinimumDistanceForFlick() const;
 
   /**
-   * @brief Sets the minimum pan distance required for a flick in pixels
+   * @brief Sets the minimum pan distance required for a flick in pixels.
    *
-   * Takes a Vector2 containing separate x and y values. As long as the pan distance exceeds one of these axes a flick will be allowed
+   * Takes a Vector2 containing separate x and y values. As long as the pan distance exceeds one of these axes a flick will be allowed.
    *
    * @SINCE_1_0.0
    * @param[in] distance The minimum pan distance for a flick
@@ -885,7 +885,7 @@ public:
   void SetMinimumDistanceForFlick( const Vector2& distance );
 
   /**
-   * @brief Returns the minimum pan speed required for a flick gesture in pixels per second
+   * @brief Returns the minimum pan speed required for a flick gesture in pixels per second.
    *
    * @SINCE_1_0.0
    * @return Minimum pan speed
@@ -893,7 +893,7 @@ public:
   float GetMinimumSpeedForFlick() const;
 
   /**
-   * @brief Sets the minimum pan speed required for a flick in pixels per second
+   * @brief Sets the minimum pan speed required for a flick in pixels per second.
    *
    * @SINCE_1_0.0
    * @param[in] speed The minimum pan speed for a flick
@@ -942,7 +942,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] step The step of scroll distance(pixel) in X and Y axes.
    *
-   * @note: If snap points are defined in the rulers, it will always
+   * @note If snap points are defined in the rulers, it will always
    * scroll to the next snap point towards the scroll direction while
    * receiving the wheel events.
    *
@@ -963,10 +963,10 @@ public:
    * a grid fashion, increasing from left to right until the end of
    * the X-domain.
    *
-   * @note: Pages start from 0 as the first page, not 1.
+   * @SINCE_1_0.0
+   * @note Pages start from 0 as the first page, not 1.
    *
    * @returns The Current page.
-   * @SINCE_1_0.0
    */
   unsigned int GetCurrentPage() const;
 
@@ -1000,7 +1000,7 @@ public:
   void ScrollTo(const Vector2& position, float duration);
 
   /**
-   * @brief Scrolls View to position specified (contents will scroll to this position)
+   * @brief Scrolls View to position specified (contents will scroll to this position).
    *
    * Position 0,0 is the origin. Increasing X scrolls contents left, while
    * increasing Y scrolls contents up.
@@ -1030,14 +1030,14 @@ public:
    * @note Contents will not snap to ruler snap points.
    * Biasing parameters are provided such that in scenarios with 2 or 2x2 pages in
    * wrap mode, the application developer can decide whether to scroll left or right
-   * to get to the target page
+   * to get to the target page.
    *
    */
   void ScrollTo(const Vector2& position, float duration,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
-   * @brief Scrolls View to position specified (contents will scroll to this position)
+   * @brief Scrolls View to position specified (contents will scroll to this position).
    *
    * Position 0,0 is the origin. Increasing X scrolls contents left, while
    * increasing Y scrolls contents up.
@@ -1052,7 +1052,7 @@ public:
    * @note Contents will not snap to ruler snap points.
    * Biasing parameters are provided such that in scenarios with 2 or 2x2 pages in
    * wrap mode, the application developer can decide whether to scroll left or right
-   * to get to the target page
+   * to get to the target page.
    *
    */
   void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha,
@@ -1139,7 +1139,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] constraint The constraint to apply
-   * @note this affects all existing and future Actors that are added to scrollview.
+   * @note This affects all existing and future Actors that are added to scrollview.
    */
   void ApplyConstraintToChildren(Constraint constraint);
 
@@ -1147,7 +1147,7 @@ public:
    * @brief Removes all constraints that will affect the children of ScrollView.
    *
    * @SINCE_1_0.0
-   * @note this removes all constraints from actors that have been added
+   * @note This removes all constraints from actors that have been added
    * to scrollview.
    */
   void RemoveConstraintsFromChildren();
@@ -1191,7 +1191,7 @@ public:
    * Once Unbound, this ScrollView will not affect the actor.
    * @SINCE_1_0.0
    * @param[in] child The actor to be unbound.
-   * @note this does not remove the child from the ScrollView container
+   * @note This does not remove the child from the ScrollView container
    *
    */
   void UnbindActor(Actor child);
@@ -1220,7 +1220,7 @@ public: // Signals
 
   /**
    * @brief Signal emitted when the ScrollView has started to snap or flick (it tells the target
-   * position, scale, rotation for the snap or flick)
+   * position, scale, rotation for the snap or flick).
    *
    * A callback of the following type may be connected:
    * @code

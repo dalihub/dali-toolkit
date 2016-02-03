@@ -110,7 +110,7 @@ public:
   /**
    * @brief Copy constructor.
    *
-   * Creates another handle that points to the same real object
+   * Creates another handle that points to the same real object.
    *
    * @SINCE_1_0.0
    * @param handle to copy from
@@ -120,7 +120,7 @@ public:
   /**
    * @brief Assignment operator.
    *
-   * Changes this handle to point to another real object
+   * Changes this handle to point to another real object.
    * @SINCE_1_0.0
    * @param[in] handle to copy from
    * @return A reference to this
@@ -136,14 +136,14 @@ public:
   ~Scrollable();
 
   /**
-   * @brief Downcast an Object handle to Scrollable.
+   * @brief Downcast a handle to Scrollable handle.
    *
    * If handle points to a Scrollable the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a Scrollable or an uninitialized handle
+   * @return A handle to a Scrollable or an uninitialized handle
    */
   static Scrollable DownCast( BaseHandle handle );
 
@@ -151,7 +151,7 @@ public:
    * @brief Checks if scroll overshoot has been enabled or not.
    *
    * @SINCE_1_0.0
-   * @return Whether the scroll obvershoot is enabled
+   * @return Whether the scroll overshoot is enabled
    */
   bool IsOvershootEnabled() const;
 
@@ -159,7 +159,7 @@ public:
    * @brief Sets whether to enables or disable scroll overshoot.
    *
    * @SINCE_1_0.0
-   * @param[in] enable Whether to enable the scroll obvershoot or not
+   * @param[in] enable Whether to enable the scroll overshoot or not
    */
   void SetOvershootEnabled(bool enable);
 
@@ -180,6 +180,7 @@ public:
 
   /**
    * @brief Set the speed of overshoot animation in pixels per second.
+   *
    * When the speed is not greater than 0, the overshoot is set instantly with no animation.
    * @SINCE_1_0.0
    * @param[in] pixelsPerSecond The speed of the overshoot animation.

@@ -343,7 +343,7 @@ public:
    *
    * @param[in] actor The actor to constrain.
    * @param[in] itemId The ID of the item represented by the actor.
-   * @param[in] layoutSize the current size of the item view instance.
+   * @param[in] layoutSize The current size of the item view instance.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
   DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) = 0;
@@ -352,9 +352,9 @@ public:
    * @brief Gets the position of a given item
    *
    * @SINCE_1_0.0
-   * @param[in] itemID id of the item we want to get its position
-   * @param[in] currentLayoutPosition the current layout position of the item view instance
-   * @param[in] layoutSize the current size of the item view instance
+   * @param[in] itemID The id of the item we want to get its position
+   * @param[in] currentLayoutPosition The current layout position of the item view instance
+   * @param[in] layoutSize The current size of the item view instance
    * @return The item position (x,y,z)
    */
   DALI_IMPORT_API virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const = 0;

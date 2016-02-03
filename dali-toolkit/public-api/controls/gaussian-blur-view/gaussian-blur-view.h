@@ -74,30 +74,34 @@ class BloomView;
  *
  * Usage example:-
  *
- *  // initialise\n
- *  GaussianBlurView gaussianBlurView = GaussianBlurView::New();\n
+ * @code
+ *  // Initialise
+ *  GaussianBlurView gaussianBlurView = GaussianBlurView::New();
  *
- *  // create and add some visible actors to the GaussianBlurView, all these child actors will therefore get blurred.\n
- *  Image image = Image::New(...);\n
- *  ImageActor imageActor = ImageActor::New(image);\n
- *  gaussianBlurView.Add(imageActor);\n
- *  ...\n
+ *  // Create and add some visible actors to the GaussianBlurView, all these child actors will therefore get blurred.
+ *  Image image = Image::New(...);
+ *  ImageView imageView = ImageView::New(image);
+ *  gaussianBlurView.Add(imageView);
+ *  ...
  *
- *  // Start rendering the GaussianBlurView\n
- *  Stage::GetCurrent().Add(gaussianBlurView);\n
- *  gaussianBlurView.Activate();\n
- *  ...\n
+ *  // Start rendering the GaussianBlurView
+ *  Stage::GetCurrent().Add(gaussianBlurView);
+ *  gaussianBlurView.Activate();
+ *  ...
  *
- *  // animate the strength of the blur - this can fade between no blur and full blur. See GetBlurStrengthPropertyIndex().\n
- *  Animation blurAnimation = Animation::New( ... );\n
- *  blurAnimation.AnimateTo( Property( gaussianBlurView, gaussianBlurView.GetBlurStrengthPropertyIndex() ), ... );\n
- *  blurAnimation.Play();\n
+ *  // Animate the strength of the blur - this can fade between no blur and full blur. See GetBlurStrengthPropertyIndex().
+ *  Animation blurAnimation = Animation::New( ... );
+ *  blurAnimation.AnimateTo( Property( gaussianBlurView, gaussianBlurView.GetBlurStrengthPropertyIndex() ), ... );
+ *  blurAnimation.Play();
  *
- *  ...\n
- *  // Stop rendering the GaussianBlurView\n
- *  Stage::GetCurrent().Remove(gaussianBlurView);\n
- *  gaussianBlurView.Deactivate();\n
+ *  ...
+ *  // Stop rendering the GaussianBlurView
+ *  Stage::GetCurrent().Remove(gaussianBlurView);
+ *  gaussianBlurView.Deactivate();
+ * @endcode
  * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release.
+ * We do recommend not to use this class.
  */
 class DALI_IMPORT_API GaussianBlurView : public Control
 {
@@ -109,20 +113,20 @@ public:
   typedef Signal< void (GaussianBlurView source) > GaussianBlurViewSignal;
 
   /**
-   * @brief Create an uninitialized GaussianBlurView; this can be initialized with GaussianBlurView::New()
+   * @brief Create an uninitialized GaussianBlurView; this can be initialized with GaussianBlurView::New().
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
    */
   GaussianBlurView();
 
   /**
-   * @brief Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor. Creates another handle that points to the same real object.
    * @SINCE_1_0.0
    */
   GaussianBlurView(const GaussianBlurView& handle);
 
   /**
-   * @brief Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator. Changes this handle to point to another real object.
    * @SINCE_1_0.0
    */
   GaussianBlurView& operator=(const GaussianBlurView& ZoomView);
@@ -136,11 +140,13 @@ public:
   ~GaussianBlurView();
 
   /**
-   * @brief Downcast an Object handle to GaussianBlurView. If handle points to a GaussianBlurView the
+   * @brief Downcast a handle to GaussianBlurView handle.
+   *
+   * If handle points to a GaussianBlurView the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a GaussianBlurView or an uninitialized handle
+   * @return A handle to a GaussianBlurView or an uninitialized handle
    */
   static GaussianBlurView DownCast( BaseHandle handle );
 
@@ -182,9 +188,6 @@ public:
 
   /**
    * @brief Adds a child Actor to this Actor.
-   * NOTE! if the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color, shader effect,
-   * scale etc as it now inherits them from this actor
    * @SINCE_1_0.0
    * @param [in] child The child.
    * @pre This Actor (the parent) has been initialized.
@@ -193,11 +196,15 @@ public:
    * @pre The actor is not the Root actor
    * @post The child will be referenced by its parent. This means that the child will be kept alive,
    * even if the handle passed into this method is reset or destroyed.
+   * @note If the child already has a parent, it will be removed from old parent
+   * and reparented to this actor. This may change childs position, color, shader effect,
+   * scale etc as it now inherits them from this actor.
    */
   void Add(Actor child);
 
   /**
    * @brief Removes a child Actor from this Actor.
+   *
    * If the actor was not a child of this actor, this is a no-op.
    * @SINCE_1_0.0
    * @param [in] child The child.
@@ -213,7 +220,9 @@ public:
   void Activate();
 
   /**
-   * @brief Render the GaussianBlurView once. Must be called after you Add() it to the stage.
+   * @brief Render the GaussianBlurView once.
+   *
+   * Must be called after you Add() it to the stage.
    * Only works with a gaussian blur view created with blurUserImage = true.
    * Listen to the Finished signal to determine when the rendering has completed.
    * @SINCE_1_0.0
@@ -227,7 +236,9 @@ public:
   void Deactivate();
 
   /**
-   * @brief Sets a custom image to be blurred and a render target to receive the blurred result. If this is called the children of the GaussianBlurObject will not be rendered blurred,
+   * @brief Sets a custom image to be blurred and a render target to receive the blurred result.
+   *
+   * If this is called the children of the GaussianBlurObject will not be rendered blurred,
    * instead the inputImage will get blurred.
    * To retrieve the blurred image the user can either pass a handle on a render target they own as the second parameter to SetUserImageAndOutputRenderTarget( ... ), or they
    * can pass NULL for this parameter and instead call GetBlurredRenderTarget() which will return a handle on a render target created internally to the GaussianBlurView object.
@@ -239,7 +250,9 @@ public:
   void SetUserImageAndOutputRenderTarget(Image inputImage, FrameBufferImage outputRenderTarget);
 
   /**
-   * @brief Get the index of the property that can be used to fade the blur in / out. This is the overall strength of the blur.
+   * @brief Get the index of the property that can be used to fade the blur in / out.
+   *
+   * This is the overall strength of the blur.
    * User can use this to animate the blur. A value of 0.0 is zero blur and 1.0 is full blur. Default is 1.0.
    * Note that if you set the blur to 0.0, the result will be no blur BUT the internal rendering will still be happening. If you wish to turn the blur off, you should remove
    * the GaussianBlurView object from the stage also.
@@ -250,6 +263,7 @@ public:
 
   /**
    * @brief Get the final blurred image.
+   *
    * Use can call this function to get the blurred result as an image, to use as they wish. It is not necessary to call this unless you specifically require it.
    * @SINCE_1_0.0
    * @return A handle on the blurred image, contained in a render target.

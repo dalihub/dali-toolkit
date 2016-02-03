@@ -118,7 +118,7 @@ public:
   static PushButton New();
 
   /**
-   * @brief Downcast an Object handle to PushButton.
+   * @brief Downcast a handle to PushButton handle.
    *
    * If handle points to a PushButton the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
@@ -135,7 +135,7 @@ public:
   using Button::SetButtonImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetUnselectedImage.
    *
    * @brief Sets the unselected image with an Actor.
    *
@@ -147,7 +147,7 @@ public:
   using Button::SetBackgroundImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetBackgroundImage.
    *
    * @brief Sets the background image with an Actor.
    *
@@ -159,7 +159,7 @@ public:
   using Button::SetSelectedImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetSelectedImage( const std::string& filename ).
    *
    * @brief Sets the selected image with an Actor.
    *
@@ -171,7 +171,7 @@ public:
   using Button::SetSelectedBackgroundImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetSelectedBackgroundImage.
    *
    * @brief Sets the selected background image with an Actor.
    *
@@ -183,7 +183,7 @@ public:
   using Button::SetDisabledBackgroundImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetDisabledBackgroundImage.
    *
    * @brief Sets the disabled background image with an Actor.
    *
@@ -195,7 +195,7 @@ public:
   using Button::SetDisabledImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetDisabledImage.
    *
    * @brief Sets the disabled image with an Actor.
    *
@@ -207,7 +207,7 @@ public:
   using Button::SetDisabledSelectedImage;
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use Button::SetDisabledSelectedImage.
    *
    * @brief Sets the disabled selected image with an Actor.
    *

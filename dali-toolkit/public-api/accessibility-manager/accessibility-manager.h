@@ -33,12 +33,12 @@ namespace Internal DALI_INTERNAL
 class AccessibilityManager;
 }
 /**
- * @addtogroup dali_toolkit_accessibility_manager
+ * @addtogroup dali_toolkit_managers
  * @{
  */
 
 /**
- * @brief Manages registration of actors in a accessibility focus chain and changing the
+ * @brief Manages registration of actors in an accessibility focus chain and changing the
  * focused actor within that chain.
  *
  * This class provides the functionality of registering the focus order and description
@@ -66,6 +66,7 @@ public:
    * @brief Accessibility Action Signal.
    *
    * The connected signal callback should return true if handled.
+   * @SINCE_1_0.0
    */
   typedef Signal< bool ( AccessibilityManager& ) > AccessibilityActionSignalType; ///< Generic signal type @SINCE_1_0.0
   typedef Signal< bool ( AccessibilityManager&, const Dali::TouchEvent& )> AccessibilityActionScrollSignalType; ///< Scroll signal type @SINCE_1_0.0
@@ -98,12 +99,15 @@ public:
  public:
 
   /// @brief Focus changed signal
+  /// @SINCE_1_0.0
   typedef Signal< void ( Actor, Actor ) > FocusChangedSignalType;
 
   /// @brief Focus overshooted signal
+  /// @SINCE_1_0.0
   typedef Signal< void ( Actor, FocusOvershotDirection ) > FocusOvershotSignalType;
 
   /// @brief Focused actor activated signal
+  /// @SINCE_1_0.0
   typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
 
   /**
@@ -209,8 +213,8 @@ public:
   /**
    * @brief Get the actor that has the specified focus order.
    *
-   * It will return an empty handle if the actor is not in the stage
-   * or has a focus order of 0.
+   * It will return an empty handle if no actor in the stage
+   * has the specified focus order.
    *
    * @SINCE_1_0.0
    * @param order The focus order of the actor
@@ -298,7 +302,7 @@ public:
    * @brief Clear the focus from the current focused actor if any, so
    * that no actor is focused in the focus chain.
    *
-   * It will emit focus changed signal without current focused actor
+   * It will emit focus changed signal without current focused actor.
    * @SINCE_1_0.0
    * @pre The AccessibilityManager has been initialized.
    */
@@ -456,7 +460,7 @@ public:
    */
   FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
- public: // Accessibility action signals.
+ public: // Accessibility action signals
 
   /**
    * @brief This is emitted when accessibility(screen-reader) feature turned on or off.
@@ -641,7 +645,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to scroll left to the
-   * previous page (by two finger swipe left)
+   * previous page (by two finger swipe left).
    *
    * A callback of the following type may be connected:
    * @code
@@ -654,7 +658,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to scroll right to the
-   * next page (by two finger swipe right)
+   * next page (by two finger swipe right).
    *
    * A callback of the following type may be connected:
    * @code
@@ -667,7 +671,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to scroll up to the
-   * previous page (by one finger swipe left and right)
+   * previous page (by one finger swipe left and right).
    *
    * A callback of the following type may be connected:
    * @code
@@ -680,7 +684,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to scroll down to the
-   * next page (by one finger swipe right and left)
+   * next page (by one finger swipe right and left).
    *
    * A callback of the following type may be connected:
    * @code
@@ -693,7 +697,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to move the focus to
-   * the first item on the screen (by one finger swipe up and down)
+   * the first item on the screen (by one finger swipe up and down).
    *
    * A callback of the following type may be connected:
    * @code
@@ -706,7 +710,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to move the focus to
-   * the last item on the screen (by one finger swipe down and up)
+   * the last item on the screen (by one finger swipe down and up).
    *
    * A callback of the following type may be connected:
    * @code
@@ -719,7 +723,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to focus and read from the
-   * first item on the top continously (by three fingers single tap)
+   * first item on the top continously (by three fingers single tap).
    *
    * A callback of the following type may be connected:
    * @code
@@ -732,7 +736,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to move the focus to and
-   * read from the next item continously (by three fingers double tap)
+   * read from the next item continously (by three fingers double tap).
    *
    * A callback of the following type may be connected:
    * @code
@@ -745,7 +749,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to zoom (by one finger
-   * triple tap)
+   * triple tap).
    *
    * A callback of the following type may be connected:
    * @code

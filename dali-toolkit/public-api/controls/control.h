@@ -169,14 +169,14 @@ public: // Creation & Destruction
   /**
    * @brief Copy constructor.
    *
-   * Creates another handle that points to the same real object
+   * Creates another handle that points to the same real object.
    * @SINCE_1_0.0
    * @param[in] uiControl Handle to copy
    */
   Control(const Control& uiControl);
 
   /**
-   * @brief Dali::Control is intended as a base class
+   * @brief Dali::Control is intended as a base class.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -188,7 +188,7 @@ public: // operators
   /**
    * @brief Assignment operator.
    *
-   * Changes this handle to point to another real object
+   * Changes this handle to point to another real object.
    * @SINCE_1_0.0
    * @param[in] handle Object to assign this to
    * @return reference to this
@@ -198,14 +198,14 @@ public: // operators
 public:
 
   /**
-   * @brief Downcast an Object handle to Control.
+   * @brief Downcast a handle to Control handle.
    *
    * If handle points to a Control the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a Control or an uninitialized handle
+   * @return A handle to a Control or an uninitialized handle
    */
   static Control DownCast( BaseHandle handle );
 
@@ -216,7 +216,6 @@ public:
    *
    * The key event can originate from a virtual or physical keyboard.
    * @SINCE_1_0.0
-   * @return True if the control has foucs, False otherwise.
    * @pre The Control has been initialized.
    * @pre The Control should be on the stage before setting keyboard focus.
    */
@@ -225,15 +224,15 @@ public:
   /**
    * @brief Quries whether the control has key input focus.
    *
-   * Note: The control can be set to have the focus and still not receive all the key events if another control has over ridden it.
-   * As the key input focus mechanism works like a stack, the top most control receives all the key events, and passes on the
-   * unhandled events to the controls below in the stack. A control in the stack will regain key input focus when there are no more
-   * controls above it in the focus stack.
-   * To query for the conrol which is on top of the focus stack use Dali::Toolkit::KeyInputFocusManager::GetCurrentKeyboardFocusActor()
    * @SINCE_1_0.0
    * @return true if this control has keyboard input focus
    * @pre The Control has been initialized.
    * @pre The Control should be on the stage before setting keyboard focus.
+   * @note The control can be set to have the focus and still not receive all the key events if another control has over ridden it.
+   * As the key input focus mechanism works like a stack, the top most control receives all the key events, and passes on the
+   * unhandled events to the controls below in the stack. A control in the stack will regain key input focus when there are no more
+   * controls above it in the focus stack.
+   * To query for the conrol which is on top of the focus stack use Dali::Toolkit::KeyInputFocusManager::GetCurrentKeyboardFocusActor().
    */
   bool HasKeyInputFocus();
 
@@ -357,7 +356,7 @@ public:
   KeyEventSignalType& KeyEventSignal();
 
   /**
-   * @brief This signal is emitted when the control gets Key Input Focus
+   * @brief This signal is emitted when the control gets Key Input Focus.
    *
    * A callback of the following type may be connected:
    * @code

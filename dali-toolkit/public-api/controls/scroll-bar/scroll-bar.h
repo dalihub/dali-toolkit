@@ -145,7 +145,9 @@ public:
   static ScrollBar New(Direction direction = Vertical);
 
   /**
-   * @brief Downcast an Object handle to ScrollBar. If handle points to a ScrollBar the
+   * @brief Downcast a handle to ScrollBar handle.
+   *
+   * If handle points to a ScrollBar the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -247,6 +249,7 @@ public:
 
   /**
    * @brief Sets the fixed height of scroll indicator.
+   *
    * Normally the height of scroll indicator is changed dynamically according to the length of scroll content.
    * However, when the height policy of scroll indicator is set to be fixed, the height will keep fixed
    * regardless of the length of scroll content.
@@ -315,6 +318,7 @@ public: // Signals
 
   /**
    * @brief Signal emitted when panning is finished on the scroll indicator.
+   *
    * Signal only emitted when the source of the scroll position properties are set.
    *
    * A callback of the following type may be connected:
@@ -330,6 +334,7 @@ public: // Signals
   /**
    * @brief Signal emitted when the current scroll position of the scrollable content
    * goes above or below the values specified by SCROLL_POSITION_INTERVALS property.
+   *
    * Signal only emitted when the source of the scroll position properties are set.
    *
    * A callback of the following type may be connected:

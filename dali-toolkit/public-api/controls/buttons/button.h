@@ -146,14 +146,14 @@ public:
   Button& operator=( const Button& button );
 
   /**
-   * @brief Downcast an Object handle to Button.
+   * @brief Downcast a handle to Button handle.
    *
    * If handle points to a Button the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a Button or an uninitialized handle
+   * @return A handle to a Button or an uninitialized handle
    */
   static Button DownCast( BaseHandle handle );
 
@@ -176,6 +176,7 @@ public:
   void SetDisabled( bool disabled );
 
   /**
+   * @brief Returns if the button is disabled.
    * @SINCE_1_0.0
    * @return \e true if the button is \e disabled.
    */
@@ -193,6 +194,7 @@ public:
   void SetAutoRepeating( bool autoRepeating );
 
   /**
+   * @brief Returns if the autorepeating property is set.
    * @SINCE_1_0.0
    * @return \e true if the \e autorepeating property is set.
    */
@@ -210,6 +212,7 @@ public:
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
 
   /**
+   * @brief Gets the initial autorepeating delay in seconds.
    * @SINCE_1_0.0
    * @return the initial autorepeating delay in seconds.
    */
@@ -227,6 +230,7 @@ public:
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
 
   /**
+   * @brief Gets the next autorepeating delay in seconds.
    * @SINCE_1_0.0
    * @return the next autorepeating delay in seconds.
    */
@@ -243,6 +247,7 @@ public:
   void SetTogglableButton( bool togglable );
 
   /**
+   * @brief Returns if the togglable property is set.
    * @SINCE_1_0.0
    * @return \e true if the \e togglable property is set.
    */
@@ -261,8 +266,9 @@ public:
   void SetSelected( bool selected );
 
   /**
+   * @brief Returns if the selected property is set and the button is togglable.
    * @SINCE_1_0.0
-   * @return \e true if the \e selected property is set and the button is togglable.
+   * @return \e true if the button is \e selected.
    */
   bool IsSelected() const;
 
@@ -357,7 +363,7 @@ public:
   // Deprecated API
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use SetLabelText.
    *
    * @brief Sets the label with an actor.
    *
@@ -367,7 +373,7 @@ public:
   void SetLabel( Actor label );
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use SetUnselectedImage.
    *
    * @brief Sets the button image.
    *
@@ -377,7 +383,7 @@ public:
   void SetButtonImage( Image image );
 
   /**
-   * @DEPRECATED_1_0.50
+   * @DEPRECATED_1_0.50. Instead, use SetSelectedImage( const std::string& filename ).
    *
    * @brief Sets the selected image.
    *
@@ -392,6 +398,7 @@ public:
    * @brief Gets the button image.
    *
    * @SINCE_1_0.0
+   * @remarks Avoid using this method as it's a legacy code.
    * @return     An actor with the button image.
    */
   Actor GetButtonImage() const;
@@ -402,6 +409,7 @@ public:
    * @brief Gets the selected image.
    *
    * @SINCE_1_0.0
+   * @remarks Avoid using this method as it's a legacy code.
    * @return     An actor with the selected image.
    */
   Actor GetSelectedImage() const;
@@ -452,6 +460,7 @@ public: //Signals
 
   /**
    * @brief This signal is emitted when the button's state is changed.
+   *
    * The application can get the state by calling IsSelected().
    *
    * A callback of the following type may be connected:
