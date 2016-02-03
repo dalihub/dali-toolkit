@@ -71,14 +71,16 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
  * @brief Replaces any character in the right to left paragraphs which could be mirrored.
  *
  * @param[in] text The text.
- * @param[in] mirroredText The mirroredText.
+ * @param[in] directions Vector with the direction of each paragraph.
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[out] mirroredText The mirroredText.
  *
  * @return @e true if a character has been replaced.
  */
 bool GetMirroredText( const Vector<Character>& text,
-                      Vector<Character>& mirroredText,
-                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo );
+                      const Vector<CharacterDirection>& directions,
+                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                      Vector<Character>& mirroredText );
 
 /**
  * @brief Retrieves the character's directions.
