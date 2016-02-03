@@ -1,4 +1,4 @@
-# DALi Introduction
+# DALi Introduction ajskdfajksd fhksja
 
 ### Introduction
  + [What is DALi?](@ref dali-introduction)
@@ -8,6 +8,7 @@
   + [Main, Update & Render Threads](@ref dali-threads)
  + [DALi Fundamentals](@ref fundamentals)
   + [Actors & Stage](@ref actors-and-stage)
+  + [Layers and draw order](@ref layer)
   + [Coordinate System](@ref coordinate-system)
   + [Scene Graph](@ref scene-graph)
   + [Handle / Body Idiom](@ref handle-body-idiom)
