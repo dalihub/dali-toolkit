@@ -90,6 +90,12 @@ public:
   static Dali::Property::Value ExtractPropertyValue( v8::Isolate* isolate, v8::Local< v8::Value> v8Value, Dali::Property::Type type);
 
   /**
+   * Extract a property value from a javascript object
+   * @return property value
+   */
+  static Dali::Property::Value ExtractPropertyValue( v8::Isolate* isolate, v8::Local< v8::Value> v8Value);
+
+  /**
    * @brief Extract a vector or a matrix from a JavaScript array
    * @return property value ( vector or matrix)
    */

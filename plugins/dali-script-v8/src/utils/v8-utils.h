@@ -50,6 +50,7 @@ enum
 };
 
 #define DALI_SCRIPT_EXCEPTION( isolate, message ) V8Utils::ScriptError( __FUNCTION__ , isolate, message );
+#define DALI_SCRIPT_WARNING( message ) V8Utils::ScriptWarning( __FUNCTION__ , message );
 
 namespace V8Utils
 {
@@ -144,6 +145,11 @@ std::string GetJavaScriptFunctionName(  const char* functionName );
  * Script error, throws an exception
  */
 void ScriptError( const char* function, v8::Isolate* isolate, std::string errorString );
+
+/**
+ * Script warning
+ */
+void ScriptWarning( const char* function, std::string warningString );
 
 /**
  * @return in the value is a boolean primitive or a boolean object
