@@ -43,11 +43,11 @@ inline ShaderEffect CreateMirrorEffect()
   std::string vertexShader(
       "void main()                                  \n"
       "{                                            \n"
-      "  mediump vec3 pos = vec3(aPosition, 0.0)*uSize;              \n"
+      "  mediump vec3 pos = aPosition;              \n"
       "  pos.y = pos.y * 3.0;                       \n"
       "  mediump vec4 world = uModelView * vec4(pos,1.0); \n"
       "  gl_Position = uProjection * world;         \n"
-      "  vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) ); \n"
+      "  vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord ); \n"
       "}                                            \n" );
 
   std::string fragmentShader(

@@ -52,7 +52,7 @@ inline ShaderEffect CreateBendyEffect()
       "void main()\n"
       "{\n"
       " mediump float lighting = 0.25;\n"
-      " mediump vec4 position = uModelView * vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
+      " mediump vec4 position = uModelView * vec4(aPosition, 1.0);\n"
       "\n"
       " mediump vec2 d = position.xy - uCenter;\n"
       " mediump float dist = max( 0.0, dot(d,uDirection) );\n"
@@ -70,7 +70,7 @@ inline ShaderEffect CreateBendyEffect()
       "\n"
       "vShade = 1.0 - abs(sn) * lighting;\n"
       "\n"
-      "vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
+      "vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );\n"
       "}" );
 
   std::string fragmentShader(

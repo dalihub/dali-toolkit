@@ -127,7 +127,7 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect()
       \n
       void main()\n
       {\n
-        vec4 position = vec4( aPosition*uSize.xy, 0.0, 1.0);\n
+        vec4 position = vec4( aPosition, 1.0);\n
         vec2 currentCenter = vec2( uCommonParameters[1][2], uCommonParameters[1][3]);\n
         vec2 originalCenter = vec2( uCommonParameters[0][2], uCommonParameters[0][3]);\n
         vec3 normal = vec3(0.0,0.0,1.0);\n
@@ -248,7 +248,7 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect()
         }\n
         gl_Position = uMvpMatrix * position;\n
         // varying parameters for fragment shader
-        vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;
+        vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );\n;
         vNormal = uNormalMatrix*normal;\n
         vPosition = uModelView * position;\n
       }\n
@@ -270,11 +270,11 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect()
         float spineShadowCoef = 1.0; \n
         // display page content
         // display back image of the page, flip the texture
-        if(  dot(vPosition.xyz, normal) > 0.0 ) texel = texture2D( sTexture, vec2( uTextureRect.p+uTextureRect.s-vTexCoord.x, vTexCoord.y ) );\n
+        if(  dot(vPosition.xyz, normal) > 0.0 ) texel = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) );\n
         // display front image of the page
         else texel = texture2D( sTexture, vTexCoord );\n
         // display book spine, a stripe of shadowed texture
-        float pixelPos = (vTexCoord.x-uTextureRect.s)*uPageSize.x; \n
+        float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageSize.x; \n
         if(pixelPos < uSpineShadowParameter.x) \n
         {\n
           float x = pixelPos - uSpineShadowParameter.x;\n

@@ -47,7 +47,7 @@ inline ShaderEffect CreateRipple2DEffect()
       "uniform float uTime;\n"
       "void main()\n"
       "{\n"
-      "  highp vec2 textureSize = uTextureRect.zw - uTextureRect.xy;\n"
+      "  highp vec2 textureSize = sTextureRect.zw - sTextureRect.xy;\n"
       "  highp vec2 pos = -1.0 + 2.0 * vTexCoord.st/textureSize;\n"
       "  highp float len = length(pos);\n"
       "  highp vec2 texCoord = vTexCoord.st/textureSize + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude;\n"
