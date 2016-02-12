@@ -325,6 +325,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   const Length numberOfCharacters = utf32Characters.Count();
 
   Vector<LineBreakInfo>& lineBreakInfo = mLogicalModel->mLineBreakInfo;
+  CharacterIndex startIndex = 0u;
+  Length requestedNumberOfCharacters = numberOfCharacters;
   if( GET_LINE_BREAKS & operations )
   {
     // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
@@ -344,6 +346,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     wordBreakInfo.Resize( numberOfCharacters, TextAbstraction::WORD_NO_BREAK );
 
     SetWordBreakInfo( utf32Characters,
+                      startIndex,
+                      requestedNumberOfCharacters,
                       wordBreakInfo );
   }
 
