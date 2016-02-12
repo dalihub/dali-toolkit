@@ -49,9 +49,13 @@ MultilanguageSupport MultilanguageSupport::Get()
 }
 
 void MultilanguageSupport::SetScripts( const Vector<Character>& text,
+                                       CharacterIndex startIndex,
+                                       Length numberOfCharacters,
                                        Vector<ScriptRun>& scripts )
 {
   GetImplementation( *this ).SetScripts( text,
+                                         startIndex,
+                                         numberOfCharacters,
                                          scripts );
 }
 
@@ -59,12 +63,16 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           const Vector<FontDescriptionRun>& fontDescriptions,
                                           FontId defaultFontId,
+                                          CharacterIndex startIndex,
+                                          Length numberOfCharacters,
                                           Vector<FontRun>& fonts )
 {
   GetImplementation( *this ).ValidateFonts( text,
                                             scripts,
                                             fontDescriptions,
                                             defaultFontId,
+                                            startIndex,
+                                            numberOfCharacters,
                                             fonts );
 }
 

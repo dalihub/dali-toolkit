@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/input-style.h>
-#include <dali-toolkit/internal/text/text-style-run-container.h>
+#include <dali-toolkit/internal/text/text-run-container.h>
 
 namespace Dali
 {

@@ -367,6 +367,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     {
       // Retrieves the scripts used in the text.
       multilanguageSupport.SetScripts( utf32Characters,
+                                       startIndex,
+                                       requestedNumberOfCharacters,
                                        scripts );
     }
 
@@ -384,6 +386,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                                           scripts,
                                           fontDescriptionRuns,
                                           defaultFontId,
+                                          startIndex,
+                                          requestedNumberOfCharacters,
                                           validFonts );
     }
   }
