@@ -140,13 +140,6 @@ public:
   void SetBubbleDensity( unsigned int density );
 
   /**
-   * @brief Enable different blending mode for rendering.
-   *
-   * @param[in] enable If false, the default blending function if ImageActor is used.
-   */
-  void SetBlendMode( bool enable );
-
-  /**
    * @brief Add a bubble movement to the animation.
    *
    * @param[in] animation The animation reference.

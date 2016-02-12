@@ -137,7 +137,7 @@ void ColorRenderer::InitializeRenderer()
   mBlendColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )
   {
-    mImpl->mRenderer.GetMaterial().SetBlendMode( BlendingMode::ON );
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
   }
 }
 
@@ -148,9 +148,9 @@ void ColorRenderer::SetColor(const Vector4& color)
   if( mImpl->mRenderer )
   {
     (mImpl->mRenderer).SetProperty( mBlendColorIndex, color );
-    if( color.a < 1.f &&  (mImpl->mRenderer).GetMaterial().GetBlendMode() != BlendingMode::ON)
+    if( color.a < 1.f )
     {
-      (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
     }
   }
 }

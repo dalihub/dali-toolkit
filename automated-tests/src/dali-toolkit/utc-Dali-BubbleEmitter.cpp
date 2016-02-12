@@ -284,44 +284,6 @@ int UtcDaliBubbleEmitterSetBubbleDensity02(void)
   END_TEST;
 }
 
-int UtcDaliBubbleEmitterSetBlendMode(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( " UtcDaliBubbleEmitterSetBlendMode " );
-
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
-  BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 150, Vector2( 5.f, 10.f ));
-  DALI_TEST_CHECK(emitter);
-  Actor root = emitter.GetRootActor();
-  Stage::GetCurrent().Add( root );
-  root.SetPosition( Vector3::ZERO );
-  root.SetParentOrigin( ParentOrigin::CENTER );
-  root.SetAnchorPoint( AnchorPoint::CENTER );
-
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  Wait(application);
-  DALI_TEST_EQUALS( (GLenum)GL_SRC_ALPHA, glAbstraction.GetLastBlendFuncSrcRgb(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_SRC_ALPHA, glAbstraction.GetLastBlendFuncDstRgb(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE, glAbstraction.GetLastBlendFuncSrcAlpha(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_SRC_ALPHA, glAbstraction.GetLastBlendFuncDstAlpha(), TEST_LOCATION );
-
-  emitter.SetBlendMode( true );
-  Wait(application);
-  DALI_TEST_EQUALS( (GLenum)GL_SRC_ALPHA, glAbstraction.GetLastBlendFuncSrcRgb(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE, glAbstraction.GetLastBlendFuncDstRgb(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ZERO, glAbstraction.GetLastBlendFuncSrcAlpha(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE, glAbstraction.GetLastBlendFuncDstAlpha(), TEST_LOCATION );
-
-  emitter.SetBlendMode( false );
-  Wait(application);
-  DALI_TEST_EQUALS( (GLenum)GL_SRC_ALPHA, glAbstraction.GetLastBlendFuncSrcRgb(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_SRC_ALPHA, glAbstraction.GetLastBlendFuncDstRgb(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE, glAbstraction.GetLastBlendFuncSrcAlpha(), TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_SRC_ALPHA, glAbstraction.GetLastBlendFuncDstAlpha(), TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliBubbleEmitterEmitBubble(void)
 {
   ToolkitTestApplication application;

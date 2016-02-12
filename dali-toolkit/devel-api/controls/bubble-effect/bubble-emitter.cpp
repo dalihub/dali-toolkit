@@ -99,11 +99,6 @@ void BubbleEmitter::SetBubbleDensity( unsigned int density )
   GetImpl(*this).SetBubbleDensity( density );
 }
 
-void BubbleEmitter::SetBlendMode( bool enable )
-{
-  GetImpl(*this).SetBlendMode( enable );
-}
-
 void BubbleEmitter::EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement )
 {
   GetImpl(*this).EmitBubble( animation, emitPosition, direction, displacement );

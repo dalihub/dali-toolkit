@@ -226,22 +226,6 @@ void BubbleEmitter::SetBubbleDensity( unsigned int density )
   }
 }
 
-void BubbleEmitter::SetBlendMode( bool enable )
-{
-  if(enable)
-  {
-    // linear overlay
-    mMaterial.SetBlendFunc(BlendingFactor::SRC_ALPHA, BlendingFactor::ONE,
-                           BlendingFactor::ZERO, BlendingFactor::ONE);
-  }
-  else
-  {
-    // using default blend func
-    mMaterial.SetBlendFunc( BlendingFactor::SRC_ALPHA,   BlendingFactor::ONE_MINUS_SRC_ALPHA,
-                            BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA );
-  }
-}
-
 // clear the resources created for the off screen rendering
 void BubbleEmitter::OnRenderFinished(RenderTask& source)
 {

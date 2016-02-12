@@ -92,11 +92,6 @@ public:
   void SetBubbleDensity( unsigned int density );
 
   /**
-   * @copydoc Toolkit::BubbleEmitter::SetBlendMode
-   */
-  void SetBlendMode( bool enable );
-
-  /**
    * @copydoc Toolkit::BubbleEmitter::EmitBubble
    */
   void EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );

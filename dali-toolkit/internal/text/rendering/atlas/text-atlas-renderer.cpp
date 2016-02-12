@@ -425,7 +425,8 @@ struct AtlasRenderer::Impl
           if( actor.GetRendererCount() )
           {
             Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
-            renderer.SetDepthIndex( renderer.GetDepthIndex() - 1 );
+            int depthIndex = renderer.GetProperty<int>(Dali::Renderer::Property::DEPTH_INDEX);
+            renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
             shadowActor.SetParentOrigin( ParentOrigin::CENTER );
             shadowActor.SetSize( actorSize );
             containerActor.Add( shadowActor );
@@ -490,7 +491,8 @@ struct AtlasRenderer::Impl
 
     Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( DepthIndex::CONTENT + mDepth );
+    renderer.SetProperty( Dali::Renderer::Property::BLENDING_MODE, BlendingMode::ON );
+    renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT + mDepth );
     Actor actor = Actor::New();
 #if defined(DEBUG_ENABLED)
     actor.SetName( "Text renderable actor" );

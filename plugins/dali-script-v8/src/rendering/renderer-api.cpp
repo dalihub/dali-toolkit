@@ -204,6 +204,162 @@ void RendererApi::GetMaterial( const v8::FunctionCallbackInfo<v8::Value>& args )
   args.GetReturnValue().Set( localObject );
 }
 
+/**
+ * Specify the pixel arithmetic used when the actor is blended.
+ *
+ * @for Renderer
+ * @method setBlendFunc
+ * @param {integer} srcFactorRgb Source Blending RGB
+ * @param {integer} destFactorRgb Destination Blending RGB
+ * @param {integer} srcFactorAlpha Source Blending Alpha
+ * @param {integer} destFactorAlpha Destination Blending Alpha
+ * @example
+ *    //blending constants
+ *    dali.BLEND_FACTOR_ZERO
+ *    dali.BLEND_FACTOR_ONE
+ *    dali.BLEND_FACTOR_SRC_COLOR
+ *    dali.BLEND_FACTOR_ONE_MINUS_SRC_COLOR
+ *    dali.BLEND_FACTOR_SRC_ALPHA
+ *    dali.BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
+ *    dali.BLEND_FACTOR_DST_ALPHA
+ *    dali.BLEND_FACTOR_ONE_MINUS_DST_ALPHA
+ *    dali.BLEND_FACTOR_DST_COLOR
+ *    dali.BLEND_FACTOR_ONE_MINUS_DST_COLOR
+ *    dali.BLEND_FACTOR_SRC_ALPHA_SATURATE
+ *    dali.BLEND_FACTOR_CONSTANT_COLOR
+ *    dali.BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR
+ *    dali.BLEND_FACTOR_CONSTANT_ALPHA
+ *    dali.BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA
+ *
+ *    renderer.setBlendFunc( dali.BLEND_FACTOR_CONSTANT_COLOR, dali.BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR,
+ *                           dali.BLEND_FACTOR_CONSTANT_ALPHA, dali.BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA );
+ */
+void RendererApi::SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  Renderer renderer = GetRenderer( isolate, args );
+
+  int params[4];
+  bool foundAllParams(false);
+  V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 4, args, 0 );
+  if( foundAllParams )
+  {
+    renderer.SetBlendFunc( static_cast< Dali::BlendingFactor::Type>(params[0]),
+                           static_cast< Dali::BlendingFactor::Type>(params[1]),
+                           static_cast< Dali::BlendingFactor::Type>(params[2]),
+                           static_cast< Dali::BlendingFactor::Type>(params[3]) );
+  }
+  else
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid blendFunc parameter");
+  }
+}
+
+/**
+ * Query the pixel arithmetic used when the actor is blended.
+ *
+ * @for Renderer
+ * @method getBlendFunc
+ * @return {Object} Blend properties
+ * @example Blend properties object has 4 fields
+ *
+ *      blendProperties.sourceRgb // source rgb enum
+ *      blendProperties.destinationRgb // destination rgb enum
+ *      blendProperties.sourceAlpha source // alpha enum
+ *      blendProperties.destinationAlpha // destination alpha enum
+ */
+void RendererApi::GetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  // Pass by reference doesn't work in Javascript
+  // For now just return a vector 4...
+
+  BlendingFactor::Type srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha;
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  Renderer renderer = GetRenderer( isolate, args );
+
+  renderer.GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+
+  v8::Local<v8::Object> blendProperties = v8::Object::New( isolate );
+
+  blendProperties->Set( v8::String::NewFromUtf8( isolate, "sourceRgb" ),        v8::Integer::New( isolate, srcFactorRgb) );
+  blendProperties->Set( v8::String::NewFromUtf8( isolate, "destinationRgb" ),   v8::Integer::New( isolate, destFactorRgb ) );
+  blendProperties->Set( v8::String::NewFromUtf8( isolate, "sourceAlpha" ),      v8::Integer::New( isolate, srcFactorAlpha  ) );
+  blendProperties->Set( v8::String::NewFromUtf8( isolate, "destinationAlpha" ), v8::Integer::New( isolate, destFactorAlpha ) );
+
+  args.GetReturnValue().Set( blendProperties );
+}
+
+/**
+ * Specify the equation used when the actor is blended.
+ *
+ * @for Renderer
+ * @method setBlendEquation
+ * @param { integer } equationRgb The equation used for combining red, green, and blue components.
+ * @param { integer } equationAlpha The equation used for combining the alpha component.
+ * @example
+ *      // blend equation is one of the following
+ *      dali.BLEND_EQUATION_ADD
+ *      dali.BLEND_EQUATION_SUBTRACT
+ *      dali.BLEND_EQUATION_REVERSE_SUBTRACT
+ *
+ *      renderer.setBlendEquation( dali.BLEND_EQUATION_ADD, dali.BLEND_EQUATION_REVERSE_SUBTRACT );
+ */
+void RendererApi::SetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  Renderer renderer = GetRenderer( isolate, args );
+
+  int params[2];
+  bool foundAllParams(false);
+  V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 2, args, 0 );
+  if( foundAllParams )
+  {
+    renderer.SetBlendEquation( static_cast< BlendingEquation::Type>(params[0]), static_cast< BlendingEquation::Type>(params[1]) );
+  }
+  else
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid BlendEquation parameter");
+  }
+}
+
+/**
+ * Query the equation used when the actor is blended.
+ *
+ * @for Renderer
+ * @method getBlendEquation
+ * @return {Object} Blend equations
+ * @example Blend equations object has 2 fields
+ *
+ *      blendEquations.equationRgb // equation used for combining rgb components
+ *      blendEquations.equationAlpha // equation used for combining alpha components
+ */
+void RendererApi::GetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  // Pass by reference doesn't work in Javascript
+  // For now just return a vector 2...
+
+  BlendingEquation::Type equationRgb, equationAlpha;
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  Renderer renderer = GetRenderer( isolate, args );
+
+  renderer.GetBlendEquation( equationRgb, equationAlpha );
+
+  v8::Local<v8::Object> blendEquations = v8::Object::New( isolate );
+
+  blendEquations->Set( v8::String::NewFromUtf8( isolate, "equationRgb" ),   v8::Integer::New( isolate, equationRgb) );
+  blendEquations->Set( v8::String::NewFromUtf8( isolate, "equationAlpha" ), v8::Integer::New( isolate, equationAlpha ) );
+
+  args.GetReturnValue().Set( blendEquations );
+}
+
 } // namespace V8Plugin
 
 } // namespace Dali

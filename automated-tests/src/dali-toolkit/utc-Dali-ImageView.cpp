@@ -21,7 +21,6 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/rendering/material.h>
 #include <dali/devel-api/rendering/renderer.h>
 
 #include <test-native-image.h>
@@ -330,36 +329,36 @@ int UtcDaliImageViewSetGetProperty03(void)
   application.Render();
 
  // conventional alpha blending
-  Material material = imageView.GetRendererAt( 0 ).GetMaterial();
+  Renderer renderer = imageView.GetRendererAt( 0 );
   BlendingFactor::Type srcFactorRgb;
   BlendingFactor::Type destFactorRgb;
   BlendingFactor::Type srcFactorAlpha;
   BlendingFactor::Type destFactorAlpha;
-  material.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
+  renderer.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
   DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::SRC_ALPHA );
   DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
   DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );
   DALI_TEST_CHECK( destFactorAlpha == BlendingFactor::ONE_MINUS_SRC_ALPHA );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  float alphaBlendingUniform;
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uAlphaBlending", alphaBlendingUniform ) );
-  DALI_TEST_EQUALS( alphaBlendingUniform, 1.f, TEST_LOCATION );
+  Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  bool enable;
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
 
   // pre-multiplied alpha blending
   imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );
   application.SendNotification();
   application.Render();
 
-  material.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
+  renderer.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
   DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::ONE );
   DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
   DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );
   DALI_TEST_CHECK( destFactorAlpha == BlendingFactor::ONE );
 
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uAlphaBlending", alphaBlendingUniform ) );
-  DALI_TEST_EQUALS( alphaBlendingUniform, 0.f, TEST_LOCATION );
+  value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );
 
   END_TEST;
 }

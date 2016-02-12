@@ -107,7 +107,7 @@ void ControlRenderer::SetDepthIndex( float index )
   mImpl->mDepthIndex = index;
   if( mImpl->mRenderer )
   {
-    mImpl->mRenderer.SetDepthIndex( mImpl->mDepthIndex );
+    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
   }
 }
 
@@ -120,7 +120,7 @@ void ControlRenderer::SetOnStage( Actor& actor )
 {
   DoSetOnStage( actor );
 
-  mImpl->mRenderer.SetDepthIndex( mImpl->mDepthIndex );
+  mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
   actor.AddRenderer( mImpl->mRenderer );
   mImpl->mFlags |= Impl::IS_ON_STAGE;
 }
