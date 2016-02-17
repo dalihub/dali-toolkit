@@ -47,10 +47,11 @@
  + [9 Patch Image](@ref resource-9-patch)
  + [Buffer Image](@ref resource-buffer)
 
-### Control Base Class
+### Control Base Class & Renderers
  + [Background Feature](@ref background)
  + Keyboard Focus
  + [Accessibility](@ref accessibility)
+ + [Control Renderers](@ref control-renderers)
 
 ### UI Components
  + Buttons

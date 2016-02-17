@@ -100,7 +100,7 @@ The result of this process is an `(x, y)` target size to fit the image in the ne
 
 ![ ](../assets/img/image-scaling/workflow-2.png) ![ ](workflow-2.png)
   
-#### Fitting Mode
+#### Fitting Mode {#resourceimagescaling-fittingmode}
   
 DALi provides a number of strategies for mapping the pixels of an image onto the target box derived above.
 It provides a `FittingMode` enumeration to the developer to select a mapping or fitting approach.

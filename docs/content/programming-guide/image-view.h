@@ -42,7 +42,7 @@
  *
  * @code
  * Property::Map renderer;
- * renderer.Insert("rendererType","borderRenderer");
+ * renderer.Insert("rendererType","border");
  * renderer.Insert("borderColor",COLOR::RED);
  * renderer.Insert("borderSize",20.f);
  *

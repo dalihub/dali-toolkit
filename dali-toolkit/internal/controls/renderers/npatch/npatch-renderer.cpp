@@ -42,7 +42,7 @@ namespace Internal
 namespace
 {
 const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("nPatchRenderer");
+const char * const RENDERER_TYPE_VALUE("nPatch");
 
 const char * const IMAGE_URL_NAME("imageUrl");
 const char * const BORDER_ONLY("borderOnly");

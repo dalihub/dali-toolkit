@@ -44,7 +44,7 @@ namespace Internal
 namespace
 {
 const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("gradientRenderer");
+const char * const RENDERER_TYPE_VALUE("gradient");
 
 // properties: linear gradient
 const char * const GRADIENT_START_POSITION_NAME("gradientStartPosition"); // Property::VECTOR2

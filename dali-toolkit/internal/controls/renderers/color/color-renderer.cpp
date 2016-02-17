@@ -38,7 +38,7 @@ namespace Internal
 namespace
 {
 const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("colorRenderer");
+const char * const RENDERER_TYPE_VALUE("color");
 const char * const COLOR_NAME("blendColor");
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
