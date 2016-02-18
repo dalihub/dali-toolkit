@@ -891,7 +891,7 @@ Toolkit::Control Popup::CreateBacking()
   backing.SetName( "popupBacking" );
 
   // Must always be positioned top-left of stage, regardless of parent.
-  backing.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
+  backing.SetInheritPosition(false);
   backing.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
   // Always the full size of the stage.

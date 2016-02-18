@@ -464,7 +464,7 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   TestPageFactory factory(application);
   Vector2 size = Stage::GetCurrent().GetSize();
   PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
-  portraitView.SetPositionInheritanceMode( USE_PARENT_POSITION );
+  portraitView.SetParentOrigin( ParentOrigin::CENTER );
   Stage::GetCurrent().Add( portraitView );
 
   // Render and notify
@@ -584,7 +584,6 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   tet_infoline(" UtcDaliPageTurnLanscapeViewSignals ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-
   /***
    * -----------------
    * |               |
@@ -602,7 +601,7 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   TestPageFactory factory(application);
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, Vector2(stageSize.x*0.5f, stageSize.x*0.8f) );
-  landscapeView.SetPositionInheritanceMode( USE_PARENT_POSITION );;
+  landscapeView.SetParentOrigin( ParentOrigin::CENTER );
   Stage::GetCurrent().Add( landscapeView );
 
   // Render and notify

@@ -299,7 +299,7 @@ void EffectsView::OnInitialize()
   mCameraForChildren.SetParentOrigin(ParentOrigin::CENTER);
 
   mActorForChildren = ImageActor::New();
-  mActorForChildren.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mActorForChildren.SetParentOrigin( ParentOrigin::CENTER );
   mActorForChildren.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   mActorPostFilter = ImageActor::New();

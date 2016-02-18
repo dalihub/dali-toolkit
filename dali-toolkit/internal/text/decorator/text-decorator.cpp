@@ -637,7 +637,6 @@ struct Decorator::Impl : public ConnectionTracker
 
       mActiveLayer.SetParentOrigin( ParentOrigin::CENTER );
       mActiveLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-      mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
       // Add the active layer telling the controller it doesn't need clipping.
       mController.AddDecoration( mActiveLayer, false );

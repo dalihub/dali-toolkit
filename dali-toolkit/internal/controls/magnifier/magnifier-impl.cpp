@@ -255,7 +255,7 @@ void Magnifier::SetFrameVisibility(bool visible)
     Actor self(Self());
 
     mFrame = Actor::New( );
-    mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
+    mFrame.SetInheritPosition(false);
     mFrame.SetInheritScale(true);
     mFrame.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
