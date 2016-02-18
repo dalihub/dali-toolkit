@@ -416,15 +416,18 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     SetBidirectionalInfo( utf32Characters,
                           scripts,
                           lineBreakInfo,
+                          startIndex,
+                          requestedNumberOfCharacters,
                           bidirectionalInfo );
 
     if( 0u != bidirectionalInfo.Count() )
     {
       // Only set the character directions if there is right to left characters.
       Vector<CharacterDirection>& directions = mLogicalModel->mCharacterDirections;
-      directions.Resize( numberOfCharacters );
-
       GetCharactersDirection( bidirectionalInfo,
+                              numberOfCharacters,
+                              startIndex,
+                              requestedNumberOfCharacters,
                               directions );
 
       // This paragraph has right to left text. Some characters may need to be mirrored.
@@ -433,6 +436,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       textMirrored = GetMirroredText( utf32Characters,
                                       directions,
                                       bidirectionalInfo,
+                                      startIndex,
+                                      requestedNumberOfCharacters,
                                       mirroredUtf32Characters );
     }
     else

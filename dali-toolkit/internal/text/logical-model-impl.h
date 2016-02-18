@@ -96,9 +96,13 @@ public:
    *
    * @param[in] bidirectionalInfo Pointer to a buffer with all the bidirectional info runs.
    * @param[in] numberOfRuns The number of bidirectional info runs.
+   * @param[in] startIndex Character index from where the conversion tables are set.
+   * @param[in] numberOfCharacters The number of characters.
    */
   void SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
-                              Length numberOfRuns );
+                              Length numberOfRuns,
+                              CharacterIndex startIndex,
+                              Length numberOfCharacters );
 
   /**
    * @brief Retrieves the logical character index for the given visual character index.
@@ -108,6 +112,8 @@ public:
    * @return The logical character index.
    */
   CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
+
+  // Text style.
 
   /**
    * @brief Updates the text's style runs with the added or removed text.
