@@ -675,6 +675,10 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
       {
         daliPropertyValue = Dali::Property::Value(  v8Value->Int32Value()  ) ;//static_cast<int>( V8Utils::GetNumberValue( isolate, v8Value) ));
       }
+      else if( V8Utils::IsStringPrimitiveOrObject( v8Value) ) // Take string as value for properties that internally convert the string to an enum
+      {
+        daliPropertyValue = Dali::Property::Value( V8Utils::GetStringValue( isolate, v8Value) );
+      }
       break;
     }
     case Dali::Property::STRING:

@@ -15,6 +15,7 @@ SET(TC_SOURCES
    utc-Dali-ConfirmationPopup.cpp
    utc-Dali-CubeTransitionEffect.cpp
    utc-Dali-EffectsView.cpp
+   utc-Dali-FlexContainer.cpp
    utc-Dali-GaussianBlurView.cpp
    utc-Dali-ImageView.cpp
    utc-Dali-JsonParser.cpp
