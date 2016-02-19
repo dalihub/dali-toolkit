@@ -140,14 +140,14 @@ public:
   static ItemView New(ItemFactory& factory);
 
   /**
-   * @brief Downcast an Object handle to ItemView.
+   * @brief Downcast a handle to ItemView handle.
    *
    * If handle points to a ItemView the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a ItemView or an uninitialized handle
+   * @return A handle to a ItemView or an uninitialized handle
    */
   static ItemView DownCast( BaseHandle handle );
 
@@ -330,7 +330,9 @@ public:
   void ScrollToItem(ItemId itemId, float durationSeconds);
 
   /**
-   * @brief Set the interval between refreshes. When the layout-position of items is changed by this interval,
+   * @brief Set the interval between refreshes.
+   *
+   * When the layout-position of items is changed by this interval,
    * new items are requested from ItemFactory.
    *
    * @SINCE_1_0.0
@@ -448,7 +450,7 @@ public:
   void ReplaceItems(const ItemContainer& replacementItems, float durationSeconds);
 
   /**
-   * @brief Set the parent origin of the items
+   * @brief Set the parent origin of the items.
    *
    * A relayout will occur for all the items if the parent origin is different than the current one.
    * @SINCE_1_0.0
@@ -457,7 +459,7 @@ public:
   void SetItemsParentOrigin( const Vector3& parentOrigin );
 
   /**
-   * @brief Get the parent origin of the items
+   * @brief Get the parent origin of the items.
    *
    * @SINCE_1_0.0
    * @return The current parent origin of the items
@@ -465,7 +467,7 @@ public:
   Vector3 GetItemsParentOrigin() const;
 
   /**
-   * @brief Set the anchor point of the items
+   * @brief Set the anchor point of the items.
    *
    * A relayout will occur for all the items if the anchor point is different than the current one.
    * @SINCE_1_0.0
@@ -474,7 +476,7 @@ public:
   void SetItemsAnchorPoint( const Vector3& anchorPoint );
 
   /**
-   * @brief Get the anchor point of the items
+   * @brief Get the anchor point of the items.
    *
    * @SINCE_1_0.0
    * @return The current anchor point of the items

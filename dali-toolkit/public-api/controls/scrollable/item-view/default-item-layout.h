@@ -31,6 +31,10 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief Default item layout mode.
+ * @SINCE_1_0.0
+ */
 namespace DefaultItemLayout
 {
 
@@ -43,7 +47,7 @@ enum Type
 };
 
 /**
- * @brief Creates a built-in default item-layout
+ * @brief Creates a built-in default item-layout.
  *
  * @SINCE_1_0.0
  * @param[in]  type  The type of layout required.

@@ -33,11 +33,13 @@ namespace Toolkit
  * If the \e border parameter is set to \e true, the Dali::ImageActor's style is set to Dali::ImageActor::STYLE_NINE_PATCH.
  *
  * @SINCE_1_0.0
+ * @remarks This is an experimental feature and might not be supported in the next release. We do recommend not to use it.
  * @param[in] color The ImageActor's color.
  * @param[in] border If \e true, a border is created. By default, the value is set to \e false.
  * @param[in] borderColor The color for the ImageActor's border. By default, the value is set to Color::WHITE.
  * @param[in] borderSize The size for the ImageActor's border. By default, the value is set to 1 pixel. It supports under 10 pixel for clear result of gl blend
  * @return a handle to the new ImageActor
+ * @see Control
  */
 DALI_IMPORT_API ImageActor CreateSolidColorActor( const Vector4& color, bool border = false, const Vector4& borderColor = Color::WHITE, const unsigned int borderSize = 1 );
 } // namespace Toolkit

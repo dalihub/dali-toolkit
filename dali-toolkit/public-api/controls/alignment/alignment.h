@@ -55,12 +55,12 @@ public:
    */
   enum Type
   {
-    HorizontalLeft   = 1,
-    HorizontalCenter = 2,
-    HorizontalRight  = 4,
-    VerticalTop      = 8,
-    VerticalCenter   = 16,
-    VerticalBottom   = 32
+    HorizontalLeft   = 1, ///< Horizontal left alignment @SINCE_1_0.0
+    HorizontalCenter = 2, ///< Horizontal center alignment @SINCE_1_0.0
+    HorizontalRight  = 4, ///< Horizontal right alignment @SINCE_1_0.0
+    VerticalTop      = 8, ///< Vertical top alignment @SINCE_1_0.0
+    VerticalCenter   = 16, ///< Vertical center alignment @SINCE_1_0.0
+    VerticalBottom   = 32 ///< Vertical bottom alignment @SINCE_1_0.0
   };
 
   /**
@@ -153,14 +153,14 @@ public:
   ~Alignment();
 
   /**
-   * @brief Downcast an Object handle to Alignment.
+   * @brief Downcast a handle to Alignment handle.
    *
    * If handle points to a Alignment the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a Alignment or an uninitialized handle
+   * @return A handle to a Alignment or an uninitialized handle
    */
   static Alignment DownCast( BaseHandle handle );
 
@@ -169,7 +169,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param [in] type The new alignment option.
-   * @note there should only be one horizontal and one vertical policy
+   * @note There should only be one horizontal and one vertical policy.
    */
   void SetAlignmentType( Type type );
 

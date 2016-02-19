@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 class KeyboardFocusManager;
 }
 /**
- * @addtogroup dali_toolkit_focus_manager
+ * @addtogroup dali_toolkit_managers
  * @{
  */
 
@@ -134,7 +134,7 @@ public:
    * @brief Clear the focus from the current focused actor if any, so
    * that no actor is focused in the focus chain.
    *
-   * It will emit focus changed signal without current focused actor
+   * It will emit focus changed signal without current focused actor.
    * @SINCE_1_0.0
    * @pre The KeyboardFocusManager has been initialized.
    */

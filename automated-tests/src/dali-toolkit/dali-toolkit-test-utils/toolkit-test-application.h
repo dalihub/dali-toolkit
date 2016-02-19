@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 #include "toolkit-orientation.h"
 
@@ -40,6 +41,13 @@ public:
   : TestApplication( false, surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi )
   {
     Initialize();
+
+    // set the DPI value for font rendering
+    Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
+    if( fontClient )
+    {
+      fontClient.SetDpi( mDpi.x, mDpi.y );
+    }
   }
 
   ~ToolkitTestApplication()

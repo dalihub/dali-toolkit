@@ -33,6 +33,7 @@ namespace Toolkit
 
 /**
  * @brief ItemFactory is for providing actors to ItemView.
+ *
  * Each actor is identified by a unique ID, and has a linear order from 0 to GetNumberOfItems()-1.
  * @SINCE_1_0.0
  */
@@ -76,7 +77,7 @@ public:
   virtual void ItemReleased(unsigned int itemId, Actor actor) {};
 
   /**
-   * @brief Retrieve the extension for this control
+   * @brief Retrieve the extension for this control.
    *
    * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise

@@ -43,16 +43,15 @@ class CheckBoxButton;
  *
  * By default a CheckBoxButton emits a Button::ClickedSignal() signal when the button changes its state to selected or unselected.
  *
- * The button's appearance could be modified by setting images or actors with CheckBoxButton::SetBackgroundImage,
- * CheckBoxButton::SetSelectedImage, CheckBoxButton::SetDisabledBackgroundImage and CheckBoxButton::SetDisabledSelectedImage.
+ * The button's appearance could be modified by Button::SetUnselectedImage, Button::SetBackgroundImage,
+ * Button::SetSelectedImage, Button::SetSelectedBackgroundImage, Button::SetDisabledBackgroundImage,
+ * Button::SetDisabledImage, and Button::SetDisabledSelectedImage.
  *
  * When the button is not disabled, if it's not selected it only shows the \e background image. The \e selected image is shown over the
  * \e background image when the box is selected (\e background image is not replaced by \e selected image).
  *
  * When the button is disabled, \e background image and \e selected image are replaced by \e disabled images.
  *
- * CheckBoxButton doesn't have a text. However, a Dali::Toolkit::TableView with a Dali::TextActor or a Dali::Toolkit::TextView
- * and a CheckBoxButton could be used instead.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API CheckBoxButton : public Button
@@ -60,7 +59,7 @@ class DALI_IMPORT_API CheckBoxButton : public Button
 public:
 
   /**
-   * @brief Create an uninitialized CheckBoxButton; this can be initialized with CheckBoxButton::New()
+   * @brief Create an uninitialized CheckBoxButton; this can be initialized with CheckBoxButton::New().
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
    */
@@ -94,7 +93,9 @@ public:
   static CheckBoxButton New();
 
   /**
-   * @brief Downcast an Object handle to CheckBoxButton. If handle points to a CheckBoxButton the
+   * @brief Downcast a handle to CheckBoxButton handle.
+   *
+   * If handle points to a CheckBoxButton the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object

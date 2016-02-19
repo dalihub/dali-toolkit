@@ -41,6 +41,7 @@ class ScrollViewPagePathEffect;
 
 /**
  * @brief ScrollView Page Path Effect.
+ *
  * This effect causes Actors to follow a given path. The opacity of the actor will be 0.0 at
  * the beginning of the path and will go to 1.0 as it is approximating to half of the path to return
  * to 0.0 at the end of the path
@@ -86,7 +87,9 @@ public:
   ScrollViewPagePathEffect();
 
   /**
-   * @brief Downcast an Object handle to ScrollViewPagePathEffect. If handle points to a ScrollViewPagePathEffect the
+   * @brief Downcast a handle to ScrollViewPagePathEffect handle.
+   *
+   * If handle points to a ScrollViewPagePathEffect the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object

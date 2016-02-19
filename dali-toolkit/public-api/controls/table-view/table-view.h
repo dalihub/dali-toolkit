@@ -207,7 +207,9 @@ public:
   static TableView New( unsigned int initialRows, unsigned int initialColumns );
 
   /**
-   * @brief Downcast an Object handle to TableView. If handle points to a TableView the
+   * @brief Downcast a handle to TableView handle.
+   *
+   * If handle points to a TableView the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -228,20 +230,20 @@ public:
 
   /**
    * @brief Returns a child from the given layout position
-   * Note! if there is no child in this position this method returns an uninitialized
-   * Actor handle
    * @SINCE_1_0.0
    * @param[in] position in the table
    * @return child that was in the cell or an uninitialized handle
+   * @note If there is no child in this position this method returns an uninitialized.
+   * Actor handle
    */
   Actor GetChildAt( CellPosition position );
 
   /**
    * @brief Removes a child from the given layout position
-   * Note! if there is no child in this position this method does nothing
    * @SINCE_1_0.0
    * @param[in] position for the child to remove
    * @return child that was removed or an uninitialized handle
+   * @note If there is no child in this position this method does nothing.
    */
   Actor RemoveChildAt( CellPosition position );
 
@@ -301,24 +303,26 @@ public:
   void DeleteColumn( unsigned int columnIndex, std::vector<Actor>& removed );
 
   /**
-   * @brief Resize the TableView. Note! if the new size is smaller than old,
-   * superfluous actors get removed. If you want to relayout removed children,
-   * use the variant that returns the removed Actors and reinsert them into the table
-   * If an actor spans to a removed row or column it gets removed from the table
+   * @brief Resize the TableView.
    * @SINCE_1_0.0
    * @param[in] rows for the table
    * @param[in] columns for the table
+   * @note If the new size is smaller than old,
+   * superfluous actors get removed. If you want to relayout removed children,
+   * use the variant that returns the removed Actors and reinsert them into the table.
+   * If an actor spans to a removed row or column it gets removed from the table.
    */
   void Resize( unsigned int rows, unsigned int columns );
 
   /**
-   * @brief Resize the TableView. Note! if the new size is smaller than old,
-   * superfluous actors get removed.
-   * If an actor spans to a removed row or column it gets removed from the table
+   * @brief Resize the TableView.
    * @SINCE_1_0.0
    * @param[in] rows for the table
    * @param[in] columns for the table
    * @param[out] removed actor handles
+   * @note If the new size is smaller than old,
+   * superfluous actors get removed.
+   * If an actor spans to a removed row or column it gets removed from the table.
    */
   void Resize( unsigned int rows, unsigned int columns, std::vector<Actor>& removed );
 
@@ -330,6 +334,7 @@ public:
   void SetCellPadding( Size padding );
 
   /**
+   * @brief Get the current padding as width and height.
    * @SINCE_1_0.0
    * @return the current padding as width and height
    */
@@ -381,10 +386,10 @@ public:
 
   /**
    * @brief Gets a row's fixed height.
-   * Note! The returned value is valid if it has been set before.
    * @SINCE_1_0.0
    * @return height in world coordinate units.
    * @pre The row rowIndex must exist.
+   * @note The returned value is valid if it has been set before.
    */
   float GetFixedHeight( unsigned int rowIndex ) const;
 
@@ -401,10 +406,10 @@ public:
 
   /**
    * @brief Gets a row's relative height.
-   * Note! The returned value is valid if it has been set before.
    * @SINCE_1_0.0
    * @return height in percentage units, between 0.0f and 1.0f.
    * @pre The row rowIndex must exist.
+   * @note The returned value is valid if it has been set before.
    */
   float GetRelativeHeight( unsigned int rowIndex ) const;
 
@@ -420,10 +425,10 @@ public:
 
   /**
    * @brief Gets a column's fixed width.
-   * Note! The returned value is valid if it has been set before.
    * @SINCE_1_0.0
    * @return width in world coordinate units.
    * @pre The column columnIndex must exist.
+   * @note The returned value is valid if it has been set before.
    */
   float GetFixedWidth( unsigned int columnIndex ) const;
 
@@ -440,20 +445,22 @@ public:
 
   /**
    * @brief Gets a column's relative width.
-   * Note! The returned value is valid if it has been set before.
    * @SINCE_1_0.0
    * @return width in percentage units, between 0.0f and 1.0f.
    * @pre The column columnIndex must exist.
+   * @note The returned value is valid if it has been set before.
    */
   float GetRelativeWidth( unsigned int columnIndex ) const;
 
   /**
+   * @brief Gets the amount of rows in the table.
    * @SINCE_1_0.0
    * @return the amount of rows in the table
    */
   unsigned int GetRows();
 
   /**
+   * @brief Gets the amount of columns in the table.
    * @SINCE_1_0.0
    * @return the amount of columns in the table
    */

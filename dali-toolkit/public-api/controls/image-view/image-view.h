@@ -182,7 +182,7 @@ public:
   ImageView& operator=( const ImageView& imageView );
 
   /**
-   * @brief Downcast an Object handle to ImageView.
+   * @brief Downcast a handle to ImageView handle.
    *
    * If handle points to a ImageView the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
@@ -228,6 +228,7 @@ public:
    * @brief Gets the Image
    *
    * @SINCE_1_0.0
+   * @remarks Calls to this method should be avoided as this may return an empty handle if the image has not been created yet.
    * @return The Image currently set to this ImageView
    */
   Image GetImage() const;

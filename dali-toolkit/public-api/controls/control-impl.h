@@ -509,7 +509,7 @@ public: // API for derived classes to override
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond
-   * the accessibility zoom action
+   * the accessibility zoom action.
    *
    * @SINCE_1_0.0
    * @return true if the zoom action has been consumed by this control
@@ -660,7 +660,7 @@ private:
 };
 
 /**
- * @brief Get implementation from the handle
+ * @brief Get implementation from the handle.
  *
  * @SINCE_1_0.0
  * @param handle
@@ -670,7 +670,7 @@ private:
 DALI_IMPORT_API Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
 
 /**
- * @brief Get implementation from the handle
+ * @brief Get implementation from the handle.
  *
  * @SINCE_1_0.0
  * @param handle
