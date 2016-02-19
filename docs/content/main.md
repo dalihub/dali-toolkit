@@ -84,11 +84,9 @@
  + [Overview](@ref viewing-modes)
 
 ### Extending DALi
- + Control Base Class Services
- + How to write Custom UI Components
+ + [How to write Custom UI Components](@ref creating-custom-controls)
   + [Size Negotiation for Controls](@ref size-negotiation-controls)
   + [Type Registration](@ref type-registration)
-  + How to make Controls Scriptable
  + [Automated Tests](@ref auto_testing)
  + [Programming Guide](@ref documentationguide)
  + [JavaScript Wrapping Guide for DALi developers](@ref javascriptwrapping)
