@@ -77,6 +77,11 @@ bool ImageAtlas::Upload( Vector4& textureRect,
   return GetImplementation(*this).Upload( textureRect, url, size, fittingMode, orientationCorrection );
 }
 
+bool ImageAtlas::Upload( Vector4& textureRect, PixelDataPtr pixelData )
+{
+  return GetImplementation(*this).Upload( textureRect, pixelData );
+}
+
 void ImageAtlas::Remove(const Vector4& textureRect)
 {
   GetImplementation(*this).Remove( textureRect );

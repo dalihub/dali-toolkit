@@ -138,6 +138,26 @@ bool ImageAtlas::Upload( Vector4& textureRect,
   return false;
 }
 
+bool ImageAtlas::Upload( Vector4& textureRect, PixelDataPtr pixelData )
+{
+  unsigned int packPositionX = 0;
+  unsigned int packPositionY = 0;
+  if( mPacker.Pack( pixelData->GetWidth(), pixelData->GetHeight(), packPositionX, packPositionY ) )
+  {
+    mAtlas.Upload( pixelData, packPositionX, packPositionY );
+
+    // apply the half pixel correction
+    textureRect.x = ( static_cast<float>( packPositionX ) +0.5f ) / mWidth; // left
+    textureRect.y = ( static_cast<float>( packPositionY ) +0.5f ) / mHeight; // right
+    textureRect.z = ( static_cast<float>( packPositionX + pixelData->GetWidth() )-0.5f ) / mWidth; // right
+    textureRect.w = ( static_cast<float>( packPositionY + pixelData->GetHeight() )-0.5f ) / mHeight;// bottom
+
+    return true;
+  }
+
+  return false;
+}
+
 void ImageAtlas::Remove( const Vector4& textureRect )
 {
   mPacker.DeleteBlock( static_cast<SizeType>(textureRect.x*mWidth),

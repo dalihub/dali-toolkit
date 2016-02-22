@@ -22,6 +22,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
 
 namespace Dali
 {
@@ -33,11 +34,13 @@ namespace Internal
 {
 
 RendererFactoryCache::RendererFactoryCache()
+: mSvgRasterizeThread( NULL )
 {
 }
 
 RendererFactoryCache::~RendererFactoryCache()
 {
+  SvgRasterizeThread::TerminateThread( mSvgRasterizeThread );
 }
 
 Geometry RendererFactoryCache::GetGeometry( GeometryType type )
@@ -174,6 +177,24 @@ Geometry RendererFactoryCache::CreateQuadGeometry()
   geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
+}
+
+SvgRasterizeThread* RendererFactoryCache::GetSVGRasterizationThread()
+{
+  if( !mSvgRasterizeThread )
+  {
+    mSvgRasterizeThread = new SvgRasterizeThread( new EventThreadCallback( MakeCallback( this, &RendererFactoryCache::ApplyRasterizedSVGToSampler ) ) );
+    mSvgRasterizeThread->Start();
+  }
+  return mSvgRasterizeThread;
+}
+
+void RendererFactoryCache::ApplyRasterizedSVGToSampler()
+{
+  while( RasterizingTaskPtr task = mSvgRasterizeThread->NextCompletedTask() )
+  {
+    task->GetSvgRenderer()->ApplyRasterizedImage( task->GetPixelData() );
+  }
 }
 
 } // namespace Internal

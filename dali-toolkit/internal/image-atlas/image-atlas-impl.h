@@ -67,13 +67,18 @@ public:
   void SetBrokenImage( const std::string& brokenImageUrl );
 
   /**
-   * @copydoc Toolkit::ImageAtlas::Upload
+   * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, const std::string&, ImageDimensions,FittingMode::Type, bool )
    */
   bool Upload( Vector4& textureRect,
                const std::string& url,
                ImageDimensions size,
                FittingMode::Type fittingMode,
                bool orientationCorrection);
+
+  /**
+   * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, PixelDataPtr )
+   */
+  bool Upload( Vector4& textureRect, PixelDataPtr pixelData );
 
   /**
    * @copydoc Toolkit::ImageAtlas::Remove

@@ -207,7 +207,6 @@ ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasMana
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
-  mIsAlphaPreMultiplied( false ),
   mNativeFragmentShaderCode( ),
   mNativeImageFlag( false )
 {
@@ -546,7 +545,6 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
     InitializeRenderer( mImage );
   }
 
-  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, mIsAlphaPreMultiplied);
 }
 
 void ImageRenderer::DoSetOffStage( Actor& actor )
@@ -556,7 +554,6 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   {
     actor.RemoveRenderer( mImpl->mRenderer );
     CleanCache(mImageUrl);
-
     mImage.Reset();
   }
   else
@@ -793,15 +790,6 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
     mDesiredSize = ImageDimensions();
     mFittingMode = FittingMode::DEFAULT;
     mSamplingMode = SamplingMode::DEFAULT;
-  }
-}
-
-void ImageRenderer::EnablePreMultipliedAlpha( bool preMultipled )
-{
-  mIsAlphaPreMultiplied = preMultipled;
-  if( mImpl->mRenderer )
-  {
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, mIsAlphaPreMultiplied);
   }
 }
 

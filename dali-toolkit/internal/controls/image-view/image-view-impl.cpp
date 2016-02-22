@@ -12,7 +12,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
-#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 
 namespace Dali
 {
@@ -131,17 +130,13 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
     mUrl = url;
 
-    if( size.GetWidth() == 0u && size.GetHeight() == 0u )
-    {
-      mImageSize = ResourceImage::GetImageSize( mUrl );
-    }
-    else
+    if( size.GetWidth() != 0u && size.GetHeight() != 0u )
     {
       mImageSize = size;
     }
 
     Actor self = Self();
-    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl, mImageSize );
+    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl, size );
 
     RelayoutRequest();
   }
@@ -149,22 +144,19 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
 void ImageView::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  mPremultipledAlphaEnabled = preMultipled;
-
   if( mRenderer )
   {
-    ControlRenderer& rendererImpl = GetImplementation( mRenderer );
-    if (&typeid( rendererImpl ) == &typeid(ImageRenderer) )
-    {
-      ImageRenderer* imageRenderer = static_cast<ImageRenderer*>( &rendererImpl );
-      imageRenderer->EnablePreMultipliedAlpha( preMultipled );
-    }
+     GetImplementation( mRenderer ).EnablePreMultipliedAlpha( preMultipled );
   }
 }
 
 bool ImageView::IsPreMultipliedAlphaEnabled() const
 {
-  return mPremultipledAlphaEnabled;
+  if( mRenderer )
+  {
+    return GetImplementation( mRenderer ).IsPreMultipliedAlphaEnabled();
+  }
+  return false;
 }
 
 void ImageView::SetDepthIndex( int depthIndex )
@@ -177,8 +169,14 @@ void ImageView::SetDepthIndex( int depthIndex )
 
 Vector3 ImageView::GetNaturalSize()
 {
-  Vector3 size;
+  if( mRenderer )
+  {
+    Vector2 rendererNaturalSize;
+    mRenderer.GetNaturalSize( rendererNaturalSize );
+    return Vector3( rendererNaturalSize );
+  }
 
+  Vector3 size;
   size.x = mImageSize.GetWidth();
   size.y = mImageSize.GetHeight();
 
@@ -244,6 +242,15 @@ void ImageView::OnStageDisconnection()
   }
 
   Control::OnStageDisconnection();
+}
+
+void ImageView::OnSizeSet( const Vector3& targetSize )
+{
+  if( mRenderer )
+  {
+    Vector2 size( targetSize );
+    mRenderer.SetSize( size );
+  }
 }
 
 ///////////////////////////////////////////////////////////

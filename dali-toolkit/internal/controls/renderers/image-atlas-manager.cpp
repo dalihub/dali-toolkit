@@ -79,19 +79,37 @@ Material ImageAtlasManager::Add( Vector4& textureRect,
     i++;
   }
 
-  Toolkit::ImageAtlas newAtlas = Toolkit::ImageAtlas::New( DEFAULT_ATLAS_SIZE, DEFAULT_ATLAS_SIZE  );
-  if( !mBrokenImageUrl.empty() )
+  CreateNewAtlas();
+  mAtlasList.back().Upload( textureRect, url, size, fittingMode, orientationCorrection );
+  return mMaterialList.back();
+}
+
+Material ImageAtlasManager::Add( Vector4& textureRect,
+                                 PixelDataPtr pixelData )
+{
+
+  // big buffer, atlasing is not applied
+  if( static_cast<uint32_t>(pixelData->GetWidth()) * static_cast<uint32_t>(pixelData->GetHeight()) > MAX_ITEM_AREA
+      || pixelData->GetWidth()>DEFAULT_ATLAS_SIZE
+      || pixelData->GetHeight()>DEFAULT_ATLAS_SIZE )
   {
-    newAtlas.SetBrokenImage( mBrokenImageUrl );
+    return Material();
   }
-  mAtlasList.push_back( newAtlas );
-  Material newMaterial = Material::New( mShader );
-  newMaterial.AddTexture( newAtlas.GetAtlas(), mTextureUniformName );
-  mMaterialList.push_back( newMaterial );
 
-  newAtlas.Upload( textureRect, url, size, fittingMode, orientationCorrection );
+  unsigned int i = 0;
+  for( AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
+  {
+    if( (*iter).Upload( textureRect, pixelData ) )
+    {
+      return mMaterialList[i];
+    }
+    i++;
+  }
 
-  return newMaterial;
+  CreateNewAtlas();
+  mAtlasList.back().Upload( textureRect, pixelData );
+  return mMaterialList.back();
+
 }
 
 void ImageAtlasManager::Remove( Material material, const Vector4& textureRect )
@@ -114,6 +132,19 @@ void ImageAtlasManager::SetBrokenImage( const std::string& brokenImageUrl )
   {
     mBrokenImageUrl = brokenImageUrl;
   }
+}
+
+void ImageAtlasManager::CreateNewAtlas()
+{
+  Toolkit::ImageAtlas newAtlas = Toolkit::ImageAtlas::New( DEFAULT_ATLAS_SIZE, DEFAULT_ATLAS_SIZE  );
+  if( !mBrokenImageUrl.empty() )
+  {
+    newAtlas.SetBrokenImage( mBrokenImageUrl );
+  }
+  mAtlasList.push_back( newAtlas );
+  Material newMaterial = Material::New( mShader );
+  newMaterial.AddTexture( newAtlas.GetAtlas(), mTextureUniformName );
+  mMaterialList.push_back( newMaterial );
 }
 
 } // namespace Internal
