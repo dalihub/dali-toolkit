@@ -54,7 +54,7 @@ inline ShaderEffect CreateDissolveLocalEffect( unsigned int numberOfDimples )
       "varying float vPercentage;\n"
       "void main()\n"
       "{\n"
-      "  vec4 position = uModelView * vec4( aPosition, 1.0 );\n"
+      "  vec4 position = uModelView * vec4( aPosition*uSize.xy, 0.0,  1.0 );\n"
       "  float percentage = 0.0;\n"
       "  for( int i=0; i<NUMBER_OF_DIMPLE; ++i )\n"
       "  {\n"
@@ -63,7 +63,7 @@ inline ShaderEffect CreateDissolveLocalEffect( unsigned int numberOfDimples )
       "  }\n"
       "  vPercentage = clamp( percentage, 0.0, 1.0 );\n"
       "  gl_Position = uProjection * position;\n"
-      "  vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );\n"
+      "  vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
       "}\n");
   vertexShaderStringStream << vertexShader;
 

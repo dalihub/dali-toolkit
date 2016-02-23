@@ -55,10 +55,10 @@ inline ShaderEffect CreateIrisEffect()
       "\n"
       "void main()\n"
       "{\n"
-      "    mediump vec4 world = uModelView * vec4(aPosition, 1.0);\n"
+      "    mediump vec4 world = uModelView * vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
       "    gl_Position = uProjection * world;\n"
       "    \n"
-      "    vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );\n"
+      "    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );;\n"
       "    vRelativePosition = vTexCoord - uCenter;\n"
       "}\n");
 

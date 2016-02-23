@@ -117,11 +117,11 @@ inline ShaderEffect CreateSoftButtonEffect(SoftButtonEffectType type)
 
       "void main()\n"
       "{\n"
-      "  vTexCoord = mix( sTextureRect.xy, sTextureRect.zw, aTexCoord );\n"
+      "  vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5) );\n;\n"
       // Get the rect coords of the effect region in -1..1 range, i.e. circle centred around the center of the rect
       // Done in the vertex shader itself to make use of gl interpolation for varying.
       "  vCentredCoord = vec2( ( (vTexCoord.x - uEffectRegion.x)/(uEffectRegion.z - uEffectRegion.x) * 2.0 - 1.0 ), ( (vTexCoord.y - uEffectRegion.y)/(uEffectRegion.w - uEffectRegion.y) * 2.0 - 1.0  ) );\n"
-      "  gl_Position = uMvpMatrix * vec4(aPosition, 1.0);\n"
+      "  gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy, 0.0, 1.0);\n"
       "}\n";
 
   std::string fragmentSourceFixed;
