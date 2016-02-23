@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,10 @@ namespace Internal
 class Replacement;
 
 extern Animation CreateAnimation(const TreeNode& child, const Replacement& replacements, const Dali::Actor searchRoot, Builder* const builder );
-extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
-extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
-extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
-extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
+extern void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value );
+extern void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
+extern bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
+extern bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
 extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
@@ -298,7 +298,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
         Property::Type type = propertyObject.GetPropertyType(index);
 
         Property::Value value;
-        if( !SetPropertyFromNode( keyChild.second, type, value, constant ) )
+        if( !DeterminePropertyFromNode( keyChild.second, type, value, constant ) )
         {
           // verbose as this might not be a problem
           // eg parentOrigin can be a string which is picked up later
@@ -677,7 +677,7 @@ ShaderEffect Builder::GetShaderEffect( const std::string &name, const Replacemen
       if( OptionalChild effect = IsChild( *effects, name ) )
       {
         Dali::Property::Value propertyMap(Property::MAP);
-        if( SetPropertyFromNode( *effect, Property::MAP, propertyMap, constant ) )
+        if( DeterminePropertyFromNode( *effect, Property::MAP, propertyMap, constant ) )
         {
           ret = Dali::Scripting::NewShaderEffect( propertyMap );
           mShaderEffectLut[ name ] = ret;
@@ -713,7 +713,7 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
       if( OptionalChild image = IsChild( *images, name ) )
       {
         Dali::Property::Value property(Property::MAP);
-        if( SetPropertyFromNode( *image, Property::MAP, property, constant ) )
+        if( DeterminePropertyFromNode( *image, Property::MAP, property, constant ) )
         {
           Property::Map* map = property.GetMap();
 
@@ -752,7 +752,7 @@ Path Builder::GetPath( const std::string& name )
         if( OptionalChild pointsProperty = IsChild( *path, "points") )
         {
           Dali::Property::Value points(Property::ARRAY);
-          if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+          if( DeterminePropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
           {
             ret = Path::New();
             ret.SetProperty( Path::Property::POINTS, points);
@@ -761,7 +761,7 @@ Path Builder::GetPath( const std::string& name )
             if( OptionalChild pointsProperty = IsChild( *path, "controlPoints") )
             {
               Dali::Property::Value points(Property::ARRAY);
-              if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+              if( DeterminePropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
               {
                 ret.SetProperty( Path::Property::CONTROL_POINTS, points);
               }
@@ -826,7 +826,7 @@ PathConstrainer Builder::GetPathConstrainer( const std::string& name )
         if( OptionalChild pointsProperty = IsChild( *pathConstrainer, "points") )
         {
           Dali::Property::Value points(Property::ARRAY);
-          if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+          if( DeterminePropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
           {
             ret = PathConstrainer::New();
             ret.SetProperty( PathConstrainer::Property::POINTS, points);
@@ -835,7 +835,7 @@ PathConstrainer Builder::GetPathConstrainer( const std::string& name )
             if( OptionalChild pointsProperty = IsChild( *pathConstrainer, "controlPoints") )
             {
               Dali::Property::Value points(Property::ARRAY);
-              if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+              if( DeterminePropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
               {
                 ret.SetProperty( PathConstrainer::Property::CONTROL_POINTS, points);
               }
@@ -935,7 +935,7 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer( const std::string& name )
         if( OptionalChild pointsProperty = IsChild( *linearConstrainer, "value") )
         {
           Dali::Property::Value points(Property::ARRAY);
-          if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+          if( DeterminePropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
           {
             ret = Dali::LinearConstrainer::New();
             ret.SetProperty( LinearConstrainer::Property::VALUE, points);
@@ -944,7 +944,7 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer( const std::string& name )
             if( OptionalChild pointsProperty = IsChild( *linearConstrainer, "progress") )
             {
               Dali::Property::Value points(Property::ARRAY);
-              if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+              if( DeterminePropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
               {
                 ret.SetProperty( LinearConstrainer::Property::PROGRESS, points);
               }
@@ -1117,7 +1117,6 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
                       parser.GetErrorDescription().c_str() );
 
     DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
-
   }
   else
   {
@@ -1155,7 +1154,6 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
   }
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
-
 }
 
 void Builder::AddConstants( const Property::Map& map )
@@ -1202,15 +1200,8 @@ void Builder::LoadConstants( const TreeNode& root, Property::Map& intoMap )
 #if defined(DEBUG_ENABLED)
         DALI_SCRIPT_VERBOSE("Constant set from json '%s'\n", (*iter).second.GetName());
 #endif
-        if( SetPropertyFromNode( (*iter).second, property, replacer ) )
-        {
-          intoMap[ (*iter).second.GetName() ] = property;
-        }
-        else
-        {
-          DALI_SCRIPT_WARNING("Cannot convert property for constant %s\n",
-                              (*iter).second.GetName() == NULL ? "no name?" : (*iter).second.GetName());
-        }
+        DeterminePropertyFromNode( (*iter).second, property, replacer );
+        intoMap[ (*iter).second.GetName() ] = property;
       }
     }
   }
@@ -1359,9 +1350,9 @@ Builder::Builder()
   mParser = Dali::Toolkit::JsonParser::New();
 
   Property::Map defaultDirs;
-  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]  = DALI_IMAGE_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]  = DALI_SOUND_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ] = DALI_STYLE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]       = DALI_IMAGE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]       = DALI_SOUND_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ]       = DALI_STYLE_DIR;
   defaultDirs[ TOKEN_STRING(DALI_STYLE_IMAGE_DIR) ] = DALI_STYLE_IMAGE_DIR;
 
   AddConstants( defaultDirs );

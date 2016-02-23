@@ -13,6 +13,10 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/actors/actor-api.cpp \
    $(v8_plugin_dir)/actors/layer-api.cpp \
    $(v8_plugin_dir)/actors/camera-actor-api.cpp \
+   $(v8_plugin_dir)/controls/control-wrapper.cpp \
+   $(v8_plugin_dir)/controls/item-factory-wrapper.cpp \
+   $(v8_plugin_dir)/controls/item-view-api.cpp \
+   $(v8_plugin_dir)/controls/scroll-view-api.cpp \
    $(v8_plugin_dir)/constants/constants-wrapper.cpp \
    $(v8_plugin_dir)/animation/animation-api.cpp \
    $(v8_plugin_dir)/animation/animation-wrapper.cpp \

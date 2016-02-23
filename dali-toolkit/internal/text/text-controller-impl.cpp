@@ -368,17 +368,18 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
     if( validateFonts )
     {
-      if( 0u == validFonts.Count() )
-      {
-        // Copy the requested font defaults received via the property system.
-        // These may not be valid i.e. may not contain glyphs for the necessary scripts.
-        GetDefaultFonts( validFonts, numberOfCharacters );
-      }
+      // Validate the fonts set through the mark-up string.
+      Vector<FontDescriptionRun>& fontDescriptionRuns = mLogicalModel->mFontDescriptionRuns;
+
+      // Get the default font id.
+      const FontId defaultFontId = ( NULL == mFontDefaults ) ? 0u : mFontDefaults->GetFontId( mFontClient );
 
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
       multilanguageSupport.ValidateFonts( utf32Characters,
                                           scripts,
+                                          fontDescriptionRuns,
+                                          defaultFontId,
                                           validFonts );
     }
   }
@@ -411,19 +412,20 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
     if( 0u != bidirectionalInfo.Count() )
     {
-      // This paragraph has right to left text. Some characters may need to be mirrored.
-      // TODO: consider if the mirrored string can be stored as well.
-
-      textMirrored = GetMirroredText( utf32Characters,
-                                      mirroredUtf32Characters,
-                                      bidirectionalInfo );
-
       // Only set the character directions if there is right to left characters.
       Vector<CharacterDirection>& directions = mLogicalModel->mCharacterDirections;
       directions.Resize( numberOfCharacters );
 
       GetCharactersDirection( bidirectionalInfo,
                               directions );
+
+      // This paragraph has right to left text. Some characters may need to be mirrored.
+      // TODO: consider if the mirrored string can be stored as well.
+
+      textMirrored = GetMirroredText( utf32Characters,
+                                      directions,
+                                      bidirectionalInfo,
+                                      mirroredUtf32Characters );
     }
     else
     {
@@ -517,22 +519,37 @@ bool Controller::Impl::UpdateModelStyle( OperationsMask operationsRequired )
 
 void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
 {
-  // Set the default text's color.
+  // Sets the default text's color.
   inputStyle.textColor = mTextColor;
-}
 
-void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
-{
+  // Sets the default font's family name, weight, width, slant and size.
   if( mFontDefaults )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::GetDefaultFonts font family(%s)\n", mFontDefaults->mFontDescription.family.c_str() );
-    FontRun fontRun;
-    fontRun.characterRun.characterIndex = 0;
-    fontRun.characterRun.numberOfCharacters = numberOfCharacters;
-    fontRun.fontId = mFontDefaults->GetFontId( mFontClient );
-    fontRun.isDefault = true;
+    inputStyle.familyName = mFontDefaults->mFontDescription.family;
+    inputStyle.weight = mFontDefaults->mFontDescription.weight;
+    inputStyle.width = mFontDefaults->mFontDescription.width;
+    inputStyle.slant = mFontDefaults->mFontDescription.slant;
+    inputStyle.size = mFontDefaults->mDefaultPointSize;
 
-    fonts.PushBack( fontRun );
+    inputStyle.familyDefined = mFontDefaults->familyDefined;
+    inputStyle.weightDefined = mFontDefaults->weightDefined;
+    inputStyle.widthDefined = mFontDefaults->widthDefined;
+    inputStyle.slantDefined = mFontDefaults->slantDefined;
+    inputStyle.sizeDefined = mFontDefaults->sizeDefined;
+  }
+  else
+  {
+    inputStyle.familyName.clear();
+    inputStyle.weight = TextAbstraction::FontWeight::NORMAL;
+    inputStyle.width = TextAbstraction::FontWidth::NORMAL;
+    inputStyle.slant = TextAbstraction::FontSlant::NORMAL;
+    inputStyle.size = 0.f;
+
+    inputStyle.familyDefined = false;
+    inputStyle.weightDefined = false;
+    inputStyle.widthDefined = false;
+    inputStyle.slantDefined = false;
+    inputStyle.sizeDefined = false;
   }
 }
 
@@ -1157,9 +1174,15 @@ void Controller::Impl::RepositionSelectionHandles()
   const Vector2 primaryPosition = primaryCursorInfo.primaryPosition + offset;
   const Vector2 secondaryPosition = secondaryCursorInfo.primaryPosition + offset;
 
-  mEventData->mDecorator->SetPosition( LEFT_SELECTION_HANDLE, primaryPosition.x, primaryPosition.y, primaryCursorInfo.lineHeight );
+  mEventData->mDecorator->SetPosition( LEFT_SELECTION_HANDLE,
+                                       primaryPosition.x,
+                                       primaryCursorInfo.lineOffset + offset.y,
+                                       primaryCursorInfo.lineHeight );
 
-  mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
+  mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE,
+                                       secondaryPosition.x,
+                                       secondaryCursorInfo.lineOffset + offset.y,
+                                       secondaryCursorInfo.lineHeight );
 
   // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
   mEventData->mPrimaryCursorPosition = ( indicesSwapped ) ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
@@ -1642,6 +1665,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     // If there is no font's family set, use the default font.
     // Use the current alignment to place the cursor at the beginning, center or end of the box.
 
+    cursorInfo.lineOffset = 0.f;
     cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
@@ -1721,7 +1745,8 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
   cursorInfo.isSecondaryCursor = ( !isLastPosition && ( isCurrentRightToLeft != isNextRightToLeft ) ) ||
                                  ( isLastPosition && ( isRightToLeftParagraph != isCurrentRightToLeft ) );
 
-  // Set the line height.
+  // Set the line offset and height.
+  cursorInfo.lineOffset = 0.f;
   cursorInfo.lineHeight = line.ascender + -line.descender;
 
   // Calculate the primary cursor.
@@ -1934,7 +1959,7 @@ void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
   // Sets the grab handle position.
   mEventData->mDecorator->SetPosition( GRAB_HANDLE,
                                        cursorPosition.x,
-                                       cursorPosition.y,
+                                       cursorInfo.lineOffset + offset.y,
                                        cursorInfo.lineHeight );
 
   if( cursorInfo.isSecondaryCursor )
@@ -1976,12 +2001,13 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
     return;
   }
 
-  const Vector2 cursorPosition = cursorInfo.primaryPosition + mEventData->mScrollPosition + mAlignmentOffset;
+  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
 
   // Sets the handle's position.
   mEventData->mDecorator->SetPosition( handleType,
                                        cursorPosition.x,
-                                       cursorPosition.y,
+                                       cursorInfo.lineOffset + offset.y,
                                        cursorInfo.lineHeight );
 
   // If selection handle at start of the text and other at end of the text then all text is selected.

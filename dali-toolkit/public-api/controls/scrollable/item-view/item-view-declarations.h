@@ -33,17 +33,17 @@ namespace Toolkit
  * @{
  */
 
-typedef unsigned int ItemId; ///< Unique identity for each item in the view.
+typedef unsigned int ItemId; ///< Unique identity for each item in the view. @SINCE_1_0.0
 
-typedef std::vector<ItemId> ItemIdContainer;
-typedef ItemIdContainer::iterator ItemIdIter;
-typedef ItemIdContainer::const_iterator ConstItemIdIter;
+typedef std::vector<ItemId> ItemIdContainer;  ///< Item id container type @SINCE_1_0.0
+typedef ItemIdContainer::iterator ItemIdIter; ///< Item id iterator type @SINCE_1_0.0
+typedef ItemIdContainer::const_iterator ConstItemIdIter;  ///< Item id const iterator type @SINCE_1_0.0
 
-typedef std::pair<ItemId, Actor> Item;
+typedef std::pair<ItemId, Actor> Item;  ///< Item type @SINCE_1_0.0
 
-typedef std::vector<Item> ItemContainer;
-typedef ItemContainer::iterator ItemIter;
-typedef ItemContainer::const_iterator ConstItemIter;
+typedef std::vector<Item> ItemContainer;  ///< Item container type @SINCE_1_0.0
+typedef ItemContainer::iterator ItemIter; ///< Item iterator type @SINCE_1_0.0
+typedef ItemContainer::const_iterator ConstItemIter;  ///< Item const iterator type @SINCE_1_0.0
 
 class ItemView;
 class ItemLayout;

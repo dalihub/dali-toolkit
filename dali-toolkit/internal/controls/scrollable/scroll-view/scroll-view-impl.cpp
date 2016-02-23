@@ -244,6 +244,11 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollView, Toolkit::Scrollable, Create )
 
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrapEnabled",                BOOLEAN,   WRAP_ENABLED                )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panningEnabled",             BOOLEAN,   PANNING_ENABLED             )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "axisAutoLockEnabled",        BOOLEAN,   AXIS_AUTO_LOCK_ENABLED      )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wheelScrollDistanceStep",    VECTOR2,   WHEEL_SCROLL_DISTANCE_STEP  )
+
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPosition",  VECTOR2, SCROLL_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPrePosition",   VECTOR2, SCROLL_PRE_POSITION)
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scrollPrePositionX",    SCROLL_PRE_POSITION_X, SCROLL_PRE_POSITION, 0)
@@ -966,6 +971,11 @@ void ScrollView::UpdatePropertyDomain()
   }
 }
 
+bool ScrollView::GetScrollSensitive()
+{
+  return mSensitive;
+}
+
 void ScrollView::SetScrollSensitive(bool sensitive)
 {
   Actor self = Self();
@@ -1011,9 +1021,19 @@ void ScrollView::SetSnapOvershootAlphaFunction(AlphaFunction alpha)
   mSnapOvershootAlphaFunction = alpha;
 }
 
+float ScrollView::GetSnapOvershootDuration()
+{
+  return mSnapOvershootDuration;
+}
+
 void ScrollView::SetSnapOvershootDuration(float duration)
 {
   mSnapOvershootDuration = duration;
+}
+
+bool ScrollView::GetActorAutoSnap()
+{
+  return mActorAutoSnapEnabled;
 }
 
 void ScrollView::SetActorAutoSnap(bool enable)
@@ -2819,6 +2839,76 @@ void ScrollView::SetInternalConstraints()
   constraint.AddSource( Source( self, Toolkit::ScrollView::Property::WRAP ) );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
+}
+
+void ScrollView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::ScrollView scrollView = Toolkit::ScrollView::DownCast( Dali::BaseHandle( object ) );
+
+  if( scrollView )
+  {
+    ScrollView& scrollViewImpl( GetImpl( scrollView ) );
+    switch( index )
+    {
+      case Toolkit::ScrollView::Property::WRAP_ENABLED:
+      {
+        scrollViewImpl.SetWrapMode( value.Get<bool>() );
+        break;
+      }
+      case Toolkit::ScrollView::Property::PANNING_ENABLED:
+      {
+        scrollViewImpl.SetScrollSensitive( value.Get<bool>() );
+        break;
+      }
+      case Toolkit::ScrollView::Property::AXIS_AUTO_LOCK_ENABLED:
+      {
+        scrollViewImpl.SetAxisAutoLock( value.Get<bool>() );
+        break;
+      }
+      case Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP:
+      {
+        scrollViewImpl.SetWheelScrollDistanceStep( value.Get<Vector2>() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value ScrollView::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::ScrollView scrollView = Toolkit::ScrollView::DownCast( Dali::BaseHandle( object ) );
+
+  if( scrollView )
+  {
+    ScrollView& scrollViewImpl( GetImpl( scrollView ) );
+    switch( index )
+    {
+      case Toolkit::ScrollView::Property::WRAP_ENABLED:
+      {
+        value = scrollViewImpl.GetWrapMode();
+        break;
+      }
+      case Toolkit::ScrollView::Property::PANNING_ENABLED:
+      {
+        value = scrollViewImpl.GetScrollSensitive();
+        break;
+      }
+      case Toolkit::ScrollView::Property::AXIS_AUTO_LOCK_ENABLED:
+      {
+        value = scrollViewImpl.GetAxisAutoLock();
+        break;
+      }
+      case Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP:
+      {
+        value = scrollViewImpl.GetWheelScrollDistanceStep();
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 } // namespace Internal

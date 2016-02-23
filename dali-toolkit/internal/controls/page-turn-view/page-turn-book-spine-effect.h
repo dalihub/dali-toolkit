@@ -61,11 +61,11 @@ inline ShaderEffect CreatePageTurnBookSpineEffect()
       {\n
       // flip the image horizontally by changing the x component of the texture coordinate
         if( uIsBackImageVisible == 1.0 )\n
-          gl_FragColor = texture2D( sTexture, vec2( uTextureRect.p+uTextureRect.s-vTexCoord.x, vTexCoord.y ) ) * uColor; \n
+          gl_FragColor = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) ) * uColor; \n
         else\n
         gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
       // display book spine, a stripe of shadowed texture
-        float pixelPos = (vTexCoord.x-uTextureRect.s)*uPageWidth; \n
+        float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageWidth; \n
         if(pixelPos < uSpineShadowParameter.x) \n
         {\n
           float x = pixelPos - uSpineShadowParameter.x;\n

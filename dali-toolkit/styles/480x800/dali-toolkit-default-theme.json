@@ -131,6 +131,25 @@ distributing this software or its derivatives.
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":120.0,
       "overshootSize":[480.0,42.0]
+    },
+    "texteditor":
+    {
+      "pointSize":18,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":1,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+    },
+    "popup":
+    {
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
+    },
+    "confirmationpopup":
+    {
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
     }
   }
 }

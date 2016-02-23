@@ -21,6 +21,7 @@
 // EXTERNAL HEADER
 #include <cstring> // for strncasecmp
 #include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/images/native-image.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADER
@@ -71,15 +72,20 @@ const char * const NO_FILTER("noFilter");
 const char * const DONT_CARE("dontCare");
 
 const std::string TEXTURE_UNIFORM_NAME = "sTexture";
-const std::string TEXTURE_RECT_UNIFORM_NAME = "uTextureRect";
+const std::string ATLAS_RECT_UNIFORM_NAME = "uAtlasRect";
+const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
+
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
+const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump vec4 uTextureRect;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform mediump vec4 pixelArea;
+  varying mediump vec2 vTexCoord;\n
   \n
   void main()\n
   {\n
@@ -87,7 +93,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vertexPosition.xyz *= uSize;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
-    vTexCoord = mix( uTextureRect.xy, uTextureRect.zw, aPosition + vec2(0.5));\n
+    vTexCoord = mix( uAtlasRect.xy, uAtlasRect.zw, pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) ) );\n
     gl_Position = vertexPosition;\n
   }\n
 );
@@ -102,6 +108,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
   }\n
 );
+
 
 Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned int >& indices )
 {
@@ -197,10 +204,12 @@ Geometry CreateGeometry( RendererFactoryCache& factoryCache, ImageDimensions gri
 ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
 : ControlRenderer( factoryCache ),
   mAtlasManager( atlasManager ),
-  mTextureRect( FULL_TEXTURE_RECT ),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
-  mSamplingMode( SamplingMode::DEFAULT )
+  mSamplingMode( SamplingMode::DEFAULT ),
+  mIsAlphaPreMultiplied( false ),
+  mNativeFragmentShaderCode( ),
+  mNativeImageFlag( false )
 {
 }
 
@@ -329,6 +338,13 @@ void ImageRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap
     }
   }
 
+  NativeImage nativeImage = NativeImage::DownCast( mImage );
+
+  if( nativeImage )
+  {
+    SetNativeFragmentShaderCode( nativeImage );
+  }
+
   // if actor is on stage, create new renderer and apply to actor
   if( actor && actor.OnStage() )
   {
@@ -380,9 +396,17 @@ Renderer ImageRenderer::CreateRenderer() const
   Geometry geometry;
   Shader shader;
 
+  // If mImage is nativeImage with custom sampler or prefix, mNativeFragmentShaderCode will be applied.
+  // Renderer can't be shared between NativeImage and other image types.
+  if( !mNativeFragmentShaderCode.empty() )
+  {
+    return CreateNativeImageRenderer();
+  }
+
   if( !mImpl->mCustomShader )
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+
     shader = GetImageShader(mFactoryCache);
   }
   else
@@ -397,6 +421,48 @@ Renderer ImageRenderer::CreateRenderer() const
       shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
                              mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER : mImpl->mCustomShader->mFragmentShader,
                              mImpl->mCustomShader->mHints );
+      if( mImpl->mCustomShader->mVertexShader.empty() )
+      {
+        shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      }
+    }
+  }
+
+  Material material = Material::New( shader );
+  return Renderer::New( geometry, material );
+}
+
+Renderer ImageRenderer::CreateNativeImageRenderer() const
+{
+  Geometry geometry;
+  Shader shader;
+
+  if( !mImpl->mCustomShader )
+  {
+    geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+
+    shader  = Shader::New( VERTEX_SHADER, mNativeFragmentShaderCode );
+    shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+  }
+  else
+  {
+    geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
+    if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
+    {
+      shader  = Shader::New( VERTEX_SHADER, mNativeFragmentShaderCode );
+    }
+    else
+    {
+      shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
+                             mNativeFragmentShaderCode,
+                             mImpl->mCustomShader->mHints );
+      if( mImpl->mCustomShader->mVertexShader.empty() )
+      {
+        shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      }
     }
   }
 
@@ -421,20 +487,19 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
     mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
     if( !mImpl->mRenderer )
     {
-      Material material = mAtlasManager.Add(mTextureRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      Vector4 atlasRect;
+      Material material = mAtlasManager.Add(atlasRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
       if( material )
       {
         Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
         mImpl->mRenderer = Renderer::New( geometry, material );
-        SetTextureRectUniform(mTextureRect);
+        mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       }
       else // big image, atlasing is not applied
       {
         mImpl->mRenderer = CreateRenderer();
-        mTextureRect = FULL_TEXTURE_RECT;
-        SetTextureRectUniform(mTextureRect);
 
-        ResourceImage image = Dali::ResourceImage::New( imageUrl );
+        ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
         image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
         Material material = mImpl->mRenderer.GetMaterial();
         material.AddTexture( image, TEXTURE_UNIFORM_NAME );
@@ -442,11 +507,7 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
 
       mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
     }
-    else
-    {
-      Property::Value textureRect = mImpl->mRenderer.GetProperty( mImpl->mRenderer.GetPropertyIndex(TEXTURE_RECT_UNIFORM_NAME) );
-      textureRect.Get( mTextureRect );
-    }
+
     mImpl->mFlags |= Impl::IS_FROM_CACHE;
   }
   else
@@ -458,15 +519,6 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
     ResourceImage resourceImage = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
     resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
     ApplyImageToSampler( resourceImage );
-
-    // custom vertex shader does not need texture rect uniform
-    if( mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty() )
-    {
-      return;
-    }
-
-    mTextureRect = FULL_TEXTURE_RECT;
-    SetTextureRectUniform( mTextureRect );
   }
 }
 
@@ -479,13 +531,6 @@ void ImageRenderer::InitializeRenderer( const Image& image )
   if( image )
   {
     ApplyImageToSampler( image );
-  }
-
-  // default shader or custom shader with the default image vertex shader
-  if( !mImpl->mCustomShader || mImpl->mCustomShader->mVertexShader.empty() )
-  {
-    mTextureRect = FULL_TEXTURE_RECT;
-    SetTextureRectUniform( mTextureRect );
   }
 }
 
@@ -500,6 +545,8 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer( mImage );
   }
+
+  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, mIsAlphaPreMultiplied);
 }
 
 void ImageRenderer::DoSetOffStage( Actor& actor )
@@ -622,6 +669,8 @@ Shader ImageRenderer::GetImageShader( RendererFactoryCache& factoryCache )
   {
     shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     factoryCache.SaveShader( RendererFactoryCache::IMAGE_SHADER, shader );
+    shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }
   return shader;
 }
@@ -672,11 +721,35 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
 {
   if( mImage != image )
   {
+    NativeImage newNativeImage = NativeImage::DownCast( image );
+    bool newRendererFlag = true;
+
+    if( newNativeImage && !mNativeImageFlag )
+    {
+      SetNativeFragmentShaderCode( newNativeImage );
+    }
+
+    if( ( newNativeImage && mNativeImageFlag ) || ( !newNativeImage && !mNativeImageFlag ) )
+    {
+      newRendererFlag = false;
+    }
+
+    if( newNativeImage )
+    {
+      mNativeImageFlag = true;
+    }
+    else
+    {
+      mNativeFragmentShaderCode.clear();
+      mNativeImageFlag = false;
+    }
+
     mImage = image;
 
     if( mImpl->mRenderer )
     {
-      if( GetIsFromCache() ) // if renderer is from cache, remove the old one
+      // if renderer is from cache, remove the old one, and create new renderer
+      if( GetIsFromCache() )
       {
         //remove old renderer
         if( actor )
@@ -696,6 +769,20 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
           SetOnStage(actor);
         }
       }
+      // if input image is nativeImage and mImage is regular image or the reverse, remove the old one, and create new renderer
+      else if( newRendererFlag )
+      {
+        //remove old renderer
+        if( actor )
+        {
+          actor.RemoveRenderer( mImpl->mRenderer );
+        }
+
+        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
+        {
+          SetOnStage(actor);
+        }
+      }
       else // if renderer is not from cache, reuse the same renderer and only change the texture
       {
         ApplyImageToSampler( image );
@@ -706,6 +793,15 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
     mDesiredSize = ImageDimensions();
     mFittingMode = FittingMode::DEFAULT;
     mSamplingMode = SamplingMode::DEFAULT;
+  }
+}
+
+void ImageRenderer::EnablePreMultipliedAlpha( bool preMultipled )
+{
+  mIsAlphaPreMultiplied = preMultipled;
+  if( mImpl->mRenderer )
+  {
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, mIsAlphaPreMultiplied);
   }
 }
 
@@ -740,23 +836,50 @@ void ImageRenderer::OnImageLoaded( ResourceImage image )
   }
 }
 
-void ImageRenderer::SetTextureRectUniform( const Vector4& textureRect )
-{
-  if( mImpl->mRenderer )
-  {
-    // Register/Set property.
-    mImpl->mRenderer.RegisterProperty( TEXTURE_RECT_UNIFORM_NAME, textureRect );
-  }
-}
-
 void ImageRenderer::CleanCache(const std::string& url)
 {
   Material material = mImpl->mRenderer.GetMaterial();
-  mImpl->mRenderer.Reset();
-  if( mFactoryCache.CleanRendererCache( url ) )
+
+  Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
+  Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+  if( index != Property::INVALID_INDEX )
   {
-    mAtlasManager.Remove( material, mTextureRect );
+    Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
+    atlasRectValue.Get( atlasRect );
   }
+
+  mImpl->mRenderer.Reset();
+  if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
+  {
+    mAtlasManager.Remove( material, atlasRect );
+  }
+}
+
+void ImageRenderer::SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage )
+{
+  const char* fragmentPreFix = nativeImage.GetCustomFragmentPreFix();
+  const char* customSamplerTypename = nativeImage.GetCustomSamplerTypename();
+
+  if( fragmentPreFix )
+  {
+    mNativeFragmentShaderCode = fragmentPreFix;
+    mNativeFragmentShaderCode += "\n";
+  }
+
+  if( mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty() )
+  {
+    mNativeFragmentShaderCode += mImpl->mCustomShader->mFragmentShader;
+  }
+  else
+  {
+    mNativeFragmentShaderCode += FRAGMENT_SHADER;
+  }
+
+  if( customSamplerTypename )
+  {
+    mNativeFragmentShaderCode.replace( mNativeFragmentShaderCode.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
+  }
+
 }
 
 } // namespace Internal

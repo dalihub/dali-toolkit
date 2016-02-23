@@ -61,7 +61,7 @@ class PageTurnView;
  * | pagePanStarted   | @ref PagePanStartedSignal()   |
  * | pagePanFinished  | @ref PagePanFinishedSignal()  |
  *
- * @since DALi 1.1.4
+ * @SINCE_1_1.4
  */
 class DALI_IMPORT_API PageTurnView : public Control
 {
@@ -69,42 +69,46 @@ public:
 
   /**
    * @brief The start and end property ranges for this control.
+   * @SINCE_1_1.4
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.4
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_1.4
   };
 
   struct Property
   {
     enum
     {
-      PAGE_SIZE = PROPERTY_START_INDEX, ///< name "pageSize",        type Vector2
-      CURRENT_PAGE_ID,                  ///< name "currentPageId",   type Integer
+      PAGE_SIZE = PROPERTY_START_INDEX, ///< name "pageSize",        type Vector2 @SINCE_1_1.4
+      CURRENT_PAGE_ID,                  ///< name "currentPageId",   type Integer @SINCE_1_1.4
 
       /**
        * The two values are the major&minor radius (in pixels) to form an ellipse shape.
        * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow.
        */
-      SPINE_SHADOW,                     ///< name "spineShadow",     type Vector2
+      SPINE_SHADOW,                     ///< name "spineShadow",     type Vector2 @SINCE_1_1.4
     };
   };
 
   /**
-   * Creates an empty PageTurnView handle. Only derived versions can be instantiated.
+   * @brief Creates an empty PageTurnView handle. Only derived versions can be instantiated.
    * Calling member function with an uninitialized handle is not allowed.
+   * @SINCE_1_1.4
    */
   PageTurnView();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor. Creates another handle that points to the same real object
+   * @SINCE_1_1.4
    * @param[in] handle Handle to copy from
    */
   PageTurnView( const PageTurnView& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator. Changes this handle to point to another real object
+   * @SINCE_1_1.4
    */
   PageTurnView& operator=( const PageTurnView& handle );
 
@@ -112,13 +116,15 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_1.4
    */
   ~PageTurnView();
 
   /**
-   * Downcast an Object handle to PageTurnView.
+   * @brief Downcast an Object handle to PageTurnView.
    * If handle points to an PageTurnView the downcast produces valid handle.
    * If not the returned handle is left uninitialized.
+   * @SINCE_1_1.4
    * @param[in] handle Handle to an object
    * @return handle to a PageTurnView or an uninitialized handle
    */
@@ -131,41 +137,45 @@ public: //Signal
   typedef Signal< void ( PageTurnView ) > PagePanSignal;
 
   /**
-   * Signal emitted when a page has started to turn over.
+   * @brief Signal emitted when a page has started to turn over.
    * A callback of the following type may be connected:
    * @code
    *   void YourCallBackName( PageTurnView pageTurnView, unsigned int pageIndex, bool isTurningForward );
    * @endcode
+   * @SINCE_1_1.4
    * @return The signal to connect to
    */
   PageTurnSignal& PageTurnStartedSignal();
 
   /**
-   * Signal emitted when a page has finished turning over.
+   * @brief Signal emitted when a page has finished turning over.
    * A callback of the following type may be connected:
    * @code
    *   void YourCallBackName( PageTurnView pageTurnView, unsigned int pageIndex, bool isTurningForward );
    * @endcode
+   * @SINCE_1_1.4
    * @return The signal to connect to
    */
   PageTurnSignal& PageTurnFinishedSignal();
 
   /**
-   * Signal emitted when a page pan has commenced
+   * @brief Signal emitted when a page pan has commenced
    * A callback of the following type may be connected:
    * @code
    *   void YourCallBackName( PageTurnView pageTurnView );
    * @endcode
+   * @SINCE_1_1.4
    * @return The signal to connect to
    */
   PagePanSignal& PagePanStartedSignal();
 
   /**
-   * Signal emitted when a page pan has finished
+   * @brief Signal emitted when a page pan has finished
    * A callback of the following type may be connected:
    * @code
    *   void YourCallBackName( PageTurnView pageTurnView );
    * @endcode
+   * @SINCE_1_1.4
    * @return The signal to connect to
    */
   PagePanSignal& PagePanFinishedSignal();
@@ -173,13 +183,15 @@ public: //Signal
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   * @SINCE_1_1.4
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL PageTurnView(Internal::PageTurnView& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @SINCE_1_1.4
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL PageTurnView(Dali::Internal::CustomActor* internal);

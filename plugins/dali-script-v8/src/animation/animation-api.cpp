@@ -20,7 +20,6 @@
 #include "path-wrapper.h"
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 #include <dali/integration-api/debug.h>
 
 
@@ -38,85 +37,11 @@ namespace V8Plugin
 namespace // un named namespace
 {
 
-// @todo think about alternative ways of passing around
-struct AlphaFuncStruct
-{
-  const char* const name;
-  AlphaFunction alphaFunc;
-};
-/**
- * Contains a list of alpha functions that can be used.
- */
-const AlphaFuncStruct AlphaFunctionTable[]=
-{
-
- {"default"               , AlphaFunction::DEFAULT              },
- {"linear"                , AlphaFunction::LINEAR               },
- {"reverse"               , AlphaFunction::REVERSE              },
-
- {"easeInSquare"          , AlphaFunction::EASE_IN_SQUARE       },
- {"easeOutSquare"         , AlphaFunction::EASE_OUT_SQUARE      },
-
- {"easeIn"                , AlphaFunction::EASE_IN               },
- {"easeOut"               , AlphaFunction::EASE_OUT              },
- {"easeInOut"             , AlphaFunction::EASE_IN_OUT           },
-
- {"easeInSine"            , AlphaFunction::EASE_IN_SINE          },
- {"easeOutSine"           , AlphaFunction::EASE_OUT_SINE         },
- {"easeInOutSine"         , AlphaFunction::EASE_IN_OUT_SINE      },
-
- {"bounce"                , AlphaFunction::BOUNCE                },
- {"sin"                   , AlphaFunction::SIN                   },
- {"easeOutBack"           , AlphaFunction::EASE_OUT_BACK         },
-
-};
-const unsigned int AlphaFunctionTableCount = sizeof(AlphaFunctionTable)/sizeof(AlphaFunctionTable[0]);
-const char* const DEFAULT_ALPHA_NAME = "default";
-static AlphaFunction DEFAULT_ALPHA_FUNCTION = AlphaFunction::DEFAULT;
-
-
-
-AlphaFunction GetAlphaFunction( const std::string& alphaFuncName )
-{
-  // This will normally get called just a few times during the application, so no point in doing anything clever
-  for( unsigned int i = 0; i < AlphaFunctionTableCount; i++)
-  {
-    const AlphaFuncStruct& alphaStruct( AlphaFunctionTable[i] );
-
-    if( std::strcmp( alphaStruct.name , alphaFuncName.c_str() ) == 0 )
-    {
-      return alphaStruct.alphaFunc;
-    }
-  }
-
-  DALI_LOG_ERROR("Failed to find alpha func |%s| \n", alphaFuncName.c_str() );
-  return DEFAULT_ALPHA_FUNCTION;
-}
-
-const char* const GetAlphaFunctionName(  AlphaFunction alphaFunc )
-{
-  // This may get called 3 times during the application, so no point
-  // in doing anything clever
-
-  for( unsigned int i = 0; i < AlphaFunctionTableCount; i++)
-  {
-    const AlphaFuncStruct& alphaStruct( AlphaFunctionTable[i] );
-
-
-    if( alphaStruct.alphaFunc.GetBuiltinFunction()  == alphaFunc.GetBuiltinFunction() )
-    {
-      return alphaStruct.name;
-    }
-  }
-  return "default";
-}
-
-
 struct AnimationParameters
 {
   AnimationParameters( const Animation& anim)
   : propertyIndex( Property::INVALID_INDEX  ),
-    alphaFunction( DEFAULT_ALPHA_FUNCTION),
+    alphaFunction( AlphaFunction::DEFAULT),
     delay( 0.f ),
     duration(anim.GetDuration()),
     optionsFound( false )
@@ -150,11 +75,10 @@ void GetAnimationOptions( v8::Isolate* isolate,
   {
     v8::Local<v8::Object> obj = options->ToObject();
     v8::Local<v8::Value> alphaValue = obj->Get( v8::String::NewFromUtf8( isolate, "alpha" ) );
-    if( alphaValue->IsString() )
+    if( alphaValue->IsUint32() )
     {
       animParams.optionsFound = true;
-      std::string alphaName = V8Utils::v8StringToStdString( alphaValue );
-      animParams.alphaFunction = GetAlphaFunction( alphaName );
+      animParams.alphaFunction = static_cast<AlphaFunction::BuiltinFunction>(alphaValue->ToUint32()->Value());
     }
 
     v8::Local<v8::Value> delayValue = obj->Get( v8::String::NewFromUtf8( isolate, "delay" ) );
@@ -225,10 +149,9 @@ KeyFrames GetKeyFrames( v8::Isolate* isolate, v8::Local<v8::Value > keyFrameArra
 
     // get keyframe.alpha
     v8::Handle<v8::Value> alphaValue = keyFrameObject->Get(v8::String::NewFromUtf8( isolate, "alpha"));
-    if( alphaValue->IsString() )
+    if( alphaValue->IsUint32() )
     {
-      std::string alphaName = V8Utils::v8StringToStdString( alphaValue );
-      AlphaFunction alphaFunction = GetAlphaFunction( alphaName );
+      AlphaFunction alphaFunction = static_cast<AlphaFunction::BuiltinFunction>(alphaValue->ToUint32()->Value());
       keyframes.Add( progress->NumberValue(), value, alphaFunction );
     }
     else
@@ -529,7 +452,7 @@ void AnimationApi::GetDisconnectAction( const v8::FunctionCallbackInfo< v8::Valu
  * Set the default alpha function for an animation.
  * @method setDefaultAlphaFunction
  * @for Animation
- * @param {string} alpha function
+ * @param {Integer} alpha function
  */
 void AnimationApi::SetDefaultAlphaFunction( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
@@ -539,23 +462,22 @@ void AnimationApi::SetDefaultAlphaFunction( const v8::FunctionCallbackInfo< v8::
   Animation anim = GetAnimation( isolate, args );
 
   bool found( false );
-  std::string alphaFunc = V8Utils::GetStringParameter( PARAMETER_0, found, isolate, args );
+  int alphaFunc = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0 );
   if( !found )
   {
     DALI_SCRIPT_EXCEPTION( isolate, "bad parameter" );
   }
   else
   {
-    AlphaFunction func = GetAlphaFunction( alphaFunc );
+    AlphaFunction func = static_cast<AlphaFunction::BuiltinFunction>(alphaFunc);
     anim.SetDefaultAlphaFunction( func );
   }
-
 }
 /**
  * Get the default alpha function for an animation.
  * @method getDefaultAlphaFunction
  * @for Animation
- * @return {string} alpha function
+ * @return {Integer} alpha function
  */
 void AnimationApi::GetDefaultAlphaFunction( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
@@ -564,10 +486,10 @@ void AnimationApi::GetDefaultAlphaFunction( const v8::FunctionCallbackInfo<v8::V
 
   Animation anim = GetAnimation( isolate, args );
 
-  std::string alphaName = GetAlphaFunctionName(  anim.GetDefaultAlphaFunction() );
+  AlphaFunction alphaFunc = anim.GetDefaultAlphaFunction();
 
 
-  args.GetReturnValue().Set( v8::String::NewFromUtf8( isolate, alphaName.c_str() ) );
+  args.GetReturnValue().Set( v8::Integer::New( isolate, alphaFunc.GetBuiltinFunction() ) );
 }
 
 /**

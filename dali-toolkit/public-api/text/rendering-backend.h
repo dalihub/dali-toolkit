@@ -30,7 +30,7 @@ namespace Text
 // The type of text renderer required
 enum RenderingType
 {
-  RENDERING_SHARED_ATLAS ///< A bitmap-based solution where renderers can share a texture atlas
+  RENDERING_SHARED_ATLAS ///< A bitmap-based solution where renderers can share a texture atlas @SINCE_1_0.0
 };
 
 const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;

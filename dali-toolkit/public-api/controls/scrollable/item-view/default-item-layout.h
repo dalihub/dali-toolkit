@@ -31,20 +31,25 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief Default item layout mode.
+ * @SINCE_1_0.0
+ */
 namespace DefaultItemLayout
 {
 
 enum Type
 {
-  DEPTH,     ///< Items arranged in a grid, scrolling along the Z-Axis.
-  GRID,      ///< Items arranged in a grid, scrolling along the Y-Axis.
-  LIST,      ///< One item per line, scrolling along the Y-Axis.
-  SPIRAL     ///< Items arranged in a spiral, centered around the Y-Axis.
+  DEPTH,     ///< Items arranged in a grid, scrolling along the Z-Axis. @SINCE_1_0.0
+  GRID,      ///< Items arranged in a grid, scrolling along the Y-Axis. @SINCE_1_0.0
+  LIST,      ///< One item per line, scrolling along the Y-Axis. @SINCE_1_0.0
+  SPIRAL     ///< Items arranged in a spiral, centered around the Y-Axis. @SINCE_1_0.0
 };
 
 /**
- * @brief Creates a built-in default item-layout
+ * @brief Creates a built-in default item-layout.
  *
+ * @SINCE_1_0.0
  * @param[in]  type  The type of layout required.
  *
  * @return An ItemLayoutPtr to the newly created layout.

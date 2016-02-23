@@ -127,6 +127,16 @@ public:
   ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor );
 
   /**
+   * @brief Request the control renderer to renderer the border with the given size and color, and specify whether anti-aliasing is needed.
+   *
+   * @param[in] borderSize The size of the border. Border size is the same along all edges.
+   * @param[in] borderColor The color of the border.
+   * @param[in] antiAliasing Whether anti-aliasing is required for border rendering.
+   * @return The pointer pointing to the control renderer
+   */
+  ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing );
+
+  /**
    * @brief Request the control renderer to render the image.
    *
    * @param[in] image The image to be rendered.

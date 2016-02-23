@@ -308,6 +308,24 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
+  //properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
 private:
 
   /**

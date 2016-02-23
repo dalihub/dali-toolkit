@@ -38,7 +38,7 @@ namespace Internal
 {
 class ImageView : public Control
 {
- protected:
+protected:
 
   /**
    * Construct a new ImageView.
@@ -49,8 +49,6 @@ class ImageView : public Control
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~ImageView();
-
-
 
 public:
   /**
@@ -76,6 +74,20 @@ public:
    * @copydoc Dali::Toolkit::SetImage
    */
   void SetImage( const std::string& imageUrl, ImageDimensions size );
+
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha( bool preMultipled );
+
+  /**
+   * @brief Query whether alpha is pre-multiplied.
+   *
+   * @return True is alpha is pre-multiplied, false otherwise.
+   */
+  bool IsPreMultipliedAlphaEnabled() const;
 
   // Properties
   /**
@@ -131,14 +143,6 @@ private: // From Control
   virtual float GetWidthForHeight( float height );
 
 private:
-  /**
-   * Attaches mImage member to the renderer, creating the renderers, samplers, meshes and materials if needed
-   *
-   * @pre mImage has been initialised
-   */
-  void AttachImage();
-
-private:
   // Undefined
   ImageView( const ImageView& );
   ImageView& operator=( const ImageView& );
@@ -150,6 +154,8 @@ private:
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise
   Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
+
+  bool             mPremultipledAlphaEnabled; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 };
 
 } // namespace Internal

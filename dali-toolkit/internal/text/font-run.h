@@ -37,7 +37,6 @@ struct FontRun
 {
   CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
   FontId       fontId;       ///< Font id of the run.
-  bool         isDefault;    ///< Whether the font is a default font not defined by the user.
 };
 
 } // namespace Text

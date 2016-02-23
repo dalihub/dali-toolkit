@@ -31,6 +31,19 @@ namespace Toolkit
 namespace Text
 {
 
+void FreeFontFamilyNames( Vector<FontDescriptionRun>& fontDescriptionRuns )
+{
+  for( Vector<FontDescriptionRun>::Iterator it = fontDescriptionRuns.Begin(),
+         endIt = fontDescriptionRuns.End();
+       it != endIt;
+       ++it )
+  {
+    delete (*it).familyName;
+  }
+
+  fontDescriptionRuns.Clear();
+}
+
 LogicalModelPtr LogicalModel::New()
 {
   return LogicalModelPtr( new LogicalModel() );
@@ -256,16 +269,28 @@ void LogicalModel::UpdateTextStyleRuns( CharacterIndex index, int numberOfCharac
                                  totalNumberOfCharacters,
                                  mColorRuns,
                                  removedColorRuns );
+
+  // Process the font description runs.
+  Vector<FontDescriptionRun> removedFontDescriptionRuns;
+  UpdateCharacterRuns<FontDescriptionRun>( index,
+                                           numberOfCharacters,
+                                           totalNumberOfCharacters,
+                                           mFontDescriptionRuns,
+                                           removedFontDescriptionRuns );
+
+  // Free memory allocated for the font family name.
+  FreeFontFamilyNames( removedFontDescriptionRuns );
 }
 
 void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
 {
   unsigned int runIndex = 0u;
-  unsigned int lastRunIndex = 0u;
-  bool overriden = false;
 
   // Set the text color.
-  for( Vector<ColorRun>::ConstIterator it = mColorRuns.Begin(),
+  bool colorOverriden = false;
+  unsigned int colorIndex = 0u;
+  const ColorRun* const colorRunsBuffer = mColorRuns.Begin();
+  for( Vector<ColorRun>::ConstIterator it = colorRunsBuffer,
          endIt = mColorRuns.End();
        it != endIt;
        ++it, ++runIndex )
@@ -275,20 +300,131 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     if( ( colorRun.characterRun.characterIndex <= index ) &&
         ( index < colorRun.characterRun.characterIndex + colorRun.characterRun.numberOfCharacters ) )
     {
-      lastRunIndex = runIndex;
-      overriden = true;
+      colorIndex = runIndex;
+      colorOverriden = true;
     }
   }
 
   // Set the text's color if it's overriden.
-  if( overriden )
+  if( colorOverriden )
   {
-    style.textColor = ( *( mColorRuns.Begin() + lastRunIndex ) ).color;
+    style.textColor = ( *( colorRunsBuffer + colorIndex ) ).color;
   }
+
+  // Reset the run index.
+  runIndex = 0u;
+
+  // Set the font's parameters.
+  bool nameOverriden = false;
+  bool weightOverriden = false;
+  bool widthOverriden = false;
+  bool slantOverriden = false;
+  bool sizeOverriden = false;
+  unsigned int nameIndex = 0u;
+  unsigned int weightIndex = 0u;
+  unsigned int widthIndex = 0u;
+  unsigned int slantIndex = 0u;
+  unsigned int sizeIndex = 0u;
+  const FontDescriptionRun* const fontDescriptionRunsBuffer = mFontDescriptionRuns.Begin();
+  for( Vector<FontDescriptionRun>::ConstIterator it = fontDescriptionRunsBuffer,
+         endIt = mFontDescriptionRuns.End();
+       it != endIt;
+       ++it, ++runIndex )
+  {
+    const FontDescriptionRun& fontDescriptionRun = *it;
+
+    if( ( fontDescriptionRun.characterRun.characterIndex <= index ) &&
+        ( index < fontDescriptionRun.characterRun.characterIndex + fontDescriptionRun.characterRun.numberOfCharacters ) )
+    {
+      if( fontDescriptionRun.familyDefined )
+      {
+        nameIndex = runIndex;
+        nameOverriden = true;
+      }
+
+      if( fontDescriptionRun.weightDefined )
+      {
+        weightIndex = runIndex;
+        weightOverriden = true;
+      }
+
+      if( fontDescriptionRun.widthDefined )
+      {
+        widthIndex = runIndex;
+        widthOverriden = true;
+      }
+
+      if( fontDescriptionRun.slantDefined )
+      {
+        slantIndex = runIndex;
+        slantOverriden = true;
+      }
+
+      if( fontDescriptionRun.sizeDefined )
+      {
+        sizeIndex = runIndex;
+        sizeOverriden = true;
+      }
+    }
+  }
+
+  // Set the font's family name if it's overriden.
+  if( nameOverriden )
+  {
+    const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + nameIndex );
+
+    style.familyName = std::string( fontDescriptionRun.familyName, fontDescriptionRun.familyLength );
+    style.familyDefined = true;
+  }
+
+  // Set the font's weight if it's overriden.
+  if( weightOverriden )
+  {
+    const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + weightIndex );
+
+    style.weight = fontDescriptionRun.weight;
+    style.weightDefined = true;
+  }
+
+  // Set the font's width if it's overriden.
+  if( widthOverriden )
+  {
+    const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + widthIndex );
+
+    style.width = fontDescriptionRun.width;
+    style.widthDefined = true;
+  }
+
+  // Set the font's slant if it's overriden.
+  if( slantOverriden )
+  {
+    const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + slantIndex );
+
+    style.slant = fontDescriptionRun.slant;
+    style.slantDefined = true;
+  }
+
+  // Set the font's size if it's overriden.
+  if( sizeOverriden )
+  {
+    const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + sizeIndex );
+
+    style.size = static_cast<float>( fontDescriptionRun.size ) / 64.f;
+    style.sizeDefined = true;
+  }
+
+  // Reset the run index.
+  runIndex = 0u;
+}
+
+void LogicalModel::ClearFontDescriptionRuns()
+{
+  FreeFontFamilyNames( mFontDescriptionRuns );
 }
 
 LogicalModel::~LogicalModel()
 {
+  ClearFontDescriptionRuns();
 }
 
 LogicalModel::LogicalModel()

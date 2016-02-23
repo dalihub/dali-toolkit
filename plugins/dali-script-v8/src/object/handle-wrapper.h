@@ -81,6 +81,13 @@ public:
    */
   static void RegisterAnimatableProperty( const v8::FunctionCallbackInfo< v8::Value >& args );
 
+  /**
+   * @brief Register a custom property for a JavaScript object that
+   * contains a Dali Handle.
+   * @param[in] args v8 function call arguments interpreted
+   */
+  static void RegisterCustomProperty( const v8::FunctionCallbackInfo< v8::Value >& args );
+
   Handle GetHandle() { return mHandle; }
   Handle mHandle;
   ConnectionTracker mConnectionTracker;

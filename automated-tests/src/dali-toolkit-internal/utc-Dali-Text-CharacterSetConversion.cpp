@@ -221,9 +221,10 @@ int UtcDaliTextCharacterSetConversionUtf8ToUtf32(void)
   tet_infoline(" UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes");
 
   unsigned int utf32_01[] = { 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World
-  unsigned int utf32_02[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
-  unsigned int utf32_03[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
-  unsigned int utf32_04[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
+  unsigned int utf32_02[] = { 0xA, 0x20, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xA, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World + CR and CR+LF
+  unsigned int utf32_03[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
+  unsigned int utf32_04[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
+  unsigned int utf32_05[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
 
   const Utf8ToUtf32Data data[] =
   {
@@ -233,22 +234,27 @@ int UtcDaliTextCharacterSetConversionUtf8ToUtf32(void)
       utf32_01,
     },
     {
+      "Latin script with 'CR' and 'CR'+'LF'",
+      "\xd Hello\xd\xa World",
+      utf32_02,
+    },
+    {
       "Arabic script",
       "مرحبا بالعالم",
-      utf32_02,
+      utf32_03,
     },
     {
       "Devanagari script",
       "हैलो वर्ल्ड",
-      utf32_03,
+      utf32_04,
     },
     {
       "Emojis",
       "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
-      utf32_04,
+      utf32_05,
     },
   };
-  const unsigned int numberOfTests = 4u;
+  const unsigned int numberOfTests = 5u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {

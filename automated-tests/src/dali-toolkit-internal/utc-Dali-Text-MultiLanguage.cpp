@@ -33,7 +33,11 @@ using namespace Text;
 // Tests the following functions with different scripts.
 // Constructor, destructor and MultilanguageSupport::Get()
 // void MultilanguageSupport::SetScripts( const Vector<Character>& text, const Vector<LineBreakInfo>& lineBreakInfo, Vector<ScriptRun>& scripts );
-// void MultilanguageSupport::ValidateFonts( const Vector<Character>& text, const Vector<ScriptRun>& scripts, Vector<FontRun>& fonts );
+// void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
+//                                           const Vector<ScriptRun>& scripts,
+//                                           const Vector<FontDescriptionRun>& fontDescriptions,
+//                                           FontId defaultFontId,
+//                                           Vector<FontRun>& fonts );
 
 //////////////////////////////////////////////////////////
 
@@ -127,12 +131,17 @@ bool ValidateFontTest( const ValidateFontsData& data )
   multilanguageSupport.SetScripts( utf32,
                                    scripts );
 
+  // To be completed ...
+  Vector<FontDescriptionRun> fontDescriptions;
+  FontId defaultFontId = 0u;
   Vector<FontRun> fonts;
+
   // 3) Validate the fonts
   multilanguageSupport.ValidateFonts( utf32,
                                       scripts,
+                                      fontDescriptions,
+                                      defaultFontId,
                                       fonts );
-
   return true;
 }
 

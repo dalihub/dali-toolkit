@@ -191,6 +191,13 @@ public:
   void SetRulerY(RulerPtr ruler);
 
   /**
+   * Retrieve the touch sensitivity.
+   *
+   * @return whether the touch sensitivity is true or false.
+   */
+  bool GetScrollSensitive();
+
+  /**
    * @copydoc Toolkit::ScrollView::SetScrollSensitive
    */
   void SetScrollSensitive(bool sensitive);
@@ -206,9 +213,23 @@ public:
   void SetSnapOvershootAlphaFunction(AlphaFunction alpha);
 
   /**
+   * Retrieve the duartion of Snap Overshoot animation
+   *
+   * @return the duration.
+   */
+  float GetSnapOvershootDuration();
+
+  /**
    * @copydoc Toolkit::ScrollView::SetSnapOvershootDuration
    */
   void SetSnapOvershootDuration(float duration);
+
+  /**
+   * Retrieve whether Actor Auto-Snap mode is enabled or not.
+   *
+   * @return Actor Auto-Snap mode Enabled flag.
+   */
+  bool GetActorAutoSnap();
 
   /**
    * @copydoc Toolkit::ScrollView::SetActorAutoSnap
@@ -481,6 +502,24 @@ public:
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
    */
   void SetOvershootEffectColor( const Vector4& color );
+
+  //properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 public: //Signals
 

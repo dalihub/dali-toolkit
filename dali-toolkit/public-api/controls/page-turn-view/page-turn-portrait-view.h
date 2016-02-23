@@ -34,26 +34,29 @@ class PageTurnPortraitView;
 }
 
 /**
- * PageTurnLandscapeView provides a page turn view in portrait mode
+ * @brief PageTurnPortraitView provides a page turn view in portrait mode
  *
- * @since DALi 1.1.4
+ * @SINCE_1_1.4
  */
 class DALI_IMPORT_API PageTurnPortraitView : public PageTurnView
 {
 public:
   /**
-   * Create an uninitialized PageTurnPortraitView; this can be initialized with PageTurnPortraitView::New()
+   * @brief Create an uninitialized PageTurnPortraitView; this can be initialized with PageTurnPortraitView::New()
    * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @SINCE_1_1.4
    */
   PageTurnPortraitView();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   * @SINCE_1_1.4
    */
   PageTurnPortraitView( const PageTurnPortraitView& pageTurnPortraitView );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   * @SINCE_1_1.4
    */
   PageTurnPortraitView& operator=( const PageTurnPortraitView& pageTurnPortraitView );
 
@@ -61,11 +64,13 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_1.4
    */
   ~PageTurnPortraitView();
 
   /**
-   * Create an initialized  PageTurnPortraitView control
+   * @brief Create an initialized  PageTurnPortraitView control
+   * @SINCE_1_1.4
    * @param[in] pageFactory The factory which provides PageTurnView with pages.
    * @param[in] pageSize The size of the page
    * @return A handle to the PageTurnPortraitView control.
@@ -73,8 +78,9 @@ public:
   static PageTurnPortraitView New( PageFactory& pageFactory, const Vector2& pageSize );
 
   /**
-   * Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnPortraitView the
+   * @brief Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnPortraitView the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_1.4
    * @param[in] handle Handle to an object
    * @return handle to a PageTurnPortraitView or an uninitialized handle
    */
@@ -83,13 +89,15 @@ public:
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   * @SINCE_1_1.4
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL PageTurnPortraitView( Internal::PageTurnPortraitView& implementation );
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @SINCE_1_1.4
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL PageTurnPortraitView( Dali::Internal::CustomActor* internal );

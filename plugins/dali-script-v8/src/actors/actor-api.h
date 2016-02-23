@@ -28,14 +28,6 @@ namespace Dali
 namespace V8Plugin
 {
 
-namespace TextLabelApi
-{
-  /**
-   * Temporary TextView constructor
-   */
-  Actor New( const v8::FunctionCallbackInfo< v8::Value >& args );
-}
-
 namespace ActorApi
 {
 
@@ -65,6 +57,7 @@ namespace ActorApi
   void SetKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
   void IsKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetNaturalSize( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetRelayoutSize( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetWidthForHeight( const v8::FunctionCallbackInfo<v8::Value>& args );
   void GetHeightForWidth( const v8::FunctionCallbackInfo<v8::Value>& args );
   void TranslateBy( const v8::FunctionCallbackInfo< v8::Value >& args );

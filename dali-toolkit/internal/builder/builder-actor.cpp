@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace Internal
 {
 
 using namespace Dali::Scripting;
-extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& constant );
+extern void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& constant );
 
 /*
  * Handles special case actor configuration (anything thats not already a property)
@@ -82,11 +82,9 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
       std::string key( keyChild.first );
 
       Property::Value value;
-      if( SetPropertyFromNode( keyChild.second, value, constant ))
-      {
-        // Register/Set property.
-        actor.RegisterProperty( key, value, Property::READ_WRITE );
-      }
+      DeterminePropertyFromNode( keyChild.second, value, constant );
+      // Register/Set property.
+      actor.RegisterProperty( key, value, Property::READ_WRITE );
     }
   }
 

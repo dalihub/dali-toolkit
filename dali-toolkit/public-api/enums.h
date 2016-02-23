@@ -25,6 +25,7 @@ namespace Dali
 {
 /**
  * @brief DALi Toolkit namespace.
+ * @SINCE_1_0.0
  */
 namespace Toolkit
 {
@@ -35,19 +36,21 @@ namespace Toolkit
 
 /**
  * @brief Control Orientation namespace.
+ * @SINCE_1_0.0
  */
 namespace ControlOrientation
 {
 
 /**
  * @brief The internal orientation of a control.
+ * @SINCE_1_0.0
  */
 enum Type
 {
-  Up,   ///< The contents of control are in a vertical layout, from top to bottom
-  Left, ///< The contents of control are in a horizontal layout, from left to right
-  Down, ///< The contents of control are in a vertical layout, from bottom to top
-  Right ///< The contents of control are in a horizontal layout, from right to left
+  Up,   ///< The contents of control are in a vertical layout, from top to bottom @SINCE_1_0.0
+  Left, ///< The contents of control are in a horizontal layout, from left to right @SINCE_1_0.0
+  Down, ///< The contents of control are in a vertical layout, from bottom to top @SINCE_1_0.0
+  Right ///< The contents of control are in a horizontal layout, from right to left @SINCE_1_0.0
 };
 
 } // namespace ControlOrientation
@@ -63,6 +66,7 @@ DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
 /**
  * @brief Query whether an orientation is horizontal.
  *
+ * @SINCE_1_0.0
  * @param[in] orientation The orientation.
  * @return True if the orientation is horizontal.
  */

@@ -97,10 +97,12 @@ public:
                    Vector<ScriptRun>& scripts );
 
   /**
-   * @copydoc Dali::MultilanguageSupport::ValidateFonts( const Vector<Character>& text, const Vector<ScriptRun>& scripts, Vector<FontRun>& fonts )
+   * @copydoc Dali::MultilanguageSupport::ValidateFonts()
    */
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
+                      const Vector<FontDescriptionRun>& fontDescriptions,
+                      FontId defaultFontId,
                       Vector<FontRun>& fonts );
 
 private:

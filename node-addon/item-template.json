@@ -1,0 +1,92 @@
+{
+  "templates":
+  {
+    "template-item-list":
+    {
+      "name":"item",
+      "type":"Actor",
+      "position":[0,0,0],
+      "anchorPoint":"TOP_LEFT",
+      "parentOrigin":"TOP_LEFT",
+      "actors":
+       [
+        {
+          "name":"icon",
+          "type":"ImageView",
+          "image":
+          {
+            "rendererType" : "imageRenderer",
+            "imageUrl": "{icon_path}"
+          },
+          "position":[20.0, 0.0, 0.0],
+          "size":[70.0, 70.0, 0.0],
+          "color":[1.0,1.0,1.0,1.0],
+          "anchorPoint":"CENTER_LEFT",
+          "parentOrigin":"CENTER_LEFT",
+          "actors":
+          [
+            {
+              "name":"title",
+              "anchorPoint":"CENTER_LEFT",
+              "parentOrigin":"CENTER_RIGHT",
+              "type":"TextLabel",
+              "position": [30.0, 0.0, 0.0],
+              "size":[200.0, 70.0, 0.0],
+              "pointSize":30,
+              "fontFamily":"HelveticaNeue",
+              "fontStyle":"Bold",
+              "horizontalAlignment":"BEGIN",
+              "verticalAlignment":"CENTER",
+              "textColor": [1.0,0.0,1.0,1.0],
+              "text":"{title_text}"
+            }
+          ]
+        }
+      ]
+    },
+
+    "template-item-grid":
+    {
+      "name":"item",
+      "type":"Actor",
+      "position":[0,0,0],
+      "anchorPoint":"TOP_LEFT",
+      "parentOrigin":"TOP_LEFT",
+      "actors":
+       [
+        {
+          "name":"icon",
+          "type":"ImageView",
+          "image":
+          {
+            "rendererType" : "imageRenderer",
+            "imageUrl": "{icon_path}"
+          },
+          "position":[0.0, -10.0, 0.0],
+          "size":[70.0, 70.0, 0.0],
+          "color":[1.0,1.0,1.0,1.0],
+          "anchorPoint":"CENTER",
+          "parentOrigin":"CENTER",
+          "actors":
+          [
+            {
+              "name":"title",
+              "anchorPoint":"TOP_CENTER",
+              "parentOrigin":"BOTTOM_CENTER",
+              "type":"TextLabel",
+              "position": [0.0,10.0,0.0],
+              "size":[100.0, 100.0, 0.0],
+              "pointSize":22,
+              "fontFamily":"HelveticaNeue",
+              "fontStyle":"Bold",
+              "horizontalAlignment":"CENTER",
+              "textColor": [1.0,0.0,1.0,1.0],
+              "text":"{title_text}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+

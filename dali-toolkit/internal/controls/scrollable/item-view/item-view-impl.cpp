@@ -42,21 +42,6 @@ using namespace Dali;
 namespace // Unnamed namespace
 {
 
-//Type registration
-
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL)
-
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollSpeed",         FLOAT,    SCROLL_SPEED)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "overshoot",           FLOAT,    OVERSHOOT)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollDirection",     VECTOR2,  SCROLL_DIRECTION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutOrientation",   INTEGER,  LAYOUT_ORIENTATION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollContentSize",   FLOAT,    SCROLL_CONTENT_SIZE)
-
-DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",     LAYOUT_ACTIVATED_SIGNAL )
-
-DALI_TYPE_REGISTRATION_END()
-
 const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
 const float DEFAULT_MINIMUM_SWIPE_DISTANCE = 3.0f;
 const float DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = 0.1f;
@@ -255,6 +240,27 @@ namespace Internal
 
 namespace // unnamed namespace
 {
+
+//Type registration
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL)
+
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "minimumSwipeSpeed",          FLOAT,     MINIMUM_SWIPE_SPEED          )
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "minimumSwipeDistance",       FLOAT,     MINIMUM_SWIPE_DISTANCE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "wheelScrollDistanceStep",    FLOAT,     WHEEL_SCROLL_DISTANCE_STEP   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "snapToItemEnabled",          BOOLEAN,   SNAP_TO_ITEM_ENABLED         )
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "refreshInterval",            FLOAT,     REFRESH_INTERVAL             )
+
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollSpeed",         FLOAT,    SCROLL_SPEED)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "overshoot",           FLOAT,    OVERSHOOT)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollDirection",     VECTOR2,  SCROLL_DIRECTION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutOrientation",   INTEGER,  LAYOUT_ORIENTATION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollContentSize",   FLOAT,    SCROLL_CONTENT_SIZE)
+
+DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",     LAYOUT_ACTIVATED_SIGNAL )
+
+DALI_TYPE_REGISTRATION_END()
 
 bool FindById( const ItemContainer& items, ItemId id )
 {
@@ -1690,6 +1696,86 @@ bool ItemView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* 
   }
 
   return connected;
+}
+
+void ItemView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::ItemView itemView = Toolkit::ItemView::DownCast( Dali::BaseHandle( object ) );
+
+  if( itemView )
+  {
+    ItemView& itemViewImpl( GetImpl( itemView ) );
+    switch( index )
+    {
+      case Toolkit::ItemView::Property::MINIMUM_SWIPE_SPEED:
+      {
+        itemViewImpl.SetMinimumSwipeSpeed( value.Get<float>() );
+        break;
+      }
+      case Toolkit::ItemView::Property::MINIMUM_SWIPE_DISTANCE:
+      {
+        itemViewImpl.SetMinimumSwipeDistance( value.Get<float>() );
+        break;
+      }
+      case Toolkit::ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP:
+      {
+        itemViewImpl.SetWheelScrollDistanceStep( value.Get<float>() );
+        break;
+      }
+      case Toolkit::ItemView::Property::SNAP_TO_ITEM_ENABLED:
+      {
+        itemViewImpl.SetAnchoring( value.Get<bool>() );
+        break;
+      }
+      case Toolkit::ItemView::Property::REFRESH_INTERVAL:
+      {
+        itemViewImpl.SetRefreshInterval( value.Get<float>() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value ItemView::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::ItemView itemView = Toolkit::ItemView::DownCast( Dali::BaseHandle( object ) );
+
+  if( itemView )
+  {
+    ItemView& itemViewImpl( GetImpl( itemView ) );
+    switch( index )
+    {
+      case Toolkit::ItemView::Property::MINIMUM_SWIPE_SPEED:
+      {
+        value = itemViewImpl.GetMinimumSwipeSpeed();
+        break;
+      }
+      case Toolkit::ItemView::Property::MINIMUM_SWIPE_DISTANCE:
+      {
+        value = itemViewImpl.GetMinimumSwipeDistance();
+        break;
+      }
+      case Toolkit::ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP:
+      {
+        value = itemViewImpl.GetWheelScrollDistanceStep();
+        break;
+      }
+      case Toolkit::ItemView::Property::SNAP_TO_ITEM_ENABLED:
+      {
+        value = itemViewImpl.GetAnchoring();
+        break;
+      }
+      case Toolkit::ItemView::Property::REFRESH_INTERVAL:
+      {
+        value = itemViewImpl.GetRefreshInterval();
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 } // namespace Internal

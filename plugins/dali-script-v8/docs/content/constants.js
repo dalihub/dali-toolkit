@@ -169,21 +169,49 @@ Constants accessible under the dali global object.
 |GEOMETRY_TRIANGLE_STRIP              | integer value  |
 
 |**Property type ** | |
-|PROPERTY_NONE                        | integer value  |
+|PROPERTY_NONE                        | none  |
 |PROPERTY_BOOLEAN                     | integer value  |
-|PROPERTY_FLOAT                       | integer value  |
+|PROPERTY_FLOAT                       | float value  |
 |PROPERTY_INTEGER                     | integer value  |
-|PROPERTY_VECTOR2                     | integer value  |
-|PROPERTY_VECTOR3                     | integer value  |
-|PROPERTY_VECTOR4                     | integer value  |
-|PROPERTY_MATRIX3                     | integer value  |
-|PROPERTY_MATRIX                      | integer value  |
-|PROPERTY_RECTANGLE                   | integer value  |
-|PROPERTY_ROTATION                    | integer value  |
-|PROPERTY_STRING                      | integer value  |
-|PROPERTY_ARRAY                       | integer value  |
-|PROPERTY_MAP                         | integer value  |
-|PROPERTY_INVALID_INDEX               | integer value  |
+|PROPERTY_VECTOR2                     | Array[ float, float ] |
+|PROPERTY_VECTOR3                     | Array[ float, float, float ]  |
+|PROPERTY_VECTOR4                     | Array[ float, float, float, float ]  |
+|PROPERTY_MATRIX3                     | Object         |
+|PROPERTY_MATRIX                      | Object         |
+|PROPERTY_RECTANGLE                   | Object |
+|PROPERTY_ORIENTATION                 | Object  |
+|PROPERTY_STRING                      | String  |
+|PROPERTY_ARRAY                       | Object   |
+|PROPERTY_MAP                         | Object  |
+
+|**Layout dimensions ** | |
+|DIMENSION_WIDTH                      | integer value  |
+|DIMENSION_HEIGHT                     | integer value  |
+
+|**Item layout type ** | |
+|ITEM_LAYOUT_LIST                     | integer value  |
+|ITEM_LAYOUT_GRID                     | integer value  |
+
+|**Scroll direction bias ** | |
+|DIRECTION_BIAS_NONE                  | integer value  |
+|DIRECTION_BIAS_LEFT                  | integer value  |
+|DIRECTION_BIAS_RIGHT                 | integer value  |
+
+|**Animation alpha function ** | |
+|ALPHA_FUNCTION_DEFAULT               | integer value  |
+|ALPHA_FUNCTION_LINEAR                | integer value  |
+|ALPHA_FUNCTION_REVERSE               | integer value  |
+|ALPHA_FUNCTION_EASE_IN_SQUARE        | integer value  |
+|ALPHA_FUNCTION_EASE_OUT_SQUARE       | integer value  |
+|ALPHA_FUNCTION_EASE_IN               | integer value  |
+|ALPHA_FUNCTION_EASE_OUT              | integer value  |
+|ALPHA_FUNCTION_EASE_IN_OUT           | integer value  |
+|ALPHA_FUNCTION_EASE_IN_SINE          | integer value  |
+|ALPHA_FUNCTION_EASE_OUT_SINE         | integer value  |
+|ALPHA_FUNCTION_EASE_IN_OUT_SINE      | integer value  |
+|ALPHA_FUNCTION_BOUNCE                | integer value  |
+|ALPHA_FUNCTION_SIN                   | integer value  |
+|ALPHA_FUNCTION_EASE_OUT_BACK         | integer value  |
 
  * @class Constants
  */

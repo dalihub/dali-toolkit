@@ -281,7 +281,7 @@ void CubeTransitionEffect::OnStageConnection( int depth )
   }
   mCurrentRenderer = Renderer::New( geometry, material );
 
-  mCurrentRenderer.SetDepthIndex( depth );
+  mCurrentRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, depth );
   Self().AddRenderer( mCurrentRenderer );
 }
 
@@ -394,7 +394,8 @@ void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisp
   Geometry geometry = mCurrentRenderer.GetGeometry();
   mTargetRenderer = Renderer::New( geometry, material );
 
-  mTargetRenderer.SetDepthIndex( mCurrentRenderer.GetDepthIndex() );
+  int depthIndex = mCurrentRenderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX);
+  mTargetRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex );
 
   for( size_t i = 0; i < mBoxes.size(); ++i )
   {

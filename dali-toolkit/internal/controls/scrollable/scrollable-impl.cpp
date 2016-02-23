@@ -48,7 +48,8 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEffectColor",      VECTOR4, OVERSHOOT_EFFECT_COLOR    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootAnimationSpeed",   FLOAT,   OVERSHOOT_ANIMATION_SPEED )
-const int OVERSHOOT_SIZE = Dali::Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED + 1; // OVERSHOOT_SIZE is not public yet
+DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEnabled",          BOOLEAN, OVERSHOOT_ENABLED )
+const int OVERSHOOT_SIZE = Dali::Toolkit::Scrollable::Property::OVERSHOOT_ENABLED + 1; // OVERSHOOT_SIZE is not public yet
 Dali::PropertyRegistration p1( typeRegistration, "overshootSize",  OVERSHOOT_SIZE, Property::VECTOR2, Dali::Toolkit::Internal::Scrollable::SetProperty, Dali::Toolkit::Internal::Scrollable::GetProperty );
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollRelativePosition",   VECTOR2, SCROLL_RELATIVE_POSITION)
@@ -194,6 +195,11 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
         scrollableImpl.SetOvershootAnimationSpeed( value.Get<float>() );
         break;
       }
+      case Toolkit::Scrollable::Property::OVERSHOOT_ENABLED:
+      {
+        scrollableImpl.SetOvershootEnabled( value.Get<bool>() );
+        break;
+      }
       case OVERSHOOT_SIZE: // OVERSHOOT_SIZE is not public yet
       {
         Vector2 input;
@@ -227,6 +233,11 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED:
       {
         value = scrollableImpl.GetOvershootAnimationSpeed();
+        break;
+      }
+      case Toolkit::Scrollable::Property::OVERSHOOT_ENABLED:
+      {
+        value = scrollableImpl.IsOvershootEnabled();
         break;
       }
       case OVERSHOOT_SIZE: // OVERSHOOT_SIZE is not public yet

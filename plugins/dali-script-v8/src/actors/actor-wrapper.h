@@ -76,13 +76,6 @@ public:
   static void NewActor( const v8::FunctionCallbackInfo< v8::Value >& args);
 
   /**
-   * @brief Creates a new Control wrapped inside a Javascript Object.
-   * @note: the control type is passed as a parameter e.g. 'TextField'
-   * @param[in] args v8 function call arguments interpreted
-   */
-  static void NewControl( const v8::FunctionCallbackInfo< v8::Value >& args);
-
-  /**
    * @brief Wraps an actor of a given type
    */
   static v8::Handle<v8::Object> WrapActor(v8::Isolate* isolate, Dali::Actor actor,ActorType actorType);
@@ -107,13 +100,15 @@ public:
    */
   static ActorWrapper::ActorType GetActorType( const std::string& name );
 
-private:
+protected:
 
   /**
-   * Helper to make the actor template
+   * @brief Helper to make the actor template
    *
    */
   static v8::Handle<v8::ObjectTemplate> MakeDaliActorTemplate( v8::Isolate* isolate, ActorType actorType );
+
+private:
 
   /**
    * Helper, get an actor template given an actor type

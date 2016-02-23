@@ -18,6 +18,10 @@
       '<(DALI_JS_DIR)/actors/layer-api.cpp',
       '<(DALI_JS_DIR)/actors/camera-actor-api.cpp',
       '<(DALI_JS_DIR)/constants/constants-wrapper.cpp',
+      '<(DALI_JS_DIR)/controls/control-wrapper.cpp',
+      '<(DALI_JS_DIR)/controls/item-factory-wrapper.cpp',
+      '<(DALI_JS_DIR)/controls/item-view-api.cpp',
+      '<(DALI_JS_DIR)/controls/scroll-view-api.cpp',
       '<(DALI_JS_DIR)/animation/animation-api.cpp',
       '<(DALI_JS_DIR)/animation/animation-wrapper.cpp',
       '<(DALI_JS_DIR)/animation/constrainer-api.cpp',
@@ -66,7 +70,7 @@
       'cflags': [
             '-fPIC',
             '-frtti',
-            '<!@(pkg-config --cflags dali dali-toolkit)'
+            '<!@(pkg-config --cflags dali-core dali-adaptor-uv dali-toolkit)'
         ],
 
     'cflags_cc': [
@@ -74,10 +78,10 @@
             '-frtti'    # needed for typeinfo with dali-any
         ],
       'ldflags': [
-            '<!@(pkg-config --libs-only-L --libs-only-other dali dali-toolkit)'
+            '<!@(pkg-config --libs-only-L --libs-only-other dali-core dali-adaptor-uv dali-toolkit)'
         ],
       'libraries': [
-        '<!@(pkg-config --libs-only-l dali dali-toolkit)'
+        '<!@(pkg-config --libs-only-l dali-core dali-adaptor-uv dali-toolkit)'
       ]
     }]
 }

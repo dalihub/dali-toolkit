@@ -68,14 +68,12 @@ libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -I../../../ \
                       $(DALI_TOOLKIT_CFLAGS) \
                       $(DALICORE_CFLAGS) \
-                      $(DALI_CFLAGS) \
                       $(DLOG_CFLAGS) \
                       $(FRIBIDI_CFLAGS) \
                       $(HTMLCXX_CFLAGS)
 
 libdali_toolkit_la_LIBADD = \
                       $(DALICORE_LIBS) \
-                      $(DALI_LIBS) \
                       $(DLOG_LIBS) \
                       $(FRIBIDI_LIBS) \
                       $(HTMLCXX_LIBS)
@@ -108,6 +106,7 @@ develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 
 # devel headers
+develapicontrols_HEADERS =          $(devel_api_controls_header_files)
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
 develapibuilder_HEADERS =           $(devel_api_builder_header_files)
@@ -128,44 +127,44 @@ develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
 develapitextselectionpopup_HEADERS = $(devel_api_text_controls_header_files)
 
 # public api source
-publicapidir =                    $(topleveldir)/public-api
-publicapicontrolsdir =            $(publicapidir)/controls
-develapiaccessibilitymanagerdir = $(publicapidir)/accessibility-manager
-publicapialignmentdir =           $(publicapicontrolsdir)/alignment
-publicapibuttonsdir =             $(publicapicontrolsdir)/buttons
-publicapidefaultcontrolsdir =     $(publicapicontrolsdir)/default-controls
-publicapigaussianblurviewdir =    $(publicapicontrolsdir)/gaussian-blur-view
-publicapiimageviewdir =           $(publicapicontrolsdir)/image-view
-publicapimodel3dviewdir =         $(publicapicontrolsdir)/model3d-view
-publicapipageturnviewdir =        $(publicapicontrolsdir)/page-turn-view
-publicapiscrollbardir =           $(publicapicontrolsdir)/scroll-bar
-publicapiscrollabledir =          $(publicapicontrolsdir)/scrollable
-publicapiscrollviewdir =          $(publicapicontrolsdir)/scrollable/scroll-view
-publicapiitemviewdir =            $(publicapicontrolsdir)/scrollable/item-view
-publicapitableviewdir =           $(publicapicontrolsdir)/table-view
-publicapitextcontrolsdir =        $(publicapicontrolsdir)/text-controls
-publicapifocusmanagerdir =        $(publicapidir)/focus-manager
-publicapirenderingbackenddir =    $(publicapidir)/text
+publicapidir =                     $(topleveldir)/public-api
+publicapicontrolsdir =             $(publicapidir)/controls
+publicapiaccessibilitymanagerdir = $(publicapidir)/accessibility-manager
+publicapialignmentdir =            $(publicapicontrolsdir)/alignment
+publicapibuttonsdir =              $(publicapicontrolsdir)/buttons
+publicapidefaultcontrolsdir =      $(publicapicontrolsdir)/default-controls
+publicapigaussianblurviewdir =     $(publicapicontrolsdir)/gaussian-blur-view
+publicapiimageviewdir =            $(publicapicontrolsdir)/image-view
+publicapimodel3dviewdir =          $(publicapicontrolsdir)/model3d-view
+publicapipageturnviewdir =         $(publicapicontrolsdir)/page-turn-view
+publicapiscrollbardir =            $(publicapicontrolsdir)/scroll-bar
+publicapiscrollabledir =           $(publicapicontrolsdir)/scrollable
+publicapiscrollviewdir =           $(publicapicontrolsdir)/scrollable/scroll-view
+publicapiitemviewdir =             $(publicapicontrolsdir)/scrollable/item-view
+publicapitableviewdir =            $(publicapicontrolsdir)/table-view
+publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
+publicapifocusmanagerdir =         $(publicapidir)/focus-manager
+publicapirenderingbackenddir =     $(publicapidir)/text
 
 # public api headers
-publicapi_HEADERS =                    $(public_api_header_files)
-publicapicontrols_HEADERS =            $(public_api_controls_header_files)
-develapiaccessibilitymanager_HEADERS = $(public_api_accessibility_manager_header_files)
-publicapialignment_HEADERS =           $(public_api_alignment_header_files)
-publicapibuttons_HEADERS =             $(public_api_buttons_header_files)
-publicapidefaultcontrols_HEADERS =     $(public_api_default_controls_header_files)
-publicapigaussianblurview_HEADERS =    $(public_api_gaussian_blur_view_header_files)
-publicapiimageview_HEADERS =           $(public_api_image_view_header_files)
-publicapiitemview_HEADERS =            $(public_api_item_view_header_files)
-publicapimodel3dview_HEADERS =         $(public_api_model3d_view_header_files)
-publicapipageturnview_HEADERS =        $(public_api_page_turn_view_header_files)
-publicapiscrollbar_HEADERS =           $(public_api_scroll_bar_header_files)
-publicapiscrollable_HEADERS =          $(public_api_scrollable_header_files)
-publicapiscrollview_HEADERS =          $(public_api_scroll_view_header_files)
-publicapitableview_HEADERS =           $(public_api_table_view_header_files)
-publicapitextcontrols_HEADERS =        $(public_api_text_controls_header_files)
-publicapifocusmanager_HEADERS =        $(public_api_focus_manager_header_files)
-publicapirenderingbackend_HEADERS =    $(public_api_rendering_backend_header_files)
+publicapi_HEADERS =                     $(public_api_header_files)
+publicapicontrols_HEADERS =             $(public_api_controls_header_files)
+publicapiaccessibilitymanager_HEADERS = $(public_api_accessibility_manager_header_files)
+publicapialignment_HEADERS =            $(public_api_alignment_header_files)
+publicapibuttons_HEADERS =              $(public_api_buttons_header_files)
+publicapidefaultcontrols_HEADERS =      $(public_api_default_controls_header_files)
+publicapigaussianblurview_HEADERS =     $(public_api_gaussian_blur_view_header_files)
+publicapiimageview_HEADERS =            $(public_api_image_view_header_files)
+publicapiitemview_HEADERS =             $(public_api_item_view_header_files)
+publicapimodel3dview_HEADERS =          $(public_api_model3d_view_header_files)
+publicapipageturnview_HEADERS =         $(public_api_page_turn_view_header_files)
+publicapiscrollbar_HEADERS =            $(public_api_scroll_bar_header_files)
+publicapiscrollable_HEADERS =           $(public_api_scrollable_header_files)
+publicapiscrollview_HEADERS =           $(public_api_scroll_view_header_files)
+publicapitableview_HEADERS =            $(public_api_table_view_header_files)
+publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
+publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)
+publicapirenderingbackend_HEADERS =     $(public_api_rendering_backend_header_files)
 
 # package doxygen file (contains doxygen grouping information)
 packagedoxydir = $(topleveldir)/doc

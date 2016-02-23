@@ -50,7 +50,7 @@ inline ShaderEffect CreateSwirlEffect( bool warp )
       "uniform mediump vec2  uCenter;\n"
       "void main()\n"
       "{\n"
-      "  highp vec2 textureCenter = (uTextureRect.xy + uTextureRect.zw) * 0.5;\n"
+      "  highp vec2 textureCenter = (sTextureRect.xy + sTextureRect.zw) * 0.5;\n"
       "  textureCenter = vTexCoord.st - textureCenter;\n"
       "  highp float distance = length(textureCenter);\n"
       "  if (distance >= uRadius)\n"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Toolkit
 namespace Internal
 {
 extern Animation CreateAnimation( const TreeNode& child, Dali::Toolkit::Internal::Builder* const builder  );
-extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
+extern bool DeterminePropertyFromNode( const TreeNode& node, Property::Value& value );
 }
 }
 }
@@ -342,7 +342,7 @@ Property::Value GetPropertyValue(const TreeNode &child)
   if(0 == nChildren)
   {
     // cast away unused return for static analyzers
-    static_cast<void>( Dali::Toolkit::Internal::SetPropertyFromNode( child, ret ) );
+    static_cast<void>( Dali::Toolkit::Internal::DeterminePropertyFromNode( child, ret ) );
   }
   else if(1 == nChildren)
   {
@@ -484,10 +484,7 @@ void SetActionOnSignal(const TreeNode &root, const TreeNode &child, Actor actor,
       action.actorName       = *actorName;
       action.propertyName    = *propertyName;
       // actor may not exist yet so we can't check the property type
-      if( !Dali::Toolkit::Internal::SetPropertyFromNode( *valueChild, action.value ) )
-      {
-        DALI_SCRIPT_WARNING("Cannot set property for set property action\n");
-      }
+      Dali::Toolkit::Internal::DeterminePropertyFromNode( *valueChild, action.value );
       connector.Connect( action );
     }
     else

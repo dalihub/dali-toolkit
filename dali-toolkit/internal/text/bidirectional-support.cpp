@@ -114,8 +114,8 @@ void SetBidirectionalInfo( const Vector<Character>& text,
     const ScriptRun& scriptRun = *it;
     const CharacterIndex lastScriptRunIndex = scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters;
 
-    if( TextAbstraction::IsRightToLeftScript( scriptRun.script ) && // The script is right to left.
-        ( lastScriptRunIndex > paragraphCharacterIndex ) )          // It isn't part of a previous paragraph.
+    if( ( lastScriptRunIndex > paragraphCharacterIndex ) &&        // It isn't part of a previous paragraph.
+        TextAbstraction::IsRightToLeftScript( scriptRun.script ) ) // The script is right to left.
     {
       // Find the paragraphs which contains this script run.
       // Consider:
@@ -231,8 +231,9 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
 }
 
 bool GetMirroredText( const Vector<Character>& text,
-                      Vector<Character>& mirroredText,
-                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo )
+                      const Vector<CharacterDirection>& directions,
+                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                      Vector<Character>& mirroredText )
 {
   bool hasTextMirrored = false;
 
@@ -242,6 +243,7 @@ bool GetMirroredText( const Vector<Character>& text,
   mirroredText = text;
 
   Character* mirroredTextBuffer = mirroredText.Begin();
+  CharacterDirection* directionsBuffer = directions.Begin();
 
   // Traverse the paragraphs and mirror the right to left ones.
   for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
@@ -249,10 +251,11 @@ bool GetMirroredText( const Vector<Character>& text,
        it != endIt;
        ++it )
   {
-    const BidirectionalParagraphInfoRun& run = *it;
+    const BidirectionalParagraphInfoRun& paragraph = *it;
 
-    const bool tmpMirrored = bidirectionalSupport.GetMirroredText( mirroredTextBuffer + run.characterRun.characterIndex,
-                                                                   run.characterRun.numberOfCharacters );
+    const bool tmpMirrored = bidirectionalSupport.GetMirroredText( mirroredTextBuffer + paragraph.characterRun.characterIndex,
+                                                                   directionsBuffer + paragraph.characterRun.characterIndex,
+                                                                   paragraph.characterRun.numberOfCharacters );
 
     hasTextMirrored = hasTextMirrored || tmpMirrored;
   }

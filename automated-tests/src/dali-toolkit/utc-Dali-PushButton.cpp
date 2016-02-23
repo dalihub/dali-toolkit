@@ -725,9 +725,31 @@ int UtcDaliPushButtonAlignmentLayout(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliPushButtonAlignmentLayout");
 
-  // This test checks different alignments for the icon against the label.
-  // The icon is then moved around the label in each of it's alignments.
-  // The final relayed out size is checked to confirm the layout has been done correctly.
+  /*
+   * This test checks different alignments for the icon against the label.
+   * The icon is then moved around the label in each of it's alignments.
+   * The final relayed out size is checked to confirm the layout has been done correctly.
+   *
+   * There is an Icon which has 0 width and height, but with 75 padding on all sides.
+   *  - Therefore total width and height are both 150.
+   *
+   * There is a Label which has "an unknown" width and height, but with 30 padding on all sides.
+   *  - Therefore total width and height are 60+x and 60+y respectively.
+   *    Where x & y are the width and height of the text.
+   *
+   * The width of the button will always expand to the largest of the icon and label sizes (plus padding).
+   * So We use the padding to help us determine the orientation is correct for each alignment.
+   *
+   * |<- 150 ->|         |<-- 60+x -->|
+   *
+   * +---------+   -
+   * |         |   ^     +------------+   -
+   * |         |   |     |            |   ^
+   * |  Icon   |  150    |   Label    |  60+y
+   * |         |   |     |            |   v
+   * |         |   v     +------------+   -
+   * +---------+   -
+   */
   PushButton pushButton = PushButton::New();
 
   pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 30.0f, 30.0f, 30.0f, 30.0f ) );
@@ -765,6 +787,20 @@ int UtcDaliPushButtonAlignmentLayout(void)
   size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
 
+
+  /*
+   * Test Icon right alignment.
+   * Height grows to largest of Icon or Label (+ padding).
+   * Normally this will be Icons height, except with very large font sizes.
+   *
+   *  +------------+---------+
+   *  |............+         |
+   *  |            |         |
+   *  |   Label    |  Icon   |
+   *  |            |         |
+   *  |............+         |
+   *  +------------+---------+
+   */
   DALI_TEST_GREATER( size.width, 150.0f + 60.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 150.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
@@ -778,6 +814,19 @@ int UtcDaliPushButtonAlignmentLayout(void)
   compareSize.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   compareSize.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
 
+  /*
+   * Test Icon left alignment.
+   * Height grows to largest of Icon or Label (+ padding).
+   * Normally this will be Icons height, except with very large font sizes.
+   *
+   *  +---------+------------+
+   *  |         +............|
+   *  |         |            |
+   *  |  Icon   |   Label    |
+   *  |         |            |
+   *  |         +............|
+   *  +---------+------------+
+   */
   DALI_TEST_EQUALS( size, compareSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Test top alignment.
@@ -789,7 +838,25 @@ int UtcDaliPushButtonAlignmentLayout(void)
   compareSize.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   compareSize.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
 
-  DALI_TEST_EQUALS( compareSize.width, 150.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  /*
+   * Test Icon top alignment.
+   * Width grows to largest of Icon or Label (+ padding).
+   *
+   *  +---------+
+   *  |         |
+   *  |         |
+   *  |  Icon   |
+   *  |         |
+   *  |         |
+   *  +---------+
+   *  |         |
+   *  |  Label  |
+   *  |         |
+   *  +---------+
+   *
+   *  Note: We subtract a small number as we want to do a >= test.
+   */
+  DALI_TEST_GREATER( size.width, 150.0f - Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_GREATER( compareSize.height, 150.0f + 60.0f, TEST_LOCATION );
 
   // Test bottom alignment.
@@ -801,6 +868,22 @@ int UtcDaliPushButtonAlignmentLayout(void)
   size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
 
+  /*
+   * Test Icon bottom alignment.
+   * Width grows to largest of Icon or Label (+ padding).
+   *
+   *  +---------+
+   *  |         |
+   *  |  Label  |
+   *  |         |
+   *  +---------+
+   *  |         |
+   *  |         |
+   *  |  Icon   |
+   *  |         |
+   *  |         |
+   *  +---------+
+   */
   DALI_TEST_EQUALS( size, compareSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;

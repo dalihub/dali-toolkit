@@ -42,6 +42,7 @@ const char * const RENDERER_TYPE_VALUE("borderRenderer");
 
 const char * const COLOR_NAME("borderColor");
 const char * const SIZE_NAME("borderSize");
+const char * const ANTI_ALIASING("antiAliasing");
 
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
@@ -71,6 +72,35 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = borderColor*uColor;\n
   }\n
 );
+
+const char* VERTEX_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  attribute mediump vec2 aDrift;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump float borderSize;\n
+  varying mediump float vAlpha;\n
+  \n
+  void main()\n
+  {\n
+    vec2 position = aPosition*(uSize.xy+vec2(0.75)) + aDrift*(borderSize+1.5);\n
+    gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n
+    vAlpha = min( abs(aDrift.x), abs(aDrift.y) )*(borderSize+1.5);
+  }\n
+);
+
+const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec4 borderColor;\n
+  uniform mediump float borderSize;\n
+  varying mediump float vAlpha;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = borderColor*uColor;\n
+    gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha)*smoothstep( borderSize+1.5, borderSize, vAlpha );\n
+  }\n
+);
 }
 
 BorderRenderer::BorderRenderer( RendererFactoryCache& factoryCache )
@@ -78,7 +108,8 @@ BorderRenderer::BorderRenderer( RendererFactoryCache& factoryCache )
   mBorderColor( Color::TRANSPARENT ),
   mBorderSize( 0.f ),
   mBorderColorIndex( Property::INVALID_INDEX ),
-  mBorderSizeIndex( Property::INVALID_INDEX )
+  mBorderSizeIndex( Property::INVALID_INDEX ),
+  mAntiAliasing( false )
 {
 }
 
@@ -99,6 +130,12 @@ void BorderRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMa
   {
     DALI_LOG_ERROR( "Fail to provide a border size to the BorderRenderer object" );
   }
+
+  Property::Value* antiAliasing = propertyMap.Find( ANTI_ALIASING );
+  if( antiAliasing )
+  {
+    antiAliasing->Get( mAntiAliasing );
+  }
 }
 
 void BorderRenderer::SetClipRect( const Rect<int>& clipRect )
@@ -113,9 +150,9 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
   InitializeRenderer();
 
   mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_NAME, mBorderColor );
-  if( mBorderColor.a < 1.f )
+  if( mBorderColor.a < 1.f || mAntiAliasing)
   {
-    (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
   }
   mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
 }
@@ -137,14 +174,7 @@ void BorderRenderer::InitializeRenderer()
     mFactoryCache.SaveGeometry( RendererFactoryCache::BORDER_GEOMETRY, geometry );
   }
 
-  Shader shader = mFactoryCache.GetShader( RendererFactoryCache::BORDER_SHADER );
-  if( !shader )
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mFactoryCache.SaveShader( RendererFactoryCache::BORDER_SHADER, shader );
-  }
-
-  Material material = Material::New( shader );
+  Material material = Material::New( GetBorderShader() );
   mImpl->mRenderer = Renderer::New( geometry, material );
 }
 
@@ -155,9 +185,9 @@ void BorderRenderer::SetBorderColor(const Vector4& color)
   if( mImpl->mRenderer )
   {
     (mImpl->mRenderer).SetProperty( mBorderColorIndex, color );
-    if( color.a < 1.f &&  (mImpl->mRenderer).GetMaterial().GetBlendMode() != BlendingMode::ON)
+    if( color.a < 1.f )
     {
-      (mImpl->mRenderer).GetMaterial().SetBlendMode( BlendingMode::ON );
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
     }
   }
 }
@@ -172,14 +202,57 @@ void BorderRenderer::SetBorderSize( float size )
   }
 }
 
+void BorderRenderer::RequireAntiAliasing( bool antiAliasing )
+{
+  if( mAntiAliasing != antiAliasing )
+  {
+    mAntiAliasing = antiAliasing;
+    if( mImpl->mRenderer )
+    {
+      Material material =  mImpl->mRenderer.GetMaterial();
+      Shader shader = GetBorderShader();
+      material.SetShader( shader );
+      if( mAntiAliasing )
+      {
+        mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
+      }
+    }
+  }
+}
+
+Shader BorderRenderer::GetBorderShader()
+{
+  Shader shader;
+  if( mAntiAliasing )
+  {
+    shader = mFactoryCache.GetShader( RendererFactoryCache::BORDER_SHADER_ANTI_ALIASING );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER_ANTI_ALIASING, FRAGMENT_SHADER_ANTI_ALIASING );
+      mFactoryCache.SaveShader( RendererFactoryCache::BORDER_SHADER_ANTI_ALIASING, shader );
+    }
+  }
+  else
+  {
+    shader = mFactoryCache.GetShader( RendererFactoryCache::BORDER_SHADER );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      mFactoryCache.SaveShader( RendererFactoryCache::BORDER_SHADER, shader );
+    }
+  }
+
+  return shader;
+}
+
 /**
  * Vertices and triangles of the border geometry:
  *
  * vertex position = aPosition*uSize.xy + aDrift*uBorderSize;
  *
  * 0--1--2--3
- * | /| /| /|
- * |/ |/ |/ |
+ * |\ | /| /|
+ * | \|/ |/ |
  * 4--5--6--7
  * |\ |  |\ |
  * | \|  | \|
@@ -223,7 +296,7 @@ Geometry BorderRenderer::CreateBorderGeometry()
   borderVertices.SetData(borderVertexData);
 
   // Create indices
-  unsigned int indexData[24] = { 0,4,1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5 };
+  unsigned int indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
   Property::Map indexFormat;
   indexFormat[INDEX_NAME] = Property::INTEGER;
   PropertyBuffer indices = PropertyBuffer::New( indexFormat, 24 );

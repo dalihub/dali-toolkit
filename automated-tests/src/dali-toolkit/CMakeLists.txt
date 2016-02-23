@@ -27,6 +27,7 @@ SET(TC_SOURCES
    utc-Dali-ShadowView.cpp
    utc-Dali-Slider.cpp
    utc-Dali-TableView.cpp
+   utc-Dali-TextEditor.cpp
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
    utc-Dali-TextSelectionPopup.cpp
@@ -78,12 +79,13 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
    dali-toolkit-test-utils/test-render-controller.cpp
    dali-toolkit-test-utils/test-trace-call-stack.cpp
+   dali-toolkit-test-utils/test-native-image.cpp
 )
 
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-core
-    dali
+    dali-adaptor
     dali-toolkit
 )
 

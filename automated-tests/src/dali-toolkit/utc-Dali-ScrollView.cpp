@@ -2347,3 +2347,166 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
 
   END_TEST;
 }
+
+int UtcDaliScrollViewSetGetProperty(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ScrollView actor
+  ScrollView scrollView = ScrollView::New();
+  DALI_TEST_CHECK(scrollView);
+
+  // Event side properties
+
+  // Test "wrapEnabled" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("wrapEnabled") == ScrollView::Property::WRAP_ENABLED );
+  scrollView.SetProperty( ScrollView::Property::WRAP_ENABLED, true );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::WRAP_ENABLED).Get<bool>(), true, TEST_LOCATION );
+
+  // Test "panningEnabled" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("panningEnabled") == ScrollView::Property::PANNING_ENABLED );
+  scrollView.SetProperty( ScrollView::Property::PANNING_ENABLED, false );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::PANNING_ENABLED).Get<bool>(), false, TEST_LOCATION );
+
+  // Test "axisAutoLockEnabled" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("axisAutoLockEnabled") == ScrollView::Property::AXIS_AUTO_LOCK_ENABLED );
+  scrollView.SetProperty( ScrollView::Property::AXIS_AUTO_LOCK_ENABLED, false );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::AXIS_AUTO_LOCK_ENABLED).Get<bool>(), false, TEST_LOCATION );
+
+  // Test "wheelScrollDistanceStep" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("wheelScrollDistanceStep") == ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP );
+  scrollView.SetProperty( ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP, Vector2(100.0f, 50.0f) );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP).Get<Vector2>(), Vector2(100.0f, 50.0f), TEST_LOCATION );
+
+  // Test "overshootEnabled" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("overshootEnabled") == Scrollable::Property::OVERSHOOT_ENABLED  );
+  DALI_TEST_EQUALS( scrollView.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), scrollView.IsOvershootEnabled(), TEST_LOCATION );
+  scrollView.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, false );
+  DALI_TEST_EQUALS( scrollView.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), false, TEST_LOCATION );
+
+  // Animatable properties
+
+  // Test "scrollPosition" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPosition") == ScrollView::Property::SCROLL_POSITION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION, Vector2(320.0f, 550.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_POSITION).Get<Vector2>(), Vector2(320.0f, 550.0f), TEST_LOCATION );
+
+  // Test "scrollPrePosition", "scrollPrePositionX" and "scrollPrePositionY" properties
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPrePosition") == ScrollView::Property::SCROLL_PRE_POSITION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_PRE_POSITION, Vector2(300.0f, 500.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION).Get<Vector2>(), Vector2(300.0f, 500.0f), TEST_LOCATION );
+
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPrePositionX") == ScrollView::Property::SCROLL_PRE_POSITION_X );
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPrePositionY") == ScrollView::Property::SCROLL_PRE_POSITION_Y );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_X).Get<float>(), 300.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_Y).Get<float>(), 500.0f, TEST_LOCATION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_PRE_POSITION_X, 400.0f );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_PRE_POSITION_Y, 600.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_X).Get<float>(), 400.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_Y).Get<float>(), 600.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION).Get<Vector2>(), Vector2(400.0f, 600.0f), TEST_LOCATION );
+
+  // Test "scrollPrePositionMax", "scrollPrePositionMaxX" and "scrollPrePositionMaxY" properties
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPrePositionMax") == ScrollView::Property::SCROLL_PRE_POSITION_MAX );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_PRE_POSITION_MAX, Vector2(100.0f, 200.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_MAX).Get<Vector2>(), Vector2(100.0f, 200.0f), TEST_LOCATION );
+
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPrePositionMaxX") == ScrollView::Property::SCROLL_PRE_POSITION_MAX_X );
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPrePositionMaxY") == ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_MAX_X).Get<float>(), 100.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y).Get<float>(), 200.0f, TEST_LOCATION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_PRE_POSITION_MAX_X, 300.0f );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y, 400.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_MAX_X).Get<float>(), 300.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y).Get<float>(), 400.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_PRE_POSITION_MAX).Get<Vector2>(), Vector2(300.0f, 400.0f), TEST_LOCATION );
+
+  // Test "overshootX" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("overshootX") == ScrollView::Property::OVERSHOOT_X );
+  scrollView.SetProperty( ScrollView::Property::OVERSHOOT_X, 0.8f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::OVERSHOOT_X).Get<float>(), 0.8f, TEST_LOCATION );
+
+  // Test "overshootY" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("overshootY") == ScrollView::Property::OVERSHOOT_Y );
+  scrollView.SetProperty( ScrollView::Property::OVERSHOOT_Y, 0.8f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::OVERSHOOT_Y).Get<float>(), 0.8f, TEST_LOCATION );
+
+  // Test "scrollFinal", "scrollFinalX" and "scrollFinalY" properties
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollFinal") == ScrollView::Property::SCROLL_FINAL );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_FINAL, Vector2(200.0f, 300.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_FINAL).Get<Vector2>(), Vector2(200.0f, 300.0f), TEST_LOCATION );
+
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollFinalX") == ScrollView::Property::SCROLL_FINAL_X );
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollFinalY") == ScrollView::Property::SCROLL_FINAL_Y );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_FINAL_X).Get<float>(), 200.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_FINAL_Y).Get<float>(), 300.0f, TEST_LOCATION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_FINAL_X, 500.0f );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_FINAL_Y, 600.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_FINAL_X).Get<float>(), 500.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_FINAL_Y).Get<float>(), 600.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_FINAL).Get<Vector2>(), Vector2(500.0f, 600.0f), TEST_LOCATION );
+
+  // Test "wrap" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("wrap") == ScrollView::Property::WRAP );
+  scrollView.SetProperty( ScrollView::Property::WRAP, false );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::WRAP).Get<bool>(), false, TEST_LOCATION );
+
+  // Test "panning" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("panning") == ScrollView::Property::PANNING );
+  scrollView.SetProperty( ScrollView::Property::PANNING, true );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::PANNING).Get<bool>(), true, TEST_LOCATION );
+
+  // Test "scrolling" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrolling") == ScrollView::Property::SCROLLING );
+  scrollView.SetProperty( ScrollView::Property::SCROLLING, false );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLLING).Get<bool>(), false, TEST_LOCATION );
+
+  // Test "scrollDomainSize", "scrollDomainSizeX" and "scrollDomainSizeY" properties
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollDomainSize") == ScrollView::Property::SCROLL_DOMAIN_SIZE );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_DOMAIN_SIZE, Vector2(1200.0f, 1300.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_SIZE).Get<Vector2>(), Vector2(1200.0f, 1300.0f), TEST_LOCATION );
+
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollDomainSizeX") == ScrollView::Property::SCROLL_DOMAIN_SIZE_X );
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollDomainSizeY") == ScrollView::Property::SCROLL_DOMAIN_SIZE_Y );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_SIZE_X).Get<float>(), 1200.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_SIZE_Y).Get<float>(), 1300.0f, TEST_LOCATION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_DOMAIN_SIZE_X, 1500.0f );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_DOMAIN_SIZE_Y, 1600.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_SIZE_X).Get<float>(), 1500.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_SIZE_Y).Get<float>(), 1600.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_SIZE).Get<Vector2>(), Vector2(1500.0f, 1600.0f), TEST_LOCATION );
+
+  // Test "scrollDomainOffset" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollDomainOffset") == ScrollView::Property::SCROLL_DOMAIN_OFFSET );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_DOMAIN_OFFSET, Vector2(500.0f, 200.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_DOMAIN_OFFSET).Get<Vector2>(), Vector2(500.0f, 200.0f), TEST_LOCATION );
+
+  // Test "scrollPositionDelta" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("scrollPositionDelta") == ScrollView::Property::SCROLL_POSITION_DELTA );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION_DELTA, Vector2(10.0f, 30.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::SCROLL_POSITION_DELTA).Get<Vector2>(), Vector2(10.0f, 30.0f), TEST_LOCATION );
+
+  // Test "startPagePosition" property
+  DALI_TEST_CHECK( scrollView.GetPropertyIndex("startPagePosition") == ScrollView::Property::START_PAGE_POSITION );
+  scrollView.SetProperty( ScrollView::Property::START_PAGE_POSITION, Vector3(50.0f, 100.0f, 20.0f) );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::START_PAGE_POSITION).Get<Vector3>(), Vector3(50.0f, 100.0f, 20.0f), TEST_LOCATION );
+
+  END_TEST;
+}

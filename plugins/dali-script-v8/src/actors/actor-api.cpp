@@ -36,21 +36,14 @@ namespace V8Plugin
 
 namespace  // unanmed namespace
 {
+
 Actor GetActor( v8::Isolate* isolate, const v8::FunctionCallbackInfo<v8::Value>& args )
 {
   HandleWrapper* handleWrapper = HandleWrapper::Unwrap( isolate, args.This() );
   return Actor::DownCast( handleWrapper->mHandle );
 }
+
 } //unanmed namespace
-
-
-namespace TextLabelApi
-{
- Actor New( const v8::FunctionCallbackInfo< v8::Value >& args )
- {
-   return Dali::Toolkit::TextLabel::New();
- }
-}
 
 /***************************************
  * ACTOR API FUNCTIONS
@@ -279,7 +272,7 @@ void ActorApi::GetChildCount( const v8::FunctionCallbackInfo<v8::Value>& args )
 }
 
 /**
- * Retrieve and child actor by index.
+ * Retrieve a child actor by index.
  *
  * @for Actor
  * @method getChildAt
@@ -522,6 +515,31 @@ void ActorApi::GetNaturalSize( const v8::FunctionCallbackInfo<v8::Value>& args )
   sizeObject->Set( v8::String::NewFromUtf8( isolate, "z" ), v8::Integer::New( isolate, size.depth ) );
 
   args.GetReturnValue().Set( sizeObject );
+}
+
+/**
+ * Return the value of negotiated dimension for the given dimension
+ *
+ * @for Actor
+ * @method getRelayoutSize
+ * @param {Integer} dimension The dimension of layout to retrieve (either dali.DIMENSION_WIDTH or dali.DIMENSION_HEIGHT)
+ * @return {Number} The value of the negotiated dimension
+ */
+void ActorApi::GetRelayoutSize( const v8::FunctionCallbackInfo<v8::Value>& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+  Actor actor = GetActor( isolate, args );
+
+  bool found;
+  int dimension = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0 );
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "missing dimension parameter");
+    return;
+  }
+
+  args.GetReturnValue().Set( v8::Number::New( isolate, actor.GetRelayoutSize( static_cast<Dimension::Type>(dimension) ) ) );
 }
 
 /**

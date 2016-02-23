@@ -40,6 +40,7 @@ class TextLabel;
  * @brief A control which renders a short text string.
  *
  * Text labels are lightweight, non-editable and do not respond to user input.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API TextLabel : public Control
 {
@@ -47,41 +48,44 @@ public:
 
   /**
    * @brief The start and end property ranges for this control.
+   * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
   };
 
   /**
    * @brief An enumeration of properties belonging to the TextLabel class.
+   * @SINCE_1_0.0
    */
   struct Property
   {
     enum
     {
-      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",     The type or rendering e.g. bitmap-based,          type INT
-      TEXT,                                     ///< name "text",                 The text to display in UTF-8 format,              type STRING
-      FONT_FAMILY,                              ///< name "fontFamily",           The requested font family,                        type STRING
-      FONT_STYLE,                               ///< name "fontStyle",            The requested font style,                         type STRING
-      POINT_SIZE,                               ///< name "pointSize",            The size of font in points,                       type FLOAT
-      MULTI_LINE,                               ///< name "multiLine",            The single-line or multi-line layout option,      type BOOLEAN
-      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",  The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END"
-      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",    The line vertical alignment,                      type STRING,  values "TOP",   "CENTER", "BOTTOM"
-      TEXT_COLOR,                               ///< name "textColor",            The text color,                                   type VECTOR4
-      SHADOW_OFFSET,                            ///< name "shadowOffset",         The drop shadow offset 0 indicates no shadow,     type VECTOR2
-      SHADOW_COLOR,                             ///< name "shadowColor",          The color of a drop shadow,                       type VECTOR4
-      UNDERLINE_ENABLED,                        ///< name "underlineEnabled",     The underline enabled flag,                       type BOOLEAN
-      UNDERLINE_COLOR,                          ///< name "underlineColor",       The color of the underline,                       type VECTOR4
-      UNDERLINE_HEIGHT,                         ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT
-      ENABLE_MARKUP                             ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN
+      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",     The type or rendering e.g. bitmap-based,          type INT @SINCE_1_0.0
+      TEXT,                                     ///< name "text",                 The text to display in UTF-8 format,              type STRING @SINCE_1_0.0
+      FONT_FAMILY,                              ///< name "fontFamily",           The requested font family,                        type STRING @SINCE_1_0.0
+      FONT_STYLE,                               ///< name "fontStyle",            The requested font style,                         type STRING @SINCE_1_0.0
+      POINT_SIZE,                               ///< name "pointSize",            The size of font in points,                       type FLOAT @SINCE_1_0.0
+      MULTI_LINE,                               ///< name "multiLine",            The single-line or multi-line layout option,      type BOOLEAN @SINCE_1_0.0
+      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",  The line horizontal alignment,                    type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_0.0
+      VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",    The line vertical alignment,                      type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0
+      TEXT_COLOR,                               ///< name "textColor",            The text color,                                   type VECTOR4 @SINCE_1_0.0
+      SHADOW_OFFSET,                            ///< name "shadowOffset",         The drop shadow offset 0 indicates no shadow,     type VECTOR2 @SINCE_1_0.0
+      SHADOW_COLOR,                             ///< name "shadowColor",          The color of a drop shadow,                       type VECTOR4 @SINCE_1_0.0
+      UNDERLINE_ENABLED,                        ///< name "underlineEnabled",     The underline enabled flag,                       type BOOLEAN @SINCE_1_0.0
+      UNDERLINE_COLOR,                          ///< name "underlineColor",       The color of the underline,                       type VECTOR4 @SINCE_1_0.0
+      UNDERLINE_HEIGHT,                         ///< name "underlineHeight",      Overrides the underline height from font metrics, type FLOAT @SINCE_1_0.0
+      ENABLE_MARKUP                             ///< name "enableMarkup",         Whether the mark-up processing is enabled.        type BOOLEAN @SINCE_1_0.0
     };
   };
 
   /**
    * @brief Create the TextLabel control.
    *
+   * @SINCE_1_0.0
    * @return A handle to the TextLabel control.
    */
   static TextLabel New();
@@ -89,6 +93,7 @@ public:
   /**
    * @brief Create the TextLabel control.
    *
+   * @SINCE_1_0.0
    * @param[in] text The text to display.
    * @return A handle to the TextLabel control.
    */
@@ -96,12 +101,14 @@ public:
 
   /**
    * @brief Creates an empty handle.
+   * @SINCE_1_0.0
    */
   TextLabel();
 
   /**
    * @brief Copy constructor.
    *
+   * @SINCE_1_0.0
    * @param[in] handle The handle to copy from.
    */
   TextLabel( const TextLabel& handle );
@@ -109,6 +116,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_0.0
    * @param[in] handle The handle to copy from.
    * @return A reference to this.
    */
@@ -118,6 +126,7 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_0.0
    */
   ~TextLabel();
 
@@ -127,6 +136,7 @@ public:
    * If the BaseHandle points is a TextLabel the downcast returns a valid handle.
    * If not the returned handle is left empty.
    *
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a TextLabel or an empty handle
    */
@@ -137,6 +147,7 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
+   * @SINCE_1_0.0
    * @param[in] implementation The Control implementation.
    */
   DALI_INTERNAL TextLabel( Internal::TextLabel& implementation );
@@ -144,6 +155,7 @@ public: // Not intended for application developers
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
+   * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL TextLabel( Dali::Internal::CustomActor* internal );

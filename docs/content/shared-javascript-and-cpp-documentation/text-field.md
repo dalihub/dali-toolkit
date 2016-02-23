@@ -11,7 +11,9 @@ The Dali::Toolkit::TextField is a control which provides a single-line editable 
 
 Before any text has been entered, the TextField can display some placeholder text.
 An alternative placeholder can be displayed when the TextField has keyboard focus.
-For example a TextField used to enter a username could initially show "Unknown Name", and then show "Enter Name." when the cursor is shown. 
+For example a TextField used to enter a username could initially show "Unknown Name", and then show "Enter Name." when the cursor is shown.
+
+Note *CR+LF* new line characters are replaced by a *LF* one.
 
 ~~~{.cpp}
 // C++
@@ -59,13 +61,7 @@ Mark-up tags can be used to change the style of the text. See the [Mark-up Style
 
 ### Input Style
 
-The input style can be changed through the control properties. Current supported input style properties are:
-
-#### INPUT_COLOR
-
-Sets the input color. All subsequent characters added will be rendered with the input color.
-
-Note the input color may change if the cursor is updated by tapping in a new position.
+The input style can be changed through the control properties. See the [Input Style](@ref input-style) section for more details.
 
 ### Text Alignment
 
@@ -86,25 +82,7 @@ field.HorizontalAlignment = "BEGIN"; // "CENTER" or "END"
 
 ### Copy and Paste  (Selection)
 
-Text can be selected by a long press or double tapping it.   Depending on certain conditions a popup could be shown giving options including [CUT][COPY][PASTE], [SELECT ALL] or [CLIPBOARD]. Below these conditions will be explained.
-
-[CUT] or [COPY] send the selected text to the clipboard ready to be pasted directly or via the clipboard UI.   Pressing [PASTE] will paste the top item from the clipboard (what has just been copied, possibly from another application).  If the system supports a clipboard UI this can be displayed by pressing the [CLIPBOARD] button.
-
-Empty text means the user has not inputted any text, a TextField containing special characters or purely whitespace is not empty.
-
-Below shows how the popup will look depending on the state of the TextField
-
-|  |  |
-|--|--|
-| Condition: Long press/double tap when empty text but clipboard has content  |  Condition: Long press/double tap when TextField contains text |
-|[PASTE][CLIPBOARD] buttons shown| [CUT][COPY], [SELECT ALL] unless all text selected and [PASTE][CLIPBOARD] if content to paste. |
-|    ![ ](../assets/img/text-controls/EmptyTextClipboardHasContent.png) ![ ](./EmptyTextClipboardHasContent.png) |   ![ ](../assets/img/text-controls/SelectingText.png) ![ ](./SelectingText.png) |
-| Condition: Long press/double tap popup when TextField contains just whitespace | Condition: Empty text & clipboard empty |
-| Whitespace treated as regular text, [CUT][COPY] shown and [PASTE][CLIPBOARD] if content to paste. As all text is selected there is no need for [SELECT ALL] |  No popup shown after longpress/double tap|
-|  ![ ](../assets/img/text-controls/SelectAllWhitespace.png) ![ ](./SelectAllWhitespace.png) | ![ ](../assets/img/text-controls/EmptyTextAndNoContentToPaste.png) ![ ](./EmptyTextAndNoContentToPaste.png)|
-| Condition: Longpress/(double tap) on whitespace which is following text | Condition: Tapping text or panning grab handle |
-| [PASTE][CLIPBOARD] shown if something to paste. [SELECT ALL] as more text to select | If content in clipboard [PASTE][CLIPBOARD] popup will be shown. |
-| ![ ](../assets/img/text-controls/SelectWhitespaceAfterText.png) ![ ](./SelectWhitespaceAfterText.png) | ![ ](../assets/img/text-controls/TapAfterCopyingText.png) ![ ](./TapAfterCopyingText.png) |
+Text can be selected by a long press or double tapping it. See the [Copy and Paste](@ref copy-n-paste) section for more details.
 
 ### TextField Decorations
 
@@ -167,6 +145,9 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  inputMethodSettings               | INPUT_METHOD_SETTINGS                |  MAP         | O            | X
  inputColor                        | INPUT_COLOR                          |  VECTOR4     | O            | X
  enableMarkup                      | ENABLE_MARKUP                        |  BOOLEAN     | O            | X
+ inputFontFamily                   | INPUT_FONT_FAMILY                    |  STRING      | O            | X
+ inputFontStyle                    | INPUT_FONT_STYLE                     |  STRING      | O            | X
+ inputPointSize                    | INPUT_POINT_SIZE                     |  FLOAT       | O            | X
 
 @class TextField
 

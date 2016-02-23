@@ -40,7 +40,8 @@ class ScrollViewPagePathEffect;
  */
 
 /**
- * ScrollView Page Path Effect.
+ * @brief ScrollView Page Path Effect.
+ *
  * This effect causes Actors to follow a given path. The opacity of the actor will be 0.0 at
  * the beginning of the path and will go to 1.0 as it is approximating to half of the path to return
  * to 0.0 at the end of the path
@@ -59,6 +60,7 @@ class ScrollViewPagePathEffect;
  *
  * Automatic operation:
  * not implemented.
+ * @SINCE_1_0.0
  */
 class DALI_IMPORT_API ScrollViewPagePathEffect : public ScrollViewEffect
 {
@@ -66,7 +68,8 @@ class DALI_IMPORT_API ScrollViewPagePathEffect : public ScrollViewEffect
 public:
 
   /**
-   * Create an initialized ScrollViewPagePathEffect.
+   * @brief Create an initialized ScrollViewPagePathEffect.
+   * @SINCE_1_0.0
    * @param[in] path The path that will be used by the scroll effect
    * @param[in] forward Vector in page object space which will be aligned with the tangent of the path
    * @param[in] inputPropertyIndex Index of a property of the scroll-view which will be used as the input for the path.
@@ -77,21 +80,26 @@ public:
   static ScrollViewPagePathEffect New(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& pageSize, unsigned int pageCount);
 
   /**
-   * Create an uninitialized ScrollViewPagePathEffect; this can be initialized with ScrollViewPagePathEffect::New()
+   * @brief Create an uninitialized ScrollViewPagePathEffect; this can be initialized with ScrollViewPagePathEffect::New()
    * Calling member functions with an uninitialized Toolkit::ScrollViewPagePathEffect is not allowed.
+   * @SINCE_1_0.0
    */
   ScrollViewPagePathEffect();
 
   /**
-   * Downcast an Object handle to ScrollViewPagePathEffect. If handle points to a ScrollViewPagePathEffect the
+   * @brief Downcast a handle to ScrollViewPagePathEffect handle.
+   *
+   * If handle points to a ScrollViewPagePathEffect the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @SINCE_1_0.0
    * @param[in] handle Handle to an object
    * @return handle to a ScrollViewPagePathEffect or an uninitialized handle
    */
   static ScrollViewPagePathEffect DownCast( BaseHandle handle );
 
   /**
-   * Manually apply effect to a page in the scroll-view.
+   * @brief Manually apply effect to a page in the scroll-view.
+   * @SINCE_1_0.0
    * @param[in] page The page to be affected by this effect.
    * @param[in] pageOrder The order of the page in the scroll-view
    */
@@ -100,7 +108,8 @@ public:
 protected:
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   * @SINCE_1_0.0
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL ScrollViewPagePathEffect( Internal::ScrollViewPagePathEffect *impl );

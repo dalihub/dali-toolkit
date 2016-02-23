@@ -49,6 +49,10 @@ const ApiFunction RendererFunctionTable[]=
    { "GetGeometry"             , RendererApi::GetGeometry },
    { "SetMaterial"             , RendererApi::SetMaterial },
    { "GetMaterial"             , RendererApi::GetMaterial },
+   { "SetBlendFunc"            , RendererApi::SetBlendFunc },
+   { "GetBlendFunc"            , RendererApi::GetBlendFunc },
+   { "SetBlendEquation"        , RendererApi::SetBlendEquation },
+   { "GetBlendEquation"        , RendererApi::GetBlendEquation },
 };
 
 const unsigned int RendererFunctionTableCount = sizeof(RendererFunctionTable)/sizeof(RendererFunctionTable[0]);

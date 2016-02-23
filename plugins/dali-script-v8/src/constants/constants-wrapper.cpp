@@ -33,8 +33,10 @@
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/common/loading-state.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/geometry.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 namespace Dali
 {
@@ -215,10 +217,10 @@ const IntegerPair EnumTable[] =
     { "WRAP_MODE_REPEAT",                     WrapMode::REPEAT           },
     { "WRAP_MODE_MIRRORED_REPEAT",            WrapMode::MIRRORED_REPEAT  },
 
-    { "MATERIAL_NONE",                        Material::NONE                      },
-    { "MATERIAL_CULL_BACK",                   Material::CULL_BACK                 },
-    { "MATERIAL_CULL_FRONT",                  Material::CULL_FRONT                },
-    { "MATERIAL_CULL_BACK_AND_FRONT",         Material::CULL_BACK_AND_FRONT       },
+    { "MATERIAL_NONE",                        Renderer::NONE                      },
+    { "MATERIAL_CULL_BACK",                   Renderer::CULL_BACK                 },
+    { "MATERIAL_CULL_FRONT",                  Renderer::CULL_FRONT                },
+    { "MATERIAL_CULL_BACK_AND_FRONT",         Renderer::CULL_BACK_AND_FRONT       },
 
     { "GEOMETRY_POINTS",                      Geometry::POINTS          },
     { "GEOMETRY_LINES",                       Geometry::LINES           },
@@ -243,6 +245,34 @@ const IntegerPair EnumTable[] =
     { "PROPERTY_ARRAY",                       Property::ARRAY          },
     { "PROPERTY_MAP",                         Property::MAP            },
     { "PROPERTY_INVALID_INDEX",               Property::INVALID_INDEX  },
+    { "PROPERTY_READ_ONLY",                   Property::READ_ONLY      },
+    { "PROPERTY_READ_WRITE",                  Property::READ_WRITE     },
+    { "PROPERTY_ANIMATABLE",                  Property::ANIMATABLE     },
+
+    { "DIMENSION_WIDTH",                      Dimension::WIDTH   },
+    { "DIMENSION_HEIGHT",                     Dimension::HEIGHT  },
+
+    { "ITEM_LAYOUT_LIST",                     Toolkit::DefaultItemLayout::LIST     },
+    { "ITEM_LAYOUT_GRID",                     Toolkit::DefaultItemLayout::GRID     },
+
+    { "DIRECTION_BIAS_NONE",                  Toolkit::DirectionBiasNone   },
+    { "DIRECTION_BIAS_LEFT",                  Toolkit::DirectionBiasLeft   },
+    { "DIRECTION_BIAS_RIGHT",                 Toolkit::DirectionBiasRight  },
+
+    { "ALPHA_FUNCTION_DEFAULT",               AlphaFunction::DEFAULT              },
+    { "ALPHA_FUNCTION_LINEAR",                AlphaFunction::LINEAR               },
+    { "ALPHA_FUNCTION_REVERSE",               AlphaFunction::REVERSE              },
+    { "ALPHA_FUNCTION_EASE_IN_SQUARE",        AlphaFunction::EASE_IN_SQUARE       },
+    { "ALPHA_FUNCTION_EASE_OUT_SQUARE",       AlphaFunction::EASE_OUT_SQUARE      },
+    { "ALPHA_FUNCTION_EASE_IN",               AlphaFunction::EASE_IN              },
+    { "ALPHA_FUNCTION_EASE_OUT",              AlphaFunction::EASE_OUT             },
+    { "ALPHA_FUNCTION_EASE_IN_OUT",           AlphaFunction::EASE_IN_OUT          },
+    { "ALPHA_FUNCTION_EASE_IN_SINE",          AlphaFunction::EASE_IN_SINE         },
+    { "ALPHA_FUNCTION_EASE_OUT_SINE",         AlphaFunction::EASE_OUT_SINE        },
+    { "ALPHA_FUNCTION_EASE_IN_OUT_SINE",      AlphaFunction::EASE_IN_OUT_SINE     },
+    { "ALPHA_FUNCTION_BOUNCE",                AlphaFunction::BOUNCE               },
+    { "ALPHA_FUNCTION_SIN",                   AlphaFunction::SIN                  },
+    { "ALPHA_FUNCTION_EASE_OUT_BACK",         AlphaFunction::EASE_OUT_BACK        },
 
 };
 const unsigned int EnumTableCount = sizeof(EnumTable)/sizeof(EnumTable[0]);

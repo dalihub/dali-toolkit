@@ -30,6 +30,8 @@
 namespace Dali
 {
 
+class NativeImage;
+
 namespace Toolkit
 {
 
@@ -162,6 +164,13 @@ public:
    */
   void SetImage( Actor& actor, const Image& image );
 
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha(  bool preMultipled );
+
 private:
 
   /**
@@ -193,6 +202,13 @@ private:
   Renderer CreateRenderer() const;
 
   /**
+   * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
+   *
+   * @return Returns the created Dali::Renderer
+   */
+  Renderer CreateNativeImageRenderer() const;
+
+  /**
    * Callback function of image resource loading succeed
    * @param[in] image The Image content that we attempted to load from mImageUrl
    */
@@ -209,16 +225,23 @@ private:
    */
   void CleanCache(const std::string& url);
 
+  /**
+   * Set shader code for nativeimage if it exists
+   */
+  void SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage );
+
 private:
   Image mImage;
   ImageAtlasManager& mAtlasManager;
-  Vector4 mTextureRect;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;
   Dali::FittingMode::Type mFittingMode;
   Dali::SamplingMode::Type mSamplingMode;
+  bool mIsAlphaPreMultiplied;
 
+  std::string mNativeFragmentShaderCode;
+  bool mNativeImageFlag;
 };
 
 } // namespace Internal

@@ -45,40 +45,78 @@ namespace Internal
 {
 
 /**
- * @brief Retrieves the font Id from the font run for a given character's @p index.
+ * @brief Merges the font descriptions to retrieve the font Id for each character.
  *
- * If the character's index exceeds the current font run it increases the iterator to get the next one.
- *
- * @param[in] index The character's index.
- * @param[in,out] fontRunIt Iterator to the current font run.
- * @param[in] fontRunEndIt Iterator to one after the last font run.
- *
- * @return The font id.
+ * @param[in] fontDescriptions The font descriptions.
+ * @param[out] fontIds The font id for each character.
+ * @param[in] defaultFontDescription The default font description.
+ * @param[in] defaultPointSize The default font size.
  */
-FontId GetFontId( Length index,
-                  Vector<FontRun>::ConstIterator& fontRunIt,
-                  const Vector<FontRun>::ConstIterator& fontRunEndIt )
+void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
+                            Vector<FontId>& fontIds,
+                            const TextAbstraction::FontDescription& defaultFontDescription,
+                            TextAbstraction::PointSize26Dot6 defaultPointSize )
 {
-  FontId fontId = 0u;
+  // Get the handle to the font client.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
-  if( fontRunIt != fontRunEndIt )
+  // Pointer to the font id buffer.
+  FontId* fontIdsBuffer = fontIds.Begin();
+
+  // Traverse all the characters.
+  const Length numberOfCharacters = fontIds.Count();
+  for( CharacterIndex index = 0u; index < numberOfCharacters; ++index )
   {
-    const FontRun& fontRun = *fontRunIt;
+    // The default font description and font point size.
+    TextAbstraction::FontDescription fontDescription = defaultFontDescription;
+    TextAbstraction::PointSize26Dot6 fontSize = defaultPointSize;
+    bool defaultFont = true;
 
-    if( ( index >= fontRun.characterRun.characterIndex ) &&
-        ( index < fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters ) )
+    // Traverse all the font descriptions.
+    for( Vector<FontDescriptionRun>::ConstIterator it = fontDescriptions.Begin(),
+           endIt = fontDescriptions.End();
+         it != endIt;
+         ++it )
     {
-      fontId = fontRun.fontId;
+      // Check whether the character's font is modified by the current font description.
+      const FontDescriptionRun& fontRun = *it;
+      if( ( index >= fontRun.characterRun.characterIndex ) &&
+          ( index < fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters ) )
+      {
+        if( fontRun.familyDefined )
+        {
+          fontDescription.family = std::string( fontRun.familyName, fontRun.familyLength );
+          defaultFont = false;
+        }
+        if( fontRun.weightDefined )
+        {
+          fontDescription.weight = fontRun.weight;
+          defaultFont = false;
+        }
+        if( fontRun.widthDefined )
+        {
+          fontDescription.width = fontRun.width;
+          defaultFont = false;
+        }
+        if( fontRun.slantDefined )
+        {
+          fontDescription.slant = fontRun.slant;
+          defaultFont = false;
+        }
+        if( fontRun.sizeDefined )
+        {
+          fontSize = fontRun.size;
+          defaultFont = false;
+        }
+      }
     }
 
-    if( index + 1u == fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters )
+    // Get the font id if is not the default font.
+    if( !defaultFont )
     {
-      // All the characters of the current run have been traversed. Get the next one for the next iteration.
-      ++fontRunIt;
+      *( fontIdsBuffer + index ) = fontClient.GetFontId( fontDescription, fontSize );
     }
   }
-
-  return fontId;
 }
 
 /**
@@ -349,8 +387,13 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
+                                          const Vector<FontDescriptionRun>& fontDescriptions,
+                                          FontId defaultFontId,
                                           Vector<FontRun>& fonts )
 {
+  // Clear any previously validated font.
+  fonts.Clear();
+
   DALI_LOG_INFO( gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n" );
   const Length numberOfCharacters = text.Count();
 
@@ -361,11 +404,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     return;
   }
 
-  // Copy the fonts set by application developers.
-  const Length numberOfFontRuns = fonts.Count();
-  const Vector<FontRun> userSetFonts = fonts;
-  fonts.Clear();
-
   // Traverse the characters and validate/set the fonts.
 
   // Get the caches.
@@ -373,33 +411,46 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   ValidateFontsPerScript** validFontsPerScriptCacheBuffer = mValidFontsPerScriptCache.Begin();
 
   // Stores the validated font runs.
-  fonts.Reserve( numberOfFontRuns );
+  fonts.Reserve( fontDescriptions.Count() );
 
   // Initializes a validated font run.
   FontRun currentFontRun;
   currentFontRun.characterRun.characterIndex = 0u;
   currentFontRun.characterRun.numberOfCharacters = 0u;
   currentFontRun.fontId = 0u;
-  currentFontRun.isDefault = false;
 
   // Get the font client.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
-  // Iterators of the font and script runs.
-  Vector<FontRun>::ConstIterator fontRunIt = userSetFonts.Begin();
-  Vector<FontRun>::ConstIterator fontRunEndIt = userSetFonts.End();
+  // Get the default font description and default size.
+  TextAbstraction::FontDescription defaultFontDescription;
+  TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+  if( defaultFontId > 0u )
+  {
+    fontClient.GetDescription( defaultFontId, defaultFontDescription );
+    defaultPointSize = fontClient.GetPointSize( defaultFontId );
+  }
+
+  // Merge font descriptions
+  Vector<FontId> fontIds;
+  fontIds.Resize( numberOfCharacters, defaultFontId );
+  MergeFontDescriptions( fontDescriptions,
+                         fontIds,
+                         defaultFontDescription,
+                         defaultPointSize );
+
+  const Character* const textBuffer = text.Begin();
+  const FontId* const fontIdsBuffer = fontIds.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
 
   for( Length index = 0u; index < numberOfCharacters; ++index )
   {
     // Get the character.
-    const Character character = *( text.Begin() + index );
+    const Character character = *( textBuffer + index );
 
     // Get the font for the character.
-    FontId fontId = GetFontId( index,
-                               fontRunIt,
-                               fontRunEndIt );
+    FontId fontId = *( fontIdsBuffer + index );
 
     // Get the script for the character.
     Script script = GetScript( index,
@@ -427,92 +478,77 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     }
 
     // Whether the font being validated is a default one not set by the user.
-    const bool isDefault = ( 0u == fontId );
     FontId preferredFont = fontId;
 
-    DALI_LOG_INFO( gLogFilter,
-                   Debug::Verbose,
-                   "  Is a default font : %s\n",
-                   ( isDefault ? "true" : "false" ) );
+    // Validate if the font set by the user supports the character.
 
-    // The default font point size.
-    PointSize26Dot6 pointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+    // Check first in the caches.
 
-    if( !isDefault )
+    // The user may have set the default font. Check it. Otherwise check in the valid fonts cache.
+    if( fontId != *( defaultFontPerScriptCacheBuffer + script ) )
     {
-      // Validate if the font set by the user supports the character.
+      // Check in the valid fonts cache.
+      ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
 
-      // Check first in the caches.
-
-      // The user may have set the default font. Check it. Otherwise check in the valid fonts cache.
-      if( fontId != *( defaultFontPerScriptCacheBuffer + script ) )
+      if( NULL == validateFontsPerScript )
       {
-        // Check in the valid fonts cache.
-        ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
+        validateFontsPerScript = new ValidateFontsPerScript();
 
-        if( NULL == validateFontsPerScript )
+        *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
+      }
+
+      if( NULL != validateFontsPerScript )
+      {
+        if( !validateFontsPerScript->FindValidFont( fontId ) )
         {
-          validateFontsPerScript = new ValidateFontsPerScript();
+          // Use the font client to validate the font.
+          GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
 
-          *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
-        }
-
-        if( NULL != validateFontsPerScript )
-        {
-          if( !validateFontsPerScript->FindValidFont( fontId ) )
+          // Emojis are present in many monochrome fonts; prefer color by default.
+          if( ( TextAbstraction::EMOJI == script ) &&
+              ( 0u != glyphIndex ) )
           {
-            // Use the font client to validate the font.
-            GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
-
-            // Emojis are present in many monochrome fonts; prefer color by default.
-            if( TextAbstraction::EMOJI == script &&
-                0u != glyphIndex )
+            BufferImage bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
+            if( bitmap &&
+                ( Pixel::BGRA8888 != bitmap.GetPixelFormat() ) )
             {
-              BufferImage bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
-              if( bitmap &&
-                  Pixel::BGRA8888 != bitmap.GetPixelFormat() )
+              glyphIndex = 0u;
+            }
+          }
+
+          if( 0u == glyphIndex )
+          {
+            // The font is not valid. Set to zero and a default one will be set.
+            fontId = 0u;
+          }
+          else
+          {
+            // Add the font to the valid font cache.
+
+            //   At this point the validated font supports the given character. However, characters
+            // common for all scripts, like white spaces or new paragraph characters, need to be
+            // processed differently.
+            //
+            //   i.e. A white space can have assigned a DEVANAGARI script but the font assigned may not
+            // support none of the DEVANAGARI glyphs. This font can't be added to the cache as a valid
+            // font for the DEVANAGARI script but the COMMON one.
+            if( TextAbstraction::IsCommonScript( character ) )
+            {
+              validateFontsPerScript = *( validFontsPerScriptCacheBuffer + TextAbstraction::COMMON );
+
+              if( NULL == validateFontsPerScript )
               {
-                glyphIndex = 0;
+                validateFontsPerScript = new ValidateFontsPerScript();
+
+                *( validFontsPerScriptCacheBuffer + TextAbstraction::COMMON ) = validateFontsPerScript;
               }
             }
 
-            if( 0u == glyphIndex )
-            {
-              // Get the point size of the current font. It will be used to get a default font id.
-              pointSize = fontClient.GetPointSize( fontId );
-
-              // The font is not valid. Set to zero and a default one will be set.
-              fontId = 0u;
-            }
-            else
-            {
-              // Add the font to the valid font cache.
-
-              //   At this point the validated font supports the given character. However, characters
-              // common for all scripts, like white spaces or new paragraph characters, need to be
-              // processed differently.
-              //
-              //   i.e. A white space can have assigned a DEVANAGARI script but the font assigned may not
-              // support none of the DEVANAGARI glyphs. This font can't be added to the cache as a valid
-              // font for the DEVANAGARI script but the COMMON one.
-              if( TextAbstraction::IsCommonScript( character ) )
-              {
-                validateFontsPerScript = *( validFontsPerScriptCacheBuffer + TextAbstraction::COMMON );
-
-                if( NULL == validateFontsPerScript )
-                {
-                  validateFontsPerScript = new ValidateFontsPerScript();
-
-                  *( validFontsPerScriptCacheBuffer + TextAbstraction::COMMON ) = validateFontsPerScript;
-                }
-              }
-
-              validateFontsPerScript->mValidFonts.PushBack( fontId );
-            }
+            validateFontsPerScript->mValidFonts.PushBack( fontId );
           }
         }
       }
-    } // !isDefault
+    }
 
     // The font has not been validated. Find a default one.
     if( 0u == fontId )
@@ -527,7 +563,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         bool preferColor = ( TextAbstraction::EMOJI == script );
 
         // Find a fallback-font.
-        fontId = fontClient.FindFallbackFont( preferredFont, character, pointSize, preferColor );
+        fontId = fontClient.FindFallbackFont( preferredFont, character, defaultPointSize, preferColor );
 
         // If the system does not support a suitable font, fallback to Latin
         if( 0u == fontId )
@@ -536,7 +572,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         }
         if( 0u == fontId )
         {
-          fontId = fontClient.FindDefaultFont( UTF32_A, pointSize );
+          fontId = fontClient.FindDefaultFont( UTF32_A, defaultPointSize );
         }
 
         // Cache the font.
@@ -559,8 +595,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // The font is now validated.
 
-    if( ( fontId != currentFontRun.fontId ) ||
-        ( isDefault != currentFontRun.isDefault ) )
+    if( fontId != currentFontRun.fontId )
     {
       // Current run needs to be stored and a new one initialized.
 
@@ -574,7 +609,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId = fontId;
-      currentFontRun.isDefault = isDefault;
     }
 
     // Add one more character to the run.
