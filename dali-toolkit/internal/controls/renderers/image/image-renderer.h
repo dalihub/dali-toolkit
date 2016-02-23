@@ -30,8 +30,6 @@
 namespace Dali
 {
 
-class NativeImage;
-
 namespace Toolkit
 {
 
@@ -195,13 +193,6 @@ private:
   Renderer CreateRenderer() const;
 
   /**
-   * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
-   *
-   * @return Returns the created Dali::Renderer
-   */
-  Renderer CreateNativeImageRenderer() const;
-
-  /**
    * Callback function of image resource loading succeed
    * @param[in] image The Image content that we attempted to load from mImageUrl
    */
@@ -218,11 +209,6 @@ private:
    */
   void CleanCache(const std::string& url);
 
-  /**
-   * Set shader code for nativeimage if it exists
-   */
-  void SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage );
-
 private:
   Image mImage;
   ImageAtlasManager& mAtlasManager;
@@ -233,8 +219,6 @@ private:
   Dali::FittingMode::Type mFittingMode;
   Dali::SamplingMode::Type mSamplingMode;
 
-  std::string mNativeFragmentShaderCode;
-  bool mNativeImageFlag;
 };
 
 } // namespace Internal
