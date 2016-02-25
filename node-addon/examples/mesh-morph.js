@@ -240,7 +240,7 @@ daliApp.createMeshActor = function() {
       // Animate the mesh actor
       var animation = new dali.Animation(5);
 
-      var animOptions = { alpha:"sin", delay:0, duration:5};
+      var animOptions = { alpha:dali.ALPHA_FUNCTION_SIN, delay:0, duration:5};
 
       animation.animateTo( meshActor, "uDelta", 1.0, animOptions );
       animation.setLooping(true);

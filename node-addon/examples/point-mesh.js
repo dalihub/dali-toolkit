@@ -132,7 +132,7 @@ daliApp.createMeshActor = function() {
 
       // Animate the mesh actor
       var animation = new dali.Animation(5);
-      var animOptions = { alpha:"linear", delay:0, duration:5};
+      var animOptions = { alpha:dali.ALPHA_FUNCTION_LINEAR, delay:0, duration:5};
       var rotation = new dali.Rotation(360,0,0,1);
       animation.animateBy( meshActor, "orientation", rotation, animOptions );
       animation.setLooping(true);

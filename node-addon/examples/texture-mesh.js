@@ -129,10 +129,10 @@ daliApp.createMeshActor = function() {
       var animation = new dali.Animation(5);
 
       var keyFramesIndex = [{progress:0.0, value: [0.0, 0.0, 0.0, 0.0]}, {progress:1.0, value:[0.0, 1.0, 0.0, 1.0]}];
-      var animOptions = { alpha:"sin", delay:0, duration:5};
+      var animOptions = { alpha:dali.ALPHA_FUNCTION_SIN, delay:0, duration:5};
 
       var keyFramesIndex2 = [{progress:0.0, value: [0.0, 0.0, 0.0, 0.0]}, {progress:1.0, value:[1.0, 0.0, 1.0, 1.0]}];
-      var animOptions2 = { alpha:"sin", delay:0, duration:5};
+      var animOptions2 = { alpha:dali.ALPHA_FUNCTION_SIN, delay:0, duration:5};
 
       animation.animateBetween( meshActor, "uFadeColor", keyFramesIndex, animOptions );
       animation.animateBetween( meshActor2, "uFadeColor", keyFramesIndex2, animOptions2 );
