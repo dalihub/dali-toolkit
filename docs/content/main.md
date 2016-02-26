@@ -1,4 +1,4 @@
-# DALi Introduction
+# DALi Introduction ajskdfajksd fhksja
 
 ### Introduction
  + [What is DALi?](@ref dali-introduction)
@@ -8,6 +8,7 @@
   + [Main, Update & Render Threads](@ref dali-threads)
  + [DALi Fundamentals](@ref fundamentals)
   + [Actors & Stage](@ref actors-and-stage)
+  + [Layers and draw order](@ref layer)
   + [Coordinate System](@ref coordinate-system)
   + [Scene Graph](@ref scene-graph)
   + [Handle / Body Idiom](@ref handle-body-idiom)
@@ -47,10 +48,11 @@
  + [9 Patch Image](@ref resource-9-patch)
  + [Buffer Image](@ref resource-buffer)
 
-### Control Base Class
+### Control Base Class & Renderers
  + [Background Feature](@ref background)
  + Keyboard Focus
  + [Accessibility](@ref accessibility)
+ + [Control Renderers](@ref control-renderers)
 
 ### UI Components
  + Buttons
@@ -83,11 +85,9 @@
  + [Overview](@ref viewing-modes)
 
 ### Extending DALi
- + Control Base Class Services
- + How to write Custom UI Components
+ + [How to write Custom UI Components](@ref creating-custom-controls)
   + [Size Negotiation for Controls](@ref size-negotiation-controls)
   + [Type Registration](@ref type-registration)
-  + How to make Controls Scriptable
  + [Automated Tests](@ref auto_testing)
  + [Programming Guide](@ref documentationguide)
  + [JavaScript Wrapping Guide for DALi developers](@ref javascriptwrapping)

@@ -190,7 +190,7 @@ var imageView = createImageView();
 var shader = createColorShiftAndZoomEffect();
   
 var image = {
-    "rendererType" : "imageRenderer",
+    "rendererType" : "image",
     "imageUrl" : getImageDirectory()+"gallery-medium-50.jpg",
     "shader" : shader
 };

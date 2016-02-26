@@ -396,7 +396,7 @@ int UtcDaliControlBackgroundColor(void)
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "colorRenderer" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" )->Get<Vector4>() == Color::RED );
 
@@ -427,7 +427,7 @@ int UtcDaliControlBackgroundImage(void)
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "imageRenderer" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
   DALI_TEST_CHECK( resultMap->Find( "imageUrl" ) );
   DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get<std::string>() == "TestImage" );
 
@@ -456,7 +456,7 @@ int UtcDaliControlBackgroundProperties(void)
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "colorRenderer" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" )->Get<Vector4>() == Color::RED );
 
@@ -466,18 +466,18 @@ int UtcDaliControlBackgroundProperties(void)
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "imageRenderer" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
   DALI_TEST_CHECK( resultMap->Find( "imageUrl" ) );
   DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get<std::string>() == "TestImage" );
 
   Property::Map rendererMap;
-  rendererMap["rendererType"] = "colorRenderer";
+  rendererMap["rendererType"] = "color";
   rendererMap["blendColor"] = Color::CYAN;
   control.SetProperty( Control::Property::BACKGROUND, rendererMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "colorRenderer" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "blendColor" )->Get<Vector4>() == Color::CYAN );
 

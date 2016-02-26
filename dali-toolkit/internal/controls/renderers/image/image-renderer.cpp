@@ -46,7 +46,7 @@ const char HTTP_URL[] = "http://";
 const char HTTPS_URL[] = "https://";
 
 const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("imageRenderer");
+const char * const RENDERER_TYPE_VALUE("image");
 
 // property names
 const char * const IMAGE_URL_NAME( "imageUrl" );

@@ -252,7 +252,7 @@ void BloomView::OnInitialize()
   Property::Map customShader;
   customShader[ "fragmentShader" ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
   Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "imageRenderer" );
+  rendererMap.Insert( "rendererType", "image" );
   rendererMap.Insert( "shader", customShader );
   mBloomExtractImageActor.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 

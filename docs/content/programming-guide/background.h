@@ -62,7 +62,7 @@ then the above image will look like:
 The background can be set to use a specified renderer, e.g the border renderer
 @code
 Property::Map renderer;
-renderer.Insert("rendererType","borderRenderer");
+renderer.Insert("rendererType","border");
 renderer.Insert("borderColor",COLOR::RED);
 renderer.Insert("borderSize",20.f);
 
