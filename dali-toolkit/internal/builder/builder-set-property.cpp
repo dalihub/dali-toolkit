@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/replacement.h>
-
+#include <dali-toolkit/internal/builder/builder-set-property.h>
 
 namespace Dali
 {
@@ -35,46 +35,6 @@ namespace Toolkit
 
 namespace Internal
 {
-
-/*
- * Set a property value from a tree node.
- * This function determines the type of the property from the format of the string in the node.
- * This is not always possible and if the type cannot be determined then then the type will default to Array.
- * @param node  The node string to convert from
- * @param value The property value to set
- */
-void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value );
-
-/*
- * Set a property value from a tree node as SetPropertyFromNode() above
- * This function determines the type of the property from the format of the string in the node.
- * This is not always possible and if the type cannot be determined then then the type will default to Array.
- * @param node  The node string to convert from
- * @param value The property value to set
- * @param replacement The overriding replacement map (if any)
- */
-void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value,
-                          const Replacement& replacement );
-
-/*
- * Set a property value as the given type from a tree node.
- * @param node The node string to convert from
- * @param type The property type to convert to.
- * @param value The property value to set
- * @return true if the string could be converted to the correct type.
- */
-bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
-
-/*
- * Set a property value as the given type from a tree node as SetPropertyFromNode() above
- * @param node The node string to convert from
- * @param type The property type to convert to.
- * @param value The property value to set
- * @param replacement The overriding replacement map (if any)
- * @return true if the string could be converted to the correct type.
- */
-bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value,
-                          const Replacement& replacement );
 
 
 namespace
@@ -103,13 +63,12 @@ Vector4 HexStringToVector4( const char* s )
  * A property value type can be forced when its unknown by a disambiguation convention in the json
  * ie  "myarray": [1,2,3,4] ; would be a vector but
  *     "myarray": {"typeCast":"array", "value":[1,2,3,4]} would be an array
- * @param child The node whos string to search for a disambiguated type
+ * @param child The node whose string to search for a disambiguated type
  * @param value The value to set
- * @param overrideMap The user overriding constant map
- * @param defaultMap The default map.
+ * @param replacement The user overriding constant map
  * @return True if child contained a disambiguated string that could be converted.
  */
-bool Disambiguated(const TreeNode& child, // ConstantLut& constantLut,
+bool Disambiguated(const TreeNode& child,
                    Dali::Property::Value& value,
                    const Replacement& replacement )
 {
@@ -175,7 +134,7 @@ bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Prope
 }
 
 bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value,
-                          const Replacement& replacer )
+                                const Replacement& replacer )
 {
   bool done = false;
 
@@ -406,7 +365,7 @@ void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value )
 }
 
 void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value,
-                          const Replacement& replacer )
+                                const Replacement& replacer )
 {
 
   TreeNode::NodeType nodeType = node.GetType();
@@ -517,7 +476,6 @@ void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value,
         }
         else
         {
-          // string always succeeds with the current json parser so its last
           value = *aString;
         }
       } // if aBool

@@ -4,6 +4,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/builder-actor.cpp \
    $(toolkit_src_dir)/builder/builder-animations.cpp \
    $(toolkit_src_dir)/builder/builder-impl.cpp \
+   $(toolkit_src_dir)/builder/builder-impl-debug.cpp \
    $(toolkit_src_dir)/builder/builder-set-property.cpp \
    $(toolkit_src_dir)/builder/builder-signals.cpp \
    $(toolkit_src_dir)/builder/json-parser-state.cpp \
@@ -123,5 +124,3 @@ toolkit_src_files = \
    $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp \
    $(toolkit_src_dir)/scripting/script-impl.cpp \
    $(toolkit_src_dir)/scripting/script-plugin-proxy.cpp
-
-
