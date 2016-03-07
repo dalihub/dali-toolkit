@@ -11,6 +11,8 @@ SET(TC_SOURCES
  utc-Dali-Text-CharacterSetConversion.cpp
  utc-Dali-Text-Segmentation.cpp
  utc-Dali-Text-MultiLanguage.cpp
+ utc-Dali-LogicalModel.cpp
+ utc-Dali-BidirectionalSupport.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
@@ -26,6 +28,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-singleton-service.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-text-model.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-application.cpp

@@ -666,7 +666,7 @@ void AccessibilityManager::CreateDefaultFocusIndicatorActor()
   Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
 
   ImageActor focusIndicator = ImageActor::New(borderImage);
-  focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  focusIndicator.SetParentOrigin( ParentOrigin::CENTER );
   focusIndicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
   focusIndicator.SetNinePatchBorder(FOCUS_BORDER_IMAGE_BORDER);
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));

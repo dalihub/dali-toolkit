@@ -341,7 +341,7 @@ void PageTurnView::SetupShadowView()
   mShadowView.SetShadowColor(DEFAULT_SHADOW_COLOR);
 
   mShadowPlaneBackground = Actor::New();
-  mShadowPlaneBackground.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  mShadowPlaneBackground.SetParentOrigin( ParentOrigin::CENTER );
   mShadowPlaneBackground.SetSize( mControlSize );
   Self().Add( mShadowPlaneBackground );
   mShadowView.SetShadowPlaneBackground( mShadowPlaneBackground );

@@ -30,6 +30,7 @@ using namespace Text;
 // Tests the following functions for scripts with different number of bytes per character.
 // Latin 1 byte per character, Arabic 2 bytes per character, Devanagari 3 bytes per character and emojis 4 bytes per character.
 //
+// uint8_t GetUtf8Length( uint8_t utf8LeadByte );
 // uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, uint32_t length );
 // uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCharacters );
 // uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf32 );
@@ -121,6 +122,67 @@ bool Utf32ToUtf8Test( const Utf32ToUtf8Data& data )
 }
 
 //////////////////////////////////////////////////////////
+
+int UtcDaliTextCharacterSetConversionGetUtf8Length(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextCharacterSetConversionGetUtf8Length");
+
+  // Copy of the table used to get the size in bytes of a character encoded with utf8.
+  // If the table used by the GetUtf8Length() function is updated, this one needs to be updated as well.
+  const static uint8_t U1 = 1u;
+  const static uint8_t U2 = 2u;
+  const static uint8_t U3 = 3u;
+  const static uint8_t U4 = 4u;
+  const static uint8_t U0 = 0u;
+  const static uint8_t UTF8_LENGTH[256] = {
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, // lead byte = 0xxx xxxx (U+0000 - U+007F + some extended ascii characters)
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
+    U1, U1,                                 //
+
+    U2, U2, U2, U2, U2, U2, U2, U2, U2, U2, //
+    U2, U2, U2, U2, U2, U2, U2, U2, U2, U2, // lead byte = 110x xxxx (U+0080 - U+07FF)
+    U2, U2, U2, U2, U2, U2, U2, U2, U2, U2, //
+    U2, U2,                                 //
+
+    U3, U3, U3, U3, U3, U3, U3, U3, U3, U3, // lead byte = 1110 xxxx (U+0800 - U+FFFF)
+    U3, U3, U3, U3, U3, U3,                 //
+
+    U4, U4, U4, U4, U4, U4, U4, U4,         // lead byte = 1111 0xxx (U+10000 - U+1FFFFF)
+
+    U0, U0, U0, U0,                         // Non valid.
+    U0, U0, U0, U0,                         // Non valid.
+  };
+
+  for( unsigned int index = 0; index < 256u; ++index )
+  {
+    if( GetUtf8Length( index ) != UTF8_LENGTH[static_cast<uint8_t>(index)] )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
 
 int UtcDaliTextCharacterSetConversionGetNumberOfUtf8Characters(void)
 {

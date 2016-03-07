@@ -31,6 +31,97 @@ namespace Text
 {
 
 /**
+ * @brief Clears the runs starting from the given character index.
+ *
+ * @param[in] startIndex The starting character index used to remove runs.
+ * @param[in] endIndex The ending character index used to remove runs.
+ * @param[in,out] runs The text's runs.
+ * @param[out] startRemoveIndex The index to the first run to be removed.
+ * @param[out] endRemoveIndex The index to the last run to be removed.
+ */
+template< typename T >
+void ClearCharacterRuns( CharacterIndex startIndex,
+                         CharacterIndex endIndex,
+                         Vector<T>& runs,
+                         uint32_t& startRemoveIndex,
+                         uint32_t& endRemoveIndex )
+{
+  T* runsBuffer = runs.Begin();
+
+  const Length length = runs.Count();
+  for( Length index = 0u; index < length; ++index )
+  {
+    T* run = ( runsBuffer + index );
+
+    if( ( run->characterRun.characterIndex <= endIndex ) &&
+        ( startIndex < run->characterRun.characterIndex + run->characterRun.numberOfCharacters ) )
+    {
+      // Run found.
+
+      // Set the index to the first run to be removed.
+      startRemoveIndex = index;
+      break;
+    }
+  }
+
+  for( Length index = startRemoveIndex; index < length; ++index )
+  {
+    T* run = ( runsBuffer + index );
+
+    if( ( run->characterRun.characterIndex <= endIndex ) &&
+        ( startIndex < run->characterRun.characterIndex + run->characterRun.numberOfCharacters ) )
+    {
+      // Update the index to the last run to be removed.
+      endRemoveIndex = index + 1u;
+    }
+    else
+    {
+      // Run found. Nothing else to do.
+      break;
+    }
+  }
+
+  // The number of characters to remove.
+  const Length numberOfCharactersRemoved = 1u + endIndex - startIndex;
+
+  // Update the character index of the next runs.
+  for( Length index = 0u; index < length; ++index )
+  {
+    T* run = ( runsBuffer + index );
+
+    if( run->characterRun.characterIndex > startIndex )
+    {
+      run->characterRun.characterIndex -= numberOfCharactersRemoved;
+    }
+  }
+}
+
+/**
+ * @brief Clears the runs starting from the given character index.
+ *
+ * @param[in] startIndex The starting character index used to remove runs.
+ * @param[in] endIndex The ending character index used to remove runs.
+ * @param[in,out] runs The text's runs.
+ */
+template< typename T >
+void ClearCharacterRuns( CharacterIndex startIndex,
+                         CharacterIndex endIndex,
+                         Vector<T>& runs )
+{
+  uint32_t startRemoveIndex = runs.Count();
+  uint32_t endRemoveIndex = startRemoveIndex;
+  ClearCharacterRuns( startIndex,
+                      endIndex,
+                      runs,
+                      startRemoveIndex,
+                      endRemoveIndex );
+
+  // Remove all remaining runs.
+  T* runBuffer = runs.Begin();
+  runs.Erase( runBuffer + startRemoveIndex, runBuffer + endRemoveIndex );
+}
+
+/**
  * @brief Updates the number of characters and the character index of the text's style runs.
  *
  * If the @p numberOfCharacters is a negative value, it means the number of characters that are removed starting from the @p index.

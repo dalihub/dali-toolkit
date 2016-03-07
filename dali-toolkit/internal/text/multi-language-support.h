@@ -90,9 +90,13 @@ public:
    *   script of the first character of the paragraph with a defined script.
    *
    * @param[in] text Vector of UTF-32 characters.
+   * @param[in] startIndex The character from where the script info is set.
+   * @param[in] numberOfCharacters The number of characters to set the script.
    * @param[out] scripts Vector containing the script runs for the whole text.
    */
   void SetScripts( const Vector<Character>& text,
+                   CharacterIndex startIndex,
+                   Length numberOfCharacters,
                    Vector<ScriptRun>& scripts );
 
   /**
@@ -110,12 +114,16 @@ public:
    * @param[in] scripts Vector containing the script runs for the whole text.
    * @param[in] fontDescriptions The fonts set by the application developers.
    * @param[in] defaultFontId The default font's id.
+   * @param[in] startIndex The character from where the font info is set.
+   * @param[in] numberOfCharacters The number of characters to set the font.
    * @param[out] fonts The validated fonts.
    */
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
                       const Vector<FontDescriptionRun>& fontDescriptions,
                       FontId defaultFontId,
+                      CharacterIndex startIndex,
+                      Length numberOfCharacters,
                       Vector<FontRun>& fonts );
 };
 

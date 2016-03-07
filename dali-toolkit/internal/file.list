@@ -102,6 +102,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/visual-model-impl.cpp \
    $(toolkit_src_dir)/text/decorator/text-decorator.cpp \
    $(toolkit_src_dir)/text/layouts/layout-engine.cpp \
+   $(toolkit_src_dir)/text/multi-language-helper-functions.cpp \
    $(toolkit_src_dir)/text/multi-language-support-impl.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend.cpp \
    $(toolkit_src_dir)/text/rendering/text-renderer.cpp \

@@ -42,11 +42,15 @@ namespace Text
  * @param[in] text Vector of UTF-32 characters.
  * @param[in] scripts Vector containing the script runs for the whole text.
  * @param[in] lineBreakInfo The line break info.
+ * @param[in] startIndex The character from where the bidirectional info is set.
+ * @param[in] numberOfCharacters The number of characters.
  * @param[out] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
  */
 void SetBidirectionalInfo( const Vector<Character>& text,
                            const Vector<ScriptRun>& scripts,
                            const Vector<LineBreakInfo>& lineBreakInfo,
+                           CharacterIndex startIndex,
+                           Length numberOfCharacters,
                            Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo );
 
 /**
@@ -60,10 +64,14 @@ void SetBidirectionalInfo( const Vector<Character>& text,
  * @pre The @p visualModel needs to have the laid-out lines info set.
  *
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[in] startIndex The character from where the bidirectional info is set.
+ * @param[in] numberOfCharacters The number of characters.
  * @param[in,out] lineRuns The line runs converted to characters.
  * @param[out] lineInfoRuns line runs with the visual to logical conversion maps.
  */
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                   CharacterIndex startIndex,
+                   Length numberOfCharacters,
                    Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns );
 
@@ -73,6 +81,8 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
  * @param[in] text The text.
  * @param[in] directions Vector with the direction of each paragraph.
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[in] startIndex The character from where the text is mirrored.
+ * @param[in] numberOfCharacters The number of characters.
  * @param[out] mirroredText The mirroredText.
  *
  * @return @e true if a character has been replaced.
@@ -80,6 +90,8 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
 bool GetMirroredText( const Vector<Character>& text,
                       const Vector<CharacterDirection>& directions,
                       const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                      CharacterIndex startIndex,
+                      Length numberOfCharacters,
                       Vector<Character>& mirroredText );
 
 /**
@@ -89,9 +101,15 @@ bool GetMirroredText( const Vector<Character>& text,
  * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.
  *
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[in] totalNumberOfCharacters The number of characters of the whole text.
+ * @param[in] startIndex The character from where the direction info is set.
+ * @param[in] numberOfCharacters The number of characters.
  * @param[out] directions The direction, @e false is left to right and @e true is right to left, of each character of the paragraph.
  */
 void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                             Length totalNumberOfCharacters,
+                             CharacterIndex startIndex,
+                             Length numberOfCharacters,
                              Vector<CharacterDirection>& directions );
 
 } // namespace Text
