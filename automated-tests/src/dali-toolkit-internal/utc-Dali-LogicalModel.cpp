@@ -60,8 +60,12 @@ bool SetVisualToLogicalMapTest( const SetVisualToLogicalMapData& data )
   Size layoutSize;
 
   // Create the model with the whole text.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    data.textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );

@@ -47,49 +47,60 @@ struct LayoutParameters
    * @param[in] textBuffer The text buffer.
    * @param[in] lineBreakInfoBuffer The line break info.
    * @param[in] wordBreakInfoBuffer The word break info.
-   * @param[in] totalNumberOfGlyphs The number of glyphs.
-   * @param[in] glyphsBuffer A vector with glyphs.
+   * @param[in] characterDirectionBuffer Vector with the direction of each character.
+   * @param[in] glyphsBuffer Vector with glyphs.
    * @param[in] glyphsToCharactersBuffer Vector with indices pointing the first character of each glyph.
    * @param[in] charactersPerGlyphBuffer Vector with the number of characters that forms each glyph.
+   * @param[in] charactersToGlyphsBuffer Vector with indices pointing the first glyph of each character.
+   * @param[in] glyphsPerCharacterBuffer Vector with the number of glyphs shaped from the character.
+   * @param[in] totalNumberOfGlyphs The number of glyphs.
    */
   LayoutParameters( const Vector2& boundingBox,
                     const Character* const textBuffer,
                     const LineBreakInfo* const lineBreakInfoBuffer,
                     const WordBreakInfo* const wordBreakInfoBuffer,
                     const CharacterDirection* const characterDirectionBuffer,
-                    Length totalNumberOfGlyphs,
                     const GlyphInfo* const glyphsBuffer,
                     const CharacterIndex* const glyphsToCharactersBuffer,
-                    const Length* const charactersPerGlyphBuffer )
+                    const Length* const charactersPerGlyphBuffer,
+                    const GlyphIndex* const charactersToGlyphsBuffer,
+                    const Length* const glyphsPerCharacterBuffer,
+                    Length totalNumberOfGlyphs )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
     wordBreakInfoBuffer( wordBreakInfoBuffer ),
     characterDirectionBuffer( characterDirectionBuffer ),
-    totalNumberOfGlyphs( totalNumberOfGlyphs ),
     glyphsBuffer( glyphsBuffer ),
     glyphsToCharactersBuffer( glyphsToCharactersBuffer ),
     charactersPerGlyphBuffer( charactersPerGlyphBuffer ),
-    charactersToGlyphsBuffer( NULL ),
-    glyphsPerCharacterBuffer( NULL ),
+    charactersToGlyphsBuffer( charactersToGlyphsBuffer ),
+    glyphsPerCharacterBuffer( glyphsPerCharacterBuffer ),
     lineBidirectionalInfoRunsBuffer( NULL ),
     numberOfBidirectionalInfoRuns( 0u ),
+    startGlyphIndex( 0u ),
+    numberOfGlyphs( 0u ),
+    totalNumberOfGlyphs( totalNumberOfGlyphs ),
+    startLineIndex( 0u ),
     isLastNewParagraph( false )
   {}
 
-  Vector2                         boundingBox;
-  const Character* const          textBuffer;
-  const LineBreakInfo* const      lineBreakInfoBuffer;
-  const WordBreakInfo* const      wordBreakInfoBuffer;
-  const CharacterDirection* const characterDirectionBuffer;
-  Length                          totalNumberOfGlyphs;
-  const GlyphInfo* const          glyphsBuffer;
-  const CharacterIndex* const     glyphsToCharactersBuffer;
-  const Length* const             charactersPerGlyphBuffer;
-  GlyphIndex*                     charactersToGlyphsBuffer;        ///< The character to glyph conversion table.
-  Length*                         glyphsPerCharacterBuffer;        ///< The number of glyphs per character.
+  Vector2                         boundingBox;                     ///< The size of the box containing the text.
+  const Character* const          textBuffer;                      ///< The text buffer.
+  const LineBreakInfo* const      lineBreakInfoBuffer;             ///< The line break info.
+  const WordBreakInfo* const      wordBreakInfoBuffer;             ///< The word break info.
+  const CharacterDirection* const characterDirectionBuffer;        ///< Vector with the direction of each character.
+  const GlyphInfo* const          glyphsBuffer;                    ///< Vector with glyphs.
+  const CharacterIndex* const     glyphsToCharactersBuffer;        ///< Vector with indices pointing the first character of each glyph.
+  const Length* const             charactersPerGlyphBuffer;        ///< Vector with the number of characters that forms each glyph.
+  const GlyphIndex* const         charactersToGlyphsBuffer;        ///< Vector with indices pointing the first glyph of each character.
+  const Length* const             glyphsPerCharacterBuffer;        ///< Vector with the number of glyphs shaped from the character.
   BidirectionalLineInfoRun*       lineBidirectionalInfoRunsBuffer; ///< Bidirectional conversion tables per line.
   Length                          numberOfBidirectionalInfoRuns;   ///< The number of lines with bidirectional info.
+  GlyphIndex                      startGlyphIndex;                 ///< Index to the first glyph to layout.
+  Length                          numberOfGlyphs;                  ///< The number of glyphs to layout.
+  Length                          totalNumberOfGlyphs;             ///< The number of glyphs.
+  LineIndex                       startLineIndex;                  ///< The line index where to insert the new lines.
   bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
 };
 

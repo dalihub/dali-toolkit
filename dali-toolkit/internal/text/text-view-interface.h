@@ -65,12 +65,12 @@ public:
   virtual const Vector2& GetControlSize() const = 0;
 
   /**
-   * @brief Retrieves the text's actual size after it has been laid out.
+   * @brief Retrieves the text's layout size.
    *
    * @return The text's size. Note that this may be larger than the control size,
    * in the case where text is scrolling/clipped.
    */
-  virtual const Vector2& GetActualSize() const = 0;
+  virtual const Vector2& GetLayoutSize() const = 0;
 
   /**
    * Retrieves the number of glyphs.

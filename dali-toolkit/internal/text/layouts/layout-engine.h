@@ -93,7 +93,7 @@ public:
    *
    * @return The required layout.
    */
-  unsigned int GetLayout() const;
+  Layout GetLayout() const;
 
   /**
    * @brief Enable or disable the text ellipsis.
@@ -155,14 +155,14 @@ public:
    * @param[in] layoutParameters The parameters needed to layout the text.
    * @param[out] glyphPositions The positions of all the glyphs.
    * @param[out] lines The laid-out lines.
-   * @param[out] actualSize The size of the text after it has been laid-out.
+   * @param[out] layoutSize The size of the text after it has been laid-out.
    *
    * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
    */
   bool LayoutText( const LayoutParameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
-                   Size& actualSize );
+                   Size& layoutSize );
 
   /**
    * @brief Re-lays out those lines with right to left characters.
@@ -170,18 +170,26 @@ public:
    * It doesn't change the phisical position of the glyphs in the model but sets their new position.
    *
    * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in] startIndex Character index of the line from where the lines are reordered.
+   * @param[in] numberOfCharacters The number of characters.
    * @param[in,out] glyphPositions The positions of all the glyphs.
    */
   void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+                                 CharacterIndex startIndex,
+                                 Length numberOfCharacters,
                                  Vector<Vector2>& glyphPositions );
 
   /**
    * @brief Aligns the laid out lines.
    *
-   * @param[in] layoutSize The size of the laid out the text.
+   * @param[in] size The size of the container where the text is laid-out.
+   * @param[in] startIndex Character index of the line from where the lines are aligned.
+   * @param[in] numberOfCharacters The number of characters.
    * @param[in,out] lines The laid-out lines.
    */
-  void Align( const Size& layoutSize,
+  void Align( const Size& size,
+              CharacterIndex startIndex,
+              Length numberOfCharacters,
               Vector<LineRun>& lines );
 
 private:

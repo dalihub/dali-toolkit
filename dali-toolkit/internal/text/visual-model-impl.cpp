@@ -315,14 +315,14 @@ const Vector2& VisualModel::GetNaturalSize() const
   return mNaturalSize;
 }
 
-void VisualModel::SetActualSize( const Vector2& size )
+void VisualModel::SetLayoutSize( const Vector2& size )
 {
-  mActualSize = size;
+  mLayoutSize = size;
 }
 
-const Vector2& VisualModel::GetActualSize() const
+const Vector2& VisualModel::GetLayoutSize() const
 {
-  return mActualSize;
+  return mLayoutSize;
 }
 
 void VisualModel::SetTextColor( const Vector4& textColor )
@@ -414,7 +414,7 @@ VisualModel::VisualModel()
   mShadowOffset( Vector2::ZERO ),
   mUnderlineHeight( 0.0f ),
   mNaturalSize(),
-  mActualSize(),
+  mLayoutSize(),
   mCachedLineIndex( 0u ),
   mUnderlineEnabled( false ),
   mUnderlineColorSet( false )

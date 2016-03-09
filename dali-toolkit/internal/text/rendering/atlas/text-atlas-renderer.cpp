@@ -176,7 +176,7 @@ struct AtlasRenderer::Impl
     mDepth = depth;
 
     const Vector2& actorSize( view.GetControlSize() );
-    const Vector2& textSize( view.GetActualSize() );
+    const Vector2& textSize( view.GetLayoutSize() );
     const Vector2 halfTextSize( textSize * 0.5f );
     const Vector2& shadowOffset( view.GetShadowOffset() );
     const Vector4& shadowColor( view.GetShadowColor() );

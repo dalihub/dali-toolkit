@@ -47,6 +47,26 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
 const float CURSOR_WIDTH = 1.f;
 
+Length CountParagraphs( const LayoutParameters& layoutParameters )
+{
+  Length numberOfParagraphs = 0u;
+
+  const CharacterIndex startCharacterIndex = *( layoutParameters.glyphsToCharactersBuffer + layoutParameters.startGlyphIndex );
+
+  const GlyphIndex lastGlyphIndex = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs - 1u;
+  const CharacterIndex lastCharacterIndexPlusOne = *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex );
+
+  for( CharacterIndex index = startCharacterIndex; index < lastCharacterIndexPlusOne; ++index )
+  {
+    if( TextAbstraction::LINE_MUST_BREAK == *( layoutParameters.lineBreakInfoBuffer + index ) )
+    {
+      ++numberOfParagraphs;
+    }
+  }
+
+  return numberOfParagraphs;
+}
+
 } //namespace
 
 /**
@@ -172,7 +192,7 @@ struct LayoutEngine::Impl
    * @note This method lais out text as it were left to right. At this point is not possible to reorder the line
    *       because the number of characters of the line is not known (one of the responsabilities of this method
    *       is calculate that). Due to glyph's 'x' bearing, width and advance, when right to left or mixed right to left
-   *       and left to right text is laid out, it can be small differences in the line length. One solution is to
+   *       and left to right text is laid-out, it can be small differences in the line length. One solution is to
    *       reorder and re-lay out the text after this method and add or remove one extra glyph if needed. However,
    *       this method calculates which are the first and last glyphs of the line (the ones that causes the
    *       differences). This is a good point to check if there is problems with the text exceeding the boundaries
@@ -219,8 +239,9 @@ struct LayoutEngine::Impl
 
     bool oneWordLaidOut = false;
 
+    const GlyphIndex lastGlyphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;
     for( GlyphIndex glyphIndex = lineLayout.glyphIndex;
-         glyphIndex < parameters.totalNumberOfGlyphs;
+         glyphIndex < lastGlyphPlusOne;
          ++glyphIndex )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  glyph index : %d\n", glyphIndex );
@@ -369,7 +390,7 @@ struct LayoutEngine::Impl
         {
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Break the word by character\n" );
 
-          // The word's with doesn't fit in the control's with. It needs to be split by character.
+          // The word doesn't fit in the control's width. It needs to be split by character.
           if( tmpLineLayout.numberOfGlyphs > 0u )
           {
             tmpLineLayout.numberOfCharacters -= charactersPerGlyph;
@@ -420,7 +441,7 @@ struct LayoutEngine::Impl
           ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
       {
         oneWordLaidOut = true;
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  One word laid out\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  One word laid-out\n" );
 
         // Current glyph is the last one of the current word.
         // Add the temporal layout to the current one.
@@ -436,6 +457,34 @@ struct LayoutEngine::Impl
     lineLayout.extraWidth = tmpExtraWidth;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
+  }
+
+  /**
+   * @brief Calculates the vertical offset to add to the new laid-out glyphs.
+   *
+   * @pre @p lineIndex must be between 0 and the number of lines (both inclusive).
+   *
+   * @param[in] lines The previously laid-out lines.
+   * @param[in] lineIndex Index to the line where the new laid-out lines are inserted.
+   *
+   * @return The vertical offset of the lines starting from the beginning to the line @p lineIndex.
+   */
+  float SetParagraphOffset( const Vector<LineRun>& lines,
+                            LineIndex lineIndex )
+  {
+    float offset = 0.f;
+
+    for( Vector<LineRun>::ConstIterator it = lines.Begin(),
+           endIt = lines.Begin() + lineIndex;
+         it != endIt;
+         ++it )
+    {
+      const LineRun& line = *it;
+
+      offset += line.ascender + -line.descender;
+    }
+
+    return offset;
   }
 
   void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
@@ -464,19 +513,327 @@ struct LayoutEngine::Impl
     }
   }
 
+  /**
+   * @brief Resizes the line buffer.
+   *
+   * @param[in,out] lines The vector of lines. Used when the layout is created from scratch.
+   * @param[in,out] newLines The vector of lines used instead of @p lines when the layout is updated.
+   * @param[in,out] linesCapacity The capacity of the vector (either lines or newLines).
+   * @param[in] updateCurrentBuffer Whether the layout is updated.
+   *
+   * @return Pointer to either lines or newLines.
+   */
+  LineRun* ResizeLinesBuffer( Vector<LineRun>& lines,
+                              Vector<LineRun>& newLines,
+                              Length& linesCapacity,
+                              bool updateCurrentBuffer )
+  {
+    LineRun* linesBuffer = NULL;
+    // Reserve more space for the next lines.
+    linesCapacity *= 2u;
+    if( updateCurrentBuffer )
+    {
+      newLines.Resize( linesCapacity );
+      linesBuffer = newLines.Begin();
+    }
+    else
+    {
+      lines.Resize( linesCapacity );
+      linesBuffer = lines.Begin();
+    }
+
+    return linesBuffer;
+  }
+
+  /**
+   * Ellipsis a line if it exceeds the width's of the bounding box.
+   *
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in] layout The line layout.
+   * @param[in,out] layoutSize The text's layout size.
+   * @param[in,out] linesBuffer Pointer to the line's buffer.
+   * @param[in,out] glyphPositionsBuffer Pointer to the position's buffer.
+   * @param[in,out] numberOfLines The number of laid-out lines.
+   * @param[in] penY The vertical layout position.
+   * @param[in] currentParagraphDirection The current paragraph's direction.
+   *
+   * return Whether the line is ellipsized.
+   */
+  bool EllipsisLine( const LayoutParameters& layoutParameters,
+                     const LineLayout& layout,
+                     Size& layoutSize,
+                     LineRun* linesBuffer,
+                     Vector2* glyphPositionsBuffer,
+                     Length& numberOfLines,
+                     float penY,
+                     CharacterDirection currentParagraphDirection )
+  {
+    const bool ellipsis = ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
+                            ( ( mLayout == SINGLE_LINE_BOX ) &&
+                              ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) );
+
+    if( ellipsis )
+    {
+      // Do not layout more lines if ellipsis is enabled.
+
+      // The last line needs to be completely filled with characters.
+      // Part of a word may be used.
+
+      LineRun* lineRun = NULL;
+      LineLayout ellipsisLayout;
+      if( 0u != numberOfLines )
+      {
+        // Get the last line and layout it again with the 'completelyFill' flag to true.
+        lineRun = linesBuffer + ( numberOfLines - 1u );
+
+        penY -= layout.ascender - lineRun->descender;
+
+        ellipsisLayout.glyphIndex = lineRun->glyphRun.glyphIndex;
+      }
+      else
+      {
+        // At least there is space reserved for one line.
+        lineRun = linesBuffer;
+
+        lineRun->glyphRun.glyphIndex = 0u;
+        ellipsisLayout.glyphIndex = 0u;
+
+        ++numberOfLines;
+      }
+
+      GetLineLayoutForBox( layoutParameters,
+                           ellipsisLayout,
+                           currentParagraphDirection,
+                           true );
+
+      lineRun->glyphRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
+      lineRun->characterRun.characterIndex = ellipsisLayout.characterIndex;
+      lineRun->characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
+      lineRun->width = ellipsisLayout.length;
+      lineRun->extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
+      lineRun->ascender = ellipsisLayout.ascender;
+      lineRun->descender = ellipsisLayout.descender;
+      lineRun->direction = !RTL;
+      lineRun->ellipsis = true;
+
+      layoutSize.width = layoutParameters.boundingBox.width;
+      layoutSize.height += ( lineRun->ascender + -lineRun->descender );
+
+      SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
+                         ellipsisLayout.numberOfGlyphs,
+                         penY,
+                         glyphPositionsBuffer + lineRun->glyphRun.glyphIndex - layoutParameters.startGlyphIndex );
+    }
+
+    return ellipsis;
+  }
+
+  /**
+   * @brief Updates the text layout with a new laid-out line.
+   *
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in] layout The line layout.
+   * @param[in,out] layoutSize The text's layout size.
+   * @param[in,out] linesBuffer Pointer to the line's buffer.
+   * @param[in] index Index to the vector of glyphs.
+   * @param[in,out] numberOfLines The number of laid-out lines.
+   * @param[in] isLastLine Whether the laid-out line is the last one.
+   */
+  void UpdateTextLayout( const LayoutParameters& layoutParameters,
+                         const LineLayout& layout,
+                         Size& layoutSize,
+                         LineRun* linesBuffer,
+                         GlyphIndex index,
+                         Length& numberOfLines,
+                         bool isLastLine )
+  {
+    LineRun& lineRun = *( linesBuffer + numberOfLines );
+    ++numberOfLines;
+
+    lineRun.glyphRun.glyphIndex = index;
+    lineRun.glyphRun.numberOfGlyphs = layout.numberOfGlyphs;
+    lineRun.characterRun.characterIndex = layout.characterIndex;
+    lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
+    if( isLastLine && !layoutParameters.isLastNewParagraph )
+    {
+      const float width = layout.extraBearing + layout.length + layout.extraWidth + layout.wsLengthEndOfLine;
+      if( MULTI_LINE_BOX == mLayout )
+      {
+        lineRun.width = ( width > layoutParameters.boundingBox.width ) ? layoutParameters.boundingBox.width : width;
+      }
+      else
+      {
+        lineRun.width = width;
+      }
+
+      lineRun.extraLength = 0.f;
+    }
+    else
+    {
+      lineRun.width = layout.extraBearing + layout.length + layout.extraWidth;
+      lineRun.extraLength = ( layout.wsLengthEndOfLine > 0.f ) ? layout.wsLengthEndOfLine - layout.extraWidth : 0.f;
+    }
+    lineRun.ascender = layout.ascender;
+    lineRun.descender = layout.descender;
+    lineRun.direction = !RTL;
+    lineRun.ellipsis = false;
+
+    // Update the actual size.
+    if( lineRun.width > layoutSize.width )
+    {
+      layoutSize.width = lineRun.width;
+    }
+
+    layoutSize.height += ( lineRun.ascender + -lineRun.descender );
+  }
+
+  /**
+   * @brief Updates the text layout with the last laid-out line.
+   *
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in] layout The line layout.
+   * @param[in,out] layoutSize The text's layout size.
+   * @param[in,out] linesBuffer Pointer to the line's buffer.
+   * @param[in] index Index to the vector of glyphs.
+   * @param[in,out] numberOfLines The number of laid-out lines.
+   */
+  void UpdateTextLayout( const LayoutParameters& layoutParameters,
+                         const LineLayout& layout,
+                         Size& layoutSize,
+                         LineRun* linesBuffer,
+                         GlyphIndex index,
+                         Length& numberOfLines )
+  {
+    // Need to add a new line with no characters but with height to increase the layoutSize.height
+    const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
+
+    Text::FontMetrics fontMetrics;
+    mMetrics->GetFontMetrics( glyphInfo.fontId, fontMetrics );
+
+    LineRun& lineRun = *( linesBuffer + numberOfLines );
+    ++numberOfLines;
+
+    lineRun.glyphRun.glyphIndex = index + layout.numberOfGlyphs;
+    lineRun.glyphRun.numberOfGlyphs = 0u;
+    lineRun.characterRun.characterIndex = layout.characterIndex + layout.numberOfCharacters;
+    lineRun.characterRun.numberOfCharacters = 0u;
+    lineRun.width = 0.f;
+    lineRun.ascender = fontMetrics.ascender;
+    lineRun.descender = fontMetrics.descender;
+    lineRun.extraLength = 0.f;
+    lineRun.alignmentOffset = 0.f;
+    lineRun.direction = !RTL;
+    lineRun.ellipsis = false;
+
+    layoutSize.height += ( lineRun.ascender + -lineRun.descender );
+  }
+
+  /**
+   * @brief Updates the text's layout size adding the size of the previously laid-out lines.
+   *
+   * @param[in] lines The vector of lines (before the new laid-out lines are inserted).
+   * @param[in,out] layoutSize The text's layout size.
+   */
+  void UpdateLayoutSize( const Vector<LineRun>& lines,
+                         Size& layoutSize )
+  {
+    for( Vector<LineRun>::ConstIterator it = lines.Begin(),
+           endIt = lines.End();
+         it != endIt;
+         ++it )
+    {
+      const LineRun& line = *it;
+
+      if( line.width > layoutSize.width )
+      {
+        layoutSize.width = line.width;
+      }
+
+      layoutSize.height += ( line.ascender + -line.descender );
+    }
+  }
+
+  /**
+   * @brief Updates the indices of the character and glyph runs of the lines before the new lines are inserted.
+   *
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in,out] lines The vector of lines (before the new laid-out lines are inserted).
+   * @param[in] characterOffset The offset to be added to the runs of characters.
+   * @param[in] glyphOffset The offset to be added to the runs of glyphs.
+   */
+  void UpdateLineIndexOffsets( const LayoutParameters& layoutParameters,
+                               Vector<LineRun>& lines,
+                               Length characterOffset,
+                               Length glyphOffset )
+  {
+    // Update the glyph and character runs.
+    for( Vector<LineRun>::Iterator it = lines.Begin() + layoutParameters.startLineIndex,
+           endIt = lines.End();
+         it != endIt;
+         ++it )
+    {
+      LineRun& line = *it;
+
+      line.glyphRun.glyphIndex = glyphOffset;
+      line.characterRun.characterIndex = characterOffset;
+
+      glyphOffset += line.glyphRun.numberOfGlyphs;
+      characterOffset += line.characterRun.numberOfCharacters;
+    }
+  }
+
   bool LayoutText( const LayoutParameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
-                   Size& actualSize )
+                   Size& layoutSize )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height );
 
+    if( 0u == layoutParameters.numberOfGlyphs )
+    {
+      // Nothing to do if there are no glyphs to layout.
+      return false;
+    }
+
     // Set the first paragraph's direction.
     CharacterDirection paragraphDirection = ( NULL != layoutParameters.characterDirectionBuffer ) ? *layoutParameters.characterDirectionBuffer : !RTL;
 
-    float penY = 0.f;
-    for( GlyphIndex index = 0u; index < layoutParameters.totalNumberOfGlyphs; )
+    // Whether the layout is being updated or set from scratch.
+    const bool updateCurrentBuffer = layoutParameters.numberOfGlyphs < layoutParameters.totalNumberOfGlyphs;
+
+    Vector2* glyphPositionsBuffer = NULL;
+    Vector<Vector2> newGlyphPositions;
+
+    LineRun* linesBuffer = NULL;
+    Vector<LineRun> newLines;
+
+    // Estimate the number of lines.
+    // TODO: In a next patch the paragraphs are properly managed and this can be removed.
+    Length linesCapacity = CountParagraphs( layoutParameters );
+    Length numberOfLines = 0u;
+
+    if( updateCurrentBuffer )
+    {
+      newGlyphPositions.Resize( layoutParameters.numberOfGlyphs );
+      glyphPositionsBuffer = newGlyphPositions.Begin();
+
+      newLines.Resize( linesCapacity );
+      linesBuffer = newLines.Begin();
+    }
+    else
+    {
+      glyphPositionsBuffer = glyphPositions.Begin();
+
+      lines.Resize( linesCapacity );
+      linesBuffer = lines.Begin();
+    }
+
+    float penY = SetParagraphOffset( lines,
+                                     layoutParameters.startLineIndex );
+
+    const GlyphIndex lastGlyphPlusOne = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs;
+    for( GlyphIndex index = layoutParameters.startGlyphIndex; index < lastGlyphPlusOne; )
     {
       CharacterDirection currentParagraphDirection = paragraphDirection;
 
@@ -498,6 +855,8 @@ struct LayoutEngine::Impl
       {
         // The width is too small and no characters are laid-out.
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText width too small!\n\n" );
+
+        lines.Resize( numberOfLines );
         return false;
       }
 
@@ -506,153 +865,125 @@ struct LayoutEngine::Impl
       penY += layout.ascender;
 
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  pen y %f\n", penY );
-      if( mEllipsisEnabled &&
-          ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
-            ( ( mLayout == SINGLE_LINE_BOX ) &&
-              ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) ) )
+
+      bool ellipsis = false;
+      if( mEllipsisEnabled )
       {
-        // Do not layout more lines if ellipsis is enabled.
+        // Does the ellipsis of the last line.
+        ellipsis = EllipsisLine( layoutParameters,
+                                 layout,
+                                 layoutSize,
+                                 linesBuffer,
+                                 glyphPositionsBuffer,
+                                 numberOfLines,
+                                 penY,
+                                 currentParagraphDirection );
+      }
 
-        // The last line needs to be completely filled with characters.
-        // Part of a word may be used.
-
-        const Length numberOfLines = lines.Count();
-
-        LineRun lineRun;
-        LineLayout ellipsisLayout;
-        if( 0u != numberOfLines )
-        {
-          // Get the last line and layout it again with the 'completelyFill' flag to true.
-          lineRun = *( lines.Begin() + ( numberOfLines - 1u ) );
-
-          penY -= layout.ascender - lineRun.descender;
-
-          ellipsisLayout.glyphIndex = lineRun.glyphRun.glyphIndex;
-        }
-        else
-        {
-          lineRun.glyphRun.glyphIndex = 0u;
-          ellipsisLayout.glyphIndex = 0u;
-        }
-
-        GetLineLayoutForBox( layoutParameters,
-                             ellipsisLayout,
-                             currentParagraphDirection,
-                             true );
-
-        lineRun.glyphRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
-        lineRun.characterRun.characterIndex = ellipsisLayout.characterIndex;
-        lineRun.characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
-        lineRun.width = ellipsisLayout.length;
-        lineRun.extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
-        lineRun.ascender = ellipsisLayout.ascender;
-        lineRun.descender = ellipsisLayout.descender;
-        lineRun.direction = !RTL;
-        lineRun.ellipsis = true;
-
-        actualSize.width = layoutParameters.boundingBox.width;
-        actualSize.height += ( lineRun.ascender + -lineRun.descender );
-
-        SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun.glyphRun.glyphIndex,
-                           ellipsisLayout.numberOfGlyphs,
-                           penY,
-                           glyphPositions.Begin() + lineRun.glyphRun.glyphIndex );
-
-        if( 0u != numberOfLines )
-        {
-          // Set the last line with the ellipsis layout.
-          *( lines.Begin() + ( numberOfLines - 1u ) ) = lineRun;
-        }
-        else
-        {
-          // Push the line.
-          lines.PushBack( lineRun );
-        }
-
+      if( ellipsis )
+      {
+        // No more lines to layout.
         break;
       }
       else
       {
+        // Whether the last line has been laid-out.
         const bool isLastLine = index + layout.numberOfGlyphs == layoutParameters.totalNumberOfGlyphs;
 
-        LineRun lineRun;
-        lineRun.glyphRun.glyphIndex = index;
-        lineRun.glyphRun.numberOfGlyphs = layout.numberOfGlyphs;
-        lineRun.characterRun.characterIndex = layout.characterIndex;
-        lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-        if( isLastLine && !layoutParameters.isLastNewParagraph )
+        if( numberOfLines == linesCapacity )
         {
-          const float width = layout.extraBearing + layout.length + layout.extraWidth + layout.wsLengthEndOfLine;
-          if( MULTI_LINE_BOX == mLayout )
-          {
-            lineRun.width = ( width > layoutParameters.boundingBox.width ) ? layoutParameters.boundingBox.width : width;
-          }
-          else
-          {
-            lineRun.width = width;
-          }
-
-          lineRun.extraLength = 0.f;
-        }
-        else
-        {
-          lineRun.width = layout.extraBearing + layout.length + layout.extraWidth;
-          lineRun.extraLength = ( layout.wsLengthEndOfLine > 0.f ) ? layout.wsLengthEndOfLine - layout.extraWidth : 0.f;
-        }
-        lineRun.ascender = layout.ascender;
-        lineRun.descender = layout.descender;
-        lineRun.direction = !RTL;
-        lineRun.ellipsis = false;
-
-        lines.PushBack( lineRun );
-
-        // Update the actual size.
-        if( lineRun.width > actualSize.width )
-        {
-          actualSize.width = lineRun.width;
+          // Reserve more space for the next lines.
+          linesBuffer = ResizeLinesBuffer( lines,
+                                           newLines,
+                                           linesCapacity,
+                                           updateCurrentBuffer );
         }
 
-        actualSize.height += ( lineRun.ascender + -lineRun.descender );
-
-        SetGlyphPositions( layoutParameters.glyphsBuffer + index,
-                           layout.numberOfGlyphs,
-                           penY,
-                           glyphPositions.Begin() + index );
-
-        penY += -layout.descender;
-
-        // Increase the glyph index.
-        index += layout.numberOfGlyphs;
+        // Updates the current text's layout with the line's layout.
+        UpdateTextLayout( layoutParameters,
+                          layout,
+                          layoutSize,
+                          linesBuffer,
+                          index,
+                          numberOfLines,
+                          isLastLine );
 
         if( isLastLine &&
             layoutParameters.isLastNewParagraph &&
             ( mLayout == MULTI_LINE_BOX ) )
         {
-          // Need to add a new line with no characters but with height to increase the actualSize.height
-          const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
+          // The last character of the text is a new paragraph character.
+          // An extra line with no characters is added to increase the text's height
+          // in order to place the cursor.
 
-          Text::FontMetrics fontMetrics;
-          mMetrics->GetFontMetrics( glyphInfo.fontId, fontMetrics );
+          if( numberOfLines == linesCapacity )
+          {
+            // Reserve more space for the next lines.
+            linesBuffer = ResizeLinesBuffer( lines,
+                                             newLines,
+                                             linesCapacity,
+                                             updateCurrentBuffer );
+          }
 
-          LineRun lineRun;
-          lineRun.glyphRun.glyphIndex = 0u;
-          lineRun.glyphRun.numberOfGlyphs = 0u;
-          lineRun.characterRun.characterIndex = 0u;
-          lineRun.characterRun.numberOfCharacters = 0u;
-          lineRun.width = 0.f;
-          lineRun.ascender = fontMetrics.ascender;
-          lineRun.descender = fontMetrics.descender;
-          lineRun.extraLength = 0.f;
-          lineRun.alignmentOffset = 0.f;
-          lineRun.direction = !RTL;
-          lineRun.ellipsis = false;
+          UpdateTextLayout( layoutParameters,
+                            layout,
+                            layoutSize,
+                            linesBuffer,
+                            index,
+                            numberOfLines );
+        } // whether to add a last line.
 
-          actualSize.height += ( lineRun.ascender + -lineRun.descender );
+        // Sets the positions of the glyphs.
+        SetGlyphPositions( layoutParameters.glyphsBuffer + index,
+                           layout.numberOfGlyphs,
+                           penY,
+                           glyphPositionsBuffer + index - layoutParameters.startGlyphIndex );
 
-          lines.PushBack( lineRun );
-        }
-      }
+        // Updates the vertical pen's position.
+        penY += -layout.descender;
+
+        // Increase the glyph index.
+        index += layout.numberOfGlyphs;
+
+      } // no ellipsis
     } // end for() traversing glyphs.
+
+    if( updateCurrentBuffer )
+    {
+      glyphPositions.Insert( glyphPositions.Begin() + layoutParameters.startGlyphIndex,
+                             newGlyphPositions.Begin(),
+                             newGlyphPositions.End() );
+
+      newLines.Resize( numberOfLines );
+
+      // Current text's layout size adds only the newly laid-out lines.
+      // Updates the layout size with the previously laid-out lines.
+      UpdateLayoutSize( lines,
+                        layoutSize );
+
+      if( 0u != newLines.Count() )
+      {
+        const LineRun& lastLine = *( newLines.End() - 1u );
+
+        const Length characterOffset = lastLine.characterRun.characterIndex + lastLine.characterRun.numberOfCharacters;
+        const Length glyphOffset = lastLine.glyphRun.glyphIndex + lastLine.glyphRun.numberOfGlyphs;
+
+        // Update the indices of the runs before the new laid-out lines are inserted.
+        UpdateLineIndexOffsets( layoutParameters,
+                                lines,
+                                characterOffset,
+                                glyphOffset );
+
+        // Insert the lines.
+        lines.Insert( lines.Begin() + layoutParameters.startLineIndex,
+                      newLines.Begin(),
+                      newLines.End() );
+      }
+    }
+    else
+    {
+      lines.Resize( numberOfLines );
+    }
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
 
@@ -660,12 +991,28 @@ struct LayoutEngine::Impl
   }
 
   void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+                                 CharacterIndex startIndex,
+                                 Length numberOfCharacters,
                                  Vector<Vector2>& glyphPositions )
   {
+    const CharacterIndex lastCharacterIndex = startIndex + numberOfCharacters;
+
     // Traverses the paragraphs with right to left characters.
     for( LineIndex lineIndex = 0u; lineIndex < layoutParameters.numberOfBidirectionalInfoRuns; ++lineIndex )
     {
       const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer + lineIndex );
+
+      if( startIndex >= bidiLine.characterRun.characterIndex + bidiLine.characterRun.numberOfCharacters )
+      {
+        // Do not reorder the line if it has been already reordered.
+        continue;
+      }
+
+      if( bidiLine.characterRun.characterIndex >= lastCharacterIndex )
+      {
+        // Do not reorder the lines after the last requested character.
+        break;
+      }
 
       const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *bidiLine.visualToLogicalMap;
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
@@ -702,48 +1049,71 @@ struct LayoutEngine::Impl
     }
   }
 
-  void Align( const Size& layoutSize,
+  void Align( const Size& size,
+              CharacterIndex startIndex,
+              Length numberOfCharacters,
               Vector<LineRun>& lines )
   {
-    // Traverse all lines and align the glyphs.
+    const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
 
+    // Traverse all lines and align the glyphs.
     for( Vector<LineRun>::Iterator it = lines.Begin(), endIt = lines.End();
          it != endIt;
          ++it )
     {
       LineRun& line = *it;
-      const bool isLastLine = lines.End() == it + 1u;
 
-      // Calculate the alignment offset accordingly with the align option,
-      // the box width, line length, and the paragraphs direction.
-      CalculateHorizontalAlignment( layoutSize.width,
-                                    line,
-                                    isLastLine );
+      if( line.characterRun.characterIndex < startIndex )
+      {
+        // Do not align lines which have already been aligned.
+        continue;
+      }
+
+      if( line.characterRun.characterIndex >= lastCharacterPlusOne )
+      {
+        // Do not align lines beyond the last laid-out character.
+        break;
+      }
+
+      // Calculate the line's alignment offset accordingly with the align option,
+      // the box width, line length, and the paragraph's direction.
+      CalculateHorizontalAlignment( size.width,
+                                    line );
     }
   }
 
   void CalculateHorizontalAlignment( float boxWidth,
-                                     LineRun& line,
-                                     bool isLastLine )
+                                     LineRun& line )
   {
     line.alignmentOffset = 0.f;
     const bool isRTL = RTL == line.direction;
     float lineLength = line.width;
 
     HorizontalAlignment alignment = mHorizontalAlignment;
-    if( isRTL &&
-        ( HORIZONTAL_ALIGN_CENTER != alignment ) )
+    if( isRTL )
     {
-      if( HORIZONTAL_ALIGN_BEGIN == alignment )
+      // Swap the alignment type if the line is right to left.
+      switch( alignment )
       {
-        alignment = HORIZONTAL_ALIGN_END;
-      }
-      else
-      {
-        alignment = HORIZONTAL_ALIGN_BEGIN;
+        case HORIZONTAL_ALIGN_BEGIN:
+        {
+          alignment = HORIZONTAL_ALIGN_END;
+          break;
+        }
+        case HORIZONTAL_ALIGN_CENTER:
+        {
+          // Nothing to do.
+          break;
+        }
+        case HORIZONTAL_ALIGN_END:
+        {
+          alignment = HORIZONTAL_ALIGN_BEGIN;
+          break;
+        }
       }
     }
 
+    // Calculate the horizontal line offset.
     switch( alignment )
     {
       case HORIZONTAL_ALIGN_BEGIN:
@@ -754,39 +1124,16 @@ struct LayoutEngine::Impl
         {
           // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
           line.alignmentOffset -= line.extraLength;
-
-          if( isLastLine )
-          {
-            line.alignmentOffset += std::min( line.extraLength, boxWidth - lineLength );
-          }
         }
         break;
       }
       case HORIZONTAL_ALIGN_CENTER:
       {
-        if( isLastLine && !isRTL )
-        {
-          // Add the length of the white saces at the end of the line.
-          lineLength += line.extraLength;
-          if( lineLength > boxWidth )
-          {
-            // The line's length is longer than the box's width.
-            // Set the line's offset to 0 and nothing else to do.
-            line.alignmentOffset = 0.f;
-            break;
-          }
-        }
-
         line.alignmentOffset = 0.5f * ( boxWidth - lineLength );
 
         if( isRTL )
         {
           line.alignmentOffset -= line.extraLength;
-
-          if( isLastLine )
-          {
-            line.alignmentOffset += 0.5f * std::min( line.extraLength, boxWidth - lineLength );
-          }
         }
 
         line.alignmentOffset = floorf( line.alignmentOffset ); // try to avoid pixel alignment.
@@ -794,16 +1141,6 @@ struct LayoutEngine::Impl
       }
       case HORIZONTAL_ALIGN_END:
       {
-        if( isLastLine && !isRTL )
-        {
-          lineLength += line.extraLength;
-          if( lineLength > boxWidth )
-          {
-            line.alignmentOffset = 0.f;
-            break;
-          }
-        }
-
         if( isRTL )
         {
           lineLength += line.extraLength;
@@ -846,7 +1183,7 @@ void LayoutEngine::SetLayout( Layout layout )
   mImpl->mLayout = layout;
 }
 
-unsigned int LayoutEngine::GetLayout() const
+LayoutEngine::Layout LayoutEngine::GetLayout() const
 {
   return mImpl->mLayout;
 }
@@ -894,25 +1231,33 @@ int LayoutEngine::GetCursorWidth() const
 bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,
                                Vector<Vector2>& glyphPositions,
                                Vector<LineRun>& lines,
-                               Size& actualSize )
+                               Size& layoutSize )
 {
   return mImpl->LayoutText( layoutParameters,
                             glyphPositions,
                             lines,
-                            actualSize );
+                            layoutSize );
 }
 
 void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+                                             CharacterIndex startIndex,
+                                             Length numberOfCharacters,
                                              Vector<Vector2>& glyphPositions )
 {
   mImpl->ReLayoutRightToLeftLines( layoutParameters,
+                                   startIndex,
+                                   numberOfCharacters,
                                    glyphPositions );
 }
 
-void LayoutEngine::Align( const Size& layoutSize,
+void LayoutEngine::Align( const Size& size,
+                          CharacterIndex startIndex,
+                          Length numberOfCharacters,
                           Vector<LineRun>& lines )
 {
-  mImpl->Align( layoutSize,
+  mImpl->Align( size,
+                startIndex,
+                numberOfCharacters,
                 lines );
 }
 
