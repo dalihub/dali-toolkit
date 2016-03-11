@@ -453,6 +453,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   Vector<GlyphIndex> newParagraphGlyphs;
   newParagraphGlyphs.Reserve( numberOfParagraphs );
 
+  GlyphIndex startGlyphIndex = 0u;
   if( SHAPE_TEXT & operations )
   {
     const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
@@ -461,21 +462,24 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                lineBreakInfo,
                scripts,
                validFonts,
+               startIndex,
+               startGlyphIndex,
+               requestedNumberOfCharacters,
                glyphs,
                glyphsToCharactersMap,
                charactersPerGlyph,
                newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
-    mVisualModel->CreateCharacterToGlyphTable( numberOfCharacters );
+    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, numberOfCharacters );
+    mVisualModel->CreateCharacterToGlyphTable( startIndex, numberOfCharacters );
   }
 
   const Length numberOfGlyphs = glyphs.Count();
 
   if( GET_GLYPH_METRICS & operations )
   {
-    GlyphInfo* glyphsBuffer = glyphs.Begin();
+    GlyphInfo* glyphsBuffer = glyphs.Begin() + startGlyphIndex;
     mMetrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
 
     // Update the width and advance of all new paragraph characters.

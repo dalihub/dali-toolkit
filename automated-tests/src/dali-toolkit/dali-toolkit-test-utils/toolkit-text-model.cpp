@@ -214,30 +214,30 @@ void CreateTextModel( const std::string& text,
   Vector<Length>& charactersPerGlyph = visualModel->mCharactersPerGlyph;
   Vector<GlyphIndex> newParagraphGlyphs;
 
-  const Length currentNumberOfGlyphs = glyphs.Count();
   const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
 
   ShapeText( textToShape,
              lineBreakInfo,
              scripts,
              validFonts,
+             0u,
+             0u,
+             numberOfCharacters,
              glyphs,
              glyphsToCharactersMap,
              charactersPerGlyph,
              newParagraphGlyphs );
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-  visualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
-  visualModel->CreateCharacterToGlyphTable( numberOfCharacters );
+  visualModel->CreateGlyphsPerCharacterTable( 0u, numberOfCharacters );
+  visualModel->CreateCharacterToGlyphTable( 0u, numberOfCharacters );
 
-  const Length numberOfGlyphs = glyphs.Count() - currentNumberOfGlyphs;
+  const Length numberOfGlyphs = glyphs.Count();
 
   // 8) Get the glyph metrics
   MetricsPtr metrics = Metrics::New( fontClient );
 
-  const GlyphIndex glyphIndex = currentNumberOfGlyphs;
-
-  GlyphInfo* glyphsBuffer = glyphs.Begin() + glyphIndex;
+  GlyphInfo* glyphsBuffer = glyphs.Begin();
   metrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
 
   // Update the width and advance of all new paragraph characters.
@@ -247,7 +247,7 @@ void CreateTextModel( const std::string& text,
        ++it )
   {
     const GlyphIndex index = *it;
-    GlyphInfo& glyph = *( glyphsBuffer + ( index - glyphIndex ) );
+    GlyphInfo& glyph = *( glyphsBuffer + index );
 
     glyph.xBearing = 0.f;
     glyph.width = 0.f;

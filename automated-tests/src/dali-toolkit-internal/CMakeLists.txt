@@ -13,6 +13,8 @@ SET(TC_SOURCES
  utc-Dali-Text-MultiLanguage.cpp
  utc-Dali-LogicalModel.cpp
  utc-Dali-BidirectionalSupport.cpp
+ utc-Dali-Text-Shaping.cpp
+ utc-Dali-VisualModel.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

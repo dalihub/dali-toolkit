@@ -531,9 +531,16 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   Actor actor = Actor::New();
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
   // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  const int width=512;
+  const int height=513;
+
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height,width, height );
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
-                             ImageDimensions(512, 513),
-                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)));
+                             ImageDimensions(width, height),
+                             Integration::ResourcePointer( bitmap ) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -560,9 +567,16 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
   Actor actor = Actor::New();
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
   // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  const int width=512;
+  const int height=513;
+
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height,width, height );
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
-                             ImageDimensions(512, 513),
-                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)) );
+                             ImageDimensions(width, height),
+                             Integration::ResourcePointer(bitmap) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -775,10 +789,13 @@ int UtcDaliRendererFactoryGetNPatchRendererN1(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
+
   //The testkit still has to load a bitmap for the broken renderer image
+  Integration::Bitmap* bitmap = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 100, 100, 100, 100 );
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(),
-                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)) );
+                             Integration::ResourcePointer(bitmap) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
@@ -806,10 +823,13 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
+
   //The testkit still has to load a bitmap for the broken renderer image
+  Integration::Bitmap* bitmap = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 100, 100, 100, 100 );
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(),
-                             Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD)) );
+                             Integration::ResourcePointer(bitmap) );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   int textureUnit = -1;
