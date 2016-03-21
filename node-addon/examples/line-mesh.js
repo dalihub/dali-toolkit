@@ -71,8 +71,8 @@ daliApp.createMeshActor = function() {
 
       var pentagonVertexDataArray = new Float32Array(pentagonVertexData.length);
       pentagonVertexDataArray.set(pentagonVertexData, 0);
-      var pentagonVertices = new dali.PropertyBuffer(pentagonVertexFormat, 5);
-      pentagonVertices.setData(pentagonVertexDataArray);
+      var pentagonVertices = new dali.PropertyBuffer(pentagonVertexFormat);
+      pentagonVertices.setData(pentagonVertexDataArray, 5);
 
       var pentacleVertexFormat ={ "aPosition2" : dali.PROPERTY_VECTOR2};
 
@@ -84,8 +84,8 @@ daliApp.createMeshActor = function() {
 
       var pentacleVertexDataArray = new Float32Array(pentacleVertexData.length);
       pentacleVertexDataArray.set(pentacleVertexData, 0);
-      var pentacleVertices = new dali.PropertyBuffer(pentacleVertexFormat, 5);
-      pentacleVertices.setData(pentacleVertexDataArray);
+      var pentacleVertices = new dali.PropertyBuffer(pentacleVertexFormat);
+      pentacleVertices.setData(pentacleVertexDataArray, 5);
 
       var indexFormat ={ "indices" : dali.PROPERTY_INTEGER };
 
@@ -93,8 +93,8 @@ daliApp.createMeshActor = function() {
 
       var indexDataArray = new Uint32Array(indexData.length);
       indexDataArray.set(indexData, 0);
-      var indices = new dali.PropertyBuffer(indexFormat, 10);
-      indices.setData(indexDataArray);
+      var indices = new dali.PropertyBuffer(indexFormat);
+      indices.setData(indexDataArray, 10);
 
       // Create geometry
       var geometry = new dali.Geometry();

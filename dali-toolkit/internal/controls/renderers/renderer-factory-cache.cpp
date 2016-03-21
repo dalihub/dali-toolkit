@@ -165,8 +165,8 @@ Geometry RendererFactoryCache::CreateQuadGeometry()
 
   Property::Map quadVertexFormat;
   quadVertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat, 4 );
-  quadVertices.SetData(quadVertexData);
+  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
+  quadVertices.SetData( quadVertexData, 4 );
 
   // Create the geometry object
   Geometry geometry = Geometry::New();

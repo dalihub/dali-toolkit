@@ -480,10 +480,10 @@ struct AtlasRenderer::Impl
 
   Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize )
   {
-    PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, meshRecord.mMesh.mVertices.Size() );
-    PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
-    quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ) );
-    quadIndices.SetData( const_cast< unsigned int* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
+    PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat );
+    PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat );
+    quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ), meshRecord.mMesh.mVertices.Size() );
+    quadIndices.SetData(  const_cast< unsigned int* >(           &meshRecord.mMesh.mIndices[ 0 ] ),  meshRecord.mMesh.mIndices.Size() );
 
     Geometry quadGeometry = Geometry::New();
     quadGeometry.AddVertexBuffer( quadVertices );

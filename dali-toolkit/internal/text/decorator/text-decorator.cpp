@@ -1048,26 +1048,18 @@ struct Decorator::Impl : public ConnectionTracker
           indices.PushBack( v + 3 );
         }
 
-        if( mQuadVertices )
+        if( ! mQuadVertices )
         {
-          mQuadVertices.SetSize( vertices.Size() );
-        }
-        else
-        {
-          mQuadVertices = PropertyBuffer::New( mQuadVertexFormat, vertices.Size() );
+          mQuadVertices = PropertyBuffer::New( mQuadVertexFormat );
         }
 
-        if( mQuadIndices )
+        if( ! mQuadIndices )
         {
-          mQuadIndices.SetSize( indices.Size() );
-        }
-        else
-        {
-          mQuadIndices = PropertyBuffer::New( mQuadIndexFormat, indices.Size() );
+          mQuadIndices = PropertyBuffer::New( mQuadIndexFormat );
         }
 
-        mQuadVertices.SetData( &vertices[ 0 ] );
-        mQuadIndices.SetData( &indices[ 0 ] );
+        mQuadVertices.SetData( &vertices[ 0 ], vertices.Size() );
+        mQuadIndices.SetData( &indices[ 0 ], indices.Size() );
 
         if( !mQuadGeometry )
         {

@@ -114,18 +114,18 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
 {
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat, vertices.Size() );
+  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
   if( vertices.Size() > 0 )
   {
-    vertexPropertyBuffer.SetData( &vertices[ 0 ] );
+    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
   Property::Map indexFormat;
   indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat, indices.Size() );
+  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
   if( indices.Size() > 0 )
   {
-    indexPropertyBuffer.SetData( &indices[ 0 ] );
+    indexPropertyBuffer.SetData( &indices[ 0 ], indices.Size() );
   }
 
   // Create the geometry object

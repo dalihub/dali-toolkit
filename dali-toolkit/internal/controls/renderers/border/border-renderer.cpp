@@ -292,15 +292,15 @@ Geometry BorderRenderer::CreateBorderGeometry()
   Property::Map borderVertexFormat;
   borderVertexFormat[POSITION_ATTRIBUTE_NAME] = Property::VECTOR2;
   borderVertexFormat[DRIFT_ATTRIBUTE_NAME] = Property::VECTOR2;
-  PropertyBuffer borderVertices = PropertyBuffer::New( borderVertexFormat, 16 );
-  borderVertices.SetData(borderVertexData);
+  PropertyBuffer borderVertices = PropertyBuffer::New( borderVertexFormat );
+  borderVertices.SetData( borderVertexData, 16 );
 
   // Create indices
   unsigned int indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
   Property::Map indexFormat;
   indexFormat[INDEX_NAME] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 24 );
-  indices.SetData(indexData);
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( indexData, 24 );
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
