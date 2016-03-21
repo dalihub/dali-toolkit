@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
+#include <dali-toolkit/internal/text/text-run-container.h>
 
 namespace
 {
@@ -313,6 +314,381 @@ bool Controller::Impl::ProcessInputEvents()
   return decoratorUpdated;
 }
 
+void Controller::Impl::CalculateTextUpdateIndices( Length& numberOfCharacters )
+{
+  mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+  mTextUpdateInfo.mStartGlyphIndex = 0u;
+  mTextUpdateInfo.mStartLineIndex = 0u;
+  numberOfCharacters = 0u;
+
+  const Length numberOfParagraphs = mLogicalModel->mParagraphInfo.Count();
+  if( 0u == numberOfParagraphs )
+  {
+    mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    numberOfCharacters = 0u;
+
+    mTextUpdateInfo.mRequestedNumberOfCharacters = mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+
+    // Nothing else to do if there are no paragraphs.
+    return;
+  }
+
+  // Find the paragraphs to be updated.
+  Vector<ParagraphRunIndex> paragraphsToBeUpdated;
+  if( mTextUpdateInfo.mCharacterIndex >= mTextUpdateInfo.mPreviousNumberOfCharacters )
+  {
+    // Text is being added at the end of the current text.
+    if( mTextUpdateInfo.mIsLastCharacterNewParagraph )
+    {
+      // Text is being added in a new paragraph after the last character of the text.
+      mTextUpdateInfo.mParagraphCharacterIndex = mTextUpdateInfo.mPreviousNumberOfCharacters;
+      numberOfCharacters = 0u;
+      mTextUpdateInfo.mRequestedNumberOfCharacters = mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+
+      mTextUpdateInfo.mStartGlyphIndex = mVisualModel->mGlyphs.Count();
+      mTextUpdateInfo.mStartLineIndex = mVisualModel->mLines.Count() - 1u;
+
+      // Nothing else to do;
+      return;
+    }
+
+    paragraphsToBeUpdated.PushBack( numberOfParagraphs - 1u );
+  }
+  else
+  {
+    CharacterIndex lastIndex = 0u;
+    if( mTextUpdateInfo.mFullRelayoutNeeded )
+    {
+      lastIndex = mTextUpdateInfo.mPreviousNumberOfCharacters;
+    }
+    else
+    {
+      lastIndex = ( mTextUpdateInfo.mNumberOfCharactersToRemove > 0u ) ? mTextUpdateInfo.mNumberOfCharactersToRemove : 1u;
+    }
+    mLogicalModel->FindParagraphs( mTextUpdateInfo.mCharacterIndex,
+                                   lastIndex,
+                                   paragraphsToBeUpdated );
+  }
+
+  if( 0u != paragraphsToBeUpdated.Count() )
+  {
+    const ParagraphRunIndex firstParagraphIndex = *( paragraphsToBeUpdated.Begin() );
+    const ParagraphRun& firstParagraph = *( mLogicalModel->mParagraphInfo.Begin() + firstParagraphIndex );
+    mTextUpdateInfo.mParagraphCharacterIndex = firstParagraph.characterRun.characterIndex;
+
+    ParagraphRunIndex lastParagraphIndex = *( paragraphsToBeUpdated.End() - 1u );
+    const ParagraphRun& lastParagraph = *( mLogicalModel->mParagraphInfo.Begin() + lastParagraphIndex );
+
+    if( ( mTextUpdateInfo.mNumberOfCharactersToRemove > 0u ) &&                                            // Some character are removed.
+        ( lastParagraphIndex < numberOfParagraphs - 1u ) &&                                                // There is a next paragraph.
+        ( ( lastParagraph.characterRun.characterIndex + lastParagraph.characterRun.numberOfCharacters ) == // The last removed character is the new paragraph character.
+          ( mTextUpdateInfo.mCharacterIndex + mTextUpdateInfo.mNumberOfCharactersToRemove ) ) )
+    {
+      // The new paragraph character of the last updated paragraph has been removed so is going to be merged with the next one.
+      const ParagraphRun& lastParagraph = *( mLogicalModel->mParagraphInfo.Begin() + lastParagraphIndex + 1u );
+
+      numberOfCharacters = lastParagraph.characterRun.characterIndex + lastParagraph.characterRun.numberOfCharacters - mTextUpdateInfo.mParagraphCharacterIndex;
+    }
+    else
+    {
+      numberOfCharacters = lastParagraph.characterRun.characterIndex + lastParagraph.characterRun.numberOfCharacters - mTextUpdateInfo.mParagraphCharacterIndex;
+    }
+  }
+  mTextUpdateInfo.mRequestedNumberOfCharacters = numberOfCharacters + mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+  mTextUpdateInfo.mStartGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + mTextUpdateInfo.mParagraphCharacterIndex );
+}
+
+void Controller::Impl::ClearFullModelData( OperationsMask operations )
+{
+  if( GET_LINE_BREAKS & operations )
+  {
+    mLogicalModel->mLineBreakInfo.Clear();
+    mLogicalModel->mParagraphInfo.Clear();
+  }
+
+  if( GET_WORD_BREAKS & operations )
+  {
+    mLogicalModel->mLineBreakInfo.Clear();
+  }
+
+  if( GET_SCRIPTS & operations )
+  {
+    mLogicalModel->mScriptRuns.Clear();
+  }
+
+  if( VALIDATE_FONTS & operations )
+  {
+    mLogicalModel->mFontRuns.Clear();
+  }
+
+  if( 0u != mLogicalModel->mBidirectionalParagraphInfo.Count() )
+  {
+    if( BIDI_INFO & operations )
+    {
+      mLogicalModel->mBidirectionalParagraphInfo.Clear();
+      mLogicalModel->mCharacterDirections.Clear();
+    }
+
+    if( REORDER & operations )
+    {
+      // Free the allocated memory used to store the conversion table in the bidirectional line info run.
+      for( Vector<BidirectionalLineInfoRun>::Iterator it = mLogicalModel->mBidirectionalLineInfo.Begin(),
+             endIt = mLogicalModel->mBidirectionalLineInfo.End();
+           it != endIt;
+           ++it )
+      {
+        BidirectionalLineInfoRun& bidiLineInfo = *it;
+
+        free( bidiLineInfo.visualToLogicalMap );
+        bidiLineInfo.visualToLogicalMap = NULL;
+      }
+      mLogicalModel->mBidirectionalLineInfo.Clear();
+
+      mLogicalModel->mLogicalToVisualMap.Clear();
+      mLogicalModel->mVisualToLogicalMap.Clear();
+    }
+  }
+
+  if( SHAPE_TEXT & operations )
+  {
+    mVisualModel->mGlyphs.Clear();
+    mVisualModel->mGlyphsToCharacters.Clear();
+    mVisualModel->mCharactersToGlyph.Clear();
+    mVisualModel->mCharactersPerGlyph.Clear();
+    mVisualModel->mGlyphsPerCharacter.Clear();
+    mVisualModel->mGlyphPositions.Clear();
+  }
+
+  if( LAYOUT & operations )
+  {
+    mVisualModel->mLines.Clear();
+  }
+}
+
+void Controller::Impl::ClearCharacterModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations )
+{
+  const CharacterIndex endIndexPlusOne = endIndex + 1u;
+
+  if( GET_LINE_BREAKS & operations )
+  {
+    // Clear the line break info.
+    LineBreakInfo* lineBreakInfoBuffer = mLogicalModel->mLineBreakInfo.Begin();
+
+    mLogicalModel->mLineBreakInfo.Erase( lineBreakInfoBuffer + startIndex,
+                                         lineBreakInfoBuffer + endIndexPlusOne );
+
+    // Clear the paragraphs.
+    ClearCharacterRuns( startIndex,
+                        endIndex,
+                        mLogicalModel->mParagraphInfo );
+  }
+
+  if( GET_WORD_BREAKS & operations )
+  {
+    // Clear the word break info.
+    WordBreakInfo* wordBreakInfoBuffer = mLogicalModel->mWordBreakInfo.Begin();
+
+    mLogicalModel->mWordBreakInfo.Erase( wordBreakInfoBuffer + startIndex,
+                                         wordBreakInfoBuffer + endIndexPlusOne );
+  }
+
+  if( GET_SCRIPTS & operations )
+  {
+    // Clear the scripts.
+    ClearCharacterRuns( startIndex,
+                        endIndex,
+                        mLogicalModel->mScriptRuns );
+  }
+
+  if( VALIDATE_FONTS & operations )
+  {
+    // Clear the fonts.
+    ClearCharacterRuns( startIndex,
+                        endIndex,
+                        mLogicalModel->mFontRuns );
+  }
+
+  if( 0u != mLogicalModel->mBidirectionalParagraphInfo.Count() )
+  {
+    if( BIDI_INFO & operations )
+    {
+      // Clear the bidirectional paragraph info.
+      ClearCharacterRuns( startIndex,
+                          endIndex,
+                          mLogicalModel->mBidirectionalParagraphInfo );
+
+      // Clear the character's directions.
+      CharacterDirection* characterDirectionsBuffer = mLogicalModel->mCharacterDirections.Begin();
+
+      mLogicalModel->mCharacterDirections.Erase( characterDirectionsBuffer + startIndex,
+                                                 characterDirectionsBuffer + endIndexPlusOne );
+    }
+
+    if( REORDER & operations )
+    {
+      uint32_t startRemoveIndex = mLogicalModel->mBidirectionalLineInfo.Count();
+      uint32_t endRemoveIndex = startRemoveIndex;
+      ClearCharacterRuns( startIndex,
+                          endIndex,
+                          mLogicalModel->mBidirectionalLineInfo,
+                          startRemoveIndex,
+                          endRemoveIndex );
+
+      BidirectionalLineInfoRun* bidirectionalLineInfoBuffer = mLogicalModel->mBidirectionalLineInfo.Begin();
+
+      // Free the allocated memory used to store the conversion table in the bidirectional line info run.
+      for( Vector<BidirectionalLineInfoRun>::Iterator it = bidirectionalLineInfoBuffer + startRemoveIndex,
+             endIt = bidirectionalLineInfoBuffer + endRemoveIndex;
+           it != endIt;
+           ++it )
+      {
+        BidirectionalLineInfoRun& bidiLineInfo = *it;
+
+        free( bidiLineInfo.visualToLogicalMap );
+        bidiLineInfo.visualToLogicalMap = NULL;
+      }
+
+      mLogicalModel->mBidirectionalLineInfo.Erase( bidirectionalLineInfoBuffer + startRemoveIndex,
+                                                   bidirectionalLineInfoBuffer + endRemoveIndex );
+
+      // Clear the logical to visual and the visual to logical conversion tables.
+      CharacterIndex* logicalToVisualMapBuffer = mLogicalModel->mLogicalToVisualMap.Begin();
+      mLogicalModel->mLogicalToVisualMap.Erase( logicalToVisualMapBuffer + startIndex,
+                                                logicalToVisualMapBuffer + endIndexPlusOne );
+
+      CharacterIndex* visualToLogicalMapBuffer = mLogicalModel->mVisualToLogicalMap.Begin();
+      mLogicalModel->mVisualToLogicalMap.Erase( visualToLogicalMapBuffer + startIndex,
+                                                visualToLogicalMapBuffer + endIndexPlusOne );
+    }
+  }
+}
+
+void Controller::Impl::ClearGlyphModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations )
+{
+  const CharacterIndex endIndexPlusOne = endIndex + 1u;
+  const Length numberOfCharactersRemoved = endIndexPlusOne - startIndex;
+
+  const bool clearShape = SHAPE_TEXT & operations;
+  const bool clearLayout = LAYOUT & operations;
+
+  if( clearShape || clearLayout )
+  {
+    // Convert the character index to glyph index before deleting the character to glyph and the glyphs per character buffers.
+    GlyphIndex* charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+    Length* glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+
+    const GlyphIndex endGlyphIndex = *( charactersToGlyphBuffer + endIndex );
+    const GlyphIndex endGlyphIndexPlusOne = endGlyphIndex + *( glyphsPerCharacterBuffer + endIndex );
+    const Length numberOfGlyphsRemoved = endGlyphIndexPlusOne - mTextUpdateInfo.mStartGlyphIndex;
+
+    if( clearShape )
+    {
+      // Update the character to glyph indices.
+      for( Vector<GlyphIndex>::Iterator it =  charactersToGlyphBuffer + endIndexPlusOne,
+             endIt =  charactersToGlyphBuffer + mVisualModel->mCharactersToGlyph.Count();
+           it != endIt;
+           ++it )
+      {
+        CharacterIndex& index = *it;
+        index -= numberOfGlyphsRemoved;
+      }
+
+      // Clear the character to glyph conversion table.
+      mVisualModel->mCharactersToGlyph.Erase( charactersToGlyphBuffer + startIndex,
+                                              charactersToGlyphBuffer + endIndexPlusOne );
+
+      // Clear the glyphs per character table.
+      mVisualModel->mGlyphsPerCharacter.Erase( glyphsPerCharacterBuffer + startIndex,
+                                               glyphsPerCharacterBuffer + endIndexPlusOne );
+
+      // Clear the glyphs buffer.
+      GlyphInfo* glyphsBuffer = mVisualModel->mGlyphs.Begin();
+      mVisualModel->mGlyphs.Erase( glyphsBuffer + mTextUpdateInfo.mStartGlyphIndex,
+                                   glyphsBuffer + endGlyphIndexPlusOne );
+
+      CharacterIndex* glyphsToCharactersBuffer = mVisualModel->mGlyphsToCharacters.Begin();
+
+      // Update the glyph to character indices.
+      for( Vector<CharacterIndex>::Iterator it = glyphsToCharactersBuffer + endGlyphIndexPlusOne,
+             endIt = glyphsToCharactersBuffer + mVisualModel->mGlyphsToCharacters.Count();
+           it != endIt;
+           ++it )
+      {
+        CharacterIndex& index = *it;
+        index -= numberOfCharactersRemoved;
+      }
+
+      // Clear the glyphs to characters buffer.
+      mVisualModel->mGlyphsToCharacters.Erase( glyphsToCharactersBuffer + mTextUpdateInfo.mStartGlyphIndex,
+                                               glyphsToCharactersBuffer  + endGlyphIndexPlusOne );
+
+      // Clear the characters per glyph buffer.
+      Length* charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+      mVisualModel->mCharactersPerGlyph.Erase( charactersPerGlyphBuffer + mTextUpdateInfo.mStartGlyphIndex,
+                                               charactersPerGlyphBuffer + endGlyphIndexPlusOne );
+
+      // Clear the positions buffer.
+      Vector2* positionsBuffer = mVisualModel->mGlyphPositions.Begin();
+      mVisualModel->mGlyphPositions.Erase( positionsBuffer + mTextUpdateInfo.mStartGlyphIndex,
+                                           positionsBuffer + endGlyphIndexPlusOne );
+    }
+
+    if( clearLayout )
+    {
+      // Clear the lines.
+      uint32_t startRemoveIndex = mVisualModel->mLines.Count();
+      uint32_t endRemoveIndex = startRemoveIndex;
+      ClearCharacterRuns( startIndex,
+                          endIndex,
+                          mVisualModel->mLines,
+                          startRemoveIndex,
+                          endRemoveIndex );
+
+      // Will update the glyph runs.
+      uint32_t startRemoveGlyphIndex = mVisualModel->mLines.Count();
+      uint32_t endRemoveGlyphIndex = startRemoveIndex;
+      ClearGlyphRuns( mTextUpdateInfo.mStartGlyphIndex,
+                      endGlyphIndex,
+                      mVisualModel->mLines,
+                      startRemoveGlyphIndex,
+                      endRemoveGlyphIndex );
+
+      // Set the line index from where to insert the new laid-out lines.
+      mTextUpdateInfo.mStartLineIndex = startRemoveIndex;
+
+      LineRun* linesBuffer = mVisualModel->mLines.Begin();
+      mVisualModel->mLines.Erase( linesBuffer + startRemoveIndex,
+                                  linesBuffer + endRemoveIndex );
+    }
+  }
+}
+
+void Controller::Impl::ClearModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations )
+{
+  if( mTextUpdateInfo.mClearAll ||
+      ( ( 0u == startIndex ) &&
+        ( mTextUpdateInfo.mPreviousNumberOfCharacters == endIndex + 1u ) ) )
+  {
+    ClearFullModelData( operations );
+  }
+  else
+  {
+    // Clear the model data related with characters.
+    ClearCharacterModelData( startIndex, endIndex, operations );
+
+    // Clear the model data related with glyphs.
+    ClearGlyphModelData( startIndex, endIndex, operations );
+  }
+
+  // The estimated number of lines. Used to avoid reallocations when layouting.
+  mTextUpdateInfo.mEstimatedNumberOfLines = std::max( mVisualModel->mLines.Count(), mLogicalModel->mParagraphInfo.Count() );
+
+  mVisualModel->ClearCaches();
+
+  // TODO finish the mark-up.
+  mVisualModel->mColorRuns.Clear();
+}
+
 void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::UpdateModel\n" );
@@ -320,13 +696,35 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mOperationsPending & operationsRequired );
 
+  if( NO_OPERATION == operations )
+  {
+    // Nothing to do if no operations are pending and required.
+    return;
+  }
+
   Vector<Character>& utf32Characters = mLogicalModel->mText;
 
   const Length numberOfCharacters = utf32Characters.Count();
 
-  Vector<LineBreakInfo>& lineBreakInfo = mLogicalModel->mLineBreakInfo;
+  // Index to the first character of the first paragraph to be updated.
   CharacterIndex startIndex = 0u;
-  Length requestedNumberOfCharacters = numberOfCharacters;
+  // Number of characters of the paragraphs to be removed.
+  Length paragraphCharacters = 0u;
+
+  CalculateTextUpdateIndices( paragraphCharacters );
+  startIndex = mTextUpdateInfo.mParagraphCharacterIndex;
+
+  if( mTextUpdateInfo.mClearAll ||
+      ( 0u != paragraphCharacters ) )
+  {
+    ClearModelData( startIndex, startIndex + ( ( paragraphCharacters > 0u ) ? paragraphCharacters - 1u : 0u ), operationsRequired );
+  }
+
+  mTextUpdateInfo.mClearAll = false;
+
+  Vector<LineBreakInfo>& lineBreakInfo = mLogicalModel->mLineBreakInfo;
+  const Length requestedNumberOfCharacters = mTextUpdateInfo.mRequestedNumberOfCharacters;
+
   if( GET_LINE_BREAKS & operations )
   {
     // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
@@ -400,21 +798,9 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   Vector<Character> mirroredUtf32Characters;
   bool textMirrored = false;
-  Length numberOfParagraphs = 0u;
+  const Length numberOfParagraphs = mLogicalModel->mParagraphInfo.Count();
   if( BIDI_INFO & operations )
   {
-    // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
-    // bidirectional info.
-
-    const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
-    for( Length index = 0u; index < numberOfCharacters; ++index )
-    {
-      if( TextAbstraction::LINE_NO_BREAK == *( lineBreakInfoBuffer + index ) )
-      {
-        ++numberOfParagraphs;
-      }
-    }
-
     Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mLogicalModel->mBidirectionalParagraphInfo;
     bidirectionalInfo.Reserve( numberOfParagraphs );
 
@@ -459,7 +845,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   Vector<GlyphIndex> newParagraphGlyphs;
   newParagraphGlyphs.Reserve( numberOfParagraphs );
 
-  GlyphIndex startGlyphIndex = 0u;
+  const Length currentNumberOfGlyphs = glyphs.Count();
   if( SHAPE_TEXT & operations )
   {
     const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
@@ -469,7 +855,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                scripts,
                validFonts,
                startIndex,
-               startGlyphIndex,
+               mTextUpdateInfo.mStartGlyphIndex,
                requestedNumberOfCharacters,
                glyphs,
                glyphsToCharactersMap,
@@ -477,16 +863,16 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, startGlyphIndex, numberOfCharacters );
-    mVisualModel->CreateCharacterToGlyphTable( startIndex, startGlyphIndex, numberOfCharacters );
+    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters );
+    mVisualModel->CreateCharacterToGlyphTable( startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters );
   }
 
-  const Length numberOfGlyphs = glyphs.Count();
+  const Length numberOfGlyphs = glyphs.Count() - currentNumberOfGlyphs;
 
   if( GET_GLYPH_METRICS & operations )
   {
-    GlyphInfo* glyphsBuffer = glyphs.Begin() + startGlyphIndex;
-    mMetrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
+    GlyphInfo* glyphsBuffer = glyphs.Begin();
+    mMetrics->GetGlyphMetrics( glyphsBuffer + mTextUpdateInfo.mStartGlyphIndex, numberOfGlyphs );
 
     // Update the width and advance of all new paragraph characters.
     for( Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it )
@@ -520,6 +906,12 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     // TODO: At the moment the underline runs are only for pre-edit.
     mVisualModel->mUnderlineRuns.PushBack( underlineRun );
   }
+
+  // The estimated number of lines. Used to avoid reallocations when layouting.
+  mTextUpdateInfo.mEstimatedNumberOfLines = std::max( mVisualModel->mLines.Count(), mLogicalModel->mParagraphInfo.Count() );
+
+  // Set the previous number of characters for the next time the text is updated.
+  mTextUpdateInfo.mPreviousNumberOfCharacters = numberOfCharacters;
 }
 
 bool Controller::Impl::UpdateModelStyle( OperationsMask operationsRequired )
@@ -988,12 +1380,13 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
   const CharacterIndex startOfSelectedText = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
   const Length lengthOfSelectedText = ( handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
+  Vector<Character>& utf32Characters = mLogicalModel->mText;
+  const Length numberOfCharacters = utf32Characters.Count();
+
   // Validate the start and end selection points
-  if( ( startOfSelectedText + lengthOfSelectedText ) <= mLogicalModel->mText.Count() )
+  if( ( startOfSelectedText + lengthOfSelectedText ) <= numberOfCharacters )
   {
     //Get text as a UTF8 string
-    Vector<Character>& utf32Characters = mLogicalModel->mText;
-
     Utf32ToUtf8( &utf32Characters[startOfSelectedText], lengthOfSelectedText, selectedText );
 
     if( deleteAfterRetrieval ) // Only delete text if copied successfully
@@ -1003,12 +1396,14 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
       mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
 
-      // Delete text between handles
-      Vector<Character>& currentText = mLogicalModel->mText;
+      // Mark the paragraphs to be updated.
+      mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
 
-      Vector<Character>::Iterator first = currentText.Begin() + startOfSelectedText;
+      // Delete text between handles
+      Vector<Character>::Iterator first = utf32Characters.Begin() + startOfSelectedText;
       Vector<Character>::Iterator last  = first + lengthOfSelectedText;
-      currentText.Erase( first, last );
+      utf32Characters.Erase( first, last );
 
       // Scroll after delete.
       mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;

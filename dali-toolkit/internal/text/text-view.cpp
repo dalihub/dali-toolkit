@@ -181,19 +181,28 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
         GlyphIndex lastGlyphIndexOfLine = line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs - 1u;
 
         // Add the alignment offset to the glyph's position.
+
+        float penY = line->ascender;
         for( Length index = 0u; index < numberOfLaidOutGlyphs; ++index )
         {
-          ( *( glyphPositions + index ) ).x += line->alignmentOffset;
+          Vector2& position =  *( glyphPositions + index );
+          position.x += line->alignmentOffset;
+          position.y += penY;
 
           if( lastGlyphIndexOfLine == index )
           {
+            penY += -line->descender;
+
             // Get the next line.
             ++lineIndex;
 
             if( lineIndex < numberOfLines )
             {
               line = lineBuffer + lineIndex;
+
               lastGlyphIndexOfLine = line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs - 1u;
+
+              penY += line->ascender;
             }
           }
         }

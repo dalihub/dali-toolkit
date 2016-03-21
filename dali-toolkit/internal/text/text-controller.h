@@ -776,11 +776,6 @@ private:
   void ShowPlaceholderText();
 
   /**
-   * @brief Helper to clear all the model data except for LogicalModel::mText.
-   */
-  void ClearModelData();
-
-  /**
    * @brief Helper to clear font-specific data (only).
    */
   void ClearFontData();
