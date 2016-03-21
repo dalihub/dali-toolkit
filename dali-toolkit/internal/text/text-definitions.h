@@ -59,6 +59,7 @@ typedef uint32_t                         UnderlineRunIndex;         ///< An inde
 typedef uint32_t                         BidirectionalRunIndex;     ///< An index into an array of bidirectional info.
 typedef uint32_t                         BidirectionalLineRunIndex; ///< An index into an array of bidirectional line info.
 typedef uint32_t                         LineIndex;                 ///< An index into an array of lines.
+typedef uint32_t                         ParagraphRunIndex;         ///< An index into an array of paragraphs.
 
 } // namespace Text
 

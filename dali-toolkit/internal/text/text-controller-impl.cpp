@@ -336,7 +336,13 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     lineBreakInfo.Resize( numberOfCharacters, TextAbstraction::LINE_NO_BREAK );
 
     SetLineBreakInfo( utf32Characters,
+                      startIndex,
+                      requestedNumberOfCharacters,
                       lineBreakInfo );
+
+    // Create the paragraph info.
+    mLogicalModel->CreateParagraphInfo( startIndex,
+                                        requestedNumberOfCharacters );
   }
 
   Vector<WordBreakInfo>& wordBreakInfo = mLogicalModel->mWordBreakInfo;

@@ -420,6 +420,131 @@ void LogicalModel::ClearFontDescriptionRuns()
   FreeFontFamilyNames( mFontDescriptionRuns );
 }
 
+void LogicalModel::CreateParagraphInfo( CharacterIndex startIndex,
+                                        Length numberOfCharacters )
+{
+  const Length totalNumberOfCharacters = mLineBreakInfo.Count();
+
+  // Count the number of LINE_MUST_BREAK to reserve some space for the vector of paragraph's info.
+  Vector<CharacterIndex> paragraphs;
+  paragraphs.Reserve( numberOfCharacters );
+  const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = mLineBreakInfo.Begin();
+  const CharacterIndex lastCharacterIndexPlusOne = startIndex + numberOfCharacters;
+  for( Length index = startIndex; index < lastCharacterIndexPlusOne; ++index )
+  {
+    if( TextAbstraction::LINE_MUST_BREAK == *( lineBreakInfoBuffer + index ) )
+    {
+      paragraphs.PushBack( index );
+    }
+  }
+
+  // Whether the current paragraphs are updated or set from scratch.
+  const bool updateCurrentParagraphs = numberOfCharacters < totalNumberOfCharacters;
+
+  // Reserve space for current paragraphs plus new ones.
+  const Length numberOfNewParagraphs = paragraphs.Count();
+  const Length totalNumberOfParagraphs = mParagraphInfo.Count() + numberOfNewParagraphs;
+  mParagraphInfo.Resize( totalNumberOfParagraphs );
+
+  ParagraphRun* paragraphInfoBuffer = NULL;
+  Vector<ParagraphRun> newParagraphs;
+
+  if( updateCurrentParagraphs )
+  {
+    newParagraphs.Resize( numberOfNewParagraphs );
+    paragraphInfoBuffer = newParagraphs.Begin();
+  }
+  else
+  {
+    paragraphInfoBuffer = mParagraphInfo.Begin();
+  }
+
+  // Find where to insert the new paragraphs.
+  ParagraphRunIndex paragraphIndex = 0u;
+  CharacterIndex firstIndex = startIndex;
+
+  if( updateCurrentParagraphs )
+  {
+    for( Vector<ParagraphRun>::ConstIterator it = mParagraphInfo.Begin(),
+           endIt = mParagraphInfo.Begin() + totalNumberOfParagraphs - numberOfNewParagraphs;
+         it != endIt;
+         ++it )
+    {
+      const ParagraphRun& paragraph( *it );
+
+      if( startIndex < paragraph.characterRun.characterIndex + paragraph.characterRun.numberOfCharacters )
+      {
+        firstIndex = paragraph.characterRun.characterIndex;
+        break;
+      }
+
+      ++paragraphIndex;
+    }
+  }
+
+  // Create the paragraph info.
+  ParagraphRunIndex newParagraphIndex = 0u;
+  for( Vector<CharacterIndex>::ConstIterator it = paragraphs.Begin(),
+         endIt = paragraphs.End();
+       it != endIt;
+       ++it, ++newParagraphIndex )
+  {
+    const CharacterIndex index = *it;
+
+    ParagraphRun& paragraph = *( paragraphInfoBuffer + newParagraphIndex );
+    paragraph.characterRun.characterIndex = firstIndex;
+    paragraph.characterRun.numberOfCharacters = 1u + index - firstIndex;
+
+    firstIndex += paragraph.characterRun.numberOfCharacters;
+  }
+
+
+  // Insert the new paragraphs.
+  if( updateCurrentParagraphs )
+  {
+    mParagraphInfo.Insert( mParagraphInfo.Begin() + paragraphIndex,
+                           newParagraphs.Begin(),
+                           newParagraphs.End() );
+
+    mParagraphInfo.Resize( totalNumberOfParagraphs );
+
+    // Update the next paragraph indices.
+    for( Vector<ParagraphRun>::Iterator it = mParagraphInfo.Begin() + paragraphIndex + newParagraphs.Count(),
+           endIt = mParagraphInfo.End();
+         it != endIt;
+         ++it )
+    {
+      ParagraphRun& paragraph( *it );
+
+      paragraph.characterRun.characterIndex += numberOfCharacters;
+    }
+  }
+}
+
+void LogicalModel::FindParagraphs( CharacterIndex index,
+                                   Length numberOfCharacters,
+                                   Vector<ParagraphRunIndex>& paragraphs )
+{
+  // Reserve som space for the paragraph indices.
+  paragraphs.Reserve( mParagraphInfo.Count() );
+
+  // Traverse the paragraphs to find which ones contain the given characters.
+  ParagraphRunIndex paragraphIndex = 0u;
+  for( Vector<ParagraphRun>::ConstIterator it = mParagraphInfo.Begin(),
+         endIt = mParagraphInfo.End();
+       it != endIt;
+       ++it, ++paragraphIndex )
+  {
+    const ParagraphRun& paragraph( *it );
+
+    if( ( paragraph.characterRun.characterIndex + paragraph.characterRun.numberOfCharacters > index ) &&
+        ( paragraph.characterRun.characterIndex < index + numberOfCharacters ) )
+    {
+      paragraphs.PushBack( paragraphIndex );
+    }
+  }
+}
+
 LogicalModel::~LogicalModel()
 {
   ClearFontDescriptionRuns();
