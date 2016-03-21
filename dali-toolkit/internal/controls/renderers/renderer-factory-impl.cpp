@@ -38,11 +38,11 @@ namespace
 {
 const char * const RENDERER_TYPE_NAME( "rendererType" );
 
-const char * const COLOR_RENDERER("colorRenderer");
-const char * const BORDER_RENDERER("borderRenderer");
-const char * const GRADIENT_RENDERER("gradientRenderer");
-const char * const IMAGE_RENDERER("imageRenderer");
-const char * const N_PATCH_RENDERER("nPatchRenderer");
+const char * const COLOR_RENDERER("color");
+const char * const BORDER_RENDERER("border");
+const char * const GRADIENT_RENDERER("gradient");
+const char * const IMAGE_RENDERER("image");
+const char * const N_PATCH_RENDERER("nPatch");
 
 const std::string TEXTURE_UNIFORM_NAME = "sTexture";
 

@@ -1382,32 +1382,36 @@ bool Controller::DoRelayout( const Size& size,
       if( REORDER & operations )
       {
         Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mLogicalModel->mBidirectionalParagraphInfo;
+        Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mLogicalModel->mBidirectionalLineInfo;
 
         // Check first if there are paragraphs with bidirectional info.
         if( 0u != bidirectionalInfo.Count() )
         {
           // Get the lines
           const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
+          const CharacterIndex startIndex = 0u;
+          Length requestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
           // Reorder the lines.
-          Vector<BidirectionalLineInfoRun> lineBidirectionalInfoRuns;
-          lineBidirectionalInfoRuns.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
+          bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
           ReorderLines( bidirectionalInfo,
+                        startIndex,
+                        requestedNumberOfCharacters,
                         lines,
-                        lineBidirectionalInfoRuns );
-
-          // Set the bidirectional info into the model.
-          const Length numberOfBidirectionalInfoRuns = lineBidirectionalInfoRuns.Count();
-          mImpl->mLogicalModel->SetVisualToLogicalMap( lineBidirectionalInfoRuns.Begin(),
-                                                       numberOfBidirectionalInfoRuns );
+                        bidirectionalLineInfo );
 
           // Set the bidirectional info per line into the layout parameters.
-          layoutParameters.lineBidirectionalInfoRunsBuffer = lineBidirectionalInfoRuns.Begin();
-          layoutParameters.numberOfBidirectionalInfoRuns = numberOfBidirectionalInfoRuns;
+          layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
+          layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
+
+          // Set the bidirectional info into the model.
+          mImpl->mLogicalModel->SetVisualToLogicalMap( layoutParameters.lineBidirectionalInfoRunsBuffer,
+                                                       layoutParameters.numberOfBidirectionalInfoRuns,
+                                                       startIndex,
+                                                       requestedNumberOfCharacters );
 
           // Get the character to glyph conversion table and set into the layout.
           layoutParameters.charactersToGlyphsBuffer = mImpl->mVisualModel->mCharactersToGlyph.Begin();
-
           // Get the glyphs per character table and set into the layout.
           layoutParameters.glyphsPerCharacterBuffer = mImpl->mVisualModel->mGlyphsPerCharacter.Begin();
 
@@ -1416,15 +1420,18 @@ bool Controller::DoRelayout( const Size& size,
                                                          glyphPositions );
 
           // Free the allocated memory used to store the conversion table in the bidirectional line info run.
-          for( Vector<BidirectionalLineInfoRun>::Iterator it = lineBidirectionalInfoRuns.Begin(),
-                 endIt = lineBidirectionalInfoRuns.End();
+          for( Vector<BidirectionalLineInfoRun>::Iterator it = bidirectionalLineInfo.Begin(),
+                 endIt = bidirectionalLineInfo.End();
                it != endIt;
                ++it )
           {
             BidirectionalLineInfoRun& bidiLineInfo = *it;
 
             free( bidiLineInfo.visualToLogicalMap );
+            bidiLineInfo.visualToLogicalMap = NULL;
           }
+
+          bidirectionalLineInfo.Clear();
         }
       } // REORDER
 

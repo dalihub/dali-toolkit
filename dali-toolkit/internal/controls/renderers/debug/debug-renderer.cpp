@@ -36,7 +36,7 @@ namespace Internal
 namespace
 {
 const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("debugRenderer");
+const char * const RENDERER_TYPE_VALUE("debug");
 
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const INDEX_NAME("indices");

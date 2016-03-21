@@ -79,7 +79,7 @@ void PageTurnLandscapeView::OnAddPage( ImageActor newPage, bool isLeftSide )
   if( 0 < newPage.GetChildCount() )
   {
      ImageActor backImage = ImageActor::DownCast( newPage.GetChildAt( 0 ) );
-     backImage.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+     backImage.SetParentOrigin( ParentOrigin::CENTER );
      backImage.SetSize( mPageSize );
      SetCullFace( backImage, CullFront );
      backImage.SetZ( 0.25f * STATIC_PAGE_INTERVAL_DISTANCE );

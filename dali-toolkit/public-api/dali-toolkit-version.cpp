@@ -31,7 +31,7 @@ namespace Toolkit
 
 const unsigned int TOOLKIT_MAJOR_VERSION = 1;
 const unsigned int TOOLKIT_MINOR_VERSION = 1;
-const unsigned int TOOLKIT_MICRO_VERSION = 22;
+const unsigned int TOOLKIT_MICRO_VERSION = 26;
 const char * const TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED

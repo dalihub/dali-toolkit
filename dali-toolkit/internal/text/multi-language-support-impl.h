@@ -94,6 +94,8 @@ public:
    * @copydoc Dali::MultilanguageSupport::SetScripts()
    */
   void SetScripts( const Vector<Character>& text,
+                   CharacterIndex startIndex,
+                   Length numberOfCharacters,
                    Vector<ScriptRun>& scripts );
 
   /**
@@ -103,6 +105,8 @@ public:
                       const Vector<ScriptRun>& scripts,
                       const Vector<FontDescriptionRun>& fontDescriptions,
                       FontId defaultFontId,
+                      CharacterIndex startIndex,
+                      Length numberOfCharacters,
                       Vector<FontRun>& fonts );
 
 private:

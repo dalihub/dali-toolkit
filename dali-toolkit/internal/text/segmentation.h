@@ -57,9 +57,13 @@ void SetLineBreakInfo( const Vector<Character>& text,
  * - 1 is a WORD_NO_BREAK. Text can't be broken into a new word.
  *
  * @param[in] text Vector of UTF-32 characters.
+ * @param[in] startIndex The character from where the break info is set.
+ * @param[in] numberOfCharacters The number of characters.
  * @param[out] wordBreakInfo The word break info.
  */
 void SetWordBreakInfo( const Vector<Character>& text,
+                       CharacterIndex startIndex,
+                       Length numberOfCharacters,
                        Vector<WordBreakInfo>& wordBreakInfo );
 
 } // namespace Text

@@ -260,7 +260,7 @@ void GaussianBlurView::OnInitialize()
   Property::Map customShader;
   customShader[ "fragmentShader" ] = horizFragmentShaderStringStream.str();
   Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "imageRenderer" );
+  rendererMap.Insert( "rendererType", "image" );
   rendererMap.Insert( "shader", customShader );
 
   //////////////////////////////////////////////////////

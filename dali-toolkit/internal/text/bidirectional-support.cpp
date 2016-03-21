@@ -86,13 +86,32 @@ void GetLines( const BidirectionalParagraphInfoRun& paragraphInfo,
 void SetBidirectionalInfo( const Vector<Character>& text,
                            const Vector<ScriptRun>& scripts,
                            const Vector<LineBreakInfo>& lineBreakInfo,
+                           CharacterIndex startIndex,
+                           Length numberOfCharacters,
                            Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo )
 {
+  // Find where to insert the new paragraphs.
+  BidirectionalRunIndex bidiInfoIndex = 0u;
+  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
+         endIt = bidirectionalInfo.End();
+       it != endIt;
+       ++it )
+  {
+    const BidirectionalParagraphInfoRun& run = *it;
+
+    if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+    {
+      // Found where to insert the bidi info.
+      break;
+    }
+    ++bidiInfoIndex;
+  }
+
   // Traverse the script runs. If there is one with a right to left script, create the bidirectional info for the paragraph containing that script is needed.
   // From the bidirectional point of view, a paragraph is the piece of text between two LINE_MUST_BREAK.
 
   // Index pointing the first character of the current paragraph.
-  CharacterIndex paragraphCharacterIndex = 0u;
+  CharacterIndex paragraphCharacterIndex = startIndex;
 
   // Pointer to the text buffer.
   const Character* textBuffer = text.Begin();
@@ -100,11 +119,12 @@ void SetBidirectionalInfo( const Vector<Character>& text,
   // Pointer to the line break info buffer.
   const LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
 
-  // The number of characters.
-  const Length numberOfCharacters = text.Count();
-
   // Handle to the bidirectional info module in text-abstraction.
   TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  const CharacterIndex lastCharacter = startIndex + numberOfCharacters;
+
+  bool hasRightToLeftScript = false;
 
   for( Vector<ScriptRun>::ConstIterator it = scripts.Begin(),
          endIt = scripts.End();
@@ -112,62 +132,92 @@ void SetBidirectionalInfo( const Vector<Character>& text,
        ++it )
   {
     const ScriptRun& scriptRun = *it;
-    const CharacterIndex lastScriptRunIndex = scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters;
+    const CharacterIndex lastScriptRunIndex = scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters - 1u;
 
-    if( ( lastScriptRunIndex > paragraphCharacterIndex ) &&        // It isn't part of a previous paragraph.
-        TextAbstraction::IsRightToLeftScript( scriptRun.script ) ) // The script is right to left.
+    if( startIndex > lastScriptRunIndex )
     {
-      // Find the paragraphs which contains this script run.
-      // Consider:
-      //  1) Different paragraphs may contain this script run.
-      //  ------||------------------- rtl sr ------------------------||-------------------
-      //  --||----- p -----||------------------ p -------------||-------- p ------||------
-      //
-      //  2) The paragraph which contains this script run may contain other right to left script runs.
-      //  -----||--- rtl sr ---||---- ltr sr ----||---------- rtl sr -----------||--------
-      //  -----||---------------------------------- p -----------------------------------|
-
-      while( lastScriptRunIndex > paragraphCharacterIndex )
-      {
-        // There is a paragraph which contains the current script.
-
-        Length index = paragraphCharacterIndex;
-        while( ( index < numberOfCharacters ) && ( paragraphCharacterIndex < lastScriptRunIndex ) )
-        {
-          if( TextAbstraction::LINE_MUST_BREAK == *( lineBreakInfoBuffer + index ) )
-          {
-            if( index >= scriptRun.characterRun.characterIndex )
-            {
-              // The Bidirectional run must have the same number of characters than the paragraph.
-              BidirectionalParagraphInfoRun bidirectionalRun;
-              bidirectionalRun.characterRun.characterIndex = paragraphCharacterIndex;
-              bidirectionalRun.characterRun.numberOfCharacters = ( index - paragraphCharacterIndex ) + 1u; // The must break character is part of the paragrah.
-
-              // Create the bidirectional info for the whole paragraph and store the index to the table with this info in the run.
-              bidirectionalRun.bidirectionalInfoIndex = bidirectionalSupport.CreateInfo( textBuffer + bidirectionalRun.characterRun.characterIndex,
-                                                                                         bidirectionalRun.characterRun.numberOfCharacters );
-
-              bidirectionalInfo.PushBack( bidirectionalRun );
-            }
-
-            // Update the character index of the next paragraph.
-            paragraphCharacterIndex = index + 1u;
-          }
-          ++index;
-        }
-
-        // The last character is always a must-break, so there is no need to check if there is characters left.
-      }
+      // Skip the run as it has already been processed.
+      continue;
     }
+
+    if( lastCharacter <= scriptRun.characterRun.characterIndex )
+    {
+      // Do not get bidirectional info beyond startIndex + numberOfCharacters.
+      break;
+    }
+
+    if( !hasRightToLeftScript && TextAbstraction::IsRightToLeftScript( scriptRun.script ) )
+    {
+      // The script is right to left.
+      hasRightToLeftScript = true;
+    }
+
+    if( TextAbstraction::LINE_MUST_BREAK == *( lineBreakInfoBuffer + lastScriptRunIndex ) )
+    {
+      // A new paragraph has been found.
+
+      if( hasRightToLeftScript )
+      {
+        // The Bidirectional run must have the same number of characters than the paragraph.
+        BidirectionalParagraphInfoRun bidirectionalRun;
+        bidirectionalRun.characterRun.characterIndex = paragraphCharacterIndex;
+        bidirectionalRun.characterRun.numberOfCharacters = ( lastScriptRunIndex - paragraphCharacterIndex ) + 1u; // The must break character is part of the paragrah.
+
+        // Create the bidirectional info for the whole paragraph and store the index to the table with this info in the run.
+        bidirectionalRun.bidirectionalInfoIndex = bidirectionalSupport.CreateInfo( textBuffer + bidirectionalRun.characterRun.characterIndex,
+                                                                                   bidirectionalRun.characterRun.numberOfCharacters );
+
+        bidirectionalInfo.Insert( bidirectionalInfo.Begin() + bidiInfoIndex, bidirectionalRun );
+        ++bidiInfoIndex;
+      }
+
+      // Point to the next paragraph.
+      paragraphCharacterIndex = lastScriptRunIndex + 1u;
+
+      // Reset whether there is a right to left script.
+      hasRightToLeftScript = false;
+    }
+  }
+
+  // Update indices of the bidi runs.
+  for( Vector<BidirectionalParagraphInfoRun>::Iterator it = bidirectionalInfo.Begin() + bidiInfoIndex,
+         endIt = bidirectionalInfo.End();
+       it != endIt;
+       ++it )
+  {
+    BidirectionalParagraphInfoRun& run = *it;
+
+    run.characterRun.characterIndex += numberOfCharacters;
   }
 }
 
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                   CharacterIndex startIndex,
+                   Length numberOfCharacters,
                    Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns )
 {
+  // Find where to insert the new paragraphs.
+  BidirectionalLineRunIndex bidiLineInfoIndex = 0u;
+  for( Vector<BidirectionalLineInfoRun>::ConstIterator it = lineInfoRuns.Begin(),
+         endIt = lineInfoRuns.End();
+       it != endIt;
+       ++it )
+  {
+    const BidirectionalLineInfoRun& run = *it;
+
+    if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+    {
+      // Found where to insert the bidi line info.
+      break;
+    }
+    ++bidiLineInfoIndex;
+  }
+
   // Handle to the bidirectional info module in text-abstraction.
   TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  const CharacterIndex lastCharacter = startIndex + numberOfCharacters;
 
   // Keep an index to the first line to be checked if it's contained inside the paragraph.
   // Avoids check the lines from the beginning for each paragraph.
@@ -179,6 +229,19 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
        ++it )
   {
     const BidirectionalParagraphInfoRun& paragraphInfo = *it;
+
+    if( paragraphInfo.characterRun.characterIndex < startIndex )
+    {
+      // Do not process, the paragraph has already been processed.
+      continue;
+    }
+
+    if( lastCharacter <= paragraphInfo.characterRun.characterIndex )
+    {
+      // Do not process paragraphs beyond startIndex + numberOfCharacters.
+      break;
+    }
+
     const CharacterDirection direction = bidirectionalSupport.GetParagraphDirection( paragraphInfo.bidirectionalInfoIndex );
 
     // Get the lines for this paragraph.
@@ -225,14 +288,28 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
       }
 
       // Push the run into the vector.
-      lineInfoRuns.PushBack( lineInfoRun );
+      lineInfoRuns.Insert( lineInfoRuns.Begin() + bidiLineInfoIndex, lineInfoRun );
+      ++bidiLineInfoIndex;
     }
+  }
+
+  // Update indices of the bidi runs.
+  for( Vector<BidirectionalLineInfoRun>::Iterator it = lineInfoRuns.Begin() + bidiLineInfoIndex,
+         endIt = lineInfoRuns.End();
+       it != endIt;
+       ++it )
+  {
+    BidirectionalLineInfoRun& run = *it;
+
+    run.characterRun.characterIndex += numberOfCharacters;
   }
 }
 
 bool GetMirroredText( const Vector<Character>& text,
                       const Vector<CharacterDirection>& directions,
                       const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                      CharacterIndex startIndex,
+                      Length numberOfCharacters,
                       Vector<Character>& mirroredText )
 {
   bool hasTextMirrored = false;
@@ -245,6 +322,9 @@ bool GetMirroredText( const Vector<Character>& text,
   Character* mirroredTextBuffer = mirroredText.Begin();
   CharacterDirection* directionsBuffer = directions.Begin();
 
+  CharacterIndex index = startIndex;
+  const CharacterIndex lastCharacter = startIndex + numberOfCharacters;
+
   // Traverse the paragraphs and mirror the right to left ones.
   for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
          endIt = bidirectionalInfo.End();
@@ -253,6 +333,19 @@ bool GetMirroredText( const Vector<Character>& text,
   {
     const BidirectionalParagraphInfoRun& paragraph = *it;
 
+    if( index >= paragraph.characterRun.characterIndex + paragraph.characterRun.numberOfCharacters )
+    {
+      // Skip the paragraph as it has already been processed.
+      continue;
+    }
+
+    if( lastCharacter <= paragraph.characterRun.characterIndex )
+    {
+      // Do not get mirror characters beyond startIndex + numberOfCharacters.
+      break;
+    }
+
+    index += paragraph.characterRun.numberOfCharacters;
     const bool tmpMirrored = bidirectionalSupport.GetMirroredText( mirroredTextBuffer + paragraph.characterRun.characterIndex,
                                                                    directionsBuffer + paragraph.characterRun.characterIndex,
                                                                    paragraph.characterRun.numberOfCharacters );
@@ -264,13 +357,36 @@ bool GetMirroredText( const Vector<Character>& text,
 }
 
 void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                             Length totalNumberOfCharacters,
+                             CharacterIndex startIndex,
+                             Length numberOfCharacters,
                              Vector<CharacterDirection>& directions )
 {
   // Handle to the bidirectional info module in text-abstraction.
   TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
-  CharacterIndex index = 0u;
-  CharacterDirection* directionsBuffer = directions.Begin();
+  // Resize the vector.
+  directions.Resize( totalNumberOfCharacters );
+
+  // Whether the current buffer is being updated or is set from scratch.
+  const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
+
+  CharacterDirection* directionsBuffer = NULL;
+  Vector<CharacterDirection> newDirections;
+
+  if( updateCurrentBuffer )
+  {
+    newDirections.Resize( numberOfCharacters );
+    directionsBuffer = newDirections.Begin();
+  }
+  else
+  {
+    directionsBuffer = directions.Begin();
+  }
+
+  const CharacterIndex lastCharacter = startIndex + numberOfCharacters;
+  CharacterIndex index = startIndex;
+
   for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
          endIt = bidirectionalInfo.End();
        it != endIt;
@@ -278,17 +394,46 @@ void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidire
   {
     const BidirectionalParagraphInfoRun& paragraph = *it;
 
-    // Fills with left to right those paragraphs without right to left characters.
-    memset( directionsBuffer + index, false, ( paragraph.characterRun.characterIndex - index ) * sizeof( bool ) );
-    index += paragraph.characterRun.numberOfCharacters;
+    if( index >= paragraph.characterRun.characterIndex + paragraph.characterRun.numberOfCharacters )
+    {
+      // Skip the paragraph as it has already been processed.
+      continue;
+    }
 
+    if( lastCharacter <= paragraph.characterRun.characterIndex )
+    {
+      // Do not get the character directions beyond startIndex + numberOfCharacters.
+      break;
+    }
+
+    // Set the directions of any previous left to right characters.
+    const Length numberOfLeftToRightCharacters = paragraph.characterRun.characterIndex - index;
+    if( numberOfLeftToRightCharacters > 0u )
+    {
+      memset( directionsBuffer + index - startIndex, false, numberOfLeftToRightCharacters * sizeof( bool ) );
+    }
+
+    // Set the directions of the bidirectional text.
     bidirectionalSupport.GetCharactersDirection( paragraph.bidirectionalInfoIndex,
-                                                 directionsBuffer + paragraph.characterRun.characterIndex,
+                                                 directionsBuffer + paragraph.characterRun.characterIndex - startIndex,
                                                  paragraph.characterRun.numberOfCharacters );
+
+    // Update the index.
+    index += paragraph.characterRun.numberOfCharacters + numberOfLeftToRightCharacters;
   }
 
   // Fills with left to right those paragraphs without right to left characters.
-  memset( directionsBuffer + index, false, ( directions.Count() - index ) * sizeof( bool ) );
+  memset( directionsBuffer + index - startIndex, false, ( lastCharacter - index ) * sizeof( bool ) );
+
+  // If the direction info is updated, it needs to be inserted in the model.
+  if( updateCurrentBuffer )
+  {
+    // Insert the directions in the given buffer.
+    directions.Insert( directions.Begin() + startIndex,
+                       newDirections.Begin(),
+                       newDirections.End() );
+    directions.Resize( totalNumberOfCharacters );
+  }
 }
 
 } // namespace Text

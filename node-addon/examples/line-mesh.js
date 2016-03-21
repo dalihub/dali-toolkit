@@ -120,7 +120,7 @@ daliApp.createMeshActor = function() {
       var animation = new dali.Animation(5);
 
       var keyFramesIndex = [{progress:0.0, value: 0.0}, {progress:1.0, value:1.0}];
-      var animOptions = { alpha:"sin", delay:0, duration:5};
+      var animOptions = { alpha:dali.ALPHA_FUNCTION_SIN, delay:0, duration:5};
 
       animation.animateBetween( meshActor, "uMorphAmount", keyFramesIndex, animOptions );
       animation.setLooping(true);

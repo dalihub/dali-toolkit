@@ -35,29 +35,50 @@ VisualModelPtr VisualModel::New()
   return VisualModelPtr( new VisualModel() );
 }
 
-void VisualModel::CreateCharacterToGlyphTable( Length numberOfCharacters )
+void VisualModel::CreateCharacterToGlyphTable( CharacterIndex startIndex,
+                                               Length numberOfCharacters )
 {
-  // 1) Reserve some space for the characters to avoid reallocations.
   if( 0u == numberOfCharacters )
   {
-    // If no number of characters is given, just set something sensible to avoid reallocations.
-    numberOfCharacters = static_cast<Length> ( static_cast<float>( mGlyphs.Count() ) * 1.3f );
+    // Nothing to do.
+    return;
   }
-  mCharactersToGlyph.Reserve( numberOfCharacters );
 
-  DALI_ASSERT_DEBUG( mGlyphsPerCharacter.Count() != 0u ||
-                     ( 0u == numberOfCharacters ) );
+  DALI_ASSERT_DEBUG( mGlyphsPerCharacter.Count() != 0u );
+
+  // Get the total number of characters.
+  const Length totalNumberOfCharacters = ( 0u == mGlyphsToCharacters.Count() ) ? 0u : *( mGlyphsToCharacters.End() - 1u ) + *( mCharactersPerGlyph.End() - 1u ); // Index to the first character + the number of characters that form the last glyph.
+
+  // Whether the current buffer is being updated or is set from scratch.
+  const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
+
+  Vector<GlyphIndex> newCharactersToGlyph;
+  GlyphIndex* charactersToGlyphBuffer = NULL;
+
+  // 1) Reserve some space for the glyph indices to avoid reallocations.
+  if( updateCurrentBuffer )
+  {
+    newCharactersToGlyph.Resize( numberOfCharacters );
+    charactersToGlyphBuffer = newCharactersToGlyph.Begin();
+  }
+  else
+  {
+    mCharactersToGlyph.Resize( numberOfCharacters );
+    charactersToGlyphBuffer = mCharactersToGlyph.Begin() + startIndex;
+  }
 
   const Length* const glyphsPerCharacterBuffer = mGlyphsPerCharacter.Begin();
 
   // 2) Traverse the glyphs and set the glyph indices per character.
 
   // Index to the glyph.
-  GlyphIndex glyphIndex = 0u;
-  CharacterIndex characterIndex = 0u;
-  for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin(),
+  const GlyphIndex startGlyphIndex = updateCurrentBuffer ? *( mCharactersToGlyph.Begin() + startIndex ) : 0u;
+  GlyphIndex glyphIndex = startGlyphIndex;
+  CharacterIndex characterIndex = startIndex;
+  const CharacterIndex lastCharacterIndexPlusOne = startIndex + numberOfCharacters;
+  for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin() + glyphIndex,
          endIt = mCharactersPerGlyph.End();
-       it != endIt;
+       ( it != endIt ) && ( characterIndex < lastCharacterIndexPlusOne );
        ++it )
   {
     const Length numberOfCharactersPerGlyph = *it;
@@ -66,34 +87,79 @@ void VisualModel::CreateCharacterToGlyphTable( Length numberOfCharacters )
     // Set the glyph indices.
     for( Length index = 0u; index < numberOfCharactersPerGlyph; ++index, ++characterIndex )
     {
-      mCharactersToGlyph.PushBack( glyphIndex );
+      *charactersToGlyphBuffer = glyphIndex;
       numberOfGlyphs += *( glyphsPerCharacterBuffer + characterIndex );
+      ++charactersToGlyphBuffer;
     }
     glyphIndex += numberOfGlyphs;
   }
+
+  // If the character to glyph buffer is updated, it needs to be inserted in the model.
+  if( updateCurrentBuffer )
+  {
+    // Update the indices.
+    const Length numberOfGlyphs = glyphIndex - startGlyphIndex;
+    for( Vector<Length>::Iterator it = mCharactersToGlyph.Begin() + startIndex,
+           endIt = mCharactersToGlyph.End();
+         it != endIt;
+         ++it )
+    {
+      *it += numberOfGlyphs;
+    }
+
+    mCharactersToGlyph.Insert( mCharactersToGlyph.Begin() + startIndex,
+                               newCharactersToGlyph.Begin(),
+                               newCharactersToGlyph.End() );
+
+  }
 }
 
-void VisualModel::CreateGlyphsPerCharacterTable( Length numberOfCharacters )
+void VisualModel::CreateGlyphsPerCharacterTable( CharacterIndex startIndex,
+                                                 Length numberOfCharacters )
 {
-  // 1) Reserve some space for the characters to avoid reallocations.
   if( 0u == numberOfCharacters )
   {
-    // If no number of characters is given, just set something sensible to avoid reallocations.
-    numberOfCharacters = static_cast<Length> ( static_cast<float>( mGlyphs.Count() ) * 1.3f );
+    // Nothing to do.
+    return;
   }
-  mGlyphsPerCharacter.Reserve( numberOfCharacters );
+
+  // Get the total number of characters.
+  const Length totalNumberOfCharacters = ( 0u == mGlyphsToCharacters.Count() ) ? 0u : *( mGlyphsToCharacters.End() - 1u ) + *( mCharactersPerGlyph.End() - 1u ); // Index to the first character + the number of characters that form the last glyph.
+
+  // Whether the current buffer is being updated or is set from scratch.
+  const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
+
+  Vector<Length> newGlyphsPerCharacter;
+  Length* glyphsPerCharacterBuffer = NULL;
+
+  // 1) Reserve some space for the glyphs per character to avoid reallocations.
+  if( updateCurrentBuffer )
+  {
+    newGlyphsPerCharacter.Resize( numberOfCharacters );
+    glyphsPerCharacterBuffer = newGlyphsPerCharacter.Begin();
+  }
+  else
+  {
+    mGlyphsPerCharacter.Resize( numberOfCharacters );
+    glyphsPerCharacterBuffer = mGlyphsPerCharacter.Begin() + startIndex;
+  }
 
   // 2) Traverse the glyphs and set the number of glyphs per character.
+
+  // The glyph index.
+  const GlyphIndex glyphIndex = updateCurrentBuffer  ? *( mCharactersToGlyph.Begin() + startIndex ) : 0u;
+  Length traversedCharacters = 0;
 
   // The number of 'characters per glyph' equal to zero.
   Length zeroCharactersPerGlyph = 0u;
 
-  for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin(),
+  for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin() + glyphIndex,
          endIt = mCharactersPerGlyph.End();
-       it != endIt;
+       ( it != endIt ) && ( traversedCharacters < numberOfCharacters );
        ++it )
   {
     const Length numberOfCharactersPerGlyph = *it;
+    traversedCharacters += numberOfCharactersPerGlyph;
 
     // Set the glyphs per character.
     if( 0u == numberOfCharactersPerGlyph )
@@ -103,15 +169,29 @@ void VisualModel::CreateGlyphsPerCharacterTable( Length numberOfCharacters )
     else
     {
       const Length numberOfZeroGlyphsPerCharacter = ( numberOfCharactersPerGlyph - 1u );
-      for( Length zeroIndex = 0u; zeroIndex < numberOfZeroGlyphsPerCharacter ; ++zeroIndex )
+      for( Length zeroIndex = 0u; zeroIndex < numberOfZeroGlyphsPerCharacter; ++zeroIndex )
       {
-        mGlyphsPerCharacter.PushBack( 0u );
+        *glyphsPerCharacterBuffer = 0u;
+
+        // Point to the next position in the buffer.
+        ++glyphsPerCharacterBuffer;
       }
 
-      mGlyphsPerCharacter.PushBack( 1u + zeroCharactersPerGlyph );
+      *glyphsPerCharacterBuffer = zeroCharactersPerGlyph + 1u;
 
       zeroCharactersPerGlyph = 0u;
+
+      // Point to the next position in the buffer.
+      ++glyphsPerCharacterBuffer;
     }
+  }
+
+  // If the glyphs per character buffer is updated, it needs to be inserted in the model.
+  if( updateCurrentBuffer )
+  {
+    mGlyphsPerCharacter.Insert( mGlyphsPerCharacter.Begin() + startIndex,
+                                newGlyphsPerCharacter.Begin(),
+                                newGlyphsPerCharacter.End() );
   }
 }
 

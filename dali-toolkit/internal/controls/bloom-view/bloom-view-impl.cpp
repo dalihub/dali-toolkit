@@ -239,26 +239,26 @@ void BloomView::Remove(Actor child)
 void BloomView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
-  mChildrenRoot.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
 
   //////////////////////////////////////////////////////
   // Create actors
 
   // Create an ImageActor for rendering from the scene texture to the bloom texture
   mBloomExtractImageActor = Toolkit::ImageView::New();
-  mBloomExtractImageActor.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mBloomExtractImageActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Create shader used for extracting the bright parts of an image
   Property::Map customShader;
   customShader[ "fragmentShader" ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
   Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "imageRenderer" );
+  rendererMap.Insert( "rendererType", "image" );
   rendererMap.Insert( "shader", customShader );
   mBloomExtractImageActor.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Create an ImageActor for compositing the result (scene and bloom textures) to output
   mCompositeImageActor = Toolkit::ImageView::New();
-  mCompositeImageActor.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mCompositeImageActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Create shader used to composite bloom and original image to output render target
   customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
@@ -267,15 +267,14 @@ void BloomView::OnInitialize()
 
   // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
   mTargetImageActor = Toolkit::ImageView::New();
-  mTargetImageActor.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-
+  mTargetImageActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Create the Gaussian Blur object + render tasks
   // Note that we use mBloomExtractTarget as the source image and also re-use this as the gaussian blur final render target. This saves the gaussian blur code from creating it
   // render targets etc internally, so we make better use of resources
   // Note, this also internally creates the render tasks used by the Gaussian blur, this must occur after the bloom extraction and before the compositing
   mGaussianBlurView = Dali::Toolkit::GaussianBlurView::New(mBlurNumSamples, mBlurBellCurveWidth, mPixelFormat, mDownsampleWidthScale, mDownsampleHeightScale, true);
-  mGaussianBlurView.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mGaussianBlurView.SetParentOrigin( ParentOrigin::CENTER );
 
 
   //////////////////////////////////////////////////////

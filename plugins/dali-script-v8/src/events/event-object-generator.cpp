@@ -118,8 +118,11 @@ v8::Local<v8::Object> CreateTouchPoint( v8::Isolate* isolate, const TouchPoint& 
   // set state
   pointObject->Set( v8::String::NewFromUtf8( isolate, "state"), v8::String::NewFromUtf8( isolate, GetTouchPointStateName(touchPoint.state)));
 
-  // set the hit actor
-  pointObject->Set( v8::String::NewFromUtf8( isolate, "hitActor"), ActorWrapper::WrapActor(isolate, touchPoint.hitActor ));
+  if(touchPoint.hitActor)
+  {
+    // set the hit actor
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "hitActor"), ActorWrapper::WrapActor(isolate, touchPoint.hitActor ));
+  }
 
   // Think about changing these Vector 2 from wrapped objects to JavaScript objects...
 

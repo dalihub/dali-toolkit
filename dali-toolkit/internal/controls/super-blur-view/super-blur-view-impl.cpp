@@ -156,7 +156,7 @@ void SuperBlurView::OnInitialize()
   mBlurStrengthPropertyIndex = Self().RegisterProperty( "blurStrength", 0.f );
 
   Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "imageRenderer");
+  rendererMap.Insert( "rendererType", "image");
 
   Property::Map shaderMap;
   std::stringstream verterShaderString;

@@ -869,7 +869,7 @@ int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
   customShader.Insert( "hints", shaderHints );
 
   Property::Map map;
-  map.Insert( "rendererType", "imageRenderer" );
+  map.Insert( "rendererType", "image" );
   map.Insert( "shader", customShader );
 
   TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
@@ -921,7 +921,7 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
   customShader.Insert( "hints", shaderHints );
 
   Property::Map map;
-  map.Insert( "rendererType", "imageRenderer" );
+  map.Insert( "rendererType", "image" );
   map.Insert( "shader", customShader );
 
   BufferImage image = CreateBufferImage( width, height, Color::WHITE );

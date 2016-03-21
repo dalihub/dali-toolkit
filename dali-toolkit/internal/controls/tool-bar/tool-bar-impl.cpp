@@ -303,7 +303,7 @@ void ToolBar::OnInitialize()
   mLayout = Toolkit::TableView::New( 1, 1 );
   mLayout.SetName( "TOOLBAR_LAYOUT" );
   mLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  mLayout.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mLayout.SetParentOrigin( ParentOrigin::CENTER );
 
   Self().Add( mLayout );
 

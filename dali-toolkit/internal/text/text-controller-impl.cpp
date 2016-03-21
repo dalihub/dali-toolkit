@@ -325,6 +325,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   const Length numberOfCharacters = utf32Characters.Count();
 
   Vector<LineBreakInfo>& lineBreakInfo = mLogicalModel->mLineBreakInfo;
+  CharacterIndex startIndex = 0u;
+  Length requestedNumberOfCharacters = numberOfCharacters;
   if( GET_LINE_BREAKS & operations )
   {
     // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
@@ -344,6 +346,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     wordBreakInfo.Resize( numberOfCharacters, TextAbstraction::WORD_NO_BREAK );
 
     SetWordBreakInfo( utf32Characters,
+                      startIndex,
+                      requestedNumberOfCharacters,
                       wordBreakInfo );
   }
 
@@ -363,6 +367,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     {
       // Retrieves the scripts used in the text.
       multilanguageSupport.SetScripts( utf32Characters,
+                                       startIndex,
+                                       requestedNumberOfCharacters,
                                        scripts );
     }
 
@@ -380,6 +386,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                                           scripts,
                                           fontDescriptionRuns,
                                           defaultFontId,
+                                          startIndex,
+                                          requestedNumberOfCharacters,
                                           validFonts );
     }
   }
@@ -408,15 +416,18 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     SetBidirectionalInfo( utf32Characters,
                           scripts,
                           lineBreakInfo,
+                          startIndex,
+                          requestedNumberOfCharacters,
                           bidirectionalInfo );
 
     if( 0u != bidirectionalInfo.Count() )
     {
       // Only set the character directions if there is right to left characters.
       Vector<CharacterDirection>& directions = mLogicalModel->mCharacterDirections;
-      directions.Resize( numberOfCharacters );
-
       GetCharactersDirection( bidirectionalInfo,
+                              numberOfCharacters,
+                              startIndex,
+                              requestedNumberOfCharacters,
                               directions );
 
       // This paragraph has right to left text. Some characters may need to be mirrored.
@@ -425,6 +436,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       textMirrored = GetMirroredText( utf32Characters,
                                       directions,
                                       bidirectionalInfo,
+                                      startIndex,
+                                      requestedNumberOfCharacters,
                                       mirroredUtf32Characters );
     }
     else
@@ -440,6 +453,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   Vector<GlyphIndex> newParagraphGlyphs;
   newParagraphGlyphs.Reserve( numberOfParagraphs );
 
+  GlyphIndex startGlyphIndex = 0u;
   if( SHAPE_TEXT & operations )
   {
     const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
@@ -448,21 +462,24 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                lineBreakInfo,
                scripts,
                validFonts,
+               startIndex,
+               startGlyphIndex,
+               requestedNumberOfCharacters,
                glyphs,
                glyphsToCharactersMap,
                charactersPerGlyph,
                newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
-    mVisualModel->CreateCharacterToGlyphTable( numberOfCharacters );
+    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, numberOfCharacters );
+    mVisualModel->CreateCharacterToGlyphTable( startIndex, numberOfCharacters );
   }
 
   const Length numberOfGlyphs = glyphs.Count();
 
   if( GET_GLYPH_METRICS & operations )
   {
-    GlyphInfo* glyphsBuffer = glyphs.Begin();
+    GlyphInfo* glyphsBuffer = glyphs.Begin() + startGlyphIndex;
     mMetrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
 
     // Update the width and advance of all new paragraph characters.

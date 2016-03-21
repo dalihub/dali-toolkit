@@ -85,29 +85,59 @@ void SetLineBreakInfo( const Vector<Character>& text,
 }
 
 void SetWordBreakInfo( const Vector<Character>& text,
+                       CharacterIndex startIndex,
+                       Length numberOfCharacters,
                        Vector<WordBreakInfo>& wordBreakInfo )
 {
-  const Length numberOfCharacters = text.Count();
+  const Length totalNumberOfCharacters = text.Count();
 
-  if( 0u == numberOfCharacters )
+  if( 0u == totalNumberOfCharacters )
   {
     // Nothing to do if there are no characters.
     return;
   }
 
+  // Resize the vector.
+  wordBreakInfo.Resize( totalNumberOfCharacters );
+
+  // Whether the current buffer is being updated or is set from scratch.
+  const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
+
+  WordBreakInfo* wordBreakInfoBuffer = NULL;
+  Vector<WordBreakInfo> newWordBreakInfo;
+
+  if( updateCurrentBuffer )
+  {
+    newWordBreakInfo.Resize( numberOfCharacters );
+    wordBreakInfoBuffer = newWordBreakInfo.Begin();
+  }
+  else
+  {
+    wordBreakInfoBuffer = wordBreakInfo.Begin();
+  }
+
   // Retrieve the word break info.
-  wordBreakInfo.Resize( numberOfCharacters );
-  TextAbstraction::Segmentation::Get().GetWordBreakPositions( text.Begin(),
+  TextAbstraction::Segmentation::Get().GetWordBreakPositions( text.Begin() + startIndex,
                                                               numberOfCharacters,
-                                                              wordBreakInfo.Begin() );
+                                                              wordBreakInfoBuffer );
+
+  // If the word break info is updated, it needs to be inserted in the model.
+  if( updateCurrentBuffer )
+  {
+    wordBreakInfo.Insert( wordBreakInfo.Begin() + startIndex,
+                          newWordBreakInfo.Begin(),
+                          newWordBreakInfo.End() );
+    wordBreakInfo.Resize( totalNumberOfCharacters );
+  }
+
 #ifdef DEBUG_ENABLED
   if( gLogFilter->IsEnabledFor(Debug::Verbose) )
   {
     std::string utf8;
-    Utf32ToUtf8( text.Begin(), numberOfCharacters, utf8 );
+    Utf32ToUtf8( text.Begin(), totalNumberOfCharacters, utf8 );
 
     std::string info;
-    info.reserve( numberOfCharacters );
+    info.reserve( totalNumberOfCharacters );
     for( unsigned int i=0; i<wordBreakInfo.Count(); ++i )
     {
       info.push_back( static_cast<char>('0' + wordBreakInfo[i]) );

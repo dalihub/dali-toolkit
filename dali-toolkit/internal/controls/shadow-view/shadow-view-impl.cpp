@@ -241,7 +241,7 @@ void ShadowView::Deactivate()
 void ShadowView::OnInitialize()
 {
   // root actor to parent all user added actors. Used as source actor for shadow render task.
-  mChildrenRoot.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+  mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
   mChildrenRoot.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
@@ -288,7 +288,7 @@ void ShadowView::OnInitialize()
   mBlurRootActor.SetName( "BLUR_ROOT_ACTOR" );
 
   // Turn off inheritance to ensure filter renders properly
-  mBlurRootActor.SetPositionInheritanceMode(USE_PARENT_POSITION);
+  mBlurRootActor.SetParentOrigin( ParentOrigin::CENTER );
   mBlurRootActor.SetInheritOrientation(false);
   mBlurRootActor.SetInheritScale(false);
   mBlurRootActor.SetColorMode(USE_OWN_COLOR);

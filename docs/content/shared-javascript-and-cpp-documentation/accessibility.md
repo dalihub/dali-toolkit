@@ -242,16 +242,19 @@ Stage::GetCurrent().Add( table );
 
 ### Using accessibility within a custom control (C++) {#accessibilitycustomcontrol}
 
-As well as the Activation signal, if implementing a custom control from C++ you can use the OnAccessibilityActivate() virtual function.
-  
-Other virtual accessibility methods are available for overriding within control also:
-  
-- virtual bool OnAccessibilityPan( PanGesture gesture );
-- virtual bool OnAccessibilityTouch( const TouchEvent& touchEvent );
-- virtual bool OnAccessibilityValueChange( bool isIncrease ); // (i.e. value change of slider control)
-- virtual bool OnAccessibilityZoom();
-  
+Accessibility behaviour can be customized in a custom UI control by overriding all or some of the following methods.
 
+| Method                     | Description                                                                                                                                                                |
+|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| OnAccessibilityActivated   | When the control is *activated* or selected, in accessibility mode.                                                                                                        |
+| OnAccessibilityPan         | When an accessibility pan gesture occurs while this control is focussed.                                                                                                   |
+| OnAccessibilityTouch       | Touch events are delivered differently in Accessibility mode. This method should be overridden if some special behaviour is required when these touch events are received. |
+| OnAccessibilityValueChange | When a value is changed while this control is focussed (e.g. value change of a slider control).                                                                            |
+| OnAccessibilityZoom        | Should be overridden if behaviour is required when the magnification level changes when this control is focussed.                                                          |
+ 
+If these events are consumed, then the method should return true.
+The default behaviour in the control base classes returns false, i.e. not consumed.
+ 
 ### Using accessibility signals for extra control {#accessibilitysignals}
 
 For more specific control of functionality when accessibility is enabled, there are several signals within the accessibility manager's public API that can be connected to.

@@ -38,7 +38,7 @@ namespace Internal
 namespace
 {
 const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("borderRenderer");
+const char * const RENDERER_TYPE_VALUE("border");
 
 const char * const COLOR_NAME("borderColor");
 const char * const SIZE_NAME("borderSize");

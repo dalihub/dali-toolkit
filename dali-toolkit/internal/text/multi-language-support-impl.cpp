@@ -23,6 +23,9 @@
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/multi-language-helper-functions.h>
+
 namespace Dali
 {
 
@@ -43,118 +46,6 @@ namespace Text
 
 namespace Internal
 {
-
-/**
- * @brief Merges the font descriptions to retrieve the font Id for each character.
- *
- * @param[in] fontDescriptions The font descriptions.
- * @param[out] fontIds The font id for each character.
- * @param[in] defaultFontDescription The default font description.
- * @param[in] defaultPointSize The default font size.
- */
-void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
-                            Vector<FontId>& fontIds,
-                            const TextAbstraction::FontDescription& defaultFontDescription,
-                            TextAbstraction::PointSize26Dot6 defaultPointSize )
-{
-  // Get the handle to the font client.
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-
-  // Pointer to the font id buffer.
-  FontId* fontIdsBuffer = fontIds.Begin();
-
-  // Traverse all the characters.
-  const Length numberOfCharacters = fontIds.Count();
-  for( CharacterIndex index = 0u; index < numberOfCharacters; ++index )
-  {
-    // The default font description and font point size.
-    TextAbstraction::FontDescription fontDescription = defaultFontDescription;
-    TextAbstraction::PointSize26Dot6 fontSize = defaultPointSize;
-    bool defaultFont = true;
-
-    // Traverse all the font descriptions.
-    for( Vector<FontDescriptionRun>::ConstIterator it = fontDescriptions.Begin(),
-           endIt = fontDescriptions.End();
-         it != endIt;
-         ++it )
-    {
-      // Check whether the character's font is modified by the current font description.
-      const FontDescriptionRun& fontRun = *it;
-      if( ( index >= fontRun.characterRun.characterIndex ) &&
-          ( index < fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters ) )
-      {
-        if( fontRun.familyDefined )
-        {
-          fontDescription.family = std::string( fontRun.familyName, fontRun.familyLength );
-          defaultFont = false;
-        }
-        if( fontRun.weightDefined )
-        {
-          fontDescription.weight = fontRun.weight;
-          defaultFont = false;
-        }
-        if( fontRun.widthDefined )
-        {
-          fontDescription.width = fontRun.width;
-          defaultFont = false;
-        }
-        if( fontRun.slantDefined )
-        {
-          fontDescription.slant = fontRun.slant;
-          defaultFont = false;
-        }
-        if( fontRun.sizeDefined )
-        {
-          fontSize = fontRun.size;
-          defaultFont = false;
-        }
-      }
-    }
-
-    // Get the font id if is not the default font.
-    if( !defaultFont )
-    {
-      *( fontIdsBuffer + index ) = fontClient.GetFontId( fontDescription, fontSize );
-    }
-  }
-}
-
-/**
- * @brief Retrieves the script Id from the script run for a given character's @p index.
- *
- * If the character's index exceeds the current script run it increases the iterator to get the next one.
- *
- * @param[in] index The character's index.
- * @param[in,out] scriptRunIt Iterator to the current font run.
- * @param[in] scriptRunEndIt Iterator to one after the last script run.
- *
- * @return The script.
- */
-Script GetScript( Length index,
-                  Vector<ScriptRun>::ConstIterator& scriptRunIt,
-                  const Vector<ScriptRun>::ConstIterator& scriptRunEndIt )
-{
-  Script script = TextAbstraction::UNKNOWN;
-
-  if( scriptRunIt != scriptRunEndIt )
-  {
-    const ScriptRun& scriptRun = *scriptRunIt;
-
-    if( ( index >= scriptRun.characterRun.characterIndex ) &&
-        ( index < scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters ) )
-    {
-      script = scriptRun.script;
-    }
-
-    if( index + 1u == scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters )
-    {
-      // All the characters of the current run have been traversed. Get the next one for the next iteration.
-      ++scriptRunIt;
-    }
-  }
-
-  return script;
-}
 
 bool ValidateFontsPerScript::FindValidFont( FontId fontId ) const
 {
@@ -224,24 +115,42 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
 }
 
 void MultilanguageSupport::SetScripts( const Vector<Character>& text,
+                                       CharacterIndex startIndex,
+                                       Length numberOfCharacters,
                                        Vector<ScriptRun>& scripts )
 {
-  const Length numberOfCharacters = text.Count();
-
   if( 0u == numberOfCharacters )
   {
     // Nothing to do if there are no characters.
     return;
   }
 
+  // Find the first index where to insert the script.
+  ScriptRunIndex scriptIndex = 0u;
+  if( 0u != startIndex )
+  {
+    for( Vector<ScriptRun>::ConstIterator it = scripts.Begin(),
+           endIt = scripts.End();
+         it != endIt;
+         ++it, ++scriptIndex )
+    {
+      const ScriptRun& run = *it;
+      if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+      {
+        // Run found.
+        break;
+      }
+    }
+  }
+
   // Stores the current script run.
   ScriptRun currentScriptRun;
-  currentScriptRun.characterRun.characterIndex = 0u;
+  currentScriptRun.characterRun.characterIndex = startIndex;
   currentScriptRun.characterRun.numberOfCharacters = 0u;
   currentScriptRun.script = TextAbstraction::UNKNOWN;
 
   // Reserve some space to reduce the number of reallocations.
-  scripts.Reserve( numberOfCharacters << 2u );
+  scripts.Reserve( text.Count() << 2u );
 
   // Whether the first valid script needs to be set.
   bool isFirstScriptToBeSet = true;
@@ -256,7 +165,8 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
   const Character* const textBuffer = text.Begin();
 
   // Traverse all characters and set the scripts.
-  for( Length index = 0u; index < numberOfCharacters; ++index )
+  const Length lastCharacter = startIndex + numberOfCharacters;
+  for( Length index = startIndex; index < lastCharacter; ++index )
   {
     Character character = *( textBuffer + index );
 
@@ -272,7 +182,7 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     //   script of the first character of the paragraph with a defined script.
 
     // Skip those characters valid for many scripts like white spaces or '\n'.
-    bool endOfText = index == numberOfCharacters;
+    bool endOfText = index == lastCharacter;
     while( !endOfText &&
            ( TextAbstraction::COMMON == script ) )
     {
@@ -287,17 +197,27 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         // the same direction than the first script of the paragraph.
         isFirstScriptToBeSet = true;
 
-        // Characters common to all scripts at the end of the paragraph are added to the last script (if the last one is not unknown).
-        if( TextAbstraction::UNKNOWN != currentScriptRun.script )
+        // Characters common to all scripts at the end of the paragraph are added to the last script.
+        currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
+
+        // Store the script run.
+        if( TextAbstraction::UNKNOWN == currentScriptRun.script )
         {
-          currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
-          numberOfAllScriptCharacters = 0u;
+          currentScriptRun.script = TextAbstraction::LATIN;
         }
-      }
+        scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+        ++scriptIndex;
+
+        // Initialize the new one.
+        currentScriptRun.characterRun.characterIndex = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+        currentScriptRun.characterRun.numberOfCharacters = 0u;
+        currentScriptRun.script = TextAbstraction::UNKNOWN;
+        numberOfAllScriptCharacters = 0u;
+     }
 
       // Get the next character.
       ++index;
-      endOfText = index == numberOfCharacters;
+      endOfText = index == lastCharacter;
       if( !endOfText )
       {
         character = *( textBuffer + index );
@@ -347,7 +267,8 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
       if( 0u != currentScriptRun.characterRun.numberOfCharacters )
       {
         // Store the script run.
-        scripts.PushBack( currentScriptRun );
+        scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+        ++scriptIndex;
       }
 
       // Initialize the new one.
@@ -373,35 +294,70 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
   // Add remaining characters into the last script.
   currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
 
-  DALI_ASSERT_DEBUG( ( 0u != currentScriptRun.characterRun.numberOfCharacters ) && "MultilanguageSupport::SetScripts() Trying to insert a script run with zero characters." );
-
-  if( TextAbstraction::UNKNOWN == currentScriptRun.script )
+  if( 0u != currentScriptRun.characterRun.numberOfCharacters )
   {
-    // There are only white spaces in the last script. Set the latin script.
-    currentScriptRun.script = TextAbstraction::LATIN;
+    if( TextAbstraction::UNKNOWN == currentScriptRun.script )
+    {
+      // There are only white spaces in the last script. Set the latin script.
+      currentScriptRun.script = TextAbstraction::LATIN;
+    }
+
+    // Store the last run.
+    scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+    ++scriptIndex;
   }
 
-  // Store the last run.
-  scripts.PushBack( currentScriptRun );
+  if( scriptIndex < scripts.Count() )
+  {
+    // Update the indices of the next script runs.
+    const ScriptRun& run = *( scripts.Begin() + scriptIndex - 1u );
+    CharacterIndex nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
+
+    for( Vector<ScriptRun>::Iterator it = scripts.Begin() + scriptIndex,
+           endIt = scripts.End();
+         it != endIt;
+         ++it )
+    {
+      ScriptRun& run = *it;
+      run.characterRun.characterIndex = nextCharacterIndex;
+      nextCharacterIndex += run.characterRun.numberOfCharacters;
+    }
+  }
 }
 
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           const Vector<FontDescriptionRun>& fontDescriptions,
                                           FontId defaultFontId,
+                                          CharacterIndex startIndex,
+                                          Length numberOfCharacters,
                                           Vector<FontRun>& fonts )
 {
-  // Clear any previously validated font.
-  fonts.Clear();
-
   DALI_LOG_INFO( gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n" );
-  const Length numberOfCharacters = text.Count();
 
   if( 0u == numberOfCharacters )
   {
     DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
     // Nothing to do if there are no characters.
     return;
+  }
+
+  // Find the first index where to insert the font run.
+  FontRunIndex fontIndex = 0u;
+  if( 0u != startIndex )
+  {
+    for( Vector<FontRun>::ConstIterator it = fonts.Begin(),
+           endIt = fonts.End();
+         it != endIt;
+         ++it, ++fontIndex )
+    {
+      const FontRun& run = *it;
+      if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+      {
+        // Run found.
+        break;
+      }
+    }
   }
 
   // Traverse the characters and validate/set the fonts.
@@ -415,7 +371,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
   // Initializes a validated font run.
   FontRun currentFontRun;
-  currentFontRun.characterRun.characterIndex = 0u;
+  currentFontRun.characterRun.characterIndex = startIndex;
   currentFontRun.characterRun.numberOfCharacters = 0u;
   currentFontRun.fontId = 0u;
 
@@ -437,20 +393,24 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   MergeFontDescriptions( fontDescriptions,
                          fontIds,
                          defaultFontDescription,
-                         defaultPointSize );
+                         defaultPointSize,
+                         startIndex,
+                         numberOfCharacters );
 
   const Character* const textBuffer = text.Begin();
   const FontId* const fontIdsBuffer = fontIds.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
+  bool isNewParagraphCharacter = false;
 
-  for( Length index = 0u; index < numberOfCharacters; ++index )
+  CharacterIndex lastCharacter = startIndex + numberOfCharacters;
+  for( Length index = startIndex; index < lastCharacter; ++index )
   {
     // Get the character.
     const Character character = *( textBuffer + index );
 
     // Get the font for the character.
-    FontId fontId = *( fontIdsBuffer + index );
+    FontId fontId = *( fontIdsBuffer + index - startIndex );
 
     // Get the script for the character.
     Script script = GetScript( index,
@@ -470,12 +430,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                      description.path.c_str() );
     }
 #endif
-
-    if( TextAbstraction::UNKNOWN == script )
-    {
-      DALI_LOG_WARNING( "MultilanguageSupport::ValidateFonts. Unknown script!" );
-      script = TextAbstraction::LATIN;
-    }
 
     // Whether the font being validated is a default one not set by the user.
     FontId preferredFont = fontId;
@@ -594,15 +548,16 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 #endif
 
     // The font is now validated.
-
-    if( fontId != currentFontRun.fontId )
+    if( ( fontId != currentFontRun.fontId ) ||
+        isNewParagraphCharacter )
     {
       // Current run needs to be stored and a new one initialized.
 
       if( 0u != currentFontRun.characterRun.numberOfCharacters )
       {
         // Store the font run.
-        fonts.PushBack( currentFontRun );
+        fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+        ++fontIndex;
       }
 
       // Initialize the new one.
@@ -613,13 +568,36 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Add one more character to the run.
     ++currentFontRun.characterRun.numberOfCharacters;
+
+    // Whether the current character is a new paragraph character.
+    isNewParagraphCharacter = TextAbstraction::IsNewParagraph( character );
   }
 
   if( 0u != currentFontRun.characterRun.numberOfCharacters )
   {
     // Store the last run.
-    fonts.PushBack( currentFontRun );
+    fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+    ++fontIndex;
   }
+
+  if( fontIndex < fonts.Count() )
+  {
+    // Update the indices of the next font runs.
+    const FontRun& run = *( fonts.Begin() + fontIndex - 1u );
+    CharacterIndex nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
+
+    for( Vector<FontRun>::Iterator it = fonts.Begin() + fontIndex,
+           endIt = fonts.End();
+         it != endIt;
+         ++it )
+    {
+      FontRun& run = *it;
+
+      run.characterRun.characterIndex = nextCharacterIndex;
+      nextCharacterIndex += run.characterRun.numberOfCharacters;
+    }
+  }
+
   DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
 }
 

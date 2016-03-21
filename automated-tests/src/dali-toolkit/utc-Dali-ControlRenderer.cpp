@@ -48,7 +48,7 @@ int UtcDaliControlRendererCopyAndAssignment(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "colorRenderer");
+  propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("blendColor",  Color::BLUE);
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
 
@@ -81,7 +81,7 @@ int UtcDaliControlRendererSetGetDepthIndex(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "colorRenderer");
+  propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("blendColor",  Color::BLUE);
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
 
@@ -149,7 +149,7 @@ int UtcDaliControlRendererSize(void)
 
   // gradient renderer
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "gradientRenderer");
+  propertyMap.Insert("rendererType",  "gradient");
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
   propertyMap.Insert("gradientStartPosition",   start);
@@ -175,7 +175,7 @@ int UtcDaliControlRendererSetOnOffStage(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "colorRenderer");
+  propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("blendColor",  Color::BLUE);
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
 
@@ -248,7 +248,7 @@ int UtcDaliControlRendererGetPropertyMap1(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "colorRenderer");
+  propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("blendColor",  Color::BLUE);
   ControlRenderer colorRenderer = factory.GetControlRenderer( propertyMap );
 
@@ -257,7 +257,7 @@ int UtcDaliControlRendererGetPropertyMap1(void)
 
   Property::Value* typeValue = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( typeValue );
-  DALI_TEST_CHECK( typeValue->Get<std::string>() == "colorRenderer" );
+  DALI_TEST_CHECK( typeValue->Get<std::string>() == "color" );
 
   Property::Value* colorValue = resultMap.Find( "blendColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
@@ -282,7 +282,7 @@ int UtcDaliControlRendererGetPropertyMap2(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "borderRenderer");
+  propertyMap.Insert("rendererType",  "border");
   propertyMap.Insert("borderColor",  Color::BLUE);
   propertyMap.Insert("borderSize",  5.f);
   ControlRenderer borderRenderer = factory.GetControlRenderer( propertyMap );
@@ -293,7 +293,7 @@ int UtcDaliControlRendererGetPropertyMap2(void)
   // check the property values from the returned map from control renderer
   Property::Value* typeValue = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( typeValue );
-  DALI_TEST_CHECK( typeValue->Get<std::string>() == "borderRenderer" );
+  DALI_TEST_CHECK( typeValue->Get<std::string>() == "border" );
 
   Property::Value* colorValue = resultMap.Find( "borderColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
@@ -308,7 +308,7 @@ int UtcDaliControlRendererGetPropertyMap2(void)
 
   typeValue = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( typeValue );
-  DALI_TEST_CHECK( typeValue->Get<std::string>() == "borderRenderer" );
+  DALI_TEST_CHECK( typeValue->Get<std::string>() == "border" );
 
    colorValue = resultMap.Find( "borderColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
@@ -330,7 +330,7 @@ int UtcDaliControlRendererGetPropertyMap3(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "gradientRenderer");
+  propertyMap.Insert("rendererType",  "gradient");
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
@@ -353,7 +353,7 @@ int UtcDaliControlRendererGetPropertyMap3(void)
   // check the property values from the returned map from control renderer
   Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "gradientRenderer" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "gradient" );
 
   value = resultMap.Find( "gradientUnits",  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -397,7 +397,7 @@ int UtcDaliControlRendererGetPropertyMap4(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "gradientRenderer");
+  propertyMap.Insert("rendererType",  "gradient");
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
@@ -421,7 +421,7 @@ int UtcDaliControlRendererGetPropertyMap4(void)
   // check the property values from the returned map from control renderer
   Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "gradientRenderer" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "gradient" );
 
   value = resultMap.Find( "gradientUnits",  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -466,7 +466,7 @@ int UtcDaliControlRendererGetPropertyMap5(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "imageRenderer" );
+  propertyMap.Insert( "rendererType",  "image" );
   propertyMap.Insert( "imageUrl",  TEST_IMAGE_FILE_NAME );
   propertyMap.Insert( "imageDesiredWidth",   20 );
   propertyMap.Insert( "imageDesiredHeight",   30 );
@@ -482,7 +482,7 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   // check the property values from the returned map from control renderer
   Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "imageRenderer" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
   value = resultMap.Find( "imageUrl",  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -511,7 +511,7 @@ int UtcDaliControlRendererGetPropertyMap5(void)
 
   value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "imageRenderer" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
   value = resultMap.Find( "imageUrl",  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -543,7 +543,7 @@ int UtcDaliControlRendererGetPropertyMap6(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatchRenderer" );
+  propertyMap.Insert( "rendererType",  "nPatch" );
   propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( "borderOnly",  true );
   ControlRenderer nPatchRenderer = factory.GetControlRenderer( propertyMap );
@@ -554,7 +554,7 @@ int UtcDaliControlRendererGetPropertyMap6(void)
   // check the property values from the returned map from control renderer
   Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "nPatchRenderer" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "nPatch" );
 
   value = resultMap.Find( "imageUrl",  Property::STRING );
   DALI_TEST_CHECK( value );
