@@ -61,6 +61,11 @@ public:
   virtual const Vector2& GetControlSize() const;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetActualSize()
+   */
+  virtual const Vector2& GetActualSize() const;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfGlyphs()
    */
   virtual Length GetNumberOfGlyphs() const;

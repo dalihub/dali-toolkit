@@ -176,7 +176,8 @@ struct AtlasRenderer::Impl
     mDepth = depth;
 
     const Vector2& actorSize( view.GetControlSize() );
-    const Vector2 halfActorSize( actorSize * 0.5f );
+    const Vector2& textSize( view.GetActualSize() );
+    const Vector2 halfTextSize( textSize * 0.5f );
     const Vector2& shadowOffset( view.GetShadowOffset() );
     const Vector4& shadowColor( view.GetShadowColor() );
     const bool underlineEnabled( view.IsUnderlineEnabled() );
@@ -323,7 +324,7 @@ struct AtlasRenderer::Impl
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor
-        const Vector2 position = *( positionsBuffer + i ) - halfActorSize;
+        const Vector2 position = *( positionsBuffer + i ) - halfTextSize;
 
         // Generate mesh data for this quad, plugging in our supplied position
         AtlasManager::Mesh2D newMesh;
@@ -395,7 +396,7 @@ struct AtlasRenderer::Impl
       {
         MeshRecord& meshRecord = *it;
 
-        Actor actor = CreateMeshActor( meshRecord, actorSize );
+        Actor actor = CreateMeshActor( meshRecord, textSize );
 
         // Create an effect if necessary
         if( style == STYLE_DROP_SHADOW )
@@ -416,7 +417,7 @@ struct AtlasRenderer::Impl
           containerActor.SetParentOrigin( ParentOrigin::CENTER );
           containerActor.SetSize( actorSize );
 
-          Actor shadowActor = CreateMeshActor( meshRecord, actorSize );
+          Actor shadowActor = CreateMeshActor( meshRecord, textSize );
 #if defined(DEBUG_ENABLED)
           shadowActor.SetName( "Text Shadow renderable actor" );
 #endif
@@ -427,8 +428,6 @@ struct AtlasRenderer::Impl
             Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
             int depthIndex = renderer.GetProperty<int>(Dali::Renderer::Property::DEPTH_INDEX);
             renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
-            shadowActor.SetParentOrigin( ParentOrigin::CENTER );
-            shadowActor.SetSize( actorSize );
             containerActor.Add( shadowActor );
             containerActor.Add( actor );
             actor = containerActor;
@@ -498,7 +497,11 @@ struct AtlasRenderer::Impl
     actor.SetName( "Text renderable actor" );
 #endif
     actor.AddRenderer( renderer );
-    actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
+
+    // Keep all of the origins aligned
+    actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
     actor.SetSize( actorSize );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
     return actor;
