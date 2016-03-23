@@ -84,16 +84,6 @@ ShadowView ShadowView::DownCast( BaseHandle handle )
   return Control::DownCast<ShadowView, Internal::ShadowView>(handle);
 }
 
-void ShadowView::Add(Actor child)
-{
-  GetImpl(*this).Add(child);
-}
-
-void ShadowView::Remove(Actor child)
-{
-  GetImpl(*this).Remove(child);
-}
-
 void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
 {
   GetImpl(*this).SetShadowPlaneBackground(shadowPlaneBackground);
