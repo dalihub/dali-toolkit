@@ -499,8 +499,8 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   Property::Map vertexFormat;
   vertexFormat["aPosition"] = Property::VECTOR3;
   vertexFormat["aNormal"] = Property::VECTOR3;
-  PropertyBuffer surfaceVertices = PropertyBuffer::New( vertexFormat, vertices.Size() );
-  surfaceVertices.SetData( &vertices[0] );
+  PropertyBuffer surfaceVertices = PropertyBuffer::New( vertexFormat );
+  surfaceVertices.SetData( &vertices[0], vertices.Size() );
 
   Geometry surface = Geometry::New();
   surface.AddVertexBuffer( surfaceVertices );
@@ -510,8 +510,8 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   {
     Property::Map textureFormat;
     textureFormat["aTexCoord"] = Property::VECTOR2;
-    PropertyBuffer extraVertices = PropertyBuffer::New( textureFormat, textures.Size() );
-    extraVertices.SetData( &textures[0] );
+    PropertyBuffer extraVertices = PropertyBuffer::New( textureFormat );
+    extraVertices.SetData( &textures[0], textures.Size() );
 
     surface.AddVertexBuffer( extraVertices );
   }
@@ -522,8 +522,8 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
     Property::Map vertexExtFormat;
     vertexExtFormat["aTangent"] = Property::VECTOR3;
     vertexExtFormat["aBiNormal"] = Property::VECTOR3;
-    PropertyBuffer extraVertices = PropertyBuffer::New( vertexExtFormat, verticesExt.Size() );
-    extraVertices.SetData( &verticesExt[0] );
+    PropertyBuffer extraVertices = PropertyBuffer::New( vertexExtFormat );
+    extraVertices.SetData( &verticesExt[0], verticesExt.Size() );
 
     surface.AddVertexBuffer( extraVertices );
   }
@@ -533,8 +533,8 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
     //Indices
     Property::Map indicesVertexFormat;
     indicesVertexFormat["aIndices"] = Property::INTEGER;
-    PropertyBuffer indicesToVertices = PropertyBuffer::New( indicesVertexFormat, indices.Size() );
-    indicesToVertices.SetData(&indices[0]);
+    PropertyBuffer indicesToVertices = PropertyBuffer::New( indicesVertexFormat );
+    indicesToVertices.SetData( &indices[0], indices.Size() );
 
     surface.SetIndexBuffer ( indicesToVertices );
   }

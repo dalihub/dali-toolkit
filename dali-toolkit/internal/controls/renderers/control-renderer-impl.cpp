@@ -94,7 +94,6 @@ void ControlRenderer::GetNaturalSize( Vector2& naturalSize ) const
 
 void ControlRenderer::SetClipRect( const Rect<int>& clipRect )
 {
-  mImpl->mClipRect = clipRect;
 }
 
 void ControlRenderer::SetOffset( const Vector2& offset )
@@ -120,6 +119,7 @@ void ControlRenderer::SetOnStage( Actor& actor )
 {
   DoSetOnStage( actor );
 
+  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
   mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
   actor.AddRenderer( mImpl->mRenderer );
   mImpl->mFlags |= Impl::IS_ON_STAGE;
@@ -133,6 +133,20 @@ void ControlRenderer::SetOffStage( Actor& actor )
 
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
+}
+
+void ControlRenderer::EnablePreMultipliedAlpha( bool preMultipled )
+{
+  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+  if( mImpl->mRenderer )
+  {
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, preMultipled);
+  }
+}
+
+bool ControlRenderer::IsPreMultipliedAlphaEnabled() const
+{
+  return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 void ControlRenderer::DoSetOnStage( Actor& actor )

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-event-thread-callback.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/material.h>
 #include <dali/devel-api/rendering/shader.h>
@@ -31,6 +32,8 @@ typedef NinePatchImage::StretchRanges StretchRanges;
 
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
+
+const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 
 Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
 {
@@ -839,6 +842,48 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   END_TEST;
 }
 
+int UtcDaliRendererFactoryGetSvgRenderer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetSvgRenderer: Request svg renderer with a svg url" );
+
+  RendererFactory factory = RendererFactory::Get();
+  ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
+  DALI_TEST_CHECK( controlRenderer );
+
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2(200.f, 200.f) );
+  controlRenderer.SetOnStage( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  // texture is not added until the rasterization completed.
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 0 );
+
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  CallbackBase* callback = eventTrigger->GetCallback();
+
+  eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
+  CallbackBase::Execute( *callback );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
+
+  // waiting for the resource uploading
+  application.SendNotification();
+  application.Render();
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  int textureUnit = -1;
+  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
+  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliRendererFactoryResetRenderer1(void)
 {
   ToolkitTestApplication application;
@@ -917,6 +962,49 @@ int UtcDaliRendererFactoryResetRenderer2(void)
   Vector4 actualValue(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryResetRenderer3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryResetRenderer3" );
+
+  Actor actor = Actor::New();
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Get renderer for rendering a resource image
+  Image resourceImage = ResourceImage::New(TEST_IMAGE_FILE_NAME);
+  ControlRenderer controlRenderer = factory.GetControlRenderer( resourceImage );
+  DALI_TEST_CHECK( controlRenderer );
+  controlRenderer.SetSize(Vector2(200.f, 200.f));
+  controlRenderer.SetOnStage( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
+
+  // reset the renderer to renderer a svg image
+  factory.ResetRenderer( controlRenderer, actor, TEST_SVG_FILE_NAME, ImageDimensions( 100, 100 ) );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  // texture is not added until the rasterization completed.
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 0 );
+
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  CallbackBase* callback = eventTrigger->GetCallback();
+
+  eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
+  CallbackBase::Execute( *callback );
+
+  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
 
   END_TEST;
 }

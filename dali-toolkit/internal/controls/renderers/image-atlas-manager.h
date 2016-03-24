@@ -67,13 +67,23 @@ public:
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @return True if there is enough space to fit this image in,false otherwise.
+   * @return The material containing the image.
    */
   Material Add( Vector4& textureRect,
                 const std::string& url,
                 ImageDimensions size = ImageDimensions(),
                 FittingMode::Type fittingMode = FittingMode::DEFAULT,
                 bool orientationCorrection = true );
+
+  /**
+   * @brief Add a pixel buffer to the atlas
+   *
+   * @param [out] textureRect The texture area of the resource image in the atlas.
+   * @param [in] pixelData The pixel data.
+   * @return The material containing the image.
+   */
+  Material Add( Vector4& textureRect,
+                PixelDataPtr pixelData );
 
   /**
    * Remove the image at the given rectangle from the material.
@@ -89,6 +99,15 @@ public:
    * @param[in] brokenImageUrl The url of the broken image.
    */
   void SetBrokenImage( const std::string& brokenImageUrl );
+
+private:
+
+  /**
+   * @brief Create a new atlas.
+   *
+   * This method is called when the newly added image or pixel buffer cannot fit into the current atlas list.
+   */
+  void CreateNewAtlas();
 
 protected:
 

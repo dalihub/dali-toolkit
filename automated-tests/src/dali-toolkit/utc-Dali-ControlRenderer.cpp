@@ -29,6 +29,7 @@ namespace
 {
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
+const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 }
 
 void dali_control_renderer_startup(void)
@@ -165,6 +166,16 @@ int UtcDaliControlRendererSize(void)
   gradientRenderer.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
 
+  //svg renderer
+  ControlRenderer svgRenderer = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
+  svgRenderer.SetSize( rendererSize );
+  DALI_TEST_EQUALS( svgRenderer.GetSize(), rendererSize, TEST_LOCATION );
+  svgRenderer.GetNaturalSize(naturalSize);
+  // TEST_SVG_FILE:
+  //  <svg width="100" height="100">
+  //  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
+  //  </svg>
+  DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -563,6 +574,45 @@ int UtcDaliControlRendererGetPropertyMap6(void)
   value = resultMap.Find( "borderOnly",  Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() );
+
+  END_TEST;
+}
+
+int UtcDaliControlRendererGetPropertyMap7(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliControlRendererGetPropertyMap7: SvgRenderer" );
+
+  // request SvgRenderer with a property map
+  RendererFactory factory = RendererFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType",  "svg" );
+  propertyMap.Insert( "imageUrl",  TEST_SVG_FILE_NAME );
+  ControlRenderer svgRenderer = factory.GetControlRenderer( propertyMap );
+
+  Property::Map resultMap;
+  svgRenderer.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from control renderer
+  Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == "svg" );
+
+  value = resultMap.Find( "imageUrl",  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
+
+  // request SvgRenderer with an URL
+  ControlRenderer svgRenderer2 = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
+  resultMap.Clear();
+  svgRenderer2.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from control renderer
+  value = resultMap.Find( "rendererType",  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == "svg" );
+
+  value = resultMap.Find( "imageUrl",  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
 
   END_TEST;
 }

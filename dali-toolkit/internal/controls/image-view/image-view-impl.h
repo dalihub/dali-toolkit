@@ -128,6 +128,11 @@ private: // From Control
   virtual void OnStageDisconnection();
 
   /**
+   * @copydoc Toolkit::Control::OnSizeSet()
+   */
+  virtual void OnSizeSet( const Vector3& targetSize );
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   virtual Vector3 GetNaturalSize();

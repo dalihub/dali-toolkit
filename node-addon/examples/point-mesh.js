@@ -107,8 +107,8 @@ daliApp.createMeshActor = function() {
 
       var polyhedraVertexDataArray = new Float32Array(polyhedraVertexData.length);
       polyhedraVertexDataArray.set(polyhedraVertexData, 0);
-      var polyhedraVertices = new dali.PropertyBuffer(polyhedraVertexFormat, numSides);
-      polyhedraVertices.setData(polyhedraVertexDataArray);
+      var polyhedraVertices = new dali.PropertyBuffer(polyhedraVertexFormat);
+      polyhedraVertices.setData(polyhedraVertexDataArray, numSides);
 
       // Create geometry
       var geometry = new dali.Geometry();

@@ -114,18 +114,18 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
 {
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat, vertices.Size() );
+  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
   if( vertices.Size() > 0 )
   {
-    vertexPropertyBuffer.SetData( &vertices[ 0 ] );
+    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
   Property::Map indexFormat;
   indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat, indices.Size() );
+  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
   if( indices.Size() > 0 )
   {
-    indexPropertyBuffer.SetData( &indices[ 0 ] );
+    indexPropertyBuffer.SetData( &indices[ 0 ], indices.Size() );
   }
 
   // Create the geometry object
@@ -207,7 +207,6 @@ ImageRenderer::ImageRenderer( RendererFactoryCache& factoryCache, ImageAtlasMana
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
-  mIsAlphaPreMultiplied( false ),
   mNativeFragmentShaderCode( ),
   mNativeImageFlag( false )
 {
@@ -546,7 +545,6 @@ void ImageRenderer::DoSetOnStage( Actor& actor )
     InitializeRenderer( mImage );
   }
 
-  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, mIsAlphaPreMultiplied);
 }
 
 void ImageRenderer::DoSetOffStage( Actor& actor )
@@ -556,7 +554,6 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
   {
     actor.RemoveRenderer( mImpl->mRenderer );
     CleanCache(mImageUrl);
-
     mImage.Reset();
   }
   else
@@ -793,15 +790,6 @@ void ImageRenderer::SetImage( Actor& actor, const Image& image )
     mDesiredSize = ImageDimensions();
     mFittingMode = FittingMode::DEFAULT;
     mSamplingMode = SamplingMode::DEFAULT;
-  }
-}
-
-void ImageRenderer::EnablePreMultipliedAlpha( bool preMultipled )
-{
-  mIsAlphaPreMultiplied = preMultipled;
-  if( mImpl->mRenderer )
-  {
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, mIsAlphaPreMultiplied);
   }
 }
 

@@ -24,6 +24,11 @@
  * Dali::Toolkit::ImageView myImageView = ImageView::New( "source-image-url.9.png" );
  * @endcode
  *
+ * A path to a svg image file:
+ * @code
+ * Dali::Toolkit::ImageView myImageView = ImageView::New( "source-image-url.svg" );
+ * @endcode
+ *
  * <h3 class="pg">Loading from a Image handle</h3>
  * Dali::Image is an abstract base class with multiple derived classes.
  *

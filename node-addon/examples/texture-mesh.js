@@ -84,8 +84,8 @@ daliApp.createMeshActor = function() {
 
       var texturedQuadVertexDataArray = new Float32Array(texturedQuadVertexData.length);
       texturedQuadVertexDataArray.set(texturedQuadVertexData, 0);
-      var texturedQuadVertices = new dali.PropertyBuffer(texturedQuadVertexFormat, 4);
-      texturedQuadVertices.setData(texturedQuadVertexDataArray);
+      var texturedQuadVertices = new dali.PropertyBuffer(texturedQuadVertexFormat);
+      texturedQuadVertices.setData(texturedQuadVertexDataArray, 4);
 
       var indexFormat ={ "indices" : dali.PROPERTY_INTEGER };
 
@@ -93,8 +93,8 @@ daliApp.createMeshActor = function() {
 
       var indexDataArray = new Uint32Array(indexData.length);
       indexDataArray.set(indexData, 0);
-      var indices = new dali.PropertyBuffer(indexFormat, 6);
-      indices.setData(indexDataArray);
+      var indices = new dali.PropertyBuffer(indexFormat);
+      indices.setData(indexDataArray, 6);
 
       // Create geometry
       var geometry = new dali.Geometry();

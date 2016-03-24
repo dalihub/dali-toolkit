@@ -114,15 +114,15 @@ Geometry DebugRenderer::CreateQuadWireframeGeometry()
 
   Property::Map quadVertexFormat;
   quadVertexFormat[POSITION_ATTRIBUTE_NAME] = Property::VECTOR2;
-  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat, 4 );
-  quadVertices.SetData(quadVertexData);
+  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
+  quadVertices.SetData( quadVertexData, 4 );
 
   // Create indices
   unsigned int indexData[10] = { 0, 1, 1, 2, 2, 3, 3, 0 };
   Property::Map indexFormat;
   indexFormat[INDEX_NAME] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, sizeof(indexData)/sizeof(indexData[0]) );
-  indices.SetData(indexData);
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
