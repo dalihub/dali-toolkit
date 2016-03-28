@@ -13,6 +13,7 @@ SET(TC_SOURCES
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-bitmap-loader.cpp
@@ -23,6 +24,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-feedback-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-file-loader.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-imf-manager.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-native-image-source.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
@@ -32,6 +34,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-video-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-virtual-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
