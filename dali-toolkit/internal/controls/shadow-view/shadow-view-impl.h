@@ -72,16 +72,6 @@ public:
   static Dali::Toolkit::ShadowView New(float downsampleWidthScale, float downsampleHeightScale);
 
   /**
-   * @copydoc Dali::Toolkit::ShadowView::Add(Actor child)
-   */
-  void Add(Actor child);
-
-  /**
-   * @copydoc Dali::Toolkit::ShadowView::Remove(Actor child)
-   */
-  void Remove(Actor child);
-
-  /**
    * @copydoc Dali::Toolkit::ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
    */
   void SetShadowPlaneBackground(Actor shadowPlaneBackground);
@@ -126,7 +116,16 @@ public:
 private:
 
   virtual void OnInitialize();
-  virtual void OnSizeSet(const Vector3& targetSize);
+
+  /**
+   * @copydoc Control::OnControlChildAdd()
+   */
+  virtual void OnControlChildAdd( Actor& child );
+
+  /**
+   * @copydoc Control::OnControlChildRemove()
+   */
+  virtual void OnControlChildRemove( Actor& child );
 
   /**
    * Constrain the camera actor to the position of the point light, pointing

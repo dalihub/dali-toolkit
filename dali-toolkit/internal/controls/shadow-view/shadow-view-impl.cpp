@@ -36,7 +36,6 @@
 // pixel format / size - set from JSON
 // aspect ratio property needs to be able to be constrained also for cameras. (now do-able)
 // default near clip value
-// mChildrenRoot Add()/Remove() overloads - better solution
 
 
 /////////////////////////////////////////////////////////
@@ -146,19 +145,6 @@ Toolkit::ShadowView ShadowView::New(float downsampleWidthScale, float downsample
   impl->Initialize();
 
   return handle;
-}
-
-/////////////////////////////////////////////////////////////
-// for creating a subtree for all user added child actors.
-// TODO: overloading Actor::Add()/Remove() not nice since breaks polymorphism. Need another method to pass ownership of added child actors to our internal actor root.
-void ShadowView::Add(Actor child)
-{
-  mChildrenRoot.Add(child);
-}
-
-void ShadowView::Remove(Actor child)
-{
-  mChildrenRoot.Remove(child);
 }
 
 void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
@@ -307,8 +293,17 @@ void ShadowView::OnInitialize()
   blurStrengthConstraint.Apply();
 }
 
-void ShadowView::OnSizeSet(const Vector3& targetSize)
+void ShadowView::OnControlChildAdd( Actor& child )
 {
+  if( child != mChildrenRoot && child != mBlurRootActor)
+  {
+    mChildrenRoot.Add( child );
+  }
+}
+
+void ShadowView::OnControlChildRemove( Actor& child )
+{
+  mChildrenRoot.Remove( child );
 }
 
 void ShadowView::ConstrainCamera()

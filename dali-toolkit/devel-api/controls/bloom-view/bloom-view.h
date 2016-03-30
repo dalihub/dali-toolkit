@@ -154,30 +154,6 @@ public:
                               const float downsampleWidthScale, const float downsampleHeightScale);
 
   /**
-   * Adds a child Actor to this Actor.
-   * NOTE! if the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color, shader effect,
-   * scale etc as it now inherits them from this actor
-   * @pre This Actor (the parent) has been initialized.
-   * @pre The child actor has been initialized.
-   * @pre The child actor is not the same as the parent actor.
-   * @pre The actor is not the Root actor
-   * @param [in] child The child.
-   * @post The child will be referenced by its parent. This means that the child will be kept alive,
-   * even if the handle passed into this method is reset or destroyed.
-   */
-  void Add(Actor child);
-
-  /**
-   * Removes a child Actor from this Actor.
-   * If the actor was not a child of this actor, this is a no-op.
-   * @pre This Actor (the parent) has been initialized.
-   * @pre The child actor is not the same as the parent actor.
-   * @param [in] child The child.
-   */
-  void Remove(Actor child);
-
-  /**
    * Start rendering the BloomView. Must be called after you Add() it to the stage.
    */
   void Activate();
