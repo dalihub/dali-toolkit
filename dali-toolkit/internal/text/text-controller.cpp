@@ -1327,6 +1327,11 @@ bool Controller::DoRelayout( const Size& size,
 
     if( 0u == numberOfGlyphs )
     {
+      if( UPDATE_ACTUAL_SIZE & operations )
+      {
+        mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
+      }
+
       // Nothing else to do if there is no glyphs.
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
       return true;
