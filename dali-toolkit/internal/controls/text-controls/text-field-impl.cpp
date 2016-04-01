@@ -1089,9 +1089,11 @@ void TextField::RenderText()
 
   if( mRenderableActor )
   {
-    const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
+    // TODO: Scroll and alignment needs to be refactored.
+    const Vector2& alignmentOffset = mController->GetAlignmentOffset();
+    const Vector2& scrollOffset = mController->GetScrollPosition();
 
-    mRenderableActor.SetPosition( offset.x, offset.y );
+    mRenderableActor.SetPosition( scrollOffset.x, alignmentOffset.y + scrollOffset.y );
 
     Actor clipRootActor;
     if( mClipper )

@@ -187,6 +187,7 @@ public:
                               bool blurUserImage = false);
 
   /**
+   * @DEPRECATED_1_1.28 Use Actor::Add(Actor) instead
    * @brief Adds a child Actor to this Actor.
    * @SINCE_1_0.0
    * @param [in] child The child.
@@ -203,6 +204,7 @@ public:
   void Add(Actor child);
 
   /**
+   * @DEPRECATED_1_1.28 Use Actor::Remove(Actor) instead
    * @brief Removes a child Actor from this Actor.
    *
    * If the actor was not a child of this actor, this is a no-op.

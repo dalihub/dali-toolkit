@@ -174,18 +174,18 @@ public:
   const Vector2& GetNaturalSize() const;
 
   /**
-   * @brief Sets the text's actual size after it has been laid out.
+   * @brief Sets the text's layout size.
    *
    * @param[in] size The text's size.
    */
-  void SetActualSize( const Vector2& size );
+  void SetLayoutSize( const Vector2& size );
 
   /**
-   * @brief Retrieves the text's actual size after it has been laid out.
+   * @brief Retrieves the text's layout size.
    *
    * @return The text's size.
    */
-  const Vector2& GetActualSize() const;
+  const Vector2& GetLayoutSize() const;
 
   /**
    * @brief Set the text's color
@@ -318,7 +318,7 @@ public:
 private:
 
   Size                   mNaturalSize;        ///< Size of the text with no line wrapping.
-  Size                   mActualSize;         ///< Size of the laid-out text considering the layout properties set.
+  Size                   mLayoutSize;         ///< Size of the laid-out text considering the layout properties set.
 
   // Caches to increase performance in some consecutive operations.
   LineIndex mCachedLineIndex; ///< Used to increase performance in consecutive calls to GetLineOfGlyph() or GetLineOfCharacter() with consecutive glyphs or characters.

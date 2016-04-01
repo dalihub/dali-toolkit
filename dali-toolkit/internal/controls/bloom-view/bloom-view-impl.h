@@ -70,10 +70,6 @@ public:
   static Dali::Toolkit::BloomView New();
   static Dali::Toolkit::BloomView New( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
                                               const float downsampleWidthScale, const float downsampleHeightScale);
-
-  void Add(Actor child);
-  void Remove(Actor child);
-
   void Activate();
   void Deactivate();
 
@@ -88,6 +84,16 @@ private:
 
   virtual void OnInitialize();
   virtual void OnSizeSet(const Vector3& targetSize);
+
+  /**
+   * @copydoc Control::OnControlChildAdd()
+   */
+  virtual void OnControlChildAdd( Actor& child );
+
+  /**
+   * @copydoc Control::OnControlChildRemove()
+   */
+  virtual void OnControlChildRemove( Actor& child );
 
   void AllocateResources();
   void CreateRenderTasks();
@@ -117,6 +123,8 @@ private:
   /////////////////////////////////////////////////////////////
   // for creating a subtree for all user added child actors, so that we can have them exclusive to the mRenderChildrenTask and our other actors exclusive to our other tasks
   Actor mChildrenRoot;
+  // for creating a subtree for the internal actors
+  Actor mInternalRoot;
 
   /////////////////////////////////////////////////////////////
   // for mapping offscreen renders to render target sizes

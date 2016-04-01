@@ -245,7 +245,6 @@ bool ValidateFontTest( const ValidateFontsData& data )
   const FontId defaultFontId = fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + data.defaultFont,
                                                      data.defaultFontSize );
 
-  // To be completed ...
   Vector<FontRun> fontRuns;
 
   // 3) Validate the fonts.

@@ -72,6 +72,8 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-tts-player.cpp
    dali-toolkit-test-utils/dummy-control.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
+   dali-toolkit-test-utils/test-animation-data.cpp
+   dali-toolkit-test-utils/test-button.cpp
    dali-toolkit-test-utils/test-application.cpp
    dali-toolkit-test-utils/test-platform-abstraction.cpp
    dali-toolkit-test-utils/test-gesture-manager.cpp

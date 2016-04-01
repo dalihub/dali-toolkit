@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <sys/stat.h>
 #include <sstream>
+
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry.h>
@@ -39,7 +40,11 @@
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-filesystem.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
+#include <dali-toolkit/internal/builder/builder-set-property.h>
 #include <dali-toolkit/internal/builder/replacement.h>
+#include <dali-toolkit/internal/builder/tree-node-manipulator.h>
+
+#include <dali-toolkit/internal/builder/builder-impl-debug.h>
 
 namespace Dali
 {
@@ -52,10 +57,6 @@ namespace Internal
 class Replacement;
 
 extern Animation CreateAnimation(const TreeNode& child, const Replacement& replacements, const Dali::Actor searchRoot, Builder* const builder );
-extern void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value );
-extern void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
-extern bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
-extern bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
 extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
@@ -76,108 +77,28 @@ const std::string KEYNAME_SIGNALS   = "signals";
 const std::string KEYNAME_NAME      = "name";
 const std::string KEYNAME_TEMPLATES = "templates";
 const std::string KEYNAME_INCLUDES  = "includes";
+const std::string KEYNAME_MAPPINGS  = "mappings";
 
 typedef std::vector<const TreeNode*> TreeNodeList;
 
-template <typename T>
-std::string ToString(const T& value)
+
+bool GetMappingKey( const std::string& str, std::string& key )
 {
-  std::stringstream ss;
-  ss << value;
-  return ss.str();
-}
-
-template <>
-std::string ToString(const Rect<int>& value)
-{
-  std::stringstream ss;
-  ss << value.x << "," << value.y << "," << value.width << "," << value.height;
-  return ss.str();
-}
-
-#if defined(DEBUG_ENABLED)
-
-std::string PropertyValueToString( const Property::Value& value )
-{
-  std::string ret;
-
-  switch( value.GetType() )
+  bool result = false;
+  std::string test( str );
+  if( ! test.empty() )
   {
-    case Property::NONE:
+    if( test.at(0) == '<' )
     {
-      ret = "NONE";
-      break;
-    }            ///< No type
-    case Property::BOOLEAN:
-    {
-      ret = value.Get<bool>() ? "True" : "False";
-      break;
-    }
-    case Property::FLOAT:
-    {
-
-      ret = ToString( value.Get<float>() );
-      break;
-    }
-    case Property::INTEGER:
-    {
-      ret = ToString( value.Get<int>() );
-      break;
-    }
-    case Property::VECTOR2:
-    {
-      ret = ToString( value.Get<Vector2>() );
-      break;
-    }
-    case Property::VECTOR3:
-    {
-      ret = ToString( value.Get<Vector3>() );
-      break;
-    }
-    case Property::VECTOR4:
-    {
-      ret = ToString( value.Get<Vector4>() );
-      break;
-    }
-    case Property::MATRIX3:
-    {
-      ret = ToString( value.Get<Matrix3>() );
-      break;
-    }
-    case Property::MATRIX:
-    {
-      ret = ToString( value.Get<Matrix>() );
-      break;
-    }
-    case Property::RECTANGLE:
-    {
-      ret = ToString( value.Get< Rect<int> >() );
-      break;
-    }
-    case Property::ROTATION:
-    {
-      break;
-    }
-    case Property::STRING:
-    {
-      ret = value.Get<std::string>();
-      break;
-    }
-    case Property::ARRAY:
-    {
-      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().Size() );
-      break;
-    }
-    case Property::MAP:
-    {
-      ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().Count() );
-      break;
+      if( test.at(test.length()-1) == '>' )
+      {
+        key = test.substr( 1, test.length()-2 );
+        result = true;
+      }
     }
   }
-
-  return ret;
+  return result;
 }
-#endif // DEBUG_ENABLED
 
 /*
  * Recursively collects all stylesin a node (An array of style names).
@@ -219,6 +140,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
 {
   if( handle )
   {
+
     for( TreeNode::ConstIterator iter = node.CBegin(); iter != node.CEnd(); ++iter )
     {
       const TreeNode::KeyNodePair& keyChild = *iter;
@@ -226,16 +148,16 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
       std::string key( keyChild.first );
 
       // ignore special fields; type,actors,signals,styles
-      if(key == KEYNAME_TYPE || key == KEYNAME_ACTORS || key == KEYNAME_SIGNALS || key == KEYNAME_STYLES)
+      if(key == KEYNAME_TYPE || key == KEYNAME_ACTORS || key == KEYNAME_SIGNALS || key == KEYNAME_STYLES || key == KEYNAME_MAPPINGS )
       {
         continue;
       }
 
       // special field 'image' usually contains an json object description
       // although sometimes refers to a framebuffer
-      if( 0 == keyChild.second.Size() )
+      if( key == "image" )
       {
-        if(key == "image")
+        if( 0 == keyChild.second.Size() )
         {
           ImageActor imageActor = ImageActor::DownCast(handle);
           if(imageActor)
@@ -253,7 +175,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
       }
 
       // special field 'effect' references the shader effect instances
-      if(key == "effect")
+      if( key == "effect" )
       {
         ImageActor actor = ImageActor::DownCast(handle);
         if( actor )
@@ -296,15 +218,30 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
       if( Property::INVALID_INDEX != index )
       {
         Property::Type type = propertyObject.GetPropertyType(index);
-
         Property::Value value;
-        if( !DeterminePropertyFromNode( keyChild.second, type, value, constant ) )
+        bool mapped = false;
+
+        // if node.value is a mapping, get the property value from the "mappings" table
+        if( keyChild.second.GetType() == TreeNode::STRING )
         {
-          // verbose as this might not be a problem
-          // eg parentOrigin can be a string which is picked up later
-          DALI_SCRIPT_VERBOSE("Could not convert property:%s\n", key.c_str());
+          std::string mappingKey;
+          if( GetMappingKey(keyChild.second.GetString(), mappingKey) )
+          {
+            OptionalChild mappingRoot = IsChild( mParser.GetRoot(), KEYNAME_MAPPINGS );
+            mapped = GetPropertyMap( *mappingRoot, mappingKey.c_str(), type, value );
+          }
         }
-        else
+        if( ! mapped )
+        {
+          mapped = DeterminePropertyFromNode( keyChild.second, type, value, constant );
+          if( ! mapped )
+          {
+            // verbose as this might not be a problem
+            // eg parentOrigin can be a string which is picked up later
+            DALI_SCRIPT_VERBOSE("Could not convert property:%s\n", key.c_str());
+          }
+        }
+        if( mapped )
         {
           DALI_SCRIPT_VERBOSE("SetProperty '%s' Index=:%d Value Type=%d Value '%s'\n", key.c_str(), index, value.GetType(), PropertyValueToString(value).c_str() );
 
@@ -972,7 +909,7 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer( const std::string& name )
 
 bool Builder::IsLinearConstrainer( const std::string& name )
 {
-  //Search the LinearConstrainer in the LUT
+  // Search the LinearConstrainer in the LUT
   size_t count( mLinearConstrainerLut.size() );
   for( size_t i(0); i!=count; ++i )
   {
@@ -1104,6 +1041,118 @@ Animation Builder::CreateAnimation( const std::string& animationName )
   return CreateAnimation( animationName, replacement, Dali::Stage::GetCurrent().GetRootLayer() );
 }
 
+bool Builder::ConvertChildValue( const TreeNode& mappingRoot, KeyStack& keyStack, Property::Value& child )
+{
+  bool result = false;
+
+  switch( child.GetType() )
+  {
+    case Property::STRING:
+    {
+      std::string value;
+      if( child.Get( value ) )
+      {
+        std::string key;
+        if( GetMappingKey( value, key ) )
+        {
+          // Check key for cycles:
+          result=true;
+          for( KeyStack::iterator iter = keyStack.begin() ; iter != keyStack.end(); ++iter )
+          {
+            if( key.compare(*iter) == 0 )
+            {
+              // key is already in stack; stop.
+              DALI_LOG_WARNING("Detected cycle in stylesheet mapping table:%s\n", key.c_str());
+              child = Property::Value("");
+              result=false;
+              break;
+            }
+          }
+
+          if( result )
+          {
+            // The following call will overwrite the child with the value
+            // from the mapping.
+            RecursePropertyMap( mappingRoot, keyStack, key.c_str(), Property::NONE, child );
+            result = true;
+          }
+        }
+      }
+      break;
+    }
+
+    case Property::MAP:
+    {
+      Property::Map* map = child.GetMap();
+      for( Property::Map::SizeType i=0; i < map->Count(); ++i )
+      {
+        Property::Value& child = map->GetValue(i);
+        ConvertChildValue(mappingRoot, keyStack, child);
+      }
+      break;
+    }
+
+    case Property::ARRAY:
+    {
+      Property::Array* array = child.GetArray();
+      for( Property::Array::SizeType i=0; i < array->Count(); ++i )
+      {
+        Property::Value& child = array->GetElementAt(i);
+        ConvertChildValue(mappingRoot, keyStack, child);
+      }
+      break;
+    }
+
+    default:
+      // Ignore other types.
+      break;
+  }
+
+  return result;
+}
+
+bool Builder::RecursePropertyMap( const TreeNode& mappingRoot, KeyStack& keyStack, const char* theKey, Property::Type propertyType, Property::Value& value )
+{
+  Replacement replacer( mReplacementMap );
+  bool result = false;
+
+  keyStack.push_back( theKey );
+
+  for( TreeNode::ConstIterator iter = mappingRoot.CBegin(); iter != mappingRoot.CEnd(); ++iter )
+  {
+    std::string aKey( (*iter).first );
+    if( aKey.compare( theKey ) == 0 )
+    {
+      if( propertyType == Property::NONE )
+      {
+        DeterminePropertyFromNode( (*iter).second, value, replacer );
+        result = true;
+      }
+      else
+      {
+        result = DeterminePropertyFromNode( (*iter).second, propertyType, value, replacer );
+      }
+
+      if( result )
+      {
+        ConvertChildValue(mappingRoot, keyStack, value);
+      }
+      break;
+    }
+  }
+  keyStack.pop_back();
+
+  return result;
+}
+
+
+bool Builder::GetPropertyMap( const TreeNode& mappingRoot, const char* theKey, Property::Type propertyType, Property::Value& value )
+{
+  KeyStack keyStack;
+  return RecursePropertyMap( mappingRoot, keyStack, theKey, propertyType, value );
+}
+
+
 void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::UIFormat format )
 {
   // parser to get constants and includes only
@@ -1152,6 +1201,9 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
       DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
     }
   }
+
+  DUMP_PARSE_TREE(parser); // This macro only writes out if DEBUG is enabled and the "DUMP_TREE" constant is defined in the stylesheet.
+  DUMP_TEST_MAPPINGS(parser);
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
 }

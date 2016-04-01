@@ -98,6 +98,16 @@ private:
   virtual void OnInitialize();
   virtual void OnSizeSet(const Vector3& targetSize);
 
+  /**
+   * @copydoc Control::OnControlChildAdd()
+   */
+  virtual void OnControlChildAdd( Actor& child );
+
+  /**
+   * @copydoc Control::OnControlChildRemove()
+   */
+  virtual void OnControlChildRemove( Actor& child );
+
   void SetBlurBellCurveWidth(float blurBellCurveWidth);
   float CalcGaussianWeight(float x);
   void SetShaderConstants();
@@ -138,6 +148,8 @@ private:
   /////////////////////////////////////////////////////////////
   // for creating a subtree for all user added child actors, so that we can have them exclusive to the mRenderChildrenTask and our other actors exclusive to our other tasks
   Actor mChildrenRoot;
+  // for creating a subtree for the internal actors
+  Actor mInternalRoot;
 
   /////////////////////////////////////////////////////////////
   // for mapping offscreen renders to render target sizes

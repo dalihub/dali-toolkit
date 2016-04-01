@@ -86,6 +86,8 @@ struct ReorderLinesData
   unsigned int  numberOfCharacters; ///< The number of characters.
   unsigned int  numberOfLineInfo;   ///< The number or reordered lines.
   BidiLineData* bidiLineData;       ///< The bidirectional line info.
+  unsigned int  numberOfLines;      ///< The number of laid-out lines.
+  bool*         lineDirections;     ///< The directions of the lines.
 };
 
 struct GetMirroredTextData
@@ -115,8 +117,12 @@ bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
   Size layoutSize;
 
   // Create the model.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );
@@ -215,8 +221,12 @@ bool ReorderLinesTest( const ReorderLinesData& data )
   Size layoutSize;
 
   // Create the model.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );
@@ -302,6 +312,26 @@ bool ReorderLinesTest( const ReorderLinesData& data )
     }
   }
 
+  if( data.numberOfLines != visualModel->mLines.Count() )
+  {
+    std::cout << "Different number of lines : " << visualModel->mLines.Count() << ", expected : " << data.numberOfLines << std::endl;
+
+    unsigned int index = 0u;
+    for( Vector<LineRun>::ConstIterator it = visualModel->mLines.Begin(),
+           endIt = visualModel->mLines.End();
+         it != endIt;
+         ++it, ++index )
+    {
+      const LineRun& line = *it;
+
+      if( line.direction != *( data.lineDirections + index ) )
+      {
+        std::cout << "  Different line direction : " << line.direction << ", expected : " << *( data.lineDirections + index ) << std::endl;
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 
@@ -314,8 +344,12 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
   Size layoutSize;
 
   // Create the model.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );
@@ -382,8 +416,12 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
   Size layoutSize;
 
   // Create the model.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );
@@ -673,6 +711,9 @@ int UtcDaliReorderLines(void)
     },
   };
 
+  bool directions02[] = { false, false, false, false, false, false };
+  bool directions03[] = { false, false, false, false, false, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true };
+
   struct ReorderLinesData data[] =
   {
     {
@@ -681,7 +722,9 @@ int UtcDaliReorderLines(void)
       0u,
       0u,
       0u,
-      bidiLine01
+      bidiLine01,
+      0u,
+      NULL
     },
     {
       "Left to right text only.",
@@ -689,7 +732,9 @@ int UtcDaliReorderLines(void)
       0u,
       51u,
       0u,
-      bidiLine02
+      bidiLine02,
+      6u,
+      directions02
     },
     {
       "Bidirectional paragraphs.",
@@ -697,7 +742,9 @@ int UtcDaliReorderLines(void)
       0u,
       195u,
       16u,
-      bidiLine03
+      bidiLine03,
+      20u,
+      directions03
     },
     {
       "Bidirectional paragraphs. Update initial paragraphs.",
@@ -705,7 +752,9 @@ int UtcDaliReorderLines(void)
       0u,
       44u,
       16u,
-      bidiLine03
+      bidiLine03,
+      20u,
+      directions03
     },
     {
       "Bidirectional paragraphs. Update middle paragraphs.",
@@ -713,7 +762,9 @@ int UtcDaliReorderLines(void)
       44u,
       54u,
       16u,
-      bidiLine03
+      bidiLine03,
+      20u,
+      directions03
     },
     {
       "Bidirectional paragraphs. Update final paragraphs.",
@@ -721,7 +772,9 @@ int UtcDaliReorderLines(void)
       142u,
       53u,
       16u,
-      bidiLine03
+      bidiLine03,
+      20u,
+      directions03
     },
   };
   const unsigned int numberOfTests = 6u;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014-2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <test-button.h>
+#include <test-animation-data.h>
 
 #define STRINGIFY(A)#A
 
@@ -1452,6 +1456,197 @@ int UtcDaliBuilderPathConstraintsP(void)
 
   Dali::LinearConstrainer constrainer1_2 = builder.GetLinearConstrainer( "constrainer1" );
   DALI_TEST_CHECK( constrainer1 == constrainer1_2 );
+
+  END_TEST;
+}
+
+#define CHECK_MAP_ELEMENT( xMap, xKey, xType, xPropType, xExpected, xLocation ) \
+  {                                                                       \
+    Property::Value* value = xMap->Find( xKey );                          \
+    DALI_TEST_EQUALS( value==NULL, false, xLocation);                     \
+    if( value != NULL )                                                   \
+    {                                                                     \
+      DALI_TEST_EQUALS( value->GetType(), xPropType, xLocation );         \
+      xType result;                                                       \
+      value->Get(result);                                                 \
+      DALI_TEST_EQUALS( result, xExpected, TEST_LOCATION );               \
+      std::ostringstream oss;                                             \
+      oss << "Animation element " << xKey << "= " << result << std::endl; \
+      tet_printf( oss.str().c_str() );                                    \
+    }                                                                     \
+    else                                                                  \
+    {                                                                     \
+      tet_printf("Can't find map element " xKey "\n");                    \
+    }                                                                     \
+  }
+
+
+int UtcDaliBuilderMapping01(void)
+{
+  ToolkitTestApplication application;
+
+  const char* json =
+    "{\n"
+    "  \"mappings\":\n"
+    "  {\n"
+    "    \"buttonPressFadeOut\":{\n"
+    "      \"alphaFunction\":\"EASE_OUT\",\n"
+    "      \"timePeriod\":{\n"
+    "        \"delay\":0.0,\n"
+    "        \"duration\":0.4\n"
+    "      }\n"
+    "    },\n"
+    "    \"buttonPressFadeIn\":{\n"
+    "      \"alphaFunction\":\"EASE_IN\",\n"
+    "      \"timePeriod\":{\n"
+    "        \"delay\":0.4,\n"
+    "        \"duration\":0.5\n"
+    "      }\n"
+    "    },\n"
+    "    \"transition:buttonPressed\":\n"
+    "    [\n"
+    "      {\n"
+    "        \"target\": \"unselectedBackgroundRenderer\",\n"
+    "        \"property\": \"opacity\",\n"
+    "        \"value\": 0,\n"
+    "        \"animator\":\"<buttonPressFadeOut>\"\n"
+    "      }\n"
+    "    ],\n"
+    "    \"transition:buttonReleased\":\n"
+    "    [\n"
+    "      {\n"
+    "        \"target\": \"unselectedBackgroundRenderer\",\n"
+    "        \"property\": \"opacity\",\n"
+    "        \"value\": 1,\n"
+    "        \"animator\":\"<buttonPressFadeIn>\"\n"
+    "      },\n"
+    "      {\n"
+    "        \"target\": \"unselectedForegroundRenderer\",\n"
+    "        \"property\": \"scale\",\n"
+    "        \"value\": [ 1, 1, 1 ],\n"
+    "        \"animator\":\"<buttonPressFadeIn>\"\n"
+    "      },\n"
+    "      {\n"
+    "        \"target\": \"selectedBackgroundRenderer\",\n"
+    "        \"property\": \"opacity\",\n"
+    "        \"value\": 0,\n"
+    "        \"animator\": \"<buttonPressFadeOut>\"\n"
+    "      },\n"
+    "      {\n"
+    "        \"target\": \"selectedForegroundRenderer\",\n"
+    "        \"property\": \"scale\",\n"
+    "        \"value\": [ 0, 0, 0 ],\n"
+    "        \"animator\":\"<buttonPressFadeOut>\"\n"
+    "      }\n"
+    "    ]\n"
+    "  },\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"pressTransition\":\"<transition:buttonPressed>\",\n"
+    "      \"releaseTransition\":\"<transition:buttonReleased>\"\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+
+  Test::TestButton testButton = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( builder.ApplyStyle( "testbutton", testButton ) );
+
+  // Now check that it has loaded the transition correctly:
+  Property::Value transition = testButton.GetProperty(Test::TestButton::Property::PRESS_TRANSITION);
+  DALI_TEST_EQUALS( transition.GetType(), Property::ARRAY, TEST_LOCATION );
+  Property::Array* array = transition.GetArray();
+
+  DALI_TEST_EQUALS( array->Size(), 1, TEST_LOCATION );
+  Property::Value element = array->GetElementAt(0);
+  DALI_TEST_CHECK( element.GetType() == Property::MAP );
+  Property::Map* map = element.GetMap();
+
+  CHECK_MAP_ELEMENT(map, "target", std::string, Property::STRING, "unselectedBackgroundRenderer", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "property", std::string, Property::STRING, "opacity", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "alphaFunction", int, Property::INTEGER, (int)Dali::AlphaFunction::EASE_OUT, TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "timePeriodDelay", float, Property::FLOAT, 0.0f, TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "timePeriodDuration", float, Property::FLOAT, 0.4f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+int UtcDaliBuilderMappingCycleCheck(void)
+{
+  ToolkitTestApplication application;
+
+  std::string json(
+    "{\n"
+    "  \"mappings\":\n"
+    "  {\n"
+    "    \"cyclicKey1\":\"<cyclicKey1>\",\n"
+    "    \"cyclicKey2\":\"<cyclicKey3>\",\n"
+    "    \"cyclicKey3\":\"<cyclicKey2>\",\n"
+    "    \"FadeOut\":{\n"
+    "      \"alphaFunction\":\"EASE_IN\",\n"
+    "      \"timePeriod\":{\n"
+    "        \"delay\":\"<cyclicKey3>\",\n"
+    "        \"duration\":0.6\n"
+    "      }\n"
+    "    },\n"
+    "    \"transition:buttonPressed\":\n"
+    "    [\n"
+    "      {\n"
+    "        \"target\": \"<cyclicKey1>\",\n"
+    "        \"property\": \"<cyclicKey2>\",\n"
+    "        \"value\": 0,\n"
+    "        \"animator\":\"<FadeOut>\"\n"
+    "      }\n"
+    "    ]\n"
+    "  },\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"pressTransition\":\"<transition:buttonPressed>\",\n"
+    "      \"releaseTransition\":\"<cyclicKey2>\",\n"
+    "      \"disabledTransition\":\"<cyclicKey3>\",\n"
+    "      \"enabledTransition\":\"<unknownKey>\"\n"
+    "    }\n"
+    "  }\n"
+    "}\n");
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+
+  Test::TestButton testButton = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( builder.ApplyStyle( "testbutton", testButton ) );
+
+  // Now check that it has loaded the transition correctly:
+  Property::Value transition = testButton.GetProperty(Test::TestButton::Property::PRESS_TRANSITION);
+  DALI_TEST_EQUALS( transition.GetType(), Property::ARRAY, TEST_LOCATION );
+  Property::Array* array = transition.GetArray();
+
+  DALI_TEST_EQUALS( array->Size(), 1, TEST_LOCATION );
+  Property::Value element = array->GetElementAt(0);
+  DALI_TEST_CHECK( element.GetType() == Property::MAP );
+  Property::Map* map = element.GetMap();
+
+  CHECK_MAP_ELEMENT(map, "target", std::string, Property::STRING, "", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "property", std::string, Property::STRING, "", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "timePeriodDuration", float, Property::FLOAT, 0.6f, TEST_LOCATION);
 
   END_TEST;
 }

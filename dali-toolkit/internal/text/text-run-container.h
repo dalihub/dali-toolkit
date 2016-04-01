@@ -47,12 +47,12 @@ void ClearCharacterRuns( CharacterIndex startIndex,
                          uint32_t& endRemoveIndex )
 {
   T* runsBuffer = runs.Begin();
+  T* run = runsBuffer;
 
   const Length length = runs.Count();
-  for( Length index = 0u; index < length; ++index )
+  Length index = 0u;
+  for( index = 0u; index < length; ++index )
   {
-    T* run = ( runsBuffer + index );
-
     if( ( run->characterRun.characterIndex <= endIndex ) &&
         ( startIndex < run->characterRun.characterIndex + run->characterRun.numberOfCharacters ) )
     {
@@ -62,37 +62,36 @@ void ClearCharacterRuns( CharacterIndex startIndex,
       startRemoveIndex = index;
       break;
     }
+
+    ++run;
   }
 
-  for( Length index = startRemoveIndex; index < length; ++index )
+  run = ( runsBuffer + startRemoveIndex );
+  for( index = startRemoveIndex; index < length; ++index )
   {
-    T* run = ( runsBuffer + index );
-
-    if( ( run->characterRun.characterIndex <= endIndex ) &&
-        ( startIndex < run->characterRun.characterIndex + run->characterRun.numberOfCharacters ) )
-    {
-      // Update the index to the last run to be removed.
-      endRemoveIndex = index + 1u;
-    }
-    else
+    if( ( run->characterRun.characterIndex > endIndex ) ||
+        ( startIndex >= run->characterRun.characterIndex + run->characterRun.numberOfCharacters ) )
     {
       // Run found. Nothing else to do.
       break;
     }
+    ++run;
   }
+  endRemoveIndex = index;
 
   // The number of characters to remove.
   const Length numberOfCharactersRemoved = 1u + endIndex - startIndex;
 
   // Update the character index of the next runs.
+  run = runsBuffer;
   for( Length index = 0u; index < length; ++index )
   {
-    T* run = ( runsBuffer + index );
-
     if( run->characterRun.characterIndex > startIndex )
     {
       run->characterRun.characterIndex -= numberOfCharactersRemoved;
     }
+
+    ++run;
   }
 }
 
@@ -257,6 +256,94 @@ void UpdateCharacterRuns( CharacterIndex index,
       }
     }
   }
+}
+
+/**
+ * @brief Clears the runs starting from the given glyph index.
+ *
+ * @param[in] startIndex The starting glyph index used to remove runs.
+ * @param[in] endIndex The ending glyph index used to remove runs.
+ * @param[in,out] runs The text's runs.
+ * @param[out] startRemoveIndex The index to the first run to be removed.
+ * @param[out] endRemoveIndex The index to the last run to be removed.
+ */
+template< typename T >
+void ClearGlyphRuns( GlyphIndex startIndex,
+                     GlyphIndex endIndex,
+                     Vector<T>& runs,
+                     uint32_t& startRemoveIndex,
+                     uint32_t& endRemoveIndex )
+{
+  T* runsBuffer = runs.Begin();
+  T* run = runsBuffer;
+
+  const Length length = runs.Count();
+  Length index = 0u;
+  for( index = 0u; index < length; ++index )
+  {
+    if( ( run->glyphRun.glyphIndex <= endIndex ) &&
+        ( startIndex < run->glyphRun.glyphIndex + run->glyphRun.numberOfGlyphs ) )
+    {
+      // Run found.
+
+      // Set the index to the first run to be removed.
+      startRemoveIndex = index;
+      break;
+    }
+    ++run;
+  }
+
+  run = ( runsBuffer + startRemoveIndex );
+  for( index = startRemoveIndex; index < length; ++index )
+  {
+    if( ( run->glyphRun.glyphIndex > endIndex ) ||
+        ( startIndex >= run->glyphRun.glyphIndex + run->glyphRun.numberOfGlyphs ) )
+    {
+      // Run found. Nothing else to do.
+    }
+
+    ++run;
+  }
+  endRemoveIndex = index;
+
+  // The number of glyphs to remove.
+  const Length numberOfGlyphsRemoved = 1u + endIndex - startIndex;
+
+  // Update the glyph index of the next runs.
+  run = runsBuffer;
+  for( Length index = 0u; index < length; ++index )
+  {
+
+    if( run->glyphRun.glyphIndex > startIndex )
+    {
+      run->glyphRun.glyphIndex -= numberOfGlyphsRemoved;
+    }
+  }
+}
+
+/**
+ * @brief Clears the runs starting from the given glyph index.
+ *
+ * @param[in] startIndex The starting glyph index used to remove runs.
+ * @param[in] endIndex The ending glyph index used to remove runs.
+ * @param[in,out] runs The text's runs.
+ */
+template< typename T >
+void ClearGlyphRuns( GlyphIndex startIndex,
+                     GlyphIndex endIndex,
+                     Vector<T>& runs )
+{
+  uint32_t startRemoveIndex = runs.Count();
+  uint32_t endRemoveIndex = startRemoveIndex;
+  ClearGlyphRuns( startIndex,
+                  endIndex,
+                  runs,
+                  startRemoveIndex,
+                  endRemoveIndex );
+
+  // Remove all remaining runs.
+  T* runBuffer = runs.Begin();
+  runs.Erase( runBuffer + startRemoveIndex, runBuffer + endRemoveIndex );
 }
 
 } // namespace Text

@@ -65,6 +65,16 @@ const Vector2& View::GetControlSize() const
   return Vector2::ZERO;
 }
 
+const Vector2& View::GetLayoutSize() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->GetLayoutSize();
+  }
+
+  return Vector2::ZERO;
+}
+
 Length View::GetNumberOfGlyphs() const
 {
   if( mImpl->mVisualModel )

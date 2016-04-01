@@ -258,6 +258,9 @@ private:
 
   Property::Map mReplacementMap;
 
+  typedef std::vector< TreeNode::KeyNodePair > MappingsLut;
+  MappingsLut mCompleteMappings;
+
   BaseHandle Create( const std::string& templateName, const Replacement& constant );
 
   BaseHandle DoCreate( const TreeNode& root, const TreeNode& node, Actor parent, const Replacement& replacements );
@@ -269,6 +272,39 @@ private:
   bool ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
 
   Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor );
+
+  typedef std::vector<const char*> KeyStack;
+
+  /**
+   * Tests if the value is a string delimited by <>. If it is, then it attempts to
+   * change the value to the mapping from a matching key in the mappings table.
+   * @param[in] mappingRoot The JSON node containing the mappings
+   * @param[in,out] keyStack the stack of visited keys
+   * @param[in,out] value The string value to test and write back to.
+   * @return true if the value was converted, false otherwise.
+   */
+  bool ConvertChildValue( const TreeNode& mappingRoot, KeyStack& keyStack, Property::Value& value );
+
+  /**
+   * Find the key in the mapping table, if it's present, then generate a property value for it (of the given type if available), recursing as necessary, and stopping if any cycles
+   * are detected.
+   * @param[in] mappingRoot The JSON node containing the mappings
+   * @param[in] theKey The key to search for
+   * @param[in,out] keyStack the stack of visited keys
+   * @param[in] propertyType The property type if known, or NONE
+   * @param[in,out] value The string value to test and write back to.
+   */
+  bool RecursePropertyMap( const TreeNode& mappingRoot, KeyStack& keyStack, const char* theKey, Property::Type propertyType, Property::Value& value );
+
+  /**
+   * Find the key in the mapping table, if it's present, then generate a property value for it (of the given type if available), recursing as necessary, and stopping if any cycles
+   * are detected.
+   * @param[in] mappingRoot The JSON node containing the mappings
+   * @param[in] theKey The key to search for
+   * @param[in] propertyType The property type if known, or NONE
+   * @param[in,out] value The string value to test and write back to.
+   */
+  bool GetPropertyMap( const TreeNode& mappingRoot, const char* theKey, Property::Type propertyType, Property::Value& value );
 
   void ApplyProperties( const TreeNode& root, const TreeNode& node,
                         Dali::Handle& handle, const Replacement& constant );
