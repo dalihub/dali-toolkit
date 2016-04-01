@@ -42,29 +42,27 @@ class Gradient;
  *
  * | %Property Name          | Type             |
  * |-------------------------|------------------|
- * | gradientStartPosition   | VECTOR2          |
- * | gradientEndPosition     | VECTOR2          |
- * | gradientStopOffset      | ARRAY of FLOAT   |
- * | gradientStopColor       | ARRAY of VECTOR4 |
+ * | startPosition           | VECTOR2          |
+ * | endPosition             | VECTOR2          |
+ * | stopColor               | ARRAY of VECTOR4 |
  *
  * The following properties are essential for create a RADIAL GradientRender
  *
  * | %Property Name          | Type             |
  * |-------------------------|------------------|
- * | gradientCenter          | VECTOR2          |
- * | gradientRadius          | FLOAT            |
- * | gradientStopOffset      | ARRAY of FLOAT   |
- * | gradientStopColor       | ARRAY of VECTOR4 |
+ * | center                  | VECTOR2          |
+ * | radius                  | FLOAT            |
+ * | stopColor               | ARRAY of VECTOR4 |
  *
  * The following properties are optional for both LINEAR and RADIAL GradientRender.
  *
  * | %Property Name          | Type             |
  * |-------------------------|------------------|
- * | gradientUnits           | STRING           |
- * | gradientSpreadMethod    | STRING           |
+ * | units                   | STRING           |
+ * | spreadMethod            | STRING           |
  *
- * Valid values for gradientUnits are 'userSpace' and 'objectBoundingBox'.
- * Valid values for gradientSpreadMethod are 'pad', 'repeat' and 'reflect.'
+ * Valid values for units are 'userSpace' and 'objectBoundingBox'.
+ * Valid values for spreadMethod are 'pad', 'repeat' and 'reflect.'
  * If not provided, 'objectBoundingBox' is used as default gradient units, and 'pad' is used as default spread method.
  */
 class GradientRenderer: public ControlRenderer
@@ -146,7 +144,7 @@ private:
    * @param[in] value The property value of stop-offsets
    * @param[out] stopOffsets The vector contains the stop offset values.
    */
-  static bool GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets);
+  static void GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets);
 
   // Undefined
   GradientRenderer( const GradientRenderer& gradientRenderer );

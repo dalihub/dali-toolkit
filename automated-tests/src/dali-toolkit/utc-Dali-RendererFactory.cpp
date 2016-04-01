@@ -444,19 +444,19 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("gradientStartPosition",   start);
-  propertyMap.Insert("gradientEndPosition",   end);
-  propertyMap.Insert("gradientSpreadMethod",   "repeat");
+  propertyMap.Insert("startPosition",   start);
+  propertyMap.Insert("endPosition",   end);
+  propertyMap.Insert("spreadMethod",   "repeat");
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.2f );
   stopOffsets.PushBack( 0.8f );
-  propertyMap.Insert("gradientStopOffset",   stopOffsets);
+  propertyMap.Insert("stopOffset",   stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradientStopColor",   stopColors);
+  propertyMap.Insert("stopColor",   stopColors);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -484,19 +484,19 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
-  propertyMap.Insert("gradientUnits",  "userSpace");
-  propertyMap.Insert("gradientCenter",  center);
-  propertyMap.Insert("gradientRadius",  radius);
+  propertyMap.Insert("units",  "userSpace");
+  propertyMap.Insert("center",  center);
+  propertyMap.Insert("radius",  radius);
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.0f );
   stopOffsets.PushBack( 1.f );
-  propertyMap.Insert("gradientStopOffset",   stopOffsets);
+  propertyMap.Insert("stopOffset",   stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradientStopColor",   stopColors);
+  propertyMap.Insert("stopColor",   stopColors);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -512,6 +512,41 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uAlignmentMatrix", actualValue ) );
   DALI_TEST_EQUALS( actualValue, alignMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererFactoryDefaultOffsetsGradientRenderer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRendererFactoryGetRadialGradientRenderer");
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert("rendererType",  "gradient");
+
+  Vector2 start(-1.f, -1.f);
+  Vector2 end(1.f, 1.f);
+  propertyMap.Insert("startPosition",   start);
+  propertyMap.Insert("endPosition",   end);
+  propertyMap.Insert("spreadMethod",   "repeat");
+
+  Property::Array stopColors;
+  stopColors.PushBack( Color::RED );
+  stopColors.PushBack( Color::GREEN );
+  propertyMap.Insert("stopColor",   stopColors);
+
+  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  DALI_TEST_CHECK( controlRenderer );
+
+  // A lookup texture is generated and pass to shader as sampler
+  Actor actor = Actor::New();
+  TestControlRendererRender( application, actor, controlRenderer, 1u );
+
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
