@@ -537,6 +537,9 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
 
   const int width=512;
   const int height=513;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
 
   Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height,width, height );
@@ -545,10 +548,7 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
                              ImageDimensions(width, height),
                              Integration::ResourcePointer( bitmap ) );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   controlRenderer.SetOffStage( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -577,14 +577,15 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
   Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height,width, height );
 
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(width, height),
                              Integration::ResourcePointer(bitmap) );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -614,14 +615,16 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     TestControlRendererRender( application, actor, controlRenderer, 1u,
                                ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                                ninePatchResource );
 
-    TestGlAbstraction& gl = application.GetGlAbstraction();
-    int textureUnit = -1;
-    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   }
 
   propertyMap.Insert( "borderOnly",  true );
@@ -631,14 +634,16 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     TestControlRendererRender( application, actor, controlRenderer, 1u,
                                ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                                ninePatchResource );
 
-    TestGlAbstraction& gl = application.GetGlAbstraction();
-    int textureUnit = -1;
-    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   }
 
   END_TEST;
@@ -673,14 +678,16 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
     TestControlRendererRender( application, actor, controlRenderer, 1u,
                                ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                                ninePatchResource );
 
-    TestGlAbstraction& gl = application.GetGlAbstraction();
-    int textureUnit = -1;
-    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
     controlRenderer.SetOffStage( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -692,15 +699,16 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
 
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
     Actor actor = Actor::New();
     TestControlRendererRender( application, actor, controlRenderer, 1u,
                                ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                                ninePatchResource );
 
-    TestGlAbstraction& gl = application.GetGlAbstraction();
-    int textureUnit = -1;
-    DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-    DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
     controlRenderer.SetOffStage( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -729,14 +737,16 @@ int UtcDaliRendererFactoryGetNPatchRenderer3(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                              ninePatchResource );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -766,14 +776,16 @@ int UtcDaliRendererFactoryGetNPatchRenderer4(void)
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                              ninePatchResource );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -796,14 +808,16 @@ int UtcDaliRendererFactoryGetNPatchRendererN1(void)
   //The testkit still has to load a bitmap for the broken renderer image
   Integration::Bitmap* bitmap = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 100, 100, 100, 100 );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(),
                              Integration::ResourcePointer(bitmap) );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -830,14 +844,16 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   //The testkit still has to load a bitmap for the broken renderer image
   Integration::Bitmap* bitmap = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 100, 100, 100, 100 );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
   TestControlRendererRender( application, actor, controlRenderer, 1u,
                              ImageDimensions(),
                              Integration::ResourcePointer(bitmap) );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -850,6 +866,10 @@ int UtcDaliRendererFactoryGetSvgRenderer(void)
   RendererFactory factory = RendererFactory::Get();
   ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
   DALI_TEST_CHECK( controlRenderer );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
 
   Actor actor = Actor::New();
   actor.SetSize( 200.f, 200.f );
@@ -872,14 +892,12 @@ int UtcDaliRendererFactoryGetSvgRenderer(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
 
+
   // waiting for the resource uploading
   application.SendNotification();
   application.Render();
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  int textureUnit = -1;
-  DALI_TEST_CHECK( gl.GetUniformValue< int >( "sTexture", textureUnit ) );
-  DALI_TEST_EQUALS( textureUnit, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
   END_TEST;
 }
