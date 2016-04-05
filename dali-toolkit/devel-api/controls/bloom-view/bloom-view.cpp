@@ -77,16 +77,6 @@ BloomView BloomView::DownCast( BaseHandle handle )
   return Control::DownCast<BloomView, Internal::BloomView>(handle);
 }
 
-void BloomView::Add(Actor child)
-{
-  GetImpl(*this).Add(child);
-}
-
-void BloomView::Remove(Actor child)
-{
-  GetImpl(*this).Remove(child);
-}
-
 void BloomView::Activate()
 {
   GetImpl(*this).Activate();

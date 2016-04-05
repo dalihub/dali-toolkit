@@ -70,8 +70,12 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );
@@ -142,8 +146,12 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
+                   fontDescriptions,
+                   options,
                    layoutSize,
                    logicalModel,
                    visualModel );

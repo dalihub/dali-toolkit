@@ -4,6 +4,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/builder-actor.cpp \
    $(toolkit_src_dir)/builder/builder-animations.cpp \
    $(toolkit_src_dir)/builder/builder-impl.cpp \
+   $(toolkit_src_dir)/builder/builder-impl-debug.cpp \
    $(toolkit_src_dir)/builder/builder-set-property.cpp \
    $(toolkit_src_dir)/builder/builder-signals.cpp \
    $(toolkit_src_dir)/builder/json-parser-state.cpp \
@@ -24,6 +25,10 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/renderers/gradient/linear-gradient.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/radial-gradient.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/gradient-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/svg/nanosvg/nanosvg.cc \
+   $(toolkit_src_dir)/controls/renderers/svg/nanosvg/nanosvgrast.cc \
+   $(toolkit_src_dir)/controls/renderers/svg/svg-rasterize-thread.cpp \
+   $(toolkit_src_dir)/controls/renderers/svg/svg-renderer.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
@@ -119,5 +124,3 @@ toolkit_src_files = \
    $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp \
    $(toolkit_src_dir)/scripting/script-impl.cpp \
    $(toolkit_src_dir)/scripting/script-plugin-proxy.cpp
-
-

@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/controls/renderers/gradient/gradient-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
 
@@ -43,10 +44,12 @@ const char * const BORDER_RENDERER("border");
 const char * const GRADIENT_RENDERER("gradient");
 const char * const IMAGE_RENDERER("image");
 const char * const N_PATCH_RENDERER("nPatch");
+const char * const SVG_RENDERER("svg");
 
 const std::string TEXTURE_UNIFORM_NAME = "sTexture";
 
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
+
 }
 
 namespace Dali
@@ -120,6 +123,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     else if( typeValue == BORDER_RENDERER )
     {
       rendererPtr = new BorderRenderer( *( mFactoryCache.Get() ) );
+    }
+    else if( typeValue == SVG_RENDERER )
+    {
+      CreateAtlasManager();
+      rendererPtr = new SvgRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     }
   }
 
@@ -297,6 +305,13 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string&
 
     return Toolkit::ControlRenderer( rendererPtr );
   }
+  else if( SvgRenderer::IsSvgUrl( url ) )
+  {
+    CreateAtlasManager();
+    SvgRenderer* rendererPtr = new SvgRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    rendererPtr->SetImage( url, size );
+    return Toolkit::ControlRenderer( rendererPtr );
+  }
   else
   {
     CreateAtlasManager();
@@ -329,6 +344,15 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
       if( rendererPtr )
       {
         rendererPtr->SetImage( url );
+        return;
+      }
+    }
+    else if( SvgRenderer::IsSvgUrl( url ) )
+    {
+      SvgRenderer* rendererPtr = dynamic_cast< SvgRenderer* >( &GetImplementation( renderer ) );
+      if( rendererPtr )
+      {
+        rendererPtr->SetImage( url, size );
         return;
       }
     }
@@ -368,11 +392,12 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 
     //If there's no renderer type specified or if there hasn't been a renderer type change then we can reuse the renderer
     if( !type || !type->Get( typeValue ) ||
-        ( typeValue ==  IMAGE_RENDERER    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
-        ( typeValue ==  N_PATCH_RENDERER  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
-        ( typeValue ==  COLOR_RENDERER    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
-        ( typeValue ==  GRADIENT_RENDERER && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
-        ( typeValue ==  BORDER_RENDERER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) )
+        ( typeValue == IMAGE_RENDERER    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
+        ( typeValue == N_PATCH_RENDERER  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
+        ( typeValue == COLOR_RENDERER    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
+        ( typeValue == GRADIENT_RENDERER && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
+        ( typeValue == BORDER_RENDERER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) ||
+        ( typeValue == SVG_RENDERER      && typeid( controlRenderer ) == typeid( SvgRenderer ) ) )
     {
       controlRenderer.Initialize( actor, propertyMap );
       return;

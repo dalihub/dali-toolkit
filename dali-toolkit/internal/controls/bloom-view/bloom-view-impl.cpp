@@ -149,6 +149,7 @@ BloomView::BloomView()
   , mTargetSize(Vector2::ZERO)
   , mLastSize(Vector2::ZERO)
   , mChildrenRoot(Actor::New())
+  , mInternalRoot(Actor::New() )
   , mBloomThresholdPropertyIndex(Property::INVALID_INDEX)
   , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
   , mBloomIntensityPropertyIndex(Property::INVALID_INDEX)
@@ -172,6 +173,7 @@ BloomView::BloomView( const unsigned int blurNumSamples, const float blurBellCur
   , mTargetSize(Vector2::ZERO)
   , mLastSize(Vector2::ZERO)
   , mChildrenRoot(Actor::New())
+  , mInternalRoot(Actor::New())
   , mBloomThresholdPropertyIndex(Property::INVALID_INDEX)
   , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
   , mBloomIntensityPropertyIndex(Property::INVALID_INDEX)
@@ -213,24 +215,6 @@ Toolkit::BloomView BloomView::New(const unsigned int blurNumSamples, const float
   return handle;
 }
 
-/////////////////////////////////////////////////////////////
-// for creating a subtree for all user added child actors, so that we can have them exclusive to the mRenderChildrenTask and our other actors exclusive to our other tasks
-// TODO: overloading Actor::Add()/Remove() not nice since breaks polymorphism. Need another method to pass ownership of added child actors to our internal actor root.
-void BloomView::Add(Actor child)
-{
-  mChildrenRoot.Add(child);
-}
-
-void BloomView::Remove(Actor child)
-{
-  mChildrenRoot.Remove(child);
-}
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -240,6 +224,7 @@ void BloomView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
   mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
+  mInternalRoot.SetParentOrigin( ParentOrigin::CENTER );
 
   //////////////////////////////////////////////////////
   // Create actors
@@ -291,12 +276,13 @@ void BloomView::OnInitialize()
   ////////////////////////////////
   // Connect to actor tree
   Self().Add( mChildrenRoot );
-  Self().Add( mBloomExtractImageActor );
-  Self().Add( mGaussianBlurView );
-  Self().Add( mCompositeImageActor );
-  Self().Add( mTargetImageActor );
-  Self().Add( mRenderDownsampledCamera );
-  Self().Add( mRenderFullSizeCamera );
+  Self().Add( mInternalRoot );
+  mInternalRoot.Add( mBloomExtractImageActor );
+  mInternalRoot.Add( mGaussianBlurView );
+  mInternalRoot.Add( mCompositeImageActor );
+  mInternalRoot.Add( mTargetImageActor );
+  mInternalRoot.Add( mRenderDownsampledCamera );
+  mInternalRoot.Add( mRenderFullSizeCamera );
 
   // bind properties for / set shader constants to defaults
   SetupProperties();
@@ -327,10 +313,23 @@ void BloomView::OnSizeSet(const Vector3& targetSize)
   }
 }
 
+void BloomView::OnControlChildAdd( Actor& child )
+{
+  if( child != mChildrenRoot && child != mInternalRoot)
+  {
+    mChildrenRoot.Add( child );
+  }
+}
+
+void BloomView::OnControlChildRemove( Actor& child )
+{
+  mChildrenRoot.Remove( child );
+}
+
 void BloomView::AllocateResources()
 {
   // size of render targets etc is based on the size of this actor, ignoring z
-  if(mTargetSize != mLastSize)
+  if(mTargetSize != mLastSize || !mActivated)
   {
     mLastSize = mTargetSize;
 
@@ -464,6 +463,9 @@ void BloomView::Deactivate()
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
+  mRenderTargetForRenderingChildren.Reset();
+  mBloomExtractTarget.Reset();
+  mOutputRenderTarget.Reset();
   mActivated = false;
 }
 

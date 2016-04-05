@@ -37,7 +37,6 @@
 // pixel format / size - set from JSON
 // aspect ratio property needs to be able to be constrained also for cameras, not possible currently. Therefore changing aspect ratio of GaussianBlurView won't currently work
 // default near clip value
-// mChildrenRoot Add()/Remove() overloads - better solution
 // Manager object - re-use render targets if there are multiple GaussianBlurViews created
 
 
@@ -133,6 +132,7 @@ GaussianBlurView::GaussianBlurView()
   , mTargetSize(Vector2::ZERO)
   , mLastSize(Vector2::ZERO)
   , mChildrenRoot(Actor::New())
+  , mInternalRoot(Actor::New())
   , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
   , mActivated( false )
 {
@@ -156,6 +156,7 @@ GaussianBlurView::GaussianBlurView( const unsigned int numSamples, const float b
   , mTargetSize(Vector2::ZERO)
   , mLastSize(Vector2::ZERO)
   , mChildrenRoot(Actor::New())
+  , mInternalRoot(Actor::New())
   , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
   , mActivated( false )
 {
@@ -199,7 +200,7 @@ Toolkit::GaussianBlurView GaussianBlurView::New(const unsigned int numSamples, c
 
 /////////////////////////////////////////////////////////////
 // for creating a subtree for all user added child actors, so that we can have them exclusive to the mRenderChildrenTask and our other actors exclusive to our other tasks
-// TODO: overloading Actor::Add()/Remove() not nice since breaks polymorphism. Need another method to pass ownership of added child actors to our internal actor root.
+// DEPRECATED: overloading Actor::Add()/Remove() not nice since breaks polymorphism. Need another method to pass ownership of added child actors to our internal actor root.
 void GaussianBlurView::Add(Actor child)
 {
   mChildrenRoot.Add(child);
@@ -250,6 +251,7 @@ void GaussianBlurView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
   mChildrenRoot.SetParentOrigin(ParentOrigin::CENTER);
+  mInternalRoot.SetParentOrigin(ParentOrigin::CENTER);
 
   //////////////////////////////////////////////////////
   // Create shaders
@@ -277,7 +279,8 @@ void GaussianBlurView::OnInitialize()
   mImageActorVertBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Register a property that the user can control to fade the blur in / out via the GaussianBlurView object
-  mBlurStrengthPropertyIndex = Self().RegisterProperty(GAUSSIAN_BLUR_VIEW_STRENGTH_PROPERTY_NAME, GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH);
+  Actor self = Self();
+  mBlurStrengthPropertyIndex = self.RegisterProperty(GAUSSIAN_BLUR_VIEW_STRENGTH_PROPERTY_NAME, GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH);
 
   // Create an ImageActor for compositing the blur and the original child actors render
   if(!mBlurUserImage)
@@ -287,7 +290,7 @@ void GaussianBlurView::OnInitialize()
     mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
     Constraint blurStrengthConstraint = Constraint::New<float>( mImageActorComposite, Actor::Property::COLOR_ALPHA, EqualToConstraint());
-    blurStrengthConstraint.AddSource( ParentSource(mBlurStrengthPropertyIndex) );
+    blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
     blurStrengthConstraint.Apply();
 
     // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
@@ -303,9 +306,9 @@ void GaussianBlurView::OnInitialize()
 
     //////////////////////////////////////////////////////
     // Connect to actor tree
-    Self().Add( mImageActorComposite );
-    Self().Add( mTargetActor );
-    Self().Add( mRenderFullSizeCamera );
+    mInternalRoot.Add( mImageActorComposite );
+    mInternalRoot.Add( mTargetActor );
+    mInternalRoot.Add( mRenderFullSizeCamera );
   }
 
 
@@ -319,9 +322,10 @@ void GaussianBlurView::OnInitialize()
   //////////////////////////////////////////////////////
   // Connect to actor tree
   Self().Add( mChildrenRoot );
-  Self().Add( mImageActorHorizBlur );
-  Self().Add( mImageActorVertBlur );
-  Self().Add( mRenderDownsampledCamera );
+  Self().Add( mInternalRoot );
+  mInternalRoot.Add( mImageActorHorizBlur );
+  mInternalRoot.Add( mImageActorVertBlur );
+  mInternalRoot.Add( mRenderDownsampledCamera );
 }
 
 
@@ -351,6 +355,19 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
     Deactivate();
     Activate();
   }
+}
+
+void GaussianBlurView::OnControlChildAdd( Actor& child )
+{
+  if( child != mChildrenRoot && child != mInternalRoot)
+  {
+    mChildrenRoot.Add( child );
+  }
+}
+
+void GaussianBlurView::OnControlChildRemove( Actor& child )
+{
+  mChildrenRoot.Remove( child );
 }
 
 void GaussianBlurView::AllocateResources()

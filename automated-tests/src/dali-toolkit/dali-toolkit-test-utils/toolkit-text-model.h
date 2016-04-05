@@ -34,17 +34,35 @@ namespace Text
 {
 
 /**
+ * @brief Some layout options.
+ */
+struct LayoutOptions
+{
+  LayoutOptions()
+  : reorder( true ),
+    align( true )
+  {}
+
+  bool reorder : 1; ///< Whether to reorder the bidirectional lines.
+  bool align   : 1; ///< Whether to align the lines.
+};
+
+/**
  * @brief Creates and fills all the vectors of a text model: characters in utf32, segmentation info,
  * scripts, fonts, bidi info, glyphs, conversion tables, etc.
  *
  * @param[in] text The given text.
  * @param[in] textArea The area where to layout the text.
+ * @param[in] fontDescriptions The fonts to be used.
+ * @param[in] options Layout options.
  * @param[out] layoutSize The laid-out size.
- * @param[out] Pointer to a logical text model instance.
- * @param[out] Pointer to a visual text model instance.
+ * @param[out] logicalModel Pointer to a logical text model instance.
+ * @param[out] visualModel Pointer to a visual text model instance.
  */
 void CreateTextModel( const std::string& text,
                       const Size& textArea,
+                      const Vector<FontDescriptionRun>& fontDescriptions,
+                      const LayoutOptions& options,
                       Size& layoutSize,
                       LogicalModelPtr logicalModel,
                       VisualModelPtr visualModel );

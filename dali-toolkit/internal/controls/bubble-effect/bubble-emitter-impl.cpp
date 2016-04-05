@@ -307,13 +307,13 @@ Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
   vertexFormat["aIndex"] = Property::FLOAT;
   vertexFormat["aPosition"] = Property::VECTOR2;
   vertexFormat["aTexCoord"] = Property::VECTOR2;
-  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat, numVertex  );
-  vertices.SetData( &vertexData[0] );
+  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat );
+  vertices.SetData( &vertexData[0], numVertex );
 
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat, numIndex  );
-  indices.SetData( &indexData[0] );
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
+  indices.SetData( &indexData[0], numIndex );
 
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertices );

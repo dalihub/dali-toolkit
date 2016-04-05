@@ -678,7 +678,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
   if( Gesture::Started    == state ||
       Gesture::Continuing == state )
   {
-    const Vector2& actualSize = mVisualModel->GetActualSize();
+    const Vector2& actualSize = mVisualModel->GetLayoutSize();
     const Vector2 currentScroll = mEventData->mScrollPosition;
 
     if( mEventData->mHorizontalScrollingEnabled )
@@ -833,7 +833,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
   else if( HANDLE_SCROLLING == state )
   {
     const float xSpeed = event.p2.mFloat;
-    const Vector2& actualSize = mVisualModel->GetActualSize();
+    const Vector2& actualSize = mVisualModel->GetLayoutSize();
     const Vector2 currentScrollPosition = mEventData->mScrollPosition;
 
     mEventData->mScrollPosition.x += xSpeed;
@@ -1904,6 +1904,25 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
     cursorInfo.secondaryPosition.y = cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
   }
+
+  if( LayoutEngine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
+  {
+    // If the text is editable and multi-line, the cursor position after a white space shouldn't exceed the boundaries of the text control.
+
+    // Note the white spaces laid-out at the end of the line might exceed the boundaries of the control.
+    // The reason is a wrapped line must not start with a white space so they are laid-out at the end of the line.
+
+    if( 0.f > cursorInfo.primaryPosition.x )
+    {
+      cursorInfo.primaryPosition.x = 0.f;
+    }
+
+    const float edgeWidth = mVisualModel->mControlSize.width - static_cast<float>( mEventData->mDecorator->GetCursorWidth() );
+    if( cursorInfo.primaryPosition.x > edgeWidth )
+    {
+      cursorInfo.primaryPosition.x = edgeWidth;
+    }
+  }
 }
 
 CharacterIndex Controller::Impl::CalculateNewCursorIndex( CharacterIndex index ) const
@@ -2074,17 +2093,18 @@ void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
   const float positionEnd = position.x + ( mEventData->mDecorator ? mEventData->mDecorator->GetCursorWidth() : 0.f );
 
   // Transform the position to decorator coords.
-  const float offset = mEventData->mScrollPosition.x + mAlignmentOffset.x;
+  const float alignment = IsShowingRealText() ? mAlignmentOffset.x : 0.f;
+  const float offset = mEventData->mScrollPosition.x + alignment;
   const float decoratorPositionBegin = position.x + offset;
   const float decoratorPositionEnd = positionEnd + offset;
 
   if( decoratorPositionBegin < 0.f )
   {
-    mEventData->mScrollPosition.x = -position.x - mAlignmentOffset.x;
+    mEventData->mScrollPosition.x = -position.x - alignment;
   }
   else if( decoratorPositionEnd > mVisualModel->mControlSize.width )
   {
-    mEventData->mScrollPosition.x = mVisualModel->mControlSize.width - positionEnd - mAlignmentOffset.x;
+    mEventData->mScrollPosition.x = mVisualModel->mControlSize.width - positionEnd - alignment;
   }
 }
 
@@ -2096,7 +2116,7 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
   // Calculate the offset to match the cursor position before the character was deleted.
   mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
 
-  ClampHorizontalScroll( mVisualModel->GetActualSize() );
+  ClampHorizontalScroll( mVisualModel->GetLayoutSize() );
 }
 
 void Controller::Impl::RequestRelayout()

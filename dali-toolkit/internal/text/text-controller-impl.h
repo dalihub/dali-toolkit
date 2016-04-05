@@ -514,7 +514,7 @@ struct Controller::Impl
    *
    * @pre mEventData must not be NULL. (there is a text-input or selection capabilities).
    *
-   * @param[in] position A position in decorator coords.
+   * @param[in] position A position in text coords.
    *
    * This method is called after inserting text, moving the cursor with the grab handle or the keypad,
    * or moving the selection handles.
@@ -526,7 +526,7 @@ struct Controller::Impl
    *
    * This method is called after deleting text.
    */
-  void ScrollTextToMatchCursor( const CursorInfo& cursorInfo);
+  void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
 
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.

@@ -17,7 +17,8 @@
  * limitations under the License.
  */
 
-#include <map>
+// INTERNAL INCLUDES
+#include "svg/svg-rasterize-thread.h"
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
@@ -152,6 +153,19 @@ public:
    */
   Renderer GetDebugRenderer();
 
+  /**
+   * Get the SVG rasterization thread.
+   * @return A pointer pointing to the SVG rasterization thread.
+   */
+  SvgRasterizeThread* GetSVGRasterizationThread();
+
+private: // for svg rasterization thread
+
+  /**
+   * Applies the rasterized image to material
+   */
+  void ApplyRasterizedSVGToSampler();
+
 protected:
 
   /**
@@ -192,9 +206,6 @@ private:
   int FindRenderer( const std::string& key ) const;
 
 private:
-  // ToDo: test whether using the WeakHandle could improve the performance
-  //       With WeakHandle, the resource would be released automatically when no control is using it
-
   Geometry mGeometry[GEOMETRY_TYPE_MAX+1];
   Shader mShader[SHADER_TYPE_MAX+1];
 
@@ -202,6 +213,8 @@ private:
   CachedRenderers mRenderers;
 
   Renderer mDebugRenderer;
+
+  SvgRasterizeThread*  mSvgRasterizeThread;
 };
 
 } // namespace Internal

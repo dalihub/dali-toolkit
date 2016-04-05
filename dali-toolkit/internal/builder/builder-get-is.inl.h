@@ -57,6 +57,7 @@ inline OptionalString IsString(const OptionalChild& node)
     return OptionalString();
   }
 }
+
 inline OptionalFloat IsFloat(const OptionalChild& node)
 {
   OptionalFloat ret;
@@ -108,6 +109,7 @@ inline OptionalBoolean IsBoolean(const OptionalChild& node)
     return OptionalBoolean();
   }
 }
+
 
 // copy N Numbers
 template <typename T>

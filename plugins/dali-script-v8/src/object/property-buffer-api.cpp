@@ -34,18 +34,15 @@ namespace // unnamed namespace
 struct PropertyBufferParameters
 {
   PropertyBufferParameters()
-      : mSize( 0 )
   {
   }
 
   PropertyBuffer NewPropertyBuffer()
   {
-    return PropertyBuffer::New( mBufferFormat,
-                                mSize);
+    return PropertyBuffer::New( mBufferFormat );
   }
 
   Property::Map mBufferFormat;
-  std::size_t mSize;
 };
 
 } // unnamed space
@@ -145,15 +142,7 @@ PropertyBuffer PropertyBufferApi::New( v8::Isolate* isolate, const v8::FunctionC
     return PropertyBuffer();
   }
 
-  found = false;
-  int size = V8Utils::GetIntegerParameter( PARAMETER_1, found, isolate, args, 0);
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "missing buffer size from param 1" );
-    return PropertyBuffer();
-  }
-
-  return PropertyBuffer::New(bufferFormat, static_cast<std::size_t>(size));
+  return PropertyBuffer::New( bufferFormat );
 }
 
 /**
@@ -177,7 +166,7 @@ PropertyBuffer PropertyBufferApi::New( v8::Isolate* isolate, const v8::FunctionC
  *   var vertexDataArray = new Float32Array(vertexData.length);
  *   vertexDataArray.set(vertexData, 0);
  *
- *   propertyBuffer.setData( vertexDataArray );
+ *   propertyBuffer.setData( vertexDataArray, vertexData.length );
  *```
  */
 void PropertyBufferApi::SetData( const v8::FunctionCallbackInfo< v8::Value >& args )
@@ -189,13 +178,22 @@ void PropertyBufferApi::SetData( const v8::FunctionCallbackInfo< v8::Value >& ar
 
   bool found( false );
   void* data = V8Utils::GetArrayBufferViewParameter( PARAMETER_0, found, isolate, args);
-  if( !found )
+
+  if( ! found )
   {
     DALI_SCRIPT_EXCEPTION( isolate, "invalid data parameter" );
   }
   else
   {
-    buffer.SetData( data );
+    int size = V8Utils::GetIntegerParameter( PARAMETER_1, found, isolate, args, 0);
+    if( !found )
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "missing buffer size from param 1" );
+    }
+    else
+    {
+      buffer.SetData( data, size );
+    }
   }
 }
 

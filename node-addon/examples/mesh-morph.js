@@ -110,8 +110,8 @@ daliApp.createMeshActor = function() {
 
       var initialPositionVertexDataArray = new Float32Array(initialPositionVertexData.length);
       initialPositionVertexDataArray.set(initialPositionVertexData, 0);
-      var initialPositionVertices = new dali.PropertyBuffer(initialPositionVertexFormat, 27);
-      initialPositionVertices.setData(initialPositionVertexDataArray);
+      var initialPositionVertices = new dali.PropertyBuffer(initialPositionVertexFormat);
+      initialPositionVertices.setData(initialPositionVertexDataArray, 27);
 
       // Create vertex buffer for final positions
       var finalPositionVertexFormat = { "aFinalPos" : dali.PROPERTY_VECTOR2 };
@@ -164,8 +164,8 @@ daliApp.createMeshActor = function() {
 
       var finalPositionVertexDataArray = new Float32Array(finalPositionVertexData.length);
       finalPositionVertexDataArray.set(finalPositionVertexData, 0);
-      var finalPositionVertices = new dali.PropertyBuffer(finalPositionVertexFormat, 27);
-      finalPositionVertices.setData(finalPositionVertexDataArray);
+      var finalPositionVertices = new dali.PropertyBuffer(finalPositionVertexFormat);
+      finalPositionVertices.setData(finalPositionVertexDataArray, 27);
 
       // Create vertex buffer for color
       var colorVertexFormat = { "aColor" : dali.PROPERTY_VECTOR3 };
@@ -215,8 +215,8 @@ daliApp.createMeshActor = function() {
 
       var colorVertexDataArray = new Float32Array(colorVertexData.length);
       colorVertexDataArray.set(colorVertexData, 0);
-      var colorVertices = new dali.PropertyBuffer(colorVertexFormat, 27);
-      colorVertices.setData(colorVertexDataArray);
+      var colorVertices = new dali.PropertyBuffer(colorVertexFormat);
+      colorVertices.setData(colorVertexDataArray, 27);
 
       // Create geometry
       var geometry = new dali.Geometry();

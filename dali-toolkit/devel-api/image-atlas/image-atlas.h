@@ -24,13 +24,13 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/pixel.h>
+#include <dali/devel-api/images/pixel-data.h>
 
 namespace Dali
 {
 
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ImageAtlas;
@@ -126,6 +126,14 @@ public:
                ImageDimensions size = ImageDimensions(),
                FittingMode::Type fittingMode = FittingMode::DEFAULT,
                bool orientationCorrection = true );
+
+  /**
+   * @brief Upload a pixel buffer to atlas
+   *
+   * @param [out] textureRect The texture area of the resource image in the atlas.
+   * @param [in] pixelData The pixel data.
+   */
+  bool Upload( Vector4& textureRect, PixelDataPtr pixelData );
 
   /**
    * @brief Remove the image at the given rectangle.

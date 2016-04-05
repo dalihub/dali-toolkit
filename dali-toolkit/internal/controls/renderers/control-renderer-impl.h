@@ -132,6 +132,20 @@ public:
    */
   void CreatePropertyMap( Property::Map& map ) const;
 
+  /**
+   * @brief Set whether the Pre-multiplied Alpha Blending is required
+   *
+   * @param[in] preMultipled whether alpha is pre-multiplied.
+   */
+  void EnablePreMultipliedAlpha(  bool preMultipled );
+
+  /**
+   * @brief Query whether alpha is pre-multiplied.
+   *
+   * @return True is alpha is pre-multiplied, false otherwise.
+   */
+  bool IsPreMultipliedAlphaEnabled() const;
+
 protected:
 
   /**

@@ -38,7 +38,8 @@ struct Internal::ControlRenderer::Impl
   enum Flags
   {
     IS_ON_STAGE = 1,
-    IS_FROM_CACHE = 1 << 1
+    IS_FROM_CACHE = 1 << 1,
+    IS_PREMULTIPLIED_ALPHA = 1 << 2
   };
 
   struct CustomShader
@@ -59,7 +60,6 @@ struct Internal::ControlRenderer::Impl
 
   Vector2   mSize;
   Vector2   mOffset;
-  Rect<int> mClipRect;
   float     mDepthIndex;
   int       mFlags;
 

@@ -43,7 +43,6 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const unsigned int POINTS_PER_INCH = 72;
 
 const std::string EMPTY_STRING("");
-const unsigned int ZERO = 0u;
 
 float ConvertToEven( float value )
 {
@@ -1041,7 +1040,7 @@ float Controller::GetHeightForWidth( float width )
   }
   else
   {
-    layoutSize = mImpl->mVisualModel->GetActualSize();
+    layoutSize = mImpl->mVisualModel->GetLayoutSize();
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height );
   }
 
@@ -1065,6 +1064,7 @@ bool Controller::Relayout( const Size& size )
     return glyphsRemoved;
   }
 
+  // Whether a new size has been set.
   const bool newSize = ( size != mImpl->mVisualModel->mControlSize );
 
   if( newSize )
@@ -1327,6 +1327,11 @@ bool Controller::DoRelayout( const Size& size,
 
     if( 0u == numberOfGlyphs )
     {
+      if( UPDATE_ACTUAL_SIZE & operations )
+      {
+        mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
+      }
+
       // Nothing else to do if there is no glyphs.
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
       return true;
@@ -1339,6 +1344,8 @@ bool Controller::DoRelayout( const Size& size,
     const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
     const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
+    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mVisualModel->mCharactersToGlyph;
+    const Vector<Length>& glyphsPerCharacter = mImpl->mVisualModel->mGlyphsPerCharacter;
 
     // Set the layout parameters.
     LayoutParameters layoutParameters( size,
@@ -1346,10 +1353,12 @@ bool Controller::DoRelayout( const Size& size,
                                        lineBreakInfo.Begin(),
                                        wordBreakInfo.Begin(),
                                        ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
-                                       numberOfGlyphs,
                                        glyphs.Begin(),
                                        glyphsToCharactersMap.Begin(),
-                                       charactersPerGlyph.Begin() );
+                                       charactersPerGlyph.Begin(),
+                                       charactersToGlyph.Begin(),
+                                       glyphsPerCharacter.Begin(),
+                                       numberOfGlyphs );
 
     // The laid-out lines.
     // It's not possible to know in how many lines the text is going to be laid-out,
@@ -1369,6 +1378,10 @@ bool Controller::DoRelayout( const Size& size,
 
     // Whether the last character is a new paragraph character.
     layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
+
+    // The initial glyph and the number of glyphs to layout.
+    layoutParameters.startGlyphIndex = 0u;
+    layoutParameters.numberOfGlyphs = numberOfGlyphs;
 
     // Update the visual model.
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
@@ -1390,7 +1403,7 @@ bool Controller::DoRelayout( const Size& size,
           // Get the lines
           const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
           const CharacterIndex startIndex = 0u;
-          Length requestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+          const Length requestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
           // Reorder the lines.
           bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
@@ -1410,13 +1423,10 @@ bool Controller::DoRelayout( const Size& size,
                                                        startIndex,
                                                        requestedNumberOfCharacters );
 
-          // Get the character to glyph conversion table and set into the layout.
-          layoutParameters.charactersToGlyphsBuffer = mImpl->mVisualModel->mCharactersToGlyph.Begin();
-          // Get the glyphs per character table and set into the layout.
-          layoutParameters.glyphsPerCharacterBuffer = mImpl->mVisualModel->mGlyphsPerCharacter.Begin();
-
           // Re-layout the text. Reorder those lines with right to left characters.
           mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
+                                                         startIndex,
+                                                         requestedNumberOfCharacters,
                                                          glyphPositions );
 
           // Free the allocated memory used to store the conversion table in the bidirectional line info run.
@@ -1438,13 +1448,13 @@ bool Controller::DoRelayout( const Size& size,
       // Sets the actual size.
       if( UPDATE_ACTUAL_SIZE & operations )
       {
-        mImpl->mVisualModel->SetActualSize( layoutSize );
+        mImpl->mVisualModel->SetLayoutSize( layoutSize );
       }
     } // view updated
   }
   else
   {
-    layoutSize = mImpl->mVisualModel->GetActualSize();
+    layoutSize = mImpl->mVisualModel->GetLayoutSize();
   }
 
   if( ALIGN & operations )
@@ -1452,7 +1462,12 @@ bool Controller::DoRelayout( const Size& size,
     // The laid-out lines.
     Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
 
-    mImpl->mLayoutEngine.Align( layoutSize,
+    const CharacterIndex startIndex = 0u;
+    const Length requestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+
+    mImpl->mLayoutEngine.Align( size,
+                                startIndex,
+                                requestedNumberOfCharacters,
                                 lines );
 
     viewUpdated = true;
@@ -1525,49 +1540,62 @@ LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
   return mImpl->mLayoutEngine.GetVerticalAlignment();
 }
 
-void Controller::CalculateTextAlignment( const Size& size )
+void Controller::CalculateTextAlignment( const Size& controlSize )
 {
-  // Get the direction of the first character.
-  const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
+  Size layoutSize = mImpl->mVisualModel->GetLayoutSize();
 
-  Size actualSize = mImpl->mVisualModel->GetActualSize();
-  if( fabsf( actualSize.height ) < Math::MACHINE_EPSILON_1000 )
+  if( fabsf( layoutSize.height ) < Math::MACHINE_EPSILON_1000 )
   {
     // Get the line height of the default font.
-    actualSize.height = mImpl->GetDefaultFontLineHeight();
+    layoutSize.height = mImpl->GetDefaultFontLineHeight();
   }
 
-  // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
-  LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
-  if( firstParagraphDirection &&
-      ( LayoutEngine::HORIZONTAL_ALIGN_CENTER != horizontalAlignment ) )
+  if( LayoutEngine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
   {
-    if( LayoutEngine::HORIZONTAL_ALIGN_BEGIN == horizontalAlignment )
-    {
-      horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_END;
-    }
-    else
-    {
-      horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_BEGIN;
-    }
-  }
+    // Get the direction of the first character.
+    const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
 
-  switch( horizontalAlignment )
-  {
-    case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
+    // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
+    LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
+    if( firstParagraphDirection )
     {
-      mImpl->mAlignmentOffset.x = 0.f;
-      break;
+      switch( horizontalAlignment )
+      {
+        case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
+        {
+          horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_END;
+          break;
+        }
+        case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
+        {
+          // Nothing to do.
+          break;
+        }
+        case LayoutEngine::HORIZONTAL_ALIGN_END:
+        {
+          horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_BEGIN;
+          break;
+        }
+      }
     }
-    case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
+
+    switch( horizontalAlignment )
     {
-      mImpl->mAlignmentOffset.x = floorf( 0.5f * ( size.width - actualSize.width ) ); // try to avoid pixel alignment.
-      break;
-    }
-    case LayoutEngine::HORIZONTAL_ALIGN_END:
-    {
-      mImpl->mAlignmentOffset.x = size.width - actualSize.width;
-      break;
+      case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
+      {
+        mImpl->mAlignmentOffset.x = 0.f;
+        break;
+      }
+      case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
+      {
+        mImpl->mAlignmentOffset.x = floorf( 0.5f * ( controlSize.width - layoutSize.width ) ); // try to avoid pixel alignment.
+        break;
+      }
+      case LayoutEngine::HORIZONTAL_ALIGN_END:
+      {
+        mImpl->mAlignmentOffset.x = controlSize.width - layoutSize.width;
+        break;
+      }
     }
   }
 
@@ -1581,12 +1609,12 @@ void Controller::CalculateTextAlignment( const Size& size )
     }
     case LayoutEngine::VERTICAL_ALIGN_CENTER:
     {
-      mImpl->mAlignmentOffset.y = floorf( 0.5f * ( size.height - actualSize.height ) ); // try to avoid pixel alignment.
+      mImpl->mAlignmentOffset.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
       break;
     }
     case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
     {
-      mImpl->mAlignmentOffset.y = size.height - actualSize.height;
+      mImpl->mAlignmentOffset.y = controlSize.height - layoutSize.height;
       break;
     }
   }
@@ -1815,7 +1843,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     const Length numberOfCharactersInModel = mImpl->mLogicalModel->mText.Count();
 
     // Restrict new text to fit within Maximum characters setting
-    Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
+    Length maxSizeOfNewText = std::min( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
     maxLengthReached = ( characterCount > maxSizeOfNewText );
 
     // The cursor position.

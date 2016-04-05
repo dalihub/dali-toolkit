@@ -97,6 +97,8 @@ void ClearModelData( CharacterIndex characterIndex,
 
 void CreateTextModel( const std::string& text,
                       const Size& textArea,
+                      const Vector<FontDescriptionRun>& fontDescriptions,
+                      const LayoutOptions& options,
                       Size& layoutSize,
                       LogicalModelPtr logicalModel,
                       VisualModelPtr visualModel )
@@ -142,6 +144,7 @@ void CreateTextModel( const std::string& text,
 
   // 4) Set the font info
   Vector<FontDescriptionRun>& fontDescriptionRuns = logicalModel->mFontDescriptionRuns;
+  fontDescriptionRuns = fontDescriptions;
   Vector<FontRun>& validFonts = logicalModel->mFontRuns;
 
   // The default font id.
@@ -262,27 +265,29 @@ void CreateTextModel( const std::string& text,
   // Set the layout parameters.
   const Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   const Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
+
   LayoutParameters layoutParameters( textArea,
                                      utf32Characters.Begin(),
                                      lineBreakInfo.Begin(),
                                      wordBreakInfo.Begin(),
                                      ( 0u != characterDirections.Count() ) ? characterDirections.Begin() : NULL,
-                                     glyphs.Count(),
                                      glyphs.Begin(),
                                      glyphsToCharactersMap.Begin(),
-                                     charactersPerGlyph.Begin() );
-
-  // Get the character to glyph conversion table and set into the layout.
-  layoutParameters.charactersToGlyphsBuffer = charactersToGlyph.Begin();
-  // Get the glyphs per character table and set into the layout.
-  layoutParameters.glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
+                                     charactersPerGlyph.Begin(),
+                                     charactersToGlyph.Begin(),
+                                     glyphsPerCharacter.Begin(),
+                                     numberOfGlyphs );
 
   Vector<LineRun>& lines = visualModel->mLines;
 
   Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;
   glyphPositions.Resize( numberOfGlyphs );
 
-  layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( utf32Characters.Begin() + ( logicalModel->mText.Count() - 1u ) ) );
+  layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( utf32Characters.Begin() + ( numberOfCharacters - 1u ) ) );
+
+  // The initial glyph and the number of glyphs to layout.
+  layoutParameters.startGlyphIndex = 0u;
+  layoutParameters.numberOfGlyphs = numberOfGlyphs;
 
   layoutEngine.LayoutText( layoutParameters,
                            glyphPositions,
@@ -315,9 +320,22 @@ void CreateTextModel( const std::string& text,
                                          0u,
                                          numberOfCharacters );
 
-    // Re-layout the text. Reorder those lines with right to left characters.
-    layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                           glyphPositions );
+    if( options.reorder )
+    {
+      // Re-layout the text. Reorder those lines with right to left characters.
+      layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
+                                             0u,
+                                             numberOfCharacters,
+                                             glyphPositions );
+    }
+  }
+
+  if( options.align )
+  {
+    layoutEngine.Align( textArea,
+                        0u,
+                        numberOfCharacters,
+                        lines );
   }
 }
 

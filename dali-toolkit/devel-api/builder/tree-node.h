@@ -56,7 +56,7 @@ public:
     STRING,
     INTEGER,
     FLOAT,
-    BOOLEAN,
+    BOOLEAN
   };
 
   /*

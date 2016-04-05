@@ -15,6 +15,7 @@ SET(TC_SOURCES
  utc-Dali-BidirectionalSupport.cpp
  utc-Dali-Text-Shaping.cpp
  utc-Dali-VisualModel.cpp
+ utc-Dali-Text-Layout.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

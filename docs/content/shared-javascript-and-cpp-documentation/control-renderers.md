@@ -14,6 +14,7 @@ DALi provides the following renderers:
  + [Gradient](@ref gradient-renderer)
  + [Image](@ref image-renderer)
  + [N-Patch](@ref n-patch-renderer)
+ + [SVG](@ref svg-renderer)
  + [Border](@ref border-renderer)
  
 Controls can provide properties that allow users to specify the renderer type.
@@ -293,6 +294,58 @@ control.background =
 {
   rendererType : "nPatch",
   imageUrl : "path-to-image.9.png"
+};
+~~~
+
+___________________________________________________________________________________________________
+
+## SVG Renderer {#svg-renderer}
+
+Renders a svg image into the control's quad.
+ 
+<div style="width:300px">
+ 
+![ ](../assets/img/renderers/svg-renderer.svg)
+ 
+</div>
+ 
+<div style="width:300px">
+ 
+![ ](renderers/svg-renderer.svg)
+ 
+</div>
+ 
+### Properties Supported
+
+**RendererType:** "svg"
+
+| Property Name | Type    | Required | Description                      |
+|---------------|:-------:|:--------:|----------------------------------|
+| imageUrl      | STRING  | Yes      | The URL of the SVG image.    |
+
+### Usage
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+Dali::Property::Map map;
+
+map[ "rendererType" ] = "svg";
+map[ "imageUrl" ] = "path-to-image.svg";
+
+control.SetSize( 200.f, 200.f );
+control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
+~~~
+
+~~~{.js}
+// JavaScript
+var control = new dali.Control( "Control" );
+
+control.background =
+{
+  rendererType : "svg",
+  imageUrl : "path-to-image.svg"
 };
 ~~~
 ___________________________________________________________________________________________________

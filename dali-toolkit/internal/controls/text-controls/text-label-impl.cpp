@@ -546,8 +546,9 @@ void TextLabel::RenderText()
 
     if( renderableActor )
     {
+      // TODO: Scroll and alignment needs to be refactored.
       const Vector2& alignmentOffset = mController->GetAlignmentOffset();
-      renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
+      renderableActor.SetPosition( 0.f, alignmentOffset.y );
 
       self.Add( renderableActor );
     }
