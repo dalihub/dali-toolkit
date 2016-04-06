@@ -46,8 +46,8 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/render-tasks/render-task-wrapper.cpp \
    $(v8_plugin_dir)/rendering/geometry-api.cpp \
    $(v8_plugin_dir)/rendering/geometry-wrapper.cpp \
-   $(v8_plugin_dir)/rendering/material-api.cpp \
-   $(v8_plugin_dir)/rendering/material-wrapper.cpp \
+   $(v8_plugin_dir)/rendering/texture-set-api.cpp \
+   $(v8_plugin_dir)/rendering/texture-set-wrapper.cpp \
    $(v8_plugin_dir)/rendering/renderer-api.cpp \
    $(v8_plugin_dir)/rendering/renderer-wrapper.cpp \
    $(v8_plugin_dir)/rendering/sampler-api.cpp \

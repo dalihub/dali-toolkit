@@ -104,8 +104,9 @@ void SvgRenderer::DoSetOnStage( Actor& actor )
     geometry =  mFactoryCache.CreateQuadGeometry();
     mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
-  Material material = Material::New( shader );
-  mImpl->mRenderer = Renderer::New( geometry, material );
+  TextureSet textureSet = TextureSet::New();
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer.SetTextures( textureSet );
 
   if( mImpl->mSize != Vector2::ZERO && mParsedImage )
   {
@@ -197,19 +198,19 @@ void SvgRenderer::ApplyRasterizedImage( PixelDataPtr rasterizedPixelData )
 {
   if( GetIsOnStage()  )
   {
-    Material currentMaterial = mImpl->mRenderer.GetMaterial();
+    TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if( mAtlasRect != FULL_TEXTURE_RECT )
     {
-      mAtlasManager.Remove( currentMaterial, mAtlasRect );
+      mAtlasManager.Remove( currentTextureSet, mAtlasRect );
     }
 
     Vector4 atlasRect;
-    Material material = mAtlasManager.Add(atlasRect, rasterizedPixelData );
-    if( material ) // atlasing
+    TextureSet textureSet = mAtlasManager.Add(atlasRect, rasterizedPixelData );
+    if( textureSet ) // atlasing
     {
-      if( material != currentMaterial )
+      if( textureSet != currentTextureSet )
       {
-        mImpl->mRenderer.SetMaterial( material );
+        mImpl->mRenderer.SetTextures( textureSet );
       }
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       mAtlasRect = atlasRect;
@@ -221,27 +222,20 @@ void SvgRenderer::ApplyRasterizedImage( PixelDataPtr rasterizedPixelData )
 
       if( mAtlasRect == FULL_TEXTURE_RECT )
       {
-        material = currentMaterial;
+        textureSet = currentTextureSet;
       }
       else
       {
-        material = Material::New( ImageRenderer::GetImageShader( mFactoryCache ) );
-        mImpl->mRenderer.SetMaterial( material );
+        textureSet = TextureSet::New();
+        mImpl->mRenderer.SetTextures( textureSet );
 
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
         mAtlasRect = FULL_TEXTURE_RECT;
       }
 
-      if( material )
+      if( textureSet )
       {
-        int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
-        if( index != -1 )
-        {
-          material.SetTextureImage( index, texture );
-          return;
-        }
-
-        material.AddTexture( texture, TEXTURE_UNIFORM_NAME );
+        textureSet.SetImage( 0u, texture );
       }
     }
   }

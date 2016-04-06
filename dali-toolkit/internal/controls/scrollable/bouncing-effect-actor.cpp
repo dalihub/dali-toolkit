@@ -23,7 +23,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/property-buffer.h>
 #include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/shader.h>
 
@@ -127,12 +127,11 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   meshGeometry.AddVertexBuffer( vertices );
   meshGeometry.SetIndexBuffer( indices );
 
-  // Create material
+  // Create the shader
   Shader shader = Shader::New( MESH_VERTEX_SHADER, MESH_FRAGMENT_SHADER );
-  Material material = Material::New( shader );
 
   // Create renderer
-  Renderer renderer = Renderer::New( meshGeometry, material );
+  Renderer renderer = Renderer::New( meshGeometry, shader );
 
   // Create actor
   Actor meshActor= Actor::New();

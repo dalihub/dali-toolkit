@@ -88,7 +88,7 @@ public:
       TIMER,
       SHADER,
       SAMPLER,
-      MATERIAL,
+      TEXTURE_SET,
       GEOMETRY,
       RENDERER,
       PROPERTY_BUFFER,

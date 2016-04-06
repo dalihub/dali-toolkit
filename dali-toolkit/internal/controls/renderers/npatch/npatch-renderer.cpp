@@ -47,8 +47,6 @@ const char * const RENDERER_TYPE_VALUE("nPatch");
 const char * const IMAGE_URL_NAME("imageUrl");
 const char * const BORDER_ONLY("borderOnly");
 
-std::string TEXTURE_UNIFORM_NAME = "sTexture";
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
@@ -172,7 +170,7 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
   vertices.PushBack( Vector2( x, y ) );
 }
 
-void RegisterStretchProperties( Material& material, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
+void RegisterStretchProperties( TextureSet& textureSet, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
 {
   uint16_t prevEnd = 0;
   uint16_t prevFix = 0;
@@ -188,7 +186,7 @@ void RegisterStretchProperties( Material& material, const char * uniformName, co
 
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    material.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
+    textureSet.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
 
     prevEnd = end;
     prevFix = fix;
@@ -199,7 +197,7 @@ void RegisterStretchProperties( Material& material, const char * uniformName, co
     prevFix += imageExtent - prevEnd;
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    material.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
+    textureSet.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
   }
 }
 
@@ -369,8 +367,9 @@ void NPatchRenderer::InitializeRenderer()
     InitializeFromBrokenImage();
   }
 
-  Material material = Material::New( shader );
-  mImpl->mRenderer = Renderer::New( geometry, material );
+  TextureSet textureSet = TextureSet::New();
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer.SetTextures( textureSet );
 }
 
 
@@ -443,19 +442,15 @@ void NPatchRenderer::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t
   if( gridChanged )
   {
     Shader shader = CreateShader();
-    Material material;
+    TextureSet textureSet;
     if( shader )
     {
-      material = mImpl->mRenderer.GetMaterial();
-      if( material )
+      textureSet = mImpl->mRenderer.GetTextures();
+      if( !textureSet )
       {
-        material.SetShader( shader );
+        InitializeFromBrokenImage();
       }
-    }
-
-    if( !material )
-    {
-      InitializeFromBrokenImage();
+      mImpl->mRenderer.SetShader( shader );
     }
   }
 }
@@ -543,18 +538,10 @@ void NPatchRenderer::InitializeFromBrokenImage()
 
 void NPatchRenderer::ApplyImageToSampler()
 {
-  Material material = mImpl->mRenderer.GetMaterial();
-  if( material )
+  TextureSet textureSet = mImpl->mRenderer.GetTextures();
+  if( textureSet )
   {
-    int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
-    if( index > -1 )
-    {
-      material.SetTextureImage( index, mCroppedImage );
-    }
-    else
-    {
-      material.AddTexture(  mCroppedImage, TEXTURE_UNIFORM_NAME );
-    }
+    textureSet.SetImage( 0u, mCroppedImage );
 
     if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
     {
@@ -565,18 +552,18 @@ void NPatchRenderer::ApplyImageToSampler()
       uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
       uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
 
-      material.RegisterProperty( "uFixed[0]", Vector2::ZERO );
-      material.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
-      material.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
-      material.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
+      textureSet.RegisterProperty( "uFixed[0]", Vector2::ZERO );
+      textureSet.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
+      textureSet.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
+      textureSet.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
     }
     else
     {
-      material.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
-      material.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
+      textureSet.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
+      textureSet.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
 
-      RegisterStretchProperties( material, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
-      RegisterStretchProperties( material, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
+      RegisterStretchProperties( textureSet, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
+      RegisterStretchProperties( textureSet, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
     }
   }
 }

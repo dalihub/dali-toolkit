@@ -50,7 +50,7 @@ BubbleActor::BubbleActor( unsigned int numberOfBubble,
   mActor = Actor::New();
 }
 
-void BubbleActor::MakeRenderable( Geometry geometry, Material material  )
+void BubbleActor::MakeRenderable( Geometry geometry, TextureSet textureSet, Shader shader  )
 {
   if( mRenderer )
   {
@@ -58,7 +58,8 @@ void BubbleActor::MakeRenderable( Geometry geometry, Material material  )
     return;
   }
 
-  mRenderer = Renderer::New( geometry, material );
+  mRenderer = Renderer::New( geometry, shader );
+  mRenderer.SetTextures( textureSet );
 
   mActor.AddRenderer( mRenderer );
   mActor.SetSize( mMovementArea );

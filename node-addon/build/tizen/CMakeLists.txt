@@ -89,8 +89,8 @@ add_library(dali_addon SHARED
   ${PLUGING_SRC_DIR}/render-tasks/render-task-wrapper.cpp
   ${PLUGING_SRC_DIR}/rendering/geometry-api.cpp
   ${PLUGING_SRC_DIR}/rendering/geometry-wrapper.cpp
-  ${PLUGING_SRC_DIR}/rendering/material-api.cpp
-  ${PLUGING_SRC_DIR}/rendering/material-wrapper.cpp
+  ${PLUGING_SRC_DIR}/rendering/texture-set-api.cpp
+  ${PLUGING_SRC_DIR}/rendering/texture-set-wrapper.cpp
   ${PLUGING_SRC_DIR}/rendering/renderer-api.cpp
   ${PLUGING_SRC_DIR}/rendering/renderer-wrapper.cpp
   ${PLUGING_SRC_DIR}/rendering/sampler-api.cpp

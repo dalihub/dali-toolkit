@@ -21,7 +21,7 @@
 #include <string>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-atlas/image-atlas.h>
@@ -42,17 +42,15 @@ class ImageAtlasManager : public RefObject
 {
 public:
   typedef std::vector< Toolkit::ImageAtlas > AtlasContainer;
-  typedef std::vector< Material > MaterialContainer;
+  typedef std::vector< TextureSet > TextureSetContainer;
 
 public:
 
   /**
    * Construtor
    *
-   * @param[in] shader The shader for material.
-   * @param[in] textureUniformName The texture uniform name for the atlas image.
    */
-  ImageAtlasManager( Shader shader, const std::string& textureUniformName );
+  ImageAtlasManager();
 
   /**
    * @brief Add an image to the atlas.
@@ -67,9 +65,9 @@ public:
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @return The material containing the image.
+   * @return The texture set containing the image.
    */
-  Material Add( Vector4& textureRect,
+  TextureSet Add( Vector4& textureRect,
                 const std::string& url,
                 ImageDimensions size = ImageDimensions(),
                 FittingMode::Type fittingMode = FittingMode::DEFAULT,
@@ -80,18 +78,18 @@ public:
    *
    * @param [out] textureRect The texture area of the resource image in the atlas.
    * @param [in] pixelData The pixel data.
-   * @return The material containing the image.
+   * @return The texture set containing the image.
    */
-  Material Add( Vector4& textureRect,
+  TextureSet Add( Vector4& textureRect,
                 PixelDataPtr pixelData );
 
   /**
-   * Remove the image at the given rectangle from the material.
+   * Remove the image at the given rectangle from the texture set.
    *
-   * @param [in] material The material containing the atlas image.
+   * @param [in] textureSet The texture set containing the atlas image.
    * @param [in] textureRect The texture area to be removed.
    */
-  void Remove( Material material, const Vector4& textureRect );
+  void Remove( TextureSet textureSet, const Vector4& textureRect );
 
   /**
    * @brief Set the broken image which is used to replace the image if loading fails.
@@ -99,6 +97,11 @@ public:
    * @param[in] brokenImageUrl The url of the broken image.
    */
   void SetBrokenImage( const std::string& brokenImageUrl );
+
+  /**
+   * @brief Get shader
+   */
+  Shader GetShader() const;
 
 private:
 
@@ -130,9 +133,7 @@ protected:
 private:
 
   AtlasContainer    mAtlasList;
-  MaterialContainer mMaterialList;
-  Shader            mShader;
-  std::string       mTextureUniformName;
+  TextureSetContainer mTextureSetList;
   std::string       mBrokenImageUrl;
 
 };

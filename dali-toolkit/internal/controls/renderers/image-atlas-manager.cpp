@@ -37,10 +37,8 @@ const uint32_t MAX_ITEM_SIZE( 512u  );
 const uint32_t MAX_ITEM_AREA( MAX_ITEM_SIZE*MAX_ITEM_SIZE  );
 }
 
-ImageAtlasManager::ImageAtlasManager( Shader shader, const std::string& textureUniformName )
-: mShader( shader ),
-  mTextureUniformName( textureUniformName ),
-  mBrokenImageUrl( "" )
+ImageAtlasManager::ImageAtlasManager()
+: mBrokenImageUrl( "" )
 {
 }
 
@@ -48,7 +46,7 @@ ImageAtlasManager::~ImageAtlasManager()
 {
 }
 
-Material ImageAtlasManager::Add( Vector4& textureRect,
+TextureSet ImageAtlasManager::Add( Vector4& textureRect,
                                  const std::string& url,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
@@ -66,7 +64,7 @@ Material ImageAtlasManager::Add( Vector4& textureRect,
       || dimensions.GetWidth()>DEFAULT_ATLAS_SIZE
       || dimensions.GetHeight()>DEFAULT_ATLAS_SIZE)
   {
-    return Material();
+    return TextureSet();
   }
 
   unsigned int i = 0;
@@ -74,17 +72,17 @@ Material ImageAtlasManager::Add( Vector4& textureRect,
   {
     if( (*iter).Upload( textureRect, url, size, fittingMode, orientationCorrection ) )
     {
-      return mMaterialList[i];
+      return mTextureSetList[i];
     }
     i++;
   }
 
   CreateNewAtlas();
   mAtlasList.back().Upload( textureRect, url, size, fittingMode, orientationCorrection );
-  return mMaterialList.back();
+  return mTextureSetList.back();
 }
 
-Material ImageAtlasManager::Add( Vector4& textureRect,
+TextureSet ImageAtlasManager::Add( Vector4& textureRect,
                                  PixelDataPtr pixelData )
 {
 
@@ -93,7 +91,7 @@ Material ImageAtlasManager::Add( Vector4& textureRect,
       || pixelData->GetWidth()>DEFAULT_ATLAS_SIZE
       || pixelData->GetHeight()>DEFAULT_ATLAS_SIZE )
   {
-    return Material();
+    return TextureSet();
   }
 
   unsigned int i = 0;
@@ -101,23 +99,23 @@ Material ImageAtlasManager::Add( Vector4& textureRect,
   {
     if( (*iter).Upload( textureRect, pixelData ) )
     {
-      return mMaterialList[i];
+      return mTextureSetList[i];
     }
     i++;
   }
 
   CreateNewAtlas();
   mAtlasList.back().Upload( textureRect, pixelData );
-  return mMaterialList.back();
+  return mTextureSetList.back();
 
 }
 
-void ImageAtlasManager::Remove( Material material, const Vector4& textureRect )
+void ImageAtlasManager::Remove( TextureSet textureSet, const Vector4& textureRect )
 {
   unsigned int i = 0;
-  for( MaterialContainer::iterator iter = mMaterialList.begin(); iter != mMaterialList.end(); ++iter)
+  for( TextureSetContainer::iterator iter = mTextureSetList.begin(); iter != mTextureSetList.end(); ++iter)
   {
-    if( (*iter) == material )
+    if( (*iter) == textureSet )
     {
       mAtlasList[i].Remove(textureRect);
       return;
@@ -142,9 +140,9 @@ void ImageAtlasManager::CreateNewAtlas()
     newAtlas.SetBrokenImage( mBrokenImageUrl );
   }
   mAtlasList.push_back( newAtlas );
-  Material newMaterial = Material::New( mShader );
-  newMaterial.AddTexture( newAtlas.GetAtlas(), mTextureUniformName );
-  mMaterialList.push_back( newMaterial );
+  TextureSet textureSet = TextureSet::New();
+  textureSet.SetImage( 0u, newAtlas.GetAtlas() );
+  mTextureSetList.push_back( textureSet );
 }
 
 } // namespace Internal

@@ -131,8 +131,7 @@ void ColorRenderer::InitializeRenderer()
     mFactoryCache.SaveShader( RendererFactoryCache::COLOR_SHADER, shader );
   }
 
-  Material material = Material::New( shader );
-  mImpl->mRenderer = Renderer::New( geometry, material );
+  mImpl->mRenderer = Renderer::New( geometry, shader );
 
   mBlendColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mBlendColor );
   if( mBlendColor.a < 1.f )

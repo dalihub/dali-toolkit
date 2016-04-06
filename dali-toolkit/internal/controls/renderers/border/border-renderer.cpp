@@ -174,8 +174,10 @@ void BorderRenderer::InitializeRenderer()
     mFactoryCache.SaveGeometry( RendererFactoryCache::BORDER_GEOMETRY, geometry );
   }
 
-  Material material = Material::New( GetBorderShader() );
-  mImpl->mRenderer = Renderer::New( geometry, material );
+
+  Shader shader = GetBorderShader();
+  mImpl->mRenderer = Renderer::New( geometry, shader  );
+
 }
 
 void BorderRenderer::SetBorderColor(const Vector4& color)
@@ -209,9 +211,8 @@ void BorderRenderer::RequireAntiAliasing( bool antiAliasing )
     mAntiAliasing = antiAliasing;
     if( mImpl->mRenderer )
     {
-      Material material =  mImpl->mRenderer.GetMaterial();
-      Shader shader = GetBorderShader();
-      material.SetShader( shader );
+      Shader borderShader( GetBorderShader() );
+      mImpl->mRenderer.SetShader( borderShader );
       if( mAntiAliasing )
       {
         mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );

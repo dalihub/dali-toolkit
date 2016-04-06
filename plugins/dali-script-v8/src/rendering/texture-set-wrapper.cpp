@@ -16,11 +16,11 @@
  */
 
 // CLASS HEADER
-#include "renderer-wrapper.h"
+#include "texture-set-wrapper.h"
 
 // INTERNAL INCLUDES
 #include <v8-utils.h>
-#include <rendering/renderer-api.h>
+#include <rendering/texture-set-api.h>
 #include <shared/api-function.h>
 #include <shared/object-template-helper.h>
 #include <dali-wrapper.h>
@@ -31,7 +31,7 @@ namespace Dali
 namespace V8Plugin
 {
 
-v8::Persistent<v8::ObjectTemplate> RendererWrapper::mRendererTemplate;
+v8::Persistent<v8::ObjectTemplate> TextureSetWrapper::mTextureSetTemplate;
 
 namespace // un-named name space
 {
@@ -39,44 +39,38 @@ namespace // un-named name space
 /**
  * Contains a list of all functions that can be called
  */
-const ApiFunction RendererFunctionTable[]=
+const ApiFunction TextureSetFunctionTable[]=
 {
     /**************************************
-    * Renderer API (in order of Renderer.h)
+    * TextureSet API (in order of texture-set.h)
     **************************************/
 
-   { "SetGeometry"             , RendererApi::SetGeometry },
-   { "GetGeometry"             , RendererApi::GetGeometry },
-   { "SetTextures"             , RendererApi::SetTextures },
-   { "GetTextures"             , RendererApi::GetTextures },
-   { "SetBlendFunc"            , RendererApi::SetBlendFunc },
-   { "GetBlendFunc"            , RendererApi::GetBlendFunc },
-   { "SetBlendEquation"        , RendererApi::SetBlendEquation },
-   { "GetBlendEquation"        , RendererApi::GetBlendEquation },
+   { "SetImage"                        , TextureSetApi::SetImage },
+   { "SetSampler"                      , TextureSetApi::SetSampler },
 };
 
-const unsigned int RendererFunctionTableCount = sizeof(RendererFunctionTable)/sizeof(RendererFunctionTable[0]);
+const unsigned int TextureSetFunctionTableCount = sizeof(TextureSetFunctionTable)/sizeof(TextureSetFunctionTable[0]);
 } //un-named space
 
 
-RendererWrapper::RendererWrapper( const Dali::Renderer& renderer, GarbageCollectorInterface& gc )
-:  HandleWrapper(  BaseWrappedObject::RENDERER , renderer, gc )
+TextureSetWrapper::TextureSetWrapper( const Dali::TextureSet& textureSet, GarbageCollectorInterface& gc )
+:  HandleWrapper(  BaseWrappedObject::TEXTURE_SET , textureSet, gc )
 {
-    mRenderer = renderer;
+    mTextureSet = textureSet;
 }
 
-v8::Handle<v8::Object> RendererWrapper::WrapRenderer(v8::Isolate* isolate, const Dali::Renderer& renderer )
+v8::Handle<v8::Object> TextureSetWrapper::WrapTextureSet(v8::Isolate* isolate, const Dali::TextureSet& textureSet )
 {
   v8::EscapableHandleScope handleScope( isolate );
   v8::Local<v8::ObjectTemplate> objectTemplate;
 
-  objectTemplate = GetRendererTemplate( isolate);
+  objectTemplate = GetTextureSetTemplate( isolate);
 
   // create an instance of the template
   v8::Local<v8::Object> localObject = objectTemplate->NewInstance();
 
-  // create the Renderer wrapper
-  RendererWrapper* pointer =  new RendererWrapper( renderer, Dali::V8Plugin::DaliWrapper::Get().GetDaliGarbageCollector() );
+  // create the texture set wrapper
+  TextureSetWrapper* pointer =  new TextureSetWrapper( textureSet, Dali::V8Plugin::DaliWrapper::Get().GetDaliGarbageCollector() );
 
   // assign the JavaScript object to the wrapper.
   pointer->SetJavascriptObject( isolate, localObject );
@@ -84,25 +78,25 @@ v8::Handle<v8::Object> RendererWrapper::WrapRenderer(v8::Isolate* isolate, const
   return handleScope.Escape( localObject );
 }
 
-v8::Local<v8::ObjectTemplate> RendererWrapper::GetRendererTemplate( v8::Isolate* isolate)
+v8::Local<v8::ObjectTemplate> TextureSetWrapper::GetTextureSetTemplate( v8::Isolate* isolate)
 {
   v8::EscapableHandleScope handleScope( isolate );
   v8::Local<v8::ObjectTemplate> objectTemplate;
 
-  if( mRendererTemplate.IsEmpty() )
+  if( mTextureSetTemplate.IsEmpty() )
   {
-    objectTemplate = MakeRendererTemplate( isolate );
-    mRendererTemplate.Reset( isolate, objectTemplate );
+    objectTemplate = MakeTextureSetTemplate( isolate );
+    mTextureSetTemplate.Reset( isolate, objectTemplate );
   }
   else
   {
     // get the object template
-    objectTemplate = v8::Local<v8::ObjectTemplate>::New( isolate, mRendererTemplate );
+    objectTemplate = v8::Local<v8::ObjectTemplate>::New( isolate, mTextureSetTemplate );
   }
   return handleScope.Escape( objectTemplate );
 }
 
-v8::Handle<v8::ObjectTemplate> RendererWrapper::MakeRendererTemplate( v8::Isolate* isolate )
+v8::Handle<v8::ObjectTemplate> TextureSetWrapper::MakeTextureSetTemplate( v8::Isolate* isolate )
 {
   v8::EscapableHandleScope handleScope( isolate );
 
@@ -114,34 +108,34 @@ v8::Handle<v8::ObjectTemplate> RendererWrapper::MakeRendererTemplate( v8::Isolat
   objTemplate->SetInternalFieldCount( BaseWrappedObject::FIELD_COUNT );
 
   // add our function properties
-  ObjectTemplateHelper::InstallFunctions( isolate, objTemplate, RendererFunctionTable, RendererFunctionTableCount );
+  ObjectTemplateHelper::InstallFunctions( isolate, objTemplate, TextureSetFunctionTable, TextureSetFunctionTableCount );
 
   return handleScope.Escape( objTemplate );
 }
 
-void RendererWrapper::NewRenderer( const v8::FunctionCallbackInfo< v8::Value >& args)
+void TextureSetWrapper::NewTextureSet( const v8::FunctionCallbackInfo< v8::Value >& args)
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate);
 
   if(!args.IsConstructCall())
   {
-      DALI_SCRIPT_EXCEPTION( isolate, "Renderer constructor called without 'new'");
+      DALI_SCRIPT_EXCEPTION( isolate, "TextureSet constructor called without 'new'");
       return;
   }
-  Dali::Renderer renderer = RendererApi::New( args );
+  Dali::TextureSet textureSet = TextureSetApi::New( args );
 
-  if(renderer)
+  if(textureSet)
   {
-    v8::Local<v8::Object> localObject = WrapRenderer( isolate, renderer );
+    v8::Local<v8::Object> localObject = WrapTextureSet( isolate, textureSet );
     args.GetReturnValue().Set( localObject );
   }
 }
 
 
-Renderer RendererWrapper::GetRenderer()
+TextureSet TextureSetWrapper::GetTextureSet()
 {
-  return mRenderer;
+  return mTextureSet;
 }
 
 

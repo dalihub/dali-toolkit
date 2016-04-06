@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 

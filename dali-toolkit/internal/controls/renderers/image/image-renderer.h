@@ -167,9 +167,9 @@ public:
 private:
 
   /**
-   * @brief Applies the image to the material used for this renderer
+   * @brief Applies the image to the texture set used for this renderer
    *
-   * @param[in] image The Image to apply to the material used for this renderer
+   * @param[in] image The Image to apply to the texture set used for this renderer
    */
   void ApplyImageToSampler( const Image& image );
 

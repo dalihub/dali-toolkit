@@ -284,8 +284,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadIndexFormat[ "indices" ] = Property::INTEGER;
-    mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-
+    mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     SetupTouchEvents();
   }
 
@@ -1069,7 +1068,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         if( !mHighlightRenderer )
         {
-          mHighlightRenderer = Dali::Renderer::New( mQuadGeometry, mHighlightMaterial );
+          mHighlightRenderer = Dali::Renderer::New( mQuadGeometry, mHighlightShader );
           mHighlightActor.AddRenderer( mHighlightRenderer );
         }
       }
@@ -1653,7 +1652,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   Actor               mHighlightActor;            ///< Actor to display highlight
   Renderer            mHighlightRenderer;
-  Material            mHighlightMaterial;         ///< Material used for highlight
+  Shader              mHighlightShader;           ///< Shader used for highlight
   Property::Map       mQuadVertexFormat;
   Property::Map       mQuadIndexFormat;
   PopupImpl           mCopyPastePopup;

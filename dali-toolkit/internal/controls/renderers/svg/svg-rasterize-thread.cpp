@@ -22,11 +22,6 @@
 #include "nanosvg/nanosvgrast.h"
 #include "svg-renderer.h"
 
-namespace
-{
-const std::string TEXTURE_UNIFORM_NAME = "sTexture";
-}
-
 namespace Dali
 {
 
@@ -110,8 +105,8 @@ void SvgRasterizeThread::AddTask( RasterizingTaskPtr task )
     wasEmpty = mRasterizeTasks.empty();
     if( !wasEmpty && task != NULL)
     {
-      // Remove the tasks with the same material.
-      // Older task which waiting to rasterize and apply the svg to the same material is expired.
+      // Remove the tasks with the same renderer.
+      // Older task which waiting to rasterize and apply the svg to the same renderer is expired.
       for( std::vector< RasterizingTaskPtr >::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it )
       {
         if( (*it) && (*it)->GetSvgRenderer() == task->GetSvgRenderer() )

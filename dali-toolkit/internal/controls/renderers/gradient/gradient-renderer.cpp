@@ -69,7 +69,6 @@ const char * const SPREAD_REPEAT("repeat");
 
 // uniform names
 const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
-const char * const UNIFORM_TEXTULRE_NAME("sTexture");
 
 // default offset value
 const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
@@ -316,16 +315,17 @@ void GradientRenderer::InitializeRenderer()
     mFactoryCache.SaveShader( shaderType, shader );
   }
 
-  Material material;
-  material = Material::New( shader );
-  mImpl->mRenderer = Renderer::New( geometry, material );
-
+  //Set up the texture set
+  TextureSet textureSet = TextureSet::New();
   Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
-  Sampler sampler = Sampler::New();
+  textureSet.SetImage( 0u, lookupTexture );
   Dali::WrapMode::Type wrap = GetWrapMode( mGradient->GetSpreadMethod() );
+  Sampler sampler = Sampler::New();
   sampler.SetWrapMode(  wrap, wrap  );
+  textureSet.SetSampler( 0u, sampler );
 
-  material.AddTexture( lookupTexture, UNIFORM_TEXTULRE_NAME, sampler );
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer.SetTextures( textureSet );
 
   mImpl->mRenderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 }

@@ -92,9 +92,8 @@ void DebugRenderer::InitializeRenderer()
   {
     Geometry geometry = CreateQuadWireframeGeometry();
     Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    Material material = Material::New( shader );
-    mImpl->mRenderer = Renderer::New( geometry,
-                                      material );
+
+    mImpl->mRenderer = Renderer::New( geometry, shader);
     mFactoryCache.CacheDebugRenderer( mImpl->mRenderer );
   }
 }

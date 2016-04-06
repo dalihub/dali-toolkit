@@ -158,7 +158,7 @@ private:
   CameraActor                 mCameraActor;         ///< The render task views the scene from the perspective of this actor.
 
   Geometry                    mMeshGeometry;         ///< The mesh geometry which contains the vertices and indices data
-  Material                    mMaterial;             ///< The material which controls the bubble display
+  TextureSet                  mTextureSet;           ///< The texture set which controls the bubble display
   std::vector<BubbleActorPtr> mBubbleActors;         ///< The meshActor vector, its size is mNumShader.
 
   Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background image actor.

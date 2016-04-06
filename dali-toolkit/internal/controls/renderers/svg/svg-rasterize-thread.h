@@ -21,7 +21,7 @@
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/images/pixel-data.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/common/intrusive-ptr.h>
@@ -138,9 +138,9 @@ public:
   RasterizingTaskPtr NextCompletedTask();
 
   /**
-   * Remove the task with the given material from the waiting queue, called by main thread.
+   * Remove the task with the given renderer from the waiting queue, called by main thread.
    *
-   * Typically called when the actor is put off stage, so the material is not needed anymore.
+   * Typically called when the actor is put off stage, so the renderer is not needed anymore.
    *
    * @param[in] renderer The renderer pointer.
    */
@@ -181,7 +181,7 @@ protected:
 
   /**
    * The entry function of the worker thread.
-   * It fetches task from the Queue, rasterizes the image and apply to the material.
+   * It fetches task from the Queue, rasterizes the image and apply to the renderer.
    */
   virtual void Run();
 

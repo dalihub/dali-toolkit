@@ -488,8 +488,10 @@ struct AtlasRenderer::Impl
     quadGeometry.AddVertexBuffer( quadVertices );
     quadGeometry.SetIndexBuffer( quadIndices );
 
-    Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
-    Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
+    TextureSet textureSet( mGlyphManager.GetTextures( meshRecord.mAtlasId ) );
+    Shader shader( mGlyphManager.GetShader( meshRecord.mAtlasId ) );
+    Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, shader );
+    renderer.SetTextures( textureSet );
     renderer.SetProperty( Dali::Renderer::Property::BLENDING_MODE, BlendingMode::ON );
     renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT + mDepth );
     Actor actor = Actor::New();

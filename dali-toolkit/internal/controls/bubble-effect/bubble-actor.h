@@ -61,9 +61,10 @@ public:
   /**
    * Prepare for the rendering: create and add renderer, and register properties
    * @param[in] geometry The geometry to be used by the renderer
-   * @param[in] material The material to be used by the renderer
+   * @param[in] textureSet The texture set to be used by the renderer
+   * @param[in] textureSet The shader set to be used by the renderer
    */
-  void MakeRenderable( Geometry geometry, Material material  );
+  void MakeRenderable( Geometry geometry, TextureSet textureSet, Shader shader  );
 
   /**
    * Return the mesh actor which is used to display the bubbles

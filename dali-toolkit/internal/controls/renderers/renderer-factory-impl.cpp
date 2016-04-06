@@ -46,8 +46,6 @@ const char * const IMAGE_RENDERER("image");
 const char * const N_PATCH_RENDERER("nPatch");
 const char * const SVG_RENDERER("svg");
 
-const std::string TEXTURE_UNIFORM_NAME = "sTexture";
-
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 
 }
@@ -423,7 +421,7 @@ void RendererFactory::CreateAtlasManager()
   if( !mAtlasManager )
   {
     Shader shader = ImageRenderer::GetImageShader( *( mFactoryCache.Get() ) );
-    mAtlasManager = new ImageAtlasManager(shader, TEXTURE_UNIFORM_NAME);
+    mAtlasManager = new ImageAtlasManager();
     mAtlasManager->SetBrokenImage( BROKEN_RENDERER_IMAGE_URL );
   }
 }
