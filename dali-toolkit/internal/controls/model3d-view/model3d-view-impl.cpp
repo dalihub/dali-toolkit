@@ -80,28 +80,22 @@ const char* SIMPLE_VERTEX_SHADER = MAKE_SHADER(
   uniform mediump mat3 uNormalMatrix;
   uniform mediump mat4 uObjectMatrix;\n
   uniform mediump vec3 uLightPosition;\n
-  \n
+
   void main()\n
   {\n
     vec4 vertexPosition = vec4(aPosition*min(uSize.x, uSize.y), 1.0);\n
     vertexPosition = uObjectMatrix * vertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
+
     //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 vertPos4 = uModelView * vec4(aPosition.xyz, 1.0);\n
-    vec3 vertPos = vec3(vertPos4) / vertPos4.w;\n
-    \n
-    vec3 normalInterp = uNormalMatrix * aNormal;\n
-    \n
-    vec4 lightPos4 = uModelView * vec4(uLightPosition, 1.0);\n
-    vec3 lightPos = vec3(lightPos4) / lightPos4.w;\n
-    \n
+    vec4 vertPos = uModelView * vec4(aPosition.xyz, 1.0);\n
+    vec3 normal = uNormalMatrix * aNormal;\n
+    vec4 lightPos = uModelView * vec4(uLightPosition, 1.0);\n
     vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-    \n
-    float lightDiffuse = dot( vecToLight, normalInterp );\n
-    lightDiffuse = max(0.0,lightDiffuse);\n
+
+    float lightDiffuse = max( dot( vecToLight, normal ), 0.0 );\n
     vIllumination = vec3(lightDiffuse * 0.5 + 0.5);\n
-    \n
+
     gl_Position = vertexPosition;\n
   }\n
 );
@@ -110,11 +104,10 @@ const char* SIMPLE_FRAGMENT_SHADER = MAKE_SHADER(
   precision mediump float;\n
   varying mediump vec3 vIllumination;\n
   uniform lowp vec4 uColor;\n
-  \n
+
   void main()\n
   {\n
-    gl_FragColor.rgb = vIllumination.rgb * uColor.rgb;\n
-    gl_FragColor.a = uColor.a;\n
+    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a);\n
   }\n
 );
 
@@ -133,41 +126,30 @@ const char* VERTEX_SHADER = MAKE_SHADER(
   uniform mediump mat3 uNormalMatrix;
   uniform mediump mat4 uObjectMatrix;\n
   uniform mediump vec3 uLightPosition;\n
-  \n
+
   void main()
   {\n
     vec4 vertexPosition = vec4(aPosition*min(uSize.x, uSize.y), 1.0);\n
     vertexPosition = uObjectMatrix * vertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
+
     //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 vertPos4 = uModelView * vec4(aPosition.xyz, 1.0);\n
-    vec3 vertPos = vec3(vertPos4) / vertPos4.w;\n
-    \n
-    vec4 lightPos4 = uModelView * vec4(uLightPosition, 1.0);\n
-    vec3 lightPos = vec3(lightPos4) / lightPos4.w;\n
-    \n
-    vec3 normalInterp = normalize(uNormalMatrix * aNormal);\n
-    \n
+    vec4 vertPos = uModelView * vec4(aPosition.xyz, 1.0);\n
+    vec4 lightPos = uModelView * vec4(uLightPosition, 1.0);\n
+    vec3 normal = normalize(uNormalMatrix * aNormal);\n
+
     vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-    vec3 viewDir = normalize(-vertPos);
-    \n
+    vec3 viewDir = normalize(-vertPos.xyz);
+
     vec3 halfVector = normalize(viewDir + vecToLight);
-    \n
-    float lightDiffuse = dot( vecToLight, normalInterp );\n
+
+    float lightDiffuse = dot( vecToLight, normal );\n
     lightDiffuse = max(0.0,lightDiffuse);\n
     vIllumination = vec3(lightDiffuse * 0.5 + 0.5);\n
-    \n
-    // this is blinn phong
-    //float specAngle = max(dot(halfVector, normalInterp), 0.0);\n
-    //vSpecular = pow(specAngle, 16.0);\n
-    \n
-    // this is phong (for comparison)
-    vec3 reflectDir = reflect(-vecToLight, normalInterp);
-    float specAngle = max(dot(reflectDir, viewDir), 0.0);
-    // note that the exponent is different here
-    vSpecular = pow(specAngle, 16.0/4.0);
-    \n
+
+    vec3 reflectDir = reflect(-vecToLight, normal);
+    vSpecular = pow( max(dot(reflectDir, viewDir), 0.0), 4.0 );
+
     vTexCoord = aTexCoord;\n
     gl_Position = vertexPosition;\n
   }\n
@@ -180,12 +162,11 @@ const char* FRAGMENT_SHADER = MAKE_SHADER(
   varying mediump float vSpecular;\n
   uniform sampler2D sDiffuse;\n
   uniform lowp vec4 uColor;\n
-  \n
+
   void main()\n
   {\n
     vec4 texture = texture2D( sDiffuse, vTexCoord );\n
-    gl_FragColor.rgb = vIllumination.rgb * texture.rgb * uColor.rgb + vSpecular * 0.3;\n
-    gl_FragColor.a = texture.a * uColor.a;\n
+    gl_FragColor = vec4( vIllumination.rgb * texture.rgb * uColor.rgb + vSpecular * 0.3, texture.a * uColor.a);\n
   }\n
 );
 
@@ -206,41 +187,33 @@ const char* NRMMAP_VERTEX_SHADER = MAKE_SHADER(
   uniform mediump mat3 uNormalMatrix;
   uniform mediump mat4 uObjectMatrix;\n
   uniform mediump vec3 uLightPosition;\n
-  \n
+
   void main()
   {\n
     vec4 vertexPosition = vec4(aPosition*min(uSize.x, uSize.y), 1.0);\n
     vertexPosition = uObjectMatrix * vertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = aTexCoord;\n
-    \n
-    vec3 vNormal = normalize(uNormalMatrix * aNormal);\n
-    vec3 vTangent = normalize(uNormalMatrix * aTangent);\n
-    vec3 vBiNormal = normalize(uNormalMatrix * aBiNormal);\n
-    \n
-    vec4 vertPos4 = uModelView * vec4(aPosition.xyz, 1.0);\n
-    vec3 vertPos = vec3(vertPos4) / vertPos4.w;\n
-    \n
-    vec4 lightPos4 = uModelView * vec4(uLightPosition, 1.0);\n
-    vec3 lightPos = vec3(lightPos4) / lightPos4.w;\n
-    \n
-    vec3 vecToLight = lightPos - vertPos;
-    vLightDirection.x = dot(vecToLight, vTangent);
-    vLightDirection.y = dot(vecToLight, vBiNormal);
-    vLightDirection.z = dot(vecToLight, vNormal);
-    vLightDirection = normalize(vLightDirection);
-    \n
-    vec3 viewDir = normalize(vertPos);
-    \n
-    vec3 halfVector = normalize(viewDir + vecToLight);
-    vHalfVector.x = dot (halfVector, vTangent);
-    vHalfVector.y = dot (halfVector, vBiNormal);
-    vHalfVector.z = dot (halfVector, vNormal);
-    \n
-    gl_Position = vertexPosition;\n
 
-    //vHalfVector = aTangent;
+    vec4 vertPos = uModelView * vec4(aPosition.xyz, 1.0);\n
+    vec4 lightPos = uModelView * vec4(uLightPosition, 1.0);\n
+
+    vec3 tangent = normalize(uNormalMatrix * aTangent);
+    vec3 binormal = normalize(uNormalMatrix * aBiNormal);
+    vec3 normal = normalize(uNormalMatrix * aNormal);
+
+    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
+    vLightDirection.x = dot(vecToLight, tangent);
+    vLightDirection.y = dot(vecToLight, binormal);
+    vLightDirection.z = dot(vecToLight, normal);
+
+    vec3 viewDir = normalize(-vertPos.xyz);
+    vec3 halfVector = normalize(viewDir + vecToLight);
+    vHalfVector.x = dot(halfVector, tangent);
+    vHalfVector.y = dot(halfVector, binormal);
+    vHalfVector.z = dot(halfVector, normal);
+
+    vTexCoord = aTexCoord;\n
+    gl_Position = vertexPosition;\n
   }\n
 );
 
@@ -253,23 +226,19 @@ const char* NRMMAP_FRAGMENT_SHADER = MAKE_SHADER(
   uniform sampler2D sNormal;\n
   uniform sampler2D sGloss;\n
   uniform lowp vec4 uColor;\n
-  \n
+
   void main()\n
   {\n
     vec4 texture = texture2D( sDiffuse, vTexCoord );\n
-    vec4 nrmMap = texture2D( sNormal, vTexCoord ) * 2.0 - 1.0;\n
+    vec3 normal = normalize( texture2D( sNormal, vTexCoord ).xyz * 2.0 - 1.0 );\n
     vec4 glossMap = texture2D( sGloss, vTexCoord );\n
-    \n
-    vec3 normalizedLightDirection = normalize(vLightDirection);\n
-    float lightDiffuse = max( 0.0, dot( nrmMap.xyz, normalizedLightDirection ) );\n
-    lightDiffuse = lightDiffuse * 0.5 + 0.5;\n
-    \n
-    float shininess = pow (max (dot (vHalfVector, nrmMap.xyz), 0.0), 16.0)  ;
-    \n
-    gl_FragColor.rgb = texture.rgb * uColor.rgb * lightDiffuse + shininess * glossMap.rgb;\n
-    gl_FragColor.a = texture.a * uColor.a;\n
 
-    //gl_FragColor.rgb = vHalfVector.rgb;
+    float lightDiffuse = max( 0.0, dot( normal, normalize(vLightDirection) ) );\n
+    lightDiffuse = lightDiffuse * 0.5 + 0.5;\n
+
+    float shininess = pow (max (dot (normalize( vHalfVector ), normal), 0.0), 16.0)  ;
+
+    gl_FragColor = vec4( texture.rgb * uColor.rgb * lightDiffuse + shininess * glossMap.rgb, texture.a * uColor.a);\n
   }\n
 );
 
