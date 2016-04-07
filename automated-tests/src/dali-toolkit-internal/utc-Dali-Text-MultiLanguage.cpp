@@ -1243,15 +1243,26 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   const std::string pathName( pathNamePtr );
   free( pathNamePtr );
 
+  const PointSize26Dot6 pointSize01 = static_cast<PointSize26Dot6>( 21.f * 64.f );
+  const PointSize26Dot6 pointSize02 = static_cast<PointSize26Dot6>( 35.f * 64.f );
+
   // Load some fonts.
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenColorEmoji.ttf", EMOJI_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf", pointSize01 );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf", pointSize02 );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf", pointSize01 );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf", pointSize02 );
 
   // Font id 1 --> TizenSansArabicRegular.ttf
   // Font id 2 --> TizenSansHebrewRegular.ttf
   // Font id 3 --> TizenColorEmoji.ttf
-  // Font id 4 --> (default)
+  // Font id 4 --> TizenSansRegular.ttf, size 8
+  // Font id 5 --> TizenSansRegular.ttf, size 16
+  // Font id 6 --> TizenSansHebrewRegular.ttf, size 8
+  // Font id 7 --> TizenSansHebrewRegular.ttf, size 16
+  // Font id 8 --> (default)
 
   Vector<FontRun> fontRuns01;
   Vector<FontDescriptionRun> fontDescriptions01;
@@ -1262,7 +1273,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       0u,
       11u
     },
-    4u
+    8u
   };
   Vector<FontRun> fontRuns02;
   fontRuns02.PushBack( fontRun0201 );
@@ -1294,7 +1305,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       0u,
       12u
     },
-    4u
+    8u
   };
   FontRun fontRun0302 =
   {
@@ -1302,7 +1313,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       12u,
       12u
     },
-    4u
+    8u
   };
   FontRun fontRun0303 =
   {
@@ -1310,7 +1321,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       24u,
       4u
     },
-    4u
+    8u
   };
   Vector<FontRun> fontRuns03;
   fontRuns03.PushBack( fontRun0301 );
@@ -1333,7 +1344,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       4u,
       1u
     },
-    4u
+    8u
   };
   FontRun fontRun0703 =
   {
@@ -1433,6 +1444,122 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   };
   fontDescriptions09.PushBack( fontDescription0901 );
 
+  FontRun fontRun1001 =
+  {
+    {
+      0u,
+      13u
+    },
+    4u
+  };
+  FontRun fontRun1002 =
+  {
+    {
+      13u,
+      9u
+    },
+    6u
+  };
+  FontRun fontRun1003 =
+  {
+    {
+      22u,
+      15u
+    },
+    5u
+  };
+  FontRun fontRun1004 =
+  {
+    {
+      37u,
+      9u
+    },
+    7u
+  };
+  Vector<FontRun> fontRuns10;
+  fontRuns10.PushBack( fontRun1001 );
+  fontRuns10.PushBack( fontRun1002 );
+  fontRuns10.PushBack( fontRun1003 );
+  fontRuns10.PushBack( fontRun1004 );
+
+  FontDescriptionRun fontDescription1001 =
+  {
+    {
+      0u,
+      13u
+    },
+    const_cast<char*>( "TizenSans" ),
+    9u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    pointSize01,
+    true,
+    false,
+    false,
+    false,
+    true
+  };
+  FontDescriptionRun fontDescription1002 =
+  {
+    {
+      13u,
+      9u
+    },
+    const_cast<char*>( "TizenSansHebrew" ),
+    15u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    pointSize01,
+    true,
+    false,
+    false,
+    false,
+    true
+  };
+  FontDescriptionRun fontDescription1003 =
+  {
+    {
+      22u,
+      15u
+    },
+    const_cast<char*>( "TizenSans" ),
+    9u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    pointSize02,
+    true,
+    false,
+    false,
+    false,
+    true
+  };
+  FontDescriptionRun fontDescription1004 =
+  {
+    {
+      37u,
+      9u
+    },
+    const_cast<char*>( "TizenSansHebrew" ),
+    15u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    pointSize02,
+    true,
+    false,
+    false,
+    false,
+    true
+  };
+  Vector<FontDescriptionRun> fontDescriptions10;
+  fontDescriptions10.PushBack( fontDescription1001 );
+  fontDescriptions10.PushBack( fontDescription1002 );
+  fontDescriptions10.PushBack( fontDescription1003 );
+  fontDescriptions10.PushBack( fontDescription1004 );
+
   const ValidateFontsData data[] =
   {
     {
@@ -1525,8 +1652,18 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       fontDescriptions09,
       fontRuns09
     },
+    {
+      "Mix text. Default font: latin. Different font sizes",
+      "Hello world, שלום עולם, hello world, שלום עולם",
+      "/tizen/TizenSansRegular.ttf",
+      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      0u,
+      46u,
+      fontDescriptions10,
+      fontRuns10
+    },
   };
-  const unsigned int numberOfTests = 9u;
+  const unsigned int numberOfTests = 10u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
