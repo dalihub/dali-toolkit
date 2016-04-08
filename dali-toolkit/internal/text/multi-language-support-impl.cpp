@@ -63,13 +63,30 @@ bool ValidateFontsPerScript::FindValidFont( FontId fontId ) const
   return false;
 }
 
+FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient, PointSize26Dot6 size ) const
+{
+  for( Vector<FontId>::ConstIterator it = mFonts.Begin(),
+         endIt = mFonts.End();
+       it != endIt;
+       ++it )
+  {
+    const FontId fontId = *it;
+    if( size == fontClient.GetPointSize( fontId ) )
+    {
+      return fontId;
+    }
+  }
+
+  return 0u;
+}
+
 MultilanguageSupport::MultilanguageSupport()
 : mDefaultFontPerScriptCache(),
   mValidFontsPerScriptCache()
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
-  mDefaultFontPerScriptCache.Resize( TextAbstraction::UNKNOWN, 0u );
+  mDefaultFontPerScriptCache.Resize( TextAbstraction::UNKNOWN, NULL );
 
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
@@ -78,8 +95,16 @@ MultilanguageSupport::MultilanguageSupport()
 
 MultilanguageSupport::~MultilanguageSupport()
 {
-  // Destroy the valid fonts per script cache.
+  // Destroy the default font per script cache.
+  for( Vector<DefaultFonts*>::Iterator it = mDefaultFontPerScriptCache.Begin(),
+         endIt = mDefaultFontPerScriptCache.End();
+       it != endIt;
+       ++it )
+  {
+    delete *it;
+  }
 
+  // Destroy the valid fonts per script cache.
   for( Vector<ValidateFontsPerScript*>::Iterator it = mValidFontsPerScriptCache.Begin(),
          endIt = mValidFontsPerScriptCache.End();
        it != endIt;
@@ -363,7 +388,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   // Traverse the characters and validate/set the fonts.
 
   // Get the caches.
-  FontId* defaultFontPerScriptCacheBuffer = mDefaultFontPerScriptCache.Begin();
+  DefaultFonts** defaultFontPerScriptCacheBuffer = mDefaultFontPerScriptCache.Begin();
   ValidateFontsPerScript** validFontsPerScriptCacheBuffer = mValidFontsPerScriptCache.Begin();
 
   // Stores the validated font runs.
@@ -403,6 +428,9 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
   bool isNewParagraphCharacter = false;
 
+  PointSize26Dot6 currentPointSize = defaultPointSize;
+  FontId currentFontId = 0u;
+
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
   for( Length index = startIndex; index < lastCharacter; ++index )
   {
@@ -416,6 +444,13 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     Script script = GetScript( index,
                                scriptRunIt,
                                scriptRunEndIt );
+
+    // Get the current point size.
+    if( currentFontId != fontId )
+    {
+      currentPointSize = fontClient.GetPointSize( fontId );
+      currentFontId = fontId;
+    }
 
 #ifdef DEBUG_ENABLED
     {
@@ -438,8 +473,15 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Check first in the caches.
 
+    DefaultFonts* defaultFonts = *( defaultFontPerScriptCacheBuffer + script );
+    FontId cachedDefaultFontId = 0u;
+    if( NULL != defaultFonts )
+    {
+      cachedDefaultFontId = defaultFonts->FindFont( fontClient, currentPointSize );
+    }
+
     // The user may have set the default font. Check it. Otherwise check in the valid fonts cache.
-    if( fontId != *( defaultFontPerScriptCacheBuffer + script ) )
+    if( fontId != cachedDefaultFontId )
     {
       // Check in the valid fonts cache.
       ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
@@ -508,7 +550,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     if( 0u == fontId )
     {
       // The character has no font assigned. Get a default one from the cache
-      fontId = *( defaultFontPerScriptCacheBuffer + script );
+      fontId = cachedDefaultFontId;
 
       // If the cache has not a default font, get one from the font client.
       if( 0u == fontId )
@@ -517,20 +559,31 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         bool preferColor = ( TextAbstraction::EMOJI == script );
 
         // Find a fallback-font.
-        fontId = fontClient.FindFallbackFont( preferredFont, character, defaultPointSize, preferColor );
+        fontId = fontClient.FindFallbackFont( preferredFont, character, currentPointSize, preferColor );
 
         // If the system does not support a suitable font, fallback to Latin
+        DefaultFonts* latinDefaults = NULL;
         if( 0u == fontId )
         {
-          fontId = *( defaultFontPerScriptCacheBuffer + TextAbstraction::LATIN );
+          latinDefaults = *( defaultFontPerScriptCacheBuffer + TextAbstraction::LATIN );
+          if( NULL != latinDefaults )
+          {
+            fontId = latinDefaults->FindFont( fontClient, currentPointSize );
+          }
         }
+
         if( 0u == fontId )
         {
-          fontId = fontClient.FindDefaultFont( UTF32_A, defaultPointSize );
+          fontId = fontClient.FindDefaultFont( UTF32_A, currentPointSize );
         }
 
         // Cache the font.
-        *( defaultFontPerScriptCacheBuffer + script ) = fontId;
+        if( NULL == latinDefaults )
+        {
+          latinDefaults = new DefaultFonts();
+          *( defaultFontPerScriptCacheBuffer + script ) = latinDefaults;
+        }
+        latinDefaults->mFonts.PushBack( fontId );
       }
     }
 

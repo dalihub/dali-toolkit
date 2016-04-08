@@ -77,18 +77,18 @@ Both Linear and Radial gradients are supported.
 
 **RendererType:** "gradient"
 
-| Property Name                                                | Type             | Required   | Description                                                       |
-|--------------------------------------------------------------|:----------------:|:----------:|-------------------------------------------------------------------|
-| gradientStartPosition                                        | VECTOR2          | For Linear | The start position of the linear gradient.                        |
-| gradientEndPosition                                          | VECTOR2          | For Linear | The end position of the linear gradient.                          |
-| gradientCenter                                               | VECTOR2          | For Radial | The center point of the gradient.                                 |
-| gradientRadius                                               | FLOAT            | For Radial | The size of the radius.                                           |
-| gradientStopOffset                                           | ARRAY of FLOAT   | Yes        | All the stop offsets.                                             |
-| gradientStopColor                                            | ARRAY of VECTOR4 | Yes        | The color at those stop offsets.                                  |
-| [gradientUnits](@ref gradient-renderer-units)                | STRING           | No         | *objectBoundingBox* or *userSpace*. Default: *objectBoundingBox*. |
-| [gradientSpreadMethod](@ref gradient-renderer-spread-method) | STRING           | No         | *pad*, *repeat* or *reflect*. Default: *pad*                      |
+| Property Name                                                | Type             | Required   | Description                                                             |
+|--------------------------------------------------------------|:----------------:|:----------:|-------------------------------------------------------------------------|
+| startPosition                                                | VECTOR2          | For Linear | The start position of the linear gradient.                              |
+| endPosition                                                  | VECTOR2          | For Linear | The end position of the linear gradient.                                |
+| center                                                       | VECTOR2          | For Radial | The center point of the gradient.                                       |
+| radius                                                       | FLOAT            | For Radial | The size of the radius.                                                 |
+| stopOffset                                                   | ARRAY of FLOAT   | No         | All the stop offsets. If not supplied default is 0.0 and 1.0            |
+| stopColor                                                    | ARRAY of VECTOR4 | Yes        | The color at those stop offsets. At least 2 required to show a gradient |
+| [gradientUnits](@ref gradient-renderer-units)                | STRING           | No         | *objectBoundingBox* or *userSpace*. Default: *objectBoundingBox*.       |
+| [gradientSpreadMethod](@ref gradient-renderer-spread-method) | STRING           | No         | *pad*, *repeat* or *reflect*. Default: *pad*                            |
 
-If the *gradientStopOffset* and *gradientStopColor* arrays do not have the same number of elements, then the minimum of the two is used as the stop points.
+If the *stopOffset* and *stopColor* arrays do not have the same number of elements, then the minimum of the two is used as the stop points.
 
 ### Units {#gradient-renderer-units}
 
@@ -120,8 +120,8 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 map[ "rendererType" ] = "gradient";
-map[ "gradientStartPosition" ] = Vector2( 0.5f, 0.5f );
-map[ "gradientEndPosition" ] = Vector2( -0.5f, -0.5f );
+map[ "startPosition" ] = Vector2( 0.5f, 0.5f );
+map[ "endPosition" ] = Vector2( -0.5f, -0.5f );
 
 Dali::Property::Array stopOffsets;
 stopOffsets.PushBack( 0.0f );
@@ -129,7 +129,7 @@ stopOffsets.PushBack( 0.3f );
 stopOffsets.PushBack( 0.6f );
 stopOffsets.PushBack( 0.8f );
 stopOffsets.PushBack( 1.f );
-map[ "gradientStopOffset" ] = stopOffsets;
+map[ "stopOffset" ] = stopOffsets;
 
 Dali::Property::Array stopColors;
 stopColors.PushBack( Vector4( 129.f, 198.f, 193.f, 255.f )/255.f );
@@ -137,7 +137,7 @@ stopColors.PushBack( Vector4( 196.f, 198.f, 71.f, 122.f )/255.f );
 stopColors.PushBack( Vector4( 214.f, 37.f, 139.f, 191.f )/255.f );
 stopColors.PushBack( Vector4( 129.f, 198.f, 193.f, 150.f )/255.f );
 stopColors.PushBack( Color::YELLOW );
-map[ "gradientStopColor" ] = stopColors;
+map[ "stopColor" ] = stopColors;
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -149,10 +149,10 @@ var control = new dali.Control( "Control" );
 control.background =
 {
   rendererType : "gradient",
-  gradientStartPosition : [ 0.5, 0.5 ],
-  gradientEndPosition : [ -0.5, -0.5 ],
-  gradientStopOffset : [ 0.0, 0.3, 0.6, 0.8, 1.0 ],
-  gradientStopColor : [
+  startPosition : [ 0.5, 0.5 ],
+  endPosition : [ -0.5, -0.5 ],
+  stopOffset : [ 0.0, 0.3, 0.6, 0.8, 1.0 ],
+  stopColor : [
     [ 129 / 255, 198 / 255, 193 / 255, 255 / 255 ],
     [ 196 / 255, 198 / 255,  71 / 255, 122 / 255 ],
     [ 214 / 255,  37 / 255, 139 / 255, 191 / 255 ],
@@ -169,8 +169,8 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 map[ "rendererType" ] = "gradient";
-map[ "gradientCenter" ] = Vector2( 0.5f, 0.5f );
-map[ "gradientRadius" ] = 1.414f;
+map[ "center" ] = Vector2( 0.5f, 0.5f );
+map[ "radius" ] = 1.414f;
 
 Dali::Property::Array stopOffsets;
 stopOffsets.PushBack( 0.0f );
@@ -178,7 +178,7 @@ stopOffsets.PushBack( 0.3f );
 stopOffsets.PushBack( 0.6f );
 stopOffsets.PushBack( 0.8f );
 stopOffsets.PushBack( 1.f );
-map[ "gradientStopOffset" ] = stopOffsets;
+map[ "stopOffset" ] = stopOffsets;
 
 Dali::Property::Array stopColors;
 stopColors.PushBack( Vector4( 129.f, 198.f, 193.f, 255.f )/255.f );
@@ -186,7 +186,7 @@ stopColors.PushBack( Vector4( 196.f, 198.f, 71.f, 122.f )/255.f );
 stopColors.PushBack( Vector4( 214.f, 37.f, 139.f, 191.f )/255.f );
 stopColors.PushBack( Vector4( 129.f, 198.f, 193.f, 150.f )/255.f );
 stopColors.PushBack( Color::YELLOW );
-map[ "gradientStopColor" ] = stopColors;
+map[ "stopColor" ] = stopColors;
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -198,10 +198,10 @@ var control = new dali.Control( "Control" );
 control.background =
 {
   rendererType : "gradient",
-  gradientCenter : [ 0.5, 0.5 ],
-  gradientRadius : 1.414,
-  gradientStopOffset : [ 0.0, 0.3, 0.6, 0.8, 1.0 ],
-  gradientStopColor : [
+  center : [ 0.5, 0.5 ],
+  radius : 1.414,
+  stopOffset : [ 0.0, 0.3, 0.6, 0.8, 1.0 ],
+  stopColor : [
     [ 129 / 255, 198 / 255, 193 / 255, 255 / 255 ],
     [ 196 / 255, 198 / 255,  71 / 255, 122 / 255 ],
     [ 214 / 255,  37 / 255, 139 / 255, 191 / 255 ],

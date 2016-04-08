@@ -21,6 +21,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -33,6 +34,18 @@ static void TestCallback(BaseHandle handle)
 {
   gObjectCreatedCallBackCalled = true;
 }
+
+Actor CreateColorActor( const Vector4& color )
+{
+  Actor solidColorActor = Actor::New();
+
+  RendererFactory factory = RendererFactory::Get();
+  ControlRenderer colorRenderer = factory.GetControlRenderer( color );
+  colorRenderer.SetOnStage( solidColorActor );
+
+  return solidColorActor;
+}
+
 } // namespace
 
 void dali_toolbar_startup(void)
@@ -88,15 +101,15 @@ int UtcDaliToolBarAddControl01(void)
 
   try
   {
-    ImageActor control1 = CreateSolidColorActor( Color::RED );
+    Actor control1 = CreateColorActor( Color::RED );
     control1.SetSize( Vector2( 100.f, 100.f ) );
-    ImageActor control2 = CreateSolidColorActor( Color::RED );
+    Actor control2 = CreateColorActor( Color::RED );
     control2.SetSize( Vector2( 100.f, 100.f ) );
-    ImageActor control3 = CreateSolidColorActor( Color::RED );
+    Actor control3 = CreateColorActor( Color::RED );
     control3.SetSize( Vector2( 100.f, 100.f ) );
-    ImageActor control4 = CreateSolidColorActor( Color::RED );
+    Actor control4 = CreateColorActor( Color::RED );
     control4.SetSize( Vector2( 100.f, 100.f ) );
-    ImageActor control5 = CreateSolidColorActor( Color::RED );
+    Actor control5 = CreateColorActor( Color::RED );
     control5.SetSize( Vector2( 100.f, 100.f ) );
 
     ToolBar toolbar = ToolBar::New();
@@ -113,11 +126,11 @@ int UtcDaliToolBarAddControl01(void)
     toolbar.AddControl( control4, 0.1f, Alignment::HorizontalCenter, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
     toolbar.AddControl( control5, 0.1f, Alignment::HorizontalRight, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
 
-    ImageActor control6 = CreateSolidColorActor( Color::RED );
+    Actor control6 = CreateColorActor( Color::RED );
     control6.SetSize( Vector2( 100.f, 100.f ) );
-    ImageActor control7 = CreateSolidColorActor( Color::RED );
+    Actor control7 = CreateColorActor( Color::RED );
     control7.SetSize( Vector2( 100.f, 100.f ) );
-    ImageActor control8 = CreateSolidColorActor( Color::RED );
+    Actor control8 = CreateColorActor( Color::RED );
     control8.SetSize( Vector2( 100.f, 100.f ) );
 
     application.Render();
@@ -147,7 +160,7 @@ int UtcDaliToolBarAddControl02(void)
 
   try
   {
-    ImageActor control = CreateSolidColorActor( Color::RED );
+    Actor control = CreateColorActor( Color::RED );
 
     ToolBar toolbar = ToolBar::New();
 
@@ -177,7 +190,7 @@ int UtcDaliToolBarRemoveControl01(void)
 
   try
   {
-    ImageActor control = CreateSolidColorActor( Color::RED );
+    Actor control = CreateColorActor( Color::RED );
 
     ToolBar toolbar = ToolBar::New();
     toolbar.AddControl( control, 0.1f, Alignment::HorizontalLeft );
@@ -200,8 +213,8 @@ int UtcDaliToolBarRemoveControl02(void)
 
   try
   {
-    ImageActor control01 = CreateSolidColorActor( Color::RED );
-    ImageActor control02 = CreateSolidColorActor( Color::RED );
+    Actor control01 = CreateColorActor( Color::RED );
+    Actor control02 = CreateColorActor( Color::RED );
 
     ToolBar toolbar01 = ToolBar::New();
     ToolBar toolbar02 = ToolBar::New();
@@ -222,7 +235,7 @@ int UtcDaliToolBarRemoveControl02(void)
 
   try
   {
-    ImageActor control = CreateSolidColorActor( Color::RED );
+    Actor control = CreateColorActor( Color::RED );
 
     ToolBar toolbar = ToolBar::New();
     toolbar.AddControl( control, 0.1f, Alignment::HorizontalLeft );

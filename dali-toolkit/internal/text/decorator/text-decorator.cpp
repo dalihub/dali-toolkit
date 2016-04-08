@@ -33,7 +33,6 @@
 #include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
@@ -529,7 +528,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     cursor = Control::New();
     cursor.SetBackgroundColor( color );
-    cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
+    cursor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     cursor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   }
 

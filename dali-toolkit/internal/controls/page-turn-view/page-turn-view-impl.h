@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
 

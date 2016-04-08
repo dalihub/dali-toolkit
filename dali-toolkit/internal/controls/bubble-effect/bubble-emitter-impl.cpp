@@ -27,6 +27,8 @@
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-actor.h>
 #include <dali-toolkit/internal/controls/bubble-effect/color-adjuster.h>
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-effect.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+
 
 namespace
 {
@@ -174,13 +176,15 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
   mBackgroundImage = bgImage;
   mHSVDelta = hsvDelta;
 
-  ImageActor sourceActor = ImageActor::New( bgImage );
+  Toolkit::ImageView sourceActor = Toolkit::ImageView::New( bgImage );
   sourceActor.SetSize( mMovementArea );
   sourceActor.SetParentOrigin(ParentOrigin::CENTER);
-  Stage::GetCurrent().Add( sourceActor );
 
-  ShaderEffect colorAdjuster = CreateColorAdjuster( hsvDelta, true /*ignore alpha to make bubble color always*/ );
-  sourceActor.SetShaderEffect( colorAdjuster );
+  Property::Map colorAdjuster = CreateColorAdjuster();
+  sourceActor.SetProperty( Toolkit::ImageView::Property::IMAGE, colorAdjuster);
+  SetColorAdjusterProperties( sourceActor, hsvDelta, true /*ignore alpha to make bubble color always*/ );
+
+  Stage::GetCurrent().Add( sourceActor );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   RenderTask task = taskList.CreateTask();
@@ -231,15 +235,6 @@ void BubbleEmitter::OnRenderFinished(RenderTask& source)
 {
   mRenderTaskRunning = false;
   Actor sourceActor = source.GetSourceActor();
-  if( sourceActor )
-  {
-    ImageActor renderable = ImageActor::DownCast( sourceActor );
-    if( renderable )
-    {
-      renderable.RemoveShaderEffect();
-    }
-  }
-
   Stage stage = Stage::GetCurrent();
   stage.Remove(sourceActor);
   stage.GetRenderTaskList().RemoveTask(source);

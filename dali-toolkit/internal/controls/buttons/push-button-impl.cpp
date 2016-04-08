@@ -19,7 +19,6 @@
 #include "push-button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>

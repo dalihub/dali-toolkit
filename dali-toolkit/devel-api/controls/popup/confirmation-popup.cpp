@@ -22,7 +22,6 @@
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/popup/confirmation-popup-impl.h>
-#include <dali/public-api/actors/image-actor.h>
 
 using namespace Dali;
 

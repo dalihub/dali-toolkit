@@ -163,7 +163,6 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
-const char * const BACKGROUND_COLOR_NAME("color");
 const char * const COLOR_RENDERER_COLOR_NAME("blendColor");
 
 } // unnamed namespace
@@ -283,21 +282,16 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND:
         {
-          Image image = Scripting::NewImage( value );
-          if ( image )
-          {
-            controlImpl.SetBackgroundImage( image );
-            break;
-          }
           const Property::Map* map = value.GetMap();
           if( map )
           {
             controlImpl.SetBackground( *map );
-            break;
           }
-
-          // The background is neither a valid image nor a property map, so it is no longer required
-          controlImpl.ClearBackground();
+          else
+          {
+            // The background is not a property map, so we should clear the background
+            controlImpl.ClearBackground();
+          }
           break;
         }
       }
@@ -474,14 +468,6 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground(const Property::Map& map)
 {
-  const Property::Value* colorValue = map.Find( BACKGROUND_COLOR_NAME );
-  Vector4 color;
-  if( colorValue && colorValue->Get(color))
-  {
-    SetBackgroundColor( color );
-    return;
-  }
-
   Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
