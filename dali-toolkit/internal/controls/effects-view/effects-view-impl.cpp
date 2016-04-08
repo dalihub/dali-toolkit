@@ -317,6 +317,8 @@ void EffectsView::OnInitialize()
 
 void EffectsView::OnSizeSet(const Vector3& targetSize)
 {
+  Control::OnSizeSet( targetSize );
+
   mTargetSize = Vector2(targetSize);
 
   // if we are already on stage, need to update render target sizes now to reflect the new size of this actor
@@ -365,6 +367,8 @@ void EffectsView::OnStageDisconnection()
   {
     mFilters[i]->Disable();
   }
+
+  Control::OnStageDisconnection();
 }
 
 void EffectsView::SetupFilters()

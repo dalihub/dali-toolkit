@@ -1049,10 +1049,12 @@ bool Button::OnKeyboardEnter()
   return ret;
 }
 
-void Button::OnControlStageDisconnection()
+void Button::OnStageDisconnection()
 {
   OnButtonStageDisconnection(); // Notification for derived classes.
   mState = ButtonUp;
+
+  Control::OnStageDisconnection();
 }
 
 void Button::OnTap(Actor actor, const TapGesture& tap)

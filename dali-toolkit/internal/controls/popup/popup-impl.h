@@ -432,13 +432,13 @@ private:
   /**
    * Called when the popup is directly or indirectly parented to the stage.
    */
-  virtual void OnControlStageConnection();
+  virtual void OnStageConnection( int depth );
 
   /**
    * From Control; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
-  virtual void OnControlChildAdd( Actor& child );
+  virtual void OnChildAdd( Actor& child );
 
   /**
    * @copydoc Control::OnRelayOut()

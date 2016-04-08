@@ -287,7 +287,7 @@ Actor TableView::RemoveChildAt( const Toolkit::TableView::CellPosition& position
   if( child )
   {
     RelayoutingLock lock( *this );
-    // Remove the child, this will trigger a call to OnControlChildRemove
+    // Remove the child, this will trigger a call to OnChildRemove
     Self().Remove( child );
 
     // relayout the table only if instances were found
@@ -968,8 +968,10 @@ Property::Value TableView::GetProperty( BaseObject* object, Property::Index inde
   return value;
 }
 
-void TableView::OnControlChildAdd( Actor& child )
+void TableView::OnChildAdd( Actor& child )
 {
+  Control::OnChildAdd( child );
+
   if( mLayoutingChild )
   {
     // we're in the middle of laying out children so no point doing anything here
@@ -1061,7 +1063,7 @@ void TableView::OnControlChildAdd( Actor& child )
   RelayoutRequest();
 }
 
-void TableView::OnControlChildRemove( Actor& child )
+void TableView::OnChildRemove( Actor& child )
 {
   // dont process if we're in the middle of bigger operation like delete row, column or resize
   if( !mLayoutingChild )
@@ -1072,6 +1074,8 @@ void TableView::OnControlChildRemove( Actor& child )
       RelayoutRequest();
     }
   }
+
+  Control::OnChildRemove( child );
 }
 
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )

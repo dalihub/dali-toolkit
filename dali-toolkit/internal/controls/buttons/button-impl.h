@@ -511,7 +511,7 @@ private: // From Control
    * Callback received when the button is disconnected from the stage.
    * It resets the button status.
    */
-  void OnControlStageDisconnection();
+  void OnStageDisconnection();
 
 private:
 

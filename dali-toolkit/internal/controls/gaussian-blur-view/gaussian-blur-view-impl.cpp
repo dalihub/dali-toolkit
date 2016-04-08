@@ -331,6 +331,8 @@ void GaussianBlurView::OnInitialize()
 
 void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
 {
+  Control::OnSizeSet( targetSize );
+
   mTargetSize = Vector2(targetSize);
 
   mChildrenRoot.SetSize(targetSize);
@@ -357,17 +359,21 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
   }
 }
 
-void GaussianBlurView::OnControlChildAdd( Actor& child )
+void GaussianBlurView::OnChildAdd( Actor& child )
 {
+  Control::OnChildAdd( child );
+
   if( child != mChildrenRoot && child != mInternalRoot)
   {
     mChildrenRoot.Add( child );
   }
 }
 
-void GaussianBlurView::OnControlChildRemove( Actor& child )
+void GaussianBlurView::OnChildRemove( Actor& child )
 {
   mChildrenRoot.Remove( child );
+
+  Control::OnChildRemove( child );
 }
 
 void GaussianBlurView::AllocateResources()

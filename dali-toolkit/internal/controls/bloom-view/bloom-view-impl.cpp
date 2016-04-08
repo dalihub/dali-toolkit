@@ -290,6 +290,8 @@ void BloomView::OnInitialize()
 
 void BloomView::OnSizeSet(const Vector3& targetSize)
 {
+  Control::OnSizeSet( targetSize );
+
   mTargetSize = Vector2(targetSize);
   mChildrenRoot.SetSize(targetSize);
   mCompositeImageActor.SetSize(targetSize);
@@ -313,17 +315,21 @@ void BloomView::OnSizeSet(const Vector3& targetSize)
   }
 }
 
-void BloomView::OnControlChildAdd( Actor& child )
+void BloomView::OnChildAdd( Actor& child )
 {
+  Control::OnChildAdd( child );
+
   if( child != mChildrenRoot && child != mInternalRoot)
   {
     mChildrenRoot.Add( child );
   }
 }
 
-void BloomView::OnControlChildRemove( Actor& child )
+void BloomView::OnChildRemove( Actor& child )
 {
   mChildrenRoot.Remove( child );
+
+  Control::OnChildRemove( child );
 }
 
 void BloomView::AllocateResources()
