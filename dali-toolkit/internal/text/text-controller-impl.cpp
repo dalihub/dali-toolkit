@@ -477,8 +477,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, numberOfCharacters );
-    mVisualModel->CreateCharacterToGlyphTable( startIndex, numberOfCharacters );
+    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, startGlyphIndex, numberOfCharacters );
+    mVisualModel->CreateCharacterToGlyphTable( startIndex, startGlyphIndex, numberOfCharacters );
   }
 
   const Length numberOfGlyphs = glyphs.Count();

@@ -239,8 +239,8 @@ void CreateTextModel( const std::string& text,
              newParagraphGlyphs );
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-  visualModel->CreateGlyphsPerCharacterTable( 0u, numberOfCharacters );
-  visualModel->CreateCharacterToGlyphTable( 0u, numberOfCharacters );
+  visualModel->CreateGlyphsPerCharacterTable( 0u, 0u, numberOfCharacters );
+  visualModel->CreateCharacterToGlyphTable( 0u, 0u, numberOfCharacters );
 
   const Length numberOfGlyphs = glyphs.Count();
 
