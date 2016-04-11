@@ -823,22 +823,6 @@ bool Button::DoClickAction( const Property::Map& attributes )
   return false;
 }
 
-void Button::OnButtonStageDisconnection()
-{
-  if( ButtonDown == mState )
-  {
-    if( !mTogglableButton )
-    {
-      Released();
-
-      if( mAutoRepeating )
-      {
-        mAutoRepeatingTimer.Reset();
-      }
-    }
-  }
-}
-
 void Button::OnButtonDown()
 {
   if( !mTogglableButton )
@@ -1030,8 +1014,6 @@ void Button::OnInitialize()
   mTapDetector.Attach( self );
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
-  OnButtonInitialize();
-
   self.SetKeyboardFocusable( true );
 }
 
@@ -1051,7 +1033,19 @@ bool Button::OnKeyboardEnter()
 
 void Button::OnStageDisconnection()
 {
-  OnButtonStageDisconnection(); // Notification for derived classes.
+  if( ButtonDown == mState )
+  {
+    if( !mTogglableButton )
+    {
+      Released();
+
+      if( mAutoRepeating )
+      {
+        mAutoRepeatingTimer.Reset();
+      }
+    }
+  }
+
   mState = ButtonUp;
 
   Control::OnStageDisconnection();

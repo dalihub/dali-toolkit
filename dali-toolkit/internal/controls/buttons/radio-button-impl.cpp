@@ -74,8 +74,10 @@ RadioButton::~RadioButton()
 {
 }
 
-void RadioButton::OnButtonInitialize()
+void RadioButton::OnInitialize()
 {
+  Button::OnInitialize();
+
   Actor self = Self();
 
   // Wrap size of radio button around all its children

@@ -127,8 +127,10 @@ PushButton::~PushButton()
 {
 }
 
-void PushButton::OnButtonInitialize()
+void PushButton::OnInitialize()
 {
+  Button::OnInitialize();
+
   // Push button requires the Leave event.
   Actor self = Self();
   self.SetLeaveRequired( true );

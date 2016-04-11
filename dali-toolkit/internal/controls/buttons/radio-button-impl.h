@@ -64,9 +64,9 @@ private:
 private: // From Button
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonInitialize
+   * @copydoc Toolkit::Internal::Button::OnInitialize
    */
-  virtual void OnButtonInitialize();
+  virtual void OnInitialize();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnButtonUp
