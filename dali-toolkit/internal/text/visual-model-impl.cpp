@@ -36,6 +36,7 @@ VisualModelPtr VisualModel::New()
 }
 
 void VisualModel::CreateCharacterToGlyphTable( CharacterIndex startIndex,
+                                               GlyphIndex startGlyphIndex,
                                                Length numberOfCharacters )
 {
   if( 0u == numberOfCharacters )
@@ -72,7 +73,6 @@ void VisualModel::CreateCharacterToGlyphTable( CharacterIndex startIndex,
   // 2) Traverse the glyphs and set the glyph indices per character.
 
   // Index to the glyph.
-  const GlyphIndex startGlyphIndex = updateCurrentBuffer ? *( mCharactersToGlyph.Begin() + startIndex ) : 0u;
   GlyphIndex glyphIndex = startGlyphIndex;
   CharacterIndex characterIndex = startIndex;
   const CharacterIndex lastCharacterIndexPlusOne = startIndex + numberOfCharacters;
@@ -115,6 +115,7 @@ void VisualModel::CreateCharacterToGlyphTable( CharacterIndex startIndex,
 }
 
 void VisualModel::CreateGlyphsPerCharacterTable( CharacterIndex startIndex,
+                                                 GlyphIndex startGlyphIndex,
                                                  Length numberOfCharacters )
 {
   if( 0u == numberOfCharacters )
@@ -146,14 +147,12 @@ void VisualModel::CreateGlyphsPerCharacterTable( CharacterIndex startIndex,
 
   // 2) Traverse the glyphs and set the number of glyphs per character.
 
-  // The glyph index.
-  const GlyphIndex glyphIndex = updateCurrentBuffer  ? *( mCharactersToGlyph.Begin() + startIndex ) : 0u;
   Length traversedCharacters = 0;
 
   // The number of 'characters per glyph' equal to zero.
   Length zeroCharactersPerGlyph = 0u;
 
-  for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin() + glyphIndex,
+  for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin() + startGlyphIndex,
          endIt = mCharactersPerGlyph.End();
        ( it != endIt ) && ( traversedCharacters < numberOfCharacters );
        ++it )

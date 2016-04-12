@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/paragraph-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
@@ -136,6 +137,30 @@ public:
    */
   void ClearFontDescriptionRuns();
 
+  // Paragraphs
+
+  /**
+   * @brief Creates the paragraph info.
+   *
+   * @pre The line break info must be set.
+   *
+   * @param[in] startIndex The character from where the paragraph info is set.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void CreateParagraphInfo( CharacterIndex startIndex,
+                            Length numberOfCharacters );
+
+  /**
+   * @brief Find the paragraphs which contains the given characters.
+   *
+   * @param[in] index The first character's index of the run.
+   * @param[in] numberOfCharacters The number of characters of the run.
+   * @param[out] paragraphs Indices to the paragraphs which contain the characters.
+   */
+  void FindParagraphs( CharacterIndex index,
+                       Length numberOfCharacters,
+                       Vector<ParagraphRunIndex>& paragraphs );
+
 protected:
 
   /**
@@ -165,6 +190,7 @@ public:
   Vector<FontDescriptionRun>            mFontDescriptionRuns;
   Vector<LineBreakInfo>                 mLineBreakInfo;
   Vector<WordBreakInfo>                 mWordBreakInfo;
+  Vector<ParagraphRun>                  mParagraphInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
   Vector<CharacterDirection>            mCharacterDirections;        ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;

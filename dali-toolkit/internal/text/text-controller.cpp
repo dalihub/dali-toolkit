@@ -466,7 +466,7 @@ float Controller::GetDefaultPointSize() const
   return 0.0f;
 }
 
-void Controller::UpdateAfterFontChange( std::string& newDefaultFont )
+void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
 
@@ -499,7 +499,7 @@ const Vector4& Controller::GetTextColor() const
   return mImpl->mTextColor;
 }
 
-bool Controller::RemoveText( int cursorOffset, int numberOfChars )
+bool Controller::RemoveText( int cursorOffset, int numberOfCharacters )
 {
   bool removed = false;
 
@@ -508,8 +508,8 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
     return removed;
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfChars %d\n",
-                 this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfChars );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfCharacters %d\n",
+                 this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfCharacters );
 
   if( !mImpl->IsShowingPlaceholderText() )
   {
@@ -525,12 +525,12 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
       cursorIndex = oldCursorIndex + cursorOffset;
     }
 
-    if( ( cursorIndex + numberOfChars ) > currentText.Count() )
+    if( ( cursorIndex + numberOfCharacters ) > currentText.Count() )
     {
-      numberOfChars = currentText.Count() - cursorIndex;
+      numberOfCharacters = currentText.Count() - cursorIndex;
     }
 
-    if( ( cursorIndex + numberOfChars ) <= currentText.Count() )
+    if( ( cursorIndex + numberOfCharacters ) <= currentText.Count() )
     {
       // Update the input style and remove the text's style before removing the text.
 
@@ -541,18 +541,18 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
       mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
 
       // Remove the text's style before removing the text.
-      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfChars );
+      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
 
       // Remove the characters.
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
-      Vector<Character>::Iterator last  = first + numberOfChars;
+      Vector<Character>::Iterator last  = first + numberOfCharacters;
 
       currentText.Erase( first, last );
 
       // Cursor position retreat
       oldCursorIndex = cursorIndex;
 
-      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfChars );
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
       removed = true;
     }
   }
@@ -1776,14 +1776,14 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
   // Remove the previous IMF pre-edit (predicitive text)
   if( mImpl->mEventData->mPreEditFlag &&
-      ( 0 != mImpl->mEventData->mPreEditLength ) )
+      ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
-    CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
+    const CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
 
-    removedPrevious = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
+    removedPrevious = RemoveText( -static_cast<int>( offset ), mImpl->mEventData->mPreEditLength );
 
     mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
-    mImpl->mEventData->mPreEditLength = 0;
+    mImpl->mEventData->mPreEditLength = 0u;
   }
   else
   {
@@ -1842,7 +1842,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     const Length numberOfCharactersInModel = mImpl->mLogicalModel->mText.Count();
 
-    // Restrict new text to fit within Maximum characters setting
+    // Restrict new text to fit within Maximum characters setting.
     Length maxSizeOfNewText = std::min( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
     maxLengthReached = ( characterCount > maxSizeOfNewText );
 
@@ -2514,7 +2514,7 @@ void Controller::ShowPlaceholderText()
 
     // Transform a text array encoded in utf8 into an array encoded in utf32.
     // It returns the actual number of characters.
-    Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
+    const Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
 
     // Reset the cursor position

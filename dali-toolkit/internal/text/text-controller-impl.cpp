@@ -336,7 +336,13 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     lineBreakInfo.Resize( numberOfCharacters, TextAbstraction::LINE_NO_BREAK );
 
     SetLineBreakInfo( utf32Characters,
+                      startIndex,
+                      requestedNumberOfCharacters,
                       lineBreakInfo );
+
+    // Create the paragraph info.
+    mLogicalModel->CreateParagraphInfo( startIndex,
+                                        requestedNumberOfCharacters );
   }
 
   Vector<WordBreakInfo>& wordBreakInfo = mLogicalModel->mWordBreakInfo;
@@ -471,8 +477,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, numberOfCharacters );
-    mVisualModel->CreateCharacterToGlyphTable( startIndex, numberOfCharacters );
+    mVisualModel->CreateGlyphsPerCharacterTable( startIndex, startGlyphIndex, numberOfCharacters );
+    mVisualModel->CreateCharacterToGlyphTable( startIndex, startGlyphIndex, numberOfCharacters );
   }
 
   const Length numberOfGlyphs = glyphs.Count();
