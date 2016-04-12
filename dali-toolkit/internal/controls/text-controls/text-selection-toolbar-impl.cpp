@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,10 +163,10 @@ void TextSelectionToolbar::OnStageConnection( int depth )
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
 {
   mMaxSize = maxSize;
-  if (mScrollView && mStencilLayer )
+  if (mScrollView && mToolbarLayer )
   {
     mScrollView.SetMaximumSize( mMaxSize );
-    mStencilLayer.SetMaximumSize( mMaxSize );
+    mToolbarLayer.SetMaximumSize( mMaxSize );
   }
 }
 
@@ -198,23 +198,18 @@ void TextSelectionToolbar::SetUpScrollView()
 void TextSelectionToolbar::SetUp()
 {
   Actor self = Self();
+
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
-  // Create Layer and Stencil.  Layer enable's clipping when content exceed maximum defined width.
-  mStencilLayer = Layer::New();
-  mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
+  // Create Layer to house the toolbar.
+  mToolbarLayer = Layer::New();
+  mToolbarLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  mToolbarLayer.SetAnchorPoint( AnchorPoint::CENTER );
+  mToolbarLayer.SetParentOrigin( ParentOrigin::CENTER );
 
-  BufferImage stencilImage = BufferImage::WHITE(); // ImageView needs an Image or does nothing
-  Toolkit::ImageView stencil = Toolkit::ImageView::New(stencilImage);
-  stencil.SetDrawMode( DrawMode::STENCIL );
-  stencil.SetVisible( true );
-  stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  stencil.SetParentOrigin( ParentOrigin::CENTER );
-
-  if ( !mScrollView )
+  if( !mScrollView )
   {
-    mScrollView  = Toolkit::ScrollView::New();
+    mScrollView = Toolkit::ScrollView::New();
   }
   SetUpScrollView();
 
@@ -224,10 +219,10 @@ void TextSelectionToolbar::SetUp()
   mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   mTableOfButtons.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
 
-  mStencilLayer.Add( stencil );
-  mStencilLayer.Add( mScrollView );
   mScrollView.Add( mTableOfButtons );
-  self.Add( mStencilLayer );
+  mToolbarLayer.Add( mScrollView );
+
+  self.Add( mToolbarLayer );
 }
 
 void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
@@ -265,7 +260,7 @@ void TextSelectionToolbar::ResizeDividers( Size& size )
 
 void TextSelectionToolbar::RaiseAbove( Layer target )
 {
-  mStencilLayer.RaiseAbove( target );
+  mToolbarLayer.RaiseAbove( target );
 }
 
 void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )

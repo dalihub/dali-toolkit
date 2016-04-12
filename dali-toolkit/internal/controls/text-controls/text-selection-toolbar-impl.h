@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,7 @@ private:
 
 private: // Data
 
-  Layer mStencilLayer;                                ///< The stencil layer
+  Layer mToolbarLayer;                                ///< The layer used to house the toolbar.
   Toolkit::TableView mTableOfButtons;                 ///< Actor which holds all the buttons, sensitivity can be set on buttons via this actor
   Toolkit::ScrollView mScrollView;                    ///< Provides scrolling of Toolbar when content does not fit.
   RulerPtr mRulerX;                                   ///< Ruler to clamp horizontal scrolling. Updates on Relayout
@@ -196,4 +196,4 @@ inline const Toolkit::Internal::TextSelectionToolbar& GetImpl( const Toolkit::Te
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H
