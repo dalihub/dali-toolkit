@@ -19,11 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/object/property-input.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
-#include <sstream>
 
 namespace Dali
 {
@@ -37,15 +32,16 @@ namespace Internal
 
 /**
  * @brief Re-applies PageTurnEffect internal constraints
- * The internal constraint uses the OriginalCenter property and the CurrentCenter Property
+ * The internal constraint uses the OriginalCenter property and the CURRENT_CENTER Property
  * to update the variety of common parameters which are with the same value for all the vertices.
  * Note: For each actor, the constraints are applied in the same order as the calls to Actor::ApplyConstraint().
- * So if there are other contraints applied to the OriginalCenter or CurrentCenter while when using this effect,
+ * So if there are other contraints applied to the ORIGINAL_CENTER or CURRENT_CENTER while when using this effect,
  * call this method to get the internal constraints and re-apply it afterwards.
  *
- * @param[in] shaderEffect The page turn effect to which internal constraints should be re-applied
+ * @param[in] actor The page turn actor to which internal constraints should be re-applied
+ * @param[in] pageHeight The page height.
  */
-void PageTurnApplyInternalConstraint( ShaderEffect& shaderEffect);
+void PageTurnApplyInternalConstraint( Actor& actor, float pageHeight );
 
 /**
  * @brief Create a new PageTurnEffect
@@ -54,33 +50,33 @@ void PageTurnApplyInternalConstraint( ShaderEffect& shaderEffect);
  * Usage example:-
  *
  * // create shader used for doing page-turn effect\n
- * ShaderEffect pageTurnEffect = CreatePageTurnEffect();
+ * Property::Map pageTurnEffect = CreatePageTurnEffect();
  *
- * // set image actor shader to the page-turn one\n
+ * // set image view custom shader to the page-turn one\n
  * // for portrait view, one image actor for each page\n
  * // for landscape view, the page turned over is still visible, so back image is needed \n
  * //     in this case, create another image Actor using the back image and added to the page actor \n
- * ImageActor pageActor = ImageActor::New(....); \n
- * ImageActor backImageActor = ImageActor::New(....); \n
- * pageActor.Add(backPageActor);\n
- * pageActor.SetShaderEffect ( pageTurnEffect ); \n
+ * ImageView page = ImageView::New(....); \n
+ * page.SetProperty ( ImageView::Property::IMAGE, pageTurnEffect ); \n
  *
  * //set initial values
- * pageTurnEffect.SetUniform("uPageSize", Vector2);\n
- * pageTurnEffect.SetUniform("uOriginalCenter", Vector2);\n
- * pageTurnEffect.SetUniform("uIsTurningBack", bool);\n
- * pageTurnEffect.SetUniform("uCurrentCenter",Vector2);\n
+ * page.SetProperty( page.GetPropertyIndex("uIsTurningBack",) bool );\n
+ * page.SetProperty( page.GetPropertyIndex("uSpineShadowParameter",) Vector2 );\n
+ * page.SetProperty( page.GetPropertyIndex("ORIGINAL_CENTER"), Vector2 );\n
+ * page.SetProperty( page.GetPropertyIndex("CURRENT_CENTER"), Vector2 );\n
+ * page.SetProperty( page.GetPropertyIndex("uCommonParameters"), Matrix );\n
+ * page.SetProperty( page.GetPropertyIndex("uTextureWidth"), float ); // Set to 1.0 for single-sided or 2.0 for double-sided \n
+ * PageTurnApplyInternalConstraint( page );\n
  *
  * //Animate it with the current center property\n
- * Animation animation[mAnimationIndex] = Animation::New( ... );\n
- * animation.AnimateTo(Property( pageTurnEffect, "uCurrentCenter" ),
- *                            currentCenter,
- *                            AlphaFunction::...);\n
- * animation[mAnimationIndex].Play(); \n
+ * Animation animation = Animation::New( ... );\n
+ * animation.AnimateTo(Property( page, "CURRENT_CENTER" ),
+ *                               currentCenter,
+ *                               AlphaFunction::...);\n
+ * animation.Play(); \n
  *
- * Animatable/Constrainable uniforms:
  */
-ShaderEffect CreatePageTurnEffect();
+Property::Map CreatePageTurnEffect();
 
 } // namespace Internal
 

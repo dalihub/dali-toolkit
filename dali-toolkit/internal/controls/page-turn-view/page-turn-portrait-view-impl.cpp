@@ -38,8 +38,6 @@ namespace Internal
 
 namespace
 {
-using namespace Dali;
-
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnPortraitView, Toolkit::PageTurnView, NULL )
 DALI_TYPE_REGISTRATION_END()
 
@@ -54,7 +52,6 @@ const float PAGE_TURN_OVER_ANIMATION_DURATION(0.5f);
 PageTurnPortraitView::PageTurnPortraitView( PageFactory& pageFactory, const Vector2& pageSize )
 : PageTurnView( pageFactory, pageSize )
 {
-
 }
 
 PageTurnPortraitView::~PageTurnPortraitView()
@@ -78,6 +75,9 @@ Toolkit::PageTurnPortraitView PageTurnPortraitView::New( PageFactory& pageFactor
 
 void PageTurnPortraitView::OnPageTurnViewInitialize()
 {
+  mTurnEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 1.f );
+  mSpineEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 1.f );
+
   mControlSize = mPageSize;
   Self().SetSize( mPageSize );
   mTurningPageLayer.SetParentOrigin( ParentOrigin::CENTER_LEFT );
@@ -92,24 +92,11 @@ void PageTurnPortraitView::SetPanActor( const Vector2& panPosition )
 {
   if( mCurrentPageIndex < mTotalPageCount )
   {
-    mPanActor = mPageActors[mCurrentPageIndex%NUMBER_OF_CACHED_PAGES];
     mTurningPageIndex = mCurrentPageIndex;
   }
   else
   {
-    mPanActor.Reset();
-  }
-}
-
-void PageTurnPortraitView::SetSpineEffect(ImageActor actor, bool isLeftSide)
-{
-  if(isLeftSide)
-  {
-    actor.RemoveShaderEffect();
-  }
-  else
-  {
-    actor.SetShaderEffect( mSpineEffectFront );
+    mTurningPageIndex = -1;
   }
 }
 
@@ -119,7 +106,8 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
   // There is previous page and an outwards flick is detected
   if( mCurrentPageIndex > 0 && gestureSpeed > GESTURE_SPEED_THRESHOLD && offset.x > fabs( offset.y ))
   {
-    ImageActor actor = mPageActors[ (mCurrentPageIndex-1) % NUMBER_OF_CACHED_PAGES ];
+    int actorIndex = (mCurrentPageIndex-1) % NUMBER_OF_CACHED_PAGES;
+    Actor actor = mPages[ actorIndex ].actor;
     if(actor.GetParent() != Self())
     {
       return;
@@ -136,40 +124,34 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
     RemovePage( mCurrentPageIndex+NUMBER_OF_CACHED_PAGES_EACH_SIDE );
     AddPage( mCurrentPageIndex-NUMBER_OF_CACHED_PAGES_EACH_SIDE );
     OrganizePageDepth();
+    mPageUpdated = true;
 
-    mPageActors[mTurningPageIndex%NUMBER_OF_CACHED_PAGES].SetVisible(true);
+    actor.SetVisible(true);
 
     // Add the page to tuning page layer and set up PageTurnEffect
     mShadowView.Add( actor );
-    actor.SetShaderEffect( mTurnEffect[mIndex] );
-    PageTurnApplyInternalConstraint(mTurnEffect[mIndex]);
-    mIsAnimating[mIndex] = true;
-    mTurnEffect[mIndex].SetUniform("uIsTurningBack", 1.f );
+    mPages[actorIndex].UseEffect( mTurnEffectShader );
+    mAnimatingCount++;
     Vector2 originalCenter( mPageSize.width*1.5f, 0.5f*mPageSize.height );
-    mTurnEffect[mIndex].SetUniform("uOriginalCenter", originalCenter );
-    mTurnEffect[mIndex].SetUniform("uCurrentCenter", Vector2( mPageSize.width*0.5f, mPageSize.height*0.5f ) );
+    mPages[actorIndex].SetOriginalCenter( originalCenter );
+    mPages[actorIndex].SetCurrentCenter( Vector2( mPageSize.width*0.5f, mPageSize.height*0.5f ) );
+    PageTurnApplyInternalConstraint(actor, mPageSize.height);
 
     // Start an animation to turn the previous page back
     Animation animation = Animation::New( PAGE_TURN_OVER_ANIMATION_DURATION );
     mAnimationPageIdPair[animation] = mCurrentPageIndex;
-    mAnimationIndexPair[animation] = mIndex;
 
-    animation.AnimateTo( Property( mTurnEffect[mIndex], "uCurrentCenter" ),
+    animation.AnimateTo( Property( actor, mPages[actorIndex].propertyCurrentCenter ),
                          originalCenter,
                          AlphaFunction::EASE_OUT, TimePeriod(PAGE_TURN_OVER_ANIMATION_DURATION*0.75f) );
     animation.AnimateBy( Property( actor, Actor::Property::ORIENTATION ), AngleAxis( Degree( 180.0f ), Vector3::YAXIS ) ,AlphaFunction::EASE_OUT );
     animation.Play();
 
-    ImageActor imageActor = ImageActor::DownCast(actor);
-    if( imageActor )
-    {
-      SetCullFace( imageActor, CullBack );
-    }
     animation.FinishedSignal().Connect( this, &PageTurnPortraitView::TurnedOverBackwards );
   }
 }
 
-void PageTurnPortraitView::OnTurnedOver( ImageActor actor, bool isLeftSide )
+void PageTurnPortraitView::OnTurnedOver( Actor actor, bool isLeftSide )
 {
   if( isLeftSide )
   {
@@ -179,11 +161,6 @@ void PageTurnPortraitView::OnTurnedOver( ImageActor actor, bool isLeftSide )
 
 void PageTurnPortraitView::TurnedOverBackwards( Animation& animation )
 {
-  ImageActor imageActor =  mPageActors[mAnimationPageIdPair[animation] % NUMBER_OF_CACHED_PAGES];
-  if( imageActor )
-  {
-    SetCullFace( imageActor, CullNone );
-  }
   TurnedOver( animation );
 }
 

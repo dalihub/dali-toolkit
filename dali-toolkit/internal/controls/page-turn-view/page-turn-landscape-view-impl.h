@@ -36,15 +36,16 @@ class PageTurnLandscapeView : public PageTurnView
 public:
 
   /**
-   * Create a new PageTurnLandscapeView
-   * @return A handle to the newly allocated PageTurnLandscapeView
+   * @copydoc Toolkit::PageTurnLandscapeView::New( PageFactory&, const Vector2& )
    */
   static Toolkit::PageTurnLandscapeView New( PageFactory& pageFactory, const Vector2& pageSize );
 
 protected:
   /**
    * Constructor.
-   * It initializes the PageTurnLandscapeView members
+   * It initializes the PageTurnPortraitView members
+   * @param[in] pageFactory The factory which provides image actors to PageTurnView as the page content.
+   * @param[in] pageSize The size of the page
    */
   PageTurnLandscapeView( PageFactory& pageFactory, const Vector2& pageSize );
 
@@ -63,7 +64,7 @@ protected: // From PageTurnView
   /**
    * @copydoc PageTurnView::OnAddPage
    */
-  virtual void OnAddPage( ImageActor newPage, bool isLeftSide );
+  virtual void OnAddPage( Actor newPage, bool isLeftSide );
 
   /**
    * @copydoc PageTurnView::SetPanPosition
@@ -74,11 +75,6 @@ protected: // From PageTurnView
    * @copydoc PageTurnView::SetPanActor
    */
   virtual void SetPanActor( const Vector2& panPosition );
-
-  /**
-   * @copydoc PageTurnView::SetSpineEffect
-   */
-  virtual void SetSpineEffect(ImageActor actor, bool isLeftSide);
 
 private:
 
