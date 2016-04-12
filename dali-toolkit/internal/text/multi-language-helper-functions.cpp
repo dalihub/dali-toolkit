@@ -43,19 +43,36 @@ void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
   // Pointer to the font id buffer.
   FontId* fontIdsBuffer = fontIds.Begin();
 
+  // Used to temporarily store the style per character.
+  TextAbstraction::FontDescription fontDescription;
+  TextAbstraction::PointSize26Dot6 fontSize;
+
+  Length familyIndex = 0u;
+  Length weightIndex = 0u;
+  Length widthIndex = 0u;
+  Length slantIndex = 0u;
+  Length sizeIndex = 0u;
+
   // Traverse all the characters.
-  for( CharacterIndex index = startIndex; index < numberOfCharacters; ++index )
+  const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
+  for( CharacterIndex index = startIndex; index < lastCharacterPlusOne; ++index )
   {
-    // The default font description and font point size.
-    TextAbstraction::FontDescription fontDescription = defaultFontDescription;
-    TextAbstraction::PointSize26Dot6 fontSize = defaultPointSize;
     bool defaultFont = true;
 
+    Length runIndex = 0u;
+
+    bool familyOverriden = false;
+    bool weightOverriden = false;
+    bool widthOverriden = false;
+    bool slantOverriden = false;
+    bool sizeOverriden = false;
+
     // Traverse all the font descriptions.
-    for( Vector<FontDescriptionRun>::ConstIterator it = fontDescriptions.Begin(),
+    const FontDescriptionRun* const fontDescriptionsBuffer = fontDescriptions.Begin();
+    for( Vector<FontDescriptionRun>::ConstIterator it = fontDescriptionsBuffer,
            endIt = fontDescriptions.End();
          it != endIt;
-         ++it )
+         ++it, ++runIndex )
     {
       // Check whether the character's font is modified by the current font description.
       const FontDescriptionRun& fontRun = *it;
@@ -64,28 +81,33 @@ void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
       {
         if( fontRun.familyDefined )
         {
-          fontDescription.family = std::string( fontRun.familyName, fontRun.familyLength );
           defaultFont = false;
+          familyOverriden = true;
+          familyIndex = runIndex;
         }
         if( fontRun.weightDefined )
         {
-          fontDescription.weight = fontRun.weight;
           defaultFont = false;
+          weightOverriden = true;
+          weightIndex = runIndex;
         }
         if( fontRun.widthDefined )
         {
-          fontDescription.width = fontRun.width;
           defaultFont = false;
+          widthOverriden = true;
+          widthIndex = runIndex;
         }
         if( fontRun.slantDefined )
         {
-          fontDescription.slant = fontRun.slant;
           defaultFont = false;
+          slantOverriden = true;
+          slantIndex = runIndex;
         }
         if( fontRun.sizeDefined )
         {
-          fontSize = fontRun.size;
           defaultFont = false;
+          sizeOverriden = true;
+          sizeIndex = runIndex;
         }
       }
     }
@@ -93,6 +115,56 @@ void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
     // Get the font id if is not the default font.
     if( !defaultFont )
     {
+      if( familyOverriden )
+      {
+        const FontDescriptionRun& fontRun = *( fontDescriptionsBuffer + familyIndex );
+        fontDescription.family = std::string( fontRun.familyName, fontRun.familyLength ); // TODO Could use move constructor when switch to c++11.
+      }
+      else
+      {
+        fontDescription.family = defaultFontDescription.family;
+      }
+
+      if( weightOverriden )
+      {
+        const FontDescriptionRun& fontRun = *( fontDescriptionsBuffer + weightIndex );
+        fontDescription.weight = fontRun.weight;
+      }
+      else
+      {
+        fontDescription.weight = defaultFontDescription.weight;
+      }
+
+      if( widthOverriden )
+      {
+        const FontDescriptionRun& fontRun = *( fontDescriptionsBuffer + widthIndex );
+        fontDescription.width = fontRun.width;
+      }
+      else
+      {
+        fontDescription.width = defaultFontDescription.width;
+      }
+
+      if( slantOverriden )
+      {
+        const FontDescriptionRun& fontRun = *( fontDescriptionsBuffer + slantIndex );
+        fontDescription.slant = fontRun.slant;
+      }
+      else
+      {
+        fontDescription.slant = defaultFontDescription.slant;
+      }
+
+      if( sizeOverriden )
+      {
+        const FontDescriptionRun& fontRun = *( fontDescriptionsBuffer + sizeIndex );
+        fontSize = fontRun.size;
+      }
+      else
+      {
+        fontSize = defaultPointSize;
+      }
+
       *( fontIdsBuffer + index - startIndex ) = fontClient.GetFontId( fontDescription, fontSize );
     }
   }

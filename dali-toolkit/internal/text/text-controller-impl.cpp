@@ -896,34 +896,50 @@ void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
   inputStyle.textColor = mTextColor;
   inputStyle.isDefaultColor = true;
 
+  inputStyle.familyName.clear();
+  inputStyle.weight = TextAbstraction::FontWeight::NORMAL;
+  inputStyle.width = TextAbstraction::FontWidth::NORMAL;
+  inputStyle.slant = TextAbstraction::FontSlant::NORMAL;
+  inputStyle.size = 0.f;
+
+  inputStyle.familyDefined = false;
+  inputStyle.weightDefined = false;
+  inputStyle.widthDefined = false;
+  inputStyle.slantDefined = false;
+  inputStyle.sizeDefined = false;
+
   // Sets the default font's family name, weight, width, slant and size.
   if( mFontDefaults )
   {
-    inputStyle.familyName = mFontDefaults->mFontDescription.family;
-    inputStyle.weight = mFontDefaults->mFontDescription.weight;
-    inputStyle.width = mFontDefaults->mFontDescription.width;
-    inputStyle.slant = mFontDefaults->mFontDescription.slant;
-    inputStyle.size = mFontDefaults->mDefaultPointSize;
+    if( mFontDefaults->familyDefined )
+    {
+      inputStyle.familyName = mFontDefaults->mFontDescription.family;
+      inputStyle.familyDefined = true;
+    }
 
-    inputStyle.familyDefined = mFontDefaults->familyDefined;
-    inputStyle.weightDefined = mFontDefaults->weightDefined;
-    inputStyle.widthDefined = mFontDefaults->widthDefined;
-    inputStyle.slantDefined = mFontDefaults->slantDefined;
-    inputStyle.sizeDefined = mFontDefaults->sizeDefined;
-  }
-  else
-  {
-    inputStyle.familyName.clear();
-    inputStyle.weight = TextAbstraction::FontWeight::NORMAL;
-    inputStyle.width = TextAbstraction::FontWidth::NORMAL;
-    inputStyle.slant = TextAbstraction::FontSlant::NORMAL;
-    inputStyle.size = 0.f;
+    if( mFontDefaults->weightDefined )
+    {
+      inputStyle.weight = mFontDefaults->mFontDescription.weight;
+      inputStyle.weightDefined = true;
+    }
 
-    inputStyle.familyDefined = false;
-    inputStyle.weightDefined = false;
-    inputStyle.widthDefined = false;
-    inputStyle.slantDefined = false;
-    inputStyle.sizeDefined = false;
+    if( mFontDefaults->widthDefined )
+    {
+      inputStyle.width = mFontDefaults->mFontDescription.width;
+      inputStyle.widthDefined = true;
+    }
+
+    if( mFontDefaults->slantDefined )
+    {
+      inputStyle.slant = mFontDefaults->mFontDescription.slant;
+      inputStyle.slantDefined = true;
+    }
+
+    if( mFontDefaults->sizeDefined )
+    {
+      inputStyle.size = mFontDefaults->mDefaultPointSize;
+      inputStyle.sizeDefined = true;
+    }
   }
 }
 
