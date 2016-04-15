@@ -43,28 +43,17 @@ class StyleManager;
  *
  * The default theme is automatically loaded and applied.
  *
- * If the application wants to customize the theme, RequestThemeChange needs to be called.
- * Also, the default orientation is Portrait, if the application wants to adapt to the orientation change, call SetOrientation or SetOrienationValue.
- * @code
- *   const char* CUSTOM_THEME = DALI_SCRIPT_DIR "tizen-dark-theme.json";
- *
- *   void OnInit(Application& app)
- *   {
- *      Toolkit::StyleManager::Get().RequestThemeChange( CUSTOM_THEME );
- *      Toolkit::StyleManager::Get().SetOrientation( ... );
- *      ...
- *   }
- * @endcode
- *
- * Internal::Control can be configured to register for the signals that are required from StyleManager,
- * such as theme change.
+ * If the application wants to customize the theme, RequestThemeChange
+ * needs to be called.  Internal::Control can be configured to
+ * register for the signals that are required from StyleManager, such
+ * as theme change.
  */
 class DALI_IMPORT_API StyleManager : public BaseHandle
 {
 public:
 
   // Signals
-  typedef Signal< void ( StyleManager, StyleChange::Type ) >  StyleChangeSignalType;
+  typedef Signal< void ( StyleManager, StyleChange::Type ) >  StyleChangedSignalType;
 
   /**
    * @brief Create a StyleManager handle; this can be initialised with StyleManager::Get()
@@ -171,14 +160,16 @@ public:
 public: // Signals
 
   /**
-   * @brief This signal is emitted whenever the style (e.g. theme/font change) is changed on device
+   * @brief This signal is emitted after the style (e.g. theme/font change) has changed
+   * and the controls have been informed.
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( StyleManager styleManager, StyleChange change );
    * @endcode
    * @return The signal to connect to.
    */
-  StyleChangeSignalType& StyleChangeSignal();
+  StyleChangedSignalType& StyleChangedSignal();
 
 public:
 

@@ -248,9 +248,14 @@ void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& json
   }
 }
 
-Toolkit::StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
+Toolkit::StyleManager::StyleChangedSignalType& StyleManager::StyleChangedSignal()
 {
-  return mStyleChangeSignal;
+  return mStyleChangedSignal;
+}
+
+Toolkit::StyleManager::StyleChangedSignalType& StyleManager::ControlStyleChangeSignal()
+{
+  return mControlStyleChangeSignal;
 }
 
 void StyleManager::SetTheme( const std::string& themeFile )
@@ -275,7 +280,7 @@ void StyleManager::SetTheme( const std::string& themeFile )
       mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
     }
 
-    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
+    EmitStyleChangeSignals(StyleChange::THEME_CHANGE);
   }
   else
   {
@@ -447,9 +452,20 @@ void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::T
       break;
     }
   }
-
-  mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );
+  EmitStyleChangeSignals( styleChange );
 }
+
+void StyleManager::EmitStyleChangeSignals( StyleChange::Type styleChange )
+{
+  Toolkit::StyleManager styleManager = StyleManager::Get();
+
+  // Update Controls first
+  mControlStyleChangeSignal.Emit( styleManager, styleChange );
+
+  // Inform application last
+  mStyleChangedSignal.Emit( styleManager, styleChange );
+}
+
 
 } // namespace Internal
 

@@ -56,7 +56,7 @@ public: // Getters
 
   static AccessibilityAdaptor Get();
 
-  Vector2 GetReadPosition();
+  Vector2 GetReadPosition() const;
   bool IsEnabled() const;
   void SetActionHandler(AccessibilityActionHandler& handler);
   void SetGestureHandler(AccessibilityGestureHandler& handler);

@@ -88,9 +88,9 @@ StyleManager::StyleManager( Internal::StyleManager *impl )
 {
 }
 
-StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
+StyleManager::StyleChangedSignalType& StyleManager::StyleChangedSignal()
 {
-  return GetImpl( *this ).StyleChangeSignal();
+  return GetImpl( *this ).StyleChangedSignal();
 }
 
 void StyleManager::RequestThemeChange( const std::string& themeFile )
@@ -106,4 +106,3 @@ void StyleManager::RequestDefaultTheme()
 } // namespace Toolkit
 
 } // namespace Dali
-

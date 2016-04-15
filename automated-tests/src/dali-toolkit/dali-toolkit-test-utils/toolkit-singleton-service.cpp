@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
  */
 
-#include "toolkit-singleton-service.h"
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
@@ -31,108 +31,125 @@ namespace Internal
 namespace Adaptor
 {
 
-/**
- * Stub for the SingletonService
- */
+namespace
+{
+Dali::IntrusivePtr<SingletonService> gSingletonService;
+} // unnamed namespace
+
+
 class SingletonService : public Dali::BaseObject
 {
 public:
-  static Dali::SingletonService New();
-  static Dali::SingletonService Get();
-  void Register( const std::type_info& info, BaseHandle singleton );
-  void UnregisterAll();
-  BaseHandle GetSingleton( const std::type_info& info ) const;
+
+  /**
+   * Create a SingletonService.
+   * This should only be called once by the Application class.
+   * @return A newly created SingletonService.
+   */
+  static Dali::SingletonService New()
+  {
+    DALI_ASSERT_ALWAYS( 0 && "SingletonService New method used");
+    gSingletonService = Dali::IntrusivePtr<SingletonService>( new SingletonService() );
+    return Dali::SingletonService( gSingletonService.Get() );
+  }
+
+  /**
+   * @copydoc Dali::SingletonService::Get()
+   */
+  static Dali::SingletonService Get()
+  {
+    Dali::SingletonService singletonService;
+    if ( !gSingletonService )
+    {
+      gSingletonService = Dali::IntrusivePtr<SingletonService>( new SingletonService() );
+    }
+    return Dali::SingletonService( gSingletonService.Get() );
+  }
+
+  /**
+   * @copydoc Dali::SingletonService::Register()
+   */
+  void Register( const std::type_info& info, BaseHandle singleton )
+  {
+    if( singleton )
+    {
+      mSingletonContainer.insert( SingletonPair( info.name(), singleton ) );
+    }
+  }
+
+  /**
+   * @copydoc Dali::SingletonService::UnregisterAll()
+   */
+  void UnregisterAll()
+  {
+    mSingletonContainer.clear();
+  }
+
+  /**
+   * @copydoc Dali::SingletonService::GetSingleton()
+   */
+  BaseHandle GetSingleton( const std::type_info& info ) const
+  {
+    BaseHandle object;
+
+    SingletonConstIter iter = mSingletonContainer.find(info.name());
+    if( iter != mSingletonContainer.end() )
+    {
+      object = ( *iter ).second;
+    }
+    return object;
+  }
 
 private:
-  SingletonService();
-  virtual ~SingletonService();
+
+  /**
+   * Private Constructor
+   * @see SingletonService::New()
+   */
+  SingletonService()
+  : mSingletonContainer()
+  {
+    // Can only have one instance of SingletonService
+    DALI_ASSERT_ALWAYS( !gSingletonService && "Only one instance of SingletonService is allowed");
+    gSingletonService = this;
+  }
+
+  /**
+   * Virtual Destructor
+   */
+  virtual ~SingletonService()
+  {
+    gSingletonService = 0;
+  }
 
   // Undefined
   SingletonService( const SingletonService& );
   SingletonService& operator=( SingletonService& );
 
 private:
-
   typedef std::pair<std::string, BaseHandle> SingletonPair;
   typedef std::map<std::string, BaseHandle>  SingletonContainer;
   typedef SingletonContainer::const_iterator SingletonConstIter;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
-
-  static Dali::SingletonService mToolkitSingletonService;
 };
-
-Dali::SingletonService SingletonService::mToolkitSingletonService;
-
-Dali::SingletonService SingletonService::New()
-{
-  return Get();
-}
-
-Dali::SingletonService SingletonService::Get()
-{
-  if( ! mToolkitSingletonService )
-  {
-    mToolkitSingletonService = Dali::SingletonService( new Dali::Internal::Adaptor::SingletonService );
-  }
-  return mToolkitSingletonService;
-}
-
-void SingletonService::Register( const std::type_info& info, BaseHandle singleton )
-{
-  if( singleton )
-  {
-    mSingletonContainer.insert( SingletonPair( info.name(), singleton ) );
-  }
-}
-
-void SingletonService::UnregisterAll()
-{
-  mSingletonContainer.clear();
-}
-
-BaseHandle SingletonService::GetSingleton( const std::type_info& info ) const
-{
-  BaseHandle object;
-
-  SingletonConstIter iter = mSingletonContainer.find(info.name());
-  if( iter != mSingletonContainer.end() )
-  {
-    object = ( *iter ).second;
-  }
-
-  return object;
-}
-
-SingletonService::SingletonService()
-: mSingletonContainer()
-{
-}
-
-SingletonService::~SingletonService()
-{
-}
 
 } // namespace Adaptor
 } // namespace Internal
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Internal::Adaptor::SingletonService& GetImplementation(Dali::SingletonService& player)
+inline Internal::Adaptor::SingletonService& GetImplementation(Dali::SingletonService& player)
 {
   DALI_ASSERT_ALWAYS( player && "SingletonService handle is empty" );
-
   BaseObject& handle = player.GetBaseObject();
-
   return static_cast<Internal::Adaptor::SingletonService&>(handle);
 }
 
-const Internal::Adaptor::SingletonService& GetImplementation(const Dali::SingletonService& player)
+inline const Internal::Adaptor::SingletonService& GetImplementation(const Dali::SingletonService& player)
 {
   DALI_ASSERT_ALWAYS( player && "SingletonService handle is empty" );
-
   const BaseObject& handle = player.GetBaseObject();
-
   return static_cast<const Internal::Adaptor::SingletonService&>(handle);
 }
 

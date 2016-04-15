@@ -486,7 +486,6 @@ void TextLabel::OnInitialize()
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
-
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::OnStyleChange\n");
 
   switch ( change )
