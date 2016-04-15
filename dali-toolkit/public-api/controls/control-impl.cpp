@@ -187,8 +187,7 @@ public:
   mLongPressGestureDetector(),
   mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false ),
-  mAddRemoveBackgroundChild( false )
+  mIsKeyboardFocusGroup( false )
 {
 }
 
@@ -384,7 +383,6 @@ public:
   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-  bool mAddRemoveBackgroundChild:1;        ///< Flag to know when we are adding or removing our own actor to avoid call to OnControlChildAdd
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
   static const PropertyRegistration PROPERTY_1;
@@ -841,31 +839,23 @@ void Control::OnKeyInputFocusLost()
 
 void Control::OnChildAdd(Actor& child)
 {
-  // If this is the background actor, then we do not want to inform deriving classes
-  if ( mImpl->mAddRemoveBackgroundChild )
-  {
-    return;
-  }
-
   // Notify derived classes.
   OnControlChildAdd( child );
 }
 
 void Control::OnChildRemove(Actor& child)
 {
-  // If this is the background actor, then we do not want to inform deriving classes
-  if ( mImpl->mAddRemoveBackgroundChild )
-  {
-    return;
-  }
-
   // Notify derived classes.
   OnControlChildRemove( child );
 }
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  // Background is resized through size negotiation
+  if( mImpl->mBackgroundRenderer )
+  {
+    Vector2 size( targetSize );
+    mImpl->mBackgroundRenderer.SetSize( size );
+  }
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)

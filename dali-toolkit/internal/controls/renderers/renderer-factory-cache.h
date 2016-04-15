@@ -21,6 +21,7 @@
 #include "svg/svg-rasterize-thread.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/devel-api/rendering/shader.h>
@@ -113,6 +114,13 @@ public:
    * Quad geometry is shared by multiple kind of Renderer, so implement it in the factory-cache.
    */
   static Geometry CreateQuadGeometry();
+
+  /**
+   * Create the grid geometry.
+   * @param[in] gridSize The size of the grid.
+   * @return The created grid geometry.
+   */
+  static Geometry CreateGridGeometry( Uint16Pair gridSize );
 
 public:
 

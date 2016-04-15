@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/camera-actor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -136,22 +137,24 @@ public:
    */
   void SetBackgroundColor( const Vector4& color );
 
+protected:
+
   /**
-   * Enable optional debug output in the shader
-   * @param[in] flag Set true to enable, dalse to disable.
+   * Setup position and parameters for camera
    */
-  void RenderDebug( bool flag );
+  void SetupCamera();
 
 protected:
   Image            mInputImage;
   FrameBufferImage mOutputImage;
   FilterKernel     mKernel;
   Actor            mRootActor;
+  CameraActor      mCameraActor;
   Vector4          mBackgroundColor;
   Vector2          mTargetSize;
   Pixel::Format    mPixelFormat;
   bool             mRefreshOnDemand;
-  bool             mDebugRender;
+
 }; // class Imagefilter
 
 } // namespace Internal

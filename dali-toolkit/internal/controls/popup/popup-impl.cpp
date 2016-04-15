@@ -1506,14 +1506,18 @@ bool Popup::OnDialogTouched(Actor actor, const TouchEvent& event)
   return true;
 }
 
-void Popup::OnControlStageConnection()
+void Popup::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   mLayoutDirty = true;
   RelayoutRequest();
 }
 
-void Popup::OnControlChildAdd( Actor& child )
+void Popup::OnChildAdd( Actor& child )
 {
+  Control::OnChildAdd( child );
+
   // Re-parent any children added by user to the body layer.
   if( mAlterAddedChild )
   {

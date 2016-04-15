@@ -72,9 +72,9 @@ private: // From Control
    * Adds a control using some default values (the control uses 10% of the tool bar space and is placed on the left group).
    * @param child The control to be added.
    *
-   * @see Control::OnControlChildAdd()
+   * @see Control::OnChildAdd()
    */
-  virtual void OnControlChildAdd(Actor& child);
+  virtual void OnChildAdd(Actor& child);
 
 private:
   /**

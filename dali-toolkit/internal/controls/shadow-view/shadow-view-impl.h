@@ -118,14 +118,14 @@ private:
   virtual void OnInitialize();
 
   /**
-   * @copydoc Control::OnControlChildAdd()
+   * @copydoc Control::OnChildAdd()
    */
-  virtual void OnControlChildAdd( Actor& child );
+  virtual void OnChildAdd( Actor& child );
 
   /**
-   * @copydoc Control::OnControlChildRemove()
+   * @copydoc Control::OnChildRemove()
    */
-  virtual void OnControlChildRemove( Actor& child );
+  virtual void OnChildRemove( Actor& child );
 
   /**
    * Constrain the camera actor to the position of the point light, pointing

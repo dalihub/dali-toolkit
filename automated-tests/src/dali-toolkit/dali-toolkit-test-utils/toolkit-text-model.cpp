@@ -116,7 +116,10 @@ void CreateTextModel( const std::string& text,
   Vector<LineBreakInfo>& lineBreakInfo = logicalModel->mLineBreakInfo;
   lineBreakInfo.Resize( numberOfCharacters );
 
-  SetLineBreakInfo( utf32Characters, lineBreakInfo );
+  SetLineBreakInfo( utf32Characters,
+                    0u,
+                    numberOfCharacters,
+                    lineBreakInfo );
 
   if( 0u == numberOfCharacters )
   {
@@ -184,6 +187,10 @@ void CreateTextModel( const std::string& text,
                         numberOfCharacters,
                         bidirectionalInfo );
 
+  // Create the paragraph info.
+  logicalModel->CreateParagraphInfo( 0u,
+                                     numberOfCharacters );
+
   // 6) Set character directions.
   Vector<CharacterDirection>& characterDirections = logicalModel->mCharacterDirections;
   if( 0u != bidirectionalInfo.Count() )
@@ -232,8 +239,8 @@ void CreateTextModel( const std::string& text,
              newParagraphGlyphs );
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-  visualModel->CreateGlyphsPerCharacterTable( 0u, numberOfCharacters );
-  visualModel->CreateCharacterToGlyphTable( 0u, numberOfCharacters );
+  visualModel->CreateGlyphsPerCharacterTable( 0u, 0u, numberOfCharacters );
+  visualModel->CreateCharacterToGlyphTable( 0u, 0u, numberOfCharacters );
 
   const Length numberOfGlyphs = glyphs.Count();
 

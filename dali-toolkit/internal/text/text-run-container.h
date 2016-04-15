@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_STYLE_RUN_CONTAINER_H__
-#define __DALI_TOOLKIT_TEXT_STYLE_RUN_CONTAINER_H__
+#ifndef __DALI_TOOLKIT_TEXT_RUN_CONTAINER_H__
+#define __DALI_TOOLKIT_TEXT_RUN_CONTAINER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -300,6 +300,7 @@ void ClearGlyphRuns( GlyphIndex startIndex,
         ( startIndex >= run->glyphRun.glyphIndex + run->glyphRun.numberOfGlyphs ) )
     {
       // Run found. Nothing else to do.
+      break;
     }
 
     ++run;
@@ -352,4 +353,4 @@ void ClearGlyphRuns( GlyphIndex startIndex,
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_STYLE_RUN_CONTAINER_H__
+#endif // __DALI_TOOLKIT_TEXT_RUN_CONTAINER_H__

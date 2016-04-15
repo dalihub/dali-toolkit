@@ -315,8 +315,10 @@ void ToolBar::OnInitialize()
   mLayout.SetRelativeWidth( 1, mRightRelativeSpace );
 }
 
-void ToolBar::OnControlChildAdd(Actor& child)
+void ToolBar::OnChildAdd(Actor& child)
 {
+  Control::OnChildAdd( child );
+
   if( !mInitializing )
   {
     // An actor is being added through the Actor's API.
@@ -330,7 +332,7 @@ void ToolBar::OnControlChildAdd(Actor& child)
     AddControl( child, DEFAULT_RELATIVE_SIZE, DEFAULT_ALIGNMENT, Toolkit::ToolBar::DEFAULT_PADDING );
   }
 
-  // No OnControlChildRemove method required because Actors are added to the mLayout table view, so if an
+  // No OnChildRemove method required because Actors are added to the mLayout table view, so if an
   // actor is removed using the Actor::RemoveChild method it will not remove anything because the
   // actor is in mLayout not in Self().
 }

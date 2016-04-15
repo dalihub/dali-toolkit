@@ -22,8 +22,10 @@
 #include <sstream>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 // INTERNAL INCLUDES
 
@@ -39,74 +41,38 @@ namespace Internal
 namespace
 {
 
-const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
-
-const char* EMBOSS_FRAGMENT_SOURCE1 =
+const char* EMBOSS_FRAGMENT_SOURCE =
 {
  "precision highp float;\n"
+ "varying mediump vec2 vTexCoord;\n"
+ "uniform sampler2D sTexture;\n"
  "uniform vec2 uTexScale;\n"
+ "uniform vec3 uCoefficient;\n"
  "\n"
  "void main()\n"
  "{\n"
- "  vec4 color;\n"
- "# ifdef DEBUG_RENDER\n"
- "  if( vTexCoord.s < 0.495 )\n"
- "  {\n"
- "# endif //def DEBUG_RENDER\n"
- "    color  =  2.0 * texture2D( sTexture, vTexCoord + vec2(0.0, -uTexScale.y) );\n"
- "    color += -1.0 * texture2D( sTexture, vTexCoord );\n"
- "    color += -1.0 * texture2D( sTexture, vTexCoord + vec2(0.0, uTexScale.y) );\n"
- "# ifdef DEBUG_RENDER\n"
- "  }\n"
- "  else if( vTexCoord.s > 0.505 )\n"
- "  {\n"
- "    color = texture2D( sTexture, vTexCoord );\n"
- "  }\n"
- "  else\n"
- "  {\n"
- "    color = vec4( 1.0, 0.0, 0.0, 1.0 );\n"
- "  }\n"
- "# endif //def DEBUG_RENDER\n"
- "  gl_FragColor = uColor * color;\n"
- "}\n"
-};
-
-const char* EMBOSS_FRAGMENT_SOURCE2 =
-{
- "precision highp float;\n"
- "uniform vec2 uTexScale;\n"
- "\n"
- "void main()\n"
- "{\n"
- "  vec4 color;\n"
- "# ifdef DEBUG_RENDER\n"
- "  if( vTexCoord.s < 0.495 )\n"
- "  {\n"
- "# endif //def DEBUG_RENDER\n"
- "    color  = -1.0 * texture2D( sTexture, vTexCoord + vec2(0.0, -uTexScale.y) );\n"
- "    color += -1.0 * texture2D( sTexture, vTexCoord );\n"
- "    color +=  2.0 * texture2D( sTexture, vTexCoord + vec2(0.0, uTexScale.y) );\n"
- "# ifdef DEBUG_RENDER\n"
- "  }\n"
- "  else if( vTexCoord.s > 0.505 )\n"
- "  {\n"
- "    color = texture2D( sTexture, vTexCoord );\n"
- "  }\n"
- "  else\n"
- "  {\n"
- "    color = vec4( 1.0, 0.0, 0.0, 1.0 );\n"
- "  }\n"
- "# endif //def DEBUG_RENDER\n"
- "  gl_FragColor = uColor * color;\n"
+ "  vec4 color  = uCoefficient.x * texture2D( sTexture, vTexCoord + vec2(0.0, -uTexScale.y) );\n"
+ "  color += uCoefficient.y * texture2D( sTexture, vTexCoord );\n"
+ "  color += uCoefficient.z * texture2D( sTexture, vTexCoord + vec2(0.0, uTexScale.y) );\n"
+ "  gl_FragColor = color;\n"
  "}\n"
 };
 
 const char* const COMPOSITE_FRAGMENT_SOURCE =
-    "void main()\n"
-    "{\n"
-    "  gl_FragColor = uColor;\n"
-    "  gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;\n"
-    "}\n";
+{
+  "varying mediump vec2 vTexCoord;\n"
+  "uniform sampler2D sTexture;\n"
+  "uniform lowp vec4 uEffectColor;\n"
+  "void main()\n"
+  "{\n"
+  "  gl_FragColor = uEffectColor;\n"
+  "  gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;\n"
+  "}\n"
+};
+
+const char* const TEX_SCALE_UNIFORM_NAME( "uTexScale" );
+const char* const COEFFICIENT_UNIFORM_NAME( "uCoefficient" );
+const char* const COLOR_UNIFORM_NAME( "uEffectColor" );
 
 } // namespace
 
@@ -121,73 +87,56 @@ EmbossFilter::~EmbossFilter()
 
 void EmbossFilter::Enable()
 {
-  // Create camera
-  mCameraActor = CameraActor::New();
-  mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
-
   mImageForEmboss1 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
   mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
 
+  Property::Map customShader;
+  customShader[ "fragmentShader" ] = EMBOSS_FRAGMENT_SOURCE;
+  Property::Map rendererMap;
+  rendererMap.Insert( "shader", customShader );
+
   // create actor to render input with applied emboss effect
-  mActorForInput1 = ImageActor::New( mInputImage );
+  mActorForInput1 = Toolkit::ImageView::New( mInputImage );
   mActorForInput1.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput1.SetSize(mTargetSize);
-  mActorForInput1.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
-  mActorForInput1.SetColor( Color::WHITE );
+  Vector2 textureScale( 1.5f/mTargetSize.width, 1.5f/mTargetSize.height);
+  mActorForInput1.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
+  mActorForInput1.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( 2.f, -1.f, -1.f ) );
+  // set EMBOSS custom shader
+  mActorForInput1.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  mRootActor.Add( mActorForInput1 );
 
-  mActorForInput2 = ImageActor::New( mInputImage );
+  mActorForInput2 = Toolkit::ImageView::New( mInputImage );
   mActorForInput2.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput2.SetSize(mTargetSize);
-  mActorForInput2.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
-  mActorForInput2.SetColor( Color::WHITE );
-
-  mActorForEmboss1 = ImageActor::New( mImageForEmboss1 );
-  mActorForEmboss1.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForEmboss1.SetSize(mTargetSize);
-  mActorForEmboss1.SetColor( Color::BLACK );
-  mActorForEmboss1.SetShaderEffect( ShaderEffect::New( "", COMPOSITE_FRAGMENT_SOURCE ) );
-
-  mActorForEmboss2 = ImageActor::New( mImageForEmboss2 );
-  mActorForEmboss2.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForEmboss2.SetSize(mTargetSize);
-  mActorForEmboss2.SetColor( Color::WHITE );
-  mActorForEmboss2.SetShaderEffect( ShaderEffect::New( "", COMPOSITE_FRAGMENT_SOURCE ) );
+  mActorForInput2.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
+  mActorForInput2.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( -1.f, -1.f, 2.f ) );
+  // set EMBOSS custom shader
+  mActorForInput2.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  mRootActor.Add( mActorForInput2 );
 
   mActorForComposite = Actor::New();
   mActorForComposite.SetParentOrigin( ParentOrigin::CENTER );
   mActorForComposite.SetSize(mTargetSize);
-  mActorForComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
+  mActorForComposite.SetColor( Color::BLACK );
 
-  // create custom shader effect
-  std::ostringstream embossFragmentSource1;
-  if( mDebugRender )
-  {
-    embossFragmentSource1 << "#define DEBUG_RENDER\n";
-  }
-  embossFragmentSource1 << EMBOSS_FRAGMENT_SOURCE1;
-  ShaderEffect effect1 = ShaderEffect::New( "", embossFragmentSource1.str() );
-  mActorForInput1.SetShaderEffect( effect1 );
-  effect1.SetUniform( "uTexScale", Vector2( 1.0f/mTargetSize.width, 1.0f/mTargetSize.height) * 1.5f );
-
-  std::ostringstream embossFragmentSource2;
-  if( mDebugRender )
-  {
-    embossFragmentSource2 << "#define DEBUG_RENDER\n";
-  }
-  embossFragmentSource2 << EMBOSS_FRAGMENT_SOURCE2;
-  ShaderEffect effect2 = ShaderEffect::New( "", embossFragmentSource2.str() );
-  mActorForInput2.SetShaderEffect( effect2 );
-  effect2.SetUniform( "uTexScale", Vector2( 1.0f/mTargetSize.width, 1.0f/mTargetSize.height) * 1.5f );
+  customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
+  rendererMap[ "shader"] = customShader;
+  Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+  mRendererForEmboss1 = rendererFactory.GetControlRenderer( mImageForEmboss1 );
+  mRendererForEmboss2 = rendererFactory.GetControlRenderer( mImageForEmboss2 );
+  // set COMPOSITE custom shader to both renderers
+  rendererFactory.ResetRenderer( mRendererForEmboss1, mActorForComposite, rendererMap);
+  rendererFactory.ResetRenderer( mRendererForEmboss2, mActorForComposite, rendererMap);
+  // apply renderers to the actor
+  mRendererForEmboss1.SetOnStage( mActorForComposite );
+  mRendererForEmboss2.SetOnStage( mActorForComposite );
+  mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
+  mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
+  mRootActor.Add( mActorForComposite );
 
   SetupCamera();
   CreateRenderTasks();
-
-  mRootActor.Add( mActorForInput1 );
-  mRootActor.Add( mActorForInput2 );
-  mRootActor.Add( mActorForComposite );
-  mActorForComposite.Add( mActorForEmboss1 );
-  mActorForComposite.Add( mActorForEmboss2 );
-  mRootActor.Add( mCameraActor );
 }
 
 void EmbossFilter::Disable()
@@ -214,10 +163,12 @@ void EmbossFilter::Disable()
 
     if( mActorForComposite )
     {
+      mRendererForEmboss1.SetOffStage( mActorForComposite );
+      mRendererForEmboss2.SetOffStage( mActorForComposite );
+      mRendererForEmboss1.Reset();
+      mRendererForEmboss2.Reset();
       mRootActor.Remove( mActorForComposite );
       mActorForComposite.Reset();
-      mActorForEmboss1.Reset();
-      mActorForEmboss2.Reset();
     }
 
     RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -258,28 +209,10 @@ void EmbossFilter::SetSize( const Vector2& size )
   {
     mActorForInput2.SetSize(mTargetSize);
   }
-  if( mActorForEmboss1 )
-  {
-    mActorForEmboss1.SetSize(mTargetSize);
-  }
-  if( mActorForEmboss2 )
-  {
-    mActorForEmboss2.SetSize(mTargetSize);
-  }
   if( mActorForComposite )
   {
     mActorForComposite.SetSize(mTargetSize);
   }
-}
-
-void EmbossFilter::SetupCamera()
-{
-  // Create and place a camera for the embossing render, corresponding to its render target size
-  mCameraActor.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
-  mCameraActor.SetNearClippingPlane(1.0f);
-  mCameraActor.SetAspectRatio(mTargetSize.width / mTargetSize.height);
-  mCameraActor.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-  mCameraActor.SetPosition(0.0f, 0.0f, ((mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
 }
 
 void EmbossFilter::CreateRenderTasks()

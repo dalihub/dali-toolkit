@@ -161,8 +161,8 @@ Geometry RendererFactoryCache::CreateQuadGeometry()
   QuadVertex quadVertexData[4] =
   {
       { Vector2(-halfWidth, -halfHeight) },
-      { Vector2( halfWidth, -halfHeight) },
       { Vector2(-halfWidth, halfHeight)  },
+      { Vector2( halfWidth, -halfHeight) },
       { Vector2( halfWidth, halfHeight)  }
   };
 
@@ -195,6 +195,74 @@ void RendererFactoryCache::ApplyRasterizedSVGToSampler()
   {
     task->GetSvgRenderer()->ApplyRasterizedImage( task->GetPixelData() );
   }
+}
+
+Geometry RendererFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
+{
+  uint16_t gridWidth = gridSize.GetWidth();
+  uint16_t gridHeight = gridSize.GetHeight();
+
+  // Create vertices
+  Vector< Vector2 > vertices;
+  vertices.Reserve( ( gridWidth + 1 ) * ( gridHeight + 1 ) );
+
+  for( int y = 0; y < gridHeight + 1; ++y )
+  {
+    for( int x = 0; x < gridWidth + 1; ++x )
+    {
+      vertices.PushBack( Vector2( (float)x/gridWidth - 0.5f, (float)y/gridHeight  - 0.5f) );
+    }
+  }
+
+  // Create indices
+  Vector< unsigned int > indices;
+  indices.Reserve( (gridWidth+2)*gridHeight*2 - 2);
+
+  for( unsigned int row = 0u; row < gridHeight; ++row )
+  {
+    unsigned int rowStartIndex = row*(gridWidth+1u);
+    unsigned int nextRowStartIndex = rowStartIndex + gridWidth +1u;
+
+    if( row != 0u ) // degenerate index on non-first row
+    {
+      indices.PushBack( rowStartIndex );
+    }
+
+    for( unsigned int column = 0u; column < gridWidth+1u; column++) // main strip
+    {
+      indices.PushBack( rowStartIndex + column);
+      indices.PushBack( nextRowStartIndex + column);
+    }
+
+    if( row != gridHeight-1u ) // degenerate index on non-last row
+    {
+      indices.PushBack( nextRowStartIndex + gridWidth );
+    }
+  }
+
+  Property::Map vertexFormat;
+  vertexFormat[ "aPosition" ] = Property::VECTOR2;
+  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
+  if( vertices.Size() > 0 )
+  {
+    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
+  }
+
+  Property::Map indexFormat;
+  indexFormat[ "indices" ] = Property::INTEGER;
+  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
+  if( indices.Size() > 0 )
+  {
+    indexPropertyBuffer.SetData( &indices[ 0 ], indices.Size() );
+  }
+
+  // Create the geometry object
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexPropertyBuffer );
+  geometry.SetIndexBuffer( indexPropertyBuffer );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
+
+  return geometry;
 }
 
 } // namespace Internal

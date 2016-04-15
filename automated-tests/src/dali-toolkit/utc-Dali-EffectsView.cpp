@@ -42,10 +42,14 @@ int UtcDaliEffectsViewNew(void)
   EffectsView view;
   DALI_TEST_CHECK( !view );
 
-  view = EffectsView::New();
+  view = EffectsView::New( EffectsView::DROP_SHADOW );
   DALI_TEST_CHECK( view );
 
   Stage::GetCurrent().Add( view );
+
+  view.Reset();
+  view = EffectsView::New( EffectsView::EMBOSS );
+  DALI_TEST_CHECK( view );
 
   application.SendNotification();
   application.Render();
@@ -57,7 +61,7 @@ int UtcDaliEffectsViewCopyAndAssignment(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
   DALI_TEST_CHECK( view );
 
   EffectsView copy( view );
@@ -80,7 +84,7 @@ int UtcDaliEffectsViewDownCast(void)
 {
   ToolkitTestApplication application;
 
-  BaseHandle view = EffectsView::New();
+  BaseHandle view = EffectsView::New( EffectsView::EMBOSS );
   DALI_TEST_CHECK( EffectsView::DownCast( view ) );
 
   BaseHandle empty;
@@ -92,122 +96,83 @@ int UtcDaliEffectsViewDownCast(void)
   END_TEST;
 }
 
-int UtcDaliEffectsViewSetGetTypeP(void)
+// Positive test case for a method
+int UtcDaliEffectsViewAddRemove(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGaussianBlurViewAddRemove");
+
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
+  DALI_TEST_CHECK( view );
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( !actor.OnStage() );
+
+
+  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetSize(Stage::GetCurrent().GetSize());
+  view.Add(actor);
+  Stage::GetCurrent().Add(view);
+
+  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetParent() );
+  DALI_TEST_CHECK( actor.GetParent() != view );
+
+  view.Remove(actor);
+
+  DALI_TEST_CHECK( !actor.OnStage() );
+  END_TEST;
+}
+
+int UtcDaliEffectsViewGetTypeP(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
-  DALI_TEST_CHECK( view.GetType() == EffectsView::INVALID_TYPE );
-
-  view.SetType( EffectsView::DROP_SHADOW );
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
   DALI_TEST_CHECK( view.GetType() == EffectsView::DROP_SHADOW );
 
-  view.SetType( EffectsView::EMBOSS );
+  view.Reset();
+  view = EffectsView::New( EffectsView::EMBOSS );
   DALI_TEST_CHECK( view.GetType() == EffectsView::EMBOSS );
 
   END_TEST;
 }
 
-int UtcDaliEffectsViewSetTypeN(void)
+int UtcDaliEffectsViewOnStage(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view;
-  try
-  {
-    view.SetType( EffectsView::DROP_SHADOW );
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetTypeN(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view;
-  try
-  {
-    EffectsView::EffectType type = view.GetType();
-    (void) type;
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewEnableP(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view = EffectsView::New();
+  EffectsView view = EffectsView::New(EffectsView::EMBOSS);
+  view.SetSize(100.f, 100.f);
   Stage stage = Stage::GetCurrent();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
 
-  view.Enable();
+  stage.Add( view );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() > 1 );
 
   END_TEST;
 }
 
-int UtcDaliEffectsViewEnableN(void)
+int UtcDaliEffectsViewOffStage(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view;
-  try
-  {
-    view.Enable();
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewDisableP(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view = EffectsView::New();
+  EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
+  view.SetSize(100.f, 100.f);
   Stage stage = Stage::GetCurrent();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
 
-  view.Enable();
+  stage.Add( view );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() > 1 );
 
-  view.Disable();
+  stage.Remove( view );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewDisableN(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view;
-  try
-  {
-    view.Disable();
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
 
   END_TEST;
 }
@@ -216,7 +181,7 @@ int UtcDaliEffectsViewRefreshP(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
   try
   {
     view.Refresh();
@@ -252,7 +217,7 @@ int UtcDaliEffectsViewSetPixelFormatP(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
   try
   {
     view.SetPixelFormat( Pixel::RGBA8888 );
@@ -284,179 +249,90 @@ int UtcDaliEffectsViewSetPixelFormatN(void)
   END_TEST;
 }
 
-int UtcDaliEffectsViewSetGetOutputImage(void)
+int UtcDaliEffectsViewSizeProperty(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
-  FrameBufferImage image = FrameBufferImage::New();
-  DALI_TEST_CHECK( image );
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
 
-  view.SetOutputImage( image );
-  DALI_TEST_CHECK( view.GetOutputImage() == image );
+  Property::Index idx = view.GetPropertyIndex( "effectSize" );
+  DALI_TEST_EQUALS( idx, (Property::Index)EffectsView::Property::EFFECT_SIZE, TEST_LOCATION );
 
-  // Replace with another image
-  FrameBufferImage image2 = FrameBufferImage::New();
-  DALI_TEST_CHECK( image2 );
-  view.SetOutputImage( image2 );
-  DALI_TEST_CHECK( view.GetOutputImage() == image2 );
-
-  // Remove output image
-  view.SetOutputImage( FrameBufferImage() );
-  DALI_TEST_CHECK( ! view.GetOutputImage() );
+  view.SetProperty( idx, 5 );
+  Property::Value value = view.GetProperty( EffectsView::Property::EFFECT_SIZE );
+  int size;
+  DALI_TEST_CHECK( value.Get(size) );
+  DALI_TEST_CHECK( size == 5 );
 
   END_TEST;
 }
 
-int UtcDaliEffectsViewSetOutputImageN(void)
+int UtcDaliEffectsViewOffsetProperty(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view;
-  try
-  {
-    view.SetOutputImage( FrameBufferImage::New() );
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
+  EffectsView view = EffectsView::New( EffectsView::EMBOSS );
+  Stage::GetCurrent().Add( view );
+
+  Property::Value value = view.GetProperty( EffectsView::Property::EFFECT_OFFSET );
+  Vector3 offsetValue;
+  DALI_TEST_CHECK( value.Get(offsetValue) );
+  DALI_TEST_EQUALS( offsetValue, Vector3::ZERO, TEST_LOCATION );
+
+  Vector3 offsetSet( 2.f, 3.f, 4.f );
+  view.SetProperty( EffectsView::Property::EFFECT_OFFSET, offsetSet);
+  application.SendNotification();
+  application.Render(0);
+  value = view.GetProperty( EffectsView::Property::EFFECT_OFFSET );
+  value.Get(offsetValue);
+  DALI_TEST_EQUALS( offsetValue, offsetSet, TEST_LOCATION );
+
+  Vector3 offsetAnimate( 4.f, 6.f, 8.f );
+  float durationSeconds(0.05f);
+  Animation animation = Animation::New( durationSeconds );
+  animation.AnimateTo( Property(view,EffectsView::Property::EFFECT_OFFSET ), offsetAnimate );
+  animation.Play();
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) + 1u/*just beyond the animation duration*/);
+
+  value = view.GetProperty( EffectsView::Property::EFFECT_OFFSET );
+  value.Get(offsetValue);
+  DALI_TEST_EQUALS( offsetValue, offsetAnimate, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliEffectsViewGetOutputImageN(void)
+int UtcDaliEffectsViewColorProperty(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view;
-  try
-  {
-    FrameBufferImage image = view.GetOutputImage();
-    (void)image;
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
+  EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
+  Stage::GetCurrent().Add( view );
 
-  END_TEST;
-}
+  Property::Value value = view.GetProperty( EffectsView::Property::EFFECT_COLOR );
+  Vector4 colorValue;
+  DALI_TEST_CHECK( value.Get(colorValue) );
+  DALI_TEST_EQUALS( colorValue, Color::WHITE, TEST_LOCATION );
 
-int UtcDaliEffectsViewGetEffectSizePropertyIndexP(void)
-{
-  ToolkitTestApplication application;
+  Vector4 colorSet( 0.2f, 0.3f, 0.4f, 0.5f );
+  view.SetProperty( EffectsView::Property::EFFECT_COLOR, colorSet);
+  application.SendNotification();
+  application.Render(0);
+  value = view.GetProperty( EffectsView::Property::EFFECT_COLOR );
+  value.Get(colorValue);
+  DALI_TEST_EQUALS( colorValue, colorSet, TEST_LOCATION );
 
-  EffectsView view = EffectsView::New();
-  DALI_TEST_CHECK( Property::INVALID_INDEX != view.GetEffectSizePropertyIndex() );
+  Vector4 colorAnimate( 0.5f, 0.6f, 0.8f, 1.f );
+  float durationSeconds(0.05f);
+  Animation animation = Animation::New( durationSeconds );
+  animation.AnimateTo( Property(view,EffectsView::Property::EFFECT_COLOR ), colorAnimate );
+  animation.Play();
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) + 1u/*just beyond the animation duration*/);
 
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectSizePropertyIndexN(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view;
-  try
-  {
-    Property::Index index = view.GetEffectSizePropertyIndex();
-    (void)index;
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectStrengthPropertyIndexP(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view = EffectsView::New();
-  DALI_TEST_CHECK( Property::INVALID_INDEX != view.GetEffectStrengthPropertyIndex() );
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectStrengthPropertyIndexN(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view;
-  try
-  {
-    Property::Index index = view.GetEffectStrengthPropertyIndex();
-    (void)index;
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectOffsetPropertyIndexP(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view = EffectsView::New();
-  DALI_TEST_CHECK( Property::INVALID_INDEX != view.GetEffectOffsetPropertyIndex() );
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectOffsetPropertyIndexN(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view;
-  try
-  {
-    Property::Index index = view.GetEffectOffsetPropertyIndex();
-    (void)index;
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectColorPropertyIndexP(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view = EffectsView::New();
-  DALI_TEST_CHECK( Property::INVALID_INDEX != view.GetEffectColorPropertyIndex() );
-
-  END_TEST;
-}
-
-int UtcDaliEffectsViewGetEffectColorPropertyIndexN(void)
-{
-  ToolkitTestApplication application;
-
-  EffectsView view;
-  try
-  {
-    Property::Index index = view.GetEffectColorPropertyIndex();
-    (void)index;
-    DALI_TEST_CHECK( false ); // Should not get here
-  }
-  catch( ... )
-  {
-    DALI_TEST_CHECK( true );
-  }
+  value = view.GetProperty( EffectsView::Property::EFFECT_COLOR );
+  value.Get(colorValue);
+  DALI_TEST_EQUALS( colorValue, colorAnimate, TEST_LOCATION );
 
   END_TEST;
 }
@@ -465,7 +341,7 @@ int UtcDaliEffectsViewGetSetBackgroundColor(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
+  EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
   view.SetBackgroundColor( Color::RED );
   DALI_TEST_CHECK( Color::RED == view.GetBackgroundColor() );
 
@@ -516,25 +392,22 @@ int UtcDaliEffectsViewSetRefreshOnDemandP(void)
 {
   ToolkitTestApplication application;
 
-  EffectsView view = EffectsView::New();
-  FrameBufferImage image = FrameBufferImage::New();
-  view.SetOutputImage( image );
-  view.Enable();
+  EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
+  view.SetSize(100.f, 100.f);
 
   Stage stage = Stage::GetCurrent();
   stage.Add( view );
+  application.SendNotification();
+  application.Render();
 
   RenderTaskList renderTaskList = stage.GetRenderTaskList();
   DALI_TEST_CHECK( renderTaskList.GetTask( 1 ).GetRefreshRate() == RenderTask::REFRESH_ALWAYS );
-  DALI_TEST_CHECK( renderTaskList.GetTask( 2 ).GetRefreshRate() == RenderTask::REFRESH_ALWAYS );
 
   view.SetRefreshOnDemand( true );
   DALI_TEST_CHECK( renderTaskList.GetTask( 1 ).GetRefreshRate() == RenderTask::REFRESH_ONCE );
-  DALI_TEST_CHECK( renderTaskList.GetTask( 2 ).GetRefreshRate() == RenderTask::REFRESH_ONCE );
 
   view.SetRefreshOnDemand( false );
   DALI_TEST_CHECK( renderTaskList.GetTask( 1 ).GetRefreshRate() == RenderTask::REFRESH_ALWAYS );
-  DALI_TEST_CHECK( renderTaskList.GetTask( 2 ).GetRefreshRate() == RenderTask::REFRESH_ALWAYS );
 
   END_TEST;
 }
@@ -563,23 +436,16 @@ int UtcDaliEffectsViewSizeSet(void)
   Stage stage = Stage::GetCurrent();
 
   {
-    EffectsView view = EffectsView::New();
+    EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
     view.SetSize( 200.0f, 200.0f, 0.0f );
     stage.Add( view );
-    view.Enable();
     application.SendNotification();
     application.Render();
-    view.Disable();
-    application.SendNotification();
-    application.Render();
-
     DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   {
-    EffectsView view = EffectsView::New();
-    view.SetOutputImage( FrameBufferImage::New( 200, 200 ) );
-    view.SetType( EffectsView::EMBOSS );
+    EffectsView view = EffectsView::New(EffectsView::EMBOSS);
     view.SetSize( 200.0f, 200.0f, 0.0f );
     stage.Add( view );
     application.SendNotification();
@@ -589,8 +455,7 @@ int UtcDaliEffectsViewSizeSet(void)
   }
 
   {
-    EffectsView view = EffectsView::New();
-    view.SetType( EffectsView::DROP_SHADOW );
+    EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
     view.SetSize( 200.0f, 200.0f, 0.0f );
     stage.Add( view );
     application.SendNotification();

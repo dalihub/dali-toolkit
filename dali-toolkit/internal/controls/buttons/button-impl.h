@@ -335,12 +335,6 @@ private:
   bool DoClickAction( const Property::Map& attributes );
 
   /**
-   * This method is called after the button initialization.
-   * Could be reimplemented in subclasses to provide specific behaviour.
-   */
-  virtual void OnButtonInitialize() { }
-
-  /**
    * This method is called when the label is set.
    * @param[in] noPadding Used to bypass padding if the label is to be treated generically.
    */
@@ -405,12 +399,6 @@ private:
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnTouchPointInterrupted();
-
-  /**
-   * This method is called when the button is removed from the stage.
-   * Could be reimplemented in subclasses to provide specific behaviour.
-   */
-  virtual void OnButtonStageDisconnection();
 
   /**
    * This method is called when the \e selected property is changed.
@@ -483,17 +471,16 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
-protected: // From CustomActorImpl
+protected: // From Control
 
   /**
-   * @copydoc Dali::CustomActorImpl::OnTouchEvent( const TouchEvent& event )
+   * @copydoc Dali::Control::OnTouchEvent( const TouchEvent& event )
    */
   virtual bool OnTouchEvent( const TouchEvent& event );
 
-private: // From Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
+   * @note If overridden by deriving button classes, then an up-call to Button::OnInitialize MUST be made at the start.
    */
   virtual void OnInitialize();
 
@@ -508,10 +495,10 @@ private: // From Control
   virtual bool OnKeyboardEnter();
 
   /**
-   * Callback received when the button is disconnected from the stage.
-   * It resets the button status.
+   * @copydoc Toolkit::Control::OnStageDisconnection()
+   * @note If overridden by deriving button classes, then an up-call to Button::OnStageDisconnection MUST be made at the end.
    */
-  void OnControlStageDisconnection();
+  void OnStageDisconnection();
 
 private:
 

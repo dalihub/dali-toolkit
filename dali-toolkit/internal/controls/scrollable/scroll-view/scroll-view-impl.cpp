@@ -1956,6 +1956,8 @@ void ScrollView::OnSizeSet( const Vector3& size )
 
 void ScrollView::OnChildAdd(Actor& child)
 {
+  ScrollBase::OnChildAdd( child );
+
   Dali::Toolkit::ScrollBar scrollBar = Dali::Toolkit::ScrollBar::DownCast(child);
   if(scrollBar)
   {
@@ -1987,6 +1989,8 @@ void ScrollView::OnChildRemove(Actor& child)
 {
   // TODO: Actor needs a RemoveConstraint method to take out an individual constraint.
   UnbindActor(child);
+
+  ScrollBase::OnChildRemove( child );
 }
 
 void ScrollView::StartTouchDownTimer()

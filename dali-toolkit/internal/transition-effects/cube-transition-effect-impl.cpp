@@ -270,6 +270,8 @@ void CubeTransitionEffect::Initialize()
 
 void CubeTransitionEffect::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
@@ -306,6 +308,8 @@ void CubeTransitionEffect::OnStageDisconnection()
     }
     mTargetRenderer.Reset();
   }
+
+  Control::OnStageDisconnection();
 }
 
 void CubeTransitionEffect::SetTransitionDuration( float duration )

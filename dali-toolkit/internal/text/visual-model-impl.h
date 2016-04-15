@@ -67,18 +67,22 @@ public:
    * @pre The glyphs per character table needs to be created first.
    *
    * @param[in] startIndex The character from where the conversion table is created.
+   * @param[in] startGlyphIndex The glyph from where the conversion table is created.
    * @param[in] numberOfCharacters The number of characters.
    */
   void CreateCharacterToGlyphTable( CharacterIndex startIndex,
+                                    GlyphIndex startGlyphIndex,
                                     Length numberOfCharacters );
 
   /**
    * @brief Creates an array containing the number of glyphs per character.
    *
    * @param[in] startIndex The character from where the table is created.
+   * @param[in] startGlyphIndex The glyph from where the conversion table is created.
    * @param[in] numberOfCharacters The number of characters.
    */
   void CreateGlyphsPerCharacterTable( CharacterIndex startIndex,
+                                      GlyphIndex startGlyphIndex,
                                       Length numberOfCharacters );
 
   /**

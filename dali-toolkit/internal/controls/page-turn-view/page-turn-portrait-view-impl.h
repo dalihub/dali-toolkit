@@ -39,8 +39,7 @@ class PageTurnPortraitView : public PageTurnView
 public:
 
   /**
-   * Create a new PageTurnPortraitView
-   * @return A handle to the newly allocated PageTurnPortraitView
+   * @copydoc Toolkit::PageTurnPortraitView::New( PageFactory&, const Vector2& )
    */
   static Toolkit::PageTurnPortraitView New( PageFactory& pageFactory, const Vector2& pageSize );
 
@@ -49,6 +48,8 @@ protected:
   /**
    * Constructor.
    * It initializes the PageTurnPortraitView members
+   * @param[in] pageFactory The factory which provides image actors to PageTurnView as the page content.
+   * @param[in] pageSize The size of the page
    */
   PageTurnPortraitView( PageFactory& pageFactory, const Vector2& pageSize );
 
@@ -75,16 +76,14 @@ protected: // From PageTurnView
   virtual void SetPanActor( const Vector2& panPosition );
 
   /**
-   * @copydoc PageTurnView::SetSpineEffect
-   */
-  virtual void SetSpineEffect(ImageActor actor, bool isLeftSide);
-
-  /**
    * @copydoc PageTurnView::OnPossibleOutwardsFlick
    */
   virtual void OnPossibleOutwardsFlick( const Vector2& panPosition, float gestureSpeed );
 
-  virtual void OnTurnedOver( ImageActor actor, bool isLeftSide );
+  /**
+   * @copydoc PageTurnView::OnTurnedOver
+   */
+  virtual void OnTurnedOver( Actor actor, bool isLeftSide );
 
 private:
 

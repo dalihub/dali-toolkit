@@ -50,21 +50,51 @@ namespace Text
 {
 
 void SetLineBreakInfo( const Vector<Character>& text,
+                       CharacterIndex startIndex,
+                       Length numberOfCharacters,
                        Vector<LineBreakInfo>& lineBreakInfo )
 {
-  const Length numberOfCharacters = text.Count();
+  const Length totalNumberOfCharacters = text.Count();
 
-  if( 0u == numberOfCharacters )
+  if( 0u == totalNumberOfCharacters )
   {
     // Nothing to do if there are no characters.
     return;
   }
 
   // Retrieve the line break info.
-  lineBreakInfo.Resize( numberOfCharacters );
-  TextAbstraction::Segmentation::Get().GetLineBreakPositions( text.Begin(),
+  lineBreakInfo.Resize( totalNumberOfCharacters );
+
+  // Whether the current buffer is being updated or is set from scratch.
+  const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
+
+  LineBreakInfo* lineBreakInfoBuffer = NULL;
+  Vector<LineBreakInfo> newLineBreakInfo;
+
+  if( updateCurrentBuffer )
+  {
+    newLineBreakInfo.Resize( numberOfCharacters );
+    lineBreakInfoBuffer = newLineBreakInfo.Begin();
+  }
+  else
+  {
+    lineBreakInfoBuffer = lineBreakInfo.Begin();
+  }
+
+  // Retrieve the line break info.
+  TextAbstraction::Segmentation::Get().GetLineBreakPositions( text.Begin() + startIndex,
                                                               numberOfCharacters,
-                                                              lineBreakInfo.Begin() );
+                                                              lineBreakInfoBuffer );
+
+  // If the line break info is updated, it needs to be inserted in the model.
+  if( updateCurrentBuffer )
+  {
+    lineBreakInfo.Insert( lineBreakInfo.Begin() + startIndex,
+                          newLineBreakInfo.Begin(),
+                          newLineBreakInfo.End() );
+    lineBreakInfo.Resize( totalNumberOfCharacters );
+  }
+
 #ifdef DEBUG_ENABLED
   if( gLogFilter->IsEnabledFor(Debug::Verbose) )
   {

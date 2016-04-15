@@ -62,13 +62,31 @@ bool LineBreakInfoTest( const BreakInfoData& data )
 
   utf32.Resize( numberOfCharacters );
 
-  // 2) Set the line break info.
+  // 2) Set the line break info for the whole text.
   Vector<LineBreakInfo> lineBreakInfo;
   lineBreakInfo.Resize( numberOfCharacters );
 
-  SetLineBreakInfo( utf32, lineBreakInfo );
+  SetLineBreakInfo( utf32,
+                    0u,
+                    numberOfCharacters,
+                    lineBreakInfo );
 
-  // 3) compare the results
+  // 3) Update the word text info if it's requested for part of the text.
+  if( ( 0u != data.index ) &&
+      ( numberOfCharacters != data.numberOfCharacters ) )
+  {
+    // Clear part of the line break info.
+    lineBreakInfo.Erase( lineBreakInfo.Begin() + data.index,
+                         lineBreakInfo.Begin() + data.index + data.numberOfCharacters );
+
+    // Update the word line info.
+    SetLineBreakInfo( utf32,
+                      data.index,
+                      data.numberOfCharacters,
+                      lineBreakInfo );
+  }
+
+  // 4) compare the results
   std::ostringstream breakInfo;
 
   for( unsigned int index = 0u; index < numberOfCharacters; ++index )
@@ -78,8 +96,11 @@ bool LineBreakInfoTest( const BreakInfoData& data )
 
   if( data.breakInfo != breakInfo.str() )
   {
-    std::cout << "  expected : [" << data.breakInfo << "]" << std::endl;
-    std::cout << "       got : [" << breakInfo.str() << "]" << std::endl;
+    std::cout << "                text : [" << data.text << "]" << std::endl;
+    std::cout << "               index : " <<  data.index << std::endl;
+    std::cout << "  numberOfCharacters : " <<  data.numberOfCharacters << std::endl;
+    std::cout << "            expected : [" << data.breakInfo << "]" << std::endl;
+    std::cout << "                 got : [" << breakInfo.str() << "]" << std::endl;
     return false;
   }
 
@@ -149,7 +170,6 @@ bool WordBreakInfoTest( const BreakInfoData& data )
 
 int UtcDaliTextSegnemtationSetLineBreakInfo(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextSegnemtationSetLineBreakInfo");
 
   struct BreakInfoData data[] =
@@ -170,6 +190,51 @@ int UtcDaliTextSegnemtationSetLineBreakInfo(void)
       "Quidam corpora at duo. An eos possim scripserit?",
       0u,
       317u,
+      "22222122222122222122212222212222212222222222122122221222221222222222122122220"
+      "2221221222212222222122222222221222222122222222122222222122212220"
+      "221222122222122222221222222222122212222221222222212220"
+      "22122222212222222122222222222122221222122222122222222222122222222222212220"
+      "222222122222221221222212212221222222122222222220",
+    },
+    {
+      "Latin script. Update initial paragraphs.",
+      "Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.\n"
+      "Usu ne nisl maiorum iudicabit, veniam epicurei oporteat eos an.\n"
+      "Ne nec nulla regione albucius, mea doctus delenit ad!\n"
+      "Et everti blandit adversarium mei, eam porro neglegentur suscipiantur an.\n"
+      "Quidam corpora at duo. An eos possim scripserit?",
+      0u,
+      141u,
+      "22222122222122222122212222212222212222222222122122221222221222222222122122220"
+      "2221221222212222222122222222221222222122222222122222222122212220"
+      "221222122222122222221222222222122212222221222222212220"
+      "22122222212222222122222222222122221222122222122222222222122222222222212220"
+      "222222122222221221222212212221222222122222222220",
+    },
+    {
+      "Latin script. Update mid paragraphs.",
+      "Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.\n"
+      "Usu ne nisl maiorum iudicabit, veniam epicurei oporteat eos an.\n"
+      "Ne nec nulla regione albucius, mea doctus delenit ad!\n"
+      "Et everti blandit adversarium mei, eam porro neglegentur suscipiantur an.\n"
+      "Quidam corpora at duo. An eos possim scripserit?",
+      141u,
+      128u,
+      "22222122222122222122212222212222212222222222122122221222221222222222122122220"
+      "2221221222212222222122222222221222222122222222122222222122212220"
+      "221222122222122222221222222222122212222221222222212220"
+      "22122222212222222122222222222122221222122222122222222222122222222222212220"
+      "222222122222221221222212212221222222122222222220",
+    },
+    {
+      "Latin script. Update final paragraphs.",
+      "Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.\n"
+      "Usu ne nisl maiorum iudicabit, veniam epicurei oporteat eos an.\n"
+      "Ne nec nulla regione albucius, mea doctus delenit ad!\n"
+      "Et everti blandit adversarium mei, eam porro neglegentur suscipiantur an.\n"
+      "Quidam corpora at duo. An eos possim scripserit?",
+      195u,
+      122u,
       "22222122222122222122212222212222212222222222122122221222221222222222122122220"
       "2221221222212222222122222222221222222122222222122222222122212220"
       "221222122222122222221222222222122212222221222222212220"
@@ -199,10 +264,11 @@ int UtcDaliTextSegnemtationSetLineBreakInfo(void)
       "21111112112111111111111211121111111111120",
     }
   };
-  const unsigned int numberOfTests = 4u;
+  const unsigned int numberOfTests = 7u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !LineBreakInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -215,7 +281,6 @@ int UtcDaliTextSegnemtationSetLineBreakInfo(void)
 
 int UtcDaliTextSegnemtationSetWordBreakInfo(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextSegnemtationSetWordBreakInfo");
 
   struct BreakInfoData data[] =
@@ -380,6 +445,7 @@ int UtcDaliTextSegnemtationSetWordBreakInfo(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !WordBreakInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);
