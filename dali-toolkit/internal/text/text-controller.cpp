@@ -508,7 +508,9 @@ const Vector4& Controller::GetTextColor() const
   return mImpl->mTextColor;
 }
 
-bool Controller::RemoveText( int cursorOffset, int numberOfCharacters )
+bool Controller::RemoveText( int cursorOffset,
+                             int numberOfCharacters,
+                             UpdateInputStyleType type )
 {
   bool removed = false;
 
@@ -547,13 +549,16 @@ bool Controller::RemoveText( int cursorOffset, int numberOfCharacters )
 
       // Update the input style and remove the text's style before removing the text.
 
-      // Set first the default input style.
-      mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
+      if( UPDATE_INPUT_STYLE == type )
+      {
+        // Set first the default input style.
+        mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
 
-      // Update the input style.
-      mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+        // Update the input style.
+        mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+      }
 
-      // Remove the text's style before removing the text.
+      // Updates the text style runs by removing characters. Runs with no characters are removed.
       mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
 
       // Remove the characters.
@@ -1804,7 +1809,9 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     const CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
 
-    removedPrevious = RemoveText( -static_cast<int>( offset ), mImpl->mEventData->mPreEditLength );
+    removedPrevious = RemoveText( -static_cast<int>( offset ),
+                                  mImpl->mEventData->mPreEditLength,
+                                  DONT_UPDATE_INPUT_STYLE );
 
     mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
     mImpl->mEventData->mPreEditLength = 0u;
@@ -2373,7 +2380,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
     case ImfManager::DELETESURROUNDING:
     {
-      update = RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+      update = RemoveText( imfEvent.cursorOffset,
+                           imfEvent.numberOfChars,
+                           DONT_UPDATE_INPUT_STYLE );
 
       if( update )
       {
@@ -2453,7 +2462,9 @@ bool Controller::BackspaceKeyEvent()
   else if( mImpl->mEventData->mPrimaryCursorPosition > 0 )
   {
     // Remove the character before the current cursor position
-    removed = RemoveText( -1, 1 );
+    removed = RemoveText( -1,
+                          1,
+                          UPDATE_INPUT_STYLE );
   }
 
   if( removed )
