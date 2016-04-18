@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Merk alt"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopier"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Velg"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Klipp ut"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Lim inn"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Utklippstavle"
+

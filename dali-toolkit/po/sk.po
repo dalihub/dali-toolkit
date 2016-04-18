@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Vybrať všetky"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopírovať"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Vybrať"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Vystrihnúť"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Vložiť"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Schránka"
+

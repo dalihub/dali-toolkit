@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Избери всички"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Копиране"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Избери"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Отрежи"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Поставяне"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Системен буфер"
+

@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Valitse kaikki"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopioi"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Valitse"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Poimi"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Liitä"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Leikepöytä"
+

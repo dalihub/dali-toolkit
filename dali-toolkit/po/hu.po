@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Összes kijelölése"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Másol"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Választ"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Kivág"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Beilleszt"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Vágólap"
+

@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Selecionar tudo"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Copiar"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Selecionar"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Cortar"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Colar"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Área de transferência"
+

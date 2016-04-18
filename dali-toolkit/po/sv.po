@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Välj alla"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopiera"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Välj"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Klipp ut"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Klistra in"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Urklipp"
+

@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "ყველას არჩევა"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "ასლი"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "არჩევა"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "მოჭრა"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ჩასმა"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ბუფერული მეხს."
+

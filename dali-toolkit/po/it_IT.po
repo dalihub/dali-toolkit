@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Seleziona tutto"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Copia"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Seleziona"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Taglia"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Incolla"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Appunti"
+

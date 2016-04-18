@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "모두 선택"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "복사"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "선택"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "잘라내기"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "붙여넣기"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "클립보드"
+
