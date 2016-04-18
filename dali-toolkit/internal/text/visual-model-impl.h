@@ -310,7 +310,8 @@ public:
   Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
   Vector<LineRun>        mLines;                ///< The laid out lines.
   Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
-  Vector<ColorGlyphRun>  mColorRuns;            ///< Runs of glyphs with the same color.
+  Vector<Vector4>        mColors;               ///< Colors of the glyphs.
+  Vector<ColorIndex>     mColorIndices;         ///< Indices to the vector of colors for each glyphs.
 
   Vector2                mControlSize;           ///< The size of the UI control the decorator is adding it's decorations to.
   Vector4                mTextColor;            ///< The text color

@@ -38,15 +38,23 @@ class LogicalModel;
 /**
  * @brief Creates color glyph runs.
  *
- * @param[in] characterColorRuns The color runs in characters (set in the mark-up string).
+ * @param[in] colorRuns The color runs in characters (set in the mark-up string).
  * @param[in] charactersToGlyph Conversion table from characters to glyphs.
  * @param[in] glyphsPerCharacter Table with the number of glyphs for each character.
- * @param[out] glyphColorRuns The color runs in glyphs.
+ * @param[in] startCharacterIndex The character from where the text is shaped.
+ * @param[in] startGlyphIndex The glyph from where the text is shaped.
+ * @param[in] numberOfCharacters The number of characters to be shaped.
+ * @param[out] colors The vector of colors.
+ * @param[out] colorIndices Indices to the vector of colors.
  */
-void SetColorSegmentationInfo( const Vector<ColorRun>& characterColorRuns,
+void SetColorSegmentationInfo( const Vector<ColorRun>& colorRuns,
                                const Vector<GlyphIndex>& charactersToGlyph,
                                const Vector<Length>& glyphsPerCharacter,
-                               Vector<ColorGlyphRun>& glyphColorRuns );
+                               CharacterIndex startCharacterIndex,
+                               GlyphIndex startGlyphIndex,
+                               Length numberOfCharacters,
+                               Vector<Vector4>& colors,
+                               Vector<ColorIndex>& colorIndices );
 
 } // namespace Text
 

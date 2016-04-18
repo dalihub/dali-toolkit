@@ -307,6 +307,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
   if( colorOverriden )
   {
     style.textColor = ( *( colorRunsBuffer + colorIndex ) ).color;
+    style.isDefaultColor = false;
   }
 
   // Reset the run index.
@@ -410,9 +411,6 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     style.size = static_cast<float>( fontDescriptionRun.size ) / 64.f;
     style.sizeDefined = true;
   }
-
-  // Reset the run index.
-  runIndex = 0u;
 }
 
 void LogicalModel::ClearFontDescriptionRuns()

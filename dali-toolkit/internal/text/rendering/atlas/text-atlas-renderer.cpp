@@ -166,7 +166,9 @@ struct AtlasRenderer::Impl
   void AddGlyphs( Text::ViewInterface& view,
                   const Vector<Vector2>& positions,
                   const Vector<GlyphInfo>& glyphs,
-                  const Vector<Vector4>& colors,
+                  const Vector4& defaultColor,
+                  const Vector4* const colorsBuffer,
+                  const ColorIndex* const colorIndicesBuffer,
                   int depth )
   {
     AtlasManager::AtlasSlot slot;
@@ -183,6 +185,8 @@ struct AtlasRenderer::Impl
     const bool underlineEnabled( view.IsUnderlineEnabled() );
     const Vector4& underlineColor( view.GetUnderlineColor() );
     const float underlineHeight( view.GetUnderlineHeight() );
+
+    const bool useDefaultColor = ( NULL == colorsBuffer );
 
     // Get the underline runs.
     const Length numberOfUnderlineRuns = view.GetNumberOfUnderlineRuns();
@@ -212,7 +216,6 @@ struct AtlasRenderer::Impl
     Vector< TextCacheEntry > newTextCache;
     const GlyphInfo* const glyphsBuffer = glyphs.Begin();
     const Vector2* const positionsBuffer = positions.Begin();
-    const Vector4* const colorsBuffer = colors.Begin();
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
@@ -352,7 +355,8 @@ struct AtlasRenderer::Impl
         }
 
         // Get the color of the character.
-        const Vector4& color = *( colorsBuffer + i );
+        const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
+        const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
 
         for( unsigned int index = 0u, size = newMesh.mVertices.Count();
              index < size;
@@ -750,23 +754,24 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
     Vector<Vector2> positions;
     positions.Resize( numberOfGlyphs );
 
-    Vector<Vector4> colors;
-    colors.Resize( numberOfGlyphs, view.GetTextColor() );
-
     numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
                                      positions.Begin(),
-                                     colors.Begin(),
                                      0u,
                                      numberOfGlyphs );
 
     glyphs.Resize( numberOfGlyphs );
     positions.Resize( numberOfGlyphs );
-    colors.Resize( numberOfGlyphs );
+
+    const Vector4* const colorsBuffer = view.GetColors();
+    const ColorIndex* const colorIndicesBuffer = view.GetColorIndices();
+    const Vector4& defaultColor = view.GetTextColor();
 
     mImpl->AddGlyphs( view,
                       positions,
                       glyphs,
-                      colors,
+                      defaultColor,
+                      colorsBuffer,
+                      colorIndicesBuffer,
                       depth );
 
     /* In the case where AddGlyphs does not create a renderable Actor for example when glyphs are all whitespace create a new Actor. */

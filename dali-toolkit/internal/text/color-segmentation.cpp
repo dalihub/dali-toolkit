@@ -33,52 +33,103 @@ namespace Toolkit
 namespace Text
 {
 
-void SetColorSegmentationInfo( const Vector<ColorRun>& characterColorRuns,
+/**
+ * @brief Finds a color in the vector of colors.
+ *        It inserts the color in the vector if it's not in.
+ *
+ * @param[in,out] colors The vector of colors.
+ * @param[in] color The color to find.
+ *
+ * @return The index where the color is in the vector.
+ */
+ColorIndex FindColor( Vector<Vector4>& colors,
+                      const Vector4& color )
+{
+  ColorIndex index = 1u;
+  for( Vector<Vector4>::Iterator it = colors.Begin(),
+         endIt = colors.End();
+       it != endIt;
+       ++it )
+  {
+    if( color == *it )
+    {
+      return index;
+    }
+
+    ++index;
+  }
+
+  colors.PushBack( color );
+
+  return index;
+}
+
+void SetColorSegmentationInfo( const Vector<ColorRun>& colorRuns,
                                const Vector<GlyphIndex>& charactersToGlyph,
                                const Vector<Length>& glyphsPerCharacter,
-                               Vector<ColorGlyphRun>& glyphColorRuns )
+                               CharacterIndex startCharacterIndex,
+                               GlyphIndex startGlyphIndex,
+                               Length numberOfCharacters,
+                               Vector<Vector4>& colors,
+                               Vector<ColorIndex>& colorIndices )
 {
-  const VectorBase::SizeType numberOfColorRuns = characterColorRuns.Count();
-
-  if( 0u == numberOfColorRuns )
+  if( 0u == charactersToGlyph.Count() )
   {
-    // Nothing to do.
+    // Nothing to do if there is no text.
     return;
   }
 
-  // Resize the color runs for the glyphs.
-  glyphColorRuns.Resize( numberOfColorRuns );
-
   // Get pointers to the buffers.
-  ColorGlyphRun* glyphColorRunsBuffer = glyphColorRuns.Begin();
   const GlyphIndex* const charactersToGlyphBuffer = charactersToGlyph.Begin();
   const Length* const glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
 
+  // Calculate the number of glyphs to insert.
+  const CharacterIndex lastCharacterIndex = startCharacterIndex + numberOfCharacters - 1u;
+  const Length numberOfNewGlyphs = *( charactersToGlyphBuffer + lastCharacterIndex ) + *( glyphsPerCharacterBuffer + lastCharacterIndex ) - *( charactersToGlyphBuffer + startCharacterIndex );
+
+  // Reserve space for the new color indices.
+  Vector<ColorIndex> newColorIndices;
+  newColorIndices.Resize( numberOfNewGlyphs );
+
+  ColorIndex* newColorIndicesBuffer = newColorIndices.Begin();
+
   // Convert from characters to glyphs.
   Length index = 0u;
-  for( Vector<ColorRun>::ConstIterator it = characterColorRuns.Begin(),
-         endIt = characterColorRuns.End();
+  for( Vector<ColorRun>::ConstIterator it = colorRuns.Begin(),
+         endIt = colorRuns.End();
        it != endIt;
        ++it, ++index )
   {
     const ColorRun& colorRun = *it;
 
-    if( 0u < colorRun.characterRun.numberOfCharacters )
+    if( ( startCharacterIndex < colorRun.characterRun.characterIndex + colorRun.characterRun.numberOfCharacters ) &&
+        ( colorRun.characterRun.characterIndex < startCharacterIndex + numberOfCharacters ) )
     {
-      // Get the next color glyph run.
-      ColorGlyphRun& colorGlyphRun = *( glyphColorRunsBuffer + index );
-      colorGlyphRun.color = colorRun.color;
+      if( 0u < colorRun.characterRun.numberOfCharacters )
+      {
+        // Find the color index.
+        const ColorIndex colorIndex = FindColor( colors, colorRun.color );
 
-      // Convert the color run index from character to glyph.
-      colorGlyphRun.glyphRun.glyphIndex = *( charactersToGlyphBuffer + colorRun.characterRun.characterIndex );
+        // Get the index to the last character of the run.
+        const CharacterIndex lastIndex = colorRun.characterRun.characterIndex + colorRun.characterRun.numberOfCharacters - 1u;
 
-      // Get the index to the last character of the run.
-      const CharacterIndex lastIndex = colorRun.characterRun.characterIndex + colorRun.characterRun.numberOfCharacters - 1u;
+        const GlyphIndex glyphIndex = std::max( startGlyphIndex, *( charactersToGlyphBuffer + colorRun.characterRun.characterIndex ) ) - startGlyphIndex;
+        // Get the number of glyphs of the run.
+        const Length lastGlyphIndexPlusOne = std::min( numberOfNewGlyphs, *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex );
 
-      // Calculate the number of glyphs.
-      colorGlyphRun.glyphRun.numberOfGlyphs = *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - colorGlyphRun.glyphRun.glyphIndex;
+        // Set the indices.
+        for( GlyphIndex i = glyphIndex; i < lastGlyphIndexPlusOne; ++i )
+        {
+          *( newColorIndicesBuffer + i ) = colorIndex;
+        }
+      }
     }
   }
+
+  // Insert the new indices.
+  colorIndices.Insert( colorIndices.Begin() + startGlyphIndex,
+                       newColorIndices.Begin(),
+                       newColorIndices.End() );
 }
 
 } // namespace Text

@@ -159,6 +159,8 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
+    mImpl->mVisualModel->SetTextColor( mImpl->mTextColor );
+
     MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns,
                                          mImpl->mLogicalModel->mFontDescriptionRuns );
 
@@ -667,6 +669,7 @@ void Controller::SetInputColor( const Vector4& color )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.textColor = color;
+    mImpl->mEventData->mInputStyle.isDefaultColor = false;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -688,6 +691,10 @@ void Controller::SetInputColor( const Vector4& color )
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | COLOR );
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
     }
   }
 }
@@ -1114,6 +1121,7 @@ bool Controller::Relayout( const Size& size )
 
     // Not worth to relayout if width or height is equal to zero.
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
+
     return glyphsRemoved;
   }
 
@@ -1136,21 +1144,16 @@ bool Controller::Relayout( const Size& size )
   }
 
   // Whether there are modify events.
-  const bool isModifyEventsEmpty = 0u == mImpl->mModifyEvents.Count();
-
-  // Make sure the model is up-to-date before layouting.
-  ProcessModifyEvents();
-  mImpl->UpdateModel( mImpl->mOperationsPending );
-
-  // Style operations that need to be done if the text is modified.
-  if( !isModifyEventsEmpty )
+  if( 0u != mImpl->mModifyEvents.Count() )
   {
+    // Style operations that need to be done if the text is modified.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              COLOR );
   }
 
-  // Apply the style runs if text is modified.
-  bool updated = mImpl->UpdateModelStyle( mImpl->mOperationsPending );
+  // Make sure the model is up-to-date before layouting.
+  ProcessModifyEvents();
+  bool updated = mImpl->UpdateModel( mImpl->mOperationsPending );
 
   // Layout the text.
   Size layoutSize;
@@ -1191,8 +1194,8 @@ bool Controller::Relayout( const Size& size )
 
   // Clear the update info. This info will be set the next time the text is updated.
   mImpl->mTextUpdateInfo.Clear();
-
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
+
   return updated;
 }
 
@@ -1890,10 +1893,11 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     // Retrieve the text's style for the given index.
     InputStyle style;
+    mImpl->RetrieveDefaultInputStyle( style );
     mImpl->mLogicalModel->RetrieveStyle( styleIndex, style );
 
     // Whether to add a new text color run.
-    const bool addColorRun = style.textColor != mImpl->mEventData->mInputStyle.textColor;
+    const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor );
 
     // Whether to add a new font run.
     const bool addFontNameRun = style.familyName != mImpl->mEventData->mInputStyle.familyName;

@@ -90,7 +90,6 @@ void ClearModelData( CharacterIndex characterIndex,
   visualModel->mGlyphsPerCharacter.Clear();
   visualModel->mGlyphPositions.Clear();
   visualModel->mLines.Clear();
-  visualModel->mColorRuns.Clear();
 
   visualModel->ClearCaches();
 }

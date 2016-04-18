@@ -43,12 +43,6 @@ struct ColorRun
   Vector4      color;        ///< The color of the characters.
 };
 
-struct ColorGlyphRun
-{
-  GlyphRun glyphRun; ///< The initial glyph index and the number of glyphs of the run.
-  Vector4  color;    ///< The color of the glyphs.
-};
-
 } // namespace Text
 
 } // namespace Toolkit
