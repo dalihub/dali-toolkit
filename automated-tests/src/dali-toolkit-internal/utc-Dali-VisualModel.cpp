@@ -84,10 +84,12 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
 
+  GlyphIndex startGlyphIndex = 0u;
   if( 0u != charactersToGlyph.Count() )
   {
     // The number of glyphs to be removed.
     const Length numberOfGlyphs = charactersToGlyph[data.startIndex + data.numberOfCharacters - 1u] + glyphsPerCharacter[data.startIndex + data.numberOfCharacters - 1u] - charactersToGlyph[data.startIndex];
+    startGlyphIndex = charactersToGlyph[data.startIndex];
 
     charactersToGlyph.Erase( charactersToGlyph.Begin() + data.startIndex,
                              charactersToGlyph.Begin() + data.startIndex + data.numberOfCharacters );
@@ -106,6 +108,7 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
 
   // 3) Call the CreateGlyphsPerCharacterTable() function
   visualModel->CreateGlyphsPerCharacterTable( data.startIndex,
+                                              startGlyphIndex,
                                               data.numberOfCharacters );
 
   // 4) Compare the results.
@@ -160,10 +163,12 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
 
+  GlyphIndex startGlyphIndex = 0u;
   if( 0u != charactersToGlyph.Count() )
   {
     // The number of glyphs to be removed.
     const Length numberOfGlyphs = charactersToGlyph[data.startIndex + data.numberOfCharacters - 1u] + glyphsPerCharacter[data.startIndex + data.numberOfCharacters - 1u] - charactersToGlyph[data.startIndex];
+    startGlyphIndex = charactersToGlyph[data.startIndex];
 
     charactersToGlyph.Erase( charactersToGlyph.Begin() + data.startIndex,
                              charactersToGlyph.Begin() + data.startIndex + data.numberOfCharacters );
@@ -180,6 +185,7 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
 
   // 3) Call the CreateCharacterToGlyphTable() function
   visualModel->CreateCharacterToGlyphTable( data.startIndex,
+                                            startGlyphIndex,
                                             data.numberOfCharacters );
 
   // 4) Compare the results.

@@ -19,10 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 // INTERNAL INCLUDES
 #include "image-filter.h"
@@ -72,10 +70,6 @@ public: // From ImageFilter
   virtual void SetSize( const Vector2& size );
 
 private:
-  /**
-   * Setup position and parameters for camera
-   */
-  void SetupCamera();
 
   /**
    * Setup render tasks for blur
@@ -87,19 +81,17 @@ private:
   SpreadFilter& operator=( const SpreadFilter& );
 
 private: // Attributes
-  int              mSpread;
-  CameraActor      mCameraActor;
 
   // To perform horizontal spread from mInputImage to mImageForHorz
-  RenderTask       mRenderTaskForHorz;
-  ImageActor       mActorForInput;
-  FrameBufferImage mImageForHorz;
-  ShaderEffect     mShaderForHorz;
+  RenderTask         mRenderTaskForHorz;
+  Toolkit::ImageView mActorForInput;
+  FrameBufferImage   mImageForHorz;
 
   // To perform vertical spread from mImageForHorz to mOutputImage
-  RenderTask       mRenderTaskForVert;
-  ImageActor       mActorForHorz;
-  ShaderEffect     mShaderForVert;
+  RenderTask         mRenderTaskForVert;
+  Toolkit::ImageView mActorForHorz;
+
+  int                mSpread;
 }; // class SpreadFilter
 
 } // namespace Internal

@@ -175,7 +175,7 @@ void ShapeText( const Vector<Character>& text,
     shaping.GetGlyphs( tmpGlyphs.Begin(),
                        tmpGlyphToCharacterMap.Begin() );
 
-    // Update the indices.
+    // Update the new indices of the glyph to character map.
     if( 0u != totalNumberOfGlyphs )
     {
       for( Vector<CharacterIndex>::Iterator it = tmpGlyphToCharacterMap.Begin(),

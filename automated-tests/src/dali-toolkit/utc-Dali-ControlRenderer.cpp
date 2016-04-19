@@ -153,13 +153,13 @@ int UtcDaliControlRendererSize(void)
   propertyMap.Insert("rendererType",  "gradient");
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("gradientStartPosition",   start);
-  propertyMap.Insert("gradientEndPosition",   end);
-  propertyMap.Insert("gradientStopOffset",   Vector2(0.f, 1.f));
+  propertyMap.Insert("startPosition",   start);
+  propertyMap.Insert("endPosition",   end);
+  propertyMap.Insert("stopOffset",   Vector2(0.f, 1.f));
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradientStopColor",   stopColors);
+  propertyMap.Insert("stopColor",   stopColors);
   ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
   gradientRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( gradientRenderer.GetSize(), rendererSize, TEST_LOCATION );
@@ -345,16 +345,16 @@ int UtcDaliControlRendererGetPropertyMap3(void)
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("gradientStartPosition",   start);
-  propertyMap.Insert("gradientEndPosition",   end);
-  propertyMap.Insert("gradientSpreadMethod",   "repeat");
+  propertyMap.Insert("startPosition",   start);
+  propertyMap.Insert("endPosition",   end);
+  propertyMap.Insert("spreadMethod",   "repeat");
 
-  propertyMap.Insert("gradientStopOffset",   Vector2(0.2f, 0.8f));
+  propertyMap.Insert("stopOffset",   Vector2(0.2f, 0.8f));
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradientStopColor",   stopColors);
+  propertyMap.Insert("stopColor",   stopColors);
 
   ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
 
@@ -366,30 +366,30 @@ int UtcDaliControlRendererGetPropertyMap3(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "gradient" );
 
-  value = resultMap.Find( "gradientUnits",  Property::STRING );
+  value = resultMap.Find( "units",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "objectBoundingBox" );
 
-  value = resultMap.Find( "gradientSpreadMethod",   Property::STRING );
+  value = resultMap.Find( "spreadMethod",   Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "repeat" );
 
-  value = resultMap.Find( "gradientStartPosition",   Property::VECTOR2 );
+  value = resultMap.Find( "startPosition",   Property::VECTOR2 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector2>(), start , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "gradientEndPosition",   Property::VECTOR2 );
+  value = resultMap.Find( "endPosition",   Property::VECTOR2 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector2>(), end , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "gradientStopOffset",   Property::ARRAY );
+  value = resultMap.Find( "stopOffset",   Property::ARRAY );
   DALI_TEST_CHECK( value );
   Property::Array* offsetArray = value->GetArray();
   DALI_TEST_CHECK( offsetArray->Count() == 2 );
   DALI_TEST_EQUALS( offsetArray->GetElementAt(0).Get<float>(), 0.2f , Math::MACHINE_EPSILON_100, TEST_LOCATION );
   DALI_TEST_EQUALS( offsetArray->GetElementAt(1).Get<float>(), 0.8f , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "gradientStopColor",   Property::ARRAY );
+  value = resultMap.Find( "stopColor",   Property::ARRAY );
   DALI_TEST_CHECK( value );
   Property::Array* colorArray = value->GetArray();
   DALI_TEST_CHECK( colorArray->Count() == 2 );
@@ -412,16 +412,16 @@ int UtcDaliControlRendererGetPropertyMap4(void)
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
-  propertyMap.Insert("gradientUnits",  "userSpace");
-  propertyMap.Insert("gradientCenter",  center);
-  propertyMap.Insert("gradientRadius",  radius);
-  propertyMap.Insert("gradientStopOffset",   Vector3(0.1f, 0.3f, 1.1f));
+  propertyMap.Insert("units",  "userSpace");
+  propertyMap.Insert("center",  center);
+  propertyMap.Insert("radius",  radius);
+  propertyMap.Insert("stopOffset",   Vector3(0.1f, 0.3f, 1.1f));
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::BLACK );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("gradientStopColor",   stopColors);
+  propertyMap.Insert("stopColor",   stopColors);
 
   ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( gradientRenderer );
@@ -434,23 +434,23 @@ int UtcDaliControlRendererGetPropertyMap4(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "gradient" );
 
-  value = resultMap.Find( "gradientUnits",  Property::STRING );
+  value = resultMap.Find( "units",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "userSpace" );
 
-  value = resultMap.Find( "gradientSpreadMethod",   Property::STRING );
+  value = resultMap.Find( "spreadMethod",   Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "pad" );
 
-  value = resultMap.Find( "gradientCenter",  Property::VECTOR2 );
+  value = resultMap.Find( "center",  Property::VECTOR2 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector2>(), center , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "gradientRadius",  Property::FLOAT );
+  value = resultMap.Find( "radius",  Property::FLOAT );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<float>(), radius , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "gradientStopOffset",   Property::ARRAY );
+  value = resultMap.Find( "stopOffset",   Property::ARRAY );
   DALI_TEST_CHECK( value );
   Property::Array* offsetArray = value->GetArray();
   DALI_TEST_CHECK( offsetArray->Count() == 3 );
@@ -459,7 +459,7 @@ int UtcDaliControlRendererGetPropertyMap4(void)
   // any stop value will be clamped to [0.0, 1.0];
   DALI_TEST_EQUALS( offsetArray->GetElementAt(2).Get<float>(), 1.0f , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "gradientStopColor",   Property::ARRAY );
+  value = resultMap.Find( "stopColor",   Property::ARRAY );
   DALI_TEST_CHECK( value );
   Property::Array* colorArray = value->GetArray();
   DALI_TEST_CHECK( colorArray->Count() == 3 );

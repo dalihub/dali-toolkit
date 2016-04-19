@@ -36,7 +36,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
@@ -1507,14 +1506,18 @@ bool Popup::OnDialogTouched(Actor actor, const TouchEvent& event)
   return true;
 }
 
-void Popup::OnControlStageConnection()
+void Popup::OnStageConnection( int depth )
 {
+  Control::OnStageConnection( depth );
+
   mLayoutDirty = true;
   RelayoutRequest();
 }
 
-void Popup::OnControlChildAdd( Actor& child )
+void Popup::OnChildAdd( Actor& child )
 {
+  Control::OnChildAdd( child );
+
   // Re-parent any children added by user to the body layer.
   if( mAlterAddedChild )
   {

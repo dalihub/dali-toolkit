@@ -31,6 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
@@ -57,8 +58,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FOC
 const char* const ACTOR_FOCUSABLE("focusable");
 const char* const IS_FOCUS_GROUP("isFocusGroup");
 
-const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.png";
-const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
+const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.9.png";
 
 const char* FOCUS_SOUND_FILE = DALI_SOUND_DIR "Focus.ogg";
 const char* FOCUS_CHAIN_END_SOUND_FILE = DALI_SOUND_DIR "End_of_List.ogg";
@@ -663,12 +663,8 @@ void AccessibilityManager::SetFocusable(Actor actor, bool focusable)
 void AccessibilityManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the focusable actors
-  Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
-
-  ImageActor focusIndicator = ImageActor::New(borderImage);
+  Toolkit::ImageView focusIndicator = Toolkit::ImageView::New(FOCUS_BORDER_IMAGE_PATH);
   focusIndicator.SetParentOrigin( ParentOrigin::CENTER );
-  focusIndicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
-  focusIndicator.SetNinePatchBorder(FOCUS_BORDER_IMAGE_BORDER);
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
 
   // Apply size constraint to the focus indicator

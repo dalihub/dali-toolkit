@@ -246,6 +246,8 @@ void ImageView::OnStageDisconnection()
 
 void ImageView::OnSizeSet( const Vector3& targetSize )
 {
+  Control::OnSizeSet( targetSize );
+
   if( mRenderer )
   {
     Vector2 size( targetSize );

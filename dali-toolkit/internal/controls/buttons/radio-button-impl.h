@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
@@ -65,9 +64,9 @@ private:
 private: // From Button
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonInitialize
+   * @copydoc Toolkit::Internal::Button::OnInitialize
    */
-  virtual void OnButtonInitialize();
+  virtual void OnInitialize();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnButtonUp

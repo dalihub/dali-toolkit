@@ -212,14 +212,14 @@ public:
 private: // From Control
 
   /**
-   * @copydoc Control::OnControlChildAdd(Actor& child)
+   * @copydoc Control::OnChildAdd(Actor& child)
    */
-  virtual void OnControlChildAdd( Actor& child );
+  virtual void OnChildAdd( Actor& child );
 
   /**
-   * @copydoc Control::OnControlChildRemove(Actor& child)
+   * @copydoc Control::OnChildRemove(Actor& child)
    */
-  virtual void OnControlChildRemove( Actor& child );
+  virtual void OnChildRemove( Actor& child );
 
   /**
    * @copydoc Control::OnRelayout

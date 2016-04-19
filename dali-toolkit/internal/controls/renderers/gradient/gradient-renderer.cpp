@@ -47,18 +47,18 @@ const char * const RENDERER_TYPE("rendererType");
 const char * const RENDERER_TYPE_VALUE("gradient");
 
 // properties: linear gradient
-const char * const GRADIENT_START_POSITION_NAME("gradientStartPosition"); // Property::VECTOR2
-const char * const GRADIENT_END_POSITION_NAME("gradientEndPosition"); // Property::VECTOR2
+const char * const START_POSITION_NAME("startPosition"); // Property::VECTOR2
+const char * const END_POSITION_NAME("endPosition"); // Property::VECTOR2
 
 // properties: radial gradient
-const char * const GRADIENT_CENTER_NAME("gradientCenter"); // Property::VECTOR2
-const char * const GRADIENT_RADIUS_NAME("gradientRadius"); // Property::FLOAT
+const char * const CENTER_NAME("center"); // Property::VECTOR2
+const char * const RADIUS_NAME("radius"); // Property::FLOAT
 
 // properties: linear&radial gradient
-const char * const GRADIENT_STOP_OFFSET_NAME("gradientStopOffset"); // Property::Array FLOAT
-const char * const GRADIENT_STOP_COLOR_NAME("gradientStopColor"); // Property::Array VECTOR4
-const char * const GRADIENT_UNITS_NAME("gradientUnits"); // Property::String  "userSpaceOnUse | objectBoundingBox"
-const char * const GRADIENT_SPREAD_METHOD_NAME("gradientSpreadMethod"); // Property::String  "pad | reflect | repeat"
+const char * const STOP_OFFSET_NAME("stopOffset"); // Property::Array FLOAT
+const char * const STOP_COLOR_NAME("stopColor"); // Property::Array VECTOR4
+const char * const UNITS_NAME("units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
+const char * const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
 
 // string values
 const char * const UNIT_USER_SPACE("userSpace");
@@ -70,6 +70,10 @@ const char * const SPREAD_REPEAT("repeat");
 // uniform names
 const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
 const char * const UNIFORM_TEXTULRE_NAME("sTexture");
+
+// default offset value
+const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
+const unsigned int DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
 RendererFactoryCache::ShaderType GetShaderType( GradientRenderer::Type type, Gradient::GradientUnits units)
 {
@@ -191,7 +195,7 @@ GradientRenderer::~GradientRenderer()
 void GradientRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Gradient::GradientUnits gradientUnits = Gradient::OBJECT_BOUNDING_BOX;
-  Property::Value* unitsValue = propertyMap.Find( GRADIENT_UNITS_NAME );
+  Property::Value* unitsValue = propertyMap.Find( UNITS_NAME );
   std::string units;
   // The default unit is OBJECT_BOUNDING_BOX.
   // Only need to set new units if 'user-space'
@@ -201,7 +205,7 @@ void GradientRenderer::DoInitialize( Actor& actor, const Property::Map& property
   }
 
   mGradientType = LINEAR;
-  if( propertyMap.Find( GRADIENT_RADIUS_NAME ))
+  if( propertyMap.Find( RADIUS_NAME ))
   {
     mGradientType = RADIAL;
   }
@@ -247,25 +251,25 @@ void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
   Gradient::GradientUnits units = mGradient->GetGradientUnits();
   if( units == Gradient::USER_SPACE_ON_USE )
   {
-    map.Insert( GRADIENT_UNITS_NAME, UNIT_USER_SPACE );
+    map.Insert( UNITS_NAME, UNIT_USER_SPACE );
   }
   else // if( units == Gradient::OBJECT_BOUNDING_BOX )
   {
-    map.Insert( GRADIENT_UNITS_NAME, UNIT_BOUNDING_BOX );
+    map.Insert( UNITS_NAME, UNIT_BOUNDING_BOX );
   }
 
   Gradient::SpreadMethod spread = mGradient->GetSpreadMethod();
   if( spread == Gradient::PAD )
   {
-    map.Insert( GRADIENT_SPREAD_METHOD_NAME, SPREAD_PAD );
+    map.Insert( SPREAD_METHOD_NAME, SPREAD_PAD );
   }
   else if( spread == Gradient::REFLECT )
   {
-    map.Insert( GRADIENT_SPREAD_METHOD_NAME, SPREAD_REFLECT );
+    map.Insert( SPREAD_METHOD_NAME, SPREAD_REFLECT );
   }
   else // if( units == Gradient::REPEAT )
   {
-    map.Insert( GRADIENT_SPREAD_METHOD_NAME, SPREAD_REPEAT );
+    map.Insert( SPREAD_METHOD_NAME, SPREAD_REPEAT );
   }
 
   const Vector<Gradient::GradientStop>& stops( mGradient->GetStops() );
@@ -277,20 +281,20 @@ void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
     colors.PushBack( stops[i].mStopColor );
   }
 
-  map.Insert( GRADIENT_STOP_OFFSET_NAME, offsets );
-  map.Insert( GRADIENT_STOP_COLOR_NAME, colors );
+  map.Insert( STOP_OFFSET_NAME, offsets );
+  map.Insert( STOP_COLOR_NAME, colors );
 
   if( &typeid( *mGradient ) == &typeid(LinearGradient) )
   {
     LinearGradient* gradient = static_cast<LinearGradient*>( mGradient.Get() );
-    map.Insert( GRADIENT_START_POSITION_NAME, gradient->GetStartPosition() );
-    map.Insert( GRADIENT_END_POSITION_NAME, gradient->GetEndPosition() );
+    map.Insert( START_POSITION_NAME, gradient->GetStartPosition() );
+    map.Insert( END_POSITION_NAME, gradient->GetEndPosition() );
   }
   else // if( &typeid( *mGradient ) == &typeid(RadialGradient) )
   {
     RadialGradient* gradient = static_cast<RadialGradient*>( mGradient.Get() );
-    map.Insert( GRADIENT_CENTER_NAME, gradient->GetCenter() );
-    map.Insert( GRADIENT_RADIUS_NAME, gradient->GetRadius() );
+    map.Insert( CENTER_NAME, gradient->GetCenter() );
+    map.Insert( RADIUS_NAME, gradient->GetRadius() );
   }
 }
 
@@ -330,8 +334,8 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
 {
   if( gradientType==LINEAR )
   {
-    Property::Value* startPositionValue = propertyMap.Find( GRADIENT_START_POSITION_NAME );
-    Property::Value* endPositionValue = propertyMap.Find( GRADIENT_END_POSITION_NAME );
+    Property::Value* startPositionValue = propertyMap.Find( START_POSITION_NAME );
+    Property::Value* endPositionValue = propertyMap.Find( END_POSITION_NAME );
     Vector2 startPosition;
     Vector2 endPosition;
 
@@ -347,8 +351,8 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
   }
   else // type==RADIAL
   {
-    Property::Value* centerValue = propertyMap.Find( GRADIENT_CENTER_NAME );
-    Property::Value* radiusValue = propertyMap.Find( GRADIENT_RADIUS_NAME );
+    Property::Value* centerValue = propertyMap.Find( CENTER_NAME );
+    Property::Value* radiusValue = propertyMap.Find( RADIUS_NAME );
     Vector2 center;
     float radius;
     if( centerValue && centerValue->Get(center)
@@ -363,14 +367,15 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
   }
 
   unsigned int numValidStop = 0u;
-  Property::Value* stopOffsetValue = propertyMap.Find( GRADIENT_STOP_OFFSET_NAME );
-  Property::Value* stopColorValue = propertyMap.Find( GRADIENT_STOP_COLOR_NAME );
-  if( stopOffsetValue && stopColorValue )
+  Property::Value* stopOffsetValue = propertyMap.Find( STOP_OFFSET_NAME );
+  Property::Value* stopColorValue = propertyMap.Find( STOP_COLOR_NAME );
+  if( stopColorValue )
   {
     Vector<float> offsetArray;
     Property::Array* colorArray = stopColorValue->GetArray();
-    if( colorArray && GetStopOffsets( stopOffsetValue, offsetArray ))
+    if( colorArray )
     {
+      GetStopOffsets( stopOffsetValue, offsetArray );
       unsigned int numStop = offsetArray.Count() < colorArray->Count() ?
                              offsetArray.Count() : colorArray->Count();
       Vector4 color;
@@ -390,7 +395,7 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
     return false;
   }
 
-  Property::Value* spread = propertyMap.Find( GRADIENT_SPREAD_METHOD_NAME );
+  Property::Value* spread = propertyMap.Find( SPREAD_METHOD_NAME );
   std::string stringValue ;
   // The default spread method is PAD.
   // Only need to set new spread if 'reflect' or 'repeat"
@@ -409,51 +414,68 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
   return true;
 }
 
-bool GradientRenderer::GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets)
+void GradientRenderer::GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets)
 {
-  Vector2 offset2;
-  if( value->Get( offset2 ) )
-  {
-    stopOffsets.PushBack( offset2.x );
-    stopOffsets.PushBack( offset2.y );
-    return true;
-  }
 
-  Vector3 offset3;
-  if( value->Get( offset3 ) )
+  if ( value ) // Only check valve type if a valid Property has been passed in
   {
-    stopOffsets.PushBack( offset3.x );
-    stopOffsets.PushBack( offset3.y );
-    stopOffsets.PushBack( offset3.z );
-    return true;
-  }
-
-  Vector4 offset4;
-  if( value->Get( offset4 ) )
-  {
-    stopOffsets.PushBack( offset4.x );
-    stopOffsets.PushBack( offset4.y );
-    stopOffsets.PushBack( offset4.z );
-    stopOffsets.PushBack( offset4.w );
-    return true;
-  }
-
-  Property::Array* offsetArray = value->GetArray();
-  if( offsetArray )
-  {
-    unsigned int numStop = offsetArray->Count();
-    float offset;
-    for( unsigned int i=0; i<numStop; i++ )
+    switch ( value->GetType() )
     {
-      if( offsetArray->GetElementAt(i).Get(offset) )
+      case Property::VECTOR2:
       {
-        stopOffsets.PushBack( offset );
+        Vector2 offset2;
+        value->Get( offset2 );
+        stopOffsets.PushBack( offset2.x );
+        stopOffsets.PushBack( offset2.y );
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        Vector3 offset3;
+        value->Get( offset3 );
+        stopOffsets.PushBack( offset3.x );
+        stopOffsets.PushBack( offset3.y );
+        stopOffsets.PushBack( offset3.z );
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        Vector4 offset4;
+        value->Get( offset4 );
+        stopOffsets.PushBack( offset4.x );
+        stopOffsets.PushBack( offset4.y );
+        stopOffsets.PushBack( offset4.z );
+        stopOffsets.PushBack( offset4.w );
+        break;
+      }
+      case Property::ARRAY:
+      {
+        Property::Array* offsetArray = value->GetArray();
+        unsigned int numStop = offsetArray->Count();
+        float offset;
+        for( unsigned int i=0; i<numStop; i++ )
+        {
+          if( offsetArray->GetElementAt(i).Get(offset) )
+          {
+            stopOffsets.PushBack( offset );
+          }
+        }
+        break;
+      }
+      default:
+      {
+        DALI_LOG_WARNING("GetStopOffsets passed unsupported Property Map\n");
+        // Unsupported Type
       }
     }
-    return true;
   }
 
-  return false;
+  if ( stopOffsets.Empty() )
+  {
+    // Set default offset if none set by Property system, need a minimum and maximum
+    stopOffsets.PushBack( DEFAULT_OFFSET_MINIMUM );
+    stopOffsets.PushBack( DEFAULT_OFFSET_MAXIMUM );
+  }
 }
 
 } // namespace Internal

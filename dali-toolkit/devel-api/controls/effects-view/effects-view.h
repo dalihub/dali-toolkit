@@ -42,7 +42,7 @@ class EffectsView;
  *
  * Example usage: Applying an emboss effect
  * ...
- * EffectsView effectsView = EffectsView::New();
+ * EffectsView effectsView = EffectsView::New( Toolkit::EffectsView::EMBOSS );
  *
  * // set position and format
  * effectsView.SetParentOrigin( ParentOrigin::CENTER );
@@ -50,22 +50,15 @@ class EffectsView;
  * effectsView.SetPixelFormat( Pixel::RGBA8888 );
  *
  * // set effect type and properties
- * effectsView.SetType( Toolkit::EffectsView::EMBOSS );
  * effectsView.SetProperty( effectsView.GetEffectSizePropertyIndex(), static_cast< float >( shadowSize ) );
  * effectsView.SetProperty( effectsView.GetEffectOffsetPropertyIndex(), Vector3( shadowDistance.x, shadowDistance.y, 0.0f ) );
  * effectsView.SetProperty( effectsView.GetEffectColorPropertyIndex(), shadowColor );
- *
- * // Render result to an offscreen
- * effectsView.SetOutputImage( image );
  *
  * // Render once
  * effectsView.SetRefreshOnDemand( true );
  *
  * // optionally set a clear color
  * effectsView.SetBackgroundColor( Vector4( 0.0f, 0.0f, 0.0f, 0.0f ) );
- *
- * // start effect processing
- * effectsView.Enable();
  */
 class DALI_IMPORT_API EffectsView : public Control
 {
@@ -78,12 +71,42 @@ public:
     INVALID_TYPE
   };
 
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,              ///< Reserve property indices @SINCE_1_0.0
+
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,        ///< @SINCE_1_1.18
+    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000  ///< Reserve animatable property indices, @SINCE_1_1.18
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the EffectsView class.
+   */
+  struct Property
+  {
+    enum
+    {
+      // Event side properties
+      EFFECT_SIZE = PROPERTY_START_INDEX,              ///< name "effectSize", type INTEGER
+
+      // Animatable properties
+      EFFECT_OFFSET = ANIMATABLE_PROPERTY_START_INDEX, ///< name "effectOffset", type VECTOR3
+      EFFECT_COLOR,                                    ///< name "effectColor", type VECTOR4
+    };
+  };
+
 public:
 
   /**
    * Create an EffectsView object with default configuration
+   * @param[in] type The type of effect to be performed by the EffectView.
+   *                 A member of the EffectType enumeration.
    */
-  static EffectsView New();
+  static EffectsView New( EffectType type );
 
   /**
    * Create an uninitialized EffectsView. Only derived versions can be instantiated.
@@ -119,27 +142,10 @@ public:
 public:
 
   /**
-   * Set the effect type
-   * @param[in] type The type of effect to be performed by the EffectView.
-   *                 A member of the EffectType enumeration.
-   */
-  void SetType( EffectType type );
-
-  /**
    * Get the effect type
    * @return The type of effect performed by the EffectView. A member of the EffectType enumeration.
    */
   EffectType GetType() const;
-
-  /**
-   * Enable the effect
-   */
-  void Enable();
-
-  /**
-   * Disable the effect
-   */
-  void Disable();
 
   /**
    * Refresh/Redraw the effect
@@ -158,42 +164,6 @@ public:
     * @param[in] pixelFormat The pixel format for the output
     */
    void SetPixelFormat( Pixel::Format pixelFormat );
-
-   /**
-    * Set the FrameBufferImage that will receive the final output of the EffectsView.
-    * @param[in] image User supplied FrameBufferImage that will receive the final output of the EffectsView.
-    */
-   void SetOutputImage( FrameBufferImage image );
-
-   /**
-    * Get the FrameBufferImage that holds the final output of the EffectsView.
-    * @return The FrameBufferImage that holds the final output of the EffectsView.
-    */
-   FrameBufferImage GetOutputImage();
-
-   /**
-    * Get the property index to the effect size
-    * @return The property index to the effect size
-    */
-   Dali::Property::Index GetEffectSizePropertyIndex() const;
-
-   /**
-    * Get the property index to the effect strength
-    * @return The property index to the effect strength
-    */
-   Dali::Property::Index GetEffectStrengthPropertyIndex() const;
-
-   /**
-    * Get the property index to the Vector3 specifying the effect offset (eg drop shadow offset)
-    * @return The property index to the Vector3 specifying the effect offset
-    */
-   Dali::Property::Index GetEffectOffsetPropertyIndex() const;
-
-   /**
-    * Get the property index to the effect color (eg shadow color)
-    * @return The property index to the effect color
-    */
-   Dali::Property::Index GetEffectColorPropertyIndex() const;
 
    /**
     * Set background color for the view. The background will be filled with this color.

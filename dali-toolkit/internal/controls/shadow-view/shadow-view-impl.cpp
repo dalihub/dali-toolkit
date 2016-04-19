@@ -293,17 +293,21 @@ void ShadowView::OnInitialize()
   blurStrengthConstraint.Apply();
 }
 
-void ShadowView::OnControlChildAdd( Actor& child )
+void ShadowView::OnChildAdd( Actor& child )
 {
+  Control::OnChildAdd( child );
+
   if( child != mChildrenRoot && child != mBlurRootActor)
   {
     mChildrenRoot.Add( child );
   }
 }
 
-void ShadowView::OnControlChildRemove( Actor& child )
+void ShadowView::OnChildRemove( Actor& child )
 {
   mChildrenRoot.Remove( child );
+
+  Control::OnChildRemove( child );
 }
 
 void ShadowView::ConstrainCamera()

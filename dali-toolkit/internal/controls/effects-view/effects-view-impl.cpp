@@ -22,14 +22,16 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include "../../filters/blur-two-pass-filter.h"
-#include "../../filters/emboss-filter.h"
-#include "../../filters/spread-filter.h"
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
+#include <dali-toolkit/internal/filters/emboss-filter.h>
+#include <dali-toolkit/internal/filters/spread-filter.h>
 
 namespace Dali
 {
@@ -45,10 +47,13 @@ namespace
 
 Dali::BaseHandle Create()
 {
-  return Toolkit::EffectsView::New();
+  return EffectsView::New();
 }
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::EffectsView, Toolkit::Control, Create )
+DALI_PROPERTY_REGISTRATION( Toolkit, EffectsView, "effectSize", INTEGER, EFFECT_SIZE )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, EffectsView, "effectOffset", VECTOR3, EFFECT_OFFSET )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, EffectsView, "effectColor", Color::WHITE, EFFECT_COLOR )
 DALI_TYPE_REGISTRATION_END()
 
 const Pixel::Format EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT = Pixel::RGBA8888;
@@ -56,23 +61,36 @@ const float         ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 1.0f, 1.0f, 1.0f, 0.0 );
 const bool          EFFECTS_VIEW_REFRESH_ON_DEMAND(false);
 
-// Custom properties
-const char* const   EFFECT_SIZE_PROPERTY_NAME = "EffectSize";
-const char* const   EFFECT_STRENGTH_PROPERTY_NAME = "EffectStrength";
-const char* const   EFFECT_OFFSET_PROPERTY_NAME = "EffectOffset";
-const char* const   EFFECT_COLOR_PROPERTY_NAME = "EffectColor";
+const char* EFFECTS_VIEW_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump vec3 effectOffset;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    vertexPosition.xyz += effectOffset;\n
+    vertexPosition = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = aPosition + vec2(0.5);\n
+    gl_Position = vertexPosition;\n
+  }\n
+);
 
-const float         EFFECT_SIZE_DEFAULT( 1.0f );
-const float         EFFECT_STRENGTH_DEFAULT( 0.5f );
-const Vector3       EFFECT_OFFSET_DEFAULT( 0.0f, 0.0f, 0.0f );
-const Vector4       EFFECT_COLOR_DEFAULT( Color::WHITE );
-
-const char* const EFFECTS_VIEW_FRAGMENT_SOURCE =
-    "void main()\n"
-    "{\n"
-    "  gl_FragColor = uColor;\n"
-    "  gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;\n"
-    "}\n";
+const char* EFFECTS_VIEW_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 effectColor;\n
+  \n
+  void main()\n
+  {\n
+     gl_FragColor = effectColor;\n
+     gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;\n
+  }\n
+);
 
 const float BLUR_KERNEL0[] = { 12.0f/16.0f,
                                2.0f/16.0f, 2.0f/16.0f };
@@ -113,17 +131,15 @@ Toolkit::EffectsView EffectsView::New()
 
 EffectsView::EffectsView()
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
-  mEffectType( Toolkit::EffectsView::INVALID_TYPE ),
-  mPixelFormat( EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT ),
-  mSpread(0.0f),
+  mChildrenRoot(Actor::New()),
   mBackgroundColor( EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR ),
   mTargetSize( Vector2::ZERO ),
   mLastSize( Vector2::ZERO ),
-  mRefreshOnDemand(EFFECTS_VIEW_REFRESH_ON_DEMAND),
-  mEffectSizePropertyIndex(Property::INVALID_INDEX),
-  mEffectStrengthPropertyIndex(Property::INVALID_INDEX),
-  mEffectOffsetPropertyIndex(Property::INVALID_INDEX),
-  mEffectColorPropertyIndex(Property::INVALID_INDEX)
+  mEffectSize(0),
+  mEffectType( Toolkit::EffectsView::INVALID_TYPE ),
+  mPixelFormat( EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT ),
+  mEnabled( false ),
+  mRefreshOnDemand(EFFECTS_VIEW_REFRESH_ON_DEMAND)
 {
 }
 
@@ -136,24 +152,25 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
 {
   if( mEffectType != type )
   {
-    mEffectType = type;
-
     RemoveFilters();
 
-    switch( mEffectType )
+    Actor self = Self();
+    Property::Map rendererMap;
+    rendererMap.Insert( "rendererType", "image" );
+
+    switch( type )
     {
       case Toolkit::EffectsView::DROP_SHADOW:
       {
-        mFilters.push_back( new SpreadFilter );
-        mFilters.push_back( new BlurTwoPassFilter );
+        mFilters.PushBack( new SpreadFilter );
+        mFilters.PushBack( new BlurTwoPassFilter );
         break;
       }
       case Toolkit::EffectsView::EMBOSS:
       {
-        mFilters.push_back( new SpreadFilter );
-        mFilters.push_back( new EmbossFilter );
-        mFilters.push_back( new BlurTwoPassFilter );
-        mActorPostFilter.RemoveShaderEffect();
+        mFilters.PushBack( new SpreadFilter );
+        mFilters.PushBack( new EmbossFilter );
+        mFilters.PushBack( new BlurTwoPassFilter );
         break;
       }
       default:
@@ -161,6 +178,14 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
         break;
       }
     }
+
+    Property::Map customShader;
+    customShader[ "vertexShader" ] = EFFECTS_VIEW_VERTEX_SOURCE;
+    customShader[ "fragmentShader" ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
+    rendererMap[ "shader" ] = customShader;
+    Toolkit::RendererFactory::Get().ResetRenderer( mRendererPostFilter, self, rendererMap );
+
+    mEffectType = type;
   }
 }
 
@@ -174,6 +199,7 @@ void EffectsView::Enable()
   // make sure resources are allocated and start the render tasks processing
   AllocateResources();
   CreateRenderTasks();
+  mEnabled = true;
 }
 
 void EffectsView::Disable()
@@ -181,6 +207,7 @@ void EffectsView::Disable()
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
+  mEnabled = false;
 }
 
 void EffectsView::Refresh()
@@ -200,86 +227,6 @@ void EffectsView::SetPixelFormat( Pixel::Format pixelFormat )
   mPixelFormat = pixelFormat;
 }
 
-void EffectsView::SetOutputImage( FrameBufferImage image )
-{
-  CustomActor self = Self();
-
-  if( mImageForResult != image )
-  {
-    if( !image )
-    {
-      if( mImageForResult )
-      {
-        self.Remove( mActorForResult );
-        mActorForResult.Reset();
-
-        self.Add( mActorPostFilter );
-        self.Add( mActorForChildren );
-      }
-    }
-    else
-    {
-      if( mImageForResult )
-      {
-        self.Remove( mActorForResult );
-      }
-      mActorForResult = Actor::New();
-      mActorForResult.SetParentOrigin( ParentOrigin::CENTER );
-      mActorForResult.SetSize( mTargetSize );
-      mActorForResult.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
-
-      Self().Add( mActorForResult );
-      mActorForResult.Add( mActorPostFilter );
-      mActorForResult.Add( mActorForChildren );
-    }
-    mImageForResult = image;
-  }
-}
-
-FrameBufferImage EffectsView::GetOutputImage()
-{
-  return mImageForResult;
-}
-
-Property::Index EffectsView::GetEffectSizePropertyIndex() const
-{
-  return mEffectSizePropertyIndex;
-}
-
-Property::Index EffectsView::GetEffectStrengthPropertyIndex() const
-{
-  return mEffectStrengthPropertyIndex;
-}
-
-Property::Index EffectsView::GetEffectOffsetPropertyIndex() const
-{
-  return mEffectOffsetPropertyIndex;
-}
-
-Property::Index EffectsView::GetEffectColorPropertyIndex() const
-{
-  return mEffectColorPropertyIndex;
-}
-
-void EffectsView::SetupProperties()
-{
-  CustomActor self = Self();
-
-  // Register a property that the user can control the drop shadow offset
-  mEffectSizePropertyIndex     = self.RegisterProperty(EFFECT_SIZE_PROPERTY_NAME, EFFECT_SIZE_DEFAULT, Property::READ_WRITE);
-  mEffectStrengthPropertyIndex = self.RegisterProperty(EFFECT_STRENGTH_PROPERTY_NAME, EFFECT_STRENGTH_DEFAULT, Property::READ_WRITE);
-  mEffectOffsetPropertyIndex   = self.RegisterProperty(EFFECT_OFFSET_PROPERTY_NAME, EFFECT_OFFSET_DEFAULT);
-  mEffectColorPropertyIndex    = self.RegisterProperty(EFFECT_COLOR_PROPERTY_NAME, EFFECT_COLOR_DEFAULT);
-
-  Constraint positionConstraint = Constraint::New<Vector3>( mActorPostFilter, Actor::Property::POSITION, EqualToConstraint() );
-  positionConstraint.AddSource( Source( self, mEffectOffsetPropertyIndex ) );
-  positionConstraint.Apply();
-
-  Constraint colorConstraint = Constraint::New<Vector4>( mActorPostFilter, Actor::Property::COLOR, EqualToConstraint() );
-  colorConstraint.AddSource( Source( self, mEffectColorPropertyIndex ) );
-  colorConstraint.Apply();
-}
-
 void EffectsView::SetBackgroundColor( const Vector4& color )
 {
   mBackgroundColor = color;
@@ -290,86 +237,118 @@ Vector4 EffectsView::GetBackgroundColor() const
   return mBackgroundColor;
 }
 
+void EffectsView::SetEffectSize( int effectSize )
+{
+  mEffectSize = effectSize;
+
+  if( mEnabled )
+  {
+    const size_t numFilters( mFilters.Size() );
+    for( size_t i = 0; i < numFilters; ++i )
+    {
+      mFilters[i]->Disable();
+    }
+
+    SetupFilters();
+
+    for( size_t i = 0; i < numFilters; ++i )
+    {
+      mFilters[i]->Enable();
+    }
+  }
+}
+
+int EffectsView::GetEffectSize()
+{
+  return mEffectSize;
+}
+
 // From Control
 void EffectsView::OnInitialize()
 {
-  //////////////////////////////////////////////////////
-  // Create cameras
-  mCameraForChildren = CameraActor::New();
-  mCameraForChildren.SetParentOrigin(ParentOrigin::CENTER);
-
-  mActorForChildren = ImageActor::New();
-  mActorForChildren.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForChildren.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
-
-  mActorPostFilter = ImageActor::New();
-  mActorPostFilter.SetParentOrigin( ParentOrigin::CENTER );
-  mActorPostFilter.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
-  mActorPostFilter.SetShaderEffect( ShaderEffect::New( "", EFFECTS_VIEW_FRAGMENT_SOURCE ) );
-
-  // Connect to actor tree
-  Self().Add( mActorPostFilter );
-  Self().Add( mActorForChildren );
-  Self().Add( mCameraForChildren );
-
-  SetupProperties();
+  CustomActor self = Self();
+  mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
+  self.Add( mChildrenRoot );
 }
 
 void EffectsView::OnSizeSet(const Vector3& targetSize)
 {
+  Control::OnSizeSet( targetSize );
+
   mTargetSize = Vector2(targetSize);
 
   // if we are already on stage, need to update render target sizes now to reflect the new size of this actor
-  if(Self().OnStage())
+  if(mEnabled)
   {
-    AllocateResources();
+    if( mLastSize != Vector2::ZERO )
+    {
+      Disable();
+    }
+    Enable();
   }
 
-  if( mActorForResult )
-  {
-    mActorForResult.SetSize( targetSize );
-  }
-  if( mActorForChildren )
-  {
-    mActorForChildren.SetSize( targetSize );
-  }
-  if( mActorPostFilter )
-  {
-    mActorPostFilter.SetSize( targetSize );
-  }
+  mChildrenRoot.SetSize( targetSize );
+}
 
-  // Children render camera must move when EffectsView object is resized.
-  // This is since we cannot change render target size - so we need to remap the child actors' rendering
-  // accordingly so they still exactly fill the render target.
-  // Note that this means the effective resolution of the child render changes as the EffectsView object
-  // changes size, this is the trade off for not being able to modify render target size
-  // Change camera z position based on EffectsView actor height
-  if( mCameraForChildren )
-  {
-    const float cameraPosScale( 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) );
-    mCameraForChildren.SetZ( targetSize.height * cameraPosScale );
-  }
+void EffectsView::OnStageConnection( int depth )
+{
+  Control::OnStageConnection( depth );
 
-  const size_t numFilters( mFilters.size() );
-  for( size_t i = 0; i < numFilters; ++i )
-  {
-    mFilters[i]->SetSize( mTargetSize );
-  }
+  Enable();
 
+  Actor self = Self();
+  if( mRendererPostFilter )
+  {
+    mRendererPostFilter.SetOnStage( self );
+  }
+  if( mRendererForChildren )
+  {
+    mRendererForChildren.SetOnStage( self );
+  }
 }
 
 void EffectsView::OnStageDisconnection()
 {
-  const size_t numFilters( mFilters.size() );
+  Disable();
+
+  const size_t numFilters( mFilters.Size() );
   for( size_t i = 0; i < numFilters; ++i )
   {
     mFilters[i]->Disable();
   }
+
+  Actor self = Self();
+  if( mRendererPostFilter )
+  {
+    mRendererPostFilter.SetOffStage( self );
+  }
+  if( mRendererForChildren )
+  {
+    mRendererForChildren.SetOffStage( self );
+  }
+
+  Control::OnStageDisconnection();
+}
+
+void EffectsView::OnChildAdd( Actor& child )
+{
+  Control::OnChildAdd( child );
+
+  if( child != mChildrenRoot && child != mCameraForChildren )
+  {
+    mChildrenRoot.Add( child );
+  }
+}
+
+void EffectsView::OnChildRemove( Actor& child )
+{
+  mChildrenRoot.Remove( child );
+
+  Control::OnChildRemove( child );
 }
 
 void EffectsView::SetupFilters()
 {
-  int effectSize = static_cast< int >( Self().GetProperty( mEffectSizePropertyIndex ).Get<float>() );
   switch( mEffectType )
   {
     case Toolkit::EffectsView::DROP_SHADOW:
@@ -377,23 +356,23 @@ void EffectsView::SetupFilters()
       SpreadFilter* spreadFilter = static_cast< SpreadFilter* >( mFilters[0] );
       spreadFilter->SetInputImage( mImageForChildren );
       spreadFilter->SetOutputImage( mImagePostFilter );
-      spreadFilter->SetRootActor( Self() );
+      spreadFilter->SetRootActor( mChildrenRoot );
       spreadFilter->SetBackgroundColor( mBackgroundColor );
       spreadFilter->SetPixelFormat( mPixelFormat );
       spreadFilter->SetSize( mTargetSize );
-      spreadFilter->SetSpread( effectSize );
+      spreadFilter->SetSpread( mEffectSize );
 
       BlurTwoPassFilter* blurFilter = static_cast< BlurTwoPassFilter* >( mFilters[1] );
       blurFilter->SetInputImage( mImagePostFilter );
       blurFilter->SetOutputImage( mImagePostFilter );
-      blurFilter->SetRootActor( Self() );
+      blurFilter->SetRootActor( mChildrenRoot );
       blurFilter->SetBackgroundColor( mBackgroundColor );
       blurFilter->SetPixelFormat( mPixelFormat );
       blurFilter->SetSize( mTargetSize );
 
       const float* kernel(NULL);
       size_t kernelSize(0);
-      switch( effectSize )
+      switch( mEffectSize )
       {
         case 4:  {  kernel = BLUR_KERNEL4; kernelSize = sizeof(BLUR_KERNEL4)/sizeof(BLUR_KERNEL4[0]); break; }
         case 3:  {  kernel = BLUR_KERNEL3; kernelSize = sizeof(BLUR_KERNEL3)/sizeof(BLUR_KERNEL3[0]); break; }
@@ -410,16 +389,16 @@ void EffectsView::SetupFilters()
       SpreadFilter* spreadFilter = static_cast< SpreadFilter* >( mFilters[0] );
       spreadFilter->SetInputImage( mImageForChildren );
       spreadFilter->SetOutputImage( mImagePostFilter );
-      spreadFilter->SetRootActor( Self() );
+      spreadFilter->SetRootActor( mChildrenRoot );
       spreadFilter->SetBackgroundColor( mBackgroundColor );
       spreadFilter->SetPixelFormat( Pixel::RGBA8888 );
       spreadFilter->SetSize( mTargetSize );
-      spreadFilter->SetSpread( effectSize );
+      spreadFilter->SetSpread( mEffectSize );
 
       EmbossFilter* embossFilter = static_cast< EmbossFilter* >( mFilters[1] );
       embossFilter->SetInputImage( mImagePostFilter );
       embossFilter->SetOutputImage( mImagePostFilter );
-      embossFilter->SetRootActor( Self() );
+      embossFilter->SetRootActor( mChildrenRoot );
       embossFilter->SetBackgroundColor( mBackgroundColor );
       embossFilter->SetPixelFormat( Pixel::RGBA8888 );
       embossFilter->SetSize( mTargetSize );
@@ -427,7 +406,7 @@ void EffectsView::SetupFilters()
       BlurTwoPassFilter* blurFilter = static_cast< BlurTwoPassFilter* >( mFilters[2] );
       blurFilter->SetInputImage( mImagePostFilter );
       blurFilter->SetOutputImage( mImagePostFilter );
-      blurFilter->SetRootActor( Self() );
+      blurFilter->SetRootActor( mChildrenRoot );
       blurFilter->SetBackgroundColor( Vector4( 0.5f, 0.5f, 0.5f, 0.0 ) );
       blurFilter->SetPixelFormat( Pixel::RGBA8888 );
       blurFilter->SetSize( mTargetSize );
@@ -446,14 +425,18 @@ void EffectsView::AllocateResources()
   if(mTargetSize != mLastSize)
   {
     mLastSize = mTargetSize;
-
     SetupCameras();
 
+    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+    Actor self = Self();
+
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    mActorForChildren.SetImage(mImageForChildren);
+    rendererFactory.ResetRenderer(mRendererForChildren, self, mImageForChildren);
+    mRendererForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    mActorPostFilter.SetImage(mImagePostFilter);
+    rendererFactory.ResetRenderer(mRendererPostFilter, self, mImagePostFilter);
+    mRendererPostFilter.SetDepthIndex( DepthIndex::CONTENT );
 
     SetupFilters();
   }
@@ -461,26 +444,39 @@ void EffectsView::AllocateResources()
 
 void EffectsView::SetupCameras()
 {
-  const float cameraPosScale( 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) );
-
-  // Create and place a camera for the children render, corresponding to its render target size
-  mCameraForChildren.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
-  // TODO: how do we pick a reasonable value for near clip? Needs to relate to normal camera the user renders with, but we don't have a handle on it
-  mCameraForChildren.SetNearClippingPlane(1.0f);
-  mCameraForChildren.SetAspectRatio(mTargetSize.width / mTargetSize.height);
-  mCameraForChildren.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-  mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosScale);
-  mCameraForChildren.SetZ( mTargetSize.height * cameraPosScale );
+  if( !mCameraForChildren )
+  {
+    // Create a camera for the children render, corresponding to its render target size
+    mCameraForChildren = CameraActor::New(mTargetSize);
+    mCameraForChildren.SetParentOrigin(ParentOrigin::CENTER);
+    mCameraForChildren.SetInvertYAxis( true );
+    Self().Add( mCameraForChildren );
+  }
+  else
+  {
+    // place the camera for the children render, corresponding to its render target size
+    const float cameraPosScale( 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) );
+    mCameraForChildren.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
+    mCameraForChildren.SetNearClippingPlane(1.0f);
+    mCameraForChildren.SetAspectRatio(mTargetSize.width / mTargetSize.height);
+    mCameraForChildren.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
+    mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosScale);
+    mCameraForChildren.SetZ( mTargetSize.height * cameraPosScale );
+  }
 }
 
 void EffectsView::CreateRenderTasks()
 {
+  if( mTargetSize == Vector2::ZERO )
+  {
+    return;
+  }
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
   // create render task to render our child actors to offscreen buffer
   mRenderTaskForChildren = taskList.CreateTask();
   mRenderTaskForChildren.SetRefreshRate( mRefreshOnDemand ? RenderTask::REFRESH_ONCE : RenderTask::REFRESH_ALWAYS );
-  mRenderTaskForChildren.SetSourceActor( Self() );
+  mRenderTaskForChildren.SetSourceActor( mChildrenRoot );
   mRenderTaskForChildren.SetExclusive(true);
   mRenderTaskForChildren.SetInputEnabled( false );
   mRenderTaskForChildren.SetClearColor( mBackgroundColor );
@@ -489,35 +485,25 @@ void EffectsView::CreateRenderTasks()
   mRenderTaskForChildren.SetCameraActor(mCameraForChildren); // use camera that covers render target exactly
 
   // Enable image filters
-  const size_t numFilters( mFilters.size() );
+  const size_t numFilters( mFilters.Size() );
   for( size_t i = 0; i < numFilters; ++i )
   {
     mFilters[i]->Enable();
-  }
-
-  // create render task to render result of the image filters to the final offscreen
-  if( mImageForResult )
-  {
-    mRenderTaskForResult = taskList.CreateTask();
-    mRenderTaskForResult.SetRefreshRate( mRefreshOnDemand ? RenderTask::REFRESH_ONCE : RenderTask::REFRESH_ALWAYS );
-    mRenderTaskForResult.SetSourceActor( mActorForResult );
-    mRenderTaskForResult.SetExclusive(true);
-    mRenderTaskForResult.SetInputEnabled( false );
-    mRenderTaskForResult.SetClearColor( mBackgroundColor );
-    mRenderTaskForResult.SetClearEnabled( true );
-    mRenderTaskForResult.SetTargetFrameBuffer( mImageForResult );
-    mRenderTaskForResult.SetCameraActor(mCameraForChildren); // use camera that covers render target exactly
   }
 }
 
 void EffectsView::RemoveRenderTasks()
 {
+  if( mTargetSize == Vector2::ZERO )
+  {
+    return;
+  }
+
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
   taskList.RemoveTask(mRenderTaskForChildren);
-  taskList.RemoveTask(mRenderTaskForResult);
 
-  const size_t numFilters( mFilters.size() );
+  const size_t numFilters( mFilters.Size() );
   for( size_t i = 0; i < numFilters; ++i )
   {
     mFilters[i]->Disable();
@@ -533,12 +519,7 @@ void EffectsView::RefreshRenderTasks()
     mRenderTaskForChildren.SetRefreshRate( mRefreshOnDemand ? RenderTask::REFRESH_ONCE : RenderTask::REFRESH_ALWAYS );
   }
 
-  if( mRenderTaskForResult )
-  {
-    mRenderTaskForResult.SetRefreshRate( mRefreshOnDemand ? RenderTask::REFRESH_ONCE : RenderTask::REFRESH_ALWAYS );
-  }
-
-  const size_t numFilters( mFilters.size() );
+  const size_t numFilters( mFilters.Size() );
   for( size_t i = 0; i < numFilters; ++i )
   {
     mFilters[i]->Refresh();
@@ -547,12 +528,63 @@ void EffectsView::RefreshRenderTasks()
 
 void EffectsView::RemoveFilters()
 {
-  const size_t numFilters( mFilters.size() );
+  const size_t numFilters( mFilters.Size() );
   for( size_t i = 0; i < numFilters; ++i )
   {
     delete mFilters[i];
   }
-  mFilters.clear();
+  mFilters.Release();
+}
+
+void EffectsView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::EffectsView effectsView = Toolkit::EffectsView::DownCast( Dali::BaseHandle( object ) );
+
+  if ( effectsView )
+  {
+    switch ( index )
+    {
+      case Toolkit::EffectsView::Property::EFFECT_SIZE:
+      {
+        int effectSize;
+        if( value.Get( effectSize ) )
+        {
+          GetImpl( effectsView ).SetEffectSize( effectSize );
+        }
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+  }
+}
+
+Property::Value EffectsView::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Property::Value value;
+
+  Toolkit::EffectsView imageview = Toolkit::EffectsView::DownCast( Dali::BaseHandle( object ) );
+
+  if ( imageview )
+  {
+    EffectsView& impl = GetImpl( imageview );
+    switch ( propertyIndex )
+    {
+      case Toolkit::EffectsView::Property::EFFECT_SIZE:
+      {
+         value = impl.GetEffectSize();
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 } // namespace Internal

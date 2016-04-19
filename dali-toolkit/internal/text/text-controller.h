@@ -151,10 +151,10 @@ public:
    * @brief Remove a given number of characters
    *
    * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
-   * @param[in] numberOfChars The number of characters to delete from the cursorOffset.
+   * @param[in] numberOfCharacters The number of characters to delete from the cursorOffset.
    * @return True if the remove was successful.
    */
-  bool RemoveText( int cursorOffset, int numberOfChars );
+  bool RemoveText( int cursorOffset, int numberOfCharacters );
 
   /**
    * @brief Retrieve the current cursor position.
@@ -283,7 +283,7 @@ public:
    * @ brief Update the text after a font change
    * @param[in] newDefaultFont The new font to change to
    */
-  void UpdateAfterFontChange( std::string& newDefaultFont );
+  void UpdateAfterFontChange( const std::string& newDefaultFont );
 
   /**
    * @brief Set the text color

@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
 
 // INTERNAL INCLUDES
 #include "image-filter.h"
@@ -66,11 +66,6 @@ public: // From ImageFilter
 
 private:
   /**
-   * Setup position and parameters for camera
-   */
-  void SetupCamera();
-
-  /**
    * Setup render tasks for blur
    */
   void CreateRenderTasks();
@@ -81,17 +76,16 @@ private:
 
 private: // Attributes
 
-  RenderTask       mRenderTaskForEmboss1;
-  RenderTask       mRenderTaskForEmboss2;
-  RenderTask       mRenderTaskForOutput;
-  FrameBufferImage mImageForEmboss1;
-  FrameBufferImage mImageForEmboss2;
-  CameraActor      mCameraActor;
-  ImageActor       mActorForInput1;
-  ImageActor       mActorForInput2;
-  ImageActor       mActorForEmboss1;
-  ImageActor       mActorForEmboss2;
-  Actor            mActorForComposite;
+  RenderTask         mRenderTaskForEmboss1;
+  RenderTask         mRenderTaskForEmboss2;
+  RenderTask         mRenderTaskForOutput;
+  FrameBufferImage   mImageForEmboss1;
+  FrameBufferImage   mImageForEmboss2;
+  Toolkit::ImageView mActorForInput1;
+  Toolkit::ImageView mActorForInput2;
+  Toolkit::ControlRenderer mRendererForEmboss1;
+  Toolkit::ControlRenderer mRendererForEmboss2;
+  Actor              mActorForComposite;
 }; // class EmbossFilter
 
 } // namespace Internal

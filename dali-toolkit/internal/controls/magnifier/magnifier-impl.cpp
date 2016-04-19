@@ -280,6 +280,8 @@ void Magnifier::SetFrameVisibility(bool visible)
 
 void Magnifier::OnSizeSet(const Vector3& targetSize)
 {
+  Control::OnSizeSet( targetSize );
+
   // TODO: Once Camera/CameraActor properties function as proper animatable properties
   // this code can disappear.
   // whenever the size of the magnifier changes, the field of view needs to change

@@ -163,7 +163,6 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
-const char * const BACKGROUND_COLOR_NAME("color");
 const char * const COLOR_RENDERER_COLOR_NAME("blendColor");
 
 } // unnamed namespace
@@ -188,8 +187,7 @@ public:
   mLongPressGestureDetector(),
   mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false ),
-  mAddRemoveBackgroundChild( false )
+  mIsKeyboardFocusGroup( false )
 {
 }
 
@@ -283,21 +281,16 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND:
         {
-          Image image = Scripting::NewImage( value );
-          if ( image )
-          {
-            controlImpl.SetBackgroundImage( image );
-            break;
-          }
           const Property::Map* map = value.GetMap();
           if( map )
           {
             controlImpl.SetBackground( *map );
-            break;
           }
-
-          // The background is neither a valid image nor a property map, so it is no longer required
-          controlImpl.ClearBackground();
+          else
+          {
+            // The background is not a property map, so we should clear the background
+            controlImpl.ClearBackground();
+          }
           break;
         }
       }
@@ -390,7 +383,6 @@ public:
   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-  bool mAddRemoveBackgroundChild:1;        ///< Flag to know when we are adding or removing our own actor to avoid call to OnControlChildAdd
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
   static const PropertyRegistration PROPERTY_1;
@@ -474,14 +466,6 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground(const Property::Map& map)
 {
-  const Property::Value* colorValue = map.Find( BACKGROUND_COLOR_NAME );
-  Vector4 color;
-  if( colorValue && colorValue->Get(color))
-  {
-    SetBackgroundColor( color );
-    return;
-  }
-
   Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
@@ -855,31 +839,23 @@ void Control::OnKeyInputFocusLost()
 
 void Control::OnChildAdd(Actor& child)
 {
-  // If this is the background actor, then we do not want to inform deriving classes
-  if ( mImpl->mAddRemoveBackgroundChild )
-  {
-    return;
-  }
-
   // Notify derived classes.
   OnControlChildAdd( child );
 }
 
 void Control::OnChildRemove(Actor& child)
 {
-  // If this is the background actor, then we do not want to inform deriving classes
-  if ( mImpl->mAddRemoveBackgroundChild )
-  {
-    return;
-  }
-
   // Notify derived classes.
   OnControlChildRemove( child );
 }
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  // Background is resized through size negotiation
+  if( mImpl->mBackgroundRenderer )
+  {
+    Vector2 size( targetSize );
+    mImpl->mBackgroundRenderer.SetSize( size );
+  }
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)

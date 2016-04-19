@@ -45,9 +45,13 @@ class LogicalModel;
  *  - 2 is a LINE_NO_BREAK.    Text can't be broken into a new line.
  *
  * @param[in] text Vector of UTF-32 characters.
+ * @param[in] startIndex The character from where the break info is set.
+ * @param[in] numberOfCharacters The number of characters.
  * @param[out] lineBreakInfo The line break info
  */
 void SetLineBreakInfo( const Vector<Character>& text,
+                       CharacterIndex startIndex,
+                       Length numberOfCharacters,
                        Vector<LineBreakInfo>& lineBreakInfo );
 
 /**

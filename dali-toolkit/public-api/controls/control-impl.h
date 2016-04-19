@@ -301,31 +301,37 @@ protected: // From CustomActorImpl, not to be used by application developers
 
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
+   * @note If overridden, then an up-call to Control::OnStageConnection MUST be made at the start.
    */
   virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc CustomActorImpl::OnStageDisconnection()
+   * @note If overridden, then an up-call to Control::OnStageDisconnection MUST be made at the end.
    */
   virtual void OnStageDisconnection();
 
   /**
    * @copydoc CustomActorImpl::OnChildAdd()
+   * @note If overridden, then an up-call to Control::OnChildAdd MUST be made at the start.
    */
   virtual void OnChildAdd( Actor& child );
 
   /**
    * @copydoc CustomActorImpl::OnChildRemove()
+   * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
   virtual void OnChildRemove( Actor& child );
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
+   * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the start.
    */
   virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
    * @copydoc CustomActorImpl::OnSizeAnimation()
+   * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the start.
    */
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize );
 
@@ -436,6 +442,8 @@ public: // API for derived classes to override
   virtual void OnInitialize();
 
   /**
+   * @DEPRECATED_1_1.30. Override OnChildAdd instead.
+   *
    * @brief Called whenever an Actor is added to the control.
    *
    * Could be overridden by derived classes.
@@ -446,6 +454,8 @@ public: // API for derived classes to override
   virtual void OnControlChildAdd( Actor& child );
 
   /**
+   * @DEPRECATED_1_1.30. Override OnChildRemove instead.
+   *
    * @brief Called whenever an Actor is removed from the control.
    *
    * Could be overridden by derived classes.

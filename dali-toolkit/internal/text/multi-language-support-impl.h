@@ -27,6 +27,12 @@
 namespace Dali
 {
 
+namespace TextAbstraction
+{
+//Forward declaration
+class FontClient;
+}
+
 namespace Toolkit
 {
 
@@ -64,6 +70,37 @@ struct ValidateFontsPerScript
   bool FindValidFont( FontId fontId ) const;
 
   Vector<FontId> mValidFonts;
+};
+
+/**
+ * @brief Stores default font ids per script. It can be different sizes for a default font family.
+ */
+struct DefaultFonts
+{
+  /**
+   * Default constructor.
+   */
+  DefaultFonts()
+  : mFonts()
+  {}
+
+  /**
+   * Default destructor.
+   */
+  ~DefaultFonts()
+  {}
+
+  /**
+   * @brief Finds a default font for the given @p size.
+   *
+   * @param[in] fontClient The font client.
+   * @param[in] size The given size.
+   *
+   * @return The font id of a default font for the given @p size. If there isn't any font cached it returns 0.
+   */
+  FontId FindFont( TextAbstraction::FontClient& fontClient, PointSize26Dot6 size ) const;
+
+  Vector<FontId> mFonts;
 };
 
 /**
@@ -110,7 +147,7 @@ public:
                       Vector<FontRun>& fonts );
 
 private:
-  Vector<FontId>                  mDefaultFontPerScriptCache; ///< Caches the default font for a script.
+  Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
   Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
 };
 

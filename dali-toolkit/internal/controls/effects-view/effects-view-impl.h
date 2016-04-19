@@ -20,15 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/effects-view/effects-view.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 namespace Dali
 {
@@ -80,12 +79,6 @@ public:
   /// @copydoc Dali::Toolkit::EffectsView::GetType
   Toolkit::EffectsView::EffectType GetType() const;
 
-  /// @copydoc Dali::Toolkit::EffectsView::Enable
-  void Enable();
-
-  /// @copydoc Dali::Toolkit::EffectsView::Disable
-  void Disable();
-
   /// @copydoc Dali::Toolkit::EffectsView::Refresh
   void Refresh();
 
@@ -95,40 +88,46 @@ public:
   /// @copydoc Dali::Toolkit::EffectsView::SetPixelFormat
   void SetPixelFormat( Pixel::Format pixelFormat );
 
-  /// @copydoc Dali::Toolkit::EffectsView::SetOutputImage
-  void SetOutputImage( FrameBufferImage image );
-
-  /// @copydoc Dali::Toolkit::EffectsView::GetOutputImage
-  FrameBufferImage GetOutputImage();
-
-  /// @copydoc Dali::Toolkit::EffectsView::GetEffectSizePropertyIndex
-  Property::Index GetEffectSizePropertyIndex() const;
-
-  /// @copydoc Dali::Toolkit::EffectsView::GetEffectStrengthPropertyIndex
-  Property::Index GetEffectStrengthPropertyIndex() const;
-
-  /// @copydoc Dali::Toolkit::EffectsView::GetEffectOffsetPropertyIndex
-  Property::Index GetEffectOffsetPropertyIndex() const;
-
-  /// @copydoc Dali::Toolkit::EffectsView::GetEffectColorPropertyIndex
-  Property::Index GetEffectColorPropertyIndex() const;
-
   /// @copydoc Dali::Toolkit::EffectsView::SetBackgroundColor(const Vector4&)
   void SetBackgroundColor( const Vector4& color );
 
   /// @copydoc Dali::Toolkit::GaussianBlurView::GetBackgroundColor
   Vector4 GetBackgroundColor() const;
 
-private:
   /**
-   * Register and setup indices for EffectsView properties
+   * Set the effect size which decides the size of filter kernel.
+   * @param[in] effectSize The effect size.
    */
-  void SetupProperties();
+  void SetEffectSize( int effectSize );
+
+  /**
+   * Get the effect size.
+   * @return The effect size.
+   */
+  int GetEffectSize();
+
+  // Properties
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 private: // From Control
 
   /**
-   * @copydoc Toolkit::Control::OnInitialize()
+   * @copydoc Toolkit::Internal::Control::OnInitialize()
    */
   virtual void OnInitialize();
 
@@ -137,12 +136,37 @@ private: // From Control
    */
   virtual void OnSizeSet( const Vector3& targetSize );
 
+  /**
+   * @copydoc Toolkit::Internal::Control::OnStageConnection
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
+   * @copydoc Toolkit::Internal::Control::OnStageDisconnection
+   */
+  virtual void OnStageDisconnection();
+
+  /**
+   * @copydoc Toolkit::Internal::Control::OnChildAdd
+   */
+  virtual void OnChildAdd( Actor& child );
+
+  /**
+   * @copydoc Toolkit::Internal::Control::OnChildRemove
+   */
+  virtual void OnChildRemove( Actor& child );
+
 private:
 
   /**
-   * Callback received when the control is disconnected from the stage.
+   * Enable the effect when the control is set on stage
    */
-  void OnStageDisconnection();
+  void Enable();
+
+  /**
+   * Disable the effect when the control is set off stage
+   */
+  void Disable();
 
   /**
    * Setup image filters
@@ -188,21 +212,14 @@ private:
   EffectsView& operator = ( const EffectsView& );
 
 private: // attributes/properties
-  Toolkit::EffectsView::EffectType mEffectType;
 
   /////////////////////////////////////////////////////////////
   // for rendering all user added children to offscreen target
   FrameBufferImage mImageForChildren;
-  ImageActor mActorForChildren;
+  Toolkit::ControlRenderer mRendererForChildren;
   RenderTask mRenderTaskForChildren;
   CameraActor mCameraForChildren;
-
-  /////////////////////////////////////////////////////////////
-  Pixel::Format mPixelFormat;     ///< pixel format used by render targets
-
-  /////////////////////////////////////////////////////////////
-  // downsampling is used for the separated blur passes to get increased blur with the same number of samples and also to make rendering quicker
-  float mSpread;
+  Actor mChildrenRoot; // for creating a subtree for all user added child actors
 
   /////////////////////////////////////////////////////////////
   // background fill color
@@ -212,40 +229,23 @@ private: // attributes/properties
   // for checking if we need to reallocate render targets
   Vector2 mTargetSize;
   Vector2 mLastSize;
-
-  bool mRefreshOnDemand;
-
-  /////////////////////////////////////////////////////////////
-  // horizontal spread objects
-  FrameBufferImage mImageForHorzSpread;
-  ImageActor mActorForHorzSpread;
-  RenderTask mRenderTaskForHorzSpread;
-
-  /////////////////////////////////////////////////////////////
-  // vertical spread objects
-  FrameBufferImage mImageForVertSpread;
-  ImageActor mActorForVertSpread;
-  RenderTask mRenderTaskForVertSpread;
-
-  CameraActor mCameraForSpread;
-
   /////////////////////////////////////////////////////////////
   // post blur image
   FrameBufferImage mImagePostFilter;
-  ImageActor mActorPostFilter;
+  Toolkit::ControlRenderer mRendererPostFilter;
+
+  Vector<ImageFilter*> mFilters;
 
   /////////////////////////////////////////////////////////////
-  // final image
-  FrameBufferImage mImageForResult;
-  Actor mActorForResult;
-  RenderTask mRenderTaskForResult;
+  // downsampling is used for the separated blur passes to get increased blur with the same number of samples and also to make rendering quicker
+  int mEffectSize;
 
-  Property::Index mEffectSizePropertyIndex;
-  Property::Index mEffectStrengthPropertyIndex;
-  Property::Index mEffectOffsetPropertyIndex;
-  Property::Index mEffectColorPropertyIndex;
+  /////////////////////////////////////////////////////////////
+  Toolkit::EffectsView::EffectType mEffectType;
+  Pixel::Format mPixelFormat;     ///< pixel format used by render targets
 
-  std::vector<ImageFilter*> mFilters;
+  bool mEnabled:1;
+  bool mRefreshOnDemand:1;
 }; // class EffectsView
 
 } // namespace Internal

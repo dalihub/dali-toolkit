@@ -26,7 +26,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 
 namespace Dali

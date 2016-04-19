@@ -22,7 +22,6 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/actors/image-actor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

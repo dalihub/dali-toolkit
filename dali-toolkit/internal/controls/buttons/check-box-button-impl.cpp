@@ -97,8 +97,10 @@ void CheckBoxButton::SetTickUVEffect()
   }
 }
 
-void CheckBoxButton::OnButtonInitialize()
+void CheckBoxButton::OnInitialize()
 {
+  Button::OnInitialize();
+
   // Wrap around all children
   Self().SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 

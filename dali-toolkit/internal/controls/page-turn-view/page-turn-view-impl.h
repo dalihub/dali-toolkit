@@ -21,9 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -42,6 +40,82 @@ namespace Internal
 
 class PageTurnView : public Control
 {
+protected:
+
+  /**
+   * The book page class
+   */
+  struct Page
+  {
+    /**
+     * Constructor
+     */
+    Page();
+    /**
+     * Destructor
+     */
+    ~Page(){};
+
+    /**
+     * Set the page image content
+     * @param[in] image The content of the page.
+     */
+    void SetImage( Image image );
+
+    /**
+     * Apply an effect onto the page actor.
+     * @param[in] shader The shader for rendering effect.
+     */
+    void UseEffect(Shader shader);
+
+    /**
+     * Apply an effect onto the page actor.
+     * @param[in] shader The shader for rendering effect.
+     * @param[in] geometry The geometry for rendering effect.
+     */
+    void UseEffect(Shader shader, Geometry geometry);
+
+    /**
+     * Change the page turning direction.
+     */
+    void ChangeTurnDirection();
+
+    /**
+     * Set the pan displacement property
+     * @param[in] value The property value
+     */
+    void SetPanDisplacement(float value);
+
+    /**
+     * Set the pan center property
+     * @param[in] value The property value
+     */
+    void SetPanCenter( const Vector2& value );
+
+    /**
+     * Set the original center property to be used by shader
+     * @param[in] value The property value
+     */
+    void SetOriginalCenter( const Vector2& value );
+
+    /**
+     * Set the current center property to be used by shader
+     * @param[in] value The property value
+     */
+    void SetCurrentCenter( const Vector2& value );
+
+    Actor actor;                              ///< The page actor
+    Material material;                        ///< The material of the actor
+    Renderer renderer;                        ///< The renderer of the actor
+    bool isTurnBack;                          ///< The turning direction
+    Property::Index propertyPanDisplacement;  ///< The horizontal displacement of the pan
+    Property::Index propertyPanCenter;        ///< The current pan position
+    Property::Index propertyOriginalCenter;   ///< The original center to be used by the shader
+    Property::Index propertyCurrentCenter;    ///< The current center to be used by the shader
+    Property::Index propertyTurnDirection;    ///< The turning direction property
+  };
+
+
 protected:
 
   /**
@@ -124,15 +198,14 @@ protected:
    */
   void OrganizePageDepth();
 
-  /**
-   * Set shader Effect to the actor.
-   * If the actor has children, the shader effect is also applied to its first child
-   * @param[in] actor The actor which the shader effect would be applied onto
-   * @param[in] shaderEffect The shader effect to be set to the actor
-   */
-  void SetShaderEffect( ImageActor actor, ShaderEffect shaderEffect );
-
 private:
+
+  /**
+   * Create shader from a property map.
+   * @param[in] shaderMap The shader property map;
+   * @return The created shader.
+   */
+  Shader CreateShader( const Property::Map& shaderMap );
 
  /**
   * Set up the shadow view control to cast shadow
@@ -165,6 +238,11 @@ private:
    */
   void SliddenBack( Animation& animation );
 
+  /**
+   * Stop the page turning animation and contraint.
+   * This method should be called when taking off stage or jump to a specified page.
+   */
+  void StopTurning();
 
 private: // from Control
 
@@ -203,7 +281,7 @@ private: // implemented differently by PageTurnLandscapeView and PageTurnPortrai
    * @param[in] newPage The added page actor
    * @param[in] isLeftSide Which side the new page is added to
    */
-  virtual void OnAddPage( ImageActor newPage, bool isLeftSide ) { }
+  virtual void OnAddPage( Actor newPage, bool isLeftSide ) { }
 
   /**
    * This method is called when pan started or continuing
@@ -222,15 +300,6 @@ private: // implemented differently by PageTurnLandscapeView and PageTurnPortrai
   virtual void SetPanActor( const Vector2& panPosition ) = 0;
 
   /**
-   * This method is called when a page is turned over or slidden back
-   * Remove PageTurnEffect and use a proper PageTurnBookSpineEffect
-   * Implemented in subclasses to provide specific behaviour.
-   * @param[in] actor The current page actor
-   * @param[in] isLeftSide Which side the current page is located
-   */
-  virtual void SetSpineEffect(ImageActor actor, bool isLeftSide) = 0;
-
-  /**
    * This method is called when pan finished to detect outwards flick
    * In portrait view, start an animation of turning previous page back when outwards flick is detected
    * In landscape view, nothing to do
@@ -245,7 +314,7 @@ private: // implemented differently by PageTurnLandscapeView and PageTurnPortrai
    * @param[in] actor The page actor
    * @param[in] isLeftSide Which side the page is turned to
    */
-  virtual void OnTurnedOver( ImageActor actor, bool isLeftSide ) { }
+  virtual void OnTurnedOver( Actor actor, bool isLeftSide ) { }
 
 public: //signal and property
 
@@ -308,52 +377,49 @@ private:
 
 protected:
 
-  Vector2                        mControlSize;             ///< The size of the control, it is decided by the page size, the SetSize from application can not change it
   Layer                          mTurningPageLayer;        ///< The layer for the turning page, to avoid possible depth conflict
   Toolkit::ShadowView            mShadowView;              ///< The shadow view control for shadow casting
   Actor                          mShadowPlaneBackground;   ///< The plane for the shadow to cast on
   Actor                          mPointLight;              ///< The point light used for shadow casting
 
-  PageFactory&                   mPageFactory;             ///< The page factory which provides the page actors
+  PageFactory* const             mPageFactory;             ///< The factory which provides the page actors
+  Shader                         mTurnEffectShader;        ///< The group of PageTurnEffects
+  Shader                         mSpineEffectShader;       ///< The book spine shader effect
+  Geometry                       mGeometry;                ///< The grid geometry for pages
+
+  std::vector<Page>              mPages;                   ///< The vector of pages on stage
+  std::map<Animation,int>        mAnimationPageIdPair;     ///< The map to keep track which page actor is the animation act on
+
   Vector2                        mPageSize;                ///< The page size
-  int                            mTotalPageCount;          ///< The total number of pages provided by the page factory
-
-  bool                           mPanning;                 ///< The boolean to indicate whether the pan gesture is continuing
-
-  std::vector<ShaderEffect>      mTurnEffect;              ///< The group of PageTurnEffects
-  ShaderEffect                   mSpineEffectFront;        ///< The book spine shader effect without flipping image content
-  ShaderEffect                   mSpineEffectBack;         ///< The book spine shader effect with image content flipped
+  Vector2                        mControlSize;             ///< The size of the control, it is decided by the page size, the SetSize from application can not change it
   Vector2                        mSpineShadowParameter;    ///< The spine shadow parameter for all the above shader effects
   Vector2                        mOriginalCenter;          ///< The original center set to the PageTurnEffect
   Vector2                        mCurrentCenter;           ///< The current center set to the PageTurnEffect
-
-  std::vector<ImageActor>        mPageActors;              ///< The vector of pages on stage
-  int                            mCurrentPageIndex;        ///< The index of the current page, between 0 ~ mTotalPageCount-1
-  int                            mTurningPageIndex;        ///< The index of the turning page
-  std::map<ImageActor,bool>      mIsTurnBack;              ///< The map to keep track the page actor's turning direction
-  std::map<Animation,int>        mAnimationPageIdPair;     ///< The map to keep track which page actor is the animation act on
-  std::map<Animation, int>       mAnimationIndexPair;      ///< The map to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is used for the animation
-  int                            mIndex;                   ///< The index to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is used for the current panning page
-  std::vector<bool>              mIsAnimating;             ///< The boolean vector to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is available for using
-  std::vector<bool>              mIsSliding;               ///< The boolean vector to keep track whether there are animating pages sliding back
-
-  ImageActor                     mPanActor;                ///< The page being panned by the pan gesture
   Vector2                        mPressDownPosition;       ///< The first press down position of the pan gesture
-  bool                           mPress;                   ///< The boolean to keep track the state of the pageTurnEffect is activated or not
-  bool                           mPageUpdated;             ///< The boolean to keep track whether is page is updated after any turning activity
 
   float                          mDistanceUpCorner;        ///< The distance between the original center of PageTurnEffect and the top-left corner of the page
   float                          mDistanceBottomCorner;    ///< The distance between the original center of PageTurnEffect and the bottom-left corner of the page
-
-  std::vector<Property::Index>   mPropertyPanDisplacement; ///< The pan displacement property group
-  std::vector<Property::Index>   mPropertyCurrentCenter;   ///< The current center property group
   float                          mPanDisplacement;         ///< The displacement of the pan after the constrains are applied
+
+  int                            mTotalPageCount;          ///< The total number of pages provided by the page factory
+  int                            mCurrentPageIndex;        ///< The index of the current page, between 0 ~ mTotalPageCount-1
+  int                            mTurningPageIndex;        ///< The index of the turning page
+  int                            mIndex;                   ///< The index to keep track which PanDisplacementProperty, CurrentCenterProperty is used for the current panning page
+  int                            mSlidingCount;            ///< The boolean vector to keep track whether there are animating pages sliding back
+  int                            mAnimatingCount;          ///< The boolean vector to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is available for using
+
   bool                           mConstraints;             ///< The boolean to keep track the constrains are applied or not
+  bool                           mPress;                   ///< The boolean to keep track the state of the pageTurnEffect is activated or not
+  bool                           mPageUpdated;             ///< The boolean to keep track whether is page is updated after any turning activity
 
   Toolkit::PageTurnView::PageTurnSignal   mPageTurnStartedSignal;   ///< The signal to notify that a page has started turning
   Toolkit::PageTurnView::PageTurnSignal   mPageTurnFinishedSignal;  ///< The signal to notify that a page has finished turning
   Toolkit::PageTurnView::PagePanSignal    mPagePanStartedSignal;    ///< The signal to notify that a page has started panning
   Toolkit::PageTurnView::PagePanSignal    mPagePanFinishedSignal;   ///< The signal to notify that a page has finished panning
+
+  static const char * const PROPERTY_TEXTURE_WIDTH;     ///< The uniform name of texture width
+  static const char * const PROPERTY_ORIGINAL_CENTER;   ///< The property name of original center, which is used to constrain the uniforms
+  static const char * const PROPERTY_CURRENT_CENTER;    ///< The property name of current center, which is used to constrain the uniforms
 
   static const int               MAXIMUM_TURNING_NUM;                  ///< How many pages are allowed to animating in the same time
   static const int               NUMBER_OF_CACHED_PAGES_EACH_SIDE;     ///< The maximum number of pages kept, (MAXIMUM_ANIMATION_NUM+1) pages for each side

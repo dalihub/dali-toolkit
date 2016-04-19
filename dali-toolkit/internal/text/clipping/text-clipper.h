@@ -20,9 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali/public-api/signals/connection-tracker.h>
 
 namespace Dali
 {
@@ -39,7 +40,7 @@ typedef IntrusivePtr<Clipper> ClipperPtr;
 /**
  * @brief A helper class for clipping actors using a FrameBufferImage.
  */
-class Clipper : public RefObject
+class Clipper : public RefObject, public ConnectionTracker
 {
 public:
 
@@ -63,7 +64,7 @@ public:
    *
    * @return The image actor.
    */
-  ImageActor GetImageActor() const;
+  Actor GetImageActor() const;
 
   /**
    * @brief Refresh the contents of the FrameBufferImage.
@@ -80,6 +81,13 @@ private: // Implementation
    * @param[in] size The size of the clipping region.
    */
   void Initialize( const Vector2& size );
+
+  /**
+   * The renderer is not created until the clipper actor is set on stage, only by then the blend function could be set.
+   *
+   * @param[in] actor The actor connected to stage.
+   */
+  void OnStageConnect( Dali::Actor actor );
 
   /**
    * Construct a new Clipper.
@@ -101,7 +109,7 @@ private: // Data
 
   Layer mOffscreenRootActor;
   CameraActor mOffscreenCameraActor;
-  ImageActor mImageActor;
+  ImageView mImageActor;
   RenderTask mRenderTask;
   Vector2 mCurrentOffscreenSize;
 };

@@ -31,15 +31,14 @@ namespace Internal
 
 namespace
 {
-
+const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 } // namespace
 
 ImageFilter::ImageFilter()
 : mBackgroundColor( Vector4( 1.0f, 1.0f, 1.0f, 0.0f ) ),
   mTargetSize( Vector2::ZERO ),
   mPixelFormat( Pixel::RGBA8888 ),
-  mRefreshOnDemand( false ),
-  mDebugRender( false )
+  mRefreshOnDemand( false )
 {
 }
 
@@ -116,10 +115,27 @@ void ImageFilter::SetBackgroundColor( const Vector4& color )
   mBackgroundColor = color;
 }
 
-void ImageFilter::RenderDebug( bool flag )
+void ImageFilter::SetupCamera()
 {
-  mDebugRender = flag;
+  if( !mCameraActor )
+  {
+    // create a camera for the render task, corresponding to its render target size
+    mCameraActor = CameraActor::New(mTargetSize);
+    mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+    mCameraActor.SetInvertYAxis( true );
+    mRootActor.Add( mCameraActor );
+  }
+  else
+  {
+    // place the camera for the render task, corresponding to its render target size
+    mCameraActor.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
+    mCameraActor.SetNearClippingPlane(1.0f);
+    mCameraActor.SetAspectRatio(mTargetSize.width / mTargetSize.height);
+    mCameraActor.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
+    mCameraActor.SetPosition(0.0f, 0.0f, ((mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
+  }
 }
+
 
 } // namespace Internal
 

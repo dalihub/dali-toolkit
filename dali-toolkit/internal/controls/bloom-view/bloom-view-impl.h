@@ -22,7 +22,6 @@
 #include <sstream>
 #include <cmath>
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
@@ -86,14 +85,14 @@ private:
   virtual void OnSizeSet(const Vector3& targetSize);
 
   /**
-   * @copydoc Control::OnControlChildAdd()
+   * @copydoc Control::OnChildAdd()
    */
-  virtual void OnControlChildAdd( Actor& child );
+  virtual void OnChildAdd( Actor& child );
 
   /**
-   * @copydoc Control::OnControlChildRemove()
+   * @copydoc Control::OnChildRemove()
    */
-  virtual void OnControlChildRemove( Actor& child );
+  virtual void OnChildRemove( Actor& child );
 
   void AllocateResources();
   void CreateRenderTasks();

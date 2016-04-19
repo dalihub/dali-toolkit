@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 namespace
 {
@@ -55,7 +56,7 @@ Actor Clipper::GetRootActor() const
   return mOffscreenRootActor;
 }
 
-ImageActor Clipper::GetImageActor() const
+Actor Clipper::GetImageActor() const
 {
   return mImageActor;
 }
@@ -103,10 +104,8 @@ void Clipper::Initialize( const Vector2& size )
   mOffscreenRootActor.SetDepthTestDisabled( true );
   mOffscreenRootActor.SetSize( offscreenSize );
 
-  mImageActor = ImageActor::New();
+  mImageActor = ImageView::New();
   mImageActor.SetParentOrigin( ParentOrigin::CENTER );
-  mImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
-                            BlendingFactor::ONE, BlendingFactor::ONE );
   mImageActor.SetScale( Vector3( 1.0f, -1.0f, 1.0f ) );
   mImageActor.SetSize( offscreenSize );
 
@@ -130,9 +129,17 @@ void Clipper::Initialize( const Vector2& size )
                                                              Pixel::RGBA8888 );
   mImageActor.SetImage( frameBufferImage );
   mRenderTask.SetTargetFrameBuffer( frameBufferImage );
+  mImageActor.OnStageSignal().Connect(this, &Clipper::OnStageConnect);
 
   // Stores current size to avoid create new Dali resources if text changes.
   mCurrentOffscreenSize = offscreenSize;
+}
+
+void Clipper::OnStageConnect( Dali::Actor actor )
+{
+  Renderer renderer = mImageActor.GetRendererAt(0);
+  renderer.SetBlendFunc(BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                        BlendingFactor::ONE, BlendingFactor::ONE);
 }
 
 Clipper::Clipper()

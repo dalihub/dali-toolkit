@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-text-model.h>
 
@@ -39,6 +40,26 @@ using namespace Text;
 
 namespace
 {
+struct CreateParagraphData
+{
+  std::string    description;                    ///< Description of the test.
+  std::string    text;                           ///< Input text.
+  CharacterIndex index;                          ///< The first character index.
+  Length         numberOfCharacters;             ///< The number of characters.
+  unsigned int   numberOfParagraphs;             ///< The expected number of paragraphs.
+  unsigned int*  indices;                        ///< The expected paragraph info indices.
+  unsigned int*  numberOfCharactersPerParagraph; ///< The expected number of characters of each paragraph.
+};
+
+struct FindParagraphData
+{
+  std::string    description;        ///< Description of the test.
+  std::string    text;               ///< Input text.
+  CharacterIndex index;              ///< The first character index.
+  Length         numberOfCharacters; ///< The number of characters.
+  unsigned int   numberOfParagraphs; ///< The expected number of paragraphs.
+  unsigned int*  paragraphs;         ///< The expected paragraph info.
+};
 
 struct SetVisualToLogicalMapData
 {
@@ -50,6 +71,109 @@ struct SetVisualToLogicalMapData
   unsigned int  expectedNumberOfCharacters; ///< The expected number of characters.
   unsigned int* visualToLogical;            ///< The expected visual to logical conversion table.
 };
+
+bool CreateParagraphTest( const CreateParagraphData& data )
+{
+  // 1) Create the model.
+  LogicalModelPtr logicalModel = LogicalModel::New();
+  VisualModelPtr visualModel = VisualModel::New();
+  Size textArea(100.f, 60.f);
+  Size layoutSize;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  LayoutOptions options;
+  CreateTextModel( data.text,
+                   textArea,
+                   fontDescriptionRuns,
+                   options,
+                   layoutSize,
+                   logicalModel,
+                   visualModel );
+
+  // 2) Clear the paragraphs.
+  Vector<ParagraphRun>& paragraphs = logicalModel->mParagraphInfo;
+  ClearCharacterRuns( data.index,
+                      data.index + data.numberOfCharacters - 1u,
+                      paragraphs );
+
+  // 3) Call the LogicalModel::CreateParagraphInfo() method
+  logicalModel->CreateParagraphInfo( data.index,
+                                     data.numberOfCharacters );
+
+  // 4) Compare the results.
+  if( data.numberOfParagraphs != paragraphs.Count() )
+  {
+    std::cout << "  Different number of paragraphs : " << paragraphs.Count() << ", expected : " << data.numberOfParagraphs << std::endl;
+    return false;
+  }
+
+  unsigned int index = 0u;
+  for( Vector<ParagraphRun>::ConstIterator it = paragraphs.Begin(),
+         endIt = paragraphs.End();
+       it != endIt;
+       ++it, ++index )
+  {
+    const ParagraphRun& paragraph( *it );
+
+    if( data.indices[index] != paragraph.characterRun.characterIndex )
+    {
+      std::cout << "  Different character index for paragraph : " << index << ", " << paragraph.characterRun.characterIndex << ", expected : " << data.indices[index] << std::endl;
+      return false;
+    }
+    if( data.numberOfCharactersPerParagraph[index] != paragraph.characterRun.numberOfCharacters )
+    {
+      std::cout << "  Different number of characters for paragraph : " << index << ", " << paragraph.characterRun.numberOfCharacters << ", expected : " << data.numberOfCharactersPerParagraph[index] << std::endl;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool FindParagraphTest( const FindParagraphData& data )
+{
+  // 1) Create the model.
+  LogicalModelPtr logicalModel = LogicalModel::New();
+  VisualModelPtr visualModel = VisualModel::New();
+  Size textArea(100.f, 60.f);
+  Size layoutSize;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  LayoutOptions options;
+  CreateTextModel( data.text,
+                   textArea,
+                   fontDescriptionRuns,
+                   options,
+                   layoutSize,
+                   logicalModel,
+                   visualModel );
+
+  // 2) Find the paragraphs.
+  Vector<ParagraphRunIndex> paragraphs;
+  logicalModel->FindParagraphs( data.index, data.numberOfCharacters, paragraphs );
+
+  // 3) compare the results.
+  if( data.numberOfParagraphs != paragraphs.Count() )
+  {
+    return false;
+  }
+
+  unsigned int index = 0u;
+  for( Vector<ParagraphRunIndex>::ConstIterator it = paragraphs.Begin(),
+         endIt = paragraphs.End();
+       it != endIt;
+       ++it, ++index )
+  {
+    const ParagraphRunIndex paragraphIndex = *it;
+
+    if( paragraphIndex != data.paragraphs[index] )
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 bool SetVisualToLogicalMapTest( const SetVisualToLogicalMapData& data )
 {
@@ -106,10 +230,158 @@ bool SetVisualToLogicalMapTest( const SetVisualToLogicalMapData& data )
 } // namespace
 
 //////////////////////////////////////////////////////////
+//
+// UtcDaliCreateParagraph
+// UtcDaliFindParagraph
+// UtcDaliSetVisualToLogicalMap
+//
+//////////////////////////////////////////////////////////
+
+int UtcDaliCreateParagraph(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliCreateParagraph");
+
+  unsigned int paragraphsIndices01[] = { 0u };
+  unsigned int paragraphsNumberOfCharacters01[] = { 0u };
+  unsigned int paragraphsIndices02[] = { 0u, 12u, 17u };
+  unsigned int paragraphsNumberOfCharacters02[] = { 12u, 5u, 1u };
+  unsigned int paragraphsIndices03[] = { 0u, 12u, 17u, 34u };
+  unsigned int paragraphsNumberOfCharacters03[] = { 12u, 5u, 17u ,1u };
+
+  struct CreateParagraphData data[] =
+  {
+    {
+      "Zero characters",
+      "",
+      0u,
+      0u,
+      0u,
+      paragraphsIndices01,
+      paragraphsNumberOfCharacters01,
+    },
+    {
+      "Some paragraphs",
+      "Hello world\ndemo\n\n",
+      0u,
+      18u,
+      3u,
+      paragraphsIndices02,
+      paragraphsNumberOfCharacters02,
+    },
+    {
+      "Some paragraphs. Update the initial paragraphs.",
+      "Hello world\ndemo\nhello world demo\n\n",
+      0u,
+      17u,
+      4u,
+      paragraphsIndices03,
+      paragraphsNumberOfCharacters03,
+    },
+    {
+      "Some paragraphs. Update the mid paragraphs.",
+      "Hello world\ndemo\nhello world demo\n\n",
+      12u,
+      5u,
+      4u,
+      paragraphsIndices03,
+      paragraphsNumberOfCharacters03,
+    },
+    {
+      "Some paragraphs. Update the final paragraphs.",
+      "Hello world\ndemo\nhello world demo\n\n",
+      17u,
+      18u,
+      4u,
+      paragraphsIndices03,
+      paragraphsNumberOfCharacters03,
+    },
+  };
+  const unsigned int numberOfTests = 5u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    // ToolkitTestApplication application;
+    if( !CreateParagraphTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliFindParagraph(void)
+{
+  tet_infoline(" UtcDaliFindParagraph");
+
+  unsigned int paragraphs01[] = {};
+  unsigned int paragraphs02[] = { 0u, 1u, 2u };
+  unsigned int paragraphs03[] = { 0u };
+  unsigned int paragraphs04[] = { 1u };
+  unsigned int paragraphs05[] = { 0u, 1u, 2u };
+
+  struct FindParagraphData data[] =
+  {
+    {
+      "Zero characters",
+      "",
+      0u,
+      100u,
+      0u,
+      paragraphs01,
+    },
+    {
+      "Some paragraphs",
+      "Hello world\ndemo\n\n",
+      0u,
+      18u,
+      3u,
+      paragraphs02
+    },
+    {
+      "Some paragraphs",
+      "Hello world\ndemo\n\n",
+      0u,
+      12u,
+      1u,
+      paragraphs03
+    },
+    {
+      "Some paragraphs",
+      "Hello world\ndemo\n\n",
+      12u,
+      5u,
+      1u,
+      paragraphs04
+    },
+    {
+      "Some paragraphs",
+      "Hello world\ndemo\n\n",
+      3u,
+      15u,
+      3u,
+      paragraphs05
+    },
+  };
+  const unsigned int numberOfTests = 5u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !FindParagraphTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
 
 int UtcDaliSetVisualToLogicalMap(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliSetVisualToLogicalMap");
 
   unsigned int* visualToLogical01 = NULL;
@@ -210,6 +482,7 @@ int UtcDaliSetVisualToLogicalMap(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !SetVisualToLogicalMapTest( data[index] ) )
     {
       tet_result(TET_FAIL);

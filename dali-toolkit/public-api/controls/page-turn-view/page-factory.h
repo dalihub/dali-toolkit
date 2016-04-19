@@ -29,13 +29,15 @@ namespace Toolkit
 
 /**
  * @brief PageFactory is an abstract interface for providing image actors to PageTurnView
- * Each image actor is identified by a unique ID, and has a linear order from 0 to GetNumberOfPages()-1
+ * Each page is identified by a unique ID, and has a linear order from 0 to GetNumberOfPages()-1
  *
  * @SINCE_1_1.4
  */
 class DALI_IMPORT_API PageFactory
 {
 public:
+
+  class Extension; ///< Forward declare future extension interface
 
   /**
    * @brief Virtual destructor
@@ -45,18 +47,35 @@ public:
 
   /**
    * @brief Query the number of pages available from the factory.
+   *
    * The maximum available page has an ID of GetNumberOfPages()-1.
    * @SINCE_1_1.4
+   * @return The page count.
    */
   virtual unsigned int GetNumberOfPages() = 0;
 
   /**
    * @brief Create an actor to represent the page content.
-   * @SINCE_1_1.4
+   * @SINCE_1_1.30
+   *
+   * If no valid image provided, a broken image is displayed.
+   * For double-sided page( PageTurnLandscapeView ), the left half of image is used as page front side, and the right half as page back side.
+   *
    * @param[in] pageId The ID of the page to create.
    * @return An actor, or an uninitialized pointer if the ID is out of range.
    */
-  virtual Actor NewPage( unsigned int pageId ) = 0;
+  virtual Image NewPage( unsigned int pageId ) = 0;
+
+  /**
+   * @brief Retrieve the extension for this factory
+   * @SINCE_1_1.30
+   *
+   * @return The extension if available, NULL otherwise.
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 };
 
 } // namespace Toolkit

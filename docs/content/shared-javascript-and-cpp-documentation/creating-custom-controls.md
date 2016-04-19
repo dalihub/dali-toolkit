@@ -327,6 +327,93 @@ void AppFunction()
 
 customControl.MyCustomSignal.Connect( this, &AppFunction );
 ~~~
+ 
+___________________________________________________________________________________________________
+
+### Children Added/Removed {#creating-controls-children}
+
+Methods are provided that can be overridden if notification is required when a child is added or removed from our control.
+An up call to the Control class is necessary if these methods are overridden.
+ 
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnChildAdd( Actor& child );
+{
+  // Up call to Control first
+  Control::OnChildAdd( child );
+
+  // Do any other operations required upon child addition
+}
+~~~
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnChildRemove( Actor& child );
+{
+  // Do any other operations required upon child removal
+
+  // Up call to Control at the end
+  Control::OnChildRemove( child );
+}
+~~~
+ 
+Avoid adding or removing the child again within these methods.
+ 
+___________________________________________________________________________________________________
+
+### Stage Connection {#creating-controls-stage}
+
+Methods are provided that can be overridden if notification is required when our control is connected to or disconnected from the stage.
+An up call to the Control class is necessary if these methods are overridden.
+ 
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnStageConnection( int depth )
+{
+  // Up call to Control first
+  Control::OnStageConnection( depth );
+
+  // Do any other operations required upon stage connection
+}
+~~~
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnStageDisconnection()
+{
+  // Do any other operations required upon stage disconnection
+
+  // Up call to Control at the end
+  Control::OnStageDisconnection();
+}
+~~~
+ 
+___________________________________________________________________________________________________
+
+### Size {#creating-controls-size}
+
+Methods are provided that can be overridden if notification is required when our control's size is manipulated.
+An up call to the Control class is necessary if these methods are overridden.
+ 
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnSizeSet( const Vector3& targetSize )
+{
+  // Up call to Control
+  Control::OnSizeSet( targetSize );
+
+  // Do any other operations required upon size set
+}
+~~~
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnSizeAnimation( Animation& animation, const Vector3& targetSize )
+{
+  // Up call to Control
+  Control::OnSizeAnimation( animation, targetSize );
+
+  // Do any other operations required upon size animation
+}
+~~~
+ 
 ___________________________________________________________________________________________________
 
 ### Other Features {#creating-controls-other}

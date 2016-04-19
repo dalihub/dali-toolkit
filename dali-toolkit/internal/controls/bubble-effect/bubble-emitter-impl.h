@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
