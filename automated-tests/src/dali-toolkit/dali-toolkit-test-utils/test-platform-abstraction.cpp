@@ -188,7 +188,8 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
   {
     case SuspendFunc:                         return mTrace.FindMethod("Suspend");
     case ResumeFunc:                          return mTrace.FindMethod("Resume");
-    case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource") || mTrace.FindMethod("LoadResourceSynchronously");
+    case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
+    case LoadResourceSynchronouslyFunc:       return mTrace.FindMethod("LoadResourceSynchronously");
     case LoadFileFunc:                        return mTrace.FindMethod("LoadFile");
     case LoadShaderBinaryFileFunc:            return mTrace.FindMethod("LoadShaderBinaryFile");
     case SaveShaderBinaryFileFunc:            return mTrace.FindMethod("SaveShaderBinaryFile");

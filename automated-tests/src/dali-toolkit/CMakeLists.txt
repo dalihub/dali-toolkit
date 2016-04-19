@@ -57,28 +57,32 @@ SET(TC_SOURCES
 
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
-   dali-toolkit-test-utils/test-harness.cpp
    dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
+   dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    dali-toolkit-test-utils/toolkit-environment-variable.cpp
    dali-toolkit-test-utils/toolkit-imf-manager.cpp
+   dali-toolkit-test-utils/toolkit-orientation.cpp
    dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    dali-toolkit-test-utils/toolkit-style-monitor.cpp
    dali-toolkit-test-utils/toolkit-singleton-service.cpp
+   dali-toolkit-test-utils/toolkit-text-model.cpp
    dali-toolkit-test-utils/toolkit-timer.cpp
-   dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    dali-toolkit-test-utils/toolkit-tts-player.cpp
-   dali-toolkit-test-utils/dummy-control.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
+   dali-toolkit-test-utils/dummy-control.cpp
+   dali-toolkit-test-utils/mesh-builder.cpp
+   dali-toolkit-test-utils/test-actor-utils.cpp
    dali-toolkit-test-utils/test-animation-data.cpp
-   dali-toolkit-test-utils/test-button.cpp
    dali-toolkit-test-utils/test-application.cpp
-   dali-toolkit-test-utils/test-platform-abstraction.cpp
+   dali-toolkit-test-utils/test-button.cpp
+   dali-toolkit-test-utils/test-harness.cpp
    dali-toolkit-test-utils/test-gesture-manager.cpp
    dali-toolkit-test-utils/test-gl-abstraction.cpp
    dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
+   dali-toolkit-test-utils/test-platform-abstraction.cpp
    dali-toolkit-test-utils/test-render-controller.cpp
    dali-toolkit-test-utils/test-trace-call-stack.cpp
    dali-toolkit-test-utils/test-native-image.cpp

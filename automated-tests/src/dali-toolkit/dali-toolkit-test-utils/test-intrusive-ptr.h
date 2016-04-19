@@ -1,3 +1,6 @@
+#ifndef __TEST_INTRUSIVE_PTR_H__
+#define __TEST_INTRUSIVE_PTR_H__
+
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
@@ -15,27 +18,43 @@
  *
  */
 
-
-#include "test-application.h"
-#include "test-native-image.h"
-
+// INTERNAL INCLUDES
+#include <iostream>
+#include <stdlib.h>
+#include <dali/public-api/dali-core.h>
+#include <dali-test-suite-utils.h>
 
 namespace Dali
 {
 
-TestNativeImagePointer TestNativeImage::New(int width, int height)
+template <typename T>
+struct UtcCoverageIntrusivePtr
 {
-  return new TestNativeImage(width, height);
-}
+  typedef IntrusivePtr<T> (*Creator)();
 
-TestNativeImage::TestNativeImage(int width, int height)
-: mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
-{
-  mExtension = new TestNativeImageExtension();
-}
+  void Check( Creator creator)
+  {
+    IntrusivePtr<T> a = creator();
+    IntrusivePtr<T> b = creator();
 
-TestNativeImage::~TestNativeImage()
-{
-}
+    DALI_TEST_CHECK( a.Get() );
 
-} // namespace dali
+    a.Reset();
+
+    T* pB = b.Detach();
+
+    a.Reset(pB);
+
+    DALI_TEST_CHECK(a);
+
+    a.Reset();
+
+  };
+
+};
+
+} // Dali
+
+#endif
+
+

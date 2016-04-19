@@ -205,7 +205,8 @@ void TestControlRendererRender( ToolkitTestApplication& application,
 
   if( resourcePtr )
   {
-    DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+    DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) ||
+                     application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceSynchronouslyFunc ));
   }
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
