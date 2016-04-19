@@ -35,7 +35,6 @@ SET(TC_SOURCES
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp
    utc-Dali-ControlImpl.cpp
-   utc-Dali-DefaultControls.cpp
    utc-Dali-AccessibilityManager.cpp
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp

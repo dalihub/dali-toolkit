@@ -115,7 +115,7 @@ public: // From ItemFactory
   {
     // Create an image actor for this item
     Image image = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-    Actor actor = ImageActor::New(image);
+    Actor actor = CreateRenderableActor(image);
 
     return actor;
   }

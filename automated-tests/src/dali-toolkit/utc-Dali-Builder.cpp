@@ -426,13 +426,13 @@ int UtcDaliBuilderConstantsP(void)
       "},"
       "\"stage\":"
       "[{"
-      "  \"type\": \"ImageActor\","
+      "  \"type\": \"ImageView\","
       "  \"name\": \"{NAME}\","
       "  \"size\": [100,100,1],"
       "  \"parentOrigin\": \"TOP_LEFT\","
       "  \"anchorPoint\": \"{ANCHOR}\","
       "  \"padding\": \"{PADDING}\","
-      "  \"image\": { \"filename\": \"dir/{IMAGE_PATH}\" },"
+      "  \"image\": { \"imageUrl\": \"dir/{IMAGE_PATH}\" },"
       "  \"sizeWidth\": \"{WIDTH}\","
       "  \"signals\": [{"
       "    \"name\": \"touched\","
@@ -496,7 +496,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
       "\"templates\":\n"
       "{\n"
       "  \"imageTree\": { \n"
-      "    \"type\": \"ImageActor\",\n"
+      "    \"type\": \"ImageView\",\n"
       "    \"styles\": [\"imageStyle\"],\n"
       "    \"name\": \"image\",\n"
       "    \"size\": \"{SIZE}\",\n"
@@ -506,7 +506,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
       "    }],\n"
       "    \"actors\": [\n"
       "      {\n"
-      "        \"type\":\"ImageActor\",\n"
+      "        \"type\":\"ImageView\",\n"
       "        \"name\":\"childImage\" \n"
       "      }\n"
       "    ]\n"
@@ -533,7 +533,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
 
   std::string templatejson(
     "{ \n"
-    "  \"type\": \"ImageActor\",\n"
+    "  \"type\": \"ImageView\",\n"
     "  \"styles\": [\"imageStyle\"],\n"
     "  \"name\": \"image\",\n"
     "  \"size\": \"{SIZE}\",\n"
@@ -543,7 +543,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
     "  }],\n"
     "  \"actors\": [\n"
     "    {\n"
-    "      \"type\":\"ImageActor\",\n"
+    "      \"type\":\"ImageView\",\n"
     "      \"name\":\"childImage\" \n"
     "    }\n"
     "  ]\n"
@@ -553,16 +553,16 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  ImageActor actor = ImageActor::DownCast( builder.Create( "imageTree" ) );
+  ImageView actor = ImageView::DownCast( builder.Create( "imageTree" ) );
   DALI_TEST_CHECK( actor );
 
   Dali::Property::Map map;
   map["SIZE"] = Vector3(100,100,1);
-  actor = ImageActor::DownCast( builder.Create( "imageTree",  map ) );
+  actor = ImageView::DownCast( builder.Create( "imageTree",  map ) );
   DALI_TEST_CHECK( actor );
 
   // create from json snippet
-  actor = ImageActor::DownCast( builder.CreateFromJson( templatejson ) );
+  actor = ImageView::DownCast( builder.CreateFromJson( templatejson ) );
   DALI_TEST_CHECK( actor );
 
 
@@ -596,7 +596,7 @@ int UtcDaliBuilderRenderTasksP(void)
       "    \"name\": \"image\"\n"
       "  }, \n"
       "  { \n"
-      "    \"type\": \"ImageActor\",\n"
+      "    \"type\": \"ImageView\",\n"
       "    \"name\": \"image\",\n"
       "    \"size\": [100,100,1],\n"
       "    \"signals\": [{\n"
@@ -605,7 +605,7 @@ int UtcDaliBuilderRenderTasksP(void)
       "    }],\n"
       "    \"actors\": [\n"
       "      {\n"
-      "        \"type\":\"ImageActor\",\n"
+      "        \"type\":\"ImageView\",\n"
       "        \"name\":\"childImage\" \n"
       "      }\n"
       "    ]\n"
@@ -856,7 +856,7 @@ int UtcDaliBuilderCustomPropertyP(void)
       "\"templates\":\n"
       "{\n"
       "  \"imageTree\": { \n"
-      "    \"type\": \"ImageActor\",\n"
+      "    \"type\": \"ImageView\",\n"
       "    \"name\": \"image\",\n"
       "    \"size\": [100,100,1],\n"
       "    \"signals\": [{\n"
@@ -868,7 +868,7 @@ int UtcDaliBuilderCustomPropertyP(void)
       "    },\n"
       "    \"actors\": [\n"
       "      {\n"
-      "        \"type\":\"ImageActor\",\n"
+      "        \"type\":\"ImageView\",\n"
       "        \"name\":\"childImage\" \n"
       "      }\n"
       "    ]\n"
@@ -880,7 +880,7 @@ int UtcDaliBuilderCustomPropertyP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  ImageActor actor = ImageActor::DownCast( builder.Create( "imageTree" ) );
+  ImageView actor = ImageView::DownCast( builder.Create( "imageTree" ) );
   DALI_TEST_CHECK( actor );
 
   // NB: already applied in create
@@ -901,7 +901,7 @@ int UtcDaliBuilderShaderEffectP(void)
     "{\n"
     "  \"stage\": [\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"Image1\",\n"
     "      \"position\": [\n"
     "        0.40461349487305,\n"
@@ -1028,7 +1028,7 @@ int UtcDaliBuilderShaderEffect2P(void)
     "\"templates\":\n"
     "{\n"
     "  \"imageTree\": { \n"
-    "    \"type\": \"ImageActor\",\n"
+    "    \"type\": \"ImageView\",\n"
     "    \"size\": [100,100,1],\n"
     "    \"parentOrigin\": [0.5, 0.5, 0.5],\n"
     "    \"position\": [\n"
@@ -1042,7 +1042,7 @@ int UtcDaliBuilderShaderEffect2P(void)
     "    }],\n"
     "    \"actors\": [\n"
     "      {\n"
-    "        \"type\":\"ImageActor\",\n"
+    "        \"type\":\"ImageView\",\n"
     "        \"name\":\"childImage\" \n"
     "      }\n"
     "    ]\n"
@@ -1154,7 +1154,7 @@ int UtcDaliBuilderFrameBufferP(void)
     "  },\n"
     "  \"stage\": [\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"fbOnStage\",\n"
     "      \"position\": [\n"
     "        0.40461349487305,\n"
@@ -1167,17 +1167,13 @@ int UtcDaliBuilderFrameBufferP(void)
     "      \"clearColor\": [1,0,0,1]\n"
     "    },\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"Image1\",\n"
     "      \"size\": [200, 200, 0],\n"
     "      \"parentOrigin\": [0.5, 0.5, 0.5],\n"
     "      \"effect\": \"Ripple2D\",\n"
     "      \"image\": {\n"
-    "        \"filename\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\",\n"
-    "        \"width\": 200,\n"
-    "        \"height\": 80,\n"
-    "        \"loadPolicy\": \"IMMEDIATE\",\n"
-    "        \"releasePolicy\": \"NEVER\"\n"
+    "        \"imageUrl\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\"\n"
     "      },\n"
     "      \"signals\": [\n"
     "        {\n"
@@ -1294,17 +1290,13 @@ int UtcDaliBuilderPathConstraintsP(void)
     "  },\n"
     "  \"stage\": [\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"Image1\",\n"
     "      \"size\": [200, 200, 0],\n"
     "      \"parentOrigin\": [0.5, 0.5, 0.5],\n"
     "      \"effect\": \"Ripple2D\",\n"
     "      \"image\": {\n"
-    "        \"filename\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\",\n"
-    "        \"width\": 200,\n"
-    "        \"height\": 80,\n"
-    "        \"loadPolicy\": \"IMMEDIATE\",\n"
-    "        \"releasePolicy\": \"NEVER\"\n"
+    "        \"imageUrl\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\"\n"
     "      },\n"
     "      \"signals\": [\n"
     "        {\n"
