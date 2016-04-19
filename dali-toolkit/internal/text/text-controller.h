@@ -390,6 +390,22 @@ public:
   const Vector4& GetShadowColor() const;
 
   /**
+   * @brief Sets the shadow's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] shadowProperties The shadow's properties string.
+   */
+  void SetDefaultShadowProperties( const std::string& shadowProperties );
+
+  /**
+   * @brief Retrieves the shadow's properties string.
+   *
+   * @return The shadow's properties string.
+   */
+  const std::string& GetDefaultShadowProperties() const;
+
+  /**
    * @brief Set the underline color.
    *
    * @param[in] color color of underline.
@@ -430,6 +446,68 @@ public:
    * @return The height of the underline, or 0 if height is not overrided.
    */
   float GetUnderlineHeight() const;
+
+  /**
+   * @brief Sets the underline's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] underlineProperties The underline's properties string.
+   */
+  void SetDefaultUnderlineProperties( const std::string& underlineProperties );
+
+  /**
+   * @brief Retrieves the underline's properties string.
+   *
+   * @return The underline's properties string.
+   */
+  const std::string& GetDefaultUnderlineProperties() const;
+
+  /**
+   * @brief Sets the emboss's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] embossProperties The emboss's properties string.
+   */
+  void SetDefaultEmbossProperties( const std::string& embossProperties );
+
+  /**
+   * @brief Retrieves the emboss's properties string.
+   *
+   * @return The emboss's properties string.
+   */
+  const std::string& GetDefaultEmbossProperties() const;
+
+  /**
+   * @brief Sets the outline's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] outlineProperties The outline's properties string.
+   */
+  void SetDefaultOutlineProperties( const std::string& outlineProperties );
+
+  /**
+   * @brief Retrieves the outline's properties string.
+   *
+   * @return The outline's properties string.
+   */
+  const std::string& GetDefaultOutlineProperties() const;
+
+  /**
+   * @brief Sets the default line spacing.
+   *
+   * @param[in] lineSpacing The line spacing.
+   */
+  void SetDefaultLineSpacing( float lineSpacing );
+
+  /**
+   * @brief Retrieves the default line spacing.
+   *
+   * @return The line spacing.
+   */
+  float GetDefaultLineSpacing() const;
 
   /**
    * @brief Sets the input text's color.
@@ -528,6 +606,84 @@ public:
    * @return The input font's point size.
    */
   float GetInputFontPointSize() const;
+
+  /**
+   * @brief Sets the input line spacing.
+   *
+   * @param[in] lineSpacing The line spacing.
+   */
+  void SetInputLineSpacing( float lineSpacing );
+
+  /**
+   * @brief Retrieves the input line spacing.
+   *
+   * @return The line spacing.
+   */
+  float GetInputLineSpacing() const;
+
+  /**
+   * @brief Sets the input shadow's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] shadowProperties The shadow's properties string.
+   */
+  void SetInputShadowProperties( const std::string& shadowProperties );
+
+  /**
+   * @brief Retrieves the input shadow's properties string.
+   *
+   * @return The shadow's properties string.
+   */
+  const std::string& GetInputShadowProperties() const;
+
+  /**
+   * @brief Sets the input underline's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] underlineProperties The underline's properties string.
+   */
+  void SetInputUnderlineProperties( const std::string& underlineProperties );
+
+  /**
+   * @brief Retrieves the input underline's properties string.
+   *
+   * @return The underline's properties string.
+   */
+  const std::string& GetInputUnderlineProperties() const;
+
+  /**
+   * @brief Sets the input emboss's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] embossProperties The emboss's properties string.
+   */
+  void SetInputEmbossProperties( const std::string& embossProperties );
+
+  /**
+   * @brief Retrieves the input emboss's properties string.
+   *
+   * @return The emboss's properties string.
+   */
+  const std::string& GetInputEmbossProperties() const;
+
+  /**
+   * @brief Sets input the outline's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] outlineProperties The outline's properties string.
+   */
+  void SetInputOutlineProperties( const std::string& outlineProperties );
+
+  /**
+   * @brief Retrieves the input outline's properties string.
+   *
+   * @return The outline's properties string.
+   */
+  const std::string& GetInputOutlineProperties() const;
 
   /**
    * @brief Called to enable/disable cursor blink.

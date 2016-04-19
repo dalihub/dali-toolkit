@@ -259,6 +259,30 @@ struct TextUpdateInfo
   }
 };
 
+struct UnderlineDefaults
+{
+  std::string properties;
+  // TODO: complete with underline parameters.
+};
+
+struct ShadowDefaults
+{
+  std::string properties;
+  // TODO: complete with shadow parameters.
+};
+
+struct EmbossDefaults
+{
+  std::string properties;
+  // TODO: complete with emboss parameters.
+};
+
+struct OutlineDefaults
+{
+  std::string properties;
+  // TODO: complete with outline parameters.
+};
+
 struct Controller::Impl
 {
   Impl( ControlInterface& controlInterface )
@@ -266,6 +290,10 @@ struct Controller::Impl
     mLogicalModel(),
     mVisualModel(),
     mFontDefaults( NULL ),
+    mUnderlineDefaults( NULL ),
+    mShadowDefaults( NULL ),
+    mEmbossDefaults( NULL ),
+    mOutlineDefaults( NULL ),
     mEventData( NULL ),
     mFontClient(),
     mClipboard(),
@@ -304,6 +332,10 @@ struct Controller::Impl
   ~Impl()
   {
     delete mFontDefaults;
+    delete mUnderlineDefaults;
+    delete mShadowDefaults;
+    delete mEmbossDefaults;
+    delete mOutlineDefaults;
     delete mEventData;
   }
 
@@ -616,6 +648,10 @@ public:
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
+  UnderlineDefaults* mUnderlineDefaults;   ///< Avoid allocating this when the user does not specify underline parameters.
+  ShadowDefaults* mShadowDefaults;         ///< Avoid allocating this when the user does not specify shadow parameters.
+  EmbossDefaults* mEmbossDefaults;         ///< Avoid allocating this when the user does not specify emboss parameters.
+  OutlineDefaults* mOutlineDefaults;       ///< Avoid allocating this when the user does not specify outline parameters.
   EventData* mEventData;                   ///< Avoid allocating everything for text input until EnableTextInput().
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
   Clipboard mClipboard;                    ///< Handle to the system clipboard

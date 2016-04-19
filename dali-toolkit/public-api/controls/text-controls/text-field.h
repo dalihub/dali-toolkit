@@ -82,8 +82,8 @@ public:
       VERTICAL_ALIGNMENT,                       ///< name "verticalAlignment",                   The line vertical alignment,                                                       type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0
       TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                    type VECTOR4 @SINCE_1_0.0
       PLACEHOLDER_TEXT_COLOR,                   ///< name "placeholderTextColor",                The placeholder-text color,                                                        type VECTOR4 @SINCE_1_0.0
-      SHADOW_OFFSET,                            ///< name "shadowOffset",                        The drop shadow offset 0 indicates no shadow,                                      type VECTOR2 @SINCE_1_0.0
-      SHADOW_COLOR,                             ///< name "shadowColor",                         The color of a drop shadow,                                                        type VECTOR4 @SINCE_1_0.0
+      SHADOW_OFFSET,                            ///< name "shadowOffset",                        The drop shadow offset 0 indicates no shadow,                                      type VECTOR2 @DEPRECATED_1_1.37 Use SHADOW instead.
+      SHADOW_COLOR,                             ///< name "shadowColor",                         The color of a drop shadow,                                                        type VECTOR4 @DEPRECATED_1_1.37 Use SHADOW instead.
       PRIMARY_CURSOR_COLOR,                     ///< name "primaryCursorColor",                  The color to apply to the primary cursor,                                          type VECTOR4 @SINCE_1_0.0
       SECONDARY_CURSOR_COLOR,                   ///< name "secondaryCursorColor",                The color to apply to the secondary cursor,                                        type VECTOR4 @SINCE_1_0.0
       ENABLE_CURSOR_BLINK,                      ///< name "enableCursorBlink",                   Whether the cursor should blink or not,                                            type BOOLEAN @SINCE_1_0.0
@@ -107,7 +107,15 @@ public:
       ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                         type BOOLEAN @SINCE_1_0.0
       INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                           type STRING @SINCE_1_0.0
       INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                            type STRING @SINCE_1_0.0
-      INPUT_POINT_SIZE                          ///< name "inputPointSize",                      The font's size of the new input text in points,                                   type FLOAT @SINCE_1_0.0
+      INPUT_POINT_SIZE,                         ///< name "inputPointSize",                      The font's size of the new input text in points,                                   type FLOAT @SINCE_1_0.0
+      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                  type STRING @SINCE_1_1.37
+      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                    type STRING @SINCE_1_1.37
+      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                     type STRING @SINCE_1_1.37
+      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                       type STRING @SINCE_1_1.37
+      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                     type STRING @SINCE_1_1.37
+      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                       type STRING @SINCE_1_1.37
+      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                    type STRING @SINCE_1_1.37
+      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                      type STRING @SINCE_1_1.37
     };
   };
 

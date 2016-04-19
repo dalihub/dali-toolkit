@@ -79,6 +79,15 @@ const char* const PROPERTY_NAME_INPUT_FONT_FAMILY                    = "inputFon
 const char* const PROPERTY_NAME_INPUT_FONT_STYLE                     = "inputFontStyle";
 const char* const PROPERTY_NAME_INPUT_POINT_SIZE                     = "inputPointSize";
 
+const char* const PROPERTY_NAME_UNDERLINE                            = "underline";
+const char* const PROPERTY_NAME_INPUT_UNDERLINE                      = "inputUnderline";
+const char* const PROPERTY_NAME_SHADOW                               = "shadow";
+const char* const PROPERTY_NAME_INPUT_SHADOW                         = "inputShadow";
+const char* const PROPERTY_NAME_EMBOSS                               = "emboss";
+const char* const PROPERTY_NAME_INPUT_EMBOSS                         = "inputEmboss";
+const char* const PROPERTY_NAME_OUTLINE                              = "outline";
+const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
+
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
@@ -271,6 +280,15 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_FONT_FAMILY ) == TextField::Property::INPUT_FONT_FAMILY );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_FONT_STYLE ) == TextField::Property::INPUT_FONT_STYLE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_POINT_SIZE ) == TextField::Property::INPUT_POINT_SIZE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_UNDERLINE ) == TextField::Property::UNDERLINE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_UNDERLINE ) == TextField::Property::INPUT_UNDERLINE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextField::Property::SHADOW );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_SHADOW ) == TextField::Property::INPUT_SHADOW );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextField::Property::EMBOSS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextField::Property::INPUT_EMBOSS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextField::Property::OUTLINE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextField::Property::INPUT_OUTLINE );
+
   END_TEST;
 }
 
@@ -414,6 +432,38 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "Setting input font style", TEST_LOCATION );
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the underline property
+  field.SetProperty( TextField::Property::UNDERLINE, "Underline properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+
+  // Check the input underline property
+  field.SetProperty( TextField::Property::INPUT_UNDERLINE, "Underline input properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
+
+  // Check the shadow property
+  field.SetProperty( TextField::Property::SHADOW, "Shadow properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+
+  // Check the input shadow property
+  field.SetProperty( TextField::Property::INPUT_SHADOW, "Shadow input properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_SHADOW ), std::string("Shadow input properties"), TEST_LOCATION );
+
+  // Check the emboss property
+  field.SetProperty( TextField::Property::EMBOSS, "Emboss properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::EMBOSS ), std::string("Emboss properties"), TEST_LOCATION );
+
+  // Check the input emboss property
+  field.SetProperty( TextField::Property::INPUT_EMBOSS, "Emboss input properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_EMBOSS ), std::string("Emboss input properties"), TEST_LOCATION );
+
+  // Check the outline property
+  field.SetProperty( TextField::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Check the input outline property
+  field.SetProperty( TextField::Property::INPUT_OUTLINE, "Outline input properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_OUTLINE ), std::string("Outline input properties"), TEST_LOCATION );
 
   END_TEST;
 }

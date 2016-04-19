@@ -47,6 +47,7 @@ namespace
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
 const float CURSOR_WIDTH = 1.f;
+const float LINE_SPACING= 0.f;
 
 } //namespace
 
@@ -104,6 +105,7 @@ struct LayoutEngine::Impl
     mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
     mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP ),
     mCursorWidth( CURSOR_WIDTH ),
+    mDefaultLineSpacing( LINE_SPACING ),
     mEllipsisEnabled( false )
   {
   }
@@ -1213,6 +1215,7 @@ struct LayoutEngine::Impl
   LayoutEngine::HorizontalAlignment mHorizontalAlignment;
   LayoutEngine::VerticalAlignment mVerticalAlignment;
   float mCursorWidth;
+  float mDefaultLineSpacing;
 
   IntrusivePtr<Metrics> mMetrics;
 
@@ -1318,6 +1321,16 @@ void LayoutEngine::Align( const Size& size,
                 startIndex,
                 numberOfCharacters,
                 lines );
+}
+
+void LayoutEngine::SetDefaultLineSpacing( float lineSpacing )
+{
+  mImpl->mDefaultLineSpacing = lineSpacing;
+}
+
+float LayoutEngine::GetDefaultLineSpacing() const
+{
+  return mImpl->mDefaultLineSpacing;
 }
 
 } // namespace Text

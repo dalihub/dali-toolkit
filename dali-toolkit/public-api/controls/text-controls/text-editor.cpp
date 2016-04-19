@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/controls/text-controls/text-editor.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>

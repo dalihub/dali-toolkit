@@ -22,7 +22,6 @@
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-editor.h> ///< @todo to be removed when text-editor is added to the dali-toolkit.h
 
 using namespace Dali;
 using namespace Toolkit;
@@ -70,6 +69,17 @@ const char* const PROPERTY_NAME_INPUT_COLOR                          = "inputCol
 const char* const PROPERTY_NAME_INPUT_FONT_FAMILY                    = "inputFontFamily";
 const char* const PROPERTY_NAME_INPUT_FONT_STYLE                     = "inputFontStyle";
 const char* const PROPERTY_NAME_INPUT_POINT_SIZE                     = "inputPointSize";
+
+const char* const PROPERTY_NAME_LINE_SPACING                         = "lineSpacing";
+const char* const PROPERTY_NAME_INPUT_LINE_SPACING                   = "inputLineSpacing";
+const char* const PROPERTY_NAME_UNDERLINE                            = "underline";
+const char* const PROPERTY_NAME_INPUT_UNDERLINE                      = "inputUnderline";
+const char* const PROPERTY_NAME_SHADOW                               = "shadow";
+const char* const PROPERTY_NAME_INPUT_SHADOW                         = "inputShadow";
+const char* const PROPERTY_NAME_EMBOSS                               = "emboss";
+const char* const PROPERTY_NAME_INPUT_EMBOSS                         = "inputEmboss";
+const char* const PROPERTY_NAME_OUTLINE                              = "outline";
+const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -180,7 +190,7 @@ int UtcDaliToolkitTextEditorCopyConstructorP(void)
 
   TextEditor copy( textEditor );
   DALI_TEST_CHECK( copy );
-  DALI_TEST_CHECK( copy.GetProperty<std::string>( TextLabel::Property::TEXT ) == textEditor.GetProperty<std::string>( TextLabel::Property::TEXT ) );
+  DALI_TEST_CHECK( copy.GetProperty<std::string>( TextEditor::Property::TEXT ) == textEditor.GetProperty<std::string>( TextEditor::Property::TEXT ) );
   END_TEST;
 }
 
@@ -245,6 +255,18 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_FONT_FAMILY ) == TextEditor::Property::INPUT_FONT_FAMILY );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_FONT_STYLE ) == TextEditor::Property::INPUT_FONT_STYLE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_POINT_SIZE ) == TextEditor::Property::INPUT_POINT_SIZE );
+
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_SPACING ) == TextEditor::Property::LINE_SPACING );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_LINE_SPACING ) == TextEditor::Property::INPUT_LINE_SPACING );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_UNDERLINE ) == TextEditor::Property::UNDERLINE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_UNDERLINE ) == TextEditor::Property::INPUT_UNDERLINE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextEditor::Property::SHADOW );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_SHADOW ) == TextEditor::Property::INPUT_SHADOW );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextEditor::Property::EMBOSS );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextEditor::Property::INPUT_EMBOSS );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextEditor::Property::OUTLINE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextEditor::Property::INPUT_OUTLINE );
+
   END_TEST;
 }
 
@@ -361,6 +383,48 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), "Setting input font style", TEST_LOCATION );
   editor.SetProperty( TextEditor::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the line spacing property
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::LINE_SPACING, 10.f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the input line spacing property
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::INPUT_LINE_SPACING, 20.f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_LINE_SPACING ), 20.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the underline property
+  editor.SetProperty( TextEditor::Property::UNDERLINE, "Underline properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+
+  // Check the input underline property
+  editor.SetProperty( TextEditor::Property::INPUT_UNDERLINE, "Underline input properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
+
+  // Check the shadow property
+  editor.SetProperty( TextEditor::Property::SHADOW, "Shadow properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+
+  // Check the input shadow property
+  editor.SetProperty( TextEditor::Property::INPUT_SHADOW, "Shadow input properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_SHADOW ), std::string("Shadow input properties"), TEST_LOCATION );
+
+  // Check the emboss property
+  editor.SetProperty( TextEditor::Property::EMBOSS, "Emboss properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::EMBOSS ), std::string("Emboss properties"), TEST_LOCATION );
+
+  // Check the input emboss property
+  editor.SetProperty( TextEditor::Property::INPUT_EMBOSS, "Emboss input properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_EMBOSS ), std::string("Emboss input properties"), TEST_LOCATION );
+
+  // Check the outline property
+  editor.SetProperty( TextEditor::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Check the input outline property
+  editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "Outline input properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_OUTLINE ), std::string("Outline input properties"), TEST_LOCATION );
 
   END_TEST;
 }

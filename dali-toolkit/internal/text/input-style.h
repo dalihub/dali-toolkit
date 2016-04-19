@@ -46,31 +46,45 @@ struct InputStyle
     width( TextAbstraction::FontWidth::NORMAL ),
     slant( TextAbstraction::FontSlant::NORMAL ),
     size( 0.f ),
+    lineSpacing( 0.f ),
+    underlineProperties(),
+    shadowProperties(),
+    embossProperties(),
+    outlineProperties(),
     isDefaultColor( true ),
     familyDefined( false ),
     weightDefined( false ),
     widthDefined( false ),
     slantDefined( false ),
-    sizeDefined( false )
+    sizeDefined( false ),
+    lineSpacingDefined( false )
   {}
 
   ~InputStyle()
   {};
 
-  Vector4     textColor;  ///< The text's color.
-  std::string fontStyle;  ///< The font's style string.
-  std::string familyName; ///< The font's family name.
-  FontWeight  weight;     ///< The font's weight.
-  FontWidth   width;      ///< The font's width.
-  FontSlant   slant;      ///< The font's slant.
-  float       size;       ///< The font's size.
+  Vector4     textColor;           ///< The text's color.
+  std::string fontStyle;           ///< The font's style string.
+  std::string familyName;          ///< The font's family name.
+  FontWeight  weight;              ///< The font's weight.
+  FontWidth   width;               ///< The font's width.
+  FontSlant   slant;               ///< The font's slant.
+  float       size;                ///< The font's size.
 
-  bool        isDefaultColor : 1; ///< Whether the text's color is the default.
-  bool        familyDefined  : 1; ///< Whether the font's family is defined.
-  bool        weightDefined  : 1; ///< Whether the font's weight is defined.
-  bool        widthDefined   : 1; ///< Whether the font's width is defined.
-  bool        slantDefined   : 1; ///< Whether the font's slant is defined.
-  bool        sizeDefined    : 1; ///< Whether the font's size is defined.
+  float       lineSpacing;         ///< The line's spacing.
+  std::string underlineProperties; ///< The underline properties string.
+  std::string shadowProperties;    ///< The shadow properties string.
+  std::string embossProperties;    ///< The emboss properties string.
+  std::string outlineProperties;   ///< The outline properties string.
+
+  bool        isDefaultColor     : 1; ///< Whether the text's color is the default.
+  bool        familyDefined      : 1; ///< Whether the font's family is defined.
+  bool        weightDefined      : 1; ///< Whether the font's weight is defined.
+  bool        widthDefined       : 1; ///< Whether the font's width is defined.
+  bool        slantDefined       : 1; ///< Whether the font's slant is defined.
+  bool        sizeDefined        : 1; ///< Whether the font's size is defined.
+
+  bool        lineSpacingDefined : 1; ///< Whether the line spacing is defined.
 };
 
 } // namespace Text

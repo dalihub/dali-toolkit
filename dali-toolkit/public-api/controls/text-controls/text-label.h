@@ -53,16 +53,13 @@ class TextLabel;
  * | Property::HORIZONTAL_ALIGNMENT   | horizontalAlignment |  STRING      | O      | X        |
  * | Property::VERTICAL_ALIGNMENT     | verticalAlignment   |  STRING      | O      | X        |
  * | Property::TEXT_COLOR             | textColor           |  VECTOR4     | O      | X        |
- * | Property::SHADOW_OFFSET          | shadowOffset        |  VECTOR2     | O      | X        |
- * | Property::SHADOW_COLOR           | shadowColor         |  VECTOR4     | O      | X        |
- * | Property::UNDERLINE_ENABLED      | underlineEnabled    |  BOOLEAN     | O      | X        |
- * | Property::UNDERLINE_COLOR        | underlineColor      |  VECTOR4     | O      | X        |
- * | Property::UNDERLINE_HEIGHT       | underlineHeight     |  FLOAT       | O      | X        |
  * | Property::ENABLE_MARKUP          | enableMarkup        |  BOOLEAN     | O      | X        |
  * | Property::ENABLE_AUTO_SCROLL     | enableAutoScroll    |  BOOLEAN     | O      | X        |
  * | Property::AUTO_SCROLL_SPEED      | autoScrollSpeed     |  INTEGER     | O      | X        |
  * | Property::AUTO_SCROLL_LOOP_COUNT | autoScrollLoopCount |  INTEGER     | O      | X        |
  * | Property::AUTO_SCROLL_GAP        | autoScrollGap       |  INTEGER     | O      | X        |
+ * | Property::SHADOW                 | shadow              |  STRING      | O      | X        |
+ * | Property::UNDERLINE              | underline           |  STRING      | O      | X        |
  *
  * @SINCE_1_0.0
  */
@@ -154,35 +151,35 @@ public:
       /**
        * @brief The drop shadow offset 0 indicates no shadow
        * @details name "shadowOffset", type VECTOR4
-       * @SINCE_1_0.0
+       * @DEPRECATED_1_1.37 Use SHADOW instead
        */
       SHADOW_OFFSET,
 
       /**
        * @brief The color of a drop shadow
        * @details name "shadowColor", type VECTOR4
-       * @SINCE_1_0.0
+       * @DEPRECATED_1_1.37 Use SHADOW instead
        */
       SHADOW_COLOR,
 
       /**
        * @brief The underline enabled flag
        * @details name "underlineEnabled", type BOOLEAN
-       * @SINCE_1_0.0
+       * @DEPRECATED_1_1.37 Use UNDERLINE instead
        */
       UNDERLINE_ENABLED,
 
       /**
        * @brief The color of the underline
        * @details name "underlineColor", type VECTOR4
-       * @SINCE_1_0.0
+       * @DEPRECATED_1_1.37 Use UNDERLINE instead
        */
       UNDERLINE_COLOR,
 
       /**
        * @brief Overrides the underline height from font metrics
        * @details name "underlineHeight", type FLOAT
-       * @SINCE_1_0.0
+       * @DEPRECATED_1_1.37 Use UNDERLINE instead
        */
       UNDERLINE_HEIGHT,
 
@@ -219,7 +216,42 @@ public:
        * @details name "autoScrollGap", type INT, default in style sheet but can be overridden to prevent same text being show at start and end.
        * @SINCE_1_1.35
        */
-      AUTO_SCROLL_GAP
+      AUTO_SCROLL_GAP,
+
+      /**
+       * @brief The default extra space between lines in points.
+       * @details name "lineSpacing", type FLOAT.
+       * @SINCE_1_1.37
+       */
+      LINE_SPACING,
+
+      /**
+       * @brief The default underline parameters.
+       * @details name "underline", type STRING.
+       * @SINCE_1_1.37
+       */
+      UNDERLINE,
+
+      /**
+       * @brief The default shadow parameters.
+       * @details name "shadow", type STRING.
+       * @SINCE_1_1.37
+       */
+      SHADOW,
+
+      /**
+       * @brief The default emboss parameters.
+       * @details name "emboss", type STRING.
+       * @SINCE_1_1.37
+       */
+      EMBOSS,
+
+      /**
+       * @brief The default outline parameters.
+       * @details name "outline", type STRING.
+       * @SINCE_1_1.37
+       */
+      OUTLINE,
     };
   };
 
