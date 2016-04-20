@@ -64,7 +64,7 @@ void AddVertex( Vector<Vertex2D>& vertices, float x, float y, float u, float v, 
   vertices.PushBack( meshVertex );
 }
 
-void AddTriangle( Vector<unsigned int>& indices, unsigned int v0, unsigned int v1, unsigned int v2 )
+void AddTriangle( Vector<unsigned short>& indices, unsigned int v0, unsigned int v1, unsigned int v2 )
 {
   indices.PushBack( v0 );
   indices.PushBack( v1 );
@@ -79,7 +79,7 @@ bool CreateGeometry( const Vector<GlyphInfo>& glyphs,
                      VectorBlobAtlas& atlas,
                      Dali::TextAbstraction::FontClient& fontClient,
                      Vector< Vertex2D >& vertices,
-                     Vector< unsigned int >& indices,
+                     Vector< unsigned short >& indices,
                      const Vector4* const colorsBuffer,
                      const ColorIndex* const colorIndicesBuffer,
                      const Vector4& defaultColor )
@@ -161,7 +161,6 @@ struct VectorBasedRenderer::Impl
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aColor" ] = Property::VECTOR4;
-    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
   }
 
   Actor mActor;                            ///< The actor parent which renders the text
@@ -169,7 +168,6 @@ struct VectorBasedRenderer::Impl
   TextAbstraction::FontClient mFontClient; ///> The font client used to supply glyph information
 
   Property::Map mQuadVertexFormat;         ///> Describes the vertex format for text
-  Property::Map mQuadIndexFormat;          ///> Describes the index format for text
 
   Shader mShaderEffect;
 
@@ -217,7 +215,7 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
     const Vector4& defaultColor = view.GetTextColor();
 
     Vector< Vertex2D > vertices;
-    Vector< unsigned int > indices;
+    Vector< unsigned short > indices;
 
     const Vector2& controlSize = view.GetControlSize();
     float xOffset = controlSize.width  * -0.5f;
@@ -272,14 +270,13 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
     if( 0 != vertices.Count() )
     {
       PropertyBuffer quadVertices = PropertyBuffer::New( mImpl->mQuadVertexFormat );
-      PropertyBuffer quadIndices = PropertyBuffer::New( mImpl->mQuadIndexFormat );
 
       quadVertices.SetData( &vertices[ 0 ], vertices.Size() );
-      quadIndices.SetData( &indices[ 0 ], indices.Size() );
+
 
       Geometry quadGeometry = Geometry::New();
       quadGeometry.AddVertexBuffer( quadVertices );
-      quadGeometry.SetIndexBuffer( quadIndices );
+      quadGeometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
 
       TextureSet texture = mImpl->mAtlas->GetTextureSet();
 

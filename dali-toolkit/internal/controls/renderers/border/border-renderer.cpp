@@ -295,16 +295,12 @@ Geometry BorderRenderer::CreateBorderGeometry()
   borderVertices.SetData( borderVertexData, 16 );
 
   // Create indices
-  unsigned int indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
-  Property::Map indexFormat;
-  indexFormat[INDEX_NAME] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( indexData, 24 );
+  unsigned short indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( borderVertices );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
   geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;

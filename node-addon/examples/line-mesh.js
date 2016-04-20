@@ -91,14 +91,12 @@ daliApp.createMeshActor = function() {
 
       var indexDataArray = new Uint32Array(indexData.length);
       indexDataArray.set(indexData, 0);
-      var indices = new dali.PropertyBuffer(indexFormat);
-      indices.setData(indexDataArray, 10);
 
       // Create geometry
       var geometry = new dali.Geometry();
       geometry.addVertexBuffer( pentagonVertices );
       geometry.addVertexBuffer( pentacleVertices );
-      geometry.setIndexBuffer( indices );
+      geometry.setIndexBuffer( indexDataArray, 10 );
       geometry.setGeometryType( dali.GEOMETRY_LINES );
 
       var renderer = new dali.Renderer(geometry, shader);

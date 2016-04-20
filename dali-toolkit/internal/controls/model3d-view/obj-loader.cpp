@@ -164,7 +164,7 @@ void ObjLoader::CenterAndScale(bool center, Dali::Vector<Vector3>& points)
 void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
                                     Dali::Vector<Vector2> & textures,
                                     Dali::Vector<VertexExt> & verticesExt,
-                                    Dali::Vector<int> & indices)
+                                    Dali::Vector<unsigned short> & indices)
 {
   //If we don't have tangents, calculate them
   //we need to recalculate the normals too, because we need just one normal,tangent, bitangent per vertex
@@ -491,7 +491,7 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   Dali::Vector<Vertex> vertices;
   Dali::Vector<Vector2> textures;
   Dali::Vector<VertexExt> verticesExt;
-  Dali::Vector<int> indices;
+  Dali::Vector<unsigned short> indices;
 
   CreateGeometryArray(vertices, textures, verticesExt, indices);
 
@@ -530,13 +530,7 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
 
   if (indices.Size())
   {
-    //Indices
-    Property::Map indicesVertexFormat;
-    indicesVertexFormat["aIndices"] = Property::INTEGER;
-    PropertyBuffer indicesToVertices = PropertyBuffer::New( indicesVertexFormat );
-    indicesToVertices.SetData( &indices[0], indices.Size() );
-
-    surface.SetIndexBuffer ( indicesToVertices );
+    surface.SetIndexBuffer ( &indices[0], indices.Size() );
   }
 
   surface.SetRequiresDepthTesting(true);

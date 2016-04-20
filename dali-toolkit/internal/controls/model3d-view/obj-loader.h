@@ -139,7 +139,7 @@ private:
   void CreateGeometryArray(Dali::Vector<Vertex> & vertices,
                            Dali::Vector<Vector2> & textures,
                            Dali::Vector<VertexExt> & verticesExt,
-                           Dali::Vector<int> & indices);
+                           Dali::Vector<unsigned short> & indices);
 
 };
 
