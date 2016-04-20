@@ -275,6 +275,7 @@ void ShadowView::OnInitialize()
 
   // Turn off inheritance to ensure filter renders properly
   mBlurRootActor.SetParentOrigin( ParentOrigin::CENTER );
+  mBlurRootActor.SetInheritPosition(false);
   mBlurRootActor.SetInheritOrientation(false);
   mBlurRootActor.SetInheritScale(false);
   mBlurRootActor.SetColorMode(USE_OWN_COLOR);
