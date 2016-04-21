@@ -68,7 +68,6 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    dali-toolkit-test-utils/toolkit-style-monitor.cpp
    dali-toolkit-test-utils/toolkit-singleton-service.cpp
-   dali-toolkit-test-utils/toolkit-text-model.cpp
    dali-toolkit-test-utils/toolkit-timer.cpp
    dali-toolkit-test-utils/toolkit-tts-player.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
