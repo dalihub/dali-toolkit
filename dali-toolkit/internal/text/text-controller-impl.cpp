@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -37,28 +38,6 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-/**
- * @brief Some characters can be shaped in more than one glyph.
- * This struct is used to retrieve metrics from these group of glyphs.
- */
-struct GlyphMetrics
-{
-  GlyphMetrics()
-  : fontHeight( 0.f ),
-    advance( 0.f ),
-    ascender( 0.f ),
-    xBearing( 0.f )
-  {}
-
-  ~GlyphMetrics()
-  {}
-
-  float fontHeight; ///< The font's height of that glyphs.
-  float advance;    ///< The sum of all the advances of all the glyphs.
-  float ascender;   ///< The font's ascender.
-  float xBearing;   ///< The x bearing of the first glyph.
-};
-
 } // namespace
 
 namespace Dali
@@ -69,41 +48,6 @@ namespace Toolkit
 
 namespace Text
 {
-
-/**
- * @brief Get some glyph's metrics of a group of glyphs formed as a result of shaping one character.
- *
- * @param[in] glyphIndex The index to the first glyph.
- * @param[in] numberOfGlyphs The number of glyphs.
- * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
- * @param[in] visualModel The visual model.
- * @param[in] metrics Used to access metrics from FontClient.
- */
-void GetGlyphsMetrics( GlyphIndex glyphIndex,
-                       Length numberOfGlyphs,
-                       GlyphMetrics& glyphMetrics,
-                       VisualModelPtr& visualModel,
-                       MetricsPtr& metrics )
-{
-  const GlyphInfo* glyphsBuffer = visualModel->mGlyphs.Begin();
-
-  const GlyphInfo& firstGlyph = *( glyphsBuffer + glyphIndex );
-
-  Text::FontMetrics fontMetrics;
-  metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
-
-  glyphMetrics.fontHeight = fontMetrics.height;
-  glyphMetrics.advance = firstGlyph.advance;
-  glyphMetrics.ascender = fontMetrics.ascender;
-  glyphMetrics.xBearing = firstGlyph.xBearing;
-
-  for( unsigned int i = 1u; i < numberOfGlyphs; ++i )
-  {
-    const GlyphInfo& glyphInfo = *( glyphsBuffer + glyphIndex + i );
-
-    glyphMetrics.advance += glyphInfo.advance;
-  }
-}
 
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
@@ -1585,6 +1529,9 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   // Get the glyphs per character table.
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
 
+  // Get the glyph's info buffer.
+  const GlyphInfo* const glyphInfoBuffer = mVisualModel->mGlyphs.Begin();
+
   // If the vector is void, there is no right to left characters.
   const bool hasRightToLeftCharacters = NULL != visualToLogicalBuffer;
 
@@ -1623,7 +1570,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
       GetGlyphsMetrics( firstLogicalGlyphIndex,
                         numberOfGlyphs,
                         glyphMetrics,
-                        mVisualModel,
+                        glyphInfoBuffer,
                         mMetrics );
 
       // Get the position of the first glyph.
@@ -1802,6 +1749,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
   const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
   const CharacterIndex* const glyphsToCharactersBuffer = mVisualModel->mGlyphsToCharacters.Begin();
   const Vector2* const glyphPositionsBuffer = mVisualModel->mGlyphPositions.Begin();
+  const GlyphInfo* const glyphInfoBuffer = mVisualModel->mGlyphs.Begin();
 
   // Convert the cursor position into the glyph position.
   const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
@@ -1813,7 +1761,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
   GetGlyphsMetrics( primaryGlyphIndex,
                     primaryNumberOfGlyphs,
                     glyphMetrics,
-                    mVisualModel,
+                    glyphInfoBuffer,
                     mMetrics );
 
   // Whether to add the glyph's advance to the cursor position.
@@ -1903,7 +1851,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     GetGlyphsMetrics( secondaryGlyphIndex,
                       secondaryNumberOfGlyphs,
                       glyphMetrics,
-                      mVisualModel,
+                      glyphInfoBuffer,
                       mMetrics );
 
     // Set the secondary cursor's position.

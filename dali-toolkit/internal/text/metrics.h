@@ -22,6 +22,9 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/text-definitions.h>
+
 namespace Dali
 {
 
