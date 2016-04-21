@@ -24,6 +24,7 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
 namespace Dali
@@ -37,9 +38,6 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("border");
-
 const char * const COLOR_NAME("borderColor");
 const char * const SIZE_NAME("borderSize");
 const char * const ANTI_ALIASING("antiAliasing");
@@ -160,7 +158,7 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
 void BorderRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, BORDER_RENDERER );
   map.Insert( COLOR_NAME, mBorderColor );
   map.Insert( SIZE_NAME, mBorderSize );
 }

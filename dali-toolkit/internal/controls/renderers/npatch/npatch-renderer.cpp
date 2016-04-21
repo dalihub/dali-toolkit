@@ -26,6 +26,7 @@
 // INTERNAL IINCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
@@ -41,10 +42,6 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("nPatch");
-
-const char * const IMAGE_URL_NAME("imageUrl");
 const char * const BORDER_ONLY("borderOnly");
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
@@ -407,7 +404,7 @@ void NPatchRenderer::DoSetOffStage( Actor& actor )
 void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
   if( !mImageUrl.empty() )
   {
     map.Insert( IMAGE_URL_NAME, mImageUrl );

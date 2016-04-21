@@ -110,15 +110,15 @@ int UtcDaliDebugRendererGetRenderer1(void)
   // Test that image renderer is replaced with debug renderer
   Property::Map propertyMap4;
   propertyMap4.Insert( "rendererType",  "image" );
-  propertyMap4.Insert( "imageUrl",  TEST_IMAGE_FILE_NAME );
+  propertyMap4.Insert( "url",  TEST_IMAGE_FILE_NAME );
   ControlRenderer imageRenderer = factory.GetControlRenderer( propertyMap4 );
   DALI_TEST_CHECK( imageRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( imageRenderer ) );
 
   // Test that n patch renderer is replaced with debug renderer
   Property::Map propertyMap5;
-  propertyMap5.Insert( "rendererType",  "nPatch" );
-  propertyMap5.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
+  propertyMap5.Insert( "rendererType",  "image" );
+  propertyMap5.Insert( "url",  TEST_NPATCH_FILE_NAME );
   ControlRenderer nPatchRenderer = factory.GetControlRenderer( propertyMap4 );
   DALI_TEST_CHECK( nPatchRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( nPatchRenderer ) );

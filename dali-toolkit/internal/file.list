@@ -16,6 +16,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/renderers/image-atlas-manager.cpp \
    $(toolkit_src_dir)/controls/renderers/renderer-factory-cache.cpp \
    $(toolkit_src_dir)/controls/renderers/renderer-factory-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/renderer-string-constants.cpp \
    $(toolkit_src_dir)/controls/renderers/border/border-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/color/color-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/debug/debug-renderer.cpp \

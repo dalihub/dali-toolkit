@@ -428,16 +428,16 @@ int UtcDaliControlBackgroundImage(void)
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
   DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" ) );
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get<std::string>() == "TestImage" );
+  DALI_TEST_CHECK( resultMap->Find( "url" ) );
+  DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage" );
 
   image = ResourceImage::New("TestImage2");
   control.SetBackgroundImage( image );
 
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" ) );
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get<std::string>() == "TestImage2" );
+  DALI_TEST_CHECK( resultMap->Find( "url" ) );
+  DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage2" );
 
   END_TEST;
 }
@@ -452,14 +452,14 @@ int UtcDaliControlBackgroundProperties(void)
 
   Property::Map imageMap;
   imageMap[ "rendererType" ] = "image";
-  imageMap[ "imageUrl" ] = "TestImage";
+  imageMap[ "url" ] = "TestImage";
   control.SetProperty( Control::Property::BACKGROUND, imageMap );
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
   DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" ) );
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get<std::string>() == "TestImage" );
+  DALI_TEST_CHECK( resultMap->Find( "url" ) );
+  DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage" );
 
   Property::Map rendererMap;
   rendererMap["rendererType"] = "color";
@@ -487,7 +487,7 @@ int UtcDaliControlBackgroundProperties(void)
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, deprecatedImageMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "imageUrl" )->Get< std::string >() == "TestImage" );
+  DALI_TEST_CHECK( resultMap->Find( "url" )->Get< std::string >() == "TestImage" );
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
 
