@@ -115,7 +115,6 @@ void Controller::SetGlyphType( TextAbstraction::GlyphType glyphType )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
@@ -322,7 +321,6 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
@@ -371,7 +369,6 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
@@ -400,7 +397,6 @@ void Controller::SetDefaultFontWidth( FontWidth width )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
@@ -429,7 +425,6 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
@@ -467,7 +462,6 @@ void Controller::SetDefaultPointSize( float pointSize )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
@@ -492,8 +486,6 @@ void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
     ClearFontData();
     mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
-    mImpl->UpdateModel( ALL_OPERATIONS );
-    mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
     mImpl->mRecalculateNaturalSize = true;
     mImpl->RequestRelayout();
   }
@@ -2579,15 +2571,21 @@ void Controller::ClearFontData()
   {
     mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
   }
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
   mImpl->mVisualModel->ClearCaches();
+
+  mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mLogicalModel->mText.Count();
+
+  mImpl->mTextUpdateInfo.mClearAll = true;
+  mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                           VALIDATE_FONTS            |
+                                                           SHAPE_TEXT                |
+                                                           GET_GLYPH_METRICS         |
+                                                           LAYOUT                    |
+                                                           UPDATE_ACTUAL_SIZE        |
+                                                           REORDER                   |
+                                                           ALIGN );
 }
 
 void Controller::ClearStyleData()
