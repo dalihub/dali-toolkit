@@ -223,6 +223,63 @@ struct FontDefaults
   bool   sizeDefined:1; ///< Whether the default font's point size is defined.
 };
 
+/**
+ * @brief Stores indices used to update the text.
+ * Stores the character index where the text is updated and the number of characters removed and added.
+ * Stores as well indices to the first and the last paragraphs to be updated.
+ */
+struct TextUpdateInfo
+{
+  TextUpdateInfo()
+  : mCharacterIndex( 0u ),
+    mNumberOfCharactersToRemove( 0u ),
+    mNumberOfCharactersToAdd( 0u ),
+    mPreviousNumberOfCharacters( 0u ),
+    mParagraphCharacterIndex( 0u ),
+    mRequestedNumberOfCharacters( 0u ),
+    mStartGlyphIndex( 0u ),
+    mStartLineIndex( 0u ),
+    mEstimatedNumberOfLines( 0u ),
+    mClearAll( true ),
+    mFullRelayoutNeeded( true ),
+    mIsLastCharacterNewParagraph( false )
+  {}
+
+  ~TextUpdateInfo()
+  {}
+
+  CharacterIndex    mCharacterIndex;                ///< Index to the first character to be updated.
+  Length            mNumberOfCharactersToRemove;    ///< The number of characters to be removed.
+  Length            mNumberOfCharactersToAdd;       ///< The number of characters to be added.
+  Length            mPreviousNumberOfCharacters;    ///< The number of characters before the text update.
+
+  CharacterIndex    mParagraphCharacterIndex;       ///< Index of the first character of the first paragraph to be updated.
+  Length            mRequestedNumberOfCharacters;   ///< The requested number of characters.
+  GlyphIndex        mStartGlyphIndex;
+  LineIndex         mStartLineIndex;
+  Length            mEstimatedNumberOfLines;         ///< The estimated number of lines. Used to avoid reallocations when layouting.
+
+  bool              mClearAll:1;                    ///< Whether the whole text is cleared. i.e. when the text is reset.
+  bool              mFullRelayoutNeeded:1;          ///< Whether a full re-layout is needed. i.e. when a new size is set to the text control.
+  bool              mIsLastCharacterNewParagraph:1; ///< Whether the last character is a new paragraph character.
+
+  void Clear()
+  {
+    // Clear all info except the mPreviousNumberOfCharacters member.
+    mCharacterIndex = static_cast<CharacterIndex>( -1 );
+    mNumberOfCharactersToRemove = 0u;
+    mNumberOfCharactersToAdd = 0u;
+    mParagraphCharacterIndex = 0u;
+    mRequestedNumberOfCharacters = 0u;
+    mStartGlyphIndex = 0u;
+    mStartLineIndex = 0u;
+    mEstimatedNumberOfLines = 0u;
+    mClearAll = false;
+    mFullRelayoutNeeded = false;
+    mIsLastCharacterNewParagraph = false;
+  }
+};
+
 struct Controller::Impl
 {
   Impl( ControlInterface& controlInterface )
@@ -239,6 +296,7 @@ struct Controller::Impl
     mModifyEvents(),
     mTextColor( Color::BLACK ),
     mAlignmentOffset(),
+    mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
@@ -367,8 +425,57 @@ struct Controller::Impl
   bool IsClipboardEmpty()
   {
     bool result( mClipboard && mClipboard.NumberOfItems() );
-    return !result; // // If NumberOfItems greater than 0, return false
+    return !result; // If NumberOfItems greater than 0, return false
   }
+
+  /**
+   * @brief Calculates the start character index of the first paragraph to be updated and
+   * the end character index of the last paragraph to be updated.
+   *
+   * @param[out] numberOfCharacters The number of characters to be updated.
+   */
+  void CalculateTextUpdateIndices( Length& numberOfCharacters );
+
+  /**
+   * @brief Helper to clear completely the parts of the model specified by the given @p operations.
+   *
+   * @note It never clears the text stored in utf32.
+   */
+  void ClearFullModelData( OperationsMask operations );
+
+  /**
+   * @brief Helper to clear completely the parts of the model related with the characters specified by the given @p operations.
+   *
+   * @note It never clears the text stored in utf32.
+   *
+   * @param[in] startIndex Index to the first character to be cleared.
+   * @param[in] endIndex Index to the last character to be cleared.
+   * @param[in] operations The operations required.
+   */
+  void ClearCharacterModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations );
+
+  /**
+   * @brief Helper to clear completely the parts of the model related with the glyphs specified by the given @p operations.
+   *
+   * @note It never clears the text stored in utf32.
+   * @note Character indices are transformed to glyph indices.
+   *
+   * @param[in] startIndex Index to the first character to be cleared.
+   * @param[in] endIndex Index to the last character to be cleared.
+   * @param[in] operations The operations required.
+   */
+  void ClearGlyphModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations );
+
+  /**
+   * @brief Helper to clear the parts of the model specified by the given @p operations and from @p startIndex to @p endIndex.
+   *
+   * @note It never clears the text stored in utf32.
+   *
+   * @param[in] startIndex Index to the first character to be cleared.
+   * @param[in] endIndex Index to the last character to be cleared.
+   * @param[in] operations The operations required.
+   */
+  void ClearModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations );
 
   /**
    * @brief Updates the logical and visual models.
@@ -541,6 +648,7 @@ struct Controller::Impl
   Vector<ModifyEvent> mModifyEvents;       ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
+  TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
 

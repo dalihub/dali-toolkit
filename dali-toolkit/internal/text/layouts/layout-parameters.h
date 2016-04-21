@@ -82,6 +82,7 @@ struct LayoutParameters
     numberOfGlyphs( 0u ),
     totalNumberOfGlyphs( totalNumberOfGlyphs ),
     startLineIndex( 0u ),
+    estimatedNumberOfLines( 0u ),
     isLastNewParagraph( false )
   {}
 
@@ -101,6 +102,7 @@ struct LayoutParameters
   Length                          numberOfGlyphs;                  ///< The number of glyphs to layout.
   Length                          totalNumberOfGlyphs;             ///< The number of glyphs.
   LineIndex                       startLineIndex;                  ///< The line index where to insert the new lines.
+  Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
   bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
 };
 

@@ -48,26 +48,6 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
 const float CURSOR_WIDTH = 1.f;
 
-Length CountParagraphs( const LayoutParameters& layoutParameters )
-{
-  Length numberOfParagraphs = 0u;
-
-  const CharacterIndex startCharacterIndex = *( layoutParameters.glyphsToCharactersBuffer + layoutParameters.startGlyphIndex );
-
-  const GlyphIndex lastGlyphIndex = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs - 1u;
-  const CharacterIndex lastCharacterIndexPlusOne = *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex );
-
-  for( CharacterIndex index = startCharacterIndex; index < lastCharacterIndexPlusOne; ++index )
-  {
-    if( TextAbstraction::LINE_MUST_BREAK == *( layoutParameters.lineBreakInfoBuffer + index ) )
-    {
-      ++numberOfParagraphs;
-    }
-  }
-
-  return numberOfParagraphs;
-}
-
 } //namespace
 
 /**
@@ -514,7 +494,6 @@ struct LayoutEngine::Impl
 
   void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
                           Length numberOfGlyphs,
-                          float penY,
                           Vector2* glyphPositionsBuffer )
   {
     // Traverse the glyphs and set the positions.
@@ -532,7 +511,7 @@ struct LayoutEngine::Impl
       Vector2& position = *( glyphPositionsBuffer + i );
 
       position.x = penX + glyph.xBearing;
-      position.y = penY - glyph.yBearing;
+      position.y = -glyph.yBearing;
 
       penX += glyph.advance;
     }
@@ -646,7 +625,6 @@ struct LayoutEngine::Impl
 
       SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
                          ellipsisLayout.numberOfGlyphs,
-                         penY,
                          glyphPositionsBuffer + lineRun->glyphRun.glyphIndex - layoutParameters.startGlyphIndex );
     }
 
@@ -716,17 +694,17 @@ struct LayoutEngine::Impl
    * @brief Updates the text layout with the last laid-out line.
    *
    * @param[in] layoutParameters The parameters needed to layout the text.
-   * @param[in] layout The line layout.
+   * @param[in] characterIndex The character index of the line.
+   * @param[in] glyphIndex The glyph index of the line.
    * @param[in,out] layoutSize The text's layout size.
    * @param[in,out] linesBuffer Pointer to the line's buffer.
-   * @param[in] index Index to the vector of glyphs.
    * @param[in,out] numberOfLines The number of laid-out lines.
    */
   void UpdateTextLayout( const LayoutParameters& layoutParameters,
-                         const LineLayout& layout,
+                         CharacterIndex characterIndex,
+                         GlyphIndex glyphIndex,
                          Size& layoutSize,
                          LineRun* linesBuffer,
-                         GlyphIndex index,
                          Length& numberOfLines )
   {
     // Need to add a new line with no characters but with height to increase the layoutSize.height
@@ -738,9 +716,9 @@ struct LayoutEngine::Impl
     LineRun& lineRun = *( linesBuffer + numberOfLines );
     ++numberOfLines;
 
-    lineRun.glyphRun.glyphIndex = index + layout.numberOfGlyphs;
+    lineRun.glyphRun.glyphIndex = glyphIndex;
     lineRun.glyphRun.numberOfGlyphs = 0u;
-    lineRun.characterRun.characterIndex = layout.characterIndex + layout.numberOfCharacters;
+    lineRun.characterRun.characterIndex = characterIndex;
     lineRun.characterRun.numberOfCharacters = 0u;
     lineRun.width = 0.f;
     lineRun.ascender = fontMetrics.ascender;
@@ -817,8 +795,47 @@ struct LayoutEngine::Impl
 
     if( 0u == layoutParameters.numberOfGlyphs )
     {
-      // Nothing to do if there are no glyphs to layout.
+      // Add an extra line if the last character is a new paragraph character and the last line doesn't have zero characters.
+      if( layoutParameters.isLastNewParagraph )
+      {
+        Length numberOfLines = lines.Count();
+        if( 0u != numberOfLines )
+        {
+          const LineRun& lastLine = *( lines.End() - 1u );
+
+          if( 0u != lastLine.characterRun.numberOfCharacters )
+          {
+            // Need to add a new line with no characters but with height to increase the layoutSize.height
+            LineRun newLine;
+            lines.PushBack( newLine );
+
+            UpdateTextLayout( layoutParameters,
+                              lastLine.characterRun.characterIndex + lastLine.characterRun.numberOfCharacters,
+                              lastLine.glyphRun.glyphIndex + lastLine.glyphRun.numberOfGlyphs,
+                              layoutSize,
+                              lines.Begin(),
+                              numberOfLines );
+          }
+        }
+      }
+
+      // Nothing else do if there are no glyphs to layout.
       return false;
+    }
+
+    const GlyphIndex lastGlyphPlusOne = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs;
+
+    // In a previous layout, an extra line with no characters may have been added if the text ended with a new paragraph character.
+    // This extra line needs to be removed.
+    if( 0u != lines.Count() )
+    {
+      Vector<LineRun>::Iterator lastLine = lines.End() - 1u;
+
+      if( ( 0u == lastLine->characterRun.numberOfCharacters ) &&
+          ( lastGlyphPlusOne == layoutParameters.totalNumberOfGlyphs ) )
+      {
+        lines.Remove( lastLine );
+      }
     }
 
     // Set the first paragraph's direction.
@@ -834,8 +851,7 @@ struct LayoutEngine::Impl
     Vector<LineRun> newLines;
 
     // Estimate the number of lines.
-    // TODO: In a next patch the paragraphs are properly managed and this can be removed.
-    Length linesCapacity = CountParagraphs( layoutParameters );
+    Length linesCapacity = layoutParameters.estimatedNumberOfLines;
     Length numberOfLines = 0u;
 
     if( updateCurrentBuffer )
@@ -857,7 +873,6 @@ struct LayoutEngine::Impl
     float penY = SetParagraphOffset( lines,
                                      layoutParameters.startLineIndex );
 
-    const GlyphIndex lastGlyphPlusOne = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs;
     for( GlyphIndex index = layoutParameters.startGlyphIndex; index < lastGlyphPlusOne; )
     {
       CharacterDirection currentParagraphDirection = paragraphDirection;
@@ -933,7 +948,9 @@ struct LayoutEngine::Impl
                           numberOfLines,
                           isLastLine );
 
-        if( isLastLine &&
+        const GlyphIndex nextIndex = index + layout.numberOfGlyphs;
+
+        if( ( nextIndex == layoutParameters.totalNumberOfGlyphs ) &&
             layoutParameters.isLastNewParagraph &&
             ( mLayout == MULTI_LINE_BOX ) )
         {
@@ -951,25 +968,23 @@ struct LayoutEngine::Impl
           }
 
           UpdateTextLayout( layoutParameters,
-                            layout,
+                            layout.characterIndex + layout.numberOfCharacters,
+                            index + layout.numberOfGlyphs,
                             layoutSize,
                             linesBuffer,
-                            index,
                             numberOfLines );
         } // whether to add a last line.
 
         // Sets the positions of the glyphs.
         SetGlyphPositions( layoutParameters.glyphsBuffer + index,
                            layout.numberOfGlyphs,
-                           penY,
                            glyphPositionsBuffer + index - layoutParameters.startGlyphIndex );
 
         // Updates the vertical pen's position.
         penY += -layout.descender;
 
         // Increase the glyph index.
-        index += layout.numberOfGlyphs;
-
+        index = nextIndex;
       } // no ellipsis
     } // end for() traversing glyphs.
 
@@ -978,6 +993,7 @@ struct LayoutEngine::Impl
       glyphPositions.Insert( glyphPositions.Begin() + layoutParameters.startGlyphIndex,
                              newGlyphPositions.Begin(),
                              newGlyphPositions.End() );
+      glyphPositions.Resize( layoutParameters.totalNumberOfGlyphs );
 
       newLines.Resize( numberOfLines );
 

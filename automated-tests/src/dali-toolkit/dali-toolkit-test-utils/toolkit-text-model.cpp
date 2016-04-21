@@ -295,6 +295,8 @@ void CreateTextModel( const std::string& text,
   // The initial glyph and the number of glyphs to layout.
   layoutParameters.startGlyphIndex = 0u;
   layoutParameters.numberOfGlyphs = numberOfGlyphs;
+  layoutParameters.startLineIndex = 0u;
+  layoutParameters.estimatedNumberOfLines = logicalModel->mParagraphInfo.Count();
 
   layoutEngine.LayoutText( layoutParameters,
                            glyphPositions,
