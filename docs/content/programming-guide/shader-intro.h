@@ -45,8 +45,8 @@
  *
  * Property::Map customShader;
  *
- * customShader.Insert(“vertex-shader”, VERTEX_SHADER); //if this is not set then the default ImageView vertex shader will be used
- * customShader.Insert(“fragment-shader”, FRAGMENT_SHADER); //if this is not set then the default ImageView fragment shader will be used
+ * customShader.Insert(“vertexShader”, VERTEX_SHADER); //if this is not set then the default ImageView vertex shader will be used
+ * customShader.Insert(“fragmentShader”, FRAGMENT_SHADER); //if this is not set then the default ImageView fragment shader will be used
  *
  * Property::Map map;
  * map.Insert(“shader”, customShader);
@@ -59,21 +59,21 @@
  * @code
  * int X_SUB_DIVISIONS = 20;
  * int Y_SUB_DIVISIONS = 20;
- * customShader.Insert(“subdivide-grid-x”, X_SUB_DIVISIONS); //optional number of times to subdivide the grid horizontally, don’t add if you just want to use a quad
- * customShader.Insert(“subdivide-grid-y”, Y_SUB_DIVISIONS); //optional number of times to subdivide the grid vertically, don’t add if you just want to use a quad
+ * customShader.Insert(“subdivideGridX”, X_SUB_DIVISIONS); //optional number of times to subdivide the grid horizontally, don’t add if you just want to use a quad
+ * customShader.Insert(“subdivideGridY”, Y_SUB_DIVISIONS); //optional number of times to subdivide the grid vertically, don’t add if you just want to use a quad
  *
  * //shader hints can be an array or a string
  * optional array of shader hints
  *
  * Property::Array shaderHints;
- * shaderHints.PushBack(“requires-self-depth-test”);
- * shaderHints.PushBack(“output-is-transparent”);
- * shaderHints.PushBack(“output-is-opaque”);
- * shaderHints.PushBack(“modifies-geometry”);
+ * shaderHints.PushBack(“requiresSelfDepthTest”);
+ * shaderHints.PushBack(“outputIsTransparent”);
+ * shaderHints.PushBack(“outputIsOpaque”);
+ * shaderHints.PushBack(“modifiesGeometry”);
  * customShader.Insert(“hints”, shaderHints);
  *
  * //or optional single shader hint as a string
- * //customShader.Insert(“hints”, “output-is-transparent”);
+ * //customShader.Insert(“hints”, “outputIsTransparent”);
  * @endcode
  *
  * The value of a uniform can be set on the imageView

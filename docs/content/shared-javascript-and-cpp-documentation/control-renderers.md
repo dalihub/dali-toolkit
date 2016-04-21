@@ -12,9 +12,7 @@ Additionaly, they respond to actor size and color change, while also providing c
 DALi provides the following renderers:
  + [Color](@ref color-renderer)
  + [Gradient](@ref gradient-renderer)
- + [Image](@ref image-renderer)
- + [N-Patch](@ref n-patch-renderer)
- + [SVG](@ref svg-renderer)
+ + [Image](@ref image-renderers)
  + [Border](@ref border-renderer)
  
 Controls can provide properties that allow users to specify the renderer type.
@@ -212,26 +210,38 @@ control.background =
 ~~~
 ___________________________________________________________________________________________________
 
-## Image Renderer {#image-renderer}
+## Image Renderers {#image-renderers}
 
 Renders an image into the control's quad.
+ 
+Depending on the extension of the image, different renderer is provided to render the image onto the screen.
+ 
+ + [Normal](@ref image-renderer)
+ + [N-Patch](@ref n-patch-renderer)
+ + [SVG](@ref svg-renderer)
+ 
+___________________________
+ 
+### Normal {#image-renderer}
+ 
+Renders a raster image ( jpg, png etc.) into the control's quad.
  
 ![ ](../assets/img/renderers/image-renderer.png)
 ![ ](renderers/image-renderer.png)
 
-### Properties Supported
+#### Properties Supported
 
 **RendererType:** "image"
 
 | Property Name      | Type     | Required | Description                                                                                                                                     |
 |--------------------|:--------:|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| imageUrl           | STRING   | Yes      | The URL of the image.                                                                                                                           |
-| [imageFittingMode](@ref resourceimagescaling-fittingmode) | STRING   | No       | *shrinkToFit*, *scaleToFill*, *fitWidth* or *fitHeight*. Default: *shrinkToFit*.                         |
-| [imageSamplingMode](@ref resourceimagescaling-scaling)    | STRING   | No       | *box*, *nearest*, *linear*, *boxThenNearest*, *boxThenLinear*, *noFilter* or *dontCare*. Default: *box*. |
-| imageDesiredWidth  | INT      | No       | The desired image width. Will use actual image width if not specified.                                                                          |
-| imageDesiredHeight | INT      | No       | The desired image height. Will use actual image height if not specified.                                                                        |
+| url           | STRING   | Yes      | The URL of the image.                                                                                                                           |
+| [fittingMode](@ref resourceimagescaling-fittingmode) | STRING   | No       | *SHRINK_TO_FIT*, *SCALE_TO_FILL*, *FIT_WIDTH* or *FIT_HEIGHT*. Default: *SHRINK_TO_FIT*.                         |
+| [samplingMode](@ref resourceimagescaling-scaling)    | STRING   | No       | *BOX*, *NEAREST*, *LINEAR*, *BOX_THEN_NEAREST*, *BOX_THEN_LINEAR*, *NO_FILTERr* or *DONT_CARE*. Default: *BOX*. |
+| desiredWidth  | INT      | No       | The desired image width. Will use actual image width if not specified.                                                                          |
+| desiredHeight | INT      | No       | The desired image height. Will use actual image height if not specified.                                                                        |
 
-### Usage
+#### Usage
 
 ~~~{.cpp}
 // C++
@@ -239,7 +249,7 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 map[ "rendererType" ] = "image";
-map[ "imageUrl" ] = "path-to-image.jpg";
+map[ "url" ] = "path-to-image.jpg";
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -251,28 +261,28 @@ var control = new dali.Control( "Control" );
 control.background =
 {
   rendererType : "image",
-  imageUrl : "path-to-image.jpg"
+  url : "path-to-image.jpg"
 };
 ~~~
 ___________________________________________________________________________________________________
 
-## N-Patch Renderer {#n-patch-renderer}
+### N-Patch {#n-patch-renderer}
 
 Renders an n-patch or a 9-patch image into the control's quad.
  
 ![ ](../assets/img/renderers/n-patch-renderer.png)
 ![ ](renderers/n-patch-renderer.png)
 
-### Properties Supported
+#### Properties Supported
 
-**RendererType:** "nPatch"
+**RendererType:** "image"
 
 | Property Name | Type    | Required | Description                      |
 |---------------|:-------:|:--------:|----------------------------------|
-| imageUrl      | STRING  | Yes      | The URL of the n-patch image.    |
+| url           | STRING  | Yes      | The URL of the n-patch image.    |
 | borderOnly    | BOOLEAN | No       | If true, only draws the borders. |
 
-### Usage
+#### Usage
 
 ~~~{.cpp}
 // C++
@@ -280,8 +290,8 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "nPatch";
-map[ "imageUrl" ] = "path-to-image.9.png";
+map[ "rendererType" ] = "image";
+map[ "url" ] = "path-to-image.9.png";
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -292,17 +302,35 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "nPatch",
-  imageUrl : "path-to-image.9.png"
+  rendererType : "image",
+  url : "path-to-image.9.png"
 };
 ~~~
 
 ___________________________________________________________________________________________________
 
-## SVG Renderer {#svg-renderer}
+### SVG {#svg-renderer}
 
 Renders a svg image into the control's quad.
  
+#### Features: SVG Tiny 1.2 specification
+
+**supported:**
+ 
+  * basic shapes
+  * paths
+  * solid color fill
+  * gradient color fill
+  * solid color stroke
+ 
+**not supported:**
+ 
+  * gradient color stroke
+  * dash array stroke
+  * view box
+  * text
+  * clip path
+
 <div style="width:300px">
  
 ![ ](../assets/img/renderers/svg-renderer.svg)
@@ -314,16 +342,17 @@ Renders a svg image into the control's quad.
 ![ ](renderers/svg-renderer.svg)
  
 </div>
- 
-### Properties Supported
 
-**RendererType:** "svg"
+ 
+#### Properties Supported
+
+**RendererType:** "image"
 
 | Property Name | Type    | Required | Description                      |
 |---------------|:-------:|:--------:|----------------------------------|
-| imageUrl      | STRING  | Yes      | The URL of the SVG image.    |
+| url           | STRING  | Yes      | The URL of the SVG image.    |
 
-### Usage
+#### Usage
 
 ~~~{.cpp}
 // C++
@@ -331,8 +360,8 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "svg";
-map[ "imageUrl" ] = "path-to-image.svg";
+map[ "rendererType" ] = "image";
+map[ "url" ] = "path-to-image.svg";
 
 control.SetSize( 200.f, 200.f );
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
@@ -344,8 +373,8 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "svg",
-  imageUrl : "path-to-image.svg"
+  rendererType : "image",
+  url : "path-to-image.svg"
 };
 ~~~
 ___________________________________________________________________________________________________

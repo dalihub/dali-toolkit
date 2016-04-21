@@ -69,9 +69,9 @@ class TableView;
  *
  * @code
  * "name":"gallery1",
- * "type":"ImageActor",
+ * "type":"ImageView",
  * "image": {
- *    "filename": "{DALI_IMAGE_DIR}gallery-small-1.jpg"
+ *    "url": "{DALI_IMAGE_DIR}gallery-small-1.jpg"
  *  },
  *  "customProperties": {
  *     "cellIndex":[1,1],  // property to specify the top-left cell this child occupies, if not set, the first available cell is used

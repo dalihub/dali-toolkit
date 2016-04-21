@@ -190,7 +190,7 @@ public: //Signal
    * Signal emitted when the transition has completed animation
    * A callback of the following type may be connected
    * @code
-   *   void YourCallbackName( CubeTransitionEffect cubeEffect, ImageActor currentImage );
+   *   void YourCallbackName( CubeTransitionEffect cubeEffect, Image currentImage );
    * @endcode
    * @return The Signal to connect to.
    */
