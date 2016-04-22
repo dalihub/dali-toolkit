@@ -142,9 +142,9 @@ void BubbleEmitter::OnInitialize()
 
   Shader bubbleShader = CreateBubbleShader (mNumBubblePerActor );
 
-  mMaterial = Material::New( bubbleShader );
-  mMaterial.AddTexture( mEffectImage, "sBackground" );
-  mMaterial.AddTexture( mShapeImage,  "sBubbleShape" );
+  mTextureSet = TextureSet::New();
+  mTextureSet.SetImage( 0u, mEffectImage );
+  mTextureSet.SetImage( 1u, mShapeImage );
 
   mBubbleActors.resize( mNumActor );
 
@@ -152,7 +152,7 @@ void BubbleEmitter::OnInitialize()
   for(unsigned int i=0; i < mNumActor; i++ )
   {
     mBubbleActors[i] = new BubbleActor( mNumBubblePerActor, mMovementArea );
-    (mBubbleActors[i])->MakeRenderable( mMeshGeometry, mMaterial );
+    (mBubbleActors[i])->MakeRenderable( mMeshGeometry, mTextureSet, bubbleShader );
     mBubbleRoot.Add( (mBubbleActors[i])->GetMeshActor() );
   }
 
@@ -200,7 +200,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
 
 void BubbleEmitter::SetShapeImage( Image shapeImage )
 {
-  mMaterial.SetTextureImage( 1, shapeImage );
+  mTextureSet.SetImage( 1, shapeImage );
 }
 
 void BubbleEmitter::SetBubbleScale( float scale )

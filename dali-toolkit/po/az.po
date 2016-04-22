@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Hamısını seç"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Köçür"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Göndər"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Kəs"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Yapışdır"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Mübadilə buferi"
+

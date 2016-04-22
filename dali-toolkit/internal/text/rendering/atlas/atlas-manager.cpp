@@ -108,7 +108,7 @@ AtlasManager::SizeType AtlasManager::GetAtlasCount() const
   return GetImplementation(*this).GetAtlasCount();
 }
 
-Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas )
+Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas ) const
 {
   return GetImplementation(*this).GetPixelFormat( atlas );
 }
@@ -118,14 +118,14 @@ void AtlasManager::GetMetrics( Metrics& metrics )
   GetImplementation(*this).GetMetrics( metrics );
 }
 
-Material AtlasManager::GetMaterial( AtlasId atlas ) const
+TextureSet AtlasManager::GetTextures( AtlasId atlas ) const
 {
-  return GetImplementation(*this).GetMaterial( atlas );
+  return GetImplementation(*this).GetTextures( atlas );
 }
 
-void AtlasManager::SetMaterial( AtlasId atlas, Material& material )
+void AtlasManager::SetTextures( AtlasId atlas, TextureSet& textureSet )
 {
-  GetImplementation(*this).SetMaterial( atlas, material );
+  GetImplementation(*this).SetTextures( atlas, textureSet );
 }
 
 } // namespace Toolkit

@@ -545,14 +545,14 @@ int UtcDaliKeyInputFocusManagerDestroyObject02(void)
 
   {
     BufferImage image = CreateBufferImage();
-    ImageActor imageActor = ImageActor::New( image );
-    stage.Add( imageActor );
-    imageActor.SetSize(100, 100);
+    Actor actor = CreateRenderableActor( image );
+    stage.Add( actor );
+    actor.SetSize(100, 100);
 
     application.SendNotification();
     application.Render();
 
-    stage.Remove( imageActor );
+    stage.Remove( actor );
   }
 
   DALI_TEST_CHECK( dummy2 == manager.GetCurrentFocusControl());

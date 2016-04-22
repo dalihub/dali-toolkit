@@ -721,7 +721,7 @@ void ActorApi::ScaleBy( const v8::FunctionCallbackInfo<v8::Value>& args )
  * Add a renderer to this actor.
  * @example
  *
- *     var renderer = new dali.Renderer( geometry, material );
+ *     var renderer = new dali.Renderer( geometry, shader );
  *     actor.addRenderer( renderer );
  *
  * @for Actor

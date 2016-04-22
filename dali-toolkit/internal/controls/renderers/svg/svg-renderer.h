@@ -121,7 +121,7 @@ public:
 
 private:
   /**
-   * @bried Rasterize the svg with the given size, and add it to the material.
+   * @bried Rasterize the svg with the given size, and add it to the renderer.
    *
    * @param[in] size The target size of the SVG rasterization.
    */

@@ -27,8 +27,9 @@
 #include <rendering/renderer-wrapper.h>
 #include <rendering/geometry-api.h>
 #include <rendering/geometry-wrapper.h>
-#include <rendering/material-api.h>
-#include <rendering/material-wrapper.h>
+#include <rendering/texture-set-api.h>
+#include <rendering/texture-set-wrapper.h>
+#include <rendering/shader-api.h>
 
 namespace Dali
 {
@@ -85,7 +86,7 @@ Renderer RendererApi::GetRendererFromParams( int paramIndex,
  * @method Renderer
  * @for Renderer
  * @param {Object} geometry The geometry to be used by this renderer
- * @param {Object} material The material to be used by this renderer
+ * @param {Object} shader The shader to be used by this renderer
  * @return {Object} Renderer
  */
 Renderer RendererApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
@@ -102,14 +103,14 @@ Renderer RendererApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
   }
 
   found = false;
-  Material material = MaterialApi::GetMaterialFromParams( 1, found, isolate, args );
+  Shader shader = ShaderApi::GetShaderFromParams( 1, found, isolate, args );
   if( !found )
   {
-    DALI_SCRIPT_EXCEPTION( isolate, "missing material from param 0" );
+    DALI_SCRIPT_EXCEPTION( isolate, "missing shader from param 0" );
     return Renderer();
   }
 
-  return Renderer::New(geometry, material);
+  return Renderer::New(geometry, shader);
 }
 
 /**
@@ -159,13 +160,13 @@ void RendererApi::GetGeometry( const v8::FunctionCallbackInfo<v8::Value>& args )
 }
 
 /**
- * Sets the material to be used by this renderer
+ * Sets the texture set to be used by this renderer
  *
- * @method setMaterial
+ * @method setTextures
  * @for Renderer
- * @param {Object} material The material to be used by this renderer
+ * @param {Object} textureSet The TextureSet to be used by this renderer
  */
-void RendererApi::SetMaterial( const v8::FunctionCallbackInfo< v8::Value >& args )
+void RendererApi::SetTextures( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
@@ -173,34 +174,34 @@ void RendererApi::SetMaterial( const v8::FunctionCallbackInfo< v8::Value >& args
   Renderer renderer = GetRenderer( isolate, args );
 
   bool found( false );
-  Material material = MaterialApi::GetMaterialFromParams( 0, found, isolate, args );
+  TextureSet textureSet = TextureSetApi::GetTextureSetFromParams( 0, found, isolate, args );
   if( !found )
   {
-    DALI_SCRIPT_EXCEPTION( isolate, "missing material from param 0" );
+    DALI_SCRIPT_EXCEPTION( isolate, "missing texture set from param 0" );
   }
   else
   {
-    renderer.SetMaterial(material);
+    renderer.SetTextures(textureSet);
   }
 }
 
 /**
- * Gets the material used by this renderer
+ * Gets the texture set used by this renderer
  *
- * @method getMaterial
+ * @method getTextures
  * @for Renderer
- * @return {Object} The material used by this renderer
+ * @return {Object} The texture set used by this renderer
  */
-void RendererApi::GetMaterial( const v8::FunctionCallbackInfo<v8::Value>& args )
+void RendererApi::GetTextures( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
 
   Renderer renderer = GetRenderer( isolate, args );
-  Material material = renderer.GetMaterial();
+  TextureSet textureSet = renderer.GetTextures();
 
-  // Wrap the material
-  v8::Local<v8::Object> localObject = MaterialWrapper::WrapMaterial( isolate, material );
+  // Wrap the textureset
+  v8::Local<v8::Object> localObject = TextureSetWrapper::WrapTextureSet( isolate, textureSet );
   args.GetReturnValue().Set( localObject );
 }
 

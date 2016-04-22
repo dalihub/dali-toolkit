@@ -59,8 +59,8 @@ namespace RendererApi
     */
    void SetGeometry( const v8::FunctionCallbackInfo< v8::Value >& args );
    void GetGeometry( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetMaterial( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void GetMaterial( const v8::FunctionCallbackInfo< v8::Value >& args );
+   void SetTextures( const v8::FunctionCallbackInfo< v8::Value >& args );
+   void GetTextures( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
    void GetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args );

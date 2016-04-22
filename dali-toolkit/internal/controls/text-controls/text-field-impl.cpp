@@ -164,11 +164,23 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         int backend = value.Get< int >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p RENDERING_BACKEND %d\n", impl.mController.Get(), backend );
 
+#ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
+        if( Text::RENDERING_VECTOR_BASED == backend )
+        {
+          backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
+        }
+#endif
         if( impl.mRenderingBackend != backend )
         {
           impl.mRenderingBackend = backend;
           impl.mRenderer.Reset();
-          impl.RequestTextRelayout();
+
+          if( impl.mController )
+          {
+            // When using the vector-based rendering, the size of the GLyphs are different
+            TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+            impl.mController->SetGlyphType( glyphType );
+          }
         }
         break;
       }
@@ -971,6 +983,10 @@ void TextField::OnInitialize()
   Actor self = Self();
 
   mController = Text::Controller::New( *this );
+
+  // When using the vector-based rendering, the size of the GLyphs are different
+  TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+  mController->SetGlyphType( glyphType );
 
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );

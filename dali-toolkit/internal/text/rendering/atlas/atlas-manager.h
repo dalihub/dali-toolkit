@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/devel-api/images/atlas.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 
 namespace Dali
 {
@@ -247,7 +247,7 @@ public:
    *
    * @return Pixel format used by this atlas
    */
-  Pixel::Format GetPixelFormat( AtlasId atlas );
+  Pixel::Format GetPixelFormat( AtlasId atlas ) const;
 
   /**
    * @brief Fill in a metrics structure showing current status of this Atlas Manager
@@ -257,21 +257,21 @@ public:
   void GetMetrics( Metrics& metrics );
 
   /**
-   * @brief Get Material used by atlas
+   * @brief Get TextureSet used by atlas
    *
    * @param[in] atlas AtlasId
    *
-   * @return Material used by atlas
+   * @return TextureSet used by atlas
    */
-  Material GetMaterial( AtlasId atlas ) const;
+  TextureSet GetTextures( AtlasId atlas ) const;
 
   /**
-   * @brief Set the material used by an atlas
+   * @brief Set the texture set used by an atlas
    *
    * @param[in] atlas AtlasId
-   * @param[in] material The Material to assign
+   * @param[in] textureSet The texture set to assign
    */
-  void SetMaterial( AtlasId atlas, Material& material );
+  void SetTextures( AtlasId atlas, TextureSet& textureSet );
 
 private:
 

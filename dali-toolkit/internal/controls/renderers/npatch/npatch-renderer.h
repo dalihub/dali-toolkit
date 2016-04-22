@@ -189,7 +189,7 @@ private:
   void InitializeFromBrokenImage();
 
   /**
-   * @brief Applies this renderer's image to the sampler to the material used for this renderer
+   * @brief Applies this renderer's image to the sampler to the texture set used for this renderer
    */
   void ApplyImageToSampler();
 

@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Velja allt"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Afrita"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Velja"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Klippa"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Líma"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Klippiborð"
+

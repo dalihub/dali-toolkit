@@ -125,13 +125,25 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextLabel::Property::RENDERING_BACKEND:
       {
-        const int backend = value.Get< int >();
+        int backend = value.Get< int >();
 
+#ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
+        if( Text::RENDERING_VECTOR_BASED == backend )
+        {
+          backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
+        }
+#endif
         if( impl.mRenderingBackend != backend )
         {
           impl.mRenderingBackend = backend;
           impl.mRenderer.Reset();
-          impl.RequestTextRelayout();
+
+          if( impl.mController )
+          {
+            // When using the vector-based rendering, the size of the GLyphs are different
+            TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+            impl.mController->SetGlyphType( glyphType );
+          }
         }
         break;
       }
@@ -454,6 +466,10 @@ void TextLabel::OnInitialize()
   Actor self = Self();
 
   mController = Text::Controller::New( *this );
+
+  // When using the vector-based rendering, the size of the GLyphs are different
+  TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+  mController->SetGlyphType( glyphType );
 
   // Use height-for-width negotiation by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );

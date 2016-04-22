@@ -32,6 +32,14 @@ include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
 include ../../../dali-toolkit/devel-api/file.list
 
+vector_based_text_src_dir = ../../../dali-toolkit/internal/text/rendering/vector-based
+include ../../../dali-toolkit/internal/text/rendering/vector-based/file.list
+
+if ENABLE_VECTOR_BASED_TEXT_RENDERING
+toolkit_src_files += $(vector_based_text_src_files)
+DALI_TOOLKIT_CFLAGS += -DENABLE_VECTOR_BASED_TEXT_RENDERING
+endif
+
 resources_dir = ../../../resources
 daliimagedir = ${dataReadOnlyDir}/toolkit/images/
 daliimage_DATA = ${dali_toolkit_image_files}
@@ -90,6 +98,7 @@ develapicontrolsdir =           $(develapidir)/controls
 develapibloomviewdir =          $(develapicontrolsdir)/bloom-view
 develapibubbleemitterdir =      $(develapicontrolsdir)/bubble-effect
 develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
+develapiflexcontainerdir =      $(develapicontrolsdir)/flex-container
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
 develapirendererfactorydir =    $(develapicontrolsdir)/renderer-factory
 develapipopupdir =              $(develapicontrolsdir)/popup
@@ -111,6 +120,7 @@ develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
 develapibuilder_HEADERS =           $(devel_api_builder_header_files)
 develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
+develapiflexcontainer_HEADERS =     $(devel_api_flex_container_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
 develapiimageatlas_HEADERS =        $(devel_api_image_atlas_header_files)
 develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)

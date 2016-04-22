@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Odaberi sve"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopiraj"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Odaberi"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Izreži"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Zalijepi"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Međuspremnik"
+

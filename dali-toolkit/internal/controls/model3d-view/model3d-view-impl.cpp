@@ -313,7 +313,7 @@ void Model3dView::SetProperty( BaseObject* object, Property::Index index, const 
       }
       case Toolkit::Model3dView::Property::MATERIAL_URL:
       {
-        if( value.Get(impl.mMaterialUrl) )
+        if( value.Get(impl.mTextureSetUrl) )
         {
           impl.LoadMaterial();
           impl.CreateMaterial();
@@ -377,7 +377,7 @@ Property::Value Model3dView::GetProperty( BaseObject* object, Property::Index in
       }
       case Toolkit::Model3dView::Property::MATERIAL_URL:
       {
-        value = impl.mMaterialUrl;
+        value = impl.mTextureSetUrl;
         break;
       }
       case Toolkit::Model3dView::Property::IMAGES_URL:
@@ -449,8 +449,8 @@ void Model3dView::OnInitialize()
   //Create empty versions of the geometry and material so we always have a Renderer
   Geometry mesh = Geometry::New();
   Shader shader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
-  Material material = Material::New( shader );
-  mRenderer = Renderer::New( mesh, material );
+  mRenderer = Renderer::New( mesh, shader );
+
 }
 
 void Model3dView::LoadGeometry()
@@ -482,7 +482,7 @@ void Model3dView::LoadMaterial()
   std::streampos fileSize;
   Dali::Vector<char> fileContent;
 
-  if( FileLoader::ReadFile(mMaterialUrl, fileSize, fileContent, FileLoader::TEXT) )
+  if( FileLoader::ReadFile(mTextureSetUrl, fileSize, fileContent, FileLoader::TEXT) )
   {
     mObjLoader.LoadMaterial(fileContent.Begin(), fileSize, mTexture0Url, mTexture1Url, mTexture2Url);
   }
@@ -573,11 +573,12 @@ void Model3dView::CreateMaterial()
     mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
   }
 
-  mMaterial = Material::New( mShader );
+  mTextureSet = TextureSet::New();
 
   if( mRenderer )
   {
-    mRenderer.SetMaterial( mMaterial );
+    mRenderer.SetTextures( mTextureSet );
+    mRenderer.SetShader( mShader );
     mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, Renderer::NONE);
   }
 
@@ -586,7 +587,7 @@ void Model3dView::CreateMaterial()
 
 void Model3dView::LoadTextures()
 {
-  if( !mMaterial )
+  if( !mTextureSet )
     return ;
 
   if( mTexture0Url != "" )
@@ -597,7 +598,7 @@ void Model3dView::LoadTextures()
     Image tex0 = ResourceImage::New( imgUrl );
     if( tex0 )
     {
-      mMaterial.AddTexture( tex0, "sDiffuse" );
+      mTextureSet.SetImage( 0u, tex0 );
     }
   }
 
@@ -609,7 +610,7 @@ void Model3dView::LoadTextures()
     Image tex1 = ResourceImage::New( imgUrl );
     if (tex1)
     {
-      mMaterial.AddTexture( tex1, "sNormal" );
+      mTextureSet.SetImage( 1u, tex1 );
     }
   }
 
@@ -621,7 +622,7 @@ void Model3dView::LoadTextures()
     Image tex2 = ResourceImage::New( imgUrl );
     if( tex2 )
     {
-      mMaterial.AddTexture( tex2, "sGloss" );
+      mTextureSet.SetImage( 2u, tex2 );
     }
   }
 }

@@ -64,16 +64,16 @@ protected:
 
     /**
      * Apply an effect onto the page actor.
-     * @param[in] shader The shader for rendering effect.
+     * @param[in] newShader The shader for rendering effect.
      */
-    void UseEffect(Shader shader);
+    void UseEffect(Shader newShader);
 
     /**
      * Apply an effect onto the page actor.
-     * @param[in] shader The shader for rendering effect.
+     * @param[in] newShader The shader for rendering effect.
      * @param[in] geometry The geometry for rendering effect.
      */
-    void UseEffect(Shader shader, Geometry geometry);
+    void UseEffect(Shader newShader, Geometry geometry);
 
     /**
      * Change the page turning direction.
@@ -105,7 +105,8 @@ protected:
     void SetCurrentCenter( const Vector2& value );
 
     Actor actor;                              ///< The page actor
-    Material material;                        ///< The material of the actor
+    Shader shader;                            ///< The shader used by the actor
+    TextureSet textureSet;                    ///< The set of textures used by the actor
     Renderer renderer;                        ///< The renderer of the actor
     bool isTurnBack;                          ///< The turning direction
     Property::Index propertyPanDisplacement;  ///< The horizontal displacement of the pan

@@ -106,9 +106,14 @@ Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
   return GetImplementation(*this).GetPixelFormat( atlasId );
 }
 
-Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
+TextureSet AtlasGlyphManager::GetTextures( uint32_t atlasId ) const
 {
-  return GetImplementation(*this).GetMaterial( atlasId );
+  return GetImplementation(*this).GetTextures( atlasId );
+}
+
+Shader AtlasGlyphManager::GetShader( uint32_t atlasId ) const
+{
+  return GetImplementation(*this).GetShader( atlasId );
 }
 
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()

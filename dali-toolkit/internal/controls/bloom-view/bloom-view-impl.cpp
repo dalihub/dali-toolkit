@@ -83,8 +83,6 @@ const char* const BLOOM_SATURATION_PROPERTY_NAME = "uBloomSaturation";
 const char* const IMAGE_INTENSITY_PROPERTY_NAME = "uImageIntensity";
 const char* const IMAGE_SATURATION_PROPERTY_NAME = "uImageSaturation";
 
-const char* const EFFECT_IMAGE_NAME( "sEffect" );
-
 ///////////////////////////////////////////////////////
 //
 // Bloom shaders
@@ -393,16 +391,8 @@ void BloomView::AllocateResources()
 
     // use the completed blur in the first buffer and composite with the original child actors render
     mCompositeImageActor.SetImage( mRenderTargetForRenderingChildren );
-    Material material = mCompositeImageActor.GetRendererAt(0).GetMaterial();
-    int textureIndex = material.GetTextureIndex( EFFECT_IMAGE_NAME );
-    if( textureIndex == -1 )
-    {
-      material.AddTexture( mBlurExtractTarget, EFFECT_IMAGE_NAME );
-    }
-    else
-    {
-      material.SetTextureImage( textureIndex, mBlurExtractTarget );
-    }
+    TextureSet textureSet = mCompositeImageActor.GetRendererAt(0).GetTextures();
+    textureSet.SetImage( 1u, mBlurExtractTarget );
 
     // set up target actor for rendering result, i.e. the blurred image
     mTargetImageActor.SetImage(mOutputRenderTarget);

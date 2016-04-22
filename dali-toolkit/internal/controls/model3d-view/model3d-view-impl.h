@@ -150,7 +150,7 @@ private:
 
   //Properties
   std::string mObjUrl;
-  std::string mMaterialUrl;
+  std::string mTextureSetUrl;
   std::string mImagesUrl;
   std::string mTexture0Url;
   std::string mTexture1Url;
@@ -166,7 +166,7 @@ private:
 
   //Render members
   Shader mShader;
-  Material mMaterial;
+  TextureSet mTextureSet;
   Geometry mMesh;
   Renderer mRenderer;
 };

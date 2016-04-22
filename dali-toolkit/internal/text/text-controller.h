@@ -115,6 +115,13 @@ public:
   void EnableTextInput( DecoratorPtr decorator );
 
   /**
+   * @brief Used to switch between bitmap & vector based glyphs
+   *
+   * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
+   */
+  void SetGlyphType( TextAbstraction::GlyphType glyphType );
+
+  /**
    * @brief Enables/disables the mark-up processor.
    *
    * By default is disabled.
@@ -767,11 +774,6 @@ private:
    * @brief Helper to clear font-specific data.
    */
   void ShowPlaceholderText();
-
-  /**
-   * @brief Helper to clear all the model data except for LogicalModel::mText.
-   */
-  void ClearModelData();
 
   /**
    * @brief Helper to clear font-specific data (only).

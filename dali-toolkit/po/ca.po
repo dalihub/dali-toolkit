@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Seleccioni-ho tot"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Copia"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Selec."
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Tallar"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Enganxar"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Porta-retalls"
+
