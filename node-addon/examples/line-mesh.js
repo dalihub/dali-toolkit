@@ -58,8 +58,6 @@ daliApp.createMeshActor = function() {
 
       var shader = new dali.Shader(shaderOptions);
 
-      var material = new dali.Material( shader );
-
       // Create vertex buffer
       var pentagonVertexFormat ={ "aPosition1" : dali.PROPERTY_VECTOR2 };
 
@@ -103,7 +101,7 @@ daliApp.createMeshActor = function() {
       geometry.setIndexBuffer( indices );
       geometry.setGeometryType( dali.GEOMETRY_LINES );
 
-      var renderer = new dali.Renderer(geometry, material);
+      var renderer = new dali.Renderer(geometry, shader);
       renderer.depthIndex = 0;
 
       // Create mesh actor

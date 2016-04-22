@@ -64,13 +64,13 @@ daliApp.createMeshActor = function() {
 
       var shader = new dali.Shader(shaderOptions);
 
-      var material = new dali.Material( shader );
+      var textureSet = new dali.TextureSet;
       var image = new dali.ResourceImage( {url: imageDir + "image-1.jpg"} );
-      material.addTexture(image, "sTexture");
+      textureSet.setImage(0, image);
 
-      var material2 = new dali.Material( shader );
+      var textureSet2 = new dali.TextureSet;
       var image2 = new dali.ResourceImage( {url: imageDir + "image-2.jpg"} );
-      material2.addTexture(image2, "sTexture");
+      textureSet2.setImage(0, image2);
 
       // Create vertex buffer
       var texturedQuadVertexFormat ={ "aPosition" : dali.PROPERTY_VECTOR2,
@@ -101,7 +101,8 @@ daliApp.createMeshActor = function() {
       geometry.addVertexBuffer( texturedQuadVertices );
       geometry.setIndexBuffer( indices );
 
-      var renderer = new dali.Renderer(geometry, material);
+      var renderer = new dali.Renderer(geometry, shader);
+      renderer.setTextures(textureSet);
       renderer.depthIndex = 0;
 
       var meshActor = new dali.Actor();
@@ -113,7 +114,8 @@ daliApp.createMeshActor = function() {
 
       dali.stage.add( meshActor );
 
-      var renderer2 = new dali.Renderer(geometry, material2);
+      var renderer2 = new dali.Renderer(geometry, shader);
+      renderer2.setTextures(textureSet2);
       renderer2.depthIndex = 0;
 
       var meshActor2 = new dali.Actor();
