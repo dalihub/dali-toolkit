@@ -38,7 +38,7 @@ namespace Internal
 
 namespace
 {
-const char * const COLOR_NAME("blendColor");
+const char * const COLOR_NAME("mixColor");
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -55,18 +55,18 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
-  uniform lowp vec4 blendColor;\n
+  uniform lowp vec4 mixColor;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = blendColor*uColor;\n
+    gl_FragColor = mixColor*uColor;\n
   }\n
 );
 }
 
 ColorRenderer::ColorRenderer( RendererFactoryCache& factoryCache )
 : ControlRenderer( factoryCache ),
-  mBlendColorIndex( Property::INVALID_INDEX )
+  mMixColorIndex( Property::INVALID_INDEX )
 {
 }
 
@@ -77,7 +77,7 @@ ColorRenderer::~ColorRenderer()
 void ColorRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( COLOR_NAME );
-  if( !( color && color->Get(mBlendColor) ) )
+  if( !( color && color->Get(mMixColor) ) )
   {
     DALI_LOG_ERROR( "Fail to provide a color to the ColorRenderer object" );
   }
@@ -111,7 +111,7 @@ void ColorRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, COLOR_RENDERER );
-  map.Insert( COLOR_NAME, mBlendColor );
+  map.Insert( COLOR_NAME, mMixColor );
 }
 
 void ColorRenderer::InitializeRenderer()
@@ -132,23 +132,23 @@ void ColorRenderer::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mBlendColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mBlendColor );
-  if( mBlendColor.a < 1.f )
+  mMixColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mMixColor );
+  if( mMixColor.a < 1.f )
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
 }
 
 void ColorRenderer::SetColor(const Vector4& color)
 {
-  mBlendColor = color;
+  mMixColor = color;
 
   if( mImpl->mRenderer )
   {
-    (mImpl->mRenderer).SetProperty( mBlendColorIndex, color );
+    (mImpl->mRenderer).SetProperty( mMixColorIndex, color );
     if( color.a < 1.f )
     {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
     }
   }
 }

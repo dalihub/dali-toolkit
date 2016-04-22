@@ -73,7 +73,7 @@ int UtcDaliDebugRendererGetRenderer1(void)
   // Test that color renderer is replaced with debug renderer
   Property::Map propertyMap1;
   propertyMap1.Insert("rendererType",  "color");
-  propertyMap1.Insert("blendColor",  Color::BLUE);
+  propertyMap1.Insert("mixColor",  Color::BLUE);
   ControlRenderer colorRenderer = factory.GetControlRenderer(propertyMap1);
   DALI_TEST_CHECK( colorRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( colorRenderer ) );

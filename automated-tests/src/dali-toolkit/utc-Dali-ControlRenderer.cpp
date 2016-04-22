@@ -50,7 +50,7 @@ int UtcDaliControlRendererCopyAndAssignment(void)
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
-  propertyMap.Insert("blendColor",  Color::BLUE);
+  propertyMap.Insert("mixColor",  Color::BLUE);
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
 
   ControlRenderer controlRendererCopy( controlRenderer );
@@ -83,7 +83,7 @@ int UtcDaliControlRendererSetGetDepthIndex(void)
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
-  propertyMap.Insert("blendColor",  Color::BLUE);
+  propertyMap.Insert("mixColor",  Color::BLUE);
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
 
   controlRenderer.SetDepthIndex( 1.f );
@@ -187,7 +187,7 @@ int UtcDaliControlRendererSetOnOffStage(void)
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
-  propertyMap.Insert("blendColor",  Color::BLUE);
+  propertyMap.Insert("mixColor",  Color::BLUE);
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
 
   Actor actor = Actor::New();
@@ -260,7 +260,7 @@ int UtcDaliControlRendererGetPropertyMap1(void)
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
-  propertyMap.Insert("blendColor",  Color::BLUE);
+  propertyMap.Insert("mixColor",  Color::BLUE);
   ControlRenderer colorRenderer = factory.GetControlRenderer( propertyMap );
 
   Property::Map resultMap;
@@ -270,7 +270,7 @@ int UtcDaliControlRendererGetPropertyMap1(void)
   DALI_TEST_CHECK( typeValue );
   DALI_TEST_CHECK( typeValue->Get<std::string>() == "color" );
 
-  Property::Value* colorValue = resultMap.Find( "blendColor",  Property::VECTOR4 );
+  Property::Value* colorValue = resultMap.Find( "mixColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLUE );
 
@@ -279,7 +279,7 @@ int UtcDaliControlRendererGetPropertyMap1(void)
   factory.ResetRenderer( colorRenderer, actor, Color::CYAN );
   colorRenderer.CreatePropertyMap( resultMap );
 
-  colorValue = resultMap.Find( "blendColor",  Property::VECTOR4 );
+  colorValue = resultMap.Find( "mixColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
 

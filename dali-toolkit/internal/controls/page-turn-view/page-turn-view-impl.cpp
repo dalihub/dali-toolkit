@@ -320,7 +320,7 @@ void PageTurnView::Page::UseEffect(Shader newShader, Geometry geometry)
     }
 
     renderer.SetTextures( textureSet );
-    renderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, Renderer::DEPTH_WRITE_ON );
+    renderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
     actor.AddRenderer( renderer );
   }
 }

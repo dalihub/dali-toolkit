@@ -525,7 +525,7 @@ void Model3dView::CreateGeometry()
     if( mRenderer )
     {
       mRenderer.SetGeometry( mMesh );
-      mRenderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, Renderer::DEPTH_WRITE_ON );
+      mRenderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
     }
   }
 }
@@ -580,7 +580,7 @@ void Model3dView::CreateMaterial()
   {
     mRenderer.SetTextures( mTextureSet );
     mRenderer.SetShader( mShader );
-    mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, Renderer::CULL_NONE);
+    mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK );
   }
 
   UpdateShaderUniforms();

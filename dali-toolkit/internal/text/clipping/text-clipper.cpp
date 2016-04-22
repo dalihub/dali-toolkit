@@ -138,8 +138,10 @@ void Clipper::Initialize( const Vector2& size )
 void Clipper::OnStageConnect( Dali::Actor actor )
 {
   Renderer renderer = mImageActor.GetRendererAt(0);
-  renderer.SetBlendFunc(BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
-                        BlendingFactor::ONE, BlendingFactor::ONE);
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB,    BlendFactor::ONE );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB,   BlendFactor::ONE_MINUS_SRC_ALPHA );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA,  BlendFactor::ONE );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE );
 }
 
 Clipper::Clipper()
