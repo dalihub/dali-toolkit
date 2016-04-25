@@ -40,12 +40,12 @@ namespace Text
  * @param[in,out] colors The vector of colors.
  * @param[in] color The color to find.
  *
- * @return The index where the color is in the vector.
+ * @return The index + 1 where the color is in the vector. The index zero is reserved for the default color.
  */
 ColorIndex FindColor( Vector<Vector4>& colors,
                       const Vector4& color )
 {
-  ColorIndex index = 1u;
+  ColorIndex index = 1u; // The index zero is reserved for the default color.
   for( Vector<Vector4>::Iterator it = colors.Begin(),
          endIt = colors.End();
        it != endIt;
