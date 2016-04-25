@@ -553,13 +553,13 @@ void Model3dView::UpdateShaderUniforms()
 
 void Model3dView::CreateMaterial()
 {
-  if( mObjLoader.IsMaterialLoaded() && (mTexture0Url != ""))
+  if( mObjLoader.IsMaterialLoaded() && (mTexture0Url != "") && mObjLoader.IsTexturePresent() )
   {
-    if( (mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP))
+    if( (mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) && mObjLoader.IsNormalMapPresent() )
     {
       mShader = Shader::New( NRMMAP_VERTEX_SHADER, NRMMAP_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
     }
-    else if(mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE)
+    else if( mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE )
     {
       mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
     }

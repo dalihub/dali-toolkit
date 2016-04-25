@@ -112,12 +112,17 @@ public:
 
   void      ClearArrays();
 
+  bool      IsTexturePresent();
+  bool      IsNormalMapPresent();
+
 private:
 
   BoundingVolume mSceneAABB;
 
   bool mSceneLoaded;
   bool mMaterialLoaded;
+  bool mHasTexture;
+  bool mHasNormalMap;
 
   Dali::Vector<Vector3> mPoints;
   Dali::Vector<Vector2> mTextures;
