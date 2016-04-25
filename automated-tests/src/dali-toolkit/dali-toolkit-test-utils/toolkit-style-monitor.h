@@ -79,7 +79,7 @@ namespace Test
 {
 namespace StyleMonitor
 {
-void SetThemeFileOutput( const std::string& output );
+void SetThemeFileOutput( const std::string& name, const std::string& output );
 void SetDefaultFontFamily(const std::string& family);
 void SetDefaultFontStyle(const std::string& style);
 void SetDefaultFontSize( float size );

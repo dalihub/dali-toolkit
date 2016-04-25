@@ -17,7 +17,7 @@
 
 #include "dummy-control.h"
 
-#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 namespace Dali
 {

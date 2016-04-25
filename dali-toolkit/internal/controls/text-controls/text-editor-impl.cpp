@@ -807,7 +807,7 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnStyleChange DEFAULT_FONT_CHANGE\n");
-      std::string newFont = styleManager.GetDefaultFontFamily();
+      const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       // Property system did not set the font so should update it.
       mController->UpdateAfterFontChange( newFont );
       break;

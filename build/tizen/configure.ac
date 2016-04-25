@@ -168,6 +168,7 @@ AC_CONFIG_FILES([
  dali-toolkit.pc
  docs/Makefile
  docs/dali.doxy
+ ../../automated-tests/CMakeLists.txt
 ])
 
 AC_OUTPUT

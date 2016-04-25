@@ -34,7 +34,6 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 
-#include <dali-toolkit/devel-api/styling/style-manager.h>
 
 #include "dummy-control.h"
 
@@ -934,7 +933,3 @@ int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
 
   END_TEST;
 }
-
-
-
-

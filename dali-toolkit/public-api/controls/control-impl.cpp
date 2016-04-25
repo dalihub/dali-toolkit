@@ -34,10 +34,10 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 

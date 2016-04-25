@@ -27,7 +27,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 
 namespace Dali
@@ -67,30 +67,20 @@ protected:
 
 public: // Public API
 
-  /**
-   * @copydoc Toolkit::StyleManager::SetOrientationValue
+/**
+   * @copydoc Toolkit::StyleManager::ApplyTheme
    */
-  void SetOrientationValue( int orientation );
+  void ApplyTheme( const std::string& themeFile );
 
   /**
-   * @copydoc Toolkit::StyleManager::GetOrientationValue
+   * @copydoc Toolkit::StyleManager::ApplyDefaultTheme
    */
-  int GetOrientationValue();
-
-  /**
-   * @copydoc Toolkit::StyleManager::SetOrientation( Orientation orientation )
-   */
-  void SetOrientation( Orientation orientation );
-
-  /**
-   * @copydoc Toolkit::StyleManager::GetOrientation
-   */
-  Orientation GetOrientation();
+  void ApplyDefaultTheme();
 
   /**
    * @copydoc Toolkit::StyleManager::GetDefaultFontFamily
    */
-  std::string GetDefaultFontFamily() const;
+  const std::string& GetDefaultFontFamily() const;
 
   /**
    * @copydoc Toolkit::StyleManager::SetStyleConstant
@@ -101,16 +91,6 @@ public: // Public API
    * @copydoc Toolkit::StyleManager::GetStyleConstant
    */
   bool GetStyleConstant( const std::string& key, Property::Value& valueOut );
-
-  /**
-   * @copydoc Toolkit::StyleManager::RequestThemeChange
-   */
-  void RequestThemeChange( const std::string& themeFile );
-
-  /**
-   * @copydoc Toolkit::StyleManager::RequestDefaultTheme
-   */
-  void RequestDefaultTheme();
 
   /**
    * @brief Apply the theme style to a control.
@@ -210,13 +190,6 @@ private:
   void ApplyStyle( Toolkit::Builder builder, Toolkit::Control control );
 
   /**
-   * @brief Callback for orientation changes
-   *
-   * @param[in] orientation The orientation object
-   */
-  void OnOrientationChanged( Orientation orientation );
-
-  /**
    * Search for a builder in the cache
    *
    * @param[in] key The key the builder was cached under
@@ -258,9 +231,6 @@ private:
 
   Toolkit::Builder mThemeBuilder;     ///< Builder for all default theme properties
   StyleMonitor mStyleMonitor;         ///< Style monitor handle
-
-  Orientation mOrientation;           ///< Handle to application orientation object
-  int mOrientationDegrees;            ///< Directly set value of orientation
 
   int mDefaultFontSize;               ///< Logical size, not a point-size
   std::string mDefaultFontFamily;

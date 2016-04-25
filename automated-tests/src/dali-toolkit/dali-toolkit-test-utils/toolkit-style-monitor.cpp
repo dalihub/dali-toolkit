@@ -40,6 +40,19 @@ const char* DEFAULT_THEME=
   "  }\n"
   "}\n";
 
+struct NamedTheme
+{
+  NamedTheme( const std::string& name, const std::string& theme )
+  : name(name), theme(theme)
+  {
+  }
+
+  std::string name;
+  std::string theme;
+};
+typedef std::vector< NamedTheme > NamedThemes;
+NamedThemes gThemes;
+
 std::string gTheme;
 std::string gFontFamily = Dali::StyleMonitor::DEFAULT_FONT_FAMILY;
 std::string gFontStyle  = Dali::StyleMonitor::DEFAULT_FONT_STYLE;
@@ -81,9 +94,8 @@ public: // Signals
 private:
   Dali::StyleMonitor::StyleChangeSignalType mStyleChangeSignal;
   static Dali::StyleMonitor mToolkitStyleMonitor;
-  std::string mTheme;
 
-  std::string mOutput; //<<< Test output. Use SetThemeFileOutput in a testharness to use it.
+  std::string mTheme;  ///<< Current theme name
 };
 
 Dali::StyleMonitor StyleMonitor::mToolkitStyleMonitor;
@@ -135,6 +147,16 @@ void StyleMonitor::SetTheme(std::string path)
 
 bool StyleMonitor::LoadThemeFile( const std::string& filename, std::string& output )
 {
+  for( NamedThemes::iterator iter = gThemes.begin(); iter != gThemes.end(); ++iter )
+  {
+    NamedTheme& theme = *iter;
+    if( theme.name == filename )
+    {
+      output = theme.theme;
+      return true;
+    }
+  }
+
   if( !gTheme.empty() )
   {
     output = gTheme;
@@ -246,9 +268,19 @@ namespace Test
 namespace StyleMonitor
 {
 
-void SetThemeFileOutput( const std::string& output )
+void SetThemeFileOutput( const std::string& name, const std::string& output )
 {
-  gTheme = output;
+  for( NamedThemes::iterator iter = gThemes.begin(); iter != gThemes.end(); ++iter )
+  {
+    NamedTheme& theme = *iter;
+    if( theme.name == name )
+    {
+      theme.theme = output;
+      return;
+    }
+  }
+
+  gThemes.push_back( NamedTheme( name, output ) );
 }
 
 void SetDefaultFontFamily(const std::string& family)

@@ -2,4 +2,5 @@
 build
 build.log
 tct*core.h
+CMakeLists.txt
 results_xml.*
