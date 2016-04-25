@@ -378,7 +378,7 @@ Upscaling can still be effected at render time by setting the size of an actor t
 
 ### Compressed Textures and Scaling {#resourceimagescaling-compressedtextures}
   
-Compressed textures cannot be scaled at load time as their formats are designed to be uploaded directly to GPU memory. To achieve scaling of compressed textures, set the desired size on the attached `ImageActor` for scaling at render time instead.
+Compressed textures cannot be scaled at load time as their formats are designed to be uploaded directly to GPU memory. To achieve scaling of compressed textures, set the desired size on the attached `ImageView` for scaling at render time instead.
   
   
 
@@ -411,7 +411,7 @@ The application can get a scaled resource image rendered correctly to screen wit
   
   1. Use one of the special cases above.
   2. Read the image header from disk, recreate the dimension deriving, fitting, and sampling logic described in this document, and use that to generate a pair of requested dimensions which match the eventual image dimensions.
-  3. Use the requested dimensions it really wants to but then read the image header from disk, recreate the dimension deriving, fitting, and sampling logic described in this document, and set the size of an `ImageActor` to that size explicitly rather than relying on the *natural size* of the image.
+  3. Use the requested dimensions it really wants to but then read the image header from disk, recreate the dimension deriving, fitting, and sampling logic described in this document, and set the size of an `ImageView` to that size explicitly rather than relying on the *natural size* of the image.
   
 
 

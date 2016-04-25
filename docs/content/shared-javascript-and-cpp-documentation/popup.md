@@ -44,7 +44,7 @@ Example: Image only popup (using the content field):
 ### Example content: {#popupfieldexample}
   
 - Title:   TextLabel
-- Content: ImageActor or TextLabel
+- Content: ImageView or TextLabel
 - Footer:  PushButton or Actor containing two PushButtons
   
 ## Setting and getting the display state {#popupdisplaystate}
@@ -216,7 +216,7 @@ This example creates a Popup with:
   
 - Title:   TextLabel
 - Content: TextLabel
-- Footer:  ImageActor (an image border around the buttons)
+- Footer:  ImageView (an image border around the buttons)
             - PushButton (OK control)
             - PushButton (Cancel control)
   
@@ -237,7 +237,7 @@ contentActor.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "C
 popup.SetContent( contentActor );
 
 // Create the footer: Two buttons surrounded by an image.
-ImageActor footer = ImageActor::New( ResourceImage::New( DEFAULT_CONTROL_AREA_IMAGE_PATH ) );
+ImageView footer = ImageView::New( DEFAULT_CONTROL_AREA_IMAGE_PATH );
 footer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 footer.SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
 footer.SetSize( 0.0f, 80.0f );

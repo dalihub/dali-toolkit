@@ -121,10 +121,10 @@ The constants section supports sub-string and full property replacement.
     },                                  //
     ...                                 //
     {                                   //
-      "type":"ImageActor"               // An DALi type or a template name
+      "type":"ImageView"               // An DALi type or a template name
       "image":                          //
       {                                 //
-        "filename":"{IMAGES}b.jpg"      // Image filename substring replacement
+        "url":"{IMAGES}b.jpg"      // Image filename substring replacement
       },                                //
       "size": "{SIZE}"                  //
     }                                   //  Property replacement
@@ -171,12 +171,12 @@ an optional actor sub hierarchy.
    {                                    //
    "basic-text":                        //  The template name
    {                                    //
-     "type":"ImageActor",               //  Concrete DALi Type/Class to create
+     "type":"ImageView",               //  Concrete DALi Type/Class to create
      "styles":["base-style"],           //  Style list to apply
      "name":"image",                    //  }
      "image":                           //  } property name : value
      {                                  //  }
-     "filename":"{IMAGES}/b.jpg"        //
+     "url":"{IMAGES}/b.jpg"        //
      },                                 //
      "parentOrigin": "CENTER"           //
      ...                                //
@@ -357,52 +357,6 @@ animation property.
     }                                    //
 ~~~
 
-## Shaders {#shaders}
-
-The shader section of the JSON file defines a library of shader effect
-instances that are created on demand.
-
-The shaders are referred to by name from the template, style, stage or
-animation sections.
-
-Multiple actors can set the same shader as the name refers to a single
-instance.
-
-Similarly one named shader instance can be set to several actors and can
-be animated by one animation.
-
-~~~
-    {                                             //
-    "shaderEffects":                              // Shader Effect section
-    {                                             //
-      "myshader1":                                // Shader  instance  name
-      {                                           //
-       "program":                                 //
-       {                                          // Prefixs are placed before DALi uniforms.
-         "vertexPrefix": "",                      // (Useful for \#defines.)
-         "vertex":"",                             // Glsl vertex program
-         "fragmentPrefix": "",
-         "fragment": "",                          // Glsl fragment program.
-         "geometryType": "GEOMETRY_TYPE_IMAGE",   // Geometry type(see DALi documentation)
-       },
-       "geometryHints": "HINT_NONE":              // Geometry hints (see DALi documentation)
-       "gridDensity": 0,                          // Grid density(see DALi documentation)
-       "image":
-       {
-         "filename": ""                           // Effect image available as a second texture unit.
-       }
-     },
-     ...
-    },
-    "stage":
-    [{
-     "type": "ImageActor",
-     "effect": "myshader1",
-     ...
-    }]
-    }
-~~~
-
 At least one of the vertex or fragment fields is mandatory. All
 other fields are optional will use internal defaults.
 
@@ -486,7 +440,7 @@ builder.addActors( dali.stage.getRootLayer() );
     "stage":                             \\  Stage Section Number
     [                                    \\  An array of actors
      {
-     "type": "ImageActor",
+     "type": "ImageView",
      ...
      "actors":                           \\  Each actor can have children
                                          \\ creating a tree
