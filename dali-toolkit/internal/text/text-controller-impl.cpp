@@ -388,8 +388,6 @@ void Controller::Impl::ClearFullModelData( OperationsMask operations )
         bidiLineInfo.visualToLogicalMap = NULL;
       }
       mLogicalModel->mBidirectionalLineInfo.Clear();
-
-      mLogicalModel->mVisualToLogicalMap.Clear();
     }
   }
 
@@ -499,10 +497,6 @@ void Controller::Impl::ClearCharacterModelData( CharacterIndex startIndex, Chara
 
       mLogicalModel->mBidirectionalLineInfo.Erase( bidirectionalLineInfoBuffer + startRemoveIndex,
                                                    bidirectionalLineInfoBuffer + endRemoveIndex );
-
-      CharacterIndex* visualToLogicalMapBuffer = mLogicalModel->mVisualToLogicalMap.Begin();
-      mLogicalModel->mVisualToLogicalMap.Erase( visualToLogicalMapBuffer + startIndex,
-                                                visualToLogicalMapBuffer + endIndexPlusOne );
     }
   }
 }
@@ -1939,10 +1933,6 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   const Vector<Vector2>& positions = mVisualModel->mGlyphPositions;
   const Vector2* const positionsBuffer = positions.Begin();
 
-  // Get the visual to logical conversion tables.
-  const CharacterIndex* const visualToLogicalBuffer = ( 0u != mLogicalModel->mVisualToLogicalMap.Count() ) ? mLogicalModel->mVisualToLogicalMap.Begin() : NULL;
-  const CharacterIndex* const visualToLogicalCursorBuffer = mLogicalModel->mVisualToLogicalCursorMap.Begin();
-
   // Get the character to glyph conversion table.
   const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
 
@@ -1951,9 +1941,6 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   // Get the glyph's info buffer.
   const GlyphInfo* const glyphInfoBuffer = mVisualModel->mGlyphs.Begin();
-
-  // If the vector is void, there is no right to left characters.
-  const bool hasRightToLeftCharacters = NULL != visualToLogicalBuffer;
 
   const CharacterIndex startCharacter = line.characterRun.characterIndex;
   const CharacterIndex endCharacter   = line.characterRun.characterIndex + line.characterRun.numberOfCharacters;
@@ -1968,7 +1955,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   for( ; !matched && ( visualIndex < endCharacter ); ++visualIndex )
   {
     // The character in logical order.
-    const CharacterIndex characterLogicalOrderIndex = hasRightToLeftCharacters ? *( visualToLogicalBuffer + visualIndex ) : visualIndex;
+    const CharacterIndex characterLogicalOrderIndex = mLogicalModel->GetLogicalCharacterIndex( visualIndex );
 
     // Get the script of the character.
     const Script script = mLogicalModel->GetScript( characterLogicalOrderIndex );
@@ -1982,7 +1969,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     {
       // Get the first character/glyph of the group of glyphs.
       const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfCharacters;
-      const CharacterIndex firstLogicalCharacterIndex = hasRightToLeftCharacters ? *( visualToLogicalBuffer + firstVisualCharacterIndex ) : firstVisualCharacterIndex;
+      const CharacterIndex firstLogicalCharacterIndex = mLogicalModel->GetLogicalCharacterIndex( firstVisualCharacterIndex );
       const GlyphIndex firstLogicalGlyphIndex = *( charactersToGlyphBuffer + firstLogicalCharacterIndex );
 
       // Get the metrics for the group of glyphs.
@@ -2025,7 +2012,6 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   }
 
-
   // Return the logical position of the cursor in characters.
 
   if( !matched )
@@ -2033,7 +2019,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     visualIndex = endCharacter;
   }
 
-  logicalIndex = hasRightToLeftCharacters ? *( visualToLogicalCursorBuffer + visualIndex ) : visualIndex;
+  logicalIndex = mLogicalModel->GetLogicalCursorIndex( visualIndex );
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
 
   DALI_ASSERT_DEBUG( ( logicalIndex <= mLogicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );

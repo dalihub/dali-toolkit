@@ -81,7 +81,6 @@ void ClearModelData( CharacterIndex characterIndex,
   logicalModel->mBidirectionalParagraphInfo.Clear();
   logicalModel->mCharacterDirections.Clear();
   logicalModel->mBidirectionalLineInfo.Clear();
-  logicalModel->mVisualToLogicalMap.Clear();
   visualModel->mGlyphs.Clear();
   visualModel->mGlyphsToCharacters.Clear();
   visualModel->mCharactersToGlyph.Clear();
@@ -320,10 +319,6 @@ void CreateTextModel( const std::string& text,
     // Set the bidirectional info per line into the layout parameters.
     layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
     layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-    // Set the bidirectional info into the model.
-    logicalModel->SetVisualToLogicalMap( 0u,
-                                         numberOfCharacters );
 
     if( options.reorder )
     {

@@ -78,174 +78,220 @@ CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex character
   return *( mCharacterDirections.Begin() + characterIndex );
 }
 
-void LogicalModel::SetVisualToLogicalMap( CharacterIndex startIndex,
-                                          Length numberOfCharacters )
+CharacterIndex LogicalModel::GetLogicalCursorIndex( CharacterIndex visualCursorIndex )
 {
-  mVisualToLogicalMap.Resize( numberOfCharacters );
+  // The total number of characters.
+  const Length numberOfCharacters = mText.Count();
 
-  CharacterIndex* modelVisualToLogicalMapBuffer = mVisualToLogicalMap.Begin();
-
-  const BidirectionalLineInfoRun* const bidirectionalInfo = mBidirectionalLineInfo.Begin();
-  const Length numberOfRuns = mBidirectionalLineInfo.Count();
-
-  CharacterIndex lastIndex = startIndex;
-  for( unsigned int bidiIndex = 0u; bidiIndex < numberOfRuns; ++bidiIndex )
+  const bool fetch = FetchBidirectionalLineInfo( visualCursorIndex );
+  if( !fetch )
   {
-    const BidirectionalLineInfoRun& bidiLineInfo = *( bidirectionalInfo + bidiIndex );
-
-    if( bidiLineInfo.characterRun.characterIndex + bidiLineInfo.characterRun.numberOfCharacters <= startIndex )
-    {
-      // Skip this paragraph. It has been already processed.
-      continue;
-    }
-
-    if( lastIndex < bidiLineInfo.characterRun.characterIndex )
-    {
-      // Fill with the identity.
-      for( ; lastIndex < bidiLineInfo.characterRun.characterIndex; ++lastIndex )
-      {
-        *( modelVisualToLogicalMapBuffer + lastIndex ) = lastIndex;
-      }
-    }
-
-    // Fill the conversion table of the run.
-    for( CharacterIndex index = 0u;
-         index < bidiLineInfo.characterRun.numberOfCharacters;
-         ++index, ++lastIndex )
-    {
-      *( modelVisualToLogicalMapBuffer + lastIndex ) = bidiLineInfo.characterRun.characterIndex + *( bidiLineInfo.visualToLogicalMap + index );
-    }
+    // The character is not inside a bidi line.
+    return visualCursorIndex;
   }
 
-  // Complete with the identity if there are some left to right characters after the last right to left.
-  for( ; lastIndex < numberOfCharacters; ++lastIndex )
-  {
-    *( modelVisualToLogicalMapBuffer + lastIndex ) = lastIndex;
-  }
-
-  // Sets the visual to logical conversion map for cursor positions.
-  const Length numberOfCharactersPlusOne = numberOfCharacters + 1u;
-  mVisualToLogicalCursorMap.Resize( numberOfCharactersPlusOne );
-
-  CharacterIndex* modelVisualToLogicalCursorMap = mVisualToLogicalCursorMap.Begin();
-
-  const Length numberOfBidirectionalParagraphs = mBidirectionalParagraphInfo.Count();
-  BidirectionalParagraphInfoRun* bidirectionalParagraphInfoBuffer = mBidirectionalParagraphInfo.Begin();
-  BidirectionalParagraphInfoRun* bidirectionalParagraph = bidirectionalParagraphInfoBuffer;
-
+  // The character's directions buffer.
   const CharacterDirection* const modelCharacterDirections = mCharacterDirections.Begin();
 
-  Length bidirectionalParagraphIndex = 0u;
-  bool isRightToLeftParagraph = false;
-  for( CharacterIndex index = startIndex; index < numberOfCharactersPlusOne; ++index )
-  {
-    if( bidirectionalParagraph &&
-        ( bidirectionalParagraph->characterRun.characterIndex == index ) )
-    {
-      isRightToLeftParagraph = *( modelCharacterDirections + index );
-    }
+  // The bidirectional line info.
+  const BidirectionalLineInfoRun* const bidirectionalLineInfo = mBidirectionalLineInfo.Begin() + mBidirectionalLineIndex;
 
-    if( 0u == index )
+  // Whether the paragraph starts with a right to left character.
+  const bool isRightToLeftParagraph = bidirectionalLineInfo->direction;
+
+  CharacterIndex logicalCursorIndex = 0u;
+
+  if( 0u == visualCursorIndex )
+  {
+    if( isRightToLeftParagraph )
     {
-      if( isRightToLeftParagraph )
-      {
-        *( modelVisualToLogicalCursorMap + index ) = numberOfCharacters;
-      }
-      else // else logical position is zero.
-      {
-        *( modelVisualToLogicalCursorMap + index ) = 0u;
-      }
+      logicalCursorIndex = numberOfCharacters;
     }
-    else if( numberOfCharacters == index )
+    else // else logical position is zero.
     {
-      if( isRightToLeftParagraph )
+      logicalCursorIndex = 0u;
+    }
+  }
+  else if( numberOfCharacters == visualCursorIndex )
+  {
+    if( isRightToLeftParagraph )
+    {
+      logicalCursorIndex = 0u;
+    }
+    else // else logical position is the number of characters.
+    {
+      logicalCursorIndex = numberOfCharacters;
+    }
+  }
+  else
+  {
+    // Get the character indexed by  index - 1 and index
+    // and calculate the logical position according the directions of
+    // both characters and the direction of the paragraph.
+
+    const CharacterIndex previousVisualCursorIndex = visualCursorIndex - 1u;
+    const CharacterIndex previousLogicalCursorIndex = *( bidirectionalLineInfo->visualToLogicalMap + previousVisualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex ) + bidirectionalLineInfo->characterRun.characterIndex;
+    const CharacterIndex currentLogicalCursorIndex = *( bidirectionalLineInfo->visualToLogicalMap + visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex ) + bidirectionalLineInfo->characterRun.characterIndex;
+
+    const CharacterDirection previousCharacterDirection = *( modelCharacterDirections + previousLogicalCursorIndex );
+    const CharacterDirection currentCharacterDirection = *( modelCharacterDirections + currentLogicalCursorIndex );
+
+    if( previousCharacterDirection == currentCharacterDirection )
+    {
+      // Both glyphs have the same direction.
+      if( previousCharacterDirection )
       {
-        *( modelVisualToLogicalCursorMap + index ) = 0u;
+        logicalCursorIndex = previousLogicalCursorIndex;
       }
-      else // else logical position is the number of characters.
+      else
       {
-        *( modelVisualToLogicalCursorMap + index ) = numberOfCharacters;
+        logicalCursorIndex = currentLogicalCursorIndex;
       }
     }
     else
     {
-      // Get the character indexed by  index - 1 and index
-      // and calculate the logical position according the directions of
-      // both characters and the direction of the paragraph.
-
-      const CharacterIndex previousIndex = index - 1u;
-      const CharacterIndex logicalPosition0 = *( modelVisualToLogicalMapBuffer + previousIndex );
-      const CharacterIndex logicalPosition1 = *( modelVisualToLogicalMapBuffer + index );
-
-      const CharacterDirection direction0 = *( modelCharacterDirections + logicalPosition0 );
-      const CharacterDirection direction1 = *( modelCharacterDirections + logicalPosition1 );
-
-      if( direction0 == direction1 )
+      if( isRightToLeftParagraph )
       {
-        // Both glyphs have the same direction.
-        if( direction0 )
+        if( currentCharacterDirection )
         {
-          *( modelVisualToLogicalCursorMap + index ) = logicalPosition0;
+          logicalCursorIndex = currentLogicalCursorIndex + 1u;
         }
         else
         {
-          *( modelVisualToLogicalCursorMap + index ) = logicalPosition1;
+          logicalCursorIndex = previousLogicalCursorIndex;
         }
       }
       else
       {
-        if( isRightToLeftParagraph )
+        if( previousCharacterDirection )
         {
-          if( direction1 )
-          {
-            *( modelVisualToLogicalCursorMap + index ) = logicalPosition1 + 1u;
-          }
-          else
-          {
-            *( modelVisualToLogicalCursorMap + index ) = logicalPosition0;
-          }
+          logicalCursorIndex = currentLogicalCursorIndex;
         }
         else
         {
-          if( direction0 )
-          {
-            *( modelVisualToLogicalCursorMap + index ) = logicalPosition1;
-          }
-          else
-          {
-            *( modelVisualToLogicalCursorMap + index ) = logicalPosition0 + 1u;
-          }
+          logicalCursorIndex = previousLogicalCursorIndex + 1u;
         }
-      }
-    }
-
-    if( bidirectionalParagraph &&
-        ( bidirectionalParagraph->characterRun.characterIndex + bidirectionalParagraph->characterRun.numberOfCharacters == index ) )
-    {
-      isRightToLeftParagraph = false;
-      ++bidirectionalParagraphIndex;
-      if( bidirectionalParagraphIndex < numberOfBidirectionalParagraphs )
-      {
-        bidirectionalParagraph = bidirectionalParagraphInfoBuffer + bidirectionalParagraphIndex;
-      }
-      else
-      {
-        bidirectionalParagraph = NULL;
       }
     }
   }
+
+  return logicalCursorIndex;
 }
 
-CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const
+CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex )
 {
-  if( 0u == mVisualToLogicalMap.Count() )
+  const bool fetch = FetchBidirectionalLineInfo( visualCharacterIndex );
+  if( !fetch )
   {
-    // If there is no visual to logical info is because the whole text is left to right.
-    // Return the identity.
+    // The character is not inside a bidi line.
     return visualCharacterIndex;
   }
 
-  return *( mVisualToLogicalMap.Begin() + visualCharacterIndex );
+  // The bidirectional line info.
+  const BidirectionalLineInfoRun* const bidirectionalLineInfo = mBidirectionalLineInfo.Begin() + mBidirectionalLineIndex;
+
+  return *( bidirectionalLineInfo->visualToLogicalMap + visualCharacterIndex - bidirectionalLineInfo->characterRun.characterIndex ) + bidirectionalLineInfo->characterRun.characterIndex;
+}
+
+bool LogicalModel::FetchBidirectionalLineInfo( CharacterIndex characterIndex )
+{
+  // The number of bidirectional lines.
+  const Length numberOfBidirectionalLines = mBidirectionalLineInfo.Count();
+
+  if( 0u == numberOfBidirectionalLines )
+  {
+    // If there is no bidirectional info.
+    return false;
+  }
+
+  // Find the bidi line where the character is laid-out.
+
+  const BidirectionalLineInfoRun* const bidirectionalLineInfoBuffer = mBidirectionalLineInfo.Begin();
+
+  // Check first if the character is in the previously fetched line.
+
+  BidirectionalLineRunIndex bidiLineIndex = 0u;
+  CharacterIndex lastCharacterOfRightToLeftRun = 0u;
+  if( mBidirectionalLineIndex < numberOfBidirectionalLines )
+  {
+    const BidirectionalLineInfoRun& bidiLineRun = *( bidirectionalLineInfoBuffer + mBidirectionalLineIndex );
+
+    // Whether the character index is just after the last one. i.e The cursor position after the last character.
+    const bool isLastIndex = characterIndex == mText.Count();
+
+    const CharacterIndex lastCharacterOfRunPlusOne = bidiLineRun.characterRun.characterIndex + bidiLineRun.characterRun.numberOfCharacters;
+    if( ( bidiLineRun.characterRun.characterIndex <= characterIndex ) &&
+        ( ( characterIndex < lastCharacterOfRunPlusOne ) || ( isLastIndex && ( characterIndex == lastCharacterOfRunPlusOne ) ) ) )
+    {
+      // The character is in the previously fetched bidi line.
+      return true;
+    }
+    else
+    {
+      // The character is not in the previously fetched line.
+
+      if( isLastIndex )
+      {
+        // The given index is one after the last character, so it's not in a bidi line.
+        // Check if it's just after the last bidi line.
+        const BidirectionalLineRunIndex lastBidiLineIndex = numberOfBidirectionalLines - 1u;
+        const BidirectionalLineInfoRun& bidiLineRun = *( bidirectionalLineInfoBuffer + lastBidiLineIndex );
+
+        if( characterIndex == bidiLineRun.characterRun.characterIndex + bidiLineRun.characterRun.numberOfCharacters )
+        {
+          // The character is in the last bidi line.
+          mBidirectionalLineIndex = lastBidiLineIndex;
+          return true;
+        }
+      }
+
+      // Set the bidi line index from where to start the fetch.
+
+      if( characterIndex < bidiLineRun.characterRun.characterIndex )
+      {
+        // Start the fetch from the beginning.
+        bidiLineIndex = 0u;
+      }
+      else
+      {
+        // Start the fetch from the next line.
+        bidiLineIndex = mBidirectionalLineIndex + 1u;
+        lastCharacterOfRightToLeftRun = lastCharacterOfRunPlusOne - 1u;
+      }
+    }
+  }
+
+  // The character has not been found in the previously fetched bidi line.
+  for( Vector<BidirectionalLineInfoRun>::ConstIterator it = bidirectionalLineInfoBuffer + bidiLineIndex,
+         endIt = mBidirectionalLineInfo.End();
+       it != endIt;
+       ++it, ++bidiLineIndex )
+  {
+    const BidirectionalLineInfoRun& bidiLineRun = *it;
+
+    if( ( lastCharacterOfRightToLeftRun < characterIndex ) && ( characterIndex < bidiLineRun.characterRun.characterIndex ) )
+    {
+      // The character is not inside a bidi line.
+      return false;
+    }
+
+    const CharacterIndex lastCharacterOfRunPlusOne = bidiLineRun.characterRun.characterIndex + bidiLineRun.characterRun.numberOfCharacters;
+    lastCharacterOfRightToLeftRun = lastCharacterOfRunPlusOne - 1u;
+    if( ( bidiLineRun.characterRun.characterIndex <= characterIndex ) &&
+        ( characterIndex < lastCharacterOfRunPlusOne ) )
+    {
+      // Bidi line found. Fetch the line.
+      mBidirectionalLineIndex = bidiLineIndex;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+BidirectionalLineRunIndex LogicalModel::GetBidirectionalLineInfo() const
+{
+  return mBidirectionalLineIndex;
 }
 
 void LogicalModel::UpdateTextStyleRuns( CharacterIndex index, int numberOfCharacters )
@@ -541,6 +587,7 @@ LogicalModel::~LogicalModel()
 }
 
 LogicalModel::LogicalModel()
+: mBidirectionalLineIndex( 0u )
 {
 }
 
