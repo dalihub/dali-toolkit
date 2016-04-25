@@ -389,7 +389,6 @@ void Controller::Impl::ClearFullModelData( OperationsMask operations )
       }
       mLogicalModel->mBidirectionalLineInfo.Clear();
 
-      mLogicalModel->mLogicalToVisualMap.Clear();
       mLogicalModel->mVisualToLogicalMap.Clear();
     }
   }
@@ -500,11 +499,6 @@ void Controller::Impl::ClearCharacterModelData( CharacterIndex startIndex, Chara
 
       mLogicalModel->mBidirectionalLineInfo.Erase( bidirectionalLineInfoBuffer + startRemoveIndex,
                                                    bidirectionalLineInfoBuffer + endRemoveIndex );
-
-      // Clear the logical to visual and the visual to logical conversion tables.
-      CharacterIndex* logicalToVisualMapBuffer = mLogicalModel->mLogicalToVisualMap.Begin();
-      mLogicalModel->mLogicalToVisualMap.Erase( logicalToVisualMapBuffer + startIndex,
-                                                logicalToVisualMapBuffer + endIndexPlusOne );
 
       CharacterIndex* visualToLogicalMapBuffer = mLogicalModel->mVisualToLogicalMap.Begin();
       mLogicalModel->mVisualToLogicalMap.Erase( visualToLogicalMapBuffer + startIndex,

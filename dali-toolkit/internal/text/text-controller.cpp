@@ -1531,9 +1531,7 @@ bool Controller::DoRelayout( const Size& size,
           //       It's better to refactor this. Store this table per line and don't update the indices.
           //       For the cursor position probably is better to use the function instead creating a table.
           // Set the bidirectional info into the model.
-          mImpl->mLogicalModel->SetVisualToLogicalMap( layoutParameters.lineBidirectionalInfoRunsBuffer,
-                                                       layoutParameters.numberOfBidirectionalInfoRuns,
-                                                       0u,
+          mImpl->mLogicalModel->SetVisualToLogicalMap( 0u,
                                                        mImpl->mLogicalModel->mText.Count() );
 
           // Re-layout the text. Reorder those lines with right to left characters.
