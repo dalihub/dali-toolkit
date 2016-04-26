@@ -90,7 +90,7 @@ public:
   struct Mesh2D
   {
     Vector< Vertex2D > mVertices;       ///< container of vertices
-    Vector< SizeType > mIndices;        ///< container of indices
+    Vector< unsigned short > mIndices;        ///< container of indices
   };
 
   /**

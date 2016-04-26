@@ -118,7 +118,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
  * @param[in]  indices              The indices to generate the geometry from
  * @return The geometry formed from the vertices and indices
  */
-Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned int >& indices )
+Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned short >& indices )
 {
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
@@ -128,18 +128,14 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
     vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
-  Property::Map indexFormat;
-  indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
-  if( indices.Size() > 0 )
-  {
-    indexPropertyBuffer.SetData( &indices[ 0 ], indices.Size() );
-  }
-
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexPropertyBuffer );
-  geometry.SetIndexBuffer( indexPropertyBuffer );
+  if( indices.Size() > 0 )
+  {
+    geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
+  }
+
 
   return geometry;
 }
@@ -151,7 +147,7 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
  * @param[in]  rowIdx      The row index to start the quad
  * @param[in]  nextRowIdx  The index to the next row
  */
-void AddQuadIndices( Vector< unsigned int >& indices, unsigned int rowIdx, unsigned int nextRowIdx )
+void AddQuadIndices( Vector< unsigned short >& indices, unsigned int rowIdx, unsigned int nextRowIdx )
 {
   indices.PushBack( rowIdx );
   indices.PushBack( nextRowIdx + 1 );
@@ -584,7 +580,7 @@ Geometry NPatchRenderer::CreateGeometry( Uint16Pair gridSize )
 
   // Create indices
   //TODO: compare performance with triangle strip when Geometry supports it
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( gridWidth * gridHeight * 6 );
 
   unsigned int rowIdx     = 0;
@@ -641,7 +637,7 @@ Geometry NPatchRenderer::CreateGeometryBorder( Uint16Pair gridSize )
 
   // Create indices
   //TODO: compare performance with triangle strip when Geometry supports it
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( gridWidth * gridHeight * 6 );
 
   //top

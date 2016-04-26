@@ -93,13 +93,11 @@ daliApp.createMeshActor = function() {
 
       var indexDataArray = new Uint32Array(indexData.length);
       indexDataArray.set(indexData, 0);
-      var indices = new dali.PropertyBuffer(indexFormat);
-      indices.setData(indexDataArray, 6);
 
       // Create geometry
       var geometry = new dali.Geometry();
       geometry.addVertexBuffer( texturedQuadVertices );
-      geometry.setIndexBuffer( indices );
+      geometry.setIndexBuffer( indexDataArray, 6 );
 
       var renderer = new dali.Renderer(geometry, shader);
       renderer.setTextures(textureSet);

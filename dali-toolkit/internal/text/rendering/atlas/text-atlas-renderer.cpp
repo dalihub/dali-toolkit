@@ -141,7 +141,6 @@ struct AtlasRenderer::Impl
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aColor" ] = Property::VECTOR4;
-    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
   }
 
   bool IsGlyphUnderlined( GlyphIndex index,
@@ -484,13 +483,11 @@ struct AtlasRenderer::Impl
   Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize )
   {
     PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat );
-    PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ), meshRecord.mMesh.mVertices.Size() );
-    quadIndices.SetData(  const_cast< unsigned int* >(           &meshRecord.mMesh.mIndices[ 0 ] ),  meshRecord.mMesh.mIndices.Size() );
 
     Geometry quadGeometry = Geometry::New();
     quadGeometry.AddVertexBuffer( quadVertices );
-    quadGeometry.SetIndexBuffer( quadIndices );
+    quadGeometry.SetIndexBuffer( &meshRecord.mMesh.mIndices[0],  meshRecord.mMesh.mIndices.Size() );
 
     TextureSet textureSet( mGlyphManager.GetTextures( meshRecord.mAtlasId ) );
     Shader shader( mGlyphManager.GetShader( meshRecord.mAtlasId ) );
@@ -729,7 +726,6 @@ struct AtlasRenderer::Impl
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
   Vector< TextCacheEntry > mTextCache;                ///> Caches data from previous render
   Property::Map mQuadVertexFormat;                    ///> Describes the vertex format for text
-  Property::Map mQuadIndexFormat;                     ///> Describes the index format for text
   int mDepth;                                         ///> DepthIndex passed by control when connect to stage
 };
 

@@ -148,7 +148,7 @@ void AppendMesh( Toolkit::AtlasManager::Mesh2D& first,
                          second.mIndices.Begin(),
                          second.mIndices.End() );
 
-  for( Vector<unsigned int>::Iterator it = first.mIndices.Begin() + indicesCount,
+  for( Vector<unsigned short>::Iterator it = first.mIndices.Begin() + indicesCount,
          endIt = first.mIndices.End();
        it != endIt;
        ++it )
