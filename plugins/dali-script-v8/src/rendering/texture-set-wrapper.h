@@ -36,7 +36,7 @@ namespace V8Plugin
  * A TextureSet wrapper.
  * Provides access to TextureSet specific functionality and V8 memory handling.
  */
-class TextureSetWrapper : public HandleWrapper
+class TextureSetWrapper : public BaseWrappedObject
 {
 
 public:
