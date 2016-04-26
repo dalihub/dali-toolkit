@@ -71,23 +71,6 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
     }
   }
 
-  // Add custom properties
-  if( OptionalChild customPropertiesChild = IsChild(child,  "customProperties") )
-  {
-    const TreeNode& customPropertiesNode = *customPropertiesChild;
-    const TreeConstIter endIter = customPropertiesNode.CEnd();
-    for( TreeConstIter iter = customPropertiesNode.CBegin(); endIter != iter; ++iter )
-    {
-      const TreeNode::KeyNodePair& keyChild = *iter;
-      std::string key( keyChild.first );
-
-      Property::Value value;
-      DeterminePropertyFromNode( keyChild.second, value, constant );
-      // Register/Set property.
-      actor.RegisterProperty( key, value, Property::READ_WRITE );
-    }
-  }
-
   return actor;
 }
 

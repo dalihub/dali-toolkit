@@ -79,6 +79,9 @@ const std::string KEYNAME_TEMPLATES = "templates";
 const std::string KEYNAME_INCLUDES  = "includes";
 const std::string KEYNAME_MAPPINGS  = "mappings";
 
+const std::string PROPERTIES = "properties";
+const std::string ANIMATABLE_PROPERTIES = "animatableProperties";
+
 typedef std::vector<const TreeNode*> TreeNodeList;
 
 
@@ -153,67 +156,9 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
         continue;
       }
 
-      // special field 'image' usually contains an json object description
-      // although sometimes refers to a framebuffer
-      if( key == "image" )
-      {
-        if( 0 == keyChild.second.Size() )
-        {
-          ImageActor imageActor = ImageActor::DownCast(handle);
-          if(imageActor)
-          {
-            if( OptionalString s = constant.IsString( keyChild.second ) )
-            {
-              FrameBufferImage fb = GetFrameBufferImage(*s, constant);
-              if(fb)
-              {
-                imageActor.SetImage( fb );
-              }
-            }
-          }
-        }
-      }
-
-      // special field 'effect' references the shader effect instances
-      if( key == "effect" )
-      {
-        ImageActor actor = ImageActor::DownCast(handle);
-        if( actor )
-        {
-          OptionalString str = constant.IsString( keyChild.second );
-          if( str )
-          {
-            ShaderEffect effect = GetShaderEffect( *str, constant );
-            actor.SetShaderEffect(effect);
-          }
-        }
-        else
-        {
-          DALI_SCRIPT_WARNING("Could not find or set shader effect\n");
-        }
-
-        continue;
-      }
-
       Handle propertyObject( handle );
 
       Dali::Property::Index index = propertyObject.GetPropertyIndex( key );
-
-      if( Property::INVALID_INDEX == index )
-      {
-        ImageActor actor = ImageActor::DownCast(handle);
-        if( actor )
-        {
-          if( ShaderEffect effect = actor.GetShaderEffect() )
-          {
-            index = effect.GetPropertyIndex( key );
-            if(index != Property::INVALID_INDEX)
-            {
-              propertyObject = effect;
-            }
-          }
-        }
-      }
 
       if( Property::INVALID_INDEX != index )
       {
@@ -253,11 +198,36 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
         DALI_SCRIPT_VERBOSE("SetProperty INVALID '%s' Index=:%d\n", key.c_str(), index);
       }
 
+      // Add custom properties
+      SetCustomProperties(node, handle, constant, PROPERTIES, Property::READ_WRITE);
+      SetCustomProperties(node, handle, constant, ANIMATABLE_PROPERTIES, Property::ANIMATABLE);
+
     } // for property nodes
   }
   else
   {
     DALI_SCRIPT_WARNING("Style applied to empty handle\n");
+  }
+}
+
+void Builder::SetCustomProperties( const TreeNode& node, Handle& handle, const Replacement& constant,
+                          const std::string& childName, Property::AccessMode accessMode )
+{
+  // Add custom properties
+  if( OptionalChild customPropertiesChild = IsChild(node, childName) )
+  {
+    const TreeNode& customPropertiesNode = *customPropertiesChild;
+    const TreeConstIter endIter = customPropertiesNode.CEnd();
+    for( TreeConstIter iter = customPropertiesNode.CBegin(); endIter != iter; ++iter )
+    {
+      const TreeNode::KeyNodePair& keyChild = *iter;
+      std::string key( keyChild.first );
+
+      Property::Value value;
+      DeterminePropertyFromNode( keyChild.second, value, constant );
+      // Register/Set property.
+      handle.RegisterProperty( key, value, accessMode );
+    }
   }
 }
 
@@ -588,42 +558,6 @@ void Builder::CreateRenderTask( const std::string &name )
       }
     }
   }
-}
-
-ShaderEffect Builder::GetShaderEffect( const std::string &name)
-{
-  Replacement constant( mReplacementMap );
-  return GetShaderEffect( name, constant );
-}
-
-ShaderEffect Builder::GetShaderEffect( const std::string &name, const Replacement& constant )
-{
-  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
-
-  ShaderEffect ret;
-
-  ShaderEffectLut::const_iterator iter( mShaderEffectLut.find( name ) );
-  if( iter != mShaderEffectLut.end() )
-  {
-    ret = iter->second;
-  }
-  else
-  {
-    if( OptionalChild effects = IsChild( *mParser.GetRoot(), "shaderEffects") )
-    {
-      if( OptionalChild effect = IsChild( *effects, name ) )
-      {
-        Dali::Property::Value propertyMap(Property::MAP);
-        if( DeterminePropertyFromNode( *effect, Property::MAP, propertyMap, constant ) )
-        {
-          ret = Dali::Scripting::NewShaderEffect( propertyMap );
-          mShaderEffectLut[ name ] = ret;
-        }
-      }
-    }
-  }
-
-  return ret;
 }
 
 FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )

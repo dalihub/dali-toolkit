@@ -69,7 +69,7 @@ class ShadowView;
  *  ImageView imageView = ImageView::New(image);
  *  imageView.SetParentOrigin( ParentOrigin::CENTER );
  *  imageView.SetAnchorPoint( AnchorPoint::CENTER );
- *  shadowView.Add(imageActor);\n Add the renderable actor to the shadow view
+ *  shadowView.Add(imageView);\n Add the renderable actor to the shadow view
  *
  *  ImageView shadowPlaneBg = ImageView::New(); //This will be the shadow plane
  *  shadowPlaneBg.SetParentOrigin( ParentOrigin::CENTER );

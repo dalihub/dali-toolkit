@@ -384,15 +384,6 @@ class DALI_IMPORT_API Builder : public BaseHandle
   void CreateRenderTask( const std::string &name );
 
   /**
-   * Get or create ShaderEffect from the ShaderEffect instance library.
-   * An empty handle is returned otherwise.
-   * @pre The Builder has been initialized.
-   * @param name The name of a ShaderEffect in the loaded representation
-   * @return A handle to a ShaderEffect if found, otherwise empty
-   */
-  ShaderEffect GetShaderEffect( const std::string &name );
-
-  /**
    * Get or create FrameBufferImage from the FrameBufferImage instance library.
    * An empty handle is returned otherwise.
    * @pre The Builder has been initialized.
