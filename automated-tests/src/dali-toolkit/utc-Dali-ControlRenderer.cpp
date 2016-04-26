@@ -321,7 +321,7 @@ int UtcDaliControlRendererGetPropertyMap2(void)
   DALI_TEST_CHECK( typeValue );
   DALI_TEST_CHECK( typeValue->Get<std::string>() == "border" );
 
-   colorValue = resultMap.Find( "borderColor",  Property::VECTOR4 );
+  colorValue = resultMap.Find( "borderColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
 

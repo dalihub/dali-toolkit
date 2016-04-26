@@ -674,12 +674,12 @@ Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
   return mImpl->mKeyEventSignal;
 }
 
-Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusGainedSignal()
+Toolkit::Control::KeyInputFocusSignalType& Control::KeyInputFocusGainedSignal()
 {
   return mImpl->mKeyInputFocusGainedSignal;
 }
 
-Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusLostSignal()
+Toolkit::Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
 {
   return mImpl->mKeyInputFocusLostSignal;
 }
@@ -720,15 +720,18 @@ void Control::Initialize()
 
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
-    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    Toolkit::StyleManager styleManager = StyleManager::Get();
+
     // if stylemanager is available
     if( styleManager )
     {
+      StyleManager& styleManagerImpl = GetImpl( styleManager );
+
       // Register for style changes
-      styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
+      styleManagerImpl.ControlStyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
       // Apply the current style
-      GetImpl( styleManager ).ApplyThemeStyleAtInit( Toolkit::Control( GetOwner() ) );
+      styleManagerImpl.ApplyThemeStyleAtInit( Toolkit::Control( GetOwner() ) );
     }
   }
 

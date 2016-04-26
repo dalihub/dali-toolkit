@@ -23,8 +23,31 @@
 
 namespace Dali
 {
+const std::string Dali::StyleMonitor::DEFAULT_FONT_FAMILY("DefaultFont");
+const std::string Dali::StyleMonitor::DEFAULT_FONT_STYLE("Regular");
+const float       Dali::StyleMonitor::DEFAULT_FONT_SIZE(1.0f);
+}
 
+namespace
+{
+const char* DEFAULT_THEME=
+  "{\"styles\":{\n"
+  "  \"textlabel\":\n"
+  "    {\n"
+  "      \"fontStyle\":\"Regular\",\n"
+  "      \"pointSize\":18\n"
+  "    }\n"
+  "  }\n"
+  "}\n";
 
+std::string gTheme;
+std::string gFontFamily = Dali::StyleMonitor::DEFAULT_FONT_FAMILY;
+std::string gFontStyle  = Dali::StyleMonitor::DEFAULT_FONT_STYLE;
+float       gFontSize   = Dali::StyleMonitor::DEFAULT_FONT_SIZE;
+}
+
+namespace Dali
+{
 namespace Internal
 {
 namespace Adaptor
@@ -41,9 +64,11 @@ public: // Creation & Destruction
 
 public: // Style Information
   std::string GetDefaultFontFamily() const;
+  std::string GetDefaultFontStyle() const;
   float GetDefaultFontSize() const;
   const std::string& GetTheme() const;
   void SetTheme(std::string theme);
+  bool LoadThemeFile( const std::string& filename, std::string& output );
 
 public: // Signals
   Dali::StyleMonitor::StyleChangeSignalType& StyleChangeSignal();
@@ -57,6 +82,8 @@ private:
   Dali::StyleMonitor::StyleChangeSignalType mStyleChangeSignal;
   static Dali::StyleMonitor mToolkitStyleMonitor;
   std::string mTheme;
+
+  std::string mOutput; //<<< Test output. Use SetThemeFileOutput in a testharness to use it.
 };
 
 Dali::StyleMonitor StyleMonitor::mToolkitStyleMonitor;
@@ -81,12 +108,18 @@ StyleMonitor::~StyleMonitor()
 
 std::string StyleMonitor::GetDefaultFontFamily() const
 {
-  return Dali::StyleMonitor::DEFAULT_FONT_FAMILY;
+  return gFontFamily;
+}
+
+std::string StyleMonitor::GetDefaultFontStyle() const
+{
+  return gFontStyle;
 }
 
 float StyleMonitor::GetDefaultFontSize() const
 {
-  return Dali::StyleMonitor::DEFAULT_FONT_SIZE;
+  return gFontSize;
+
 }
 
 const std::string& StyleMonitor::GetTheme() const
@@ -98,6 +131,19 @@ void StyleMonitor::SetTheme(std::string path)
 {
   mTheme = path;
   EmitStyleChangeSignal( StyleChange::THEME_CHANGE );
+}
+
+bool StyleMonitor::LoadThemeFile( const std::string& filename, std::string& output )
+{
+  if( !gTheme.empty() )
+  {
+    output = gTheme;
+  }
+  else
+  {
+    output = DEFAULT_THEME;
+  }
+  return true;
 }
 
 Dali::StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
@@ -121,9 +167,6 @@ const Internal::Adaptor::StyleMonitor& GetImplementation(const Dali::StyleMonito
   return static_cast<const Internal::Adaptor::StyleMonitor&>(object);
 }
 
-const std::string Dali::StyleMonitor::DEFAULT_FONT_FAMILY("DefaultFont");
-const float       Dali::StyleMonitor::DEFAULT_FONT_SIZE(1.0f);
-
 StyleMonitor::StyleMonitor()
 {
 }
@@ -145,6 +188,11 @@ StyleMonitor::~StyleMonitor()
 std::string StyleMonitor::GetDefaultFontFamily() const
 {
   return GetImplementation(*this).GetDefaultFontFamily();
+}
+
+std::string StyleMonitor::GetDefaultFontStyle() const
+{
+  return GetImplementation(*this).GetDefaultFontStyle();
 }
 
 float StyleMonitor::GetDefaultFontSize() const
@@ -172,6 +220,11 @@ void StyleMonitor::EmitStyleChangeSignal(StyleChange::Type styleChange)
   GetImplementation(*this).EmitStyleChangeSignal(styleChange);
 }
 
+bool StyleMonitor::LoadThemeFile( const std::string& filename, std::string& output )
+{
+  return GetImplementation(*this).LoadThemeFile(filename, output);
+}
+
 StyleMonitor& StyleMonitor::operator=(const StyleMonitor& monitor)
 {
   if( *this != monitor )
@@ -187,3 +240,31 @@ StyleMonitor::StyleMonitor(Internal::Adaptor::StyleMonitor* internal)
 }
 
 } // namespace Dali
+
+namespace Test
+{
+namespace StyleMonitor
+{
+
+void SetThemeFileOutput( const std::string& output )
+{
+  gTheme = output;
+}
+
+void SetDefaultFontFamily(const std::string& family)
+{
+  gFontFamily = family;
+}
+
+void SetDefaultFontStyle(const std::string& style)
+{
+  gFontStyle = style;
+}
+
+void SetDefaultFontSize( float size )
+{
+  gFontSize = size;
+}
+
+} // StyleMonitor
+} // Test

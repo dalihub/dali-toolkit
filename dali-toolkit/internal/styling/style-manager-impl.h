@@ -136,8 +136,16 @@ public:
 
   /**
    * @copydoc Toolkit::StyleManager::StyleChangeSignal
+   * This signal is sent after all the controls have been updated
+   * due to style change
    */
-  Toolkit::StyleManager::StyleChangeSignalType& StyleChangeSignal();
+  Toolkit::StyleManager::StyleChangedSignalType& StyleChangedSignal();
+
+  /**
+   * This signal is sent to the controls following a style change.
+   * It should not be exposed in the public API
+   */
+  Toolkit::StyleManager::StyleChangedSignalType& ControlStyleChangeSignal();
 
 private:
   typedef std::vector<std::string> StringList;
@@ -232,6 +240,12 @@ private:
    */
   void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange );
 
+  /**
+   * Emit signals to controls first, app second
+   */
+  void EmitStyleChangeSignals( StyleChange::Type styleChange );
+
+
   // Undefined
   StyleManager(const StyleManager&);
 
@@ -260,7 +274,8 @@ private:
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
   // Signals
-  Toolkit::StyleManager::StyleChangeSignalType       mStyleChangeSignal;         ///< Emitted when the style( theme/font ) changes
+  Toolkit::StyleManager::StyleChangedSignalType mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves
+  Toolkit::StyleManager::StyleChangedSignalType mStyleChangedSignal; ///< Emitted after the controls have been styled
 };
 
 } // namespace Internal

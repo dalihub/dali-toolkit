@@ -45,7 +45,6 @@ SET(TC_SOURCES
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp
    utc-Dali-ScrollViewEffect.cpp
-   utc-Dali-StyleManager.cpp
    utc-Dali-SuperBlurView.cpp
    utc-Dali-Toolkit.cpp
    utc-Dali-Model3dView.cpp
