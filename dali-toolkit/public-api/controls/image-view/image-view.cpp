@@ -101,7 +101,7 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
 Image ImageView::GetImage() const
 {
-  return Image();
+  return Dali::Toolkit::GetImpl( *this ).GetImage();
 }
 
 ImageView::ImageView( Internal::ImageView& implementation )
