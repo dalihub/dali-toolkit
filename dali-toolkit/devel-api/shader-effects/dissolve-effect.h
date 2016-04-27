@@ -35,9 +35,10 @@ namespace Toolkit
  * As we use the texture coordinate as pixel position to calculate random offset,
  * the line should passing through rectangle {(0,0),(0,1),(1,0),(1,1)},
  * so make the position parameter with two component values between 0.0 to 1.0
+ * @param[in] actor The actor that registers the uniform properties
  * @param[in] position The point ( locates within rectangle {(0,0),(0,1),(1,0),(1,1)} ) passed through by the central line
  * @param[in] displacement The direction of the central line
- * @param[in] initialProgress, the normalised initial progress of the shader
+ * @param[in] initialProgress The normalised initial progress of the shader
  */
 inline void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress )
 {

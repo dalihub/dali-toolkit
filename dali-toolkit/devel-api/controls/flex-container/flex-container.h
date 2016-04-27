@@ -53,12 +53,13 @@ class FlexContainer;
  * Below is an illustration of the various directions and terms as applied to a flex
  * container with the "flex direction" defined as "row".
  *
+ * @code
  *     flex container
  *    --------------------------------------------------------------- cross start
  *    | ------------------ --------|--------------------------- |
  *    | |                | |       |                          | |
  *    | |                | |       |                          | |
- *    | |  flex item 1   | |       |    flex item 2           | |  main axis
+ *    | |  flex item 1   | |       |    flex item 2           | | main axis
  *    |-|----------------|-|-------|--------------------------|-|------------>
  *    | |                | |       |                          | |
  *    | |                | |       |                          | |
@@ -69,6 +70,7 @@ class FlexContainer;
  *    | main start                 | cross axis                 | main end
  *    |                            |                            |
  *                                 v
+ * @endcode
  *
  * @nosubgrouping
  * <h3>Per-child Custom properties for script supporting:</h3>

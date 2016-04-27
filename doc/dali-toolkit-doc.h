@@ -156,6 +156,9 @@
  *     @defgroup dali_toolkit_controls_text_controls Text Controls
  *     @brief Controls for displaying text or text input.
 
+ *     @defgroup dali_toolkit_controls_flex_container Flex Container
+ *     @brief FlexContainer is a container for Flexbox layout.
+
  *   @}
 
  *   @defgroup dali_toolkit_managers Managers
