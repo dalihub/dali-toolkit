@@ -47,9 +47,7 @@ const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type STRING for a hint f
 /**
  * where hints should be contain strings of the following shader hints:
  *   "none"                    | corresponds to HINT_NONE
- *   "requiresSelfDepthTest"   | corresponds to HINT_REQUIRES_SELF_DEPTH_TEST
  *   "outputIsTransparent"     | corresponds to HINT_OUTPUT_IS_TRANSPARENT
- *   "outputIsOpaque"          | corresponds to HINT_OUTPUT_IS_OPAQUE
  *   "modifiesGeometry"        | corresponds to HINT_MODIFIES_GEOMETRY
  */
 
@@ -59,17 +57,9 @@ Shader::ShaderHints HintFromString( std::string hintString )
   {
     return Shader::HINT_NONE;
   }
-  else if( hintString == "requiresSelfDepthTest" )
-  {
-    return Shader::HINT_REQUIRES_SELF_DEPTH_TEST;
-  }
   else if( hintString == "outputIsTransparent" )
   {
     return Shader::HINT_OUTPUT_IS_TRANSPARENT;
-  }
-  else if( hintString == "outputIsOpaque" )
-  {
-    return Shader::HINT_OUTPUT_IS_OPAQUE;
   }
   else if( hintString == "modifiesGeometry" )
   {
