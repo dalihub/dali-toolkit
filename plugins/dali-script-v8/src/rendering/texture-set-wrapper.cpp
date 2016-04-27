@@ -54,7 +54,7 @@ const unsigned int TextureSetFunctionTableCount = sizeof(TextureSetFunctionTable
 
 
 TextureSetWrapper::TextureSetWrapper( const Dali::TextureSet& textureSet, GarbageCollectorInterface& gc )
-:  HandleWrapper(  BaseWrappedObject::TEXTURE_SET , textureSet, gc )
+:  BaseWrappedObject(  BaseWrappedObject::TEXTURE_SET, gc )
 {
     mTextureSet = textureSet;
 }
@@ -101,9 +101,6 @@ v8::Handle<v8::ObjectTemplate> TextureSetWrapper::MakeTextureSetTemplate( v8::Is
   v8::EscapableHandleScope handleScope( isolate );
 
   v8::Local<v8::ObjectTemplate> objTemplate = v8::ObjectTemplate::New();
-
-  // property handle intercepts property getters and setters and signals
-  HandleWrapper::AddInterceptsToTemplate( isolate, objTemplate );
 
   objTemplate->SetInternalFieldCount( BaseWrappedObject::FIELD_COUNT );
 
