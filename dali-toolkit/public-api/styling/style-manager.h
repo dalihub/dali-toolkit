@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_STYLE_MANAGER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/orientation.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 
 // INTERNAL INCLUDES
@@ -36,28 +35,43 @@ class StyleManager;
 }
 
 /**
- * @brief StyleManager provides the following functionalities:
+ * @addtogroup dali_toolkit_managers
+ * @{
+ */
+
+/**
+ * @brief StyleManager informs applications of system theme change,
+ * and supports application theme change at runtime.
  *
  * Applies various styles to Controls using the properties system.
- * On theme change a signal is raised that controls can be configured to listen to.
  *
- * The default theme is automatically loaded and applied.
+ * On theme change, it automatically updates all controls, then raises
+ * a signal to inform the application.
+ *
+ * The default theme is automatically loaded and applied, followed by
+ * any application specific theme defined in Application::New().
  *
  * If the application wants to customize the theme, RequestThemeChange
- * needs to be called.  Internal::Control can be configured to
- * register for the signals that are required from StyleManager, such
- * as theme change.
+ * needs to be called.
+ *
+ * Signals
+ * | %Signal Name            | Method                           |
+ * |------------------------------------------------------------|
+ * | styleChanged            | @ref StyleChangedSignal()        |
+ * @SINCE_1_1.32
  */
 class DALI_IMPORT_API StyleManager : public BaseHandle
 {
 public:
 
-  // Signals
+  /// @brief Style Changed signal. Emitted after controls have been updated
   typedef Signal< void ( StyleManager, StyleChange::Type ) >  StyleChangedSignalType;
 
   /**
    * @brief Create a StyleManager handle; this can be initialised with StyleManager::Get()
+   *
    * Calling member functions with an uninitialised handle is not allowed.
+   * @SINCE_1_1.32
    */
   StyleManager();
 
@@ -65,71 +79,54 @@ public:
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_1.32
    */
   ~StyleManager();
 
   /**
    * @brief Get the singleton of StyleManager object.
    *
+   * @SINCE_1_1.32
    * @return A handle to the StyleManager control.
    */
   static StyleManager Get();
 
   /**
-   * @brief Specify the orientation value directly for the style manager
+   * @brief Apply a new theme to the application. This will be merged
+   * on top of the default Toolkit theme.
    *
-   * @param[in] orientation The orientation in degrees
+   * If the application theme file doesn't style all controls that the
+   * application uses, then the default Toolkit theme will be used
+   * instead for those controls.
+   *
+   * On application startup, it is suggested that the theme file name is
+   * passed to Application::New instead of using this API to prevent
+   * controls being styled more than once.
+   * @sa Application::New()
+   *
+   * @SINCE_1_1.32
+   * @param[in] themeFile If a relative path is specified, then this is relative
+   * to the directory returned by app_get_resource_path().
    */
-  void SetOrientationValue( int orientation );
+  void ApplyTheme( const std::string& themeFile );
 
   /**
-   * @brief Return the orientation value
+   * @brief Apply the default Toolkit theme.
    *
-   * @return The orientation value
-   */
-  int GetOrientationValue();
-
-  /**
-   * @brief Set the orientation object. This will take precedence over setting the orientation value.
+   * Request that any application specific styling is removed
+   * and that the default Toolkit theme is re-applied.
    *
-   * @param[in] orientation Device orientation
+   * @SINCE_1_1.32
    */
-  void SetOrientation( Orientation orientation );
-
-  /**
-   * @brief Return the orientation object
-   *
-   * @return The orientation.
-   */
-  Orientation GetOrientation();
-
-  /**
-   * @brief Retrieves the default font family.
-   * @return The default font family.
-   */
-  std::string GetDefaultFontFamily() const;
-
-  /**
-   * @brief Make a request to set the theme JSON file to one that exists in the Toolkit package.
-   *
-   * Multiple requests per event processing cycle can be made, but only the final one will be acted
-   * on in the event processing finished callback.
-   *
-   * @param[in] themeFile This is just the JSON theme file name and not the full path.
-   */
-  void RequestThemeChange( const std::string& themeFile );
-
-  /**
-   * @brief Request a change to the default theme
-   */
-  void RequestDefaultTheme();
+  void ApplyDefaultTheme();
 
   /**
    * @brief Set a constant for use when building styles
    *
-   * A constant is used in JSON files e.g. "myImage":"{ROOT_PATH}/mypath/image.jpg"
-   * where the string "{ROOT_PATH}" is substituted with the value.
+   * A constant is used in JSON files e.g. "myImage":"{RELATIVE_PATH}/image.jpg"
+   * where the string "{RELATIVE_PATH}" is substituted with the value.
    *
+   * @SINCE_1_1.32
    * @param[in] key The key of the constant
    * @param[in] value The value of the constant
    */
@@ -138,6 +135,7 @@ public:
   /**
    * @brief Return the style constant set for a specific key
    *
+   * @SINCE_1_1.32
    * @param[in] key The key of the constant
    * @param[out] valueOut The value of the constant if it exists
    *
@@ -148,11 +146,11 @@ public:
   /**
    * @brief Apply the specified style to the control.
    *
-   * The JSON file will be cached and subsequent calls using the same JSON file name will
-   * use the already loaded cached values instead.
-   *
-   * @param[in] control The control to apply style.
-   * @param[in] jsonFileName The name of the JSON style file to apply.
+   * @SINCE_1_1.32
+   * @param[in] control The control to which to apply the style.
+   * @param[in] jsonFileName The name of the JSON style file to apply. If a
+   * relative path is specified, then this is relative to the directory
+   * returned by app_get_resource_path().
    * @param[in] styleName The name of the style within the JSON file to apply.
    */
   void ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName );
@@ -163,6 +161,7 @@ public: // Signals
    * @brief This signal is emitted after the style (e.g. theme/font change) has changed
    * and the controls have been informed.
    *
+   * @SINCE_1_1.32
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( StyleManager styleManager, StyleChange change );
@@ -174,14 +173,19 @@ public: // Signals
 public:
 
   /**
-   * @brief Creates a new handle from the implementation.
+   * @brief Allows the creation of a StyleManager handle from an internal pointer.
    *
+   * @note Not intended for application developers
+   * @SINCE_1_1.32
    * @param[in] impl A pointer to the object.
    */
   explicit DALI_INTERNAL StyleManager( Internal::StyleManager *impl );
 
 }; // class StyleManager
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

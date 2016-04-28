@@ -19,7 +19,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <test-button.h>
 #include <test-animation-data.h>
@@ -163,6 +162,40 @@ void dali_style_manager_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+
+int UtcDaliStyleManagerConstructorP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliStyleManagerConstructorP");
+  StyleManager styleManager;
+  DALI_TEST_CHECK( !styleManager);
+  END_TEST;
+}
+
+int UtcDaliStyleManagerCopyConstructorP(void)
+{
+  TestApplication application;
+
+  StyleManager styleManager = StyleManager::Get();
+  StyleManager copyOfStyleManager( styleManager );
+
+  DALI_TEST_CHECK( copyOfStyleManager );
+  END_TEST;
+}
+
+int UtcDaliStyleManagerAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  StyleManager styleManager = StyleManager::Get();
+  StyleManager copyOfStyleManager = styleManager;
+
+  DALI_TEST_CHECK( copyOfStyleManager );
+  DALI_TEST_CHECK( copyOfStyleManager == styleManager );
+  END_TEST;
+}
+
 int UtcDaliStyleManagerGet(void)
 {
   ToolkitTestApplication application;
@@ -189,66 +222,6 @@ int UtcDaliStyleManagerGet(void)
   END_TEST;
 }
 
-int UtcDaliStyleManagerSetOrientationValue(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline( " UtcDaliStyleManagerSetOrientationValue" );
-
-  StyleManager manager = StyleManager::Get();
-
-  int orientation1 = 0;
-  manager.SetOrientationValue( orientation1 );
-  DALI_TEST_CHECK( manager.GetOrientationValue() == orientation1 );
-
-  int orientation2 = 180;
-  manager.SetOrientationValue( orientation2 );
-  DALI_TEST_CHECK( manager.GetOrientationValue() == orientation2 );
-
-  END_TEST;
-}
-
-int UtcDaliStyleManagerSetOrientation(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline( " UtcDaliStyleManagerSetOrientation" );
-
-  StyleManager manager = StyleManager::Get();
-
-  Orientation orientation;
-
-  manager.SetOrientation( orientation );
-
-  DALI_TEST_CHECK( manager.GetOrientation() == orientation );
-
-  END_TEST;
-}
-
-int UtcDaliStyleManagerSetStyleConstant(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline( " UtcDaliStyleManagerSetStyleConstant" );
-
-  StyleManager manager = StyleManager::Get();
-
-  std::string key( "key" );
-  Property::Value value( 100 );
-
-  manager.SetStyleConstant( key, value );
-
-  Property::Value returnedValue;
-  manager.GetStyleConstant( key, returnedValue );
-
-  DALI_TEST_CHECK( value.Get<int>() == returnedValue.Get<int>() );
-
-  std::string key2( "key2" );
-  Property::Value returnedValue2;
-  DALI_TEST_CHECK( !manager.GetStyleConstant( key2, returnedValue2 ) );
-
-  END_TEST;
-}
 
 namespace
 {
@@ -276,11 +249,11 @@ public:
 
 } // anonymous namespace
 
-int UtcDaliStyleManagerPropertyOverride(void)
+int UtcDaliStyleManagerApplyTheme(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline( "Testing StyleManager property overrides" );
+  tet_infoline( "Testing StyleManager ApplyTheme" );
 
   const char* json1 =
     "{\n"
@@ -323,9 +296,9 @@ int UtcDaliStyleManagerPropertyOverride(void)
 
   tet_infoline("Apply the style");
 
-  Test::StyleMonitor::SetThemeFileOutput(json1);
   std::string themeFile("ThemeOne");
-  StyleManager::Get().RequestThemeChange(themeFile);
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  StyleManager::Get().ApplyTheme(themeFile);
 
   Property::Value bgColor( testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR) );
   Property::Value fgColor( testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR) );
@@ -350,7 +323,7 @@ int UtcDaliStyleManagerPropertyOverride(void)
   tet_infoline("Apply the style again");
 
   styleChangedSignalHandler.signalCount = 0;
-  StyleManager::Get().RequestThemeChange(themeFile);
+  StyleManager::Get().ApplyTheme(themeFile);
 
   bgColor = testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR);
   fgColor = testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
@@ -364,11 +337,11 @@ int UtcDaliStyleManagerPropertyOverride(void)
   tet_infoline( "Load a different stylesheet");
 
   tet_infoline("Apply the new style");
-  Test::StyleMonitor::SetThemeFileOutput(json2);
+  std::string themeFile2("ThemeTwo");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile2, json2);
 
   styleChangedSignalHandler.signalCount = 0;
-  std::string themeFile2("ThemeTwo");
-  StyleManager::Get().RequestThemeChange(themeFile2);
+  StyleManager::Get().ApplyTheme(themeFile2);
 
   bgColor = testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR);
   fgColor = testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
@@ -381,10 +354,230 @@ int UtcDaliStyleManagerPropertyOverride(void)
   END_TEST;
 }
 
-int UtcDaliStyleManagerFontSizeChange(void)
+
+int UtcDaliStyleManagerApplyDefaultTheme(void)
+{
+  tet_infoline( "Testing StyleManager ApplyTheme" );
+
+  const char* defaultTheme =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,1.0,0.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+  // Bg: Yellow, Fg: Blue
+
+  const char* appTheme =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,0.0,1.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,1.0,0.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+  // Bg::Magenta, Fg:Green
+
+  std::string filepath(TEST_RESOURCE_DIR "");
+
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme);
+  ToolkitTestApplication application;
+
+  Test::TestButton testButton = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleManager styleManager = StyleManager::Get();
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Get the default:
+  Property::Value defaultBgColor( testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR) );
+  Property::Value defaultFgColor( testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR) );
+
+  tet_infoline("Apply the style");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, appTheme);
+  StyleManager::Get().ApplyTheme(themeFile);
+
+  Property::Value bgColor( testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR) );
+  Property::Value fgColor( testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR) );
+
+  DALI_TEST_EQUALS( bgColor, Property::Value(Color::MAGENTA), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( fgColor, Property::Value(Color::GREEN), 0.001, TEST_LOCATION );
+
+  tet_infoline("Testing that the signal handler is called only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+  tet_infoline("Revert the style");
+
+  styleChangedSignalHandler.signalCount = 0;
+  StyleManager::Get().ApplyDefaultTheme();
+
+  bgColor = testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR);
+  fgColor = testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
+
+  tet_infoline("Check that the property is reverted");
+  DALI_TEST_EQUALS( bgColor, defaultBgColor, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( fgColor, defaultFgColor, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( bgColor, Property::Value(Color::YELLOW), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( fgColor, Property::Value(Color::BLUE), 0.001, TEST_LOCATION );
+  tet_infoline("Testing that the signal handler is called only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerSetStyleConstantP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( " UtcDaliStyleManagerSetStyleConstantP" );
+
+  StyleManager manager = StyleManager::Get();
+
+  std::string key( "key" );
+  Property::Value value( 100 );
+
+  manager.SetStyleConstant( key, value );
+
+  Property::Value returnedValue;
+  manager.GetStyleConstant( key, returnedValue );
+
+  DALI_TEST_CHECK( value.Get<int>() == returnedValue.Get<int>() );
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerGetStyleConstantP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( " UtcDaliStyleManagerGetStyleConstantP" );
+
+  StyleManager manager = StyleManager::Get();
+
+  std::string key( "key" );
+  Property::Value value( 100 );
+
+  manager.SetStyleConstant( key, value );
+
+  Property::Value returnedValue;
+  manager.GetStyleConstant( key, returnedValue );
+
+  DALI_TEST_CHECK( value.Get<int>() == returnedValue.Get<int>() );
+  END_TEST;
+}
+
+int UtcDaliStyleManagerGetStyleConstantN(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( " UtcDaliStyleManagerGetStyleConstantN" );
+
+  StyleManager manager = StyleManager::Get();
+
+  std::string key2( "key2" );
+  Property::Value returnedValue2;
+  DALI_TEST_CHECK( !manager.GetStyleConstant( key2, returnedValue2 ) );
+
+  END_TEST;
+}
+
+int UtcDaliStyleManagerApplyStyle(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliStyleManagerApplyStyle - test that a style can be applied to a single button" );
+
+  const char* json1 =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,1.0,0.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  const char* json2 =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,0.0,0.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,1.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  // Add 2 buttons
+  Test::TestButton testButton = Test::TestButton::New();
+  Test::TestButton testButton2 = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+  Stage::GetCurrent().Add( testButton2 );
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleManager styleManager = StyleManager::Get();
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  tet_infoline("Apply the style");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  styleManager.ApplyTheme(themeFile);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Property::Value themedBgColor( testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR) );
+  Property::Value themedFgColor( testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR) );
+
+  // Apply the style to the test button:
+  std::string themeFile2("ThemeTwo");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile2, json2);
+  styleManager.ApplyStyle( testButton, themeFile2, "testbutton" );
+
+  tet_infoline("Check that the properties change for the first button");
+  Property::Value bgColor = testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR);
+  Property::Value fgColor = testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
+  DALI_TEST_EQUALS( bgColor, Property::Value(Color::RED), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( fgColor, Property::Value(Color::CYAN), 0.001, TEST_LOCATION );
+
+  DALI_TEST_NOT_EQUALS( bgColor, themedBgColor, 0.001, TEST_LOCATION );
+  DALI_TEST_NOT_EQUALS( fgColor, themedFgColor, 0.001, TEST_LOCATION );
+
+  tet_infoline("Check that the properties remain the same for the second button");
+  bgColor = testButton2.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR);
+  fgColor = testButton2.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
+  DALI_TEST_EQUALS( bgColor, themedBgColor, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( fgColor, themedFgColor, 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerStyleChangedSignal(void)
 {
   tet_infoline("Test that the StyleChange signal is fired when the font size is altered" );
-  Test::StyleMonitor::SetThemeFileOutput(defaultTheme);
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
 
   ToolkitTestApplication application;
 

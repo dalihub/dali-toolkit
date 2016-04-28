@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 // CLASS HEADER
 
-#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 // EXTERNAL INCLUDES
 
@@ -43,29 +43,14 @@ StyleManager StyleManager::Get()
   return Internal::StyleManager::Get();
 }
 
-void StyleManager::SetOrientationValue( int orientation )
+void StyleManager::ApplyTheme( const std::string& themeFile )
 {
-  GetImpl(*this).SetOrientationValue( orientation );
+  GetImpl(*this).ApplyTheme( themeFile );
 }
 
-int StyleManager::GetOrientationValue()
+void StyleManager::ApplyDefaultTheme()
 {
-  return GetImpl(*this).GetOrientationValue();
-}
-
-void StyleManager::SetOrientation( Orientation orientation )
-{
-  GetImpl(*this).SetOrientation( orientation );
-}
-
-std::string StyleManager::GetDefaultFontFamily() const
-{
-  return GetImpl(*this).GetDefaultFontFamily();
-}
-
-Orientation StyleManager::GetOrientation()
-{
-  return GetImpl(*this).GetOrientation();
+  GetImpl(*this).ApplyDefaultTheme();
 }
 
 void StyleManager::SetStyleConstant( const std::string& key, const Property::Value& value )
@@ -83,24 +68,14 @@ void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& json
   GetImpl(*this).ApplyStyle( control, jsonFileName, styleName );
 }
 
-StyleManager::StyleManager( Internal::StyleManager *impl )
-  : BaseHandle( impl )
-{
-}
-
 StyleManager::StyleChangedSignalType& StyleManager::StyleChangedSignal()
 {
   return GetImpl( *this ).StyleChangedSignal();
 }
 
-void StyleManager::RequestThemeChange( const std::string& themeFile )
+StyleManager::StyleManager( Internal::StyleManager *impl )
+  : BaseHandle( impl )
 {
-  GetImpl(*this).RequestThemeChange( themeFile );
-}
-
-void StyleManager::RequestDefaultTheme()
-{
-  GetImpl(*this).RequestDefaultTheme();
 }
 
 } // namespace Toolkit

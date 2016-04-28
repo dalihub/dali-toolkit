@@ -493,7 +493,7 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
       // Property system did not set the font so should update it.
-      std::string newFont = styleManager.GetDefaultFontFamily();
+      const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE newFont(%s)\n", newFont.c_str() );
       mController->UpdateAfterFontChange( newFont );
       break;

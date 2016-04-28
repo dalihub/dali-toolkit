@@ -22,7 +22,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(devel_api_src_dir)/image-atlas/image-atlas.cpp \
-  $(devel_api_src_dir)/styling/style-manager.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
@@ -74,9 +73,6 @@ devel_api_focus_manager_header_files = \
 devel_api_image_atlas_header_files = \
   $(devel_api_src_dir)/image-atlas/image-atlas.h
 
-devel_api_styling_header_files = \
-  $(devel_api_src_dir)/styling/style-manager.h
-
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
   $(devel_api_src_dir)/scripting/script-plugin.h
@@ -123,4 +119,3 @@ devel_api_transition_effects_header_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.h \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.h \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.h
-

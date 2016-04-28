@@ -272,6 +272,23 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, float epsilon, const char
   }
 }
 
+template<typename Type>
+inline void DALI_TEST_NOT_EQUALS(Type value1, Type value2, float epsilon, const char* location)
+{
+  if( CompareType<Type>(value1, value2, epsilon) )
+  {
+    std::ostringstream o;
+    o << value1 << " !=  " << value2 << std::endl;
+    fprintf(stderr, "%s, checking %s", location, o.str().c_str());
+    tet_result(TET_FAIL);
+  }
+  else
+  {
+    tet_result(TET_PASS);
+  }
+}
+
+
 /**
  * Test whether two TimePeriods are within a certain distance of each other.
  * @param[in] value1 The first value
