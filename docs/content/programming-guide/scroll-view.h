@@ -31,8 +31,7 @@
 
    Add Actors to this ScrollView
    @code
-   Image image = Image::New(DALI_IMAGE_DIR "button-background.png");
-   ImageActor imageActor = ImageActor::New(image);
+   ImageView imageActor = Toolkit::ImageView::New(DALI_IMAGE_DIR "button-background.png");
    myScrollView.Add( imageActor );
    @endcode
 

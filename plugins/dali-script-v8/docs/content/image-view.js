@@ -46,9 +46,9 @@ dali.stage.add( imageView );
   
 var image = {
     "rendererType" : "image",
-    "imageUrl" : "myImage.jpg",
-    "width" : desiredWidth,   // The desired image width while loading (optional but preferable to set for efficiency)
-    "height" : desiredHeight,   // The desired image height while loading (optional but preferable to set for efficiency)
+    "url" : "myImage.jpg",
+    "desiredWidth" : desiredWidth,   // The desired image width while loading (optional but preferable to set for efficiency)
+    "desiredHeight" : desiredHeight,   // The desired image height while loading (optional but preferable to set for efficiency)
     "shader" : shader  // Optional
 };
   
