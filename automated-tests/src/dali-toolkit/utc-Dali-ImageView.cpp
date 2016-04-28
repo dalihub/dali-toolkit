@@ -968,3 +968,46 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewGetImageP1(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  DALI_TEST_CHECK( ! imageView.GetImage() );
+
+  Image image = CreateBufferImage();
+  imageView.SetImage( image );
+  DALI_TEST_CHECK( imageView.GetImage() == image );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewGetImageP2(void)
+{
+  ToolkitTestApplication application;
+
+  BufferImage image = CreateBufferImage();
+  ImageView imageView = ImageView::New( image );
+  DALI_TEST_CHECK( imageView.GetImage() == image );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewGetImageN(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New( TEST_IMAGE_FILE_NAME );
+  DALI_TEST_CHECK( ! imageView.GetImage() );
+
+  Image image = CreateBufferImage();
+  imageView.SetImage( image );
+  DALI_TEST_CHECK( imageView.GetImage() == image );
+
+  imageView.SetImage( TEST_IMAGE_FILE_NAME );
+  DALI_TEST_CHECK( ! imageView.GetImage() );
+
+  END_TEST;
+}
+

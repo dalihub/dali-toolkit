@@ -76,6 +76,11 @@ public:
   void SetImage( const std::string& imageUrl, ImageDimensions size );
 
   /**
+   * @copydoc Dali::Toolkit::GetImage
+   */
+  Image GetImage() const;
+
+  /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.

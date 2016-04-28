@@ -40,13 +40,17 @@ class ImageView;
  */
 
 /**
- * @brief ImageView is a class for displaying an Image.
+ * @brief ImageView is a class for displaying an image resource.
+ *
+ * An instance of ImageView can be created using a URL or an Image instance.
+ *
  * @SINCE_1_0.0
  *
  */
 class DALI_IMPORT_API ImageView : public Control
 {
 public:
+
   /**
    * @brief The start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -76,11 +80,13 @@ public:
        * @SINCE_1_0.0
        */
       RESOURCE_URL = PROPERTY_START_INDEX,
+
       /**
        * @brief name "image", type string if it is a url, map otherwise
        * @SINCE_1_0.0
        */
       IMAGE,
+
       /**
        * @brief name "preMultipliedAlpha", type Boolean
        * @SINCE_1_1.18
@@ -89,7 +95,6 @@ public:
       PRE_MULTIPLIED_ALPHA,
 
       // Animatable properties
-
 
       /**
        * @brief name "pixelArea", type Vector4
@@ -119,18 +124,18 @@ public:
   static ImageView New();
 
   /**
-   * @brief Create an initialized ImageView from an Image.
+   * @brief Create an initialized ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will not display anything.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Image to display.
+   * @param[in] image The Image instance to display.
    * @return A handle to a newly allocated ImageView.
    */
   static ImageView New( Image image );
 
   /**
-   * @brief Create an initialized ImageView from an Image resource URL
+   * @brief Create an initialized ImageView from an URL to an image resource.
    *
    * If the string is empty, ImageView will not display anything.
    *
@@ -141,13 +146,13 @@ public:
   static ImageView New( const std::string& url );
 
   /**
-   * @brief Create an initialized ImageView from an Image resource URL
+   * @brief Create an initialized ImageView from a URL to an image resource.
    *
    * If the string is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.10
    * @param[in] url The url of the image resource to display.
-   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] size The width and height to which to fit the loaded image.
    * @return A handle to a newly allocated ImageView.
    *
    * @note A valid size is preferable for efficiency.
@@ -194,42 +199,43 @@ public:
   static ImageView DownCast( BaseHandle handle );
 
   /**
-   * @brief Sets this ImageView from an Image
+   * @brief Sets this ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will display nothing
    * @SINCE_1_0.0
-   * @param[in] image The Image to display.
+   * @param[in] image The Image instance to display.
    */
   void SetImage( Image image );
 
   /**
-   * @brief Sets this ImageView from an Image URL
+   * @brief Sets this ImageView from the given URL.
    *
    * If the URL is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.4
-   * @param[in] url The Image resource to display.
+   * @param[in] url The URL to the image resource to display.
    */
   void SetImage( const std::string& url );
 
   /**
-   * @brief Sets this ImageView from an Image URL
+   * @brief Sets this ImageView from the given URL.
    *
    * If the URL is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.10
-   * @param[in] url A URL to the image resource to display.
+   * @param[in] url The URL to the image resource to display.
    * @param [in] size The width and height to fit the loaded image to.
    */
   void SetImage( const std::string& url, ImageDimensions size );
 
   /**
    * @DEPRECATED_1_1.4
-   * @brief Gets the Image
+   * @brief Gets the Image instance handle used by the ImageView.
+   *
+   * A valid handle will be returned only if this instance was created with New(Image) or SetImage(Image) was called.
    *
    * @SINCE_1_0.0
-   * @remarks Calls to this method should be avoided as this may return an empty handle if the image has not been created yet.
-   * @return The Image currently set to this ImageView
+   * @return The Image instance currently used by the ImageView.
    */
   Image GetImage() const;
 
