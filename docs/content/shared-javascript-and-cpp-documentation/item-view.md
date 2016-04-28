@@ -32,13 +32,12 @@ public:
   {
     // We should create the actor here that represents our item based on the itemId given.
 
-    // Here we'll create an ImageActor which uses the the itemId to parse the image in a particular directory.
+    // Here we'll create an ImageView which uses the the itemId to parse the image in a particular directory.
     std::ostringstream imageName;
     imageName << "my-image-folder/" << itemId << ".png"; // If item was 10, then this would result in my-image-folder/10.png
-    Dali::ResourceImage image = Dali::ResourceImage::New( imageName.str() );
 
-    // Create an Image Actor from the image and return
-    return Dali::ImageActor::New( image );
+    // Create the Image View from the image and return
+    return Dali::Toolkit::ImageView::New( imageName.str() );
   }
 };
 ~~~
