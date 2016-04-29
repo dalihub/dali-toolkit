@@ -36,7 +36,7 @@ namespace V8Plugin
  * A Geometry wrapper.
  * Provides access to Geometry specific functionality and V8 memory handling.
  */
-class GeometryWrapper : public HandleWrapper
+class GeometryWrapper : public BaseWrappedObject
 {
 
 public:

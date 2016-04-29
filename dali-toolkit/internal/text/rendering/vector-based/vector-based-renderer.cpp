@@ -50,19 +50,21 @@ struct Vertex2D
   float y;
   float u;
   float v;
+  Vector4 color;
 };
 
-void AddVertex( Vector<Vertex2D>& vertices, float x, float y, float u, float v )
+void AddVertex( Vector<Vertex2D>& vertices, float x, float y, float u, float v, const Vector4& color )
 {
   Vertex2D meshVertex;
   meshVertex.x = x;
   meshVertex.y = y;
   meshVertex.u = u;
   meshVertex.v = v;
+  meshVertex.color = color;
   vertices.PushBack( meshVertex );
 }
 
-void AddTriangle( Vector<unsigned int>& indices, unsigned int v0, unsigned int v1, unsigned int v2 )
+void AddTriangle( Vector<unsigned short>& indices, unsigned int v0, unsigned int v1, unsigned int v2 )
 {
   indices.PushBack( v0 );
   indices.PushBack( v1 );
@@ -77,8 +79,14 @@ bool CreateGeometry( const Vector<GlyphInfo>& glyphs,
                      VectorBlobAtlas& atlas,
                      Dali::TextAbstraction::FontClient& fontClient,
                      Vector< Vertex2D >& vertices,
-                     Vector< unsigned int >& indices )
+                     Vector< unsigned short >& indices,
+                     const Vector4* const colorsBuffer,
+                     const ColorIndex* const colorIndicesBuffer,
+                     const Vector4& defaultColor )
 {
+  // Whether the default color is used.
+  const bool useDefaultColor = ( NULL == colorsBuffer );
+
   bool atlasFull( false );
 
   for( unsigned int i=0, idx=0; i<numberOfGlyphs && !atlasFull; ++i )
@@ -114,20 +122,24 @@ bool CreateGeometry( const Vector<GlyphInfo>& glyphs,
 
       if( foundBlob )
       {
+        // Get the color of the character.
+        const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
+        const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
+
         const float x1( xOffset + positions[i].x );
         const float x2( xOffset + positions[i].x + glyphs[i].width );
         const float y1( yOffset + positions[i].y );
         const float y2( yOffset + positions[i].y + glyphs[i].height );
 
-        AddVertex( vertices, x1, y2, blobCoords[0].u, blobCoords[0].v );
-        AddVertex( vertices, x1, y1, blobCoords[1].u, blobCoords[1].v );
-        AddVertex( vertices, x2, y2, blobCoords[2].u, blobCoords[2].v );
+        AddVertex( vertices, x1, y2, blobCoords[0].u, blobCoords[0].v, color );
+        AddVertex( vertices, x1, y1, blobCoords[1].u, blobCoords[1].v, color );
+        AddVertex( vertices, x2, y2, blobCoords[2].u, blobCoords[2].v, color );
         AddTriangle( indices, idx, idx+1, idx+2 );
         idx+=3;
 
-        AddVertex( vertices, x1, y1, blobCoords[1].u, blobCoords[1].v );
-        AddVertex( vertices, x2, y2, blobCoords[2].u, blobCoords[2].v );
-        AddVertex( vertices, x2, y1, blobCoords[3].u, blobCoords[3].v );
+        AddVertex( vertices, x1, y1, blobCoords[1].u, blobCoords[1].v, color );
+        AddVertex( vertices, x2, y2, blobCoords[2].u, blobCoords[2].v, color );
+        AddVertex( vertices, x2, y1, blobCoords[3].u, blobCoords[3].v, color );
         AddTriangle( indices, idx, idx+1, idx+2 );
         idx+=3;
       }
@@ -148,7 +160,7 @@ struct VectorBasedRenderer::Impl
 
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
-    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
+    mQuadVertexFormat[ "aColor" ] = Property::VECTOR4;
   }
 
   Actor mActor;                            ///< The actor parent which renders the text
@@ -156,7 +168,6 @@ struct VectorBasedRenderer::Impl
   TextAbstraction::FontClient mFontClient; ///> The font client used to supply glyph information
 
   Property::Map mQuadVertexFormat;         ///> Describes the vertex format for text
-  Property::Map mQuadIndexFormat;          ///> Describes the index format for text
 
   Shader mShaderEffect;
 
@@ -177,7 +188,7 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
   mImpl->mActor = Actor::New();
   mImpl->mActor.SetParentOrigin( ParentOrigin::CENTER );
   mImpl->mActor.SetSize( view.GetControlSize() );
-  mImpl->mActor.SetColor( Color::BLACK );
+  mImpl->mActor.SetColor( Color::WHITE );
 #if defined(DEBUG_ENABLED)
   mImpl->mActor.SetName( "Text renderable actor" );
 #endif
@@ -192,19 +203,19 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
     Vector<Vector2> positions;
     positions.Resize( numberOfGlyphs );
 
-    Vector<Vector4> colors;
-    colors.Resize( numberOfGlyphs, view.GetTextColor() );
-
     numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
                                      positions.Begin(),
-                                     colors.Begin(),
                                      0u,
                                      numberOfGlyphs );
     glyphs.Resize( numberOfGlyphs );
     positions.Resize( numberOfGlyphs );
 
+    const Vector4* const colorsBuffer = view.GetColors();
+    const ColorIndex* const colorIndicesBuffer = view.GetColorIndices();
+    const Vector4& defaultColor = view.GetTextColor();
+
     Vector< Vertex2D > vertices;
-    Vector< unsigned int > indices;
+    Vector< unsigned short > indices;
 
     const Vector2& controlSize = view.GetControlSize();
     float xOffset = controlSize.width  * -0.5f;
@@ -218,7 +229,18 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
     }
 
     // First try adding the glyphs to the previous shared atlas
-    bool allGlyphsAdded = CreateGeometry( glyphs, numberOfGlyphs, positions, xOffset, yOffset, *mImpl->mAtlas, mImpl->mFontClient, vertices, indices );
+    bool allGlyphsAdded = CreateGeometry( glyphs,
+                                          numberOfGlyphs,
+                                          positions,
+                                          xOffset,
+                                          yOffset,
+                                          *mImpl->mAtlas,
+                                          mImpl->mFontClient,
+                                          vertices,
+                                          indices,
+                                          colorsBuffer,
+                                          colorIndicesBuffer,
+                                          defaultColor );
 
     if( ! allGlyphsAdded )
     {
@@ -230,21 +252,31 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
       VectorBlobAtlasShare atlasShare = VectorBlobAtlasShare::Get();
       mImpl->mAtlas = atlasShare.GetNewAtlas();
 
-      CreateGeometry( glyphs, numberOfGlyphs, positions, xOffset, yOffset, *mImpl->mAtlas, mImpl->mFontClient, vertices, indices );
+      CreateGeometry( glyphs,
+                      numberOfGlyphs,
+                      positions,
+                      xOffset,
+                      yOffset,
+                      *mImpl->mAtlas,
+                      mImpl->mFontClient,
+                      vertices,
+                      indices,
+                      colorsBuffer,
+                      colorIndicesBuffer,
+                      defaultColor );
       // Return value ignored; using more than an entire new atlas is not supported
     }
 
     if( 0 != vertices.Count() )
     {
       PropertyBuffer quadVertices = PropertyBuffer::New( mImpl->mQuadVertexFormat );
-      PropertyBuffer quadIndices = PropertyBuffer::New( mImpl->mQuadIndexFormat );
 
       quadVertices.SetData( &vertices[ 0 ], vertices.Size() );
-      quadIndices.SetData( &indices[ 0 ], indices.Size() );
+
 
       Geometry quadGeometry = Geometry::New();
       quadGeometry.AddVertexBuffer( quadVertices );
-      quadGeometry.SetIndexBuffer( quadIndices );
+      quadGeometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
 
       TextureSet texture = mImpl->mAtlas->GetTextureSet();
 

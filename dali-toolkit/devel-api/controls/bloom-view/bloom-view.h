@@ -69,8 +69,8 @@ class BloomView;
  *
  *  // create and add some visible actors to the BloomView, all these child actors will therefore get bloomed\n
  *  Image image = Image::New(...);\n
- *  ImageActor imageActor = ImageActor::New(image);\n
- *  bloomView.Add(imageActor);\n
+ *  ImageView imageView = ImageView::New(image);\n
+ *  bloomView.Add(imageView);\n
  *  ...\n
  *
  *  // Start rendering the BloomView\n

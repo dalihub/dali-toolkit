@@ -78,21 +78,15 @@ CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex character
   return *( mCharacterDirections.Begin() + characterIndex );
 }
 
-void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
-                                          Length numberOfRuns,
-                                          CharacterIndex startIndex,
+void LogicalModel::SetVisualToLogicalMap( CharacterIndex startIndex,
                                           Length numberOfCharacters )
 {
   mVisualToLogicalMap.Resize( numberOfCharacters );
-  mLogicalToVisualMap.Resize( numberOfCharacters );
-
-  const Length numberOfCharactersPlus = numberOfCharacters + 1u;
-  mVisualToLogicalCursorMap.Resize( numberOfCharactersPlus );
 
   CharacterIndex* modelVisualToLogicalMapBuffer = mVisualToLogicalMap.Begin();
-  CharacterIndex* modelLogicalToVisualMapBuffer = mLogicalToVisualMap.Begin();
 
-  CharacterIndex* modelVisualToLogicalCursorMap = mVisualToLogicalCursorMap.Begin();
+  const BidirectionalLineInfoRun* const bidirectionalInfo = mBidirectionalLineInfo.Begin();
+  const Length numberOfRuns = mBidirectionalLineInfo.Count();
 
   CharacterIndex lastIndex = startIndex;
   for( unsigned int bidiIndex = 0u; bidiIndex < numberOfRuns; ++bidiIndex )
@@ -129,13 +123,11 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
     *( modelVisualToLogicalMapBuffer + lastIndex ) = lastIndex;
   }
 
-  // Sets the logical to visual conversion map.
-  for( CharacterIndex index = startIndex; index < numberOfCharacters; ++index )
-  {
-    *( modelLogicalToVisualMapBuffer + *( modelVisualToLogicalMapBuffer + index ) ) = index;
-  }
-
   // Sets the visual to logical conversion map for cursor positions.
+  const Length numberOfCharactersPlusOne = numberOfCharacters + 1u;
+  mVisualToLogicalCursorMap.Resize( numberOfCharactersPlusOne );
+
+  CharacterIndex* modelVisualToLogicalCursorMap = mVisualToLogicalCursorMap.Begin();
 
   const Length numberOfBidirectionalParagraphs = mBidirectionalParagraphInfo.Count();
   BidirectionalParagraphInfoRun* bidirectionalParagraphInfoBuffer = mBidirectionalParagraphInfo.Begin();
@@ -145,7 +137,7 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
 
   Length bidirectionalParagraphIndex = 0u;
   bool isRightToLeftParagraph = false;
-  for( CharacterIndex index = startIndex; index < numberOfCharactersPlus; ++index )
+  for( CharacterIndex index = startIndex; index < numberOfCharactersPlusOne; ++index )
   {
     if( bidirectionalParagraph &&
         ( bidirectionalParagraph->characterRun.characterIndex == index ) )
@@ -307,6 +299,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
   if( colorOverriden )
   {
     style.textColor = ( *( colorRunsBuffer + colorIndex ) ).color;
+    style.isDefaultColor = false;
   }
 
   // Reset the run index.
@@ -410,9 +403,6 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     style.size = static_cast<float>( fontDescriptionRun.size ) / 64.f;
     style.sizeDefined = true;
   }
-
-  // Reset the run index.
-  runIndex = 0u;
 }
 
 void LogicalModel::ClearFontDescriptionRuns()

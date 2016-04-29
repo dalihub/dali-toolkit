@@ -58,7 +58,7 @@ const unsigned int GeometryFunctionTableCount = sizeof(GeometryFunctionTable)/si
 
 
 GeometryWrapper::GeometryWrapper( const Dali::Geometry& geometry, GarbageCollectorInterface& gc )
-:  HandleWrapper(  BaseWrappedObject::GEOMETRY , geometry, gc )
+:  BaseWrappedObject(  BaseWrappedObject::GEOMETRY, gc )
 {
     mGeometry = geometry;
 }
@@ -105,9 +105,6 @@ v8::Handle<v8::ObjectTemplate> GeometryWrapper::MakeGeometryTemplate( v8::Isolat
   v8::EscapableHandleScope handleScope( isolate );
 
   v8::Local<v8::ObjectTemplate> objTemplate = v8::ObjectTemplate::New();
-
-  // property handle intercepts property getters and setters and signals
-  HandleWrapper::AddInterceptsToTemplate( isolate, objTemplate );
 
   objTemplate->SetInternalFieldCount( BaseWrappedObject::FIELD_COUNT );
 

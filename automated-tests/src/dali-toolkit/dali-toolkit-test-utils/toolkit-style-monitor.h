@@ -43,6 +43,7 @@ class StyleMonitor : public BaseHandle
 public: // Typedefs
   typedef Signal< void (StyleMonitor, StyleChange::Type) > StyleChangeSignalType;
   static const std::string DEFAULT_FONT_FAMILY;
+  static const std::string DEFAULT_FONT_STYLE;
   static const float       DEFAULT_FONT_SIZE;
 
 public: // Creation & Destruction
@@ -54,9 +55,11 @@ public: // Creation & Destruction
 
 public: // Style Information
   std::string GetDefaultFontFamily() const;
+  std::string GetDefaultFontStyle() const;
   float GetDefaultFontSize() const;
   const std::string& GetTheme() const;
   void SetTheme(std::string themeFilePath);
+  bool LoadThemeFile( const std::string& filename, std::string& output );
 
 public: // Signals
   StyleChangeSignalType& StyleChangeSignal();
@@ -71,5 +74,17 @@ public:
 
 
 } // namespace Dali
+
+namespace Test
+{
+namespace StyleMonitor
+{
+void SetThemeFileOutput( const std::string& name, const std::string& output );
+void SetDefaultFontFamily(const std::string& family);
+void SetDefaultFontStyle(const std::string& style);
+void SetDefaultFontSize( float size );
+
+}
+}
 
 #endif // __DALI_TOOLKIT_TOOLKIT_STYLE_MONITOR_H__

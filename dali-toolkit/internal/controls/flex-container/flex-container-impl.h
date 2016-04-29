@@ -250,20 +250,20 @@ private: // Data
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::FlexContainer& GetImpl( Toolkit::FlexContainer& tableView )
+inline Toolkit::Internal::FlexContainer& GetImpl( Toolkit::FlexContainer& flexContainer )
 {
-  DALI_ASSERT_ALWAYS(tableView);
+  DALI_ASSERT_ALWAYS(flexContainer);
 
-  Dali::RefObject& handle = tableView.GetImplementation();
+  Dali::RefObject& handle = flexContainer.GetImplementation();
 
   return static_cast<Toolkit::Internal::FlexContainer&>(handle);
 }
 
-inline const Toolkit::Internal::FlexContainer& GetImpl( const Toolkit::FlexContainer& tableView )
+inline const Toolkit::Internal::FlexContainer& GetImpl( const Toolkit::FlexContainer& flexContainer )
 {
-  DALI_ASSERT_ALWAYS(tableView);
+  DALI_ASSERT_ALWAYS(flexContainer);
 
-  const Dali::RefObject& handle = tableView.GetImplementation();
+  const Dali::RefObject& handle = flexContainer.GetImplementation();
 
   return static_cast<const Toolkit::Internal::FlexContainer&>(handle);
 }

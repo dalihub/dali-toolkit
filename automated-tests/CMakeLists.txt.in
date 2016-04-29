@@ -4,8 +4,10 @@ PROJECT(tct_coreapi_utc)
 INCLUDE(FindPkgConfig)
 SET(BIN_DIR "/opt/usr/bin")
 
+ADD_DEFINITIONS(-DDALI_STYLE_DIR="@dataReadOnlyDir@/toolkit/styles/")
+
 INCLUDE_DIRECTORIES(
-	src/common
+  src/common
 )
 
 ADD_SUBDIRECTORY(src)

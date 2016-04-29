@@ -215,7 +215,7 @@ public:
   /**
    * @brief Sets the actor to use for a footer in this Popup.
    *
-   * @param[in] control The footer actor to be added to this Popup
+   * @param[in] footer The footer actor to be added to this Popup
    */
   void SetFooter( Actor footer );
 

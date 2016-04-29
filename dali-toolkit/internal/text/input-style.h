@@ -46,6 +46,7 @@ struct InputStyle
     width( TextAbstraction::FontWidth::NORMAL ),
     slant( TextAbstraction::FontSlant::NORMAL ),
     size( 0.f ),
+    isDefaultColor( true ),
     familyDefined( false ),
     weightDefined( false ),
     widthDefined( false ),
@@ -64,11 +65,12 @@ struct InputStyle
   FontSlant   slant;      ///< The font's slant.
   float       size;       ///< The font's size.
 
-  bool        familyDefined : 1; ///< Whether the font's family is defined.
-  bool        weightDefined : 1; ///< Whether the font's weight is defined.
-  bool        widthDefined  : 1; ///< Whether the font's width is defined.
-  bool        slantDefined  : 1; ///< Whether the font's slant is defined.
-  bool        sizeDefined   : 1; ///< Whether the font's size is defined.
+  bool        isDefaultColor : 1; ///< Whether the text's color is the default.
+  bool        familyDefined  : 1; ///< Whether the font's family is defined.
+  bool        weightDefined  : 1; ///< Whether the font's weight is defined.
+  bool        widthDefined   : 1; ///< Whether the font's width is defined.
+  bool        slantDefined   : 1; ///< Whether the font's slant is defined.
+  bool        sizeDefined    : 1; ///< Whether the font's size is defined.
 };
 
 } // namespace Text

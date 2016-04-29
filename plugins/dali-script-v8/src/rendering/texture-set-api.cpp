@@ -89,9 +89,7 @@ TextureSet TextureSetApi::GetTextureSetFromParams( int paramIndex,
  */
 TextureSet TextureSetApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  return TextureSet();
+  return TextureSet::New();
 }
 
 

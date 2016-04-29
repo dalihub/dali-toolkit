@@ -94,7 +94,6 @@ Length View::GetNumberOfGlyphs() const
 
 Length View::GetGlyphs( GlyphInfo* glyphs,
                         Vector2* glyphPositions,
-                        Vector4* glyphColors,
                         GlyphIndex glyphIndex,
                         Length numberOfGlyphs ) const
 {
@@ -131,30 +130,6 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
         mImpl->mVisualModel->GetGlyphPositions( glyphPositions,
                                                 glyphIndex,
                                                 numberOfLaidOutGlyphs );
-
-        // Set the colors.
-        const GlyphIndex lastLaidOutGlyphIndex = glyphIndex + numberOfLaidOutGlyphs;
-
-        for( Vector<ColorGlyphRun>::ConstIterator it = mImpl->mVisualModel->mColorRuns.Begin(),
-               endIt = mImpl->mVisualModel->mColorRuns.End();
-             it != endIt;
-             ++it )
-        {
-          const ColorGlyphRun& colorGlyphRun = *it;
-          const GlyphIndex lastGlyphIndex = colorGlyphRun.glyphRun.glyphIndex + colorGlyphRun.glyphRun.numberOfGlyphs;
-
-          if( ( colorGlyphRun.glyphRun.glyphIndex < lastLaidOutGlyphIndex ) &&
-              ( glyphIndex < lastGlyphIndex ) )
-          {
-            for( GlyphIndex index = glyphIndex < colorGlyphRun.glyphRun.glyphIndex ? colorGlyphRun.glyphRun.glyphIndex : glyphIndex,
-                   endIndex = lastLaidOutGlyphIndex < lastGlyphIndex ? lastLaidOutGlyphIndex : lastGlyphIndex;
-                 index < endIndex;
-                 ++index )
-            {
-              *( glyphColors + index - glyphIndex ) = colorGlyphRun.color;
-            }
-          }
-        }
 
         // Get the lines for the given range of glyphs.
         // The lines contain the alignment offset which needs to be added to the glyph's position.
@@ -308,6 +283,26 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
   }
 
   return numberOfLaidOutGlyphs;
+}
+
+const Vector4* const View::GetColors() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->mColors.Begin();
+  }
+
+  return NULL;
+}
+
+const ColorIndex* const View::GetColorIndices() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->mColorIndices.Begin();
+  }
+
+  return NULL;
 }
 
 const Vector4& View::GetTextColor() const

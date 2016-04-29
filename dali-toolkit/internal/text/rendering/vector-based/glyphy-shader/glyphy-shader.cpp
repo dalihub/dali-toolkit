@@ -48,6 +48,8 @@ const char* const VERTEX_SHADER_MAIN =
 "varying   mediump vec3    vNormal;\n"
 "attribute mediump vec2    aPosition;\n"
 "varying   mediump vec4    vVertex;\n"
+"attribute mediump vec4    aColor;\n"
+"varying   mediump vec4    vColor;\n"
 "varying vec4 v_glyph;\n"
 "\n"
 "vec4\n"
@@ -65,6 +67,7 @@ const char* const VERTEX_SHADER_MAIN =
 "{\n"
 "  gl_Position = uMvpMatrix * vec4 (aPosition, 0.0, 1.0);\n"
 "  v_glyph = glyph_vertex_transcode (aTexCoord);\n"
+"  vColor = aColor;\n"
 "}\n"
 ;
 
@@ -87,6 +90,7 @@ const char* const FRAGMENT_SHADER_PREFIX =
 "uniform lowp  vec4    uColor;\n"
 "varying highp vec4    vVertex;\n"
 "varying highp vec3    vNormal;\n"
+"varying mediump vec4  vColor;\n"
 "uniform vec4 u_atlas_info;\n"
 "\n"
 "#define GLYPHY_TEXTURE1D_EXTRA_DECLS , sampler2D _tex, ivec4 _atlas_info, ivec2 _atlas_pos\n"
@@ -157,7 +161,7 @@ static const char* FRAGMENT_SHADER_MAIN =
 "  vec2 dpdy = dFdy (p);\n"
 "  float m = length (vec2 (length (dpdx), length (dpdy))) * SQRT2_2;\n"
 "\n"
-"  vec4 color = uColor;\n"
+"  vec4 color = vec4( vColor.rgb * uColor.rgb, vColor.a * uColor.a );\n"
 "\n"
 "  ivec4 uu_atlas_info = ivec4( u_atlas_info );"
 "  float gsdist = glyphy_sdf (p, gi.nominal_size GLYPHY_DEMO_EXTRA_ARGS);\n"

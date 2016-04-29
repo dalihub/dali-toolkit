@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/internal/feedback/feedback-style.h>
 
 namespace
@@ -98,8 +98,7 @@ Toolkit::StyleManager StyleManager::Get()
 }
 
 StyleManager::StyleManager()
-: mOrientationDegrees( 0 ),  // Portrait
-  mDefaultFontSize( -1 ),
+: mDefaultFontSize( -1 ),
   mDefaultFontFamily(""),
   mFeedbackStyle( NULL )
 {
@@ -123,43 +122,18 @@ StyleManager::~StyleManager()
   delete mFeedbackStyle;
 }
 
-void StyleManager::SetOrientationValue( int orientation )
+void StyleManager::ApplyTheme( const std::string& themeFile )
 {
-  if( orientation !=  mOrientationDegrees )
-  {
-    mOrientationDegrees = orientation;
-    // TODO: if orientation changed, apply the new style to all controls
-    // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
-    SetTheme( mThemeFile );
-  }
+  SetTheme( themeFile );
 }
 
-int StyleManager::GetOrientationValue()
+void StyleManager::ApplyDefaultTheme()
 {
-  return mOrientationDegrees;
+  std::string empty;
+  SetTheme( empty );
 }
 
-void StyleManager::SetOrientation( Orientation orientation )
-{
-  if( mOrientation )
-  {
-    mOrientation.ChangedSignal().Disconnect( this, &StyleManager::OnOrientationChanged );
-  }
-
-  OnOrientationChanged( orientation );
-
-  if( mOrientation )
-  {
-    mOrientation.ChangedSignal().Connect( this, &StyleManager::OnOrientationChanged );
-  }
-}
-
-Orientation StyleManager::GetOrientation()
-{
-  return mOrientation;
-}
-
-std::string StyleManager::GetDefaultFontFamily() const
+const std::string& StyleManager::GetDefaultFontFamily() const
 {
   return mDefaultFontFamily;
 }
@@ -181,22 +155,11 @@ bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& va
   return false;
 }
 
-void StyleManager::RequestThemeChange( const std::string& themeFile )
-{
-  SetTheme( themeFile );
-}
-
-void StyleManager::RequestDefaultTheme()
-{
-  std::string empty;
-  SetTheme( empty );
-}
-
 void StyleManager::ApplyThemeStyle( Toolkit::Control control )
 {
   if( !mThemeBuilder )
   {
-    RequestDefaultTheme();
+    ApplyDefaultTheme();
   }
 
   if( mThemeBuilder )
@@ -248,9 +211,14 @@ void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& json
   }
 }
 
-Toolkit::StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
+Toolkit::StyleManager::StyleChangedSignalType& StyleManager::StyleChangedSignal()
 {
-  return mStyleChangeSignal;
+  return mStyleChangedSignal;
+}
+
+Toolkit::StyleManager::StyleChangedSignalType& StyleManager::ControlStyleChangeSignal()
+{
+  return mControlStyleChangeSignal;
 }
 
 void StyleManager::SetTheme( const std::string& themeFile )
@@ -275,7 +243,7 @@ void StyleManager::SetTheme( const std::string& themeFile )
       mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
     }
 
-    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
+    EmitStyleChangeSignals(StyleChange::THEME_CHANGE);
   }
   else
   {
@@ -323,13 +291,7 @@ bool StyleManager::LoadJSON( Toolkit::Builder builder, const std::string& jsonFi
 void StyleManager::CollectQualifiers( StringList& qualifiersOut )
 {
   // Append the relevant qualifier for orientation
-  int orientation = mOrientationDegrees;
-
-  if( mOrientation )
-  {
-    orientation = mOrientation.GetDegrees();
-  }
-
+  int orientation = 0; // Get the orientation from the system
   switch( orientation )
   {
     case 90:
@@ -400,15 +362,6 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
   }
 }
 
-void StyleManager::OnOrientationChanged( Orientation orientation )
-{
-  mOrientation = orientation;
-  // TODO: if orientation changed, apply the new style to all controls
-  // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
-  SetTheme( mThemeFile );
-}
-
-
 Toolkit::Builder StyleManager::FindCachedBuilder( const std::string& key )
 {
   BuilderMap::iterator builderIt = mBuilderCache.find( key );
@@ -447,9 +400,20 @@ void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::T
       break;
     }
   }
-
-  mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );
+  EmitStyleChangeSignals( styleChange );
 }
+
+void StyleManager::EmitStyleChangeSignals( StyleChange::Type styleChange )
+{
+  Toolkit::StyleManager styleManager = StyleManager::Get();
+
+  // Update Controls first
+  mControlStyleChangeSignal.Emit( styleManager, styleChange );
+
+  // Inform application last
+  mStyleChangedSignal.Emit( styleManager, styleChange );
+}
+
 
 } // namespace Internal
 

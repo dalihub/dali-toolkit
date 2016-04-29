@@ -99,7 +99,7 @@ public:
    * Depth-index controls draw-order for overlapping renderers.
    * Renderer with higher depth indices are rendered in front of other renderer with smaller values
    *
-   * @param[in] depthIndex The depth index of this renderer.
+   * @param[in] index The depth index of this renderer.
    */
   void SetDepthIndex( float index );
 

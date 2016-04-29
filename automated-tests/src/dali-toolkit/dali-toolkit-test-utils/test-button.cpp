@@ -72,6 +72,7 @@ void TestButton::SetProperty( BaseObject* object, Property::Index index, const P
 
   if ( button )
   {
+    TestButton& buttonImpl = GetImpl(button);
     switch ( index )
     {
       case Test::TestButton::Property::PRESS_TRANSITION:
@@ -79,17 +80,26 @@ void TestButton::SetProperty( BaseObject* object, Property::Index index, const P
         if( value.GetType() == Property::MAP )
         {
           Property::Map* valueMap = value.GetMap();
-          TestButton& buttonImpl = GetImpl(button);
           buttonImpl.mPressTransitionData.Clear();
           NewAnimation( *valueMap, buttonImpl.mPressTransitionData );
         }
         else if( value.GetType() == Property::ARRAY )
         {
           Property::Array* valueArray = value.GetArray();
-          TestButton& buttonImpl = GetImpl(button);
           buttonImpl.mPressTransitionData.Clear();
           NewAnimation( *valueArray, buttonImpl.mPressTransitionData );
         }
+        break;
+      }
+      case Test::TestButton::Property::BACKGROUND_COLOR:
+      {
+        buttonImpl.mBackgroundColor = value.Get<Vector4>();
+        break;
+      }
+
+      case Test::TestButton::Property::FOREGROUND_COLOR:
+      {
+        buttonImpl.mForegroundColor = value.Get<Vector4>();
         break;
       }
     }
@@ -100,6 +110,8 @@ Property::Value TestButton::GetProperty( BaseObject* object, Property::Index pro
 {
   Test::TestButton button = Test::TestButton::DownCast( Dali::BaseHandle( object ) );
 
+  Property::Value value;
+
   if ( button )
   {
     TestButton& buttonImpl = GetImpl(button);
@@ -108,22 +120,26 @@ Property::Value TestButton::GetProperty( BaseObject* object, Property::Index pro
       case Test::TestButton::Property::PRESS_TRANSITION:
       {
         return ConvertAnimationMap(buttonImpl.mPressTransitionData);
-        break;
       }
       case Test::TestButton::Property::RELEASE_TRANSITION:
       {
         return ConvertAnimationMap(buttonImpl.mReleaseTransitionData);
-        break;
       }
       case Test::TestButton::Property::DISABLED_TRANSITION:
       {
         return ConvertAnimationMap(buttonImpl.mDisabledTransitionData);
-        break;
       }
       case Test::TestButton::Property::ENABLED_TRANSITION:
       {
         return ConvertAnimationMap(buttonImpl.mEnabledTransitionData);
-        break;
+      }
+      case Test::TestButton::Property::BACKGROUND_COLOR:
+      {
+        return Property::Value(buttonImpl.mBackgroundColor);
+      }
+      case Test::TestButton::Property::FOREGROUND_COLOR:
+      {
+        return Property::Value(buttonImpl.mForegroundColor);
       }
     }
   }
@@ -142,6 +158,8 @@ DALI_PROPERTY_REGISTRATION( Test, TestButton, "pressTransition", ARRAY, PRESS_TR
 DALI_PROPERTY_REGISTRATION( Test, TestButton, "releaseTransition", ARRAY, RELEASE_TRANSITION)
 DALI_PROPERTY_REGISTRATION( Test, TestButton, "disabledTransition", ARRAY, DISABLED_TRANSITION )
 DALI_PROPERTY_REGISTRATION( Test, TestButton, "enabledTransition", ARRAY, ENABLED_TRANSITION )
+DALI_PROPERTY_REGISTRATION( Test, TestButton, "backgroundColor", VECTOR4, BACKGROUND_COLOR )
+DALI_PROPERTY_REGISTRATION( Test, TestButton, "foregroundColor", VECTOR4, FOREGROUND_COLOR )
 
 DALI_TYPE_REGISTRATION_END()
 

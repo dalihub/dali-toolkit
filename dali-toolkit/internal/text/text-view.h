@@ -75,9 +75,18 @@ public:
    */
   virtual Length GetGlyphs( GlyphInfo* glyphs,
                             Vector2* glyphPositions,
-                            Vector4* glyphColors,
                             GlyphIndex glyphIndex,
                             Length numberOfGlyphs ) const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetColors()
+   */
+  virtual const Vector4* const GetColors() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetColorIndices()
+   */
+  virtual const ColorIndex* const GetColorIndices() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()

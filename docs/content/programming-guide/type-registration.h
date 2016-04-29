@@ -184,6 +184,10 @@ bool MyControl::DoAction(
 }
 @endcode
 
+If the action is not performed by the derived class, it will be propagated to the base class.
+For example, in the above case, MyControl can perform "action1" so should return true, but it
+cannot perform "action4" so should return false and propagate the action to Control.
+
 @section register-property Registering a Property
 
 DALi has a property system which can be extended by registering more properties through the type

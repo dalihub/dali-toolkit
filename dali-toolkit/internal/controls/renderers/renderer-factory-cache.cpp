@@ -215,7 +215,7 @@ Geometry RendererFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
   }
 
   // Create indices
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( (gridWidth+2)*gridHeight*2 - 2);
 
   for( unsigned int row = 0u; row < gridHeight; ++row )
@@ -251,15 +251,16 @@ Geometry RendererFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
   Property::Map indexFormat;
   indexFormat[ "indices" ] = Property::INTEGER;
   PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
-  if( indices.Size() > 0 )
-  {
-    indexPropertyBuffer.SetData( &indices[ 0 ], indices.Size() );
-  }
+
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexPropertyBuffer );
-  geometry.SetIndexBuffer( indexPropertyBuffer );
+  if( indices.Size() > 0 )
+  {
+    geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
+  }
+
   geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;

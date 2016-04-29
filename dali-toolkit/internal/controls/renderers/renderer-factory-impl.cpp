@@ -33,21 +33,12 @@
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
 
 namespace
 {
-const char * const RENDERER_TYPE_NAME( "rendererType" );
-
-const char * const COLOR_RENDERER("color");
-const char * const BORDER_RENDERER("border");
-const char * const GRADIENT_RENDERER("gradient");
-const char * const IMAGE_RENDERER("image");
-const char * const N_PATCH_RENDERER("nPatch");
-const char * const SVG_RENDERER("svg");
-
 const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
-
 }
 
 namespace Dali
@@ -83,13 +74,63 @@ RendererFactory::~RendererFactory()
 {
 }
 
+RendererFactory::RendererType RendererFactory::GetRendererType( const Property::Map& propertyMap )
+{
+  RendererType rendererType = UNDEFINED;
+
+  Property::Value* type = propertyMap.Find( RENDERER_TYPE );
+  std::string typeValue ;
+  if( type && type->Get( typeValue ))
+  {
+    if( typeValue ==  COLOR_RENDERER )
+    {
+      rendererType = COLOR;
+    }
+    else if( typeValue == BORDER_RENDERER )
+    {
+      rendererType = BORDER;
+    }
+    else if( typeValue ==  GRADIENT_RENDERER )
+    {
+      rendererType = GRADIENT;
+    }
+    else if( typeValue ==  IMAGE_RENDERER )
+    {
+      rendererType = IMAGE;
+    }
+  }
+
+  // check the url if exist, to decide the renderer type
+  if( rendererType == IMAGE || rendererType == UNDEFINED )
+  {
+    Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
+    std::string imageUrl;
+    if( imageURLValue && imageURLValue->Get( imageUrl ))
+    {
+      if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
+      {
+        rendererType = N_PATCH;
+      }
+      else if( SvgRenderer::IsSvgUrl( imageUrl ) )
+      {
+        rendererType = SVG;
+      }
+      else
+      {
+        rendererType = IMAGE;
+      }
+    }
+  }
+
+  return rendererType;
+}
+
 Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Map& propertyMap )
 {
   ControlRenderer* rendererPtr = NULL;
 
-  Property::Value* type = propertyMap.Find( RENDERER_TYPE_NAME );
-  std::string typeValue ;
-  if( type && type->Get( typeValue ))
+  RendererType type = GetRendererType( propertyMap );
+  if( type != UNDEFINED)
   {
     if( !mFactoryCache )
     {
@@ -100,32 +141,46 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     {
       return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
     }
+  }
 
-    if( typeValue ==  COLOR_RENDERER )
+  switch( type )
+  {
+    case COLOR:
     {
       rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
+      break;
     }
-    else if( typeValue ==  GRADIENT_RENDERER )
+     case GRADIENT:
+     {
+       rendererPtr = new GradientRenderer( *( mFactoryCache.Get() ) );
+       break;
+     }
+    case BORDER:
     {
-      rendererPtr = new GradientRenderer( *( mFactoryCache.Get() ) );
+      rendererPtr = new BorderRenderer( *( mFactoryCache.Get() ) );
+      break;
     }
-    else if( typeValue ==  IMAGE_RENDERER )
+    case IMAGE:
     {
       CreateAtlasManager();
       rendererPtr = new ImageRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+      break;
     }
-    else if( typeValue ==  N_PATCH_RENDERER )
+    case N_PATCH:
     {
       rendererPtr = new NPatchRenderer( *( mFactoryCache.Get() ) );
+      break;
     }
-    else if( typeValue == BORDER_RENDERER )
-    {
-      rendererPtr = new BorderRenderer( *( mFactoryCache.Get() ) );
-    }
-    else if( typeValue == SVG_RENDERER )
+    case SVG:
     {
       CreateAtlasManager();
       rendererPtr = new SvgRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+      break;
+    }
+    case UNDEFINED:
+    default:
+    {
+      break;
     }
   }
 
@@ -385,17 +440,16 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
   {
     ControlRenderer& controlRenderer = GetImplementation( renderer );
 
-    Property::Value* type = propertyMap.Find( RENDERER_TYPE_NAME );
-    std::string typeValue ;
+    RendererType type = GetRendererType( propertyMap );
 
     //If there's no renderer type specified or if there hasn't been a renderer type change then we can reuse the renderer
-    if( !type || !type->Get( typeValue ) ||
-        ( typeValue == IMAGE_RENDERER    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
-        ( typeValue == N_PATCH_RENDERER  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
-        ( typeValue == COLOR_RENDERER    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
-        ( typeValue == GRADIENT_RENDERER && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
-        ( typeValue == BORDER_RENDERER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) ||
-        ( typeValue == SVG_RENDERER      && typeid( controlRenderer ) == typeid( SvgRenderer ) ) )
+    if( type == UNDEFINED ||
+        ( type == IMAGE    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
+        ( type == N_PATCH  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
+        ( type == COLOR    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
+        ( type == GRADIENT && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
+        ( type == BORDER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) ||
+        ( type == SVG      && typeid( controlRenderer ) == typeid( SvgRenderer ) ) )
     {
       controlRenderer.Initialize( actor, propertyMap );
       return;

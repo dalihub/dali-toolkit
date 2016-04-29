@@ -30,7 +30,8 @@ namespace Toolkit
 /**
  * @brief Set the properties for the motion blur
  *
- * @param numBlurSamples Number of samples used by the shader
+ * @param[in] actor The actor that registers the uniform properties
+ * @param[in] numBlurSamples Number of samples used by the shader
  */
 inline void SetMotionBlurProperties( Actor& actor, unsigned int numBlurSamples = 8 )
 {

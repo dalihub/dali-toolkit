@@ -26,6 +26,7 @@
 // INTERNAL IINCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
@@ -41,10 +42,6 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("nPatch");
-
-const char * const IMAGE_URL_NAME("imageUrl");
 const char * const BORDER_ONLY("borderOnly");
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
@@ -121,7 +118,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
  * @param[in]  indices              The indices to generate the geometry from
  * @return The geometry formed from the vertices and indices
  */
-Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned int >& indices )
+Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsigned short >& indices )
 {
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
@@ -131,18 +128,14 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
     vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
-  Property::Map indexFormat;
-  indexFormat[ "indices" ] = Property::INTEGER;
-  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
-  if( indices.Size() > 0 )
-  {
-    indexPropertyBuffer.SetData( &indices[ 0 ], indices.Size() );
-  }
-
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertexPropertyBuffer );
-  geometry.SetIndexBuffer( indexPropertyBuffer );
+  if( indices.Size() > 0 )
+  {
+    geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
+  }
+
 
   return geometry;
 }
@@ -154,7 +147,7 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
  * @param[in]  rowIdx      The row index to start the quad
  * @param[in]  nextRowIdx  The index to the next row
  */
-void AddQuadIndices( Vector< unsigned int >& indices, unsigned int rowIdx, unsigned int nextRowIdx )
+void AddQuadIndices( Vector< unsigned short >& indices, unsigned int rowIdx, unsigned int nextRowIdx )
 {
   indices.PushBack( rowIdx );
   indices.PushBack( nextRowIdx + 1 );
@@ -170,7 +163,7 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
   vertices.PushBack( Vector2( x, y ) );
 }
 
-void RegisterStretchProperties( TextureSet& textureSet, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
+void RegisterStretchProperties( Renderer& renderer, const char * uniformName, const NinePatchImage::StretchRanges& stretchPixels, uint16_t imageExtent)
 {
   uint16_t prevEnd = 0;
   uint16_t prevFix = 0;
@@ -186,7 +179,7 @@ void RegisterStretchProperties( TextureSet& textureSet, const char * uniformName
 
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    textureSet.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
+    renderer.RegisterProperty( uniform.str(), Vector2( fix, stretch ) );
 
     prevEnd = end;
     prevFix = fix;
@@ -197,7 +190,7 @@ void RegisterStretchProperties( TextureSet& textureSet, const char * uniformName
     prevFix += imageExtent - prevEnd;
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    textureSet.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
+    renderer.RegisterProperty( uniform.str(), Vector2( prevFix, prevStretch ) );
   }
 }
 
@@ -407,7 +400,7 @@ void NPatchRenderer::DoSetOffStage( Actor& actor )
 void NPatchRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
   if( !mImageUrl.empty() )
   {
     map.Insert( IMAGE_URL_NAME, mImageUrl );
@@ -552,18 +545,18 @@ void NPatchRenderer::ApplyImageToSampler()
       uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
       uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
 
-      textureSet.RegisterProperty( "uFixed[0]", Vector2::ZERO );
-      textureSet.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
-      textureSet.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
-      textureSet.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
+      mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
+      mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
+      mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
+      mImpl->mRenderer.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
     }
     else
     {
-      textureSet.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
-      textureSet.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
+      mImpl->mRenderer.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
+      mImpl->mRenderer.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
 
-      RegisterStretchProperties( textureSet, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
-      RegisterStretchProperties( textureSet, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
+      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
+      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
     }
   }
 }
@@ -587,7 +580,7 @@ Geometry NPatchRenderer::CreateGeometry( Uint16Pair gridSize )
 
   // Create indices
   //TODO: compare performance with triangle strip when Geometry supports it
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( gridWidth * gridHeight * 6 );
 
   unsigned int rowIdx     = 0;
@@ -644,7 +637,7 @@ Geometry NPatchRenderer::CreateGeometryBorder( Uint16Pair gridSize )
 
   // Create indices
   //TODO: compare performance with triangle strip when Geometry supports it
-  Vector< unsigned int > indices;
+  Vector< unsigned short > indices;
   indices.Reserve( gridWidth * gridHeight * 6 );
 
   //top

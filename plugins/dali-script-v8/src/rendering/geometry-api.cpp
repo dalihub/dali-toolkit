@@ -188,8 +188,15 @@ void GeometryApi::RemoveVertexBuffer( const v8::FunctionCallbackInfo< v8::Value 
  *
  * @method setIndexBuffer
  * @for Geometry
- * @param {Object} indexBuffer PropertyBuffer to be used as a source of indices
- *                             for the geometry
+ * @param {Uint32Array} data The data that will be copied to the buffer
+ *
+ * @example
+ * var indexData = [0, 1, 1, 2, 2, 3, 3, 4, 4, 0];
+ * var indexDataArray = new Uint32Array(indexData.length);
+ * indexDataArray.set(indexData, 0);
+ *
+ * geometry.SetIndexBuffer( indexDataArray, indexDataArray.length );
+ *```
  */
 void GeometryApi::SetIndexBuffer( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
@@ -199,14 +206,23 @@ void GeometryApi::SetIndexBuffer( const v8::FunctionCallbackInfo<v8::Value>& arg
   Geometry geometry = GetGeometry( isolate, args );
 
   bool found( false );
-  PropertyBuffer indexBuffer = PropertyBufferApi::GetPropertyBufferFromParams( 0, found, isolate, args );
-  if( !found )
+  void* data = V8Utils::GetArrayBufferViewParameter( PARAMETER_0, found, isolate, args);
+
+  if( ! found )
   {
-    DALI_SCRIPT_EXCEPTION( isolate, "invalid property buffer parameter" );
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid data parameter" );
   }
   else
   {
-    geometry.SetIndexBuffer(indexBuffer);
+    int size = V8Utils::GetIntegerParameter( PARAMETER_1, found, isolate, args, 0);
+    if( !found )
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "missing buffer size from param 1" );
+    }
+    else
+    {
+      geometry.SetIndexBuffer( static_cast<const unsigned short*>(data), size );
+    }
   }
 }
 

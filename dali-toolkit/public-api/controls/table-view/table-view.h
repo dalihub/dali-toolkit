@@ -69,11 +69,11 @@ class TableView;
  *
  * @code
  * "name":"gallery1",
- * "type":"ImageActor",
+ * "type":"ImageView",
  * "image": {
- *    "filename": "{DALI_IMAGE_DIR}gallery-small-1.jpg"
+ *    "url": "{DALI_IMAGE_DIR}gallery-small-1.jpg"
  *  },
- *  "customProperties": {
+ *  "properties": {
  *     "cellIndex":[1,1],  // property to specify the top-left cell this child occupies, if not set, the first available cell is used
  *     "rowSpan":3,        // property to specify how many rows this child occupies, if not set, default value is 1
  *     "columnSpan": 2,    // property to specify how many columns this child occupies, if nor set, default value is 1

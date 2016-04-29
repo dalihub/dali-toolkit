@@ -321,7 +321,7 @@ int UtcDaliControlRendererGetPropertyMap2(void)
   DALI_TEST_CHECK( typeValue );
   DALI_TEST_CHECK( typeValue->Get<std::string>() == "border" );
 
-   colorValue = resultMap.Find( "borderColor",  Property::VECTOR4 );
+  colorValue = resultMap.Find( "borderColor",  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
 
@@ -478,11 +478,11 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType",  "image" );
-  propertyMap.Insert( "imageUrl",  TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( "imageDesiredWidth",   20 );
-  propertyMap.Insert( "imageDesiredHeight",   30 );
-  propertyMap.Insert( "imageFittingMode",   "fitHeight" );
-  propertyMap.Insert( "imageSamplingMode",   "boxThenNearest" );
+  propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( "desiredWidth",   20 );
+  propertyMap.Insert( "desiredHeight",   30 );
+  propertyMap.Insert( "fittingMode",   "FIT_HEIGHT" );
+  propertyMap.Insert( "samplingMode",   "BOX_THEN_NEAREST" );
 
   ControlRenderer imageRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( imageRenderer );
@@ -495,23 +495,23 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
-  value = resultMap.Find( "imageUrl",  Property::STRING );
+  value = resultMap.Find( "url",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
 
-  value = resultMap.Find( "imageFittingMode",   Property::STRING );
+  value = resultMap.Find( "fittingMode",   Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "fitHeight" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "FIT_HEIGHT" );
 
-  value = resultMap.Find( "imageSamplingMode",   Property::STRING );
+  value = resultMap.Find( "samplingMode",   Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "boxThenNearest" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "BOX_THEN_NEAREST" );
 
-  value = resultMap.Find( "imageDesiredWidth",   Property::INTEGER );
+  value = resultMap.Find( "desiredWidth",   Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 20 );
 
-  value = resultMap.Find( "imageDesiredHeight",   Property::INTEGER );
+  value = resultMap.Find( "desiredHeight",   Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 30 );
 
@@ -524,23 +524,23 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
-  value = resultMap.Find( "imageUrl",  Property::STRING );
+  value = resultMap.Find( "url",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
 
-  value = resultMap.Find( "imageFittingMode",   Property::STRING );
+  value = resultMap.Find( "fittingMode",   Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "shrinkToFit" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "SHRINK_TO_FIT" );
 
-  value = resultMap.Find( "imageSamplingMode",   Property::STRING );
+  value = resultMap.Find( "samplingMode",   Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "box" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "BOX" );
 
-  value = resultMap.Find( "imageDesiredWidth",   Property::INTEGER );
+  value = resultMap.Find( "desiredWidth",   Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 100 );
 
-  value = resultMap.Find( "imageDesiredHeight",   Property::INTEGER );
+  value = resultMap.Find( "desiredHeight",   Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 200 );
 
@@ -554,8 +554,8 @@ int UtcDaliControlRendererGetPropertyMap6(void)
 
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( "borderOnly",  true );
   ControlRenderer nPatchRenderer = factory.GetControlRenderer( propertyMap );
 
@@ -565,9 +565,9 @@ int UtcDaliControlRendererGetPropertyMap6(void)
   // check the property values from the returned map from control renderer
   Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "nPatch" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
-  value = resultMap.Find( "imageUrl",  Property::STRING );
+  value = resultMap.Find( "url",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_NPATCH_FILE_NAME );
 
@@ -586,8 +586,8 @@ int UtcDaliControlRendererGetPropertyMap7(void)
   // request SvgRenderer with a property map
   RendererFactory factory = RendererFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "svg" );
-  propertyMap.Insert( "imageUrl",  TEST_SVG_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "url",  TEST_SVG_FILE_NAME );
   ControlRenderer svgRenderer = factory.GetControlRenderer( propertyMap );
 
   Property::Map resultMap;
@@ -595,9 +595,9 @@ int UtcDaliControlRendererGetPropertyMap7(void)
   // check the property values from the returned map from control renderer
   Property::Value* value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "svg" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
-  value = resultMap.Find( "imageUrl",  Property::STRING );
+  value = resultMap.Find( "url",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
 
@@ -608,9 +608,9 @@ int UtcDaliControlRendererGetPropertyMap7(void)
   // check the property values from the returned map from control renderer
   value = resultMap.Find( "rendererType",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "svg" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "image" );
 
-  value = resultMap.Find( "imageUrl",  Property::STRING );
+  value = resultMap.Find( "url",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
 

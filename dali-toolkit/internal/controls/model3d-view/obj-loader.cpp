@@ -68,10 +68,10 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
 
   Vector3 *tan1 = new Vector3[vertex.Size() * 2];
 
-  memset(tan1, 0, normal.Size() * sizeof(Vector3) * 2);
-  memset(&normal[0], 0, normal.Size() * sizeof(Vector3) * 2);
+  memset( tan1, 0, normal.Size() * sizeof(Vector3) * 2 );
+  memset( &normal[0], 0, normal.Size() * sizeof(Vector3) * 2 );
 
-  for (unsigned long a = 0; a < triangle.Size(); a++)
+  for ( unsigned long a = 0; a < triangle.Size(); a++ )
   {
     Vector3 Tangent, Bitangent, Normal;
 
@@ -95,9 +95,9 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
 
     float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
 
-    Tangent.x = f * (DeltaV2 * Edge1.x - DeltaV1 * Edge2.x);
-    Tangent.y = f * (DeltaV2 * Edge1.y - DeltaV1 * Edge2.y);
-    Tangent.z = f * (DeltaV2 * Edge1.z - DeltaV1 * Edge2.z);
+    Tangent.x = f * ( DeltaV2 * Edge1.x - DeltaV1 * Edge2.x );
+    Tangent.y = f * ( DeltaV2 * Edge1.y - DeltaV1 * Edge2.y );
+    Tangent.z = f * ( DeltaV2 * Edge1.z - DeltaV1 * Edge2.z );
 
     tan1[triangle[a].pntIndex[0]] += Tangent;
     tan1[triangle[a].pntIndex[1]] += Tangent;
@@ -108,15 +108,15 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
     normal[triangle[a].pntIndex[2]] += Normal;
   }
 
-  for (unsigned long a = 0; a < triangle.Size(); a++)
+  for ( unsigned long a = 0; a < triangle.Size(); a++ )
   {
-    for (unsigned long j = 0; j < 3; j++)
+    for ( unsigned long j = 0; j < 3; j++ )
     {
       triangle[a].nrmIndex[j] = triangle[a].pntIndex[j];
     }
   }
 
-  for (unsigned long a = 0; a < normal.Size(); a++)
+  for ( unsigned long a = 0; a < normal.Size(); a++ )
   {
     normal[a].Normalize();
 
@@ -126,14 +126,14 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
     // Gram-Schmidt orthogonalize
     Vector3 calc = t - n * n.Dot(t);
     calc.Normalize();
-    tangent[a] = Vector3(calc.x,calc.y,calc.z);
+    tangent[a] = Vector3( calc.x,calc.y,calc.z );
   }
 
   delete[] tan1;
 }
 
 
-void ObjLoader::CenterAndScale(bool center, Dali::Vector<Vector3>& points)
+void ObjLoader::CenterAndScale( bool center, Dali::Vector<Vector3>& points )
 {
   BoundingVolume newAABB;
 
@@ -151,7 +151,7 @@ void ObjLoader::CenterAndScale(bool center, Dali::Vector<Vector3>& points)
 
 
   newAABB.Init();
-  for( unsigned int ui = 0; ui < points.Size(); ++ui)
+  for( unsigned int ui = 0; ui < points.Size(); ++ui )
   {
     points[ui] = points[ui] - GetCenter();
     points[ui] = points[ui] / biggestDimension;
@@ -164,76 +164,122 @@ void ObjLoader::CenterAndScale(bool center, Dali::Vector<Vector3>& points)
 void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
                                     Dali::Vector<Vector2> & textures,
                                     Dali::Vector<VertexExt> & verticesExt,
-                                    Dali::Vector<int> & indices)
+                                    Dali::Vector<unsigned short> & indices)
 {
   //If we don't have tangents, calculate them
   //we need to recalculate the normals too, because we need just one normal,tangent, bitangent per vertex
+  //In the case of a textureless object, we don't need tangents and so we skip this step
   //TODO: Use a better function to calculate tangents
-  if( mTangents.Size() == 0 )
+  if( mTangents.Size() == 0 && mHasTexture && mHasNormalMap )
   {
-    mTangents.Resize(mNormals.Size());
-    mBiTangents.Resize(mNormals.Size());
-    CalculateTangentArray(mPoints, mTextures, mTriangles, mNormals, mTangents);
-    for (unsigned int ui = 0 ; ui < mNormals.Size() ; ++ui )
+    mTangents.Resize( mNormals.Size() );
+    mBiTangents.Resize( mNormals.Size() );
+    CalculateTangentArray( mPoints, mTextures, mTriangles, mNormals, mTangents );
+    for ( unsigned int ui = 0 ; ui < mNormals.Size() ; ++ui )
     {
       mBiTangents[ui] = mNormals[ui].Cross(mTangents[ui]);
     }
   }
 
-  //Check the number of points textures and normals
-  if ((mPoints.Size() == mTextures.Size()) && (mTextures.Size() == mNormals.Size()))
+  bool mapsCorrespond; //True if the sizes of the arrays necessary for the object agree.
+
+  if ( mHasTexture )
   {
+    mapsCorrespond = ( mPoints.Size() == mTextures.Size() ) && ( mTextures.Size() == mNormals.Size() );
+  }
+  else
+  {
+    mapsCorrespond = ( mPoints.Size() == mNormals.Size() );
+  }
+
+  //Check the number of points textures and normals
+  if ( mapsCorrespond )
+  {
+    int numPoints = mPoints.Size();
+    int numIndices = 3 * mTriangles.Size();
+    vertices.Resize( numPoints );
+    textures.Resize( numPoints );
+    verticesExt.Resize( numPoints );
+    indices.Resize( numIndices );
+
     //We create the vertices array. For now we just copy points info
     for (unsigned int ui = 0 ; ui < mPoints.Size() ; ++ui )
     {
       Vertex vertex;
       vertex.position = mPoints[ui];
-      vertices.PushBack(vertex);
+      vertices[ui] = vertex;
 
-      textures.PushBack(Vector2());
-      verticesExt.PushBack(VertexExt());
+      if ( mHasTexture )
+      {
+        textures[ui] = Vector2();
+        verticesExt[ui] = VertexExt();
+      }
     }
 
+    int indiceIndex = 0;
+
     //We copy the indices
-    for (unsigned int ui = 0 ; ui < mTriangles.Size() ; ++ui )
+    for ( unsigned int ui = 0 ; ui < mTriangles.Size() ; ++ui )
     {
-      for (int j = 0 ; j < 3 ; ++j)
+      for ( int j = 0 ; j < 3 ; ++j )
       {
-        indices.PushBack(mTriangles[ui].pntIndex[j]);
+        indices[indiceIndex] = mTriangles[ui].pntIndex[j];
+        indiceIndex++;
 
         vertices[mTriangles[ui].pntIndex[j]].normal = mNormals[mTriangles[ui].nrmIndex[j]];
 
-        textures[mTriangles[ui].pntIndex[j]] = mTextures[mTriangles[ui].texIndex[j]];
+        if ( mHasTexture )
+        {
+          textures[mTriangles[ui].pntIndex[j]] = mTextures[mTriangles[ui].texIndex[j]];
+        }
 
-        verticesExt[mTriangles[ui].pntIndex[j]].tangent = mTangents[mTriangles[ui].nrmIndex[j]];
-        verticesExt[mTriangles[ui].pntIndex[j]].bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
+        if ( mHasNormalMap && mHasTexture )
+        {
+          verticesExt[mTriangles[ui].pntIndex[j]].tangent = mTangents[mTriangles[ui].nrmIndex[j]];
+          verticesExt[mTriangles[ui].pntIndex[j]].bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
+        }
       }
     }
   }
   else
   {
+    int numVertices = 3 * mTriangles.Size();
+    vertices.Resize( numVertices );
+    textures.Resize( numVertices );
+    verticesExt.Resize( numVertices );
+
+    int index = 0;
+
     //We have to normalize the arrays so we can draw we just one index array
-    for (unsigned int ui = 0 ; ui < mTriangles.Size() ; ++ui )
+    for ( unsigned int ui = 0 ; ui < mTriangles.Size() ; ++ui )
     {
-      for (int j = 0 ; j < 3 ; ++j)
+      for ( int j = 0 ; j < 3 ; ++j )
       {
         Vertex vertex;
         vertex.position = mPoints[mTriangles[ui].pntIndex[j]];
         vertex.normal = mNormals[mTriangles[ui].nrmIndex[j]];
-        vertices.PushBack(vertex);
+        vertices[index] = vertex;
 
-        textures.PushBack(mTextures[mTriangles[ui].texIndex[j]]);
+        if ( mHasTexture )
+        {
+          textures[index] = mTextures[mTriangles[ui].texIndex[j]];
+        }
 
-        VertexExt vertexExt;
-        vertexExt.tangent = mTangents[mTriangles[ui].nrmIndex[j]];
-        vertexExt.bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
-        verticesExt.PushBack(vertexExt);
+        if ( mHasNormalMap && mHasTexture )
+        {
+          VertexExt vertexExt;
+          vertexExt.tangent = mTangents[mTriangles[ui].nrmIndex[j]];
+          vertexExt.bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
+          verticesExt[index] = vertexExt;
+        }
+
+        index++;
       }
     }
   }
 }
 
-bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& materialFile)
+bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& materialFile )
 {
   Vector3 point;
   Vector2 texture;
@@ -244,6 +290,8 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
   TriIndex triangle,triangle2;
   int pntAcum = 0, texAcum = 0, nrmAcum = 0;
   bool iniObj = false;
+  bool hasTexture = false;
+  bool hasNormalMap = false;
   int face = 0;
 
   //Init AABB for the file
@@ -253,75 +301,77 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
 
   std::string input = objBuffer;
   std::istringstream ss(input);
-  ss.imbue(std::locale("C"));
+  ss.imbue( std::locale( "C" ) );
 
 
   std::string line;
-  std::getline(ss, line);
+  std::getline( ss, line );
 
-  while (std::getline(ss, line))
+  while ( std::getline( ss, line ) )
   {
-    std::istringstream isline(line, std::istringstream::in);
+    std::istringstream isline( line, std::istringstream::in );
     std::string tag;
 
     isline >> tag;
 
-    if (tag == "v")
+    if ( tag == "v" )
     {
       //Two different objects in the same file
       isline >> point.x;
       isline >> point.y;
       isline >> point.z;
-      mPoints.PushBack(point);
+      mPoints.PushBack( point );
 
-      mSceneAABB.ConsiderNewPointInVolume(point);
+      mSceneAABB.ConsiderNewPointInVolume( point );
     }
-    else if (tag == "vn")
+    else if ( tag == "vn" )
     {
       isline >> point.x;
       isline >> point.y;
       isline >> point.z;
 
-      mNormals.PushBack(point);
+      mNormals.PushBack( point );
     }
-    else if (tag == "#_#tangent")
+    else if ( tag == "#_#tangent" )
     {
       isline >> point.x;
       isline >> point.y;
       isline >> point.z;
 
-      mTangents.PushBack(point);
+      mTangents.PushBack( point );
+      hasNormalMap = true;
     }
-    else if (tag == "#_#binormal")
+    else if ( tag == "#_#binormal" )
     {
       isline >> point.x;
       isline >> point.y;
       isline >> point.z;
 
-      mBiTangents.PushBack(point);
+      mBiTangents.PushBack( point );
+      hasNormalMap = true;
     }
-    else if (tag == "vt")
+    else if ( tag == "vt" )
     {
       isline >> texture.x;
       isline >> texture.y;
 
       texture.y = 1.0-texture.y;
-      mTextures.PushBack(texture);
+      mTextures.PushBack( texture );
     }
-    else if (tag == "#_#vt1")
+    else if ( tag == "#_#vt1" )
     {
       isline >> texture.x;
       isline >> texture.y;
 
       texture.y = 1.0-texture.y;
-      mTextures2.PushBack(texture);
+      mTextures2.PushBack( texture );
     }
-    else if (tag == "s")
+    else if ( tag == "s" )
     {
     }
-    else if (tag == "f")
+    else if ( tag == "f" )
     {
-      if (!iniObj)
+      if ( !iniObj )
       {
         //name assign
 
@@ -336,29 +386,30 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
 
       char separator;
       char separator2;
-      //File could not have texture Coordinates
-      if (strstr(vet[0].c_str(),"//"))
+
+      if ( strstr( vet[0].c_str(),"//" ) ) //No texture coordinates.
       {
         for( int i = 0 ; i < numIndices; i++)
         {
-          std::istringstream isindex(vet[i]);
-          isindex >> ptIdx[i] >> separator >> nrmIdx[i];
+          std::istringstream isindex( vet[i] );
+          isindex >> ptIdx[i] >> separator >> separator2 >> nrmIdx[i];
           texIdx[i] = 0;
         }
       }
-      else if (strstr(vet[0].c_str(),"/"))
+      else if ( strstr( vet[0].c_str(),"/" ) ) //Has texture coordinates, and possibly also normals.
       {
-        for( int i = 0 ; i < numIndices; i++)
+        for( int i = 0 ; i < numIndices; i++ )
         {
-          std::istringstream isindex(vet[i]);
+          std::istringstream isindex( vet[i] );
           isindex >> ptIdx[i] >> separator >> texIdx[i] >> separator2 >> nrmIdx[i];
+          hasTexture = true;
         }
       }
-      else
+      else //Has just points.
       {
-        for( int i = 0 ; i < numIndices; i++)
+        for( int i = 0 ; i < numIndices; i++ )
         {
-          std::istringstream isindex(vet[i]);
+          std::istringstream isindex( vet[i] );
           isindex >> ptIdx[i];
           texIdx[i] = 0;
           nrmIdx[i] = 0;
@@ -368,47 +419,47 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
       //If it is a triangle
       if( numIndices == 3 )
       {
-        for( int i = 0 ; i < 3; i++)
+        for( int i = 0 ; i < 3; i++ )
         {
           triangle.pntIndex[i] = ptIdx[i] - 1 - pntAcum;
           triangle.nrmIndex[i] = nrmIdx[i] - 1 - nrmAcum;
           triangle.texIndex[i] = texIdx[i] - 1 - texAcum;
         }
-        mTriangles.PushBack(triangle);
+        mTriangles.PushBack( triangle );
         face++;
       }
       //If on the other hand it is a quad, we will create two triangles
       else if( numIndices == 4 )
       {
-        for( int i = 0 ; i < 3; i++)
+        for( int i = 0 ; i < 3; i++ )
         {
           triangle.pntIndex[i] = ptIdx[i] - 1 - pntAcum;
           triangle.nrmIndex[i] = nrmIdx[i] - 1 - nrmAcum;
           triangle.texIndex[i] = texIdx[i] - 1 - texAcum;
         }
-        mTriangles.PushBack(triangle);
+        mTriangles.PushBack( triangle );
         face++;
 
-        for( int i = 0 ; i < 3; i++)
+        for( int i = 0 ; i < 3; i++ )
         {
-          int idx = (i+2) % numIndices;
+          int idx = ( i + 2 ) % numIndices;
           triangle2.pntIndex[i] = ptIdx[idx] - 1 - pntAcum;
           triangle2.nrmIndex[i] = nrmIdx[idx] - 1 - nrmAcum;
           triangle2.texIndex[i] = texIdx[idx] - 1 - texAcum;
         }
-        mTriangles.PushBack(triangle2);
+        mTriangles.PushBack( triangle2 );
         face++;
       }
     }
-    else if (tag == "usemtl")
+    else if ( tag == "usemtl" )
     {
       isline >> strMatActual;
     }
-    else if (tag == "mtllib")
+    else if ( tag == "mtllib" )
     {
       isline >> strMatActual;
     }
-    else if (tag == "g")
+    else if ( tag == "g" )
     {
       isline >> name;
     }
@@ -417,10 +468,12 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
     }
   }
 
-  if (iniObj)
+  if ( iniObj )
   {
-    CenterAndScale(true, mPoints);
+    CenterAndScale( true, mPoints );
     mSceneLoaded = true;
+    mHasTexture = hasTexture;
+    mHasNormalMap = hasNormalMap;
     return true;
   }
 
@@ -428,7 +481,8 @@ bool ObjLoader::Load(char* objBuffer, std::streampos fileSize, std::string& mate
 
 }
 
-void ObjLoader::LoadMaterial(char* objBuffer, std::streampos fileSize, std::string& texture0Url, std::string& texture1Url, std::string& texture2Url)
+void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::string& texture0Url,
+                              std::string& texture1Url, std::string& texture2Url )
 {
   float fR,fG,fB;
 
@@ -439,44 +493,45 @@ void ObjLoader::LoadMaterial(char* objBuffer, std::streampos fileSize, std::stri
   ss.imbue(std::locale("C"));
 
   std::string line;
-  std::getline(ss, line);
+  std::getline( ss, line );
 
-  while (std::getline(ss, line))
+  while ( std::getline( ss, line ) )
   {
-    std::istringstream isline(line, std::istringstream::in);
+    std::istringstream isline( line, std::istringstream::in );
     std::string tag;
 
     isline >> tag;
 
-    if (tag == "newmtl")  //name of the material
+    if ( tag == "newmtl" )  //name of the material
     {
       isline >> info;
     }
-    else if (tag == "Kd") //diffuse color
+    else if ( tag == "Kd" ) //diffuse color
     {
       isline >> fR >> fG >> fB;
     }
-    else if (tag == "Kd") //Ambient color
+    else if ( tag == "Kd" ) //Ambient color
     {
       isline >> fR >> fG >> fB;
     }
-    else if (tag == "Tf") //color
+    else if ( tag == "Tf" ) //color
     {
     }
-    else if (tag == "Ni")
+    else if ( tag == "Ni" )
     {
     }
-    else if (tag == "map_Kd")
+    else if ( tag == "map_Kd" )
     {
       isline >> info;
       texture0Url = info;
     }
-    else if (tag == "bump")
+    else if ( tag == "bump" )
     {
       isline >> info;
       texture1Url = info;
+      mHasNormalMap = true;
     }
-    else if (tag == "map_Ks")
+    else if ( tag == "map_Ks" )
     {
       isline >> info;
       texture2Url = info;
@@ -486,14 +541,14 @@ void ObjLoader::LoadMaterial(char* objBuffer, std::streampos fileSize, std::stri
   mMaterialLoaded = true;
 }
 
-Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illuminationType)
+Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illuminationType )
 {
   Dali::Vector<Vertex> vertices;
   Dali::Vector<Vector2> textures;
   Dali::Vector<VertexExt> verticesExt;
-  Dali::Vector<int> indices;
+  Dali::Vector<unsigned short> indices;
 
-  CreateGeometryArray(vertices, textures, verticesExt, indices);
+  CreateGeometryArray( vertices, textures, verticesExt, indices );
 
   //All vertices need at least Position and Normal
   Property::Map vertexFormat;
@@ -506,7 +561,8 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   surface.AddVertexBuffer( surfaceVertices );
 
   //Some need texture coordinates
-  if( (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP ) || (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ) )
+  if( ( (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP ) ||
+        (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ) ) && mHasTexture )
   {
     Property::Map textureFormat;
     textureFormat["aTexCoord"] = Property::VECTOR2;
@@ -517,7 +573,7 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
   }
 
   //Some need tangent and bitangent
-  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
+  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP && mHasNormalMap && mHasTexture )
   {
     Property::Map vertexExtFormat;
     vertexExtFormat["aTangent"] = Property::VECTOR3;
@@ -528,18 +584,12 @@ Geometry ObjLoader::CreateGeometry(Toolkit::Model3dView::IlluminationType illumi
     surface.AddVertexBuffer( extraVertices );
   }
 
-  if (indices.Size())
+  if ( indices.Size() )
   {
-    //Indices
-    Property::Map indicesVertexFormat;
-    indicesVertexFormat["aIndices"] = Property::INTEGER;
-    PropertyBuffer indicesToVertices = PropertyBuffer::New( indicesVertexFormat );
-    indicesToVertices.SetData( &indices[0], indices.Size() );
-
-    surface.SetIndexBuffer ( indicesToVertices );
+    surface.SetIndexBuffer ( &indices[0], indices.Size() );
   }
 
-  surface.SetRequiresDepthTesting(true);
+  surface.SetRequiresDepthTesting( true );
 
   vertices.Clear();
   verticesExt.Clear();
@@ -571,6 +621,16 @@ void ObjLoader::ClearArrays()
   mTriangles.Clear();
 
   mSceneLoaded = false;
+}
+
+bool ObjLoader::IsTexturePresent()
+{
+  return mHasTexture;
+}
+
+bool ObjLoader::IsNormalMapPresent()
+{
+  return mHasNormalMap;
 }
 
 } // namespace Internal

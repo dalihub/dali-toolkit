@@ -561,7 +561,7 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
 
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType",  "image" );
-  propertyMap.Insert( "imageUrl",  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
@@ -642,8 +642,8 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
@@ -706,8 +706,8 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
@@ -868,8 +868,8 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  111 );
+  propertyMap.Insert( "rendererType",  111 );
+  propertyMap.Insert( "url",  "ERROR.9.jpg" );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );

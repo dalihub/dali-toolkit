@@ -10,7 +10,7 @@ To create a resource image:
 ~~~{.cpp}
 Dali::ResourceImage image = Dali::ResourceImage::New( "/my-path/my-image.png" );
 ~~~
-Which can then be used with actors (e.g. ImageActor).
+Which can then be used with actors (e.g. ImageView).
 
 Resources are loaded in separate threads.
 The application can connect to the Dali::ResourceImage::LoadingFinishedSignal() to get notified when the image has loaded.

@@ -51,9 +51,8 @@ A common example is when an actor is added to a container with Dali::Actor::Add(
 // At this point we own a Dali::Actor named "container"
 // Enter a code block
 {
-  // Create an image actor
-  Image img = Image::New(SomeImageFile);
-  Actor actor = ImageActor::New(img);
+  // Create an image view
+  Actor actor = Toolkit::ImageView::New(SomeImageFile);
 
   // Add the image actor to a container
   container.Add(actor);

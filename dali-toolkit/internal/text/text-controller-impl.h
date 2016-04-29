@@ -478,7 +478,7 @@ struct Controller::Impl
   void ClearModelData( CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations );
 
   /**
-   * @brief Updates the logical and visual models.
+   * @brief Updates the logical and visual models. Updates the style runs in the visual model when the text's styles changes.
    *
    * When text or style changes the model is set with some operations pending.
    * When i.e. the text's size or a relayout is required this method is called
@@ -486,17 +486,10 @@ struct Controller::Impl
    * matched with the operations pending to perform the minimum number of operations.
    *
    * @param[in] operationsRequired The operations required.
-   */
-  void UpdateModel( OperationsMask operationsRequired );
-
-  /**
-   * @brief Updates the style runs in the visual model when the text's styles changes.
-   *
-   * @param[in] operationsRequired The operations required.
    *
    * @return @e true if the model has been modified.
    */
-  bool UpdateModelStyle( OperationsMask operationsRequired );
+  bool UpdateModel( OperationsMask operationsRequired );
 
   /**
    * @brief Retreieves the default style.

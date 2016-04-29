@@ -22,8 +22,6 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
-#include "toolkit-orientation.h"
-
 namespace Dali
 {
 

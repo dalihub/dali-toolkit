@@ -117,15 +117,11 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   PropertyBuffer vertices = PropertyBuffer::New( vertexFormat );
   vertices.SetData( vertexData, 20u );
 
-  unsigned int indexData[30] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11,12,15,13,12,14,15,16,19,17,16,18,19};
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( indexData, 30u );
+  unsigned short indexData[30] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11,12,15,13,12,14,15,16,19,17,16,18,19};
 
   Geometry meshGeometry = Geometry::New();
   meshGeometry.AddVertexBuffer( vertices );
-  meshGeometry.SetIndexBuffer( indices );
+  meshGeometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   // Create the shader
   Shader shader = Shader::New( MESH_VERTEX_SHADER, MESH_FRAGMENT_SHADER );

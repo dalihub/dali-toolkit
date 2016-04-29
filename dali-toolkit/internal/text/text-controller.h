@@ -99,6 +99,15 @@ public:
   };
 
   /**
+   * @brief Used to specify whether to update the input style.
+   */
+  enum UpdateInputStyleType
+  {
+    UPDATE_INPUT_STYLE,
+    DONT_UPDATE_INPUT_STYLE
+  };
+
+  /**
    * @brief Create a new instance of a Controller.
    *
    * @param[in] controlInterface An interface used to request a text relayout.
@@ -157,11 +166,18 @@ public:
   /**
    * @brief Remove a given number of characters
    *
+   * When predictve text is used the pre-edit text is removed and inserted again with the new characters.
+   * The UpdateInputStyleType @type parameter if set to DONT_UPDATE_INPUT_STYLE avoids to update the input
+   * style when pre-edit text is removed.
+   *
    * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
    * @param[in] numberOfCharacters The number of characters to delete from the cursorOffset.
+   * @param[in] type Whether to update the input style.
    * @return True if the remove was successful.
    */
-  bool RemoveText( int cursorOffset, int numberOfCharacters );
+  bool RemoveText( int cursorOffset,
+                   int numberOfCharacters,
+                   UpdateInputStyleType type  );
 
   /**
    * @brief Retrieve the current cursor position.

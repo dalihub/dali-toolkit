@@ -49,17 +49,17 @@ Text and image actors have relayout enabled by default, while a plain Actor is d
 
 <h3>Specifying Size Policies</h3>
 
-Actors have different size policies by default. For example ImageActor is set to USE_NATURAL_SIZE. This ensures that when an image actor is
+Actors have different size policies by default. For example ImageView is set to USE_NATURAL_SIZE. This ensures that when an image actor is
 placed on the stage it will use its natural size by default. However if the user calls SetSize with non-zero sizes on the image actor then the current
 size policy is overridden by the FIXED size policy and the actor will take on the size specified.
 
 The next step is to specify how an actor will be size negotiated. The resize policies for an actor may be specified by the following method:
 @code void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) @endcode
 It is common to specifiy different policies for the different dimensions of width and height to achive different layouts. Different actors have
-different resize policies specified by default. For example ImageActors are set to use USE_NATURAL_SIZE.
+different resize policies specified by default. For example ImageViews are set to use USE_NATURAL_SIZE.
 
 The following example code snippet shows rootActor having its width policy set to ResizePolicy::FILL_TO_PARENT and its height policy set to ResizePolicy::FIT_TO_CHILDREN.
-It has an ImageActor added to it with an explicit call to USE_NATURAL_SIZE in both dimensions called on it. This will make an actor that will
+It has an ImageView added to it with an explicit call to USE_NATURAL_SIZE in both dimensions called on it. This will make an actor that will
 fill up the space of its parent in the width dimension and fit to its child in the height dimension. As the image actor child is using natural size
 the height of the root actor will fit to the height of the child image.
 
@@ -67,7 +67,7 @@ the height of the root actor will fit to the height of the child image.
 Actor rootActor = Actor::New();
 rootActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 rootActor.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
-ImageActor image = ImageActor::New( Image::New( MY_IMAGE_PATH ) );
+Toolkit::ImageView image = Toolkit::ImageView::New( MY_IMAGE_PATH );
 image.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 rootActor.Add( image );
 @endcode
@@ -141,7 +141,7 @@ text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 content.AddChild( text, Toolkit::TableView::CellPosition( 0, 0 ) );
 
 // Image
-ImageActor image = ImageActor::New( ResourceImage::New( IMAGE1 ) );
+Toolkit::ImageView image = Toolkit::ImageView::New( IMAGE_PATH );
 image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 image.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 image.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );

@@ -276,7 +276,7 @@ Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
   vertexData.reserve( numVertex );
 
   unsigned int numIndex = numOfPatch*6u;
-  Vector<unsigned int> indexData;
+  Vector<unsigned short> indexData;
   indexData.Reserve( numIndex );
 
   for(unsigned int i = 0; i < numOfPatch; i++)
@@ -289,7 +289,7 @@ Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
     vertexData.push_back( Vertex( index, Vector2(curSize,curSize), Vector2(1.f,1.f)  ) );
     vertexData.push_back( Vertex( index, Vector2(curSize,0.f),     Vector2(1.f,0.f)  ) );
 
-    unsigned int idx = index * 4;
+    unsigned short idx = index * 4;
     indexData.PushBack( idx );
     indexData.PushBack( idx+1 );
     indexData.PushBack( idx+2 );
@@ -305,14 +305,9 @@ Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
   PropertyBuffer vertices = PropertyBuffer::New( vertexFormat );
   vertices.SetData( &vertexData[0], numVertex );
 
-  Property::Map indexFormat;
-  indexFormat["indices"] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( &indexData[0], numIndex );
-
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( vertices );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetIndexBuffer( &indexData[0], numIndex );
 
   return geometry;
 }

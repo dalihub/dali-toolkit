@@ -163,16 +163,6 @@ public:
   void CreateRenderTask( const std::string &name );
 
   /**
-   * @copydoc Toolkit::Builder::GetShaderEffect
-   */
-  ShaderEffect GetShaderEffect( const std::string &name );
-
-  /**
-   * @copydoc Toolkit::Builder::GetShaderEffect
-   */
-  ShaderEffect GetShaderEffect( const std::string &name, const Replacement& constant );
-
-  /**
    * @copydoc Toolkit::Builder::GetFrameBufferImage
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name );
@@ -234,14 +224,13 @@ private:
 
   void SetupTask( RenderTask& task, const Toolkit::TreeNode& node, const Replacement& replacement );
 
+  void SetCustomProperties( const TreeNode& node, Handle& handle, const Replacement& constant, const std::string& childName, Property::AccessMode accessMode );
+
 private:
   Toolkit::JsonParser mParser;
 
   typedef std::map<const std::string, FrameBufferImage> ImageLut;
   ImageLut mFrameBufferImageLut;
-
-  typedef std::map<const std::string, ShaderEffect> ShaderEffectLut;
-  ShaderEffectLut mShaderEffectLut;
 
   typedef std::map<const std::string, Path> PathLut;
   PathLut mPathLut;
