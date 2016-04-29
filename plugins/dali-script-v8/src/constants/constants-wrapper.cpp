@@ -217,10 +217,14 @@ const IntegerPair EnumTable[] =
     { "WRAP_MODE_REPEAT",                     WrapMode::REPEAT           },
     { "WRAP_MODE_MIRRORED_REPEAT",            WrapMode::MIRRORED_REPEAT  },
 
-    { "MATERIAL_NONE",                        Renderer::NONE                      },
-    { "MATERIAL_CULL_BACK",                   Renderer::CULL_BACK                 },
-    { "MATERIAL_CULL_FRONT",                  Renderer::CULL_FRONT                },
-    { "MATERIAL_CULL_BACK_AND_FRONT",         Renderer::CULL_BACK_AND_FRONT       },
+    { "RENDERER_CULL_NONE",                   Renderer::CULL_NONE                 },
+    { "RENDERER_CULL_BACK",                   Renderer::CULL_BACK                 },
+    { "RENDERER_CULL_FRONT",                  Renderer::CULL_FRONT                },
+    { "RENDERER_CULL_BACK_AND_FRONT",         Renderer::CULL_BACK_AND_FRONT       },
+
+    { "RENDERER_DEPTH_WRITE_OFF",             Renderer::DEPTH_WRITE_OFF   },
+    { "RENDERER_DEPTH_WRITE_AUTO",            Renderer::DEPTH_WRITE_AUTO  },
+    { "RENDERER_DEPTH_WRITE_ON",              Renderer::DEPTH_WRITE_ON    },
 
     { "GEOMETRY_POINTS",                      Geometry::POINTS          },
     { "GEOMETRY_LINES",                       Geometry::LINES           },

@@ -589,8 +589,6 @@ Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illum
     surface.SetIndexBuffer ( &indices[0], indices.Size() );
   }
 
-  surface.SetRequiresDepthTesting( true );
-
   vertices.Clear();
   verticesExt.Clear();
   indices.Clear();
