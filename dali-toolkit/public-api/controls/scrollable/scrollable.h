@@ -46,8 +46,8 @@ class Scrollable;
  * | %Signal Name     | Method                       |
  * |------------------|------------------------------|
  * | scrollStarted    | @ref ScrollStartedSignal()   |
- * | scrollCompleted  | @ref ScrollUpdatedSignal()   |
- * | scrollUpdated    | @ref ScrollCompletedSignal() |
+ * | scrollCompleted  | @ref ScrollCompletedSignal() |
+ * | scrollUpdated    | @ref ScrollUpdatedSignal()   |
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Scrollable : public Control
@@ -80,6 +80,7 @@ public:
       OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshootAnimationSpeed",   @see SetOvershootAnimationSpeed(), type float @SINCE_1_0.0
       OVERSHOOT_ENABLED,                             ///< Property, name "overshootEnabled",          @see SetOvershootEnabled(),        type bool,    @SINCE_1_1.18
       OVERSHOOT_SIZE,                                ///< Property, name "overshootSize",                                                type Vector2, @SINCE_1_1.31
+      SCROLL_TO_ALPHA_FUNCTION,                      ///< Property, name "scrollToAlphaFunction",                                        type int,     @SINCE_1_1.33
 
       // Animatable properties
       SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollRelativePosition",   type Vector2 @SINCE_1_0.0
