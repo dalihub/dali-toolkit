@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Barchasini tanlash"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Nusxa olish"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Tanlash"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Qirqish"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Qo‘shib qo‘yish"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Bufer"
+

@@ -27,7 +27,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 
 namespace Dali
@@ -67,30 +67,20 @@ protected:
 
 public: // Public API
 
-  /**
-   * @copydoc Toolkit::StyleManager::SetOrientationValue
+/**
+   * @copydoc Toolkit::StyleManager::ApplyTheme
    */
-  void SetOrientationValue( int orientation );
+  void ApplyTheme( const std::string& themeFile );
 
   /**
-   * @copydoc Toolkit::StyleManager::GetOrientationValue
+   * @copydoc Toolkit::StyleManager::ApplyDefaultTheme
    */
-  int GetOrientationValue();
-
-  /**
-   * @copydoc Toolkit::StyleManager::SetOrientation( Orientation orientation )
-   */
-  void SetOrientation( Orientation orientation );
-
-  /**
-   * @copydoc Toolkit::StyleManager::GetOrientation
-   */
-  Orientation GetOrientation();
+  void ApplyDefaultTheme();
 
   /**
    * @copydoc Toolkit::StyleManager::GetDefaultFontFamily
    */
-  std::string GetDefaultFontFamily() const;
+  const std::string& GetDefaultFontFamily() const;
 
   /**
    * @copydoc Toolkit::StyleManager::SetStyleConstant
@@ -101,16 +91,6 @@ public: // Public API
    * @copydoc Toolkit::StyleManager::GetStyleConstant
    */
   bool GetStyleConstant( const std::string& key, Property::Value& valueOut );
-
-  /**
-   * @copydoc Toolkit::StyleManager::RequestThemeChange
-   */
-  void RequestThemeChange( const std::string& themeFile );
-
-  /**
-   * @copydoc Toolkit::StyleManager::RequestDefaultTheme
-   */
-  void RequestDefaultTheme();
 
   /**
    * @brief Apply the theme style to a control.
@@ -136,8 +116,16 @@ public:
 
   /**
    * @copydoc Toolkit::StyleManager::StyleChangeSignal
+   * This signal is sent after all the controls have been updated
+   * due to style change
    */
-  Toolkit::StyleManager::StyleChangeSignalType& StyleChangeSignal();
+  Toolkit::StyleManager::StyleChangedSignalType& StyleChangedSignal();
+
+  /**
+   * This signal is sent to the controls following a style change.
+   * It should not be exposed in the public API
+   */
+  Toolkit::StyleManager::StyleChangedSignalType& ControlStyleChangeSignal();
 
 private:
   typedef std::vector<std::string> StringList;
@@ -202,13 +190,6 @@ private:
   void ApplyStyle( Toolkit::Builder builder, Toolkit::Control control );
 
   /**
-   * @brief Callback for orientation changes
-   *
-   * @param[in] orientation The orientation object
-   */
-  void OnOrientationChanged( Orientation orientation );
-
-  /**
    * Search for a builder in the cache
    *
    * @param[in] key The key the builder was cached under
@@ -232,6 +213,12 @@ private:
    */
   void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange );
 
+  /**
+   * Emit signals to controls first, app second
+   */
+  void EmitStyleChangeSignals( StyleChange::Type styleChange );
+
+
   // Undefined
   StyleManager(const StyleManager&);
 
@@ -245,9 +232,6 @@ private:
   Toolkit::Builder mThemeBuilder;     ///< Builder for all default theme properties
   StyleMonitor mStyleMonitor;         ///< Style monitor handle
 
-  Orientation mOrientation;           ///< Handle to application orientation object
-  int mOrientationDegrees;            ///< Directly set value of orientation
-
   int mDefaultFontSize;               ///< Logical size, not a point-size
   std::string mDefaultFontFamily;
   std::string mThemeFile;             ///< The full path of the current theme file
@@ -260,7 +244,8 @@ private:
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
   // Signals
-  Toolkit::StyleManager::StyleChangeSignalType       mStyleChangeSignal;         ///< Emitted when the style( theme/font ) changes
+  Toolkit::StyleManager::StyleChangedSignalType mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves
+  Toolkit::StyleManager::StyleChangedSignalType mStyleChangedSignal; ///< Emitted after the controls have been styled
 };
 
 } // namespace Internal

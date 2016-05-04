@@ -83,7 +83,7 @@ public:
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    *
-   * @param [in] rhs  A reference to the copied handle
+   * @param [in] handle  A reference to the copied handle
    * @return A reference to this
    */
   ImageAtlas& operator=( const ImageAtlas& handle );

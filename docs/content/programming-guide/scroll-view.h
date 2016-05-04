@@ -31,9 +31,8 @@
 
    Add Actors to this ScrollView
    @code
-   Image image = Image::New(DALI_IMAGE_DIR "button-background.png");
-   ImageActor imageActor = ImageActor::New(image);
-   myScrollView.Add( imageActor );
+   Toolkit::ImageView imageView = Toolkit::ImageView::New(DALI_IMAGE_DIR "button-background.png");
+   myScrollView.Add( imageView );
    @endcode
 
    The ScrollView contents are now draggable by the user using touch (panning gestures).

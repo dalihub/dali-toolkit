@@ -80,9 +80,10 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
                    logicalModel,
                    visualModel );
 
-  // 2) Clear the model.
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
+
+  // 2) Clear the model.
 
   GlyphIndex startGlyphIndex = 0u;
   if( 0u != charactersToGlyph.Count() )
@@ -159,9 +160,10 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
                    logicalModel,
                    visualModel );
 
-  // 2) Clear the model.
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
+
+  // 2) Clear the model.
 
   GlyphIndex startGlyphIndex = 0u;
   if( 0u != charactersToGlyph.Count() )

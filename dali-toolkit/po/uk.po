@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Вибрати всі"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Копіювати"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Вибрати"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Вирізати"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Вставити"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Буфер обміну"
+

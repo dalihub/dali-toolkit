@@ -30,8 +30,6 @@
   + [Positioning](@ref positioning-actors)
   + [Event Handling](@ref event-system)
   + [Layouting](@ref size-negotiation)
-  + [Image Actor](@ref image-actor)
-  + [Image View](@ref image-view)
  + [Animation](@ref animation)
   + [Basic Framework](@ref animation-basics)
   + [Key Frame Animations](@ref animation-key-frame)
@@ -56,6 +54,7 @@
 
 ### UI Components
  + Buttons
+ + [ImageView](@ref image-view)
  + [ItemView](@ref item-view)
  + [Popup](@ref popup)
  + [Scroll View](@ref scroll-view)
@@ -93,8 +92,6 @@
  + [JavaScript Wrapping Guide for DALi developers](@ref javascriptwrapping)
 
 ### Application Optimization Guide
- + [Texture Atlases](@ref textureatlases)
- + [Texture Compression](@ref texturecompression)
  + [Rescaling Images](@ref resourceimagescaling)
  + Performance & Debugging
  + [Performance Tips](@ref performancetips)

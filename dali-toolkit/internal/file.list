@@ -16,6 +16,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/renderers/image-atlas-manager.cpp \
    $(toolkit_src_dir)/controls/renderers/renderer-factory-cache.cpp \
    $(toolkit_src_dir)/controls/renderers/renderer-factory-impl.cpp \
+   $(toolkit_src_dir)/controls/renderers/renderer-string-constants.cpp \
    $(toolkit_src_dir)/controls/renderers/border/border-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/color/color-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/debug/debug-renderer.cpp \
@@ -38,6 +39,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
+   $(toolkit_src_dir)/controls/flex-container/layout.c \
+   $(toolkit_src_dir)/controls/flex-container/flex-container-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
@@ -89,6 +92,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \
    $(toolkit_src_dir)/text/clipping/text-clipper.cpp \
    $(toolkit_src_dir)/text/color-segmentation.cpp \
+   $(toolkit_src_dir)/text/glyph-metrics-helper.cpp \
    $(toolkit_src_dir)/text/logical-model-impl.cpp \
    $(toolkit_src_dir)/text/markup-processor.cpp \
    $(toolkit_src_dir)/text/markup-processor-color.cpp \

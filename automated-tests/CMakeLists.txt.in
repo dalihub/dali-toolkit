@@ -1,0 +1,13 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+PROJECT(tct_coreapi_utc)
+
+INCLUDE(FindPkgConfig)
+SET(BIN_DIR "/opt/usr/bin")
+
+ADD_DEFINITIONS(-DDALI_STYLE_DIR="@dataReadOnlyDir@/toolkit/styles/")
+
+INCLUDE_DIRECTORIES(
+  src/common
+)
+
+ADD_SUBDIRECTORY(src)

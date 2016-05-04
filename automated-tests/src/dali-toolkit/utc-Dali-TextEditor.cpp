@@ -23,7 +23,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor.h> ///< @todo to be removed when text-editor is added to the dali-toolkit.h
-#include <dali-toolkit/devel-api/styling/style-manager.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -372,7 +371,7 @@ int utcDaliTextEditorAtlasRenderP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextEditorAtlasRenderP");
   StyleManager styleManager = StyleManager::Get();
-  styleManager.RequestDefaultTheme();
+  styleManager.ApplyDefaultTheme();
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 

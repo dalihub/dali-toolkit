@@ -79,9 +79,9 @@ daliApp.createMeshActor = function() {
 
       var shader = new dali.Shader(shaderOptions);
 
-      var material = new dali.Material( shader );
       var image = new dali.ResourceImage( {url: imageDir + "image-1.jpg"} );
-      material.addTexture(image, "sTexture");
+      var textureSet = new dali.TextureSet;
+      textureSet.setImage(0, image);
 
       // Create vertex buffer
       var polyhedraVertexFormat ={ "aPosition" : dali.PROPERTY_VECTOR2,
@@ -115,7 +115,8 @@ daliApp.createMeshActor = function() {
       geometry.addVertexBuffer( polyhedraVertices );
       geometry.setGeometryType( dali.GEOMETRY_POINTS );
 
-      var renderer = new dali.Renderer(geometry, material);
+      var renderer = new dali.Renderer(geometry, shader);
+      renderer.setTextures(textureSet);
       renderer.registerAnimatableProperty("uFadeColor", [1.0, 0.0, 1.0, 1.0]); // Green
       renderer.registerAnimatableProperty("uPointSize", 80.0);
       renderer.depthIndex = 0;

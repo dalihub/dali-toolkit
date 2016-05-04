@@ -125,13 +125,25 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextLabel::Property::RENDERING_BACKEND:
       {
-        const int backend = value.Get< int >();
+        int backend = value.Get< int >();
 
+#ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
+        if( Text::RENDERING_VECTOR_BASED == backend )
+        {
+          backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
+        }
+#endif
         if( impl.mRenderingBackend != backend )
         {
           impl.mRenderingBackend = backend;
           impl.mRenderer.Reset();
-          impl.RequestTextRelayout();
+
+          if( impl.mController )
+          {
+            // When using the vector-based rendering, the size of the GLyphs are different
+            TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+            impl.mController->SetGlyphType( glyphType );
+          }
         }
         break;
       }
@@ -455,6 +467,10 @@ void TextLabel::OnInitialize()
 
   mController = Text::Controller::New( *this );
 
+  // When using the vector-based rendering, the size of the GLyphs are different
+  TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+  mController->SetGlyphType( glyphType );
+
   // Use height-for-width negotiation by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
@@ -470,7 +486,6 @@ void TextLabel::OnInitialize()
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
-
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::OnStyleChange\n");
 
   switch ( change )
@@ -478,7 +493,7 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
       // Property system did not set the font so should update it.
-      std::string newFont = styleManager.GetDefaultFontFamily();
+      const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE newFont(%s)\n", newFont.c_str() );
       mController->UpdateAfterFontChange( newFont );
       break;

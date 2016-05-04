@@ -35,7 +35,7 @@ class ControlRenderer;
 /**
  * @brief ControlRenderer provides renderer for rendering the controls. A control may have multiple ControlRenders.
  *
- * ControlRenderers reuses geometry, shader etc. across controls and manages the renderer and material to exist only when control is on-stage.
+ * ControlRenderers reuses geometry, shader etc. across controls and manages the renderer and texture sets to exist only when control is on-stage.
  * It also responds to actor size and color change, and provides the clipping at the renderer level.
  * Note: The control renderer responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
  */
@@ -99,7 +99,7 @@ public:
    * Depth-index controls draw-order for overlapping renderers.
    * Renderer with higher depth indices are rendered in front of other renderer with smaller values
    *
-   * @param[in] depthIndex The depth index of this renderer.
+   * @param[in] index The depth index of this renderer.
    */
   void SetDepthIndex( float index );
 

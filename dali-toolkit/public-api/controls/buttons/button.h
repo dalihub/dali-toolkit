@@ -66,7 +66,7 @@ class Button;
  *
  * When the button is disabled, \e background, \e button and \e selected images are replaced by their \e disabled images.
  *
- * Is not mandatory set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e selected images.
+ * Is not mandatory to set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e selected images.
  *
  * Signals
  * | %Signal Name     | Method                      |
@@ -165,7 +165,11 @@ public:
    */
   ~Button();
 
+  // Deprecated API
+
   /**
+   * @DEPRECATED_1_1.32 Use SetProperty DISABLED or Styling file
+   *
    * @brief Sets the button as \e disabled.
    *
    * No signals are emitted when the \e disabled property is set.
@@ -176,6 +180,8 @@ public:
   void SetDisabled( bool disabled );
 
   /**
+   * @DEPRECATED_1_1.32 Use GetProperty DISABLED
+   *
    * @brief Returns if the button is disabled.
    * @SINCE_1_0.0
    * @return \e true if the button is \e disabled.
@@ -183,6 +189,8 @@ public:
   bool IsDisabled() const;
 
   /**
+   * @DEPRECATED_1_1.32 SetProperty AUTO_REPEATING or Styling file
+   *
    * @brief Sets the \e autorepeating property.
    *
    * If the \e autorepeating property is set to \e true, then the \e togglable property is set to false
@@ -194,6 +202,8 @@ public:
   void SetAutoRepeating( bool autoRepeating );
 
   /**
+   * @DEPRECATED_1_1.32 GetProperty AUTO_REPEATING
+   *
    * @brief Returns if the autorepeating property is set.
    * @SINCE_1_0.0
    * @return \e true if the \e autorepeating property is set.
@@ -201,6 +211,8 @@ public:
   bool IsAutoRepeating() const;
 
   /**
+   * @DEPRECATED_1_1.32 SetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file
+   *
    * @brief Sets the initial autorepeating delay.
    *
    * By default this value is set to 0.15 seconds.
@@ -212,6 +224,8 @@ public:
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
 
   /**
+   * @DEPRECATED_1_1.32 GetProperty INITIAL_AUTO_REPEATING_DELAY
+   *
    * @brief Gets the initial autorepeating delay in seconds.
    * @SINCE_1_0.0
    * @return the initial autorepeating delay in seconds.
@@ -219,6 +233,8 @@ public:
   float GetInitialAutoRepeatingDelay() const;
 
   /**
+   * @DEPRECATED_1_1.32 SetProperty NEXT_AUTO_REPEATING_DELAY or Styling file
+   *
    * @brief Sets the next autorepeating delay.
    *
    * By default this value is set to 0.05 seconds.
@@ -230,6 +246,8 @@ public:
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
 
   /**
+   * @DEPRECATED_1_1.32 GetProperty NEXT_AUTO_REPEATING_DELAY
+   *
    * @brief Gets the next autorepeating delay in seconds.
    * @SINCE_1_0.0
    * @return the next autorepeating delay in seconds.
@@ -237,6 +255,8 @@ public:
   float GetNextAutoRepeatingDelay() const;
 
   /**
+   * @DEPRECATED_1_1.32 SetProperty TOGGLABLE or Styling file
+   *
    * @brief Sets the \e togglable property.
    *
    * If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
@@ -247,6 +267,8 @@ public:
   void SetTogglableButton( bool togglable );
 
   /**
+   * @DEPRECATED_1_1.32 GetProperty TOGGLABLE
+   *
    * @brief Returns if the togglable property is set.
    * @SINCE_1_0.0
    * @return \e true if the \e togglable property is set.
@@ -254,6 +276,8 @@ public:
   bool IsTogglableButton() const;
 
   /**
+   * @DEPRECATED_1_1.32 SetProperty SELECTED
+   *
    * @brief Sets the button as selected or unselected.
    *
    * \e togglable property must be set to \e true.
@@ -266,6 +290,8 @@ public:
   void SetSelected( bool selected );
 
   /**
+   * DEPRECATED_1_1.32  SetProperty SELECTED
+   *
    * @brief Returns if the selected property is set and the button is togglable.
    * @SINCE_1_0.0
    * @return \e true if the button is \e selected.
@@ -273,6 +299,8 @@ public:
   bool IsSelected() const;
 
   /**
+   * @DEPRECATED_1_1.32 Use Styling file to set animation
+   *
    * @brief Sets the animation time.
    *
    * @SINCE_1_0.0
@@ -281,6 +309,8 @@ public:
   void SetAnimationTime( float animationTime );
 
   /**
+   * DEPRECATED_1_1.32 Use Styling file to set animation
+   *
    * @brief Retrieves button's animation time.
    *
    * @SINCE_1_0.0
@@ -289,6 +319,8 @@ public:
   float GetAnimationTime() const;
 
   /**
+   * @DEPRECATED_1_1.32 SetProperty LABEL or Styling file
+   *
    * @brief Sets the button's label.
    *
    * @SINCE_1_0.0
@@ -297,6 +329,8 @@ public:
   void SetLabelText( const std::string& label );
 
   /**
+   * DEPRECATED_1_1.32 GetProperty LABEL
+   *
    * @brief Gets the label.
    *
    * @SINCE_1_0.0
@@ -305,6 +339,8 @@ public:
   std::string GetLabelText() const;
 
   /**
+   * @DEPRECATED_1_1.32 Use Styling file
+   *
    * @brief Sets the unselected button image.
    *
    * @SINCE_1_0.0
@@ -313,6 +349,8 @@ public:
   void SetUnselectedImage( const std::string& filename );
 
   /**
+   * @DEPRECATED_1_1.32 Use styling
+   *
    * @brief Sets the background image.
    *
    * @SINCE_1_0.0
@@ -321,6 +359,8 @@ public:
   void SetBackgroundImage( const std::string& filename );
 
   /**
+   * @DEPRECATED_1_1.32 Use styling file
+   *
    * @brief Sets the selected image.
    *
    * @SINCE_1_0.0
@@ -329,6 +369,8 @@ public:
   void SetSelectedImage( const std::string& filename );
 
   /**
+   * @DEPRECATED_1_1.32 Use styling file
+   *
    * @brief Sets the selected background image.
    *
    * @SINCE_1_0.0
@@ -337,6 +379,8 @@ public:
   void SetSelectedBackgroundImage( const std::string& filename );
 
   /**
+   * @DEPRECATED_1_1.32 Use styling file
+   *
    * @brief Sets the disabled background image.
    *
    * @SINCE_1_0.0
@@ -345,6 +389,8 @@ public:
   void SetDisabledBackgroundImage( const std::string& filename );
 
   /**
+   * @DEPRECATED_1_1.32 Use styling file
+   *
    * @brief Sets the disabled button image.
    *
    * @SINCE_1_0.0
@@ -353,14 +399,14 @@ public:
   void SetDisabledImage( const std::string& filename );
 
   /**
+   * @DEPRECATED_1_1.32 Use styling file
+   *
    * @brief Sets the disabled selected button image.
    *
    * @SINCE_1_0.0
    * @param[in] filename The disabled selected button image.
    */
   void SetDisabledSelectedImage( const std::string& filename );
-
-  // Deprecated API
 
   /**
    * @DEPRECATED_1_0.50. Instead, use SetLabelText.

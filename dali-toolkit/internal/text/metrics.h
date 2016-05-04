@@ -22,6 +22,9 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/text-definitions.h>
+
 namespace Dali
 {
 
@@ -47,6 +50,16 @@ public:
   static Metrics* New( TextAbstraction::FontClient& fontClient )
   {
     return new Metrics( fontClient );
+  }
+
+  /**
+   * @brief Used to switch between bitmap & vector based glyphs
+   *
+   * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
+   */
+  void SetGlyphType( TextAbstraction::GlyphType glyphType )
+  {
+    mGlyphType = glyphType;
   }
 
   /**
@@ -91,7 +104,7 @@ public:
    */
   bool GetGlyphMetrics( GlyphInfo* array, uint32_t size )
   {
-    return mFontClient.GetGlyphMetrics( array, size, true, mEmojiSize ); // inline for performance
+    return mFontClient.GetGlyphMetrics( array, size, mGlyphType, true, mEmojiSize ); // inline for performance
   }
 
 protected:
@@ -108,6 +121,7 @@ private:
    */
   Metrics( TextAbstraction::FontClient& fontClient )
   : mFontClient( fontClient ),
+    mGlyphType( TextAbstraction::BITMAP_GLYPH ),
     mEmojiSize( 0 )
   {
   }
@@ -121,7 +135,7 @@ private:
 private:
 
   TextAbstraction::FontClient mFontClient;
-
+  TextAbstraction::GlyphType mGlyphType;
   int mEmojiSize;
 };
 

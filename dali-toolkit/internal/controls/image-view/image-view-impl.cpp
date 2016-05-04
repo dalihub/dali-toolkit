@@ -142,6 +142,11 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   }
 }
 
+Image ImageView::GetImage() const
+{
+  return mImage;
+}
+
 void ImageView::EnablePreMultipliedAlpha( bool preMultipled )
 {
   if( mRenderer )

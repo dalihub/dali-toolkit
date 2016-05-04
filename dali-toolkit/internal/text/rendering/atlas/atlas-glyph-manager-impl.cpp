@@ -96,12 +96,11 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
 
   if ( mAtlasManager.Add( bitmap, slot ) )
   {
-    // A new atlas was created so set the material details for the atlas
+    // A new atlas was created so set the texture set details for the atlas
     Dali::Atlas atlas = mAtlasManager.GetAtlasContainer( slot.mAtlasId );
-    Pixel::Format pixelFormat = mAtlasManager.GetPixelFormat( slot.mAtlasId );
-    Material material = Material::New( pixelFormat == Pixel::L8 ? mShaderL8 : mShaderRgba );
-    material.AddTexture( atlas, "sTexture" );
-    mAtlasManager.SetMaterial( slot.mAtlasId, material );
+    TextureSet textureSet = TextureSet::New();
+    textureSet.SetImage( 0u, atlas );
+    mAtlasManager.SetTextures( slot.mAtlasId, textureSet );
   }
 
   GlyphRecordEntry record;
@@ -252,9 +251,15 @@ void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIn
   }
 }
 
-Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
+TextureSet AtlasGlyphManager::GetTextures( uint32_t atlasId ) const
 {
-  return mAtlasManager.GetMaterial( atlasId );
+  return mAtlasManager.GetTextures( atlasId );
+}
+
+Shader AtlasGlyphManager::GetShader( uint32_t atlasId ) const
+{
+  Pixel::Format pixelFormat = mAtlasManager.GetPixelFormat( atlasId );
+  return pixelFormat == Pixel::L8 ? mShaderL8 : mShaderRgba;
 }
 
 AtlasGlyphManager::~AtlasGlyphManager()

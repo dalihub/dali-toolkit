@@ -166,7 +166,7 @@ private:
 
   /**
    * Callback function of transition animation finished
-   * Hide transition layer, show current imageActor, and set isAnimating flag to false
+   * Hide transition layer, show current image, and set isAnimating flag to false
    * @param[in] source The cube transition animation
    */
   void OnTransitionFinished(Animation& source);

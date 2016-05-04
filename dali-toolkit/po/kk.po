@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Бәрін бөлектеу"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Көшіру"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Таңдау"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Кесу"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Қою"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Буфер"
+

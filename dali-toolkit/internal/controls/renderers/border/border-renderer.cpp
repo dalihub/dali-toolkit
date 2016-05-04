@@ -24,6 +24,7 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
 namespace Dali
@@ -37,9 +38,6 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("border");
-
 const char * const COLOR_NAME("borderColor");
 const char * const SIZE_NAME("borderSize");
 const char * const ANTI_ALIASING("antiAliasing");
@@ -160,7 +158,7 @@ void BorderRenderer::DoSetOnStage( Actor& actor )
 void BorderRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, BORDER_RENDERER );
   map.Insert( COLOR_NAME, mBorderColor );
   map.Insert( SIZE_NAME, mBorderSize );
 }
@@ -174,8 +172,10 @@ void BorderRenderer::InitializeRenderer()
     mFactoryCache.SaveGeometry( RendererFactoryCache::BORDER_GEOMETRY, geometry );
   }
 
-  Material material = Material::New( GetBorderShader() );
-  mImpl->mRenderer = Renderer::New( geometry, material );
+
+  Shader shader = GetBorderShader();
+  mImpl->mRenderer = Renderer::New( geometry, shader  );
+
 }
 
 void BorderRenderer::SetBorderColor(const Vector4& color)
@@ -209,9 +209,8 @@ void BorderRenderer::RequireAntiAliasing( bool antiAliasing )
     mAntiAliasing = antiAliasing;
     if( mImpl->mRenderer )
     {
-      Material material =  mImpl->mRenderer.GetMaterial();
-      Shader shader = GetBorderShader();
-      material.SetShader( shader );
+      Shader borderShader( GetBorderShader() );
+      mImpl->mRenderer.SetShader( borderShader );
       if( mAntiAliasing )
       {
         mImpl->mRenderer.SetProperty( Renderer::Property::BLENDING_MODE, BlendingMode::ON );
@@ -296,16 +295,12 @@ Geometry BorderRenderer::CreateBorderGeometry()
   borderVertices.SetData( borderVertexData, 16 );
 
   // Create indices
-  unsigned int indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
-  Property::Map indexFormat;
-  indexFormat[INDEX_NAME] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( indexData, 24 );
+  unsigned short indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( borderVertices );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
   geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
 
   return geometry;

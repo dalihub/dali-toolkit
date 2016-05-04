@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Hepsini seç"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopyala"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Seç"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Kes"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Yapıştır"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Pano"
+

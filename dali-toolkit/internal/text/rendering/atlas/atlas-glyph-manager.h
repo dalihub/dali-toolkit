@@ -140,13 +140,22 @@ public:
   Pixel::Format GetPixelFormat( uint32_t atlasId );
 
   /**
-   * @brief Get the material used by an atlas
+   * @brief Get the texture set used by an atlas
    *
    * @param[in] atlasId Id of an atlas
    *
-   * @return The material used by the atlas
+   * @return The texture set used by the atlas
    */
-  Material GetMaterial( uint32_t atlasId ) const;
+  TextureSet GetTextures( uint32_t atlasId ) const;
+
+  /**
+   * @brief Get the shader used by an atlas
+   *
+   * @param[in] atlasId Id of an atlas
+   *
+   * @return The shader used by the atlas
+   */
+  Shader GetShader( uint32_t atlasId ) const;
 
   /**
    * @brief Get Glyph Manager metrics

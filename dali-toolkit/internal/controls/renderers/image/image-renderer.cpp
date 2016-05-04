@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADER
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
@@ -45,34 +46,28 @@ namespace
 const char HTTP_URL[] = "http://";
 const char HTTPS_URL[] = "https://";
 
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("image");
-
 // property names
-const char * const IMAGE_URL_NAME( "imageUrl" );
-const char * const IMAGE_FITTING_MODE( "imageFittingMode" );
-const char * const IMAGE_SAMPLING_MODE( "imageSamplingMode" );
-const char * const IMAGE_DESIRED_WIDTH( "imageDesiredWidth" );
-const char * const IMAGE_DESIRED_HEIGHT( "imageDesiredHeight" );
+const char * const IMAGE_FITTING_MODE( "fittingMode" );
+const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
+const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
+const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 
 // fitting modes
-const char * const SHRINK_TO_FIT("shrinkToFit");
-const char * const SCALE_TO_FILL("scaleToFill");
-const char * const FIT_WIDTH("fitWidth");
-const char * const FIT_HEIGHT("fitHeight");
-const char * const DEFAULT("default");
+const char * const SHRINK_TO_FIT("SHRINK_TO_FIT");
+const char * const SCALE_TO_FILL("SCALE_TO_FILL");
+const char * const FIT_WIDTH("FIT_WIDTH");
+const char * const FIT_HEIGHT("FIT_HEIGHT");
+const char * const DEFAULT("DEFAULT");
 
 // sampling modes
-const char * const BOX("box");
-const char * const NEAREST("nearest");
-const char * const LINEAR("linear");
-const char * const BOX_THEN_NEAREST("boxThenNearest");
-const char * const BOX_THEN_LINEAR("boxThenLinear");
-const char * const NO_FILTER("noFilter");
-const char * const DONT_CARE("dontCare");
+const char * const BOX("BOX");
+const char * const NEAREST("NEAREST");
+const char * const LINEAR("LINEAR");
+const char * const BOX_THEN_NEAREST("BOX_THEN_NEAREST");
+const char * const BOX_THEN_LINEAR("BOX_THEN_LINEAR");
+const char * const NO_FILTER("NO_FILTER");
+const char * const DONT_CARE("DONT_CARE");
 
-const std::string TEXTURE_UNIFORM_NAME = "sTexture";
-const std::string ATLAS_RECT_UNIFORM_NAME = "uAtlasRect";
 const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
@@ -359,8 +354,12 @@ Renderer ImageRenderer::CreateRenderer() const
     }
   }
 
-  Material material = Material::New( shader );
-  return Renderer::New( geometry, material );
+  TextureSet textureSet = TextureSet::New();
+
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  return renderer;
 }
 
 Renderer ImageRenderer::CreateNativeImageRenderer() const
@@ -396,8 +395,11 @@ Renderer ImageRenderer::CreateNativeImageRenderer() const
     }
   }
 
-  Material material = Material::New( shader );
-  return Renderer::New( geometry, material );
+  TextureSet textureSet = TextureSet::New();
+  Renderer renderer = Renderer::New( geometry, shader );
+  renderer.SetTextures( textureSet );
+
+  return renderer;
 }
 
 void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
@@ -418,11 +420,13 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
     if( !mImpl->mRenderer )
     {
       Vector4 atlasRect;
-      Material material = mAtlasManager.Add(atlasRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-      if( material )
+      TextureSet textureSet = mAtlasManager.Add(atlasRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+      if( textureSet )
       {
         Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-        mImpl->mRenderer = Renderer::New( geometry, material );
+        Shader shader( GetImageShader(mFactoryCache) );
+        mImpl->mRenderer = Renderer::New( geometry, shader );
+        mImpl->mRenderer.SetTextures( textureSet );
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       }
       else // big image, atlasing is not applied
@@ -431,8 +435,8 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
 
         ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
         image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-        Material material = mImpl->mRenderer.GetMaterial();
-        material.AddTexture( image, TEXTURE_UNIFORM_NAME );
+        TextureSet textureSet = mImpl->mRenderer.GetTextures();
+        textureSet.SetImage( 0u, image );
       }
 
       mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
@@ -497,7 +501,7 @@ void ImageRenderer::DoSetOffStage( Actor& actor )
 void ImageRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
   if( !mImageUrl.empty() )
   {
     map.Insert( IMAGE_URL_NAME, mImageUrl );
@@ -728,17 +732,10 @@ void ImageRenderer::ApplyImageToSampler( const Image& image )
 {
   if( image )
   {
-    Material material = mImpl->mRenderer.GetMaterial();
-    if( material )
+    TextureSet textureSet = mImpl->mRenderer.GetTextures();
+    if( textureSet )
     {
-      int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
-      if( index != -1 )
-      {
-        material.SetTextureImage( index, image );
-        return;
-      }
-
-      material.AddTexture( image, TEXTURE_UNIFORM_NAME );
+      textureSet.SetImage( 0u, image );
     }
   }
 }
@@ -757,7 +754,7 @@ void ImageRenderer::OnImageLoaded( ResourceImage image )
 
 void ImageRenderer::CleanCache(const std::string& url)
 {
-  Material material = mImpl->mRenderer.GetMaterial();
+  TextureSet textureSet = mImpl->mRenderer.GetTextures();
 
   Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
   Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
@@ -770,7 +767,7 @@ void ImageRenderer::CleanCache(const std::string& url)
   mImpl->mRenderer.Reset();
   if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
   {
-    mAtlasManager.Remove( material, atlasRect );
+    mAtlasManager.Remove( textureSet, atlasRect );
   }
 }
 

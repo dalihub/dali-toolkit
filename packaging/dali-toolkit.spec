@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.1.30
+Version:    1.1.32
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -13,6 +13,7 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali-core)
+BuildRequires: gettext
 
 # dali-toolkit only need to know the interfaces(APIs) of dali-adaptor(the devel package).
 # It doesn't need to know which adaptor will be used by applications.
@@ -63,6 +64,16 @@ Application development package for the OpenGLES Canvas toolkit - headers and pa
 %define dali_toolkit_style_files    %{dali_data_ro_dir}/toolkit/styles/
 %define dev_include_path %{_includedir}
 
+# PO
+{
+cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
+for language in *.po
+do
+  language=${language%.po}
+  msgfmt -o ${language}.mo ${language}.po
+done
+} &> /dev/null
+
 ##############################
 # Build
 ##############################
@@ -90,6 +101,17 @@ cd build/tizen
 # LICENSE
 mkdir -p %{buildroot}/usr/share/license
 cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{name}
+
+# PO
+{
+cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
+for language in *.mo
+do
+  language=${language%.mo}
+  mkdir -p %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/
+  cp ${language}.mo %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/dali-toolkit.mo
+done
+} &> /dev/null
 
 ##############################
 # Post Install
@@ -120,6 +142,7 @@ exit 0
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/*
 %{_datadir}/license/%{name}
+%{_datadir}/locale/*/LC_MESSAGES/*
 
 %files devel
 %defattr(-,root,root,-)

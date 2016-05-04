@@ -142,6 +142,9 @@ fi
 #set a variable for the makefile to force compile the JAvaSplugin
 AM_CONDITIONAL([ENABLE_JAVASCRIPT_PLUGIN], [test x$build_javascript_plugin = xyes])
 
+# Platforms with highp shader support can use vector based text
+AM_CONDITIONAL([ENABLE_VECTOR_BASED_TEXT_RENDERING], [test x$dali_profile = xUBUNTU])
+
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_TOOLKIT_CFLAGS)
@@ -165,6 +168,7 @@ AC_CONFIG_FILES([
  dali-toolkit.pc
  docs/Makefile
  docs/dali.doxy
+ ../../automated-tests/CMakeLists.txt
 ])
 
 AC_OUTPUT

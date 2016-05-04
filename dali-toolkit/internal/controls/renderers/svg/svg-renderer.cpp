@@ -30,18 +30,13 @@
 #include "svg-rasterize-thread.h"
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("svg");
-const char * const IMAGE_URL_NAME("imageUrl");
 const char * const UNITS("px");
-
-const std::string TEXTURE_UNIFORM_NAME = "sTexture";
-const std::string ATLAS_RECT_UNIFORM_NAME = "uAtlasRect";
 
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 }
@@ -104,8 +99,9 @@ void SvgRenderer::DoSetOnStage( Actor& actor )
     geometry =  mFactoryCache.CreateQuadGeometry();
     mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
-  Material material = Material::New( shader );
-  mImpl->mRenderer = Renderer::New( geometry, material );
+  TextureSet textureSet = TextureSet::New();
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer.SetTextures( textureSet );
 
   if( mImpl->mSize != Vector2::ZERO && mParsedImage )
   {
@@ -146,7 +142,7 @@ void SvgRenderer::SetSize( const Vector2& size )
 void SvgRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
   if( !mImageUrl.empty() )
   {
     map.Insert( IMAGE_URL_NAME, mImageUrl );
@@ -197,19 +193,19 @@ void SvgRenderer::ApplyRasterizedImage( PixelDataPtr rasterizedPixelData )
 {
   if( GetIsOnStage()  )
   {
-    Material currentMaterial = mImpl->mRenderer.GetMaterial();
+    TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if( mAtlasRect != FULL_TEXTURE_RECT )
     {
-      mAtlasManager.Remove( currentMaterial, mAtlasRect );
+      mAtlasManager.Remove( currentTextureSet, mAtlasRect );
     }
 
     Vector4 atlasRect;
-    Material material = mAtlasManager.Add(atlasRect, rasterizedPixelData );
-    if( material ) // atlasing
+    TextureSet textureSet = mAtlasManager.Add(atlasRect, rasterizedPixelData );
+    if( textureSet ) // atlasing
     {
-      if( material != currentMaterial )
+      if( textureSet != currentTextureSet )
       {
-        mImpl->mRenderer.SetMaterial( material );
+        mImpl->mRenderer.SetTextures( textureSet );
       }
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       mAtlasRect = atlasRect;
@@ -221,27 +217,20 @@ void SvgRenderer::ApplyRasterizedImage( PixelDataPtr rasterizedPixelData )
 
       if( mAtlasRect == FULL_TEXTURE_RECT )
       {
-        material = currentMaterial;
+        textureSet = currentTextureSet;
       }
       else
       {
-        material = Material::New( ImageRenderer::GetImageShader( mFactoryCache ) );
-        mImpl->mRenderer.SetMaterial( material );
+        textureSet = TextureSet::New();
+        mImpl->mRenderer.SetTextures( textureSet );
 
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
         mAtlasRect = FULL_TEXTURE_RECT;
       }
 
-      if( material )
+      if( textureSet )
       {
-        int index = material.GetTextureIndex( TEXTURE_UNIFORM_NAME );
-        if( index != -1 )
-        {
-          material.SetTextureImage( index, texture );
-          return;
-        }
-
-        material.AddTexture( texture, TEXTURE_UNIFORM_NAME );
+        textureSet.SetImage( 0u, texture );
       }
     }
   }

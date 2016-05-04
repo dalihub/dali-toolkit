@@ -134,11 +134,6 @@ void Builder::CreateRenderTask( const std::string &name )
   GetImpl(*this).CreateRenderTask( name );
 }
 
-ShaderEffect Builder::GetShaderEffect( const std::string &name )
-{
-  return GetImpl(*this).GetShaderEffect( name );
-}
-
 FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
 {
   return GetImpl(*this).GetFrameBufferImage( name );

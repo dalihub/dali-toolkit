@@ -95,14 +95,10 @@ public:
    *
    * @note If the number of runs is zero the bidirectional info buffer is cleared.
    *
-   * @param[in] bidirectionalInfo Pointer to a buffer with all the bidirectional info runs.
-   * @param[in] numberOfRuns The number of bidirectional info runs.
    * @param[in] startIndex Character index from where the conversion tables are set.
    * @param[in] numberOfCharacters The number of characters.
    */
-  void SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
-                              Length numberOfRuns,
-                              CharacterIndex startIndex,
+  void SetVisualToLogicalMap( CharacterIndex startIndex,
                               Length numberOfCharacters );
 
   /**
@@ -194,7 +190,6 @@ public:
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
   Vector<CharacterDirection>            mCharacterDirections;        ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
-  Vector<CharacterIndex>                mLogicalToVisualMap;         ///< Bidirectional logical to visual conversion table.
   Vector<CharacterIndex>                mVisualToLogicalMap;         ///< Bidirectional visual to logical conversion table.
   Vector<CharacterIndex>                mVisualToLogicalCursorMap;   ///< Bidirectional visual to logical cursor conversion table.
 };

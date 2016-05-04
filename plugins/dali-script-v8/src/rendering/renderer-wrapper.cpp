@@ -47,8 +47,8 @@ const ApiFunction RendererFunctionTable[]=
 
    { "SetGeometry"             , RendererApi::SetGeometry },
    { "GetGeometry"             , RendererApi::GetGeometry },
-   { "SetMaterial"             , RendererApi::SetMaterial },
-   { "GetMaterial"             , RendererApi::GetMaterial },
+   { "SetTextures"             , RendererApi::SetTextures },
+   { "GetTextures"             , RendererApi::GetTextures },
    { "SetBlendFunc"            , RendererApi::SetBlendFunc },
    { "GetBlendFunc"            , RendererApi::GetBlendFunc },
    { "SetBlendEquation"        , RendererApi::SetBlendEquation },

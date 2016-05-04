@@ -87,7 +87,6 @@ public:
    *
    * @param[out] glyphs Pointer to a buffer where the glyphs are copied.
    * @param[out] glyphPositions Pointer to a buffer where the glyph's positions are copied.
-   * @param[out] colors Pointer to a buffer where the glyph's colors are copied.
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs Number of glyphs to be copied.
    *
@@ -95,9 +94,22 @@ public:
    */
   virtual Length GetGlyphs( GlyphInfo* glyphs,
                             Vector2* glyphPositions,
-                            Vector4* glyphColors,
                             GlyphIndex glyphIndex,
                             Length numberOfGlyphs ) const = 0;
+
+  /**
+   * @brief Retrieves the vector of colors.
+   *
+   * @return Pointer to the vector of colors.
+   */
+  virtual const Vector4* const GetColors() const = 0;
+
+  /**
+   * @brief Retrieves the vector of indices to the vector of colors.
+   *
+   * @return Pointer to a vector which stores for each glyph the index to the vector of colors.
+   */
+  virtual const ColorIndex* const GetColorIndices() const = 0;
 
   /**
    * @brief Retrieves the text color

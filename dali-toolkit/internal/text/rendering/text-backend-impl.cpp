@@ -25,6 +25,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.h>
+#ifdef ENABLE_VECTOR_BASED_TEXT_RENDERING
+#include <dali-toolkit/internal/text/rendering/vector-based/vector-based-renderer.h>
+#endif
 
 namespace Dali
 {
@@ -88,6 +91,16 @@ RendererPtr Backend::NewRenderer( unsigned int renderingType )
     case Dali::Toolkit::Text::RENDERING_SHARED_ATLAS:
     {
       renderer = Dali::Toolkit::Text::AtlasRenderer::New();
+    }
+    break;
+
+    case Dali::Toolkit::Text::RENDERING_VECTOR_BASED:
+    {
+#ifdef ENABLE_VECTOR_BASED_TEXT_RENDERING
+      renderer = Dali::Toolkit::Text::VectorBasedRenderer::New();
+#else
+      renderer = Dali::Toolkit::Text::AtlasRenderer::New(); // Fallback to bitmap-based rendering
+#endif
     }
     break;
 

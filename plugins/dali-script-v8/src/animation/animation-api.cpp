@@ -825,7 +825,7 @@ void AnimationApi::Animate( const v8::FunctionCallbackInfo<v8::Value>& args )
  *
  *     // animation x position
  *     var anim = new dali.Animation( 1 );
- *     anim.animateBy( imageActor,"positionX", 30 );
+ *     anim.animateBy( actor,"positionX", 30 );
  *     anim.play();
  *
  *     // animate x,y,z position with the optional animation options
@@ -835,7 +835,7 @@ void AnimationApi::Animate( const v8::FunctionCallbackInfo<v8::Value>& args )
  *        alpha:"easeInOutSine"   // Speeds up and slows to a gradual stop
  *     }
  *
- *     anim.animateBy( imageActor,"position", [100,200,0], options );
+ *     anim.animateBy( actor,"position", [100,200,0], options );
  *
  */
 void AnimationApi::AnimateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
@@ -886,7 +886,7 @@ void AnimationApi::AnimateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
  * @example
  *
  *     var anim = new dali.Animation( 1 );
- *     anim.animateTo( imageActor,"positionX", 30 );
+ *     anim.animateTo( actor,"positionX", 30 );
  *     anim.play();
  *
  *
@@ -897,7 +897,7 @@ void AnimationApi::AnimateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
  *        alpha:"easeInOutSine"   // Speeds up and slows to a gradual stop
  *     }
  *
- *     anim.animateTo( imageActor,"position", [100,200,0], options );
+ *     anim.animateTo( actor,"position", [100,200,0], options );
  *
  */
 void AnimationApi::AnimateTo( const v8::FunctionCallbackInfo< v8::Value >& args )
@@ -977,7 +977,7 @@ void AnimationApi::AnimateTo( const v8::FunctionCallbackInfo< v8::Value >& args 
  *     } ];
  *
  *
- *     anim.animateBetween( imageActor,"position", keyframes );
+ *     anim.animateBetween( actor,"position", keyframes );
  *
  */
 void AnimationApi::AnimateBetween( const v8::FunctionCallbackInfo< v8::Value >& args )

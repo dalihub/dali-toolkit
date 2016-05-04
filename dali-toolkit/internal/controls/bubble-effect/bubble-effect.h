@@ -32,7 +32,7 @@ namespace Internal
 {
 
 /**
- * Create the shader to be used by the material
+ * Create the shader to be used by the renderer
  * @param[in] numberOfBubble How many groups of uniforms are used to control the bubble movement.
  * @return A handle to the newly created shader.
  */
@@ -108,7 +108,7 @@ inline Shader CreateBubbleShader( unsigned int numBubble )
   {\n
     // Get the emit pisition color, and Mix with the actor color
     mediump vec4 fragColor = texture2D(sBackground, vEffectTexCoord)*uColor;\n
-    // Apply the shape defined by the texture contained in the material
+    // Apply the shape defined by the texture contained sBubbleShape
     // And make the opacity being 0.7, and animate from 0.7 to 0 during the last 1/3 of movement
     fragColor.a  *= texture2D(sBubbleShape, vTexCoord).a * ( 2.1 - max( vPercentage*2.1, 1.4 ) );\n
     gl_FragColor = fragColor;\n

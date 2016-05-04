@@ -32,6 +32,14 @@ include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
 include ../../../dali-toolkit/devel-api/file.list
 
+vector_based_text_src_dir = ../../../dali-toolkit/internal/text/rendering/vector-based
+include ../../../dali-toolkit/internal/text/rendering/vector-based/file.list
+
+if ENABLE_VECTOR_BASED_TEXT_RENDERING
+toolkit_src_files += $(vector_based_text_src_files)
+DALI_TOOLKIT_CFLAGS += -DENABLE_VECTOR_BASED_TEXT_RENDERING
+endif
+
 resources_dir = ../../../resources
 daliimagedir = ${dataReadOnlyDir}/toolkit/images/
 daliimage_DATA = ${dali_toolkit_image_files}
@@ -90,6 +98,7 @@ develapicontrolsdir =           $(develapidir)/controls
 develapibloomviewdir =          $(develapicontrolsdir)/bloom-view
 develapibubbleemitterdir =      $(develapicontrolsdir)/bubble-effect
 develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
+develapiflexcontainerdir =      $(develapicontrolsdir)/flex-container
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
 develapirendererfactorydir =    $(develapicontrolsdir)/renderer-factory
 develapipopupdir =              $(develapicontrolsdir)/popup
@@ -101,7 +110,6 @@ develapiimageatlasdir =         $(develapidir)/image-atlas
 develapiscriptingdir =          $(develapidir)/scripting
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
-develapistylingdir =            $(develapidir)/styling
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 
@@ -111,6 +119,7 @@ develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
 develapibuilder_HEADERS =           $(devel_api_builder_header_files)
 develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
+develapiflexcontainer_HEADERS =     $(devel_api_flex_container_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
 develapiimageatlas_HEADERS =        $(devel_api_image_atlas_header_files)
 develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
@@ -120,7 +129,6 @@ develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
 develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
 develapislider_HEADERS =            $(devel_api_slider_header_files)
-develapistyling_HEADERS =           $(devel_api_styling_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
@@ -141,6 +149,7 @@ publicapiscrollbardir =            $(publicapicontrolsdir)/scroll-bar
 publicapiscrollabledir =           $(publicapicontrolsdir)/scrollable
 publicapiscrollviewdir =           $(publicapicontrolsdir)/scrollable/scroll-view
 publicapiitemviewdir =             $(publicapicontrolsdir)/scrollable/item-view
+publicapistylingdir =              $(publicapidir)/styling
 publicapitableviewdir =            $(publicapicontrolsdir)/table-view
 publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =         $(publicapidir)/focus-manager
@@ -161,6 +170,7 @@ publicapipageturnview_HEADERS =         $(public_api_page_turn_view_header_files
 publicapiscrollbar_HEADERS =            $(public_api_scroll_bar_header_files)
 publicapiscrollable_HEADERS =           $(public_api_scrollable_header_files)
 publicapiscrollview_HEADERS =           $(public_api_scroll_view_header_files)
+publicapistyling_HEADERS =              $(public_api_styling_header_files)
 publicapitableview_HEADERS =            $(public_api_table_view_header_files)
 publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)

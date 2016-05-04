@@ -19,7 +19,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/texture-set.h>
 #include <dali/devel-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
@@ -187,7 +187,6 @@ void TestControlRendererRender( ToolkitTestApplication& application,
   controlRenderer.SetOnStage( actor );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == expectedSamplers );
 
   application.SendNotification();
   application.Render();
@@ -206,7 +205,8 @@ void TestControlRendererRender( ToolkitTestApplication& application,
 
   if( resourcePtr )
   {
-    DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc));
+    DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) ||
+                     application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceSynchronouslyFunc ));
   }
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
@@ -561,7 +561,7 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
 
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType",  "image" );
-  propertyMap.Insert( "imageUrl",  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
@@ -642,8 +642,8 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
@@ -706,8 +706,8 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
@@ -868,8 +868,8 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "nPatch" );
-  propertyMap.Insert( "imageUrl",  111 );
+  propertyMap.Insert( "rendererType",  111 );
+  propertyMap.Insert( "url",  "ERROR.9.jpg" );
 
   ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
@@ -915,8 +915,6 @@ int UtcDaliRendererFactoryGetSvgRenderer(void)
   application.Render();
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  // texture is not added until the rasterization completed.
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 0 );
 
   EventThreadCallback* eventTrigger = EventThreadCallback::Get();
   CallbackBase* callback = eventTrigger->GetCallback();
@@ -925,8 +923,6 @@ int UtcDaliRendererFactoryGetSvgRenderer(void)
   CallbackBase::Execute( *callback );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
-
 
   // waiting for the resource uploading
   application.SendNotification();
@@ -1040,7 +1036,6 @@ int UtcDaliRendererFactoryResetRenderer3(void)
   application.Render();
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
 
   // reset the renderer to renderer a svg image
   factory.ResetRenderer( controlRenderer, actor, TEST_SVG_FILE_NAME, ImageDimensions( 100, 100 ) );
@@ -1048,16 +1043,12 @@ int UtcDaliRendererFactoryResetRenderer3(void)
   application.Render();
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  // texture is not added until the rasterization completed.
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 0 );
 
   EventThreadCallback* eventTrigger = EventThreadCallback::Get();
   CallbackBase* callback = eventTrigger->GetCallback();
 
   eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
   CallbackBase::Execute( *callback );
-
-  DALI_TEST_CHECK( actor.GetRendererAt(0u).GetMaterial().GetNumberOfTextures() == 1 );
 
   END_TEST;
 }

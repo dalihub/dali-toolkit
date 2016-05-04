@@ -68,15 +68,19 @@ namespace Text
  *
  * @param[in] eventData The event data pointer.
  * @param[in] logicalModel The logical model where to add the new font description run.
+ * @param[out] startOfSelectedText Index to the first selected character.
+ * @param[out] lengthOfSelectedText Number of selected characters.
  */
 FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
-                                                 LogicalModelPtr logicalModel )
+                                                 LogicalModelPtr logicalModel,
+                                                 CharacterIndex& startOfSelectedText,
+                                                 Length& lengthOfSelectedText )
 {
   const bool handlesCrossed = eventData->mLeftSelectionPosition > eventData->mRightSelectionPosition;
 
   // Get start and end position of selection
-  const CharacterIndex startOfSelectedText = handlesCrossed ? eventData->mRightSelectionPosition : eventData->mLeftSelectionPosition;
-  const Length lengthOfSelectedText = ( handlesCrossed ? eventData->mLeftSelectionPosition : eventData->mRightSelectionPosition ) - startOfSelectedText;
+  startOfSelectedText = handlesCrossed ? eventData->mRightSelectionPosition : eventData->mLeftSelectionPosition;
+  lengthOfSelectedText = ( handlesCrossed ? eventData->mLeftSelectionPosition : eventData->mRightSelectionPosition ) - startOfSelectedText;
 
   // Add the font run.
   const VectorBase::SizeType numberOfRuns = logicalModel->mFontDescriptionRuns.Count();
@@ -105,6 +109,17 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
   {
     mImpl->mEventData = new EventData( decorator );
   }
+}
+
+void Controller::SetGlyphType( TextAbstraction::GlyphType glyphType )
+{
+  // Metrics for bitmap & vector based glyphs are different
+  mImpl->mMetrics->SetGlyphType( glyphType );
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->RequestRelayout();
 }
 
 void Controller::SetMarkupProcessorEnabled( bool enable )
@@ -146,6 +161,8 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
+    mImpl->mVisualModel->SetTextColor( mImpl->mTextColor );
+
     MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns,
                                          mImpl->mLogicalModel->mFontDescriptionRuns );
 
@@ -178,6 +195,9 @@ void Controller::SetText( const std::string& text )
 
     DALI_ASSERT_DEBUG( textSize >= characterCount && "Invalid UTF32 conversion length" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, textSize, mImpl->mLogicalModel->mText.Count() );
+
+    // The characters to be added.
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mLogicalModel->mText.Count();
 
     // To reset the cursor position
     lastCursorIndex = characterCount;
@@ -305,9 +325,6 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
-
   mImpl->RequestRelayout();
 }
 
@@ -354,9 +371,6 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
-
   mImpl->RequestRelayout();
 }
 
@@ -383,9 +397,6 @@ void Controller::SetDefaultFontWidth( FontWidth width )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
-
   mImpl->RequestRelayout();
 }
 
@@ -411,9 +422,6 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
 
   // Clear the font-specific data
   ClearFontData();
-
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
 }
@@ -450,9 +458,6 @@ void Controller::SetDefaultPointSize( float pointSize )
   // Clear the font-specific data
   ClearFontData();
 
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
-
   mImpl->RequestRelayout();
 }
 
@@ -473,11 +478,10 @@ void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
   if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
-    ClearFontData();
     mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
-    mImpl->UpdateModel( ALL_OPERATIONS );
-    mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
-    mImpl->mRecalculateNaturalSize = true;
+
+    ClearFontData();
+
     mImpl->RequestRelayout();
   }
 }
@@ -499,7 +503,9 @@ const Vector4& Controller::GetTextColor() const
   return mImpl->mTextColor;
 }
 
-bool Controller::RemoveText( int cursorOffset, int numberOfCharacters )
+bool Controller::RemoveText( int cursorOffset,
+                             int numberOfCharacters,
+                             UpdateInputStyleType type )
 {
   bool removed = false;
 
@@ -530,17 +536,24 @@ bool Controller::RemoveText( int cursorOffset, int numberOfCharacters )
       numberOfCharacters = currentText.Count() - cursorIndex;
     }
 
-    if( ( cursorIndex + numberOfCharacters ) <= currentText.Count() )
+    if( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
     {
+      // Mark the paragraphs to be updated.
+      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+
       // Update the input style and remove the text's style before removing the text.
 
-      // Set first the default input style.
-      mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
+      if( UPDATE_INPUT_STYLE == type )
+      {
+        // Set first the default input style.
+        mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
 
-      // Update the input style.
-      mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+        // Update the input style.
+        mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+      }
 
-      // Remove the text's style before removing the text.
+      // Updates the text style runs by removing characters. Runs with no characters are removed.
       mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
 
       // Remove the characters.
@@ -649,6 +662,7 @@ void Controller::SetInputColor( const Vector4& color )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.textColor = color;
+    mImpl->mEventData->mInputStyle.isDefaultColor = false;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -670,6 +684,10 @@ void Controller::SetInputColor( const Vector4& color )
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | COLOR );
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
     }
   }
 }
@@ -695,8 +713,12 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
+      CharacterIndex startOfSelectedText = 0u;
+      Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel );
+                                                                            mImpl->mLogicalModel,
+                                                                            startOfSelectedText,
+                                                                            lengthOfSelectedText );
 
       fontDescriptionRun.familyLength = fontFamily.size();
       fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
@@ -706,9 +728,20 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
       // The memory allocated for the font family name is freed when the font description is removed from the logical model.
 
       // Request to relayout.
-      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               VALIDATE_FONTS            |
+                                                               SHAPE_TEXT                |
+                                                               GET_GLYPH_METRICS         |
+                                                               LAYOUT                    |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               REORDER                   |
+                                                               ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font changes, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -757,16 +790,31 @@ void Controller::SetInputFontWeight( FontWeight weight )
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
+      CharacterIndex startOfSelectedText = 0u;
+      Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel );
+                                                                            mImpl->mLogicalModel,
+                                                                            startOfSelectedText,
+                                                                            lengthOfSelectedText );
 
       fontDescriptionRun.weight = weight;
       fontDescriptionRun.weightDefined = true;
 
       // Request to relayout.
-      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               VALIDATE_FONTS            |
+                                                               SHAPE_TEXT                |
+                                                               GET_GLYPH_METRICS         |
+                                                               LAYOUT                    |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               REORDER                   |
+                                                               ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -795,16 +843,31 @@ void Controller::SetInputFontWidth( FontWidth width )
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
+      CharacterIndex startOfSelectedText = 0u;
+      Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel );
+                                                                            mImpl->mLogicalModel,
+                                                                            startOfSelectedText,
+                                                                            lengthOfSelectedText );
 
       fontDescriptionRun.width = width;
       fontDescriptionRun.widthDefined = true;
 
       // Request to relayout.
-      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               VALIDATE_FONTS            |
+                                                               SHAPE_TEXT                |
+                                                               GET_GLYPH_METRICS         |
+                                                               LAYOUT                    |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               REORDER                   |
+                                                               ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -833,16 +896,31 @@ void Controller::SetInputFontSlant( FontSlant slant )
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
+      CharacterIndex startOfSelectedText = 0u;
+      Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel );
+                                                                            mImpl->mLogicalModel,
+                                                                            startOfSelectedText,
+                                                                            lengthOfSelectedText );
 
       fontDescriptionRun.slant = slant;
       fontDescriptionRun.slantDefined = true;
 
       // Request to relayout.
-      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               VALIDATE_FONTS            |
+                                                               SHAPE_TEXT                |
+                                                               GET_GLYPH_METRICS         |
+                                                               LAYOUT                    |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               REORDER                   |
+                                                               ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -870,16 +948,31 @@ void Controller::SetInputFontPointSize( float size )
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
+      CharacterIndex startOfSelectedText = 0u;
+      Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel );
+                                                                            mImpl->mLogicalModel,
+                                                                            startOfSelectedText,
+                                                                            lengthOfSelectedText );
 
       fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * 64.f );
       fontDescriptionRun.sizeDefined = true;
 
       // Request to relayout.
-      mImpl->mOperationsPending = ALL_OPERATIONS;
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               VALIDATE_FONTS            |
+                                                               SHAPE_TEXT                |
+                                                               GET_GLYPH_METRICS         |
+                                                               LAYOUT                    |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               REORDER                   |
+                                                               ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
+
+      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -963,20 +1056,28 @@ Vector3 Controller::GetNaturalSize()
     // Make sure the model is up-to-date before layouting
     mImpl->UpdateModel( onlyOnceOperations );
 
-    // Operations that need to be done if the size changes.
-    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
-                                                                        ALIGN  |
-                                                                        REORDER );
+    // Layout the text for the new width.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+
+    // Store the actual control's width.
+    const float actualControlWidth = mImpl->mVisualModel->mControlSize.width;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
-                                             sizeOperations ),
+                                             LAYOUT ),
                 naturalSize.GetVectorXY() );
 
     // Do not do again the only once operations.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
 
     // Do the size related operations again.
+    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
+                                                                        ALIGN  |
+                                                                        REORDER );
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
 
     // Stores the natural size to avoid recalculate it again
@@ -984,6 +1085,12 @@ Vector3 Controller::GetNaturalSize()
     mImpl->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
 
     mImpl->mRecalculateNaturalSize = false;
+
+    // Clear the update info. This info will be set the next time the text is updated.
+    mImpl->mTextUpdateInfo.Clear();
+
+    // Restore the actual control's width.
+    mImpl->mVisualModel->mControlSize.width = actualControlWidth;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
@@ -1021,21 +1128,38 @@ float Controller::GetHeightForWidth( float width )
     // Make sure the model is up-to-date before layouting
     mImpl->UpdateModel( onlyOnceOperations );
 
-    // Operations that need to be done if the size changes.
-    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
-                                                                        ALIGN  |
-                                                                        REORDER );
+
+    // Layout the text for the new width.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+
+    // Store the actual control's width.
+    const float actualControlWidth = mImpl->mVisualModel->mControlSize.width;
 
     DoRelayout( Size( width, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
-                                             sizeOperations ),
+                                             LAYOUT ),
                 layoutSize );
 
     // Do not do again the only once operations.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
 
     // Do the size related operations again.
+    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
+                                                                        ALIGN  |
+                                                                        REORDER );
+
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
+
+    // Clear the update info. This info will be set the next time the text is updated.
+    mImpl->mTextUpdateInfo.Clear();
+
+    // Restore the actual control's width.
+    mImpl->mVisualModel->mControlSize.width = actualControlWidth;
+
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height );
   }
   else
@@ -1059,8 +1183,13 @@ bool Controller::Relayout( const Size& size )
       mImpl->mVisualModel->mGlyphPositions.Clear();
       glyphsRemoved = true;
     }
+
+    // Clear the update info. This info will be set the next time the text is updated.
+    mImpl->mTextUpdateInfo.Clear();
+
     // Not worth to relayout if width or height is equal to zero.
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
+
     return glyphsRemoved;
   }
 
@@ -1077,30 +1206,26 @@ bool Controller::Relayout( const Size& size )
                                                              ALIGN                     |
                                                              UPDATE_ACTUAL_SIZE        |
                                                              REORDER );
-
-    mImpl->mVisualModel->mControlSize = size;
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
   }
 
   // Whether there are modify events.
-  const bool isModifyEventsEmpty = 0u == mImpl->mModifyEvents.Count();
-
-  // Make sure the model is up-to-date before layouting.
-  ProcessModifyEvents();
-  mImpl->UpdateModel( mImpl->mOperationsPending );
-
-  // Style operations that need to be done if the text is modified.
-  if( !isModifyEventsEmpty )
+  if( 0u != mImpl->mModifyEvents.Count() )
   {
+    // Style operations that need to be done if the text is modified.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              COLOR );
   }
 
-  // Apply the style runs if text is modified.
-  bool updated = mImpl->UpdateModelStyle( mImpl->mOperationsPending );
+  // Make sure the model is up-to-date before layouting.
+  ProcessModifyEvents();
+  bool updated = mImpl->UpdateModel( mImpl->mOperationsPending );
 
   // Layout the text.
   Size layoutSize;
-  updated = DoRelayout( mImpl->mVisualModel->mControlSize,
+  updated = DoRelayout( size,
                         mImpl->mOperationsPending,
                         layoutSize ) || updated;
 
@@ -1135,7 +1260,10 @@ bool Controller::Relayout( const Size& size )
     updated = mImpl->ProcessInputEvents() || updated;
   }
 
+  // Clear the update info. This info will be set the next time the text is updated.
+  mImpl->mTextUpdateInfo.Clear();
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
+
   return updated;
 }
 
@@ -1191,10 +1319,16 @@ void Controller::ResetText()
 {
   // Reset buffers.
   mImpl->mLogicalModel->mText.Clear();
-  ClearModelData();
 
   // We have cleared everything including the placeholder-text
   mImpl->PlaceholderCleared();
+
+  mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = 0u;
+
+  // Clear any previous text.
+  mImpl->mTextUpdateInfo.mClearAll = true;
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -1230,19 +1364,11 @@ void Controller::ResetScrollPosition()
 
 void Controller::TextReplacedEvent()
 {
-  // Reset buffers.
-  ClearModelData();
-
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->UpdateModel( ALL_OPERATIONS );
-  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
-                                                           ALIGN              |
-                                                           UPDATE_ACTUAL_SIZE |
-                                                           REORDER );
 }
 
 void Controller::TextInsertedEvent()
@@ -1254,19 +1380,11 @@ void Controller::TextInsertedEvent()
     return;
   }
 
-  // TODO - Optimize this
-  ClearModelData();
-
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->UpdateModel( ALL_OPERATIONS );
-  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
-                                                           ALIGN              |
-                                                           UPDATE_ACTUAL_SIZE |
-                                                           REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   if( EventData::IsEditingState( mImpl->mEventData->mState ) )
@@ -1285,19 +1403,11 @@ void Controller::TextDeletedEvent()
     return;
   }
 
-  // TODO - Optimize this
-  ClearModelData();
-
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->UpdateModel( ALL_OPERATIONS );
-  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
-                                                           ALIGN              |
-                                                           UPDATE_ACTUAL_SIZE |
-                                                           REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
@@ -1317,15 +1427,27 @@ bool Controller::DoRelayout( const Size& size,
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
 
+  const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
+  const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
+
   if( LAYOUT & operations )
   {
     // Some vectors with data needed to layout and reorder may be void
     // after the first time the text has been laid out.
     // Fill the vectors again.
 
-    const Length numberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
+    // Calculate the number of glyphs to layout.
+    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mVisualModel->mCharactersToGlyph;
+    const Vector<Length>& glyphsPerCharacter = mImpl->mVisualModel->mGlyphsPerCharacter;
+    const GlyphIndex* const charactersToGlyphBuffer = charactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
 
-    if( 0u == numberOfGlyphs )
+    const CharacterIndex lastIndex = startIndex + ( ( requestedNumberOfCharacters > 0u ) ? requestedNumberOfCharacters - 1u : 0u );
+    const GlyphIndex startGlyphIndex = mImpl->mTextUpdateInfo.mStartGlyphIndex;
+    const Length numberOfGlyphs = ( requestedNumberOfCharacters > 0u ) ? *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex : 0u;
+    const Length totalNumberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
+
+    if( 0u == totalNumberOfGlyphs )
     {
       if( UPDATE_ACTUAL_SIZE & operations )
       {
@@ -1344,8 +1466,6 @@ bool Controller::DoRelayout( const Size& size,
     const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
     const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
-    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mVisualModel->mCharactersToGlyph;
-    const Vector<Length>& glyphsPerCharacter = mImpl->mVisualModel->mGlyphsPerCharacter;
 
     // Set the layout parameters.
     LayoutParameters layoutParameters( size,
@@ -1356,37 +1476,28 @@ bool Controller::DoRelayout( const Size& size,
                                        glyphs.Begin(),
                                        glyphsToCharactersMap.Begin(),
                                        charactersPerGlyph.Begin(),
-                                       charactersToGlyph.Begin(),
-                                       glyphsPerCharacter.Begin(),
-                                       numberOfGlyphs );
-
-    // The laid-out lines.
-    // It's not possible to know in how many lines the text is going to be laid-out,
-    // but it can be resized at least with the number of 'paragraphs' to avoid
-    // some re-allocations.
-    Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
-
-    // Delete any previous laid out lines before setting the new ones.
-    lines.Clear();
-
-    // The capacity of the bidirectional paragraph info is the number of paragraphs.
-    lines.Reserve( mImpl->mLogicalModel->mBidirectionalParagraphInfo.Capacity() );
+                                       charactersToGlyphBuffer,
+                                       glyphsPerCharacterBuffer,
+                                       totalNumberOfGlyphs );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
-    glyphPositions.Resize( numberOfGlyphs );
+    glyphPositions.Resize( totalNumberOfGlyphs );
 
     // Whether the last character is a new paragraph character.
-    layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
+    mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
+    layoutParameters.isLastNewParagraph = mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph;
 
     // The initial glyph and the number of glyphs to layout.
-    layoutParameters.startGlyphIndex = 0u;
+    layoutParameters.startGlyphIndex = startGlyphIndex;
     layoutParameters.numberOfGlyphs = numberOfGlyphs;
+    layoutParameters.startLineIndex = mImpl->mTextUpdateInfo.mStartLineIndex;
+    layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
 
     // Update the visual model.
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
-                                                   lines,
+                                                   mImpl->mVisualModel->mLines,
                                                    layoutSize );
 
     if( viewUpdated )
@@ -1402,26 +1513,26 @@ bool Controller::DoRelayout( const Size& size,
         {
           // Get the lines
           const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
-          const CharacterIndex startIndex = 0u;
-          const Length requestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
           // Reorder the lines.
           bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
           ReorderLines( bidirectionalInfo,
                         startIndex,
                         requestedNumberOfCharacters,
-                        lines,
+                        mImpl->mVisualModel->mLines,
                         bidirectionalLineInfo );
 
           // Set the bidirectional info per line into the layout parameters.
           layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
           layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
 
+          // TODO: update the conversion map instead creating it from scratch.
+          //       Note this tables store indices to characters, so update the table means modify all the indices of the text after the last updated character.
+          //       It's better to refactor this. Store this table per line and don't update the indices.
+          //       For the cursor position probably is better to use the function instead creating a table.
           // Set the bidirectional info into the model.
-          mImpl->mLogicalModel->SetVisualToLogicalMap( layoutParameters.lineBidirectionalInfoRunsBuffer,
-                                                       layoutParameters.numberOfBidirectionalInfoRuns,
-                                                       startIndex,
-                                                       requestedNumberOfCharacters );
+          mImpl->mLogicalModel->SetVisualToLogicalMap( 0u,
+                                                       mImpl->mLogicalModel->mText.Count() );
 
           // Re-layout the text. Reorder those lines with right to left characters.
           mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
@@ -1429,19 +1540,6 @@ bool Controller::DoRelayout( const Size& size,
                                                          requestedNumberOfCharacters,
                                                          glyphPositions );
 
-          // Free the allocated memory used to store the conversion table in the bidirectional line info run.
-          for( Vector<BidirectionalLineInfoRun>::Iterator it = bidirectionalLineInfo.Begin(),
-                 endIt = bidirectionalLineInfo.End();
-               it != endIt;
-               ++it )
-          {
-            BidirectionalLineInfoRun& bidiLineInfo = *it;
-
-            free( bidiLineInfo.visualToLogicalMap );
-            bidiLineInfo.visualToLogicalMap = NULL;
-          }
-
-          bidirectionalLineInfo.Clear();
         }
       } // REORDER
 
@@ -1451,6 +1549,9 @@ bool Controller::DoRelayout( const Size& size,
         mImpl->mVisualModel->SetLayoutSize( layoutSize );
       }
     } // view updated
+
+    // Store the size used to layout the text.
+    mImpl->mVisualModel->mControlSize = size;
   }
   else
   {
@@ -1461,9 +1562,6 @@ bool Controller::DoRelayout( const Size& size,
   {
     // The laid-out lines.
     Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
-
-    const CharacterIndex startIndex = 0u;
-    const Length requestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
     mImpl->mLayoutEngine.Align( size,
                                 startIndex,
@@ -1780,7 +1878,9 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     const CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
 
-    removedPrevious = RemoveText( -static_cast<int>( offset ), mImpl->mEventData->mPreEditLength );
+    removedPrevious = RemoveText( -static_cast<int>( offset ),
+                                  mImpl->mEventData->mPreEditLength,
+                                  DONT_UPDATE_INPUT_STYLE );
 
     mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
     mImpl->mEventData->mPreEditLength = 0u;
@@ -1859,10 +1959,11 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     // Retrieve the text's style for the given index.
     InputStyle style;
+    mImpl->RetrieveDefaultInputStyle( style );
     mImpl->mLogicalModel->RetrieveStyle( styleIndex, style );
 
     // Whether to add a new text color run.
-    const bool addColorRun = style.textColor != mImpl->mEventData->mInputStyle.textColor;
+    const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor );
 
     // Whether to add a new font run.
     const bool addFontNameRun = style.familyName != mImpl->mEventData->mInputStyle.familyName;
@@ -1944,6 +2045,11 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
     }
 
+    // Mark the first paragraph to be updated.
+    mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+
+    // Update the cursor index.
     cursorIndex += maxSizeOfNewText;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
@@ -2344,7 +2450,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
     case ImfManager::DELETESURROUNDING:
     {
-      update = RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+      update = RemoveText( imfEvent.cursorOffset,
+                           imfEvent.numberOfChars,
+                           DONT_UPDATE_INPUT_STYLE );
 
       if( update )
       {
@@ -2424,7 +2532,9 @@ bool Controller::BackspaceKeyEvent()
   else if( mImpl->mEventData->mPrimaryCursorPosition > 0 )
   {
     // Remove the character before the current cursor position
-    removed = RemoveText( -1, 1 );
+    removed = RemoveText( -1,
+                          1,
+                          UPDATE_INPUT_STYLE );
   }
 
   if( removed )
@@ -2500,9 +2610,11 @@ void Controller::ShowPlaceholderText()
       size = mImpl->mEventData->mPlaceholderTextInactive.size();
     }
 
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+
     // Reset model for showing placeholder.
     mImpl->mLogicalModel->mText.Clear();
-    ClearModelData();
     mImpl->mVisualModel->SetTextColor( mImpl->mEventData->mPlaceholderTextColor );
 
     // Convert text into UTF-32
@@ -2516,6 +2628,9 @@ void Controller::ShowPlaceholderText()
     // It returns the actual number of characters.
     const Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
+
+    // The characters to be added.
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = characterCount;
 
     // Reset the cursor position
     mImpl->mEventData->mPrimaryCursorPosition = 0;
@@ -2531,41 +2646,30 @@ void Controller::ShowPlaceholderText()
   }
 }
 
-void Controller::ClearModelData()
-{
-  // n.b. This does not Clear the mText from mLogicalModel
-  mImpl->mLogicalModel->mScriptRuns.Clear();
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mLogicalModel->mLineBreakInfo.Clear();
-  mImpl->mLogicalModel->mWordBreakInfo.Clear();
-  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
-  mImpl->mLogicalModel->mCharacterDirections.Clear();
-  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
-  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
-  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->mColorRuns.Clear();
-  mImpl->mVisualModel->ClearCaches();
-}
-
 void Controller::ClearFontData()
 {
-  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  if( mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  }
+
+  // Set flags to update the model.
+  mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mLogicalModel->mText.Count();
+
+  mImpl->mTextUpdateInfo.mClearAll = true;
+  mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+  mImpl->mRecalculateNaturalSize = true;
+
+  mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                           VALIDATE_FONTS            |
+                                                           SHAPE_TEXT                |
+                                                           GET_GLYPH_METRICS         |
+                                                           LAYOUT                    |
+                                                           UPDATE_ACTUAL_SIZE        |
+                                                           REORDER                   |
+                                                           ALIGN );
 }
 
 void Controller::ClearStyleData()

@@ -79,6 +79,7 @@ public:
       OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshootEffectColor",      @see SetOvershootEffectColor(),    type Vector4 @SINCE_1_0.0
       OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshootAnimationSpeed",   @see SetOvershootAnimationSpeed(), type float @SINCE_1_0.0
       OVERSHOOT_ENABLED,                             ///< Property, name "overshootEnabled",          @see SetOvershootEnabled(),        type bool,    @SINCE_1_1.18
+      OVERSHOOT_SIZE,                                ///< Property, name "overshootSize",                                                type Vector2, @SINCE_1_1.31
 
       // Animatable properties
       SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollRelativePosition",   type Vector2 @SINCE_1_0.0

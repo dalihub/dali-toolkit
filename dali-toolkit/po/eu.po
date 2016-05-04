@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Hautatu denak"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopiatu"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Aukeratu"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Moztu"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Itsatsi"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Arbela"
+

@@ -426,13 +426,13 @@ int UtcDaliBuilderConstantsP(void)
       "},"
       "\"stage\":"
       "[{"
-      "  \"type\": \"ImageActor\","
+      "  \"type\": \"ImageView\","
       "  \"name\": \"{NAME}\","
       "  \"size\": [100,100,1],"
       "  \"parentOrigin\": \"TOP_LEFT\","
       "  \"anchorPoint\": \"{ANCHOR}\","
       "  \"padding\": \"{PADDING}\","
-      "  \"image\": { \"filename\": \"dir/{IMAGE_PATH}\" },"
+      "  \"image\": { \"url\": \"dir/{IMAGE_PATH}\" },"
       "  \"sizeWidth\": \"{WIDTH}\","
       "  \"signals\": [{"
       "    \"name\": \"touched\","
@@ -496,7 +496,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
       "\"templates\":\n"
       "{\n"
       "  \"imageTree\": { \n"
-      "    \"type\": \"ImageActor\",\n"
+      "    \"type\": \"ImageView\",\n"
       "    \"styles\": [\"imageStyle\"],\n"
       "    \"name\": \"image\",\n"
       "    \"size\": \"{SIZE}\",\n"
@@ -506,7 +506,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
       "    }],\n"
       "    \"actors\": [\n"
       "      {\n"
-      "        \"type\":\"ImageActor\",\n"
+      "        \"type\":\"ImageView\",\n"
       "        \"name\":\"childImage\" \n"
       "      }\n"
       "    ]\n"
@@ -533,7 +533,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
 
   std::string templatejson(
     "{ \n"
-    "  \"type\": \"ImageActor\",\n"
+    "  \"type\": \"ImageView\",\n"
     "  \"styles\": [\"imageStyle\"],\n"
     "  \"name\": \"image\",\n"
     "  \"size\": \"{SIZE}\",\n"
@@ -543,7 +543,7 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
     "  }],\n"
     "  \"actors\": [\n"
     "    {\n"
-    "      \"type\":\"ImageActor\",\n"
+    "      \"type\":\"ImageView\",\n"
     "      \"name\":\"childImage\" \n"
     "    }\n"
     "  ]\n"
@@ -553,16 +553,16 @@ int UtcDaliBuilderTemplatesAndStylesP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  ImageActor actor = ImageActor::DownCast( builder.Create( "imageTree" ) );
+  ImageView actor = ImageView::DownCast( builder.Create( "imageTree" ) );
   DALI_TEST_CHECK( actor );
 
   Dali::Property::Map map;
   map["SIZE"] = Vector3(100,100,1);
-  actor = ImageActor::DownCast( builder.Create( "imageTree",  map ) );
+  actor = ImageView::DownCast( builder.Create( "imageTree",  map ) );
   DALI_TEST_CHECK( actor );
 
   // create from json snippet
-  actor = ImageActor::DownCast( builder.CreateFromJson( templatejson ) );
+  actor = ImageView::DownCast( builder.CreateFromJson( templatejson ) );
   DALI_TEST_CHECK( actor );
 
 
@@ -596,7 +596,7 @@ int UtcDaliBuilderRenderTasksP(void)
       "    \"name\": \"image\"\n"
       "  }, \n"
       "  { \n"
-      "    \"type\": \"ImageActor\",\n"
+      "    \"type\": \"ImageView\",\n"
       "    \"name\": \"image\",\n"
       "    \"size\": [100,100,1],\n"
       "    \"signals\": [{\n"
@@ -605,7 +605,7 @@ int UtcDaliBuilderRenderTasksP(void)
       "    }],\n"
       "    \"actors\": [\n"
       "      {\n"
-      "        \"type\":\"ImageActor\",\n"
+      "        \"type\":\"ImageView\",\n"
       "        \"name\":\"childImage\" \n"
       "      }\n"
       "    ]\n"
@@ -856,19 +856,22 @@ int UtcDaliBuilderCustomPropertyP(void)
       "\"templates\":\n"
       "{\n"
       "  \"imageTree\": { \n"
-      "    \"type\": \"ImageActor\",\n"
+      "    \"type\": \"ImageView\",\n"
       "    \"name\": \"image\",\n"
       "    \"size\": [100,100,1],\n"
       "    \"signals\": [{\n"
       "      \"name\": \"touched\",\n"
       "      \"action\": \"quit\"\n"
       "    }],\n"
-      "    \"customProperties\": {\n"
+      "    \"properties\": {\n"
       "      \"newproperty\": true\n"
+      "    },\n"
+      "    \"animatableProperties\": {\n"
+      "      \"newAnimatableproperty\": 3\n"
       "    },\n"
       "    \"actors\": [\n"
       "      {\n"
-      "        \"type\":\"ImageActor\",\n"
+      "        \"type\":\"ImageView\",\n"
       "        \"name\":\"childImage\" \n"
       "      }\n"
       "    ]\n"
@@ -880,7 +883,7 @@ int UtcDaliBuilderCustomPropertyP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  ImageActor actor = ImageActor::DownCast( builder.Create( "imageTree" ) );
+  ImageView actor = ImageView::DownCast( builder.Create( "imageTree" ) );
   DALI_TEST_CHECK( actor );
 
   // NB: already applied in create
@@ -889,10 +892,15 @@ int UtcDaliBuilderCustomPropertyP(void)
   Property::Value value = actor.GetProperty(index);
   DALI_TEST_CHECK( value.Get<bool>() == true );
 
+  index = actor.GetPropertyIndex("newAnimatableproperty");
+  DALI_TEST_CHECK( Property::INVALID_INDEX != index );
+  value = actor.GetProperty(index);
+  DALI_TEST_CHECK( value.Get<int>() == 3 );
+
   END_TEST;
 }
 
-int UtcDaliBuilderShaderEffectP(void)
+int UtcDaliBuilderCustomShaderP(void)
 {
   ToolkitTestApplication application;
 
@@ -901,7 +909,7 @@ int UtcDaliBuilderShaderEffectP(void)
     "{\n"
     "  \"stage\": [\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"Image1\",\n"
     "      \"position\": [\n"
     "        0.40461349487305,\n"
@@ -912,11 +920,16 @@ int UtcDaliBuilderShaderEffectP(void)
     "      \"size\": [200, 200, 0],\n"
     "      \"effect\": \"Ripple2D\",\n"
     "      \"image\": {\n"
-    "        \"filename\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\",\n"
-    "        \"width\": 200,\n"
-    "        \"height\": 80,\n"
-    "        \"loadPolicy\": \"IMMEDIATE\",\n"
-    "        \"releasePolicy\": \"NEVER\"\n"
+    "        \"url\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\",\n"
+    "        \"desiredWidth\": 200,\n"
+    "        \"desiredHeight\": 80,\n"
+    "        \"shader\": {\n"
+    "           \"fragmentShader\": \"precision mediump float;\\nuniform sampler2D sTexture;\\nuniform vec4 uColor;\\nuniform float uAmplitude;\\nuniform float uTime;\\nvarying vec2 vTexCoord;\\nvoid main()\\n{\\n  highp vec2 pos = -1.0 + 2.0 * vTexCoord;\\n  highp float len = length(pos);\\n  highp vec2 texCoord = vTexCoord + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude;\\n  gl_FragColor = texture2D(sTexture, texCoord) * uColor;}\\n\\n\"\n"
+    "        }\n"
+    "      },\n"
+    "      \"customAnimatableProperties\": {\n"
+    "         \"uAmplitude\": 0.02,\n"
+    "         \"uTime\": 0.0\n"
     "      },\n"
     "      \"signals\": [\n"
     "        {\n"
@@ -927,7 +940,6 @@ int UtcDaliBuilderShaderEffectP(void)
     "      ]\n"
     "    }\n"
     "  ],\n"
-    "  \"paths\": {},\n"
     "  \"animations\": {\n"
     "    \"Animation_1\": {\n"
     "      \"loop\":true,\n"
@@ -940,26 +952,9 @@ int UtcDaliBuilderShaderEffectP(void)
     "          \"timePeriod\": {\n"
     "            \"delay\": 0,\n"
     "            \"duration\": 10.0\n"
-    "          },\n"
-    "          \"gui-builder-timeline-color\": \"#8dc0da\"\n"
+    "          }\n"
     "        }\n"
     "      ]\n"
-    "    }\n"
-    "  },\n"
-    "  \"shaderEffects\": {\n"
-    "    \"Ripple2D\": {\n"
-    "      \"program\": {\n"
-    "        \"vertexPrefix\": \"\",\n"
-    "        \"vertex\": \"void main(void)\\n{\\n  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\\n  vTexCoord = aTexCoord;\\n}\\n\\n\",\n"
-    "        \"fragmentPrefix\": \"\",\n"
-    "        \"fragment\": \"precision mediump float;\\nuniform float uAmplitude; // 0.02; (< 1)\\nuniform float uTime;\\nvoid main()\\n{\\n  highp vec2 textureSize = sTextureRect.zw - sTextureRect.xy;\\n  highp vec2 pos = -1.0 + 2.0 * vTexCoord.st/textureSize;\\n  highp float len = length(pos);\\n  highp vec2 texCoord = vTexCoord.st/textureSize + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude; \\n  gl_FragColor = texture2D(sTexture, texCoord) * uColor;\\n}\\n\\n\\n\",\n"
-    "        \"geometryType\": \"GEOMETRY_TYPE_IMAGE\"\n"
-    "      },\n"
-    "      \"geometryHints\": \"HINT_NONE\",\n"
-    "      \"gridDensity\": 0,\n"
-    "      \"loop\": true,\n"
-    "      \"uAmplitude\": 0.02,\n"
-    "      \"uTime\": 0.0\n"
     "    }\n"
     "  }\n"
     "}\n"
@@ -969,10 +964,16 @@ int UtcDaliBuilderShaderEffectP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  ShaderEffect effect = builder.GetShaderEffect("Ripple2D");
+  builder.AddActors ( "stage", Stage::GetCurrent().GetRootLayer() );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("Image1");
 
   // coverage
-  DALI_TEST_CHECK( effect );
+  DALI_TEST_CHECK( actor );
 
   END_TEST;
 }
@@ -1018,80 +1019,6 @@ int UtcDaliBuilderLoadFromStringN(void)
   END_TEST;
 }
 
-int UtcDaliBuilderShaderEffect2P(void)
-{
-  ToolkitTestApplication application;
-
-  // JSON with a quit event when the actor is touched
-  std::string json(
-    "{\n"
-    "\"templates\":\n"
-    "{\n"
-    "  \"imageTree\": { \n"
-    "    \"type\": \"ImageActor\",\n"
-    "    \"size\": [100,100,1],\n"
-    "    \"parentOrigin\": [0.5, 0.5, 0.5],\n"
-    "    \"position\": [\n"
-    "      0.40461349487305,\n"
-    "      0.9150390625,\n"
-    "      0.0\n"
-    "    ],\n"
-    "    \"signals\": [{\n"
-    "      \"name\": \"touched\",\n"
-    "      \"action\": \"quit\"\n"
-    "    }],\n"
-    "    \"actors\": [\n"
-    "      {\n"
-    "        \"type\":\"ImageActor\",\n"
-    "        \"name\":\"childImage\" \n"
-    "      }\n"
-    "    ]\n"
-    "  }\n"
-    "},\n"
-    "  \"stage\": [\n"
-    "    {\n"
-    "      \"type\": \"imageTree\",\n"
-    "      \"name\": \"Image1\",\n"
-    "      \"effect\": \"Ripple2D\",\n"
-    "      \"image\": \"offscreen\""
-    "    }\n"
-    "  ],\n"
-    "  \"shaderEffects\": {\n"
-    "    \"Ripple2D\": {\n"
-    "      \"program\": {\n"
-    "        \"vertexPrefix\": \"\",\n"
-    "        \"vertex\": \"void main(void)\\n{\\n  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\\n  vTexCoord = aTexCoord;\\n}\\n\\n\",\n"
-    "        \"fragmentPrefix\": \"\",\n"
-    "        \"fragment\": \"precision mediump float;\\nuniform float uAmplitude; // 0.02; (< 1)\\nuniform float uTime;\\nvoid main()\\n{\\n  highp vec2 textureSize = sTextureRect.zw - sTextureRect.xy;\\n  highp vec2 pos = -1.0 + 2.0 * vTexCoord.st/textureSize;\\n  highp float len = length(pos);\\n  highp vec2 texCoord = vTexCoord.st/textureSize + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude; \\n  gl_FragColor = texture2D(sTexture, texCoord) * uColor;\\n}\\n\\n\\n\",\n"
-    "        \"geometryType\": \"GEOMETRY_TYPE_IMAGE\"\n"
-    "      },\n"
-    "      \"geometryHints\": \"HINT_NONE\",\n"
-    "      \"gridDensity\": 0,\n"
-    "      \"loop\": true,\n"
-    "      \"uAmplitude\": 0.02,\n"
-    "      \"uTime\": 0.0\n"
-    "    }\n"
-    "  },\n"
-    "  \"frameBufferImages\": {\n"
-    "    \"offscreen\": {\n"
-    "      \"type\": \"FrameBufferImage\","
-    "      \"pixelFormat\":\"RGBA8888\","
-    "      \"width\": 400,"
-    "      \"height\": 400"
-    "    }"
-    "   }"
-    "}\n"
-
-  );
-
-  Builder builder = Builder::New();
-  builder.LoadFromString( json );
-
-  // coverage
-  DALI_TEST_CHECK( true );
-
-  END_TEST;
-}
 
 int UtcDaliBuilderAddActorsP(void)
 {
@@ -1154,7 +1081,7 @@ int UtcDaliBuilderFrameBufferP(void)
     "  },\n"
     "  \"stage\": [\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"fbOnStage\",\n"
     "      \"position\": [\n"
     "        0.40461349487305,\n"
@@ -1167,17 +1094,13 @@ int UtcDaliBuilderFrameBufferP(void)
     "      \"clearColor\": [1,0,0,1]\n"
     "    },\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"Image1\",\n"
     "      \"size\": [200, 200, 0],\n"
     "      \"parentOrigin\": [0.5, 0.5, 0.5],\n"
     "      \"effect\": \"Ripple2D\",\n"
     "      \"image\": {\n"
-    "        \"filename\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\",\n"
-    "        \"width\": 200,\n"
-    "        \"height\": 80,\n"
-    "        \"loadPolicy\": \"IMMEDIATE\",\n"
-    "        \"releasePolicy\": \"NEVER\"\n"
+    "        \"url\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\"\n"
     "      },\n"
     "      \"signals\": [\n"
     "        {\n"
@@ -1294,17 +1217,13 @@ int UtcDaliBuilderPathConstraintsP(void)
     "  },\n"
     "  \"stage\": [\n"
     "    {\n"
-    "      \"type\": \"ImageActor\",\n"
+    "      \"type\": \"ImageView\",\n"
     "      \"name\": \"Image1\",\n"
     "      \"size\": [200, 200, 0],\n"
     "      \"parentOrigin\": [0.5, 0.5, 0.5],\n"
     "      \"effect\": \"Ripple2D\",\n"
     "      \"image\": {\n"
-    "        \"filename\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\",\n"
-    "        \"width\": 200,\n"
-    "        \"height\": 80,\n"
-    "        \"loadPolicy\": \"IMMEDIATE\",\n"
-    "        \"releasePolicy\": \"NEVER\"\n"
+    "        \"url\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\"\n"
     "      },\n"
     "      \"signals\": [\n"
     "        {\n"

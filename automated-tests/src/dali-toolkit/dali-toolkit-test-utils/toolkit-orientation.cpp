@@ -15,130 +15,145 @@
  *
  */
 
-#include "toolkit-orientation.h"
+#include <dali/devel-api/adaptor-framework/orientation.h>
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/dali-signal.h>
 
+using namespace Dali;
+
 namespace Dali
 {
-
-namespace
-{
-ToolkitOrientation* gToolkitOrientation(NULL);
-} // unnamed namespace
+class Adaptor;
 
 namespace Internal
 {
-
 namespace Adaptor
 {
+class Window;
 
-/**
- * Stub for the Orientation
- */
-class Orientation : public BaseObject
+
+struct RotationEvent
 {
-public: // Creation & Destruction
-
-  Orientation();
-  Orientation(ToolkitOrientation *orientation);
-  ~Orientation();
-
-public: // Setters & Getters
-
-  void SetDegrees( int degrees )
-  {
-    mOrientation = degrees;
-  }
-
-  int GetDegrees() const;
-  float GetRadians() const;
-
-public: // Signals
-
-  Dali::Orientation::OrientationSignalType& ChangedSignal();
-
-  void EmitChangedSignal()
-  {
-    mChangedSignal.Emit(Dali::Orientation(this));
-  }
-
-private:
-
-  Dali::Orientation::OrientationSignalType mChangedSignal;
-
-  ToolkitOrientation* mToolkitOrientation;
-
-  int mOrientation;
+  int angle;     ///< one of 0, 90, 180, 270
+  int winResize; ///< true if the window should be resized
+  int width;     ///< new window width
+  int height;    ///< new window height
 };
 
+/**
+ * The RotationObserver can be overridden in order to listen to rotation events.
+ */
+class RotationObserver
+{
+public:
+  virtual void OnRotationPrepare( const RotationEvent& rotation ) = 0;
+  virtual void OnRotationRequest( ) = 0;
+
+protected:
+  RotationObserver(){}
+  virtual ~RotationObserver(){}
+};
+
+class Orientation : public BaseObject, public RotationObserver
+{
+public:
+  typedef Dali::Orientation::OrientationSignalType OrientationSignalType;
+
+  static Orientation* New(Window* window)
+  {
+    Orientation* orientation = new Orientation(window);
+    return orientation;
+  }
+  Orientation(Window* window)
+  {
+  }
+
+protected:
+  virtual ~Orientation()
+  {
+  }
+public:
+  void SetAdaptor(Dali::Adaptor& adaptor)
+  {
+  }
+  int GetDegrees() const
+  {
+    return 0;
+  }
+  float GetRadians() const
+  {
+    return 0.0f;
+  }
+  OrientationSignalType& ChangedSignal()
+  {
+    return mChangedSignal;
+  }
+  virtual void OnRotationPrepare( const RotationEvent& rotation )
+  {
+  };
+  virtual void OnRotationRequest( )
+  {
+  };
+
+private:
+  Orientation(const Orientation&);
+  Orientation& operator=(Orientation&);
+  OrientationSignalType mChangedSignal;
+};
+
+} // Adaptor namespace
+} // Internal namespace
+
+inline Internal::Adaptor::Orientation& GetImplementation (Dali::Orientation& orientation)
+{
+  DALI_ASSERT_ALWAYS(orientation && "Orientation handle is empty");
+  BaseObject& handle = orientation.GetBaseObject();
+  return static_cast<Internal::Adaptor::Orientation&>(handle);
+}
+inline const Internal::Adaptor::Orientation& GetImplementation(const Dali::Orientation& orientation)
+{
+  DALI_ASSERT_ALWAYS(orientation && "Orientation handle is empty");
+  const BaseObject& handle = orientation.GetBaseObject();
+  return static_cast<const Internal::Adaptor::Orientation&>(handle);
+}
+
 Orientation::Orientation()
-: mToolkitOrientation(NULL),
-  mOrientation(0)
 {
 }
-
-Orientation::Orientation(ToolkitOrientation *orientation)
-: mToolkitOrientation(orientation),
-  mOrientation(0)
-{
-}
-
 Orientation::~Orientation()
 {
+}
+Orientation::Orientation(const Orientation& handle)
+: BaseHandle(handle)
+{
+}
+
+Orientation& Orientation::operator=(const Orientation& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
 }
 
 int Orientation::GetDegrees() const
 {
-  mToolkitOrientation->mFunctionsCalled.GetDegrees = true;
-  return mOrientation;
+  return GetImplementation(*this).GetDegrees();
 }
 
 float Orientation::GetRadians() const
 {
-  mToolkitOrientation->mFunctionsCalled.GetRadians = true;
-  return Math::PI * (float)mOrientation / 180.0f;
+  return GetImplementation(*this).GetRadians();
 }
 
-Dali::Orientation::OrientationSignalType& Orientation::ChangedSignal()
+Orientation::OrientationSignalType& Orientation::ChangedSignal()
 {
-  mToolkitOrientation->mFunctionsCalled.ChangedSignal = true;
-  return mChangedSignal;
+  return GetImplementation(*this).ChangedSignal();
 }
 
-} // namespace Adaptor
-
-} // namespace Internal
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ToolkitOrientation::ToolkitOrientation()
-: mOrientationStub(new Internal::Adaptor::Orientation(this)),
-  mOrientation( mOrientationStub )
+Orientation::Orientation( Internal::Adaptor::Orientation* orientation )
+: BaseHandle(orientation)
 {
-  gToolkitOrientation = this;
 }
 
-ToolkitOrientation::~ToolkitOrientation()
-{
-  gToolkitOrientation = NULL;
-}
-
-Orientation ToolkitOrientation::GetHandle()
-{
-  return mOrientation;
-}
-
-void ToolkitOrientation::SetDegrees( int degrees )
-{
-  mOrientationStub->SetDegrees( degrees );
-}
-
-void ToolkitOrientation::EmitChangedSignal()
-{
-  mOrientationStub->EmitChangedSignal();
-}
-
-} // namespace Dali
+} // Dali

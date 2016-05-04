@@ -64,7 +64,7 @@ public:
     Pixel::Format mPixelFormat;                                         // pixel format used by atlas
     BufferImage mHorizontalStrip;                                       // Image used to pad upload
     BufferImage mVerticalStrip;                                         // Image used to pad upload
-    Material mMaterial;                                                 // material used for atlas texture
+    TextureSet mTextureSet;                                             // Texture set used for atlas texture
     SizeType mTotalBlocks;                                              // total number of blocks in atlas
     SizeType mAvailableBlocks;                                          // number of blocks available in atlas
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
@@ -156,7 +156,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasManager::GetPixelFormat
    */
-  Pixel::Format GetPixelFormat( AtlasId atlas );
+  Pixel::Format GetPixelFormat( AtlasId atlas ) const;
 
   /**
    * @copydoc Toolkit::AtlasManager::GetMetrics
@@ -164,14 +164,14 @@ public:
   void GetMetrics( Toolkit::AtlasManager::Metrics& metrics );
 
   /**
-   * @copydoc Toolkit::AtlasManager::GetMaterial
+   * @copydoc Toolkit::AtlasManager::GetTextures
    */
-  Material GetMaterial( AtlasId atlas ) const;
+  TextureSet GetTextures( AtlasId atlas ) const;
 
   /**
-   * @copydoc Toolkit::AtlasManager::SetMaterial
+   * @copydoc Toolkit::AtlasManager::SetTextures
    */
-  void SetMaterial( AtlasId atlas, Material& material );
+  void SetTextures( AtlasId atlas, TextureSet& textureSet );
 
 private:
 

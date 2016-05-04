@@ -34,7 +34,7 @@
 #include <events/pan-gesture-detector-wrapper.h>
 #include <object/property-buffer-wrapper.h>
 #include <rendering/geometry-wrapper.h>
-#include <rendering/material-wrapper.h>
+#include <rendering/texture-set-wrapper.h>
 #include <rendering/renderer-wrapper.h>
 #include <rendering/shader-wrapper.h>
 #include <rendering/sampler-wrapper.h>
@@ -80,7 +80,7 @@ const ApiFunction ConstructorFunctionTable[]=
     { "ItemFactory",        ItemFactoryWrapper::NewItemFactory},
     { "Shader",             ShaderWrapper::NewShader},
     { "Sampler",            SamplerWrapper::NewSampler},
-    { "Material",           MaterialWrapper::NewMaterial},
+    { "TextureSet",         TextureSetWrapper::NewTextureSet},
     { "Geometry",           GeometryWrapper::NewGeometry},
     { "Renderer",           RendererWrapper::NewRenderer},
     { "PropertyBuffer",     PropertyBufferWrapper::NewPropertyBuffer},

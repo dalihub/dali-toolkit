@@ -436,7 +436,7 @@ AtlasManager::SizeType AtlasManager::GetAtlasCount() const
   return mAtlasList.size();
 }
 
-Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas )
+Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas ) const
 {
   DALI_ASSERT_DEBUG( atlas && atlas <= mAtlasList.size() );
   Pixel::Format pixelFormat = Pixel::RGBA8888;
@@ -476,23 +476,23 @@ void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
   metrics.mTextureMemoryUsed = textureMemoryUsed;
 }
 
-Material AtlasManager::GetMaterial( AtlasId atlas ) const
+TextureSet AtlasManager::GetTextures( AtlasId atlas ) const
 {
   DALI_ASSERT_DEBUG( atlas && atlas <= mAtlasList.size() );
-  Material material;
+  TextureSet textureSet;
   if ( atlas && atlas-- <= mAtlasList.size() )
   {
-    material = mAtlasList[ atlas ].mMaterial;
+    textureSet = mAtlasList[ atlas ].mTextureSet;
   }
-  return material;
+  return textureSet;
 }
 
-void AtlasManager::SetMaterial( AtlasId atlas, Material& material )
+void AtlasManager::SetTextures( AtlasId atlas, TextureSet& textureSet )
 {
   DALI_ASSERT_DEBUG( atlas && atlas <= mAtlasList.size() );
   if ( atlas && atlas-- <= mAtlasList.size() )
   {
-    mAtlasList[ atlas ].mMaterial = material;
+    mAtlasList[ atlas ].mTextureSet = textureSet;
   }
 }
 

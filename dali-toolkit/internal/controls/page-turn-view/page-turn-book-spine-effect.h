@@ -35,7 +35,7 @@ namespace Internal
  *
  * When the page is turned over in landscape, call
  * SetIsBackImageVisible(true), this effect can display the back image
- * correctly after the imageActor been rotated 180 degrees.  To
+ * correctly after the page been rotated 180 degrees.  To
  * display the pages visually consistent with its turning state,
  * please set the uniforms with the same values as the PageTurnEffect.
  *

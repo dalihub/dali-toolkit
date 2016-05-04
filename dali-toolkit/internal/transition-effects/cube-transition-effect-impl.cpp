@@ -275,13 +275,14 @@ void CubeTransitionEffect::OnStageConnection( int depth )
   Geometry geometry = CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
-  Material material = Material::New( shader );
+  TextureSet textureSet = TextureSet::New();
 
   if( mCurrentImage )
   {
-    material.AddTexture( mCurrentImage, "sTexture" );
+    textureSet.SetImage( 0u, mCurrentImage );
   }
-  mCurrentRenderer = Renderer::New( geometry, material );
+  mCurrentRenderer = Renderer::New( geometry, shader );
+  mCurrentRenderer.SetTextures( textureSet );
 
   mCurrentRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, depth );
   Self().AddRenderer( mCurrentRenderer );
@@ -340,20 +341,10 @@ bool CubeTransitionEffect::IsTransitioning()
 void CubeTransitionEffect::SetCurrentImage( Image image )
 {
   mCurrentImage = image;
-
   if( mCurrentRenderer )
   {
-    Material material = mCurrentRenderer.GetMaterial();
-
-    int index = material.GetTextureIndex("sTexture" );
-    if( index != -1 )
-    {
-      material.SetTextureImage( index, mCurrentImage );
-    }
-    else
-    {
-      material.AddTexture( mCurrentImage, "sTexture" );
-    }
+    TextureSet textureSet = mCurrentRenderer.GetTextures();
+    textureSet.SetImage( 0u, mCurrentImage );
   }
 }
 
@@ -363,8 +354,8 @@ void CubeTransitionEffect::SetTargetImage( Image image )
 
   if( mTargetRenderer )
   {
-    Material material = mTargetRenderer.GetMaterial();
-    material.AddTexture( mTargetImage, "sTexture" );
+    TextureSet textureSet = mTargetRenderer.GetTextures();
+    textureSet.SetImage( 0u, mTargetImage );
   }
 }
 
@@ -390,13 +381,15 @@ void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisp
   }
 
   //create the target renderer
-  Material material = Material::New( mCurrentRenderer.GetMaterial().GetShader() );
+  TextureSet textureSet = TextureSet::New();
   if( mTargetImage )
   {
-    material.AddTexture( mTargetImage, "sTexture" );
+    textureSet.SetImage( 0u, mTargetImage );
   }
   Geometry geometry = mCurrentRenderer.GetGeometry();
-  mTargetRenderer = Renderer::New( geometry, material );
+  Shader shader( mCurrentRenderer.GetShader() );
+  mTargetRenderer = Renderer::New( geometry, shader );
+  mTargetRenderer.SetTextures( textureSet );
 
   int depthIndex = mCurrentRenderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX);
   mTargetRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex );

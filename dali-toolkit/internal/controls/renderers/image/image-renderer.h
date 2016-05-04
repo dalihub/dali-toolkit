@@ -48,28 +48,28 @@ typedef IntrusivePtr< ImageRenderer > ImageRendererPtr;
  *
  * | %Property Name          | Type             |
  * |-------------------------|------------------|
- * | imageUrl                | STRING           |
- * | imageFittingMode        | STRING           |
- * | imageSamplingMode       | STRING           |
- * | imageDesiredWidth       | INT              |
- * | imageDesiredHeight      | INT              |
+ * | url                | STRING           |
+ * | fittingMode        | STRING           |
+ * | samplingMode       | STRING           |
+ * | desiredWidth       | INT              |
+ * | desiredHeight      | INT              |
  *
  * where imageFittingMode should be one of the following fitting modes:
- *   "shrinkToFit"
- *   "scaleToFill"
- *   "fitWidth"
- *   "fitHeight"
- *   "default"
+ *   "SHRINK_TO_FIT"
+ *   "SCALE_TO_FIT"
+ *   "FIT_WIDTH"
+ *   "FIT_HEIGHT"
+ *   "DEFAULT"
  *
  * where imageSamplingMode should be one of the following sampling modes:
- *   "box"
- *   "nearest"
- *   "linear"
- *   "boxThenNearest"
- *   "boxThenLinear"
- *   "noFilter"
- *   "dontCare"
- *   "default"
+ *   "BOX"
+ *   "NEAREST"
+ *   "LINEAR"
+ *   "BOX_THEN_NEAREST"
+ *   "BOX_THEN_LINEAR"
+ *   "NO_FILTER"
+ *   "DONT_CARE"
+ *   "DEFAULT"
  *
  */
 class ImageRenderer: public ControlRenderer, public ConnectionTracker
@@ -167,9 +167,9 @@ public:
 private:
 
   /**
-   * @brief Applies the image to the material used for this renderer
+   * @brief Applies the image to the texture set used for this renderer
    *
-   * @param[in] image The Image to apply to the material used for this renderer
+   * @param[in] image The Image to apply to the texture set used for this renderer
    */
   void ApplyImageToSampler( const Image& image );
 

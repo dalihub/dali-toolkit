@@ -164,11 +164,23 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         int backend = value.Get< int >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p RENDERING_BACKEND %d\n", impl.mController.Get(), backend );
 
+#ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
+        if( Text::RENDERING_VECTOR_BASED == backend )
+        {
+          backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
+        }
+#endif
         if( impl.mRenderingBackend != backend )
         {
           impl.mRenderingBackend = backend;
           impl.mRenderer.Reset();
-          impl.RequestTextRelayout();
+
+          if( impl.mController )
+          {
+            // When using the vector-based rendering, the size of the GLyphs are different
+            TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+            impl.mController->SetGlyphType( glyphType );
+          }
         }
         break;
       }
@@ -972,6 +984,10 @@ void TextField::OnInitialize()
 
   mController = Text::Controller::New( *this );
 
+  // When using the vector-based rendering, the size of the GLyphs are different
+  TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+  mController->SetGlyphType( glyphType );
+
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
@@ -1008,34 +1024,34 @@ void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange\n");
 
-   switch ( change )
-   {
-     case StyleChange::DEFAULT_FONT_CHANGE:
-     {
-       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange DEFAULT_FONT_CHANGE\n");
-       std::string newFont = styleManager.GetDefaultFontFamily();
-       // Property system did not set the font so should update it.
-       mController->UpdateAfterFontChange( newFont );
-       break;
-     }
+  switch ( change )
+  {
+    case StyleChange::DEFAULT_FONT_CHANGE:
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange DEFAULT_FONT_CHANGE\n");
+      const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
+      // Property system did not set the font so should update it.
+      mController->UpdateAfterFontChange( newFont );
+      break;
+    }
 
-     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
-     {
-       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
+    case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
 
-       if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
-       {
-         // Property system did not set the PointSize so should update it.
-         // todo instruct text-controller to update model
-       }
-       break;
-     }
-     case StyleChange::THEME_CHANGE:
-     {
-       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
-       break;
-     }
-   }
+      if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
+      {
+        // Property system did not set the PointSize so should update it.
+        // todo instruct text-controller to update model
+      }
+      break;
+    }
+    case StyleChange::THEME_CHANGE:
+    {
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      break;
+    }
+  }
 }
 
 Vector3 TextField::GetNaturalSize()

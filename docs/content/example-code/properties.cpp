@@ -67,9 +67,9 @@ public:
     // Set another property to set the image-map
     Property::Map imageMap;
     imageMap[ "rendererType" ] = "image";
-    imageMap[ "imageUrl" ]     = IMAGE_CARDS;
-    imageMap[ "width" ]        = 100;
-    imageMap[ "height" ]       = 100;
+    imageMap[ "url" ]          = IMAGE_CARDS;
+    imageMap[ "desiredWidth" ]        = 100;
+    imageMap[ "desiredHeight" ]       = 100;
     mImageView.SetProperty( ImageView::Property::IMAGE, imageMap );
 
     // Add the image view to the stage

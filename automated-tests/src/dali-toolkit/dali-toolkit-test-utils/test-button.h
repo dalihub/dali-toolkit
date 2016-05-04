@@ -42,7 +42,9 @@ public:
       PRESS_TRANSITION = PROPERTY_START_INDEX,
       RELEASE_TRANSITION,
       DISABLED_TRANSITION,
-      ENABLED_TRANSITION
+      ENABLED_TRANSITION,
+      BACKGROUND_COLOR,
+      FOREGROUND_COLOR
     };
   };
   TestButton();
@@ -79,6 +81,8 @@ public:
   Test::TestAnimationData mReleaseTransitionData;
   Test::TestAnimationData mDisabledTransitionData;
   Test::TestAnimationData mEnabledTransitionData;
+  Dali::Vector4 mBackgroundColor;
+  Dali::Vector4 mForegroundColor;
 };
 
 inline TestButton& GetImpl( Test::TestButton& handle )

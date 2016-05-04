@@ -1,0 +1,7 @@
+# Add local source files here
+
+vector_based_text_src_files = \
+   $(vector_based_text_src_dir)/vector-based-renderer.cpp \
+   $(vector_based_text_src_dir)/vector-blob-atlas.cpp \
+   $(vector_based_text_src_dir)/vector-blob-atlas-share.cpp \
+   $(vector_based_text_src_dir)/glyphy-shader/glyphy-shader.cpp

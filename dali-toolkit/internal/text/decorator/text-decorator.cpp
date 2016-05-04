@@ -283,9 +283,7 @@ struct Decorator::Impl : public ConnectionTracker
     mNotifyEndOfScroll( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
-    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
-    mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
-
+    mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     SetupTouchEvents();
   }
 
@@ -1006,7 +1004,7 @@ struct Decorator::Impl : public ConnectionTracker
       if( !mHighlightQuadList.empty() )
       {
         Vector< Vector2 > vertices;
-        Vector< unsigned int> indices;
+        Vector< unsigned short> indices;
         Vector2 vertex;
 
         std::vector<QuadCoordinates>::iterator iter = mHighlightQuadList.begin();
@@ -1052,24 +1050,18 @@ struct Decorator::Impl : public ConnectionTracker
           mQuadVertices = PropertyBuffer::New( mQuadVertexFormat );
         }
 
-        if( ! mQuadIndices )
-        {
-          mQuadIndices = PropertyBuffer::New( mQuadIndexFormat );
-        }
-
         mQuadVertices.SetData( &vertices[ 0 ], vertices.Size() );
-        mQuadIndices.SetData( &indices[ 0 ], indices.Size() );
 
         if( !mQuadGeometry )
         {
           mQuadGeometry = Geometry::New();
           mQuadGeometry.AddVertexBuffer( mQuadVertices );
         }
-        mQuadGeometry.SetIndexBuffer( mQuadIndices );
+        mQuadGeometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
 
         if( !mHighlightRenderer )
         {
-          mHighlightRenderer = Dali::Renderer::New( mQuadGeometry, mHighlightMaterial );
+          mHighlightRenderer = Dali::Renderer::New( mQuadGeometry, mHighlightShader );
           mHighlightActor.AddRenderer( mHighlightRenderer );
         }
       }
@@ -1653,9 +1645,8 @@ struct Decorator::Impl : public ConnectionTracker
 
   Actor               mHighlightActor;            ///< Actor to display highlight
   Renderer            mHighlightRenderer;
-  Material            mHighlightMaterial;         ///< Material used for highlight
+  Shader              mHighlightShader;           ///< Shader used for highlight
   Property::Map       mQuadVertexFormat;
-  Property::Map       mQuadIndexFormat;
   PopupImpl           mCopyPastePopup;
   TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
   TextSelectionPopupCallbackInterface& mTextSelectionPopupCallbackInterface;
@@ -1667,7 +1658,6 @@ struct Decorator::Impl : public ConnectionTracker
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
 
   PropertyBuffer      mQuadVertices;
-  PropertyBuffer      mQuadIndices;
   Geometry            mQuadGeometry;
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
 

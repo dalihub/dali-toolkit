@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/linear-gradient.h>
 #include <dali-toolkit/internal/controls/renderers/gradient/radial-gradient.h>
 
@@ -43,9 +44,6 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("gradient");
-
 // properties: linear gradient
 const char * const START_POSITION_NAME("startPosition"); // Property::VECTOR2
 const char * const END_POSITION_NAME("endPosition"); // Property::VECTOR2
@@ -69,7 +67,6 @@ const char * const SPREAD_REPEAT("repeat");
 
 // uniform names
 const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
-const char * const UNIFORM_TEXTULRE_NAME("sTexture");
 
 // default offset value
 const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
@@ -246,7 +243,7 @@ void GradientRenderer::DoSetOnStage( Actor& actor )
 void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, GRADIENT_RENDERER );
 
   Gradient::GradientUnits units = mGradient->GetGradientUnits();
   if( units == Gradient::USER_SPACE_ON_USE )
@@ -316,16 +313,17 @@ void GradientRenderer::InitializeRenderer()
     mFactoryCache.SaveShader( shaderType, shader );
   }
 
-  Material material;
-  material = Material::New( shader );
-  mImpl->mRenderer = Renderer::New( geometry, material );
-
+  //Set up the texture set
+  TextureSet textureSet = TextureSet::New();
   Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
-  Sampler sampler = Sampler::New();
+  textureSet.SetImage( 0u, lookupTexture );
   Dali::WrapMode::Type wrap = GetWrapMode( mGradient->GetSpreadMethod() );
+  Sampler sampler = Sampler::New();
   sampler.SetWrapMode(  wrap, wrap  );
+  textureSet.SetSampler( 0u, sampler );
 
-  material.AddTexture( lookupTexture, UNIFORM_TEXTULRE_NAME, sampler );
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer.SetTextures( textureSet );
 
   mImpl->mRenderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 }

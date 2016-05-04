@@ -108,9 +108,14 @@ public:
   void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta );
 
   /**
-   * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
+   * @copydoc Toolkit::AtlasGlyphManager::GetTextures
    */
-  Material GetMaterial( uint32_t atlasId ) const;
+  TextureSet GetTextures( uint32_t atlasId ) const;
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetShader
+   */
+  Shader GetShader( uint32_t atlasId ) const;
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMetrics

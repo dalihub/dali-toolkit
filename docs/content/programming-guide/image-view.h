@@ -69,10 +69,10 @@
  *
  * @code
  * Property::Map imageProperty;
- * imageProperty.Insert("imageUrl", "source-image-url.png");
- * imageProperty.Insert("imageFittingMode", "scaleToFill");
- * imageProperty.Insert("fitWidth", 240);
- * imageProperty.Insert("fitHeight", 240);
+ * imageProperty.Insert("url", "source-image-url.png");
+ * imageProperty.Insert("fittingMode", "SCALE_TO_FILL");
+ * imageProperty.Insert("desiredWidth", 240);
+ * imageProperty.Insert("desiredHeight", 240);
  * Dali::Toolkit::ImageView myImageView = Dali::Toolkit::ImageView::New();
  * myImageView.SetProperty( Control::Property::IMAGE, imageProperty);
 
@@ -86,10 +86,10 @@
  *
  * The fitting modes and a suggested use-case for each are as follows:
  * <ol>
- *   <li> "shrinkToFit" Full-screen image display: Limit loaded image resolution to device resolution but show all of image.
- *   <li> "scaleToFill" Thumbnail gallery grid: Limit loaded image resolution to screen tile, filling whole tile but losing a few pixels to match the tile shape.
- *   <li> "fitWidth" Image columns: Limit loaded image resolution to column.
- *   <li> "fitHeight" Image rows: Limit loaded image resolution to row height.
+ *   <li> "SHRINK_TO_FIT" Full-screen image display: Limit loaded image resolution to device resolution but show all of image.
+ *   <li> "SCALE_TO_FILL" Thumbnail gallery grid: Limit loaded image resolution to screen tile, filling whole tile but losing a few pixels to match the tile shape.
+ *   <li> "FIT_WIDTH" Image columns: Limit loaded image resolution to column.
+ *   <li> "FIT_HEIGHT" Image rows: Limit loaded image resolution to row height.
  * </ol>
  *
  * The dali-demo project contains a full example under
@@ -112,7 +112,7 @@
  * <h2 class="pg">Changing the image</h2>
  * The Image View can be changed by calling Dali::Toolkit::ImageView::SetImage methods or by changing the IMAGE property.
  * @code
- * myImageActor.SetImage( newImage );
+ * myImageView.SetImage( newImage );
  * @endcode
  *
  */

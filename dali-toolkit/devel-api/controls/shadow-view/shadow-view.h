@@ -66,17 +66,17 @@ class ShadowView;
  *
  *  // create and add some visible actors to the ShadowView, all these child actors will therefore cast a shadow.
  *  Image image = Image::New(...);
- *  ImageActor imageActor = ImageActor::New(image);
- *  imageActor.SetParentOrigin( ParentOrigin::CENTER );
- *  imageActor.SetAnchorPoint( AnchorPoint::CENTER );
- *  shadowView.Add(imageActor);\n Add the renderable actor to the shadow view
+ *  ImageView imageView = ImageView::New(image);
+ *  imageView.SetParentOrigin( ParentOrigin::CENTER );
+ *  imageView.SetAnchorPoint( AnchorPoint::CENTER );
+ *  shadowView.Add(imageView);\n Add the renderable actor to the shadow view
  *
- *  ImageActor shadowPlane = ImageActor::New(); //This will be the shadow plane
- *  shadowPlane.SetParentOrigin( ParentOrigin::CENTER );
- *  shadowPlane.SetAnchorPoint( AnchorPoint::CENTER );
- *  shadowPlane.SetSize(700.0f, 700.0f);
- *  shadowPlane.SetPosition( Vector3(0.0f, 0.0f, -30.0f) ); //Just behind the image actor.
- *  shadowPlane.SetShadowPlane(ShadowPlane);
+ *  ImageView shadowPlaneBg = ImageView::New(); //This will be the shadow plane
+ *  shadowPlaneBg.SetParentOrigin( ParentOrigin::CENTER );
+ *  shadowPlaneBg.SetAnchorPoint( AnchorPoint::CENTER );
+ *  shadowPlaneBg.SetSize(700.0f, 700.0f);
+ *  shadowPlaneBg.SetPosition( Vector3(0.0f, 0.0f, -30.0f) ); //Just behind the image actor.
+ *  shadowView.SetShadowPlaneBackground(ShadowPlane);
  *
  *  Actor pointLight = Actor::New(); // This will be the light source
  *  pointLight.SetPosition(300.0f, 250.0f, 600.0f);

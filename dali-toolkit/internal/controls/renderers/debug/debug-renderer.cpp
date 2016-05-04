@@ -92,9 +92,8 @@ void DebugRenderer::InitializeRenderer()
   {
     Geometry geometry = CreateQuadWireframeGeometry();
     Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    Material material = Material::New( shader );
-    mImpl->mRenderer = Renderer::New( geometry,
-                                      material );
+
+    mImpl->mRenderer = Renderer::New( geometry, shader);
     mFactoryCache.CacheDebugRenderer( mImpl->mRenderer );
   }
 }
@@ -118,16 +117,12 @@ Geometry DebugRenderer::CreateQuadWireframeGeometry()
   quadVertices.SetData( quadVertexData, 4 );
 
   // Create indices
-  unsigned int indexData[10] = { 0, 1, 1, 2, 2, 3, 3, 0 };
-  Property::Map indexFormat;
-  indexFormat[INDEX_NAME] = Property::INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( indexFormat );
-  indices.SetData( indexData, sizeof(indexData)/sizeof(indexData[0]) );
+  unsigned short indexData[10] = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( quadVertices );
-  geometry.SetIndexBuffer( indices );
+  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
   geometry.SetGeometryType( Geometry::LINES );
 
   return geometry;

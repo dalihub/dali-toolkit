@@ -61,21 +61,21 @@ JSON file contains different sections:
       [
         {
           "name":"usersBackground",
-          "type":"ImageActor",
+          "type":"ImageView",
           "parentOrigin":"CENTER",
           "anchorPoint":"CENTER",
           "size":"{DEFAULT_MENU_USER_SIZE}",
           "colorMode":"USE_OWN_COLOR",
-          "image":{ "filename":"{IMAGE_PATH}white-pixel.png" },
+          "image":{ "url":"{IMAGE_PATH}white-pixel.png" },
           "color":"{DEFAULT_MENU_BACKGROUND_COLOR}"
         },
         {
           "name":"icon",
-          "type":"ImageActor",
+          "type":"ImageView",
           "parentOrigin":"TOP_CENTER",
           "anchorPoint":"TOP_CENTER",
           "position":[0,41,1],
-          "image":{ "filename":"{IMAGE_PATH}ico_man_nor.png" }
+          "image":{ "url":"{IMAGE_PATH}ico_man_nor.png" }
         },
       ]
     },
@@ -222,9 +222,9 @@ Animation anim = builder.createAnimation( "animate-show", propertyMap );
       },
       "actors": [{
           "name":"gallery-1",
-          "type":"ImageActor",
+          "type":"ImageView",
           "image": {
-            "filename": "{DALI_IMAGE_DIR}gallery-large-1.jpg"
+            "url": "{DALI_IMAGE_DIR}gallery-large-1.jpg"
           },
           "customProperties": { // properties registered dynamically
             "cellIndices": [0,0],// property to specify the top-left cell this child occupies

@@ -47,9 +47,6 @@ const char * const CUSTOM_SHADER( "shader" );
 const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
 const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
 
-// name of the texture in material
-const char * const TEXTURE_NAME( "sTexture" );
-
 // properties set on shader, these properties have the constant value in regardless of the page status
 const char * const PROPERTY_SPINE_SHADOW ( "uSpineShadowParameter" ); // uniform for both spine and turn effect
 
@@ -292,35 +289,37 @@ PageTurnView::Page::Page()
 
 void PageTurnView::Page::SetImage( Image image  )
 {
-  if( material.GetNumberOfTextures() > 0  )
+  if( !textureSet )
   {
-    material.SetTextureImage( 0u, image );
+    textureSet = TextureSet::New();
   }
-  else
+
+  textureSet.SetImage( 0u, image );
+}
+
+void PageTurnView::Page::UseEffect(Shader newShader)
+{
+  shader = newShader;
+  if( renderer )
   {
-    material.AddTexture(image, TEXTURE_NAME);
+    renderer.SetShader( shader );
   }
 }
 
-void PageTurnView::Page::UseEffect(Shader shader)
+void PageTurnView::Page::UseEffect(Shader newShader, Geometry geometry)
 {
-  if( material )
-  {
-    material.SetShader( shader );
-  }
-  else
-  {
-    material = Material::New( shader );
-  }
-}
-
-void PageTurnView::Page::UseEffect(Shader shader, Geometry geometry)
-{
-  UseEffect( shader );
+  UseEffect( newShader );
 
   if( !renderer )
   {
-    renderer = Renderer::New( geometry, material );
+    renderer = Renderer::New( geometry, shader );
+
+    if( !textureSet )
+    {
+      textureSet = TextureSet::New();
+    }
+
+    renderer.SetTextures( textureSet );
     actor.AddRenderer( renderer );
   }
 }

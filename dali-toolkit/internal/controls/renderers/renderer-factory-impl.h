@@ -44,8 +44,18 @@ typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
  */
 class RendererFactory : public BaseObject
 {
-
 public:
+
+  enum RendererType
+  {
+    COLOR,
+    BORDER,
+    GRADIENT,
+    IMAGE,
+    N_PATCH,
+    SVG,
+    UNDEFINED
+  };
 
   /**
    * @brief Constructor
@@ -113,6 +123,14 @@ protected:
   virtual ~RendererFactory();
 
 private:
+
+  /**
+   * Get the renderer type from the property map.
+   *
+   * @param[in] propertyMap The map contains the properties of the control renderer
+   * @return The rendererType
+   */
+  RendererType GetRendererType( const Property::Map& propertyMap );
 
   /**
    * Prepare the atlas manager

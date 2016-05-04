@@ -394,6 +394,12 @@ static Internal::Adaptor::AccessibilityAdaptor& GetImplementation(Dali::Accessib
   return static_cast<Internal::Adaptor::AccessibilityAdaptor&>(handle);
 }
 
+static const Internal::Adaptor::AccessibilityAdaptor& GetImplementation(const Dali::AccessibilityAdaptor& adaptor)
+{
+  const BaseObject& handle = adaptor.GetBaseObject();
+  return static_cast<const Internal::Adaptor::AccessibilityAdaptor&>(handle);
+}
+
 
 } // namespace Adaptor
 } // namespace Internal
@@ -422,7 +428,7 @@ void AccessibilityAdaptor::MockSetReadPosition( Vector2& position )
 
 // Methods:
 
-Vector2 AccessibilityAdaptor::GetReadPosition()
+Vector2 AccessibilityAdaptor::GetReadPosition() const
 {
   return Internal::Adaptor::GetImplementation(*this).GetReadPosition();
 }
