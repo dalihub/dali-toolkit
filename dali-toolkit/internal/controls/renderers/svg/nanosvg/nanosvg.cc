@@ -1244,12 +1244,7 @@ static NSVGcoordinate nsvg__parseCoordinateRaw(const char* str)
 {
     NSVGcoordinate coord = {0, NSVG_UNITS_USER};
     char units[32]="";
-
-    /**
-     * In the original file, the formatted data reading did not specify the string with width limitation.
-     * To prevent the possible overflow, we replace '%s' with '%32s' here.
-     */
-    sscanf(str, "%f%32s", &coord.value, units);
+    sscanf(str, "%f%s", &coord.value, units);
     coord.units = nsvg__parseUnits(units);
     return coord;
 }
