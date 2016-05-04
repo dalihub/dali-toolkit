@@ -100,8 +100,9 @@ struct GetLogicalCursorIndexData
 bool CreateParagraphTest( const CreateParagraphData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -113,7 +114,8 @@ bool CreateParagraphTest( const CreateParagraphData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Clear the paragraphs.
   Vector<ParagraphRun>& paragraphs = logicalModel->mParagraphInfo;
@@ -158,8 +160,9 @@ bool CreateParagraphTest( const CreateParagraphData& data )
 bool FindParagraphTest( const FindParagraphData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -171,7 +174,8 @@ bool FindParagraphTest( const FindParagraphData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Find the paragraphs.
   Vector<ParagraphRunIndex> paragraphs;
@@ -204,8 +208,9 @@ bool FetchBidirectionalLineInfoTest( const FetchBidirectionalLineInfoData& data 
 {
   std::cout << "  testing : " << data.description << std::endl;
   // Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea( 100.f, 300.f );
   Size layoutSize;
 
@@ -218,7 +223,8 @@ bool FetchBidirectionalLineInfoTest( const FetchBidirectionalLineInfoData& data 
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   for( unsigned int index = 0; index < data.numberOfTests; ++index )
   {
@@ -247,8 +253,9 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
   // Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size layoutSize;
 
   // Create the model with the whole text.
@@ -260,7 +267,8 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {
@@ -287,8 +295,9 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
   // Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size layoutSize;
 
   // Create the model with the whole text.
@@ -300,7 +309,8 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {

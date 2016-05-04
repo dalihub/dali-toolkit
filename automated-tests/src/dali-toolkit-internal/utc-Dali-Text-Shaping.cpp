@@ -112,8 +112,9 @@ struct ShapeInfoData
 bool ShapeInfoTest( const ShapeInfoData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -125,7 +126,8 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Clear the model.
 
@@ -267,7 +269,6 @@ bool ShapeInfoTest( const ShapeInfoData& data )
 
 int UtcDaliTextShape(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextShape");
 
   struct GlyphInfoData glyphs02[] =
@@ -521,6 +522,7 @@ int UtcDaliTextShape(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !ShapeInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);

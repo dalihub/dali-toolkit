@@ -70,6 +70,19 @@ LineIndex GetClosestLine( VisualModelPtr visualModel,
                           float visualY );
 
 /**
+ * @brief Calculates the vertical line's offset for a given line.
+ *
+ * @pre @p lineIndex must be between 0 and the number of lines (both inclusive).
+ *
+ * @param[in] lines The laid-out lines.
+ * @param[in] lineIndex Index to the line.
+ *
+ * @return The vertical offset of the given line.
+ */
+float CalculateLineOffset( const Vector<LineRun>& lines,
+                           LineIndex lineIndex );
+
+/**
  * @brief Retrieves the cursor's logical position for a given touch point x,y
  *
  * @param[in] visualModel The visual model.

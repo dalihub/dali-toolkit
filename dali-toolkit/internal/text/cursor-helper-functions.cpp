@@ -31,7 +31,9 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-} // namespace
+const Dali::Toolkit::Text::CharacterDirection LTR = false; ///< Left To Right direction.
+
+} //namespace
 
 namespace Dali
 {
@@ -49,12 +51,17 @@ LineIndex GetClosestLine( VisualModelPtr visualModel,
   LineIndex lineIndex = 0u;
 
   const Vector<LineRun>& lines = visualModel->mLines;
-  for( LineIndex endLine = lines.Count();
-       lineIndex < endLine;
-       ++lineIndex )
+
+  for( Vector<LineRun>::ConstIterator it = lines.Begin(),
+         endIt = lines.End();
+       it != endIt;
+       ++it, ++lineIndex )
   {
-    const LineRun& lineRun = lines[lineIndex];
-    totalHeight += lineRun.ascender + -lineRun.descender;
+    const LineRun& lineRun = *it;
+
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction.
+    totalHeight += lineRun.ascender - lineRun.descender;
 
     if( visualY < totalHeight )
     {
@@ -62,12 +69,32 @@ LineIndex GetClosestLine( VisualModelPtr visualModel,
     }
   }
 
-  if( lineIndex == 0 )
+  if( lineIndex == 0u )
   {
     return 0;
   }
 
   return lineIndex-1;
+}
+
+float CalculateLineOffset( const Vector<LineRun>& lines,
+                           LineIndex lineIndex )
+{
+  float offset = 0.f;
+
+  for( Vector<LineRun>::ConstIterator it = lines.Begin(),
+         endIt = lines.Begin() + lineIndex;
+       it != endIt;
+       ++it )
+  {
+    const LineRun& lineRun = *it;
+
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction.
+    offset += lineRun.ascender - lineRun.descender;
+  }
+
+  return offset;
 }
 
 CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
@@ -94,17 +121,21 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 
   // Convert from text's coords to line's coords.
   const LineRun& line = *( visualModel->mLines.Begin() + lineIndex );
+
+  // Transform the tap point from text's coords to line's coords.
   visualX -= line.alignmentOffset;
 
   // Get the positions of the glyphs.
-  const Vector<Vector2>& positions = visualModel->mGlyphPositions;
-  const Vector2* const positionsBuffer = positions.Begin();
+  const Vector2* const positionsBuffer = visualModel->mGlyphPositions.Begin();
 
   // Get the character to glyph conversion table.
   const GlyphIndex* const charactersToGlyphBuffer = visualModel->mCharactersToGlyph.Begin();
 
   // Get the glyphs per character table.
   const Length* const glyphsPerCharacterBuffer = visualModel->mGlyphsPerCharacter.Begin();
+
+  // Get the characters per glyph table.
+  const Length* const charactersPerGlyphBuffer = visualModel->mCharactersPerGlyph.Begin();
 
   // Get the glyph's info buffer.
   const GlyphInfo* const glyphInfoBuffer = visualModel->mGlyphs.Begin();
@@ -116,29 +147,29 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
   // Whether this line is a bidirectional line.
   const bool bidiLineFetched = logicalModel->FetchBidirectionalLineInfo( startCharacter );
 
+  // The character's direction buffer.
+  const CharacterDirection* const directionsBuffer = bidiLineFetched ? logicalModel->mCharacterDirections.Begin() : NULL;
+
   // Whether there is a hit on a glyph.
   bool matched = false;
 
   // Traverses glyphs in visual order. To do that use the visual to logical conversion table.
   CharacterIndex visualIndex = startCharacter;
-  Length numberOfCharacters = 0u;
-  for( ; !matched && ( visualIndex < endCharacter ); ++visualIndex )
+  Length numberOfVisualCharacters = 0u;
+  for( ; visualIndex < endCharacter; ++visualIndex )
   {
     // The character in logical order.
     const CharacterIndex characterLogicalOrderIndex = ( bidiLineFetched ? logicalModel->GetLogicalCharacterIndex( visualIndex ) : visualIndex );
-
-    // Get the script of the character.
-    const Script script = logicalModel->GetScript( characterLogicalOrderIndex );
+    const CharacterDirection direction = ( bidiLineFetched ? *( directionsBuffer + characterLogicalOrderIndex ) : LTR );
 
     // The number of glyphs for that character
     const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterLogicalOrderIndex );
-    ++numberOfCharacters;
-
+    ++numberOfVisualCharacters;
 
     if( 0u != numberOfGlyphs )
     {
       // Get the first character/glyph of the group of glyphs.
-      const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfCharacters;
+      const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfVisualCharacters;
       const CharacterIndex firstLogicalCharacterIndex = ( bidiLineFetched ? logicalModel->GetLogicalCharacterIndex( firstVisualCharacterIndex ) : firstVisualCharacterIndex );
       const GlyphIndex firstLogicalGlyphIndex = *( charactersToGlyphBuffer + firstLogicalCharacterIndex );
 
@@ -154,12 +185,25 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
       const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
 
       // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ.
+      const Length numberOfCharacters = *( charactersPerGlyphBuffer + firstLogicalGlyphIndex );
+      if( direction != LTR )
+      {
+        // As characters are being traversed in visual order,
+        // for right to left ligatures, the character which contains the
+        // number of glyphs in the table is found first.
+        // Jump the number of characters to the next glyph is needed.
+        visualIndex += numberOfCharacters - 1u;
+      }
+
+      // Get the script of the character.
+      const Script script = logicalModel->GetScript( characterLogicalOrderIndex );
+
       const bool isInterglyphIndex = ( numberOfCharacters > numberOfGlyphs ) && HasLigatureMustBreak( script );
       const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
       const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
 
-      GlyphIndex index = 0u;
-      for( ; !matched && ( index < numberOfBlocks ); ++index )
+      CharacterIndex index = 0u;
+      for( ; index < numberOfBlocks; ++index )
       {
         // Find the mid-point of the area containing the glyph
         const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
@@ -173,23 +217,83 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 
       if( matched )
       {
+        // If the glyph is shaped from more than one character, it matches the character of the glyph.
         visualIndex = firstVisualCharacterIndex + index;
         break;
       }
 
-      numberOfCharacters = 0u;
+      numberOfVisualCharacters = 0u;
     }
-
   }
+
+  // The number of characters of the whole text.
+  const Length totalNumberOfCharacters = logicalModel->mText.Count();
 
   // Return the logical position of the cursor in characters.
 
   if( !matched )
   {
+    // If no character is matched, then the last character (in visual order) of the line is used.
     visualIndex = endCharacter;
   }
 
+  // Get the paragraph direction.
+  const CharacterDirection paragraphDirection = line.direction;
+
+  if( totalNumberOfCharacters != visualIndex )
+  {
+    // The visual index is not at the end of the text.
+
+    if( LTR == paragraphDirection )
+    {
+      // The paragraph direction is left to right.
+
+      if( visualIndex == endCharacter )
+      {
+        // It places the cursor just before the last character in visual order.
+        // i.e. it places the cursor just before the '\n' or before the last character
+        // if there is a long line with no word breaks which is wrapped.
+
+        // It doesn't check if the closest line is the last one like the RTL branch below
+        // because the total number of characters is different than the visual index and
+        // the visual index is the last character of the line.
+        --visualIndex;
+      }
+    }
+    else
+    {
+      // The paragraph direction is right to left.
+
+      if( ( lineIndex != numberOfLines - 1u ) && // is not the last line.
+          ( visualIndex == startCharacter ) )
+      {
+        // It places the cursor just after the first character in visual order.
+        // i.e. it places the cursor just after the '\n' or after the last character
+        // if there is a long line with no word breaks which is wrapped.
+
+        // If the last line doesn't end with '\n' it won't increase the visual index
+        // placing the cursor at the beginning of the line (in visual order).
+        ++visualIndex;
+      }
+    }
+  }
+  else
+  {
+    // The visual index is at the end of text.
+
+    // If the text ends with a new paragraph character i.e. a '\n', an extra line with no characters is added at the end of the text.
+    // This branch checks if the closest line is the one with the last '\n'. If it is, it decrements the visual index to place
+    // the cursor just before the last '\n'.
+
+    if( ( lineIndex != numberOfLines - 1u ) &&
+        TextAbstraction::IsNewParagraph( *( logicalModel->mText.Begin() + visualIndex - 1u ) ) )
+    {
+      --visualIndex;
+    }
+  }
+
   logicalIndex = ( bidiLineFetched ? logicalModel->GetLogicalCursorIndex( visualIndex ) : visualIndex );
+
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "closest visualIndex %d logicalIndex %d\n", visualIndex, logicalIndex );
 
   DALI_ASSERT_DEBUG( ( logicalIndex <= logicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );
@@ -204,192 +308,261 @@ void GetCursorPosition( VisualModelPtr visualModel,
                         CharacterIndex logical,
                         CursorInfo& cursorInfo )
 {
-  // TODO: Check for multiline with \n, etc...
-
-  const Length numberOfCharacters = logicalModel->mText.Count();
-
-  // Check if the logical position is the first or the last one of the text.
-  const bool isFirstPosition = 0u == logical;
-  const bool isLastPosition = numberOfCharacters == logical;
-
-  // 'logical' is the logical 'cursor' index.
-  // Get the next and current logical 'character' index.
-  const CharacterIndex nextCharacterIndex = logical;
-  const CharacterIndex characterIndex = isFirstPosition ? logical : logical - 1u;
-
-  // Get the direction of the character and the next one.
-  const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL;
-
-  CharacterDirection isCurrentRightToLeft = false;
-  CharacterDirection isNextRightToLeft = false;
-  if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
-  {
-    isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + characterIndex );
-    isNextRightToLeft = *( modelCharacterDirectionsBuffer + nextCharacterIndex );
-  }
+  // Whether the logical cursor position is at the end of the whole text.
+  const bool isLastPosition = logicalModel->mText.Count() == logical;
 
   // Get the line where the character is laid-out.
+  const CharacterIndex characterOfLine = isLastPosition ? ( logical - 1u ) : logical;
+
+  // Whether the cursor is in the last position and the last position is a new paragraph character.
+  const bool isLastNewParagraph = isLastPosition && TextAbstraction::IsNewParagraph( *( logicalModel->mText.Begin() + characterOfLine ) );
+
   const LineRun* const modelLines = visualModel->mLines.Begin();
 
-  const LineIndex lineIndex = visualModel->GetLineOfCharacter( characterIndex );
+  const LineIndex lineIndex = visualModel->GetLineOfCharacter( characterOfLine );
   const LineRun& line = *( modelLines + lineIndex );
 
-  // Get the paragraph's direction.
-  const CharacterDirection isRightToLeftParagraph = line.direction;
-
-  // Check whether there is an alternative position:
-
-  cursorInfo.isSecondaryCursor = ( !isLastPosition && ( isCurrentRightToLeft != isNextRightToLeft ) ) ||
-                                 ( isLastPosition && ( isRightToLeftParagraph != isCurrentRightToLeft ) );
-
-  // Set the line offset and height.
-  cursorInfo.lineOffset = 0.f;
-  cursorInfo.lineHeight = line.ascender + -line.descender;
-
-  // Calculate the primary cursor.
-
-  CharacterIndex index = characterIndex;
-  if( cursorInfo.isSecondaryCursor )
+  if( isLastNewParagraph )
   {
-    // If there is a secondary position, the primary cursor may be in a different place than the logical index.
+    // The cursor is in a new line with no characters. Place the cursor in that line.
+    const LineIndex newLineIndex = lineIndex + 1u;
+    const LineRun& newLine = *( modelLines + newLineIndex );
 
-    if( isLastPosition )
-    {
-      // The position of the cursor after the last character needs special
-      // care depending on its direction and the direction of the paragraph.
+    cursorInfo.isSecondaryCursor = false;
 
-      // Need to find the first character after the last character with the paragraph's direction.
-      // i.e l0 l1 l2 r0 r1 should find r0.
+    // Set the line offset and height.
+    cursorInfo.lineOffset = CalculateLineOffset( visualModel->mLines,
+                                                 newLineIndex );
 
-      // TODO: check for more than one line!
-      index = isRightToLeftParagraph ? line.characterRun.characterIndex : line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u;
-      index = logicalModel->GetLogicalCharacterIndex( index );
-    }
-    else
-    {
-      index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? characterIndex : nextCharacterIndex;
-    }
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction.
+    cursorInfo.lineHeight = newLine.ascender - newLine.descender;
+
+    // Set the primary cursor's height.
+    cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
+
+    // Set the primary cursor's position.
+    cursorInfo.primaryPosition.x = 0.f;
+    cursorInfo.primaryPosition.y = cursorInfo.lineOffset;
+
+    // Transform the cursor info from line's coords to text's coords.
+    cursorInfo.primaryPosition.x += ( LTR == line.direction ) ? 0.f : visualModel->mControlSize.width;
   }
-
-  const GlyphIndex* const charactersToGlyphBuffer = visualModel->mCharactersToGlyph.Begin();
-  const Length* const glyphsPerCharacterBuffer = visualModel->mGlyphsPerCharacter.Begin();
-  const Length* const charactersPerGlyphBuffer = visualModel->mCharactersPerGlyph.Begin();
-  const CharacterIndex* const glyphsToCharactersBuffer = visualModel->mGlyphsToCharacters.Begin();
-  const Vector2* const glyphPositionsBuffer = visualModel->mGlyphPositions.Begin();
-  const GlyphInfo* const glyphInfoBuffer = visualModel->mGlyphs.Begin();
-
-  // Convert the cursor position into the glyph position.
-  const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
-  const Length primaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
-  const Length primaryNumberOfCharacters = *( charactersPerGlyphBuffer + primaryGlyphIndex );
-
-  // Get the metrics for the group of glyphs.
-  GlyphMetrics glyphMetrics;
-  GetGlyphsMetrics( primaryGlyphIndex,
-                    primaryNumberOfGlyphs,
-                    glyphMetrics,
-                    glyphInfoBuffer,
-                    metrics );
-
-  // Whether to add the glyph's advance to the cursor position.
-  // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
-  //     if the logical cursor is one, the position is the position of the first glyph and the advance is added.
-  // A 'truth table' was build and an online Karnaugh map tool was used to simplify the logic.
-  //
-  // FLCP A
-  // ------
-  // 0000 1
-  // 0001 1
-  // 0010 0
-  // 0011 0
-  // 0100 1
-  // 0101 0
-  // 0110 1
-  // 0111 0
-  // 1000 0
-  // 1001 x
-  // 1010 x
-  // 1011 1
-  // 1100 x
-  // 1101 x
-  // 1110 x
-  // 1111 x
-  //
-  // Where F -> isFirstPosition
-  //       L -> isLastPosition
-  //       C -> isCurrentRightToLeft
-  //       P -> isRightToLeftParagraph
-  //       A -> Whether to add the glyph's advance.
-
-  const bool addGlyphAdvance = ( ( isLastPosition && !isRightToLeftParagraph ) ||
-                                 ( isFirstPosition && isRightToLeftParagraph ) ||
-                                 ( !isFirstPosition && !isLastPosition && !isCurrentRightToLeft ) );
-
-  float glyphAdvance = addGlyphAdvance ? glyphMetrics.advance : 0.f;
-
-  if( !isLastPosition &&
-      ( primaryNumberOfCharacters > 1u ) )
+  else
   {
-    const CharacterIndex firstIndex = *( glyphsToCharactersBuffer + primaryGlyphIndex );
+    // Whether this line is a bidirectional line.
+    const bool bidiLineFetched = logicalModel->FetchBidirectionalLineInfo( characterOfLine );
 
-    bool isCurrentRightToLeft = false;
-    if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+    // Check if the logical position is the first or the last one of the line.
+    const bool isFirstPositionOfLine = line.characterRun.characterIndex == logical;
+    const bool isLastPositionOfLine = line.characterRun.characterIndex + line.characterRun.numberOfCharacters == logical;
+
+    // 'logical' is the logical 'cursor' index.
+    // Get the next and current logical 'character' index.
+    const CharacterIndex characterIndex = isFirstPositionOfLine ? logical : logical - 1u;
+    const CharacterIndex nextCharacterIndex = isLastPositionOfLine ? characterIndex : logical;
+
+    // The character's direction buffer.
+    const CharacterDirection* const directionsBuffer = bidiLineFetched ? logicalModel->mCharacterDirections.Begin() : NULL;
+
+    CharacterDirection isCurrentRightToLeft = false;
+    CharacterDirection isNextRightToLeft = false;
+    if( bidiLineFetched ) // If bidiLineFetched is false, it means the whole text is left to right.
     {
-      isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + index );
+      isCurrentRightToLeft = *( directionsBuffer + characterIndex );
+      isNextRightToLeft = *( directionsBuffer + nextCharacterIndex );
     }
 
-    Length numberOfGlyphAdvance = ( isFirstPosition ? 0u : 1u ) + characterIndex - firstIndex;
-    if( isCurrentRightToLeft )
-    {
-      numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
-    }
+    // Get the paragraph's direction.
+    const CharacterDirection isRightToLeftParagraph = line.direction;
 
-    glyphAdvance = static_cast<float>( numberOfGlyphAdvance ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
-  }
+    // Check whether there is an alternative position:
+    cursorInfo.isSecondaryCursor = ( ( !isLastPositionOfLine && ( isCurrentRightToLeft != isNextRightToLeft ) )     ||
+                                     ( isLastPositionOfLine && ( isRightToLeftParagraph != isCurrentRightToLeft ) ) ||
+                                     ( isFirstPositionOfLine && ( isRightToLeftParagraph != isCurrentRightToLeft ) ) );
 
-  // Get the glyph position and x bearing (in the line's coords).
-  const Vector2& primaryPosition = *( glyphPositionsBuffer + primaryGlyphIndex );
+    // Set the line offset and height.
+    cursorInfo.lineOffset = CalculateLineOffset( visualModel->mLines,
+                                                 lineIndex );
 
-  // Set the primary cursor's height.
-  cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction.
+    cursorInfo.lineHeight = line.ascender - line.descender;
 
-  // Set the primary cursor's position.
-  cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
-  cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
-
-  // Transform the cursor info from line's coords to text's coords.
-  cursorInfo.primaryPosition.x += line.alignmentOffset;
-
-  // Calculate the secondary cursor.
-
-  if( cursorInfo.isSecondaryCursor )
-  {
-    // Set the secondary cursor's height.
-    cursorInfo.secondaryCursorHeight = 0.5f * glyphMetrics.fontHeight;
+    // Calculate the primary cursor.
 
     CharacterIndex index = characterIndex;
-    if( !isLastPosition )
+    if( cursorInfo.isSecondaryCursor )
     {
-      index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? nextCharacterIndex : characterIndex;
+      // If there is a secondary position, the primary cursor may be in a different place than the logical index.
+
+      if( isLastPositionOfLine )
+      {
+        // The position of the cursor after the last character needs special
+        // care depending on its direction and the direction of the paragraph.
+
+        // Need to find the first character after the last character with the paragraph's direction.
+        // i.e l0 l1 l2 r0 r1 should find r0.
+
+        index = isRightToLeftParagraph ? line.characterRun.characterIndex : line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u;
+        if( bidiLineFetched )
+        {
+          index = logicalModel->GetLogicalCharacterIndex( index );
+        }
+      }
+      else if( isFirstPositionOfLine )
+      {
+        index = isRightToLeftParagraph ? line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u : line.characterRun.characterIndex;
+        if( bidiLineFetched )
+        {
+          index = logicalModel->GetLogicalCharacterIndex( index );
+        }
+      }
+      else
+      {
+        index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? characterIndex : nextCharacterIndex;
+      }
     }
 
-    const GlyphIndex secondaryGlyphIndex = *( charactersToGlyphBuffer + index );
-    const Length secondaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
+    const GlyphIndex* const charactersToGlyphBuffer = visualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = visualModel->mGlyphsPerCharacter.Begin();
+    const Length* const charactersPerGlyphBuffer = visualModel->mCharactersPerGlyph.Begin();
+    const CharacterIndex* const glyphsToCharactersBuffer = visualModel->mGlyphsToCharacters.Begin();
+    const Vector2* const glyphPositionsBuffer = visualModel->mGlyphPositions.Begin();
+    const GlyphInfo* const glyphInfoBuffer = visualModel->mGlyphs.Begin();
 
-    const Vector2& secondaryPosition = *( glyphPositionsBuffer + secondaryGlyphIndex );
+    // Convert the cursor position into the glyph position.
+    const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
+    const Length primaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
+    const Length primaryNumberOfCharacters = *( charactersPerGlyphBuffer + primaryGlyphIndex );
 
-    GetGlyphsMetrics( secondaryGlyphIndex,
-                      secondaryNumberOfGlyphs,
+    // Get the metrics for the group of glyphs.
+    GlyphMetrics glyphMetrics;
+    GetGlyphsMetrics( primaryGlyphIndex,
+                      primaryNumberOfGlyphs,
                       glyphMetrics,
                       glyphInfoBuffer,
                       metrics );
 
-    // Set the secondary cursor's position.
-    cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
-    cursorInfo.secondaryPosition.y = cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
+    // Whether to add the glyph's advance to the cursor position.
+    // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
+    //     if the logical cursor is one, the position is the position of the first glyph and the advance is added.
+    // A 'truth table' was build and an online Karnaugh map tool was used to simplify the logic.
+    //
+    // FLCP A
+    // ------
+    // 0000 1
+    // 0001 1
+    // 0010 0
+    // 0011 0
+    // 0100 1
+    // 0101 0
+    // 0110 1
+    // 0111 0
+    // 1000 0
+    // 1001 1
+    // 1010 0
+    // 1011 1
+    // 1100 x
+    // 1101 x
+    // 1110 x
+    // 1111 x
+    //
+    // Where F -> isFirstPosition
+    //       L -> isLastPosition
+    //       C -> isCurrentRightToLeft
+    //       P -> isRightToLeftParagraph
+    //       A -> Whether to add the glyph's advance.
+
+    const bool addGlyphAdvance = ( ( isLastPositionOfLine && !isRightToLeftParagraph ) ||
+                                   ( isFirstPositionOfLine && isRightToLeftParagraph ) ||
+                                   ( !isFirstPositionOfLine && !isLastPosition && !isCurrentRightToLeft ) );
+
+    float glyphAdvance = addGlyphAdvance ? glyphMetrics.advance : 0.f;
+
+    if( !isLastPositionOfLine &&
+        ( primaryNumberOfCharacters > 1u ) )
+    {
+      const CharacterIndex firstIndex = *( glyphsToCharactersBuffer + primaryGlyphIndex );
+
+      bool isCurrentRightToLeft = false;
+      if( bidiLineFetched ) // If bidiLineFetched is false, it means the whole text is left to right.
+      {
+        isCurrentRightToLeft = *( directionsBuffer + index );
+      }
+
+      Length numberOfGlyphAdvance = ( isFirstPositionOfLine ? 0u : 1u ) + characterIndex - firstIndex;
+      if( isCurrentRightToLeft )
+      {
+        numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
+      }
+
+      glyphAdvance = static_cast<float>( numberOfGlyphAdvance ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
+    }
+
+    // Get the glyph position and x bearing (in the line's coords).
+    const Vector2& primaryPosition = *( glyphPositionsBuffer + primaryGlyphIndex );
+
+    // Set the primary cursor's height.
+    cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
+
+    // Set the primary cursor's position.
+    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
+    cursorInfo.primaryPosition.y = cursorInfo.lineOffset + line.ascender - glyphMetrics.ascender;
 
     // Transform the cursor info from line's coords to text's coords.
-    cursorInfo.secondaryPosition.x += line.alignmentOffset;
+    cursorInfo.primaryPosition.x += line.alignmentOffset;
+
+    // Calculate the secondary cursor.
+    if( cursorInfo.isSecondaryCursor )
+    {
+      // Set the secondary cursor's height.
+      cursorInfo.secondaryCursorHeight = 0.5f * glyphMetrics.fontHeight;
+
+      CharacterIndex index = characterIndex;
+      if( !isLastPositionOfLine )
+      {
+        index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? nextCharacterIndex : characterIndex;
+      }
+
+      const GlyphIndex secondaryGlyphIndex = *( charactersToGlyphBuffer + index );
+      const Length secondaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
+
+      const Vector2& secondaryPosition = *( glyphPositionsBuffer + secondaryGlyphIndex );
+
+      GetGlyphsMetrics( secondaryGlyphIndex,
+                        secondaryNumberOfGlyphs,
+                        glyphMetrics,
+                        glyphInfoBuffer,
+                        metrics );
+
+      // Set the secondary cursor's position.
+
+      // FCP A
+      // ------
+      // 000 1
+      // 001 x
+      // 010 0
+      // 011 0
+      // 100 x
+      // 101 0
+      // 110 1
+      // 111 x
+      //
+      // Where F -> isFirstPosition
+      //       C -> isCurrentRightToLeft
+      //       P -> isRightToLeftParagraph
+      //       A -> Whether to add the glyph's advance.
+
+      const bool addGlyphAdvance = ( ( !isFirstPositionOfLine && !isCurrentRightToLeft ) ||
+                                     ( isFirstPositionOfLine && !isRightToLeftParagraph ) );
+
+      cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( addGlyphAdvance ? glyphMetrics.advance : 0.f );
+      cursorInfo.secondaryPosition.y = cursorInfo.lineOffset + cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
+
+      // Transform the cursor info from line's coords to text's coords.
+      cursorInfo.secondaryPosition.x += line.alignmentOffset;
+    }
   }
 }
 

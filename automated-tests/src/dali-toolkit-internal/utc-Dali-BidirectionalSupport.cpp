@@ -111,8 +111,9 @@ struct GetCharactersDirectionData
 bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -125,7 +126,8 @@ bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Clear the bidirectional paragraph info data.
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
@@ -215,8 +217,9 @@ void FreeBidirectionalLineInfoResources( Vector<BidirectionalLineInfoRun> bidire
 bool ReorderLinesTest( const ReorderLinesData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 300.f);
   Size layoutSize;
 
@@ -229,7 +232,8 @@ bool ReorderLinesTest( const ReorderLinesData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Clear the bidirectional line info data.
   uint32_t startRemoveIndex = logicalModel->mBidirectionalLineInfo.Count();
@@ -338,8 +342,9 @@ bool ReorderLinesTest( const ReorderLinesData& data )
 bool GetMirroredTextTest( const GetMirroredTextData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -352,7 +357,8 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Call the GetMirroredText() function for the whole text
   Vector<Character> mirroredText;
@@ -410,8 +416,9 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
 bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -424,7 +431,8 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
 
@@ -459,7 +467,6 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
 
 int UtcDaliSetBidirectionalInfo(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliSetBidirectionalInfo");
 
   unsigned int indices01[] = {};
@@ -594,6 +601,7 @@ int UtcDaliSetBidirectionalInfo(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !SetBidirectionalInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -606,7 +614,6 @@ int UtcDaliSetBidirectionalInfo(void)
 
 int UtcDaliReorderLines(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliSetBidirectionalInfo");
 
   unsigned int visualToLogical0301[] = { 0u, 1u, 2u, 3u, 4u, 5u, 9u, 8u, 7u, 6u, 10u };
@@ -781,6 +788,7 @@ int UtcDaliReorderLines(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !ReorderLinesTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -793,7 +801,6 @@ int UtcDaliReorderLines(void)
 
 int UtcDaliGetMirroredText(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliGetMirroredText");
 
   struct GetMirroredTextData data[] =
@@ -865,6 +872,7 @@ int UtcDaliGetMirroredText(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !GetMirroredTextTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -877,7 +885,6 @@ int UtcDaliGetMirroredText(void)
 
 int UtcDaliGetCharactersDirection(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliGetCharactersDirection");
 
   bool directions01[] = {};
@@ -987,6 +994,7 @@ int UtcDaliGetCharactersDirection(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !GetCharactersDirectionTest( data[index] ) )
     {
       tet_result(TET_FAIL);

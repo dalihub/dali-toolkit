@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 
@@ -464,34 +465,6 @@ struct LayoutEngine::Impl
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
   }
 
-  /**
-   * @brief Calculates the vertical offset to add to the new laid-out glyphs.
-   *
-   * @pre @p lineIndex must be between 0 and the number of lines (both inclusive).
-   *
-   * @param[in] lines The previously laid-out lines.
-   * @param[in] lineIndex Index to the line where the new laid-out lines are inserted.
-   *
-   * @return The vertical offset of the lines starting from the beginning to the line @p lineIndex.
-   */
-  float SetParagraphOffset( const Vector<LineRun>& lines,
-                            LineIndex lineIndex )
-  {
-    float offset = 0.f;
-
-    for( Vector<LineRun>::ConstIterator it = lines.Begin(),
-           endIt = lines.Begin() + lineIndex;
-         it != endIt;
-         ++it )
-    {
-      const LineRun& line = *it;
-
-      offset += line.ascender + -line.descender;
-    }
-
-    return offset;
-  }
-
   void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
                           Length numberOfGlyphs,
                           Vector2* glyphPositionsBuffer )
@@ -871,8 +844,8 @@ struct LayoutEngine::Impl
       linesBuffer = lines.Begin();
     }
 
-    float penY = SetParagraphOffset( lines,
-                                     layoutParameters.startLineIndex );
+    float penY = CalculateLineOffset( lines,
+                                      layoutParameters.startLineIndex );
 
     for( GlyphIndex index = layoutParameters.startGlyphIndex; index < lastGlyphPlusOne; )
     {
