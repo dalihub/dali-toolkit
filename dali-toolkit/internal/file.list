@@ -92,6 +92,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \
    $(toolkit_src_dir)/text/clipping/text-clipper.cpp \
    $(toolkit_src_dir)/text/color-segmentation.cpp \
+   $(toolkit_src_dir)/text/cursor-helper-functions.cpp \
    $(toolkit_src_dir)/text/glyph-metrics-helper.cpp \
    $(toolkit_src_dir)/text/logical-model-impl.cpp \
    $(toolkit_src_dir)/text/markup-processor.cpp \
