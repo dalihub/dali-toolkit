@@ -42,8 +42,6 @@ namespace
  */
 const char * const FLEX_PROPERTY_NAME("flex");
 const char * const ALIGN_SELF_PROPERTY_NAME("alignSelf");
-const char * const FLEX_PADDING_PROPERTY_NAME("flexPadding");
-const char * const FLEX_BORDER_PROPERTY_NAME("flexBorder");
 const char * const FLEX_MARGIN_PROPERTY_NAME("flexMargin");
 
 #if defined(DEBUG_ENABLED)
@@ -632,24 +630,6 @@ void FlexContainer::ComputeLayout()
                                                                           alignSelf );
         }
         childNode->style.align_self = static_cast<css_align_t>(alignSelf);
-      }
-
-      if( childActor.GetPropertyIndex( FLEX_PADDING_PROPERTY_NAME ) != Property::INVALID_INDEX )
-      {
-        Vector4 flexPadding = childActor.GetProperty( childActor.GetPropertyIndex(FLEX_PADDING_PROPERTY_NAME) ).Get<Vector4>();
-        childNode->style.padding[CSS_LEFT] = flexPadding.x;
-        childNode->style.padding[CSS_TOP] = flexPadding.y;
-        childNode->style.padding[CSS_RIGHT] = flexPadding.z;
-        childNode->style.padding[CSS_BOTTOM] = flexPadding.w;
-      }
-
-      if( childActor.GetPropertyIndex( FLEX_BORDER_PROPERTY_NAME ) != Property::INVALID_INDEX )
-      {
-        Vector4 flexBorder = childActor.GetProperty( childActor.GetPropertyIndex(FLEX_BORDER_PROPERTY_NAME) ).Get<Vector4>();
-        childNode->style.border[CSS_LEFT] = flexBorder.x;
-        childNode->style.border[CSS_TOP] = flexBorder.y;
-        childNode->style.border[CSS_RIGHT] = flexBorder.z;
-        childNode->style.border[CSS_BOTTOM] = flexBorder.w;
       }
 
       if( childActor.GetPropertyIndex( FLEX_MARGIN_PROPERTY_NAME ) != Property::INVALID_INDEX )
