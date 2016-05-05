@@ -100,7 +100,10 @@ void ParseFontStyleString( const std::string& style, Property::Map& map )
   {
     const TreeNode* const node = parser.GetRoot();
 
-    CreateFontStyleMap( node, map );
+    if( NULL != node )
+    {
+      CreateFontStyleMap( node, map );
+    }
   }
 }
 
