@@ -637,12 +637,12 @@ std::string TextSelectionPopup::GetPressedImage() const
    mOrderListOfButtons.reserve( 8u );
 
    // Create button for each possible option using Option priority
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CUT, mCutOptionPriority, OPTION_CUT, POPUP_CUT_STRING , mCutIconImage, ( mEnabledButtons & Toolkit::TextSelectionPopup::CUT)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::COPY, mCopyOptionPriority, OPTION_COPY, POPUP_COPY_STRING, mCopyIconImage, ( mEnabledButtons & Toolkit::TextSelectionPopup::COPY)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::PASTE, mPasteOptionPriority, OPTION_PASTE, POPUP_PASTE_STRING, mPasteIconImage, ( mEnabledButtons & Toolkit::TextSelectionPopup::PASTE)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT, mSelectOptionPriority, OPTION_SELECT_WORD, POPUP_SELECT_STRING, mSelectIconImage, ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT_ALL, mSelectAllOptionPriority, OPTION_SELECT_ALL, POPUP_SELECT_ALL_STRING, mSelectAllIconImage, ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT_ALL)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CLIPBOARD, mClipboardOptionPriority, OPTION_CLIPBOARD, POPUP_CLIPBOARD_STRING, mClipboardIconImage, ( mEnabledButtons & Toolkit::TextSelectionPopup::CLIPBOARD)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CUT, mCutOptionPriority, OPTION_CUT, POPUP_CUT_STRING , mCutIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::CUT)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::COPY, mCopyOptionPriority, OPTION_COPY, POPUP_COPY_STRING, mCopyIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::COPY)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::PASTE, mPasteOptionPriority, OPTION_PASTE, POPUP_PASTE_STRING, mPasteIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::PASTE)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT, mSelectOptionPriority, OPTION_SELECT_WORD, POPUP_SELECT_STRING, mSelectIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT_ALL, mSelectAllOptionPriority, OPTION_SELECT_ALL, POPUP_SELECT_ALL_STRING, mSelectAllIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT_ALL)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CLIPBOARD, mClipboardOptionPriority, OPTION_CLIPBOARD, POPUP_CLIPBOARD_STRING, mClipboardIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::CLIPBOARD)  ) );
 
    // Sort the buttons according their priorities.
    std::sort( mOrderListOfButtons.begin(), mOrderListOfButtons.end(), TextSelectionPopup::ButtonPriorityCompare() );

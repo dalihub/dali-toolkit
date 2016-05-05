@@ -807,6 +807,7 @@ struct LayoutEngine::Impl
           {
             // Need to add a new line with no characters but with height to increase the layoutSize.height
             LineRun newLine;
+            Initialize( newLine );
             lines.PushBack( newLine );
 
             UpdateTextLayout( layoutParameters,
@@ -1191,6 +1192,21 @@ struct LayoutEngine::Impl
         break;
       }
     }
+  }
+
+  void Initialize( LineRun& line )
+  {
+    line.glyphRun.glyphIndex = 0u;
+    line.glyphRun.numberOfGlyphs = 0u;
+    line.characterRun.characterIndex = 0u;
+    line.characterRun.numberOfCharacters = 0u;
+    line.width = 0.f;
+    line.ascender = 0.f;
+    line.descender = 0.f;
+    line.extraLength = 0.f;
+    line.alignmentOffset = 0.f;
+    line.direction = !RTL;
+    line.ellipsis = false;
   }
 
   LayoutEngine::Layout mLayout;
