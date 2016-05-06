@@ -34,7 +34,7 @@ Renders a solid color to the control's quad.
 
 | Property Name | Type    | Required | Description               |
 |---------------|:-------:|:--------:|---------------------------|
-| blendColor    | VECTOR4 | Yes      | The solid color required. |
+| mixColor      | VECTOR4 | Yes      | The solid color required. |
 
 ### Usage
 
@@ -44,7 +44,7 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 map[ "rendererType" ] = "color";
-map[ "blendColor" ] = Color::RED;
+map[ "mixColor" ] = Color::RED;
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -56,7 +56,7 @@ var control = new dali.Control( "Control" );
 control.background =
 {
   rendererType : "color",
-  blendColor : dali.COLOR_RED
+  mixColor : dali.COLOR_RED
 };
 ~~~
 ___________________________________________________________________________________________________

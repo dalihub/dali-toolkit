@@ -183,6 +183,7 @@ GradientRenderer::GradientRenderer( RendererFactoryCache& factoryCache )
 : ControlRenderer( factoryCache ),
   mGradientType( LINEAR )
 {
+  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 GradientRenderer::~GradientRenderer()
@@ -275,7 +276,17 @@ void GradientRenderer::DoCreatePropertyMap( Property::Map& map ) const
   for( unsigned int i=0; i<stops.Count(); i++ )
   {
     offsets.PushBack( stops[i].mOffset );
-    colors.PushBack( stops[i].mStopColor );
+    if( EqualsZero(stops[i].mStopColor.a) )
+    {
+      colors.PushBack( Vector4::ZERO );
+    }
+    else
+    {
+      colors.PushBack( Vector4( stops[i].mStopColor.r / stops[i].mStopColor.a,
+                                stops[i].mStopColor.g / stops[i].mStopColor.a,
+                                stops[i].mStopColor.b / stops[i].mStopColor.a,
+                                stops[i].mStopColor.a));
+    }
   }
 
   map.Insert( STOP_OFFSET_NAME, offsets );
@@ -381,7 +392,7 @@ bool GradientRenderer::NewGradient(Type gradientType, const Property::Map& prope
       {
         if( (colorArray->GetElementAt(i)).Get(color) )
         {
-          mGradient->AddStop( offsetArray[i], color);
+          mGradient->AddStop( offsetArray[i], Vector4(color.r*color.a, color.g*color.a, color.b*color.a, color.a));
           numValidStop++;
         }
       }

@@ -84,8 +84,6 @@ class FlexContainer;
  * |-------------------------|-------------|
  * | flex                    | float       |
  * | alignSelf               | integer     |
- * | flexPadding             | Vector4     |
- * | flexBorder              | Vector4     |
  * | flexMargin              | Vector4     |
  *
  * The available values for alignSelf are: ALIGN_AUTO, ALIGN_FLEX_START, ALIGN_CENTER, ALIGN_FLEX_END, ALIGN_STRETCH
@@ -97,9 +95,7 @@ class FlexContainer;
  *   "customProperties": {
  *     "flex":1,                        // property to make the item to receive the specified proportion of the free space in the container. If all items in the container use this pattern, their sizes will be proportional to the specified flex factor.
  *     "alignSelf":"flexStart",         // property to specify how the item will align along the cross axis, if set, this overides the default alignment for all items in the container
- *     "flexPadding":[10, 10, 10, 10],  // property to specify the space around the content (inside the flex border) of the item, if not set, default value is [0, 0, 0, 0]
- *     "flexBorder":[5, 5, 5, 5],       // property to specify the border that goes around the flex padding and the content of the item, if not set, default value is [0, 0, 0, 0]
- *     "flexMargin":[10, 10, 10, 10]    // property to specify the space outside the flex border, if not set, default value is [0, 0, 0, 0]
+ *     "flexMargin":[10, 10, 10, 10]    // property to specify the space around the item, if not set, default value is [0, 0, 0, 0]
  *   }
  * @endcode
  */

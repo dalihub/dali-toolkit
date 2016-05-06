@@ -74,9 +74,7 @@ struct ShaderHintPair
 
 const ShaderHintPair ShaderHintTable[]=
 {
-    {"requiresSelfDepthTest",  Shader::HINT_REQUIRES_SELF_DEPTH_TEST },
     {"outputIsTransparent",    Shader::HINT_OUTPUT_IS_TRANSPARENT },
-    {"outputIsOpaque",         Shader::HINT_OUTPUT_IS_OPAQUE   },
     {"modifiesGeometry",       Shader::HINT_MODIFIES_GEOMETRY },
 };
 

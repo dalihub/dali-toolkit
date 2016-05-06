@@ -320,6 +320,7 @@ void PageTurnView::Page::UseEffect(Shader newShader, Geometry geometry)
     }
 
     renderer.SetTextures( textureSet );
+    renderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
     actor.AddRenderer( renderer );
   }
 }
@@ -393,7 +394,6 @@ void PageTurnView::OnInitialize()
   uint16_t width = static_cast<uint16_t>(mPageSize.width / DEFAULT_GRID_DENSITY + 0.5f);
   uint16_t height = static_cast<uint16_t>(mPageSize.height / DEFAULT_GRID_DENSITY + 0.5f);
   mGeometry = RendererFactoryCache::CreateGridGeometry( Uint16Pair( width, height ) );
-  mGeometry.SetRequiresDepthTesting( true );
 
   mPages.reserve( NUMBER_OF_CACHED_PAGES );
   for( int i = 0; i < NUMBER_OF_CACHED_PAGES; i++ )

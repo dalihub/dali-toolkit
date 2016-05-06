@@ -37,7 +37,7 @@ namespace Internal
  *
  * | %Property Name  | Type        |
  * |-----------------|-------------|
- * | blendColor      | VECTOR4     |
+ * | mixColor        | VECTOR4     |
  */
 class ColorRenderer: public ControlRenderer
 {
@@ -113,8 +113,8 @@ private:
 
 private:
 
-  Vector4 mBlendColor;
-  Property::Index mBlendColorIndex;
+  Vector4 mMixColor;
+  Property::Index mMixColorIndex;
 
 };
 

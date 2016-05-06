@@ -89,17 +89,13 @@ public:
   // Visual <--> Logical conversion tables.
 
   /**
-   * @brief Sets the visual to logical and the logical to visual map tables.
+   * @brief Retrieves the logical cursor index for the given visual cursor index.
    *
-   * Replaces any map tables previously set.
+   * @param[in] visualCursorIndex The visual cursor index.
    *
-   * @note If the number of runs is zero the bidirectional info buffer is cleared.
-   *
-   * @param[in] startIndex Character index from where the conversion tables are set.
-   * @param[in] numberOfCharacters The number of characters.
+   * @return The logical cursor index.
    */
-  void SetVisualToLogicalMap( CharacterIndex startIndex,
-                              Length numberOfCharacters );
+  CharacterIndex GetLogicalCursorIndex( CharacterIndex visualCursorIndex );
 
   /**
    * @brief Retrieves the logical character index for the given visual character index.
@@ -108,7 +104,25 @@ public:
    *
    * @return The logical character index.
    */
-  CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
+  CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex );
+
+  /**
+   * @brief Fetch the bidirectional line info for the given character.
+   *
+   * Call GetBidirectionalLineInfo() to retrieve the last fetched line.
+   *
+   * @param[in] characterIndex The character index.
+   *
+   * @return @e true if the given @e character is in a bidirectional line.
+   */
+  bool FetchBidirectionalLineInfo( CharacterIndex characterIndex );
+
+  /**
+   * @brief Retrieves the last fetched bidirectional line info.
+   *
+   * @return The index of the bidirectional line info.
+   */
+  BidirectionalLineRunIndex GetBidirectionalLineInfo() const;
 
   // Text style.
 
@@ -188,10 +202,10 @@ public:
   Vector<WordBreakInfo>                 mWordBreakInfo;
   Vector<ParagraphRun>                  mParagraphInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
-  Vector<CharacterDirection>            mCharacterDirections;        ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
+  Vector<CharacterDirection>            mCharacterDirections;              ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
-  Vector<CharacterIndex>                mVisualToLogicalMap;         ///< Bidirectional visual to logical conversion table.
-  Vector<CharacterIndex>                mVisualToLogicalCursorMap;   ///< Bidirectional visual to logical cursor conversion table.
+
+  BidirectionalLineRunIndex             mBidirectionalLineIndex;           ///< The last fetched bidirectional line info.
 };
 
 } // namespace Text

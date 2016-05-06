@@ -628,6 +628,14 @@ struct Controller::Impl
    */
   void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
 
+private:
+  // Declared private and left undefined to avoid copies.
+  Impl( const Impl& );
+  // Declared private and left undefined to avoid copies.
+  Impl& operator=( const Impl& );
+
+public:
+
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.

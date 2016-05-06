@@ -102,6 +102,28 @@ struct StyleStack
 };
 
 /**
+ * @brief Initializes a font run description to its defaults.
+ *
+ * @param[in,out] fontRun The font description run to initialize.
+ */
+void Initialize( FontDescriptionRun& fontRun )
+{
+  fontRun.characterRun.characterIndex = 0u;
+  fontRun.characterRun.numberOfCharacters = 0u;
+  fontRun.familyName = NULL;
+  fontRun.familyLength = 0u;
+  fontRun.weight = TextAbstraction::FontWeight::NORMAL;
+  fontRun.width = TextAbstraction::FontWidth::NORMAL;
+  fontRun.slant = TextAbstraction::FontSlant::NORMAL;
+  fontRun.size = 0u;
+  fontRun.familyDefined = false;
+  fontRun.weightDefined = false;
+  fontRun.widthDefined = false;
+  fontRun.slantDefined = false;
+  fontRun.sizeDefined = false;
+}
+
+/**
  * @brief Splits the tag string into the tag name and its attributes.
  *
  * The attributes are stored in a vector in the tag.
@@ -399,18 +421,12 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         {
           // Create a new font run.
           FontDescriptionRun fontRun;
-          fontRun.characterRun.numberOfCharacters = 0u;
+          Initialize( fontRun );
 
           // Fill the run with the parameters.
           fontRun.characterRun.characterIndex = characterIndex;
           fontRun.slant = TextAbstraction::FontSlant::ITALIC;
-
-          fontRun.familyName = NULL;
-          fontRun.familyDefined = false;
-          fontRun.weightDefined = false;
-          fontRun.widthDefined = false;
           fontRun.slantDefined = true;
-          fontRun.sizeDefined = false;
 
           // Push the font run in the logical model.
           markupProcessData.fontRuns.PushBack( fontRun );
@@ -445,19 +461,12 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         {
           // Create a new font run.
           FontDescriptionRun fontRun;
-          fontRun.characterRun.numberOfCharacters = 0u;
+          Initialize( fontRun );
 
           // Fill the run with the parameters.
           fontRun.characterRun.characterIndex = characterIndex;
-
           fontRun.weight = TextAbstraction::FontWeight::BOLD;
-
-          fontRun.familyName = NULL;
-          fontRun.familyDefined = false;
           fontRun.weightDefined = true;
-          fontRun.widthDefined = false;
-          fontRun.slantDefined = false;
-          fontRun.sizeDefined = false;
 
           // Push the font run in the logical model.
           markupProcessData.fontRuns.PushBack( fontRun );
@@ -481,17 +490,10 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         {
           // Create a new font run.
           FontDescriptionRun fontRun;
-          fontRun.characterRun.numberOfCharacters = 0u;
+          Initialize( fontRun );
 
           // Fill the run with the parameters.
           fontRun.characterRun.characterIndex = characterIndex;
-
-          fontRun.familyName = NULL;
-          fontRun.familyDefined = false;
-          fontRun.weightDefined = false;
-          fontRun.widthDefined = false;
-          fontRun.slantDefined = false;
-          fontRun.sizeDefined = false;
 
           ProcessFontTag( tag, fontRun );
 

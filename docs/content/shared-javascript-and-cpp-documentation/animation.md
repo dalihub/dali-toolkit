@@ -28,6 +28,29 @@ animation.AnimateTo( Property( actor1, Dali::Actor::Property::POSITION ), Vector
 animation.AnimateBy( Property( actor2, Dali::Actor::Property::POSITION ), Vector3(10.0f, 50.0f, 0.0f) ); // End Position: 20.0f, 60.0f, 0.0f
 ~~~
 
+Note, for rotations, AnimateTo uses spherical linear interpolation to animate to the new orientation (i.e. it will take the shortest path). Because of this, the number of complete revolutions in any given angle will be reduced to 0. For example,
+
+(Assume actor1 is at orientation 0 degrees about Z-Axis at the start of the animation)
+~~~{.cpp}
+// Animate the orientation of actor1 to 390 degrees about the Z-AXIS
+animation.AnimateTo( Property( actor1, Dali::Actor::Property::ORIENTATION ), AngleAxis( Degree( 390 ), Vector3::ZAXIS ) );
+~~~
+
+will only rotate 30 degrees about the Z axis, as that is the shortest path to the final orientation.
+
+AnimateBy will preserve the full revolution count of any angle passed in using AngleAxis, for example, AngleAxis( Degree( 770 ), Vector3::ZAXIS ) will revolve 2 full times before reaching the final angle of 50 degrees from the original orientation.
+
+However, because Quaternions do not preserve the revolution count, AnimateBy will only rotate 50 degrees if the relative value is constructed using a Quaternion. For example,
+
+(Assume actor1 and actor 2 are at orientation 0 degrees about Z-Axis at the start of the animation)
+~~~{.cpp}
+// Animate the orientation of actor1 3.5 times about the Z-AXIS
+animation.AnimateBy( Property( actor1, Dali::Actor::Property::ORIENTATION ), AngleAxis( Degree( 360 * 3.5 ), Vector3::ZAXIS ) );
+
+// But the same degree value will only rotate 180 degrees if a Quaternion is used instead:
+animation.AnimateBy( Property( actor2, Dali::Actor::Property::ORIENTATION ), Quaternion( Degree( 360 * 3.5 ), Vector3::ZAXIS ) );
+~~~
+
 ### Playback Control
 
 When an animation is created, it can be played:
