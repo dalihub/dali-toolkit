@@ -70,7 +70,11 @@ However the text control will fall-back to using the default font, if the reques
 
 ### Font Styles
 
-Setting a font size programmatically is not ideal for applications which support multiple screen resolutions etc.
+Setting a font size programmatically is not ideal for applications which support multiple
+screen resolutions and platforms which support multiple logical font sizes.  Also, any
+changes to the platform font settings will override any sizes that have been programmatically
+set.
+
 A more flexible approach is to prepare various JSON stylesheets, and request a different style for each platform:
 
 ~~~{.cpp}
@@ -96,7 +100,13 @@ To change the font for standard text controls, this JSON syntax can be used:
 ~~~
 
 However the same pointSize is unlikely to be suitable for all text controls in an application.
-To set custom sizes simply set a "style name" for each case, and then provide a style override in JSON:
+To define custom styles for existing controls, simply set a style name for each case, and
+then provide a style override in JSON.
+
+To provide flexibility for the end user, the platform offers a mechanism to alter the logical
+font size between 0 and 4 inclusive. This logical size is mapped to a physical size using the
+stylesheets, by appending FontSizeN to the style name. These sections ("textlabelFontSizeN")
+in the style sheet are applied after the base section ("textlabel"), so take precedence.
 
 ~~~{.cpp}
   // C++
@@ -106,7 +116,7 @@ To set custom sizes simply set a "style name" for each case, and then provide a 
 ~~~{.js}
   // JavaScript
 
-  label.styleName = "custom"';
+  label.styleName = "customLabel"';
 ~~~
 
 ~~~{.json}
@@ -117,17 +127,59 @@ To set custom sizes simply set a "style name" for each case, and then provide a 
     {
       "fontFamily":"FreeSerif",
       "fontStyle":"{\"weight\":\"bold\",\"slant\":\"italic\"}",
-      "pointSize":8
     },
 
-    "custom":
+    "textlabelFontSize0":
+    {
+      "pointSize":8
+    },
+    "textlabelFontSize1":
     {
       "pointSize":10
+    },
+    "textlabelFontSize2":
+    {
+      "pointSize":15
+    },
+    "textlabelFontSize3":
+    {
+      "pointSize":19
+    },
+    "textlabelFontSize4":
+    {
+      "pointSize":25
+    },
+
+    "customLabel":
+    {
+      "fontFamily":"TimesNewRoman",
+      "fontStyle":"{\"weight\":\"regular\",\"slant\":\"regular\"}",
+    },
+    "customLabelFontSize0":
+    {
+      "pointSize":10
+    },
+    "customLabelFontSize1":
+    {
+      "pointSize":12
+    },
+    "customLabelFontSize2":
+    {
+      "pointSize":15
+    },
+    "customLabelFontSize3":
+    {
+      "pointSize":20
+    },
+    "customLabelFontSize4":
+    {
+      "pointSize":28
     }
   }
 }
 ~~~
 
-In the example above, standard text labels will have pointSize 8, and "custom" labels will have pointSize 10.
+In the example above, at platform logical text size 0, standard text labels will have pointSize 8, and custom labels will have pointSize 10.
+
 
 */
