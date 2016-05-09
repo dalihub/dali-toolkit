@@ -17,11 +17,14 @@
     'view-mode': viewMode,
  }
 
-// desktop
-//var dali = require('../build/Release/dali')( options );
-
-// target
-var dali = require('dali')( options );
+try {
+  // target
+  var dali = require('dali')( options );
+}
+catch(err) {
+  // desktop
+  var dali = require('../build/Release/dali')( options );
+}
 
 var daliApp = {};
 
