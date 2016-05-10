@@ -68,7 +68,12 @@ typedef struct NSVGmemPage {
 } NSVGmemPage;
 
 typedef struct NSVGcachedPaint {
-    char type;
+    /**
+     * In the original file, using char type (without signed or unsigned) can be interpreted
+     * as 'unsigned char' in some build environments, like ARM architecture.
+     * To prevent the unexpected behavior, we replace 'char type' with 'signed char type' here.
+     */
+    signed char type;
     char spread;
     float xform[6];
     unsigned int colors[256];
@@ -873,7 +878,12 @@ static void nsvg__fillScanline(unsigned char* scanline, int len, int x0, int x1,
 // note: this routine clips fills that extend off the edges... ideally this
 // wouldn't happen, but it could happen if the truetype glyph bounding boxes
 // are wrong, or if the user supplies a too-small bitmap
-static void nsvg__fillActiveEdges(unsigned char* scanline, int len, NSVGactiveEdge* e, int maxWeight, int* xmin, int* xmax, char fillRule)
+/**
+ * In the original file, using char type (without signed or unsigned) can be interpreted
+ * as 'unsigned char' in some build environments, like ARM architecture.
+ * To prevent the unexpected behavior, we replace 'char fillRule' with 'signed char fillRule' here.
+ */
+static void nsvg__fillActiveEdges(unsigned char* scanline, int len, NSVGactiveEdge* e, int maxWeight, int* xmin, int* xmax, signed char fillRule)
 {
     // non-zero winding fill
     int x0 = 0, w = 0;
