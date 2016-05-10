@@ -655,7 +655,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   if( mTextUpdateInfo.mClearAll ||
       ( 0u != paragraphCharacters ) )
   {
-    ClearModelData( startIndex, startIndex + ( ( paragraphCharacters > 0u ) ? paragraphCharacters - 1u : 0u ), operationsRequired );
+    ClearModelData( startIndex, startIndex + ( ( paragraphCharacters > 0u ) ? paragraphCharacters - 1u : 0u ), operations );
   }
 
   mTextUpdateInfo.mClearAll = false;
@@ -833,7 +833,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     updated = true;
   }
 
-  if( NO_OPERATION != ( COLOR & operationsRequired ) )
+  if( NO_OPERATION != ( COLOR & operations ) )
   {
     // Set the color runs in glyphs.
     SetColorSegmentationInfo( mLogicalModel->mColorRuns,
