@@ -1390,10 +1390,15 @@ void Controller::Impl::ShowClipboard()
 
 void Controller::Impl::HideClipboard()
 {
-  if( mClipboard )
+  if( mClipboard && mClipboardHideEnabled )
   {
     mClipboard.HideClipboard();
   }
+}
+
+void Controller::Impl::SetClipboardHideEnable(bool enable)
+{
+  mClipboardHideEnabled = enable;
 }
 
 bool Controller::Impl::CopyStringToClipboard( std::string& source )
