@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/controls/flex-container/flex-container.h>
+#include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
 extern "C"
 {
 #include "layout.h"
