@@ -113,7 +113,12 @@ typedef struct NSVGgradient {
 } NSVGgradient;
 
 typedef struct NSVGpaint {
-	char type;
+	/**
+	 * In the original file, using char type (without signed or unsigned) can be interpreted
+	 * as 'unsigned char' in some build environments, like ARM architecture.
+	 * To prevent the unexpected behavior, we replace 'char type' with 'signed char type' here.
+	 */
+	signed char type;
 	union {
 		unsigned int color;
 		NSVGgradient* gradient;
