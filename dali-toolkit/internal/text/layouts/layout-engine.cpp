@@ -852,7 +852,7 @@ struct LayoutEngine::Impl
     Vector<LineRun> newLines;
 
     // Estimate the number of lines.
-    Length linesCapacity = layoutParameters.estimatedNumberOfLines;
+    Length linesCapacity = std::max( 1u, layoutParameters.estimatedNumberOfLines );
     Length numberOfLines = 0u;
 
     if( updateCurrentBuffer )
