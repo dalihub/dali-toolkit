@@ -300,7 +300,8 @@ struct Controller::Impl
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
-    mMarkupProcessorEnabled( false )
+    mMarkupProcessorEnabled( false ),
+    mClipboardHideEnabled( true )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -523,6 +524,8 @@ struct Controller::Impl
 
   void HideClipboard();
 
+  void SetClipboardHideEnable(bool enable);
+
   bool CopyStringToClipboard( std::string& source );
 
   void SendSelectionToClipboard( bool deleteAfterSending );
@@ -655,6 +658,7 @@ public:
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
+  bool mClipboardHideEnabled:1;           ///< Whether the ClipboardHide function work or not
 };
 
 } // namespace Text
