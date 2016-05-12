@@ -483,6 +483,7 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   propertyMap.Insert( "desiredHeight",   30 );
   propertyMap.Insert( "fittingMode",   "FIT_HEIGHT" );
   propertyMap.Insert( "samplingMode",   "BOX_THEN_NEAREST" );
+  propertyMap.Insert( "synchronousLoading",   true );
 
   ControlRenderer imageRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( imageRenderer );
@@ -515,6 +516,10 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 30 );
 
+  value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<bool>() == true );
+
   // Get an image renderer with an image handle, and test the default property values
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
   imageRenderer = factory.GetControlRenderer(image);
@@ -543,6 +548,10 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   value = resultMap.Find( "desiredHeight",   Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 200 );
+
+  value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<bool>() == false );
 
   END_TEST;
 }

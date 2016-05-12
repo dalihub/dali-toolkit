@@ -94,12 +94,13 @@ public:
        */
       PRE_MULTIPLIED_ALPHA,
 
+
       // Animatable properties
 
       /**
        * @brief name "pixelArea", type Vector4
        * @details Pixel area is a relative value with the whole image area as [0.0, 0.0, 1.0, 1.0].
-       * @SINCE_1_0.18
+       * @SINCE_1_1.18
        */
       PIXEL_AREA = ANIMATABLE_PROPERTY_START_INDEX,
     };

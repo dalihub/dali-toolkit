@@ -18,6 +18,8 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-bitmap-loader.h>
+#include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -72,6 +74,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_IMAGE_FILE_NAME2 =  "gallery_image_02.jpg";
+
+// resolution: 34*34, pixel format: RGBA8888
+static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
+// resolution: 600*600, pixel format: RGB888
+static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 
 void TestImage( ImageView imageView, BufferImage image )
 {
@@ -352,6 +359,124 @@ int UtcDaliImageViewSetGetProperty03(void)
   value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   DALI_TEST_CHECK( value.Get( enable ) );
   DALI_TEST_CHECK( enable );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
+{
+  ToolkitTestApplication application;
+
+  // Async loading, no atlasing for big size image
+  ImageView imageView = ImageView::New( gImage_600_RGB );
+
+  // By default, Aysnc loading is used
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+  application.Render(16);
+  application.SendNotification();
+
+  // BitmapLoader is not used
+  BitmapLoader loader = BitmapLoader::GetLatestCreated();
+  DALI_TEST_CHECK( !loader );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewAsyncLoadingWithAltasing(void)
+{
+  ToolkitTestApplication application;
+
+  //Async loading, automatic atlasing for small size image
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+  callStack.Reset();
+  callStack.Enable(true);
+
+  ImageView imageView = ImageView::New( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
+
+  // By default, Aysnc loading is used
+  // loading is not started if the actor is offStage
+  BitmapLoader loader = BitmapLoader::GetLatestCreated();
+  DALI_TEST_CHECK( !loader );
+
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+  application.Render(16);
+  application.SendNotification();
+
+  // loading started
+  loader = BitmapLoader::GetLatestCreated();
+  DALI_TEST_CHECK( loader );
+
+  // worker thread is created
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  DALI_TEST_CHECK( eventTrigger );
+
+  loader.WaitForLoading();// waiting until the image to be loaded
+  DALI_TEST_CHECK( loader.IsLoaded() );
+
+  CallbackBase* callback = eventTrigger->GetCallback();
+  CallbackBase::Execute( *callback );
+
+  application.SendNotification();
+  application.Render(16);
+
+  callStack.Enable(false);
+
+  DALI_TEST_CHECK(  callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 34, 34" ) );
+
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSyncLoading(void)
+{
+  ToolkitTestApplication application;
+
+  Property::Map syncLoadingMap;
+  syncLoadingMap[ "synchronousLoading" ] = true;
+
+  // Sync loading, no atlasing for big size image
+  {
+    ImageView imageView = ImageView::New( gImage_600_RGB );
+
+    // Sync loading is used
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    // BitmapLoader is used, and the loading is started immediately even the actor is not on stage.
+    BitmapLoader loader = BitmapLoader::GetLatestCreated();
+    DALI_TEST_CHECK( loader );
+  }
+
+  // Sync loading, automatic atlasing for small size image
+  {
+    BitmapLoader::ResetLatestCreated();
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+    callStack.Reset();
+    callStack.Enable(true);
+
+    ImageView imageView = ImageView::New( );
+    // Sync loading is used
+    syncLoadingMap[ "url" ] = gImage_34_RGBA;
+    syncLoadingMap[ "desiredHeight" ] = 34;
+    syncLoadingMap[ "desiredWidth" ] = 34;
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    // loading is started even if the actor is offStage
+    BitmapLoader loader = BitmapLoader::GetLatestCreated();
+    DALI_TEST_CHECK( loader );
+
+    loader.WaitForLoading();
+
+    DALI_TEST_CHECK( loader.IsLoaded() );
+
+    Stage::GetCurrent().Add( imageView );
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_CHECK(  callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 34, 34" ) );
+  }
 
   END_TEST;
 }
