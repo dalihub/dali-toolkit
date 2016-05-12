@@ -30,9 +30,6 @@ namespace Dali
 Shader CreateShader();
 TextureSet CreateTextureSet();
 TextureSet CreateTextureSet( Image image );
-Geometry CreateQuadGeometry();
-Geometry CreateQuadGeometryFromBuffer( PropertyBuffer vertexData );
-PropertyBuffer CreatePropertyBuffer();
 
 }
 

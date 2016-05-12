@@ -84,33 +84,6 @@ Actor CreateTile( const Vector4& samplerRect )
   return tile;
 }
 
-
-Geometry CreateQuadGeometry()
-{
-  const float halfWidth = 0.5f;
-  const float halfHeight = 0.5f;
-  struct QuadVertex { Vector2 position;};
-  QuadVertex quadVertexData[4] =
-  {
-      { Vector2(-halfWidth, -halfHeight) },
-      { Vector2( halfWidth, -halfHeight) },
-      { Vector2(-halfWidth, halfHeight)  },
-      { Vector2( halfWidth, halfHeight)  }
-  };
-
-  Property::Map quadVertexFormat;
-  quadVertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
-  quadVertices.SetData( quadVertexData, 4 );
-
-  // Create the geometry object
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( quadVertices );
-  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
-
-  return geometry;
-}
-
 }
 
 const Vector4 CubeTransitionEffect::FULL_BRIGHTNESS( 1.0f, 1.0f, 1.0f, 1.0f );
@@ -272,7 +245,7 @@ void CubeTransitionEffect::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
 
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
   TextureSet textureSet = TextureSet::New();
