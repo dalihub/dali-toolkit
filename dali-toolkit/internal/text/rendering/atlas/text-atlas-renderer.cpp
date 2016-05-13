@@ -38,7 +38,7 @@ using namespace Dali::Toolkit::Text;
 namespace
 {
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_RENDERING");
 #endif
 
 const float ZERO( 0.0f );
@@ -433,6 +433,9 @@ struct AtlasRenderer::Impl
             renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
             containerActor.Add( shadowActor );
             containerActor.Add( actor );
+#if defined(DEBUG_ENABLED)
+            containerActor.SetName("TextContainer");
+#endif
             actor = containerActor;
           }
         }
@@ -504,7 +507,6 @@ struct AtlasRenderer::Impl
     // Keep all of the origins aligned
     actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-
     actor.SetSize( actorSize );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
     return actor;
@@ -738,6 +740,8 @@ Text::RendererPtr AtlasRenderer::New()
 
 Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Text::AtlasRenderer::Render()\n" );
+
   UnparentAndReset( mImpl->mActor );
 
   Length numberOfGlyphs = view.GetNumberOfGlyphs();
