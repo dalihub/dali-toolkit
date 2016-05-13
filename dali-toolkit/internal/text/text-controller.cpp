@@ -181,6 +181,19 @@ CharacterDirection Controller::GetAutoScrollDirection() const
   return mImpl->mAutoScrollDirectionRTL;
 }
 
+float Controller::GetAutoScrollLineAlignment() const
+{
+  float offset = 0.f;
+
+  if( mImpl->mVisualModel &&
+      ( 0u != mImpl->mVisualModel->mLines.Count() ) )
+  {
+    offset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+  }
+
+  return offset;
+}
+
 void Controller::SetText( const std::string& text )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
@@ -1072,17 +1085,7 @@ bool Controller::GetEnableCursorBlink() const
 
 const Vector2& Controller::GetScrollPosition() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mScrollPosition;
-  }
-
-  return Vector2::ZERO;
-}
-
-const Vector2& Controller::GetAlignmentOffset() const
-{
-  return mImpl->mAlignmentOffset;
+  return mImpl->mScrollPosition;
 }
 
 Vector3 Controller::GetNaturalSize()
@@ -1286,15 +1289,18 @@ bool Controller::Relayout( const Size& size )
   // Whether the text control is editable
   const bool isEditable = NULL != mImpl->mEventData;
 
-  // Keep the current offset and alignment as it will be used to update the decorator's positions (if the size changes).
+  // Keep the current offset as it will be used to update the decorator's positions (if the size changes).
   Vector2 offset;
   if( newSize && isEditable )
   {
-    offset = mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition;
+    offset = mImpl->mScrollPosition;
   }
 
-  // After doing the text layout, the alignment offset to place the actor in the desired position can be calculated.
-  CalculateTextAlignment( size );
+  if( !isEditable || !IsMultiLineEnabled() )
+  {
+    // After doing the text layout, the vertical offset to place the actor in the desired position can be calculated.
+    CalculateVerticalOffset( size );
+  }
 
   if( isEditable )
   {
@@ -1304,7 +1310,7 @@ bool Controller::Relayout( const Size& size )
       mImpl->ClampHorizontalScroll( layoutSize );
 
       // Update the decorator's positions is needed if there is a new size.
-      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition - offset );
+      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mScrollPosition - offset );
     }
 
     // Move the cursor, grab handle etc.
@@ -1408,7 +1414,7 @@ void Controller::ResetScrollPosition()
   if( NULL != mImpl->mEventData )
   {
     // Reset the scroll position.
-    mImpl->mEventData->mScrollPosition = Vector2::ZERO;
+    mImpl->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
 }
@@ -1687,7 +1693,7 @@ LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
   return mImpl->mLayoutEngine.GetVerticalAlignment();
 }
 
-void Controller::CalculateTextAlignment( const Size& controlSize )
+void Controller::CalculateVerticalOffset( const Size& controlSize )
 {
   Size layoutSize = mImpl->mVisualModel->GetLayoutSize();
 
@@ -1697,71 +1703,21 @@ void Controller::CalculateTextAlignment( const Size& controlSize )
     layoutSize.height = mImpl->GetDefaultFontLineHeight();
   }
 
-  if( LayoutEngine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
-  {
-    // Get the direction of the first character.
-    const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
-
-    // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
-    LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
-    if( firstParagraphDirection )
-    {
-      switch( horizontalAlignment )
-      {
-        case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
-        {
-          horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_END;
-          break;
-        }
-        case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
-        {
-          // Nothing to do.
-          break;
-        }
-        case LayoutEngine::HORIZONTAL_ALIGN_END:
-        {
-          horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_BEGIN;
-          break;
-        }
-      }
-    }
-
-    switch( horizontalAlignment )
-    {
-      case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
-      {
-        mImpl->mAlignmentOffset.x = 0.f;
-        break;
-      }
-      case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
-      {
-        mImpl->mAlignmentOffset.x = floorf( 0.5f * ( controlSize.width - layoutSize.width ) ); // try to avoid pixel alignment.
-        break;
-      }
-      case LayoutEngine::HORIZONTAL_ALIGN_END:
-      {
-        mImpl->mAlignmentOffset.x = controlSize.width - layoutSize.width;
-        break;
-      }
-    }
-  }
-
-  const LayoutEngine::VerticalAlignment verticalAlignment = mImpl->mLayoutEngine.GetVerticalAlignment();
-  switch( verticalAlignment )
+  switch( mImpl->mLayoutEngine.GetVerticalAlignment() )
   {
     case LayoutEngine::VERTICAL_ALIGN_TOP:
     {
-      mImpl->mAlignmentOffset.y = 0.f;
+      mImpl->mScrollPosition.y = 0.f;
       break;
     }
     case LayoutEngine::VERTICAL_ALIGN_CENTER:
     {
-      mImpl->mAlignmentOffset.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
+      mImpl->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
       break;
     }
     case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
     {
-      mImpl->mAlignmentOffset.y = controlSize.height - layoutSize.height;
+      mImpl->mScrollPosition.y = controlSize.height - layoutSize.height;
       break;
     }
   }

@@ -117,12 +117,6 @@ struct EventData
 
   InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
 
-  /**
-   * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
-   * Typically this will have a negative value with scrolling occurs.
-   */
-  Vector2            mScrollPosition;          ///< The text is offset by this position when scrolling.
-
   State              mState;                   ///< Selection mode, edit mode etc.
 
   CharacterIndex     mPrimaryCursorPosition;   ///< Index into logical model for primary cursor.
@@ -274,7 +268,6 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
-    mAlignmentOffset(),
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
@@ -624,7 +617,11 @@ public:
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   Vector<ModifyEvent> mModifyEvents;       ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
-  Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
+  /**
+   * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
+   * Typically this will have a negative value with scrolling occurs.
+   */
+  Vector2 mScrollPosition;                 ///< The text is offset by this position when scrolling.
   TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.

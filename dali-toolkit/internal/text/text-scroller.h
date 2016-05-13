@@ -65,7 +65,7 @@ public:
    * @param[in] alignmentOffset alignment of source text
    *
    */
-  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, const Vector2 alignmentOffset );
+  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around

@@ -174,6 +174,13 @@ public:
   CharacterDirection GetAutoScrollDirection() const;
 
   /**
+   * @brief Get the alignment offset of the first line of text.
+   *
+   * @return The alignment offset.
+   */
+  float GetAutoScrollLineAlignment() const;
+
+  /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.
@@ -552,13 +559,6 @@ public:
   const Vector2& GetScrollPosition() const;
 
   /**
-   * @brief Query the alignment offset.
-   *
-   * @return The alignmnet offset.
-   */
-  const Vector2& GetAlignmentOffset() const;
-
-  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize();
@@ -660,11 +660,11 @@ public:
   LayoutEngine::VerticalAlignment GetVerticalAlignment() const;
 
   /**
-   * @brief Calulates the alignment of the whole text inside the bounding box.
+   * @brief Calulates the vertical offset to align the text inside the bounding box.
    *
    * @param[in] size The size of the bounding box.
    */
-  void CalculateTextAlignment( const Size& size );
+  void CalculateVerticalOffset( const Size& size );
 
   /**
    * @brief Return the layout engine.

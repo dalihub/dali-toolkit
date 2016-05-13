@@ -55,6 +55,7 @@ LineIndex GetClosestLine( VisualModelPtr visualModel,
   {
     const LineRun& lineRun = lines[lineIndex];
     totalHeight += lineRun.ascender + -lineRun.descender;
+
     if( visualY < totalHeight )
     {
       return lineIndex;
@@ -90,7 +91,10 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
   // Find which line is closest.
   const LineIndex lineIndex = Text::GetClosestLine( visualModel,
                                                     visualY );
-  const LineRun& line = visualModel->mLines[lineIndex];
+
+  // Convert from text's coords to line's coords.
+  const LineRun& line = *( visualModel->mLines.Begin() + lineIndex );
+  visualX -= line.alignmentOffset;
 
   // Get the positions of the glyphs.
   const Vector<Vector2>& positions = visualModel->mGlyphPositions;
@@ -343,7 +347,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
     glyphAdvance = static_cast<float>( numberOfGlyphAdvance ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
   }
 
-  // Get the glyph position and x bearing.
+  // Get the glyph position and x bearing (in the line's coords).
   const Vector2& primaryPosition = *( glyphPositionsBuffer + primaryGlyphIndex );
 
   // Set the primary cursor's height.
@@ -352,6 +356,9 @@ void GetCursorPosition( VisualModelPtr visualModel,
   // Set the primary cursor's position.
   cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
   cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
+
+  // Transform the cursor info from line's coords to text's coords.
+  cursorInfo.primaryPosition.x += line.alignmentOffset;
 
   // Calculate the secondary cursor.
 
@@ -380,6 +387,9 @@ void GetCursorPosition( VisualModelPtr visualModel,
     // Set the secondary cursor's position.
     cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
     cursorInfo.secondaryPosition.y = cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
+
+    // Transform the cursor info from line's coords to text's coords.
+    cursorInfo.secondaryPosition.x += line.alignmentOffset;
   }
 }
 

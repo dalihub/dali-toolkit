@@ -664,9 +664,8 @@ void TextLabel::RenderText()
 
     if( renderableActor )
     {
-      // TODO: Scroll and alignment needs to be refactored.
-      const Vector2& alignmentOffset = mController->GetAlignmentOffset();
-      renderableActor.SetPosition( 0.f, alignmentOffset.y );
+      const Vector2& scrollOffset = mController->GetScrollPosition();
+      renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
       self.Add( renderableActor );
     }
@@ -683,15 +682,15 @@ void TextLabel::SetUpAutoScrolling()
 {
   const Size& controlSize = mController->GetView().GetControlSize();
   const Size offScreenSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
-  const Vector2& alignmentOffset = mController->GetAlignmentOffset();
+  const float alignmentOffset = mController->GetAutoScrollLineAlignment();
   const Text::CharacterDirection direction = mController->GetAutoScrollDirection();
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling alignmentOffset[%f,%f] offScreenSize[%f,%f] controlSize[%f,%f]\n",
-                 alignmentOffset.x, alignmentOffset.y, offScreenSize.x,offScreenSize.y , controlSize.x,controlSize.y);
+  DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling alignmentOffset[%f] offScreenSize[%f,%f] controlSize[%f,%f]\n",
+                 alignmentOffset, offScreenSize.x,offScreenSize.y , controlSize.x,controlSize.y );
 
   if ( !mTextScroller )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling Creating default TextScoller\n");
+    DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling Creating default TextScoller\n" );
 
     // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
     mTextScroller = Text::TextScroller::New( *this );
