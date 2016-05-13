@@ -56,6 +56,12 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
  * |---------------------------------|--------------------------------------------|
  * | layoutActivated                 | @ref LayoutActivatedSignal()               |
  * @SINCE_1_0.0
+ *
+ * Actions
+ * | %Action Name  | Attributes              | Description                                     |
+ * |---------------|-------------------------|-------------------------------------------------|
+ * | stopScrolling | Doesn't have attributes | Stops the scroll animation. See @ref DoAction() |
+ * @SINCE_1_1.33
  */
 
 class DALI_IMPORT_API ItemView : public Scrollable

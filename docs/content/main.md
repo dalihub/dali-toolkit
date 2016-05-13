@@ -54,7 +54,7 @@
 
 ### UI Components
  + Buttons
- + [ImageView](@ref image-view)
+ + [FlexContainer](@ref flex-container)
  + [ItemView](@ref item-view)
  + [Popup](@ref popup)
  + [Scroll View](@ref scroll-view)

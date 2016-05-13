@@ -326,6 +326,20 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
+  /**
+   * Performs actions as requested using the action name.
+   * @param[in] object The object on which to perform the action.
+   * @param[in] actionName The action to perform.
+   * @param[in] attributes The attributes with which to perfrom this action.
+   * @return true if action has been accepted by this control
+   */
+  static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
+
+  /**
+   * Helper for DoAction( ACTION_STOP_SCROLLING ).
+   */
+  void DoStopScrolling();
+
 private:
 
   /**

@@ -50,6 +50,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEffectColor",      VE
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootAnimationSpeed",   FLOAT,   OVERSHOOT_ANIMATION_SPEED )
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEnabled",          BOOLEAN, OVERSHOOT_ENABLED )
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootSize",             VECTOR2, OVERSHOOT_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollToAlphaFunction",     INTEGER, SCROLL_TO_ALPHA_FUNCTION )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollRelativePosition",   VECTOR2, SCROLL_RELATIVE_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollPositionMin",        VECTOR2, SCROLL_POSITION_MIN)
@@ -84,6 +85,7 @@ Scrollable::Scrollable()
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
+  mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
   mOvershootEnabled(true)
 {
 }
@@ -93,6 +95,7 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
+  mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
   mOvershootEnabled(true)
 {
 }
@@ -209,6 +212,17 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
         scrollableImpl.EnableScrollOvershoot( scrollableImpl.IsOvershootEnabled() );
         break;
       }
+      case Toolkit::Scrollable::Property::SCROLL_TO_ALPHA_FUNCTION:
+      {
+        int alphaFunction = value.Get<int>();
+
+        if( alphaFunction >= AlphaFunction::DEFAULT &&
+            alphaFunction <  AlphaFunction::COUNT )
+        {
+          scrollableImpl.mScrollToAlphaFunction = static_cast< AlphaFunction::BuiltinFunction >( alphaFunction );
+        }
+        break;
+      }
     }
   }
 }
@@ -242,6 +256,11 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::Scrollable::Property::OVERSHOOT_SIZE:
       {
         value = scrollableImpl.mOvershootSize;
+        break;
+      }
+      case Toolkit::Scrollable::Property::SCROLL_TO_ALPHA_FUNCTION:
+      {
+        value = static_cast<int>( scrollableImpl.mScrollToAlphaFunction );
         break;
       }
     }

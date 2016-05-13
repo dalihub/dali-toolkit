@@ -2335,8 +2335,13 @@ void Controller::PasteClipboardItemEvent()
   // Commit the current pre-edit text; the contents of the clipboard should be appended
   mImpl->ResetImfManager();
 
+  // Temporary disable hiding clipboard
+  mImpl->SetClipboardHideEnable( false );
+
   // Paste
   PasteText( stringToPaste );
+
+  mImpl->SetClipboardHideEnable( true );
 }
 
 void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )

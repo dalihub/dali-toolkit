@@ -69,4 +69,13 @@ itemView.ActivateLayout(
 Dali::Stage::GetCurrent().Add( itemView );
 ~~~
 
+## Actions
+The item-view provides an action to stop the scroll animation if desired.
+
+~~~{.cpp}
+Property::Map attributes;
+itemView.DoAction( "stopScrolling", attributes );
+~~~
+
+
 */

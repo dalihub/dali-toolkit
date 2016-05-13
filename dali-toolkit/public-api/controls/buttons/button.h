@@ -77,9 +77,9 @@ class Button;
  * | stateChanged     | @ref StateChangedSignal()   |
  *
  * Actions
- * | %Action Name     | Description                 |
- * |------------------|-----------------------------|
- * | buttonClick      | Simulates a button click    |
+ * | %Action Name     | Attributes              | Description                                   |
+ * |------------------|-------------------------|-----------------------------------------------|
+ * | buttonClick      | Doesn't have attributes | Simulates a button click. See @ref DoAction() |
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API Button : public Control
