@@ -28,11 +28,22 @@ TextureSet CreateTextureSet()
 {
   return TextureSet::New();
 }
+
 TextureSet CreateTextureSet( Image image )
 {
   TextureSet textureSet = TextureSet::New();
   textureSet.SetImage( 0u, image );
   return textureSet;
+}
+
+PropertyBuffer CreatePropertyBuffer()
+{
+  Property::Map texturedQuadVertexFormat;
+  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
+
+  PropertyBuffer vertexData = PropertyBuffer::New( texturedQuadVertexFormat );
+  return vertexData;
 }
 
 } // namespace Dali

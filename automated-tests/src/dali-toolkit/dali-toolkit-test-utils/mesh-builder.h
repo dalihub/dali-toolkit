@@ -30,6 +30,7 @@ namespace Dali
 Shader CreateShader();
 TextureSet CreateTextureSet();
 TextureSet CreateTextureSet( Image image );
+PropertyBuffer CreatePropertyBuffer();
 
 }
 
