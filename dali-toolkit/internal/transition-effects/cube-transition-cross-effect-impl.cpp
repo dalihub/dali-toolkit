@@ -105,8 +105,7 @@ void CubeTransitionCrossEffect::OnStartTransition( Vector2 panPosition, Vector2 
     }
   }
 
-  const Vector2& size = Self().GetCurrentSize().GetVectorXY();
-  Vector2 halfSize = size * 0.5f;
+  const Vector2 halfSize = Self().GetCurrentSize().GetVectorXY() * 0.5f;
   //the centre to "explode" the tiles outwards from
   Vector3 centre( halfSize.x, halfSize.y, -1.0f / mDisplacementSpreadFactor );
 
@@ -130,7 +129,7 @@ void CubeTransitionCrossEffect::OnStartTransition( Vector2 panPosition, Vector2 
 
 void CubeTransitionCrossEffect::SetupAnimation( unsigned int actorIndex, unsigned int x, unsigned int y, float angle, const Vector3 axis, const Vector3& displacementCentre )
 {
-  const Vector2& size = Self().GetCurrentSize().GetVectorXY();
+  const Vector2 size = Self().GetCurrentSize().GetVectorXY();
   Vector2 halfSize = size * 0.5f;
 
   //the position of the centre of the front face tile

@@ -681,8 +681,8 @@ void TextLabel::RenderText()
 
 void TextLabel::SetUpAutoScrolling()
 {
-  const Size& controlSize = mController->GetView().GetControlSize();
-  const Size& offScreenSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
+  const Size& controlSize = mController->GetView().GetControlSize(); // Needs to be a ref as the control-size can be changed by GetNaturalSize()
+  const Size offScreenSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
   const Vector2& alignmentOffset = mController->GetAlignmentOffset();
   const Text::CharacterDirection direction = mController->GetAutoScrollDirection();
 
