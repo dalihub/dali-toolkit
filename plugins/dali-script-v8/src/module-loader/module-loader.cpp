@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include "module-loader.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+
 // INTERNAL INCLUDES
 #include <v8-utils.h>
 

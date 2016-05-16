@@ -15,9 +15,12 @@
  *
  */
 
+// HEADER
 #include "toolkit-style-monitor.h"
 
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/dali-signal.h>
 
