@@ -38,6 +38,10 @@ ObjLoader::ObjLoader()
 {
   mSceneLoaded = false;
   mMaterialLoaded = false;
+  mHasTexturePoints = false;
+  mHasNormalMap = false;
+  mHasDiffuseMap = false;
+  mHasSpecularMap = false;
   mSceneAABB.Init();
 }
 
@@ -166,9 +170,10 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
 {
   //If we don't have tangents, calculate them
   //we need to recalculate the normals too, because we need just one normal,tangent, bitangent per vertex
-  //In the case of a textureless object, we don't need tangents and so we skip this step
+  //In the case of a textureless object, we don't need tangents for our shader and so we skip this step
   //TODO: Use a better function to calculate tangents
-  if( mTangents.Size() == 0 && mHasTexture && mHasNormalMap )
+
+  if( mTangents.Size() == 0 && mHasTexturePoints )
   {
     mTangents.Resize( mNormals.Size() );
     mBiTangents.Resize( mNormals.Size() );
@@ -181,7 +186,7 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
 
   bool mapsCorrespond; //True if the sizes of the arrays necessary for the object agree.
 
-  if ( mHasTexture )
+  if ( mHasTexturePoints )
   {
     mapsCorrespond = ( mPoints.Size() == mTextures.Size() ) && ( mTextures.Size() == mNormals.Size() );
   }
@@ -207,7 +212,7 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
       vertex.position = mPoints[ui];
       vertices[ui] = vertex;
 
-      if ( mHasTexture )
+      if ( mHasTexturePoints )
       {
         textures[ui] = Vector2();
         verticesExt[ui] = VertexExt();
@@ -226,13 +231,9 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
 
         vertices[mTriangles[ui].pntIndex[j]].normal = mNormals[mTriangles[ui].nrmIndex[j]];
 
-        if ( mHasTexture )
+        if ( mHasTexturePoints )
         {
           textures[mTriangles[ui].pntIndex[j]] = mTextures[mTriangles[ui].texIndex[j]];
-        }
-
-        if ( mHasNormalMap && mHasTexture )
-        {
           verticesExt[mTriangles[ui].pntIndex[j]].tangent = mTangents[mTriangles[ui].nrmIndex[j]];
           verticesExt[mTriangles[ui].pntIndex[j]].bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
         }
@@ -258,17 +259,14 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
         vertex.normal = mNormals[mTriangles[ui].nrmIndex[j]];
         vertices[index] = vertex;
 
-        if ( mHasTexture )
+        if ( mHasTexturePoints )
         {
           textures[index] = mTextures[mTriangles[ui].texIndex[j]];
-        }
-
-        if ( mHasNormalMap && mHasTexture )
-        {
           VertexExt vertexExt;
           vertexExt.tangent = mTangents[mTriangles[ui].nrmIndex[j]];
           vertexExt.bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
           verticesExt[index] = vertexExt;
+
         }
 
         index++;
@@ -289,7 +287,6 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
   int pntAcum = 0, texAcum = 0, nrmAcum = 0;
   bool iniObj = false;
   bool hasTexture = false;
-  bool hasNormalMap = false;
   int face = 0;
 
   //Init AABB for the file
@@ -337,7 +334,6 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
       isline >> point.z;
 
       mTangents.PushBack( point );
-      hasNormalMap = true;
     }
     else if ( tag == "#_#binormal" )
     {
@@ -346,7 +342,6 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
       isline >> point.z;
 
       mBiTangents.PushBack( point );
-      hasNormalMap = true;
     }
     else if ( tag == "vt" )
     {
@@ -382,28 +377,48 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
         numIndices++;
       }
 
+      //Hold slashes that separate attributes of the same point.
       char separator;
       char separator2;
 
-      if ( strstr( vet[0].c_str(),"//" ) ) //No texture coordinates.
+      const char * subString; //A pointer to the position in the string as we move through it.
+
+      subString = strstr( vet[0].c_str(),"/" ); //Search for the first '/'
+
+      if( subString )
       {
-        for( int i = 0 ; i < numIndices; i++)
+        if( subString[1] == '/' ) // Of the form A//C, so has points and normals but no texture coordinates.
         {
-          std::istringstream isindex( vet[i] );
-          isindex >> ptIdx[i] >> separator >> separator2 >> nrmIdx[i];
-          texIdx[i] = 0;
+          for( int i = 0 ; i < numIndices; i++)
+          {
+            std::istringstream isindex( vet[i] );
+            isindex >> ptIdx[i] >> separator >> separator2 >> nrmIdx[i];
+            texIdx[i] = 0;
+          }
         }
-      }
-      else if ( strstr( vet[0].c_str(),"/" ) ) //Has texture coordinates, and possibly also normals.
-      {
-        for( int i = 0 ; i < numIndices; i++ )
+        else if( strstr( subString, "/" ) ) // Of the form A/B/C, so has points, textures and normals.
         {
-          std::istringstream isindex( vet[i] );
-          isindex >> ptIdx[i] >> separator >> texIdx[i] >> separator2 >> nrmIdx[i];
+          for( int i = 0 ; i < numIndices; i++ )
+          {
+            std::istringstream isindex( vet[i] );
+            isindex >> ptIdx[i] >> separator >> texIdx[i] >> separator2 >> nrmIdx[i];
+          }
+
+          hasTexture = true;
+        }
+        else // Of the form A/B, so has points and textures but no normals.
+        {
+          for( int i = 0 ; i < numIndices; i++ )
+          {
+            std::istringstream isindex( vet[i] );
+            isindex >> ptIdx[i] >> separator >> texIdx[i];
+            nrmIdx[i] = 0;
+          }
+
           hasTexture = true;
         }
       }
-      else //Has just points.
+      else // Simply of the form A, as in, point indices only.
       {
         for( int i = 0 ; i < numIndices; i++ )
         {
@@ -470,8 +485,7 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
   {
     CenterAndScale( true, mPoints );
     mSceneLoaded = true;
-    mHasTexture = hasTexture;
-    mHasNormalMap = hasNormalMap;
+    mHasTexturePoints = hasTexture;
     return true;
   }
 
@@ -522,6 +536,7 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
     {
       isline >> info;
       texture0Url = info;
+      mHasDiffuseMap = true;
     }
     else if ( tag == "bump" )
     {
@@ -533,6 +548,7 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
     {
       isline >> info;
       texture2Url = info;
+      mHasSpecularMap = true;
     }
   }
 
@@ -541,6 +557,8 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
 
 Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illuminationType )
 {
+  Geometry surface = Geometry::New();
+
   Dali::Vector<Vertex> vertices;
   Dali::Vector<Vector2> textures;
   Dali::Vector<VertexExt> verticesExt;
@@ -554,13 +572,11 @@ Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illum
   vertexFormat["aNormal"] = Property::VECTOR3;
   PropertyBuffer surfaceVertices = PropertyBuffer::New( vertexFormat );
   surfaceVertices.SetData( &vertices[0], vertices.Size() );
-
-  Geometry surface = Geometry::New();
   surface.AddVertexBuffer( surfaceVertices );
 
   //Some need texture coordinates
   if( ( (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP ) ||
-        (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ) ) && mHasTexture )
+        (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ) ) && mHasTexturePoints && mHasDiffuseMap )
   {
     Property::Map textureFormat;
     textureFormat["aTexCoord"] = Property::VECTOR2;
@@ -571,7 +587,7 @@ Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illum
   }
 
   //Some need tangent and bitangent
-  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP && mHasNormalMap && mHasTexture )
+  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP && mHasTexturePoints )
   {
     Property::Map vertexExtFormat;
     vertexExtFormat["aTangent"] = Property::VECTOR3;
@@ -621,12 +637,22 @@ void ObjLoader::ClearArrays()
 
 bool ObjLoader::IsTexturePresent()
 {
-  return mHasTexture;
+  return mHasTexturePoints;
+}
+
+bool ObjLoader::IsDiffuseMapPresent()
+{
+  return mHasDiffuseMap;
 }
 
 bool ObjLoader::IsNormalMapPresent()
 {
   return mHasNormalMap;
+}
+
+bool ObjLoader::IsSpecularMapPresent()
+{
+  return mHasSpecularMap;
 }
 
 } // namespace Internal
