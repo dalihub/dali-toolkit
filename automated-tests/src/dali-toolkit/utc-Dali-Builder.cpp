@@ -21,7 +21,6 @@
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali/devel-api/object/type-registry-helper.h>
 #include <test-button.h>
 #include <test-animation-data.h>
 
