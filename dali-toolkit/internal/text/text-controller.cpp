@@ -1112,8 +1112,8 @@ Vector3 Controller::GetNaturalSize()
     mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
     mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
-    // Store the actual control's width.
-    const float actualControlWidth = mImpl->mVisualModel->mControlSize.width;
+    // Store the actual control's size to restore later.
+    const Size actualControlSize = mImpl->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
@@ -1138,8 +1138,8 @@ Vector3 Controller::GetNaturalSize()
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
 
-    // Restore the actual control's width.
-    mImpl->mVisualModel->mControlSize.width = actualControlWidth;
+    // Restore the actual control's size.
+    mImpl->mVisualModel->mControlSize = actualControlSize;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }

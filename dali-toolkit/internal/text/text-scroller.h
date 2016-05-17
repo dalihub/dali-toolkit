@@ -71,13 +71,13 @@ public:
    * @brief Set the gap distance to elapse before the text wraps around
    * @param[in] gap distance to elapse
    */
-  void SetGap( float gap );
+  void SetGap( int gap );
 
   /**
-   * @brief Get the distance before scrolling waps
+   * @brief Get the distance before scrolling wraps
    * @return gap distance to elapse
    */
-  float GetGap() const;
+  int GetGap() const;
 
   /**
    * @brief Set speed the text should scroll
@@ -161,9 +161,9 @@ private:
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
 
-  int   mScrollSpeed;            ///< Speed which text should automatically scroll at
-  int   mLoopCount;              ///< Number of time the text should scroll
-  float mWrapGap;                ///< Gap before text wraps around when scrolling
+  int mScrollSpeed;            ///< Speed which text should automatically scroll at
+  int mLoopCount;              ///< Number of time the text should scroll
+  int mWrapGap;                ///< Gap before text wraps around when scrolling
 
 }; // TextScroller class
 

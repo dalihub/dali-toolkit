@@ -194,13 +194,13 @@ TextScrollerPtr TextScroller::New( ScrollerInterface& scrollerInterface )
   return textScroller;
 }
 
-void TextScroller::SetGap( float gap )
+void TextScroller::SetGap( int gap )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetGap gap[%f]\n", gap );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetGap gap[%d]\n", gap );
   mWrapGap = gap;
 }
 
-float TextScroller::GetGap() const
+int TextScroller::GetGap() const
 {
   return mWrapGap;
 }
@@ -252,7 +252,7 @@ TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerIn
                             mScrollDeltaIndex( Property::INVALID_INDEX ),
                             mScrollSpeed( MINIMUM_SCROLL_SPEED ),
                             mLoopCount( 1 ),
-                            mWrapGap( 0.0f )
+                            mWrapGap( 0 )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
@@ -286,7 +286,7 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
 
   mOffscreenCameraActor.SetY( offScreenSize.height * 0.5f );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%d]\n", mWrapGap )
 
   mScrollingTextActor = Actor::New();
   mScrollingTextActor.AddRenderer( renderer );

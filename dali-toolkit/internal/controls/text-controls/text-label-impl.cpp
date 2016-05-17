@@ -681,12 +681,13 @@ void TextLabel::RenderText()
 
 void TextLabel::SetUpAutoScrolling()
 {
-  const Size& controlSize = mController->GetView().GetControlSize(); // Needs to be a ref as the control-size can be changed by GetNaturalSize()
+  const Size& controlSize = mController->GetView().GetControlSize();
   const Size offScreenSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
   const Vector2& alignmentOffset = mController->GetAlignmentOffset();
   const Text::CharacterDirection direction = mController->GetAutoScrollDirection();
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling alignmentOffset[%f] offScreenSize[%f]\n", alignmentOffset.x, offScreenSize.width);
+  DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling alignmentOffset[%f,%f] offScreenSize[%f,%f] controlSize[%f,%f]\n",
+                 alignmentOffset.x, alignmentOffset.y, offScreenSize.x,offScreenSize.y , controlSize.x,controlSize.y);
 
   if ( !mTextScroller )
   {
