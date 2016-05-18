@@ -31,10 +31,13 @@ using namespace Text;
 
 // Tests the following functions.
 //
-// void SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
-//                             Length numberOfRuns,
-//                             CharacterIndex startIndex  )
-
+// void CreateParagraphInfo( CharacterIndex startIndex,
+//                           Length numberOfCharacters );
+// void FindParagraphs( CharacterIndex index,
+//                      Length numberOfCharacters,
+//                      Vector<ParagraphRunIndex>& paragraphs );
+// CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
+// CharacterIndex GetLogicalCursorIndex( CharacterIndex visualCursorIndex ) const;
 
 //////////////////////////////////////////////////////////
 
@@ -61,15 +64,24 @@ struct FindParagraphData
   unsigned int*  paragraphs;         ///< The expected paragraph info.
 };
 
-struct SetVisualToLogicalMapData
+struct GetLogicalCharacterIndexData
 {
-  std::string   description;                ///< Description of the test.
-  std::string   text;                       ///< Input text.
-  unsigned int  startIndex;                 ///< The start index from where the visual to logical conversion table is set.
-  unsigned int  numberOfCharacters;         ///< The number of characters to set.
-  Size          textArea;                   ///< The size of the area where the text is laid-out.
-  unsigned int  expectedNumberOfCharacters; ///< The expected number of characters.
-  unsigned int* visualToLogical;            ///< The expected visual to logical conversion table.
+  std::string   description;        ///< Description of the test.
+  std::string   text;               ///< Input text.
+  Size          textArea;           ///< The text area.
+  unsigned int  numberOfIndices;    ///< The number of characters to set.
+  unsigned int* visualToLogical;    ///< The expected visual to logical conversion table.
+  unsigned int* cachedBidiLine;     ///< The cached bidi line index for each character.
+};
+
+struct GetLogicalCursorIndexData
+{
+  std::string    description;        ///< Description of the test.
+  std::string    text;               ///< Input text.
+  unsigned int   numberOfIndices;    ///< The number of characters to set.
+  unsigned int*  visualCursorIndex;  ///< The given cursor visual index.
+  unsigned int*  logicalCursorIndex; ///< The expected cursor logical index
+  unsigned int*  cachedBidiLine;     ///< The cached bidi line index for each character.
 };
 
 bool CreateParagraphTest( const CreateParagraphData& data )
@@ -175,7 +187,7 @@ bool FindParagraphTest( const FindParagraphData& data )
   return true;
 }
 
-bool SetVisualToLogicalMapTest( const SetVisualToLogicalMapData& data )
+bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
   // Create the model.
@@ -194,32 +206,58 @@ bool SetVisualToLogicalMapTest( const SetVisualToLogicalMapData& data )
                    logicalModel,
                    visualModel );
 
-  // Get the visual to logical map.
-  Vector<CharacterIndex>& visualToLogicalMap = logicalModel->mVisualToLogicalMap;
-
-  // Compare the results.
-  if( data.expectedNumberOfCharacters != visualToLogicalMap.Count() )
+  for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {
-    std::cout << "  differetn number of characters : " << visualToLogicalMap.Count() << ", expected : " << data.expectedNumberOfCharacters << std::endl;
-    return false;
-  }
-
-  for( unsigned int index = 0u; index < data.expectedNumberOfCharacters; ++index )
-  {
-    if( data.visualToLogical[index] != visualToLogicalMap[index] )
+    // Check the current cached bidi line index. (Check it before call the GetLogicalCharacterIndex() method )
+    if( data.cachedBidiLine[index] != logicalModel->mBidirectionalLineIndex )
     {
-      std::cout << "  different visualToLogical table : " << std::endl;
-      for( unsigned int i = 0; i < data.expectedNumberOfCharacters; ++i )
-      {
-        std::cout << visualToLogicalMap[i] << " ";
-      }
-      std::cout << std::endl;
-      std::cout << "                         expected : " << std::endl;
-      for( unsigned int i = 0; i < data.expectedNumberOfCharacters; ++i )
-      {
-        std::cout << data.visualToLogical[i] << " ";
-      }
-      std::cout << std::endl;
+      std::cout << "  index : " << index << ", different cached bidi index : " << logicalModel->mBidirectionalLineIndex << ", expected : " << data.cachedBidiLine[index] << std::endl;
+      return false;
+    }
+
+    const Character logicalIndex = logicalModel->GetLogicalCharacterIndex( index );
+    if( data.visualToLogical[index] != logicalIndex )
+    {
+      std::cout << "  visual index : " << index << ", different logical index : " << logicalIndex << ", expected : " << data.visualToLogical[index] << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
+
+bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
+{
+  std::cout << "  testing : " << data.description << std::endl;
+  // Create the model.
+  LogicalModelPtr logicalModel = LogicalModel::New();
+  VisualModelPtr visualModel = VisualModel::New();
+  Size textArea( 300.f, 300.f );
+  Size layoutSize;
+
+  // Create the model with the whole text.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
+  CreateTextModel( data.text,
+                   textArea,
+                   fontDescriptions,
+                   options,
+                   layoutSize,
+                   logicalModel,
+                   visualModel );
+
+  for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
+  {
+    if( logicalModel->mBidirectionalLineIndex != data.cachedBidiLine[index] )
+    {
+      std::cout << "  test : " << index << ", different cached line index : " << logicalModel->mBidirectionalLineIndex << ", expected : " << data.cachedBidiLine[index] << std::endl;
+      return false;
+    }
+
+    const CharacterIndex logicalCursorIndex = logicalModel->GetLogicalCursorIndex( data.visualCursorIndex[index] );
+
+    if( logicalCursorIndex != data.logicalCursorIndex[index] )
+    {
+      std::cout << "  test : " << index << ", different logical cursor index : " << logicalCursorIndex << ", expected : " << data.logicalCursorIndex[index] << std::endl;
       return false;
     }
   }
@@ -233,7 +271,8 @@ bool SetVisualToLogicalMapTest( const SetVisualToLogicalMapData& data )
 //
 // UtcDaliCreateParagraph
 // UtcDaliFindParagraph
-// UtcDaliSetVisualToLogicalMap
+// UtcDaliGetLogicalCharacterIndex
+// UtcDaliGetLogicalCursorIndex
 //
 //////////////////////////////////////////////////////////
 
@@ -380,110 +419,304 @@ int UtcDaliFindParagraph(void)
   END_TEST;
 }
 
-int UtcDaliSetVisualToLogicalMap(void)
+int UtcDaliGetLogicalCharacterIndex(void)
 {
   tet_infoline(" UtcDaliSetVisualToLogicalMap");
 
-  unsigned int* visualToLogical01 = NULL;
-  unsigned int* visualToLogical02 = NULL;
-  unsigned int  visualToLogical03[] = { 12u, 11u, 10u, 9u, 8u, 7u, 6u, 5u, 4u, 3u, 2u, 1u, 0u };
-  unsigned int  visualToLogical04[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, };
-  unsigned int  visualToLogical05[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u, 26u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u };
-  unsigned int  visualToLogical06[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
-  unsigned int  visualToLogical07[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
-  unsigned int  visualToLogical08[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
-  unsigned int  visualToLogical09[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
+  unsigned int visualToLogical01[] = {};
+  unsigned int  cachedBidiLine01[] = {};
+  unsigned int visualToLogical02[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u };
+  unsigned int  cachedBidiLine02[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,  0u };
+  unsigned int visualToLogical03[] = { 12u, 11u, 10u, 9u, 8u, 7u, 6u, 5u, 4u, 3u, 2u, 1u, 0u };
+  unsigned int  cachedBidiLine03[] = {  0u,  0u,  0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u };
 
-  struct SetVisualToLogicalMapData data[] =
+  unsigned int visualToLogical04[] = { 0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
+  unsigned int  cachedBidiLine04[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                       0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
+                                       1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u };
+
+// size 300, 300
+// LO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,   _  h  e  l  l  o  _  w  o  r  l  d \n
+//      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39
+// VO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ل  ا  ع   ل  ا  ب  _  ا   ب  ح  ر  م  ,   _  h  e  l  l  o  _  w  o  r  l  d \n
+//      0  1  2  3  4  5  6  7  8  9 10 11 12 25 24 23 22 21 20 19 18 17 16 15 14 13 26 27 28 29 30 31 32 33 34 35 36 37 38 39
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,  _  h  e  l  l  o  _  w  o  r  l  d   ,  _  م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
+//     40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81
+// VO  \n  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م  _  ,  h  e  l  l  o  _  w  o  r  l  d   _  ,  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
+//     81 80 79 78 77 76 75 74 73 72 71 70 69 68 67 66 55 56 57 58 59 60 61 62 63 64 65 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
+//     82 83 84 85 86 87 88 89 90 91 92 93 94 95
+// VO  \n  م  ل  ا  ع  ل   ا  ب  _  ا   ب  ح  ر  م
+//     95 94 93 92 91 90 89 88 87 86 85 84 83 82
+
+
+// LO   h   e   l   l   o   _   w   o   r   l   d
+//     96  97  98  99 100 101 102 103 104 105 106
+// VO   h   e   l   l   o   _   w   o   r   l   d
+//     96  97  98  99 100 101 102 103 104 105 106
+
+  unsigned int visualToLogical05[] = { 0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
+  unsigned int  cachedBidiLine05[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u };
+
+// size 300, 300
+// LO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,   _
+//      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+// VO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ل  ا  ع   ل  ا  ب  _  ا   ب  ح  ر  م  ,   _
+//      0  1  2  3  4  5  6  7  8  9 10 11 12 25 24 23 22 21 20 19 18 17 16 15 14 13 26 27
+
+// LO    h  e  l  l  o  _  w  o  r  l  d \n
+//      28 29 30 31 32 33 34 35 36 37 38 39
+// VO    h  e  l  l  o  _  w  o  r  l  d \n
+//      28 29 30 31 32 33 34 35 36 37 38 39
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,  _  h  e  l  l  o  _  w  o  r  l  d   ,  _
+//     40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
+// VO  _  ,  h  e  l  l  o  _  w  o  r  l  d   _  ,  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
+//     67 66 55 56 57 58 59 60 61 62 63 64 65 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
+//     68 69 70 71 72 73 74 75 76 77 78 79 80 81
+// VO  \n  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
+//     81 80 79 78 77 76 75 74 73 72 71 70 69 68
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
+//     82 83 84 85 86 87 88 89 90 91 92 93 94 95
+// VO  \n  م  ل  ا  ع  ل   ا  ب  _  ا   ب  ح  ر  م
+//     95 94 93 92 91 90 89 88 87 86 85 84 83 82
+
+
+// LO   h   e   l   l   o   _   w   o   r   l   d
+//     96  97  98  99 100 101 102 103 104 105 106
+// VO   h   e   l   l   o   _   w   o   r   l   d
+//     96  97  98  99 100 101 102 103 104 105 106
+
+  unsigned int visualToLogical06[] = { 0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u };
+  unsigned int  cachedBidiLine06[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                       0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
+                                       1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u,
+                                       2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u,
+                                       3u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u,
+                                       4u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u,
+                                       5u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u,
+                                       6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u };
+
+// size 100, 600
+// LO   H  e  l  l  o  _  w  o  r  l  d  ,  _
+//      0  1  2  3  4  5  6  7  8  9 10 11 12
+// VO   H  e  l  l  o  _  w  o  r  l  d  ,  _
+//      0  1  2  3  4  5  6  7  8  9 10 11 12
+
+// LO    م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,   _
+//      13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+// VO    م  ل  ا  ع   ل  ا  ب  _  ا   ب  ح  ر  م  ,   _
+//      25 24 23 22 21 20 19 18 17 16 15 14 13 26 27
+
+// LO    h  e  l  l  o  _  w  o  r  l  d \n
+//      28 29 30 31 32 33 34 35 36 37 38 39
+// VO    h  e  l  l  o  _  w  o  r  l  d \n
+//      28 29 30 31 32 33 34 35 36 37 38 39
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,  _
+//     40 41 42 43 44 45 46 47 48 49 50 51 52 53 54
+// VO   _  ,  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
+//     54 53 52 51 50 49 48 47 46 45 44 43 42 41 40
+
+// LO   h  e  l  l  o  _  w  o  r  l  d   ,  _
+//     55 56 57 58 59 60 61 62 63 64 65 66 67
+// VO   _  ,  h  e  l  l  o  _  w  o  r  l  d
+//     67 66 55 56 57 58 59 60 61 62 63 64 65
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
+//     68 69 70 71 72 73 74 75 76 77 78 79 80 81
+// VO  \n  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
+//     81 80 79 78 77 76 75 74 73 72 71 70 69 68
+
+// LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
+//     82 83 84 85 86 87 88 89 90 91 92 93 94 95
+// VO  \n  م  ل  ا  ع  ل   ا  ب  _  ا   ب  ح  ر  م
+//     95 94 93 92 91 90 89 88 87 86 85 84 83 82
+
+
+// LO   h   e   l   l   o   _   w   o   r   l   d
+//     96  97  98  99 100 101 102 103 104 105 106
+// VO   h   e   l   l   o   _   w   o   r   l   d
+//     96  97  98  99 100 101 102 103 104 105 106
+
+  struct GetLogicalCharacterIndexData data[] =
   {
     {
       "Zero characters text",
       "",
+      Size( 300.f, 300.f ),
       0u,
-      0u,
-      Size( 100.f, 300.f ),
-      0u,
-      visualToLogical01
+      visualToLogical01,
+      cachedBidiLine01
     },
     {
       "Left to right text only",
       "Hello world",
-      0u,
+      Size( 300.f, 300.f ),
       11u,
-      Size( 100.f, 300.f ),
-      0u,
-      visualToLogical02
+      visualToLogical02,
+      cachedBidiLine02
     },
     {
       "Right to left text only",
       "مرحبا بالعالم",
-      0u,
+      Size( 300.f, 300.f ),
       13u,
-      Size( 100.f, 300.f ),
-      13u,
-      visualToLogical03
-    },
-    {
-      "Mix of left to right and right to left text.",
-      "Hello world, مرحبا بالعالم",
-      0u,
-      26u,
-      Size( 100.f, 300.f ),
-      26u,
-      visualToLogical04
-    },
-    {
-      "Mix of left to right and right to left text.",
-      "Hello world, \nمرحبا بالعالم",
-      0u,
-      27u,
-      Size( 100.f, 300.f ),
-      27u,
-      visualToLogical05
+      visualToLogical03,
+      cachedBidiLine03
     },
     {
       "Mix of left to right and right to left text.",
       "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-      0u,
+      Size( 300.f, 300.f ),
       107u,
-      Size( 100.f, 300.f ),
-      107u,
-      visualToLogical06
+      visualToLogical04,
+      cachedBidiLine04
     },
     {
-      "Mix of left to right and right to left text. Updates from character index 5",
+      "Mix of left to right and right to left text.",
       "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-      5u,
+      Size( 200.f, 400.f ),
       107u,
-      Size( 100.f, 300.f ),
-      107u,
-      visualToLogical07
+      visualToLogical05,
+      cachedBidiLine05
     },
     {
-      "Mix of left to right and right to left text. Updates from character index 39",
+      "Mix of left to right and right to left text.",
       "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-      39u,
+      Size( 100.f, 600.f ),
       107u,
-      Size( 100.f, 300.f ),
-      107u,
-      visualToLogical08
+      visualToLogical06,
+      cachedBidiLine06
     },
-    {
-      "Mix of left to right and right to left text. Updates from character index 70",
-      "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-      70u,
-      107u,
-      Size( 100.f, 300.f ),
-      107u,
-      visualToLogical09
-    }
   };
-  const unsigned int numberOfTests = 9u;
+  const unsigned int numberOfTests = 6u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
     ToolkitTestApplication application;
-    if( !SetVisualToLogicalMapTest( data[index] ) )
+    if( !GetLogicalCharacterIndexTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliGetLogicalCursorIndex(void)
+{
+  tet_infoline(" UtcDaliGetLogicalCursorIndex");
+
+  unsigned int visualIndex01[] = { 10u };
+  unsigned int logicalIndex01[] = { 10u };
+  unsigned int bidirectionalLineIndex01[] = { 0u };
+
+  unsigned int visualIndex02[] = { 0u, 16u, 11u, 12u };
+  unsigned int logicalIndex02[] = { 0u, 16u, 11u, 12u };
+  unsigned int bidirectionalLineIndex02[] = { 0u, 0u, 0u, 0u };
+
+
+
+// LO     H  e  l  l  o  _  w  o  r  l  d  ,  _  \n
+//       0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+// VO     H  e  l  l  o  _  w  o  r  l  d  ,  _  \n
+
+// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  ,  _ \n
+//       14 15 16 17 18 19 20 21 22 23 24 25 26
+// VO      \n _  ,  ם  ל  ו  ע  _  ם  ו  ל  ש
+
+// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _ \n
+//       26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _ \n
+
+// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ש  ל  ו  ם  _  ע  ו  ל  ם \n
+//       40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ם  ל  ו  ע  _  ם  ו  ל  ש \n
+
+// LO      ש  ל  ו  ם  _  ע  ו  ל  ם
+//       63 64 65 66 67 68 69 70 71 72
+// VO      ם  ל  ו  ע  _  ם  ו  ל  ש
+
+  unsigned int visualIndex03[] = { 0u, 18u, 25u, 60u, 54u, 65u, 0u, 18u, 65u, 33u };
+  unsigned int logicalIndex03[] = { 0u, 22u, 15u, 55u, 61u, 70u, 0u, 22u, 70u, 33u };
+  unsigned int bidirectionalLineIndex03[] = { 0u, 0u, 0u, 0u, 1u, 1u, 2u, 2u, 0u, 2u };
+
+
+// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  ,  _ \n
+//        0  1  2  3  4  5  6  7  8  9 10 11 12
+// VO      \n ,  ם  ל  ו  ע  _  ם  ו  ל  ש
+
+// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _  \n
+//       12 13 14 15 16 17 18 19 20 21 22 23 24 25  26
+// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _  \n
+
+// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ש  ל  ו  ם  _  ע  ו  ל  ם  \n
+//       26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48  49
+// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ש  ל  ו  ם  _  ע  ו  ל  ם  \n
+
+// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  ,  _  \n
+//       49 50 51 52 53 54 55 56 57 58 59 60  61
+// VO      ם  ל  ו  ע  _  ם  ו  ל  ש  ,  \n
+
+// LO      h  e  l  l  o  _  w  o  r  l  d
+//       61 62 63 64 65 66 67 68 69 70 71 72
+// VO      h  e  l  l  o  _  w  o  r  l  d
+
+
+  unsigned int visualIndex04[] = { 0u };
+  unsigned int logicalIndex04[] = { 72u };
+  unsigned int bidirectionalLineIndex04[] = { 0u };
+
+
+
+  struct GetLogicalCursorIndexData data[] =
+  {
+    {
+      "Zero characters text",
+      "",
+      1u,
+      visualIndex01,
+      logicalIndex01,
+      bidirectionalLineIndex01,
+    },
+    {
+      "All left to right text 01.",
+      "Hello world\ndemo",
+      4u,
+      visualIndex02,
+      logicalIndex02,
+      bidirectionalLineIndex02,
+    },
+    {
+      "bidirectional text 01.",
+      "Hello world, \nשלום עולם, \nhello world, \nhello world, שלום עולם\nשלום עולם",
+      10u,
+      visualIndex03,
+      logicalIndex03,
+      bidirectionalLineIndex03,
+    },
+    {
+      "bidirectional text 02.",
+      "שלום עולם, \nhello world, \nhello world, שלום עולם\nשלום עולם, \nhello world",
+      1u,
+      visualIndex04,
+      logicalIndex04,
+      bidirectionalLineIndex04,
+    },
+  };
+  const unsigned int numberOfTests = 4u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !GetLogicalCursorIndexTest( data[index] ) )
     {
       tet_result(TET_FAIL);
     }

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-function.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
@@ -211,6 +214,8 @@ protected:
   Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
   float           mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
   Vector2         mOvershootSize;           ///<The size of the overshoot effect
+
+  Dali::AlphaFunction::BuiltinFunction mScrollToAlphaFunction; ///< The ScrollTo() animations use this
 
   Toolkit::Scrollable::ScrollStartedSignalType mScrollStartedSignal;
   Toolkit::Scrollable::ScrollUpdatedSignalType mScrollUpdatedSignal;

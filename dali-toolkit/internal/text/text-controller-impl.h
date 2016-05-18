@@ -300,7 +300,8 @@ struct Controller::Impl
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
-    mMarkupProcessorEnabled( false )
+    mMarkupProcessorEnabled( false ),
+    mClipboardHideEnabled( true )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -523,6 +524,8 @@ struct Controller::Impl
 
   void HideClipboard();
 
+  void SetClipboardHideEnable(bool enable);
+
   bool CopyStringToClipboard( std::string& source );
 
   void SendSelectionToClipboard( bool deleteAfterSending );
@@ -628,6 +631,14 @@ struct Controller::Impl
    */
   void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
 
+private:
+  // Declared private and left undefined to avoid copies.
+  Impl( const Impl& );
+  // Declared private and left undefined to avoid copies.
+  Impl& operator=( const Impl& );
+
+public:
+
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
@@ -647,6 +658,7 @@ struct Controller::Impl
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
+  bool mClipboardHideEnabled:1;           ///< Whether the ClipboardHide function work or not
 };
 
 } // namespace Text

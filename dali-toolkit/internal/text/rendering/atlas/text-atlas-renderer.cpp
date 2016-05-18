@@ -493,7 +493,7 @@ struct AtlasRenderer::Impl
     Shader shader( mGlyphManager.GetShader( meshRecord.mAtlasId ) );
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, shader );
     renderer.SetTextures( textureSet );
-    renderer.SetProperty( Dali::Renderer::Property::BLENDING_MODE, BlendingMode::ON );
+    renderer.SetProperty( Dali::Renderer::Property::BLEND_MODE, BlendMode::ON );
     renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT + mDepth );
     Actor actor = Actor::New();
 #if defined(DEBUG_ENABLED)

@@ -290,7 +290,7 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   propertyMap.Insert("rendererType",  "color");
-  propertyMap.Insert("blendColor",  testColor);
+  propertyMap.Insert("mixColor",  testColor);
 
   ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -300,7 +300,7 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
 
   Vector4 actualValue(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
   END_TEST;
@@ -323,7 +323,7 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
 
   Vector4 actualValue(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
 
   controlRenderer.SetOffStage( actor );
@@ -357,7 +357,7 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   controlRenderer.SetOnStage( actor );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLENDING_MODE );
+  int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( static_cast<BlendingMode::Type>(blendMode), BlendingMode::ON, TEST_LOCATION );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -406,7 +406,7 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   application.SendNotification();
   application.Render(0);
 
-  int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLENDING_MODE );
+  int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( static_cast<BlendingMode::Type>(blendMode), BlendingMode::AUTO, TEST_LOCATION );
 
   Vector4 actualColor(Vector4::ZERO);
@@ -425,7 +425,7 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
 
   application.SendNotification();
   application.Render(0);
-  blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLENDING_MODE );
+  blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( static_cast<BlendingMode::Type>(blendMode), BlendingMode::ON, TEST_LOCATION );
 
   END_TEST;
@@ -949,13 +949,13 @@ int UtcDaliRendererFactoryResetRenderer1(void)
 
   Vector4 actualValue(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
   factory.ResetRenderer( controlRenderer, actor, Color::GREEN );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
 
   Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
@@ -1009,7 +1009,7 @@ int UtcDaliRendererFactoryResetRenderer2(void)
   application.SendNotification();
   application.Render(0);
   Vector4 actualValue(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "blendColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
   DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
 
   END_TEST;

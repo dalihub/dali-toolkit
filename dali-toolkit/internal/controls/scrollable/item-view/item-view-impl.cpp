@@ -260,6 +260,8 @@ DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollContentSize",  
 
 DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",     LAYOUT_ACTIVATED_SIGNAL )
 
+DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "stopScrolling",       ACTION_STOP_SCROLLING   )
+
 DALI_TYPE_REGISTRATION_END()
 
 bool FindById( const ItemContainer& items, ItemId id )
@@ -1378,7 +1380,7 @@ void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(durationSeconds);
-    mScrollAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), firstItemScrollPosition, AlphaFunction::EASE_OUT );
+    mScrollAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), firstItemScrollPosition, mScrollToAlphaFunction );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }
@@ -1492,7 +1494,7 @@ void ItemView::ScrollTo(const Vector2& position, float duration)
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(duration);
-    mScrollAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), firstItemScrollPosition, AlphaFunction::EASE_OUT );
+    mScrollAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), firstItemScrollPosition, mScrollToAlphaFunction );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }
@@ -1776,6 +1778,31 @@ Property::Value ItemView::GetProperty( BaseObject* object, Property::Index index
   }
 
   return value;
+}
+
+bool ItemView::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
+{
+  Dali::BaseHandle handle( object );
+
+  Toolkit::ItemView itemView = Toolkit::ItemView::DownCast( handle );
+
+  DALI_ASSERT_ALWAYS( itemView );
+
+  if( 0 == strcmp( actionName.c_str(), ACTION_STOP_SCROLLING ) )
+  {
+    GetImpl( itemView ).DoStopScrolling();
+  }
+
+  return true;
+}
+
+void ItemView::DoStopScrolling()
+{
+  if( mScrollAnimation )
+  {
+    mScrollAnimation.Stop();
+    mScrollAnimation.Reset();
+  }
 }
 
 } // namespace Internal

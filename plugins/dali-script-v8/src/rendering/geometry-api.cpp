@@ -214,14 +214,21 @@ void GeometryApi::SetIndexBuffer( const v8::FunctionCallbackInfo<v8::Value>& arg
   }
   else
   {
-    int size = V8Utils::GetIntegerParameter( PARAMETER_1, found, isolate, args, 0);
+    unsigned int size = V8Utils::GetIntegerParameter( PARAMETER_1, found, isolate, args, 0);
     if( !found )
     {
       DALI_SCRIPT_EXCEPTION( isolate, "missing buffer size from param 1" );
     }
     else
     {
-      geometry.SetIndexBuffer( static_cast<const unsigned short*>(data), size );
+      Dali::Vector<unsigned short> indices;
+      indices.Resize( size );
+      unsigned int* indexData = static_cast<unsigned int*>(data);
+      for( size_t i(0); i<size; ++i )
+      {
+        indices[i] = indexData[i];
+      }
+      geometry.SetIndexBuffer( &indices[0], size );
     }
   }
 }

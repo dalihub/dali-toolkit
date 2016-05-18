@@ -448,7 +448,7 @@ void Model3dView::OnInitialize()
 {
   //Create empty versions of the geometry and material so we always have a Renderer
   Geometry mesh = Geometry::New();
-  Shader shader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
+  Shader shader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
   mRenderer = Renderer::New( mesh, shader );
 
 }
@@ -525,6 +525,7 @@ void Model3dView::CreateGeometry()
     if( mRenderer )
     {
       mRenderer.SetGeometry( mMesh );
+      mRenderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
     }
   }
 }
@@ -557,20 +558,20 @@ void Model3dView::CreateMaterial()
   {
     if( (mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) && mObjLoader.IsNormalMapPresent() )
     {
-      mShader = Shader::New( NRMMAP_VERTEX_SHADER, NRMMAP_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
+      mShader = Shader::New( NRMMAP_VERTEX_SHADER, NRMMAP_FRAGMENT_SHADER );
     }
     else if( mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE )
     {
-      mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
+      mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     }
     else
     {
-      mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
+      mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
     }
   }
   else
   {
-    mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER, (Shader::ShaderHints)(Shader::HINT_REQUIRES_SELF_DEPTH_TEST | Shader::HINT_MODIFIES_GEOMETRY) );
+    mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
   }
 
   mTextureSet = TextureSet::New();
@@ -579,7 +580,7 @@ void Model3dView::CreateMaterial()
   {
     mRenderer.SetTextures( mTextureSet );
     mRenderer.SetShader( mShader );
-    mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, Renderer::NONE);
+    mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK );
   }
 
   UpdateShaderUniforms();

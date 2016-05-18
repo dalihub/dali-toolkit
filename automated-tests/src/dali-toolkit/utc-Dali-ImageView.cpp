@@ -328,18 +328,8 @@ int UtcDaliImageViewSetGetProperty03(void)
   application.SendNotification();
   application.Render();
 
- // conventional alpha blending
+  // conventional alpha blending
   Renderer renderer = imageView.GetRendererAt( 0 );
-  BlendingFactor::Type srcFactorRgb;
-  BlendingFactor::Type destFactorRgb;
-  BlendingFactor::Type srcFactorAlpha;
-  BlendingFactor::Type destFactorAlpha;
-  renderer.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
-  DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::SRC_ALPHA );
-  DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
-  DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );
-  DALI_TEST_CHECK( destFactorAlpha == BlendingFactor::ONE_MINUS_SRC_ALPHA );
-
   Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   bool enable;
   DALI_TEST_CHECK( value.Get( enable ) );
@@ -350,7 +340,10 @@ int UtcDaliImageViewSetGetProperty03(void)
   application.SendNotification();
   application.Render();
 
-  renderer.GetBlendFunc(srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha);
+  int srcFactorRgb    = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  int destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  int srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  int destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
   DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::ONE );
   DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
   DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );

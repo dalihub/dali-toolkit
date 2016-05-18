@@ -163,8 +163,6 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
-const char * const COLOR_RENDERER_COLOR_NAME("blendColor");
-
 } // unnamed namespace
 
 namespace Internal
@@ -179,6 +177,7 @@ public:
 : mControlImpl( controlImpl ),
   mStyleName(""),
   mBackgroundRenderer(),
+  mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale( NULL ),
   mKeyEventSignal(),
   mPinchGestureDetector(),
@@ -369,6 +368,7 @@ public:
   Control& mControlImpl;
   std::string mStyleName;
   Toolkit::ControlRenderer mBackgroundRenderer;   ///< The control renderer to render the background
+  Vector4 mBackgroundColor;                       ///< The color of the background renderer
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
@@ -441,6 +441,8 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
+  mImpl->mBackgroundColor = color;
+
   Actor self( Self() );
   Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
   factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
@@ -449,19 +451,7 @@ void Control::SetBackgroundColor( const Vector4& color )
 
 Vector4 Control::GetBackgroundColor() const
 {
-  if( mImpl->mBackgroundRenderer && ( &typeid( GetImplementation(mImpl->mBackgroundRenderer) ) == &typeid( ColorRenderer ) ) )
-  {
-     Property::Map map;
-     mImpl->mBackgroundRenderer.CreatePropertyMap( map );
-     const Property::Value* colorValue = map.Find( COLOR_RENDERER_COLOR_NAME );
-     Vector4 color;
-     if( colorValue && colorValue->Get(color))
-     {
-       return color;
-     }
-  }
-
-  return Color::TRANSPARENT;
+  return mImpl->mBackgroundColor;
 }
 
 void Control::SetBackground(const Property::Map& map)

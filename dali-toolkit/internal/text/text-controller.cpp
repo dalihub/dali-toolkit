@@ -1430,7 +1430,7 @@ bool Controller::DoRelayout( const Size& size,
   const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
   const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
 
-  if( LAYOUT & operations )
+  if( NO_OPERATION != ( LAYOUT & operations ) )
   {
     // Some vectors with data needed to layout and reorder may be void
     // after the first time the text has been laid out.
@@ -1449,7 +1449,7 @@ bool Controller::DoRelayout( const Size& size,
 
     if( 0u == totalNumberOfGlyphs )
     {
-      if( UPDATE_ACTUAL_SIZE & operations )
+      if( NO_OPERATION != ( UPDATE_ACTUAL_SIZE & operations ) )
       {
         mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
       }
@@ -1503,7 +1503,7 @@ bool Controller::DoRelayout( const Size& size,
     if( viewUpdated )
     {
       // Reorder the lines
-      if( REORDER & operations )
+      if( NO_OPERATION != ( REORDER & operations ) )
       {
         Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mLogicalModel->mBidirectionalParagraphInfo;
         Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mLogicalModel->mBidirectionalLineInfo;
@@ -1526,14 +1526,6 @@ bool Controller::DoRelayout( const Size& size,
           layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
           layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
 
-          // TODO: update the conversion map instead creating it from scratch.
-          //       Note this tables store indices to characters, so update the table means modify all the indices of the text after the last updated character.
-          //       It's better to refactor this. Store this table per line and don't update the indices.
-          //       For the cursor position probably is better to use the function instead creating a table.
-          // Set the bidirectional info into the model.
-          mImpl->mLogicalModel->SetVisualToLogicalMap( 0u,
-                                                       mImpl->mLogicalModel->mText.Count() );
-
           // Re-layout the text. Reorder those lines with right to left characters.
           mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
                                                          startIndex,
@@ -1544,7 +1536,7 @@ bool Controller::DoRelayout( const Size& size,
       } // REORDER
 
       // Sets the actual size.
-      if( UPDATE_ACTUAL_SIZE & operations )
+      if( NO_OPERATION != ( UPDATE_ACTUAL_SIZE & operations ) )
       {
         mImpl->mVisualModel->SetLayoutSize( layoutSize );
       }
@@ -1558,7 +1550,7 @@ bool Controller::DoRelayout( const Size& size,
     layoutSize = mImpl->mVisualModel->GetLayoutSize();
   }
 
-  if( ALIGN & operations )
+  if( NO_OPERATION != ( ALIGN & operations ) )
   {
     // The laid-out lines.
     Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
@@ -2113,10 +2105,10 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       // This is to avoid unnecessary relayouts when tapping an empty text-field
       bool relayoutNeeded( false );
 
-      if( ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) ||
+      if( ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
           ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) )
       {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE);  // If Popup shown hide it here so can be shown again if required.
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );  // If Popup shown hide it here so can be shown again if required.
       }
 
       if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != mImpl->mEventData->mState ) )
@@ -2343,8 +2335,13 @@ void Controller::PasteClipboardItemEvent()
   // Commit the current pre-edit text; the contents of the clipboard should be appended
   mImpl->ResetImfManager();
 
+  // Temporary disable hiding clipboard
+  mImpl->SetClipboardHideEnable( false );
+
   // Paste
   PasteText( stringToPaste );
+
+  mImpl->SetClipboardHideEnable( true );
 }
 
 void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
