@@ -230,25 +230,13 @@ typedef struct NSVGgradientData
 {
     char id[64];
     char ref[64];
-
-    /**
-     * In the original file, using char type (without signed or unsigned) can be interpreted
-     * as 'unsigned char' in some build environments, like ARM architecture.
-     * To prevent the unexpected behavior, we replace 'char type' with 'signed char type' here.
-     */
-    signed char type;
+    char type;
     union {
         NSVGlinearData linear;
         NSVGradialData radial;
     };
     char spread;
-
-    /**
-     * In the original file, using char type (without signed or unsigned) can be interpreted
-     * as 'unsigned char' in some build environments, like ARM architecture.
-     * To prevent the unexpected behavior, we replace 'char units' with 'signed char units' here.
-     */
-    signed char units;
+    char units;
     float xform[6];
     int nstops;
     NSVGgradientStop* stops;
@@ -655,12 +643,7 @@ static NSVGgradientData* nsvg__findGradientData(NSVGparser* p, const char* id)
     return NULL;
 }
 
-/**
- * In the original file, using char type (without signed or unsigned) can be interpreted
- * as 'unsigned char' in some build environments, like ARM architecture.
- * To prevent the unexpected behavior, we replace 'char paintType' with 'signed char paintType' here.
- */
-static NSVGgradient* nsvg__createGradient(NSVGparser* p, const char* id, const float* localBounds, signed char* paintType)
+static NSVGgradient* nsvg__createGradient(NSVGparser* p, const char* id, const float* localBounds, char* paintType)
 {
     NSVGattrib* attr = nsvg__getAttr(p);
     NSVGgradientData* data = NULL;
