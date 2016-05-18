@@ -1392,28 +1392,27 @@ Toolkit::AccessibilityManager::FocusedActorActivatedSignalType& AccessibilityMan
 
 bool AccessibilityManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
+  Dali::BaseHandle handle( object );
+
   bool connected( true );
   AccessibilityManager* manager = dynamic_cast<AccessibilityManager*>( object );
 
-  if( manager )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {
-    if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
-    {
-      manager->FocusChangedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_OVERSHOT ) )
-    {
-      manager->FocusOvershotSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ACTIVATED ) )
-    {
-      manager->FocusedActorActivatedSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
-    }
+    manager->FocusChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_OVERSHOT ) )
+  {
+    manager->FocusOvershotSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ACTIVATED ) )
+  {
+    manager->FocusedActorActivatedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
   }
 
   return connected;
