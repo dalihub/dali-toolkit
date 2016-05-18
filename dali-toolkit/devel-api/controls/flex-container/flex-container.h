@@ -92,10 +92,10 @@ class FlexContainer;
  * "name":"icon",
  * "type":"ImageView",
  * "image":"image.png",
- *   "customProperties": {
- *     "flex":1,                        // property to make the item to receive the specified proportion of the free space in the container. If all items in the container use this pattern, their sizes will be proportional to the specified flex factor.
- *     "alignSelf":"flexStart",         // property to specify how the item will align along the cross axis, if set, this overides the default alignment for all items in the container
- *     "flexMargin":[10, 10, 10, 10]    // property to specify the space around the item, if not set, default value is [0, 0, 0, 0]
+ *   "properties": {
+ *     "flex":1,                        // property to make the item to receive the specified proportion of the free space in the container.
+ *     "alignSelf":"flexStart",         // property to specify how the item will align along the cross axis.
+ *     "flexMargin":[10, 10, 10, 10]    // property to specify the space around the item.
  *   }
  * @endcode
  */
@@ -171,7 +171,10 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,                           ///< Reserve property indices
+
+    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,
+    CHILD_PROPERTY_END_INDEX =   CHILD_PROPERTY_REGISTRATION_START_INDEX + 1000   ///< Reserve child property indices
   };
 
   /**
@@ -191,7 +194,21 @@ public:
   };
 
   /**
-   * Create a FlexContainer handle; this can be initialised with FlexContainer::New()
+   * @brief An enumeration of child properties belonging to the FlexContainer class.
+   */
+  struct ChildProperty
+  {
+    enum
+    {
+      // Event side child properties
+      FLEX = CHILD_PROPERTY_START_INDEX,        ///< name "flex",               The proportion of the free space in the container the flex item will receive. If all items in the container set this property, their sizes will be proportional to the specified flex factor,  type FLOAT
+      ALIGN_SELF,                               ///< name "alignSelf",          The alignment of the flex item along the cross axis, which, if set, overides the default alignment for all items in the container,                          @see FlexContainer::Alignment,     type INTEGER
+      FLEX_MARGIN                               ///< name "flexMargin",         The space around the flex item,                                                                                                                                                                type VECTOR4
+    };
+  };
+
+  /**
+   * @brief Create a FlexContainer handle; this can be initialised with FlexContainer::New()
    * Calling member functions with an uninitialised handle is not allowed.
    */
   FlexContainer();
