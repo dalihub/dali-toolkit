@@ -7,7 +7,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/bloom-view/bloom-view.cpp \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
-  $(devel_api_src_dir)/controls/flex-container/flex-container.cpp \
   $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
@@ -46,9 +45,6 @@ devel_api_builder_header_files = \
 
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
-
-devel_api_flex_container_header_files = \
-  $(devel_api_src_dir)/controls/flex-container/flex-container.h
 
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
