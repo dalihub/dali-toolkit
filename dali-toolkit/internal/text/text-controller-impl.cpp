@@ -1930,7 +1930,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     return logicalIndex;
   }
 
-  // Find which line is closest
+  // Find which line is closest.
   const LineIndex lineIndex = GetClosestLine( visualY );
   const LineRun& line = mVisualModel->mLines[lineIndex];
 
@@ -1951,6 +1951,9 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   const CharacterIndex endCharacter   = line.characterRun.characterIndex + line.characterRun.numberOfCharacters;
   DALI_ASSERT_DEBUG( endCharacter <= mLogicalModel->mText.Count() && "Invalid line info" );
 
+  // Whether this line is a bidirectional line.
+  const bool bidiLineFetched = mLogicalModel->FetchBidirectionalLineInfo( startCharacter );
+
   // Whether there is a hit on a glyph.
   bool matched = false;
 
@@ -1960,7 +1963,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   for( ; !matched && ( visualIndex < endCharacter ); ++visualIndex )
   {
     // The character in logical order.
-    const CharacterIndex characterLogicalOrderIndex = mLogicalModel->GetLogicalCharacterIndex( visualIndex );
+    const CharacterIndex characterLogicalOrderIndex = ( bidiLineFetched ? mLogicalModel->GetLogicalCharacterIndex( visualIndex ) : visualIndex );
 
     // Get the script of the character.
     const Script script = mLogicalModel->GetScript( characterLogicalOrderIndex );
@@ -1974,7 +1977,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     {
       // Get the first character/glyph of the group of glyphs.
       const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfCharacters;
-      const CharacterIndex firstLogicalCharacterIndex = mLogicalModel->GetLogicalCharacterIndex( firstVisualCharacterIndex );
+      const CharacterIndex firstLogicalCharacterIndex = ( bidiLineFetched ? mLogicalModel->GetLogicalCharacterIndex( firstVisualCharacterIndex ) : firstVisualCharacterIndex );
       const GlyphIndex firstLogicalGlyphIndex = *( charactersToGlyphBuffer + firstLogicalCharacterIndex );
 
       // Get the metrics for the group of glyphs.
@@ -2024,7 +2027,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     visualIndex = endCharacter;
   }
 
-  logicalIndex = mLogicalModel->GetLogicalCursorIndex( visualIndex );
+  logicalIndex = ( bidiLineFetched ? mLogicalModel->GetLogicalCursorIndex( visualIndex ) : visualIndex );
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
 
   DALI_ASSERT_DEBUG( ( logicalIndex <= mLogicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );

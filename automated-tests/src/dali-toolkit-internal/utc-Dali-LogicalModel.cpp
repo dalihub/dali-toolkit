@@ -36,6 +36,7 @@ using namespace Text;
 // void FindParagraphs( CharacterIndex index,
 //                      Length numberOfCharacters,
 //                      Vector<ParagraphRunIndex>& paragraphs );
+// bool FetchBidirectionalLineInfo( CharacterIndex characterIndex )
 // CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
 // CharacterIndex GetLogicalCursorIndex( CharacterIndex visualCursorIndex ) const;
 
@@ -64,6 +65,16 @@ struct FindParagraphData
   unsigned int*  paragraphs;         ///< The expected paragraph info.
 };
 
+struct FetchBidirectionalLineInfoData
+{
+  std::string   description;    ///< Description of the test.
+  std::string   text;           ///< Input text.
+  unsigned int  numberOfTests;  ///< The number of tests.
+  unsigned int* characterIndex; ///< The logical character index.
+  bool*         fetched;        ///< Whether the expected bidi line exists.
+  unsigned int* bidiLineIndex;  ///< Index to the expected bidi line.
+};
+
 struct GetLogicalCharacterIndexData
 {
   std::string   description;        ///< Description of the test.
@@ -78,9 +89,11 @@ struct GetLogicalCursorIndexData
 {
   std::string    description;        ///< Description of the test.
   std::string    text;               ///< Input text.
+  Size           textArea;           ///< The text area.
   unsigned int   numberOfIndices;    ///< The number of characters to set.
   unsigned int*  visualCursorIndex;  ///< The given cursor visual index.
-  unsigned int*  logicalCursorIndex; ///< The expected cursor logical index
+  unsigned int*  characterIndex;     ///< Index to the first logical character of the line.
+  unsigned int*  logicalCursorIndex; ///< The expected cursor logical index.
   unsigned int*  cachedBidiLine;     ///< The cached bidi line index for each character.
 };
 
@@ -187,6 +200,49 @@ bool FindParagraphTest( const FindParagraphData& data )
   return true;
 }
 
+bool FetchBidirectionalLineInfoTest( const FetchBidirectionalLineInfoData& data )
+{
+  std::cout << "  testing : " << data.description << std::endl;
+  // Create the model.
+  LogicalModelPtr logicalModel = LogicalModel::New();
+  VisualModelPtr visualModel = VisualModel::New();
+  Size textArea( 100.f, 300.f );
+  Size layoutSize;
+
+  // Create the model with the whole text.
+  const Vector<FontDescriptionRun> fontDescriptions;
+  const LayoutOptions options;
+  CreateTextModel( data.text,
+                   textArea,
+                   fontDescriptions,
+                   options,
+                   layoutSize,
+                   logicalModel,
+                   visualModel );
+
+  for( unsigned int index = 0; index < data.numberOfTests; ++index )
+  {
+    const bool fetched = logicalModel->FetchBidirectionalLineInfo( data.characterIndex[index] );
+
+    if( fetched != data.fetched[index] )
+    {
+      std::cout << "  Different fetched result : " << fetched << ", expected : " << data.fetched[index] << std::endl;
+      return false;
+    }
+
+    if( fetched )
+    {
+      if( logicalModel->mBidirectionalLineIndex != data.bidiLineIndex[index] )
+      {
+        std::cout << "  Different bidi line index : " << logicalModel->mBidirectionalLineIndex << ", expected : " << data.bidiLineIndex << std::endl;
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
@@ -215,7 +271,9 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
       return false;
     }
 
-    const Character logicalIndex = logicalModel->GetLogicalCharacterIndex( index );
+    const bool fetched = logicalModel->FetchBidirectionalLineInfo( index );
+    const Character logicalIndex = fetched ? logicalModel->GetLogicalCharacterIndex( index ) : index;
+
     if( data.visualToLogical[index] != logicalIndex )
     {
       std::cout << "  visual index : " << index << ", different logical index : " << logicalIndex << ", expected : " << data.visualToLogical[index] << std::endl;
@@ -231,14 +289,13 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
   // Create the model.
   LogicalModelPtr logicalModel = LogicalModel::New();
   VisualModelPtr visualModel = VisualModel::New();
-  Size textArea( 300.f, 300.f );
   Size layoutSize;
 
   // Create the model with the whole text.
   const Vector<FontDescriptionRun> fontDescriptions;
   const LayoutOptions options;
   CreateTextModel( data.text,
-                   textArea,
+                   data.textArea,
                    fontDescriptions,
                    options,
                    layoutSize,
@@ -247,17 +304,20 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 
   for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {
+    const bool fetched = logicalModel->FetchBidirectionalLineInfo( data.characterIndex[index] );
+
     if( logicalModel->mBidirectionalLineIndex != data.cachedBidiLine[index] )
     {
       std::cout << "  test : " << index << ", different cached line index : " << logicalModel->mBidirectionalLineIndex << ", expected : " << data.cachedBidiLine[index] << std::endl;
       return false;
     }
 
-    const CharacterIndex logicalCursorIndex = logicalModel->GetLogicalCursorIndex( data.visualCursorIndex[index] );
+    const CharacterIndex visualCharacterIndex = data.visualCursorIndex[index];
+    const CharacterIndex logicalCursorIndex = fetched ? logicalModel->GetLogicalCursorIndex( visualCharacterIndex ) : visualCharacterIndex;
 
     if( logicalCursorIndex != data.logicalCursorIndex[index] )
     {
-      std::cout << "  test : " << index << ", different logical cursor index : " << logicalCursorIndex << ", expected : " << data.logicalCursorIndex[index] << std::endl;
+      std::cout << "  test : " << index << ", visual index : " << visualCharacterIndex << ", different logical cursor index : " << logicalCursorIndex << ", expected : " << data.logicalCursorIndex[index] << std::endl;
       return false;
     }
   }
@@ -271,6 +331,7 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 //
 // UtcDaliCreateParagraph
 // UtcDaliFindParagraph
+// UtcDaliFetchBidirectionalLineInfo
 // UtcDaliGetLogicalCharacterIndex
 // UtcDaliGetLogicalCursorIndex
 //
@@ -278,7 +339,6 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 
 int UtcDaliCreateParagraph(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliCreateParagraph");
 
   unsigned int paragraphsIndices01[] = { 0u };
@@ -340,7 +400,7 @@ int UtcDaliCreateParagraph(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
-    // ToolkitTestApplication application;
+    ToolkitTestApplication application;
     if( !CreateParagraphTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -410,6 +470,64 @@ int UtcDaliFindParagraph(void)
   {
     ToolkitTestApplication application;
     if( !FindParagraphTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliFetchBidirectionalLineInfo(void)
+{
+  tet_infoline(" UtcDaliFetchBidirectionalLineInfo");
+
+  unsigned int logicalIndex01[] = { 0u };
+  bool fetched01[] = { false };
+  unsigned int bidiLine01[] = { 0u };
+
+  unsigned int logicalIndex02[] = { 3u };
+  bool fetched02[] = { false };
+  unsigned int bidiLine02[] = { 0u };
+
+  unsigned int logicalIndex03[] = { 0u, 11u, 12u, 21u, 22u, 33u, 34u, 43u, 44u, 54u};
+  bool fetched03[] = { false, false, true, true, false, false, true, true, false, false };
+  unsigned int bidiLine03[] = { 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 0u, 0u };
+
+  struct FetchBidirectionalLineInfoData data[] =
+  {
+    {
+      "Void text",
+      "",
+      1u,
+      logicalIndex01,
+      fetched01,
+      bidiLine01
+    },
+    {
+      "LTR text",
+      "Hello world",
+      1u,
+      logicalIndex02,
+      fetched02,
+      bidiLine02
+    },
+    {
+      "Bidi text",
+      "Hello world\nשלום עולם\nhello world\nשלום עולם\nhello world",
+      10u,
+      logicalIndex03,
+      fetched03,
+      bidiLine03
+    }
+  };
+  const unsigned int numberOfTests = 3u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !FetchBidirectionalLineInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);
     }
@@ -615,103 +733,195 @@ int UtcDaliGetLogicalCursorIndex(void)
   tet_infoline(" UtcDaliGetLogicalCursorIndex");
 
   unsigned int visualIndex01[] = { 10u };
+  unsigned int characterIndex01[] = { 0u };
   unsigned int logicalIndex01[] = { 10u };
   unsigned int bidirectionalLineIndex01[] = { 0u };
 
+  //  0           11
+  //   Hello world  \n
+  // 12    16
+  //   demo
   unsigned int visualIndex02[] = { 0u, 16u, 11u, 12u };
+  unsigned int characterIndex02[] = { 0u, 0u, 0u, 0u };
   unsigned int logicalIndex02[] = { 0u, 16u, 11u, 12u };
   unsigned int bidirectionalLineIndex02[] = { 0u, 0u, 0u, 0u };
 
 
+// LO     H  e  l  l  o  _  w  o  r  l  d  \n
+//       0  1  2  3  4  5  6  7  8  9 10 11  12
+// VO     H  e  l  l  o  _  w  o  r  l  d  \n
 
-// LO     H  e  l  l  o  _  w  o  r  l  d  ,  _  \n
-//       0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-// VO     H  e  l  l  o  _  w  o  r  l  d  ,  _  \n
+// LO         ש  ל  ו  ם  _  ע  ו  ל  ם \n
+//          12 13 14 15 16 17 18 19 20 21  22
+// VO     \n  ם  ל  ו  ע _  ם  ו  ל  ש
 
-// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  ,  _ \n
-//       14 15 16 17 18 19 20 21 22 23 24 25 26
-// VO      \n _  ,  ם  ל  ו  ע  _  ם  ו  ל  ש
+// LO      h  e  l  l  o  _  w  o  r  l  d  _  ש  ל  ו  ם  _  ע ו  ל  ם  \n
+//       22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43  44
+// VO      h  e  l  l  o  _  w  o  r  l  d  _  ם  ל  ו  ע  _  ם  ו  ל  ש  \n
 
-// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _ \n
-//       26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
-// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _ \n
+// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  _  h  e  l  l  o  _  w  o  r   l  d \n
+//       44 45 46 47 48 49 50 51  52 52 54 55 56 57 58 59 60 61 62 63  64 65 66
+// VO      \n h  e  l  l  o  _  w   o  r  l  d  _  ם  ל  ו  ע  _  ם  ו  ל  ש
 
-// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ש  ל  ו  ם  _  ע  ו  ל  ם \n
-//       40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
-// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ם  ל  ו  ע  _  ם  ו  ל  ש \n
+  unsigned int visualIndex03[] = {  0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u,
+                                   13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u,
+                                   22u, 23u, 24u, 25u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 40u, 41u, 42u, 43u,
+                                   45u, 46u, 47u, 48u, 49u, 50u, 51u, 52u, 53u, 54u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 66u };
 
-// LO      ש  ל  ו  ם  _  ע  ו  ל  ם
-//       63 64 65 66 67 68 69 70 71 72
-// VO      ם  ל  ו  ע  _  ם  ו  ל  ש
+  unsigned int characterIndex03[] = {  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
+                                      12u, 12u, 12u, 12u, 12u, 12u, 12u, 12u, 12u, 12u,
+                                      22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u,
+                                      44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u};
 
-  unsigned int visualIndex03[] = { 0u, 18u, 25u, 60u, 54u, 65u, 0u, 18u, 65u, 33u };
-  unsigned int logicalIndex03[] = { 0u, 22u, 15u, 55u, 61u, 70u, 0u, 22u, 70u, 33u };
-  unsigned int bidirectionalLineIndex03[] = { 0u, 0u, 0u, 0u, 1u, 1u, 2u, 2u, 0u, 2u };
+  unsigned int logicalIndex03[] = {  0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u,
+                                    21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 12u,
+                                    22u, 23u, 24u, 25u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 42u, 41u, 40u, 39u, 38u, 37u, 36u, 35u, 43u,
+                                    65u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u };
 
-
-// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  ,  _ \n
-//        0  1  2  3  4  5  6  7  8  9 10 11 12
-// VO      \n ,  ם  ל  ו  ע  _  ם  ו  ל  ש
-
-// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _  \n
-//       12 13 14 15 16 17 18 19 20 21 22 23 24 25  26
-// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _  \n
-
-// LO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ש  ל  ו  ם  _  ע  ו  ל  ם  \n
-//       26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48  49
-// VO      h  e  l  l  o  _  w  o  r  l  d  ,  _  ש  ל  ו  ם  _  ע  ו  ל  ם  \n
-
-// LO      ש  ל  ו  ם  _  ע  ו  ל  ם  ,  _  \n
-//       49 50 51 52 53 54 55 56 57 58 59 60  61
-// VO      ם  ל  ו  ע  _  ם  ו  ל  ש  ,  \n
-
-// LO      h  e  l  l  o  _  w  o  r  l  d
-//       61 62 63 64 65 66 67 68 69 70 71 72
-// VO      h  e  l  l  o  _  w  o  r  l  d
+  unsigned int bidirectionalLineIndex03[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
+                                              2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u };
 
 
-  unsigned int visualIndex04[] = { 0u };
-  unsigned int logicalIndex04[] = { 72u };
-  unsigned int bidirectionalLineIndex04[] = { 0u };
+// LO     ש  ל  ו  ם  _  ע  ו  ל  ם \n
+//       0  1  2  3  4  5  6  7  8  9 10
+// VO  \n ם  ל  ו  ע  _  ם  ו  ל  ש
+
+//      h  e  l  l  o  _  w  o  r  l  d  \n
+// LO 10 11 12 13 14 15 16 17 18 19 20 21 22
+//      h  e  l  l  o  _  w  o  r  l  d  \n
+
+//         ש  ל  ו  ם  _  ע  ו  ל  ם _  h  e  l  l  o  _  w  o  r  l  d  \n
+// LO    22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44
+//     \n  h  e  l  l  o  _  w  o  r  l  d  _  ם  ל  ו  ע  _  ם  ו  ל  ש
+
+//      h  e  l  l  o  _  w  o  r  l  d  _  ש  ל  ו  ם  _  ע  ו  ל  ם \n
+// LO 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
+//      h  e  l  l  o  _  w  o  r  l  d  _  ם  ל  ו  ע  _  ם  ו  ל  ש \n
+
+  unsigned int  visualIndex04[] = {  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u,
+                                    10u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u,
+                                    23u, 24u, 25u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 40u, 41u, 42u, 43u, 44u,
+                                    44u, 45u, 46u, 47u, 48u, 49u, 50u, 51u, 52u, 53u, 54u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u };
+
+  unsigned int characterIndex04[] = {  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
+                                      10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u,
+                                      22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u, 22u,
+                                      44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u, 44u };
+
+  unsigned int logicalIndex04[] = {  9u,  8u,  7u,  6u,  5u,  4u,  3u,  2u,  1u,  0u,
+                                    10u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u,
+                                    43u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 40u, 41u, 42u, 32u, 31u, 30u, 29u, 28u, 27u, 26u, 25u, 24u, 23u, 22u,
+                                    44u, 45u, 46u, 47u, 48u, 49u, 50u, 51u, 52u, 53u, 54u, 55u, 56u, 64u, 63u, 62u, 61u, 60u, 59u, 58u, 57u, 65u };
+
+  unsigned int bidirectionalLineIndex04[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
+                                              2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u };
 
 
+// LO   A  B  C  D  E  F  G  H  I  J  K
+//     0  1  2  3  4  5  6  7  8  9 10 11
+// LO   L  M  N
+//    11 12 13 14
+
+  unsigned int  visualIndex05[] = {  0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u,
+                                    11u, 12u, 13u, 14u };
+
+  unsigned int characterIndex05[] = { 0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
+                                      11u, 11u, 11u, 11u };
+
+  unsigned int logicalIndex05[] = { 0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u,
+                                    11u, 12u, 13u, 14u };
+
+  unsigned int bidirectionalLineIndex05[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              0u, 0u, 0u, 0u };
+
+// LO      ק  ר  א  ט  ו  ן  ם  פ  ש  ד  ג
+//        0  1  2  3  4  5  6  7  8  9  10 11
+// VO      ג  ד  ש  פ  ם  ן  ו  ט  א  ר  ק
+
+// LO      כ  ע  י  ח  ל
+//       11 12 13 14 15 16
+// VO      ל  ח  י  ע  כ
+
+  unsigned int  visualIndex06[] = {  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u,
+                                    11u, 12u, 13u, 14u, 15u, 16u };
+
+  unsigned int characterIndex06[] = {  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
+                                      12u, 12u, 12u, 12u, 12u, 12u };
+
+  unsigned int logicalIndex06[] = { 10u,  9u,  8u,  7u,  6u,  5u,  4u,  3u,  2u,  1u,  0u,
+                                    16u, 15u, 14u, 13u, 12u, 11u };
+
+  unsigned int bidirectionalLineIndex06[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              1u, 1u, 1u, 1u, 1u, 1u };
 
   struct GetLogicalCursorIndexData data[] =
   {
     {
       "Zero characters text",
       "",
+      Size( 300.f, 300.f ),
       1u,
       visualIndex01,
+      characterIndex01,
       logicalIndex01,
       bidirectionalLineIndex01,
     },
     {
       "All left to right text 01.",
       "Hello world\ndemo",
+      Size( 300.f, 300.f ),
       4u,
       visualIndex02,
+      characterIndex02,
       logicalIndex02,
       bidirectionalLineIndex02,
     },
     {
       "bidirectional text 01.",
-      "Hello world, \nשלום עולם, \nhello world, \nhello world, שלום עולם\nשלום עולם",
-      10u,
+      "Hello world\nשלום עולם\nhello world שלום עולם\nשלום עולם hello world\n",
+      Size( 300.f, 300.f ),
+      65u,
       visualIndex03,
+      characterIndex03,
       logicalIndex03,
       bidirectionalLineIndex03,
     },
     {
       "bidirectional text 02.",
-      "שלום עולם, \nhello world, \nhello world, שלום עולם\nשלום עולם, \nhello world",
-      1u,
+      "שלום עולם\nhello world\nשלום עולם hello world\nhello world שלום עולם\n",
+      Size( 300.f, 300.f ),
+      65u,
       visualIndex04,
+      characterIndex04,
       logicalIndex04,
       bidirectionalLineIndex04,
     },
+    {
+      "long line 01.",
+      "ABCDEFGHIJKLMN",
+      Size( 100.f, 300.f ),
+      13u,
+      visualIndex05,
+      characterIndex05,
+      logicalIndex05,
+      bidirectionalLineIndex05,
+    },
+    {
+      "bidirectional text 03.",
+      "קראטוןםפשדגכעיחל",
+      Size( 100.f, 300.f ),
+      15u,
+      visualIndex06,
+      characterIndex06,
+      logicalIndex06,
+      bidirectionalLineIndex06,
+    },
   };
-  const unsigned int numberOfTests = 4u;
+  const unsigned int numberOfTests = 6u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
