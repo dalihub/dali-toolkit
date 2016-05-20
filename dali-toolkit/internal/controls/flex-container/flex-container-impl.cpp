@@ -600,29 +600,38 @@ void FlexContainer::ComputeLayout()
       // These properties should be dynamically registered to the child which
       // would be added to FlexContainer.
 
-      childNode->style.flex = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX ).Get<float>();
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX ) != Property::NONE )
+      {
+        childNode->style.flex = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX ).Get<float>();
+      }
 
       Toolkit::FlexContainer::Alignment alignSelf( Toolkit::FlexContainer::ALIGN_AUTO );
-      Property::Value alignSelfPropertyValue = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF );
-      if( alignSelfPropertyValue.GetType() == Property::INTEGER )
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::FlexContainer::ChildProperty::ALIGN_SELF ) != Property::NONE )
       {
-        alignSelf = static_cast<Toolkit::FlexContainer::Alignment>( alignSelfPropertyValue.Get< int >() );
-      }
-      else if( alignSelfPropertyValue.GetType() == Property::STRING )
-      {
-        std::string value = alignSelfPropertyValue.Get<std::string>();
-        Scripting::GetEnumeration< Toolkit::FlexContainer::Alignment >( value.c_str(),
-                                                                        ALIGN_SELF_STRING_TABLE,
-                                                                        ALIGN_SELF_STRING_TABLE_COUNT,
-                                                                        alignSelf );
+        Property::Value alignSelfPropertyValue = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF );
+        if( alignSelfPropertyValue.GetType() == Property::INTEGER )
+        {
+          alignSelf = static_cast<Toolkit::FlexContainer::Alignment>( alignSelfPropertyValue.Get< int >() );
+        }
+        else if( alignSelfPropertyValue.GetType() == Property::STRING )
+        {
+          std::string value = alignSelfPropertyValue.Get<std::string>();
+          Scripting::GetEnumeration< Toolkit::FlexContainer::Alignment >( value.c_str(),
+                                                                          ALIGN_SELF_STRING_TABLE,
+                                                                          ALIGN_SELF_STRING_TABLE_COUNT,
+                                                                          alignSelf );
+        }
       }
       childNode->style.align_self = static_cast<css_align_t>(alignSelf);
 
-      Vector4 flexMargin = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ).Get<Vector4>();
-      childNode->style.margin[CSS_LEFT] = flexMargin.x;
-      childNode->style.margin[CSS_TOP] = flexMargin.y;
-      childNode->style.margin[CSS_RIGHT] = flexMargin.z;
-      childNode->style.margin[CSS_BOTTOM] = flexMargin.w;
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ) != Property::NONE )
+      {
+        Vector4 flexMargin = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ).Get<Vector4>();
+        childNode->style.margin[CSS_LEFT] = flexMargin.x;
+        childNode->style.margin[CSS_TOP] = flexMargin.y;
+        childNode->style.margin[CSS_RIGHT] = flexMargin.z;
+        childNode->style.margin[CSS_BOTTOM] = flexMargin.w;
+      }
     }
 
     // Calculate the layout

@@ -31,20 +31,6 @@ using namespace Dali;
 
 namespace
 {
-/*
- * Custom properties for where to put the actor.
- *
- * When an actor is add to the tableView through Actor::Add() instead of TableView::AddChild,
- * the following custom properties of the actor are checked to decide the actor position inside the table
- *
- * These non-animatable properties should be registered to the child which would be added to the table
- */
-const char * const CELL_INDEX_PROPERTY_NAME("cellIndex");
-const char * const ROW_SPAN_PROPERTY_NAME("rowSpan");
-const char * const COLUMN_SPAN_PROPERTY_NAME("columnSpan");
-const char * const CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME("cellHorizontalAlignment");
-const char * const CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME("cellVerticalAlignment");
-
 /**
  * @brief Should the tableview fit around the given actor
  *
@@ -147,6 +133,11 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "columns",        INTEGER, COLUM
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cellPadding",    VECTOR2, CELL_PADDING   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layoutRows",     MAP,     LAYOUT_ROWS    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layoutColumns",  MAP,     LAYOUT_COLUMNS )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "cellIndex",                VECTOR2, CELL_INDEX                )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "rowSpan",                  FLOAT,   ROW_SPAN                  )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "columnSpan",               FLOAT,   COLUMN_SPAN               )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "cellHorizontalAlignment",  STRING,  CELL_HORIZONTAL_ALIGNMENT )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "cellVerticalAlignment",    STRING,  CELL_VERTICAL_ALIGNMENT   )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -978,41 +969,42 @@ void TableView::OnChildAdd( Actor& child )
     return;
   }
 
-  // Test properties on actor
+  // Check child properties on actor to decide its position inside the table
   HorizontalAlignment::Type horizontalAlignment = HorizontalAlignment::LEFT;
   VerticalAlignment::Type verticalAlignment = VerticalAlignment::TOP;
-  if( child.GetPropertyIndex( CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME ) != Property::INVALID_INDEX )
+
+  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT ) != Property::NONE )
   {
-    std::string value = child.GetProperty( child.GetPropertyIndex(CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME) ).Get<std::string >();
+    std::string value = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT ).Get<std::string >();
     Scripting::GetEnumeration< HorizontalAlignment::Type >( value.c_str(),
                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE,
                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
                                                             horizontalAlignment );
   }
-  if( child.GetPropertyIndex( CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME ) != Property::INVALID_INDEX )
+
+  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT ) != Property::NONE )
   {
-    std::string value = child.GetProperty( child.GetPropertyIndex(CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME) ).Get<std::string >();
+    std::string value = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT ).Get<std::string >();
     Scripting::GetEnumeration< VerticalAlignment::Type >( value.c_str(),
                                                           VERTICAL_ALIGNMENT_STRING_TABLE,
                                                           VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
                                                           verticalAlignment );
   }
 
-
   Toolkit::TableView::CellPosition cellPosition;
-  if( child.GetPropertyIndex(ROW_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
+  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::ROW_SPAN ) != Property::NONE )
   {
-    cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(ROW_SPAN_PROPERTY_NAME) ).Get<float>() );
+    cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::ROW_SPAN ).Get<float>() );
   }
 
-  if( child.GetPropertyIndex(COLUMN_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
+  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::COLUMN_SPAN ) != Property::NONE )
   {
-    cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(COLUMN_SPAN_PROPERTY_NAME) ).Get<float>() );
+    cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::COLUMN_SPAN ).Get<float>() );
   }
 
-  if( child.GetPropertyIndex(CELL_INDEX_PROPERTY_NAME) != Property::INVALID_INDEX )
+  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_INDEX ) != Property::NONE )
   {
-    Vector2 indices = child.GetProperty( child.GetPropertyIndex(CELL_INDEX_PROPERTY_NAME) ).Get<Vector2 >();
+    Vector2 indices = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_INDEX ).Get<Vector2 >();
     cellPosition.rowIndex = static_cast<unsigned int>( indices.x );
     cellPosition.columnIndex = static_cast<unsigned int>( indices.y );
 
