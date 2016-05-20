@@ -281,23 +281,23 @@ flexContainer.flexDirection = "row";
 
 // Create flex items and set the proportion
 var item1 = new dali.Control();
-item1.registerCustomProperty("flex", 1.0, dali.PROPERTY_READ_WRITE);
+item1.flex = 1.0;
 flexContainer.add(item1);
 
 var item2 = new dali.Control();
-item2.registerCustomProperty("flex", 3.0, dali.PROPERTY_READ_WRITE);
+item2.flex = 3.0;
 flexContainer.add(item2);
 
 var item3 = new dali.Control();
-item3.registerCustomProperty("flex", 1.0, dali.PROPERTY_READ_WRITE);
+item3.flex = 1.0;
 flexContainer.add(item3);
 
 var item4 = new dali.Control();
-item4.registerCustomProperty("flex", 2.0, dali.PROPERTY_READ_WRITE);
+item4.flex = 2.0;
 flexContainer.add(item4);
 
 var item5 = new dali.Control();
-item5.registerCustomProperty("flex", 1.0, dali.PROPERTY_READ_WRITE);
+item5.flex = 1.0;
 flexContainer.add(item5);
 
 ~~~
@@ -367,14 +367,14 @@ flexContainer.alignItems = "flexStart";
 
 // Create flex items and add them to the flex container
 var item1 = new dali.Control();
-item1.registerCustomProperty("alignSelf", "center", dali.PROPERTY_READ_WRITE); // Align item1 at the center of the container
+item1.alignSelf = "center"; // Align item1 at the center of the container
 flexContainer.add(item1);
 
 var item2 = new dali.Control();
 flexContainer.add(item2); // item2 is aligned at the beginning of ther container
 
 var item3 = new dali.Control();
-item1.registerCustomProperty("alignSelf", "flexEnd", dali.PROPERTY_READ_WRITE); // Align item3 at the bottom of the container
+item1.alignSelf = "flexEnd"; // Align item3 at the bottom of the container
 flexContainer.add(item3);
 
 var item4 = new dali.Control();
@@ -427,7 +427,7 @@ var flexContainer = new dali.Control("FlexContainer");
 var item = new dali.Control();
 
 // Add the margin around the item
-item.registerCustomProperty("flexMargin", [10.0, 10.0, 10.0, 10.0], dali.PROPERTY_READ_WRITE);
+item.flexMargin = [10.0, 10.0, 10.0, 10.0];
 
 // Add the item to the container
 flexContainer.add(item);
@@ -534,7 +534,7 @@ toolBar.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 0.1f ); 
 
 toolBar.flexDirection = "row"; // display toolbar items horizontally
 toolBar.alignItems = "center"; // align toolbar items vertically center
-toolBar.registerCustomProperty("flex", 0.1, dali.PROPERTY_READ_WRITE); // 10 percent of available space in the cross axis
+toolBar.flex = 0.1; // 10 percent of available space in the cross axis
 ~~~
  
 Then we create another flex container as the content area to display the image, and it will be displayed in the bottom of the main container.
@@ -566,7 +566,7 @@ content.anchorPoint = dali.TOP_LEFT;
 content.flexDirection = "row";
 content.alignItems = "center"; // align items vertically center
 content.justifyContent = "center"; // align items horizontally center
-content.registerCustomProperty("flex", 0.9, dali.PROPERTY_READ_WRITE); // 90 percent of available space in the cross axis
+content.flex = 0.9; // 90 percent of available space in the cross axis
 
 // Add it to the main container
 flexContainer.add(content);
@@ -627,7 +627,7 @@ prevButton.parentOrigin = dali.TOP_LEFT;
 prevButton.anchorPoint = dali.TOP_LEFT;
 prevButton.minimumSize = [100.0, 60.0]; // this is the minimum size the button should keep
 prevButton.labelText = "Prev";
-prevButton.registerCustomProperty("flexMargin", [10, 10, 10, 10], dali.PROPERTY_READ_WRITE); // set 10 pixel margin around the button
+prevButton.flexMargin = [10, 10, 10, 10]; // set 10 pixel margin around the button
 
 toolBar.add( prevButton );
 
@@ -640,8 +640,8 @@ title.heightResizePolicy = "USE_NATURAL_SIZE";
 title.horizontalAlignment = "CENTER";
 title.verticalAlignment = "CENTER";
 title.text = "Gallery";
-title.registerCustomProperty("flex", 1.0, dali.PROPERTY_READ_WRITE); // take all the available space left apart from the two buttons
-title.registerCustomProperty("flexMargin", [10, 10, 10, 10], dali.PROPERTY_READ_WRITE); // set 10 pixel margin around the title
+title.flex = 1.0; // take all the available space left apart from the two buttons
+title.flexMargin = [10, 10, 10, 10]; // set 10 pixel margin around the title
 
 toolBar.add( title );
 
@@ -652,7 +652,7 @@ nextButton.parentOrigin = dali.TOP_LEFT;
 nextButton.anchorPoint = dali.TOP_LEFT;
 nextButton.minimumSize = [100.0, 60.0]; // this is the minimum size the button should keep
 nextButton.labelText = "Next";
-nextButton.registerCustomProperty("flexMargin", [10, 10, 10, 10], dali.PROPERTY_READ_WRITE); // set 10 pixel margin around the button
+nextButton.flexMargin = [10, 10, 10, 10]; // set 10 pixel margin around the button
 
 toolBar.add( nextButton );
 ~~~
