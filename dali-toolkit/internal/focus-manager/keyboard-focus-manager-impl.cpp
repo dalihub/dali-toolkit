@@ -27,7 +27,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 

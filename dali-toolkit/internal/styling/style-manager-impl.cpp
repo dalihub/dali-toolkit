@@ -20,7 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

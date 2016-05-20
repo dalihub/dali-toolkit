@@ -15,16 +15,16 @@
  */
 
 // CLASS HEADER
-#include "renderer-factory-impl.h"
+#include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
-// Internal HEADER
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/border/border-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/debug/debug-renderer.h>

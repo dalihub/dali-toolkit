@@ -17,7 +17,6 @@
 #include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <test-button.h>
-#include <dali/devel-api/object/type-registry-helper.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
