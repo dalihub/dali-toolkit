@@ -51,6 +51,10 @@ const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underlineEnabled";
 const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underlineColor";
 const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underlineHeight";
 const char* const PROPERTY_NAME_ENABLE_MARKUP = "enableMarkup";
+const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL = "enableAutoScroll";
+const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED = "autoScrollSpeed";
+const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_LOOPS = "autoScrollLoopCount";
+const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_GAP = "autoScrollGap";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -152,6 +156,10 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP) == TextLabel::Property::ENABLE_MARKUP );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL ) == TextLabel::Property::ENABLE_AUTO_SCROLL );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED ) == TextLabel::Property::AUTO_SCROLL_SPEED );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_LOOPS ) == TextLabel::Property::AUTO_SCROLL_LOOP_COUNT );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_GAP ) == TextLabel::Property::AUTO_SCROLL_GAP );
 
   END_TEST;
 }
@@ -218,6 +226,20 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
   DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ENABLE_MARKUP ) );
 
+  // Check autoscroll properties
+  const int SCROLL_SPEED = 80;
+  const int SCROLL_LOOPS = 4;
+  const float SCROLL_GAP = 50.0f;
+  label.SetProperty( TextLabel::Property::MULTI_LINE, false ); // Autoscroll only supported in single line
+  DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ENABLE_AUTO_SCROLL ) );
+  label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+  DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ENABLE_AUTO_SCROLL ) );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, SCROLL_SPEED );
+  DALI_TEST_EQUALS( SCROLL_SPEED, label.GetProperty<int>( TextLabel::Property::AUTO_SCROLL_SPEED ), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, SCROLL_LOOPS );
+  DALI_TEST_EQUALS( SCROLL_LOOPS, label.GetProperty<int>( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT ), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, SCROLL_GAP );
+  DALI_TEST_EQUALS( SCROLL_GAP, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_GAP ), TEST_LOCATION );
   END_TEST;
 }
 
@@ -321,3 +343,32 @@ int UtcDaliToolkitTextLabelVectorBasedP(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelScrollingP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelScrollingP");
+  TextLabel label = TextLabel::New("Some text to scroll");
+  DALI_TEST_CHECK( label );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( label );
+  // Turn on all the effects
+  label.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    label.SetProperty(  TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render();
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}

@@ -249,23 +249,23 @@ flexContainer.SetProperty( Dali::Toolkit::FlexContainer::Property::FLEX_DIRECTIO
 
 // Create flex items and set the proportion
 Dali::Toolkit::Control item1 = Dali::Toolkit::Control::New();
-item1.RegisterProperty( "flex", 1.0f, Dali::Property::READ_WRITE );
+item1.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 1.0f );
 flexContainer.Add( item1 );
 
 Dali::Toolkit::Control item2 = Dali::Toolkit::Control::New();
-item2.RegisterProperty( "flex", 3.0f, Dali::Property::READ_WRITE );
+item2.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 3.0f );
 flexContainer.Add( item2 );
 
 Dali::Toolkit::Control item3 = Dali::Toolkit::Control::New();
-item3.RegisterProperty( "flex", 1.0f, Dali::Property::READ_WRITE );
+item3.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 1.0f );
 flexContainer.Add( item3 );
 
 Dali::Toolkit::Control item4 = Dali::Toolkit::Control::New();
-item4.RegisterProperty( "flex", 2.0f, Dali::Property::READ_WRITE );
+item4.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 2.0f );
 flexContainer.Add( item4 );
 
 Dali::Toolkit::Control item5 = Dali::Toolkit::Control::New();
-item5.RegisterProperty( "flex", 1.0f, Dali::Property::READ_WRITE );
+item5.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 1.0f );
 flexContainer.Add( item5 );
 
 ~~~
@@ -338,14 +338,14 @@ flexContainer.SetProperty( Dali::Toolkit::FlexContainer::Property::ALIGN_ITEMS, 
 
 // Create flex items and add them to the flex container
 Dali::Toolkit::Control item1 = Dali::Toolkit::Control::New();
-item1.RegisterProperty( "alignSelf", Dali::Toolkit::FlexContainer::ALIGN_CENTER, Dali::Property::READ_WRITE ); // Align item1 at the center of the container
+item1.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::ALIGN_SELF, Dali::Toolkit::FlexContainer::ALIGN_CENTER ); // Align item1 at the center of the container
 flexContainer.Add( item1 );
 
 Dali::Toolkit::Control item2 = Dali::Toolkit::Control::New();
 flexContainer.Add( item2 ); // item2 is aligned at the beginning of ther container
 
 Dali::Toolkit::Control item3 = Dali::Toolkit::Control::New();
-item3.RegisterProperty( "alignSelf", Dali::Toolkit::FlexContainer::ALIGN_FLEX_END, Dali::Property::READ_WRITE ); // Align item3 at the bottom of the container
+item3.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::ALIGN_SELF, Dali::Toolkit::FlexContainer::ALIGN_FLEX_END ); // Align item3 at the bottom of the container
 flexContainer.Add( item3 );
 
 Dali::Toolkit::Control item4 = Dali::Toolkit::Control::New();
@@ -411,7 +411,7 @@ Dali::Toolkit::FlexContainer flexContainer = Dali::Toolkit::FlexContainer::New()
 Dali::Toolkit::Control item = Dali::Toolkit::Control::New();
 
 // Add the margin around the item
-item.RegisterProperty( "flexMargin", Vector4(10.0f, 10.0f, 10.0f, 10.0f), Dali::Property::READ_WRITE );
+item.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN, Vector4(10.0f, 10.0f, 10.0f, 10.0f) );
 
 // Add the item to the container
 flexContainer.Add( item );
@@ -526,7 +526,7 @@ This can be achieved by setting the flex property.
 
 toolBar.SetProperty( Dali::Toolkit::FlexContainer::Property::FLEX_DIRECTION, Dali::Toolkit::FlexContainer::ROW ); // display toolbar items horizontally
 toolBar.SetProperty( Dali::Toolkit::FlexContainer::Property::ALIGN_ITEMS, Dali::Toolkit::FlexContainer::ALIGN_CENTER ); // align toolbar items vertically center
-toolBar.RegisterProperty( "flex", 0.1f, Dali::Property::READ_WRITE ); // 10 percent of available space in the cross axis
+toolBar.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 0.1f ); // 10 percent of available space in the cross axis
 ~~~
 
 ~~~{.js}
@@ -550,7 +550,7 @@ content.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
 content.SetProperty( Dali::Toolkit::FlexContainer::Property::FLEX_DIRECTION, Dali::Toolkit::FlexContainer::ROW ); // display items horizontally
 content.SetProperty( Dali::Toolkit::FlexContainer::Property::JUSTIFY_CONTENT, Dali::Toolkit::FlexContainer::JUSTIFY_CENTER ); // align items horizontally center
 content.SetProperty( Dali::Toolkit::FlexContainer::Property::ALIGN_ITEMS, Dali::Toolkit::FlexContainer::ALIGN_CENTER ); // align items vertically center
-content.RegisterProperty( "flex", 0.9f, Dali::Property::READ_WRITE ); // 90 percent of available space in the cross axis
+content.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 0.9f ); // 90 percent of available space in the cross axis
 
 // Add it to the main container
 flexContainer.Add( content );
@@ -584,7 +584,7 @@ Dali::Toolkit::PushButton prevButton = Dali::Toolkit::PushButton::New();
 prevButton.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
 prevButton.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
 prevButton.SetMinimumSize( Dali::Vector2( 100.0f, 60.0f ) ); // this is the minimum size the button should keep
-prevButton.RegisterProperty( "flexMargin", Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f), Dali::Property::READ_WRITE ); // set 10 pixel margin around the button
+prevButton.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN, Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f) ); // set 10 pixel margin around the button
 toolBar.Add( prevButton );
 
 // Set the button text
@@ -600,8 +600,8 @@ title.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
 title.SetResizePolicy( Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::ALL_DIMENSIONS );
 title.SetProperty( Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
 title.SetProperty( Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-title.RegisterProperty( "flex", 1.0f, Dali::Property::READ_WRITE ); // take all the available space left apart from the two buttons
-title.RegisterProperty( "flexMargin", Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f), Dali::Property::READ_WRITE ); // set 10 pixel margin around the title
+title.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX, 1.0f ); // take all the available space left apart from the two buttons
+title.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN, Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f) ); // set 10 pixel margin around the title
 toolBar.Add( title );
 
 // Add a button to the right of the toolbar
@@ -609,7 +609,7 @@ Dali::Toolkit::PushButton nextButton = Dali::Toolkit::PushButton::New();
 nextButton.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
 nextButton.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
 nextButton.SetMinimumSize( Dali::Vector2( 100.0f, 60.0f ) ); // this is the minimum size the button should keep
-nextButton.RegisterProperty( "flexMargin", Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f), Dali::Property::READ_WRITE ); // set 10 pixel margin around the button
+nextButton.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN, Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f) ); // set 10 pixel margin around the button
 toolBar.Add( nextButton );
 
 // Set the button text

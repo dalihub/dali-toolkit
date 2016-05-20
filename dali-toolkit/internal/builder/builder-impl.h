@@ -23,6 +23,7 @@
 #include <list>
 #include <map>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>

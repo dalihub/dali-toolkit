@@ -311,7 +311,7 @@ void GradientRenderer::InitializeRenderer()
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
   {
-    geometry =  RendererFactoryCache::CreateQuadGeometry();
+    geometry =  Geometry::QUAD();
     mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
 

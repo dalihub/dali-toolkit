@@ -132,6 +132,55 @@ bool Controller::IsMarkupProcessorEnabled() const
   return mImpl->mMarkupProcessorEnabled;
 }
 
+void Controller::SetAutoScrollEnabled( bool enable )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable)?"true":"false", ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX)?"true":"false", this );
+
+  if ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX )
+  {
+    if ( enable )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n" );
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               LAYOUT                    |
+                                                               ALIGN                     |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_DIRECTION          |
+                                                               REORDER );
+
+    }
+    else
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled Disabling autoscroll\n");
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                               LAYOUT                    |
+                                                               ALIGN                     |
+                                                               UPDATE_ACTUAL_SIZE        |
+                                                               REORDER );
+    }
+
+    mImpl->mAutoScrollEnabled = enable;
+    mImpl->RequestRelayout();
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored" );
+    mImpl->mAutoScrollEnabled = false;
+  }
+}
+
+bool Controller::IsAutoScrollEnabled() const
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", (mImpl->mAutoScrollEnabled)?"true":"false" );
+
+  return mImpl->mAutoScrollEnabled;
+}
+
+CharacterDirection Controller::GetAutoScrollDirection() const
+{
+  return mImpl->mAutoScrollDirectionRTL;
+}
+
 void Controller::SetText( const std::string& text )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
@@ -473,7 +522,7 @@ float Controller::GetDefaultPointSize() const
 
 void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange");
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange");
 
   if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
   {
@@ -1063,8 +1112,8 @@ Vector3 Controller::GetNaturalSize()
     mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
     mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
-    // Store the actual control's width.
-    const float actualControlWidth = mImpl->mVisualModel->mControlSize.width;
+    // Store the actual control's size to restore later.
+    const Size actualControlSize = mImpl->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
@@ -1089,8 +1138,8 @@ Vector3 Controller::GetNaturalSize()
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
 
-    // Restore the actual control's width.
-    mImpl->mVisualModel->mControlSize.width = actualControlWidth;
+    // Restore the actual control's size.
+    mImpl->mVisualModel->mControlSize = actualControlSize;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
@@ -1173,7 +1222,7 @@ float Controller::GetHeightForWidth( float width )
 
 bool Controller::Relayout( const Size& size )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f\n", this, size.width, size.height );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, (mImpl->mAutoScrollEnabled)?"true":"false"  );
 
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
@@ -1432,6 +1481,8 @@ bool Controller::DoRelayout( const Size& size,
 
   if( NO_OPERATION != ( LAYOUT & operations ) )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout LAYOUT & operations\n");
+
     // Some vectors with data needed to layout and reorder may be void
     // after the first time the text has been laid out.
     // Fill the vectors again.
@@ -1500,8 +1551,14 @@ bool Controller::DoRelayout( const Size& size,
                                                    mImpl->mVisualModel->mLines,
                                                    layoutSize );
 
+
     if( viewUpdated )
     {
+      if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
+      {
+        mImpl->mAutoScrollDirectionRTL = false;
+      }
+
       // Reorder the lines
       if( NO_OPERATION != ( REORDER & operations ) )
       {
@@ -1532,6 +1589,14 @@ bool Controller::DoRelayout( const Size& size,
                                                          requestedNumberOfCharacters,
                                                          glyphPositions );
 
+          if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
+          {
+            const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
+            if ( firstline )
+            {
+              mImpl->mAutoScrollDirectionRTL = firstline->direction;
+            }
+          }
         }
       } // REORDER
 
@@ -1562,7 +1627,11 @@ bool Controller::DoRelayout( const Size& size,
 
     viewUpdated = true;
   }
-
+#if defined(DEBUG_ENABLED)
+  std::string currentText;
+  GetText( currentText );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
+#endif
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
 }

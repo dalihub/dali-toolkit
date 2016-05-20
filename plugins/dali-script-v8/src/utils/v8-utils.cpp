@@ -378,8 +378,6 @@ std::string PropertyNameToJavaScriptName(const std::string& hyphenatedName)
   return ret;
 }
 
-
-
 void ScriptError( const char* function, v8::Isolate* isolate, std::string errorString )
 {
   v8::EscapableHandleScope scope( isolate);
@@ -391,6 +389,12 @@ void ScriptError( const char* function, v8::Isolate* isolate, std::string errorS
   // throw a V8 exception, DALi will keep running but we will get a print out
   // of where the error occured in the JavaScript source
   isolate->ThrowException( v8::String::NewFromUtf8( isolate, errorMsg.c_str()) );
+}
+
+void ScriptWarning( const char* function, std::string warningString )
+{
+  std::string warningMsg = std::string(function) + std::string("(), ") + warningString;
+  DALI_LOG_WARNING("%s \n", warningMsg.c_str() );
 }
 
 bool IsBooleanPrimitiveOrObject( const v8::Local<v8::Value>& value )
@@ -504,6 +508,13 @@ Property::Value GetPropertyValueFromObject( bool& found, v8::Isolate* isolate, c
     v8::Local<v8::Int32> v = value->ToInt32();
     return Dali::Property::Value(static_cast<int>(v->Value()));
   }
+  else if( value->IsString() )
+  {
+    found = true;
+    std::string valueString = V8Utils::v8StringToStdString( value );
+    return Dali::Property::Value(valueString);
+  }
+
   return daliPropertyValue;
 
 }

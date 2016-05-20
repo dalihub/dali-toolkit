@@ -109,7 +109,7 @@ void CubeTransitionWaveEffect::OnStartTransition( Vector2 panPosition, Vector2 p
 
 void  CubeTransitionWaveEffect::CalculateSaddleSurfaceParameters( Vector2 position, Vector2 displacement )
 {
-  const Vector2& size = Self().GetCurrentSize().GetVectorXY();
+  const Vector2 size = Self().GetCurrentSize().GetVectorXY();
   // the line passes through 'position' and has the direction of 'displacement'
   float coefA, coefB, coefC; //line equation: Ax+By+C=0;
   coefA = displacement.y;

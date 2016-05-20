@@ -316,27 +316,16 @@ label1.underlineHeight = 1;
 ![ ](../assets/img/text-controls/TextWith1pxUnderline.png)
 ![ ](TextWith1pxUnderline.png)
 
+### Auto Scrolling
+
+![ ](../assets/img/text-controls/AutoScroll.gif)
+![ ](AutoScroll.gif)
+
+The \link text-auto-scrolling Auto text scrolling \endlink section details how to scroll text automatically.
+
 ### Text Label Properties
 
- Name (JavaScript)   |  Name (C++)          |  Type        | Writable     | Animatable
----------------------|----------------------|--------------|--------------|-----------
- renderingBackend    | RENDERING_BACKEND    |  INTEGER     | O            | X
- text                | TEXT                 |  STRING      | O            | X
- fontFamily          | FONT_FAMILY          |  STRING      | O            | X
- fontStyle           | FONT_STYLE           |  STRING      | O            | X
- pointSize           | POINT_SIZE           |  FLOAT       | O            | X
- multiLine           | MULTI_LINE           |  BOOLEAN     | O            | X
- horizontalAlignment | HORIZONTAL_ALIGNMENT |  STRING      | O            | X
- verticalAlignment   | VERTICAL_ALIGNMENT   |  STRING      | O            | X
- textColor           | TEXT_COLOR           |  VECTOR4     | O            | X
- shadowOffset        | SHADOW_OFFSET        |  VECTOR2     | O            | X
- shadowColor         | SHADOW_COLOR         |  VECTOR4     | O            | X
- underlineEnabled    | UNDERLINE_ENABLED    |  BOOLEAN     | O            | X
- underlineColor      | UNDERLINE_COLOR      |  VECTOR4     | O            | X
- underlineHeight     | UNDERLINE_HEIGHT     |  FLOAT       | O            | X
- enableMarkup        | ENABLE_MARKUP        |  BOOLEAN     | O            | X
-
-
+The properties used by TextLabel are listed [here](@ref TextLabelProperties)
 
 @class TextLabel
 

@@ -1,7 +1,5 @@
-#ifndef MESH_BUILDER_H
-#define MESH_BUILDER_H
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +15,28 @@
  *
  */
 
-#include <dali/public-api/dali-core.h>
-#include <dali/devel-api/object/property-buffer.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/texture-set.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/renderer.h>
+// CLASS HEADER
+#include <dali-toolkit/internal/text/text-scroller-interface.h>
 
 namespace Dali
 {
 
-Shader CreateShader();
-TextureSet CreateTextureSet();
-TextureSet CreateTextureSet( Image image );
-PropertyBuffer CreatePropertyBuffer();
+namespace Toolkit
+{
 
+namespace Text
+{
+
+ScrollerInterface::ScrollerInterface()
+{
 }
 
-#endif // MESH_BUILDER_H
+ScrollerInterface::~ScrollerInterface()
+{
+}
+
+} // namespace Text
+
+} // namespace Toolkit
+
+} // namespace Dali
