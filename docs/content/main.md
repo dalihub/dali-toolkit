@@ -39,7 +39,7 @@
    + [Relative To Constraint](@ref constraints-relative-to)
   + [Multi-threading Notes](@ref animation-multi-threading-notes)
   + [Shader Animation](@ref animation-shader)
-  + [Styling](@ref styling)
+ + [Styling](@ref styling)
 
 ### Resources
  + [Resource Image](@ref resource-image)
