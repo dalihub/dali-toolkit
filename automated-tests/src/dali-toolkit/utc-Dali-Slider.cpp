@@ -20,7 +20,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali-toolkit/devel-api/controls/slider/slider.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -140,7 +139,7 @@ int UtcDaliSliderSignals(void)
   slider.SetProperty( Slider::Property::MARK_TOLERANCE, 0.1f );
 
   slider.ValueChangedSignal().Connect( &OnSliderValueChanged );
-  slider.MarkSignal().Connect( &OnSliderMark );
+  slider.MarkReachedSignal().Connect( &OnSliderMark );
 
   application.SendNotification();
   application.Render();

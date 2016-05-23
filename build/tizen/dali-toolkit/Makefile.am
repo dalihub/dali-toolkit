@@ -101,7 +101,6 @@ develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
 develapirendererfactorydir =    $(develapicontrolsdir)/renderer-factory
 develapipopupdir =              $(develapicontrolsdir)/popup
-develapisliderdir =             $(develapicontrolsdir)/slider
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
@@ -126,7 +125,6 @@ develapirendererfactory_HEADERS =   $(devel_api_renderer_factory_header_files)
 develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
 develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
-develapislider_HEADERS =            $(devel_api_slider_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
@@ -153,6 +151,7 @@ publicapitableviewdir =            $(publicapicontrolsdir)/table-view
 publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =         $(publicapidir)/focus-manager
 publicapirenderingbackenddir =     $(publicapidir)/text
+publicapisliderdir =               $(publicapicontrolsdir)/slider
 
 # public api headers
 publicapi_HEADERS =                     $(public_api_header_files)
@@ -175,6 +174,7 @@ publicapitableview_HEADERS =            $(public_api_table_view_header_files)
 publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS =     $(public_api_rendering_backend_header_files)
+publicapislider_HEADERS =               $(public_api_slider_header_files)
 
 # package doxygen file (contains doxygen grouping information)
 packagedoxydir = $(topleveldir)/doc

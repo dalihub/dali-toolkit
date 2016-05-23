@@ -47,6 +47,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
+#include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
