@@ -479,6 +479,7 @@ void Control::ClearBackground()
 {
   Actor self( Self() );
   mImpl->mBackgroundRenderer.RemoveAndReset( self );
+  mImpl->mBackgroundColor = Color::TRANSPARENT;
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
