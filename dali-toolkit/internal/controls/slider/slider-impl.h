@@ -286,6 +286,12 @@ protected:
    */
   virtual void OnSizeSet( const Vector3& size );
 
+  /**
+   * @copydoc CustomActorImpl::OnRelayout
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+
 private:
 
   /**
