@@ -30,11 +30,6 @@ T.O.C.
 
  gbs build -A [TARGET_ARCH] --define "%enable_debug 1"
 
-1.4. MOBILE Profile
--------------------
-
- gbs build -A [TARGET_ARCH] --spec dali-toolkit-mobile.spec
-
 2. Building for Ubuntu desktop
 ==============================
 
