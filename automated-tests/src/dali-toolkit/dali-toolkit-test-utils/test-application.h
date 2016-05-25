@@ -48,6 +48,8 @@ public:
 
   static const unsigned int DEFAULT_RENDER_INTERVAL = 1;
 
+  static const unsigned int RENDER_FRAME_INTERVAL = 16;
+
   TestApplication( size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
                    size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
@@ -80,6 +82,7 @@ public:
   bool RenderOnly( );
   void ResetContext();
   bool GetRenderNeedsUpdate();
+  unsigned int Wait( unsigned int durationToWait );
 
 private:
   void DoUpdate( unsigned int intervalMilliseconds, const char* location=NULL );

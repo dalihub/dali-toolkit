@@ -214,6 +214,88 @@
     "ProgressBarValueTextLabel":
     {
       "textColor":[0.8,0.8,1,1]
+    },
+    "Button":
+    {
+      "initialAutoRepeatingDelay":2.0,
+      "nextAutoRepeatingDelay":0.9,
+      "labelStrutLength":12
+      // Note: Visuals added to Button will be used in all derived buttons unless overridden.
+    },
+    "PushButton":
+    {
+      "styles":["Button"],
+      "autoRepeating":false,
+      "togglable":false,
+      "labelPadding":[ 12.0, 12.0, 12.0, 12.0 ],
+      "unselectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-up.9.png"
+       },
+       "selectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-down.9.png"
+       },
+       "disabledSelectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-down-disabled.9.png"
+       },
+       "disabledUnselectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-disabled.9.png"
+       }
+    },
+    "CheckBoxButton":
+    {
+      "styles":["Button"],
+      "unselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected.png"
+      },
+      "selectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-selected.png"
+      },
+      "disabledUnselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected-disabled.png"
+      },
+      "disabledSelectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-selected-disabled.png"
+      }
+    },
+    "RadioButton":
+    {
+      "styles":["Button"],
+      "unselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected.png"
+      },
+      "selectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-selected.png"
+      },
+      "disabledUnselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected-disabled.png"
+      },
+      "disabledSelectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
+      }
     }
   }
 }

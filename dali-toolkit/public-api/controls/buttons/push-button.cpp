@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
+#include <dali/public-api/images/resource-image.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/push-button-impl.h>
 
@@ -80,49 +82,46 @@ void PushButton::SetButtonImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetButtonImage() is deprecated and will be removed from next release. Use Button.SetProperty UNSELECTED_STATE_IMAGE or Styling file instead.\n" );
 
-  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( image );
+  // Passing Image as Actor not supported
 }
 
 void PushButton::SetBackgroundImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundImage() is deprecated and will be removed from next release.\n" );
 
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( image );
+  // Passing Image as Actor not supported}
 }
 
 void PushButton::SetSelectedImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetSelectedImage() is deprecated and will be removed from next release. Use Button.SetProperty SELECTED_STATE_IMAGE or Styling file instead.\n" );
 
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
+  // Passing Image as Actor not supported}
 }
 
 void PushButton::SetSelectedBackgroundImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetSelectedBackgroundImage() is deprecated and will be removed from next release.\n" );
 
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( image );
+  // Passing Image as Actor not supported}
 }
 
 void PushButton::SetDisabledBackgroundImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetDisabledBackgroundImage() is deprecated and will be removed from next release.\n" );
-
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
+  // Passing Image as Actor not supported}
 }
 
 void PushButton::SetDisabledImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetDisabledImage() is deprecated and will be removed from next release. Use Button.SetProperty DISABLED_STATE_IMAGE or Styling file instead.\n" );
-
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( image );
+  // Passing Image as Actor not supported
 }
 
 void PushButton::SetDisabledSelectedImage( Actor image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetDisabledSelectedImage() is deprecated and will be removed from next release.\n" );
-
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( image );
+  // Passing Image as Actor not supported
 }
 
 } // namespace Toolkit

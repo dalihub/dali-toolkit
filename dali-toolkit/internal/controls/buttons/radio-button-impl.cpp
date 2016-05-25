@@ -20,8 +20,13 @@
 #include "radio-button-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/images/resource-image.h>
+
+#if defined(DEBUG_ENABLED)
+  extern Debug::Filter* gLogButtonFilter;
+#endif
 
 namespace Dali
 {
@@ -42,12 +47,6 @@ BaseHandle Create()
 
 TypeRegistration typeRegistration( typeid( Toolkit::RadioButton ), typeid( Toolkit::Button ), Create);
 
-const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-unselected.png";
-const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-selected.png";
-const char* const DISABLED_UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-unselected-disabled.png";
-const char* const DISABLED_SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-selected-disabled.png";
-
-const float DISTANCE_BETWEEN_IMAGE_AND_LABEL( 5.0f );
 }
 
 Dali::Toolkit::RadioButton RadioButton::New()
@@ -77,105 +76,47 @@ RadioButton::~RadioButton()
 void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
-
-  Actor self = Self();
-
-  // Wrap size of radio button around all its children
-  self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-
-  SetUnselectedImage( UNSELECTED_BUTTON_IMAGE_DIR );
-  SetSelectedImage( SELECTED_BUTTON_IMAGE_DIR );
-  SetDisabledImage( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR );
-  SetDisabledSelectedImage( DISABLED_SELECTED_BUTTON_IMAGE_DIR );
-
-  RelayoutRequest();
 }
 
 void RadioButton::OnButtonUp()
 {
-  if( ButtonDown == GetState() )
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RadioButton::OnStateChange selecting:%s\n", ( (!IsSelected())?"true":"false" ) );
+
+  // Don't allow un-selection on an already selected radio button, can only un-select by selecting a sibling radio button
+  if( !IsSelected() )
   {
-    // Don't allow selection on an already selected radio button
-    if( !IsSelected() )
-    {
-      SetSelected( !IsSelected() );
-    }
+    SetSelected( !IsSelected() );
   }
 }
 
-void RadioButton::OnLabelSet( bool noPadding )
+void RadioButton::OnStateChange( State newState )
 {
-  Actor& label = GetLabelActor();
+  // Radio button can be part of a group, if a button in the group is selected then all others should be unselected
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RadioButton::OnStateChange state(%d)\n", newState );
 
-  if( label )
-  {
-    label.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-    label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+   switch( newState )
+   {
+     case SELECTED_STATE:
+     {
+       Actor parent = Self().GetParent();
+       if( parent )
+       {
+         for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
+         {
+           Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
+           if( radioButtonChild && radioButtonChild != Self() )
+           {
+             radioButtonChild.SetSelected( false );
+           }
+         }
+       }
+     }
 
-    // Radio button width is FIT_TO_CHILDREN, so the label must have a sensible policy to fill out the space
-    if( label.GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FILL_TO_PARENT )
-    {
-      label.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH );
-    }
-
-    if( IsSelected() && GetSelectedImage() )
-    {
-      label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
-    }
-    else if( GetUnselectedImage() )
-    {
-      label.SetX( GetUnselectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
-    }
-    else
-    {
-      label.SetX( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
-    }
-  }
-}
-
-void RadioButton::OnSelected()
-{
-  Actor& label = GetLabelActor();
-
-  PaintState paintState = GetPaintState();
-  switch( paintState )
-  {
-    case UnselectedState:
-    {
-      Actor parent = Self().GetParent();
-      if( parent )
-      {
-        for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
-        {
-          Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
-          if( radioButtonChild && radioButtonChild != Self() )
-          {
-            radioButtonChild.SetSelected( false );
-          }
-        }
-      }
-
-      Actor& selectedImage = GetSelectedImage();
-      if( label && selectedImage )
-      {
-        label.SetX( selectedImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
-      }
-      break;
-    }
-    case SelectedState:
-    {
-      Actor& buttonImage = GetUnselectedImage();
-      if( label && buttonImage )
-      {
-        label.SetX( buttonImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
-      }
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
+     default:
+     {
+       break;
+     }
+   }
 }
 
 } // namespace Internal

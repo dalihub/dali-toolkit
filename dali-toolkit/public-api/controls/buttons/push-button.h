@@ -111,9 +111,9 @@ public:
      */
     enum
     {
-      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string @SINCE_1_0.0
-      SELECTED_ICON,                          ///< Property, name "selectedIcon",    type std::string @SINCE_1_0.0
-      ICON_ALIGNMENT,                         ///< Property, name "iconAlignment",   type std::string @SINCE_1_0.0
+      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Button::Property::UNSELECTED_VISUAL
+      SELECTED_ICON,                          ///< Property, name "selectedIcon",    type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Button::Property::SELECTED_VISUAL
+      ICON_ALIGNMENT,                         ///< Property, name "iconAlignment",   type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Use Button::Property::LABEL_RELATIVE_ALIGNMENT
       LABEL_PADDING,                          ///< Property, name "labelPadding",    type Vector4 @SINCE_1_0.0
       ICON_PADDING,                           ///< Property, name "iconPadding",     type Vector4 @SINCE_1_0.0
     };
@@ -172,7 +172,7 @@ public:
    */
   static PushButton DownCast( BaseHandle handle );
 
-
+  ///////////////////////////////////////////////////////////////////////////
   // Deprecated API
 
   using Button::SetButtonImage;

@@ -62,11 +62,6 @@ private:
    */
   virtual ~CheckBoxButton();
 
-  /**
-   * Setup the ticking effect to the selected image.
-   */
-  void SetTickUVEffect();
-
 private: // From Button
 
 
@@ -76,29 +71,29 @@ private: // From Button
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnLabelSet
-   */
-  virtual void OnLabelSet( bool noPadding );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnDisabled
-   */
-  virtual void OnDisabled();
-
-  /**
    * @copydoc Toolkit::Internal::Button::PrepareForTranstionIn( Actor actor )
    */
-  virtual void PrepareForTranstionIn( Actor actor );
+  virtual void PrepareForTransitionIn( Actor actor );
 
   /**
    * @copydoc Toolkit::Internal::Button::PrepareForTranstionOut( Actor actor )
    */
-  virtual void PrepareForTranstionOut( Actor actor );
+  virtual void PrepareForTransitionOut( Actor actor );
 
   /**
    * @copydoc Toolkit::Internal::Button::OnTransitionInImage( Actor actor )
    */
   virtual void OnTransitionIn( Actor actor );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnTransitionOut( Actor actor )
+   */
+  virtual void OnTransitionOut( Actor actor );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnButtonVisualRemoval( Property::Index visualIndex )
+   */
+ // virtual void OnButtonVisualRemoval( Property::Index visualIndex );
 
 private:
 
@@ -108,8 +103,6 @@ private:
   // Undefined
   CheckBoxButton& operator=( const CheckBoxButton& );
 
-private:
-  Actor         mSelectedImage;
 };
 
 } // namespace Internal

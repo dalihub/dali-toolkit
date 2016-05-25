@@ -221,5 +221,17 @@ void TestApplication::ResetContext()
   mCore->ContextCreated();
 }
 
+unsigned int TestApplication::Wait( unsigned int durationToWait )
+{
+  int time = 0;
+
+  for(unsigned int i = 0; i <= ( durationToWait / RENDER_FRAME_INTERVAL); i++)
+  {
+    SendNotification();
+    Render(RENDER_FRAME_INTERVAL);
+    time += RENDER_FRAME_INTERVAL;
+  }
+  return time;
+}
 
 } // Namespace dali

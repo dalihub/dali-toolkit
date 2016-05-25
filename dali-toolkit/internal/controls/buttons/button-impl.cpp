@@ -20,10 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
@@ -31,32 +34,16 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 
-/**
- * Button states and contents
- *                                         (3) mSelectedContent
- *  (2) mUnselectedContent                 (2) mSelectedBackgroundContent
- *  (1) mBackgroundContent                 (1) mBackgroundContent
- * < unselected > ----------------------- < selected >
- *       |                OnSelect()            |
- *       | OnDisabled()                         | OnDisabled()
- *       |                                      |
- * < disabled >                           < disabled-selected >
- *  (2) mDisabledContent                   (2) mDisabledSelectedContent
- *  (1) mDisabledBackgroundContent         (1) mDisabledBackgroundContent
- *
- * The drawing order of child actors is as follows.
- *
- *  Top      mLabel
- *   |       mUnselectedContent / mSelectedContent / mDisabledContent / mDisabledSelectedContent
- *   |       mSelectedBackgroundContent
- * Bottom    mBackgroundContent / mDisabledBackgroundContent
- *
- * Some of contents may be missed.
- * And 2 images - fade-in image and fade-out image - in the same layer can be shown during the transition animation. Fade-in image should be above fade-out image.
- */
+#if defined(DEBUG_ENABLED)
+    Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_BUTTON_CONTROL");
+#endif
 
 namespace Dali
 {
@@ -77,23 +64,31 @@ BaseHandle Create()
 }
 
 // Setup properties, signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Button, Toolkit::Control, Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Button, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled",                     BOOLEAN, DISABLED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "autoRepeating",                BOOLEAN, AUTO_REPEATING               )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initialAutoRepeatingDelay",    FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "nextAutoRepeatingDelay",       FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                     BOOLEAN, SELECTED                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedStateImage",         STRING,  UNSELECTED_STATE_IMAGE       )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedStateImage",           STRING,  SELECTED_STATE_IMAGE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledStateImage",           STRING,  DISABLED_STATE_IMAGE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedColor",              VECTOR4, UNSELECTED_COLOR             )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedColor",                VECTOR4, SELECTED_COLOR               )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                        MAP,     LABEL                        )
-
-// Deprecated properties:
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelText",                    STRING,  LABEL_TEXT                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled",                           BOOLEAN, DISABLED                              )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "autoRepeating",                      BOOLEAN, AUTO_REPEATING                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initialAutoRepeatingDelay",          FLOAT,   INITIAL_AUTO_REPEATING_DELAY          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "nextAutoRepeatingDelay",             FLOAT,   NEXT_AUTO_REPEATING_DELAY             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                          BOOLEAN, TOGGLABLE                             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                           BOOLEAN, SELECTED                              )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedStateImage",               MAP,     UNSELECTED_STATE_IMAGE                ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedStateImage",                 MAP,     SELECTED_STATE_IMAGE                  ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledStateImage",                 MAP,     DISABLED_STATE_IMAGE                  ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedColor",                    VECTOR4, UNSELECTED_COLOR                      ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedColor",                      VECTOR4, SELECTED_COLOR                        ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                              MAP,     LABEL                                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelText",                          STRING,  LABEL_TEXT                            ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedVisual",                   MAP,     UNSELECTED_VISUAL                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedVisual",                     MAP,     SELECTED_VISUAL                       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedVisual",             MAP,     DISABLED_SELECTED_VISUAL              )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedVisual",           MAP,     DISABLED_UNSELECTED_VISUAL            )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedBackgroundVisual",         MAP,     UNSELECTED_BACKGROUND_VISUAL          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedBackgroundVisual",           MAP,     SELECTED_BACKGROUND_VISUAL            )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedBackgroundVisual", MAP,     DISABLED_UNSELECTED_BACKGROUND_VISUAL )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedBackgroundVisual",   MAP,     DISABLED_SELECTED_BACKGROUND_VISUAL   )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelStrutLength",                   INTEGER, LABEL_STRUT_LENGTH                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelRelativeAlignment",             STRING,  LABEL_RELATIVE_ALIGNMENT              )
 
 // Signals:
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
@@ -106,164 +101,52 @@ DALI_ACTION_REGISTRATION(   Toolkit, Button, "buttonClick",                     
 
 DALI_TYPE_REGISTRATION_END()
 
-const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
-const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
+DALI_ENUM_TO_STRING_TABLE_BEGIN( ALIGNMENT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Internal::Button, BEGIN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Internal::Button, END )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Internal::Button, TOP )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Internal::Button, BOTTOM )
+DALI_ENUM_TO_STRING_TABLE_END( ALIGNMENT )
+
+const Scripting::StringEnum ALIGNMENT_STRING_TABLE[] =
+{
+  { "BEGIN",  Button::BEGIN   },
+  { "END",    Button::END     },
+  { "TOP",    Button::TOP     },
+  { "BOTTOM", Button::BOTTOM  },
+};
+
+const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE ) / sizeof( ALIGNMENT_STRING_TABLE[0] );
+
+const Property::Index GET_VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
+{
+  { Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::UNSELECTED_VISUAL },
+  { Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::SELECTED_VISUAL  },
+  { Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL },
+  { Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_SELECTED_VISUAL }
+};
 
 } // unnamed namespace
 
 Button::Button()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mAutoRepeatingTimer(),
-  mUnselectedColor( Color::WHITE ), // The natural colors of the specified images will be used by default.
-  mSelectedColor( Color::WHITE ),
-  mDisabled( false ),
+  mForeGroundToLabelStrutLength( 0.0f ),
+  mTextLabelAlignment( END ),
   mAutoRepeating( false ),
   mTogglableButton( false ),
-  mSelected( false ),
-  mInitialAutoRepeatingDelay( INITIAL_AUTOREPEATING_DELAY ),
-  mNextAutoRepeatingDelay( NEXT_AUTOREPEATING_DELAY ),
+  mInitialAutoRepeatingDelay( 0.0f ),
+  mNextAutoRepeatingDelay( 0.0f ),
   mAnimationTime( 0.0f ),
-  mClickActionPerforming( false ),
-  mState( ButtonUp ),
-  mPaintState( UnselectedState )
+  mButtonPressedState( UNPRESSED ),
+  mButtonState( UNSELECTED_STATE ),
+  mPreviousButtonState( mButtonState ),
+  mClickActionPerforming( false )
 {
 }
 
 Button::~Button()
 {
-}
-
-void Button::SetDisabled( bool disabled )
-{
-  if( disabled == mDisabled )
-  {
-    return;
-  }
-
-  StopTransitionAnimation();
-
-  mDisabled = disabled;
-
-  // Notifies the derived class the button has been disabled.
-  OnDisabled();
-
-  switch( mPaintState )
-  {
-    case UnselectedState:
-    {
-      //Layer Order
-      //(3) mDisabledContent (Inserted)
-      //(4) mUnselectedContent
-      //(2) mDisabledBackgroundContent (Inserted)
-      //(1) mBackgroundContent
-
-      AddButtonImage( mBackgroundContent );
-      TransitionButtonImage( mDisabledBackgroundContent );
-      AddButtonImage( mUnselectedContent );
-      TransitionButtonImage( mDisabledContent );
-
-      AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      ReAddLabel();
-
-      TransitionOut( mDecoration[ SELECTED_DECORATION ] );
-      TransitionOut( mUnselectedContent );
-      TransitionOut( mSelectedContent );
-      TransitionOut( mBackgroundContent );
-      TransitionOut( mSelectedBackgroundContent );
-      TransitionOut( mDisabledSelectedContent );
-
-      mPaintState = DisabledUnselectedState;
-      break;
-    }
-    case SelectedState:
-    {
-      //Layer Order
-      //(5) mDisabledSelectedContent (Inserted)
-      //(4) mSelectedContent
-      //(3) mDisabledBackgroundContent (Inserted)
-      //(2) mSelectedBackgroundContent
-      //(1) mBackgroundContent
-
-      AddButtonImage( mBackgroundContent );
-      AddButtonImage( mSelectedBackgroundContent );
-      TransitionButtonImage( mDisabledBackgroundContent );
-      AddButtonImage( mSelectedContent );
-      TransitionButtonImage( mDisabledSelectedContent );
-
-      AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      ReAddLabel();
-
-      TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
-      TransitionOut( mUnselectedContent );
-      TransitionOut( mSelectedContent );
-      TransitionOut( mBackgroundContent );
-      TransitionOut( mSelectedBackgroundContent );
-      TransitionOut( mDisabledContent );
-
-      mPaintState = DisabledSelectedState;
-      break;
-    }
-    case DisabledUnselectedState:
-    {
-      //Layer Order
-      //(3) mUnselectedContent (Inserted)
-      //(4) mDisabledContent
-      //(2) mBackgroundContent (Inserted)
-      //(1) mDisabledBackgroundContent
-
-      AddButtonImage( mDisabledBackgroundContent );
-      TransitionButtonImage( mBackgroundContent );
-      AddButtonImage( mDisabledContent );
-      TransitionButtonImage( mUnselectedContent );
-
-      AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      ReAddLabel();
-
-      TransitionOut( mDecoration[ SELECTED_DECORATION ] );
-      TransitionOut( mSelectedContent );
-      TransitionOut( mSelectedBackgroundContent );
-      TransitionOut( mDisabledContent );
-      TransitionOut( mDisabledSelectedContent );
-      TransitionOut( mDisabledBackgroundContent );
-
-      mPaintState = UnselectedState;
-      break;
-    }
-    case DisabledSelectedState:
-    {
-      //Layer Order
-      //(4) mSelectedContent (Inserted)
-      //(5) mDisabledSelectedContent
-      //(3) mSelectedBackgroundContent (Inserted)
-      //(2) mBackgroundContent (Inserted)
-      //(1) mDisabledBackgroundContent
-
-      AddButtonImage( mDisabledBackgroundContent );
-      TransitionButtonImage( mBackgroundContent );
-      TransitionButtonImage( mSelectedBackgroundContent );
-      AddButtonImage( mDisabledSelectedContent );
-      TransitionButtonImage( mSelectedContent );
-
-      AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      ReAddLabel();
-
-      TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
-      TransitionOut( mUnselectedContent );
-      TransitionOut( mDisabledContent );
-      TransitionOut( mDisabledSelectedContent );
-      TransitionOut( mDisabledBackgroundContent );
-
-      mPaintState = SelectedState;
-      break;
-    }
-  }
-
-  StartTransitionAnimation();
-}
-
-bool Button::IsDisabled() const
-{
-  return mDisabled;
 }
 
 void Button::SetAutoRepeating( bool autoRepeating )
@@ -275,10 +158,9 @@ void Button::SetAutoRepeating( bool autoRepeating )
   {
     mTogglableButton = false;
 
-    if( mSelected )
+    if( IsSelected() )
     {
-      // Emit a signal is not wanted, only change the appearance.
-      SetSelected( false, false );
+      SetSelected( false );
     }
   }
 }
@@ -290,7 +172,7 @@ bool Button::IsAutoRepeating() const
 
 void Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
 {
-  DALI_ASSERT_ALWAYS( initialAutoRepeatingDelay > 0.f );
+  DALI_ASSERT_DEBUG( initialAutoRepeatingDelay > 0.f );
   mInitialAutoRepeatingDelay = initialAutoRepeatingDelay;
 }
 
@@ -301,7 +183,7 @@ float Button::GetInitialAutoRepeatingDelay() const
 
 void Button::SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay )
 {
-  DALI_ASSERT_ALWAYS( nextAutoRepeatingDelay > 0.f );
+  DALI_ASSERT_DEBUG( nextAutoRepeatingDelay > 0.f );
   mNextAutoRepeatingDelay = nextAutoRepeatingDelay;
 }
 
@@ -314,7 +196,7 @@ void Button::SetTogglableButton( bool togglable )
 {
   mTogglableButton = togglable;
 
-  // A togglable button can't be an autorepeating button.
+  // A toggle button can't be an autorepeating button.
   if( togglable )
   {
     mAutoRepeating = false;
@@ -328,98 +210,121 @@ bool Button::IsTogglableButton() const
 
 void Button::SetSelected( bool selected )
 {
-  if( !mDisabled && mTogglableButton && ( selected != mSelected ) )
+  if( mTogglableButton )
   {
-    SetSelected( selected, true );
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetSelected (%s)\n", (selected?"true":"false") );
+
+    if ( selected && ( mButtonState != SELECTED_STATE ) )
+    {
+      ChangeState( SELECTED_STATE );
+    }
+    else if ( !selected && ( mButtonState != UNSELECTED_STATE ) )
+    {
+      ChangeState( UNSELECTED_STATE );
+    }
   }
 }
 
-void Button::SetSelected( bool selected, bool emitSignal )
+void Button::SetDisabled( bool disabled )
 {
-  StopTransitionAnimation();
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetDisabled(%s) state(%d)\n", (disabled)?"disabled":"active", mButtonState );
 
-  mSelected = selected;
-
-  // Notifies the derived class the button has been selected.
-  OnSelected();
-
-  switch( mPaintState )
+  if ( disabled )
   {
-    case UnselectedState:
+    if ( mButtonState == SELECTED_STATE )
     {
-      //Layer Order
-      //(3) mSelectedContent (Inserted)
-      //(4) mUnselectedContent
-      //(2) mSelectedBackgroundContent (Inserted)
-      //(1) mBackgroundContent
-
-      AddButtonImage( mBackgroundContent );
-      TransitionButtonImage( mSelectedBackgroundContent );
-      AddButtonImage( mUnselectedContent );
-      TransitionButtonImage( mSelectedContent );
-
-      AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      TransitionButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      ReAddLabel();
-
-      TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
-      TransitionOut( mUnselectedContent );
-      TransitionOut( mDisabledContent );
-      TransitionOut( mDisabledSelectedContent );
-      TransitionOut( mDisabledBackgroundContent );
-
-      mPaintState = SelectedState;
-      break;
+      ChangeState( DISABLED_SELECTED_STATE );
     }
-    case SelectedState:
+    else if ( mButtonState == UNSELECTED_STATE )
     {
-      //Layer Order
-      //(3) mUnselectedContent (Inserted)
-      //(2) mSelectedContent
-      //(1) mBackgroundContent
-
-      AddButtonImage( mBackgroundContent );
-      AddButtonImage( mSelectedContent );
-      TransitionButtonImage( mUnselectedContent );
-
-      AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      TransitionButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      ReAddLabel();
-
-      TransitionOut( mDecoration[ SELECTED_DECORATION ] );
-      TransitionOut( mSelectedContent );
-      TransitionOut( mSelectedBackgroundContent );
-      TransitionOut( mDisabledContent );
-      TransitionOut( mDisabledSelectedContent );
-      TransitionOut( mDisabledBackgroundContent );
-
-      mPaintState = UnselectedState;
-      break;
-    }
-    case DisabledUnselectedState:
-    case DisabledSelectedState:
-    {
-      DALI_ASSERT_DEBUG( 0 && "Shouldn't be able to change paint state if the button is disabled." );
-      break;
+      ChangeState( DISABLED_UNSELECTED_STATE );
     }
   }
-
-  StartTransitionAnimation();
-
-  if( emitSignal )
+  else
   {
-    Toolkit::Button handle( GetOwner() );
-
-    // Emit signal.
-    mStateChangedSignal.Emit( handle );
+    if ( mButtonState == DISABLED_SELECTED_STATE )
+    {
+      ChangeState( SELECTED_STATE );
+    }
+    else if ( mButtonState == DISABLED_UNSELECTED_STATE )
+    {
+      ChangeState( UNSELECTED_STATE );
+    }
   }
+}
+
+bool Button::IsDisabled() const
+{
+  return ( mButtonState == DISABLED_SELECTED_STATE || mButtonState == DISABLED_UNSELECTED_STATE ) ;
+}
+
+bool Button::ValidateState( State requestedState )
+{
+  /*  Below tables shows allowed state transitions
+   *  Match rows in first column to following columns, if true then transition allowed.
+   *  eg UNSELECTED_STATE to DISABLED_UNSELECTED_STATE is true so state transition allowed.
+   *
+                                                             to| UNSELECTED_STATE | SELECTED_STATE | DISABLED_UNSELECTED_STATE | DISABLED_SELECTED_STATE |*/
+                                 /* from*/
+  bool transitionTable[4][4] = { /* UNSELECTED_STATE*/         {      false,            true,               true,                   false         },
+                                 /* SELECTED_STATE*/           {      true,             false,              false,                  true          },
+                                 /* DISABLED_UNSELECTED_STATE*/{      true,             true,               false,                  false         },
+                                 /* DISABLED_SELECTED_STATE*/  {      false,            true,               false,                  false         }
+                               };
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::ValidateState ReuestedState:%d, CurrentState:%d, result:%s\n",
+                 requestedState, mButtonState, (transitionTable[mButtonState][requestedState])?"change-accepted":"change-denied");
+
+  return transitionTable[mButtonState][requestedState];
+}
+
+void Button::PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState BACKROUND visual(%d) for state (%d)\n", GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND], state );
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState FOREGROUND visuals(%d)  for state (%d)\n", GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND], state );
+
+  (this->*functionPtr)( GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
+  (this->*functionPtr)( GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
 
   RelayoutRequest();
 }
 
+void Button::ChangeState( State requestedState )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::ChangeState ReuestedState(%d)\n", requestedState );
+
+  // Validate State before changing
+  if ( !ValidateState( requestedState ))
+  {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::ChangeState ReuestedState(%d) not validated\n", requestedState );
+    return;
+  }
+
+  // If not on stage the button could have still been set to selected so update state/
+  mPreviousButtonState = mButtonState; // Store previous state for visual removal (used when animations ended)
+  mButtonState = requestedState; // Update current state
+
+  if ( Self().OnStage() )
+  {
+    // Clear existing animation and remove visual being transitioned out before starting a new transition of visuals. ClearTransitionAnimation();
+    OnStateChange( mButtonState ); // Notify derived buttons
+    //// When animations enabled PerformFunctionOnVisualsInState( &Button::TransitionButtonVisualOut, mPreviousButtonState );
+    PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+    // When animations enabled then call PerformFunctionOnVisualsInState( &Button::TransitionButtonVisualIn, mButtonState );
+    // then StartTransitionAnimation();
+    // and ClearTransitionAnimation();
+    PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
+  }
+
+  Toolkit::Button handle( GetOwner() );
+  // Emit signal.
+  mStateChangedSignal.Emit( handle );
+}
+
 bool Button::IsSelected() const
 {
-  return mTogglableButton && mSelected;
+  bool selected = ( mButtonState == SELECTED_STATE ) || ( mButtonState == DISABLED_SELECTED_STATE );
+  return mTogglableButton && selected;
 }
 
 void Button::SetAnimationTime( float animationTime )
@@ -436,7 +341,7 @@ void Button::SetLabelText( const std::string& label )
 {
   Property::Map labelProperty;
   labelProperty.Insert( "text", label );
-  ModifyLabel( labelProperty );
+  SetupLabel( labelProperty );
 }
 
 std::string Button::GetLabelText() const
@@ -449,16 +354,37 @@ std::string Button::GetLabelText() const
   return std::string();
 }
 
-void Button::ModifyLabel( const Property::Map& properties )
+void Button::SetupLabel( const Property::Map& properties )
 {
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "SetupLabel\n");
+
   // If we don't have a label yet, create one.
   if( !mLabel )
   {
     // If we don't have a label, create one and set it up.
     // Note: The label text is set from the passed in property map after creation.
     mLabel = Toolkit::TextLabel::New();
-    mLabel.SetPosition( 0.0f, 0.0f );
-    // label should be the top of the button
+    mLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+    mLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+    mLabel.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mLabel.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+    // todo DEBUG
+    mLabel.SetProperty( Toolkit::Control::Property::BACKGROUND, Dali::Property::Map()
+                        .Add( Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR )
+                        .Add( Toolkit::ColorVisual::Property::MIX_COLOR, Color::RED )
+                      );
+
+    ResizePolicy::Type policy = Self().GetResizePolicy(  Dimension::ALL_DIMENSIONS );
+    if ( policy == ResizePolicy::USE_NATURAL_SIZE || policy == ResizePolicy::FIT_TO_CHILDREN  )
+    {
+      mLabel.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+    }
+    else
+    {
+      // todo Can't set Text Label to USE_ASSIGNED_SIZE as causes a relayout in it whilst doing a relayout = error
+     //mLabel.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
+    }
     Self().Add( mLabel );
   }
 
@@ -483,51 +409,64 @@ void Button::ModifyLabel( const Property::Map& properties )
   RelayoutRequest();
 }
 
-Actor& Button::GetLabelActor()
+void Button::SetLabelStrutLength( unsigned int length )
 {
-  return mLabel;
+  mForeGroundToLabelStrutLength = length;
 }
 
-void Button::SetDecoration( DecorationState state, Actor actor )
+void Button::SetLabelAlignment( Button::Align labelAlignment)
 {
-  if( mDecoration[ state ] && mDecoration[ state ].GetParent() )
-  {
-    mDecoration[ state ].Unparent();
-  }
-
-  mDecoration[ state ] = actor;
-  mDecoration[ state ].SetColorMode( USE_OWN_COLOR );
-
-  ResetImageLayers();
+  mTextLabelAlignment = labelAlignment;
   RelayoutRequest();
 }
 
-Actor& Button::GetDecoration( DecorationState state )
+float Button::GetLabelStrutLength()
 {
-  return mDecoration[ state ];
+  return mForeGroundToLabelStrutLength;
 }
 
-void Button::SetupContent( Actor& actorToModify, Actor newActor )
+Button::Align Button::GetLabelAlignment()
 {
-  if( newActor )
+  return mTextLabelAlignment;
+}
+
+void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent index(%d)\n", index );
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base buttonVisual;
+
+  std::string imageUrl;
+  if( value.Get( imageUrl ) )
   {
-    StopTransitionAnimation();
-
-    if( actorToModify && actorToModify.GetParent() )
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent Using image URL(%d)\n", index );
+    if ( !imageUrl.empty() )
     {
-      actorToModify.Unparent();
+      buttonVisual = visualFactory.CreateVisual(  imageUrl, ImageDimensions()  );
     }
-
-    actorToModify = newActor;
-
-    if( actorToModify )
+  }
+  else
+  {
+    // if its not a string then get a Property::Map from the property if possible.
+    Property::Map *map = value.GetMap();
+    if( map && !map->Empty()  ) // Empty map results in current visual removal.
     {
-      actorToModify.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-      actorToModify.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      actorToModify.SetPosition( 0.f, 0.f );
+      DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent Using Map(%d)\n", index );
+      buttonVisual = visualFactory.CreateVisual( *map );
     }
+  }
 
-    ResetImageLayers();
+  if ( buttonVisual )
+  {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RegisterVisual index(%d)\n", index );
+    buttonVisual.SetDepthIndex( visualDepth );
+    // Background Visuals take full size of control
+    RegisterVisual( index, buttonVisual, false );
+  }
+  else
+  {
+    UnregisterVisual( index );
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "Button visual not created or empty map provided (clearing visual).(%d)\n", index);
   }
 }
 
@@ -536,217 +475,28 @@ const Vector4 Button::GetUnselectedColor() const
   return mUnselectedColor;
 }
 
-void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
-{
-  Actor* contentActor = NULL; // Using a pointer as SetupContent assigns the new Actor to this.
-  bool imageFileExists = false;
-  Property::Index visualIndex = Toolkit::Button::Property::SELECTED_STATE_IMAGE;
-
-  if ( selectedState == SelectedState || selectedState == DisabledSelectedState )
-  {
-    mSelectedColor = color;
-    contentActor = &mSelectedContent;
-    imageFileExists = !GetSelectedImageFilename().empty();
-  }
-  else
-  {
-    mUnselectedColor = color;
-    contentActor = &mUnselectedContent;
-    imageFileExists = !GetUnselectedImageFilename().empty();
-    visualIndex = Toolkit::Button::Property::UNSELECTED_STATE_IMAGE;
-  }
-
-  if ( contentActor )
-  {
-    if( imageFileExists )
-    {
-      // If there is existing unselected content, change the color on it directly.
-      contentActor->SetColor( color );
-    }
-    else
-    {
-      // If there is no existing content, create a new actor to use for flat color.
-      Actor placementActor = Actor::New();
-      Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
-      Toolkit::Visual::Base visual;
-
-      Property::Map map;
-      map[ Toolkit::DevelVisual::Property::TYPE ] = Toolkit::Visual::COLOR;
-      map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-
-      visual = visualFactory.CreateVisual( map );
-
-      RegisterVisual( visualIndex, visual );
-
-      SetupContent( *contentActor, placementActor ); //
-      contentActor->SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    }
-  }
-}
-
 const Vector4 Button::GetSelectedColor() const
 {
   return mSelectedColor;
 }
 
-void Button::SetUnselectedImage( const std::string& filename )
+// Legacy code whilst Color can be set by direct Property setting ( deprecated ) instead of setting a Visual
+void Button::SetColor( const Vector4& color, Property::Index visualIndex )
 {
-  Toolkit::ImageView newContent;
-  if( !filename.empty() )
+  if ( visualIndex == Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL )
   {
-    newContent = Toolkit::ImageView::New( filename );
+    mSelectedColor = color;
   }
   else
   {
-    newContent = Toolkit::ImageView::New();
+    mUnselectedColor = color;
   }
 
-  if( newContent )
-  {
-    SetupContent( mUnselectedContent, newContent );
+  Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
-    mUnselectedContent.SetColor( mUnselectedColor );
-
-    OnUnselectedImageSet();
-    RelayoutRequest();
-  }
-}
-
-Actor& Button::GetUnselectedImage()
-{
-  return mUnselectedContent;
-}
-
-void Button::SetSelectedImage( const std::string& filename )
-{
-  Toolkit::ImageView newContent;
-  if( !filename.empty() )
-  {
-   newContent = Toolkit::ImageView::New( filename );
-  }
-  else
-  {
-    newContent = Toolkit::ImageView::New();
-  }
-
-  if( newContent )
-  {
-    SetupContent( mSelectedContent, newContent );
-
-    mSelectedContent.SetColor( mSelectedColor );
-
-    OnSelectedImageSet();
-    RelayoutRequest();
-  }
-}
-
-Actor& Button::GetSelectedImage()
-{
-  return mSelectedContent;
-}
-
-void Button::SetBackgroundImage( const std::string& filename )
-{
-  SetupContent( mBackgroundContent, Toolkit::ImageView::New( filename ) );
-
-  OnBackgroundImageSet();
-  RelayoutRequest();
-}
-
-Actor& Button::GetBackgroundImage()
-{
-  return mBackgroundContent;
-}
-
-void Button::SetSelectedBackgroundImage( const std::string& filename )
-{
-  SetupContent( mSelectedBackgroundContent, Toolkit::ImageView::New( filename ) );
-
-  OnSelectedBackgroundImageSet();
-  RelayoutRequest();
-}
-
-Actor& Button::GetSelectedBackgroundImage()
-{
-  return mSelectedBackgroundContent;
-}
-
-void Button::SetDisabledImage( const std::string& filename )
-{
-  SetupContent( mDisabledContent, Toolkit::ImageView::New( filename ) );
-
-  OnDisabledImageSet();
-  RelayoutRequest();
-}
-
-Actor& Button::GetDisabledImage()
-{
-  return mDisabledContent;
-}
-
-void Button::SetDisabledSelectedImage( const std::string& filename )
-{
-  SetupContent( mDisabledSelectedContent, Toolkit::ImageView::New( filename ) );
-
-  OnDisabledSelectedImageSet();
-  RelayoutRequest();
-}
-
-Actor& Button::GetDisabledSelectedImage()
-{
-  return mDisabledSelectedContent;
-}
-
-void Button::SetDisabledBackgroundImage( const std::string& filename )
-{
-  SetupContent( mDisabledBackgroundContent, Toolkit::ImageView::New( filename ) );
-
-  OnDisabledBackgroundImageSet();
-  RelayoutRequest();
-}
-
-Actor& Button::GetDisabledBackgroundImage()
-{
-  return mDisabledBackgroundContent;
-}
-
-std::string Button::GetUnselectedImageFilename() const
-{
-  if( mUnselectedContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mUnselectedContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetSelectedImageFilename() const
-{
-  if( mSelectedContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mSelectedContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetDisabledImageFilename() const
-{
-  if( mDisabledContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mDisabledContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
+  CreateVisualsForComponent( visualIndex, map, DepthIndex::BACKGROUND );
 }
 
 bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
@@ -757,7 +507,7 @@ bool Button::DoAction( BaseObject* object, const std::string& actionName, const 
 
   Toolkit::Button button = Toolkit::Button::DownCast( handle );
 
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_DEBUG( button );
 
   if( 0 == strcmp( actionName.c_str(), ACTION_BUTTON_CLICK ) )
   {
@@ -775,7 +525,10 @@ bool Button::DoClickAction( const Property::Map& attributes )
   {
     mClickActionPerforming = true;
     OnButtonDown();
-    mState = ButtonDown;
+    if ( !mTogglableButton )
+    {
+      mButtonPressedState = DEPRESSED;
+    }
     OnButtonUp();
     mClickActionPerforming = false;
 
@@ -787,13 +540,25 @@ bool Button::DoClickAction( const Property::Map& attributes )
 
 void Button::OnButtonDown()
 {
-  if( !mTogglableButton )
+  if( mTogglableButton )
+  {
+    if ( mButtonState != SELECTED_STATE )
+    {
+      SetSelected( true );
+      mButtonPressedState = TOGGLE_DEPRESSED;
+    }
+    else
+    {
+      mButtonPressedState = DEPRESSED;
+    }
+  }
+  else
   {
     Pressed();
-
+    mButtonPressedState = DEPRESSED;
     if( mAutoRepeating )
     {
-      SetUpTimer( mInitialAutoRepeatingDelay );
+       SetUpTimer( mInitialAutoRepeatingDelay );
     }
   }
 
@@ -804,16 +569,19 @@ void Button::OnButtonDown()
 
 void Button::OnButtonUp()
 {
-  if( ButtonDown == mState )
+  if( DEPRESSED == mButtonPressedState )
   {
     if( mTogglableButton )
     {
-      SetSelected( !mSelected );
+      if ( TOGGLE_DEPRESSED != mButtonPressedState )
+      {
+        SetSelected( !IsSelected() );
+        mButtonPressedState = UNPRESSED;
+      }
     }
     else
     {
       Released();
-
       if( mAutoRepeating )
       {
         mAutoRepeatingTimer.Reset();
@@ -829,7 +597,7 @@ void Button::OnButtonUp()
 
 void Button::OnTouchPointLeave()
 {
-  if( ButtonDown == mState )
+  if( DEPRESSED == mButtonPressedState )
   {
     if( !mTogglableButton )
     {
@@ -840,6 +608,8 @@ void Button::OnTouchPointLeave()
         mAutoRepeatingTimer.Reset();
       }
     }
+
+    mButtonPressedState = UNPRESSED;
 
     // The released signal should be emitted regardless of toggle mode.
     Toolkit::Button handle( GetOwner() );
@@ -906,6 +676,8 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
 
 void Button::OnInitialize()
 {
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnInitialize\n" );
+
   Actor self = Self();
 
   mTapDetector = TapGestureDetector::New();
@@ -922,73 +694,34 @@ bool Button::OnAccessibilityActivated()
   return OnKeyboardEnter();
 }
 
-bool Button::OnKeyboardEnter()
-{
-  // When the enter key is pressed, or button is activated, the click action is performed.
-  Property::Map attributes;
-  bool ret = DoClickAction( attributes );
-
-  return ret;
-}
-
-void Button::OnStageDisconnection()
-{
-  if( ButtonDown == mState )
-  {
-    if( !mTogglableButton )
-    {
-      Released();
-
-      if( mAutoRepeating )
-      {
-        mAutoRepeatingTimer.Reset();
-      }
-    }
-  }
-
-  mState = ButtonUp;
-
-  Control::OnStageDisconnection();
-}
-
 bool Button::OnTouch( Actor actor, const TouchData& touch )
 {
+
   // Only events are processed when the button is not disabled and the touch event has only
   // one touch point.
-  if( ( !mDisabled ) && ( 1 == touch.GetPointCount() ) )
+
+  if( !IsDisabled() && ( 1 == touch.GetPointCount() ) )
   {
     switch( touch.GetState( 0 ) )
     {
       case PointState::DOWN:
       {
-        OnButtonDown(); // Notification for derived classes.
-
-        // Sets the button state to ButtonDown.
-        mState = ButtonDown;
+        OnButtonDown();
         break;
       }
       case PointState::UP:
       {
-        OnButtonUp(); // Notification for derived classes.
-
-        // Sets the button state to ButtonUp.
-        mState = ButtonUp;
+        OnButtonUp();
         break;
       }
       case PointState::INTERRUPTED:
       {
-        OnTouchPointInterrupted(); // Notification for derived classes.
-
-        // Sets the button state to the default (ButtonUp).
-        mState = ButtonUp;
+        OnTouchPointInterrupted();
         break;
       }
       case PointState::LEAVE:
       {
-        OnTouchPointLeave(); // Notification for derived classes.
-
-        // Sets the button state to the default (ButtonUp).
-        mState = ButtonUp;
+        OnTouchPointLeave();
         break;
       }
       case PointState::MOTION:
@@ -1003,16 +736,284 @@ bool Button::OnTouch( Actor actor, const TouchData& touch )
   {
     OnTouchPointLeave(); // Notification for derived classes.
 
-    // Sets the button state to the default (ButtonUp).
-    mState = ButtonUp;
+    // Sets the button state to the default
+    mButtonPressedState = UNPRESSED;
   }
 
   return false;
 }
 
+bool Button::OnKeyboardEnter()
+{
+  // When the enter key is pressed, or button is activated, the click action is performed.
+  Property::Map attributes;
+  bool ret = DoClickAction( attributes );
+
+  return ret;
+}
+
+void Button::OnStageDisconnection()
+{
+  if( DEPRESSED == mButtonPressedState )
+  {
+    if( !mTogglableButton )
+    {
+      Released();
+
+      if( mAutoRepeating )
+      {
+        mAutoRepeatingTimer.Reset();
+      }
+    }
+  }
+
+  mButtonPressedState = UNPRESSED;
+
+  Control::OnStageDisconnection(); // Visuals will be set off stage
+}
+
+void Button::OnStageConnection( int depth )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnStageConnection ptr(%p) \n", this );
+  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+  Control::OnStageConnection( depth ); // Enabled visuals will be put on stage
+
+}
+
+Vector3 Button::GetNaturalSize()
+{
+  Vector3 size = Vector3::ZERO;
+
+  bool horizontalAlignment = mTextLabelAlignment == BEGIN || mTextLabelAlignment == END; // label and visual side by side
+
+  // Get natural size of foreground ( largest of the possible visuals )
+  Size largestForegroundVisual;
+  Size labelSize;
+
+  for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++)
+  {
+    Toolkit::Visual::Base visual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
+    Size visualSize;
+    if ( visual )
+    {
+      visual.GetNaturalSize( visualSize );
+      largestForegroundVisual.width = std::max(largestForegroundVisual.width, visualSize.width );
+      largestForegroundVisual.height = std::max(largestForegroundVisual.height, visualSize.height );
+    }
+  }
+
+  // Get horizontal padding total
+  if ( largestForegroundVisual.width > 0 )  // if visual exists
+  {
+    size.width += largestForegroundVisual.width + mForegroundPadding.left + mForegroundPadding.right;
+  }
+  // Get vertical padding total
+  if ( largestForegroundVisual.height > 0 )
+  {
+    size.height += largestForegroundVisual.height + mForegroundPadding.top + mForegroundPadding.bottom;
+  }
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize visual Size(%f,%f)\n",
+                 largestForegroundVisual.width, largestForegroundVisual.height );
+
+  // Get natural size of label
+  if ( mLabel )
+  {
+    labelSize = Vector2( mLabel.GetNaturalSize());
+
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize labelSize(%f,%f) padding(%f,%f)\n",
+                   labelSize.width, labelSize.height, mLabelPadding.left + mLabelPadding.right, mLabelPadding.top + mLabelPadding.bottom);
+
+    labelSize.width += mLabelPadding.left + mLabelPadding.right;
+    labelSize.height += mLabelPadding.top + mLabelPadding.bottom;
+
+    // Add label size to height or width depending on alignment position
+    if ( horizontalAlignment )
+    {
+      size.width += labelSize.width;
+      size.height = std::max(size.height, labelSize.height );
+    }
+    else
+    {
+      size.height += labelSize.height;
+      size.width = std::max(size.width, labelSize.width );
+    }
+  }
+
+  if( size.width < 1 && size.height < 1 )
+  {
+    // if no image or label then use Control's natural size
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize Using control natural size\n");
+    size = Control::GetNaturalSize();
+  }
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "Button GetNaturalSize (%f,%f)\n", size.width, size.height );
+
+  return size;
+}
+
+void Button::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnSetResizePolicy\n");
+
+  if ( policy != ResizePolicy::USE_NATURAL_SIZE || policy != ResizePolicy::FIT_TO_CHILDREN  )
+  {
+    if ( mLabel )
+    {
+      // todo Can't set Text Label to USE_ASSIGNED_SIZE as causes a relayout in it whilst doing a relayout = error
+      //mLabel.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
+    }
+  }
+
+  RelayoutRequest();
+}
+
+void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout targetSize(%f,%f) ptr(%p) state[%d]\n", size.width, size.height, this, mButtonState );
+
+  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+
+  ResizePolicy::Type widthResizePolicy = Self().GetResizePolicy(  Dimension::WIDTH );
+  ResizePolicy::Type heightResizePolicy = Self().GetResizePolicy(  Dimension::HEIGHT );
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout resize policy: width:%d height:%d\n", heightResizePolicy, widthResizePolicy);
+
+  Toolkit::Visual::Base currentVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
+
+  Toolkit::Visual::Base currentBackGroundVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][BACKGROUND] );
+
+  // Sizes and padding set to zero, if not present then values will no effect calculations.
+  Vector2 visualPosition = Vector2::ZERO;
+  Vector2 labelPosition = Vector2::ZERO;
+  Size visualSize = Size::ZERO;
+  Padding foregroundVisualPadding = Padding(0.0f, 0.0f, 0.0f, 0.0f );
+  Padding labelVisualPadding = Padding(0.0f, 0.0f, 0.0f, 0.0f );
+
+  if ( mLabel )
+  {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Label padding setting padding:%f,%f,%f,%f\n", mLabelPadding.y, mLabelPadding.x, mLabelPadding.width,mLabelPadding.height );
+    labelVisualPadding = mLabelPadding;
+  }
+
+  if ( currentVisual )
+  {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Foreground Visual setting padding:%f,%f,%f,%f\n", mForegroundPadding.y, mForegroundPadding.x, mForegroundPadding.width,mForegroundPadding.height );
+    currentVisual.GetNaturalSize( visualSize );
+    foregroundVisualPadding = mForegroundPadding;
+  }
+
+  Toolkit::Align::Type visualAnchorPoint = Toolkit::Align::TOP_BEGIN;
+
+  Vector2 visualAndPaddingSize = Vector2( ( foregroundVisualPadding.x + visualSize.width + foregroundVisualPadding.y ),
+                                          ( foregroundVisualPadding.width + visualSize.height + foregroundVisualPadding.height ));
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout visualAndPaddingSize(%f,%f)\n", visualAndPaddingSize.width, visualAndPaddingSize.height);
+
+  switch ( mTextLabelAlignment )
+  {
+    case BEGIN :
+    {
+      visualAnchorPoint = Toolkit::Align::TOP_END;
+      visualPosition.x = foregroundVisualPadding.right;
+      visualPosition.y = foregroundVisualPadding.top;
+
+      labelPosition.x = labelVisualPadding.x;
+      labelPosition.y = labelVisualPadding.top;
+      break;
+    }
+    case END :
+    {
+      visualAnchorPoint = Toolkit::Align::TOP_BEGIN;
+      visualPosition.x = foregroundVisualPadding.left;
+      visualPosition.y = foregroundVisualPadding.top;
+
+      labelPosition.x = visualAndPaddingSize.width + labelVisualPadding.x;
+      labelPosition.y = labelVisualPadding.top;
+      break;
+    }
+    case TOP :
+    {
+      visualAnchorPoint = Toolkit::Align::BOTTOM_END;
+      visualPosition.x = foregroundVisualPadding.left;
+      visualPosition.y = foregroundVisualPadding.bottom;
+
+      labelPosition.x = labelVisualPadding.left;
+      labelPosition.y = labelVisualPadding.top;
+      break;
+    }
+    case BOTTOM :
+    {
+      visualAnchorPoint = Toolkit::Align::TOP_END;
+      visualPosition.x = foregroundVisualPadding.left;
+      visualPosition.y = foregroundVisualPadding.top;
+
+      labelPosition.x = labelVisualPadding.left;
+      labelPosition.y = visualAndPaddingSize.height + labelVisualPadding.top;
+      break;
+    }
+  }
+
+  if ( currentBackGroundVisual )
+  {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Setting visual bakcground size to(%f,%f)\n", size.width, size.height);
+
+    Property::Map visualTransform;
+
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, size )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 0.0f, 0.0f, 1.0f, 1.0f) );  // Use relative size
+
+    currentBackGroundVisual.SetTransformAndSize( visualTransform, size );
+  }
+
+  if ( currentVisual )
+  {
+      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Setting visual size to(%f,%f)\n", visualSize.width, visualSize.height);
+
+      currentVisual.SetProperty( Toolkit::Visual::DevelProperty::TRANSFORM,
+                                 Dali::Property::Map()
+                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::SIZE, visualSize )
+                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET, visualPosition )
+                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4(1.0f, 1.0f, 1.0f,1.0f) )
+                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT, visualAnchorPoint )
+                                );
+  }
+
+  if ( mLabel )
+  {
+    // When Text visual size can be set, determine the size here.
+    // Text Visual should take all space available after foreground visual size and all padding is considered.
+    // Remaining Space priority, Foreground padding, foreground visual, Text padding then Text visual.
+
+    Size remainingSpaceForText = Size::ZERO;
+    remainingSpaceForText.width = size.width - visualAndPaddingSize.width - labelVisualPadding.x - labelVisualPadding.y;
+    remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.width - labelVisualPadding.height;
+
+    if ( !currentVisual )
+    {
+      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Only Text\n");
+
+      // Center Text if no foreground visual
+      Size labelNaturalSize = Vector2( mLabel.GetNaturalSize() );
+
+      // A Text visual will take up all the remainingSpaceForText, for now TextLabel natural size needed for positioning.
+      labelPosition.x = labelVisualPadding.left + remainingSpaceForText.width*0.5 - labelNaturalSize.width *0.5;
+      labelPosition.y = labelVisualPadding.height + remainingSpaceForText.height*0.5 - labelNaturalSize.height *0.5;
+    }
+
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout text Size(%f,%f) text Position(%f,%f) \n", remainingSpaceForText.width, remainingSpaceForText.height, labelPosition.x, labelPosition.y);
+
+    mLabel.SetPosition( labelPosition.x, labelPosition.y );
+    container.Add( mLabel, remainingSpaceForText ); // Currently a TextLabel is used and size can not be set here.
+  }
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout << \n");
+}
+
 void Button::OnTap(Actor actor, const TapGesture& tap)
 {
-  // Do nothing.
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnTap\n" );
 }
 
 void Button::SetUpTimer( float delay )
@@ -1025,7 +1026,7 @@ void Button::SetUpTimer( float delay )
 bool Button::AutoRepeatingSlot()
 {
   bool consumed = false;
-  if( !mDisabled )
+  if( !IsDisabled() )
   {
     // Restart the autorepeat timer.
     SetUpTimer( mNextAutoRepeatingDelay );
@@ -1036,7 +1037,7 @@ bool Button::AutoRepeatingSlot()
 
     //Emit signal.
     consumed = mReleasedSignal.Emit( handle );
-    consumed |= mClickedSignal.Emit( handle );
+    consumed = mClickedSignal.Emit( handle );
     consumed |= mPressedSignal.Emit( handle );
  }
 
@@ -1045,275 +1046,101 @@ bool Button::AutoRepeatingSlot()
 
 void Button::Pressed()
 {
-  if( mPaintState == UnselectedState )
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::Pressed\n" );
+
+  if( mButtonState == UNSELECTED_STATE )
   {
-    StopTransitionAnimation();
-
-    // Notifies the derived class the button has been pressed.
-    OnPressed();
-
-    //Layer Order
-    //(4) mSelectedContent (Inserted)
-    //(3) mUnselectedContent
-    //(2) mSelectedBackgroundContent (Inserted)
-    //(1) mBackgroundContent
-
-    AddButtonImage( mBackgroundContent );
-    TransitionButtonImage( mSelectedBackgroundContent );
-    AddButtonImage( mUnselectedContent );
-    TransitionButtonImage( mSelectedContent );
-
-    AddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-    TransitionButtonImage( mDecoration[ SELECTED_DECORATION ] );
-    ReAddLabel();
-
-    TransitionOut( mDecoration[ UNSELECTED_DECORATION ] );
-    TransitionOut( mUnselectedContent );
-    TransitionOut( mDisabledContent );
-    TransitionOut( mDisabledSelectedContent );
-    TransitionOut( mDisabledBackgroundContent );
-
-    mPaintState = SelectedState;
-
-    StartTransitionAnimation();
+    ClearTransitionAnimation();
+    ChangeState( SELECTED_STATE );
+    OnPressed();  // Notifies the derived class the button has been pressed.
   }
 }
 
 void Button::Released()
 {
-  if( mPaintState == SelectedState )
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::Released\n" );
+
+  if( mButtonState == SELECTED_STATE && !mTogglableButton )
   {
-    StopTransitionAnimation();
+    ClearTransitionAnimation();
+    ChangeState( UNSELECTED_STATE );
+    OnReleased(); //    // Notifies the derived class the button has been released.
+  }
+  mButtonPressedState = UNPRESSED;
+}
 
-    // Notifies the derived class the button has been released.
-    OnReleased();
+Button::PressState Button::GetPressedState()
+{
+  return mButtonPressedState;
+}
 
-    //Layer Order
-    //(3) mUnselectedContent (Inserted)
-    //(2) mSelectedContent
-    //(1) mBackgroundContent
+Button::State Button::GetButtonState()
+{
+  return mButtonState;
+}
 
-    AddButtonImage( mBackgroundContent );
-    AddButtonImage( mSelectedContent );
-    TransitionButtonImage( mUnselectedContent );
+void Button::SelectRequiredVisual( Property::Index visualIndex )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SelectRequiredVisual index(%d) state(%d)\n", visualIndex, mButtonState );
 
-    AddButtonImage( mDecoration[ SELECTED_DECORATION ] );
-    TransitionButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-    ReAddLabel();
+  EnableVisual( visualIndex, true );
+}
 
-    TransitionOut( mDecoration[ SELECTED_DECORATION ] );
-    TransitionOut( mSelectedContent );
-    TransitionOut( mSelectedBackgroundContent );
-    TransitionOut( mDisabledContent );
-    TransitionOut( mDisabledSelectedContent );
-    TransitionOut( mDisabledBackgroundContent );
+void Button::TransitionButtonVisualOut( Property::Index visualIndex )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::TransitionButtonVisualOut index(%d)\n", visualIndex);
 
-    mPaintState = UnselectedState;
+  // PrepareForTranstionOut and OnTransitionOut needs to be called on visual instead of Actor once animating is possible
+}
 
-    StartTransitionAnimation();
+void Button::TransitionButtonVisualIn( Property::Index visualIndex )
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::TransitionButtonVisualIn index(%d)\n", visualIndex );
+}
+
+void Button::OnTransitionIn( Actor actor )
+{
+  PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
+}
+
+void Button::RemoveVisual( Property::Index visualIndex )
+{
+  // Use OnButtonVisualRemoval if want button developer to have the option to override removal.
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::RemoveVisual index(%d) state(%d)\n", visualIndex, mButtonState );
+
+  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+
+  if( visual )
+  {
+    EnableVisual( visualIndex, false );
   }
 }
 
-Button::ButtonState Button::GetState()
+void Button::OnButtonVisualRemoval( Property::Index visualIndex )
 {
-  return mState;
-}
-
-Button::PaintState Button::GetPaintState()
-{
-  return mPaintState;
-}
-
-void Button::PrepareAddButtonImage( Actor& actor )
-{
-  if( actor )
-  {
-    Self().Add( actor );
-    PrepareForTranstionOut( actor );
-  }
-}
-
-void Button::TransitionButtonImage( Actor& actor )
-{
-  if( actor )
-  {
-    if( !actor.GetParent() )
-    {
-      Self().Add( actor );
-    }
-
-    OnTransitionIn( actor );
-  }
-}
-
-void Button::AddButtonImage( Actor& actor )
-{
-  if( actor )
-  {
-    Self().Add( actor );
-  }
-}
-
-void Button::ReAddLabel()
-{
-  if( mLabel )
-  {
-    mLabel.Unparent();
-    Self().Add( mLabel );
-  }
-}
-
-void Button::RemoveButtonImage( Actor& actor )
-{
-  if( actor )
-  {
-    if( actor.GetParent() )
-    {
-      Self().Remove( actor );
-    }
-    PrepareForTranstionIn( actor );
-  }
-}
-
-unsigned int Button::FindChildIndex( Actor& actor )
-{
-  Actor self = Self();
-  unsigned int childrenNum = self.GetChildCount();
-
-  for( unsigned int i = 0; i < childrenNum; i++ )
-  {
-    Actor child = self.GetChildAt( i );
-    if( child == actor )
-    {
-      return i;
-    }
-  }
-
-  return childrenNum;
-}
-
-void Button::TransitionOut( Actor actor )
-{
-  OnTransitionOut( actor );
-}
-
-void Button::ResetImageLayers()
-{
-  // Ensure that all layers are in the correct order and state according to the paint state
-
-  switch( mPaintState )
-  {
-    case UnselectedState:
-    {
-      //Layer Order
-      //(2) mUnselectedContent
-      //(1) mBackgroundContent
-
-      RemoveButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      RemoveButtonImage( mSelectedContent );
-      RemoveButtonImage( mSelectedBackgroundContent );
-      RemoveButtonImage( mDisabledContent );
-      RemoveButtonImage( mDisabledSelectedContent );
-      RemoveButtonImage( mDisabledBackgroundContent );
-
-      PrepareAddButtonImage( mBackgroundContent );
-      PrepareAddButtonImage( mUnselectedContent );
-
-      PrepareAddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      ReAddLabel();
-      break;
-    }
-    case SelectedState:
-    {
-      //Layer Order
-      //(3) mSelectedContent
-      //(2) mSelectedBackgroundContent
-      //(1) mBackgroundContent
-
-      RemoveButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      RemoveButtonImage( mUnselectedContent );
-      RemoveButtonImage( mDisabledContent );
-      RemoveButtonImage( mDisabledSelectedContent );
-      RemoveButtonImage( mDisabledBackgroundContent );
-
-      PrepareAddButtonImage( mBackgroundContent );
-      PrepareAddButtonImage( mSelectedBackgroundContent );
-      PrepareAddButtonImage( mSelectedContent );
-
-      PrepareAddButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      ReAddLabel();
-      break;
-    }
-    case DisabledUnselectedState:
-    {
-      //Layer Order
-      //(2) mDisabledContent
-      //(1) mDisabledBackgroundContent
-
-      RemoveButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      RemoveButtonImage( mUnselectedContent );
-      RemoveButtonImage( mBackgroundContent );
-      RemoveButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      RemoveButtonImage( mSelectedContent );
-      RemoveButtonImage( mDisabledSelectedContent );
-      RemoveButtonImage( mSelectedBackgroundContent );
-
-      PrepareAddButtonImage( mDisabledBackgroundContent ? mDisabledBackgroundContent : mBackgroundContent );
-      PrepareAddButtonImage( mDisabledContent ? mDisabledContent : mUnselectedContent );
-
-      PrepareAddButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      ReAddLabel();
-      break;
-    }
-    case DisabledSelectedState:
-    {
-      //Layer Order
-      // (2) mDisabledSelectedContent
-      // (1) mDisabledBackgroundContent
-
-      RemoveButtonImage( mDecoration[ UNSELECTED_DECORATION ] );
-      RemoveButtonImage( mUnselectedContent );
-      RemoveButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      RemoveButtonImage( mSelectedContent );
-      RemoveButtonImage( mBackgroundContent );
-      RemoveButtonImage( mSelectedBackgroundContent );
-      RemoveButtonImage( mDisabledContent );
-
-      if( mDisabledBackgroundContent )
-      {
-        PrepareAddButtonImage( mDisabledBackgroundContent );
-      }
-      else
-      {
-        PrepareAddButtonImage( mBackgroundContent );
-        PrepareAddButtonImage( mSelectedBackgroundContent );
-      }
-
-      PrepareAddButtonImage( mDisabledSelectedContent ? mDisabledSelectedContent : mSelectedContent );
-
-      PrepareAddButtonImage( mDecoration[ SELECTED_DECORATION ] );
-      ReAddLabel();
-      break;
-    }
-  }
+  // Derived Buttons can over ride this to prevent default removal.
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnButtonVisualRemoval index(%d)\n", visualIndex );
+  RemoveVisual( visualIndex );
 }
 
 void Button::StartTransitionAnimation()
 {
   if( mTransitionAnimation )
   {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::StartTransitionAnimation progress(%f) duration(%f) state(%d) \n",
+                   mTransitionAnimation.GetCurrentProgress(), mTransitionAnimation.GetDuration(),
+                   mTransitionAnimation.GetState());
     mTransitionAnimation.Play();
-  }
-  else
-  {
-    ResetImageLayers();
   }
 }
 
-void Button::StopTransitionAnimation()
+void Button::ClearTransitionAnimation()
 {
   if( mTransitionAnimation )
   {
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::ClearTransitionAnimation progress(%f) duration(%f) state(%d) \n",
+                   mTransitionAnimation.GetCurrentProgress(), mTransitionAnimation.GetDuration(),
+                   mTransitionAnimation.GetState());
     mTransitionAnimation.Clear();
     mTransitionAnimation.Reset();
   }
@@ -1332,13 +1159,16 @@ Dali::Animation Button::GetTransitionAnimation()
 
 void Button::TransitionAnimationFinished( Dali::Animation& source )
 {
-  StopTransitionAnimation();
-  ResetImageLayers();
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::TransitionAnimationFinished\n" );
+  ClearTransitionAnimation();
+  PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
 }
 
 void Button::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::Button button = Toolkit::Button::DownCast( Dali::BaseHandle( object ) );
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetProperty index[%d]\n", index );
 
   if ( button )
   {
@@ -1380,39 +1210,59 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         break;
       }
 
-      case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
+      case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE: // Legacy Tizen 3.0
       {
-        GetImplementation( button ).SetUnselectedImage( value.Get< std::string >() );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        break;
+      }
+      case Toolkit::Button::Property::DISABLED_STATE_IMAGE:  // Legacy Tizen 3.0
+      {
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        break;
+      }
+      case Toolkit::Button::Property::SELECTED_STATE_IMAGE:  // Legacy Tizen 3.0
+      {
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
+        break;
+      }
+      case Toolkit::Button::Property::UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL:
+      {
+        GetImplementation( button ).CreateVisualsForComponent( index, value, DepthIndex::CONTENT );
         break;
       }
 
-      case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
+      case Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
       {
-        GetImplementation( button ).SetSelectedImage( value.Get< std::string >() );
-        break;
-      }
-
-      case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
-      {
-        GetImplementation( button ).SetDisabledImage( value.Get< std::string >() );
+        GetImplementation( button ).CreateVisualsForComponent( index , value, DepthIndex::BACKGROUND);
         break;
       }
 
       case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
-        GetImplementation( button ).SetColor( value.Get< Vector4 >(), UnselectedState );
+        DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::UNSELECTED_COLOR instead use Button::Property::UNSELECTED_BACKGROUND_VISUAL\n", __FUNCTION__);
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_COLOR:
       {
-        GetImplementation( button ).SetColor( value.Get< Vector4 >(), SelectedState );
+        DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::SELECTED_COLOR instead use Button::Property::SELECTED_BACKGROUND_VISUAL\n", __FUNCTION__);
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::LABEL_TEXT:
       {
-        GetImplementation( button ).SetLabelText( value.Get< std::string >() );
+        DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::LABEL_TEXT instead use Button::Property::LABEL\n", __FUNCTION__);
+        Property::Map labelTextProperty;
+        labelTextProperty.Insert( "text", value.Get< std::string >() );
+        GetImplementation( button ).SetupLabel( labelTextProperty );
         break;
       }
 
@@ -1422,10 +1272,27 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         Property::Map setPropertyMap;
         if( value.Get( setPropertyMap ) )
         {
-          GetImplementation( button ).ModifyLabel( setPropertyMap );
+          GetImplementation( button ).SetupLabel( setPropertyMap );
         }
+        break;
       }
-      break;
+
+      case Toolkit::Button::Property::LABEL_STRUT_LENGTH:
+      {
+        GetImplementation( button ).SetLabelStrutLength( value.Get< int >() );
+        break;
+      }
+
+      case Toolkit::Button::Property::LABEL_RELATIVE_ALIGNMENT:
+      {
+        Button::Align labelAlignment(END);
+        Scripting::GetEnumeration< Button::Align> ( value.Get< std::string >().c_str(),
+                                                    ALIGNMENT_TABLE, ALIGNMENT_TABLE_COUNT,
+                                                    labelAlignment );
+
+        GetImplementation( button ).SetLabelAlignment( labelAlignment );
+        break;
+      }
     }
   }
 }
@@ -1442,7 +1309,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
     {
       case Toolkit::Button::Property::DISABLED:
       {
-        value = GetImplementation( button ).mDisabled;
+        value = GetImplementation( button ).IsDisabled();
         break;
       }
 
@@ -1472,25 +1339,25 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
 
       case Toolkit::Button::Property::SELECTED:
       {
-        value = GetImplementation( button ).mSelected;
+        value = GetImplementation( button ).IsSelected();
         break;
       }
 
       case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUnselectedImageFilename();
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::Button::Property::UNSELECTED_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetSelectedImageFilename();
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::Button::Property::SELECTED_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetDisabledImageFilename();
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL );
         break;
       }
 
@@ -1518,137 +1385,157 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         value = emptyMap;
         break;
       }
+
+      case Toolkit::Button::Property::LABEL_STRUT_LENGTH:
+      {
+        value = GetImplementation( button ).GetLabelStrutLength();
+        break;
+      }
+
+      case Toolkit::Button::Property::LABEL_RELATIVE_ALIGNMENT:
+      {
+        const char* alignment = Scripting::GetEnumerationName< Button::Align >( GetImplementation( button ).GetLabelAlignment(),
+                                                                                ALIGNMENT_STRING_TABLE,
+                                                                                ALIGNMENT_STRING_TABLE_COUNT );
+        if( alignment )
+        {
+          value = std::string( alignment );
+        }
+
+        break;
+      }
     }
   }
 
   return value;
 }
 
-// Deprecated API
+void Button::SetLabelPadding( const Padding& padding)
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetLabelPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.bottom, padding.top );
+  mLabelPadding = Padding( padding.left, padding.right, padding.bottom, padding.top );
+  RelayoutRequest();
+}
+
+Padding Button::GetLabelPadding()
+{
+  return mLabelPadding;
+}
+
+void Button::SetForegroundPadding( const Padding& padding)
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetForegroundPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.bottom, padding.top );
+  mForegroundPadding = Padding( padding.left, padding.right, padding.bottom, padding.top );
+  RelayoutRequest();
+}
+
+Padding Button::GetForegroundPadding()
+{
+  return mForegroundPadding;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Legacy functions from Tizen 2.4 and 3.0
 
 void Button::SetLabel( Actor label )
 {
-  if( mLabel != label )
+  if ( label )
   {
-    if( mLabel && mLabel.GetParent() )
+    Property::Value value ="";
+    value = label.GetProperty(Toolkit::TextLabel::Property::TEXT);
+
+    SetLabelText( value.Get<std::string>() );
+  }
+}
+
+void Button::SetUnselectedImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
+  }
+}
+
+void Button::SetBackgroundImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+  }
+}
+
+void Button::SetSelectedImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, filename, DepthIndex::CONTENT );
+  }
+}
+
+void Button::SetSelectedBackgroundImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+  }
+}
+
+void Button::SetDisabledBackgroundImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+  }
+}
+
+void Button::SetDisabledImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
+  }
+}
+
+void Button::SetDisabledSelectedImage( const std::string& filename )
+{
+  if( !filename.empty() )
+  {
+    CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, filename, DepthIndex::CONTENT );
+  }
+}
+
+std::string Button::GetUrlForImageVisual( Property::Index index )
+{
+  Toolkit::Visual::Base visual = GetVisual( index );
+  std::string result;
+
+  if ( visual )
+  {
+    Dali::Property::Map retreivedMap;
+    visual.CreatePropertyMap( retreivedMap );
+    Property::Value* value = retreivedMap.Find(  Toolkit::ImageVisual::Property::URL,  Property::STRING );
+    if ( value )
     {
-      mLabel.GetParent().Remove( mLabel );
+      result = value->Get<std::string>();
     }
-
-    mLabel = label;
-    mLabel.SetPosition( 0.0f, 0.0f );
-
-    // label should be the top of the button
-    Self().Add( mLabel );
-
-    ResetImageLayers();
-    OnLabelSet( true );
-
-    RelayoutRequest();
   }
+
+  return result;
 }
 
-void Button::SetButtonImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mUnselectedContent, image );
-
-    OnUnselectedImageSet();
-    RelayoutRequest();
-  }
-}
-
-void Button::SetSelectedImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mSelectedContent, image );
-
-    OnSelectedImageSet();
-    RelayoutRequest();
-  }
-}
-
-void Button::SetBackgroundImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mBackgroundContent, image );
-
-    OnBackgroundImageSet();
-    RelayoutRequest();
-  }
-}
-
-void Button::SetSelectedBackgroundImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mSelectedBackgroundContent, image );
-
-    OnSelectedBackgroundImageSet();
-    RelayoutRequest();
-  }
-}
-
-void Button::SetDisabledImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mDisabledContent, image );
-
-    OnDisabledImageSet();
-    RelayoutRequest();
-  }
-}
-
-void Button::SetDisabledSelectedImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mDisabledSelectedContent, image );
-
-    OnDisabledSelectedImageSet();
-    RelayoutRequest();
-  }
-}
-
-void Button::SetDisabledBackgroundImage( Actor image )
-{
-  if( image )
-  {
-    StopTransitionAnimation();
-
-    SetupContent( mDisabledBackgroundContent, image );
-
-    OnDisabledBackgroundImageSet();
-    RelayoutRequest();
-  }
-}
+// Below functions DEPRECATED_1_0.50 - Return empty Actors
 
 Actor Button::GetButtonImage() const
 {
-  return mUnselectedContent;
+  DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50 Returning empty Actor \n");
+  return Actor();;
 }
 
 Actor Button::GetSelectedImage() const
 {
-  return mSelectedContent;
+  DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50 Returning empty Actor \n");
+  return Actor();
 }
-
 
 } // namespace Internal
 

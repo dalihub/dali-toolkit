@@ -37,7 +37,7 @@ class Button;
  */
 
 /**
- * @brief Button is a base class for different kind of buttons.
+ * @brief Button is a base class for different kinds of buttons.
  *
  * This class provides the disabled property and the clicked signal.
  *
@@ -59,14 +59,47 @@ class Button;
  *       When \e togglable is set to \e true, a Button::StateChangedSignal() signal is emitted, with the selected state.
  * </ul>
  *
- * The button's appearance can be modified by setting properties for the various image filenames.
+ * 'Visual' describes not just traditional images like png, bmp but refers to whatever is used to show the button, it could be a color, gradient or some other kind of renderer.
  *
- * The \e background is always shown and doesn't change if the button is pressed or released. The \e button image is shown over the \e background image when the
- * button is not pressed and is replaced by the \e selected image when the button is pressed. The text label is placed always on the top of all images.
+ * The button's appearance can be modified by setting properties for the various images.
  *
- * When the button is disabled, \e background, \e button and \e selected images are replaced by their \e disabled images.
+ * It is not mandatory to set all visuals. A button could be defined only by setting its \e background visual or by setting its \e background and \e selected visuals.
  *
- * Is not mandatory to set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e selected images.
+ * The \e button visual is shown over the \e background visual..
+ * When pressed the unselected visuals are replaced by the \e selected visual. The text label is always placed on the top of all images.
+ *
+ * When the button is disabled, \e background, \e button and \e selected visuals are replaced by their \e disabled visuals.
+ *
+
+ *
+  * @brief A control which renders a short text string.
+ *
+ * Text labels are lightweight, non-editable and do not respond to user input.
+ *
+ *
+ * @section ButtonProperties Properties
+ * |%Property enum                                         |String name                             |Type          |Writable|Animatable|
+ * |-------------------------------------------------------|----------------------------------------|--------------|--------|----------|
+ * | Property::DISABLED                                    | disabled                               |  BOOLEAN     | Y      | N        |
+ * | Property::AUTO_REPEATING                              | autoRepeating                          |  BOOLEAN     | Y      | N        |
+ * | Property::INITIAL_AUTO_REPEATING_DELAY                | initialAutoRepeatingDelay              |  FLOAT       | Y      | N        |
+ * | Property::NEXT_AUTO_REPEATING_DELAY                   | nextAutoRepeatingDelay                 |  FLOAT       | Y      | N        |
+ * | Property::TOGGLABLE                                   | togglable                              |  BOOLEAN     | Y      | N        |
+ * | Property::SELECTED                                    | selected                               |  BOOLEAN     | Y      | N        |
+ * | Property::LABEL                                       | label                                  |  MAP         | Y      | N        |
+ * | Property::UNSELECTED_STATE_VISUAL                     | unselectedVisual                       |  MAP         | Y      | N        |
+ * | Property::SELECTED_VISUAL                             | selectedVisual                         |  MAP         | Y      | N        |
+ * | Property::DISABLED_SELECTED_VISUAL                    | disabledSelectedVisual                 |  MAP         | Y      | N        |
+ * | Property::DISABLED_UNSELECTED_VISUAL                  | disabledUnselectedVisual               |  MAP         | Y      | N        |
+ * | Property::UNSELECTED_BACKGROUND_VISUAL                | unselectedBackgroundVisual             |  MAP         | Y      | N        |
+ * | Property::SELECTED_BACKGROUND_VISUAL                  | selectedBackgroundVisual               |  MAP         | Y      | N        |
+ * | Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL       | disabledUnselectedBackgroundVisual     |  MAP         | Y      | N        |
+ * | Property::DISABLED_SELECTED_BACKGROUND_VISUAL         | disabledSelectedBackgroundVisual       |  MAP         | Y      | N        |
+ * | Property::LABEL_STRUT_LENGTH                          | labelStrutLength                       |  INTEGER     | Y      | N        |
+ * | Property::LABEL_RELATIVE_ALIGNMENT                    | labelRelativeAlignment                 |  STRING      | Y      | N        |
+ * -------------------------------------------------------------------------------------------------------------------------------------
+ *
+ * Note, *_VISUAL properties of type MAP can also be passed a uri of type STRING
  *
  * Signals
  * | %Signal Name     | Method                      |
@@ -108,21 +141,168 @@ public:
      */
     enum
     {
-      DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool @SINCE_1_0.0
-      AUTO_REPEATING,                  ///< name "autoRepeating",                @see SetAutoRepeating(),             type bool @SINCE_1_0.0
-      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initialAutoRepeatingDelay",    @see SetInitialAutoRepeatingDelay(), type float @SINCE_1_0.0
-      NEXT_AUTO_REPEATING_DELAY,       ///< name "nextAutoRepeatingDelay",       @see SetNextAutoRepeatingDelay(),    type float @SINCE_1_0.0
-      TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool @SINCE_1_0.0
-      SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool @SINCE_1_0.0
-      UNSELECTED_STATE_IMAGE,          ///< name "unselectedStateImage",         @see SetUnselectedImage(),           type std::string @SINCE_1_0.0
-      SELECTED_STATE_IMAGE,            ///< name "selectedStateImage",           @see SetSelectedImage(),             type std::string @SINCE_1_0.0
-      DISABLED_STATE_IMAGE,            ///< name "disabledStateImage",           @see SetDisabledImage(),             type std::string @SINCE_1_0.0
-      UNSELECTED_COLOR,                ///< name "unselectedColor",                                                   type Vector4 @SINCE_1_0.0
-      SELECTED_COLOR,                  ///< name "selectedColor",                                                     type Vector4 @SINCE_1_0.0
-      LABEL,                           ///< name "label",                                                             type Property::Map @SINCE_1_0.0
+      /**
+       * @brief name "disabled", type bool
+       * @details Sets the button as \e disabled.
+       * @SINCE_1_0.0
+       */
+      DISABLED = PROPERTY_START_INDEX,
 
-      // Deprecated properties:
-      LABEL_TEXT,                      ///< name "labelText",                    @see SetLabelText(),                 type std::string @SINCE_1_0.0
+      /**
+       * @brief name "autoRepeating", type bool
+       * @details If the \e autorepeating property is set to \e true then the \e togglable property is set to false
+       * @SINCE_1_0.0
+       */
+      AUTO_REPEATING,
+
+      /**
+       * @brief name "initialAutoRepeatingDelay", type float
+       * @details By default this value is set to 0.15 seconds.
+       * @SINCE_1_0.0
+       */
+      INITIAL_AUTO_REPEATING_DELAY,
+
+      /**
+       * @brief name "nextAutoRepeatingDelay", type float
+       * @details default this value is set to 0.05 seconds
+       * @SINCE_1_0.0
+       */
+      NEXT_AUTO_REPEATING_DELAY,
+
+      /**
+       * @brief name "togglable", type bool
+       * @details If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
+       * @SINCE_1_0.0
+       */
+      TOGGLABLE,
+
+      /**
+       * @brief name "selected", type bool
+       * @details Sets the togglable button as either selected or unselected, \e togglable property must be set to \e true.
+       * @SINCE_1_0.0
+       */
+      SELECTED,
+
+      /**
+       * @DEPRECATED_1_1.XX Use UNSELECTED_VISUAL
+       * @brief name "unselectedStateImage", type string if it is a url, map otherwise
+       * @details Sets the unselected button foreground image
+       * @SINCE_1_0.0
+       */
+      UNSELECTED_STATE_IMAGE,
+
+      /**
+       * @DEPRECATED_1_1.XX Use SELECTED_VISUAL
+       * @brief name "selectedStateImage", type string if it is a url, map otherwise
+       * @details Sets the selected button foreground image
+       * @SINCE_1_0.0
+       */
+      SELECTED_STATE_IMAGE,
+
+      /**
+       * @DEPRECATED_1_1.XX Use DISABLED_UNSELECTED_VISUAL
+       * @brief name "disabledStateImage", type string if it is a url, map otherwise
+       * @details Sets the disabled whilst unselected foreground button visual
+       * @SINCE_1_0.0
+       */
+      DISABLED_STATE_IMAGE,
+
+      /**
+       * @DEPRECATED_1_1.XX Use UNSELECTED_BACKGROUND_VISUAL
+       * @brief name "unselectedColor", type Vector4
+       * @SINCE_1_0.0
+       */
+      UNSELECTED_COLOR,
+
+      /**
+       * @DEPRECATED_1_1.XX Use SELECTED_BACKGROUND_VISUAL
+       * @brief name "selectedColor", type Vector4
+       * @SINCE_1_0.0
+       */
+      SELECTED_COLOR,
+
+      /**
+       * @brief name "label", type Property::Map
+       * @SINCE_1_0.0
+       */
+      LABEL,
+
+      /**
+       * @DEPRECATED_1_1.32 Use LABEL
+       * @brief name "labelText", type std::string
+       * @SINCE_1_0.0
+       */
+      LABEL_TEXT,
+
+      /**
+       * @brief name "unselectedVisual", type string if it is a url, map otherwise
+       * @details Sets the unselected button foreground/icon visual
+       * @SINCE_1_2.XX
+       */
+      UNSELECTED_VISUAL,
+
+      /**
+       * @brief name "selectedImage", type string if it is a url, map otherwise
+       * @details Sets the selected button foreground/icon visual
+       * @SINCE_1_2.XX
+       */
+      SELECTED_VISUAL,
+
+      /**
+       * @brief name "disabledSelectedVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled selected state foreground/icon button visual
+       * @SINCE_1_2.XX
+       */
+      DISABLED_SELECTED_VISUAL,
+
+      /**
+       * @brief name "disabledUnSelectedVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled unselected state foreground/icon visual
+       * @SINCE_1_2.XX
+       */
+      DISABLED_UNSELECTED_VISUAL,
+
+      /**
+       * @brief name "unselectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled in the unselected state background, button visual
+       * @SINCE_1_2.XX
+       */
+      UNSELECTED_BACKGROUND_VISUAL,
+
+      /**
+       * @brief name "selectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the selected background button visual
+       * @SINCE_1_2.XX
+       */
+      SELECTED_BACKGROUND_VISUAL,
+
+      /**
+       * @brief name "disabledUnselectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled while unselected background button visual
+       * @SINCE_1_2.XX
+       */
+      DISABLED_UNSELECTED_BACKGROUND_VISUAL,
+
+      /**
+       * @brief name "disabledSelectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled while selected background button visual
+       * @SINCE_1_2.XX
+       */
+      DISABLED_SELECTED_BACKGROUND_VISUAL,
+
+      /**
+       * @brief name "labelStrutLength", type INTEGER
+       * @details Sets the distance between the label and foreground/icon visual if both present
+       * @SINCE_1_2.XX
+       */
+      LABEL_STRUT_LENGTH,  // todo ????? remove
+
+      /**
+       * @brief name "labelRelativeAlignment", type STRING
+       * @details Sets the position of the the label in relation to the foreground/icon if both present
+       * @SINCE_1_2.XX
+       */
+      LABEL_RELATIVE_ALIGNMENT,
     };
   };
 
@@ -326,7 +506,7 @@ public:
   float GetAnimationTime() const DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_1.32 SetProperty LABEL or Styling file
+   * @DEPRECATED_1_1.32 SetProperty Property::LABEL or Styling file
    *
    * @brief Sets the button's label.
    *
@@ -346,7 +526,7 @@ public:
   std::string GetLabelText() const DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_1.32 Use Styling file
+   * @DEPRECATED_1_1.32 Use Styling file Property::UNSELECTED_STATE_IMAGE
    *
    * @brief Sets the unselected button image.
    *
@@ -357,8 +537,9 @@ public:
 
   /**
    * @DEPRECATED_1_1.32 Use styling
+   * Use Property::UNSELECTED_BACKGROUND_VISUAL
    *
-   * @brief Sets the background image.
+   * @brief Sets the unselected background image.
    *
    * @SINCE_1_0.0
    * @param[in] filename The background image.
@@ -366,7 +547,7 @@ public:
   void SetBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_1.32 Use styling file
+   * @DEPRECATED_1_1.32 Use styling file, Property::SELECTED_STATE_IMAGE
    *
    * @brief Sets the selected image.
    *
@@ -376,7 +557,8 @@ public:
   void SetSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_1.32 Use styling file
+   * @DEPRECATED_1_2.32 Use styling file
+   * Use Property::SELECTED_BACKGROUND_VISUAL
    *
    * @brief Sets the selected background image.
    *
@@ -387,6 +569,7 @@ public:
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
+   * Use Property::DISABLED_SELECTED_BACKGROUND_VISUAL
    *
    * @brief Sets the disabled background image.
    *
@@ -396,7 +579,7 @@ public:
   void SetDisabledBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_1.32 Use styling file
+   * @DEPRECATED_1_1.32 Use styling file Property::DISABLED_STATE_IMAGE
    *
    * @brief Sets the disabled button image.
    *
@@ -407,6 +590,7 @@ public:
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
+   * Use Property::DISABLED_SELECTED_VISUAL
    *
    * @brief Sets the disabled selected button image.
    *

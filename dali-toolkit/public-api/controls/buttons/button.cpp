@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/button-impl.h>
@@ -251,18 +253,32 @@ void Button::SetButtonImage( Image image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetButtonImage() is deprecated and will be removed from next release. Use Styling file instead.\n" );
 
-  Actor imageView = Toolkit::ImageView::New( image );
-  imageView.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageView );
+  Dali::ResourceImage resourceImage = Dali::ResourceImage::DownCast( image );
+
+  std::string imageUrl;
+
+  if ( resourceImage )
+  {
+    imageUrl = resourceImage.GetUrl();
+  }
+
+  Dali::Toolkit::GetImplementation( *this ).SetUnselectedImage( imageUrl );
 }
 
 void Button::SetSelectedImage( Image image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetSelectedImage() is deprecated and will be removed from next release. Use Styling file instead.\n" );
 
-  Actor imageView = Toolkit::ImageView::New( image );
-  imageView.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageView );
+  Dali::ResourceImage resourceImage = Dali::ResourceImage::DownCast( image );
+
+  std::string imageUrl;
+
+  if ( resourceImage )
+  {
+    imageUrl = resourceImage.GetUrl();
+  }
+
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageUrl );
 }
 
 Actor Button::GetButtonImage() const
@@ -278,7 +294,6 @@ Actor Button::GetSelectedImage() const
 
   return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
 }
-
 
 Button::Button( Internal::Button& implementation )
 : Control( implementation )

@@ -101,46 +101,6 @@ private: // From Button
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnLabelSet
-   */
-  virtual void OnLabelSet( bool noPadding );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnButtonImageSet
-   */
-  virtual void OnButtonImageSet();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnSelectedImageSet
-   */
-  virtual void OnSelectedImageSet();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnBackgroundImage
-   */
-  virtual void OnBackgroundImageSet();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnSelectedBackgroundImageSet
-   */
-  virtual void OnSelectedBackgroundImageSet();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnDisabledImageSet
-   */
-  virtual void OnDisabledImageSet();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnDisabledSelectedImageSet
-   */
-  virtual void OnDisabledSelectedImageSet();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnDisabledBackgroundImageSet
-   */
-  virtual void OnDisabledBackgroundImageSet();
-
-  /**
    * @copydoc Toolkit::Internal::Button::PrepareForTranstionIn( Actor actor )
    */
   virtual void PrepareForTranstionIn( Actor actor );
@@ -151,70 +111,17 @@ private: // From Button
   virtual void PrepareForTranstionOut( Actor actor );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnTransitionIn( Actor actor )
+   * @copydoc Toolkit::Internal::Button::OnTransitionIn( Toolkit::Visual::Base& visual )
    */
   virtual void OnTransitionIn( Actor actor );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnTransitionOut( Actor actor )
+   * @copydoc Toolkit::Internal::Button::OnTransitionOut( Toolkit::Visual::Base& visual )
    */
   virtual void OnTransitionOut( Actor actor );
 
-private: // From Control
-
-  /**
-   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& targetSize )
-   */
-  virtual void OnSizeSet( const Vector3& targetSize );
-
-  /**
-   * @copydoc Toolkit::Control::GetNaturalSize
-   */
-  virtual Vector3 GetNaturalSize();
-
-  /**
-   * @copydoc Toolkit::Control::OnSetResizePolicy
-   */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
 private:
-
-  /**
-   * It adds the actor to the root actor and to the fade in animation.
-   * @param[inout] actor The actor.
-   * @param[in] opacity The opacity to fade to
-   */
-  void FadeImageTo( Actor actor, float opacity );
-
-  /**
-   * @brief Custom configuration for size negotiation
-   */
-  void ConfigureSizeNegotiation();
-
-  /**
-   * @brief Configure size negotiation for a given dimension
-   *
-   * @param[in] dimension The dimension to configure
-   * @param[in] images The list of images to configure
-   * @param[in] label The text label to configure
-   */
-  void ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label );
-
-  /**
-   * @brief Sets either the selected or unselected icon.
-   *
-   * @param[in] state The icon state to set
-   * @param[in] iconFilename The filename of the icon
-   */
-  void SetIcon( DecorationState state, const std::string iconFilename );
-
-  /**
-   * @brief Gets either the selected or unselected icon.
-   *
-   * @param[in] state The icon state to get
-   * @return    The filename of the icon
-   */
-  std::string& GetIcon( DecorationState state );
 
   /**
    * @brief Sets the alignment mode to use to align the icon to the label.
@@ -230,34 +137,6 @@ private:
    */
   const PushButton::IconAlignment GetIconAlignment() const;
 
-  /**
-   * @brief Sets the padding for the label.
-   *
-   * @param[in] padding The padding to set
-   */
-  void SetLabelPadding( const Vector4& padding );
-
-  /**
-   * @brief Gets the padding for the label.
-   *
-   * @return The label padding
-   */
-  Vector4 GetLabelPadding();
-
-  /**
-   * @brief Sets the padding for the icon.
-   *
-   * @param[in] padding The padding to set
-   */
-  void SetIconPadding( const Vector4& padding );
-
-  /**
-   * @brief Gets the padding for the icon.
-   *
-   * @return The icon padding
-   */
-  Vector4 GetIconPadding();
-
 private:
 
   // Undefined
@@ -268,11 +147,7 @@ private:
 
 private:
 
-  std::string    mIconName[ DECORATION_STATES ]; ///< The original filenames for the icons.
-  Padding        mLabelPadding;                  ///< The padding around the label (if present).
-  Padding        mIconPadding;                   ///< The padding around the icon (if present).
   IconAlignment  mIconAlignment;                 ///< The alignment of the icon against the label.
-  Vector3        mSize;                          ///< The button's size.
 };
 
 } // namespace Internal
