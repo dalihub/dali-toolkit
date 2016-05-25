@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,28 +269,31 @@ private:
 
   Toolkit::ScrollBar::Direction mDirection;                          ///< The direction of scroll bar (vertical or horizontal)
 
-  WeakHandleBase mScrollableObject;                                      ///< Object to be scrolled
+  WeakHandleBase mScrollableObject;                                  ///< Object to be scrolled
 
   Property::Index mPropertyScrollPosition;                           ///< Index of scroll position property owned by the object to be scrolled
   Property::Index mPropertyMinScrollPosition;                        ///< Index of minimum scroll position property owned by the object to be scrolled
   Property::Index mPropertyMaxScrollPosition;                        ///< Index of maximum scroll position property owned by the object to be scrolled
   Property::Index mPropertyScrollContentSize;                        ///< Index of scroll content size property owned by the object to be scrolled
 
-  float mIndicatorShowDuration;                                     ///< The duration of scroll indicator show animation
-  float mIndicatorHideDuration;                                     ///< The duration of scroll indicator hide animation
+  float mIndicatorShowDuration;                                      ///< The duration of scroll indicator show animation
+  float mIndicatorHideDuration;                                      ///< The duration of scroll indicator hide animation
 
   float mScrollStart;                                                ///< Scroll Start position (start of drag)
   Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.
 
-  float mCurrentScrollPosition;                                     ///< The current scroll position updated by the pan gesture
+  float mCurrentScrollPosition;                                      ///< The current scroll position updated by the pan gesture
 
   Toolkit::ScrollBar::IndicatorHeightPolicy mIndicatorHeightPolicy;  ///< The height policy of scroll indicator (variable or fixed)
-  float mIndicatorFixedHeight;                                      ///< The fixed height of scroll indicator
+  float mIndicatorFixedHeight;                                       ///< The fixed height of scroll indicator
+  float mIndicatorMinimumHeight;                                     ///< The minimum height for a variable size indicator
+  float mIndicatorStartPadding;                                      ///< The padding at the start of the indicator
+  float mIndicatorEndPadding;                                        ///< The padding at the end of the indicator
 
   Timer mContractDelayTimer;                                         ///< Timer guarantee contract delay time.
   Timer mPanProcessTimer;                                            ///< The timer to process the pan gesture after the gesture is started.
 
-  Dali::Vector<float> mScrollPositionIntervals;                     ///< List of values to receive notification for when the current scroll position goes above or below them
+  Dali::Vector<float> mScrollPositionIntervals;                      ///< List of values to receive notification for when the current scroll position goes above or below them
   PropertyNotification mPositionNotification;                        ///< Stores the property notification used for scroll position changes
 
   PanFinishedSignalType mPanFinishedSignal;
@@ -300,8 +303,8 @@ private:
   Constraint mIndicatorSizeConstraint;
   Constraint mScrollPositionInCurrentAxisConstraint;
 
-  bool mIsPanning          : 1;                                      ///< Whether the scroll bar is being panned.
-  bool mIndicatorFirstShow : 1;                                      ///< True if the indicator has never been shown
+  bool mIsPanning                 : 1;                               ///< Whether the scroll bar is being panned.
+  bool mIndicatorFirstShow        : 1;                               ///< True if the indicator has never been shown
 };
 
 } // namespace Internal
