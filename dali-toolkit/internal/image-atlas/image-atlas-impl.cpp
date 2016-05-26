@@ -138,19 +138,19 @@ bool ImageAtlas::Upload( Vector4& textureRect,
   return false;
 }
 
-bool ImageAtlas::Upload( Vector4& textureRect, PixelDataPtr pixelData )
+bool ImageAtlas::Upload( Vector4& textureRect, PixelData pixelData )
 {
   unsigned int packPositionX = 0;
   unsigned int packPositionY = 0;
-  if( mPacker.Pack( pixelData->GetWidth(), pixelData->GetHeight(), packPositionX, packPositionY ) )
+  if( mPacker.Pack( pixelData.GetWidth(), pixelData.GetHeight(), packPositionX, packPositionY ) )
   {
     mAtlas.Upload( pixelData, packPositionX, packPositionY );
 
     // apply the half pixel correction
     textureRect.x = ( static_cast<float>( packPositionX ) +0.5f ) / mWidth; // left
     textureRect.y = ( static_cast<float>( packPositionY ) +0.5f ) / mHeight; // right
-    textureRect.z = ( static_cast<float>( packPositionX + pixelData->GetWidth() )-0.5f ) / mWidth; // right
-    textureRect.w = ( static_cast<float>( packPositionY + pixelData->GetHeight() )-0.5f ) / mHeight;// bottom
+    textureRect.z = ( static_cast<float>( packPositionX + pixelData.GetWidth() )-0.5f ) / mWidth; // right
+    textureRect.w = ( static_cast<float>( packPositionY + pixelData.GetHeight() )-0.5f ) / mHeight;// bottom
 
     return true;
   }
@@ -181,11 +181,11 @@ void ImageAtlas::UploadToAtlas()
     }
     else
     {
-      if( next->loader.GetPixelData()->GetWidth() < next->packRect.width || next->loader.GetPixelData()->GetHeight() < next->packRect.height  )
+      if( next->loader.GetPixelData().GetWidth() < next->packRect.width || next->loader.GetPixelData().GetHeight() < next->packRect.height  )
       {
         DALI_LOG_ERROR( "Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
-                        next->loader.GetPixelData()->GetWidth(),
-                        next->loader.GetPixelData()->GetHeight(),
+                        next->loader.GetPixelData().GetWidth(),
+                        next->loader.GetPixelData().GetHeight(),
                         next->packRect.width,
                         next->packRect.height );
       }
@@ -201,8 +201,8 @@ void ImageAtlas::UploadBrokenImage( const Rect<SizeType>& area )
 {
   BitmapLoader loader = BitmapLoader::New(mBrokenImageUrl, ImageDimensions( area.width, area.height ) );
   loader.Load();
-  SizeType loadedWidth = loader.GetPixelData()->GetWidth();
-  SizeType loadedHeight = loader.GetPixelData()->GetHeight();
+  SizeType loadedWidth = loader.GetPixelData().GetWidth();
+  SizeType loadedHeight = loader.GetPixelData().GetHeight();
 
   bool needBackgroundClear = false;
   SizeType packX = area.x;
@@ -223,7 +223,7 @@ void ImageAtlas::UploadBrokenImage( const Rect<SizeType>& area )
   {
     SizeType size = area.width * area.height * Pixel::GetBytesPerPixel( mPixelFormat );
     PixelBuffer* buffer = new PixelBuffer [size];
-    PixelDataPtr background = PixelData::New( buffer, area.width, area.height, mPixelFormat, PixelData::DELETE_ARRAY );
+    PixelData background = PixelData::New( buffer, area.width, area.height, mPixelFormat, PixelData::DELETE_ARRAY );
     for( SizeType idx = 0; idx < size; idx++ )
     {
       buffer[idx] = 0x00;
