@@ -66,46 +66,46 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
   normal.Clear();
   normal.Resize(vertex.Size());
 
-  Vector3 *tan1 = new Vector3[vertex.Size() * 2];
+  Dali::Vector<Vector3> tangents;
+  tangents.Resize( vertex.Size() );
 
-  memset( tan1, 0, normal.Size() * sizeof(Vector3) * 2 );
-  memset( &normal[0], 0, normal.Size() * sizeof(Vector3) * 2 );
+  // Resize of a vector of Vector3 will initialise with the default constructor, setting to all zeros.
 
   for ( unsigned long a = 0; a < triangle.Size(); a++ )
   {
-    Vector3 Tangent, Bitangent, Normal;
+    Vector3 tangentVector, normalVector;
 
     const Vector3& v0 = vertex[triangle[a].pntIndex[0]];
     const Vector3& v1 = vertex[triangle[a].pntIndex[1]];
     const Vector3& v2 = vertex[triangle[a].pntIndex[2]];
 
-    Vector3 Edge1 = v1 - v0;
-    Vector3 Edge2 = v2 - v0;
+    Vector3 edge1 = v1 - v0;
+    Vector3 edge2 = v2 - v0;
 
-    Normal = Edge1.Cross(Edge2);
+    normalVector = edge1.Cross(edge2);
 
     const Vector2& w0 = texcoord[triangle[a].texIndex[0]];
     const Vector2& w1 = texcoord[triangle[a].texIndex[1]];
     const Vector2& w2 = texcoord[triangle[a].texIndex[2]];
 
-    float DeltaU1 = w1.x - w0.x;
-    float DeltaV1 = w1.y - w0.y;
-    float DeltaU2 = w2.x - w0.x;
-    float DeltaV2 = w2.y - w0.y;
+    float deltaU1 = w1.x - w0.x;
+    float deltaV1 = w1.y - w0.y;
+    float deltaU2 = w2.x - w0.x;
+    float deltaV2 = w2.y - w0.y;
 
-    float f = 1.0f / (DeltaU1 * DeltaV2 - DeltaU2 * DeltaV1);
+    float f = 1.0f / (deltaU1 * deltaV2 - deltaU2 * deltaV1);
 
-    Tangent.x = f * ( DeltaV2 * Edge1.x - DeltaV1 * Edge2.x );
-    Tangent.y = f * ( DeltaV2 * Edge1.y - DeltaV1 * Edge2.y );
-    Tangent.z = f * ( DeltaV2 * Edge1.z - DeltaV1 * Edge2.z );
+    tangentVector.x = f * ( deltaV2 * edge1.x - deltaV1 * edge2.x );
+    tangentVector.y = f * ( deltaV2 * edge1.y - deltaV1 * edge2.y );
+    tangentVector.z = f * ( deltaV2 * edge1.z - deltaV1 * edge2.z );
 
-    tan1[triangle[a].pntIndex[0]] += Tangent;
-    tan1[triangle[a].pntIndex[1]] += Tangent;
-    tan1[triangle[a].pntIndex[2]] += Tangent;
+    tangents[triangle[a].pntIndex[0]] += tangentVector;
+    tangents[triangle[a].pntIndex[1]] += tangentVector;
+    tangents[triangle[a].pntIndex[2]] += tangentVector;
 
-    normal[triangle[a].pntIndex[0]] += Normal;
-    normal[triangle[a].pntIndex[1]] += Normal;
-    normal[triangle[a].pntIndex[2]] += Normal;
+    normal[triangle[a].pntIndex[0]] += normalVector;
+    normal[triangle[a].pntIndex[1]] += normalVector;
+    normal[triangle[a].pntIndex[2]] += normalVector;
   }
 
   for ( unsigned long a = 0; a < triangle.Size(); a++ )
@@ -121,15 +121,13 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
     normal[a].Normalize();
 
     const Vector3& n = normal[a];
-    const Vector3& t = tan1[a];
+    const Vector3& t = tangents[a];
 
     // Gram-Schmidt orthogonalize
     Vector3 calc = t - n * n.Dot(t);
     calc.Normalize();
     tangent[a] = Vector3( calc.x,calc.y,calc.z );
   }
-
-  delete[] tan1;
 }
 
 
