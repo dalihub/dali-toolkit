@@ -614,6 +614,8 @@ bool Controller::RemoveText( int cursorOffset,
       // Cursor position retreat
       oldCursorIndex = cursorIndex;
 
+      mImpl->mEventData->mScrollAfterDelete = true;
+
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
       removed = true;
     }
@@ -1434,13 +1436,6 @@ void Controller::TextInsertedEvent()
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-
-  // Queue a cursor reposition event; this must wait until after DoRelayout()
-  if( EventData::IsEditingState( mImpl->mEventData->mState ) )
-  {
-    mImpl->mEventData->mUpdateCursorPosition = true;
-    mImpl->mEventData->mScrollAfterUpdatePosition = true;
-  }
 }
 
 void Controller::TextDeletedEvent()
@@ -1457,13 +1452,6 @@ void Controller::TextDeletedEvent()
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-
-  // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mUpdateCursorPosition = true;
-  if( 0u != mImpl->mLogicalModel->mText.Count() )
-  {
-    mImpl->mEventData->mScrollAfterDelete = true;
-  }
 }
 
 bool Controller::DoRelayout( const Size& size,
@@ -1930,16 +1918,13 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mVisualModel->mUnderlineRuns.Clear();
 
-  Vector<Character> utf32Characters;
-  Length characterCount( 0u );
+  // Keep the current number of characters.
+  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mLogicalModel->mText.Count() : 0u;
 
-  // Remove the previous IMF pre-edit (predicitive text)
-  if( mImpl->mEventData->mPreEditFlag &&
-      ( 0u != mImpl->mEventData->mPreEditLength ) )
+  // Remove the previous IMF pre-edit.
+  if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
-    const CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
-
-    removedPrevious = RemoveText( -static_cast<int>( offset ),
+    removedPrevious = RemoveText( -static_cast<int>( mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition ),
                                   mImpl->mEventData->mPreEditLength,
                                   DONT_UPDATE_INPUT_STYLE );
 
@@ -1948,9 +1933,12 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   }
   else
   {
-    // Remove the previous Selection
+    // Remove the previous Selection.
     removedPrevious = RemoveSelectedText();
   }
+
+  Vector<Character> utf32Characters;
+  Length characterCount = 0u;
 
   if( !text.empty() )
   {
@@ -2116,6 +2104,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
+  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mLogicalModel->mText.Count() : 0u;
+
   if( ( 0u == mImpl->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
@@ -2129,6 +2119,16 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
+
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    if( numberOfCharacters < currentNumberOfCharacters )
+    {
+      mImpl->mEventData->mScrollAfterDelete = true;
+    }
+    else
+    {
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
   }
 
   if( maxLengthReached )
@@ -2441,8 +2441,11 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       else
       {
         ShowPlaceholderText();
-        mImpl->mEventData->mUpdateCursorPosition = true;
       }
+
+      mImpl->mEventData->mUpdateCursorPosition = true;
+      mImpl->mEventData->mScrollAfterDelete = true;
+
       mImpl->RequestRelayout();
       mImpl->mControlInterface.TextChanged();
       break;
@@ -2530,8 +2533,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
         else
         {
           ShowPlaceholderText();
-          mImpl->mEventData->mUpdateCursorPosition = true;
         }
+        mImpl->mEventData->mUpdateCursorPosition = true;
+        mImpl->mEventData->mScrollAfterDelete = true;
       }
       requestRelayout = true;
       break;
@@ -2618,8 +2622,9 @@ bool Controller::BackspaceKeyEvent()
     else
     {
       ShowPlaceholderText();
-      mImpl->mEventData->mUpdateCursorPosition = true;
     }
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    mImpl->mEventData->mScrollAfterDelete = true;
   }
 
   return removed;

@@ -154,16 +154,19 @@ bool Controller::Impl::ProcessInputEvents()
     GetCursorPosition( mEventData->mPrimaryCursorPosition,
                        cursorInfo );
 
+    // Scroll first the text after delete ...
+    if( mEventData->mScrollAfterDelete )
+    {
+      ScrollTextToMatchCursor( cursorInfo );
+    }
+
+    // ... then, text can be scrolled to make the cursor visible.
     if( mEventData->mScrollAfterUpdatePosition )
     {
       ScrollToMakePositionVisible( cursorInfo.primaryPosition );
-      mEventData->mScrollAfterUpdatePosition = false;
     }
-    else if( mEventData->mScrollAfterDelete )
-    {
-      ScrollTextToMatchCursor( cursorInfo );
-      mEventData->mScrollAfterDelete = false;
-    }
+    mEventData->mScrollAfterUpdatePosition = false;
+    mEventData->mScrollAfterDelete = false;
 
     UpdateCursorPosition( cursorInfo );
 
@@ -1302,6 +1305,7 @@ void Controller::Impl::OnSelectEvent( const Event& event )
 
     mEventData->mUpdateLeftSelectionPosition = true;
     mEventData->mUpdateRightSelectionPosition = true;
+    mEventData->mUpdateCursorPosition = false;
 
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
@@ -1370,12 +1374,7 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
       // Scroll after delete.
       mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
-      mEventData->mScrollAfterDelete = true;
     }
-    // Udpade the cursor position and the decorator.
-    // Scroll after the position is updated if is not scrolling after delete.
-    mEventData->mUpdateCursorPosition = true;
-    mEventData->mScrollAfterUpdatePosition = !mEventData->mScrollAfterDelete;
     mEventData->mDecoratorUpdated = true;
   }
 }
@@ -2454,8 +2453,10 @@ void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
 
 void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
 {
+  const float cursorWidth = mEventData->mDecorator ? mEventData->mDecorator->GetCursorWidth() : 0.f;
+
   // position is in actor's coords.
-  const float positionEnd = position.x + ( mEventData->mDecorator ? mEventData->mDecorator->GetCursorWidth() : 0.f );
+  const float positionEnd = position.x + cursorWidth;
 
   // Transform the position to decorator coords.
   const float alignment = IsShowingRealText() ? mAlignmentOffset.x : 0.f;
@@ -2482,6 +2483,9 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
   mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
 
   ClampHorizontalScroll( mVisualModel->GetLayoutSize() );
+
+  // Makes the new cursor position visible if needed.
+  ScrollToMakePositionVisible( cursorInfo.primaryPosition );
 }
 
 void Controller::Impl::RequestRelayout()

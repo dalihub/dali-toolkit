@@ -520,6 +520,12 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
+  /**
+   * @brief Retrieves the selected text. It removes the text if the @p deleteAfterRetrieval parameter is @e true.
+   *
+   * @param[out] selectedText The selected text encoded in utf8.
+   * @param[in] deleteAfterRetrieval Whether the text should be deleted after retrieval.
+   */
   void RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval );
 
   void ShowClipboard();
