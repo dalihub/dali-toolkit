@@ -39,6 +39,9 @@ namespace Toolkit
 namespace Text
 {
 
+//Forward declarations
+struct CursorInfo;
+
 struct Event
 {
   // Used to queue input events until DoRelayout()
@@ -74,30 +77,6 @@ struct Event
   Param p1;
   Param p2;
   Param p3;
-};
-
-struct CursorInfo
-{
-  CursorInfo()
-  : primaryPosition(),
-    secondaryPosition(),
-    lineOffset( 0.f ),
-    lineHeight( 0.f ),
-    primaryCursorHeight( 0.f ),
-    secondaryCursorHeight( 0.f ),
-    isSecondaryCursor( false )
-  {}
-
-  ~CursorInfo()
-  {}
-
-  Vector2 primaryPosition;       ///< The primary cursor's position.
-  Vector2 secondaryPosition;     ///< The secondary cursor's position.
-  float   lineOffset;            ///< The vertical offset where the line containing the cursor starts.
-  float   lineHeight;            ///< The height of the line where the cursor is placed.
-  float   primaryCursorHeight;   ///< The primary cursor's height.
-  float   secondaryCursorHeight; ///< The secondary cursor's height.
-  bool    isSecondaryCursor;     ///< Whether the secondary cursor is valid.
 };
 
 struct EventData
@@ -546,20 +525,6 @@ struct Controller::Impl
   void SetPopupButtons();
 
   void ChangeState( EventData::State newState );
-  LineIndex GetClosestLine( float y ) const;
-
-  void FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex );
-
-  /**
-   * @brief Retrieves the cursor's logical position for a given touch point x,y
-   *
-   * @param[in] visualX The touch point x.
-   * @param[in] visualY The touch point y.
-   *
-   * @return The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
-   */
-  CharacterIndex GetClosestCursorIndex( float visualX,
-                                        float visualY );
 
   /**
    * @brief Calculates the cursor's position for a given character index in the logical order.
