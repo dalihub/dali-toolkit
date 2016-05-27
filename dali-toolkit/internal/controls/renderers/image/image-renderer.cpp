@@ -22,6 +22,8 @@
 #include <cstring> // for strncasecmp
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
+#include <dali/devel-api/images/atlas.h>
+#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADER
@@ -51,6 +53,7 @@ const char * const IMAGE_FITTING_MODE( "fittingMode" );
 const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
+const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
 
 // fitting modes
 const char * const SHRINK_TO_FIT("SHRINK_TO_FIT");
@@ -248,6 +251,29 @@ void ImageRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap
     }
 
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+
+  }
+
+  Property::Value* syncLoading = propertyMap.Find( SYNCHRONOUS_LOADING );
+  if( syncLoading )
+  {
+    bool sync;
+    syncLoading->Get( sync );
+    if( sync )
+    {
+      mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+    }
+    else
+    {
+      mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+    }
+  }
+
+  // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
+  // ( for on-stage actor with image url unchanged, resource loading is already finished)
+  if( ( !mImpl->mRenderer || imageURLValue) && IsSynchronousResourceLoading() )
+  {
+    DoSynchronousResourceLoading();
   }
 
   // remove old renderer if exit
@@ -354,10 +380,7 @@ Renderer ImageRenderer::CreateRenderer() const
     }
   }
 
-  TextureSet textureSet = TextureSet::New();
-
   Renderer renderer = Renderer::New( geometry, shader );
-  renderer.SetTextures( textureSet );
 
   return renderer;
 }
@@ -378,20 +401,13 @@ Renderer ImageRenderer::CreateNativeImageRenderer() const
   else
   {
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
-    if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
+    shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
+                           mNativeFragmentShaderCode,
+                           mImpl->mCustomShader->mHints );
+    if( mImpl->mCustomShader->mVertexShader.empty() )
     {
-      shader  = Shader::New( VERTEX_SHADER, mNativeFragmentShaderCode );
-    }
-    else
-    {
-      shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
-                             mNativeFragmentShaderCode,
-                             mImpl->mCustomShader->mHints );
-      if( mImpl->mCustomShader->mVertexShader.empty() )
-      {
-        shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      }
+      shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
     }
   }
 
@@ -400,6 +416,82 @@ Renderer ImageRenderer::CreateNativeImageRenderer() const
   renderer.SetTextures( textureSet );
 
   return renderer;
+}
+
+
+bool ImageRenderer::IsSynchronousResourceLoading() const
+{
+  return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+}
+
+void ImageRenderer::DoSynchronousResourceLoading()
+{
+  if( !mImageUrl.empty() )
+  {
+    BitmapLoader loader = BitmapLoader::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+    loader.Load();
+    mPixels = loader.GetPixelData();
+  }
+}
+
+Image ImageRenderer::LoadImage( const std::string& url, bool synchronousLoading )
+{
+  if( synchronousLoading )
+  {
+    if( !mPixels )
+    {
+      // use broken image
+      return RendererFactory::GetBrokenRendererImage();
+    }
+    Atlas image = Atlas::New( mPixels->GetWidth(), mPixels->GetHeight(), mPixels->GetPixelFormat() );
+    image.Upload( mPixels, 0, 0 );
+    return image;
+  }
+  else
+  {
+    ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
+    resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+    return resourceImage;
+  }
+}
+
+TextureSet ImageRenderer::CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading )
+{
+  TextureSet textureSet;
+  textureRect = FULL_TEXTURE_RECT;
+  if( synchronousLoading )
+  {
+    if( !mPixels )
+    {
+      // use broken image
+      textureSet = TextureSet::New();
+      textureSet.SetImage( 0u, RendererFactory::GetBrokenRendererImage() );
+    }
+    else
+    {
+      textureSet = mAtlasManager.Add(textureRect, mPixels );
+      if( !textureSet ) // big image, no atlasing
+      {
+        Atlas image = Atlas::New( mPixels->GetWidth(), mPixels->GetHeight(), mPixels->GetPixelFormat() );
+        image.Upload( mPixels, 0, 0 );
+        textureSet = TextureSet::New();
+        textureSet.SetImage( 0u, image );
+      }
+    }
+  }
+  else
+  {
+    textureSet = mAtlasManager.Add(textureRect, url, mDesiredSize, mFittingMode, mSamplingMode );
+    if( !textureSet ) // big image, no atlasing
+    {
+      ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
+      resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+      textureSet = TextureSet::New();
+      textureSet.SetImage( 0u, resourceImage );
+    }
+  }
+
+  return textureSet;
 }
 
 void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
@@ -420,25 +512,15 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
     if( !mImpl->mRenderer )
     {
       Vector4 atlasRect;
-      TextureSet textureSet = mAtlasManager.Add(atlasRect, imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-      if( textureSet )
+      TextureSet textureSet = CreateTextureSet(atlasRect, imageUrl, IsSynchronousResourceLoading() );
+      Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+      Shader shader( GetImageShader(mFactoryCache) );
+      mImpl->mRenderer = Renderer::New( geometry, shader );
+      mImpl->mRenderer.SetTextures( textureSet );
+      if( atlasRect != FULL_TEXTURE_RECT )
       {
-        Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-        Shader shader( GetImageShader(mFactoryCache) );
-        mImpl->mRenderer = Renderer::New( geometry, shader );
-        mImpl->mRenderer.SetTextures( textureSet );
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       }
-      else // big image, atlasing is not applied
-      {
-        mImpl->mRenderer = CreateRenderer();
-
-        ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-        image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-        TextureSet textureSet = mImpl->mRenderer.GetTextures();
-        textureSet.SetImage( 0u, image );
-      }
-
       mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
     }
 
@@ -450,9 +532,8 @@ void ImageRenderer::InitializeRenderer( const std::string& imageUrl )
 
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     mImpl->mRenderer = CreateRenderer();
-    ResourceImage resourceImage = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-    resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
-    ApplyImageToSampler( resourceImage );
+    Image image = LoadImage( imageUrl, IsSynchronousResourceLoading() );
+    ApplyImageToSampler( image );
   }
 }
 
@@ -502,6 +583,9 @@ void ImageRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
+
+  bool sync = IsSynchronousResourceLoading();
+  map.Insert( SYNCHRONOUS_LOADING, sync );
   if( !mImageUrl.empty() )
   {
     map.Insert( IMAGE_URL_NAME, mImageUrl );
@@ -618,6 +702,11 @@ void ImageRenderer::SetImage( Actor& actor, const std::string& imageUrl, ImageDi
     mSamplingMode = samplingMode;
     mImage.Reset();
 
+    if( IsSynchronousResourceLoading() )
+    {
+      DoSynchronousResourceLoading();
+    }
+
     if( mImpl->mRenderer )
     {
       if( GetIsFromCache() ) // if renderer is from cache, remove the old one
@@ -641,8 +730,7 @@ void ImageRenderer::SetImage( Actor& actor, const std::string& imageUrl, ImageDi
       }
       else // if renderer is not from cache, reuse the same renderer and only change the texture
       {
-        ResourceImage image = Dali::ResourceImage::New( imageUrl, mDesiredSize, mFittingMode, mSamplingMode );
-        image.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
+        Image image = LoadImage( imageUrl, IsSynchronousResourceLoading() );
         ApplyImageToSampler( image );
       }
     }
@@ -733,10 +821,12 @@ void ImageRenderer::ApplyImageToSampler( const Image& image )
   if( image )
   {
     TextureSet textureSet = mImpl->mRenderer.GetTextures();
-    if( textureSet )
+    if( !textureSet )
     {
-      textureSet.SetImage( 0u, image );
+      textureSet = TextureSet::New();
+      mImpl->mRenderer.SetTextures( textureSet );
     }
+    textureSet.SetImage( 0u, image );
   }
 }
 
@@ -795,7 +885,6 @@ void ImageRenderer::SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage 
   {
     mNativeFragmentShaderCode.replace( mNativeFragmentShaderCode.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
   }
-
 }
 
 } // namespace Internal

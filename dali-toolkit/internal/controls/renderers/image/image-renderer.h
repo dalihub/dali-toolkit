@@ -46,13 +46,14 @@ typedef IntrusivePtr< ImageRenderer > ImageRendererPtr;
  *
  * The following properties are optional
  *
- * | %Property Name          | Type             |
- * |-------------------------|------------------|
+ * | %Property Name     | Type             |
+ * |--------------------|------------------|
  * | url                | STRING           |
  * | fittingMode        | STRING           |
  * | samplingMode       | STRING           |
  * | desiredWidth       | INT              |
  * | desiredHeight      | INT              |
+ * | synchronousLoading | BOOLEAN          |
  *
  * where imageFittingMode should be one of the following fitting modes:
  *   "SHRINK_TO_FIT"
@@ -145,7 +146,7 @@ public:
    * The renderer will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
-   * @param[in] imageUrl The URL to to image resource to use
+   * @param[in] imageUrl The URL of the image resource to use
    * @param[in] size The width and height to fit the loaded image to.
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
@@ -202,6 +203,32 @@ private:
   Renderer CreateNativeImageRenderer() const;
 
   /**
+   * @brief Query whether resources requires to be loaded synchronously.
+   * @return Returns true if synchronoud resource loading is required, false otherwise.
+   */
+  bool IsSynchronousResourceLoading() const;
+
+  /**
+   * @brief Do the synchronous resource loading
+   */
+  void DoSynchronousResourceLoading();
+
+  /**
+   * Load the image.
+   * @param[in] url The URL of the image resource to use.
+   * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
+   */
+  Image LoadImage( const std::string& url, bool synchronousLoading );
+
+  /**
+   * Load the image and create a texture set to hold the texture, with automatic atlasing applied.
+   * @param [out] textureRect The texture area of the resource image in the atlas.
+   * @param[in] url The URL of the image resource to use.
+   * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
+   */
+  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading );
+
+  /**
    * Callback function of image resource loading succeed
    * @param[in] image The Image content that we attempted to load from mImageUrl
    */
@@ -226,6 +253,7 @@ private:
 private:
   Image mImage;
   ImageAtlasManager& mAtlasManager;
+  PixelDataPtr mPixels;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;

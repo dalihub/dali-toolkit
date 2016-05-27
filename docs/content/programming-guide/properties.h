@@ -79,7 +79,7 @@ DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 - The parameter to DALI_PROPERTY_TABLE_END should match the start index of the property enumeration.
 
 <br>
-<h2 class="pg">How to implement a property within Dali-toolkit:</h2>
+<h2 class="pg">How to implement a property within Dali-toolkit controls and application-side custom controls:</h2>
 
 Macros are used to define properties for the following reasons:
 
@@ -153,6 +153,10 @@ Note that the “PropertyRange” contents “PROPERTY_START_INDEX” & "ANIMATA
 
 Source file: <b>image-view-impl.cpp</b>, within an unnamed namespace:
 
+@code
+#include <dali/public-api/object/type-registry-helper.h>
+@endcode
+
 @clip{"image-view-impl.cpp",DALI_TYPE_REGISTRATION_BEGIN,DALI_TYPE_REGISTRATION_END}
 
 <b>Notes:</b>
@@ -161,6 +165,9 @@ Source file: <b>image-view-impl.cpp</b>, within an unnamed namespace:
 - Properties should be in the same order as in the enum.
 - Signals and actions are registered likewise in that order.
 - Properties type-registered using these macros will have their order checked at compile time. If you get an indexing compile error, check the order matches the enum order.
+    The error will look like this: " error: invalid application of 'sizeof' to incomplete type 'Dali::CompileTimeAssertBool<false>' "
+- If using the Pimpl design pattern when creating a custom control from within an application, the Handle (public) and Object (internal) classes should have the same name. They can be separated by different namespaces.
+    This requirement is actually due to how the type-registry in DALi looks up properties.
 
 <br>
 <hr>
@@ -182,7 +189,8 @@ shows the index range of the different properties in place.
 |:----------------------|:--------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
 | Default               | Properties defined within DALi Core, e.g. Dali::Actor, Dali::ShaderEffect default properties etc. | \link Dali::DEFAULT_OBJECT_PROPERTY_START_INDEX DEFAULT_OBJECT_PROPERTY_START_INDEX\endlink                | \link Dali::DEFAULT_PROPERTY_MAX_COUNT DEFAULT_PROPERTY_MAX_COUNT\endlink (9999999)                                                |
 | Registered            | Properties registered using Dali::PropertyRegistration                                            | \link Dali::PROPERTY_REGISTRATION_START_INDEX PROPERTY_REGISTRATION_START_INDEX\endlink (10000000)         | \link Dali::PROPERTY_REGISTRATION_MAX_INDEX PROPERTY_REGISTRATION_MAX_INDEX\endlink (19999999)                                     |
-| Registered Animatable | Animatable properties registered using Dali::PropertyRegistration                                 | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX\endlink (20000000) | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX\endlink (29999999) |
+| Registered Animatable | Animatable properties registered using Dali::AnimatablePropertyRegistration                       | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX\endlink (20000000) | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX\endlink (29999999) |
+| Registered Child      | Child properties (which parent supports in its children) registered using Dali::ChildPropertyRegistration   | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX\endlink (20000000) | \link Dali::CHILD_PROPERTY_REGISTRATION_MAX_INDEX CHILD_PROPERTY_REGISTRATION_MAX_INDEX\endlink (49999999) |
 | Control               | Property range reserved by Dali::Toolkit::Control                                                 | \link Dali::Toolkit::Control::CONTROL_PROPERTY_START_INDEX CONTROL_PROPERTY_START_INDEX\endlink (10000000) | \link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX CONTROL_PROPERTY_END_INDEX\endlink (10001000)                             |
 | Derived Control       | Property range for control deriving directly from Dali::Toolkit::Control                          | 10001001                                                                                                   | \link Dali::PROPERTY_REGISTRATION_MAX_INDEX PROPERTY_REGISTRATION_MAX_INDEX\endlink (19999999)                                     |
 | Custom                | Custom properties added to instance using Dali::Handle::RegisterProperty                          | \link Dali::PROPERTY_CUSTOM_START_INDEX PROPERTY_CUSTOM_START_INDEX\endlink (50000000)                     | Onwards...                                                                                                                         |

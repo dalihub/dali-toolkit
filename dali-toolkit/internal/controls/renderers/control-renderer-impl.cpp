@@ -137,7 +137,15 @@ void ControlRenderer::SetOffStage( Actor& actor )
 
 void ControlRenderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+  if(preMultipled)
+  {
+    mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+  }
+  else
+  {
+    mImpl->mFlags &= ~Impl::IS_PREMULTIPLIED_ALPHA;
+  }
+
   if( mImpl->mRenderer )
   {
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, preMultipled);

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/devel-api/adaptor-framework/physical-keyboard.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/animation/constraints.h>

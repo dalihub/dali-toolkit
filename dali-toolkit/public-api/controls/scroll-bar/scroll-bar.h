@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLL_BAR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,12 +73,60 @@ public:
   {
     enum
     {
-      SCROLL_DIRECTION = PROPERTY_START_INDEX, ///< name "scrollDirection",          @see SetScrollDirection(),        type std::string @SINCE_1_0.0
-      INDICATOR_HEIGHT_POLICY,                 ///< name "indicatorHeightPolicy",    @see SetIndicatorHeightPolicy(),  type std::string @SINCE_1_0.0
-      INDICATOR_FIXED_HEIGHT,                  ///< name "indicatorFixedHeight",     @see SetIndicatorFixedHeight(),   type float @SINCE_1_0.0
-      INDICATOR_SHOW_DURATION,                 ///< name "indicatorShowDuration",    @see SetIndicatorShowDuration(),  type float @SINCE_1_0.0
-      INDICATOR_HIDE_DURATION,                 ///< name "indicatorHideDuration",    @see SetIndicatorHideDuration(),  type float @SINCE_1_0.0
-      SCROLL_POSITION_INTERVALS                ///< name "scrollPositionIntervals",  @see SetScrollPositionIntervals() type Property::Array @SINCE_1_0.0
+      /**
+       * @brief name "scrollDirection", type std::string
+       * @see SetScrollDirection()
+       * @SINCE_1_0.0
+       */
+      SCROLL_DIRECTION = PROPERTY_START_INDEX,
+      /**
+       * @brief name "indicatorHeightPolicy", type std::string
+       * @see SetIndicatorHeightPolicy()
+       * @SINCE_1_0.0
+       */
+      INDICATOR_HEIGHT_POLICY,
+      /**
+       * @brief name "indicatorFixedHeight", type float
+       * @see SetIndicatorFixedHeight()
+       * @SINCE_1_0.0
+       */
+      INDICATOR_FIXED_HEIGHT,
+      /**
+       * @brief name "indicatorShowDuration", type float
+       * @see SetIndicatorShowDuration()
+       * @SINCE_1_0.0
+       */
+      INDICATOR_SHOW_DURATION,
+      /**
+       * @brief name "indicatorHideDuration", type float
+       * @see SetIndicatorHideDuration()
+       * @SINCE_1_0.0
+       */
+      INDICATOR_HIDE_DURATION,
+      /**
+       * @brief name "scrollPositionIntervals", type Property::Array
+       * @see SetScrollPositionIntervals()
+       * @SINCE_1_0.0
+       */
+      SCROLL_POSITION_INTERVALS,
+      /**
+       * @brief name "indicatorMinimumHeight", type float
+       * The minimum height for a variable size indicator.
+       * @SINCE_1_1.36
+       */
+      INDICATOR_MINIMUM_HEIGHT,
+      /**
+       * @brief name "indicatorStartPadding", type float
+       * The padding at the start of the indicator. For example, the top if scrollDirection is Vertical.
+       * @SINCE_1_1.36
+       */
+      INDICATOR_START_PADDING,
+      /**
+       * @brief name "indicatorEndPadding", type float
+       * The padding at the end of the indicator. For example, the bottom if scrollDirection is Vertical.
+       * @SINCE_1_1.36
+       */
+      INDICATOR_END_PADDING
     };
   };
 

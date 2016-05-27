@@ -39,7 +39,8 @@ struct Internal::ControlRenderer::Impl
   {
     IS_ON_STAGE = 1,
     IS_FROM_CACHE = 1 << 1,
-    IS_PREMULTIPLIED_ALPHA = 1 << 2
+    IS_PREMULTIPLIED_ALPHA = 1 << 2,
+    IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 3
   };
 
   struct CustomShader
