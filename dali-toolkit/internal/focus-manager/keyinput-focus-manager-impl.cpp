@@ -228,24 +228,23 @@ void KeyInputFocusManager::OnObjectDestroyed( const Dali::RefObject* object )
 
 bool KeyInputFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
+  Dali::BaseHandle handle( object );
+
   bool connected( true );
   KeyInputFocusManager* manager = dynamic_cast<KeyInputFocusManager*>( object );
 
-  if( manager )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED ) )
   {
-    if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED ) )
-    {
-      manager->KeyInputFocusChangedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_UNHANDLED_KEY_EVENT ) )
-    {
-      manager->UnhandledKeyEventSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
-    }
+    manager->KeyInputFocusChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_UNHANDLED_KEY_EVENT ) )
+  {
+    manager->UnhandledKeyEventSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
   }
 
   return connected;
