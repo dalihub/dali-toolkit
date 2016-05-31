@@ -57,7 +57,7 @@ public:
   /**
    * @brief Create an initialized BubbleEmitter.
    *
-   * @param[in] winSize The size of the bubble moving area, usually the same size as the background image actor.
+   * @param[in] winSize The size of the bubble moving area, usually the same size as the background.
    * @param[in] shapeImage The alpha channnel of this texture defines the bubble shape.
    * @param[in] maximumNumberOfBubble The maximum number of bubble needed.
    * @param[in] bubbleSizeRange The size range of the bubbles; x component is the low bound, and y component is the up bound.

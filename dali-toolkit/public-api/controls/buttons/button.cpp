@@ -200,16 +200,16 @@ void Button::SetLabel( Actor label )
 
 void Button::SetButtonImage( Image image )
 {
-  Actor imageActor = Toolkit::ImageView::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
+  Actor imageView = Toolkit::ImageView::New( image );
+  imageView.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageView );
 }
 
 void Button::SetSelectedImage( Image image )
 {
-  Actor imageActor = Toolkit::ImageView::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageActor );
+  Actor imageView = Toolkit::ImageView::New( image );
+  imageView.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageView );
 }
 
 Actor Button::GetButtonImage() const

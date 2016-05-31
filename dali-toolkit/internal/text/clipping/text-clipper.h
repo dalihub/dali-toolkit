@@ -54,7 +54,7 @@ public:
   /**
    * @brief Children added to this actor will be clipped with the specified region.
    *
-   * @note This is done by rendering to a FrameBufferImage which must then be displayed; see also GetImageActor().
+   * @note This is done by rendering to a FrameBufferImage which must then be displayed; see also GetImageView().
    * @return The root actor.
    */
   Actor GetRootActor() const;
@@ -62,9 +62,9 @@ public:
   /**
    * @brief This actor will display the resulting FrameBufferImage.
    *
-   * @return The image actor.
+   * @return The image view.
    */
-  Actor GetImageActor() const;
+  Actor GetImageView() const;
 
   /**
    * @brief Refresh the contents of the FrameBufferImage.
@@ -109,7 +109,7 @@ private: // Data
 
   Layer mOffscreenRootActor;
   CameraActor mOffscreenCameraActor;
-  ImageView mImageActor;
+  ImageView mImageView;
   RenderTask mRenderTask;
   Vector2 mCurrentOffscreenSize;
 };

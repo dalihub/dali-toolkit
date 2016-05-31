@@ -153,7 +153,7 @@ int UtcDaliSuperBlurViewSetImage(void)
   // start multiple guassian blur call, each guassian blur creates two render tasks
   DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
 
-  // create image actors for the original image and each blurred image
+  // create image renderers for the original image and each blurred image
   Stage::GetCurrent().Add( blurView );
   Wait(application);
   DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );

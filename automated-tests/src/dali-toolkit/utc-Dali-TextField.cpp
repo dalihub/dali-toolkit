@@ -707,7 +707,7 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image actor
+  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image view
   DALI_TEST_EQUALS( field.GetChildCount(), 3u, TEST_LOCATION );
 
   Actor layer = field.GetChildAt( 0u );

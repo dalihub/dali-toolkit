@@ -75,7 +75,7 @@ class ShadowView;
  *  shadowPlaneBg.SetParentOrigin( ParentOrigin::CENTER );
  *  shadowPlaneBg.SetAnchorPoint( AnchorPoint::CENTER );
  *  shadowPlaneBg.SetSize(700.0f, 700.0f);
- *  shadowPlaneBg.SetPosition( Vector3(0.0f, 0.0f, -30.0f) ); //Just behind the image actor.
+ *  shadowPlaneBg.SetPosition( Vector3(0.0f, 0.0f, -30.0f) ); //Just behind the image view.
  *  shadowView.SetShadowPlaneBackground(ShadowPlane);
  *
  *  Actor pointLight = Actor::New(); // This will be the light source

@@ -28,7 +28,7 @@ namespace Toolkit
 {
 
 /**
- * @brief PageFactory is an abstract interface for providing image actors to PageTurnView
+ * @brief PageFactory is an abstract interface for providing images to PageTurnView
  * Each page is identified by a unique ID, and has a linear order from 0 to GetNumberOfPages()-1
  *
  * @SINCE_1_1.4

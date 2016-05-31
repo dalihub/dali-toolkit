@@ -27,7 +27,6 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/signals/functor-delegate.h>

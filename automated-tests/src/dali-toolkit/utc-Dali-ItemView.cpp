@@ -113,7 +113,7 @@ public: // From ItemFactory
    */
   virtual Actor NewItem(unsigned int itemId)
   {
-    // Create an image actor for this item
+    // Create a renderable actor for this item
     Image image = ResourceImage::New( TEST_IMAGE_FILE_NAME );
     Actor actor = CreateRenderableActor(image);
 

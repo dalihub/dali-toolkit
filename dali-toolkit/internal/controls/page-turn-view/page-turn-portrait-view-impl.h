@@ -48,7 +48,7 @@ protected:
   /**
    * Constructor.
    * It initializes the PageTurnPortraitView members
-   * @param[in] pageFactory The factory which provides image actors to PageTurnView as the page content.
+   * @param[in] pageFactory The factory which provides image to PageTurnView as the page content.
    * @param[in] pageSize The size of the page
    */
   PageTurnPortraitView( PageFactory& pageFactory, const Vector2& pageSize );

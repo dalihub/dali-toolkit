@@ -56,9 +56,9 @@ Actor Clipper::GetRootActor() const
   return mOffscreenRootActor;
 }
 
-Actor Clipper::GetImageActor() const
+Actor Clipper::GetImageView() const
 {
-  return mImageActor;
+  return mImageView;
 }
 
 void Clipper::Refresh( const Vector2& size )
@@ -80,8 +80,8 @@ void Clipper::Refresh( const Vector2& size )
 
     mOffscreenRootActor.SetSize( size );
 
-    mImageActor.SetSize( offscreenSize );
-    mImageActor.SetImage( frameBufferImage );
+    mImageView.SetSize( offscreenSize );
+    mImageView.SetImage( frameBufferImage );
     mRenderTask.SetTargetFrameBuffer( frameBufferImage );
 
     // Stores current sizPe to avoid create new Dali resources if text changes.
@@ -96,7 +96,7 @@ void Clipper::Initialize( const Vector2& size )
   const Size offscreenSize( std::min( MAX_OFFSCREEN_RENDERING_SIZE, size.width ),
                             std::min( MAX_OFFSCREEN_RENDERING_SIZE, size.height ) );
 
-  // Create a root actor and an image actor for offscreen rendering.
+  // Create a root actor and an image view for offscreen rendering.
   mOffscreenRootActor = Layer::New();
   mOffscreenRootActor.SetColorMode( USE_OWN_COLOR );
   mOffscreenRootActor.SetInheritPosition( false );
@@ -104,10 +104,10 @@ void Clipper::Initialize( const Vector2& size )
   mOffscreenRootActor.SetDepthTestDisabled( true );
   mOffscreenRootActor.SetSize( offscreenSize );
 
-  mImageActor = ImageView::New();
-  mImageActor.SetParentOrigin( ParentOrigin::CENTER );
-  mImageActor.SetScale( Vector3( 1.0f, -1.0f, 1.0f ) );
-  mImageActor.SetSize( offscreenSize );
+  mImageView = ImageView::New();
+  mImageView.SetParentOrigin( ParentOrigin::CENTER );
+  mImageView.SetScale( Vector3( 1.0f, -1.0f, 1.0f ) );
+  mImageView.SetSize( offscreenSize );
 
   // Creates a new camera actor.
   mOffscreenCameraActor = CameraActor::New();
@@ -127,9 +127,9 @@ void Clipper::Initialize( const Vector2& size )
   FrameBufferImage frameBufferImage = FrameBufferImage::New( offscreenSize.width,
                                                              offscreenSize.height,
                                                              Pixel::RGBA8888 );
-  mImageActor.SetImage( frameBufferImage );
+  mImageView.SetImage( frameBufferImage );
   mRenderTask.SetTargetFrameBuffer( frameBufferImage );
-  mImageActor.OnStageSignal().Connect(this, &Clipper::OnStageConnect);
+  mImageView.OnStageSignal().Connect(this, &Clipper::OnStageConnect);
 
   // Stores current size to avoid create new Dali resources if text changes.
   mCurrentOffscreenSize = offscreenSize;
@@ -137,7 +137,7 @@ void Clipper::Initialize( const Vector2& size )
 
 void Clipper::OnStageConnect( Dali::Actor actor )
 {
-  Renderer renderer = mImageActor.GetRendererAt(0);
+  Renderer renderer = mImageView.GetRendererAt(0);
   renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB,    BlendFactor::ONE );
   renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB,   BlendFactor::ONE_MINUS_SRC_ALPHA );
   renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA,  BlendFactor::ONE );
@@ -153,7 +153,7 @@ Clipper::~Clipper()
   if( Stage::IsInstalled() )
   {
     UnparentAndReset( mOffscreenRootActor );
-    UnparentAndReset( mImageActor );
+    UnparentAndReset( mImageView );
 
     Stage::GetCurrent().GetRenderTaskList().RemoveTask( mRenderTask );
   }
