@@ -94,7 +94,10 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
+
+    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,         ///< @SINCE_1_1.36
+    CHILD_PROPERTY_END_INDEX =   CHILD_PROPERTY_REGISTRATION_START_INDEX + 1000   ///< Reserve child property indices @SINCE_1_1.36
   };
 
   /**
@@ -132,6 +135,22 @@ public:
       CELL_PADDING,                ///< name "cellPadding",    type Vector2 @SINCE_1_0.0
       LAYOUT_ROWS,                 ///< name "layoutRows",     type Map @SINCE_1_0.0
       LAYOUT_COLUMNS,              ///< name "layoutColumns",  type Map @SINCE_1_0.0
+    };
+  };
+
+  /**
+   * @brief An enumeration of child properties belonging to the TableView class.
+   * @SINCE_1_1.36
+   */
+  struct ChildProperty
+  {
+    enum
+    {
+      CELL_INDEX = CHILD_PROPERTY_START_INDEX,  ///< name "cellIndex",                The top-left cell this child occupies, if not set, the first available cell is used,           type VECTOR2 @SINCE_1_1.36
+      ROW_SPAN,                                 ///< name "rowSpan",                  The number of rows this child occupies, if not set, default value is 1,                        type FLOAT @SINCE_1_1.36
+      COLUMN_SPAN,                              ///< name "columnSpan",               The number of columns this child occupies, if not set, default value is 1,                     type FLOAT @SINCE_1_1.36
+      CELL_HORIZONTAL_ALIGNMENT,                ///< name "cellHorizontalAlignment",  The horizontal alignment of this child inside the cells, if not set, default value is 'left',  type STRING @SINCE_1_1.36
+      CELL_VERTICAL_ALIGNMENT                   ///< name "cellVerticalAlignment",    The vertical alignment of this child inside the cells, if not set, default value is 'top',     type STRING @SINCE_1_1.36
     };
   };
 

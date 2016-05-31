@@ -36,7 +36,7 @@ namespace Text
 struct GlyphRun;
 
 /**
- * @brief Abstract interface to provide the information necessary displaying text.
+ * @brief Abstract interface to provide the information necessary to display text.
  *
  * This includes:
  * - The font & glyph IDs needed to get bitmaps etc. from TextAbstraction
@@ -60,7 +60,7 @@ public:
   /**
    * @brief Retrieves the target size of the UI control.
    *
-   * @return The text's size.
+   * @return The control's size.
    */
   virtual const Vector2& GetControlSize() const = 0;
 

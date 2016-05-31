@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/flex-container/flex-container.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -43,6 +42,9 @@ const char* const PROPERTY_NAME_FLEX_WRAP = "flexWrap";
 const char* const PROPERTY_NAME_JUSTIFY_CONTENT = "justifyContent";
 const char* const PROPERTY_NAME_ALIGN_ITEMS = "alignItems";
 const char* const PROPERTY_NAME_ALIGN_CONTENT =  "alignContent";
+const char* const CHILD_PROPERTY_NAME_FLEX = "flex";
+const char* const CHILD_PROPERTY_NAME_ALIGN_SELF = "alignSelf";
+const char* const CHILD_PROPERTY_NAME_FLEX_MARGIN =  "flexMargin";
 
 } // namespace
 
@@ -145,6 +147,18 @@ int UtcDaliToolkitFlexContainerSetPropertyP(void)
   FlexContainer flexContainer = FlexContainer::New();
   DALI_TEST_CHECK( flexContainer );
 
+  // Add flex container to the stage
+  Stage::GetCurrent().Add( flexContainer );
+
+  // Create two actors and add them to the container
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexContainer.Add(actor1);
+  flexContainer.Add(actor2);
+
   // Check content direction property.
   flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, FlexContainer::RTL );
   DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::RTL, TEST_LOCATION );
@@ -168,6 +182,40 @@ int UtcDaliToolkitFlexContainerSetPropertyP(void)
   // Check align content property.
   flexContainer.SetProperty( FlexContainer::Property::ALIGN_CONTENT, FlexContainer::ALIGN_STRETCH );
   DALI_TEST_EQUALS( (FlexContainer::Alignment)flexContainer.GetProperty<int>( FlexContainer::Property::ALIGN_CONTENT ), FlexContainer::ALIGN_STRETCH, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitFlexContainerSetChildPropertyP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitFlexContainerSetChildPropertyP");
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_CHECK( flexContainer );
+
+  // Add flex container to the stage
+  Stage::GetCurrent().Add( flexContainer );
+
+  // Create an actor and add it to the container
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( actor );
+
+  flexContainer.Add(actor);
+
+  // Check flex child property.
+  actor.SetProperty( FlexContainer::ChildProperty::FLEX, 2.0f );
+  DALI_TEST_EQUALS( actor.GetProperty<float>( FlexContainer::ChildProperty::FLEX ), 2.0f, TEST_LOCATION );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( CHILD_PROPERTY_NAME_FLEX ) == FlexContainer::ChildProperty::FLEX );
+
+  // Check align self child property.
+  actor.SetProperty( FlexContainer::ChildProperty::ALIGN_SELF, FlexContainer::ALIGN_FLEX_END );
+  DALI_TEST_EQUALS( (FlexContainer::Alignment)actor.GetProperty<int>( FlexContainer::ChildProperty::ALIGN_SELF ), FlexContainer::ALIGN_FLEX_END, TEST_LOCATION );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( CHILD_PROPERTY_NAME_ALIGN_SELF ) == FlexContainer::ChildProperty::ALIGN_SELF );
+
+  // Check flex margin child property.
+  actor.SetProperty( FlexContainer::ChildProperty::FLEX_MARGIN, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector4>( FlexContainer::ChildProperty::FLEX_MARGIN ), Vector4( 10.0f, 10.0f, 10.0f, 10.0f ), TEST_LOCATION );
+  DALI_TEST_CHECK( actor.GetPropertyIndex( CHILD_PROPERTY_NAME_FLEX_MARGIN ) == FlexContainer::ChildProperty::FLEX_MARGIN );
 
   END_TEST;
 }

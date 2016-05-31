@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,8 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
-
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
@@ -39,12 +38,14 @@ namespace
 {
 
 const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.9.png";
-const float MINIMUM_INDICATOR_HEIGHT(20.0f); // The minimum indicator height for the nine patch border
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float DEFAULT_INDICATOR_SHOW_DURATION(0.5f);
 const float DEFAULT_INDICATOR_HIDE_DURATION(0.5f);
 const float DEFAULT_PAN_GESTURE_PROCESS_TIME(16.7f); // 16.7 milliseconds, i.e. one frame
 const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
+const float DEFAULT_INDICATOR_MINIMUM_HEIGHT(0.0f);
+const float DEFAULT_INDICATOR_START_PADDING(0.0f);
+const float DEFAULT_INDICATOR_END_PADDING(0.0f);
 
 /**
  * Indicator size constraint
@@ -52,7 +53,13 @@ const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
  */
 struct IndicatorSizeConstraint
 {
-  IndicatorSizeConstraint()
+  /**
+   * @param[in] minimumHeight The minimum height for the indicator
+   * @param[in] padding The sum of the padding at the start & end of the indicator
+   */
+  IndicatorSizeConstraint( float minimumHeight, float padding )
+  : mMinimumHeight( minimumHeight ),
+    mPadding( padding )
   {
   }
 
@@ -62,17 +69,23 @@ struct IndicatorSizeConstraint
    * @param[in] parentSizeProperty The parent size of scroll indicator.
    * @return The new scroll indicator size.
    */
-  void operator()(Vector3& current, const PropertyInputContainer& inputs )
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
     const Vector3& parentSize = inputs[0]->GetVector3();
     const float contentSize = inputs[1]->GetFloat();
 
-    float height = contentSize > parentSize.height ?
-                   parentSize.height * ( parentSize.height / contentSize ) :
-                   parentSize.height * ( (parentSize.height - contentSize * 0.5f) / parentSize.height);
+    // Take into account padding that may exist at the beginning and end of the indicator.
+    const float parentHeightMinusPadding = parentSize.height - mPadding;
 
-    current.y = std::max(MINIMUM_INDICATOR_HEIGHT, height);
+    float height = contentSize > parentHeightMinusPadding ?
+                   parentHeightMinusPadding * ( parentHeightMinusPadding / contentSize ) :
+                   parentHeightMinusPadding * ( ( parentHeightMinusPadding - contentSize * 0.5f ) / parentHeightMinusPadding );
+
+    current.y = std::max( mMinimumHeight, height );
   }
+
+  float mMinimumHeight;
+  float mPadding;
 };
 
 /**
@@ -82,10 +95,12 @@ struct IndicatorSizeConstraint
 struct IndicatorPositionConstraint
 {
   /**
-   * @param[in] minPosition The minimum limit of scroll position
-   * @param[in] maxPosition the maximum limit of scroll position
+   * @param[in] startPadding The padding at the start of the indicator
+   * @param[in] endPadding The padding at the end of the indicator
    */
-  IndicatorPositionConstraint()
+  IndicatorPositionConstraint( float startPadding, float endPadding )
+  : mStartPadding( startPadding ),
+    mEndPadding( endPadding )
   {
   }
 
@@ -100,13 +115,19 @@ struct IndicatorPositionConstraint
     const Vector3& indicatorSize = inputs[0]->GetVector3();
     const Vector3& parentSize = inputs[1]->GetVector3();
     const float scrollPosition = -inputs[2]->GetFloat();
-    const float minScrollPosition = inputs[3]->GetFloat();
-    const float maxScrollPosition = inputs[4]->GetFloat();
+    const float minimumScrollPosition = inputs[3]->GetFloat();
+    const float maximumScrollPosition = inputs[4]->GetFloat();
 
-    float relativePosition = std::max( 0.0f, std::min( 1.0f, (scrollPosition - minScrollPosition) / (maxScrollPosition - minScrollPosition) ) );
-    current.y = ( parentSize.height - indicatorSize.height ) * relativePosition;
+    // Take into account padding that may exist at the beginning and end of the indicator.
+    const float parentHeightMinusPadding = parentSize.height - ( mStartPadding + mEndPadding );
+
+    float relativePosition = std::max( 0.0f, std::min( 1.0f, ( scrollPosition - minimumScrollPosition ) / ( maximumScrollPosition - minimumScrollPosition ) ) );
+    current.y = mStartPadding + ( parentHeightMinusPadding - indicatorSize.height ) * relativePosition;
     current.z = DEFAULT_SLIDER_DEPTH;
   }
+
+  float mStartPadding;
+  float mEndPadding;
 };
 
 } // unnamed namespace
@@ -139,6 +160,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorFixedHeight",         
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorShowDuration",             FLOAT,  INDICATOR_SHOW_DURATION   )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHideDuration",             FLOAT,  INDICATOR_HIDE_DURATION   )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollPositionIntervals",           ARRAY,  SCROLL_POSITION_INTERVALS )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorMinimumHeight",            FLOAT,  INDICATOR_MINIMUM_HEIGHT  )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorStartPadding",             FLOAT,  INDICATOR_START_PADDING   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorEndPadding",               FLOAT,  INDICATOR_END_PADDING     )
 
 DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "panFinished",                       PAN_FINISHED_SIGNAL )
 DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scrollPositionIntervalReached",     SCROLL_POSITION_INTERVAL_REACHED_SIGNAL )
@@ -165,6 +189,9 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
   mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),
+  mIndicatorMinimumHeight(DEFAULT_INDICATOR_MINIMUM_HEIGHT),
+  mIndicatorStartPadding(DEFAULT_INDICATOR_START_PADDING),
+  mIndicatorEndPadding(DEFAULT_INDICATOR_END_PADDING),
   mIsPanning(false),
   mIndicatorFirstShow(true)
 {
@@ -265,7 +292,8 @@ void ScrollBar::ApplyConstraints()
     }
     else
     {
-      mIndicatorSizeConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::SIZE, IndicatorSizeConstraint() );
+      mIndicatorSizeConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::SIZE,
+                                                           IndicatorSizeConstraint( mIndicatorMinimumHeight, mIndicatorStartPadding + mIndicatorEndPadding ) );
       mIndicatorSizeConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
       mIndicatorSizeConstraint.AddSource( Source( scrollableHandle, mPropertyScrollContentSize ) );
       mIndicatorSizeConstraint.Apply();
@@ -276,7 +304,8 @@ void ScrollBar::ApplyConstraints()
       mIndicatorPositionConstraint.Remove();
     }
 
-    mIndicatorPositionConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::POSITION, IndicatorPositionConstraint() );
+    mIndicatorPositionConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::POSITION,
+                                                             IndicatorPositionConstraint( mIndicatorStartPadding, mIndicatorEndPadding ) );
     mIndicatorPositionConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
     mIndicatorPositionConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
     mIndicatorPositionConstraint.AddSource( Source( scrollableHandle, mPropertyScrollPosition ) );
@@ -409,16 +438,18 @@ void ScrollBar::OnPan( const PanGesture& gesture )
       }
       case Gesture::Continuing:
       {
-        Vector3 delta(gesture.displacement.x, gesture.displacement.y, 0.0f);
-        mGestureDisplacement+=delta;
+        mGestureDisplacement.x += gesture.displacement.x;
+        mGestureDisplacement.y += gesture.displacement.y;
 
-        Vector3 span = Self().GetCurrentSize() - mIndicator.GetCurrentSize();
-        float minScrollPosition = scrollableHandle.GetProperty<float>(mPropertyMinScrollPosition);
-        float maxScrollPosition = scrollableHandle.GetProperty<float>(mPropertyMaxScrollPosition);
+        float minScrollPosition = scrollableHandle.GetProperty<float>( mPropertyMinScrollPosition );
+        float maxScrollPosition = scrollableHandle.GetProperty<float>( mPropertyMaxScrollPosition );
+
+        // The domain size is the internal range
         float domainSize = maxScrollPosition - minScrollPosition;
+        float logicalSize = Self().GetCurrentSize().y - ( mIndicator.GetCurrentSize().y + mIndicatorStartPadding + mIndicatorEndPadding );
 
-        mCurrentScrollPosition = mScrollStart - mGestureDisplacement.y * domainSize / span.y;
-        mCurrentScrollPosition = 0.0f - std::min(maxScrollPosition, std::max(-mCurrentScrollPosition, minScrollPosition));
+        mCurrentScrollPosition = mScrollStart - ( ( mGestureDisplacement.y * domainSize ) / logicalSize );
+        mCurrentScrollPosition = -std::min( maxScrollPosition, std::max( -mCurrentScrollPosition, minScrollPosition ) );
 
         break;
       }
@@ -474,8 +505,11 @@ Toolkit::ScrollBar::Direction ScrollBar::GetScrollDirection() const
 
 void ScrollBar::SetIndicatorHeightPolicy( Toolkit::ScrollBar::IndicatorHeightPolicy policy )
 {
-  mIndicatorHeightPolicy = policy;
-  ApplyConstraints();
+  if( policy != mIndicatorHeightPolicy )
+  {
+    mIndicatorHeightPolicy = policy;
+    ApplyConstraints();
+  }
 }
 
 Toolkit::ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy() const
@@ -627,6 +661,24 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::ScrollBar::Property::INDICATOR_MINIMUM_HEIGHT:
+      {
+        scrollBarImpl.mIndicatorMinimumHeight = value.Get<float>();
+        scrollBarImpl.ApplyConstraints();
+        break;
+      }
+      case Toolkit::ScrollBar::Property::INDICATOR_START_PADDING:
+      {
+        scrollBarImpl.mIndicatorStartPadding = value.Get<float>();
+        scrollBarImpl.ApplyConstraints();
+        break;
+      }
+      case Toolkit::ScrollBar::Property::INDICATOR_END_PADDING:
+      {
+        scrollBarImpl.mIndicatorEndPadding = value.Get<float>();
+        scrollBarImpl.ApplyConstraints();
+        break;
+      }
     }
   }
 }
@@ -681,6 +733,21 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
             array->PushBack( positions[i] );
           }
         }
+        break;
+      }
+      case Toolkit::ScrollBar::Property::INDICATOR_MINIMUM_HEIGHT:
+      {
+        value = scrollBarImpl.mIndicatorMinimumHeight;
+        break;
+      }
+      case Toolkit::ScrollBar::Property::INDICATOR_START_PADDING:
+      {
+        value = scrollBarImpl.mIndicatorStartPadding;
+        break;
+      }
+      case Toolkit::ScrollBar::Property::INDICATOR_END_PADDING:
+      {
+        value = scrollBarImpl.mIndicatorEndPadding;
         break;
       }
     }

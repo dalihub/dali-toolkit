@@ -28,7 +28,7 @@
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>

@@ -24,7 +24,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES

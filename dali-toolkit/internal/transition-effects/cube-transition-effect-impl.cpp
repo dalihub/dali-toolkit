@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali/integration-api/debug.h>
 
@@ -82,33 +82,6 @@ Actor CreateTile( const Vector4& samplerRect )
   tile.SetAnchorPoint( AnchorPoint::CENTER );
   tile.RegisterProperty( "uTextureRect", samplerRect );
   return tile;
-}
-
-
-Geometry CreateQuadGeometry()
-{
-  const float halfWidth = 0.5f;
-  const float halfHeight = 0.5f;
-  struct QuadVertex { Vector2 position;};
-  QuadVertex quadVertexData[4] =
-  {
-      { Vector2(-halfWidth, -halfHeight) },
-      { Vector2( halfWidth, -halfHeight) },
-      { Vector2(-halfWidth, halfHeight)  },
-      { Vector2( halfWidth, halfHeight)  }
-  };
-
-  Property::Map quadVertexFormat;
-  quadVertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
-  quadVertices.SetData( quadVertexData, 4 );
-
-  // Create the geometry object
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( quadVertices );
-  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
-
-  return geometry;
 }
 
 }
@@ -272,7 +245,7 @@ void CubeTransitionEffect::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
 
-  Geometry geometry = CreateQuadGeometry();
+  Geometry geometry = Geometry::QUAD();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
   TextureSet textureSet = TextureSet::New();

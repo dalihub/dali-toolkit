@@ -109,12 +109,6 @@ public:
    */
   void SaveShader( ShaderType type, Shader shader );
 
-  /*
-   * Greate the quad geometry.
-   * Quad geometry is shared by multiple kind of Renderer, so implement it in the factory-cache.
-   */
-  static Geometry CreateQuadGeometry();
-
   /**
    * Create the grid geometry.
    * @param[in] gridSize The size of the grid.

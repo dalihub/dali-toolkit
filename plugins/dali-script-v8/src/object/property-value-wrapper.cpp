@@ -785,6 +785,62 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
   return daliPropertyValue;
 }
 
+Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* isolate, v8::Local< v8::Value> v8Value)
+{
+  v8::HandleScope handleScope( isolate);
+
+  Dali::Property::Value daliPropertyValue;
+
+  // Check if it's a javascript Array
+  Dali::Property::Value array = VectorOrMatrixFromV8Array( isolate, v8Value );
+
+  if( V8Utils::IsBooleanPrimitiveOrObject( v8Value ) )
+  {
+    daliPropertyValue = Dali::Property::Value( V8Utils::GetBooleanValue( isolate, v8Value));
+  }
+  else if( V8Utils::IsNumberPrimitiveOrObject( v8Value )  )
+  {
+    daliPropertyValue = Dali::Property::Value( V8Utils::GetNumberValue( isolate, v8Value) );
+  }
+  else if( v8Value->IsInt32() )
+  {
+    daliPropertyValue = Dali::Property::Value(  v8Value->Int32Value()  ) ;
+  }
+  else if( V8Utils::IsStringPrimitiveOrObject( v8Value) )
+  {
+    daliPropertyValue = Dali::Property::Value( V8Utils::GetStringValue( isolate, v8Value) );
+  }
+  else if( array.GetType() == Dali::Property::VECTOR2
+         || array.GetType() == Dali::Property::VECTOR3
+         || array.GetType() == Dali::Property::VECTOR4 )
+  {
+    daliPropertyValue = array;
+  }
+  else if( array.GetType() == Dali::Property::MATRIX )
+  {
+    Dali::Matrix mat = array.Get<Dali::Matrix>();
+    daliPropertyValue = mat;
+  }
+  else if( array.GetType() == Dali::Property::MATRIX3 )
+  {
+    Dali::Matrix3 mat = array.Get<Dali::Matrix3>();
+    daliPropertyValue = mat;
+  }
+  else if( array.GetType() == Dali::Property::ARRAY )
+  {
+    daliPropertyValue = ArrayFromV8Array( isolate, v8Value );
+  }
+  else if( v8Value->IsObject() )
+  {
+    // Assume this is a property map
+    v8::Local<v8::Object> object = v8::Handle<v8::Object>::Cast(v8Value);
+    Dali::Property::Map propertyMap = V8Utils::GetPropertyMapFromObject(isolate, object);
+    daliPropertyValue = Dali::Property::Value( propertyMap );
+  }
+
+  return daliPropertyValue;
+}
+
 void PropertyValueWrapper::NewRotation( const v8::FunctionCallbackInfo< v8::Value >& args)
 {
   v8::Isolate* isolate = args.GetIsolate();

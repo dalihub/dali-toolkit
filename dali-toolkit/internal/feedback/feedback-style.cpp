@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/feedback/feedback-style.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/object-registry.h>

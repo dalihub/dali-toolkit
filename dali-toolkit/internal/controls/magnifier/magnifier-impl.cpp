@@ -25,7 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>

@@ -48,7 +48,7 @@ daliApp.init = function() {
   toolBar.backgroundColor = dali.COLOR_CYAN;
   toolBar.flexDirection = "row"; // display toolbar items horizontally
   toolBar.alignItems = "center"; // align toolbar items vertically center
-  toolBar.registerCustomProperty("flex", 0.1, dali.PROPERTY_READ_WRITE); // 10 percent of available space in the cross axis
+  toolBar.flex = 0.1; // 10 percent of available space in the cross axis
 
   flexContainer.add(toolBar);
 
@@ -59,7 +59,7 @@ daliApp.init = function() {
   content.flexDirection = "row";
   content.alignItems = "center"; // align items vertically center
   content.justifyContent = "center"; // align items horizontally center
-  content.registerCustomProperty("flex", 0.9, dali.PROPERTY_READ_WRITE); // 90 percent of available space in the cross axis
+  content.flex = 0.9; // 90 percent of available space in the cross axis
 
   flexContainer.add(content);
 
@@ -70,7 +70,7 @@ daliApp.init = function() {
   prevButton.anchorPoint = dali.TOP_LEFT;
   prevButton.minimumSize = [100.0, 60.0]; // this is the minimum size the button should keep
   prevButton.labelText = "Prev";
-  prevButton.registerCustomProperty("flexMargin", [10, 10, 10, 10], dali.PROPERTY_READ_WRITE); // set 10 pixel margin around the button
+  prevButton.flexMargin = [10, 10, 10, 10]; // set 10 pixel margin around the button
 
   toolBar.add( prevButton );
 
@@ -84,8 +84,8 @@ daliApp.init = function() {
   title.verticalAlignment = "CENTER";
   title.text = "Gallery";
   title.pointSize = 28;
-  title.registerCustomProperty("flex", 1.0, dali.PROPERTY_READ_WRITE); // take all the available space left apart from the two buttons
-  title.registerCustomProperty("flexMargin", [10, 10, 10, 10], dali.PROPERTY_READ_WRITE); // set 10 pixel margin around the title
+  title.flex = 1.0; // take all the available space left apart from the two buttons
+  title.flexMargin = [10, 10, 10, 10]; // set 10 pixel margin around the title
 
   toolBar.add( title );
 
@@ -96,7 +96,7 @@ daliApp.init = function() {
   nextButton.anchorPoint = dali.TOP_LEFT;
   nextButton.minimumSize = [100.0, 60.0]; // this is the minimum size the button should keep
   nextButton.labelText = "Next";
-  nextButton.registerCustomProperty("flexMargin", [10, 10, 10, 10], dali.PROPERTY_READ_WRITE); // set 10 pixel margin around the button
+  nextButton.flexMargin = [10, 10, 10, 10]; // set 10 pixel margin around the button
 
   toolBar.add( nextButton );
 

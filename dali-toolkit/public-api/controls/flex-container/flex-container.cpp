@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/controls/flex-container/flex-container.h>
+#include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/flex-container/flex-container-impl.h>

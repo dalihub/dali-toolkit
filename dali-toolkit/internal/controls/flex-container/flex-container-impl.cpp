@@ -22,7 +22,7 @@
 #include <sstream>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
@@ -31,18 +31,6 @@ using namespace Dali;
 
 namespace
 {
-/*
- * Custom properties for how to lay out the actor.
- *
- * When an actor is add to the flex container, the following custom properties of the actor
- * are checked to decide how to lay out the actor inside the flex container.
- *
- * These non-animatable properties should be registered to the child which would be added
- * to the flex container, and once added their values can not be changed.
- */
-const char * const FLEX_PROPERTY_NAME("flex");
-const char * const ALIGN_SELF_PROPERTY_NAME("alignSelf");
-const char * const FLEX_MARGIN_PROPERTY_NAME("flexMargin");
 
 #if defined(DEBUG_ENABLED)
 // debugging support, very useful when new features are added or bugs are hunted down
@@ -93,12 +81,15 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::FlexContainer, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer, "contentDirection",   INTEGER, CONTENT_DIRECTION )
-DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer, "flexDirection",      INTEGER, FLEX_DIRECTION    )
-DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer, "flexWrap",           INTEGER, FLEX_WRAP         )
-DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer, "justifyContent",     INTEGER, JUSTIFY_CONTENT   )
-DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer, "alignItems",         INTEGER, ALIGN_ITEMS       )
-DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer, "alignContent",       INTEGER, ALIGN_CONTENT     )
+DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer,        "contentDirection",  INTEGER,  CONTENT_DIRECTION )
+DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer,        "flexDirection",     INTEGER,  FLEX_DIRECTION    )
+DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer,        "flexWrap",          INTEGER,  FLEX_WRAP         )
+DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer,        "justifyContent",    INTEGER,  JUSTIFY_CONTENT   )
+DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer,        "alignItems",        INTEGER,  ALIGN_ITEMS       )
+DALI_PROPERTY_REGISTRATION( Toolkit, FlexContainer,        "alignContent",      INTEGER,  ALIGN_CONTENT     )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, FlexContainer,  "flex",              FLOAT,    FLEX              )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, FlexContainer,  "alignSelf",         INTEGER,  ALIGN_SELF        )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, FlexContainer,  "flexMargin",        VECTOR4,  FLEX_MARGIN       )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -605,18 +596,19 @@ void FlexContainer::ComputeLayout()
       childNode->style.maxDimensions[CSS_WIDTH] = childActor.GetMaximumSize().x;
       childNode->style.maxDimensions[CSS_HEIGHT] = childActor.GetMaximumSize().y;
 
-      // Test custom properties on the child
-      if( childActor.GetPropertyIndex( FLEX_PROPERTY_NAME ) != Property::INVALID_INDEX )
+      // Check child properties on the child for how to layout it.
+      // These properties should be dynamically registered to the child which
+      // would be added to FlexContainer.
+
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX ) != Property::NONE )
       {
-        childNode->style.flex = childActor.GetProperty( childActor.GetPropertyIndex(FLEX_PROPERTY_NAME) ).Get<float>();
+        childNode->style.flex = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX ).Get<float>();
       }
 
-      Property::Index alignSelfPropertyIndex = childActor.GetPropertyIndex( ALIGN_SELF_PROPERTY_NAME );
-      if( alignSelfPropertyIndex != Property::INVALID_INDEX )
+      Toolkit::FlexContainer::Alignment alignSelf( Toolkit::FlexContainer::ALIGN_AUTO );
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::FlexContainer::ChildProperty::ALIGN_SELF ) != Property::NONE )
       {
-        Property::Value alignSelfPropertyValue = childActor.GetProperty( alignSelfPropertyIndex );
-
-        Toolkit::FlexContainer::Alignment alignSelf( Toolkit::FlexContainer::ALIGN_AUTO );
+        Property::Value alignSelfPropertyValue = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF );
         if( alignSelfPropertyValue.GetType() == Property::INTEGER )
         {
           alignSelf = static_cast<Toolkit::FlexContainer::Alignment>( alignSelfPropertyValue.Get< int >() );
@@ -629,12 +621,12 @@ void FlexContainer::ComputeLayout()
                                                                           ALIGN_SELF_STRING_TABLE_COUNT,
                                                                           alignSelf );
         }
-        childNode->style.align_self = static_cast<css_align_t>(alignSelf);
       }
+      childNode->style.align_self = static_cast<css_align_t>(alignSelf);
 
-      if( childActor.GetPropertyIndex( FLEX_MARGIN_PROPERTY_NAME ) != Property::INVALID_INDEX )
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ) != Property::NONE )
       {
-        Vector4 flexMargin = childActor.GetProperty( childActor.GetPropertyIndex(FLEX_MARGIN_PROPERTY_NAME) ).Get<Vector4>();
+        Vector4 flexMargin = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ).Get<Vector4>();
         childNode->style.margin[CSS_LEFT] = flexMargin.x;
         childNode->style.margin[CSS_TOP] = flexMargin.y;
         childNode->style.margin[CSS_RIGHT] = flexMargin.z;

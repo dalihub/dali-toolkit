@@ -179,8 +179,14 @@ void HandleWrapper::PropertySet( v8::Local<v8::String> propertyName,
   }
   else
   {
-    std::string error="Invalid property Set for "+name + "\n";
-    DALI_SCRIPT_EXCEPTION( isolate, error );
+    // Trying to set the value for a property that is not registered yet.
+    std::stringstream msg;
+    msg << "Trying to set the value of an unregistered property: ";
+    msg << name;
+    DALI_SCRIPT_WARNING( msg.str().c_str() );
+
+    // Register the custom property automatically.
+    handle.RegisterProperty( name, PropertyValueWrapper::ExtractPropertyValue( isolate, javaScriptValue), Property::READ_WRITE );
   }
 }
 

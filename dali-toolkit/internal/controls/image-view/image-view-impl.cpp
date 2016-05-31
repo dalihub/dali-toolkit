@@ -6,7 +6,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
@@ -44,8 +44,7 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
-  mPremultipledAlphaEnabled( false )
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
 {
 }
 
@@ -305,10 +304,10 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
 
       case Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA:
       {
-        bool IsPre;
-        if( value.Get( IsPre ) )
+        bool isPre;
+        if( value.Get( isPre ) )
         {
-          GetImpl(imageView).EnablePreMultipliedAlpha( IsPre );
+          GetImpl(imageView).EnablePreMultipliedAlpha( isPre );
         }
         break;
       }

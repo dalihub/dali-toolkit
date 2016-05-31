@@ -686,10 +686,10 @@ int UtcDaliTableViewSetGetProperty(void)
   END_TEST;
 }
 
-int UtcDaliTableViewCustomProperties(void)
+int UtcDaliTableViewChildProperties(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliTableViewCustomProperties");
+  tet_infoline("UtcDaliTableViewChildProperties");
 
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
@@ -700,7 +700,7 @@ int UtcDaliTableViewCustomProperties(void)
 
   // Create a child actor with the custom properties
   Actor child1 = Actor::New();
-  child1.RegisterProperty( "cellIndex",  Vector2( 3, 4 ), Property::READ_WRITE );
+  child1.SetProperty( TableView::ChildProperty::CELL_INDEX, Vector2( 3, 4 ) );
   tableView.Add( child1 );
   // Check for actors at actual positions.
   DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(3,4)) == child1);
@@ -709,9 +709,9 @@ int UtcDaliTableViewCustomProperties(void)
   Actor child2 = Actor::New();
   float rowSpan = 3.f;
   float columnSpan = 2.f;
-  child2.RegisterProperty( "cellIndex",  Vector2( 6, 1 ), Property::READ_WRITE );
-  child2.RegisterProperty( "rowSpan",  rowSpan, Property::READ_WRITE );
-  child2.RegisterProperty( "columnSpan",  columnSpan, Property::READ_WRITE );
+  child2.SetProperty( TableView::ChildProperty::CELL_INDEX, Vector2( 6, 1 ) );
+  child2.SetProperty( TableView::ChildProperty::ROW_SPAN, rowSpan );
+  child2.SetProperty( TableView::ChildProperty::COLUMN_SPAN, columnSpan );
   tableView.Add( child2 );
   // Check for actors at actual positions.
   for( int i=0; i<rowSpan; i++ )
@@ -725,8 +725,8 @@ int UtcDaliTableViewCustomProperties(void)
   // Create a third child actor with the cell alignment properties
   Actor child3 = Actor::New();
   child3.SetSize( 5.f,5.f );
-  child3.RegisterProperty( "cellHorizontalAlignment",   "center", Property::READ_WRITE );
-  child3.RegisterProperty( "cellVerticalAlignment",   "bottom", Property::READ_WRITE );
+  child3.SetProperty( TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT, "center" );
+  child3.SetProperty( TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT,   "bottom" );
   tableView.Add( child3 );
 
   // store the actor in the first available cell
