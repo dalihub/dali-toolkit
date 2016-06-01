@@ -664,23 +664,110 @@ int UtcDaliControlRendererGetPropertyMap8(void)
   //Check values in the result map are identical to the initial map's values.
   Property::Value* value = resultMap.Find( "rendererType", Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "MESH" );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "MESH", TEST_LOCATION );
 
   value = resultMap.Find( "objectUrl", Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_OBJ_FILE_NAME );
+  DALI_TEST_EQUALS( value->Get<std::string>(), TEST_OBJ_FILE_NAME, TEST_LOCATION );
 
   value = resultMap.Find( "materialUrl", Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_MTL_FILE_NAME );
+  DALI_TEST_EQUALS( value->Get<std::string>(), TEST_MTL_FILE_NAME, TEST_LOCATION );
 
   value = resultMap.Find( "texturesPath", Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_RESOURCE_LOCATION );
+  DALI_TEST_EQUALS( value->Get<std::string>(), TEST_RESOURCE_LOCATION, TEST_LOCATION );
 
   value = resultMap.Find( "shaderType", Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "TEXTURELESS" );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "TEXTURELESS", TEST_LOCATION );
+
+  END_TEST;
+}
+
+//Primitive shape renderer
+int UtcDaliControlRendererGetPropertyMap9(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliControlRendererGetPropertyMap9: PrimitiveRenderer" );
+
+  Vector4 color = Vector4( 1.0, 0.8, 0.6, 1.0);
+  Vector3 dimensions = Vector3( 1.0, 2.0, 3.0 );
+
+  //Request PrimitiveRenderer using a property map.
+  RendererFactory factory = RendererFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "CUBE" );
+  propertyMap.Insert( "color", color );
+  propertyMap.Insert( "slices", 10 );
+  propertyMap.Insert( "stacks", 20 );
+  propertyMap.Insert( "scaleTopRadius", 30.0f );
+  propertyMap.Insert( "scaleBottomRadius", 40.0f );
+  propertyMap.Insert( "scaleHeight", 50.0f );
+  propertyMap.Insert( "scaleRadius", 60.0f );
+  propertyMap.Insert( "scaleDimensions", dimensions );
+  propertyMap.Insert( "bevelPercentage", 0.3f );
+  propertyMap.Insert( "bevelSmoothness", 0.6f );
+  propertyMap.Insert( "uLightPosition", Vector3( 5.0f, 10.0f, 15.0f) );
+  ControlRenderer primitiveRenderer = factory.CreateControlRenderer( propertyMap );
+
+  Property::Map resultMap;
+  primitiveRenderer.CreatePropertyMap( resultMap );
+
+  //Check values in the result map are identical to the initial map's values.
+  Property::Value* value = resultMap.Find( "rendererType", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "PRIMITIVE", TEST_LOCATION );
+
+  value = resultMap.Find( "shape", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "CUBE", TEST_LOCATION );
+
+  value = resultMap.Find( "color", Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<Vector4>() == color );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), color, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "slices", Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 10, TEST_LOCATION );
+
+  value = resultMap.Find( "stacks", Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 20, TEST_LOCATION );
+
+  value = resultMap.Find( "scaleTopRadius", Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 30.0f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "scaleBottomRadius", Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 40.0f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "scaleHeight", Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 50.0f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "scaleRadius", Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 60.0f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "scaleDimensions", Property::VECTOR3 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector3>(), dimensions, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "bevelPercentage", Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.3f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "bevelSmoothness", Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.6f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( "uLightPosition", Property::VECTOR3 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
   END_TEST;
 }

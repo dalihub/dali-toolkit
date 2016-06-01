@@ -1323,3 +1323,235 @@ int UtcDaliRendererFactoryGetMeshRendererN3(void)
 
   END_TEST;
 }
+
+//Creates a primitive renderer with the given property map and tests to see if it correctly loads in the given application.
+void TestPrimitiveRendererWithProperties( Property::Map& propertyMap, ToolkitTestApplication& application )
+{
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  //Create a primitive renderer.
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
+  DALI_TEST_CHECK( controlRenderer );
+
+  //Create an actor on stage to house the renderer.
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
+  controlRenderer.SetOnStage( actor );
+
+  //Ensure set on stage.
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+
+  //Tell test application to load the renderer.
+  application.SendNotification();
+  application.Render(0);
+
+  Matrix testScaleMatrix;
+  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
+  Matrix actualScaleMatrix;
+
+  //Test to see if the object has been successfully loaded.
+  DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
+  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  //Finish by setting off stage, and ensuring this was successful.
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+}
+
+//Test if primitive shape loads correctly when supplied with only the bare minimum requirements, the shape to use.
+int UtcDaliRendererFactoryGetPrimitiveRenderer1(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer1:  Request primitive renderer with a shape only" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "CUBE" );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when supplied with all possible parameters
+int UtcDaliRendererFactoryGetPrimitiveRenderer2(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer2:  Request primitive renderer with everything" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "CUBE" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "slices", 10 );
+  propertyMap.Insert( "stacks", 20 );
+  propertyMap.Insert( "scaleTopRadius", 30.0f );
+  propertyMap.Insert( "scaleBottomRadius", 40.0f );
+  propertyMap.Insert( "scaleHeight", 50.0f );
+  propertyMap.Insert( "scaleRadius", 60.0f );
+  propertyMap.Insert( "bevelPercentage", 0.7f );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads a sphere correctly.
+int UtcDaliRendererFactoryGetPrimitiveRenderer3(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer3:  Request primitive renderer to display a sphere" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "SPHERE" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "slices", 10 );
+  propertyMap.Insert( "stacks", 20 );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads a conic section correctly.
+int UtcDaliRendererFactoryGetPrimitiveRenderer4(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer4:  Request primitive renderer to display a conic section" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "CONICAL_FRUSTRUM" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "slices", 10 );
+  propertyMap.Insert( "scaleTopRadius", 30.0f );
+  propertyMap.Insert( "scaleBottomRadius", 40.0f );
+  propertyMap.Insert( "scaleHeight", 50.0f );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads a bevelled cube correctly.
+int UtcDaliRendererFactoryGetPrimitiveRenderer5(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer5:  Request primitive renderer to display a bevelled cube" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "BEVELLED_CUBE" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "bevelPercentage", 0.7f );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads an octahedron correctly.
+int UtcDaliRendererFactoryGetPrimitiveRenderer6(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer6:  Request primitive renderer to display an octahedron" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "OCTAHEDRON" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads a cone correctly.
+int UtcDaliRendererFactoryGetPrimitiveRenderer7(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer7:  Request primitive renderer to display a cone" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "CONE" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "slices", 10 );
+  propertyMap.Insert( "scaleTopRadius", 30.0f );
+  propertyMap.Insert( "scaleHeight", 50.0f );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when light position is manually set.
+int UtcDaliRendererFactoryGetPrimitiveRenderer8(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRenderer8:  Request primitive renderer with set light position" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( "shape", "SPHERE" );
+  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "uLightPosition", Vector3( 0.0, 1.0, 2.0 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape renderer handles the case of not being passed a specific shape to use.
+int UtcDaliRendererFactoryGetPrimitiveRendererN1(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetPrimitiveRendererN1:  Request primitive renderer without shape" );
+
+  //Set up renderer properties, without supplying shape.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+
+  //Test to see if shape loads regardless of missing input.
+  TestPrimitiveRendererWithProperties( propertyMap, application );
+
+  END_TEST;
+}

@@ -33,6 +33,7 @@
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/mesh/mesh-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/primitive/primitive-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
@@ -102,6 +103,10 @@ RendererFactory::RendererType RendererFactory::GetRendererType( const Property::
     else if( typeValue == MESH_RENDERER )
     {
       rendererType = MESH;
+    }
+    else if( typeValue == PRIMITIVE_RENDERER )
+    {
+      rendererType = PRIMITIVE;
     }
   }
 
@@ -185,6 +190,11 @@ Toolkit::ControlRenderer RendererFactory::CreateControlRenderer( const Property:
     case MESH:
     {
       rendererPtr = new MeshRenderer( *( mFactoryCache.Get() ) );
+      break;
+    }
+    case PRIMITIVE:
+    {
+      rendererPtr = new PrimitiveRenderer( *( mFactoryCache.Get() ) );
       break;
     }
     case UNDEFINED:

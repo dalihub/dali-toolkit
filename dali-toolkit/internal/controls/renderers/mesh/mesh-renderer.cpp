@@ -28,8 +28,6 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
 namespace Dali
@@ -115,8 +113,8 @@ const char* SIMPLE_VERTEX_SHADER = DALI_COMPOSE_SHADER(
     //Illumination in Model-View space - Transform attributes and uniforms\n
     vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
-    vec4 centre = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( centre.x, centre.y, uLightPosition.z, 1.0 );\n
+    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
+    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
     vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
 
     float lightDiffuse = max( dot( vecToLight, normal ), 0.0 );\n
@@ -161,8 +159,8 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
     //Illumination in Model-View space - Transform attributes and uniforms\n
     vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
-    vec4 centre = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( centre.x, centre.y, uLightPosition.z, 1.0 );\n
+    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
+    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
     vec3 normal = normalize( uNormalMatrix * mat3( uObjectMatrix ) * aNormal );\n
 
     vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
@@ -223,8 +221,8 @@ const char* NORMAL_MAP_VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
     vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
-    vec4 centre = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( centre.x, centre.y, uLightPosition.z, 1.0 );\n
+    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
+    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
 
     vec3 tangent = normalize( uNormalMatrix * aTangent );
     vec3 binormal = normalize( uNormalMatrix * aBiNormal );

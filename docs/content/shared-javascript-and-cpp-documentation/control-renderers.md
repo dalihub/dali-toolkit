@@ -15,6 +15,7 @@ DALi provides the following renderers:
  + [Image](@ref image-renderers)
  + [Border](@ref border-renderer)
  + [Mesh](@ref mesh-renderer)
+ + [Primitive](@ref primitive-renderer)
  
 Controls can provide properties that allow users to specify the renderer type.
 Setting renderer properties are done via a property map.
@@ -468,6 +469,134 @@ map[ "rendererType" ] = "MESH";
 map[ "objectUrl"    ] = "home/models/Dino.obj";
 map[ "materialUrl"  ] = "home/models/Dino.mtl";
 map[ "texturesPath" ] = "home/images/";
+
+control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
+~~~
+
+___________________________________________________________________________________________________
+
+## Primitive Renderer {#primitive-renderer}
+
+Renders a simple 3D shape, such as a cube or sphere. Scaled to fit the control.
+
+![ ](../assets/img/renderers/cube.png)
+![ ](renderers/cube.png)
+
+### Properties Supported
+
+**RendererType** "PRIMITIVE"
+
+| Property Name                         | Type    | Description                                                                     | Default Value        | Range                          |
+|---------------------------------------|:-------:|---------------------------------------------------------------------------------|:--------------------:|:------------------------------:|
+| [shape](@ref shape-details)           | STRING  | The specific shape to render.                                                   | "SPHERE"             | [See list](@ref shape-details) |
+| color                                 | VECTOR4 | The color of the shape.                                                         | (0.5, 0.5, 0.5, 1.0) | 0.0 - 1.0 for each             |
+| [slices](@ref slices-details)         | INT     | The number of slices as you go around the shape.                                | 128                  | 1 - 255                        |
+| [stacks](@ref stacks-details)         | INT     | The number of stacks as you go down the shape.                                  | 128                  | 1 - 255                        |
+| scaleTopRadius                        | FLOAT   | The scale of the radius of the top circle of a conical frustrum.                | 1.0                  | ≥ 0.0                          |
+| scaleBottomRadius                     | FLOAT   | The scale of the radius of the bottom circle of a conical frustrum.             | 1.5                  | ≥ 0.0                          |
+| scaleHeight                           | FLOAT   | The scale of the height of a conic.                                             | 3.0                  | > 0.0                          |
+| scaleRadius                           | FLOAT   | The scale of the radius of a cylinder.                                          | 1.0                  | > 0.0                          |
+| scaleDimensions                       | VECTOR3 | The dimensions of a cuboid. Scales in the same fashion as a 9-patch image.      | (1.0, 1.0, 1.0)      | > 0.0 for each                 |
+| [bevelPercentage](@ref bevel-details) | FLOAT   | Determines how bevelled the cuboid should be, based off the smallest dimension. | 0.0 (no bevel)       | 0.0 - 1.0                      |
+| bevelSmoothness                       | FLOAT   | Defines how smooth the bevelled edges should be.                                | 0.0 (sharp edges)    | 0.0 - 1.0                      |
+| uLightPosition                        | VECTOR3 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the upper left back corner. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. | (Offset outwards from the center of the screen.) | Unlimited |
+
+### Shapes {#shape-details}
+
+There are six shapes that can be chosen, some of which are simplified specialisations of another.
+
+| Value            | Description                                                                       | Parameters                                                    |
+|------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
+| SPHERE           | *Default*.                                                                        | color, slices, stacks                                         |
+| CONICAL_FRUSTRUM | The area bound between two circles, i.e. a cone with the tip removed.             | color, scaleTopRadius, scaleBottomRadius, scaleHeight, slices |
+| CONE             | Equivalent to a conical frustrum with top radius of zero.                         | color, scaleBottomRadius, scaleHeight, slices                 |
+| CYLINDER         | Equivalent to a conical frustrum with equal radii for the top and bottom circles. | color, scaleRadius, scaleHeight, slices                       |
+| CUBE             | Equivalent to a bevelled cube with a bevel percentage of zero.                    | color, scaleDimensions                                        |
+| OCTAHEDRON       | Equivalent to a bevelled cube with a bevel percentage of one.                     | color, scaleDimensions                                        |
+| BEVELLED_CUBE    | A cube/cuboid with all edges flattened to some degree.                            | color, scaleDimensions, bevelPercentage, bevelSmoothness      |
+
+Examples below:
+
+**sphere:**
+
+![ ](../assets/img/renderers/sphere.png)
+![ ](renderers/sphere.png)
+
+**conics:**
+
+| Frustrum | Cone | Cylinder |
+|----------|------|----------|
+| ![ ](../assets/img/renderers/conical-frustrum.png) ![ ](renderers/conical-frustrum.png) | ![ ](../assets/img/renderers/cone.png) ![ ](renderers/cone.png) | ![ ](../assets/img/renderers/cylinder.png) ![ ](renderers/cylinder.png) |
+
+### Bevel {#bevel-details}
+
+Bevel percentage ranges from 0.0 to 1.0. It affects the ratio of the outer face widths to the width of the overall cube, as shown:
+
+| 0.0 ( cube) | 0.3 | 0.7 | 1.0 (octahedron) |
+|-------------|-----|-----|------------------|
+| ![ ](../assets/img/renderers/cube.png) ![ ](renderers/cube.png) | ![ ](../assets/img/renderers/bevelled-cube-low.png) ![ ](renderers/bevelled-cube-low.png) | ![ ](../assets/img/renderers/bevelled-cube-high.png) ![ ](renderers/bevelled-cube-high.png) | ![ ](../assets/img/renderers/octahedron.png) ![ ](renderers/octahedron.png) |
+
+### Slices {#slices-details}
+
+For spheres and conical frustrums, 'slices' determines how many divisions there are as you go around the object. Note that spheres are rendered along the Z-axis, and so will appear rotated.
+
+![ ](../assets/img/renderers/slices.png)
+![ ](renderers/slices.png)
+
+### Stacks {#stacks-details}
+
+For spheres, 'stacks' determines how many layers there are as you go down the object. Note that spheres are rendered along the Z-axis, and so will appear rotated.
+
+![ ](../assets/img/renderers/stacks.png)
+![ ](renderers/stacks.png)
+
+### Usage
+
+**sphere**
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+Dali::Property::Map map;
+
+map[ "rendererType" ] = "PRIMITIVE";
+map[ "shape"        ] = "SPHERE";
+map[ "color"        ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+
+control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
+~~~
+
+**conical frustrum**
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+Dali::Property::Map map;
+
+map[ "rendererType"      ] = "PRIMITIVE";
+map[ "shape"             ] = "CONICAL_FRUSTRUM";
+map[ "color"             ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ "scaleTopRadius"    ] = 1.0f;
+map[ "scaleBottomRadius" ] = 1.5f;
+map[ "scaleHeight"       ] = 3.0f;
+
+control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
+~~~
+
+**bevelled cube**
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+Dali::Property::Map map;
+
+map[ "rendererType"    ] = "PRIMITIVE";
+map[ "shape"           ] = "BEVELLED_CUBE";
+map[ "color"           ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ "bevelPercentage" ] = 0.4f;
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~

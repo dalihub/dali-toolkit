@@ -28,6 +28,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/renderers/svg/svg-rasterize-thread.cpp \
    $(toolkit_src_dir)/controls/renderers/svg/svg-renderer.cpp \
    $(toolkit_src_dir)/controls/renderers/mesh/mesh-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/primitive/primitive-renderer.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \

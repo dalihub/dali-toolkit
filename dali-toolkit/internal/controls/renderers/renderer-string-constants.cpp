@@ -33,10 +33,12 @@ const char * const BORDER_RENDERER("BORDER");
 const char * const GRADIENT_RENDERER("GRADIENT");
 const char * const IMAGE_RENDERER("IMAGE");
 const char * const MESH_RENDERER("MESH");
+const char * const PRIMITIVE_RENDERER( "PRIMITIVE" );
 const char * const DEBUG_RENDERER("DEBUG");
 
 const char * const IMAGE_URL_NAME("url");
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
+const char * const LIGHT_POSITION_UNIFORM_NAME( "uLightPosition" );
 
 //Mesh properties
 const char * const OBJECT_URL( "objectUrl" );
@@ -44,6 +46,19 @@ const char * const MATERIAL_URL( "materialUrl" );
 const char * const TEXTURES_PATH( "texturesPath" );
 const char * const SHADER_TYPE( "shaderType" );
 const char * const USE_MIPMAPPING( "useMipmapping" );
+
+//Primitive shape properties
+const char * const PRIMITIVE_SHAPE( "shape" );
+const char * const SHAPE_COLOR( "color" );
+const char * const SLICES( "slices" );
+const char * const STACKS( "stacks" );
+const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
+const char * const SCALE_BOTTOM_RADIUS( "scaleBottomRadius" );
+const char * const SCALE_HEIGHT( "scaleHeight" );
+const char * const SCALE_RADIUS( "scaleRadius" );
+const char * const SCALE_DIMENSIONS( "scaleDimensions" );
+const char * const BEVEL_PERCENTAGE( "bevelPercentage" );
+const char * const BEVEL_SMOOTHNESS( "bevelSmoothness" );
 
 } // namespace Internal
 
