@@ -54,6 +54,7 @@ public:
     IMAGE,
     N_PATCH,
     SVG,
+    MESH,
     UNDEFINED
   };
 

@@ -83,7 +83,6 @@ public:
     DIFFUSE_WITH_NORMAL_MAP
   };
 
-
   /**
    * @brief Create a new instance of a Model3dView control.
    *

@@ -20,10 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/renderer.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
-
+#include <limits>
 
 namespace Dali
 {
@@ -65,7 +62,7 @@ public:
     {}
 
     VertexExt( const Vector3& tangent, const Vector3& binormal )
-    : tangent( tangent), bitangent (binormal)
+    : tangent( tangent), bitangent( binormal )
     {}
 
     Vector3 tangent;
@@ -76,23 +73,31 @@ public:
   {
     void Init()
     {
-      pointMin = Vector3(999999.9,999999.9,999999.9);
-      pointMax = Vector3(-999999.9,-999999.9,-999999.9);
+      pointMin = Vector3( std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() );
+      pointMax = Vector3( std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() );
     }
 
-    void ConsiderNewPointInVolume(const Vector3& position)
+    void ConsiderNewPointInVolume( const Vector3& position )
     {
-      pointMin.x = std::min(position.x, pointMin.x);
-      pointMin.y = std::min(position.y, pointMin.y);
-      pointMin.z = std::min(position.z, pointMin.z);
+      pointMin.x = std::min( position.x, pointMin.x );
+      pointMin.y = std::min( position.y, pointMin.y );
+      pointMin.z = std::min( position.z, pointMin.z );
 
-      pointMax.x = std::max(position.x, pointMax.x);
-      pointMax.y = std::max(position.y, pointMax.y);
-      pointMax.z = std::max(position.z, pointMax.z);
+      pointMax.x = std::max( position.x, pointMax.x );
+      pointMax.y = std::max( position.y, pointMax.y );
+      pointMax.z = std::max( position.z, pointMax.z );
     }
 
     Vector3 pointMin;
     Vector3 pointMax;
+  };
+
+  //Defines bit masks to declare which properties are needed by anyone requesting a geometry.
+  enum ObjectProperties
+  {
+    TEXTURE_COORDINATES = 1 << 0,
+    TANGENTS = 1 << 1,
+    BINOMIALS = 1 << 2
   };
 
   ObjLoader();
@@ -101,11 +106,12 @@ public:
   bool      IsSceneLoaded();
   bool      IsMaterialLoaded();
 
-  bool      Load(char* objBuffer, std::streampos fileSize, std::string& materialFile);
+  bool      LoadObject( char* objBuffer, std::streampos fileSize );
 
-  void      LoadMaterial(char* objBuffer, std::streampos fileSize, std::string& texture0Url, std::string& texture1Url, std::string& texture2Url);
+  void      LoadMaterial( char* objBuffer, std::streampos fileSize, std::string& diffuseTextureUrl,
+                          std::string& normalTextureUrl, std::string& glossTextureUrl );
 
-  Geometry  CreateGeometry(Toolkit::Model3dView::IlluminationType illuminationType);
+  Geometry  CreateGeometry( int objectProperties );
 
   Vector3   GetCenter();
   Vector3   GetSize();
@@ -138,19 +144,19 @@ private:
   Dali::Vector<Vector3> mBiTangents;
   Dali::Vector<TriIndex> mTriangles;
 
-  void CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
-                             const Dali::Vector<Vector2>& texcoord,
-                             Dali::Vector<TriIndex>& triangle,
-                             Dali::Vector<Vector3>& normal,
-                             Dali::Vector<Vector3>& tangent);
+  void CalculateTangentArray( const Dali::Vector<Vector3>& vertex,
+                              const Dali::Vector<Vector2>& texcoord,
+                              Dali::Vector<TriIndex>& triangle,
+                              Dali::Vector<Vector3>& normal,
+                              Dali::Vector<Vector3>& tangent );
 
-  void CenterAndScale(bool center, Dali::Vector<Vector3>& points);
+  void CenterAndScale( bool center, Dali::Vector<Vector3>& points );
 
 
-  void CreateGeometryArray(Dali::Vector<Vertex> & vertices,
-                           Dali::Vector<Vector2> & textures,
-                           Dali::Vector<VertexExt> & verticesExt,
-                           Dali::Vector<unsigned short> & indices);
+  void CreateGeometryArray( Dali::Vector<Vertex> & vertices,
+                            Dali::Vector<Vector2> & textures,
+                            Dali::Vector<VertexExt> & verticesExt,
+                            Dali::Vector<unsigned short> & indices );
 
 };
 

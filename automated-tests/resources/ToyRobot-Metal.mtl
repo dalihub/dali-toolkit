@@ -1,0 +1,11 @@
+newmtl lambert3SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd tbcol.png
+bump tb-norm.png -bm 0.05
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks TB-gloss.png
+Ns 3.66

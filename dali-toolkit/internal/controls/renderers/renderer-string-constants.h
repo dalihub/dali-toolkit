@@ -32,9 +32,17 @@ extern const char * const COLOR_RENDERER;
 extern const char * const BORDER_RENDERER;
 extern const char * const GRADIENT_RENDERER;
 extern const char * const IMAGE_RENDERER;
+extern const char * const MESH_RENDERER;
 
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;
+extern const char * const COLOR;
+
+//Mesh properties
+extern const char * const OBJECT_URL;
+extern const char * const MATERIAL_URL;
+extern const char * const TEXTURES_PATH;
+extern const char * const SHADER_TYPE;
 
 } // namespace Internal
 

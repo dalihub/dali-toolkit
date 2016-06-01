@@ -423,7 +423,7 @@ void Model3dView::OnStageConnection( int depth )
 
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( mIlluminationType );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ) );
 
     CreateMaterial();
     LoadTextures();
@@ -462,9 +462,7 @@ void Model3dView::LoadGeometry()
   if (FileLoader::ReadFile(mObjUrl,fileSize,fileContent,FileLoader::TEXT))
   {
     mObjLoader.ClearArrays();
-
-    std::string materialUrl;
-    mObjLoader.Load(fileContent.Begin(), fileSize, materialUrl);
+    mObjLoader.LoadObject(fileContent.Begin(), fileSize);
 
     //Get size information from the obj loaded
     mSceneCenter = mObjLoader.GetCenter();
@@ -520,7 +518,7 @@ void Model3dView::CreateGeometry()
 {
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( mIlluminationType );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ) );
 
     if( mRenderer )
     {
@@ -627,6 +625,24 @@ void Model3dView::LoadTextures()
       mTextureSet.SetImage( 2u, tex2 );
     }
   }
+}
+
+int Model3dView::GetShaderProperties( Toolkit::Model3dView::IlluminationType illuminationType )
+{
+  int objectProperties = 0;
+
+  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ||
+      illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
+  {
+    objectProperties |= ObjLoader::TEXTURE_COORDINATES;
+  }
+
+  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
+  {
+    objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINOMIALS;
+  }
+
+  return objectProperties;
 }
 
 } // namespace Internal
