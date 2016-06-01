@@ -100,11 +100,13 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/markup-processor-font.cpp \
    $(toolkit_src_dir)/text/markup-processor-helper-functions.cpp \
    $(toolkit_src_dir)/text/multi-language-support.cpp \
+   $(toolkit_src_dir)/text/property-string-parser.cpp \
    $(toolkit_src_dir)/text/segmentation.cpp \
    $(toolkit_src_dir)/text/shaper.cpp \
    $(toolkit_src_dir)/text/text-control-interface.cpp \
    $(toolkit_src_dir)/text/text-controller.cpp \
    $(toolkit_src_dir)/text/text-controller-impl.cpp \
+   $(toolkit_src_dir)/text/text-effects-style.cpp \
    $(toolkit_src_dir)/text/text-font-style.cpp \
    $(toolkit_src_dir)/text/text-io.cpp \
    $(toolkit_src_dir)/text/text-scroller.cpp \

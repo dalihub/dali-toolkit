@@ -192,6 +192,20 @@ public:
               Length numberOfCharacters,
               Vector<LineRun>& lines );
 
+  /**
+   * @brief Sets the default line spacing.
+   *
+   * @param[in] lineSpacing The line spacing.
+   */
+  void SetDefaultLineSpacing( float lineSpacing );
+
+  /**
+   * @brief Retrieves the default line spacing.
+   *
+   * @return The line spacing.
+   */
+  float GetDefaultLineSpacing() const;
+
 private:
 
   // Undefined

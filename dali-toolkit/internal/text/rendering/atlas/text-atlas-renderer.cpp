@@ -689,22 +689,26 @@ struct AtlasRenderer::Impl
       vert.mPosition.y = baseLine;
       vert.mTexCoords.x = ZERO;
       vert.mTexCoords.y = ZERO;
+      vert.mColor = underlineColor;
       newMesh.mVertices.PushBack( vert );
 
       vert.mPosition.x = brx;
       vert.mPosition.y = baseLine;
       vert.mTexCoords.x = u;
+      vert.mColor = underlineColor;
       newMesh.mVertices.PushBack( vert );
 
       vert.mPosition.x = tlx;
       vert.mPosition.y = baseLine + thickness;
       vert.mTexCoords.x = ZERO;
       vert.mTexCoords.y = v;
+      vert.mColor = underlineColor;
       newMesh.mVertices.PushBack( vert );
 
       vert.mPosition.x = brx;
       vert.mPosition.y = baseLine + thickness;
       vert.mTexCoords.x = u;
+      vert.mColor = underlineColor;
       newMesh.mVertices.PushBack( vert );
 
       // Six indices in counter clockwise winding
@@ -715,8 +719,6 @@ struct AtlasRenderer::Impl
       newMesh.mIndices.PushBack( faceIndex + 3u );
       newMesh.mIndices.PushBack( faceIndex + 1u );
       faceIndex += 4;
-
-      vert.mColor = underlineColor;
 
       Toolkit::Internal::AtlasMeshFactory::AppendMesh( meshRecords[ index ].mMesh, newMesh );
     }

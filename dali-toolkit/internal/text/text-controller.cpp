@@ -685,6 +685,26 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mVisualModel->GetShadowColor();
 }
 
+void Controller::SetDefaultShadowProperties( const std::string& shadowProperties )
+{
+  if( NULL == mImpl->mShadowDefaults )
+  {
+    mImpl->mShadowDefaults = new ShadowDefaults();
+  }
+
+  mImpl->mShadowDefaults->properties = shadowProperties;
+}
+
+const std::string& Controller::GetDefaultShadowProperties() const
+{
+  if( NULL != mImpl->mShadowDefaults )
+  {
+    return mImpl->mShadowDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mVisualModel->SetUnderlineColor( color );
@@ -719,6 +739,77 @@ void Controller::SetUnderlineHeight( float height )
 float Controller::GetUnderlineHeight() const
 {
   return mImpl->mVisualModel->GetUnderlineHeight();
+}
+
+void Controller::SetDefaultUnderlineProperties( const std::string& underlineProperties )
+{
+  if( NULL == mImpl->mUnderlineDefaults )
+  {
+    mImpl->mUnderlineDefaults = new UnderlineDefaults();
+  }
+
+  mImpl->mUnderlineDefaults->properties = underlineProperties;
+}
+
+const std::string& Controller::GetDefaultUnderlineProperties() const
+{
+  if( NULL != mImpl->mUnderlineDefaults )
+  {
+    return mImpl->mUnderlineDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
+{
+  if( NULL == mImpl->mEmbossDefaults )
+  {
+    mImpl->mEmbossDefaults = new EmbossDefaults();
+  }
+
+  mImpl->mEmbossDefaults->properties = embossProperties;
+}
+
+const std::string& Controller::GetDefaultEmbossProperties() const
+{
+  if( NULL != mImpl->mEmbossDefaults )
+  {
+    return mImpl->mEmbossDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultOutlineProperties( const std::string& outlineProperties )
+{
+  if( NULL == mImpl->mOutlineDefaults )
+  {
+    mImpl->mOutlineDefaults = new OutlineDefaults();
+  }
+
+  mImpl->mOutlineDefaults->properties = outlineProperties;
+}
+
+const std::string& Controller::GetDefaultOutlineProperties() const
+{
+  if( NULL != mImpl->mOutlineDefaults )
+  {
+    return mImpl->mOutlineDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultLineSpacing( float lineSpacing )
+{
+  //TODO finish implementation
+  mImpl->mLayoutEngine.SetDefaultLineSpacing( lineSpacing );
+}
+
+float Controller::GetDefaultLineSpacing() const
+{
+  return mImpl->mLayoutEngine.GetDefaultLineSpacing();
 }
 
 void Controller::SetInputColor( const Vector4& color )
@@ -1055,6 +1146,96 @@ float Controller::GetInputFontPointSize() const
 
   // Return the default font's point size if there is no EventData.
   return GetDefaultPointSize();
+}
+
+void Controller::SetInputLineSpacing( float lineSpacing )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.lineSpacing = lineSpacing;
+  }
+}
+
+float Controller::GetInputLineSpacing() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.lineSpacing;
+  }
+
+  return 0.f;
+}
+
+void Controller::SetInputShadowProperties( const std::string& shadowProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.shadowProperties = shadowProperties;
+  }
+}
+
+const std::string& Controller::GetInputShadowProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.shadowProperties;
+  }
+
+  return GetDefaultShadowProperties();
+}
+
+void Controller::SetInputUnderlineProperties( const std::string& underlineProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.underlineProperties = underlineProperties;
+  }
+}
+
+const std::string& Controller::GetInputUnderlineProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.underlineProperties;
+  }
+
+  return GetDefaultUnderlineProperties();
+}
+
+void Controller::SetInputEmbossProperties( const std::string& embossProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.embossProperties = embossProperties;
+  }
+}
+
+const std::string& Controller::GetInputEmbossProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.embossProperties;
+  }
+
+  return GetDefaultEmbossProperties();
+}
+
+void Controller::SetInputOutlineProperties( const std::string& outlineProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.outlineProperties = outlineProperties;
+  }
+}
+
+const std::string& Controller::GetInputOutlineProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.outlineProperties;
+  }
+
+  return GetDefaultOutlineProperties();
 }
 
 void Controller::SetEnableCursorBlink( bool enable )

@@ -56,6 +56,12 @@ const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED = "autoScrollSpeed";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_LOOPS = "autoScrollLoopCount";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_GAP = "autoScrollGap";
 
+const char* const PROPERTY_NAME_LINE_SPACING = "lineSpacing";
+const char* const PROPERTY_NAME_UNDERLINE = "underline";
+const char* const PROPERTY_NAME_SHADOW = "shadow";
+const char* const PROPERTY_NAME_EMBOSS = "emboss";
+const char* const PROPERTY_NAME_OUTLINE = "outline";
+
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
 } // namespace
@@ -160,6 +166,11 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED ) == TextLabel::Property::AUTO_SCROLL_SPEED );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_LOOPS ) == TextLabel::Property::AUTO_SCROLL_LOOP_COUNT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_GAP ) == TextLabel::Property::AUTO_SCROLL_GAP );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_LINE_SPACING ) == TextLabel::Property::LINE_SPACING );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE ) == TextLabel::Property::UNDERLINE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextLabel::Property::SHADOW );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextLabel::Property::EMBOSS );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextLabel::Property::OUTLINE );
 
   END_TEST;
 }
@@ -215,7 +226,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::RED, TEST_LOCATION );
   label.SetProperty( TextLabel::Property::UNDERLINE_HEIGHT, 1.0f );
-  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 1.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   TextLabel label2 = TextLabel::New( "New text" );
   DALI_TEST_CHECK( label2 );
@@ -240,6 +251,28 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( SCROLL_LOOPS, label.GetProperty<int>( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT ), TEST_LOCATION );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, SCROLL_GAP );
   DALI_TEST_EQUALS( SCROLL_GAP, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_GAP ), TEST_LOCATION );
+
+  // Check the line spacing property
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::LINE_SPACING, 10.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the underline property
+  label.SetProperty( TextLabel::Property::UNDERLINE, "Underline properties" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+
+  // Check the shadow property
+  label.SetProperty( TextLabel::Property::SHADOW, "Shadow properties" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+
+  // Check the emboss property
+  label.SetProperty( TextLabel::Property::EMBOSS, "Emboss properties" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::EMBOSS ), std::string("Emboss properties"), TEST_LOCATION );
+
+  // Check the outline property
+  label.SetProperty( TextLabel::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
   END_TEST;
 }
 
