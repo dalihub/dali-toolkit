@@ -284,7 +284,7 @@ public:
   /**
    * @brief Retrieves the blink-interval for a cursor.
    *
-   * @return The cursor blink-interval.
+   * @return The cursor blink-interval in seconds.
    */
   float GetCursorBlinkInterval() const;
 
@@ -298,7 +298,7 @@ public:
   /**
    * @brief Retrieves the blink-duration for a cursor.
    *
-   * @return The cursor blink-duration.
+   * @return The cursor blink-duration in seconds.
    */
   float GetCursorBlinkDuration() const;
 
@@ -501,14 +501,14 @@ public:
    * It defines a square area inside the control, close to the edge.
    * When the cursor enters this area, the decorator starts to send scroll events.
    *
-   * @param[in] threshold The scroll threshold.
+   * @param[in] threshold The scroll threshold in pixels.
    */
   void SetScrollThreshold( float threshold );
 
   /**
    * @brief Retrieves the scroll threshold.
    *
-   * @retunr The scroll threshold.
+   * @retunr The scroll threshold in pixels.
    */
   float GetScrollThreshold() const;
 
@@ -517,14 +517,14 @@ public:
    *
    * Is the distance the text is going to be scrolled during a scroll interval.
    *
-   * @param[in] speed The scroll speed.
+   * @param[in] speed The scroll speed in pixels/second.
    */
   void SetScrollSpeed( float speed );
 
   /**
    * @brief Retrieves the scroll speed.
    *
-   * @return The scroll speed.
+   * @return The scroll speed in pixels/second.
    */
   float GetScrollSpeed() const;
 
@@ -532,6 +532,36 @@ public:
    * @brief Notifies the decorator the whole text has been scrolled.
    */
   void NotifyEndOfScroll();
+
+  /**
+   * @copydoc Text::Controller::SetHorizontalScrollEnabled()
+   */
+  void SetHorizontalScrollEnabled( bool enable );
+
+  /**
+   * @copydoc Text::Controller::IsHorizontalScrollEnabled()
+   */
+  bool IsHorizontalScrollEnabled() const;
+
+  /**
+   * @copydoc Text::Controller::SetVerticalScrollEnabled()
+   */
+  void SetVerticalScrollEnabled( bool enable );
+
+  /**
+   * @copydoc Text::Controller::IsVerticalScrollEnabled()
+   */
+  bool IsVerticalScrollEnabled() const;
+
+  /**
+   * @copydoc Text::Controller::SetSmoothHandlePanEnabled()
+   */
+  void SetSmoothHandlePanEnabled( bool enable );
+
+  /**
+   * @copydoc Text::Controller::IsSmoothHandlePanEnabled()
+   */
+  bool IsSmoothHandlePanEnabled() const;
 
 protected:
 

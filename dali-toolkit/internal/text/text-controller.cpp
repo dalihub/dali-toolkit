@@ -93,6 +93,7 @@ FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
   // Recalculate the selection highlight as the metrics may have changed.
   eventData->mUpdateLeftSelectionPosition = true;
   eventData->mUpdateRightSelectionPosition = true;
+  eventData->mUpdateHighlightBox = true;
 
   return fontDescriptionRun;
 }
@@ -191,6 +192,69 @@ float Controller::GetAutoScrollLineAlignment() const
   }
 
   return offset;
+}
+
+void Controller::SetHorizontalScrollEnabled( bool enable )
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    mImpl->mEventData->mDecorator->SetHorizontalScrollEnabled( enable );
+  }
+}
+
+bool Controller::IsHorizontalScrollEnabled() const
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    return mImpl->mEventData->mDecorator->IsHorizontalScrollEnabled();
+  }
+
+  return false;
+}
+
+void Controller::SetVerticalScrollEnabled( bool enable )
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    if( mImpl->mEventData->mDecorator )
+    {
+      mImpl->mEventData->mDecorator->SetVerticalScrollEnabled( enable );
+    }
+  }
+}
+
+bool Controller::IsVerticalScrollEnabled() const
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    return mImpl->mEventData->mDecorator->IsVerticalScrollEnabled();
+  }
+
+  return false;
+}
+
+void Controller::SetSmoothHandlePanEnabled( bool enable )
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    mImpl->mEventData->mDecorator->SetSmoothHandlePanEnabled( enable );
+  }
+}
+
+bool Controller::IsSmoothHandlePanEnabled() const
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    return mImpl->mEventData->mDecorator->IsSmoothHandlePanEnabled();
+  }
+
+  return false;
 }
 
 void Controller::SetText( const std::string& text )
@@ -874,6 +938,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
       // As the font changes, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -947,6 +1012,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1000,6 +1066,7 @@ void Controller::SetInputFontWidth( FontWidth width )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1053,6 +1120,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1105,6 +1173,7 @@ void Controller::SetInputFontPointSize( float size )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -2313,6 +2382,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
         }
         else
         {
+          // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
           mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
         }
         relayoutNeeded = true;
@@ -2363,7 +2433,6 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
-        // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
 

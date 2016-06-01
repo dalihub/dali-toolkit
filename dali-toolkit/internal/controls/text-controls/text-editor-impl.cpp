@@ -52,10 +52,11 @@ namespace // unnamed namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
 #endif
 
-  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+const float DEFAULT_SCROLL_SPEED = 1200.f; ///< The default scroll speed for the text editor in pixels/second.
 } // unnamed namespace
 
 namespace
@@ -928,9 +929,19 @@ void TextEditor::OnInitialize()
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::MULTI_LINE_BOX );
 
+  // Enables the text input.
   mController->EnableTextInput( mDecorator );
 
+  // Enables the vertical scrolling after the text input has been enabled.
+  mController->SetVerticalScrollEnabled( true );
+
+  // Disables the horizontal scrolling.
+  mController->SetHorizontalScrollEnabled( false );
+
   mController->SetMaximumNumberOfCharacters( std::numeric_limits<Length>::max() );
+
+  // Enable the smooth handle panning.
+  mController->SetSmoothHandlePanEnabled( true );
 
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
@@ -948,8 +959,11 @@ void TextEditor::OnInitialize()
     mDecorator->SetBoundingBox( Rect<int>( 0.0f, 0.0f, stageSize.width, stageSize.height ) );
   }
 
-  // Flip vertically the 'left' selection handle
-  mDecorator->FlipHandleVertically( LEFT_SELECTION_HANDLE, true );
+  // Whether to flip the selection handles as soon as they cross.
+  mDecorator->FlipSelectionHandlesOnCrossEnabled( true );
+
+  // Set the default scroll speed.
+  mDecorator->SetScrollSpeed( DEFAULT_SCROLL_SPEED );
 
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );

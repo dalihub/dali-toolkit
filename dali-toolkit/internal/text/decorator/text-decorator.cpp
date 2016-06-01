@@ -93,17 +93,17 @@ const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight 
 
 const Dali::Vector4 HANDLE_COLOR( 0.0f, (183.0f / 255.0f), (229.0f / 255.0f), 1.0f  );
 
-const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
-const float TO_MILLISECONDS = 1000.f;
-const float TO_SECONDS = 1.f / TO_MILLISECONDS;
+const unsigned int CURSOR_BLINK_INTERVAL = 500u; ///< Cursor blink interval in milliseconds.
+const float TO_MILLISECONDS = 1000.f;            ///< Converts from seconds to milliseconds.
+const float TO_SECONDS = 1.f / TO_MILLISECONDS;  ///< Converts from milliseconds to seconds.
 
-const unsigned int SCROLL_TICK_INTERVAL = 50u;
+const unsigned int SCROLL_TICK_INTERVAL = 50u; ///< Scroll interval in milliseconds.
+const float SCROLL_THRESHOLD = 10.f;           ///< Threshold in pixels close to the edges of the decorator boundaries from where the scroll timer starts to emit signals.
+const float SCROLL_SPEED = 300.f;              ///< The scroll speed in pixels/second.
 
-const float SCROLL_THRESHOLD = 10.f;
-const float SCROLL_SPEED = 300.f;
-const float SCROLL_DISTANCE = SCROLL_SPEED * SCROLL_TICK_INTERVAL * TO_SECONDS;
+const float SCROLL_DISTANCE = SCROLL_SPEED * SCROLL_TICK_INTERVAL * TO_SECONDS; ///< Distance in pixels scrolled in one second.
 
-const float CURSOR_WIDTH = 1.f;
+const float CURSOR_WIDTH = 1.f; ///< The cursor's width in pixels.
 
 /**
  * structure to hold coordinates of each quad, which will make up the mesh.
@@ -208,6 +208,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     HandleImpl()
     : position(),
+      globalPosition(),
       size(),
       lineHeight( 0.0f ),
       grabDisplacementX( 0.f ),
@@ -226,6 +227,7 @@ struct Decorator::Impl : public ConnectionTracker
     ImageView markerActor;
 
     Vector2 position;
+    Vector2 globalPosition;
     Size    size;
     float   lineHeight;              ///< Not the handle height
     float   grabDisplacementX;
@@ -277,10 +279,12 @@ struct Decorator::Impl : public ConnectionTracker
     mFlipSelectionHandlesOnCross( false ),
     mFlipLeftSelectionHandleDirection( false ),
     mFlipRightSelectionHandleDirection( false ),
-    mHandlePanning( false ),
-    mHandleCurrentCrossed( false ),
-    mHandlePreviousCrossed( false ),
-    mNotifyEndOfScroll( false )
+    mIsHandlePanning( false ),
+    mIsHandleCurrentlyCrossed( false ),
+    mIsHandlePreviouslyCrossed( false ),
+    mNotifyEndOfScroll( false ),
+    mHorizontalScrollingEnabled( false ),
+    mVerticalScrollingEnabled( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
@@ -304,7 +308,10 @@ struct Decorator::Impl : public ConnectionTracker
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
-      mPrimaryCursorVisible = ( cursor.position.x + mCursorWidth <= mControlSize.width ) && ( cursor.position.x >= 0.f );
+      mPrimaryCursorVisible = ( ( cursor.position.x + mCursorWidth <= mControlSize.width ) &&
+                                ( cursor.position.x >= 0.f ) &&
+                                ( cursor.position.y + cursor.cursorHeight <= mControlSize.height ) &&
+                                ( cursor.position.y >= 0.f ) );
       if( mPrimaryCursorVisible )
       {
         mPrimaryCursor.SetPosition( cursor.position.x,
@@ -316,7 +323,10 @@ struct Decorator::Impl : public ConnectionTracker
     if( mSecondaryCursor )
     {
       const CursorImpl& cursor = mCursor[SECONDARY_CURSOR];
-      mSecondaryCursorVisible = ( cursor.position.x + mCursorWidth <= mControlSize.width ) && ( cursor.position.x >= 0.f );
+      mSecondaryCursorVisible = ( ( cursor.position.x + mCursorWidth <= mControlSize.width ) &&
+                                  ( cursor.position.x >= 0.f ) &&
+                                  ( cursor.position.y + cursor.cursorHeight <= mControlSize.height ) &&
+                                  ( cursor.position.y >= 0.f ) );
       if( mSecondaryCursorVisible )
       {
         mSecondaryCursor.SetPosition( cursor.position.x,
@@ -331,7 +341,10 @@ struct Decorator::Impl : public ConnectionTracker
     bool newGrabHandlePosition = false;
     if( grabHandle.active )
     {
-      const bool isVisible = ( grabHandle.position.x + floor( 0.5f * mCursorWidth ) <= mControlSize.width ) && ( grabHandle.position.x >= 0.f );
+      const bool isVisible = ( ( grabHandle.position.x + floor( 0.5f * mCursorWidth ) <= mControlSize.width ) &&
+                               ( grabHandle.position.x >= 0.f ) &&
+                               ( grabHandle.position.y <= mControlSize.height - grabHandle.lineHeight ) &&
+                               ( grabHandle.position.y >= 0.f ) );
 
       if( isVisible )
       {
@@ -363,8 +376,14 @@ struct Decorator::Impl : public ConnectionTracker
     bool newSecondaryHandlePosition = false;
     if( primary.active || secondary.active )
     {
-      const bool isPrimaryVisible = ( primary.position.x <= mControlSize.width ) && ( primary.position.x >= 0.f );
-      const bool isSecondaryVisible = ( secondary.position.x <= mControlSize.width ) && ( secondary.position.x >= 0.f );
+      const bool isPrimaryVisible = ( ( primary.position.x <= mControlSize.width ) &&
+                                      ( primary.position.x >= 0.f ) &&
+                                      ( primary.position.y <= mControlSize.height - primary.lineHeight ) &&
+                                      ( primary.position.y >= 0.f ) );
+      const bool isSecondaryVisible = ( ( secondary.position.x <= mControlSize.width ) &&
+                                        ( secondary.position.x >= 0.f ) &&
+                                        ( secondary.position.y <= mControlSize.height - secondary.lineHeight ) &&
+                                        ( secondary.position.y >= 0.f ) );
 
       if( isPrimaryVisible || isSecondaryVisible )
       {
@@ -844,8 +863,8 @@ struct Decorator::Impl : public ConnectionTracker
     // The grab handle position in world coords.
     // The active layer's world position is the center of the active layer. The origin of the
     // coord system of the handles is the top left of the active layer.
-    position.x = parentWorldPosition.x - 0.5f * mControlSize.width + handle.position.x;
-    position.y = parentWorldPosition.y - 0.5f * mControlSize.height + handle.position.y;
+    position.x = parentWorldPosition.x - 0.5f * mControlSize.width + handle.position.x + ( mSmoothHandlePanEnabled ? handle.grabDisplacementX : 0.f );
+    position.y = parentWorldPosition.y - 0.5f * mControlSize.height + handle.position.y + ( mSmoothHandlePanEnabled ? handle.grabDisplacementY : 0.f );
   }
 
   void SetGrabHandlePosition()
@@ -877,8 +896,8 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( grabHandle.actor )
     {
-      grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ),
-                                    yLocalPosition ); // TODO : Fix for multiline.
+      grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ) + ( mSmoothHandlePanEnabled ? grabHandle.grabDisplacementX : 0.f ),
+                                    yLocalPosition + ( mSmoothHandlePanEnabled ? grabHandle.grabDisplacementY : 0.f ) );
     }
   }
 
@@ -903,18 +922,21 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Whether to flip the handles if they are crossed.
     bool crossFlip = false;
-    if( mFlipSelectionHandlesOnCross || !mHandlePanning )
+    if( mFlipSelectionHandlesOnCross || !mIsHandlePanning )
     {
-      crossFlip = mHandleCurrentCrossed;
+      crossFlip = mIsHandleCurrentlyCrossed;
     }
 
+    // Whether the handle was crossed before start the panning.
+    const bool isHandlePreviouslyCrossed = mFlipSelectionHandlesOnCross ? false : mIsHandlePreviouslyCrossed;
+
     // Does not flip if both conditions are true (double flip)
-    flipHandle = flipHandle != ( crossFlip || mHandlePreviousCrossed );
+    flipHandle = flipHandle != ( crossFlip || isHandlePreviouslyCrossed );
 
     // Will flip the handles vertically if the user prefers it.
     bool verticallyFlippedPreferred = handle.verticallyFlippedPreferred;
 
-    if( crossFlip || mHandlePreviousCrossed )
+    if( crossFlip || isHandlePreviouslyCrossed )
     {
       if( isPrimaryHandle )
       {
@@ -967,8 +989,8 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( handle.actor )
     {
-      handle.actor.SetPosition( handle.position.x,
-                                yLocalPosition ); // TODO : Fix for multiline.
+      handle.actor.SetPosition( handle.position.x + ( mSmoothHandlePanEnabled ? handle.grabDisplacementX : 0.f ),
+                                yLocalPosition + ( mSmoothHandlePanEnabled ? handle.grabDisplacementY : 0.f ) );
     }
   }
 
@@ -1118,29 +1140,49 @@ struct Decorator::Impl : public ConnectionTracker
     if( Gesture::Started == gesture.state )
     {
       handle.grabDisplacementX = handle.grabDisplacementY = 0.f;
+
+      handle.globalPosition.x = handle.position.x;
+      handle.globalPosition.y = handle.position.y;
     }
 
     handle.grabDisplacementX += gesture.displacement.x;
     handle.grabDisplacementY += ( handle.verticallyFlipped ? -gesture.displacement.y : gesture.displacement.y );
 
-    const float x = handle.position.x + handle.grabDisplacementX;
-    const float y = handle.position.y + handle.lineHeight*0.5f + handle.grabDisplacementY;
+    const float x = handle.globalPosition.x + handle.grabDisplacementX;
+    const float y = handle.globalPosition.y + handle.grabDisplacementY + 0.5f * handle.lineHeight;
+    const float yVerticallyFlippedCorrected = y - ( handle.verticallyFlipped ? handle.lineHeight : 0.f );
 
-    if( Gesture::Started    == gesture.state ||
-        Gesture::Continuing == gesture.state )
+    if( ( Gesture::Started    == gesture.state ) ||
+        ( Gesture::Continuing == gesture.state ) )
     {
       Vector2 targetSize;
       mController.GetTargetSize( targetSize );
 
-      if( x < mScrollThreshold )
+      if( mHorizontalScrollingEnabled &&
+          ( x < mScrollThreshold ) )
       {
         mScrollDirection = SCROLL_RIGHT;
         mHandleScrolling = type;
         StartScrollTimer();
       }
-      else if( x > targetSize.width - mScrollThreshold )
+      else if( mHorizontalScrollingEnabled &&
+               ( x > targetSize.width - mScrollThreshold ) )
       {
         mScrollDirection = SCROLL_LEFT;
+        mHandleScrolling = type;
+        StartScrollTimer();
+      }
+      else if( mVerticalScrollingEnabled &&
+               ( yVerticallyFlippedCorrected < mScrollThreshold ) )
+      {
+        mScrollDirection = SCROLL_TOP;
+        mHandleScrolling = type;
+        StartScrollTimer();
+      }
+      else if( mVerticalScrollingEnabled &&
+               ( yVerticallyFlippedCorrected + handle.lineHeight > targetSize.height - mScrollThreshold ) )
+      {
+        mScrollDirection = SCROLL_BOTTOM;
         mHandleScrolling = type;
         StartScrollTimer();
       }
@@ -1151,10 +1193,10 @@ struct Decorator::Impl : public ConnectionTracker
         mController.DecorationEvent( type, HANDLE_PRESSED, x, y );
       }
 
-      mHandlePanning = true;
+      mIsHandlePanning = true;
     }
-    else if( Gesture::Finished  == gesture.state ||
-             Gesture::Cancelled == gesture.state )
+    else if( ( Gesture::Finished  == gesture.state ) ||
+             ( Gesture::Cancelled == gesture.state ) )
     {
       if( mScrollTimer &&
           ( mScrollTimer.IsRunning() || mNotifyEndOfScroll ) )
@@ -1175,7 +1217,7 @@ struct Decorator::Impl : public ConnectionTracker
       }
       handle.pressed = false;
 
-      mHandlePanning = false;
+      mIsHandlePanning = false;
     }
   }
 
@@ -1201,20 +1243,22 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool OnGrabHandleTouched( Actor actor, const TouchData& touch )
   {
+    HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+
     // Switch between pressed/release grab-handle images
     if( touch.GetPointCount() > 0 &&
-        mHandle[GRAB_HANDLE].actor )
+        grabHandle.actor )
     {
       const PointState::Type state = touch.GetState( 0 );
 
       if( PointState::DOWN == state )
       {
-        mHandle[GRAB_HANDLE].pressed = true;
+        grabHandle.pressed = true;
       }
       else if( ( PointState::UP == state ) ||
                ( PointState::INTERRUPTED == state ) )
       {
-        mHandle[GRAB_HANDLE].pressed = false;
+        grabHandle.pressed = false;
       }
 
       SetHandleImage( GRAB_HANDLE );
@@ -1226,22 +1270,24 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool OnHandleOneTouched( Actor actor, const TouchData& touch )
   {
+    HandleImpl& primarySelectionHandle = mHandle[LEFT_SELECTION_HANDLE];
+
     // Switch between pressed/release selection handle images
     if( touch.GetPointCount() > 0 &&
-        mHandle[LEFT_SELECTION_HANDLE].actor )
+        primarySelectionHandle.actor )
     {
       const PointState::Type state = touch.GetState( 0 );
 
       if( PointState::DOWN == state )
       {
-        mHandle[LEFT_SELECTION_HANDLE].pressed = true;
+        primarySelectionHandle.pressed = true;
       }
       else if( ( PointState::UP == state ) ||
                ( PointState::INTERRUPTED == state ) )
       {
-        mHandle[LEFT_SELECTION_HANDLE].pressed = false;
-        mHandlePreviousCrossed = mHandleCurrentCrossed;
-        mHandlePanning = false;
+        primarySelectionHandle.pressed = false;
+        mIsHandlePreviouslyCrossed = mIsHandleCurrentlyCrossed;
+        mIsHandlePanning = false;
       }
 
       SetHandleImage( LEFT_SELECTION_HANDLE );
@@ -1253,22 +1299,24 @@ struct Decorator::Impl : public ConnectionTracker
 
   bool OnHandleTwoTouched( Actor actor, const TouchData& touch )
   {
+    HandleImpl& secondarySelectionHandle = mHandle[RIGHT_SELECTION_HANDLE];
+
     // Switch between pressed/release selection handle images
     if( touch.GetPointCount() > 0 &&
-        mHandle[RIGHT_SELECTION_HANDLE].actor )
+        secondarySelectionHandle.actor )
     {
       const PointState::Type state = touch.GetState( 0 );
 
       if( PointState::DOWN == state )
       {
-        mHandle[RIGHT_SELECTION_HANDLE].pressed = true;
+        secondarySelectionHandle.pressed = true;
       }
       else if( ( PointState::UP == state ) ||
                ( PointState::INTERRUPTED == state ) )
       {
-        mHandle[RIGHT_SELECTION_HANDLE].pressed = false;
-        mHandlePreviousCrossed = mHandleCurrentCrossed;
-        mHandlePanning = false;
+        secondarySelectionHandle.pressed = false;
+        mIsHandlePreviouslyCrossed = mIsHandleCurrentlyCrossed;
+        mIsHandlePanning = false;
       }
 
       SetHandleImage( RIGHT_SELECTION_HANDLE );
@@ -1646,10 +1694,39 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( HANDLE_TYPE_COUNT != mHandleScrolling )
     {
+      float x = 0.f;
+      float y = 0.f;
+
+      switch( mScrollDirection )
+      {
+        case SCROLL_RIGHT:
+        {
+          x = mScrollDistance;
+          break;
+        }
+        case SCROLL_LEFT:
+        {
+          x = -mScrollDistance;
+          break;
+        }
+        case SCROLL_TOP:
+        {
+          y = mScrollDistance;
+          break;
+        }
+        case SCROLL_BOTTOM:
+        {
+          y = -mScrollDistance;
+          break;
+        }
+        default:
+          break;
+      }
+
       mController.DecorationEvent( mHandleScrolling,
                                    HANDLE_SCROLLING,
-                                   mScrollDirection == SCROLL_RIGHT ? mScrollDistance : -mScrollDistance,
-                                   0.f );
+                                   x,
+                                   y );
     }
 
     return true;
@@ -1715,10 +1792,13 @@ struct Decorator::Impl : public ConnectionTracker
   bool                mFlipSelectionHandlesOnCross       : 1; ///< Whether to flip the selection handles as soon as they cross.
   bool                mFlipLeftSelectionHandleDirection  : 1; ///< Whether to flip the left selection handle image because of the character's direction.
   bool                mFlipRightSelectionHandleDirection : 1; ///< Whether to flip the right selection handle image because of the character's direction.
-  bool                mHandlePanning                     : 1; ///< Whether any of the handles is moving.
-  bool                mHandleCurrentCrossed              : 1; ///< Whether the handles are crossed.
-  bool                mHandlePreviousCrossed             : 1; ///< Whether the handles where crossed at the last handle touch up.
+  bool                mIsHandlePanning                   : 1; ///< Whether any of the handles is moving.
+  bool                mIsHandleCurrentlyCrossed          : 1; ///< Whether the handles are crossed.
+  bool                mIsHandlePreviouslyCrossed         : 1; ///< Whether the handles where crossed at the last handle touch up.
   bool                mNotifyEndOfScroll                 : 1; ///< Whether to notify the end of the scroll.
+  bool                mHorizontalScrollingEnabled        : 1; ///< Whether the horizontal scrolling is enabled.
+  bool                mVerticalScrollingEnabled          : 1; ///< Whether the vertical scrolling is enabled.
+  bool                mSmoothHandlePanEnabled            : 1; ///< Whether to pan smoothly the handles.
 };
 
 DecoratorPtr Decorator::New( ControllerInterface& controller,
@@ -1762,18 +1842,22 @@ unsigned int Decorator::GetActiveCursor() const
 
 void Decorator::SetPosition( Cursor cursor, float x, float y, float cursorHeight, float lineHeight )
 {
-  mImpl->mCursor[cursor].position.x = x;
-  mImpl->mCursor[cursor].position.y = y;
-  mImpl->mCursor[cursor].cursorHeight = cursorHeight;
-  mImpl->mCursor[cursor].lineHeight = lineHeight;
+  Impl::CursorImpl& cursorImpl = mImpl->mCursor[cursor];
+
+  cursorImpl.position.x = x;
+  cursorImpl.position.y = y;
+  cursorImpl.cursorHeight = cursorHeight;
+  cursorImpl.lineHeight = lineHeight;
 }
 
 void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight ) const
 {
-  x = mImpl->mCursor[cursor].position.x;
-  y = mImpl->mCursor[cursor].position.y;
-  cursorHeight = mImpl->mCursor[cursor].cursorHeight;
-  lineHeight = mImpl->mCursor[cursor].lineHeight;
+  const Impl::CursorImpl& cursorImpl = mImpl->mCursor[cursor];
+
+  x = cursorImpl.position.x;
+  y = cursorImpl.position.y;
+  cursorHeight = cursorImpl.cursorHeight;
+  lineHeight = cursorImpl.lineHeight;
 }
 
 const Vector2& Decorator::GetPosition( Cursor cursor ) const
@@ -1861,7 +1945,7 @@ void Decorator::SetHandleActive( HandleType handleType, bool active )
   {
     if( ( LEFT_SELECTION_HANDLE == handleType ) || ( RIGHT_SELECTION_HANDLE == handleType ) )
     {
-      mImpl->mHandlePreviousCrossed = false;
+      mImpl->mIsHandlePreviouslyCrossed = false;
     }
 
     // TODO: this is a work-around.
@@ -1908,12 +1992,15 @@ void Decorator::SetPosition( HandleType handleType, float x, float y, float heig
   // Adjust handle's displacement
   Impl::HandleImpl& handle = mImpl->mHandle[handleType];
 
-  handle.grabDisplacementX -= x - handle.position.x;
-  handle.grabDisplacementY -= y - handle.position.y;
-
   handle.position.x = x;
   handle.position.y = y;
   handle.lineHeight = height;
+
+  if( mImpl->mSmoothHandlePanEnabled )
+  {
+    handle.grabDisplacementX = 0.f;
+    handle.grabDisplacementY = 0.f;
+  }
 }
 
 void Decorator::GetPosition( HandleType handleType, float& x, float& y, float& height ) const
@@ -1947,7 +2034,7 @@ void Decorator::FlipSelectionHandlesOnCrossEnabled( bool enable )
 
 void Decorator::SetSelectionHandleFlipState( bool indicesSwapped, bool left, bool right )
 {
-  mImpl->mHandleCurrentCrossed = indicesSwapped;
+  mImpl->mIsHandleCurrentlyCrossed = indicesSwapped;
   mImpl->mFlipLeftSelectionHandleDirection = left;
   mImpl->mFlipRightSelectionHandleDirection = right;
 }
@@ -2035,6 +2122,36 @@ float Decorator::GetScrollSpeed() const
 void Decorator::NotifyEndOfScroll()
 {
   mImpl->NotifyEndOfScroll();
+}
+
+void Decorator::SetHorizontalScrollEnabled( bool enable )
+{
+  mImpl->mHorizontalScrollingEnabled = enable;
+}
+
+bool Decorator::IsHorizontalScrollEnabled() const
+{
+  return mImpl->mHorizontalScrollingEnabled;
+}
+
+void Decorator::SetVerticalScrollEnabled( bool enable )
+{
+  mImpl->mVerticalScrollingEnabled = enable;
+}
+
+bool Decorator::IsVerticalScrollEnabled() const
+{
+  return mImpl->mVerticalScrollingEnabled;
+}
+
+void Decorator::SetSmoothHandlePanEnabled( bool enable )
+{
+  mImpl->mSmoothHandlePanEnabled = enable;
+}
+
+bool Decorator::IsSmoothHandlePanEnabled() const
+{
+  return mImpl->mSmoothHandlePanEnabled;
 }
 
 Decorator::~Decorator()
