@@ -161,9 +161,9 @@ private:
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
 
-  int mScrollSpeed;            ///< Speed which text should automatically scroll at
-  int mLoopCount;              ///< Number of time the text should scroll
-  int mWrapGap;                ///< Gap before text wraps around when scrolling
+  int   mScrollSpeed;            ///< Speed which text should automatically scroll at
+  int   mLoopCount;              ///< Number of time the text should scroll
+  float mWrapGap;                ///< Gap before text wraps around when scrolling
 
 }; // TextScroller class
 
