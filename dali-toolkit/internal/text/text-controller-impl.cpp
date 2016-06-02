@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -35,9 +36,24 @@
 namespace
 {
 
+/**
+ * @brief Struct used to calculate the selection box.
+ */
+struct SelectionBoxInfo
+{
+  float lineOffset;
+  float lineHeight;
+  float minX;
+  float maxX;
+};
+
 #if defined(DEBUG_ENABLED)
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
+
+const float MAX_FLOAT = std::numeric_limits<float>::max();
+const float MIN_FLOAT = std::numeric_limits<float>::min();
+const Dali::Toolkit::Text::CharacterDirection LTR = false; ///< Left To Right direction
 
 } // namespace
 
@@ -1461,16 +1477,10 @@ void Controller::Impl::RepositionSelectionHandles()
   const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != mLogicalModel->mCharacterDirections.Count() ) ? mLogicalModel->mCharacterDirections.Begin() : NULL;
 
   // TODO: Better algorithm to create the highlight box.
-  // TODO: Multi-line.
-
-  // Get the height of the line.
-  const Vector<LineRun>& lines = mVisualModel->mLines;
-  const LineRun& firstLine = *lines.Begin();
-  const float height = firstLine.ascender + -firstLine.descender;
 
   const bool isLastCharacter = selectionEnd >= mLogicalModel->mText.Count();
-  const bool startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
-  const bool endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
+  const CharacterDirection startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
+  const CharacterDirection endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
 
   // Swap the indices if the start is greater than the end.
   const bool indicesSwapped = selectionStart > selectionEnd;
@@ -1488,6 +1498,38 @@ void Controller::Impl::RepositionSelectionHandles()
   const GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
   const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + selectionEndMinusOne );
   const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + selectionEndMinusOne ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
+
+  // Get the lines where the glyphs are laid-out.
+  const LineRun* lineRun = mVisualModel->mLines.Begin();
+
+  LineIndex lineIndex = 0u;
+  Length numberOfLines = 0u;
+  mVisualModel->GetNumberOfLines( glyphStart,
+                                  1u + glyphEnd - glyphStart,
+                                  lineIndex,
+                                  numberOfLines );
+  const LineIndex firstLineIndex = lineIndex;
+
+  // Create the structure to store some selection box info.
+  Vector<SelectionBoxInfo> selectionBoxLinesInfo;
+  selectionBoxLinesInfo.Resize( numberOfLines );
+
+  SelectionBoxInfo* selectionBoxInfo = selectionBoxLinesInfo.Begin();
+  selectionBoxInfo->minX = MAX_FLOAT;
+  selectionBoxInfo->maxX = MIN_FLOAT;
+
+  // Retrieve the first line and get the line's vertical offset, the line's height and the index to the last glyph.
+
+  // The line's vertical offset of all the lines before the line where the first glyph is laid-out.
+  selectionBoxInfo->lineOffset = CalculateLineOffset( mVisualModel->mLines,
+                                                      firstLineIndex );
+  lineRun += firstLineIndex;
+
+  // The line height is the addition of the line ascender and the line descender.
+  // However, the line descender has a negative value, hence the subtraction.
+  selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+
+  GlyphIndex lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
 
   // Check if the first glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
   const Length numberOfCharactersStart = *( charactersPerGlyphBuffer + glyphStart );
@@ -1520,12 +1562,18 @@ void Controller::Impl::RepositionSelectionHandles()
       // Calculate the number of characters selected.
       const Length numberOfCharacters = ( glyphStart == glyphEnd ) ? ( selectionEnd - selectionStart ) : ( numberOfCharactersStart - interGlyphIndex );
 
-      const float xPosition = firstLine.alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+      const float xPositionAdvance = xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset + mScrollPosition.y;
+
+      // Store the min and max 'x' for each line.
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
       mEventData->mDecorator->AddHighlight( xPosition,
-                                            mScrollPosition.y,
-                                            xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance,
-                                            mScrollPosition.y + height );
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitStartGlyph = false;
       continue;
@@ -1546,22 +1594,142 @@ void Controller::Impl::RepositionSelectionHandles()
 
       const Length numberOfCharacters = numberOfCharactersEnd - interGlyphIndex;
 
-      const float xPosition = firstLine.alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      const float xPositionAdvance = xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset + mScrollPosition.y;
+
+      // Store the min and max 'x' for each line.
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
+
       mEventData->mDecorator->AddHighlight( xPosition,
-                                            mScrollPosition.y,
-                                            xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance,
-                                            mScrollPosition.y + height );
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitEndGlyph = false;
       continue;
     }
 
-    const float xPosition = firstLine.alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
+    const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
+    const float xPositionAdvance = xPosition + glyph.advance;
+    const float yPosition = selectionBoxInfo->lineOffset + mScrollPosition.y;
+
+    // Store the min and max 'x' for each line.
+    selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+    selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
+
     mEventData->mDecorator->AddHighlight( xPosition,
-                                          mScrollPosition.y,
-                                          xPosition + glyph.advance,
-                                          mScrollPosition.y + height );
+                                          yPosition,
+                                          xPositionAdvance,
+                                          yPosition + selectionBoxInfo->lineHeight );
+
+    // Whether to retrieve the next line.
+    if( index == lastGlyphOfLine )
+    {
+      // Retrieve the next line.
+      ++lineRun;
+
+      // Get the last glyph of the new line.
+      lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
+
+      ++lineIndex;
+      if( lineIndex < firstLineIndex + numberOfLines )
+      {
+        // Get the selection box info for the next line.
+        const float currentLineOffset = selectionBoxInfo->lineOffset;
+        ++selectionBoxInfo;
+
+        selectionBoxInfo->minX = MAX_FLOAT;
+        selectionBoxInfo->maxX = MIN_FLOAT;
+
+        // The line height is the addition of the line ascender and the line descender.
+        // However, the line descender has a negative value, hence the subtraction.
+        selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+
+        // Update the line's vertical offset.
+        selectionBoxInfo->lineOffset = currentLineOffset + selectionBoxInfo->lineHeight;
+      }
+    }
   }
+
+  // Add extra geometry to 'boxify' the selection.
+
+  if( 1u < numberOfLines )
+  {
+    // Boxify the first line.
+    lineRun = mVisualModel->mLines.Begin() + firstLineIndex;
+    const SelectionBoxInfo& firstSelectionBoxLineInfo = *( selectionBoxLinesInfo.Begin() );
+
+    bool boxifyBegin = ( LTR != lineRun->direction ) && ( LTR != startDirection );
+    bool boxifyEnd = ( LTR == lineRun->direction ) && ( LTR == startDirection );
+
+    if( boxifyBegin )
+    {
+      // Boxify at the beginning of the line.
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            firstSelectionBoxLineInfo.minX,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
+    }
+
+    if( boxifyEnd )
+    {
+      // Boxify at the end of the line.
+      mEventData->mDecorator->AddHighlight( firstSelectionBoxLineInfo.maxX,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
+    }
+
+    // Boxify the central lines.
+    if( 2u < numberOfLines )
+    {
+      for( Vector<SelectionBoxInfo>::ConstIterator it = selectionBoxLinesInfo.Begin() + 1u,
+             endIt = selectionBoxLinesInfo.End() - 1u;
+           it != endIt;
+           ++it )
+      {
+        const SelectionBoxInfo& info = *it;
+
+        mEventData->mDecorator->AddHighlight( 0.f,
+                                              info.lineOffset,
+                                              info.minX,
+                                              info.lineOffset + info.lineHeight );
+
+        mEventData->mDecorator->AddHighlight( info.maxX,
+                                              info.lineOffset,
+                                              mVisualModel->mControlSize.width,
+                                              info.lineOffset + info.lineHeight );
+      }
+    }
+
+    // Boxify the last line.
+    lineRun = mVisualModel->mLines.Begin() + firstLineIndex + numberOfLines - 1u;
+    const SelectionBoxInfo& lastSelectionBoxLineInfo = *( selectionBoxLinesInfo.End() - 1u );
+
+    boxifyBegin = ( LTR == lineRun->direction ) && ( LTR == endDirection );
+    boxifyEnd = ( LTR != lineRun->direction ) && ( LTR != endDirection );
+
+    if( boxifyBegin )
+    {
+      // Boxify at the beginning of the line.
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            lastSelectionBoxLineInfo.minX,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
+    }
+
+    if( boxifyEnd )
+    {
+      // Boxify at the end of the line.
+      mEventData->mDecorator->AddHighlight( lastSelectionBoxLineInfo.maxX,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
+    }
+  }
+
 
   CursorInfo primaryCursorInfo;
   GetCursorPosition( mEventData->mLeftSelectionPosition,
