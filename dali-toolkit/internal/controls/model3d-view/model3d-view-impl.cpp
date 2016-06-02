@@ -423,7 +423,7 @@ void Model3dView::OnStageConnection( int depth )
 
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry(mIlluminationType);
+    mMesh = mObjLoader.CreateGeometry( mIlluminationType );
 
     CreateMaterial();
     LoadTextures();
@@ -520,7 +520,7 @@ void Model3dView::CreateGeometry()
 {
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry(mIlluminationType);
+    mMesh = mObjLoader.CreateGeometry( mIlluminationType );
 
     if( mRenderer )
     {
@@ -556,11 +556,12 @@ void Model3dView::CreateMaterial()
 {
   if( mObjLoader.IsMaterialLoaded() && (mTexture0Url != "") && mObjLoader.IsTexturePresent() )
   {
-    if( (mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) && mObjLoader.IsNormalMapPresent() )
+    if( (mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) )
     {
       mShader = Shader::New( NRMMAP_VERTEX_SHADER, NRMMAP_FRAGMENT_SHADER );
     }
-    else if( mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE )
+    else if( mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ||
+             mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
     {
       mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     }
