@@ -45,7 +45,7 @@ namespace Internal
  *
  * | %Property Name           | Type             |
  * |--------------------------|------------------|
- * | imageUrl                 | STRING           |
+ * | url                      | STRING           |
  * | borderOnly               | BOOLEAN
  *
  */
