@@ -83,13 +83,13 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
 }
 
 TextureSet ImageAtlasManager::Add( Vector4& textureRect,
-                                 PixelDataPtr pixelData )
+                                 PixelData pixelData )
 {
 
   // big buffer, atlasing is not applied
-  if( static_cast<uint32_t>(pixelData->GetWidth()) * static_cast<uint32_t>(pixelData->GetHeight()) > MAX_ITEM_AREA
-      || pixelData->GetWidth()>DEFAULT_ATLAS_SIZE
-      || pixelData->GetHeight()>DEFAULT_ATLAS_SIZE )
+  if( static_cast<uint32_t>(pixelData.GetWidth()) * static_cast<uint32_t>(pixelData.GetHeight()) > MAX_ITEM_AREA
+      || pixelData.GetWidth()>DEFAULT_ATLAS_SIZE
+      || pixelData.GetHeight()>DEFAULT_ATLAS_SIZE )
   {
     return TextureSet();
   }

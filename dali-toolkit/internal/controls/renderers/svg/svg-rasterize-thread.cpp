@@ -62,7 +62,7 @@ SvgRenderer* RasterizingTask::GetSvgRenderer() const
   return mSvgRenderer.Get();
 }
 
-PixelDataPtr RasterizingTask::GetPixelData() const
+PixelData RasterizingTask::GetPixelData() const
 {
   return mPixelData;
 }

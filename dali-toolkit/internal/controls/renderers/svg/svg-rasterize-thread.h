@@ -85,7 +85,7 @@ public:
    * Get the rasterization result.
    * @return The pixel data with the rasterized pixels.
    */
-  PixelDataPtr GetPixelData() const;
+  PixelData GetPixelData() const;
 
 private:
 
@@ -97,7 +97,7 @@ private:
 
 private:
   SvgRendererPtr  mSvgRenderer;
-  PixelDataPtr    mPixelData;
+  PixelData       mPixelData;
   NSVGimage*      mParsedSvg;
   unsigned int    mWidth;
   unsigned int    mHeight;
