@@ -39,6 +39,9 @@ namespace Toolkit
 namespace Text
 {
 
+//Forward declarations
+struct CursorInfo;
+
 struct Event
 {
   // Used to queue input events until DoRelayout()
@@ -74,30 +77,6 @@ struct Event
   Param p1;
   Param p2;
   Param p3;
-};
-
-struct CursorInfo
-{
-  CursorInfo()
-  : primaryPosition(),
-    secondaryPosition(),
-    lineOffset( 0.f ),
-    lineHeight( 0.f ),
-    primaryCursorHeight( 0.f ),
-    secondaryCursorHeight( 0.f ),
-    isSecondaryCursor( false )
-  {}
-
-  ~CursorInfo()
-  {}
-
-  Vector2 primaryPosition;       ///< The primary cursor's position.
-  Vector2 secondaryPosition;     ///< The secondary cursor's position.
-  float   lineOffset;            ///< The vertical offset where the line containing the cursor starts.
-  float   lineHeight;            ///< The height of the line where the cursor is placed.
-  float   primaryCursorHeight;   ///< The primary cursor's height.
-  float   secondaryCursorHeight; ///< The secondary cursor's height.
-  bool    isSecondaryCursor;     ///< Whether the secondary cursor is valid.
 };
 
 struct EventData
@@ -137,12 +116,6 @@ struct EventData
   std::vector<Event> mEventQueue;              ///< The queue of touch events etc.
 
   InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
-
-  /**
-   * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
-   * Typically this will have a negative value with scrolling occurs.
-   */
-  Vector2            mScrollPosition;          ///< The text is offset by this position when scrolling.
 
   State              mState;                   ///< Selection mode, edit mode etc.
 
@@ -280,6 +253,30 @@ struct TextUpdateInfo
   }
 };
 
+struct UnderlineDefaults
+{
+  std::string properties;
+  // TODO: complete with underline parameters.
+};
+
+struct ShadowDefaults
+{
+  std::string properties;
+  // TODO: complete with shadow parameters.
+};
+
+struct EmbossDefaults
+{
+  std::string properties;
+  // TODO: complete with emboss parameters.
+};
+
+struct OutlineDefaults
+{
+  std::string properties;
+  // TODO: complete with outline parameters.
+};
+
 struct Controller::Impl
 {
   Impl( ControlInterface& controlInterface )
@@ -287,6 +284,10 @@ struct Controller::Impl
     mLogicalModel(),
     mVisualModel(),
     mFontDefaults( NULL ),
+    mUnderlineDefaults( NULL ),
+    mShadowDefaults( NULL ),
+    mEmbossDefaults( NULL ),
+    mOutlineDefaults( NULL ),
     mEventData( NULL ),
     mFontClient(),
     mClipboard(),
@@ -295,7 +296,6 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
-    mAlignmentOffset(),
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
@@ -325,6 +325,10 @@ struct Controller::Impl
   ~Impl()
   {
     delete mFontDefaults;
+    delete mUnderlineDefaults;
+    delete mShadowDefaults;
+    delete mEmbossDefaults;
+    delete mOutlineDefaults;
     delete mEventData;
   }
 
@@ -520,6 +524,12 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
+  /**
+   * @brief Retrieves the selected text. It removes the text if the @p deleteAfterRetrieval parameter is @e true.
+   *
+   * @param[out] selectedText The selected text encoded in utf8.
+   * @param[in] deleteAfterRetrieval Whether the text should be deleted after retrieval.
+   */
   void RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval );
 
   void ShowClipboard();
@@ -540,20 +550,6 @@ struct Controller::Impl
   void SetPopupButtons();
 
   void ChangeState( EventData::State newState );
-  LineIndex GetClosestLine( float y ) const;
-
-  void FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex );
-
-  /**
-   * @brief Retrieves the cursor's logical position for a given touch point x,y
-   *
-   * @param[in] visualX The touch point x.
-   * @param[in] visualY The touch point y.
-   *
-   * @return The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
-   */
-  CharacterIndex GetClosestCursorIndex( float visualX,
-                                        float visualY );
 
   /**
    * @brief Calculates the cursor's position for a given character index in the logical order.
@@ -645,6 +641,10 @@ public:
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
+  UnderlineDefaults* mUnderlineDefaults;   ///< Avoid allocating this when the user does not specify underline parameters.
+  ShadowDefaults* mShadowDefaults;         ///< Avoid allocating this when the user does not specify shadow parameters.
+  EmbossDefaults* mEmbossDefaults;         ///< Avoid allocating this when the user does not specify emboss parameters.
+  OutlineDefaults* mOutlineDefaults;       ///< Avoid allocating this when the user does not specify outline parameters.
   EventData* mEventData;                   ///< Avoid allocating everything for text input until EnableTextInput().
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
   Clipboard mClipboard;                    ///< Handle to the system clipboard
@@ -653,7 +653,11 @@ public:
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   Vector<ModifyEvent> mModifyEvents;       ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
-  Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
+  /**
+   * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
+   * Typically this will have a negative value with scrolling occurs.
+   */
+  Vector2 mScrollPosition;                 ///< The text is offset by this position when scrolling.
   TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.

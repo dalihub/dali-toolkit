@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 
@@ -47,6 +48,7 @@ namespace
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
 const float CURSOR_WIDTH = 1.f;
+const float LINE_SPACING= 0.f;
 
 } //namespace
 
@@ -104,6 +106,7 @@ struct LayoutEngine::Impl
     mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
     mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP ),
     mCursorWidth( CURSOR_WIDTH ),
+    mDefaultLineSpacing( LINE_SPACING ),
     mEllipsisEnabled( false )
   {
   }
@@ -462,34 +465,6 @@ struct LayoutEngine::Impl
     lineLayout.extraWidth = tmpExtraWidth;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
-  }
-
-  /**
-   * @brief Calculates the vertical offset to add to the new laid-out glyphs.
-   *
-   * @pre @p lineIndex must be between 0 and the number of lines (both inclusive).
-   *
-   * @param[in] lines The previously laid-out lines.
-   * @param[in] lineIndex Index to the line where the new laid-out lines are inserted.
-   *
-   * @return The vertical offset of the lines starting from the beginning to the line @p lineIndex.
-   */
-  float SetParagraphOffset( const Vector<LineRun>& lines,
-                            LineIndex lineIndex )
-  {
-    float offset = 0.f;
-
-    for( Vector<LineRun>::ConstIterator it = lines.Begin(),
-           endIt = lines.Begin() + lineIndex;
-         it != endIt;
-         ++it )
-    {
-      const LineRun& line = *it;
-
-      offset += line.ascender + -line.descender;
-    }
-
-    return offset;
   }
 
   void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
@@ -871,8 +846,8 @@ struct LayoutEngine::Impl
       linesBuffer = lines.Begin();
     }
 
-    float penY = SetParagraphOffset( lines,
-                                     layoutParameters.startLineIndex );
+    float penY = CalculateLineOffset( lines,
+                                      layoutParameters.startLineIndex );
 
     for( GlyphIndex index = layoutParameters.startGlyphIndex; index < lastGlyphPlusOne; )
     {
@@ -1213,6 +1188,7 @@ struct LayoutEngine::Impl
   LayoutEngine::HorizontalAlignment mHorizontalAlignment;
   LayoutEngine::VerticalAlignment mVerticalAlignment;
   float mCursorWidth;
+  float mDefaultLineSpacing;
 
   IntrusivePtr<Metrics> mMetrics;
 
@@ -1318,6 +1294,16 @@ void LayoutEngine::Align( const Size& size,
                 startIndex,
                 numberOfCharacters,
                 lines );
+}
+
+void LayoutEngine::SetDefaultLineSpacing( float lineSpacing )
+{
+  mImpl->mDefaultLineSpacing = lineSpacing;
+}
+
+float LayoutEngine::GetDefaultLineSpacing() const
+{
+  return mImpl->mDefaultLineSpacing;
 }
 
 } // namespace Text

@@ -32,6 +32,7 @@
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -107,6 +108,16 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputColor",                  
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputFontFamily",                      STRING,    INPUT_FONT_FAMILY                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputFontStyle",                       STRING,    INPUT_FONT_STYLE                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputPointSize",                       FLOAT,     INPUT_POINT_SIZE                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineSpacing",                          FLOAT,     LINE_SPACING                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputLineSpacing",                     FLOAT,     INPUT_LINE_SPACING                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "underline",                            STRING,    UNDERLINE                            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputUnderline",                       STRING,    INPUT_UNDERLINE                      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "shadow",                               STRING,    SHADOW                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputShadow",                          STRING,    INPUT_SHADOW                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "emboss",                               STRING,    EMBOSS                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputEmboss",                          STRING,    INPUT_EMBOSS                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                              STRING,    OUTLINE                              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         STRING,    INPUT_OUTLINE                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 
@@ -482,6 +493,98 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::TextEditor::Property::LINE_SPACING:
+      {
+        if( impl.mController )
+        {
+          const float lineSpacing = value.Get<float>();
+          impl.mController->SetDefaultLineSpacing( lineSpacing );
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_LINE_SPACING:
+      {
+        if( impl.mController )
+        {
+          const float lineSpacing = value.Get<float>();
+          impl.mController->SetInputLineSpacing( lineSpacing );
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::UNDERLINE:
+      {
+        const bool update = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_UNDERLINE:
+      {
+        const bool update = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::SHADOW:
+      {
+        const bool update = SetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_SHADOW:
+      {
+        const bool update = SetShadowProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::EMBOSS:
+      {
+        const bool update = SetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_EMBOSS:
+      {
+        const bool update = SetEmbossProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::OUTLINE:
+      {
+        const bool update = SetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_OUTLINE:
+      {
+        const bool update = SetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -727,6 +830,62 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         }
         break;
       }
+      case Toolkit::TextEditor::Property::LINE_SPACING:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultLineSpacing();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_LINE_SPACING:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetInputLineSpacing();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::UNDERLINE:
+      {
+        GetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_UNDERLINE:
+      {
+        GetUnderlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::SHADOW:
+      {
+        GetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_SHADOW:
+      {
+        GetShadowProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::EMBOSS:
+      {
+        GetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_EMBOSS:
+      {
+        GetEmbossProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::OUTLINE:
+      {
+        GetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextEditor::Property::INPUT_OUTLINE:
+      {
+        GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
     } //switch
   }
 
@@ -883,11 +1042,9 @@ void TextEditor::RenderText()
 
   if( mRenderableActor )
   {
-    // TODO: Scroll and alignment needs to be refactored.
-    const Vector2& alignmentOffset = mController->GetAlignmentOffset();
     const Vector2& scrollOffset = mController->GetScrollPosition();
 
-    mRenderableActor.SetPosition( scrollOffset.x, alignmentOffset.y + scrollOffset.y );
+    mRenderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
     Actor clipRootActor;
     if( mClipper )

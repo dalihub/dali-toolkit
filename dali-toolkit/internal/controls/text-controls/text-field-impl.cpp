@@ -31,6 +31,7 @@
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -123,6 +124,14 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableMarkup",                 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontFamily",                      STRING,    INPUT_FONT_FAMILY                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontStyle",                       STRING,    INPUT_FONT_STYLE                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputPointSize",                       FLOAT,     INPUT_POINT_SIZE                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "underline",                            STRING,    UNDERLINE                            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputUnderline",                       STRING,    INPUT_UNDERLINE                      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow",                               STRING,    SHADOW                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputShadow",                          STRING,    INPUT_SHADOW                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "emboss",                               STRING,    EMBOSS                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputEmboss",                          STRING,    INPUT_EMBOSS                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                              STRING,    OUTLINE                              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         STRING,    INPUT_OUTLINE                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -618,6 +627,78 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::UNDERLINE:
+      {
+        const bool update = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_UNDERLINE:
+      {
+        const bool update = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SHADOW:
+      {
+        const bool update = SetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_SHADOW:
+      {
+        const bool update = SetShadowProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::EMBOSS:
+      {
+        const bool update = SetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_EMBOSS:
+      {
+        const bool update = SetEmbossProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::OUTLINE:
+      {
+        const bool update = SetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_OUTLINE:
+      {
+        const bool update = SetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -938,6 +1019,46 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::UNDERLINE:
+      {
+        GetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_UNDERLINE:
+      {
+        GetUnderlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextField::Property::SHADOW:
+      {
+        GetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_SHADOW:
+      {
+        GetShadowProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextField::Property::EMBOSS:
+      {
+        GetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_EMBOSS:
+      {
+        GetEmbossProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
+      case Toolkit::TextField::Property::OUTLINE:
+      {
+        GetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_OUTLINE:
+      {
+        GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
+        break;
+      }
     } //switch
   }
 
@@ -1105,11 +1226,9 @@ void TextField::RenderText()
 
   if( mRenderableActor )
   {
-    // TODO: Scroll and alignment needs to be refactored.
-    const Vector2& alignmentOffset = mController->GetAlignmentOffset();
     const Vector2& scrollOffset = mController->GetScrollPosition();
 
-    mRenderableActor.SetPosition( scrollOffset.x, alignmentOffset.y + scrollOffset.y );
+    mRenderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
     Actor clipRootActor;
     if( mClipper )

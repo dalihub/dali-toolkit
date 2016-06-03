@@ -65,8 +65,9 @@ struct SetCharacterToGlyphData
 bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -78,7 +79,8 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
@@ -145,8 +147,9 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
 bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
 
@@ -158,7 +161,8 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
@@ -226,7 +230,6 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
 
 int UtcDaliSetGlyphsPerCharacter(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliSetGlyphsPerCharacter");
 
   Length glyphsPerCharacter02[] = { 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u };
@@ -293,6 +296,7 @@ int UtcDaliSetGlyphsPerCharacter(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !SetGlyphsPerCharacterTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -305,7 +309,6 @@ int UtcDaliSetGlyphsPerCharacter(void)
 
 int UtcDaliSetCharacterToGlyph(void)
 {
-  ToolkitTestApplication application;
   tet_infoline(" UtcDaliSetGlyphsPerCharacter");
 
   GlyphIndex glyphIndices02[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u };
@@ -370,6 +373,7 @@ int UtcDaliSetCharacterToGlyph(void)
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
+    ToolkitTestApplication application;
     if( !SetCharacterToGlyphTest( data[index] ) )
     {
       tet_result(TET_FAIL);

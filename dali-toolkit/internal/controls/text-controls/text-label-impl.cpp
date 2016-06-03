@@ -25,7 +25,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
@@ -99,6 +101,11 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableAutoScroll",     BOOLEAN,
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollSpeed",      INTEGER, AUTO_SCROLL_SPEED      )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopCount",  INTEGER, AUTO_SCROLL_LOOP_COUNT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollGap",        FLOAT,   AUTO_SCROLL_GAP        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineSpacing",          FLOAT,   LINE_SPACING           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            STRING,  UNDERLINE              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               STRING,  SHADOW                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               STRING,  EMBOSS                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              STRING,  OUTLINE                )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -372,6 +379,52 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.mTextScroller->SetGap( value.Get<float>() );
         break;
       }
+      case Toolkit::TextLabel::Property::LINE_SPACING:
+      {
+        if( impl.mController )
+        {
+          const float lineSpacing = value.Get<float>();
+          impl.mController->SetDefaultLineSpacing( lineSpacing );
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE:
+      {
+        const bool update = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::SHADOW:
+      {
+        const bool update = SetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::EMBOSS:
+      {
+        const bool update = SetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::OUTLINE:
+      {
+        const bool update = SetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
     }
   }
 }
@@ -553,6 +606,34 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextLabel::Property::LINE_SPACING:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultLineSpacing();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE:
+      {
+        GetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextLabel::Property::SHADOW:
+      {
+        GetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextLabel::Property::EMBOSS:
+      {
+        GetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::TextLabel::Property::OUTLINE:
+      {
+        GetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
     }
   }
 
@@ -664,9 +745,8 @@ void TextLabel::RenderText()
 
     if( renderableActor )
     {
-      // TODO: Scroll and alignment needs to be refactored.
-      const Vector2& alignmentOffset = mController->GetAlignmentOffset();
-      renderableActor.SetPosition( 0.f, alignmentOffset.y );
+      const Vector2& scrollOffset = mController->GetScrollPosition();
+      renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
       self.Add( renderableActor );
     }
@@ -683,15 +763,15 @@ void TextLabel::SetUpAutoScrolling()
 {
   const Size& controlSize = mController->GetView().GetControlSize();
   const Size offScreenSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
-  const Vector2& alignmentOffset = mController->GetAlignmentOffset();
+  const float alignmentOffset = mController->GetAutoScrollLineAlignment();
   const Text::CharacterDirection direction = mController->GetAutoScrollDirection();
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling alignmentOffset[%f,%f] offScreenSize[%f,%f] controlSize[%f,%f]\n",
-                 alignmentOffset.x, alignmentOffset.y, offScreenSize.x,offScreenSize.y , controlSize.x,controlSize.y);
+  DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling alignmentOffset[%f] offScreenSize[%f,%f] controlSize[%f,%f]\n",
+                 alignmentOffset, offScreenSize.x,offScreenSize.y , controlSize.x,controlSize.y );
 
   if ( !mTextScroller )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling Creating default TextScoller\n");
+    DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling Creating default TextScoller\n" );
 
     // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
     mTextScroller = Text::TextScroller::New( *this );

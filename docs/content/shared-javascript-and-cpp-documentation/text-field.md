@@ -122,8 +122,6 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  verticalAlignment                 | VERTICAL_ALIGNMENT                   |  STRING      | O            | X
  textColor                         | TEXT_COLOR                           |  VECTOR4     | O            | X
  placeholderTextColor              | PLACEHOLDER_TEXT_COLOR               |  VECTOR4     | O            | X
- shadowOffset                      | SHADOW_OFFSET                        |  VECTOR2     | O            | X
- shadowColor                       | SHADOW_COLOR                         |  VECTOR4     | O            | X
  primaryCursorColor                | PRIMARY_CURSOR_COLOR                 |  VECTOR4     | O            | X
  secondaryCursorColor              | SECONDARY_CURSOR_COLOR               |  VECTOR4     | O            | X
  enableCursorBlink                 | ENABLE_CURSOR_BLINK                  |  BOOLEAN     | O            | X
@@ -148,6 +146,14 @@ field.placeholderTextColor = dali.COLOR_BLACK;
  inputFontFamily                   | INPUT_FONT_FAMILY                    |  STRING      | O            | X
  inputFontStyle                    | INPUT_FONT_STYLE                     |  STRING      | O            | X
  inputPointSize                    | INPUT_POINT_SIZE                     |  FLOAT       | O            | X
+ underline                         | UNDERLINE                            |  STRING      | O            | X
+ inputUnderline                    | INPUT_UNDERLINE                      |  STRING      | O            | X
+ shadow                            | SHADOW                               |  STRING      | O            | X
+ inputShadow                       | INPUT_SHADOW                         |  STRING      | O            | X
+ emboss                            | EMBOSS                               |  STRING      | O            | X
+ inputEmboss                       | INPUT_EMBOSS                         |  STRING      | O            | X
+ outline                           | OUTLINE                              |  STRING      | O            | X
+ inputOutline                      | INPUT_OUTLINE                        |  STRING      | O            | X
 
 @class TextField
 

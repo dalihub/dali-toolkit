@@ -25,7 +25,6 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
-#include <dali-toolkit/internal/text/metrics.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -97,9 +96,13 @@ void CreateTextModel( const std::string& text,
                       const Vector<FontDescriptionRun>& fontDescriptions,
                       const LayoutOptions& options,
                       Size& layoutSize,
-                      LogicalModelPtr logicalModel,
-                      VisualModelPtr visualModel )
+                      LogicalModelPtr& logicalModel,
+                      VisualModelPtr& visualModel,
+                      MetricsPtr& metrics )
 {
+  logicalModel = LogicalModel::New();
+  visualModel = VisualModel::New();
+
   // 1) Convert to utf32
   Vector<Character>& utf32Characters = logicalModel->mText;
   utf32Characters.Resize( text.size() );
@@ -242,7 +245,7 @@ void CreateTextModel( const std::string& text,
   const Length numberOfGlyphs = glyphs.Count();
 
   // 8) Get the glyph metrics
-  MetricsPtr metrics = Metrics::New( fontClient );
+  metrics = Metrics::New( fontClient );
 
   GlyphInfo* glyphsBuffer = glyphs.Begin();
   metrics->GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );

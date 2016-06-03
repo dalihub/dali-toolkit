@@ -22,8 +22,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/builder/json-parser.h>
-#include <dali-toolkit/devel-api/builder/tree-node.h>
+#include <dali-toolkit/internal/text/property-string-parser.h>
 
 namespace Dali
 {
@@ -40,72 +39,12 @@ const std::string STYLE_KEY( "style" );
 const std::string WEIGHT_KEY( "weight" );
 const std::string WIDTH_KEY( "width" );
 const std::string SLANT_KEY( "slant" );
-const std::string EMPTY_STRING( "" );
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
 #endif
 
 } // namespace
-
-/**
- * @brief Creates a map with pairs 'key,value' with the font's style parameters.
- *
- * @param[in] node Data structure with the font's style parameters.
- * @param[out] map A map with the font's style parameters.
- *
- */
-void CreateFontStyleMap( const TreeNode* const node, Property::Map& map )
-{
-  switch( node->GetType() )
-  {
-    case TreeNode::IS_NULL:
-    case TreeNode::OBJECT:
-    case TreeNode::ARRAY: // FALL THROUGH
-    {
-      break;
-    }
-    case TreeNode::STRING:
-    {
-      map.Insert( node->GetName(), Property::Value( node->GetString() ) );
-      break;
-    }
-    case TreeNode::INTEGER:
-    case TreeNode::FLOAT:
-    case TreeNode::BOOLEAN: // FALL THROUGH
-    {
-      break;
-    }
-  }
-
-  for( TreeNode::ConstIterator it = node->CBegin(), endIt = node->CEnd(); it != endIt; ++it )
-  {
-    const TreeNode::KeyNodePair& pair = *it;
-    CreateFontStyleMap( &pair.second, map );
-  }
-}
-
-/**
- * @brief Parses the font's style string.
- *
- * @param[in] style The font's style string.
- * @param[out] map A map with the font's style parameters.
- *
- */
-void ParseFontStyleString( const std::string& style, Property::Map& map )
-{
-  Toolkit::JsonParser parser = Toolkit::JsonParser::New();
-
-  if( parser.Parse( style ) )
-  {
-    const TreeNode* const node = parser.GetRoot();
-
-    if( NULL != node )
-    {
-      CreateFontStyleMap( node, map );
-    }
-  }
-}
 
 void SetFontStyleProperty( ControllerPtr controller, const Property::Value& value, FontStyle::Type type )
 {
@@ -132,7 +71,7 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
 
     // Parses and applies the style.
     Property::Map map;
-    ParseFontStyleString( style, map );
+    ParsePropertyString( style, map );
 
     if( !map.Empty() )
     {

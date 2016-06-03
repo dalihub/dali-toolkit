@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/logical-model-impl.h>
+#include <dali-toolkit/internal/text/metrics.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
@@ -58,14 +59,16 @@ struct LayoutOptions
  * @param[out] layoutSize The laid-out size.
  * @param[out] logicalModel Pointer to a logical text model instance.
  * @param[out] visualModel Pointer to a visual text model instance.
+ * @param[out] metrics Pointer to a wrapper around FontClient used to get metrics.
  */
 void CreateTextModel( const std::string& text,
                       const Size& textArea,
                       const Vector<FontDescriptionRun>& fontDescriptions,
                       const LayoutOptions& options,
                       Size& layoutSize,
-                      LogicalModelPtr logicalModel,
-                      VisualModelPtr visualModel );
+                      LogicalModelPtr& logicalModel,
+                      VisualModelPtr& visualModel,
+                      MetricsPtr& metrics );
 
 } // namespace Text
 

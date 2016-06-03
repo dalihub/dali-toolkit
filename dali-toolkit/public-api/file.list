@@ -25,6 +25,7 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view.cpp \
   $(public_api_src_dir)/controls/scrollable/scrollable.cpp \
   $(public_api_src_dir)/controls/table-view/table-view.cpp \
+  $(public_api_src_dir)/controls/text-controls/text-editor.cpp \
   $(public_api_src_dir)/controls/text-controls/text-label.cpp \
   $(public_api_src_dir)/controls/text-controls/text-field.cpp \
   $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
@@ -100,6 +101,7 @@ public_api_table_view_header_files = \
   $(public_api_src_dir)/controls/table-view/table-view.h
 
 public_api_text_controls_header_files = \
+  $(public_api_src_dir)/controls/text-controls/text-editor.h \
   $(public_api_src_dir)/controls/text-controls/text-label.h \
   $(public_api_src_dir)/controls/text-controls/text-field.h
 

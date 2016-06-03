@@ -207,8 +207,7 @@ label.textColor = dali.COLOR_RED;
 
 #### Drop Shadow
 
-To add a drop-shadow to the text, simply set the SHADOW_OFFSET property with non-zero values.  
-The color can also be selected using the SHADOW_COLOR property.  
+To add a drop-shadow to the text, simply set the SHADOW property. Shadow parameters can be set through a json string, see the examples below.
 
 ~~~{.cpp}
  // C++
@@ -218,16 +217,13 @@ stage.SetBackgroundColor( Color::BLUE );
 label1.SetProperty( TextLabel::Property::TEXT, "Plain Text" );
 
 label2.SetProperty( TextLabel::Property::TEXT, "Text with Shadow" );
-label2.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 1.0f, 1.0f ) );
-label2.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLACK );
+label2.SetProperty( TextLabel::Property::SHADOW, "{\"offset\":\"1 1\",\"color\":\"black\"}" );
 
 label3.SetProperty( TextLabel::Property::TEXT, "Text with Bigger Shadow" );
-label3.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 2.0f, 2.0f ) );
-label3.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLACK );
+label3.SetProperty( TextLabel::Property::SHADOW, "{\"offset\":\"2 2\",\"color\":\"black\"}" );
 
 label4.SetProperty( TextLabel::Property::TEXT, "Text with Color Shadow" );
-label4.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 1.0f, 1.0f ) );
-label4.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::RED );
+label4.SetProperty( TextLabel::Property::SHADOW, "{\"offset\":\"1 1\",\"color\":\"red\"}" );
 ~~~
 
 ~~~{.js}
@@ -239,16 +235,13 @@ label1.text = "Plain Text";
 
 
 label2.text = "Text with Shadow";
-label2.shadowOffset = [1, 1];
-label2.shadowColor = dali.COLOR_BLACK;
+label2.shadow = "{\"offset\":\"1 1\",\"color\":\"black\"}";
 
 label3.text = "Text with Bigger Shadow";
-label3.shadowOffset = [2, 2];
-label3.shadowColor = dali.COLOR_BLACK;
+label3.shadow = "{\"offset\":\"2 2\",\"color\":\"black\"}";
 
 label4.SetProperty( TextLabel::Property::TEXT, "Text with Color Shadow" );
-label3.shadowOffset = [1, 1];
-label3.shadowColor = dali.COLOR_RED;
+label3.shadow = "{\"offset\":\"1 1\",\"color\":\"red\"}";
 ~~~
 
 

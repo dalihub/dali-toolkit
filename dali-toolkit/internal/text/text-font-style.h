@@ -94,6 +94,7 @@ namespace FontStyle
  *
  * @param[in] controller The text's controller.
  * @param[in] value The value of the font's style.
+ * @param[in] type Whether the property is for the default font's style or the input font's style.
  *
  */
 void SetFontStyleProperty( ControllerPtr controller, const Property::Value& value, FontStyle::Type type );
@@ -103,6 +104,7 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
  *
  * @param[in] controller The text's controller.
  * @param[out] value The value of the font's style.
+ * @param[in] type Whether the property is for the default font's style or the input font's style.
  */
 void GetFontStyleProperty( ControllerPtr controller, Property::Value& value, FontStyle::Type type );
 

@@ -128,6 +128,16 @@ editor.textColor = dali.COLOR_CYAN;
  inputFontFamily                   | INPUT_FONT_FAMILY                    |  STRING      | O            | X
  inputFontStyle                    | INPUT_FONT_STYLE                     |  STRING      | O            | X
  inputPointSize                    | INPUT_POINT_SIZE                     |  FLOAT       | O            | X
+ lineSpacing                       | LINE_SPACING                         |  FLOAT       | O            | X
+ inputLineSpacing                  | INPUT_LINE_SPACING                   |  FLOAT       | O            | X
+ underline                         | UNDERLINE                            |  STRING      | O            | X
+ inputUnderline                    | INPUT_UNDERLINE                      |  STRING      | O            | X
+ shadow                            | SHADOW                               |  STRING      | O            | X
+ inputShadow                       | INPUT_SHADOW                         |  STRING      | O            | X
+ emboss                            | EMBOSS                               |  STRING      | O            | X
+ inputEmboss                       | INPUT_EMBOSS                         |  STRING      | O            | X
+ outline                           | OUTLINE                              |  STRING      | O            | X
+ inputOutline                      | INPUT_OUTLINE                        |  STRING      | O            | X
 
 @class TextEditor
 

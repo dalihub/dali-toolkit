@@ -21,12 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
-#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -35,9 +36,24 @@
 namespace
 {
 
+/**
+ * @brief Struct used to calculate the selection box.
+ */
+struct SelectionBoxInfo
+{
+  float lineOffset;
+  float lineHeight;
+  float minX;
+  float maxX;
+};
+
 #if defined(DEBUG_ENABLED)
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
+
+const float MAX_FLOAT = std::numeric_limits<float>::max();
+const float MIN_FLOAT = std::numeric_limits<float>::min();
+const Dali::Toolkit::Text::CharacterDirection LTR = false; ///< Left To Right direction
 
 } // namespace
 
@@ -57,7 +73,6 @@ EventData::EventData( DecoratorPtr decorator )
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
   mEventQueue(),
-  mScrollPosition(),
   mState( INACTIVE ),
   mPrimaryCursorPosition( 0u ),
   mLeftSelectionPosition( 0u ),
@@ -154,16 +169,19 @@ bool Controller::Impl::ProcessInputEvents()
     GetCursorPosition( mEventData->mPrimaryCursorPosition,
                        cursorInfo );
 
+    // Scroll first the text after delete ...
+    if( mEventData->mScrollAfterDelete )
+    {
+      ScrollTextToMatchCursor( cursorInfo );
+    }
+
+    // ... then, text can be scrolled to make the cursor visible.
     if( mEventData->mScrollAfterUpdatePosition )
     {
       ScrollToMakePositionVisible( cursorInfo.primaryPosition );
-      mEventData->mScrollAfterUpdatePosition = false;
     }
-    else if( mEventData->mScrollAfterDelete )
-    {
-      ScrollTextToMatchCursor( cursorInfo );
-      mEventData->mScrollAfterDelete = false;
-    }
+    mEventData->mScrollAfterUpdatePosition = false;
+    mEventData->mScrollAfterDelete = false;
 
     UpdateCursorPosition( cursorInfo );
 
@@ -998,11 +1016,15 @@ void Controller::Impl::OnTapEvent( const Event& event )
     {
       if( IsShowingRealText() )
       {
-        const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-        const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+        // Convert from control's coords to text's coords.
+        const float xPosition = event.p2.mFloat - mScrollPosition.x;
+        const float yPosition = event.p3.mFloat - mScrollPosition.y;
 
-        mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
-                                                                    yPosition );
+        mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mVisualModel,
+                                                                          mLogicalModel,
+                                                                          mMetrics,
+                                                                          xPosition,
+                                                                          yPosition );
 
         // When the cursor position is changing, delay cursor blinking
         mEventData->mDecorator->DelayCursorBlink();
@@ -1036,16 +1058,16 @@ void Controller::Impl::OnPanEvent( const Event& event )
 
   int state = event.p1.mInt;
 
-  if( Gesture::Started    == state ||
-      Gesture::Continuing == state )
+  if( ( Gesture::Started == state ) ||
+      ( Gesture::Continuing == state ) )
   {
     const Vector2& actualSize = mVisualModel->GetLayoutSize();
-    const Vector2 currentScroll = mEventData->mScrollPosition;
+    const Vector2 currentScroll = mScrollPosition;
 
     if( mEventData->mHorizontalScrollingEnabled )
     {
       const float displacementX = event.p2.mFloat;
-      mEventData->mScrollPosition.x += displacementX;
+      mScrollPosition.x += displacementX;
 
       ClampHorizontalScroll( actualSize );
     }
@@ -1053,14 +1075,14 @@ void Controller::Impl::OnPanEvent( const Event& event )
     if( mEventData->mVerticalScrollingEnabled )
     {
       const float displacementY = event.p3.mFloat;
-      mEventData->mScrollPosition.y += displacementY;
+      mScrollPosition.y += displacementY;
 
       ClampVerticalScroll( actualSize );
     }
 
     if( mEventData->mDecorator )
     {
-      mEventData->mDecorator->UpdatePositions( mEventData->mScrollPosition - currentScroll );
+      mEventData->mDecorator->UpdatePositions( mScrollPosition - currentScroll );
     }
   }
 }
@@ -1089,11 +1111,15 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
   if( HANDLE_PRESSED == state )
   {
-    // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
-    const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-    const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+    // Convert from decorator's coords to text's coords.
+    const float xPosition = event.p2.mFloat - mScrollPosition.x;
+    const float yPosition = event.p3.mFloat - mScrollPosition.y;
 
-    const CharacterIndex handleNewPosition = GetClosestCursorIndex( xPosition, yPosition );
+    const CharacterIndex handleNewPosition = Text::GetClosestCursorIndex( mVisualModel,
+                                                                          mLogicalModel,
+                                                                          mMetrics,
+                                                                          xPosition,
+                                                                          yPosition );
 
     if( Event::GRAB_HANDLE_EVENT == event.type )
     {
@@ -1136,11 +1162,15 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     CharacterIndex handlePosition = 0u;
     if( handleStopScrolling )
     {
-      // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
-      const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-      const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+      // Convert from decorator's coords to text's coords.
+      const float xPosition = event.p2.mFloat - mScrollPosition.x;
+      const float yPosition = event.p3.mFloat - mScrollPosition.y;
 
-      handlePosition = GetClosestCursorIndex( xPosition, yPosition );
+      handlePosition = Text::GetClosestCursorIndex( mVisualModel,
+                                                    mLogicalModel,
+                                                    mMetrics,
+                                                    xPosition,
+                                                    yPosition );
     }
 
     if( Event::GRAB_HANDLE_EVENT == event.type )
@@ -1195,14 +1225,14 @@ void Controller::Impl::OnHandleEvent( const Event& event )
   {
     const float xSpeed = event.p2.mFloat;
     const Vector2& actualSize = mVisualModel->GetLayoutSize();
-    const Vector2 currentScrollPosition = mEventData->mScrollPosition;
+    const Vector2 currentScrollPosition = mScrollPosition;
 
-    mEventData->mScrollPosition.x += xSpeed;
+    mScrollPosition.x += xSpeed;
 
     ClampHorizontalScroll( actualSize );
 
     bool endOfScroll = false;
-    if( Vector2::ZERO == ( currentScrollPosition - mEventData->mScrollPosition ) )
+    if( Vector2::ZERO == ( currentScrollPosition - mScrollPosition ) )
     {
       // Notify the decorator there is no more text to scroll.
       // The decorator won't send more scroll events.
@@ -1226,9 +1256,12 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       position.x = scrollRightDirection ? 0.f : mVisualModel->mControlSize.width;
 
       // Get the new handle position.
-      // The grab handle's position is in decorator coords. Need to transforms to text coords.
-      const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
-                                                                   position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
+      // The grab handle's position is in decorator's coords. Need to transforms to text's coords.
+      const CharacterIndex handlePosition = Text::GetClosestCursorIndex( mVisualModel,
+                                                                         mLogicalModel,
+                                                                         mMetrics,
+                                                                         position.x - mScrollPosition.x,
+                                                                         position.y - mScrollPosition.y );
 
       mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
       mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
@@ -1248,9 +1281,12 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       position.x = scrollRightDirection ? 0.f : mVisualModel->mControlSize.width;
 
       // Get the new handle position.
-      // The selection handle's position is in decorator coords. Need to transforms to text coords.
-      const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
-                                                                   position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
+      // The selection handle's position is in decorator's coords. Need to transform to text's coords.
+      const CharacterIndex handlePosition = Text::GetClosestCursorIndex( mVisualModel,
+                                                                         mLogicalModel,
+                                                                         mMetrics,
+                                                                         position.x - mScrollPosition.x,
+                                                                         position.y - mScrollPosition.y );
 
       if( leftSelectionHandleEvent )
       {
@@ -1292,9 +1328,9 @@ void Controller::Impl::OnSelectEvent( const Event& event )
 
   if( mEventData->mSelectionEnabled )
   {
-    // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
-    const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-    const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+    // Convert from control's coords to text's coords.
+    const float xPosition = event.p2.mFloat - mScrollPosition.x;
+    const float yPosition = event.p3.mFloat - mScrollPosition.y;
 
     // Calculates the logical position from the x,y coords.
     RepositionSelectionHandles( xPosition,
@@ -1302,6 +1338,7 @@ void Controller::Impl::OnSelectEvent( const Event& event )
 
     mEventData->mUpdateLeftSelectionPosition = true;
     mEventData->mUpdateRightSelectionPosition = true;
+    mEventData->mUpdateCursorPosition = false;
 
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
@@ -1370,12 +1407,7 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
       // Scroll after delete.
       mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
-      mEventData->mScrollAfterDelete = true;
     }
-    // Udpade the cursor position and the decorator.
-    // Scroll after the position is updated if is not scrolling after delete.
-    mEventData->mUpdateCursorPosition = true;
-    mEventData->mScrollAfterUpdatePosition = !mEventData->mScrollAfterDelete;
     mEventData->mDecoratorUpdated = true;
   }
 }
@@ -1445,16 +1477,10 @@ void Controller::Impl::RepositionSelectionHandles()
   const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != mLogicalModel->mCharacterDirections.Count() ) ? mLogicalModel->mCharacterDirections.Begin() : NULL;
 
   // TODO: Better algorithm to create the highlight box.
-  // TODO: Multi-line.
-
-  // Get the height of the line.
-  const Vector<LineRun>& lines = mVisualModel->mLines;
-  const LineRun& firstLine = *lines.Begin();
-  const float height = firstLine.ascender + -firstLine.descender;
 
   const bool isLastCharacter = selectionEnd >= mLogicalModel->mText.Count();
-  const bool startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
-  const bool endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
+  const CharacterDirection startDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + selectionStart ) );
+  const CharacterDirection endDirection = ( ( NULL == modelCharacterDirectionsBuffer ) ? false : *( modelCharacterDirectionsBuffer + ( selectionEnd - ( isLastCharacter ? 1u : 0u ) ) ) );
 
   // Swap the indices if the start is greater than the end.
   const bool indicesSwapped = selectionStart > selectionEnd;
@@ -1473,6 +1499,38 @@ void Controller::Impl::RepositionSelectionHandles()
   const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + selectionEndMinusOne );
   const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + selectionEndMinusOne ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
 
+  // Get the lines where the glyphs are laid-out.
+  const LineRun* lineRun = mVisualModel->mLines.Begin();
+
+  LineIndex lineIndex = 0u;
+  Length numberOfLines = 0u;
+  mVisualModel->GetNumberOfLines( glyphStart,
+                                  1u + glyphEnd - glyphStart,
+                                  lineIndex,
+                                  numberOfLines );
+  const LineIndex firstLineIndex = lineIndex;
+
+  // Create the structure to store some selection box info.
+  Vector<SelectionBoxInfo> selectionBoxLinesInfo;
+  selectionBoxLinesInfo.Resize( numberOfLines );
+
+  SelectionBoxInfo* selectionBoxInfo = selectionBoxLinesInfo.Begin();
+  selectionBoxInfo->minX = MAX_FLOAT;
+  selectionBoxInfo->maxX = MIN_FLOAT;
+
+  // Retrieve the first line and get the line's vertical offset, the line's height and the index to the last glyph.
+
+  // The line's vertical offset of all the lines before the line where the first glyph is laid-out.
+  selectionBoxInfo->lineOffset = CalculateLineOffset( mVisualModel->mLines,
+                                                      firstLineIndex );
+  lineRun += firstLineIndex;
+
+  // The line height is the addition of the line ascender and the line descender.
+  // However, the line descender has a negative value, hence the subtraction.
+  selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+
+  GlyphIndex lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
+
   // Check if the first glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
   const Length numberOfCharactersStart = *( charactersPerGlyphBuffer + glyphStart );
   bool splitStartGlyph = ( numberOfCharactersStart > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionStart ) );
@@ -1480,8 +1538,6 @@ void Controller::Impl::RepositionSelectionHandles()
   // Check if the last glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
   const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
   bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
-
-  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
   // Traverse the glyphs.
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
@@ -1506,12 +1562,18 @@ void Controller::Impl::RepositionSelectionHandles()
       // Calculate the number of characters selected.
       const Length numberOfCharacters = ( glyphStart == glyphEnd ) ? ( selectionEnd - selectionStart ) : ( numberOfCharactersStart - interGlyphIndex );
 
-      const float xPosition = position.x - glyph.xBearing + offset.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+      const float xPositionAdvance = xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset + mScrollPosition.y;
+
+      // Store the min and max 'x' for each line.
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
       mEventData->mDecorator->AddHighlight( xPosition,
-                                            offset.y,
-                                            xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance,
-                                            offset.y + height );
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitStartGlyph = false;
       continue;
@@ -1532,22 +1594,142 @@ void Controller::Impl::RepositionSelectionHandles()
 
       const Length numberOfCharacters = numberOfCharactersEnd - interGlyphIndex;
 
-      const float xPosition = position.x - glyph.xBearing + offset.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      const float xPositionAdvance = xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset + mScrollPosition.y;
+
+      // Store the min and max 'x' for each line.
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
+
       mEventData->mDecorator->AddHighlight( xPosition,
-                                            offset.y,
-                                            xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance,
-                                            offset.y + height );
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitEndGlyph = false;
       continue;
     }
 
-    const float xPosition = position.x - glyph.xBearing + offset.x;
+    const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
+    const float xPositionAdvance = xPosition + glyph.advance;
+    const float yPosition = selectionBoxInfo->lineOffset + mScrollPosition.y;
+
+    // Store the min and max 'x' for each line.
+    selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+    selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
+
     mEventData->mDecorator->AddHighlight( xPosition,
-                                          offset.y,
-                                          xPosition + glyph.advance,
-                                          offset.y + height );
+                                          yPosition,
+                                          xPositionAdvance,
+                                          yPosition + selectionBoxInfo->lineHeight );
+
+    // Whether to retrieve the next line.
+    if( index == lastGlyphOfLine )
+    {
+      // Retrieve the next line.
+      ++lineRun;
+
+      // Get the last glyph of the new line.
+      lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
+
+      ++lineIndex;
+      if( lineIndex < firstLineIndex + numberOfLines )
+      {
+        // Get the selection box info for the next line.
+        const float currentLineOffset = selectionBoxInfo->lineOffset;
+        ++selectionBoxInfo;
+
+        selectionBoxInfo->minX = MAX_FLOAT;
+        selectionBoxInfo->maxX = MIN_FLOAT;
+
+        // The line height is the addition of the line ascender and the line descender.
+        // However, the line descender has a negative value, hence the subtraction.
+        selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+
+        // Update the line's vertical offset.
+        selectionBoxInfo->lineOffset = currentLineOffset + selectionBoxInfo->lineHeight;
+      }
+    }
   }
+
+  // Add extra geometry to 'boxify' the selection.
+
+  if( 1u < numberOfLines )
+  {
+    // Boxify the first line.
+    lineRun = mVisualModel->mLines.Begin() + firstLineIndex;
+    const SelectionBoxInfo& firstSelectionBoxLineInfo = *( selectionBoxLinesInfo.Begin() );
+
+    bool boxifyBegin = ( LTR != lineRun->direction ) && ( LTR != startDirection );
+    bool boxifyEnd = ( LTR == lineRun->direction ) && ( LTR == startDirection );
+
+    if( boxifyBegin )
+    {
+      // Boxify at the beginning of the line.
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            firstSelectionBoxLineInfo.minX,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
+    }
+
+    if( boxifyEnd )
+    {
+      // Boxify at the end of the line.
+      mEventData->mDecorator->AddHighlight( firstSelectionBoxLineInfo.maxX,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
+    }
+
+    // Boxify the central lines.
+    if( 2u < numberOfLines )
+    {
+      for( Vector<SelectionBoxInfo>::ConstIterator it = selectionBoxLinesInfo.Begin() + 1u,
+             endIt = selectionBoxLinesInfo.End() - 1u;
+           it != endIt;
+           ++it )
+      {
+        const SelectionBoxInfo& info = *it;
+
+        mEventData->mDecorator->AddHighlight( 0.f,
+                                              info.lineOffset,
+                                              info.minX,
+                                              info.lineOffset + info.lineHeight );
+
+        mEventData->mDecorator->AddHighlight( info.maxX,
+                                              info.lineOffset,
+                                              mVisualModel->mControlSize.width,
+                                              info.lineOffset + info.lineHeight );
+      }
+    }
+
+    // Boxify the last line.
+    lineRun = mVisualModel->mLines.Begin() + firstLineIndex + numberOfLines - 1u;
+    const SelectionBoxInfo& lastSelectionBoxLineInfo = *( selectionBoxLinesInfo.End() - 1u );
+
+    boxifyBegin = ( LTR == lineRun->direction ) && ( LTR == endDirection );
+    boxifyEnd = ( LTR != lineRun->direction ) && ( LTR != endDirection );
+
+    if( boxifyBegin )
+    {
+      // Boxify at the beginning of the line.
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            lastSelectionBoxLineInfo.minX,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
+    }
+
+    if( boxifyEnd )
+    {
+      // Boxify at the end of the line.
+      mEventData->mDecorator->AddHighlight( lastSelectionBoxLineInfo.maxX,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
+    }
+  }
+
 
   CursorInfo primaryCursorInfo;
   GetCursorPosition( mEventData->mLeftSelectionPosition,
@@ -1557,17 +1739,17 @@ void Controller::Impl::RepositionSelectionHandles()
   GetCursorPosition( mEventData->mRightSelectionPosition,
                      secondaryCursorInfo );
 
-  const Vector2 primaryPosition = primaryCursorInfo.primaryPosition + offset;
-  const Vector2 secondaryPosition = secondaryCursorInfo.primaryPosition + offset;
+  const Vector2 primaryPosition = primaryCursorInfo.primaryPosition + mScrollPosition;
+  const Vector2 secondaryPosition = secondaryCursorInfo.primaryPosition + mScrollPosition;
 
   mEventData->mDecorator->SetPosition( LEFT_SELECTION_HANDLE,
                                        primaryPosition.x,
-                                       primaryCursorInfo.lineOffset + offset.y,
+                                       primaryCursorInfo.lineOffset + mScrollPosition.y,
                                        primaryCursorInfo.lineHeight );
 
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE,
                                        secondaryPosition.x,
-                                       secondaryCursorInfo.lineOffset + offset.y,
+                                       secondaryCursorInfo.lineOffset + mScrollPosition.y,
                                        secondaryCursorInfo.lineHeight );
 
   // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
@@ -1603,7 +1785,13 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
   // Find which word was selected
   CharacterIndex selectionStart( 0 );
   CharacterIndex selectionEnd( 0 );
-  FindSelectionIndices( visualX, visualY, selectionStart, selectionEnd );
+  FindSelectionIndices( mVisualModel,
+                        mLogicalModel,
+                        mMetrics,
+                        visualX,
+                        visualY,
+                        selectionStart,
+                        selectionEnd );
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p selectionStart %d selectionEnd %d\n", this, selectionStart, selectionEnd );
 
   if( selectionStart == selectionEnd )
@@ -1837,207 +2025,9 @@ void Controller::Impl::ChangeState( EventData::State newState )
   }
 }
 
-LineIndex Controller::Impl::GetClosestLine( float y ) const
-{
-  float totalHeight = 0.f;
-  LineIndex lineIndex = 0u;
-
-  const Vector<LineRun>& lines = mVisualModel->mLines;
-  for( LineIndex endLine = lines.Count();
-       lineIndex < endLine;
-       ++lineIndex )
-  {
-    const LineRun& lineRun = lines[lineIndex];
-    totalHeight += lineRun.ascender + -lineRun.descender;
-    if( y < totalHeight )
-    {
-      return lineIndex;
-    }
-  }
-
-  if( lineIndex == 0 )
-  {
-    return 0;
-  }
-
-  return lineIndex-1;
-}
-
-void Controller::Impl::FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex )
-{
-  CharacterIndex hitCharacter = GetClosestCursorIndex( visualX, visualY );
-  DALI_ASSERT_DEBUG( hitCharacter <= mLogicalModel->mText.Count() && "GetClosestCursorIndex returned out of bounds index" );
-
-  if( mLogicalModel->mText.Count() == 0 )
-  {
-    return;  // if model empty
-  }
-
-  if( hitCharacter >= mLogicalModel->mText.Count() )
-  {
-    // Closest hit character is the last character.
-    if( hitCharacter ==  mLogicalModel->mText.Count() )
-    {
-      hitCharacter--; //Hit character index set to last character in logical model
-    }
-    else
-    {
-      // hitCharacter is out of bounds
-      return;
-    }
-  }
-
-  startIndex = hitCharacter;
-  endIndex = hitCharacter;
-  bool isHitCharacterWhitespace = TextAbstraction::IsWhiteSpace( mLogicalModel->mText[hitCharacter] );
-
-  // Find the start and end of the text
-  for( startIndex = hitCharacter; startIndex > 0; --startIndex )
-  {
-    if( isHitCharacterWhitespace != TextAbstraction::IsWhiteSpace( mLogicalModel->mText[ startIndex-1 ] ) )
-    {
-      break;
-    }
-  }
-  const CharacterIndex pastTheEnd = mLogicalModel->mText.Count();
-  for( endIndex = hitCharacter + 1u; endIndex < pastTheEnd; ++endIndex )
-  {
-    if( isHitCharacterWhitespace != TextAbstraction::IsWhiteSpace( mLogicalModel->mText[ endIndex ] ) )
-    {
-      break;
-    }
-  }
-}
-
-CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
-                                                        float visualY )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetClosestCursorIndex %p closest visualX %f visualY %f\n", this, visualX, visualY );
-
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text input.
-    return 0u;
-  }
-
-  CharacterIndex logicalIndex = 0u;
-
-  const Length numberOfGlyphs = mVisualModel->mGlyphs.Count();
-  const Length numberOfLines  = mVisualModel->mLines.Count();
-  if( ( 0 == numberOfGlyphs ) ||
-      ( 0 == numberOfLines ) )
-  {
-    return logicalIndex;
-  }
-
-  // Find which line is closest
-  const LineIndex lineIndex = GetClosestLine( visualY );
-  const LineRun& line = mVisualModel->mLines[lineIndex];
-
-  // Get the positions of the glyphs.
-  const Vector<Vector2>& positions = mVisualModel->mGlyphPositions;
-  const Vector2* const positionsBuffer = positions.Begin();
-
-  // Get the character to glyph conversion table.
-  const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
-
-  // Get the glyphs per character table.
-  const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
-
-  // Get the glyph's info buffer.
-  const GlyphInfo* const glyphInfoBuffer = mVisualModel->mGlyphs.Begin();
-
-  const CharacterIndex startCharacter = line.characterRun.characterIndex;
-  const CharacterIndex endCharacter   = line.characterRun.characterIndex + line.characterRun.numberOfCharacters;
-  DALI_ASSERT_DEBUG( endCharacter <= mLogicalModel->mText.Count() && "Invalid line info" );
-
-  // Whether there is a hit on a glyph.
-  bool matched = false;
-
-  // Traverses glyphs in visual order. To do that use the visual to logical conversion table.
-  CharacterIndex visualIndex = startCharacter;
-  Length numberOfCharacters = 0u;
-  for( ; !matched && ( visualIndex < endCharacter ); ++visualIndex )
-  {
-    // The character in logical order.
-    const CharacterIndex characterLogicalOrderIndex = mLogicalModel->GetLogicalCharacterIndex( visualIndex );
-
-    // Get the script of the character.
-    const Script script = mLogicalModel->GetScript( characterLogicalOrderIndex );
-
-    // The number of glyphs for that character
-    const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterLogicalOrderIndex );
-    ++numberOfCharacters;
-
-
-    if( 0u != numberOfGlyphs )
-    {
-      // Get the first character/glyph of the group of glyphs.
-      const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfCharacters;
-      const CharacterIndex firstLogicalCharacterIndex = mLogicalModel->GetLogicalCharacterIndex( firstVisualCharacterIndex );
-      const GlyphIndex firstLogicalGlyphIndex = *( charactersToGlyphBuffer + firstLogicalCharacterIndex );
-
-      // Get the metrics for the group of glyphs.
-      GlyphMetrics glyphMetrics;
-      GetGlyphsMetrics( firstLogicalGlyphIndex,
-                        numberOfGlyphs,
-                        glyphMetrics,
-                        glyphInfoBuffer,
-                        mMetrics );
-
-      // Get the position of the first glyph.
-      const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
-
-      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ.
-      const bool isInterglyphIndex = ( numberOfCharacters > numberOfGlyphs ) && HasLigatureMustBreak( script );
-      const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
-      const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
-
-      GlyphIndex index = 0u;
-      for( ; !matched && ( index < numberOfBlocks ); ++index )
-      {
-        // Find the mid-point of the area containing the glyph
-        const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
-
-        if( visualX < glyphCenter )
-        {
-          matched = true;
-          break;
-        }
-      }
-
-      if( matched )
-      {
-        visualIndex = firstVisualCharacterIndex + index;
-        break;
-      }
-
-      numberOfCharacters = 0u;
-    }
-
-  }
-
-  // Return the logical position of the cursor in characters.
-
-  if( !matched )
-  {
-    visualIndex = endCharacter;
-  }
-
-  logicalIndex = mLogicalModel->GetLogicalCursorIndex( visualIndex );
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
-
-  DALI_ASSERT_DEBUG( ( logicalIndex <= mLogicalModel->mText.Count() && logicalIndex >= 0 ) && "GetClosestCursorIndex - Out of bounds index" );
-
-  return logicalIndex;
-}
-
 void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                                           CursorInfo& cursorInfo )
 {
-  // TODO: Check for multiline with \n, etc...
-
-  const Length numberOfCharacters = mLogicalModel->mText.Count();
   if( !IsShowingRealText() )
   {
     // Do not want to use the place-holder text to set the cursor position.
@@ -2069,206 +2059,15 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
       }
     }
 
-    switch( mLayoutEngine.GetVerticalAlignment() )
-    {
-      case LayoutEngine::VERTICAL_ALIGN_TOP:
-      {
-        cursorInfo.primaryPosition.y = 0.f;
-        break;
-      }
-      case LayoutEngine::VERTICAL_ALIGN_CENTER:
-      {
-        cursorInfo.primaryPosition.y = floorf( 0.5f * ( mVisualModel->mControlSize.height - cursorInfo.lineHeight ) );
-        break;
-      }
-      case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
-      {
-        cursorInfo.primaryPosition.y = mVisualModel->mControlSize.height - cursorInfo.lineHeight;
-        break;
-      }
-    }
-
     // Nothing else to do.
     return;
   }
 
-  // Check if the logical position is the first or the last one of the text.
-  const bool isFirstPosition = 0u == logical;
-  const bool isLastPosition = numberOfCharacters == logical;
-
-  // 'logical' is the logical 'cursor' index.
-  // Get the next and current logical 'character' index.
-  const CharacterIndex nextCharacterIndex = logical;
-  const CharacterIndex characterIndex = isFirstPosition ? logical : logical - 1u;
-
-  // Get the direction of the character and the next one.
-  const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != mLogicalModel->mCharacterDirections.Count() ) ? mLogicalModel->mCharacterDirections.Begin() : NULL;
-
-  CharacterDirection isCurrentRightToLeft = false;
-  CharacterDirection isNextRightToLeft = false;
-  if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
-  {
-    isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + characterIndex );
-    isNextRightToLeft = *( modelCharacterDirectionsBuffer + nextCharacterIndex );
-  }
-
-  // Get the line where the character is laid-out.
-  const LineRun* const modelLines = mVisualModel->mLines.Begin();
-
-  const LineIndex lineIndex = mVisualModel->GetLineOfCharacter( characterIndex );
-  const LineRun& line = *( modelLines + lineIndex );
-
-  // Get the paragraph's direction.
-  const CharacterDirection isRightToLeftParagraph = line.direction;
-
-  // Check whether there is an alternative position:
-
-  cursorInfo.isSecondaryCursor = ( !isLastPosition && ( isCurrentRightToLeft != isNextRightToLeft ) ) ||
-                                 ( isLastPosition && ( isRightToLeftParagraph != isCurrentRightToLeft ) );
-
-  // Set the line offset and height.
-  cursorInfo.lineOffset = 0.f;
-  cursorInfo.lineHeight = line.ascender + -line.descender;
-
-  // Calculate the primary cursor.
-
-  CharacterIndex index = characterIndex;
-  if( cursorInfo.isSecondaryCursor )
-  {
-    // If there is a secondary position, the primary cursor may be in a different place than the logical index.
-
-    if( isLastPosition )
-    {
-      // The position of the cursor after the last character needs special
-      // care depending on its direction and the direction of the paragraph.
-
-      // Need to find the first character after the last character with the paragraph's direction.
-      // i.e l0 l1 l2 r0 r1 should find r0.
-
-      // TODO: check for more than one line!
-      index = isRightToLeftParagraph ? line.characterRun.characterIndex : line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u;
-      index = mLogicalModel->GetLogicalCharacterIndex( index );
-    }
-    else
-    {
-      index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? characterIndex : nextCharacterIndex;
-    }
-  }
-
-  const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
-  const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
-  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
-  const CharacterIndex* const glyphsToCharactersBuffer = mVisualModel->mGlyphsToCharacters.Begin();
-  const Vector2* const glyphPositionsBuffer = mVisualModel->mGlyphPositions.Begin();
-  const GlyphInfo* const glyphInfoBuffer = mVisualModel->mGlyphs.Begin();
-
-  // Convert the cursor position into the glyph position.
-  const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
-  const Length primaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
-  const Length primaryNumberOfCharacters = *( charactersPerGlyphBuffer + primaryGlyphIndex );
-
-  // Get the metrics for the group of glyphs.
-  GlyphMetrics glyphMetrics;
-  GetGlyphsMetrics( primaryGlyphIndex,
-                    primaryNumberOfGlyphs,
-                    glyphMetrics,
-                    glyphInfoBuffer,
-                    mMetrics );
-
-  // Whether to add the glyph's advance to the cursor position.
-  // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
-  //     if the logical cursor is one, the position is the position of the first glyph and the advance is added.
-  // A 'truth table' was build and an online Karnaugh map tool was used to simplify the logic.
-  //
-  // FLCP A
-  // ------
-  // 0000 1
-  // 0001 1
-  // 0010 0
-  // 0011 0
-  // 0100 1
-  // 0101 0
-  // 0110 1
-  // 0111 0
-  // 1000 0
-  // 1001 x
-  // 1010 x
-  // 1011 1
-  // 1100 x
-  // 1101 x
-  // 1110 x
-  // 1111 x
-  //
-  // Where F -> isFirstPosition
-  //       L -> isLastPosition
-  //       C -> isCurrentRightToLeft
-  //       P -> isRightToLeftParagraph
-  //       A -> Whether to add the glyph's advance.
-
-  const bool addGlyphAdvance = ( ( isLastPosition && !isRightToLeftParagraph ) ||
-                                 ( isFirstPosition && isRightToLeftParagraph ) ||
-                                 ( !isFirstPosition && !isLastPosition && !isCurrentRightToLeft ) );
-
-  float glyphAdvance = addGlyphAdvance ? glyphMetrics.advance : 0.f;
-
-  if( !isLastPosition &&
-      ( primaryNumberOfCharacters > 1u ) )
-  {
-    const CharacterIndex firstIndex = *( glyphsToCharactersBuffer + primaryGlyphIndex );
-
-    bool isCurrentRightToLeft = false;
-    if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
-    {
-      isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + index );
-    }
-
-    Length numberOfGlyphAdvance = ( isFirstPosition ? 0u : 1u ) + characterIndex - firstIndex;
-    if( isCurrentRightToLeft )
-    {
-      numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
-    }
-
-    glyphAdvance = static_cast<float>( numberOfGlyphAdvance ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
-  }
-
-  // Get the glyph position and x bearing.
-  const Vector2& primaryPosition = *( glyphPositionsBuffer + primaryGlyphIndex );
-
-  // Set the primary cursor's height.
-  cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
-
-  // Set the primary cursor's position.
-  cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
-  cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
-
-  // Calculate the secondary cursor.
-
-  if( cursorInfo.isSecondaryCursor )
-  {
-    // Set the secondary cursor's height.
-    cursorInfo.secondaryCursorHeight = 0.5f * glyphMetrics.fontHeight;
-
-    CharacterIndex index = characterIndex;
-    if( !isLastPosition )
-    {
-      index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? nextCharacterIndex : characterIndex;
-    }
-
-    const GlyphIndex secondaryGlyphIndex = *( charactersToGlyphBuffer + index );
-    const Length secondaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
-
-    const Vector2& secondaryPosition = *( glyphPositionsBuffer + secondaryGlyphIndex );
-
-    GetGlyphsMetrics( secondaryGlyphIndex,
-                      secondaryNumberOfGlyphs,
-                      glyphMetrics,
-                      glyphInfoBuffer,
-                      mMetrics );
-
-    // Set the secondary cursor's position.
-    cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
-    cursorInfo.secondaryPosition.y = cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
-  }
+  Text::GetCursorPosition( mVisualModel,
+                           mLogicalModel,
+                           mMetrics,
+                           logical,
+                           cursorInfo );
 
   if( LayoutEngine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
   {
@@ -2346,8 +2145,7 @@ void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
     return;
   }
 
-  const Vector2 offset = mEventData->mScrollPosition + ( IsShowingRealText() ? mAlignmentOffset : Vector2::ZERO );
-  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + mScrollPosition;
 
   // Sets the cursor position.
   mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
@@ -2360,17 +2158,17 @@ void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
   // Sets the grab handle position.
   mEventData->mDecorator->SetPosition( GRAB_HANDLE,
                                        cursorPosition.x,
-                                       cursorInfo.lineOffset + offset.y,
+                                       cursorInfo.lineOffset + mScrollPosition.y,
                                        cursorInfo.lineHeight );
 
   if( cursorInfo.isSecondaryCursor )
   {
     mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
-                                         cursorInfo.secondaryPosition.x + offset.x,
-                                         cursorInfo.secondaryPosition.y + offset.y,
+                                         cursorInfo.secondaryPosition.x + mScrollPosition.x,
+                                         cursorInfo.secondaryPosition.y + mScrollPosition.y,
                                          cursorInfo.secondaryCursorHeight,
                                          cursorInfo.lineHeight );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + mScrollPosition.x, cursorInfo.secondaryPosition.y + mScrollPosition.y );
   }
 
   // Set which cursors are active according the state.
@@ -2402,13 +2200,12 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
     return;
   }
 
-  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
-  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + mScrollPosition;
 
   // Sets the handle's position.
   mEventData->mDecorator->SetPosition( handleType,
                                        cursorPosition.x,
-                                       cursorInfo.lineOffset + offset.y,
+                                       cursorInfo.lineOffset + mScrollPosition.y,
                                        cursorInfo.lineHeight );
 
   // If selection handle at start of the text and other at end of the text then all text is selected.
@@ -2419,57 +2216,57 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
 
 void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
 {
-  // Clamp between -space & 0 (and the text alignment).
+  // Clamp between -space & 0.
 
   if( actualSize.width > mVisualModel->mControlSize.width )
   {
-    const float space = ( actualSize.width - mVisualModel->mControlSize.width ) + mAlignmentOffset.x;
-    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
-    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
+    const float space = ( actualSize.width - mVisualModel->mControlSize.width );
+    mScrollPosition.x = ( mScrollPosition.x < -space ) ? -space : mScrollPosition.x;
+    mScrollPosition.x = ( mScrollPosition.x > 0.f ) ? 0.f : mScrollPosition.x;
 
     mEventData->mDecoratorUpdated = true;
   }
   else
   {
-    mEventData->mScrollPosition.x = 0.f;
+    mScrollPosition.x = 0.f;
   }
 }
 
 void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
 {
-  // Clamp between -space & 0 (and the text alignment).
+  // Clamp between -space & 0.
   if( actualSize.height > mVisualModel->mControlSize.height )
   {
-    const float space = ( actualSize.height - mVisualModel->mControlSize.height ) + mAlignmentOffset.y;
-    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
-    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
+    const float space = ( actualSize.height - mVisualModel->mControlSize.height );
+    mScrollPosition.y = ( mScrollPosition.y < -space ) ? -space : mScrollPosition.y;
+    mScrollPosition.y = ( mScrollPosition.y > 0.f ) ? 0.f : mScrollPosition.y;
 
     mEventData->mDecoratorUpdated = true;
   }
   else
   {
-    mEventData->mScrollPosition.y = 0.f;
+    mScrollPosition.y = 0.f;
   }
 }
 
 void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
 {
+  const float cursorWidth = mEventData->mDecorator ? mEventData->mDecorator->GetCursorWidth() : 0.f;
+
   // position is in actor's coords.
-  const float positionEnd = position.x + ( mEventData->mDecorator ? mEventData->mDecorator->GetCursorWidth() : 0.f );
+  const float positionEnd = position.x + cursorWidth;
 
   // Transform the position to decorator coords.
-  const float alignment = IsShowingRealText() ? mAlignmentOffset.x : 0.f;
-  const float offset = mEventData->mScrollPosition.x + alignment;
-  const float decoratorPositionBegin = position.x + offset;
-  const float decoratorPositionEnd = positionEnd + offset;
+  const float decoratorPositionBegin = position.x + mScrollPosition.x;
+  const float decoratorPositionEnd = positionEnd + mScrollPosition.x;
 
   if( decoratorPositionBegin < 0.f )
   {
-    mEventData->mScrollPosition.x = -position.x - alignment;
+    mScrollPosition.x = -position.x;
   }
   else if( decoratorPositionEnd > mVisualModel->mControlSize.width )
   {
-    mEventData->mScrollPosition.x = mVisualModel->mControlSize.width - positionEnd - alignment;
+    mScrollPosition.x = mVisualModel->mControlSize.width - positionEnd;
   }
 }
 
@@ -2479,9 +2276,12 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
   const Vector2& currentCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
 
   // Calculate the offset to match the cursor position before the character was deleted.
-  mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
+  mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x;
 
   ClampHorizontalScroll( mVisualModel->GetLayoutSize() );
+
+  // Makes the new cursor position visible if needed.
+  ScrollToMakePositionVisible( cursorInfo.primaryPosition );
 }
 
 void Controller::Impl::RequestRelayout()

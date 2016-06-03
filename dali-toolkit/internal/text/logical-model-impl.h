@@ -91,6 +91,9 @@ public:
   /**
    * @brief Retrieves the logical cursor index for the given visual cursor index.
    *
+   * @pre The method FetchBidirectionalLineInfo() must be called before. If the result of FetchBidirectionalLineInfo() is false,
+   *      then the character is not in a bidirectional line and the result will be invalid.
+   *
    * @param[in] visualCursorIndex The visual cursor index.
    *
    * @return The logical cursor index.
@@ -99,6 +102,9 @@ public:
 
   /**
    * @brief Retrieves the logical character index for the given visual character index.
+   *
+   * @pre The method FetchBidirectionalLineInfo() must be called before. If the result of FetchBidirectionalLineInfo() is false,
+   *      then the character is not in a bidirectional line and the result will be invalid.
    *
    * @param[in] visualCharacterIndex The visual character index.
    *
