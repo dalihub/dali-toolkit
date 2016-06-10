@@ -597,7 +597,7 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image actor
+  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image view
   DALI_TEST_EQUALS( editor.GetChildCount(), 3u, TEST_LOCATION );
 
   Actor layer = editor.GetChildAt( 0u );

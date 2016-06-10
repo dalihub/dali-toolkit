@@ -76,9 +76,9 @@ public:
                bool orientationCorrection);
 
   /**
-   * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, PixelDataPtr )
+   * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, PixelData )
    */
-  bool Upload( Vector4& textureRect, PixelDataPtr pixelData );
+  bool Upload( Vector4& textureRect, PixelData pixelData );
 
   /**
    * @copydoc Toolkit::ImageAtlas::Remove

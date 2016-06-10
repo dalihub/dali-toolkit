@@ -1267,7 +1267,7 @@ void TextEditor::EnableClipping( bool clipping, const Vector2& size )
 
         mClipper = Clipper::New( size );
         self.Add( mClipper->GetRootActor() );
-        self.Add( mClipper->GetImageActor() );
+        self.Add( mClipper->GetImageView() );
       }
       else if ( mClipper )
       {
@@ -1277,7 +1277,7 @@ void TextEditor::EnableClipping( bool clipping, const Vector2& size )
   }
   else
   {
-    // Note - this will automatically remove the root & image actors
+    // Note - this will automatically remove the root actor & the image view
     mClipper.Reset();
   }
 }

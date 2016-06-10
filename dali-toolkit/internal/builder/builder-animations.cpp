@@ -17,7 +17,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

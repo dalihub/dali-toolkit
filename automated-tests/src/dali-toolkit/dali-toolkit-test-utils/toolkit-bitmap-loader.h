@@ -50,7 +50,7 @@ public:
   void Load();
   bool IsLoaded();
   std::string GetUrl() const;
-  PixelDataPtr GetPixelData() const;
+  PixelData GetPixelData() const;
 
   void WaitForLoading();
   static BitmapLoader GetLatestCreated(); // return the latest created BitmapLoader

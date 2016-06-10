@@ -161,7 +161,7 @@ private:
   TextureSet                  mTextureSet;           ///< The texture set which controls the bubble display
   std::vector<BubbleActorPtr> mBubbleActors;         ///< The meshActor vector, its size is mNumShader.
 
-  Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background image actor.
+  Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background.
   Vector2                     mBubbleSizeRange;     ///< The size range of the bubbles; x component is the low bound, and y component is the up bound.
   Vector3                     mHSVDelta;            ///< The HSV difference used to adjust the background image color.
 

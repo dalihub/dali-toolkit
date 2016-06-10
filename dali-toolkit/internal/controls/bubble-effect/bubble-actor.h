@@ -49,7 +49,7 @@ public:
    * Ideally use one group of uniform to control one bubble.
    * If the num of patches in the MeshActor is more than groups of uniforms,
    * the uniform values will be shared by multiple bubbles. Allow up to 9 times.
-   * @param[in] movementArea The size of the bubble moving area, usually the same size as the background image actor.
+   * @param[in] movementArea The size of the bubble moving area, usually the same size as the background.
    * @return A newly allocated object.
    */
   BubbleActor( unsigned int numberOfBubble,
@@ -131,7 +131,7 @@ private:
   Actor        mActor;
   Renderer     mRenderer;
 
-  Vector2      mMovementArea;      ///< The size of the bubble moving area, usually the same size as the background image actor.
+  Vector2      mMovementArea;      ///< The size of the bubble moving area, usually the same size as the background.
 
   //properties mapped as uniforms
   std::vector<Property::Index> mIndicesOffset;             ///< Indices of the properties mapping to uniform array 'uOffset'

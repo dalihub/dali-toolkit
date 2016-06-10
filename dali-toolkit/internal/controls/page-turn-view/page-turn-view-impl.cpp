@@ -32,9 +32,6 @@
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 
-// headers needed for backward compatibility of PageFactory::NewPage(pageId) API
-#include <dali/public-api/actors/image-actor.h>
-
 using namespace Dali;
 
 namespace //Unnamed namespace

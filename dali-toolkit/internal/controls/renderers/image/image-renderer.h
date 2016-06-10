@@ -253,7 +253,7 @@ private:
 private:
   Image mImage;
   ImageAtlasManager& mAtlasManager;
-  PixelDataPtr mPixels;
+  PixelData mPixels;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;

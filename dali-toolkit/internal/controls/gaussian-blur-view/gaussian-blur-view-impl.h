@@ -166,15 +166,15 @@ private:
   FrameBufferImage mRenderTarget1;
   FrameBufferImage mRenderTarget2;
 
-  Toolkit::ImageView mImageActorHorizBlur;
-  Toolkit::ImageView mImageActorVertBlur;
+  Toolkit::ImageView mImageViewHorizBlur;
+  Toolkit::ImageView mImageViewVertBlur;
 
   RenderTask mHorizBlurTask;
   RenderTask mVertBlurTask;
 
   /////////////////////////////////////////////////////////////
   // for compositing blur and children renders to offscreen target
-  Toolkit::ImageView mImageActorComposite;
+  Toolkit::ImageView mImageViewComposite;
   RenderTask mCompositeTask;
 
   /////////////////////////////////////////////////////////////

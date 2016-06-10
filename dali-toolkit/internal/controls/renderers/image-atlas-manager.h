@@ -81,7 +81,7 @@ public:
    * @return The texture set containing the image.
    */
   TextureSet Add( Vector4& textureRect,
-                PixelDataPtr pixelData );
+                  PixelData pixelData );
 
   /**
    * Remove the image at the given rectangle from the texture set.

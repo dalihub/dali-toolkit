@@ -189,7 +189,7 @@ void SvgRenderer::AddRasterizationTask( const Vector2& size )
   }
 }
 
-void SvgRenderer::ApplyRasterizedImage( PixelDataPtr rasterizedPixelData )
+void SvgRenderer::ApplyRasterizedImage( PixelData rasterizedPixelData )
 {
   if( GetIsOnStage()  )
   {
@@ -212,7 +212,7 @@ void SvgRenderer::ApplyRasterizedImage( PixelDataPtr rasterizedPixelData )
     }
     else // no atlasing
     {
-      Atlas texture = Atlas::New( rasterizedPixelData->GetWidth(), rasterizedPixelData->GetHeight() );
+      Atlas texture = Atlas::New( rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight() );
       texture.Upload( rasterizedPixelData, 0, 0 );
 
       if( mAtlasRect == FULL_TEXTURE_RECT )

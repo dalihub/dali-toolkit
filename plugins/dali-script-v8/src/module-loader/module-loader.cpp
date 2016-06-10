@@ -193,7 +193,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  *
  *     var ImageView = require(" ImageView.js");
  *
- *     var imageView = new ImageView( position, orientation, image, "my first image actor");
+ *     var imageView = new ImageView( position, orientation, image, "my first image view");
  *
  * #### Exporting as a singleton
  *

@@ -68,12 +68,12 @@ public:
     unsigned char* buffer = static_cast<unsigned char*>(malloc(bufferSize));
     memset(buffer, 0, bufferSize);
 
-    mPixelData = PixelData::New( buffer, mSize.GetWidth(), mSize.GetHeight(), Pixel::RGBA8888, PixelData::FREE);
+    mPixelData = Dali::PixelData::New( buffer, mSize.GetWidth(), mSize.GetHeight(), Pixel::RGBA8888, Dali::PixelData::FREE);
 
     sem_post( &mySemaphore );
   }
 
-  PixelDataPtr GetPixelData() const
+  Dali::PixelData GetPixelData() const
   {
     return mPixelData;
   }
@@ -98,7 +98,7 @@ public:
   }
 
   ImageDimensions mSize;
-  PixelDataPtr mPixelData;
+  Dali::PixelData mPixelData;
   const std::string mUrl;
   sem_t mySemaphore;
 };
@@ -150,7 +150,7 @@ void Dali::BitmapLoader::Load()
 {
   GetImplementation(*this).Load();
 }
-PixelDataPtr Dali::BitmapLoader::GetPixelData() const
+PixelData Dali::BitmapLoader::GetPixelData() const
 {
   return GetImplementation(*this).GetPixelData();
 }
