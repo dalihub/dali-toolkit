@@ -149,8 +149,6 @@ private:
 
   std::map<const std::string, FeedbackPattern>   mFeedbackPatternLut; ///< Used to convert feedback pattern strings into enumerated values
   std::map<const std::string, FeedbackStyleInfo> mStyleInfoLut;       ///< Converts key strings into style information
-
-  SlotDelegate< FeedbackStyle > mConnections; ///< Maintains the connections to the Object registry.
 };
 
 } // namespace Toolkit
