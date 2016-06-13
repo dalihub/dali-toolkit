@@ -58,7 +58,6 @@ class Replacement;
 extern Animation CreateAnimation(const TreeNode& child, const Replacement& replacements, const Dali::Actor searchRoot, Builder* const builder );
 extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
-extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gFilterScript  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_SCRIPT");
@@ -180,9 +179,9 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
           mapped = DeterminePropertyFromNode( keyChild.second, type, value, constant );
           if( ! mapped )
           {
-            // verbose as this might not be a problem
-            // eg parentOrigin can be a string which is picked up later
-            DALI_SCRIPT_VERBOSE("Could not convert property:%s\n", key.c_str());
+            // Just determine the property from the node and if it's valid, let the property object handle it
+            DeterminePropertyFromNode( keyChild.second, value, constant );
+            mapped = ( value.GetType() != Property::NONE );
           }
         }
         if( mapped )
@@ -240,8 +239,6 @@ void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
 
     if( actor )
     {
-      SetupActor( node, actor, constant );
-
       // add signals
       SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor, this );
       SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor, this );
