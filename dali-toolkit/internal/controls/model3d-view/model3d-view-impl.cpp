@@ -592,7 +592,7 @@ void Model3dView::LoadTextures()
   if( !mTextureSet )
     return ;
 
-  if( mTexture0Url != "" )
+  if( (mTexture0Url != "") && (mIlluminationType != Toolkit::Model3dView::DIFFUSE) )
   {
     std::string imgUrl = mImagesUrl + mTexture0Url;
 
