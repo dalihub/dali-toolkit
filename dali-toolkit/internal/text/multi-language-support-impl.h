@@ -67,7 +67,7 @@ struct ValidateFontsPerScript
    *
    * @return @e true if the font is in the vector of valid fonts.
    */
-  bool FindValidFont( FontId fontId ) const;
+  bool IsValidFont( FontId fontId ) const;
 
   Vector<FontId> mValidFonts;
 };
