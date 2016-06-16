@@ -151,16 +151,22 @@ int UtcDaliSliderSignals(void)
 
   event = Dali::Integration::TouchEvent();
 
-  const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
+  Integration::Point pointDown;
+  pointDown.SetState( PointState::DOWN );
+  pointDown.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
   event.AddPoint( pointDown );
 
   for( int i = 0; i < 5; ++i )
   {
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Motion, 10.0f + i * 10.0f, 10.0f );
-    event.AddPoint( pointDown );
+    Integration::Point pointMotion;
+    pointMotion.SetState( PointState::MOTION );
+    pointMotion.SetScreenPosition( Vector2( 10.0f + i * 10.0f, 10.0f ) );
+    event.AddPoint( pointMotion );
   }
 
-  const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 50.0f, 10.0f );
+  Integration::Point pointUp;
+  pointUp.SetState( PointState::UP );
+  pointUp.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
   event.AddPoint( pointUp );
 
   application.ProcessEvent( event );

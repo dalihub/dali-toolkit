@@ -31,7 +31,6 @@ Shader CreateShader();
 TextureSet CreateTextureSet();
 TextureSet CreateTextureSet( Image image );
 PropertyBuffer CreatePropertyBuffer();
-
 }
 
 #endif // MESH_BUILDER_H

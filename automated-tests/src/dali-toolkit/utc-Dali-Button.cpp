@@ -71,12 +71,54 @@ Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned 
   return imageData;
 }
 
-const Dali::TouchPoint pointDownInside( 0, TouchPoint::Down, 240, 400 );
-const Dali::TouchPoint pointUpInside( 0, TouchPoint::Up, 240, 400 );
-const Dali::TouchPoint pointLeave( 0, TouchPoint::Leave, 240, 400 );
-const Dali::TouchPoint pointEnter( 0, TouchPoint::Motion, 240, 400 );
-const Dali::TouchPoint pointDownOutside( 0, TouchPoint::Down, 10, 10 );
-const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10, 10 );
+Dali::Integration::Point GetPointDownInside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpInside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointLeave()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::LEAVE );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointEnter()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::MOTION );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointDownOutside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpOutside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  return point;
+}
+
 
 static float ANIMATION_TIME( 0.5f );
 } // namespace
@@ -404,14 +446,14 @@ int UtcDaliButtonPressedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
+  event.AddPoint( GetPointUpInside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
@@ -420,14 +462,14 @@ int UtcDaliButtonPressedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
+  event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUpOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
@@ -436,18 +478,18 @@ int UtcDaliButtonPressedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointLeave );
+  event.AddPoint( GetPointLeave() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUpOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
@@ -456,18 +498,18 @@ int UtcDaliButtonPressedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
+  event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointEnter );
+  event.AddPoint( GetPointEnter() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
+  event.AddPoint( GetPointUpInside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
@@ -499,11 +541,11 @@ int UtcDaliButtonClickedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
+  event.AddPoint( GetPointUpInside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
@@ -512,11 +554,11 @@ int UtcDaliButtonClickedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
+  event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUpOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
@@ -525,15 +567,15 @@ int UtcDaliButtonClickedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointLeave );
+  event.AddPoint( GetPointLeave() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUpOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
@@ -542,15 +584,15 @@ int UtcDaliButtonClickedSignalP(void)
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
+  event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointEnter );
+  event.AddPoint( GetPointEnter() );
   application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
+  event.AddPoint( GetPointUpInside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
