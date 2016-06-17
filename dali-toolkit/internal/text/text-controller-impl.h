@@ -429,6 +429,37 @@ struct Controller::Impl
     }
   }
 
+  /**
+   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
+   */
+  void NotifyImfManager();
+
+  /**
+   * @brief Retrieve the current cursor position.
+   *
+   * @return The cursor position.
+   */
+  CharacterIndex GetLogicalCursorPosition() const;
+
+  /**
+   * @brief Retrieves the number of consecutive white spaces starting from the given @p index.
+   *
+   * @param[in] index The character index from where to count the number of consecutive white spaces.
+   *
+   * @return The number of consecutive white spaces.
+   */
+  Length GetNumberOfWhiteSpaces( CharacterIndex index ) const;
+
+  /**
+   * @brief Retrieve any text previously set starting from the given @p index.
+   *
+   * @param[in] index The character index from where to retrieve the text.
+   * @param[out] text A string of UTF-8 characters.
+   *
+   * @see Dali::Toolkit::Text::Controller::GetText()
+   */
+  void GetText( CharacterIndex index, std::string& text ) const;
+
   bool IsClipboardEmpty()
   {
     bool result( mClipboard && mClipboard.NumberOfItems() );

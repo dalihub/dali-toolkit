@@ -292,9 +292,6 @@ void Controller::SetText( const std::string& text )
     mImpl->mEventData->mEventQueue.clear();
   }
 
-  // Notify IMF as text changed
-  NotifyImfManager();
-
   // Do this last since it provides callbacks into application code
   mImpl->mControlInterface.TextChanged();
 }
@@ -303,27 +300,13 @@ void Controller::GetText( std::string& text ) const
 {
   if( !mImpl->IsShowingPlaceholderText() )
   {
-    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-
-    if( 0u != utf32Characters.Count() )
-    {
-      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), text );
-    }
+    // Retrieves the text string.
+    mImpl->GetText( 0u, text );
   }
   else
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::GetText %p empty (but showing placeholder)\n", this );
   }
-}
-
-unsigned int Controller::GetLogicalCursorPosition() const
-{
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mPrimaryCursorPosition;
-  }
-
-  return 0u;
 }
 
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
@@ -2018,9 +2001,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    if( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
-        ( mImpl->mEventData->mState != EventData::INACTIVE ) )
+    if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
+         ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
+         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) )
     {
+      // Should not change the state if the key is the shift send by the imf manager.
+      // Otherwise, when the state is SELECTING the text controller can't send the right
+      // surrounding info to the imf.
       mImpl->ChangeState( EventData::EDITING );
     }
 
@@ -2564,12 +2551,6 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
       mImpl->mOperationsPending = ALL_OPERATIONS;
 
-      // This is to reset the virtual keyboard to Upper-case
-      if( 0u == mImpl->mLogicalModel->mText.Count() )
-      {
-        NotifyImfManager();
-      }
-
       if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
           !mImpl->IsPlaceholderAvailable() )
       {
@@ -2632,35 +2613,36 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
 
 ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
-  bool update = false;
+  // Whether the text needs to be relaid-out.
   bool requestRelayout = false;
 
-  std::string text;
-  unsigned int cursorPosition = 0u;
+  // Whether to retrieve the text and cursor position to be sent to the IMF manager.
+  bool retrieveText = false;
+  bool retrieveCursor = false;
 
   switch( imfEvent.eventName )
   {
     case ImfManager::COMMIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
-      update = true;
       requestRelayout = true;
+      retrieveCursor = true;
       break;
     }
     case ImfManager::PREEDIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
-      update = true;
       requestRelayout = true;
+      retrieveCursor = true;
       break;
     }
     case ImfManager::DELETESURROUNDING:
     {
-      update = RemoveText( imfEvent.cursorOffset,
-                           imfEvent.numberOfChars,
-                           DONT_UPDATE_INPUT_STYLE );
+      const bool textDeleted = RemoveText( imfEvent.cursorOffset,
+                                           imfEvent.numberOfChars,
+                                           DONT_UPDATE_INPUT_STYLE );
 
-      if( update )
+      if( textDeleted )
       {
         if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
             !mImpl->IsPlaceholderAvailable() )
@@ -2673,17 +2655,16 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
         }
         mImpl->mEventData->mUpdateCursorPosition = true;
         mImpl->mEventData->mScrollAfterDelete = true;
+
+        requestRelayout = true;
+        retrieveCursor = true;
       }
-      requestRelayout = true;
       break;
     }
     case ImfManager::GETSURROUNDING:
     {
-      GetText( text );
-      cursorPosition = GetLogicalCursorPosition();
-
-      imfManager.SetSurroundingText( text );
-      imfManager.SetCursorPosition( cursorPosition );
+      retrieveText = true;
+      retrieveCursor = true;
       break;
     }
     case ImfManager::VOID:
@@ -2692,12 +2673,6 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
       break;
     }
   } // end switch
-
-  if( ImfManager::GETSURROUNDING != imfEvent.eventName )
-  {
-    GetText( text );
-    cursorPosition = GetLogicalCursorPosition();
-  }
 
   if( requestRelayout )
   {
@@ -2708,7 +2683,32 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     mImpl->mControlInterface.TextChanged();
   }
 
-  ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
+  std::string text;
+  CharacterIndex cursorPosition = 0u;
+  Length numberOfWhiteSpaces = 0u;
+
+  if( retrieveCursor )
+  {
+    numberOfWhiteSpaces = mImpl->GetNumberOfWhiteSpaces( 0u );
+
+    cursorPosition = mImpl->GetLogicalCursorPosition();
+
+    if( cursorPosition < numberOfWhiteSpaces )
+    {
+      cursorPosition = 0u;
+    }
+    else
+    {
+      cursorPosition -= numberOfWhiteSpaces;
+    }
+  }
+
+  if( retrieveText )
+  {
+    mImpl->GetText( numberOfWhiteSpaces, text );
+  }
+
+  ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
 
   return callbackData;
 }
@@ -2746,11 +2746,6 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE RemovedText\n", this );
-    // Notifiy the IMF manager after text changed
-    // Automatic  Upper-case and restarting prediction on an existing word require this.
-    NotifyImfManager();
-
     if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
         !mImpl->IsPlaceholderAvailable() )
     {
@@ -2765,23 +2760,6 @@ bool Controller::BackspaceKeyEvent()
   }
 
   return removed;
-}
-
-void Controller::NotifyImfManager()
-{
-  if( NULL != mImpl->mEventData )
-  {
-    if( mImpl->mEventData->mImfManager )
-    {
-      // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
-      std::string text;
-      GetText( text );
-      mImpl->mEventData->mImfManager.SetSurroundingText( text );
-
-      mImpl->mEventData->mImfManager.SetCursorPosition( GetLogicalCursorPosition() );
-      mImpl->mEventData->mImfManager.NotifyCursorPosition();
-    }
-  }
 }
 
 void Controller::ShowPlaceholderText()

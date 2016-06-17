@@ -161,6 +161,13 @@ bool Controller::Impl::ProcessInputEvents()
     }
   }
 
+  if( mEventData->mUpdateCursorPosition ||
+      mEventData->mUpdateLeftSelectionPosition ||
+      mEventData->mUpdateRightSelectionPosition )
+  {
+    NotifyImfManager();
+  }
+
   // The cursor must also be repositioned after inserts into the model
   if( mEventData->mUpdateCursorPosition )
   {
@@ -274,6 +281,80 @@ bool Controller::Impl::ProcessInputEvents()
   mEventData->mDecoratorUpdated = false;
 
   return decoratorUpdated;
+}
+
+void Controller::Impl::NotifyImfManager()
+{
+  if( mEventData && mEventData->mImfManager )
+  {
+    CharacterIndex cursorPosition = GetLogicalCursorPosition();
+
+    const Length numberOfWhiteSpaces = GetNumberOfWhiteSpaces( 0u );
+
+    // Update the cursor position by removing the initial white spaces.
+    if( cursorPosition < numberOfWhiteSpaces )
+    {
+      cursorPosition = 0u;
+    }
+    else
+    {
+      cursorPosition -= numberOfWhiteSpaces;
+    }
+
+    mEventData->mImfManager.SetCursorPosition( cursorPosition );
+    mEventData->mImfManager.NotifyCursorPosition();
+  }
+}
+
+CharacterIndex Controller::Impl::GetLogicalCursorPosition() const
+{
+  CharacterIndex cursorPosition = 0u;
+
+  if( mEventData )
+  {
+    if( ( EventData::SELECTING == mEventData->mState ) ||
+        ( EventData::SELECTION_HANDLE_PANNING == mEventData->mState ) )
+    {
+      cursorPosition = std::min( mEventData->mRightSelectionPosition, mEventData->mLeftSelectionPosition );
+    }
+    else
+    {
+      cursorPosition = mEventData->mPrimaryCursorPosition;
+    }
+  }
+
+  return cursorPosition;
+}
+
+Length Controller::Impl::GetNumberOfWhiteSpaces( CharacterIndex index ) const
+{
+  Length numberOfWhiteSpaces = 0u;
+
+  // Get the buffer to the text.
+  Character* utf32CharacterBuffer = mLogicalModel->mText.Begin();
+
+  const Length totalNumberOfCharacters = mLogicalModel->mText.Count();
+  for( ; index < totalNumberOfCharacters; ++index, ++numberOfWhiteSpaces )
+  {
+    if( !TextAbstraction::IsWhiteSpace( *( utf32CharacterBuffer + index ) ) )
+    {
+      break;
+    }
+  }
+
+  return numberOfWhiteSpaces;
+}
+
+void Controller::Impl::GetText( CharacterIndex index, std::string& text ) const
+{
+  // Get the total number of characters.
+  Length numberOfCharacters = mLogicalModel->mText.Count();
+
+  // Retrieve the text.
+  if( 0u != numberOfCharacters )
+  {
+    Utf32ToUtf8( mLogicalModel->mText.Begin() + index, numberOfCharacters - index, text );
+  }
 }
 
 void Controller::Impl::CalculateTextUpdateIndices( Length& numberOfCharacters )
