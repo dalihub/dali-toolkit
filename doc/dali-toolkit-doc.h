@@ -159,6 +159,9 @@
  *     @defgroup dali_toolkit_controls_flex_container Flex Container
  *     @brief FlexContainer is a container for Flexbox layout.
 
+ *     @defgroup dali_toolkit_controls_video_view Video View
+ *     @brief VideoView is a control for video playback and display.
+
  *   @}
 
  *   @defgroup dali_toolkit_managers Managers

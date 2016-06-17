@@ -3,7 +3,7 @@
 LOG_FILE="build.`date +%Y_%m_%d_%H_%M_%S`.log"
 
 export START_TIME=`date +%s`
-ionice -c 3 nice doxygen ./dali_internal.doxy  2>&1 | tee "$LOG_FILE"
+ionice -c 3 nice doxygen dali-internal.doxy  2>&1 | tee "$LOG_FILE"
 export END_TIME=`date +%s`
 
 let "BUILD_TIME = $END_TIME - $START_TIME"

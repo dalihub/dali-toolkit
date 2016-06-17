@@ -103,7 +103,10 @@ int UtcDaliBuilderQuitSignal(void)
 
   // Emit touch event and check that our quit method is called
   Integration::TouchEvent touchEvent;
-  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  touchEvent.points.push_back( point );
   application.ProcessEvent( touchEvent );
   DALI_TEST_CHECK( functorCalled );
 
@@ -268,7 +271,10 @@ int UtcDaliBuilderAnimationP(void)
   // trigger play
   // Emit touch event and check that our quit method is called
   Integration::TouchEvent touchEvent;
-  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  touchEvent.points.push_back( point );
   application.ProcessEvent( touchEvent );
 
   // Render and notify
@@ -665,7 +671,10 @@ int UtcDaliBuilderChildActionP(void)
 
   // Emit touch event and check that our quit method is called
   Integration::TouchEvent touchEvent;
-  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  touchEvent.points.push_back( point );
   application.ProcessEvent( touchEvent );
 
   // Render and notify
@@ -719,7 +728,10 @@ int UtcDaliBuilderSetPropertyActionP(void)
 
   // Emit touch event and check that our quit method is called
   Integration::TouchEvent touchEvent;
-  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  touchEvent.points.push_back( point );
   application.ProcessEvent( touchEvent );
 
   // Render and notify
@@ -770,7 +782,10 @@ int UtcDaliBuilderGenericActionP(void)
 
   // Emit touch event and check that our quit method is called
   Integration::TouchEvent touchEvent;
-  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  touchEvent.points.push_back( point );
   application.ProcessEvent( touchEvent );
 
   // Render and notify
@@ -826,7 +841,10 @@ int UtcDaliBuilderPropertyNotificationP(void)
 
   // Emit touch event and check that our quit method is called
   Integration::TouchEvent touchEvent;
-  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  touchEvent.points.push_back( point );
   application.ProcessEvent( touchEvent );
 
   // Render and notify

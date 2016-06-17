@@ -38,13 +38,38 @@ bool PushButtonSelected( Button button, bool selected )
 }
 
 
-const Dali::TouchPoint pointDownInside( 0, TouchPoint::Down, 240, 400 );
-const Dali::TouchPoint pointUpInside( 0, TouchPoint::Up, 240, 400 );
-const Dali::TouchPoint pointLeave( 0, TouchPoint::Leave, 240, 400 );
-const Dali::TouchPoint pointEnter( 0, TouchPoint::Motion, 240, 400 );
-const Dali::TouchPoint pointMotionOut( 0, TouchPoint::Motion, 10, 10 );
-const Dali::TouchPoint pointDownOutside( 0, TouchPoint::Down, 10, 10 );
-const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10, 10 );
+Dali::Integration::Point GetPointDownInside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpInside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 240, 400 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointMotionOut()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::MOTION );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpOutside()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  return point;
+}
+
 } // namespace
 
 
@@ -385,7 +410,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
   // A down event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -395,7 +420,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
   // An up event is sent outside the button's boundary but inside the actor's one.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUpOutside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -419,7 +444,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
   // A down event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -429,7 +454,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
   // A motion event is sent outside the button's boundary but inside the actor's one.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointMotionOut );
+  event.AddPoint( GetPointMotionOut() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -449,7 +474,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
   // A down event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -460,7 +485,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
   // An up event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
+  event.AddPoint( GetPointUpInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -528,7 +553,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
   // A down event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -546,7 +571,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
   // An up event is sent outside the button's boundary but inside the actor's one.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUpOutside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -573,7 +598,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
   // A down event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -591,7 +616,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
   // A motion event is sent outside the button's boundary but inside the actor's one.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointMotionOut );
+  event.AddPoint( GetPointMotionOut() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -617,7 +642,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
   // A down event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
+  event.AddPoint( GetPointDownInside() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -636,7 +661,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
   // An up event is sent inside the button's boundary.
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
+  event.AddPoint( GetPointUpInside() );
 
   // flush the queue and render once
   application.SendNotification();

@@ -103,7 +103,6 @@ struct FeedbackStyleInfo
 static const FeedbackStyleInfo DEFAULT_FEEDBACK_STYLE_INFO;
 
 FeedbackStyle::FeedbackStyle()
-: mConnections( this )
 {
   mFeedback = Dali::FeedbackPlayer::Get();
 

@@ -21,10 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/controls/slider/slider.h>
+#include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -120,39 +121,32 @@ public:
   const Vector2& GetHitRegion() const;
 
   /**
-   * Set backing region
+   * Set the track region
    *
-   * @param[in] region The backing region
+   * @param[in] region The track region
    */
-  void SetBackingRegion( const Vector2& region );
+  void SetTrackRegion( const Vector2& region );
 
   /**
-   * Get backing region
+   * Get the track region
    *
-   * @return The backing region
+   * @return The track region
    */
-  const Vector2& GetBackingRegion() const;
+  const Vector2& GetTrackRegion() const;
 
   /**
-   * @brief Set the disable color.
+   * @brief Set the disabled color.
    *
-   * @param[in] color The disable color.
+   * @param[in] color The disabled color.
    */
-  void SetDisableColor( const Vector4& color );
+  void SetDisabledColor( const Vector4& color );
 
   /**
-   * @brief Get disable color
+   * @brief Get disabled color
    *
-   * @return The disable color
+   * @return The disabled color
    */
-  Vector4 GetDisableColor() const;
-
-  /**
-   * Get popup text color
-   *
-   * @return The popup text color
-   */
-  Vector4 GetPopupTextColor() const;
+  Vector4 GetDisabledColor() const;
 
   /**
    * Set the value precision to be used for numbers in the slider
@@ -241,9 +235,9 @@ public:
   Toolkit::Slider::ValueChangedSignalType& SlidingFinishedSignal();
 
   /**
-   * @copydoc Toolkit::Slider::MarkSignal()
+   * @copydoc Toolkit::Slider::MarkReachedSignal()
    */
-  Toolkit::Slider::MarkSignalType& MarkSignal();
+  Toolkit::Slider::MarkReachedSignalType& MarkReachedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -396,16 +390,16 @@ private:
   Actor CreateHitRegion();
 
   /**
-   * Create the backing for the slider
+   * Create the track for the slider
    *
-   * @return The backing actor
+   * @return The track actor
    */
-  Toolkit::ImageView CreateBacking();
+  Toolkit::ImageView CreateTrack();
 
   /**
-   * Create the progress backing for the slider
+   * Create the progress track for the slider
    *
-   * @return The backing actor
+   * @return The track actor
    */
   Toolkit::ImageView CreateProgress();
 
@@ -512,74 +506,102 @@ private:
   void DisplayValue( float value, bool raiseSignals );
 
   /**
-   * Create the image for the backing
+   * Create the image for the track
    *
-   * @param[in] imageName The name of the image to load and set
+   * @param[in] filename The track image
    */
-  void SetBackingImageName( const std::string& imageName );
+  void SetTrackVisual( const std::string& filename );
 
   /**
-   * @brief Return the backing image file name.
+   * @brief Set the track visual from an Dali::Property::Map
    *
-   * @return The backing image file name.
+   * @param[in] map The Dali::Property::Map to use for to display
    */
-  std::string GetBackingImageName();
+  void SetTrackVisual( Dali::Property::Map map );
+
+  /**
+   * @brief Return the track image.
+   *
+   * @return The track image.
+   */
+  std::string GetTrackVisual();
 
   /**
    * Create the image for the progress bar
    *
-   * @param[in] imageName The name of the image to load and set
+   * @param[in] filename The progress bar image
    */
-  void SetProgressImageName( const std::string& imageName );
+  void SetProgressVisual( const std::string& filename );
 
   /**
-   * @brief Return the progress image name.
+   * @brief Set the progress visual from an Dali::Property::Map
    *
-   * @return The progress image name if it exists.
+   * @param[in] map The Dali::Property::Map to use for to display
    */
-  std::string GetProgressImageName();
+  void SetProgressVisual( Dali::Property::Map map );
+
+  /**
+   * @brief Return the progress bar image.
+   *
+   * @return The progress bar image if it exists.
+   */
+  std::string GetProgressVisual();
 
   /**
    * @brief Create the image for the popup
    *
-   * @param[in] imageName The name of the image to load and set
+   * @param[in] filename The popup image
    */
-  void CreatePopupImage( const std::string& imageName );
+  void CreatePopupImage( const std::string& filename );
 
   /**
-   * @brief Set the popup name
+   * @brief Set the popup image
    *
-   * @param[in] imageName The name of the image to set
+   * @param[in] filename The popup image to set
    */
-  void SetPopupImageName( const std::string& imageName );
+  void SetPopupVisual( const std::string& filename );
 
   /**
-   * @brief Return the popup image name.
+   * @brief Set the popup from an Dali::Property::Map
    *
-   * @return The name of the popup image if it exists.
+   * @param[in] map The Dali::Property::Map to use for to display
    */
-  std::string GetPopupImageName();
+  void SetPopupVisual( Dali::Property::Map map );
 
   /**
-   * @brief Set the popup arrow image name
+   * @brief Return the popup image.
    *
-   * @param[in] imageName The name of the image to set
+   * @return The popup image if it exists.
    */
-  void SetPopupArrowImageName( const std::string& imageName );
+  std::string GetPopupVisual();
 
   /**
-   * @brief Return the popup arrow image name.
+   * @brief Set the popup arrow image
    *
-   * @return The name of the popup image if it exists.
+   * @param[in] filename The popup arrow image to set
    */
-  std::string GetPopupArrowImageName();
+  void SetPopupArrowVisual( const std::string& filename );
+
+  /**
+   * @brief Set the popup arrow from an Dali::Property::Map
+   *
+   * @param[in] map The Dali::Property::Map to use for to display
+   */
+  void SetPopupArrowVisual( Dali::Property::Map map );
+
+  /**
+   * @brief Return the popup arrow image.
+   *
+   * @return The popup arrow image if it exists.
+   */
+  std::string GetPopupArrowVisual();
 
   /**
    * Create the image for the popup arrow
    *
-   * @param[in] imageName The name of the image to load and set
+   * @param[in] filename The popup arrow image to load and set
    */
-  void CreatePopupArrowImage( const std::string& imageName );
+  void CreatePopupArrowImage( const std::string& filename );
 
   /**
    * Set the size of the progress bar region
@@ -591,23 +613,30 @@ private:
   /**
    * Create the image for the handle
    *
-   * @param[in] imageName The name of the image to load and set
+   * @param[in] filename The handle image
    */
-  void SetHandleImageName( const std::string& imageName );
+  void SetHandleVisual( const std::string& filename );
 
   /**
-   * @brief Return the handle image name.
+   * @brief Set the handle visual from an Dali::Property::Map
    *
-   * @return The name of the image handle if it exists.
+   * @param[in] map The Dali::Property::Map to use for to display
    */
-  std::string GetHandleImageName();
+  void SetHandleVisual( Property::Map map );
 
   /**
-   * Set the size of the handle region
+   * @brief Return the handle image.
    *
-   * @param[in] region The size of the region to set
+   * @return The handle image if it exists.
    */
-  void ResizeHandleRegion( const Vector2& region );
+  std::string GetHandleVisual();
+
+  /**
+   * Reset the size of the handle
+   *
+   * @param[in] size The size of the handle to set
+   */
+  void ResizeHandleSize( const Vector2& size );
 
   /**
    * Create and display the value on the handle
@@ -620,25 +649,18 @@ private:
   void DestroyHandleValueDisplay();
 
   /**
-   * Update the color of the popup text
+   * Set the size of the handle
    *
-   * @param[in] color The new color
+   * @param[in] size The handle size
    */
-  void SetPopupTextColor( const Vector4& color );
+  void SetHandleSize( const Vector2& size );
 
   /**
-   * Set handle region
+   * Get the size of the handle
    *
-   * @param[in] region The handle region
+   * @return The handle size
    */
-  void SetHandleRegion( const Vector2& region );
-
-  /**
-   * Get handle region
-   *
-   * @return The handle region
-   */
-  const Vector2& GetHandleRegion() const;
+  const Vector2& GetHandleSize() const;
 
   /**
    * Set the lower bound of the slider's value
@@ -682,9 +704,9 @@ private:
 
   Actor mHitArea;                           ///< The input handler
   Actor mValueDisplay;                      ///< Display of the value
-  Toolkit::ImageView mBacking;              ///< Backing image
+  Toolkit::ImageView mTrack;                ///< Track image
   Toolkit::ImageView mHandle;               ///< Slider handle
-  Toolkit::ImageView mProgress;             ///< Progress backing
+  Toolkit::ImageView mProgress;             ///< Progress bar
   Toolkit::ImageView mPopup;                ///< Popup backing
   Toolkit::ImageView mPopupArrow;           ///< Popup arrow backing
 
@@ -693,9 +715,9 @@ private:
   Vector2 mHandleLastTouchPoint;            ///< The last touch point for the handle
   Timer mValueTimer;                        ///< Timer used to hide value view
 
-  Toolkit::Slider::ValueChangedSignalType mValueChangedSignal;    ///< Signal emitted when the value is changed
+  Toolkit::Slider::ValueChangedSignalType mValueChangedSignal;       ///< Signal emitted when the value is changed
   Toolkit::Slider::ValueChangedSignalType mSlidingFinishedSignal;    ///< Signal emitted when a sliding is finished
-  Toolkit::Slider::MarkSignalType mMarkSignal;                    ///< Signal emitted when a mark is reached
+  Toolkit::Slider::MarkReachedSignalType mMarkReachedSignal;         ///< Signal emitted when a mark is reached
 
   SliderState mState;                 ///< The state of the slider
 
@@ -703,18 +725,23 @@ private:
 
   MarkList mMarks;                    ///< List of discreet marks
 
-  std::string mPopupImageName;      ///< Image name for popup image
-  std::string mPopupArrowImageName; ///< Image name for popup arrow
-  std::string mBackingImageName;    ///< Image name for backing image
-  std::string mHandleImageName;     ///< Image name for handle image
-  std::string mProgressImageName;   ///< Image name for progress image
+  std::string mPopupVisual;           ///< Image for popup image
+  std::string mPopupArrowVisual;      ///< Image for popup arrow image
+  std::string mTrackVisual;           ///< Image for track image
+  std::string mHandleVisual;          ///< Image for handle image
+  std::string mProgressVisual;        ///< Image for progress bar image
 
-  Vector4 mDisableColor;    ///< The color to tint the slider when disabled
-  Vector4 mPopupTextColor;  ///< The color of the popup text
+  Property::Map mPopupMap;         ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mTrackMap;         ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mHandleMap;        ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mProgressMap;      ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mPopupArrowMap;    ///< the Property::Map if the image came from a Property::Map, empty otherwise
+
+  Vector4 mDisabledColor;    ///< The color to tint the slider when disabled
 
   Vector2 mHitRegion;     ///< Size of hit region
-  Vector2 mBackingRegion; ///< Size of backing region
-  Vector2 mHandleRegionSize;  ///< Size of the handle region
+  Vector2 mTrackRegion;   ///< Size of track region
+  Vector2 mHandleSize;    ///< Size of the handle
 
   float mLowerBound;        ///< Lower bound on value
   float mUpperBound;        ///< Upper bound on value

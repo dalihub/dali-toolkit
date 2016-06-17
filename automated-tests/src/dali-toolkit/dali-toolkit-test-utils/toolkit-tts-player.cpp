@@ -80,5 +80,4 @@ TtsPlayer::StateChangedSignalType& TtsPlayer::StateChangedSignal()
   return mStateChangedSignal; // GetImplementation(*this).StateChangedSignal();
 }
 
-
 } // namespace Dali

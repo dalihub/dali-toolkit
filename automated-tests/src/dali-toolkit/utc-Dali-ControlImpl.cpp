@@ -562,7 +562,10 @@ int UtcDaliControlImplTouchEvent(void)
 
     DALI_TEST_EQUALS( dummyImpl.touchEventCalled, false, TEST_LOCATION );
     Integration::TouchEvent touchEvent(1);
-    TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
+    Integration::Point point;
+    point.SetDeviceId( 1 );
+    point.SetState( PointState::DOWN );
+    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
     touchEvent.AddPoint(point);
     application.ProcessEvent(touchEvent);
     DALI_TEST_EQUALS( dummyImpl.touchEventCalled, true, TEST_LOCATION );
@@ -584,7 +587,10 @@ int UtcDaliControlImplTouchEvent(void)
     application.SendNotification();
 
     Integration::TouchEvent touchEvent(1);
-    TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
+    Integration::Point point;
+    point.SetDeviceId( 1 );
+    point.SetState( PointState::DOWN );
+    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
     touchEvent.AddPoint(point);
     application.ProcessEvent(touchEvent);
 
@@ -612,8 +618,11 @@ int UtcDaliControlImplHoverEvent(void)
 
     DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, false, TEST_LOCATION );
     Integration::HoverEvent event(1);
-    TouchPoint point( 1, TouchPoint::Motion, 20.0f, 20.0f );
-    event.AddPoint( point );
+    Integration::Point point;
+    point.SetDeviceId( 1 );
+    point.SetState( PointState::MOTION );
+    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
+    event.AddPoint(point);
     application.ProcessEvent( event );
     DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, true, TEST_LOCATION );
 
@@ -634,8 +643,11 @@ int UtcDaliControlImplHoverEvent(void)
     application.SendNotification();
 
     Integration::HoverEvent event(1);
-    TouchPoint point( 1, TouchPoint::Motion, 20.0f, 20.0f );
-    event.AddPoint( point );
+    Integration::Point point;
+    point.SetDeviceId( 1 );
+    point.SetState( PointState::MOTION );
+    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
+    event.AddPoint(point);
     application.ProcessEvent( event );
 
     Stage::GetCurrent().Remove(dummy);

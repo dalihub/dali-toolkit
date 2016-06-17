@@ -13,7 +13,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/renderer-factory/renderer-factory.cpp \
   $(devel_api_src_dir)/controls/renderer-factory/control-renderer.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
-  $(devel_api_src_dir)/controls/slider/slider.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
@@ -58,9 +57,6 @@ devel_api_renderer_factory_header_files = \
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
-
-devel_api_slider_header_files = \
-  $(devel_api_src_dir)/controls/slider/slider.h
 
 devel_api_focus_manager_header_files = \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h

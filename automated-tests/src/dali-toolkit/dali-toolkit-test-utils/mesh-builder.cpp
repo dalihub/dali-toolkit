@@ -28,7 +28,6 @@ TextureSet CreateTextureSet()
 {
   return TextureSet::New();
 }
-
 TextureSet CreateTextureSet( Image image )
 {
   TextureSet textureSet = TextureSet::New();
