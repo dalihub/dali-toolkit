@@ -119,18 +119,6 @@ struct ShaderParameters
   Shader::ShaderHints mHints;
 };
 
-Shader GetShader( v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::HandleScope handleScope( isolate );
-
-  v8::Local<v8::Object> object = args.This();
-  v8::Local<v8::External> field = v8::Local<v8::External>::Cast( object->GetInternalField(0) );
-  void* ptr = field->Value();
-
-  ShaderWrapper* wrapper = static_cast< ShaderWrapper *>(ptr);
-  return wrapper->GetShader();
-}
-
 } // unnamed space
 
 /**
