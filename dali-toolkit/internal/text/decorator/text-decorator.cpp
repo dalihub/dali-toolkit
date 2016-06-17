@@ -486,7 +486,6 @@ struct Decorator::Impl : public ConnectionTracker
     {
       const HandleImpl& primaryHandle = mHandle[LEFT_SELECTION_HANDLE];
       const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
-      const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
 
       if( primaryHandle.active || secondaryHandle.active )
@@ -502,7 +501,15 @@ struct Decorator::Impl : public ConnectionTracker
       else
       {
         // Calculates the popup's position if the grab handle is active.
-        mCopyPastePopup.position = Vector3( cursor.position.x, -0.5f * popupSize.height - grabHandle.size.height + cursor.position.y, 0.0f );
+        const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
+        if( grabHandle.verticallyFlipped )
+        {
+          mCopyPastePopup.position = Vector3( cursor.position.x, -0.5f * popupSize.height - grabHandle.size.height + cursor.position.y, 0.0f );
+        }
+        else
+        {
+          mCopyPastePopup.position = Vector3( cursor.position.x, -0.5f * popupSize.height + cursor.position.y, 0.0f );
+        }
       }
     }
 
