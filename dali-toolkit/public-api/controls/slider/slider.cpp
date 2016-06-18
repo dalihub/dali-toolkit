@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  *
  */
 
-#include <dali-toolkit/devel-api/controls/slider/slider.h>
+// CLASS HEADER
+#include <dali-toolkit/public-api/controls/slider/slider.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/slider/slider-impl.h>
 
 using namespace Dali;
@@ -25,10 +28,6 @@ namespace Dali
 
 namespace Toolkit
 {
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// Slider
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Slider::Slider()
 {
@@ -78,9 +77,9 @@ Slider::ValueChangedSignalType& Slider::SlidingFinishedSignal()
   return GetImpl( *this ).SlidingFinishedSignal();
 }
 
-Slider::MarkSignalType& Slider::MarkSignal()
+Slider::MarkReachedSignalType& Slider::MarkReachedSignal()
 {
-  return GetImpl( *this ).MarkSignal();
+  return GetImpl( *this ).MarkReachedSignal();
 }
 
 Slider Slider::DownCast( BaseHandle handle )

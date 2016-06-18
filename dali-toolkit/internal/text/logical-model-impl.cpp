@@ -80,16 +80,6 @@ CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex character
 
 CharacterIndex LogicalModel::GetLogicalCursorIndex( CharacterIndex visualCursorIndex )
 {
-  // The total number of characters.
-  const Length numberOfCharacters = mText.Count();
-
-  const bool fetch = FetchBidirectionalLineInfo( visualCursorIndex );
-  if( !fetch )
-  {
-    // The character is not inside a bidi line.
-    return visualCursorIndex;
-  }
-
   // The character's directions buffer.
   const CharacterDirection* const modelCharacterDirections = mCharacterDirections.Begin();
 
@@ -99,28 +89,31 @@ CharacterIndex LogicalModel::GetLogicalCursorIndex( CharacterIndex visualCursorI
   // Whether the paragraph starts with a right to left character.
   const bool isRightToLeftParagraph = bidirectionalLineInfo->direction;
 
+  // The total number of characters of the line.
+  const Length lastCharacterIndex = bidirectionalLineInfo->characterRun.characterIndex + bidirectionalLineInfo->characterRun.numberOfCharacters;
+
   CharacterIndex logicalCursorIndex = 0u;
 
-  if( 0u == visualCursorIndex )
+  if( bidirectionalLineInfo->characterRun.characterIndex == visualCursorIndex )
   {
     if( isRightToLeftParagraph )
     {
-      logicalCursorIndex = numberOfCharacters;
+      logicalCursorIndex = lastCharacterIndex;
     }
-    else // else logical position is zero.
+    else // else logical position is the first of the line.
     {
-      logicalCursorIndex = 0u;
+      logicalCursorIndex = bidirectionalLineInfo->characterRun.characterIndex;
     }
   }
-  else if( numberOfCharacters == visualCursorIndex )
+  else if( lastCharacterIndex == visualCursorIndex )
   {
     if( isRightToLeftParagraph )
     {
-      logicalCursorIndex = 0u;
+      logicalCursorIndex = bidirectionalLineInfo->characterRun.characterIndex;
     }
     else // else logical position is the number of characters.
     {
-      logicalCursorIndex = numberOfCharacters;
+      logicalCursorIndex = lastCharacterIndex;
     }
   }
   else
@@ -180,13 +173,6 @@ CharacterIndex LogicalModel::GetLogicalCursorIndex( CharacterIndex visualCursorI
 
 CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex )
 {
-  const bool fetch = FetchBidirectionalLineInfo( visualCharacterIndex );
-  if( !fetch )
-  {
-    // The character is not inside a bidi line.
-    return visualCharacterIndex;
-  }
-
   // The bidirectional line info.
   const BidirectionalLineInfoRun* const bidirectionalLineInfo = mBidirectionalLineInfo.Begin() + mBidirectionalLineIndex;
 
@@ -216,12 +202,9 @@ bool LogicalModel::FetchBidirectionalLineInfo( CharacterIndex characterIndex )
   {
     const BidirectionalLineInfoRun& bidiLineRun = *( bidirectionalLineInfoBuffer + mBidirectionalLineIndex );
 
-    // Whether the character index is just after the last one. i.e The cursor position after the last character.
-    const bool isLastIndex = characterIndex == mText.Count();
-
     const CharacterIndex lastCharacterOfRunPlusOne = bidiLineRun.characterRun.characterIndex + bidiLineRun.characterRun.numberOfCharacters;
     if( ( bidiLineRun.characterRun.characterIndex <= characterIndex ) &&
-        ( ( characterIndex < lastCharacterOfRunPlusOne ) || ( isLastIndex && ( characterIndex == lastCharacterOfRunPlusOne ) ) ) )
+        ( characterIndex < lastCharacterOfRunPlusOne ) )
     {
       // The character is in the previously fetched bidi line.
       return true;
@@ -229,22 +212,6 @@ bool LogicalModel::FetchBidirectionalLineInfo( CharacterIndex characterIndex )
     else
     {
       // The character is not in the previously fetched line.
-
-      if( isLastIndex )
-      {
-        // The given index is one after the last character, so it's not in a bidi line.
-        // Check if it's just after the last bidi line.
-        const BidirectionalLineRunIndex lastBidiLineIndex = numberOfBidirectionalLines - 1u;
-        const BidirectionalLineInfoRun& bidiLineRun = *( bidirectionalLineInfoBuffer + lastBidiLineIndex );
-
-        if( characterIndex == bidiLineRun.characterRun.characterIndex + bidiLineRun.characterRun.numberOfCharacters )
-        {
-          // The character is in the last bidi line.
-          mBidirectionalLineIndex = lastBidiLineIndex;
-          return true;
-        }
-      }
-
       // Set the bidi line index from where to start the fetch.
 
       if( characterIndex < bidiLineRun.characterRun.characterIndex )
@@ -269,7 +236,8 @@ bool LogicalModel::FetchBidirectionalLineInfo( CharacterIndex characterIndex )
   {
     const BidirectionalLineInfoRun& bidiLineRun = *it;
 
-    if( ( lastCharacterOfRightToLeftRun < characterIndex ) && ( characterIndex < bidiLineRun.characterRun.characterIndex ) )
+    if( ( lastCharacterOfRightToLeftRun < characterIndex ) &&
+        ( characterIndex < bidiLineRun.characterRun.characterIndex ) )
     {
       // The character is not inside a bidi line.
       return false;

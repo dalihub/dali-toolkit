@@ -56,20 +56,15 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Slider, Toolkit::Control, Create )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "lowerBound",             FLOAT,    LOWER_BOUND            )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "upperBound",             FLOAT,    UPPER_BOUND            )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "value",                  FLOAT,    VALUE                  )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "hitRegion",              VECTOR2,  HIT_REGION             )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "backingRegion",          VECTOR2,  BACKING_REGION         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "handleRegion",           VECTOR2,  HANDLE_REGION          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "backingImageName",       STRING,   BACKING_IMAGE_NAME     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "handleImageName",        STRING,   HANDLE_IMAGE_NAME      )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "progressImageName",      STRING,   PROGRESS_IMAGE_NAME    )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popupImageName",         STRING,   POPUP_IMAGE_NAME       )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popupArrowImageName",    STRING,   POPUP_ARROW_IMAGE_NAME )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "disableColor",           VECTOR4,  DISABLE_COLOR          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popupTextColor",         VECTOR4,  POPUP_TEXT_COLOR       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "trackVisual",            MAP,      TRACK_VISUAL           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "handleVisual",           MAP,      HANDLE_VISUAL          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "progressVisual",         MAP,      PROGRESS_VISUAL        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popupVisual",            MAP,      POPUP_VISUAL           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popupArrowVisual",       MAP,      POPUP_ARROW_VISUAL     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "disabledColor",          VECTOR4,  DISABLED_COLOR         )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "valuePrecision",         INTEGER,  VALUE_PRECISION        )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "showPopup",              BOOLEAN,  SHOW_POPUP             )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "showValue",              BOOLEAN,  SHOW_VALUE             )
-DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "enabled",                BOOLEAN,  ENABLED                )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "marks",                  ARRAY,    MARKS                  )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "snapToMarks",            BOOLEAN,  SNAP_TO_MARKS          )
 DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "markTolerance",          FLOAT,    MARK_TOLERANCE         )
@@ -92,18 +87,17 @@ const float DEFAULT_HIT_HEIGHT = 72.0f;
 const float DEFAULT_HANDLE_HEIGHT = DEFAULT_HIT_HEIGHT;
 const float POPUP_TEXT_PADDING = 10.0f;
 
-const char* SKINNED_BACKING_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin.9.png";
-const char* SKINNED_HANDLE_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin-handle.png";;
-const char* SKINNED_PROGRESS_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin-progress.9.png";
-const char* SKINNED_POPUP_IMAGE_NAME = DALI_IMAGE_DIR "slider-popup.9.png";
-const char* SKINNED_POPUP_ARROW_IMAGE_NAME = DALI_IMAGE_DIR "slider-popup-arrow.png";
+const char* SKINNED_TRACK_VISUAL = DALI_IMAGE_DIR "slider-skin.9.png";
+const char* SKINNED_HANDLE_VISUAL = DALI_IMAGE_DIR "slider-skin-handle.png";
+const char* SKINNED_PROGRESS_VISUAL = DALI_IMAGE_DIR "slider-skin-progress.9.png";
+const char* SKINNED_POPUP_VISUAL = DALI_IMAGE_DIR "slider-popup.9.png";
+const char* SKINNED_POPUP_ARROW_VISUAL = DALI_IMAGE_DIR "slider-popup-arrow.png";
 
 const Vector2 DEFAULT_HIT_REGION( DEFAULT_WIDTH, DEFAULT_HIT_HEIGHT );
-const Vector2 DEFAULT_BACKING_REGION( DEFAULT_WIDTH, DEFAULT_HEIGHT );
-const Vector2 DEFAULT_HANDLE_REGION( DEFAULT_HANDLE_HEIGHT, DEFAULT_HANDLE_HEIGHT );
+const Vector2 DEFAULT_TRACK_REGION( DEFAULT_WIDTH, DEFAULT_HEIGHT );
+const Vector2 DEFAULT_HANDLE_SIZE( DEFAULT_HANDLE_HEIGHT, DEFAULT_HANDLE_HEIGHT );
 
-const Vector4 DEFAULT_DISABLE_COLOR( 0.5f, 0.5f, 0.5f, 1.0f );
-const Vector4 DEFAULT_POPUP_TEXT_COLOR( 0.5f, 0.5f, 0.5f, 1.0f );
+const Vector4 DEFAULT_DISABLED_COLOR( 0.5f, 0.5f, 0.5f, 1.0f );
 
 const float VALUE_POPUP_MARGIN = 10.0f;
 const float VALUE_POPUP_HEIGHT = 81.0f;
@@ -143,16 +137,19 @@ Dali::Toolkit::Slider Slider::New()
 Slider::Slider()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mState( NORMAL ),
-  mPopupImageName(""),
-  mPopupArrowImageName(""),
-  mBackingImageName(""),
-  mHandleImageName(""),
-  mProgressImageName(""),
-  mDisableColor( 0.0f, 0.0f, 0.0f, 0.0f ),
-  mPopupTextColor( 0.0f, 0.0f, 0.0f, 0.0f ),
+  mPopupVisual(""),
+  mPopupArrowVisual(""),
+  mTrackVisual(""),
+  mHandleVisual(""),
+  mProgressVisual(""),
+  mPopupMap(),
+  mTrackMap(),
+  mHandleMap(),
+  mPopupArrowMap(),
+  mDisabledColor( 0.0f, 0.0f, 0.0f, 0.0f ),
   mHitRegion( 0.0f, 0.0f ),
-  mBackingRegion( 0.0f, 0.0f ),
-  mHandleRegionSize( 0.0f, 0.0f ),
+  mTrackRegion( 0.0f, 0.0f ),
+  mHandleSize( 0.0f, 0.0f ),
   mLowerBound( 0.0f ),
   mUpperBound( 0.0f ),
   mValue( 0.0f ),
@@ -177,22 +174,20 @@ void Slider::OnInitialize()
   Actor self = Self();
 
   SetHitRegion(     DEFAULT_HIT_REGION     );
-  SetBackingRegion( DEFAULT_BACKING_REGION );
-  SetHandleRegion(  DEFAULT_HANDLE_REGION  );
+  SetTrackRegion(   DEFAULT_TRACK_REGION   );
+  SetHandleSize(    DEFAULT_HANDLE_SIZE    );
 
-  SetBackingImageName(    SKINNED_BACKING_IMAGE_NAME     );
-  SetHandleImageName(     SKINNED_HANDLE_IMAGE_NAME      );
-  SetProgressImageName(   SKINNED_PROGRESS_IMAGE_NAME    );
-  SetPopupImageName(      SKINNED_POPUP_IMAGE_NAME       );
-  SetPopupArrowImageName( SKINNED_POPUP_ARROW_IMAGE_NAME );
-
-  SetPopupTextColor( DEFAULT_POPUP_TEXT_COLOR );
+  SetTrackVisual(            SKINNED_TRACK_VISUAL             );
+  SetHandleVisual(           SKINNED_HANDLE_VISUAL            );
+  SetProgressVisual(         SKINNED_PROGRESS_VISUAL          );
+  SetPopupVisual(            SKINNED_POPUP_VISUAL             );
+  SetPopupArrowVisual(       SKINNED_POPUP_ARROW_VISUAL       );
 
   SetShowPopup( DEFAULT_SHOW_POPUP );
   SetShowValue( DEFAULT_SHOW_VALUE );
 
   SetEnabled( DEFAULT_ENABLED );
-  SetDisableColor( DEFAULT_DISABLE_COLOR );
+  SetDisabledColor( DEFAULT_DISABLED_COLOR );
 
   SetSnapToMarks( DEFAULT_SNAP_TO_MARKS );
   SetMarkTolerance( MARK_SNAP_TOLERANCE );
@@ -210,9 +205,9 @@ void Slider::OnInitialize()
 
 void Slider::OnSizeSet( const Vector3& size )
 {
-  // Factor in handle overshoot into size of backing
+  // Factor in handle overshoot into size of track
   SetHitRegion( Vector2( size.x, GetHitRegion().y ) );
-  SetBackingRegion( Vector2( size.x - GetHandleRegion().x, GetBackingRegion().y ) );
+  SetTrackRegion( Vector2( size.x - GetHandleSize().x, GetTrackRegion().y ) );
 }
 
 bool Slider::OnTouchEvent(Actor actor, const TouchEvent& event)
@@ -326,7 +321,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   // Progress bar
   if( mProgress )
   {
-    mProgress.SetSize( x, GetBackingRegion().y );
+    mProgress.SetSize( x, GetTrackRegion().y );
   }
 
   // Signals
@@ -338,7 +333,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
     int markIndex;
     if( MarkReached( percent, markIndex ) )
     {
-      mMarkSignal.Emit( self, markIndex );
+      mMarkReachedSignal.Emit( self, markIndex );
     }
   }
 
@@ -382,27 +377,66 @@ Actor Slider::CreateHitRegion()
   return hitRegion;
 }
 
-Toolkit::ImageView Slider::CreateBacking()
+Toolkit::ImageView Slider::CreateTrack()
 {
-  Toolkit::ImageView backing = Toolkit::ImageView::New();
-  backing.SetParentOrigin( ParentOrigin::CENTER );
-  backing.SetAnchorPoint( AnchorPoint::CENTER );
+  Toolkit::ImageView track = Toolkit::ImageView::New();
+  track.SetParentOrigin( ParentOrigin::CENTER );
+  track.SetAnchorPoint( AnchorPoint::CENTER );
 
-  return backing;
+  return track;
 }
 
-void Slider::SetBackingImageName( const std::string& imageName )
+void Slider::SetTrackVisual( const std::string& filename )
 {
-  if( mBacking && ( imageName.size() > 0 ) )
+  if( mHandle && ( filename.size() > 0 ) )
   {
-    mBacking.SetImage( imageName );
-    mBackingImageName = imageName;
+    mTrack.SetImage( filename );
+    mTrackVisual = filename;
   }
 }
 
-std::string Slider::GetBackingImageName()
+void Slider::SetTrackVisual( Property::Map map )
 {
-  return mBackingImageName;
+  Property::Value* imageValue = map.Find( "url" );
+  if( imageValue )
+  {
+    mTrackVisual.clear();
+    std::string filename;
+    if( imageValue->Get( filename ) )
+    {
+      if( mTrack && ( filename.size() > 0 ) )
+      {
+        mTrack.SetImage( filename );
+        mTrackMap = map;
+      }
+    }
+  }
+
+  Property::Value* sizeValue = map.Find( "size" );
+  if( sizeValue )
+  {
+    Vector2 size;
+    if( sizeValue->Get( size ) )
+    {
+      mTrackRegion = size;
+      if( mTrack )
+      {
+        mTrack.SetSize( mTrackRegion );
+      }
+
+    ResizeProgressRegion( Vector2( 0.0f, mTrackRegion.y ) );
+
+    mDomain = CalcDomain( mTrackRegion );
+
+    // Set the progress bar to correct width
+    DisplayValue( GetValue(), false );
+    }
+  }
+}
+
+std::string Slider::GetTrackVisual()
+{
+  return mTrackVisual;
 }
 
 Toolkit::ImageView Slider::CreateProgress()
@@ -414,54 +448,108 @@ Toolkit::ImageView Slider::CreateProgress()
   return progress;
 }
 
-void Slider::SetProgressImageName( const std::string& imageName )
+void Slider::SetProgressVisual( const std::string& filename )
 {
-  if( mProgress && ( imageName.size() > 0 ) )
+  if( mProgress && ( filename.size() > 0 ) )
   {
-    mProgress.SetImage( imageName );
-    mProgressImageName = imageName;
+    mProgress.SetImage( filename );
+    mProgressVisual = filename;
   }
 }
 
-std::string Slider::GetProgressImageName()
+void Slider::SetProgressVisual( Property::Map map )
 {
-  return mProgressImageName;
-}
-
-void Slider::SetPopupImageName( const std::string& imageName )
-{
-  mPopupImageName = imageName;
-}
-
-std::string Slider::GetPopupImageName()
-{
-  return mPopupImageName;
-}
-
-void Slider::CreatePopupImage( const std::string& imageName )
-{
-  if( mPopup && ( imageName.size() > 0 ) )
+  Property::Value* imageValue = map.Find( "url" );
+  if( imageValue )
   {
-    Image image = ResourceImage::New( imageName );
+    mProgressVisual.clear();
+    std::string filename;
+    if( imageValue->Get( filename ) )
+    {
+      if( mProgress && ( filename.size() > 0 ) )
+      {
+        mProgress.SetImage( filename );
+        mProgressMap = map;
+      }
+    }
+  }
+}
+
+std::string Slider::GetProgressVisual()
+{
+  return mProgressVisual;
+}
+
+void Slider::SetPopupVisual( const std::string& filename )
+{
+  mPopupVisual = filename;
+}
+
+void Slider::SetPopupVisual( Property::Map map )
+{
+  Property::Value* imageValue = map.Find( "url" );
+  if( imageValue )
+  {
+    mPopupVisual.clear();
+    std::string filename;
+    if( imageValue->Get( filename ) )
+    {
+      if( mPopup && ( filename.size() > 0 ) )
+      {
+        mPopup.SetImage( filename );
+        mPopupMap = map;
+      }
+    }
+  }
+}
+
+std::string Slider::GetPopupVisual()
+{
+  return mPopupVisual;
+}
+
+void Slider::CreatePopupImage( const std::string& filename )
+{
+  if( mPopup && ( filename.size() > 0 ) )
+  {
+    Image image = ResourceImage::New( filename );
     mPopup.SetImage( image );
   }
 }
 
-void Slider::SetPopupArrowImageName( const std::string& imageName )
+void Slider::SetPopupArrowVisual( const std::string& filename )
 {
-  mPopupArrowImageName = imageName;
+  mPopupArrowVisual = filename;
 }
 
-std::string Slider::GetPopupArrowImageName()
+void Slider::SetPopupArrowVisual( Property::Map map )
 {
-  return mPopupArrowImageName;
-}
-
-void Slider::CreatePopupArrowImage( const std::string& imageName )
-{
-  if( mPopupArrow && ( imageName.size() > 0 ) )
+  Property::Value* imageValue = map.Find( "url" );
+  if( imageValue )
   {
-    Image image = ResourceImage::New( imageName );
+    mPopupArrowVisual.clear();
+    std::string filename;
+    if( imageValue->Get( filename ) )
+    {
+      if( mPopupArrow && ( filename.size() > 0 ) )
+      {
+        mPopupArrow.SetImage( filename );
+        mPopupArrowMap = map;
+      }
+    }
+  }
+}
+
+std::string Slider::GetPopupArrowVisual()
+{
+  return mPopupArrowVisual;
+}
+
+void Slider::CreatePopupArrowImage( const std::string& filename )
+{
+  if( mPopupArrow && ( filename.size() > 0 ) )
+  {
+    Image image = ResourceImage::New( filename );
     mPopupArrow.SetImage( image );
   }
 }
@@ -500,7 +588,6 @@ Toolkit::TextLabel Slider::CreatePopupText()
   textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-  textLabel.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, DEFAULT_POPUP_TEXT_COLOR );
   textLabel.SetPadding( Padding( POPUP_TEXT_PADDING, POPUP_TEXT_PADDING, 0.0f, 0.0f ) );
   return textLabel;
 }
@@ -518,25 +605,58 @@ Toolkit::ImageView Slider::CreatePopup()
   return popup;
 }
 
-void Slider::SetHandleImageName( const std::string& imageName )
+void Slider::SetHandleVisual( const std::string& filename )
 {
-  if( mHandle && ( imageName.size() > 0 ) )
+  if( mHandle && ( filename.size() > 0 ) )
   {
-    mHandle.SetImage( imageName );
-    mHandleImageName = imageName;
+    mHandle.SetImage( filename );
+    mHandleVisual = filename;
   }
 }
 
-std::string Slider::GetHandleImageName()
+void Slider::SetHandleVisual( Property::Map map )
 {
-  return mHandleImageName;
+  Property::Value* imageValue = map.Find( "url" );
+  if( imageValue )
+  {
+    mHandleVisual.clear();
+    std::string filename;
+    if( imageValue->Get( filename ) )
+    {
+      if( mHandle && ( filename.size() > 0 ) )
+      {
+        mHandle.SetImage( filename );
+        mHandleMap = map;
+      }
+    }
+  }
+
+  Property::Value* sizeValue = map.Find( "size" );
+  if( sizeValue )
+  {
+    Vector2 size;
+    if( sizeValue->Get( size ) )
+    {
+      mHandleSize = size;
+      ResizeHandleSize( mHandleSize );
+
+      Vector2 hitRegion = GetHitRegion();
+      hitRegion.x += mHandleSize.x;
+      SetHitRegion( hitRegion );
+    }
+  }
 }
 
-void Slider::ResizeHandleRegion( const Vector2& region )
+std::string Slider::GetHandleVisual()
+{
+  return mHandleVisual;
+}
+
+void Slider::ResizeHandleSize( const Vector2& size )
 {
   if( mHandle )
   {
-    mHandle.SetSize( region );
+    mHandle.SetSize( size );
   }
 }
 
@@ -556,11 +676,6 @@ void Slider::CreateHandleValueDisplay()
 void Slider::DestroyHandleValueDisplay()
 {
   UnparentAndReset(mHandleValueTextLabel);
-}
-
-void Slider::SetPopupTextColor( const Vector4& color )
-{
-  mPopupTextColor = color;
 }
 
 Actor Slider::CreateValueDisplay()
@@ -589,9 +704,9 @@ Toolkit::Slider::ValueChangedSignalType& Slider::SlidingFinishedSignal()
   return mSlidingFinishedSignal;
 }
 
-Toolkit::Slider::MarkSignalType& Slider::MarkSignal()
+Toolkit::Slider::MarkReachedSignalType& Slider::MarkReachedSignal()
 {
-  return mMarkSignal;
+  return mMarkReachedSignal;
 }
 
 void Slider::UpdateSkin()
@@ -600,17 +715,17 @@ void Slider::UpdateSkin()
   {
     case NORMAL:
     {
-      mBacking.SetColor( Color::WHITE );
+      mTrack.SetColor( Color::WHITE );
       mHandle.SetColor( Color::WHITE );
       mProgress.SetColor( Color::WHITE );
       break;
     }
     case DISABLED:
     {
-      Vector4 disableColor = GetDisableColor();
-      mBacking.SetColor( disableColor );
-      mHandle.SetColor( disableColor );
-      mProgress.SetColor( disableColor );
+      Vector4 disabledColor = GetDisabledColor();
+      mTrack.SetColor( disabledColor );
+      mHandle.SetColor( disabledColor );
+      mProgress.SetColor( disabledColor );
       break;
     }
     case PRESSED:
@@ -635,13 +750,13 @@ void Slider::CreateChildren()
   mPanDetector.DetectedSignal().Connect( this, &Slider::OnPan );
   self.Add( mHitArea );
 
-  // Background
-  mBacking = CreateBacking();
-  self.Add( mBacking );
+  // Track
+  mTrack = CreateTrack();
+  self.Add( mTrack );
 
   // Progress bar
   mProgress = CreateProgress();
-  mBacking.Add( mProgress );
+  mTrack.Add( mProgress );
 
   // Handle
   mHandle = CreateHandle();
@@ -671,8 +786,8 @@ void Slider::AddPopup()
     mValueDisplay.SetVisible( false );
     mHandle.Add( mValueDisplay );
 
-    CreatePopupImage( GetPopupImageName() );
-    CreatePopupArrowImage( GetPopupArrowImageName() );
+    CreatePopupImage( GetPopupVisual() );
+    CreatePopupArrowImage( GetPopupArrowVisual() );
 
     mValueTimer = Timer::New( VALUE_VIEW_SHOW_DURATION );
     mValueTimer.TickSignal().Connect( this, &Slider::HideValueView );
@@ -822,58 +937,53 @@ float Slider::GetValue() const
   return mValue;
 }
 
-void Slider::SetBackingRegion( const Vector2& region )
+void Slider::SetTrackRegion( const Vector2& region )
 {
-  mBackingRegion = region;
+  mTrackRegion = region;
 
-  if( mBacking )
+  if( mTrack )
   {
-    mBacking.SetSize( mBackingRegion );
+    mTrack.SetSize( mTrackRegion );
   }
 
-  ResizeProgressRegion( Vector2( 0.0f, mBackingRegion.y ) );
+  ResizeProgressRegion( Vector2( 0.0f, mTrackRegion.y ) );
 
-  mDomain = CalcDomain( mBackingRegion );
+  mDomain = CalcDomain( mTrackRegion );
 
   DisplayValue( GetValue(), false );  // Set the progress bar to correct width
 }
 
-const Vector2& Slider::GetBackingRegion() const
+const Vector2& Slider::GetTrackRegion() const
 {
-  return mBackingRegion;
+  return mTrackRegion;
 }
 
-void Slider::SetHandleRegion( const Vector2& region )
+void Slider::SetHandleSize( const Vector2& size )
 {
-  mHandleRegionSize = region;
+  mHandleSize = size;
 
-  ResizeHandleRegion( mHandleRegionSize );
+  ResizeHandleSize( mHandleSize );
 
   Vector2 hitRegion = GetHitRegion();
-  hitRegion.x += mHandleRegionSize.x;
+  hitRegion.x += mHandleSize.x;
   SetHitRegion( hitRegion );
 }
 
-const Vector2& Slider::GetHandleRegion() const
+const Vector2& Slider::GetHandleSize() const
 {
-  return mHandleRegionSize;
+  return mHandleSize;
 }
 
-void Slider::SetDisableColor( const Vector4& color )
+void Slider::SetDisabledColor( const Vector4& color )
 {
-  mDisableColor = color;
+  mDisabledColor = color;
 
   UpdateSkin();
 }
 
-Vector4 Slider::GetDisableColor() const
+Vector4 Slider::GetDisabledColor() const
 {
-  return mDisableColor;
-}
-
-Vector4 Slider::GetPopupTextColor() const
-{
-  return mPopupTextColor;
+  return mDisabledColor;
 }
 
 void Slider::SetValuePrecision( int precision )
@@ -968,7 +1078,7 @@ bool Slider::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_MARK ) )
   {
-    slider.MarkSignal().Connect( tracker, functor );
+    slider.MarkReachedSignal().Connect( tracker, functor );
   }
   else
   {
@@ -1026,63 +1136,67 @@ void Slider::SetProperty( BaseObject* object, Property::Index propertyIndex, con
         break;
       }
 
-      case Toolkit::Slider::Property::HIT_REGION:
+      case Toolkit::Slider::Property::TRACK_VISUAL:
       {
-        sliderImpl.SetHitRegion( value.Get< Vector2 >() );
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          sliderImpl.SetTrackVisual( map );
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::BACKING_REGION:
+      case Toolkit::Slider::Property::HANDLE_VISUAL:
       {
-        sliderImpl.SetBackingRegion( value.Get< Vector2 >() );
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          sliderImpl.SetHandleVisual( map );
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::HANDLE_REGION:
+      case Toolkit::Slider::Property::PROGRESS_VISUAL:
       {
-        sliderImpl.SetHandleRegion( value.Get< Vector2 >() );
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          sliderImpl.SetProgressVisual( map );
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::BACKING_IMAGE_NAME:
+      case Toolkit::Slider::Property::POPUP_VISUAL:
       {
-        sliderImpl.SetBackingImageName( value.Get< std::string >() );
+        std::string imageUrl;
+        if( value.Get( imageUrl ) )
+        {
+          sliderImpl.SetPopupVisual( imageUrl );
+        }
+
+        // If it is not a string, then get a Property::Map from the property if possible.
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          sliderImpl.SetPopupVisual( map );
+        }
+
         break;
       }
 
-      case Toolkit::Slider::Property::HANDLE_IMAGE_NAME:
+      case Toolkit::Slider::Property::POPUP_ARROW_VISUAL:
       {
-        sliderImpl.SetHandleImageName( value.Get< std::string >() );
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          sliderImpl.SetPopupArrowVisual( map );
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::PROGRESS_IMAGE_NAME:
+      case Toolkit::Slider::Property::DISABLED_COLOR:
       {
-        sliderImpl.SetProgressImageName( value.Get< std::string >() );
-        break;
-      }
-
-      case Toolkit::Slider::Property::POPUP_IMAGE_NAME:
-      {
-        sliderImpl.SetPopupImageName( value.Get< std::string >() );
-        break;
-      }
-
-      case Toolkit::Slider::Property::POPUP_ARROW_IMAGE_NAME:
-      {
-        sliderImpl.SetPopupArrowImageName( value.Get< std::string >() );
-        break;
-      }
-
-      case Toolkit::Slider::Property::DISABLE_COLOR:
-      {
-        sliderImpl.SetDisableColor( value.Get< Vector4 >() );
-        break;
-      }
-
-      case Toolkit::Slider::Property::POPUP_TEXT_COLOR:
-      {
-        sliderImpl.SetPopupTextColor( value.Get< Vector4 >() );
+        sliderImpl.SetDisabledColor( value.Get< Vector4 >() );
         break;
       }
 
@@ -1101,12 +1215,6 @@ void Slider::SetProperty( BaseObject* object, Property::Index propertyIndex, con
       case Toolkit::Slider::Property::SHOW_VALUE:
       {
         sliderImpl.SetShowValue( value.Get< bool >() );
-        break;
-      }
-
-      case Toolkit::Slider::Property::ENABLED:
-      {
-        sliderImpl.SetEnabled( value.Get< bool >() );
         break;
       }
 
@@ -1161,63 +1269,74 @@ Property::Value Slider::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Slider::Property::HIT_REGION:
+      case Toolkit::Slider::Property::TRACK_VISUAL:
       {
-        value = sliderImpl.GetHitRegion();
+        if( !sliderImpl.mTrackVisual.empty() )
+        {
+          value = sliderImpl.GetTrackVisual();
+        }
+        else if( !sliderImpl.mTrackMap.Empty() )
+        {
+          value = sliderImpl.mTrackMap;
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::BACKING_REGION:
+      case Toolkit::Slider::Property::HANDLE_VISUAL:
       {
-        value = sliderImpl.GetBackingRegion();
+        if( !sliderImpl.mHandleVisual.empty() )
+        {
+          value = sliderImpl.GetHandleVisual();
+        }
+        else if( !sliderImpl.mHandleMap.Empty() )
+        {
+          value = sliderImpl.mHandleMap;
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::HANDLE_REGION:
+      case Toolkit::Slider::Property::PROGRESS_VISUAL:
       {
-        value = sliderImpl.GetHandleRegion();
+        if( !sliderImpl.mProgressVisual.empty() )
+        {
+          value = sliderImpl.GetProgressVisual();
+        }
+        else if( !sliderImpl.mProgressMap.Empty() )
+        {
+          value = sliderImpl.mProgressMap;
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::BACKING_IMAGE_NAME:
+      case Toolkit::Slider::Property::POPUP_VISUAL:
       {
-        value = sliderImpl.GetBackingImageName();
+        if( !sliderImpl.mPopupVisual.empty() )
+        {
+          value = sliderImpl.GetPopupVisual();
+        }
+        else if( !sliderImpl.mPopupMap.Empty() )
+        {
+          value = sliderImpl.mPopupMap;
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::HANDLE_IMAGE_NAME:
+      case Toolkit::Slider::Property::POPUP_ARROW_VISUAL:
       {
-        value = sliderImpl.GetHandleImageName();
+        if( !sliderImpl.mPopupArrowVisual.empty() )
+        {
+          value = sliderImpl.GetPopupArrowVisual();
+        }
+        else if( !sliderImpl.mPopupArrowMap.Empty() )
+        {
+          value = sliderImpl.mPopupArrowMap;
+        }
         break;
       }
 
-      case Toolkit::Slider::Property::PROGRESS_IMAGE_NAME:
+      case Toolkit::Slider::Property::DISABLED_COLOR:
       {
-        value = sliderImpl.GetProgressImageName();
-        break;
-      }
-
-      case Toolkit::Slider::Property::POPUP_IMAGE_NAME:
-      {
-        value = sliderImpl.GetPopupImageName();
-        break;
-      }
-
-      case Toolkit::Slider::Property::POPUP_ARROW_IMAGE_NAME:
-      {
-        value = sliderImpl.GetPopupArrowImageName();
-        break;
-      }
-
-      case Toolkit::Slider::Property::DISABLE_COLOR:
-      {
-        value = sliderImpl.GetDisableColor();
-        break;
-      }
-
-      case Toolkit::Slider::Property::POPUP_TEXT_COLOR:
-      {
-        value = sliderImpl.GetPopupTextColor();
+        value = sliderImpl.GetDisabledColor();
         break;
       }
 
@@ -1236,12 +1355,6 @@ Property::Value Slider::GetProperty( BaseObject* object, Property::Index propert
       case Toolkit::Slider::Property::SHOW_VALUE:
       {
         value = sliderImpl.GetShowValue();
-        break;
-      }
-
-      case Toolkit::Slider::Property::ENABLED:
-      {
-        value = sliderImpl.IsEnabled();
         break;
       }
 

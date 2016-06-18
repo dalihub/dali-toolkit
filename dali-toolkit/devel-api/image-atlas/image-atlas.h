@@ -133,7 +133,7 @@ public:
    * @param [out] textureRect The texture area of the resource image in the atlas.
    * @param [in] pixelData The pixel data.
    */
-  bool Upload( Vector4& textureRect, PixelDataPtr pixelData );
+  bool Upload( Vector4& textureRect, PixelData pixelData );
 
   /**
    * @brief Remove the image at the given rectangle.

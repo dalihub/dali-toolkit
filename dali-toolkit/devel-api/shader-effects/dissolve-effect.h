@@ -113,7 +113,7 @@ inline void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position,
 /**
  * @brief Create a new Dissolve effect
  *
- *  DissolveEffect is a custom shader effect to achieve Dissolve effects in Image actors.
+ *  DissolveEffect is a custom shader effect to achieve Dissolve effects in image views.
  *
  *  Animatable/Constrainable uniforms:
  *    "uPercentage" - This value is proportional to the distortion applied; a value of zero means no distortion.

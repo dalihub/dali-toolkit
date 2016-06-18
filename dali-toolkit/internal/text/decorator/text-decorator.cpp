@@ -1090,11 +1090,11 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( Gesture::Started == gesture.state )
     {
-      handle.grabDisplacementX = handle.grabDisplacementY = 0;
+      handle.grabDisplacementX = handle.grabDisplacementY = 0.f;
     }
 
     handle.grabDisplacementX += gesture.displacement.x;
-    handle.grabDisplacementY += gesture.displacement.y;
+    handle.grabDisplacementY += ( handle.verticallyFlipped ? -gesture.displacement.y : gesture.displacement.y );
 
     const float x = handle.position.x + handle.grabDisplacementX;
     const float y = handle.position.y + handle.lineHeight*0.5f + handle.grabDisplacementY;

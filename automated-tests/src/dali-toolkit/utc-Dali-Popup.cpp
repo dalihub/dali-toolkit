@@ -55,8 +55,22 @@ const int RENDER_FRAME_INTERVAL = 10;                          ///< Duration of 
 const int RENDER_ANIMATION_TEST_DURATION_MS = 2000;            ///< 2000ms to test animation.
 const int RENDER_ANIMATION_TEST_DURATION_FRAMES = RENDER_ANIMATION_TEST_DURATION_MS / RENDER_FRAME_INTERVAL; ///< equivalent frames.
 const Vector3 DEFAULT_BUTTON_SIZE(100.0f, 50.0f, 0.0f);
-const Dali::TouchPoint pointDownOutside( 0, TouchPoint::Down, 10.0f, 10.0f );
-const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10.0f, 10.0f );
+
+Dali::Integration::Point GetPointDown()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  return point;
+}
+
+Dali::Integration::Point GetPointUp()
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  return point;
+}
 
 /**
  * Counts how many descendants root Actor has, including
@@ -627,14 +641,14 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
   Dali::Integration::TouchEvent event;
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
+  event.AddPoint( GetPointDown() );
   application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render();
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUp() );
   application.ProcessEvent( event );
 
   application.SendNotification();
@@ -645,14 +659,14 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
   popup.SetProperty( Popup::Property::TOUCH_TRANSPARENT, true );
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
+  event.AddPoint( GetPointDown() );
   application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render();
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
+  event.AddPoint( GetPointUp() );
   application.ProcessEvent( event );
 
   application.SendNotification();
@@ -1127,18 +1141,16 @@ int UtcDaliPopupPropertyTouchTransparent(void)
 
   gPushButtonClicked = false;
   Dali::Integration::TouchEvent event;
-  const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
-  const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 10.0f );
 
   // Perform a click, the popup should block the click from hitting the button.
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDown );
+  event.AddPoint( GetPointDown() );
   application.ProcessEvent( event );
   application.SendNotification();
   application.Render();
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUp );
+  event.AddPoint( GetPointUp() );
   application.ProcessEvent( event );
   application.SendNotification();
   application.Render();
@@ -1153,13 +1165,13 @@ int UtcDaliPopupPropertyTouchTransparent(void)
 
   // Perform a click, the popup should allow the click to travel through to the button.
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDown );
+  event.AddPoint( GetPointDown() );
   application.ProcessEvent( event );
   application.SendNotification();
   application.Render();
 
   event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUp );
+  event.AddPoint( GetPointUp() );
   application.ProcessEvent( event );
   application.SendNotification();
   application.Render();

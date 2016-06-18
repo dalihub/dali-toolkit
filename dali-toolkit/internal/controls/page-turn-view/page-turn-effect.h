@@ -45,7 +45,7 @@ void PageTurnApplyInternalConstraint( Actor& actor, float pageHeight );
 
 /**
  * @brief Create a new PageTurnEffect
- * PageTurnEffect is a custom shader effect to achieve page turn effect for Image actors.
+ * PageTurnEffect is a custom shader to achieve page turn effect for image views.
  *
  * Usage example:-
  *
@@ -53,9 +53,9 @@ void PageTurnApplyInternalConstraint( Actor& actor, float pageHeight );
  * Property::Map pageTurnEffect = CreatePageTurnEffect();
  *
  * // set image view custom shader to the page-turn one\n
- * // for portrait view, one image actor for each page\n
- * // for landscape view, the page turned over is still visible, so back image is needed \n
- * //     in this case, create another image Actor using the back image and added to the page actor \n
+ * // for portrait view, the image is rendered as the front side of  page\n
+ * // for landscape view, the back side becomes visible when the page is turned over. \n
+ * //     in this case, the left and right half of the image are renderer as the front and back side separately. \n
  * ImageView page = ImageView::New(....); \n
  * page.SetProperty ( ImageView::Property::IMAGE, pageTurnEffect ); \n
  *

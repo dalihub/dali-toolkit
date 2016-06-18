@@ -86,8 +86,9 @@ bool LayoutTextTest( const LayoutTextData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size layoutSize;
 
   Vector<FontDescriptionRun> fontDescriptionRuns;
@@ -107,7 +108,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Clear the layout.
   Vector<LineRun>& lines = visualModel->mLines;
@@ -150,8 +152,6 @@ bool LayoutTextTest( const LayoutTextData& data )
                         glyphPositions.Begin() + data.startIndex + data.numberOfGlyphs );
 
   // 3) Layout
-  MetricsPtr metrics = Metrics::New( fontClient );
-
   LayoutEngine engine;
   engine.SetMetrics( metrics );
   engine.SetTextEllipsisEnabled( data.ellipsis );
@@ -343,8 +343,9 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size layoutSize;
 
   Vector<FontDescriptionRun> fontDescriptionRuns;
@@ -364,11 +365,10 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // 2) Call the ReLayoutRightToLeftLines() method.
-  MetricsPtr metrics = Metrics::New( fontClient );
-
   LayoutEngine engine;
   engine.SetMetrics( metrics );
 
@@ -452,8 +452,9 @@ bool AlignTest( const AlignData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel = LogicalModel::New();
-  VisualModelPtr visualModel = VisualModel::New();
+  LogicalModelPtr logicalModel;
+  VisualModelPtr visualModel;
+  MetricsPtr metrics;
   Size layoutSize;
 
   Vector<FontDescriptionRun> fontDescriptionRuns;
@@ -472,11 +473,10 @@ bool AlignTest( const AlignData& data )
                    options,
                    layoutSize,
                    logicalModel,
-                   visualModel );
+                   visualModel,
+                   metrics );
 
   // Call the Align method.
-  MetricsPtr metrics = Metrics::New( fontClient );
-
   LayoutEngine engine;
   engine.SetMetrics( metrics );
 

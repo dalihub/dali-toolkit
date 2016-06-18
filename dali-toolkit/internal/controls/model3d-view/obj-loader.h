@@ -113,7 +113,9 @@ public:
   void      ClearArrays();
 
   bool      IsTexturePresent();
+  bool      IsDiffuseMapPresent();
   bool      IsNormalMapPresent();
+  bool      IsSpecularMapPresent();
 
 private:
 
@@ -121,8 +123,12 @@ private:
 
   bool mSceneLoaded;
   bool mMaterialLoaded;
-  bool mHasTexture;
+  bool mHasTexturePoints;
+
+  //Material file properties.
+  bool mHasDiffuseMap;
   bool mHasNormalMap;
+  bool mHasSpecularMap;
 
   Dali::Vector<Vector3> mPoints;
   Dali::Vector<Vector2> mTextures;

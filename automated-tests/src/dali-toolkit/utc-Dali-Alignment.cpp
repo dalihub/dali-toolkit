@@ -978,7 +978,10 @@ int UtcDaliAlignmentOnTouchEvent(void)
   application.SendNotification();
 
   Integration::TouchEvent touchEvent(1);
-  TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
+  Integration::Point point;
+  point.SetDeviceId( 1 );
+  point.SetState( PointState::DOWN);
+  point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
   touchEvent.AddPoint(point);
   application.ProcessEvent(touchEvent);
 

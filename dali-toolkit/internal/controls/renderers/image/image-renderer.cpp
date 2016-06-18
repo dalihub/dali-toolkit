@@ -443,7 +443,7 @@ Image ImageRenderer::LoadImage( const std::string& url, bool synchronousLoading 
       // use broken image
       return RendererFactory::GetBrokenRendererImage();
     }
-    Atlas image = Atlas::New( mPixels->GetWidth(), mPixels->GetHeight(), mPixels->GetPixelFormat() );
+    Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
     image.Upload( mPixels, 0, 0 );
     return image;
   }
@@ -472,7 +472,7 @@ TextureSet ImageRenderer::CreateTextureSet( Vector4& textureRect, const std::str
       textureSet = mAtlasManager.Add(textureRect, mPixels );
       if( !textureSet ) // big image, no atlasing
       {
-        Atlas image = Atlas::New( mPixels->GetWidth(), mPixels->GetHeight(), mPixels->GetPixelFormat() );
+        Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
         image.Upload( mPixels, 0, 0 );
         textureSet = TextureSet::New();
         textureSet.SetImage( 0u, image );

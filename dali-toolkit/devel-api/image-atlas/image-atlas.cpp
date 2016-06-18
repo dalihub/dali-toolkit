@@ -77,7 +77,7 @@ bool ImageAtlas::Upload( Vector4& textureRect,
   return GetImplementation(*this).Upload( textureRect, url, size, fittingMode, orientationCorrection );
 }
 
-bool ImageAtlas::Upload( Vector4& textureRect, PixelDataPtr pixelData )
+bool ImageAtlas::Upload( Vector4& textureRect, PixelData pixelData )
 {
   return GetImplementation(*this).Upload( textureRect, pixelData );
 }

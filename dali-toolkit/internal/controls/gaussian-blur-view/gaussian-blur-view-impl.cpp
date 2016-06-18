@@ -55,13 +55,13 @@
 // 2 modes:
 // 1st mode, this control has a tree of actors (use Add() to add children) that are rendered and blurred.
 // mRenderChildrenTask renders children to FB mRenderTargetForRenderingChildren
-// mHorizBlurTask renders mImageActorHorizBlur Actor showing FB mRenderTargetForRenderingChildren into FB mRenderTarget2
-// mVertBlurTask renders mImageActorVertBlur Actor showing FB mRenderTarget2 into FB mRenderTarget1
-// mCompositeTask renders mImageActorComposite Actor showing FB mRenderTarget1 into FB mRenderTargetForRenderingChildren
+// mHorizBlurTask renders mImageViewHorizBlur Actor showing FB mRenderTargetForRenderingChildren into FB mRenderTarget2
+// mVertBlurTask renders mImageViewVertBlur Actor showing FB mRenderTarget2 into FB mRenderTarget1
+// mCompositeTask renders mImageViewComposite Actor showing FB mRenderTarget1 into FB mRenderTargetForRenderingChildren
 //
 // 2nd mode, an image is blurred and rendered to a supplied target framebuffer
-// mHorizBlurTask renders mImageActorHorizBlur Actor showing mUserInputImage into FB mRenderTarget2
-// mVertBlurTask renders mImageActorVertBlur Actor showing mRenderTarget2 into FB mUserOutputRenderTarget
+// mHorizBlurTask renders mImageViewHorizBlur Actor showing mUserInputImage into FB mRenderTarget2
+// mVertBlurTask renders mImageViewVertBlur Actor showing mRenderTarget2 into FB mUserOutputRenderTarget
 //
 // Only this 2nd mode handles ActivateOnce
 
@@ -217,7 +217,7 @@ void GaussianBlurView::SetUserImageAndOutputRenderTarget(Image inputImage, Frame
   DALI_ASSERT_ALWAYS(mBlurUserImage);
 
   mUserInputImage = inputImage;
-  mImageActorHorizBlur.SetImage( mUserInputImage );
+  mImageViewHorizBlur.SetImage( mUserInputImage );
 
   mUserOutputRenderTarget = outputRenderTarget;
 }
@@ -268,32 +268,32 @@ void GaussianBlurView::OnInitialize()
   //////////////////////////////////////////////////////
   // Create actors
 
-  // Create an ImageActor for performing a horizontal blur on the texture
-  mImageActorHorizBlur = Toolkit::ImageView::New();
-  mImageActorHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
-  mImageActorHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  // Create an image view for performing a horizontal blur on the texture
+  mImageViewHorizBlur = Toolkit::ImageView::New();
+  mImageViewHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
+  mImageViewHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
-  // Create an ImageActor for performing a vertical blur on the texture
-  mImageActorVertBlur = Toolkit::ImageView::New();
-  mImageActorVertBlur.SetParentOrigin(ParentOrigin::CENTER);
-  mImageActorVertBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  // Create an image view for performing a vertical blur on the texture
+  mImageViewVertBlur = Toolkit::ImageView::New();
+  mImageViewVertBlur.SetParentOrigin(ParentOrigin::CENTER);
+  mImageViewVertBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Register a property that the user can control to fade the blur in / out via the GaussianBlurView object
   Actor self = Self();
   mBlurStrengthPropertyIndex = self.RegisterProperty(GAUSSIAN_BLUR_VIEW_STRENGTH_PROPERTY_NAME, GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH);
 
-  // Create an ImageActor for compositing the blur and the original child actors render
+  // Create an image view for compositing the blur and the original child actors render
   if(!mBlurUserImage)
   {
-    mImageActorComposite = Toolkit::ImageView::New();
-    mImageActorComposite.SetParentOrigin(ParentOrigin::CENTER);
-    mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
+    mImageViewComposite = Toolkit::ImageView::New();
+    mImageViewComposite.SetParentOrigin(ParentOrigin::CENTER);
+    mImageViewComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
-    Constraint blurStrengthConstraint = Constraint::New<float>( mImageActorComposite, Actor::Property::COLOR_ALPHA, EqualToConstraint());
+    Constraint blurStrengthConstraint = Constraint::New<float>( mImageViewComposite, Actor::Property::COLOR_ALPHA, EqualToConstraint());
     blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
     blurStrengthConstraint.Apply();
 
-    // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
+    // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = Toolkit::ImageView::New();
     mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
 
@@ -306,7 +306,7 @@ void GaussianBlurView::OnInitialize()
 
     //////////////////////////////////////////////////////
     // Connect to actor tree
-    mInternalRoot.Add( mImageActorComposite );
+    mInternalRoot.Add( mImageViewComposite );
     mInternalRoot.Add( mTargetActor );
     mInternalRoot.Add( mRenderFullSizeCamera );
   }
@@ -323,8 +323,8 @@ void GaussianBlurView::OnInitialize()
   // Connect to actor tree
   Self().Add( mChildrenRoot );
   Self().Add( mInternalRoot );
-  mInternalRoot.Add( mImageActorHorizBlur );
-  mInternalRoot.Add( mImageActorVertBlur );
+  mInternalRoot.Add( mImageViewHorizBlur );
+  mInternalRoot.Add( mImageViewVertBlur );
   mInternalRoot.Add( mRenderDownsampledCamera );
 }
 
@@ -339,7 +339,7 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
 
   if( !mBlurUserImage )
   {
-    mImageActorComposite.SetSize(targetSize);
+    mImageViewComposite.SetSize(targetSize);
     mTargetActor.SetSize(targetSize);
 
     // Children render camera must move when GaussianBlurView object is resized. This is since we cannot change render target size - so we need to remap the child actors' rendering
@@ -412,14 +412,14 @@ void GaussianBlurView::AllocateResources()
       // create offscreen buffer of new size to render our child actors to
       mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
 
-      // Set ImageActor for performing a horizontal blur on the texture
-      mImageActorHorizBlur.SetImage( mRenderTargetForRenderingChildren );
+      // Set image view for performing a horizontal blur on the texture
+      mImageViewHorizBlur.SetImage( mRenderTargetForRenderingChildren );
 
       // Create offscreen buffer for vert blur pass
       mRenderTarget1 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
 
       // use the completed blur in the first buffer and composite with the original child actors render
-      mImageActorComposite.SetImage( mRenderTarget1 );
+      mImageViewComposite.SetImage( mRenderTarget1 );
 
       // set up target actor for rendering result, i.e. the blurred image
       mTargetActor.SetImage(mRenderTargetForRenderingChildren);
@@ -429,11 +429,11 @@ void GaussianBlurView::AllocateResources()
     mRenderTarget2 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
 
     // size needs to match render target
-    mImageActorHorizBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
+    mImageViewHorizBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
 
     // size needs to match render target
-    mImageActorVertBlur.SetImage( mRenderTarget2 );
-    mImageActorVertBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
+    mImageViewVertBlur.SetImage( mRenderTarget2 );
+    mImageViewVertBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
 
     // set gaussian blur up for new sized render targets
     SetShaderConstants();
@@ -460,7 +460,7 @@ void GaussianBlurView::CreateRenderTasks()
 
   // perform a horizontal blur targeting the second buffer
   mHorizBlurTask = taskList.CreateTask();
-  mHorizBlurTask.SetSourceActor( mImageActorHorizBlur );
+  mHorizBlurTask.SetSourceActor( mImageViewHorizBlur );
   mHorizBlurTask.SetExclusive(true);
   mHorizBlurTask.SetInputEnabled( false );
   mHorizBlurTask.SetClearEnabled( true );
@@ -474,7 +474,7 @@ void GaussianBlurView::CreateRenderTasks()
 
   // use the second buffer and perform a horizontal blur targeting the first buffer
   mVertBlurTask = taskList.CreateTask();
-  mVertBlurTask.SetSourceActor( mImageActorVertBlur );
+  mVertBlurTask.SetSourceActor( mImageViewVertBlur );
   mVertBlurTask.SetExclusive(true);
   mVertBlurTask.SetInputEnabled( false );
   mVertBlurTask.SetClearEnabled( true );
@@ -498,7 +498,7 @@ void GaussianBlurView::CreateRenderTasks()
   if(!mBlurUserImage)
   {
     mCompositeTask = taskList.CreateTask();
-    mCompositeTask.SetSourceActor( mImageActorComposite );
+    mCompositeTask.SetSourceActor( mImageViewComposite );
     mCompositeTask.SetExclusive(true);
     mCompositeTask.SetInputEnabled( false );
 
@@ -600,11 +600,11 @@ void GaussianBlurView::SetShaderConstants()
   Vector2 yAxis(0.0f, 1.0f);
   for (i = 0; i < mNumSamples; ++i )
   {
-    mImageActorHorizBlur.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * xAxis );
-    mImageActorHorizBlur.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
+    mImageViewHorizBlur.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * xAxis );
+    mImageViewHorizBlur.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
 
-    mImageActorVertBlur.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * yAxis );
-    mImageActorVertBlur.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
+    mImageViewVertBlur.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * yAxis );
+    mImageViewVertBlur.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
   }
 
   delete[] uvOffsets;

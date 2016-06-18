@@ -38,7 +38,7 @@ namespace StageApi
   Dali::Stage GetStage( v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args );
 
   /**
-   * StageApi API see image-actor.h for a description
+   * StageApi API see stage.h for a description
     */
   void Add( const v8::FunctionCallbackInfo< v8::Value >& args );
   void Remove( const v8::FunctionCallbackInfo< v8::Value >& args );

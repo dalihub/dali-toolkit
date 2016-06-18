@@ -181,6 +181,19 @@ CharacterDirection Controller::GetAutoScrollDirection() const
   return mImpl->mAutoScrollDirectionRTL;
 }
 
+float Controller::GetAutoScrollLineAlignment() const
+{
+  float offset = 0.f;
+
+  if( mImpl->mVisualModel &&
+      ( 0u != mImpl->mVisualModel->mLines.Count() ) )
+  {
+    offset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+  }
+
+  return offset;
+}
+
 void Controller::SetText( const std::string& text )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
@@ -614,6 +627,8 @@ bool Controller::RemoveText( int cursorOffset,
       // Cursor position retreat
       oldCursorIndex = cursorIndex;
 
+      mImpl->mEventData->mScrollAfterDelete = true;
+
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
       removed = true;
     }
@@ -670,6 +685,26 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mVisualModel->GetShadowColor();
 }
 
+void Controller::SetDefaultShadowProperties( const std::string& shadowProperties )
+{
+  if( NULL == mImpl->mShadowDefaults )
+  {
+    mImpl->mShadowDefaults = new ShadowDefaults();
+  }
+
+  mImpl->mShadowDefaults->properties = shadowProperties;
+}
+
+const std::string& Controller::GetDefaultShadowProperties() const
+{
+  if( NULL != mImpl->mShadowDefaults )
+  {
+    return mImpl->mShadowDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mVisualModel->SetUnderlineColor( color );
@@ -704,6 +739,77 @@ void Controller::SetUnderlineHeight( float height )
 float Controller::GetUnderlineHeight() const
 {
   return mImpl->mVisualModel->GetUnderlineHeight();
+}
+
+void Controller::SetDefaultUnderlineProperties( const std::string& underlineProperties )
+{
+  if( NULL == mImpl->mUnderlineDefaults )
+  {
+    mImpl->mUnderlineDefaults = new UnderlineDefaults();
+  }
+
+  mImpl->mUnderlineDefaults->properties = underlineProperties;
+}
+
+const std::string& Controller::GetDefaultUnderlineProperties() const
+{
+  if( NULL != mImpl->mUnderlineDefaults )
+  {
+    return mImpl->mUnderlineDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
+{
+  if( NULL == mImpl->mEmbossDefaults )
+  {
+    mImpl->mEmbossDefaults = new EmbossDefaults();
+  }
+
+  mImpl->mEmbossDefaults->properties = embossProperties;
+}
+
+const std::string& Controller::GetDefaultEmbossProperties() const
+{
+  if( NULL != mImpl->mEmbossDefaults )
+  {
+    return mImpl->mEmbossDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultOutlineProperties( const std::string& outlineProperties )
+{
+  if( NULL == mImpl->mOutlineDefaults )
+  {
+    mImpl->mOutlineDefaults = new OutlineDefaults();
+  }
+
+  mImpl->mOutlineDefaults->properties = outlineProperties;
+}
+
+const std::string& Controller::GetDefaultOutlineProperties() const
+{
+  if( NULL != mImpl->mOutlineDefaults )
+  {
+    return mImpl->mOutlineDefaults->properties;
+  }
+
+  return EMPTY_STRING;
+}
+
+void Controller::SetDefaultLineSpacing( float lineSpacing )
+{
+  //TODO finish implementation
+  mImpl->mLayoutEngine.SetDefaultLineSpacing( lineSpacing );
+}
+
+float Controller::GetDefaultLineSpacing() const
+{
+  return mImpl->mLayoutEngine.GetDefaultLineSpacing();
 }
 
 void Controller::SetInputColor( const Vector4& color )
@@ -1042,6 +1148,96 @@ float Controller::GetInputFontPointSize() const
   return GetDefaultPointSize();
 }
 
+void Controller::SetInputLineSpacing( float lineSpacing )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.lineSpacing = lineSpacing;
+  }
+}
+
+float Controller::GetInputLineSpacing() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.lineSpacing;
+  }
+
+  return 0.f;
+}
+
+void Controller::SetInputShadowProperties( const std::string& shadowProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.shadowProperties = shadowProperties;
+  }
+}
+
+const std::string& Controller::GetInputShadowProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.shadowProperties;
+  }
+
+  return GetDefaultShadowProperties();
+}
+
+void Controller::SetInputUnderlineProperties( const std::string& underlineProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.underlineProperties = underlineProperties;
+  }
+}
+
+const std::string& Controller::GetInputUnderlineProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.underlineProperties;
+  }
+
+  return GetDefaultUnderlineProperties();
+}
+
+void Controller::SetInputEmbossProperties( const std::string& embossProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.embossProperties = embossProperties;
+  }
+}
+
+const std::string& Controller::GetInputEmbossProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.embossProperties;
+  }
+
+  return GetDefaultEmbossProperties();
+}
+
+void Controller::SetInputOutlineProperties( const std::string& outlineProperties )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mInputStyle.outlineProperties = outlineProperties;
+  }
+}
+
+const std::string& Controller::GetInputOutlineProperties() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mInputStyle.outlineProperties;
+  }
+
+  return GetDefaultOutlineProperties();
+}
+
 void Controller::SetEnableCursorBlink( bool enable )
 {
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "TextInput disabled" );
@@ -1070,17 +1266,7 @@ bool Controller::GetEnableCursorBlink() const
 
 const Vector2& Controller::GetScrollPosition() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mScrollPosition;
-  }
-
-  return Vector2::ZERO;
-}
-
-const Vector2& Controller::GetAlignmentOffset() const
-{
-  return mImpl->mAlignmentOffset;
+  return mImpl->mScrollPosition;
 }
 
 Vector3 Controller::GetNaturalSize()
@@ -1284,15 +1470,18 @@ bool Controller::Relayout( const Size& size )
   // Whether the text control is editable
   const bool isEditable = NULL != mImpl->mEventData;
 
-  // Keep the current offset and alignment as it will be used to update the decorator's positions (if the size changes).
+  // Keep the current offset as it will be used to update the decorator's positions (if the size changes).
   Vector2 offset;
   if( newSize && isEditable )
   {
-    offset = mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition;
+    offset = mImpl->mScrollPosition;
   }
 
-  // After doing the text layout, the alignment offset to place the actor in the desired position can be calculated.
-  CalculateTextAlignment( size );
+  if( !isEditable || !IsMultiLineEnabled() )
+  {
+    // After doing the text layout, the vertical offset to place the actor in the desired position can be calculated.
+    CalculateVerticalOffset( size );
+  }
 
   if( isEditable )
   {
@@ -1302,7 +1491,7 @@ bool Controller::Relayout( const Size& size )
       mImpl->ClampHorizontalScroll( layoutSize );
 
       // Update the decorator's positions is needed if there is a new size.
-      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mAlignmentOffset + mImpl->mEventData->mScrollPosition - offset );
+      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mScrollPosition - offset );
     }
 
     // Move the cursor, grab handle etc.
@@ -1406,7 +1595,7 @@ void Controller::ResetScrollPosition()
   if( NULL != mImpl->mEventData )
   {
     // Reset the scroll position.
-    mImpl->mEventData->mScrollPosition = Vector2::ZERO;
+    mImpl->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
 }
@@ -1434,13 +1623,6 @@ void Controller::TextInsertedEvent()
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-
-  // Queue a cursor reposition event; this must wait until after DoRelayout()
-  if( EventData::IsEditingState( mImpl->mEventData->mState ) )
-  {
-    mImpl->mEventData->mUpdateCursorPosition = true;
-    mImpl->mEventData->mScrollAfterUpdatePosition = true;
-  }
 }
 
 void Controller::TextDeletedEvent()
@@ -1457,13 +1639,6 @@ void Controller::TextDeletedEvent()
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-
-  // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mUpdateCursorPosition = true;
-  if( 0u != mImpl->mLogicalModel->mText.Count() )
-  {
-    mImpl->mEventData->mScrollAfterDelete = true;
-  }
 }
 
 bool Controller::DoRelayout( const Size& size,
@@ -1699,7 +1874,7 @@ LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
   return mImpl->mLayoutEngine.GetVerticalAlignment();
 }
 
-void Controller::CalculateTextAlignment( const Size& controlSize )
+void Controller::CalculateVerticalOffset( const Size& controlSize )
 {
   Size layoutSize = mImpl->mVisualModel->GetLayoutSize();
 
@@ -1709,71 +1884,21 @@ void Controller::CalculateTextAlignment( const Size& controlSize )
     layoutSize.height = mImpl->GetDefaultFontLineHeight();
   }
 
-  if( LayoutEngine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
-  {
-    // Get the direction of the first character.
-    const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
-
-    // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
-    LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
-    if( firstParagraphDirection )
-    {
-      switch( horizontalAlignment )
-      {
-        case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
-        {
-          horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_END;
-          break;
-        }
-        case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
-        {
-          // Nothing to do.
-          break;
-        }
-        case LayoutEngine::HORIZONTAL_ALIGN_END:
-        {
-          horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_BEGIN;
-          break;
-        }
-      }
-    }
-
-    switch( horizontalAlignment )
-    {
-      case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
-      {
-        mImpl->mAlignmentOffset.x = 0.f;
-        break;
-      }
-      case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
-      {
-        mImpl->mAlignmentOffset.x = floorf( 0.5f * ( controlSize.width - layoutSize.width ) ); // try to avoid pixel alignment.
-        break;
-      }
-      case LayoutEngine::HORIZONTAL_ALIGN_END:
-      {
-        mImpl->mAlignmentOffset.x = controlSize.width - layoutSize.width;
-        break;
-      }
-    }
-  }
-
-  const LayoutEngine::VerticalAlignment verticalAlignment = mImpl->mLayoutEngine.GetVerticalAlignment();
-  switch( verticalAlignment )
+  switch( mImpl->mLayoutEngine.GetVerticalAlignment() )
   {
     case LayoutEngine::VERTICAL_ALIGN_TOP:
     {
-      mImpl->mAlignmentOffset.y = 0.f;
+      mImpl->mScrollPosition.y = 0.f;
       break;
     }
     case LayoutEngine::VERTICAL_ALIGN_CENTER:
     {
-      mImpl->mAlignmentOffset.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
+      mImpl->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
       break;
     }
     case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
     {
-      mImpl->mAlignmentOffset.y = controlSize.height - layoutSize.height;
+      mImpl->mScrollPosition.y = controlSize.height - layoutSize.height;
       break;
     }
   }
@@ -1930,16 +2055,13 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mVisualModel->mUnderlineRuns.Clear();
 
-  Vector<Character> utf32Characters;
-  Length characterCount( 0u );
+  // Keep the current number of characters.
+  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mLogicalModel->mText.Count() : 0u;
 
-  // Remove the previous IMF pre-edit (predicitive text)
-  if( mImpl->mEventData->mPreEditFlag &&
-      ( 0u != mImpl->mEventData->mPreEditLength ) )
+  // Remove the previous IMF pre-edit.
+  if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
-    const CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
-
-    removedPrevious = RemoveText( -static_cast<int>( offset ),
+    removedPrevious = RemoveText( -static_cast<int>( mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition ),
                                   mImpl->mEventData->mPreEditLength,
                                   DONT_UPDATE_INPUT_STYLE );
 
@@ -1948,9 +2070,12 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   }
   else
   {
-    // Remove the previous Selection
+    // Remove the previous Selection.
     removedPrevious = RemoveSelectedText();
   }
+
+  Vector<Character> utf32Characters;
+  Length characterCount = 0u;
 
   if( !text.empty() )
   {
@@ -2116,6 +2241,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
+  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mLogicalModel->mText.Count() : 0u;
+
   if( ( 0u == mImpl->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
@@ -2129,6 +2256,16 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
+
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    if( numberOfCharacters < currentNumberOfCharacters )
+    {
+      mImpl->mEventData->mScrollAfterDelete = true;
+    }
+    else
+    {
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
   }
 
   if( maxLengthReached )
@@ -2441,8 +2578,11 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       else
       {
         ShowPlaceholderText();
-        mImpl->mEventData->mUpdateCursorPosition = true;
       }
+
+      mImpl->mEventData->mUpdateCursorPosition = true;
+      mImpl->mEventData->mScrollAfterDelete = true;
+
       mImpl->RequestRelayout();
       mImpl->mControlInterface.TextChanged();
       break;
@@ -2530,8 +2670,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
         else
         {
           ShowPlaceholderText();
-          mImpl->mEventData->mUpdateCursorPosition = true;
         }
+        mImpl->mEventData->mUpdateCursorPosition = true;
+        mImpl->mEventData->mScrollAfterDelete = true;
       }
       requestRelayout = true;
       break;
@@ -2618,8 +2759,9 @@ bool Controller::BackspaceKeyEvent()
     else
     {
       ShowPlaceholderText();
-      mImpl->mEventData->mUpdateCursorPosition = true;
     }
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    mImpl->mEventData->mScrollAfterDelete = true;
   }
 
   return removed;

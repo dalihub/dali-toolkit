@@ -117,7 +117,7 @@ public:
    *
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    */
-  void ApplyRasterizedImage( PixelDataPtr rasterizedPixelData );
+  void ApplyRasterizedImage( PixelData rasterizedPixelData );
 
 private:
   /**

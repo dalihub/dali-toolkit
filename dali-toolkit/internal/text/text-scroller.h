@@ -65,7 +65,7 @@ public:
    * @param[in] alignmentOffset alignment of source text
    *
    */
-  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, const Vector2 alignmentOffset );
+  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
@@ -161,9 +161,9 @@ private:
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
 
-  int mScrollSpeed;            ///< Speed which text should automatically scroll at
-  int mLoopCount;              ///< Number of time the text should scroll
-  int mWrapGap;                ///< Gap before text wraps around when scrolling
+  int   mScrollSpeed;            ///< Speed which text should automatically scroll at
+  int   mLoopCount;              ///< Number of time the text should scroll
+  float mWrapGap;                ///< Gap before text wraps around when scrolling
 
 }; // TextScroller class
 

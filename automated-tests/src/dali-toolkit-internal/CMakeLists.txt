@@ -9,6 +9,7 @@ SET(CAPI_LIB "dali-toolkit-internal")
 SET(TC_SOURCES
  utc-Dali-PushButton.cpp
  utc-Dali-Text-CharacterSetConversion.cpp
+ utc-Dali-Text-Cursor.cpp
  utc-Dali-Text-Segmentation.cpp
  utc-Dali-Text-MultiLanguage.cpp
  utc-Dali-LogicalModel.cpp

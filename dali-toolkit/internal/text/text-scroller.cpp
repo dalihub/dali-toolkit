@@ -197,12 +197,12 @@ TextScrollerPtr TextScroller::New( ScrollerInterface& scrollerInterface )
 void TextScroller::SetGap( int gap )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetGap gap[%d]\n", gap );
-  mWrapGap = gap;
+  mWrapGap = static_cast<float>(gap);
 }
 
 int TextScroller::GetGap() const
 {
-  return mWrapGap;
+  return static_cast<int>(mWrapGap);
 }
 
 void TextScroller::SetSpeed( int scrollSpeed )
@@ -252,7 +252,7 @@ TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerIn
                             mScrollDeltaIndex( Property::INVALID_INDEX ),
                             mScrollSpeed( MINIMUM_SCROLL_SPEED ),
                             mLoopCount( 1 ),
-                            mWrapGap( 0 )
+                            mWrapGap( 0.0f )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
@@ -262,10 +262,10 @@ TextScroller::~TextScroller()
   CleanUp();
 }
 
-void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, const Vector2 alignmentOffset )
+void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f,%f]\n",
-                 controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset.x, alignmentOffset.y );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
+                 controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset );
 
   FrameBufferImage offscreenRenderTargetForText = FrameBufferImage::New( offScreenSize.width, offScreenSize.height, Pixel::RGBA8888, Dali::Image::UNUSED );
   Renderer renderer;
@@ -277,7 +277,7 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
   // Reposition camera to match alignment of target, RTL text has direction=true
   if ( direction )
   {
-    mOffscreenCameraActor.SetX( alignmentOffset.x + offScreenSize.width*0.5f );
+    mOffscreenCameraActor.SetX( alignmentOffset + offScreenSize.width*0.5f );
   }
   else
   {
@@ -286,7 +286,7 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
 
   mOffscreenCameraActor.SetY( offScreenSize.height * 0.5f );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%d]\n", mWrapGap )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap )
 
   mScrollingTextActor = Actor::New();
   mScrollingTextActor.AddRenderer( renderer );

@@ -139,7 +139,7 @@ private:
   // for extracting bright parts of image to an offscreen target
   FrameBufferImage mBloomExtractTarget; // for rendering bright parts of image into separate texture, also used as target for gaussian blur
   RenderTask mBloomExtractTask;
-  Toolkit::ImageView mBloomExtractImageActor;
+  Toolkit::ImageView mBloomExtractImageView;
 
   /////////////////////////////////////////////////////////////
   // for blurring extracted bloom
@@ -149,12 +149,12 @@ private:
   // for compositing bloom and children renders to offscreen target
   RenderTask mCompositeTask;
 
-  Toolkit::ImageView mCompositeImageActor;
+  Toolkit::ImageView mCompositeImageView;
 
   /////////////////////////////////////////////////////////////
   // for holding blurred result
   FrameBufferImage mOutputRenderTarget;
-  Toolkit::ImageView mTargetImageActor;
+  Toolkit::ImageView mTargetImageView;
 
   /////////////////////////////////////////////////////////////
   // Properties for setting by user, e.g. by animations
