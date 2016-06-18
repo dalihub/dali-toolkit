@@ -527,13 +527,7 @@ v8::Local<v8::Object> CreateJavaScriptPrimitive( v8::Isolate* isolate, const Dal
        break;
      }
    }
-
- v8::Local<v8::Object> ret;
-
- if( v8Value->IsObject() )
- {
-   ret = v8Value->ToObject();
- }
+ v8::Local<v8::Object> ret = v8Value->ToObject();
 
  return handleScope.Escape( ret );
 }
