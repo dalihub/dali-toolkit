@@ -425,8 +425,10 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
 
   callStack.Enable(false);
 
-  DALI_TEST_CHECK(  callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 34, 34" ) );
-
+  TraceCallStack::NamedParams params;
+  params["width"] = ToString(34);
+  params["height"] = ToString(34);
+  DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -475,9 +477,13 @@ int UtcDaliImageViewSyncLoading(void)
     Stage::GetCurrent().Add( imageView );
     application.SendNotification();
     application.Render(16);
-    DALI_TEST_CHECK(  callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 34, 34" ) );
-  }
 
+    TraceCallStack::NamedParams params;
+    params["width"] = ToString(34);
+    params["height"] = ToString(34);
+    DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
+                      true, TEST_LOCATION );
+  }
   END_TEST;
 }
 
@@ -1128,4 +1134,3 @@ int UtcDaliImageViewGetImageN(void)
 
   END_TEST;
 }
-
