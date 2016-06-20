@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAK INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
@@ -95,46 +96,7 @@ public:
    *            Depends on the content of the map, different kind of renderer would be returned.
    * @return The pointer pointing to control renderer
    */
-  ControlRenderer GetControlRenderer( const Property::Map& propertyMap  );
-
-  /**
-   * @brief Request the control renderer to render the given color
-   *
-   * @param[in] color The color to be rendered
-   * @return The pointer pointing to the control renderer
-   */
-  ControlRenderer GetControlRenderer( const Vector4& color );
-
-  /**
-   * @brief Request the current control renderer to render the given color
-   *
-   * if the current renderer is a handle to an internal color renderer, set this color to it,
-   * else the renderer would be a handle to a newly created internal color renderer.
-   *
-   * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
-   * @param[in] color The color to be rendered.
-   */
-  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color );
-
-  /**
-   * @brief Request the control renderer to renderer the border with the given size and color.
-   *
-   * @param[in] borderSize The size of the border. Border size is the same along all edges.
-   * @param[in] borderColor The color of the border.
-   * @return The pointer pointing to the control renderer
-   */
-  ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor );
-
-  /**
-   * @brief Request the control renderer to renderer the border with the given size and color, and specify whether anti-aliasing is needed.
-   *
-   * @param[in] borderSize The size of the border. Border size is the same along all edges.
-   * @param[in] borderColor The color of the border.
-   * @param[in] antiAliasing Whether anti-aliasing is required for border rendering.
-   * @return The pointer pointing to the control renderer
-   */
-  ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing );
+  ControlRenderer CreateControlRenderer( const Property::Map& propertyMap  );
 
   /**
    * @brief Request the control renderer to render the image.
@@ -142,19 +104,7 @@ public:
    * @param[in] image The image to be rendered.
    * @return The pointer pointing to the control renderer
    */
-  ControlRenderer GetControlRenderer( const Image& image );
-
-  /**
-   * @brief Request the current control renderer to render the given image
-   *
-   * if the current renderer is a handle to an internal image renderer, set this image to it,
-   * else the renderer would be a handle to a newly created internal image renderer.
-   *
-   * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
-   * @param[in] image The Image to be rendered.
-   */
-  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image );
+  ControlRenderer CreateControlRenderer( const Image& image );
 
   /**
    * @brief Request the control renderer to render the given resource at the url.
@@ -163,35 +113,7 @@ public:
    * @param[in] size The width and height to fit the loaded image to.
    * @return The pointer pointing to the control renderer
    */
-  ControlRenderer GetControlRenderer( const std::string& url,
-                                      ImageDimensions size = ImageDimensions() );
-
-  /**
-   * @brief Request the current control renderer to render the given resource at the url
-   *
-   * if the current renderer is a handle to an internal image renderer, set this image to it,
-   * else the renderer would be a handle to a newly created internal image renderer.
-   *
-   * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
-   * @param[in] url The URL to the resource to be rendered.
-   * @param[in] size The width and height to fit the loaded image to.
-   */
-  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url,
-                      ImageDimensions size = ImageDimensions() );
-
-  /**
-   * @brief Request the current control renderer from the property map, merging the property map with the renderer
-   *
-   * if the current renderer is capable of merging with the property map the reset the renderer with the merged properties
-   * else the renderer would be a handle to a newly created internal renderer.
-   *
-   * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
-   * @param[in] propertyMap The map contains the properties required by the control renderer
-   *            Depends on the content of the map, different kind of renderer would be returned.
-   */
-  void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap );
+  ControlRenderer CreateControlRenderer( const std::string& url, ImageDimensions size );
 
 private:
 
@@ -199,8 +121,52 @@ private:
 
 };
 
+
+/**
+ * @brief Template to allow discard old renderer, get new one and set it on stage if possible
+ *
+ * @tparam ParameterType0 The type of first argument passed to the CreateControlRenderer()
+ * @tparam ParameterType1 The type of second argument passed to the CreateControlRenderer()
+ * @SINCE_1_0.39
+ * @param[in] actor Actor for which the renderer will be replaced
+ * @param[in,out] renderer The renderer object to be replaced
+ * @param[in] param0 First template based argument passed to the renderer factory
+ * @param[in] param1 Second template based argument passed to the renderer factory
+ */
+template< class ParameterType0, class ParameterType1 >
+void InitializeControlRenderer( Actor& actor, ControlRenderer& renderer, ParameterType0& param0, ParameterType1& param1 )
+{
+  renderer.RemoveAndReset( actor );
+  renderer = Toolkit::RendererFactory::Get().CreateControlRenderer( param0, param1 );
+  if( renderer && actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
+  }
+}
+
+/**
+ * @brief Template to allow discard old renderer, get new one and set it on stage if possible
+ *
+ * @tparam ParameterType The type of argument passed to the CreateControlRenderer()
+ * @SINCE_1_0.39
+ * @param[in] actor Actor for which the renderer will be replaced
+ * @param[in,out] renderer The renderer object to be replaced
+ * @param[in] param Template based argument passed to the renderer factory
+ */
+template< class ParameterType >
+void InitializeControlRenderer( Actor& actor, ControlRenderer& renderer, ParameterType& param )
+{
+  renderer.RemoveAndReset( actor );
+  renderer =  Toolkit::RendererFactory::Get().CreateControlRenderer( param );
+  if( renderer && actor && actor.OnStage() )
+  {
+    renderer.SetOnStage( actor );
+  }
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
+
 
 #endif /* __DALI_TOOLKIT_RENDERER_FACTORY_H__ */

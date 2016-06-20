@@ -26,9 +26,11 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
@@ -185,7 +187,7 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     customShader[ "vertexShader" ] = EFFECTS_VIEW_VERTEX_SOURCE;
     customShader[ "fragmentShader" ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
     rendererMap[ "shader" ] = customShader;
-    Toolkit::RendererFactory::Get().ResetRenderer( mRendererPostFilter, self, rendererMap );
+    InitializeControlRenderer( self, mRendererPostFilter, rendererMap );
 
     mEffectType = type;
   }
@@ -429,15 +431,16 @@ void EffectsView::AllocateResources()
     mLastSize = mTargetSize;
     SetupCameras();
 
-    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-    Actor self = Self();
+    Actor self( Self() );
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    rendererFactory.ResetRenderer(mRendererForChildren, self, mImageForChildren);
+    InitializeControlRenderer( self, mRendererForChildren, mImageForChildren );
     mRendererForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    rendererFactory.ResetRenderer(mRendererPostFilter, self, mImagePostFilter);
+    TextureSet textureSet = TextureSet::New();
+    textureSet.SetImage( 0u,  mImagePostFilter);
+    self.GetRendererAt( 0 ).SetTextures( textureSet );
     mRendererPostFilter.SetDepthIndex( DepthIndex::CONTENT );
 
     SetupFilters();

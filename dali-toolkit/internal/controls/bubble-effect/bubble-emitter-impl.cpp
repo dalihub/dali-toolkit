@@ -176,7 +176,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
   mBackgroundImage = bgImage;
   mHSVDelta = hsvDelta;
 
-  Toolkit::ImageView sourceActor = Toolkit::ImageView::New( bgImage );
+  Toolkit::ImageView sourceActor = Toolkit::ImageView::New(bgImage);
   sourceActor.SetSize( mMovementArea );
   sourceActor.SetParentOrigin(ParentOrigin::CENTER);
 

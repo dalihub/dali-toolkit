@@ -296,7 +296,7 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
   propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("mixColor",  testColor);
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -319,7 +319,10 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
   DALI_TEST_CHECK( factory );
 
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
-  ControlRenderer controlRenderer = factory.GetControlRenderer(testColor);
+  Dali::Property::Map map;
+  map[ "rendererType" ] = "color";
+  map[ "mixColor" ] = testColor;
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( map );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -351,7 +354,7 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   propertyMap.Insert("borderColor",  testColor);
   propertyMap.Insert("borderSize",  testSize);
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -394,7 +397,11 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   Vector4 testColor( 1.f, 0.5f, 0.3f, 1.f );
   float testSize = 5.f;
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(testSize, testColor );
+  Dali::Property::Map propertyMap;
+  propertyMap[ "rendererType" ] = "border";
+  propertyMap[ "borderColor"  ] = testColor;
+  propertyMap[ "borderSize"   ] = testSize;
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -424,7 +431,12 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   controlRenderer.SetOffStage( actor );
 
   // enable the anti-aliasing
-  controlRenderer = factory.GetControlRenderer(testSize, testColor, true );
+  Dali::Property::Map map;
+  map[ "rendererType" ] = "border";
+  map[ "borderColor"  ] = testColor;
+  map[ "borderSize"   ] = testSize;
+  map[ "antiAliasing"   ] = true;
+  controlRenderer = factory.CreateControlRenderer( map );
   controlRenderer.SetOnStage( actor );
 
   application.SendNotification();
@@ -462,7 +474,7 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
   // A lookup texture is generated and pass to shader as sampler
@@ -502,7 +514,7 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
   // A lookup texture is generated and pass to shader as sampler
@@ -542,7 +554,7 @@ int UtcDaliRendererFactoryDefaultOffsetsGradientRenderer(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
 
   // A lookup texture is generated and pass to shader as sampler
@@ -567,7 +579,7 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   propertyMap.Insert( "rendererType",  "image" );
   propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -604,7 +616,7 @@ int UtcDaliRendererFactoryGetImageRenderer2(void)
   DALI_TEST_CHECK( factory );
 
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  ControlRenderer controlRenderer = factory.GetControlRenderer( image );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( image );
 
   Actor actor = Actor::New();
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
@@ -650,7 +662,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
-    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
@@ -669,7 +681,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   propertyMap.Insert( "borderOnly",  true );
   {
     tet_infoline( "border only" );
-    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
@@ -713,7 +725,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
   propertyMap.Insert( "rendererType",  "image" );
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
-    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
 
     Actor actor = Actor::New();
@@ -735,7 +747,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
   propertyMap.Insert( "borderOnly",  true );
   {
     tet_infoline( "border only" );
-    ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+    ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
     DALI_TEST_CHECK( controlRenderer );
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -772,7 +784,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer3(void)
   stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_NPATCH_FILE_NAME );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -811,7 +823,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer4(void)
   stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_NPATCH_FILE_NAME );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -839,7 +851,7 @@ int UtcDaliRendererFactoryGetNPatchRendererN1(void)
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( "ERROR.9.jpg" );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( "ERROR.9.jpg", ImageDimensions() );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -875,7 +887,7 @@ int UtcDaliRendererFactoryGetNPatchRendererN2(void)
   propertyMap.Insert( "rendererType",  111 );
   propertyMap.Insert( "url",  "ERROR.9.jpg" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -903,7 +915,7 @@ int UtcDaliRendererFactoryGetSvgRenderer(void)
   tet_infoline( "UtcDaliRendererFactoryGetSvgRenderer: Request svg renderer with a svg url" );
 
   RendererFactory factory = RendererFactory::Get();
-  ControlRenderer controlRenderer = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( TEST_SVG_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( controlRenderer );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -951,7 +963,7 @@ int UtcDaliRendererFactoryGetMeshRenderer1(void)
   propertyMap.Insert( "rendererType",  "mesh" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   Actor actor = Actor::New();
@@ -1005,7 +1017,7 @@ int UtcDaliRendererFactoryGetMeshRenderer2(void)
   propertyMap.Insert( "materialUrl", "" );
   propertyMap.Insert( "texturesPath", "" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   //Add renderer to an actor on stage.
@@ -1061,7 +1073,7 @@ int UtcDaliRendererFactoryGetMeshRenderer3(void)
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   //Add renderer to an actor on stage.
@@ -1117,7 +1129,7 @@ int UtcDaliRendererFactoryGetMeshRenderer4(void)
   propertyMap.Insert( "materialUrl", TEST_SIMPLE_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   //Add renderer to an actor on stage.
@@ -1172,7 +1184,7 @@ int UtcDaliRendererFactoryGetMeshRendererN1(void)
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   //Add renderer to an actor on stage.
@@ -1224,7 +1236,7 @@ int UtcDaliRendererFactoryGetMeshRendererN2(void)
   propertyMap.Insert( "materialUrl", "invalid" );
   propertyMap.Insert( "texturesPath", "also invalid" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   //Add renderer to an actor on stage.
@@ -1276,7 +1288,7 @@ int UtcDaliRendererFactoryGetMeshRendererN3(void)
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
   //Add renderer to an actor on stage.
@@ -1308,207 +1320,6 @@ int UtcDaliRendererFactoryGetMeshRendererN3(void)
 
   controlRenderer.SetOffStage( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
-
-  END_TEST;
-}
-
-int UtcDaliRendererFactoryResetRenderer1(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryResetRenderer1" );
-
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  ControlRenderer controlRenderer = factory.GetControlRenderer( Color::RED );
-  DALI_TEST_CHECK( controlRenderer );
-
-  Actor actor = Actor::New();
-  TestControlRendererRender( application, actor, controlRenderer );
-
-  Vector4 actualValue(Vector4::ZERO);
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
-
-  factory.ResetRenderer( controlRenderer, actor, Color::GREEN );
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
-
-  Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  factory.ResetRenderer( controlRenderer, actor, bufferImage );
-
-  Actor actor2 = Actor::New();
-  actor2.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor2 );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor2 );
-  application.SendNotification();
-  application.Render(0);
-
-  END_TEST;
-}
-
-int UtcDaliRendererFactoryResetRenderer2(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryResetRenderer2" );
-
-  Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  Image resourceImage = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  ControlRenderer controlRenderer = factory.GetControlRenderer( resourceImage );
-  DALI_TEST_CHECK( controlRenderer );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  application.SendNotification();
-  application.Render(0);
-
-  Image bufferImage = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  factory.ResetRenderer( controlRenderer, actor, bufferImage );
-  application.SendNotification();
-  application.Render(0);
-
-  factory.ResetRenderer( controlRenderer, actor, Color::RED );
-
-  Actor actor2 = Actor::New();
-  actor2.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor2 );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor2 );
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  application.SendNotification();
-  application.Render(0);
-  Vector4 actualValue(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliRendererFactoryResetRenderer3(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryResetRenderer3" );
-
-  Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  // Get renderer for rendering a resource image
-  Image resourceImage = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  ControlRenderer controlRenderer = factory.GetControlRenderer( resourceImage );
-  DALI_TEST_CHECK( controlRenderer );
-  controlRenderer.SetSize(Vector2(200.f, 200.f));
-  controlRenderer.SetOnStage( actor );
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  // reset the renderer to renderer a svg image
-  factory.ResetRenderer( controlRenderer, actor, TEST_SVG_FILE_NAME, ImageDimensions( 100, 100 ) );
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
-  CallbackBase::Execute( *callback );
-
-  END_TEST;
-}
-
-//Test resetting mesh and primitive shape renderers
-int UtcDaliRendererFactoryResetRenderer4(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryResetRenderer4:  Mesh and primitive renderers" );
-
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  Property::Map map;
-
-  //******
-
-  //Start with basic color renderer
-  ControlRenderer controlRenderer = factory.GetControlRenderer( Color::RED );
-  DALI_TEST_CHECK( controlRenderer );
-
-  TestControlRendererRender( application, actor, controlRenderer );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Ensure set correctly.
-  Vector4 actualValue( Vector4::ZERO );
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
-
-  //******
-
-  //Reset to mesh renderer
-  map.Insert( "rendererType", "mesh" );
-  map.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  map.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  map.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
-  factory.ResetRenderer( controlRenderer, actor, map );
-  application.SendNotification();
-  application.Render( 0 );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Ensure set correctly.
-  controlRenderer.CreatePropertyMap( map );
-  DALI_TEST_EQUALS( map.Find( "objectUrl", Property::STRING )->Get<std::string>(), TEST_OBJ_FILE_NAME, TEST_LOCATION );
-
-  Matrix testScaleMatrix;
-  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
-  Matrix actualScaleMatrix;
-
-  //Test to see if the object has been successfully loaded.
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
-  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  //******
-
-  //Reset back to color renderer
-  factory.ResetRenderer( controlRenderer, actor, Color::GREEN );
-  application.SendNotification();
-  application.Render( 0 );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Ensure set correctly.
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
-
-  //******
 
   END_TEST;
 }

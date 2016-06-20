@@ -29,6 +29,9 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL_INCLUDES
+#include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
+
 namespace //Unnamed namespace
 {
 
@@ -154,21 +157,6 @@ Toolkit::SuperBlurView SuperBlurView::New( unsigned int blurLevels )
 void SuperBlurView::OnInitialize()
 {
   mBlurStrengthPropertyIndex = Self().RegisterProperty( "blurStrength", 0.f );
-
-  Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "image");
-
-  Property::Map shaderMap;
-  std::stringstream verterShaderString;
-  shaderMap[ "fragmentShader" ] = FRAGMENT_SHADER;
-  rendererMap.Insert( "shader", shaderMap );
-
-  Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-  for(unsigned int i=0; i<=mBlurLevels; i++)
-  {
-    mRenderers[i] = rendererFactory.GetControlRenderer( rendererMap );
-    mRenderers[i].SetDepthIndex(i);
-  }
 }
 
 void SuperBlurView::SetImage(Image inputImage)
@@ -181,8 +169,14 @@ void SuperBlurView::SetImage(Image inputImage)
   ClearBlurResource();
 
   mInputImage = inputImage;
-  Actor self = Self();
-  Toolkit::RendererFactory::Get().ResetRenderer( mRenderers[0], self, mInputImage );
+  Actor self( Self() );
+  InitializeControlRenderer( self, mRenderers[0], mInputImage );
+  mRenderers[0].SetDepthIndex(0);
+  SetShaderEffect( mRenderers[0] );
+  if( self.OnStage() )
+  {
+    mRenderers[0].SetOnStage( self );
+  }
 
   BlurImage( 0,  inputImage);
   for(unsigned int i=1; i<mBlurLevels;i++)
@@ -265,6 +259,15 @@ void SuperBlurView::ClearBlurResource()
     mResourcesCleared = true;
   }
 }
+void SuperBlurView::SetShaderEffect( Toolkit::ControlRenderer& renderer )
+{
+  Property::Map shaderMap;
+  std::stringstream verterShaderString;
+  shaderMap[ "fragmentShader" ] = FRAGMENT_SHADER;
+
+  Internal::ControlRenderer& rendererImpl = GetImplementation( renderer );
+  rendererImpl.SetCustomShader( shaderMap );
+}
 
 void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 {
@@ -274,12 +277,14 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 
     Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
     Actor self = Self();
-    for(unsigned int i=1; i<=mBlurLevels;i++)
+    for( unsigned int i = 1; i <= mBlurLevels; i++ )
     {
       float exponent = static_cast<float>(i);
       mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
-      rendererFactory.ResetRenderer( mRenderers[i], self, mBlurredImage[i-1] );
+      InitializeControlRenderer( self, mRenderers[i], mBlurredImage[i - 1] );
+      mRenderers[ i ].SetDepthIndex( i );
+      SetShaderEffect( mRenderers[ i ] );
     }
 
     if( mInputImage )
@@ -289,7 +294,7 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 
     if( self.OnStage() )
     {
-      for(unsigned int i=0; i<=mBlurLevels;i++)
+      for( unsigned int i = 1; i <= mBlurLevels; i++ )
       {
         mRenderers[i].SetOnStage( self );
       }
@@ -307,10 +312,16 @@ void SuperBlurView::OnStageConnection( int depth )
   }
 
   Actor self = Self();
-  mRenderers[0].SetOnStage( self );
+  if( mRenderers[0] )
+  {
+    mRenderers[0].SetOnStage( self );
+  }
   for(unsigned int i=1; i<=mBlurLevels;i++)
   {
-    mRenderers[i].SetOnStage( self );
+    if( mRenderers[i] )
+    {
+      mRenderers[i].SetOnStage( self );
+    }
 
     Renderer renderer = self.GetRendererAt( i );
     Property::Index index = renderer.RegisterProperty( ALPHA_UNIFORM_NAME, 0.f );

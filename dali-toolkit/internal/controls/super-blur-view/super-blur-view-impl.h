@@ -161,6 +161,12 @@ private:
    */
   void ClearBlurResource();
 
+  /**
+   * Sets shader effect on the control renderer
+   * @param[in,out] Sets custom shader effect on the given renderer
+   */
+  void SetShaderEffect( Toolkit::ControlRenderer& renderer );
+
 private:
   std::vector<Toolkit::GaussianBlurView> mGaussianBlurView;
   std::vector<FrameBufferImage>          mBlurredImage;

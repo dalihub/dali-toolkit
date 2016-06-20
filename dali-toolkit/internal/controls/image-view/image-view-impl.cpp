@@ -12,6 +12,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
+#include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 
 namespace Dali
 {
@@ -78,8 +80,8 @@ void ImageView::SetImage( Image image )
 
     mImage = image;
 
-    Actor self = Self();
-    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, image );
+    Actor self( Self() );
+    InitializeControlRenderer( self, mRenderer, image );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -92,8 +94,8 @@ void ImageView::SetImage( Property::Map map )
   mImage.Reset();
   mPropertyMap = map;
 
-  Actor self = Self();
-  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mPropertyMap );
+  Actor self( Self() );
+  InitializeControlRenderer( self, mRenderer, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -121,7 +123,7 @@ void ImageView::SetImage( Property::Map map )
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
   if( ( mUrl != url ) ||
-      mImage          ||       // If we're changing from an Image type to a URL type
+        mImage        ||       // If we're changing from an Image type to a URL type
       ! mPropertyMap.Empty() ) // If we're changing from a property map type to a URL type
   {
     mImage.Reset();
@@ -134,8 +136,10 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
       mImageSize = size;
     }
 
-    Actor self = Self();
-    Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mUrl, size );
+    Actor self( Self() );
+    InitializeControlRenderer( self, mRenderer, url, size );
+
+    mRenderer.SetSize( mSizeSet );
 
     RelayoutRequest();
   }
@@ -251,6 +255,7 @@ void ImageView::OnStageDisconnection()
 void ImageView::OnSizeSet( const Vector3& targetSize )
 {
   Control::OnSizeSet( targetSize );
+  mSizeSet = targetSize;
 
   if( mRenderer )
   {
@@ -270,6 +275,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
 
   if ( imageView )
   {
+    ImageView& impl = GetImpl( imageView );
     switch ( index )
     {
       case Toolkit::ImageView::Property::RESOURCE_URL:
@@ -277,7 +283,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
         std::string imageUrl;
         if( value.Get( imageUrl ) )
         {
-          GetImpl( imageView ).SetImage( imageUrl, ImageDimensions() );
+          impl.SetImage( imageUrl, ImageDimensions() );
         }
         break;
       }
@@ -285,20 +291,37 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
+        Property::Map map;
         if( value.Get( imageUrl ) )
         {
-          ImageView& impl = GetImpl( imageView );
           impl.SetImage( imageUrl, ImageDimensions() );
         }
-
         // if its not a string then get a Property::Map from the property if possible.
-        Property::Map map;
-        if( value.Get( map ) )
+        else if( value.Get( map ) )
         {
-          ImageView& impl = GetImpl( imageView );
-          impl.SetImage( map );
+          Property::Value* shaderValue = map.Find( "shader" );
+          // set image only if property map contains image information other than custom shader
+          if( map.Count() > 1u ||  !shaderValue )
+          {
+            impl.SetImage( map );
+          }
+          // the property map contains only the custom shader
+          else if(  impl.mRenderer && map.Count() == 1u &&  shaderValue )
+          {
+            Property::Map shaderMap;
+            if( shaderValue->Get( shaderMap ) )
+            {
+              Internal::ControlRenderer& renderer = GetImplementation( impl.mRenderer );
+              renderer.SetCustomShader( shaderMap );
+              if( imageView.OnStage() )
+              {
+                // force to create new core renderer to use the newly set shader
+                renderer.SetOffStage( imageView );
+                renderer.SetOnStage( imageView );
+              }
+            }
+          }
         }
-
         break;
       }
 
@@ -307,7 +330,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
         bool isPre;
         if( value.Get( isPre ) )
         {
-          GetImpl(imageView).EnablePreMultipliedAlpha( isPre );
+          impl.EnablePreMultipliedAlpha( isPre );
         }
         break;
       }
