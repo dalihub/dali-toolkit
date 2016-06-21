@@ -72,8 +72,10 @@ void ParsePropertyString( const std::string& property, Property::Map& map )
   if( parser.Parse( property ) )
   {
     const TreeNode* const node = parser.GetRoot();
-
-    CreatePropertyMap( node, map );
+    if( node )
+    {
+      CreatePropertyMap( node, map );
+    }
   }
 }
 
