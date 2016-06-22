@@ -40,7 +40,6 @@ namespace
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
-const unsigned int POINTS_PER_INCH = 72;
 
 const std::string EMPTY_STRING("");
 
@@ -490,15 +489,6 @@ void Controller::SetDefaultPointSize( float pointSize )
 
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
   mImpl->mFontDefaults->sizeDefined = true;
-
-  unsigned int horizontalDpi( 0u );
-  unsigned int verticalDpi( 0u );
-  mImpl->mFontClient.GetDpi( horizontalDpi, verticalDpi );
-
-  // Adjust the metrics if the fixed-size font should be down-scaled
-  int maxEmojiSize( pointSize/POINTS_PER_INCH * verticalDpi );
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultPointSize %p setting MaxEmojiSize %d\n", this, maxEmojiSize );
-  mImpl->mMetrics->SetMaxEmojiSize( maxEmojiSize );
 
   // Clear the font-specific data
   ClearFontData();

@@ -38,7 +38,7 @@ class Metrics;
 typedef IntrusivePtr<Metrics> MetricsPtr;
 
 /**
- * @brief A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
+ * @brief A wrapper around FontClient used to get metrics.
  */
 class Metrics : public RefObject
 {
@@ -63,26 +63,6 @@ public:
   }
 
   /**
-   * @brief Set the maximum Emoji size.
-   *
-   * @param[in] emojiSize Emoticons will be scaled to fit this size in pixels.
-   */
-  void SetMaxEmojiSize( int emojiSize )
-  {
-    mEmojiSize = emojiSize;
-  }
-
-  /**
-   * @brief Get the maximum Emoji size.
-   *
-   * @return The maximum Emoji size.
-   */
-  int GetMaxEmojiSize() const
-  {
-    return mEmojiSize;
-  }
-
-  /**
    * @brief Query the metrics for a font.
    *
    * @param[in] fontId The ID of the font for the required glyph.
@@ -90,7 +70,7 @@ public:
    */
   void GetFontMetrics( FontId fontId, FontMetrics& metrics )
   {
-    mFontClient.GetFontMetrics( fontId, metrics, mEmojiSize ); // inline for performance
+    mFontClient.GetFontMetrics( fontId, metrics ); // inline for performance
   }
 
   /**
@@ -104,7 +84,7 @@ public:
    */
   bool GetGlyphMetrics( GlyphInfo* array, uint32_t size )
   {
-    return mFontClient.GetGlyphMetrics( array, size, mGlyphType, true, mEmojiSize ); // inline for performance
+    return mFontClient.GetGlyphMetrics( array, size, mGlyphType, true ); // inline for performance
   }
 
 protected:
@@ -121,10 +101,8 @@ private:
    */
   Metrics( TextAbstraction::FontClient& fontClient )
   : mFontClient( fontClient ),
-    mGlyphType( TextAbstraction::BITMAP_GLYPH ),
-    mEmojiSize( 0 )
-  {
-  }
+    mGlyphType( TextAbstraction::BITMAP_GLYPH )
+  {}
 
   // Undefined
   Metrics(const Metrics&);
@@ -136,7 +114,6 @@ private:
 
   TextAbstraction::FontClient mFontClient;
   TextAbstraction::GlyphType mGlyphType;
-  int mEmojiSize;
 };
 
 } // namespace Text

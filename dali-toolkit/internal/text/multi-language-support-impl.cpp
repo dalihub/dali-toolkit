@@ -211,6 +211,19 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     while( !endOfText &&
            ( TextAbstraction::COMMON == script ) )
     {
+      if( TextAbstraction::EMOJI == currentScriptRun.script )
+      {
+        // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
+        scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+        ++scriptIndex;
+
+        // Initialize the new one.
+        currentScriptRun.characterRun.characterIndex = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+        currentScriptRun.characterRun.numberOfCharacters = 0u;
+        currentScriptRun.script = TextAbstraction::UNKNOWN;
+        numberOfAllScriptCharacters = 0u;
+      }
+
       // Count all these characters to be added into a script.
       ++numberOfAllScriptCharacters;
 
@@ -248,7 +261,7 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         character = *( textBuffer + index );
         script = TextAbstraction::GetCharacterScript( character );
       }
-    }
+    } // end while( !endOfText && ( TextAbstraction::COMMON == script ) )
 
     if( endOfText )
     {
@@ -260,7 +273,8 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     // Check if it is the first character of a paragraph.
     if( isFirstScriptToBeSet &&
         ( TextAbstraction::UNKNOWN != script ) &&
-        ( TextAbstraction::COMMON != script ) )
+        ( TextAbstraction::COMMON != script ) &&
+        ( TextAbstraction::EMOJI != script ) )
     {
       // Sets the direction of the first valid script.
       isParagraphRTL = TextAbstraction::IsRightToLeftScript( script );
@@ -285,6 +299,13 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
       {
         // Current script and previous one have the same direction.
         // All the previously skipped characters need to be added to the previous script before it's stored.
+        currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
+        numberOfAllScriptCharacters = 0u;
+      }
+      else if( ( TextAbstraction::UNKNOWN == currentScriptRun.script ) &&
+               ( TextAbstraction::EMOJI == script ) )
+      {
+        currentScriptRun.script = TextAbstraction::LATIN;
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
@@ -435,6 +456,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   PointSize26Dot6 currentPointSize = defaultPointSize;
   FontId currentFontId = 0u;
   FontId previousFontId = 0u;
+  bool isPreviousEmojiScript = false;
 
   // Whether it's the first set of characters to be validated.
   // Used in case the paragraph starts with characters common to all scripts.
@@ -497,6 +519,23 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     isValidFont = isValidCachedDefaultFont && ( fontId == cachedDefaultFontId );
 
     bool isCommonScript = false;
+    bool isEmojiScript = TextAbstraction::EMOJI == script;
+
+    if( isEmojiScript && !isPreviousEmojiScript )
+    {
+      if( 0u != currentFontRun.characterRun.numberOfCharacters )
+      {
+        // Store the font run.
+        fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+        ++fontIndex;
+      }
+
+      // Initialize the new one.
+      currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
+      currentFontRun.characterRun.numberOfCharacters = 0u;
+      currentFontRun.fontId = fontId;
+    }
+
 
     // If the given font is not valid, it means either:
     // - there is no cached font for the current script yet or,
@@ -523,7 +562,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       if( isCommonScript )
       {
         if( isValidCachedDefaultFont &&
-            ( isDefault || ( currentFontId == previousFontId ) )  )
+            ( isDefault || ( currentFontId == previousFontId ) ) &&
+            !isEmojiScript )
         {
           // At this point the character common for all scripts has no font assigned.
           // If there is a valid previously cached default font for it, use that one.
@@ -551,7 +591,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
           // Emojis are present in many monochrome fonts; prefer color by default.
           if( isValidFont &&
-              ( TextAbstraction::EMOJI == script ) )
+              isEmojiScript )
           {
             const BufferImage bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
 
@@ -611,8 +651,13 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
               // Cache the font.
               if( NULL == defaultFontsPerScript )
               {
-                defaultFontsPerScript = new DefaultFonts();
-                *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
+                defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + script );
+
+                if( NULL == defaultFontsPerScript )
+                {
+                  defaultFontsPerScript = new DefaultFonts();
+                  *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
+                }
               }
               defaultFontsPerScript->mFonts.PushBack( fontId );
             }
@@ -670,6 +715,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // Whether the current character is a new paragraph character.
     isNewParagraphCharacter = TextAbstraction::IsNewParagraph( character );
     previousFontId = currentFontId;
+    isPreviousEmojiScript = isEmojiScript;
   } // end traverse characters.
 
   if( 0u != currentFontRun.characterRun.numberOfCharacters )
