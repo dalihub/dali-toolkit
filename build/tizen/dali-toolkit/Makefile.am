@@ -16,11 +16,12 @@
 
 # Build the Dali Toolkit library
 
-toolkit_images_dir = ../../../dali-toolkit/styles/images-common
-toolkit_sounds_dir = ../../../dali-toolkit/sounds
-toolkit_src_dir    = ../../../dali-toolkit/internal
-public_api_src_dir = ../../../dali-toolkit/public-api
-devel_api_src_dir  = ../../../dali-toolkit/devel-api
+toolkit_images_dir  = ../../../dali-toolkit/styles/images-common
+toolkit_sounds_dir  = ../../../dali-toolkit/sounds
+toolkit_src_dir     = ../../../dali-toolkit/internal
+public_api_src_dir  = ../../../dali-toolkit/public-api
+devel_api_src_dir   = ../../../dali-toolkit/devel-api
+third_party_src_dir = ../../../dali-toolkit/third-party
 
 toolkit_styles_dir = $(STYLE_DIR)
 toolkit_style_images_dir = $(STYLE_DIR)/images
@@ -31,6 +32,7 @@ include ../../../dali-toolkit/styles/images-common/file.list
 include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
 include ../../../dali-toolkit/devel-api/file.list
+include ../../../dali-toolkit/third-party/file.list
 
 vector_based_text_src_dir = ../../../dali-toolkit/internal/text/rendering/vector-based
 include ../../../dali-toolkit/internal/text/rendering/vector-based/file.list
@@ -56,7 +58,8 @@ lib_LTLIBRARIES = libdali-toolkit.la
 libdali_toolkit_la_SOURCES = \
                      $(toolkit_src_files) \
                      $(public_api_src_files) \
-                     $(devel_api_src_files)
+                     $(devel_api_src_files) \
+                     $(third_party_src_files)
 
 dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
 dalistyle_DATA = ${dali_toolkit_style_files}
