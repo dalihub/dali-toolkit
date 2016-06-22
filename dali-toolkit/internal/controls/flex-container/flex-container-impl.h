@@ -26,7 +26,7 @@
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
 extern "C"
 {
-#include "layout.h"
+#include <dali-toolkit/third-party/facebook-flexbox/layout.h>
 }
 
 namespace Dali
