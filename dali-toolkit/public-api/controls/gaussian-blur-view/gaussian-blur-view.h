@@ -298,6 +298,7 @@ public: // Signals
 
 public:
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
@@ -311,6 +312,7 @@ public:
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL GaussianBlurView( Dali::Internal::CustomActor* internal );
+  /// @endcond
 
 };
 

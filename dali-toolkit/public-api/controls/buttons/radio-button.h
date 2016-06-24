@@ -147,6 +147,7 @@ class DALI_IMPORT_API RadioButton: public Button
 
  public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
@@ -162,6 +163,7 @@ class DALI_IMPORT_API RadioButton: public Button
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL RadioButton( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**

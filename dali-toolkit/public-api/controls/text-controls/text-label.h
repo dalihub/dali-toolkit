@@ -317,6 +317,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
@@ -332,6 +333,7 @@ public: // Not intended for application developers
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL TextLabel( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**
