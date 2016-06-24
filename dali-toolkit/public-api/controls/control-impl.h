@@ -248,12 +248,14 @@ public:
   bool IsKeyboardFocusGroup();
 
   /**
+   * @internal
    * @brief Called by the AccessibilityManager to activate the Control.
    * @SINCE_1_0.0
    */
   DALI_INTERNAL void AccessibilityActivate();
 
   /**
+   * @internal
    * @brief Called by the KeyboardFocusManager.
    * @SINCE_1_0.0
    */
@@ -277,6 +279,7 @@ public:
   Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusLostSignal();
 
   /**
+   * @internal
    * @brief Called by the KeyInputFocusManager to emit key event signals.
    *
    * @SINCE_1_0.0

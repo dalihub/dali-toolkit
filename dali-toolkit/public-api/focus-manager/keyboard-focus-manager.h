@@ -288,6 +288,7 @@ public: // Signals
   // Not intended for application developers
 
   /**
+   * @internal
    * @brief Creates a new handle from the implementation.
    *
    * @SINCE_1_0.0

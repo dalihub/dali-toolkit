@@ -145,6 +145,7 @@ public:
 public: // Not intended for application developers
 
   /**
+   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_1.4
@@ -153,6 +154,7 @@ public: // Not intended for application developers
   DALI_INTERNAL Model3dView( Internal::Model3dView& implementation );
 
   /**
+   * @internal
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_1.4

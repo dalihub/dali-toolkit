@@ -412,6 +412,7 @@ public: // Intended for control developers
 public: // Templates for Deriving Classes
 
   /**
+   * @internal
    * @brief Template to allow deriving controls to DownCast handles to deriving handle classes.
    *
    * @tparam     T       The handle class
@@ -443,6 +444,7 @@ public: // Templates for Deriving Classes
   }
 
   /**
+   * @internal
    * @brief Template to allow deriving controls to verify whether the Internal::CustomActor* is actually an
    * implementation of their class.
    *
