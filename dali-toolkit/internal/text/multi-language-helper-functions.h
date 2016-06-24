@@ -39,6 +39,7 @@ namespace Text
  *
  * @param[in] fontDescriptions The font descriptions.
  * @param[out] fontIds The font id for each character.
+ * @param[out] isDefaultFont Whether the font is a default one.
  * @param[in] defaultFontDescription The default font description.
  * @param[in] defaultPointSize The default font size.
  * @param[in] startIndex The character from where the fonts are merged.
@@ -46,6 +47,7 @@ namespace Text
  */
 void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
                             Vector<FontId>& fontIds,
+                            Vector<bool>& isDefaultFont,
                             const TextAbstraction::FontDescription& defaultFontDescription,
                             TextAbstraction::PointSize26Dot6 defaultPointSize,
                             CharacterIndex startIndex,

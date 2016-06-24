@@ -146,6 +146,15 @@ private:
   void UpdateShaderUniforms();
 
 
+  /*
+   * @brief Given a specific shader type, find out which properties are necessary for it.
+   *
+   * @param[in] illuminationType The type of shader we intend to use.
+   * @return A bitmask of the properties we require to be loaded to use the given shader.
+   */
+  int GetShaderProperties( Toolkit::Model3dView::IlluminationType illuminationType );
+
+
   ObjLoader mObjLoader;
 
   //Properties

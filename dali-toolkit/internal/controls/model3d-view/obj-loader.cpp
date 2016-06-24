@@ -19,6 +19,7 @@
 #include "obj-loader.h"
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <string>
 #include <sstream>
 #include <string.h>
@@ -32,6 +33,10 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+  const int MAX_POINT_INDICES = 4;
+}
 using namespace Dali;
 
 ObjLoader::ObjLoader()
@@ -39,8 +44,8 @@ ObjLoader::ObjLoader()
   mSceneLoaded = false;
   mMaterialLoaded = false;
   mHasTexturePoints = false;
-  mHasNormalMap = false;
   mHasDiffuseMap = false;
+  mHasNormalMap = false;
   mHasSpecularMap = false;
   mSceneAABB.Init();
 }
@@ -67,9 +72,6 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
                                       Dali::Vector<Vector3>& normal,
                                       Dali::Vector<Vector3>& tangent)
 {
-  normal.Clear();
-  normal.Resize(vertex.Size());
-
   Dali::Vector<Vector3> tangents;
   tangents.Resize( vertex.Size() );
 
@@ -172,12 +174,16 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
   //we need to recalculate the normals too, because we need just one normal,tangent, bitangent per vertex
   //In the case of a textureless object, we don't need tangents for our shader and so we skip this step
   //TODO: Use a better function to calculate tangents
-
   if( mTangents.Size() == 0 && mHasTexturePoints )
   {
-    mTangents.Resize( mNormals.Size() );
-    mBiTangents.Resize( mNormals.Size() );
+    mNormals.Clear();
+
+    mNormals.Resize( mPoints.Size() );
+    mTangents.Resize( mPoints.Size() );
+    mBiTangents.Resize( mPoints.Size() );
+
     CalculateTangentArray( mPoints, mTextures, mTriangles, mNormals, mTangents );
+
     for ( unsigned int ui = 0 ; ui < mNormals.Size() ; ++ui )
     {
       mBiTangents[ui] = mNormals[ui].Cross(mTangents[ui]);
@@ -275,14 +281,14 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
   }
 }
 
-bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& materialFile )
+bool ObjLoader::LoadObject( char* objBuffer, std::streampos fileSize )
 {
   Vector3 point;
   Vector2 texture;
-  std::string vet[4], name;
-  int ptIdx[4];
-  int nrmIdx[4];
-  int texIdx[4];
+  std::string vet[MAX_POINT_INDICES], name;
+  int ptIdx[MAX_POINT_INDICES];
+  int nrmIdx[MAX_POINT_INDICES];
+  int texIdx[MAX_POINT_INDICES];
   TriIndex triangle,triangle2;
   int pntAcum = 0, texAcum = 0, nrmAcum = 0;
   bool iniObj = false;
@@ -372,7 +378,7 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
       }
 
       int numIndices = 0;
-      while( isline >> vet[numIndices] )
+      while( isline >> vet[numIndices] && numIndices < MAX_POINT_INDICES )
       {
         numIndices++;
       }
@@ -476,9 +482,6 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
     {
       isline >> name;
     }
-    else
-    {
-    }
   }
 
   if ( iniObj )
@@ -490,11 +493,10 @@ bool ObjLoader::Load( char* objBuffer, std::streampos fileSize, std::string& mat
   }
 
   return false;
-
 }
 
-void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::string& texture0Url,
-                              std::string& texture1Url, std::string& texture2Url )
+void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::string& diffuseTextureUrl,
+                              std::string& normalTextureUrl, std::string& glossTextureUrl )
 {
   float fR,fG,fB;
 
@@ -518,11 +520,15 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
     {
       isline >> info;
     }
+    else if ( tag == "Ka" ) //ambient color
+    {
+      isline >> fR >> fG >> fB;
+    }
     else if ( tag == "Kd" ) //diffuse color
     {
       isline >> fR >> fG >> fB;
     }
-    else if ( tag == "Kd" ) //Ambient color
+    else if ( tag == "Ks" ) //specular color
     {
       isline >> fR >> fG >> fB;
     }
@@ -535,19 +541,19 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
     else if ( tag == "map_Kd" )
     {
       isline >> info;
-      texture0Url = info;
+      diffuseTextureUrl = info;
       mHasDiffuseMap = true;
     }
     else if ( tag == "bump" )
     {
       isline >> info;
-      texture1Url = info;
+      normalTextureUrl = info;
       mHasNormalMap = true;
     }
     else if ( tag == "map_Ks" )
     {
       isline >> info;
-      texture2Url = info;
+      glossTextureUrl = info;
       mHasSpecularMap = true;
     }
   }
@@ -555,7 +561,7 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
   mMaterialLoaded = true;
 }
 
-Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illuminationType )
+Geometry ObjLoader::CreateGeometry( int objectProperties )
 {
   Geometry surface = Geometry::New();
 
@@ -575,8 +581,7 @@ Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illum
   surface.AddVertexBuffer( surfaceVertices );
 
   //Some need texture coordinates
-  if( ( (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP ) ||
-        (illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ) ) && mHasTexturePoints && mHasDiffuseMap )
+  if( ( objectProperties & TEXTURE_COORDINATES ) && mHasTexturePoints && mHasDiffuseMap )
   {
     Property::Map textureFormat;
     textureFormat["aTexCoord"] = Property::VECTOR2;
@@ -587,7 +592,7 @@ Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illum
   }
 
   //Some need tangent and bitangent
-  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP && mHasTexturePoints )
+  if( ( objectProperties & TANGENTS ) && ( objectProperties & BINOMIALS ) && mHasTexturePoints )
   {
     Property::Map vertexExtFormat;
     vertexExtFormat["aTangent"] = Property::VECTOR3;
@@ -598,14 +603,11 @@ Geometry ObjLoader::CreateGeometry( Toolkit::Model3dView::IlluminationType illum
     surface.AddVertexBuffer( extraVertices );
   }
 
+  //If indices are required, we set them.
   if ( indices.Size() )
   {
     surface.SetIndexBuffer ( &indices[0], indices.Size() );
   }
-
-  vertices.Clear();
-  verticesExt.Clear();
-  indices.Clear();
 
   return surface;
 }

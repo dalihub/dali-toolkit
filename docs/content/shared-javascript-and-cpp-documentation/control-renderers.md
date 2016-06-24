@@ -14,6 +14,7 @@ DALi provides the following renderers:
  + [Gradient](@ref gradient-renderer)
  + [Image](@ref image-renderers)
  + [Border](@ref border-renderer)
+ + [Mesh](@ref mesh-renderer)
  
 Controls can provide properties that allow users to specify the renderer type.
 Setting renderer properties are done via a property map.
@@ -421,6 +422,42 @@ control.background =
   borderColor : dali.COLOR_BLUE,
   borderSize = 5
 };
+~~~
+
+___________________________________________________________________________________________________
+
+## Mesh Renderer {#mesh-renderer}
+
+Renders a mesh using a .obj file, optionally with textures provided by a mtl file. Scaled to fit the control.
+
+![ ](../assets/img/renderers/mesh-renderer.png)
+![ ](renderers/mesh-renderer.png)
+
+### Properties Supported
+
+**RendererType** "mesh"
+
+| Property Name | Type    | Required           | Description                                                          |
+|---------------|:-------:|:------------------:|----------------------------------------------------------------------|
+| objectUrl     | STRING  | Yes                | The location of the .obj file.                                       |
+| materialUrl   | STRING  | No                 | The location of the .mtl file. Leave blank for a textureless object. |
+| texturesPath  | STRING  | If using material  | Path to the directory textures (including gloss and normal) are stored in.   |
+| shaderType    | STRING  | No                 | Sets the type of shader to be used with the mesh. Note that if anything the shader requires is missing, it will use a simpler one that it can handle with what has been supplied.\n Possible values: "textureless", "diffuseTexture", "allTextures".  |
+
+### Usage
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+Dali::Property::Map map;
+
+map[ "rendererType" ] = "mesh";
+map[ "objectUrl"    ] = "home/models/Dino.obj";
+map[ "materialUrl"  ] = "home/models/Dino.mtl";
+map[ "texturesPath" ] = "home/images/";
+
+control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
 
 @class _Guide_Control_Renderers

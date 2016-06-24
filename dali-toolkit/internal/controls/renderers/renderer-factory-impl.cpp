@@ -32,6 +32,7 @@
 #include <dali-toolkit/internal/controls/renderers/npatch/npatch-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/mesh/mesh-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 #include <dali-toolkit/internal/controls/renderers/image-atlas-manager.h>
@@ -82,7 +83,7 @@ RendererFactory::RendererType RendererFactory::GetRendererType( const Property::
   std::string typeValue ;
   if( type && type->Get( typeValue ))
   {
-    if( typeValue ==  COLOR_RENDERER )
+    if( typeValue == COLOR_RENDERER )
     {
       rendererType = COLOR;
     }
@@ -90,13 +91,17 @@ RendererFactory::RendererType RendererFactory::GetRendererType( const Property::
     {
       rendererType = BORDER;
     }
-    else if( typeValue ==  GRADIENT_RENDERER )
+    else if( typeValue == GRADIENT_RENDERER )
     {
       rendererType = GRADIENT;
     }
-    else if( typeValue ==  IMAGE_RENDERER )
+    else if( typeValue == IMAGE_RENDERER )
     {
       rendererType = IMAGE;
+    }
+    else if( typeValue == MESH_RENDERER )
+    {
+      rendererType = MESH;
     }
   }
 
@@ -175,6 +180,11 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
     {
       CreateAtlasManager();
       rendererPtr = new SvgRenderer( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+      break;
+    }
+    case MESH:
+    {
+      rendererPtr = new MeshRenderer( *( mFactoryCache.Get() ) );
       break;
     }
     case UNDEFINED:
@@ -444,12 +454,13 @@ void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& 
 
     //If there's no renderer type specified or if there hasn't been a renderer type change then we can reuse the renderer
     if( type == UNDEFINED ||
-        ( type == IMAGE    && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
-        ( type == N_PATCH  && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
-        ( type == COLOR    && typeid( controlRenderer ) == typeid( ColorRenderer ) )||
-        ( type == GRADIENT && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
-        ( type == BORDER   && typeid( controlRenderer ) == typeid( BorderRenderer ) ) ||
-        ( type == SVG      && typeid( controlRenderer ) == typeid( SvgRenderer ) ) )
+        ( type == IMAGE     && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
+        ( type == N_PATCH   && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
+        ( type == COLOR     && typeid( controlRenderer ) == typeid( ColorRenderer ) ) ||
+        ( type == GRADIENT  && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
+        ( type == BORDER    && typeid( controlRenderer ) == typeid( BorderRenderer ) ) ||
+        ( type == SVG       && typeid( controlRenderer ) == typeid( SvgRenderer ) ) ||
+        ( type == MESH      && typeid( controlRenderer ) == typeid( MeshRenderer ) ) )
     {
       controlRenderer.Initialize( actor, propertyMap );
       return;
@@ -485,4 +496,3 @@ void RendererFactory::CreateAtlasManager()
 } // namespace Toolkit
 
 } // namespace Dali
-

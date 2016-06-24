@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.1.39
+Version:    1.1.40
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -36,6 +36,12 @@ BuildRequires:  dali-adaptor-devel
 %if "%{tizen_profile_name}" == "mobile"
   %define dali_toolkit_profile MOBILE
 %endif
+
+%if 0%{?enable_coverage}
+CXXFLAGS+=" -fprofile-arcs -ftest-coverage --coverage "
+LDFLAGS+=" -fprofile-arcs -ftest-coverage --coverage -lgcov "
+%endif
+
 
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
@@ -155,4 +161,3 @@ exit 0
 %defattr(-,root,root,-)
 %{dev_include_path}/%{name}/*
 %{_libdir}/pkgconfig/*.pc
-

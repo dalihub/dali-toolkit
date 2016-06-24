@@ -191,7 +191,7 @@ public:
   /**
    * @brief Retrieve any text previously set.
    *
-   * @return A string of UTF-8 characters.
+   * @param[out] text A string of UTF-8 characters.
    */
   void GetText( std::string& text ) const;
 
@@ -210,13 +210,6 @@ public:
   bool RemoveText( int cursorOffset,
                    int numberOfCharacters,
                    UpdateInputStyleType type  );
-
-  /**
-   * @brief Retrieve the current cursor position.
-   *
-   * @return The cursor position.
-   */
-  unsigned int GetLogicalCursorPosition() const;
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -961,11 +954,6 @@ private:
    * @return True if a character was deleted.
    */
   bool BackspaceKeyEvent();
-
-  /**
-   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
-   */
-  void NotifyImfManager();
 
   /**
    * @brief Helper to clear font-specific data.

@@ -112,7 +112,7 @@ public:
    * else the renderer would be a handle to a newly created internal color renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
+   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
    * @param[in] color The color to be rendered.
    */
   void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color );
@@ -151,7 +151,7 @@ public:
    * else the renderer would be a handle to a newly created internal image renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
+   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
    * @param[in] image The Image to be rendered.
    */
   void ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image );
@@ -173,13 +173,12 @@ public:
    * else the renderer would be a handle to a newly created internal image renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
+   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
    * @param[in] url The URL to the resource to be rendered.
    * @param[in] size The width and height to fit the loaded image to.
    */
   void ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url,
                       ImageDimensions size = ImageDimensions() );
-
 
   /**
    * @brief Request the current control renderer from the property map, merging the property map with the renderer
@@ -188,7 +187,7 @@ public:
    * else the renderer would be a handle to a newly created internal renderer.
    *
    * @param[in] renderer The ControlRenderer to reset
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
+   * @param[in] actor The Actor the renderer is applied to, empty if the renderer has not been applied to any Actor
    * @param[in] propertyMap The map contains the properties required by the control renderer
    *            Depends on the content of the map, different kind of renderer would be returned.
    */

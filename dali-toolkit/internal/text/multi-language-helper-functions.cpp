@@ -32,6 +32,7 @@ namespace Text
 
 void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
                             Vector<FontId>& fontIds,
+                            Vector<bool>& isDefaultFont,
                             const TextAbstraction::FontDescription& defaultFontDescription,
                             TextAbstraction::PointSize26Dot6 defaultPointSize,
                             CharacterIndex startIndex,
@@ -42,6 +43,9 @@ void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
 
   // Pointer to the font id buffer.
   FontId* fontIdsBuffer = fontIds.Begin();
+
+  // Pointer to the 'is default' font buffer.
+  bool* isDefaultFontBuffer = isDefaultFont.Begin();
 
   // Used to temporarily store the style per character.
   TextAbstraction::FontDescription fontDescription;
@@ -57,7 +61,7 @@ void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
   const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
   for( CharacterIndex index = startIndex; index < lastCharacterPlusOne; ++index )
   {
-    bool defaultFont = true;
+    bool& defaultFont = *(isDefaultFontBuffer + index - startIndex );
 
     Length runIndex = 0u;
 

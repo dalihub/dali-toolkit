@@ -30,6 +30,9 @@ namespace
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
+const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
+const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
 }
 
 void dali_control_renderer_startup(void)
@@ -622,6 +625,49 @@ int UtcDaliControlRendererGetPropertyMap7(void)
   value = resultMap.Find( "url",  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
+
+  END_TEST;
+}
+
+//Mesh renderer
+int UtcDaliControlRendererGetPropertyMap8(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliControlRendererGetPropertyMap8: MeshRenderer" );
+
+  //Request MeshRenderer using a property map.
+  RendererFactory factory = RendererFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "mesh" );
+  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
+  propertyMap.Insert( "texturesPath", TEST_RESOURCE_LOCATION );
+  propertyMap.Insert( "shaderType", "textureless" );
+  ControlRenderer meshRenderer = factory.GetControlRenderer( propertyMap );
+
+  Property::Map resultMap;
+  meshRenderer.CreatePropertyMap( resultMap );
+
+  //Check values in the result map are identical to the initial map's values.
+  Property::Value* value = resultMap.Find( "rendererType", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == "mesh" );
+
+  value = resultMap.Find( "objectUrl", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_OBJ_FILE_NAME );
+
+  value = resultMap.Find( "materialUrl", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_MTL_FILE_NAME );
+
+  value = resultMap.Find( "texturesPath", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_RESOURCE_LOCATION );
+
+  value = resultMap.Find( "shaderType", Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == "textureless" );
 
   END_TEST;
 }

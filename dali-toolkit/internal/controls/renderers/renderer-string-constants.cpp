@@ -32,9 +32,17 @@ const char * const COLOR_RENDERER("color");
 const char * const BORDER_RENDERER("border");
 const char * const GRADIENT_RENDERER("gradient");
 const char * const IMAGE_RENDERER("image");
+const char * const MESH_RENDERER("mesh");
 
 const char * const IMAGE_URL_NAME("url");
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
+const char * const COLOR( "color" );
+
+//Mesh properties
+const char * const OBJECT_URL( "objectUrl" );
+const char * const MATERIAL_URL( "materialUrl" );
+const char * const TEXTURES_PATH( "texturesPath" );
+const char * const SHADER_TYPE( "shaderType" );
 
 } // namespace Internal
 

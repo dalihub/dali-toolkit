@@ -28,8 +28,6 @@ namespace Dali
 
 namespace
 {
-const char * const TEXTURE_UNIFORM_NAME( "sTexture" );
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n

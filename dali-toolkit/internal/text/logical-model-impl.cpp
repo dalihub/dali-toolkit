@@ -53,9 +53,10 @@ Script LogicalModel::GetScript( CharacterIndex characterIndex ) const
 {
   // If this operation is too slow, consider a binary search.
 
+  const ScriptRun* const scriptRunBuffer = mScriptRuns.Begin();
   for( Length index = 0u, length = mScriptRuns.Count(); index < length; ++index )
   {
-    const ScriptRun* const scriptRun = mScriptRuns.Begin() + index;
+    const ScriptRun* const scriptRun = scriptRunBuffer + index;
 
     if( ( scriptRun->characterRun.characterIndex <= characterIndex ) &&
         ( characterIndex < scriptRun->characterRun.characterIndex + scriptRun->characterRun.numberOfCharacters ) )
