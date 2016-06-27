@@ -2647,7 +2647,6 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
         mImpl->mEventData->mScrollAfterDelete = true;
 
         requestRelayout = true;
-        retrieveCursor = true;
       }
       break;
     }
