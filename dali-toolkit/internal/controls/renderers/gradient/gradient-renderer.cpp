@@ -460,13 +460,16 @@ void GradientRenderer::GetStopOffsets(const Property::Value* value, Vector<float
       case Property::ARRAY:
       {
         Property::Array* offsetArray = value->GetArray();
-        unsigned int numStop = offsetArray->Count();
-        float offset;
-        for( unsigned int i=0; i<numStop; i++ )
+        if( offsetArray )
         {
-          if( offsetArray->GetElementAt(i).Get(offset) )
+          unsigned int numStop = offsetArray->Count();
+          float offset;
+          for( unsigned int i=0; i<numStop; i++ )
           {
-            stopOffsets.PushBack( offset );
+            if( offsetArray->GetElementAt(i).Get(offset) )
+            {
+              stopOffsets.PushBack( offset );
+            }
           }
         }
         break;
