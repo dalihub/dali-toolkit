@@ -223,7 +223,7 @@ void ImageAtlas::UploadBrokenImage( const Rect<SizeType>& area )
   {
     SizeType size = area.width * area.height * Pixel::GetBytesPerPixel( mPixelFormat );
     PixelBuffer* buffer = new PixelBuffer [size];
-    PixelData background = PixelData::New( buffer, area.width, area.height, mPixelFormat, PixelData::DELETE_ARRAY );
+    PixelData background = PixelData::New( buffer, size, area.width, area.height, mPixelFormat, PixelData::DELETE_ARRAY );
     for( SizeType idx = 0; idx < size; idx++ )
     {
       buffer[idx] = 0x00;

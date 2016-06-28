@@ -47,13 +47,14 @@ void RasterizingTask::Rasterize( NSVGrasterizer* rasterizer )
     float scaleY =  static_cast<float>( mHeight ) /  mParsedSvg->height;
     float scale = scaleX < scaleY ? scaleX : scaleY;
     unsigned int bufferStride = mWidth*Pixel::GetBytesPerPixel( Pixel::RGBA8888 );
+    unsigned int bufferSize = bufferStride * mHeight;
 
-    unsigned char* buffer = new unsigned char [bufferStride*mHeight];
+    unsigned char* buffer = new unsigned char [bufferSize];
     nsvgRasterize(rasterizer, mParsedSvg, 0.f,0.f,scale,
         buffer, mWidth, mHeight,
         bufferStride );
 
-    mPixelData = Dali::PixelData::New( buffer, mWidth, mHeight, Pixel::RGBA8888, Dali::PixelData::DELETE_ARRAY );
+    mPixelData = Dali::PixelData::New( buffer, bufferSize, mWidth, mHeight, Pixel::RGBA8888, Dali::PixelData::DELETE_ARRAY );
   }
 }
 
