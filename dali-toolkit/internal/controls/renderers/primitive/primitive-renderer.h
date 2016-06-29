@@ -70,7 +70,7 @@ namespace Internal
  *
  * | %Property Name    | Type        | Shapes Affected                          |
  * |-------------------|-------------|------------------------------------------|
- * | color             | VECTOR4     | all                                      |
+ * | shapeColor        | VECTOR4     | all                                      |
  * | slices            | INTEGER     | sphere, cone, conical frustrum, cylinder |
  * | stacks            | INTEGER     | sphere                                   |
  * | scaleTopRadius    | FLOAT       | conical frustrum                         |

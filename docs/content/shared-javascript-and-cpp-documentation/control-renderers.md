@@ -438,12 +438,14 @@ Renders a mesh using a .obj file, optionally with textures provided by a mtl fil
 
 **RendererType** "MESH"
 
-| Property Name                                | Type    | Required           | Description                                                                    |
-|----------------------------------------------|:-------:|:------------------:|--------------------------------------------------------------------------------|
-| objectUrl                                    | STRING  | Yes                | The location of the ".obj" file.                                               |
-| materialUrl                                  | STRING  | No                 | The location of the ".mtl" file. Leave blank for a textureless object.         |
-| texturesPath                                 | STRING  | If using material  | Path to the directory the textures (including gloss and normal) are stored in. |
-| [shaderType](@ref mesh-renderer-shader-type) | STRING  | No                 | Sets the type of shader to be used with the mesh.                              |
+| Property Name                                | Type    | Required           | Description                                                                                |
+|----------------------------------------------|:-------:|:------------------:|--------------------------------------------------------------------------------------------|
+| objectUrl                                    | STRING  | Yes                | The location of the ".obj" file.                                                           |
+| materialUrl                                  | STRING  | No                 | The location of the ".mtl" file. Leave blank for a textureless object.                     |
+| texturesPath                                 | STRING  | If using material  | Path to the directory the textures (including gloss and normal) are stored in.             |
+| [shaderType](@ref mesh-renderer-shader-type) | STRING  | No                 | Sets the type of shader to be used with the mesh.                                          |
+| useMipmapping                                | BOOLEAN | No                 | Flag for whether to use mipmaps for textures or not. Default true.                         |
+| useSoftNormals                               | BOOLEAN | No                 | Flag for whether to average normals at each point to smooth textures or not. Default true. |
 
 ### Shader Type {#mesh-renderer-shader-type}
 
@@ -489,7 +491,7 @@ Renders a simple 3D shape, such as a cube or sphere. Scaled to fit the control.
 | Property Name                         | Type    | Description                                                                     | Default Value        | Range                          |
 |---------------------------------------|:-------:|---------------------------------------------------------------------------------|:--------------------:|:------------------------------:|
 | [shape](@ref shape-details)           | STRING  | The specific shape to render.                                                   | "SPHERE"             | [See list](@ref shape-details) |
-| color                                 | VECTOR4 | The color of the shape.                                                         | (0.5, 0.5, 0.5, 1.0) | 0.0 - 1.0 for each             |
+| shapeColor                            | VECTOR4 | The color of the shape.                                                         | (0.5, 0.5, 0.5, 1.0) | 0.0 - 1.0 for each             |
 | [slices](@ref slices-details)         | INT     | The number of slices as you go around the shape.                                | 128                  | 1 - 255                        |
 | [stacks](@ref stacks-details)         | INT     | The number of stacks as you go down the shape.                                  | 128                  | 1 - 255                        |
 | scaleTopRadius                        | FLOAT   | The scale of the radius of the top circle of a conical frustrum.                | 1.0                  | ≥ 0.0                          |
@@ -562,7 +564,7 @@ Dali::Property::Map map;
 
 map[ "rendererType" ] = "PRIMITIVE";
 map[ "shape"        ] = "SPHERE";
-map[ "color"        ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ "shapeColor"   ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -577,7 +579,7 @@ Dali::Property::Map map;
 
 map[ "rendererType"      ] = "PRIMITIVE";
 map[ "shape"             ] = "CONICAL_FRUSTRUM";
-map[ "color"             ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ "shapeColor"        ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
 map[ "scaleTopRadius"    ] = 1.0f;
 map[ "scaleBottomRadius" ] = 1.5f;
 map[ "scaleHeight"       ] = 3.0f;
@@ -595,7 +597,7 @@ Dali::Property::Map map;
 
 map[ "rendererType"    ] = "PRIMITIVE";
 map[ "shape"           ] = "BEVELLED_CUBE";
-map[ "color"           ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ "shapeColor"      ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
 map[ "bevelPercentage" ] = 0.4f;
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );

@@ -699,7 +699,7 @@ int UtcDaliControlRendererGetPropertyMap9(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "CUBE" );
-  propertyMap.Insert( "color", color );
+  propertyMap.Insert( "shapeColor", color );
   propertyMap.Insert( "slices", 10 );
   propertyMap.Insert( "stacks", 20 );
   propertyMap.Insert( "scaleTopRadius", 30.0f );
@@ -724,7 +724,7 @@ int UtcDaliControlRendererGetPropertyMap9(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<std::string>(), "CUBE", TEST_LOCATION );
 
-  value = resultMap.Find( "color", Property::VECTOR4 );
+  value = resultMap.Find( "shapeColor", Property::VECTOR4 );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<Vector4>() == color );
   DALI_TEST_EQUALS( value->Get<Vector4>(), color, Math::MACHINE_EPSILON_100, TEST_LOCATION );

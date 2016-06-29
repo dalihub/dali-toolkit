@@ -434,7 +434,7 @@ void Model3dView::OnStageConnection( int depth )
 
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ) );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ), true );
 
     CreateMaterial();
     LoadTextures();
@@ -529,7 +529,7 @@ void Model3dView::CreateGeometry()
 {
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ) );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ), true );
 
     if( mRenderer )
     {

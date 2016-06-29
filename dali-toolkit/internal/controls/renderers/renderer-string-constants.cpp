@@ -46,10 +46,11 @@ const char * const MATERIAL_URL( "materialUrl" );
 const char * const TEXTURES_PATH( "texturesPath" );
 const char * const SHADER_TYPE( "shaderType" );
 const char * const USE_MIPMAPPING( "useMipmapping" );
+const char * const USE_SOFT_NORMALS( "useSoftNormals" );
 
 //Primitive shape properties
 const char * const PRIMITIVE_SHAPE( "shape" );
-const char * const SHAPE_COLOR( "color" );
+const char * const SHAPE_COLOR( "shapeColor" );
 const char * const SLICES( "slices" );
 const char * const STACKS( "stacks" );
 const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );

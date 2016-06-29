@@ -40,12 +40,14 @@ namespace Internal
  *
  * The following Property::Map keys are required to create a MeshRender
  *
- * | %Property Name  | Type        | Representing                            |
- * |-----------------|-------------|-----------------------------------------|
- * | objectUrl       | STRING      | A URL to the .obj file                  |
- * | materialUrl     | STRING      | A URL to the .mtl file                  |
- * | texturesPath    | STRING      | A URL of the path to the texture images |
- * | shaderType      | STRING      | An enum of shader types                 |
+ * | %Property Name  | Type        | Representing                                                          |
+ * |-----------------|-------------|-----------------------------------------------------------------------|
+ * | objectUrl       | STRING      | A URL to the .obj file                                                |
+ * | materialUrl     | STRING      | A URL to the .mtl file                                                |
+ * | texturesPath    | STRING      | A URL of the path to the texture images                               |
+ * | shaderType      | STRING      | An enum of shader types                                               |
+ * | useMipmapping   | BOOLEAN     | If true, use mipmaps for textures. Default true.                      |
+ * | useSoftNormals  | BOOLEAN     | If true, average normals at points for smooth textures. Default true. |
  */
 class MeshRenderer: public ControlRenderer
 {
@@ -195,6 +197,7 @@ private:
 
   bool mUseTexture;
   bool mUseMipmapping;
+  bool mUseSoftNormals;
 };
 
 } // namespace Internal

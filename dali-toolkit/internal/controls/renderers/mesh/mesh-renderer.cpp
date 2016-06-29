@@ -276,7 +276,8 @@ MeshRenderer::MeshRenderer( RendererFactoryCache& factoryCache )
 : ControlRenderer( factoryCache ),
   mShaderType( ALL_TEXTURES ),
   mUseTexture( true ),
-  mUseMipmapping( true )
+  mUseMipmapping( true ),
+  mUseSoftNormals( true )
 {
 }
 
@@ -337,6 +338,12 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
       }
     }
   }
+
+  Property::Value* useSoftNormals = propertyMap.Find( USE_SOFT_NORMALS );
+  if( useSoftNormals )
+  {
+    useSoftNormals->Get( mUseSoftNormals );
+  }
 }
 
 void MeshRenderer::SetSize( const Vector2& size )
@@ -393,6 +400,9 @@ void MeshRenderer::DoCreatePropertyMap( Property::Map& map ) const
     }
   }
   map.Insert( SHADER_TYPE, shaderTypeString );
+
+  map.Insert( USE_MIPMAPPING, mUseMipmapping );
+  map.Insert( USE_SOFT_NORMALS, mUseSoftNormals );
 }
 
 void MeshRenderer::InitializeRenderer()
@@ -500,7 +510,7 @@ bool MeshRenderer::CreateGeometry()
   }
 
   //Create geometry with attributes required by shader.
-  mGeometry = mObjLoader.CreateGeometry( objectProperties );
+  mGeometry = mObjLoader.CreateGeometry( objectProperties, mUseSoftNormals );
 
   if( mGeometry )
   {

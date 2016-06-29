@@ -36,6 +36,7 @@ const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.png";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
+const char* TEST_SIMPLE_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube-Points-Only.obj";
 const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simple.mtl";
 
 Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
@@ -1169,6 +1170,63 @@ int UtcDaliRendererFactoryGetMeshRenderer4(void)
   END_TEST;
 }
 
+//Test if mesh renderer loads correctly when supplied an object file without face normals or texture points.
+//Note that this notably tests object loader functionality.
+int UtcDaliRendererFactoryGetMeshRenderer5(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer5:  Request mesh renderer with normal-less object file." );
+
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "MESH" );
+  propertyMap.Insert( "objectUrl", TEST_SIMPLE_OBJ_FILE_NAME );
+  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
+  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
+  DALI_TEST_CHECK( controlRenderer );
+
+  //Add renderer to an actor on stage.
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
+  controlRenderer.SetOnStage( actor );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  //Attempt to render to queue resource load requests.
+  application.SendNotification();
+  application.Render( 0 );
+
+  //Tell the platform abstraction that the required resources have been loaded.
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  platform.SetAllResourceRequestsAsLoaded();
+
+  //Render again to upload the now-loaded textures.
+  application.SendNotification();
+  application.Render( 0 );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  Matrix testScaleMatrix;
+  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
+  Matrix actualScaleMatrix;
+
+  //Test to see if the object has been successfully loaded.
+  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
+  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
 //Test if mesh renderer handles the case of lacking an object file.
 int UtcDaliRendererFactoryGetMeshRendererN1(void)
 {
@@ -1392,7 +1450,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer2(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "CUBE" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( "slices", 10 );
   propertyMap.Insert( "stacks", 20 );
   propertyMap.Insert( "scaleTopRadius", 30.0f );
@@ -1419,7 +1477,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer3(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "SPHERE" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( "slices", 10 );
   propertyMap.Insert( "stacks", 20 );
 
@@ -1441,7 +1499,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer4(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "CONICAL_FRUSTRUM" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( "slices", 10 );
   propertyMap.Insert( "scaleTopRadius", 30.0f );
   propertyMap.Insert( "scaleBottomRadius", 40.0f );
@@ -1465,7 +1523,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer5(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "BEVELLED_CUBE" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( "bevelPercentage", 0.7f );
 
   //Test to see if shape loads correctly.
@@ -1486,7 +1544,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer6(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "OCTAHEDRON" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveRendererWithProperties( propertyMap, application );
@@ -1506,7 +1564,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer7(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "CONE" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( "slices", 10 );
   propertyMap.Insert( "scaleTopRadius", 30.0f );
   propertyMap.Insert( "scaleHeight", 50.0f );
@@ -1529,7 +1587,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer8(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "SPHERE" );
-  propertyMap.Insert( "color", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( "uLightPosition", Vector3( 0.0, 1.0, 2.0 ) );
 
   //Test to see if shape loads correctly.
