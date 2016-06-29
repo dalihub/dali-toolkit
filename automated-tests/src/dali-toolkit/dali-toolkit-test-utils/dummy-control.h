@@ -103,6 +103,9 @@ private: // From Internal::Control
 
   virtual void OnInitialize();
   virtual bool OnAccessibilityActivated();
+  virtual bool OnAccessibilityTouch( const TouchEvent& touchEvent );
+  virtual bool OnAccessibilityValueChange( bool isIncrease );
+
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
   virtual void OnPinch(const PinchGesture& pinch);
   virtual void OnPan(const PanGesture& pan);
@@ -128,6 +131,8 @@ public:
 
   bool initializeCalled;
   bool activatedCalled;
+  bool onAccTouchedCalled;
+  bool onAccValueChangeCalled;
   bool themeChangeCalled;
   bool fontChangeCalled;
   bool pinchCalled;

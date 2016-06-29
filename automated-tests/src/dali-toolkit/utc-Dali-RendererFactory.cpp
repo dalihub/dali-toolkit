@@ -31,7 +31,7 @@ namespace
 typedef NinePatchImage::StretchRanges StretchRanges;
 
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
-const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
+const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.png";
 
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 
@@ -163,7 +163,8 @@ Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
 
   tet_infoline("Getting resource");
   Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+  //platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+  platform.SetSynchronouslyLoadedResource( resourcePtr);
 
   return resourcePtr;
 }

@@ -50,6 +50,21 @@ static bool ButtonCallback( Button button )
   return false;
 }
 
+struct CallbackFunctor
+{
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag( callbackFlag )
+  {
+  }
+
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
+
+
 Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
 {
   BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
@@ -437,8 +452,13 @@ int UtcDaliButtonPressedSignalP(void)
   application.Render();
 
   // connect to its touch signal
+  ConnectionTracker* testTracker = new ConnectionTracker();
   button.PressedSignal().Connect( &ButtonCallback );
   button.ReleasedSignal().Connect( &ButtonCallback );
+  bool pressedSignal = false;
+  bool releasedSignal = false;
+  button.ConnectSignal( testTracker, "pressed",   CallbackFunctor(&pressedSignal) );
+  button.ConnectSignal( testTracker, "released",  CallbackFunctor(&releasedSignal) );
 
   Dali::Integration::TouchEvent event;
 
@@ -450,6 +470,7 @@ int UtcDaliButtonPressedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( pressedSignal );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
@@ -457,15 +478,19 @@ int UtcDaliButtonPressedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( releasedSignal );
 
   // Test2. Touch point down and up outside the button.
 
+  pressedSignal = false;
+  releasedSignal = false;
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !pressedSignal );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
@@ -473,6 +498,7 @@ int UtcDaliButtonPressedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !releasedSignal );
 
   // Test3. Touch point down inside and up outside the button.
 
@@ -534,6 +560,9 @@ int UtcDaliButtonClickedSignalP(void)
 
   // connect to its touch signal
   button.ClickedSignal().Connect( &ButtonCallback );
+  bool clickedSignal = false;
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  button.ConnectSignal( testTracker, "clicked",   CallbackFunctor(&clickedSignal) );
 
   Dali::Integration::TouchEvent event;
 
@@ -549,10 +578,12 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( clickedSignal );
 
   // Test2. Touch point down and up outside the button.
 
   gIsCalledButtonCallback = false;
+  clickedSignal = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
@@ -562,10 +593,12 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !clickedSignal );
 
   // Test3. Touch point down inside and up outside the button.
 
   gIsCalledButtonCallback = false;
+  clickedSignal = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownInside() );
   application.ProcessEvent( event );
@@ -579,10 +612,12 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !clickedSignal );
 
   // Test4. Touch point down outside and up inside the button.
 
   gIsCalledButtonCallback = false;
+  clickedSignal = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
@@ -596,6 +631,7 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !clickedSignal );
   END_TEST;
 }
 
@@ -614,16 +650,23 @@ int UtcDaliButtonStateChangedSignalP(void)
 
   // connect to its signal
   button.StateChangedSignal().Connect( &ButtonCallback );
+  bool stateChangedSignal = false;
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  button.ConnectSignal( testTracker, "stateChanged",   CallbackFunctor(&stateChangedSignal) );
 
   gIsCalledButtonCallback = false;
   button.SetSelected( true );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( stateChangedSignal );
 
   gIsCalledButtonCallback = false;
+  stateChangedSignal = false;
+
   button.SetSelected( false );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( stateChangedSignal );
   END_TEST;
 }
 
