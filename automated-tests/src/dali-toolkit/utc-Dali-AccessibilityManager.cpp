@@ -18,12 +18,11 @@
 #include <iostream>
 #include <stdlib.h>
 
-// Need to override adaptor classes for toolkit test harness, so include
-// test harness headers before dali headers.
+#include <dali-toolkit/dali-toolkit.h>
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-accessibility-adaptor.h>
-
-#include <dali-toolkit/dali-toolkit.h>
+#include <dummy-control.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -223,6 +222,10 @@ int UtcDaliAccessibilityManagerSetAndGetFocusOrder(void)
   // make sure the change of focus order doesn't affect the actor's description
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   // Set the focus order and description for the third actor
   Actor third = Actor::New();
   manager.SetFocusOrder(third, 1);
@@ -309,6 +312,10 @@ int UtcDaliAccessibilityManagerGetActorByFocusOrder(void)
   DALI_TEST_CHECK(manager.GetActorByFocusOrder(2) == second);
   DALI_TEST_CHECK(manager.GetActorByFocusOrder(3) == third);
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   // Change the focus order of the third actor to 1
   manager.SetFocusOrder(third, 1);
 
@@ -330,6 +337,10 @@ int UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor(void)
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
@@ -422,6 +433,10 @@ int UtcDaliAccessibilityManagerGetCurrentFocusGroup(void)
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   // Create an actor with two child actors and add it to the stage
   Actor parent = Actor::New();
   Actor firstChild = Actor::New();
@@ -489,6 +504,10 @@ int UtcDaliAccessibilityManagerGetCurrentFocusOrder(void)
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   Actor first = Actor::New();
   Stage::GetCurrent().Add(first);
 
@@ -545,6 +564,10 @@ int UtcDaliAccessibilityManagerMoveFocusForward(void)
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   Actor first = Actor::New();
   Stage::GetCurrent().Add(first);
@@ -659,6 +682,10 @@ int UtcDaliAccessibilityManagerMoveFocusBackward(void)
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   Actor first = Actor::New();
   Stage::GetCurrent().Add(first);
 
@@ -772,6 +799,10 @@ int UtcDaliAccessibilityManagerClearFocus(void)
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   manager.SetFocusOrder(first, 1);
@@ -849,6 +880,10 @@ int UtcDaliAccessibilityManagerFocusGroup(void)
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   // Create an actor with two child actors and add it to the stage
   Actor parent = Actor::New();
@@ -1011,6 +1046,10 @@ int UtcDaliAccessibilityManagerSignalFocusOvershot(void)
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   bool signalVerified = false;
   FocusOvershotCallback callback(signalVerified);
@@ -1276,6 +1315,10 @@ int UtcDaliAccessibilityManagerActionReadSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1296,6 +1339,10 @@ int UtcDaliAccessibilityManagerActionReadSignalN(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1311,6 +1358,10 @@ int UtcDaliAccessibilityManagerActionOverSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionOverSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1332,6 +1383,10 @@ int UtcDaliAccessibilityManagerActionOverSignalN(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionOverSignalN" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1421,12 +1476,21 @@ int UtcDaliAccessibilityManagerActionUpSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accessibilityAdaptor, true );
+  accessibilityAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
   manager.ActionUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 
-  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  DummyControl dummyControl = DummyControl::New(true);
+  dummyControl.SetSize(480, 800);
+  manager.SetFocusOrder( dummyControl, 1 );
+  Stage::GetCurrent().Add( dummyControl );
+  manager.SetCurrentFocusActor( dummyControl );
+
   accessibilityAdaptor.HandleActionUpEvent();
 
   DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
@@ -1457,12 +1521,21 @@ int UtcDaliAccessibilityManagerActionDownSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accessibilityAdaptor, true );
+  accessibilityAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
   manager.ActionDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 
-  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  DummyControl dummyControl = DummyControl::New(true);
+  dummyControl.SetSize(480, 800);
+  manager.SetFocusOrder( dummyControl, 1 );
+  Stage::GetCurrent().Add( dummyControl );
+  manager.SetCurrentFocusActor( dummyControl );
+
   accessibilityAdaptor.HandleActionDownEvent();
 
   DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
@@ -1492,6 +1565,10 @@ int UtcDaliAccessibilityManagerActionClearFocusSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionClearFocusSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1529,6 +1606,10 @@ int UtcDaliAccessibilityManagerActionBackSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1564,6 +1645,10 @@ int UtcDaliAccessibilityManagerActionScrollUpSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionScrollUpSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1601,6 +1686,10 @@ int UtcDaliAccessibilityManagerActionScrollDownSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1636,6 +1725,10 @@ int UtcDaliAccessibilityManagerActionPageLeftSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionPageLeftSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1673,6 +1766,10 @@ int UtcDaliAccessibilityManagerActionPageRightSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1709,6 +1806,10 @@ int UtcDaliAccessibilityManagerActionPageUpSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1729,6 +1830,10 @@ int UtcDaliAccessibilityManagerActionPageUpSignalN(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1744,6 +1849,10 @@ int UtcDaliAccessibilityManagerActionPageDownSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionPageDownSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1781,6 +1890,10 @@ int UtcDaliAccessibilityManagerActionMoveToFirstSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1801,6 +1914,10 @@ int UtcDaliAccessibilityManagerActionMoveToFirstSignalN(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1816,6 +1933,10 @@ int UtcDaliAccessibilityManagerActionMoveToLastSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionMoveToLastSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1853,6 +1974,10 @@ int UtcDaliAccessibilityManagerActionReadFromTopSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1888,6 +2013,10 @@ int UtcDaliAccessibilityManagerActionReadFromNextSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionReadFromNextSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -1925,6 +2054,10 @@ int UtcDaliAccessibilityManagerActionZoomSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1961,6 +2094,10 @@ int UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
@@ -1996,6 +2133,10 @@ int UtcDaliAccessibilityManagerActionReadPauseResumeSignalP(void)
   tet_infoline( " UtcDaliAccessibilityManagerActionReadPauseResumeSignalP" );
 
   AccessibilityManagerSignalHandler callback;
+
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
 
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
@@ -2141,3 +2282,72 @@ int UtcDaliAccessibilityManagerActionScrollSignalN(void)
 
   END_TEST;
 }
+
+int UtcDaliAccessibilityManagerActionTouch(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionTouch" );
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+
+  DummyControl dummyControl = DummyControl::New(true);
+  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummyControl.GetImplementation());
+  dummyControl.SetSize(480, 800);
+  manager.SetFocusOrder( dummyControl, 1 );
+  Stage::GetCurrent().Add( dummyControl );
+  manager.SetCurrentFocusActor( dummyControl );
+
+  TouchPoint point( 0, TouchPoint::Started, 100.0f, 200.0f );
+  accessibilityAdaptor.HandleActionTouchEvent( point, 0u );
+
+  DALI_TEST_CHECK( dummyImpl.onAccTouchedCalled );
+
+  END_TEST;
+}
+
+
+int UtcDaliAccessibilityManagerHandlePanGesture(void)
+{
+  // Pan gesture sent from adaptor to manager via AccessibilityGestureHandler
+  // Adaptor.SetGestureHandler is called in Initialize (check it's the toolkit version)
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerHandlePanGesture" );
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  DummyControl dummyControl = DummyControl::New(true);
+  dummyControl.SetSize(480, 800);
+  Stage::GetCurrent().Add( dummyControl );
+
+  Dali::Integration::PanGestureEvent panGestureEvent(Gesture::Started);
+  panGestureEvent.previousPosition = Vector2(0.f, 0.f);
+  panGestureEvent.currentPosition = Vector2(100.f, 0.f);
+  panGestureEvent.timeDelta = 16;
+  panGestureEvent.numberOfTouches = 1;
+
+  Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
+
+  panGestureEvent.state = Gesture::Continuing;
+  panGestureEvent.previousPosition = Vector2(100.f, 0.f);
+  panGestureEvent.currentPosition = Vector2(200.f, 0.f);
+  Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
+
+  panGestureEvent.state = Gesture::Finished;
+  panGestureEvent.previousPosition = Vector2(200.f, 0.f);
+  panGestureEvent.currentPosition = Vector2(300.f, 0.f);
+  Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
+
+
+  END_TEST;
+}
+
+// Methods missing coverage:
+// IsActorFocusableFunction
+// DoActivate
+// SetFocusable
+// TtsStateChanged

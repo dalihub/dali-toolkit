@@ -44,7 +44,7 @@ namespace
 {
 const int BLUR_LEVELS = 3;
 const int RENDER_FRAME_INTERVAL = 16;
-
+const char* TEST_IMAGE_FILE_NAME("image.png");
 static bool gObjectCreatedCallBackCalled;
 static void TestCallback(BaseHandle handle)
 {
@@ -99,6 +99,43 @@ Image CreateSolidColorImage( ToolkitTestApplication& application, const Vector4&
 
   return imageData;
 }
+
+void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
+{
+  Integration::ResourceRequest* request = platform.GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
+  Integration::ResourcePointer resource(bitmap);
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, width, height, width, height);
+
+  if(request)
+  {
+    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
+  }
+}
+
+class SignalHandler : public Dali::ConnectionTracker
+{
+public:
+  SignalHandler() :
+    mCalls( 0 )
+  {
+  }
+
+  void Callback( SuperBlurView handle )
+  {
+    mCalls++;
+    tet_infoline( "Signal called" );
+  }
+
+  unsigned int GetCalls() const
+  {
+    return mCalls;
+  }
+
+private:
+  unsigned int mCalls;  ///< Keeps track of how many times the signal has been called.
+};
+
 }//namespace
 
 
@@ -139,6 +176,33 @@ int UtcDaliSuperBlurViewNew(void)
   END_TEST;
 }
 
+int UtcDaliSuperBlurViewCreate(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliSuperBlurViewNew ");
+
+  // Test default constructor.
+  SuperBlurView blurView;
+  DALI_TEST_CHECK( !blurView );
+
+  // Test object creation
+  TypeInfo type = TypeRegistry::Get().GetTypeInfo("SuperBlurView");
+  if( type )
+  {
+    Dali::BaseHandle handle = type.CreateInstance();
+    if( handle )
+    {
+      blurView = Dali::Toolkit::SuperBlurView::DownCast( handle );
+    }
+  }
+
+  DALI_TEST_CHECK( blurView );
+
+  END_TEST;
+}
+
+
 int UtcDaliSuperBlurViewSetImage(void)
 {
   ToolkitTestApplication application;
@@ -153,12 +217,92 @@ int UtcDaliSuperBlurViewSetImage(void)
   // start multiple guassian blur call, each guassian blur creates two render tasks
   DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
 
-  // create image renderers for the original image and each blurred image
-  Stage::GetCurrent().Add( blurView );
-  Wait(application);
-  DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
+  {
+    // create image renderers for the original image and each blurred image
+    Stage::GetCurrent().Add( blurView );
+    Wait(application);
+    DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+    Stage::GetCurrent().Remove( blurView );
+  }
+
   END_TEST;
 }
+
+int UtcDaliSuperBlurViewSetProperty(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliSuperBlurViewSetProperty ");
+
+  SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
+  // create image renderers for the original image and each blurred image
+  Stage::GetCurrent().Add( blurView );
+  blurView.SetSize( 100.f, 100.f );
+
+  tet_infoline(" Set property map. Set height and width large enough to avoid atlassing");
+  int width(512);
+  int height(513);
+  LoadBitmapResource( application.GetPlatform(), width, height );
+
+  Property::Map propertyMap;
+  propertyMap["filename"] = TEST_IMAGE_FILE_NAME ;
+  propertyMap["width"] = width;
+  propertyMap["height"] = height;
+
+  // Will create ResourceImage
+  blurView.SetProperty(SuperBlurView::Property::IMAGE, propertyMap);
+  Wait(application);
+
+  // start multiple guassian blur call, each guassian blur creates two render tasks
+  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+
+  Wait(application);
+
+  END_TEST;
+}
+
+
+int UtcDaliSuperBlurViewGetProperty(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliSuperBlurViewSetProperty ");
+
+  SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
+  blurView.SetSize( 100.f, 100.f );
+
+  tet_infoline(" Set property map.");
+  int width(512);
+  int height(513); // Value large enough to avoid future atlassing
+  LoadBitmapResource( application.GetPlatform(), width, height );
+
+  Property::Map propertyMap;
+  propertyMap["filename"] = TEST_IMAGE_FILE_NAME ;
+  propertyMap["width"] = width;
+  propertyMap["height"] = height;
+
+  // Will create ResourceImage
+  blurView.SetProperty(SuperBlurView::Property::IMAGE, propertyMap);
+  Wait(application);
+
+  // create image renderers for the original image and each blurred image
+  Stage::GetCurrent().Add( blurView );
+
+  Property::Value imageProperty = blurView.GetProperty(SuperBlurView::Property::IMAGE);
+  Property::Map* map = imageProperty.GetMap();
+  DALI_TEST_CHECK( map != NULL );
+  if( map )
+  {
+    Property::Map& mapRef = *map;
+    DALI_TEST_EQUALS( mapRef["filename"], TEST_IMAGE_FILE_NAME, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 
 int UtcDaliSuperBlurViewSetGetBlurStrength(void)
 {
@@ -217,6 +361,33 @@ int UtcDaliSuperBlurViewGetBlurredImage(void)
 
   Image image3 = blurView.GetBlurredImage( 3 );
   DALI_TEST_CHECK( FrameBufferImage::DownCast( image3 ) );
+
+  END_TEST;
+}
+
+int UtcDaliSuperBlurViewBlurSignal(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliSuperBlurViewSignal ");
+
+  SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
+  blurView.SetSize( 100.f, 100.f );
+
+  Image inputImage = CreateSolidColorImage( application, Color::GREEN, 50, 50 );
+  blurView.SetImage( inputImage );
+  // start multiple guassian blur call, each guassian blur creates two render tasks
+  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+
+  SignalHandler signalHandler;
+  blurView.BlurFinishedSignal().Connect(&signalHandler, &SignalHandler::Callback);
+
+  // create image renderers for the original image and each blurred image
+  Stage::GetCurrent().Add( blurView );
+  Wait(application, 1000);
+
+  DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
+  //DALI_TEST_EQUALS(signalHandler.GetCalls(), 1, TEST_LOCATION);
 
   END_TEST;
 }

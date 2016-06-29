@@ -15,11 +15,11 @@
  *
  */
 
-#include "toolkit-accessibility-adaptor.h"
-
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/base-object.h>
+#include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
 
 namespace Dali
 {
@@ -48,6 +48,13 @@ public:
 
   void MockSetReadPosition( Vector2& position );
 
+  void SetEnabled(bool enabled)
+  {
+    mIsEnabled = enabled;
+  }
+
+  void SendPanGesture( const Dali::Integration::PanGestureEvent& panEvent );
+
 public:
 
   bool IsEnabled() const;
@@ -56,16 +63,17 @@ public:
 
   Vector2 GetReadPosition() const;
 
-  bool HandleActionNextEvent();
-  bool HandleActionPreviousEvent();
+  bool HandleActionNextEvent(bool);
+  bool HandleActionPreviousEvent(bool);
   bool HandleActionActivateEvent();
   bool HandleActionReadEvent(unsigned int x, unsigned int y, bool allowReadAgain);
-  bool HandleActionReadNextEvent();
-  bool HandleActionReadPreviousEvent();
+  bool HandleActionReadNextEvent(bool);
+  bool HandleActionReadPreviousEvent(bool);
   bool HandleActionUpEvent();
   bool HandleActionDownEvent();
   bool HandleActionClearFocusEvent();
-  bool HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp);
+  bool HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp);
+  bool HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp);
   bool HandleActionBackEvent();
   bool HandleActionEnableEvent();
   bool HandleActionDisableEvent();
@@ -83,8 +91,6 @@ public:
   bool HandleActionReadIndicatorInformationEvent();
   bool HandleActionReadPauseResumeEvent();
   bool HandleActionStartStopEvent();
-
-public: // Signals
 
 private:
 
@@ -133,6 +139,11 @@ bool AccessibilityAdaptor::IsEnabled() const
   return mIsEnabled;
 }
 
+void AccessibilityAdaptor::SendPanGesture( const Integration::PanGestureEvent& panEvent )
+{
+  mGestureHandler->HandlePanGesture( panEvent );
+}
+
 void AccessibilityAdaptor::SetActionHandler(Dali::AccessibilityActionHandler& handler)
 {
   mActionHandler = &handler;
@@ -143,7 +154,7 @@ void AccessibilityAdaptor::SetGestureHandler(Dali::AccessibilityGestureHandler& 
   mGestureHandler = &handler;
 }
 
-bool AccessibilityAdaptor::HandleActionNextEvent()
+bool AccessibilityAdaptor::HandleActionNextEvent(bool allowEndFeedback)
 {
   if( mActionHandler )
   {
@@ -152,7 +163,7 @@ bool AccessibilityAdaptor::HandleActionNextEvent()
   return false;
 }
 
-bool AccessibilityAdaptor::HandleActionPreviousEvent()
+bool AccessibilityAdaptor::HandleActionPreviousEvent(bool allowEndFeedback)
 {
   if( mActionHandler )
   {
@@ -179,7 +190,7 @@ bool AccessibilityAdaptor::HandleActionReadEvent(unsigned int x, unsigned int y,
   return false;
 }
 
-bool AccessibilityAdaptor::HandleActionReadNextEvent()
+bool AccessibilityAdaptor::HandleActionReadNextEvent(bool allowEndFeedback)
 {
   if( mActionHandler )
   {
@@ -188,7 +199,7 @@ bool AccessibilityAdaptor::HandleActionReadNextEvent()
   return false;
 }
 
-bool AccessibilityAdaptor::HandleActionReadPreviousEvent()
+bool AccessibilityAdaptor::HandleActionReadPreviousEvent(bool allowEndFeedback)
 {
   if( mActionHandler )
   {
@@ -224,13 +235,24 @@ bool AccessibilityAdaptor::HandleActionClearFocusEvent()
   return false;
 }
 
-bool AccessibilityAdaptor::HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp)
+bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp)
 {
   if( mActionHandler )
   {
     Dali::TouchEvent touchEvent;
     touchEvent.points.push_back( point );
     return mActionHandler->AccessibilityActionScroll( touchEvent );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp)
+{
+  if( mActionHandler )
+  {
+    Dali::TouchEvent touchEvent;
+    touchEvent.points.push_back( point );
+    return mActionHandler->AccessibilityActionTouch( touchEvent );
   }
   return false;
 }
@@ -419,13 +441,6 @@ AccessibilityAdaptor::~AccessibilityAdaptor()
 {
 }
 
-// Mock setup:
-
-void AccessibilityAdaptor::MockSetReadPosition( Vector2& position )
-{
-  Internal::Adaptor::GetImplementation(*this).MockSetReadPosition( position );
-}
-
 // Methods:
 
 Vector2 AccessibilityAdaptor::GetReadPosition() const
@@ -435,8 +450,7 @@ Vector2 AccessibilityAdaptor::GetReadPosition() const
 
 bool AccessibilityAdaptor::IsEnabled() const
 {
-  //return Internal::Adaptor::GetImplementation(*this).IsEnabled();
-  return false;
+  return Internal::Adaptor::GetImplementation(*this).IsEnabled();
 }
 
 void AccessibilityAdaptor::SetActionHandler(AccessibilityActionHandler& handler)
@@ -449,14 +463,14 @@ void AccessibilityAdaptor::SetGestureHandler(AccessibilityGestureHandler& handle
   Internal::Adaptor::GetImplementation(*this).SetGestureHandler(handler);
 }
 
-bool AccessibilityAdaptor::HandleActionNextEvent()
+bool AccessibilityAdaptor::HandleActionNextEvent(bool allowEndFeedback)
 {
-  return Internal::Adaptor::GetImplementation(*this).HandleActionNextEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionNextEvent(allowEndFeedback);
 }
 
-bool AccessibilityAdaptor::HandleActionPreviousEvent()
+bool AccessibilityAdaptor::HandleActionPreviousEvent(bool allowEndFeedback)
 {
-  return Internal::Adaptor::GetImplementation(*this).HandleActionPreviousEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionPreviousEvent(allowEndFeedback);
 }
 
 bool AccessibilityAdaptor::HandleActionActivateEvent()
@@ -469,14 +483,14 @@ bool AccessibilityAdaptor::HandleActionReadEvent(unsigned int x, unsigned int y,
   return Internal::Adaptor::GetImplementation(*this).HandleActionReadEvent( x, y, allowReadAgain );
 }
 
-bool AccessibilityAdaptor::HandleActionReadNextEvent()
+bool AccessibilityAdaptor::HandleActionReadNextEvent(bool allowEndFeedback)
 {
-  return Internal::Adaptor::GetImplementation(*this).HandleActionReadNextEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadNextEvent(allowEndFeedback);
 }
 
-bool AccessibilityAdaptor::HandleActionReadPreviousEvent()
+bool AccessibilityAdaptor::HandleActionReadPreviousEvent(bool allowEndFeedback)
 {
-  return Internal::Adaptor::GetImplementation(*this).HandleActionReadPreviousEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadPreviousEvent(allowEndFeedback);
 }
 
 bool AccessibilityAdaptor::HandleActionUpEvent()
@@ -494,9 +508,14 @@ bool AccessibilityAdaptor::HandleActionClearFocusEvent()
   return Internal::Adaptor::GetImplementation(*this).HandleActionClearFocusEvent();
 }
 
-bool AccessibilityAdaptor::HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp)
+bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp)
 {
   return Internal::Adaptor::GetImplementation(*this).HandleActionScrollEvent(point, timeStamp);
+}
+
+bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp)
+{
+  return Internal::Adaptor::GetImplementation(*this).HandleActionTouchEvent(point, timeStamp);
 }
 
 bool AccessibilityAdaptor::HandleActionBackEvent()
@@ -590,3 +609,29 @@ AccessibilityAdaptor::AccessibilityAdaptor( Internal::Adaptor::AccessibilityAdap
 }
 
 } // namespace Dali
+
+
+namespace Test
+{
+namespace AccessibilityAdaptor
+{
+
+// Mock setup:
+
+void MockSetReadPosition( Dali::AccessibilityAdaptor adaptor, Dali::Vector2& position )
+{
+  Dali::Internal::Adaptor::GetImplementation(adaptor).MockSetReadPosition( position );
+}
+
+void SetEnabled( Dali::AccessibilityAdaptor adaptor, bool enabled )
+{
+  Dali::Internal::Adaptor::GetImplementation(adaptor).SetEnabled(enabled);
+}
+
+void SendPanGesture( Dali::AccessibilityAdaptor adaptor, const Dali::Integration::PanGestureEvent& panEvent )
+{
+  Dali::Internal::Adaptor::GetImplementation(adaptor).SendPanGesture( panEvent );
+}
+
+} // namespace AccessibilityAdaptor
+} // namespace Test
