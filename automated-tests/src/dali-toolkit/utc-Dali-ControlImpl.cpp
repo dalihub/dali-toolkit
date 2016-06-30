@@ -762,7 +762,6 @@ int UtcDaliControlImplKeyInputFocusLost(void)
 
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
-    dummyImpl.OnAccessibilityValueChange( true );
     dummyImpl.IsKeyboardNavigationSupported();
     dummyImpl.IsKeyboardFocusGroup();
 

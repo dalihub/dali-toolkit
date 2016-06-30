@@ -279,9 +279,6 @@ int UtcDaliSetPropertyP(void)
   application.SendNotification();
   application.Render();
 
-  Property::Map map;
-  map["rendererType"] = "image";
-  map["url"] = "url";
   slider.SetProperty(Slider::Property::LOWER_BOUND,        1.0f);
   slider.SetProperty(Slider::Property::UPPER_BOUND,        5.0f);
   slider.SetProperty(Slider::Property::VALUE,              3.0f);
@@ -315,6 +312,9 @@ int UtcDaliSetPropertyP(void)
   DALI_TEST_EQUALS( tolerance, 0.5f, TEST_LOCATION );
 
   {
+    Property::Map map;
+    map["rendererType"] = "image";
+    map["size"] = Vector2(200, 200);
     map["url"] = "track2.png";
     slider.SetProperty(Slider::Property::TRACK_VISUAL,       map);
     map["url"] = "handle2.png";
