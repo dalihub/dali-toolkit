@@ -1,5 +1,3 @@
-#include "toolkit-tts-player.h"
-
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -18,8 +16,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal.h>
+#include <dali/dali.h>
+
 
 namespace Dali
 {
@@ -28,11 +26,76 @@ TtsPlayer::TtsPlayer()
 {
 }
 
+namespace Internal
+{
+namespace Adaptor
+{
+
+class TtsPlayer : public BaseObject
+{
+public:
+  TtsPlayer()
+  {
+  }
+
+  void Play(const std::string& text)
+  {
+  }
+
+  void Stop()
+  {
+  }
+
+  void Pause()
+  {
+  }
+
+  void Resume()
+  {
+  }
+
+  Dali::TtsPlayer::State GetState()
+  {
+    return Dali::TtsPlayer::READY;
+  }
+
+  Dali::TtsPlayer::StateChangedSignalType& StateChangedSignal()
+  {
+    return mStateChangedSignal;
+  }
+private:
+  Dali::TtsPlayer::StateChangedSignalType mStateChangedSignal;
+};
+
+
+inline TtsPlayer& GetImplementation(Dali::TtsPlayer& player)
+{
+  DALI_ASSERT_ALWAYS( player && "TtsPlayer handle is empty" );
+  BaseObject& handle = player.GetBaseObject();
+  return static_cast<Internal::Adaptor::TtsPlayer&>(handle);
+}
+
+inline const TtsPlayer& GetImplementation(const Dali::TtsPlayer& player)
+{
+  DALI_ASSERT_ALWAYS( player && "TtsPlayer handle is empty" );
+  const BaseObject& handle = player.GetBaseObject();
+  return static_cast<const Internal::Adaptor::TtsPlayer&>(handle);
+}
+
+} // Adaptor
+} // Internal
+
+static IntrusivePtr<Internal::Adaptor::TtsPlayer> ttsSingleton = NULL;
+
 TtsPlayer TtsPlayer::Get(Dali::TtsPlayer::Mode mode)
 {
-  TtsPlayer ttsPlayer;
+  if( ! ttsSingleton )
+  {
+    ttsSingleton.Reset( new Dali::Internal::Adaptor::TtsPlayer() );
+  }
+  TtsPlayer playerHandle(ttsSingleton.Get());
 
-  return ttsPlayer;
+  return playerHandle;
 }
 
 TtsPlayer::~TtsPlayer()
@@ -77,7 +140,12 @@ TtsPlayer::State TtsPlayer::GetState()
 
 TtsPlayer::StateChangedSignalType& TtsPlayer::StateChangedSignal()
 {
-  return mStateChangedSignal; // GetImplementation(*this).StateChangedSignal();
+  return Internal::Adaptor::GetImplementation(*this).StateChangedSignal();
+}
+
+TtsPlayer::TtsPlayer( Internal::Adaptor::TtsPlayer* player )
+: BaseHandle( player )
+{
 }
 
 } // namespace Dali
