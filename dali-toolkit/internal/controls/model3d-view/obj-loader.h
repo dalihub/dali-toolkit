@@ -97,7 +97,7 @@ public:
   {
     TEXTURE_COORDINATES = 1 << 0,
     TANGENTS = 1 << 1,
-    BINOMIALS = 1 << 2
+    BINORMALS = 1 << 2
   };
 
   ObjLoader();

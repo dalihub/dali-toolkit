@@ -662,6 +662,11 @@ public:
         *type = GL_SAMPLER_2D;
         *size = 1;
         break;
+      case 2:
+        *length = snprintf(name, bufsize, "sGloss");
+        *type = GL_SAMPLER_2D;
+        *size = 1;
+        break;
       default:
         break;
     }
@@ -878,9 +883,10 @@ public:
     namedParams["program"] = ToString(program);
     mShaderTrace.PushCall("LinkProgram", out.str(), namedParams);
 
-    mNumberOfActiveUniforms=2;
+    mNumberOfActiveUniforms=3;
     GetUniformLocation(program, "sTexture");
     GetUniformLocation(program, "sEffect");
+    GetUniformLocation(program, "sGloss");
   }
 
   inline void PixelStorei(GLenum pname, GLint param)

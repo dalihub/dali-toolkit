@@ -639,7 +639,7 @@ int Model3dView::GetShaderProperties( Toolkit::Model3dView::IlluminationType ill
 
   if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
   {
-    objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINOMIALS;
+    objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINORMALS;
   }
 
   return objectProperties;

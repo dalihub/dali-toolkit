@@ -43,6 +43,7 @@ extern const char * const OBJECT_URL;
 extern const char * const MATERIAL_URL;
 extern const char * const TEXTURES_PATH;
 extern const char * const SHADER_TYPE;
+extern const char * const USE_MIPMAPPING;
 
 } // namespace Internal
 
