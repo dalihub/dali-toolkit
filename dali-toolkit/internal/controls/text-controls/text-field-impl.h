@@ -216,9 +216,9 @@ private: // Implementation
    * @brief Callback when TextField is touched
    *
    * @param[in] actor TextField touched
-   * @param[in] event TouchEvent information
+   * @param[in] touch Touch information
    */
-  bool OnTouched( Actor actor, const TouchEvent& event );
+  bool OnTouched( Actor actor, const TouchData& touch );
 
   /**
    * Construct a new TextField.

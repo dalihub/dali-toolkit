@@ -139,7 +139,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)

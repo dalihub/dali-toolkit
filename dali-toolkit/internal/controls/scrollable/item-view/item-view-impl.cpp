@@ -26,7 +26,7 @@
 #include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 
@@ -328,6 +328,7 @@ void ItemView::OnInitialize()
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
+  self.TouchSignal().Connect( this, &ItemView::OnTouch );
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
 
   mWheelEventFinishedTimer = Timer::New( WHEEL_EVENT_FINISHED_TIME_OUT );
@@ -980,37 +981,6 @@ void ItemView::OnChildAdd(Actor& child)
   }
 }
 
-bool ItemView::OnTouchEvent(const TouchEvent& event)
-{
-  // Ignore events with multiple-touch points
-  if (event.GetPointCount() != 1)
-  {
-    return false;
-  }
-
-  if (event.GetPoint(0).state == TouchPoint::Down)
-  {
-    // Cancel ongoing scrolling etc.
-    mGestureState = Gesture::Clear;
-
-    mScrollDistance = 0.0f;
-    mScrollSpeed = 0.0f;
-    Self().SetProperty(Toolkit::ItemView::Property::SCROLL_SPEED, mScrollSpeed);
-
-    mScrollOvershoot = 0.0f;
-    AnimateScrollOvershoot(0.0f);
-
-    if(mScrollAnimation)
-    {
-      mScrollCompletedSignal.Emit(GetCurrentScrollPosition());
-    }
-
-    RemoveAnimation(mScrollAnimation);
-  }
-
-  return true; // consume since we're potentially scrolling
-}
-
 bool ItemView::OnWheelEvent(const WheelEvent& event)
 {
   // Respond the wheel event to scroll
@@ -1101,6 +1071,37 @@ float ItemView::ClampFirstItemPosition( float targetPosition, const Vector3& tar
   }
 
   return clamppedPosition;
+}
+
+bool ItemView::OnTouch( Actor actor, const TouchData& touch )
+{
+  // Ignore events with multiple-touch points
+  if (touch.GetPointCount() != 1)
+  {
+    return false;
+  }
+
+  if ( touch.GetState( 0 ) == PointState::DOWN )
+  {
+    // Cancel ongoing scrolling etc.
+    mGestureState = Gesture::Clear;
+
+    mScrollDistance = 0.0f;
+    mScrollSpeed = 0.0f;
+    Self().SetProperty(Toolkit::ItemView::Property::SCROLL_SPEED, mScrollSpeed);
+
+    mScrollOvershoot = 0.0f;
+    AnimateScrollOvershoot(0.0f);
+
+    if(mScrollAnimation)
+    {
+      mScrollCompletedSignal.Emit(GetCurrentScrollPosition());
+    }
+
+    RemoveAnimation(mScrollAnimation);
+  }
+
+  return true; // consume since we're potentially scrolling
 }
 
 void ItemView::OnPan( const PanGesture& gesture )

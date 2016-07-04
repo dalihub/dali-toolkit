@@ -211,9 +211,9 @@ private: // Implementation
    * @brief Callback when TextEditor is touched
    *
    * @param[in] actor TextEditor touched
-   * @param[in] event TouchEvent information
+   * @param[in] touch Touch information
    */
-  bool OnTouched( Actor actor, const TouchEvent& event );
+  bool OnTouched( Actor actor, const TouchData& touch );
 
   /**
    * Construct a new TextEditor.

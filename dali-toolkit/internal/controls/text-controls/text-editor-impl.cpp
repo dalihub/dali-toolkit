@@ -936,7 +936,7 @@ void TextEditor::OnInitialize()
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
-  self.TouchedSignal().Connect( this, &TextEditor::OnTouched );
+  self.TouchSignal().Connect( this, &TextEditor::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
   Rect<int> boundingBox;
@@ -1313,7 +1313,7 @@ void TextEditor::OnStageConnection( int depth )
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
-bool TextEditor::OnTouched( Actor actor, const TouchEvent& event )
+bool TextEditor::OnTouched( Actor actor, const TouchData& touch )
 {
   return true;
 }

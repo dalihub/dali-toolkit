@@ -324,13 +324,13 @@ private:
   virtual void OnInitialize();
 
   /**
-   * Hit region touch event
+   * Hit region touch
    *
    * @param[in] actor The actor the event is raised for
-   * @param[in] event The touch event info
-   * @return If the event is handled or not
+   * @param[in] touch The touch info
+   * @return If touch is handled or not
    */
-  bool OnTouchEvent( Actor actor, const TouchEvent& event );
+  bool OnTouch( Actor actor, const TouchData& touch );
 
   /**
    * Pan gesture event

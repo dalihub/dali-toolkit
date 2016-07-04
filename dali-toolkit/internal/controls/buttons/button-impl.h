@@ -376,26 +376,25 @@ private:
   virtual void OnDisabledBackgroundImageSet() {}
 
   /**
-   * This method is called from the OnTouchEvent method when the button is down.
+   * This method is called the button is down.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnButtonDown();
 
   /**
-   * This method is called from the OnTouchEvent method when the button is up.
+   * This method is called when the button is up.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnButtonUp();
 
   /**
-   * This method is called from the OnTouchEvent method when the touch point leaves the boundary of the button or
-   * more than one touch points are received.
+   * This method is called when touch leaves the boundary of the button or several touch points are received.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnTouchPointLeave();
 
   /**
-   * This method is called from the OnTouchEvent method when the touch point is interrupted.
+   * This method is called when the touch is interrupted.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnTouchPointInterrupted();
@@ -474,11 +473,6 @@ public:
 protected: // From Control
 
   /**
-   * @copydoc Dali::Control::OnTouchEvent( const TouchEvent& event )
-   */
-  virtual bool OnTouchEvent( const TouchEvent& event );
-
-  /**
    * @copydoc Toolkit::Control::OnInitialize()
    * @note If overridden by deriving button classes, then an up-call to Button::OnInitialize MUST be made at the start.
    */
@@ -501,6 +495,14 @@ protected: // From Control
   void OnStageDisconnection();
 
 private:
+
+  /**
+   * @brief Handler for touch data
+   * @param[in]  actor  The touched actor.
+   * @param[in]  touch  The touch info.
+   * @return true, if consumed, false otherwise.
+   */
+  bool OnTouch( Actor actor, const TouchData& touch );
 
   /**
    * Handler for tap events.

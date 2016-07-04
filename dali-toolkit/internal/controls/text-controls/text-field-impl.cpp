@@ -1120,7 +1120,7 @@ void TextField::OnInitialize()
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
-  self.TouchedSignal().Connect( this, &TextField::OnTouched );
+  self.TouchSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
   Rect<int> boundingBox;
@@ -1499,7 +1499,7 @@ void TextField::OnStageConnection( int depth )
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
-bool TextField::OnTouched( Actor actor, const TouchEvent& event )
+bool TextField::OnTouched( Actor actor, const TouchData& touch )
 {
   return true;
 }
