@@ -174,7 +174,7 @@ $ INFO: DALI:  Event, min 0.04 ms, max 5.27 ms, total (0.1 secs), avg 0.28 ms, s
 ~~~
 
 Inside the event processing, the application may be listening for certain events.
-For example when an actor is touched, some application code may be run in an OnTouchEvent callback.
+For example when an actor is touched, some application code may be run in an OnTouch callback.
 By checking the max times you can check for any spikes that occur when interacting with the application.
 
 Example:

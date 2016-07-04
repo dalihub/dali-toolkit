@@ -221,9 +221,9 @@ private:
   /**
    * Callback for the touch event when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
-   * @param[in] touchEvent The touch event
+   * @param[in] touch The touch information
    */
-  void OnTouched(const TouchEvent& touchEvent);
+  void OnTouch( const TouchData& touch );
 
   /**
    * Change the keyboard focus status when keyboard focus feature turned on or off.
