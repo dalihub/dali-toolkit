@@ -954,7 +954,7 @@ int UtcDaliAlignmentSizeSetP(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static bool TouchEventCallback(Actor actor, const TouchEvent& event)
+static bool TouchCallback(Actor actor, const TouchData& event)
 {
   return false;
 }
@@ -970,7 +970,7 @@ int UtcDaliAlignmentOnTouchEvent(void)
   alignment.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(alignment);
 
-  alignment.TouchedSignal().Connect(&TouchEventCallback);
+  alignment.TouchSignal().Connect(&TouchCallback);
 
   application.Render();
   application.SendNotification();

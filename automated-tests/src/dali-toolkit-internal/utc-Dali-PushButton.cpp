@@ -329,7 +329,7 @@ public:
   Test mTest;
 };
 
-static bool TestCallback(Actor actor, const TouchEvent& event)
+static bool TestCallback(Actor actor, const TouchData& event)
 {
   return true;
 }
@@ -384,7 +384,7 @@ int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
 
   // * Actor's touch event is connected to a callback function
   //   and this callback function consumes the event.
-  actor.TouchedSignal().Connect( &TestCallback );
+  actor.TouchSignal().Connect( &TestCallback );
 
   // * Button's pressed signal is connected to a callback function
   //   which also consumes the event.
@@ -527,7 +527,7 @@ int UtcDaliPushButtonInterruptEventWhenNonVisible(void)
 
   // * Actor's touch event is connected to a callback function
   //   and this callback function consumes the event.
-  actor.TouchedSignal().Connect( &TestCallback );
+  actor.TouchSignal().Connect( &TestCallback );
 
   // * Button's pressed signal is connected to a callback function
   //   which also consumes the event.
