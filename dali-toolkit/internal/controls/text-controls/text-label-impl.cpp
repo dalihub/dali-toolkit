@@ -711,7 +711,9 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnRelayout\n" );
 
-  if( mController->Relayout( size ) ||
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+
+  if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) ) ||
       !mRenderer )
   {
     if( !mRenderer )

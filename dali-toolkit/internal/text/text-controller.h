@@ -108,6 +108,13 @@ public:
     DONT_UPDATE_INPUT_STYLE
   };
 
+  enum UpdateTextType
+  {
+    NONE_UPDATED      = 0x0,
+    MODEL_UPDATED     = 0x1,
+    DECORATOR_UPDATED = 0x2
+  };
+
   /**
    * @brief Create a new instance of a Controller.
    *
@@ -722,9 +729,10 @@ public:
    *
    * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
    * @param[in] size A the size of a bounding box to layout text within.
-   * @return True if the text model or decorations were updated.
+   *
+   * @return Whether the text model or decorations were updated.
    */
-  bool Relayout( const Size& size );
+  UpdateTextType Relayout( const Size& size );
 
   /**
    * @brief Process queued events which modify the model.

@@ -707,17 +707,14 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image view
-  DALI_TEST_EQUALS( field.GetChildCount(), 3u, TEST_LOCATION );
+  // Check there are the expected number of children ( offscreen root actor, and the offscreen image view
+  DALI_TEST_EQUALS( field.GetChildCount(), 2u, TEST_LOCATION );
 
-  Actor layer = field.GetChildAt( 0u );
-  DALI_TEST_CHECK( layer.IsLayer() );
-
-  Actor offscreenRoot = field.GetChildAt( 1u );
+  Actor offscreenRoot = field.GetChildAt( 0u );
   DALI_TEST_CHECK( offscreenRoot.IsLayer() );
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
 
-  Actor offscreenImage = field.GetChildAt( 2u );
+  Actor offscreenImage = field.GetChildAt( 1u );
   DALI_TEST_CHECK( offscreenImage );
 
   // Create a tap event to touch the text field.
@@ -727,6 +724,9 @@ int utcDaliTextFieldEvent02(void)
   // Render and notify
   application.SendNotification();
   application.Render();
+
+  Actor layer = field.GetChildAt( 2u );
+  DALI_TEST_CHECK( layer.IsLayer() );
 
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
