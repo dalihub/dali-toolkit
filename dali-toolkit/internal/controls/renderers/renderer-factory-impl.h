@@ -66,49 +66,19 @@ public:
   RendererFactory( bool debugEnabled );
 
   /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Property::Map& )
+   * @copydoc Toolkit::RenderFactory::CreateControlRenderer( const Property::Map& )
    */
-  Toolkit::ControlRenderer GetControlRenderer( const Property::Map& propertyMap );
+  Toolkit::ControlRenderer CreateControlRenderer( const Property::Map& propertyMap );
 
   /**
-   * @copydoc Toolkit::RenderFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
+   * @copydoc Toolkit::RenderFactory::CreateControlRenderer( const Image& )
    */
-  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap );
+  Toolkit::ControlRenderer CreateControlRenderer( const Image& image );
 
   /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Vector4& )
+   * @copydoc Toolkit::RenderFactory::CreateControlRenderer( const std::string&, ImageDimensions )
    */
-  Toolkit::ControlRenderer GetControlRenderer( const Vector4& color );
-
-  /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const Vector4& )
-   */
-  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color );
-
-  /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( float, const Vector4&, bool )
-   */
-  Toolkit::ControlRenderer GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing );
-
-  /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const Image& )
-   */
-  Toolkit::ControlRenderer GetControlRenderer( const Image& image );
-
-  /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const Image& )
-   */
-  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Image& image );
-
-  /**
-   * @copydoc Toolkit::RenderFactory::GetControlRenderer( const std::string&, ImageDimensions )
-   */
-  Toolkit::ControlRenderer GetControlRenderer( const std::string& image, ImageDimensions size );
-
-  /**
-   * @copydoc Toolkit::RendererFactory::ResetRenderer( Toolkit::ControlRenderer&, Actor& actor, const std::string&, ImageDimensions )
-   */
-  void ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& image, ImageDimensions size );
+  Toolkit::ControlRenderer CreateControlRenderer( const std::string& image, ImageDimensions size );
 
 public:
   /**

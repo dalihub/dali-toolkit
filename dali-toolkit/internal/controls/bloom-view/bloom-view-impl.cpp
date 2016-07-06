@@ -231,22 +231,9 @@ void BloomView::OnInitialize()
   mBloomExtractImageView = Toolkit::ImageView::New();
   mBloomExtractImageView.SetParentOrigin( ParentOrigin::CENTER );
 
-  // Create shader used for extracting the bright parts of an image
-  Property::Map customShader;
-  customShader[ "fragmentShader" ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
-  Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "image" );
-  rendererMap.Insert( "shader", customShader );
-  mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
-
   // Create an image view for compositing the result (scene and bloom textures) to output
   mCompositeImageView = Toolkit::ImageView::New();
   mCompositeImageView.SetParentOrigin( ParentOrigin::CENTER );
-
-  // Create shader used to composite bloom and original image to output render target
-  customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
-  rendererMap[ "shader" ] = customShader;
-  mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
   mTargetImageView = Toolkit::ImageView::New();
@@ -385,12 +372,22 @@ void BloomView::AllocateResources()
 
     mBloomExtractImageView.SetImage( mRenderTargetForRenderingChildren );
     mBloomExtractImageView.SetSize(mDownsampledWidth, mDownsampledHeight); // size needs to match render target
+    // Create shader used for extracting the bright parts of an image
+    Property::Map customShader;
+    customShader[ "fragmentShader" ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
+    Property::Map rendererMap;
+    rendererMap.Insert( "shader", customShader );
+    mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
     // set GaussianBlurView to blur our extracted bloom
     mGaussianBlurView.SetUserImageAndOutputRenderTarget(mBloomExtractTarget, mBlurExtractTarget);
 
     // use the completed blur in the first buffer and composite with the original child actors render
     mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
+    // Create shader used to composite bloom and original image to output render target
+    customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
+    rendererMap[ "shader" ] = customShader;
+    mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
     TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
     textureSet.SetImage( 1u, mBlurExtractTarget );
 

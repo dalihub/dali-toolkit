@@ -40,6 +40,7 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 
 namespace Dali
 {
@@ -441,12 +442,16 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  mImpl->mBackgroundColor = color;
-
   Actor self( Self() );
-  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
-  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+  mImpl->mBackgroundColor = color;
+  Property::Map map;
+  map[ RENDERER_TYPE ] = COLOR_RENDERER;
+  map[ "mixColor" ] = color;
+  InitializeControlRenderer( self, mImpl->mBackgroundRenderer, map );
+  if( mImpl->mBackgroundRenderer )
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+  }
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -454,25 +459,24 @@ Vector4 Control::GetBackgroundColor() const
   return mImpl->mBackgroundColor;
 }
 
-void Control::SetBackground(const Property::Map& map)
+void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  mImpl->mBackgroundRenderer.RemoveAndReset( self );
-  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-  mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
-  if( mImpl->mBackgroundRenderer  && self.OnStage() ) // Request control renderer with a property map might return an empty handle
+  InitializeControlRenderer( self, mImpl->mBackgroundRenderer, map );
+  if( mImpl->mBackgroundRenderer )
   {
     mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
   }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
-  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
-  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+  InitializeControlRenderer( self, mImpl->mBackgroundRenderer, image );
+  if( mImpl->mBackgroundRenderer )
+  {
+    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+  }
 }
 
 void Control::ClearBackground()

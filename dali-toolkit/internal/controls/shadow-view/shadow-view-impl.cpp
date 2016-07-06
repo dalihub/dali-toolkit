@@ -151,12 +151,11 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
 {
   mShadowPlaneBg = shadowPlaneBackground;
 
-  mShadowPlane = Toolkit::ImageView::New();
+  mShadowPlane = Toolkit::ImageView::New( mOutputImage );
   mShadowPlane.SetName( "SHADOW_PLANE" );
   mShadowPlane.SetParentOrigin(ParentOrigin::CENTER);
   mShadowPlane.SetAnchorPoint(AnchorPoint::CENTER);
 
-  mShadowPlane.SetImage(mOutputImage);
   mShadowPlane.SetProperty( Toolkit::ImageView::Property::IMAGE, mShadowRenderShader );
   SetShaderConstants();
 

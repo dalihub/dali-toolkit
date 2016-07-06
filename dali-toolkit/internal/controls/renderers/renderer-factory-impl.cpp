@@ -130,7 +130,7 @@ RendererFactory::RendererType RendererFactory::GetRendererType( const Property::
   return rendererType;
 }
 
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Map& propertyMap )
+Toolkit::ControlRenderer RendererFactory::CreateControlRenderer( const Property::Map& propertyMap )
 {
   ControlRenderer* rendererPtr = NULL;
 
@@ -207,72 +207,7 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Property::Ma
   return Toolkit::ControlRenderer( rendererPtr );
 }
 
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
-{
-  if( !mFactoryCache )
-  {
-    mFactoryCache = new RendererFactoryCache();
-  }
-
-  if( mDebugEnabled )
-  {
-    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
-  }
-
-  ColorRenderer* rendererPtr = new ColorRenderer( *( mFactoryCache.Get() ) );
-  rendererPtr->SetColor( color );
-
-  return Toolkit::ControlRenderer( rendererPtr );
-}
-
-void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Vector4& color )
-{
-  if( mDebugEnabled && renderer )
-  {
-    return;
-  }
-
-  if( renderer )
-  {
-    ColorRenderer* rendererPtr = dynamic_cast< ColorRenderer* >( &GetImplementation( renderer ) );
-    if( rendererPtr )
-    {
-      rendererPtr->SetColor( color );
-      return;
-    }
-
-    renderer.RemoveAndReset( actor );
-  }
-
-  renderer = GetControlRenderer( color );
-  if( actor && actor.OnStage() )
-  {
-    renderer.SetOnStage( actor );
-  }
-}
-
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing )
-{
-  if( !mFactoryCache )
-  {
-    mFactoryCache = new RendererFactoryCache();
-  }
-
-  if( mDebugEnabled )
-  {
-    return Toolkit::ControlRenderer( new DebugRenderer( *( mFactoryCache.Get() ) ) );
-  }
-
-  BorderRenderer* rendererPtr = new BorderRenderer( *mFactoryCache.Get() );
-
-  rendererPtr->SetBorderSize( borderSize );
-  rendererPtr->SetBorderColor( borderColor );
-  rendererPtr->RequireAntiAliasing( antiAliasing );
-
-  return Toolkit::ControlRenderer( rendererPtr );
-}
-
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
+Toolkit::ControlRenderer RendererFactory::CreateControlRenderer( const Image& image )
 {
   if( !mFactoryCache )
   {
@@ -303,53 +238,7 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const Image& image
   }
 }
 
-void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Image& image )
-{
-  if( mDebugEnabled && renderer )
-  {
-    return;
-  }
-
-  if( renderer )
-  {
-    if( ! image )
-    {
-      // If the image is empty, then reset the renderer and return
-      renderer.RemoveAndReset( actor );
-      return;
-    }
-
-    NinePatchImage npatchImage = NinePatchImage::DownCast( image );
-    if( npatchImage )
-    {
-      NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
-      if( rendererPtr )
-      {
-        rendererPtr->SetImage( npatchImage );
-        return;
-      }
-    }
-    else
-    {
-      ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
-      if( rendererPtr )
-      {
-        rendererPtr->SetImage( actor, image );
-        return;
-      }
-    }
-
-    renderer.RemoveAndReset( actor );
-  }
-
-  renderer = GetControlRenderer( image );
-  if( actor && actor.OnStage() )
-  {
-    renderer.SetOnStage( actor );
-  }
-}
-
-Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string& url, ImageDimensions size )
+Toolkit::ControlRenderer RendererFactory::CreateControlRenderer( const std::string& url, ImageDimensions size )
 {
   if( !mFactoryCache )
   {
@@ -383,96 +272,6 @@ Toolkit::ControlRenderer RendererFactory::GetControlRenderer( const std::string&
     rendererPtr->SetImage( actor, url, size );
 
     return Toolkit::ControlRenderer( rendererPtr );
-  }
-}
-
-void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
-{
-  if( mDebugEnabled && renderer )
-  {
-    return;
-  }
-
-  if( renderer )
-  {
-    if( url.empty() )
-    {
-      // If the URL is empty, then reset the renderer and return
-      renderer.RemoveAndReset( actor );
-      return;
-    }
-    else if( NinePatchImage::IsNinePatchUrl( url ) )
-    {
-      NPatchRenderer* rendererPtr = dynamic_cast< NPatchRenderer* >( &GetImplementation( renderer ) );
-      if( rendererPtr )
-      {
-        rendererPtr->SetImage( url );
-        return;
-      }
-    }
-    else if( SvgRenderer::IsSvgUrl( url ) )
-    {
-      SvgRenderer* rendererPtr = dynamic_cast< SvgRenderer* >( &GetImplementation( renderer ) );
-      if( rendererPtr )
-      {
-        rendererPtr->SetImage( url, size );
-        return;
-      }
-    }
-    else
-    {
-      ImageRenderer* rendererPtr = dynamic_cast< ImageRenderer* >( &GetImplementation( renderer ) );
-      if( rendererPtr )
-      {
-        rendererPtr->SetImage( actor, url, size );
-        return;
-      }
-    }
-
-    renderer.RemoveAndReset( actor );
-  }
-
-  renderer = GetControlRenderer( url, size );
-  if( actor && actor.OnStage() )
-  {
-    renderer.SetOnStage( actor );
-  }
-}
-
-void RendererFactory::ResetRenderer( Toolkit::ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
-{
-  if( mDebugEnabled && renderer )
-  {
-    return;
-  }
-
-  if( renderer )
-  {
-    ControlRenderer& controlRenderer = GetImplementation( renderer );
-
-    RendererType type = GetRendererType( propertyMap );
-
-    //If there's no renderer type specified or if there hasn't been a renderer type change then we can reuse the renderer
-    if( type == UNDEFINED ||
-        ( type == IMAGE     && typeid( controlRenderer ) == typeid( ImageRenderer ) ) ||
-        ( type == N_PATCH   && typeid( controlRenderer ) == typeid( NPatchRenderer ) ) ||
-        ( type == COLOR     && typeid( controlRenderer ) == typeid( ColorRenderer ) ) ||
-        ( type == GRADIENT  && typeid( controlRenderer ) == typeid( GradientRenderer ) ) ||
-        ( type == BORDER    && typeid( controlRenderer ) == typeid( BorderRenderer ) ) ||
-        ( type == SVG       && typeid( controlRenderer ) == typeid( SvgRenderer ) ) ||
-        ( type == MESH      && typeid( controlRenderer ) == typeid( MeshRenderer ) ) )
-    {
-      controlRenderer.Initialize( actor, propertyMap );
-      return;
-    }
-
-    renderer.RemoveAndReset( actor );
-  }
-
-  renderer = GetControlRenderer( propertyMap );
-  if( renderer && actor && actor.OnStage() )
-  {
-    renderer.SetOnStage( actor );
   }
 }
 
