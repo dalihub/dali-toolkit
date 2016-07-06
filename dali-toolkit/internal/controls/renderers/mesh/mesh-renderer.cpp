@@ -452,7 +452,6 @@ bool MeshRenderer::CreateGeometry()
   //Determine if we need to use a simpler shader to handle the provided data
   if( !mUseTexture || !mObjLoader.IsDiffuseMapPresent() )
   {
-    mUseTexture = false;
     mShaderType = TEXTURELESS;
   }
   else if( mShaderType == ALL_TEXTURES && (!mObjLoader.IsNormalMapPresent() || !mObjLoader.IsSpecularMapPresent()) )
@@ -527,7 +526,7 @@ bool MeshRenderer::LoadTextures()
 {
   mTextureSet = TextureSet::New();
 
-  if( mUseTexture )
+  if( mShaderType != TEXTURELESS )
   {
     Sampler sampler = Sampler::New();
     if( mUseMipmapping )
