@@ -250,9 +250,9 @@ void CubeTransitionEffect::OnStageConnection( int depth )
 
   TextureSet textureSet = TextureSet::New();
 
-  if( mCurrentImage )
+  if( mCurrentTexture )
   {
-    textureSet.SetImage( 0u, mCurrentImage );
+    textureSet.SetTexture( 0u, mCurrentTexture );
   }
   mCurrentRenderer = Renderer::New( geometry, shader );
   mCurrentRenderer.SetTextures( textureSet );
@@ -311,24 +311,25 @@ bool CubeTransitionEffect::IsTransitioning()
   return mIsAnimating;
 }
 
-void CubeTransitionEffect::SetCurrentImage( Image image )
+void CubeTransitionEffect::SetCurrentTexture( Texture texture )
 {
-  mCurrentImage = image;
+  mCurrentTexture = texture;
+
   if( mCurrentRenderer )
   {
     TextureSet textureSet = mCurrentRenderer.GetTextures();
-    textureSet.SetImage( 0u, mCurrentImage );
+    textureSet.SetTexture( 0u, mCurrentTexture);
   }
 }
 
-void CubeTransitionEffect::SetTargetImage( Image image )
+void CubeTransitionEffect::SetTargetTexture( Texture texture )
 {
-  mTargetImage = image;
+  mTargetTexture = texture;
 
   if( mTargetRenderer )
   {
     TextureSet textureSet = mTargetRenderer.GetTextures();
-    textureSet.SetImage( 0u, mTargetImage );
+    textureSet.SetTexture( 0u, mTargetTexture );
   }
 }
 
@@ -355,9 +356,9 @@ void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisp
 
   //create the target renderer
   TextureSet textureSet = TextureSet::New();
-  if( mTargetImage )
+  if( mTargetTexture )
   {
-    textureSet.SetImage( 0u, mTargetImage );
+    textureSet.SetTexture( 0u, mTargetTexture );
   }
   Geometry geometry = mCurrentRenderer.GetGeometry();
   Shader shader( mCurrentRenderer.GetShader() );
@@ -467,13 +468,13 @@ void CubeTransitionEffect::OnTransitionFinished(Animation& source)
 
   std::swap( mCurrentTiles, mTargetTiles );
   std::swap( mCurrentRenderer, mTargetRenderer );
-  std::swap( mCurrentImage, mTargetImage );
+  std::swap( mCurrentTexture, mTargetTexture );
 
   ResetToInitialState();
 
   //Emit signal
   Toolkit::CubeTransitionEffect handle( GetOwner() );
-  mTransitionCompletedSignal.Emit( handle, mCurrentImage );
+  mTransitionCompletedSignal.Emit( handle, mCurrentTexture );
 }
 
 Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffect::TransitionCompletedSignal()
