@@ -237,7 +237,7 @@ private: // Implementation
   /**
    * @brief Render view, create and attach actor(s) to this Text Field.
    */
-  void RenderText();
+  void RenderText( Text::Controller::UpdateTextType updateTextType );
 
   // Connection needed to re-render text, when a Text Field returns to the stage.
   void OnStageConnect( Dali::Actor actor );

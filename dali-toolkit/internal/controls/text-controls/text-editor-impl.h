@@ -232,7 +232,7 @@ private: // Implementation
   /**
    * @brief Render view, create and attach actor(s) to this text editor.
    */
-  void RenderText();
+  void RenderText( Text::Controller::UpdateTextType updateTextType );
 
   // Connection needed to re-render text, when a text editor returns to the stage.
   void OnStageConnect( Dali::Actor actor );
