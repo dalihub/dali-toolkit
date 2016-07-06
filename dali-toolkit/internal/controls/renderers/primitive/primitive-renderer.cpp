@@ -94,7 +94,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform   mediump mat4 uViewMatrix;\n
   uniform   mediump mat3 uNormalMatrix;\n
   uniform   mediump mat4 uObjectMatrix;\n
-  uniform   mediump vec3 uLightPosition;\n
+  uniform   mediump vec3 lightPosition;\n
   uniform   mediump vec2 uStageOffset;\n
 
   void main()\n
@@ -111,9 +111,9 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
 
-    vec4 lightPosition = vec4( ( uLightPosition.xy - uStageOffset ), uLightPosition.z, 1.0 );\n
-    lightPosition = uViewMatrix * lightPosition;\n
-    vec3 vectorToLight = normalize( lightPosition.xyz - mvVertexPosition.xyz );\n
+    vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
+    mvLightPosition = uViewMatrix * mvLightPosition;\n
+    vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
 
     float lightDiffuse = max( dot( vectorToLight, normal ), 0.0 );\n
     vIllumination = vec3( lightDiffuse * 0.5 + 0.5 );\n

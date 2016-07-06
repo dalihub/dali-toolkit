@@ -656,6 +656,7 @@ int UtcDaliControlRendererGetPropertyMap8(void)
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_LOCATION );
   propertyMap.Insert( "shaderType", "TEXTURELESS" );
+  propertyMap.Insert( "lightPosition", Vector3( 5.0f, 10.0f, 15.0f) );
   ControlRenderer meshRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
@@ -681,6 +682,10 @@ int UtcDaliControlRendererGetPropertyMap8(void)
   value = resultMap.Find( "shaderType", Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<std::string>(), "TEXTURELESS", TEST_LOCATION );
+
+  value = resultMap.Find( "lightPosition", Property::VECTOR3 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
   END_TEST;
 }
@@ -709,7 +714,7 @@ int UtcDaliControlRendererGetPropertyMap9(void)
   propertyMap.Insert( "scaleDimensions", dimensions );
   propertyMap.Insert( "bevelPercentage", 0.3f );
   propertyMap.Insert( "bevelSmoothness", 0.6f );
-  propertyMap.Insert( "uLightPosition", Vector3( 5.0f, 10.0f, 15.0f) );
+  propertyMap.Insert( "lightPosition", Vector3( 5.0f, 10.0f, 15.0f) );
   ControlRenderer primitiveRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
@@ -765,7 +770,7 @@ int UtcDaliControlRendererGetPropertyMap9(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<float>(), 0.6f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  value = resultMap.Find( "uLightPosition", Property::VECTOR3 );
+  value = resultMap.Find( "lightPosition", Property::VECTOR3 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
 

@@ -87,7 +87,7 @@ namespace Internal
  *
  * | %Property Name  | Type        | Representing                            |
  * |-----------------|-------------|-----------------------------------------|
- * | uLightPosition  | VECTOR3     | The position (on stage) of the light    |
+ * | lightPosition   | VECTOR3     | The position (on stage) of the light    |
  */
 class PrimitiveRenderer: public ControlRenderer
 {

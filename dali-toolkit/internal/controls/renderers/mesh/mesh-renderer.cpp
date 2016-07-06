@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
@@ -81,8 +80,9 @@ enum TextureIndex
   GLOSS_INDEX = 2u
 };
 
-const char * const LIGHT_POSITION( "uLightPosition" ); //Shader property
-const char * const OBJECT_MATRIX( "uObjectMatrix" ); //Shader property
+//Shader properties
+const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
+const char * const STAGE_OFFSET_UNIFORM_NAME( "uStageOffset" );
 
 const char * const SHADER_TYPE_TEXTURELESS( "TEXTURELESS" );
 const char * const SHADER_TYPE_DIFFUSE_TEXTURE( "DIFFUSE_TEXTURE" );
@@ -100,24 +100,27 @@ const char* SIMPLE_VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump mat4 uModelView;\n
+  uniform mediump mat4 uViewMatrix;\n
   uniform mediump mat3 uNormalMatrix;
   uniform mediump mat4 uObjectMatrix;\n
-  uniform mediump vec3 uLightPosition;\n
+  uniform mediump vec3 lightPosition;\n
+  uniform mediump vec2 uStageOffset;\n
 
   void main()\n
   {\n
-    vec4 vertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
-    vertexPosition = uObjectMatrix * vertexPosition;\n
+    vec4 normalisedVertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
+    vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
     //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
+    vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
-    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
-    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
 
-    float lightDiffuse = max( dot( vecToLight, normal ), 0.0 );\n
+    vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
+    mvLightPosition = uViewMatrix * mvLightPosition;\n
+    vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
+
+    float lightDiffuse = max( dot( vectorToLight, normal ), 0.0 );\n
     vIllumination = vec3( lightDiffuse * 0.5 + 0.5 );\n
 
     gl_Position = vertexPosition;\n
@@ -147,33 +150,34 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump mat4 uModelView;
+  uniform mediump mat4 uViewMatrix;\n
   uniform mediump mat3 uNormalMatrix;
   uniform mediump mat4 uObjectMatrix;\n
-  uniform mediump vec3 uLightPosition;\n
+  uniform mediump vec3 lightPosition;\n
+  uniform mediump vec2 uStageOffset;\n
 
   void main()
   {\n
-    vec4 vertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
-    vertexPosition = uObjectMatrix * vertexPosition;\n
+    vec4 normalisedVertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
+    vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
     //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
-    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
+    vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
     vec3 normal = normalize( uNormalMatrix * mat3( uObjectMatrix ) * aNormal );\n
 
-    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-    vec3 viewDir = normalize( -vertPos.xyz );
+    vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
+    mvLightPosition = uViewMatrix * mvLightPosition;\n
+    vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
 
-    vec3 halfVector = normalize( viewDir + vecToLight );
+    vec3 viewDirection = normalize( -mvVertexPosition.xyz );
 
-    float lightDiffuse = dot( vecToLight, normal );\n
+    float lightDiffuse = dot( vectorToLight, normal );\n
     lightDiffuse = max( 0.0,lightDiffuse );\n
     vIllumination = vec3( lightDiffuse * 0.5 + 0.5 );\n
 
-    vec3 reflectDir = reflect( -vecToLight, normal );
-    vSpecular = pow( max( dot( reflectDir, viewDir ), 0.0 ), 4.0 );
+    vec3 reflectDirection = reflect( -vectorToLight, normal );
+    vSpecular = pow( max( dot( reflectDirection, viewDirection ), 0.0 ), 4.0 );
 
     vTexCoord = aTexCoord;\n
     gl_Position = vertexPosition;\n
@@ -210,31 +214,32 @@ const char* NORMAL_MAP_VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump mat4 uModelView;
+  uniform mediump mat4 uViewMatrix;\n
   uniform mediump mat3 uNormalMatrix;
   uniform mediump mat4 uObjectMatrix;\n
-  uniform mediump vec3 uLightPosition;\n
-
+  uniform mediump vec3 lightPosition;\n
+  uniform mediump vec2 uStageOffset;\n
   void main()
   {\n
-    vec4 vertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
-    vertexPosition = uObjectMatrix * vertexPosition;\n
+    vec4 normalisedVertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
+    vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
-    vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
-    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
+    vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
 
-    vec3 tangent = normalize( uNormalMatrix * aTangent );
-    vec3 binormal = normalize( uNormalMatrix * aBiNormal );
+    vec3 tangent = normalize( uNormalMatrix * mat3( uObjectMatrix ) * aTangent );
+    vec3 binormal = normalize( uNormalMatrix * mat3( uObjectMatrix ) * aBiNormal );
     vec3 normal = normalize( uNormalMatrix * mat3( uObjectMatrix ) * aNormal );
 
-    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-    vLightDirection.x = dot( vecToLight, tangent );
-    vLightDirection.y = dot( vecToLight, binormal );
-    vLightDirection.z = dot( vecToLight, normal );
+    vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
+    mvLightPosition = uViewMatrix * mvLightPosition;\n
+    vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
+    vLightDirection.x = dot( vectorToLight, tangent );
+    vLightDirection.y = dot( vectorToLight, binormal );
+    vLightDirection.z = dot( vectorToLight, normal );
 
-    vec3 viewDir = normalize( -vertPos.xyz );
-    vec3 halfVector = normalize( viewDir + vecToLight );
+    vec3 viewDirection = normalize( -mvVertexPosition.xyz );
+    vec3 halfVector = normalize( viewDirection + vectorToLight );
     vHalfVector.x = dot( halfVector, tangent );
     vHalfVector.y = dot( halfVector, binormal );
     vHalfVector.z = dot( halfVector, normal );
@@ -294,7 +299,6 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
   }
 
   Property::Value* materialUrl = propertyMap.Find( MATERIAL_URL );
-
   if( !materialUrl || !materialUrl->Get( mMaterialUrl ) || mMaterialUrl.empty() )
   {
     mUseTexture = false;
@@ -306,12 +310,6 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
     //Default behaviour is to assume files are in the same directory,
     // or have their locations detailed in full when supplied.
     mTexturesPath.clear();
-  }
-
-  Property::Value* useMipmapping = propertyMap.Find( USE_MIPMAPPING );
-  if( useMipmapping )
-  {
-    useMipmapping->Get( mUseMipmapping );
   }
 
   Property::Value* shaderType = propertyMap.Find( SHADER_TYPE );
@@ -339,10 +337,34 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
     }
   }
 
+  Property::Value* useMipmapping = propertyMap.Find( USE_MIPMAPPING );
+  if( useMipmapping )
+  {
+    useMipmapping->Get( mUseMipmapping );
+  }
+
   Property::Value* useSoftNormals = propertyMap.Find( USE_SOFT_NORMALS );
   if( useSoftNormals )
   {
     useSoftNormals->Get( mUseSoftNormals );
+  }
+
+  Property::Value* lightPosition = propertyMap.Find( LIGHT_POSITION_UNIFORM_NAME );
+  if( lightPosition )
+  {
+    if( !lightPosition->Get( mLightPosition ) )
+    {
+      DALI_LOG_ERROR( "Invalid value passed for light position in MeshRenderer object.\n" );
+      mLightPosition = Vector3::ZERO;
+    }
+  }
+  else
+  {
+    //Default behaviour is to place the light directly in front of the object,
+    // at a reasonable distance to light everything on screen.
+    Stage stage = Stage::GetCurrent();
+
+    mLightPosition = Vector3( stage.GetSize().width / 2, stage.GetSize().height / 2, stage.GetSize().width * 5 );
   }
 }
 
@@ -403,6 +425,7 @@ void MeshRenderer::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( USE_MIPMAPPING, mUseMipmapping );
   map.Insert( USE_SOFT_NORMALS, mUseSoftNormals );
+  map.Insert( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
 }
 
 void MeshRenderer::InitializeRenderer()
@@ -457,13 +480,15 @@ void MeshRenderer::SupplyEmptyGeometry()
 void MeshRenderer::UpdateShaderUniforms()
 {
   Stage stage = Stage::GetCurrent();
-
-  Vector3 lightPosition( 0, 0, stage.GetSize().width );
-  mShader.RegisterProperty( LIGHT_POSITION, lightPosition );
+  float width = stage.GetSize().width;
+  float height = stage.GetSize().height;
 
   Matrix scaleMatrix;
   scaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
-  mShader.RegisterProperty( OBJECT_MATRIX, scaleMatrix );
+
+  mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
+  mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
+  mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
 }
 
 void MeshRenderer::CreateShader()

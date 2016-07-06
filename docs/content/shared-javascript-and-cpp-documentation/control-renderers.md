@@ -446,6 +446,7 @@ Renders a mesh using a .obj file, optionally with textures provided by a mtl fil
 | [shaderType](@ref mesh-renderer-shader-type) | STRING  | No                 | Sets the type of shader to be used with the mesh.                                          |
 | useMipmapping                                | BOOLEAN | No                 | Flag for whether to use mipmaps for textures or not. Default true.                         |
 | useSoftNormals                               | BOOLEAN | No                 | Flag for whether to average normals at each point to smooth textures or not. Default true. |
+| lightPosition                                | VECTOR3 | No                 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the upper left corner. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. |
 
 ### Shader Type {#mesh-renderer-shader-type}
 
@@ -463,14 +464,15 @@ When specifying the shader type, if anything the shader requires is missing, a s
 
 ~~~{.cpp}
 // C++
+Dali::Stage stage = Dali::Stage::GetCurrent();
 Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "MESH";
-map[ "objectUrl"    ] = "home/models/Dino.obj";
-map[ "materialUrl"  ] = "home/models/Dino.mtl";
-map[ "texturesPath" ] = "home/images/";
+map[ "rendererType"  ] = "MESH";
+map[ "objectUrl"     ] = "home/models/Dino.obj";
+map[ "materialUrl"   ] = "home/models/Dino.mtl";
+map[ "texturesPath"  ] = "home/images/";
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
@@ -501,7 +503,7 @@ Renders a simple 3D shape, such as a cube or sphere. Scaled to fit the control.
 | scaleDimensions                       | VECTOR3 | The dimensions of a cuboid. Scales in the same fashion as a 9-patch image.      | (1.0, 1.0, 1.0)      | > 0.0 for each                 |
 | [bevelPercentage](@ref bevel-details) | FLOAT   | Determines how bevelled the cuboid should be, based off the smallest dimension. | 0.0 (no bevel)       | 0.0 - 1.0                      |
 | bevelSmoothness                       | FLOAT   | Defines how smooth the bevelled edges should be.                                | 0.0 (sharp edges)    | 0.0 - 1.0                      |
-| uLightPosition                        | VECTOR3 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the upper left back corner. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. | (Offset outwards from the center of the screen.) | Unlimited |
+| lightPosition                        | VECTOR3 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the upper left back corner. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. | (Offset outwards from the center of the screen.) | Unlimited |
 
 ### Shapes {#shape-details}
 

@@ -48,6 +48,7 @@ namespace Internal
  * | shaderType      | STRING      | An enum of shader types                                               |
  * | useMipmapping   | BOOLEAN     | If true, use mipmaps for textures. Default true.                      |
  * | useSoftNormals  | BOOLEAN     | If true, average normals at points for smooth textures. Default true. |
+ * | lightPosition   | VECTOR3     | The position (on stage) of the light                                  |
  */
 class MeshRenderer: public ControlRenderer
 {
@@ -193,6 +194,8 @@ private:
   ObjLoader mObjLoader;
   Vector3 mSceneCenter;
   Vector3 mSceneSize;
+
+  Vector3 mLightPosition;
   ShaderType mShaderType;
 
   bool mUseTexture;
