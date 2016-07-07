@@ -722,63 +722,11 @@ std::string Button::GetSelectedImageFilename() const
   return std::string();
 }
 
-std::string Button::GetBackgroundImageFilename() const
-{
-  if( mBackgroundContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mBackgroundContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetSelectedBackgroundImageFilename() const
-{
-  if( mSelectedBackgroundContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mSelectedBackgroundContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
 std::string Button::GetDisabledImageFilename() const
 {
   if( mDisabledContent )
   {
     ResourceImage image = ResourceImage::DownCast( mDisabledContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetDisabledSelectedImageFilename() const
-{
-  if( mDisabledSelectedContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mDisabledSelectedContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetDisabledBackgroundImageFilename() const
-{
-  if( mDisabledBackgroundContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mDisabledBackgroundContent );
     if( image )
     {
       return image.GetUrl();
