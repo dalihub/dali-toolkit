@@ -623,11 +623,18 @@ struct Decorator::Impl : public ConnectionTracker
 
   void SetupGestures()
   {
+    // Will consume tap gestures on handles.
     mTapDetector = TapGestureDetector::New();
-    mTapDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnTap );
 
-    mPanGestureDetector = PanGestureDetector::New();
-    mPanGestureDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnPan );
+    // Will consume double tap gestures on handles.
+    mTapDetector.SetMaximumTapsRequired( 2u );
+
+    // Will consume long press gestures on handles.
+    mLongPressDetector = LongPressGestureDetector::New();
+
+    // Detects pan gestures on handles.
+    mPanDetector = PanGestureDetector::New();
+    mPanDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnPan );
   }
 
   void CreateActiveLayer()
@@ -695,8 +702,15 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.actor.SetColor( mHandleColor );
 
         grabHandle.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
-        mTapDetector.Attach( grabHandle.grabArea );
-        mPanGestureDetector.Attach( grabHandle.grabArea );
+
+        // The grab handle's actor is attached to the tap and long press detectors in order to consume these events.
+        // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
+        mTapDetector.Attach( grabHandle.actor );
+        mLongPressDetector.Attach( grabHandle.actor );
+
+        // The grab handle's area is attached to the pan detector.
+        // The OnPan() method is connected to the signals emitted by the pan detector.
+        mPanDetector.Attach( grabHandle.grabArea );
 
         mActiveLayer.Add( grabHandle.actor );
       }
@@ -755,9 +769,16 @@ struct Decorator::Impl : public ConnectionTracker
         primary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
         primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-        mTapDetector.Attach( primary.grabArea );
-        mPanGestureDetector.Attach( primary.grabArea );
         primary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
+
+        // The handle's actor is attached to the tap and long press detectors in order to consume these events.
+        // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
+        mTapDetector.Attach( primary.actor );
+        mLongPressDetector.Attach( primary.actor );
+
+        // The handle's area is attached to the pan detector.
+        // The OnPan() method is connected to the signals emitted by the pan detector.
+        mPanDetector.Attach( primary.grabArea );
 
         primary.actor.Add( primary.grabArea );
 
@@ -792,9 +813,16 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
         secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-        mTapDetector.Attach( secondary.grabArea );
-        mPanGestureDetector.Attach( secondary.grabArea );
         secondary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
+
+        // The handle's actor is attached to the tap and long press detectors in order to consume these events.
+        // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
+        mTapDetector.Attach( secondary.actor );
+        mLongPressDetector.Attach( secondary.actor );
+
+        // The handle's area is attached to the pan detector.
+        // The OnPan() method is connected to the signals emitted by the pan detector.
+        mPanDetector.Attach( secondary.grabArea );
 
         secondary.actor.Add( secondary.grabArea );
 
@@ -1082,14 +1110,6 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHighlightRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mTextDepth - 2 ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
       }
-    }
-  }
-
-  void OnTap( Actor actor, const TapGesture& tap )
-  {
-    if( actor == mHandle[GRAB_HANDLE].actor )
-    {
-      // TODO
     }
   }
 
@@ -1637,8 +1657,10 @@ struct Decorator::Impl : public ConnectionTracker
 
   ControllerInterface& mController;
 
-  TapGestureDetector  mTapDetector;
-  PanGestureDetector  mPanGestureDetector;
+  TapGestureDetector       mTapDetector;
+  PanGestureDetector       mPanDetector;
+  LongPressGestureDetector mLongPressDetector;
+
   Timer               mCursorBlinkTimer;          ///< Timer to signal cursor to blink
   Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
