@@ -593,7 +593,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
           if( isValidFont &&
               isEmojiScript )
           {
-            const BufferImage bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
+            const PixelData bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
 
             // For color emojis, the font is valid if the bitmap is RGBA.
             isValidFont = bitmap && ( Pixel::BGRA8888 == bitmap.GetPixelFormat() );

@@ -41,7 +41,6 @@ namespace
   const uint32_t DEFAULT_BLOCK_HEIGHT( 16u );
   const uint32_t SINGLE_PIXEL_PADDING( 1u );
   const uint32_t DOUBLE_PIXEL_PADDING( SINGLE_PIXEL_PADDING << 1 );
-  const uint32_t FILLED_PIXEL( -1 );
   Toolkit::AtlasManager::AtlasSize EMPTY_SIZE;
 }
 
@@ -79,8 +78,7 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
     return 0;
   }
 
-  Dali::Atlas atlas = Dali::Atlas::New( width, height, pixelformat );
-  atlas.Clear( Vector4::ZERO );
+  Dali::Texture atlas = Dali::Texture::New( TextureType::TEXTURE_2D, pixelformat, width, height );
   AtlasDescriptor atlasDescriptor;
   atlasDescriptor.mAtlas = atlas;
   atlasDescriptor.mSize = size;
@@ -88,35 +86,21 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   atlasDescriptor.mTotalBlocks = ( ( width - 1u ) / blockWidth ) * ( ( height - 1u ) / blockHeight );
   atlasDescriptor.mAvailableBlocks = atlasDescriptor.mTotalBlocks;
 
-  atlasDescriptor.mHorizontalStrip = BufferImage::New( blockWidth, SINGLE_PIXEL_PADDING, pixelformat );
-  atlasDescriptor.mVerticalStrip = BufferImage::New( SINGLE_PIXEL_PADDING, blockHeight - DOUBLE_PIXEL_PADDING, pixelformat );
+  unsigned int bufferSize(  blockWidth * SINGLE_PIXEL_PADDING * Dali::Pixel::GetBytesPerPixel(pixelformat) );
+  unsigned char* bufferHorizontalStrip = new unsigned char[bufferSize];
+  memset( bufferHorizontalStrip, 0, bufferSize );
+  atlasDescriptor.mHorizontalStrip = PixelData::New( bufferHorizontalStrip, bufferSize, blockWidth, SINGLE_PIXEL_PADDING, pixelformat, PixelData::DELETE_ARRAY );
 
-  PixelBuffer* buffer = atlasDescriptor.mHorizontalStrip.GetBuffer();
-  if( buffer == NULL )
-  {
-    DALI_LOG_ERROR("atlasDescriptor.mHorizontalStrip.GetBuffer() returns NULL\n");
-    return 0;
-  }
-  memset( buffer, 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
+  bufferSize = SINGLE_PIXEL_PADDING * (blockHeight - DOUBLE_PIXEL_PADDING) * Dali::Pixel::GetBytesPerPixel(pixelformat);
+  unsigned char* bufferVerticalStrip = new unsigned char[bufferSize];
+  memset( bufferVerticalStrip, 0, bufferSize );
+  atlasDescriptor.mVerticalStrip = PixelData::New( bufferVerticalStrip, bufferSize, SINGLE_PIXEL_PADDING, blockHeight - DOUBLE_PIXEL_PADDING, pixelformat, PixelData::DELETE_ARRAY );
 
-  buffer = atlasDescriptor.mVerticalStrip.GetBuffer();
-  if( buffer == NULL )
-  {
-    DALI_LOG_ERROR("atlasDescriptor.mVerticalStrip.GetBuffer() returns NULL\n");
-    return 0;
-  }
-  memset( buffer, 0, atlasDescriptor.mVerticalStrip.GetBufferSize() );
-
-  BufferImage filledPixelImage = BufferImage::New( 1u, 1u, pixelformat );
-  buffer = filledPixelImage.GetBuffer();
-  if( buffer == NULL)
-  {
-    DALI_LOG_ERROR("filledPixelImage.GetBuffer() returns NULL\n");
-    return 0;
-  }
-
-  memset( buffer, 0xFF, filledPixelImage.GetBufferSize() );
-  atlas.Upload( filledPixelImage, 0, 0 );
+  bufferSize = Dali::Pixel::GetBytesPerPixel(pixelformat);
+  unsigned char* buffer = new unsigned char[bufferSize];
+  memset( buffer, 0xFF, bufferSize );
+  PixelData filledPixelImage = PixelData::New( buffer, bufferSize, 1u, 1u, pixelformat, PixelData::DELETE_ARRAY );
+  atlas.Upload( filledPixelImage, 0u, 0u, 0u, 0u, 1u, 1u );
   mAtlasList.push_back( atlasDescriptor );
   return mAtlasList.size();
 }
@@ -126,7 +110,7 @@ void AtlasManager::SetAddPolicy( Toolkit::AtlasManager::AddFailPolicy policy )
   mAddFailPolicy = policy;
 }
 
-bool AtlasManager::Add( const BufferImage& image,
+bool AtlasManager::Add( const PixelData& image,
                         Toolkit::AtlasManager::AtlasSlot& slot,
                         Toolkit::AtlasManager::AtlasId atlas )
 {
@@ -245,7 +229,7 @@ AtlasManager::SizeType AtlasManager::CheckAtlas( SizeType atlas,
   return result;
 }
 
-void AtlasManager::UploadImage( const BufferImage& image,
+void AtlasManager::UploadImage( const PixelData& image,
                                 const AtlasSlotDescriptor& desc )
 {
   // Get the atlas to upload the image to
@@ -271,25 +255,30 @@ void AtlasManager::UploadImage( const BufferImage& image,
   SizeType height = image.GetHeight();
 
   // Blit image 1 pixel to the right and down into the block to compensate for texture filtering
-  if ( !mAtlasList[ atlas ].mAtlas.Upload( image,
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( image, 0u, 0u,
                                            blockOffsetX + SINGLE_PIXEL_PADDING,
-                                           blockOffsetY + SINGLE_PIXEL_PADDING ) )
+                                           blockOffsetY + SINGLE_PIXEL_PADDING,
+                                           width, height) )
   {
     DALI_LOG_ERROR("Uploading image to Atlas Failed!.\n");
   }
 
   // Blit top strip
-  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip, 0u, 0u,
                                            blockOffsetX,
-                                           blockOffsetY ) )
+                                           blockOffsetY,
+                                           mAtlasList[ atlas ].mHorizontalStrip.GetWidth(),
+                                           mAtlasList[ atlas ].mHorizontalStrip.GetHeight()) )
   {
     DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
   }
 
   // Blit left strip
-  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip, 0u, 0u,
                                            blockOffsetX,
-                                           blockOffsetY + SINGLE_PIXEL_PADDING ) )
+                                           blockOffsetY + SINGLE_PIXEL_PADDING,
+                                           mAtlasList[ atlas ].mVerticalStrip.GetWidth(),
+                                           mAtlasList[ atlas ].mVerticalStrip.GetHeight() ) )
   {
     DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
   }
@@ -297,9 +286,11 @@ void AtlasManager::UploadImage( const BufferImage& image,
   // Blit bottom strip
   if ( blockOffsetY + height + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mHeight )
   {
-    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip, 0u, 0u,
                                              blockOffsetX,
-                                             blockOffsetY + height + SINGLE_PIXEL_PADDING ) )
+                                             blockOffsetY + height + SINGLE_PIXEL_PADDING,
+                                             mAtlasList[ atlas ].mHorizontalStrip.GetWidth(),
+                                             mAtlasList[ atlas ].mHorizontalStrip.GetHeight() ) )
     {
       DALI_LOG_ERROR("Uploading bottom strip to Atlas Failed!.\n");
     }
@@ -308,9 +299,11 @@ void AtlasManager::UploadImage( const BufferImage& image,
   // Blit right strip
   if ( blockOffsetX + width + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mWidth )
   {
-    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip, 0u, 0u,
                                              blockOffsetX + width + SINGLE_PIXEL_PADDING,
-                                             blockOffsetY + SINGLE_PIXEL_PADDING ) )
+                                             blockOffsetY + SINGLE_PIXEL_PADDING,
+                                             mAtlasList[ atlas ].mVerticalStrip.GetWidth(),
+                                             mAtlasList[ atlas ].mVerticalStrip.GetHeight() ) )
     {
       DALI_LOG_ERROR("Uploading right strip to Atlas Failed!.\n");
     }
@@ -349,10 +342,10 @@ void AtlasManager::GenerateMeshData( ImageId id,
   }
 }
 
-Dali::Atlas AtlasManager::GetAtlasContainer( AtlasId atlas ) const
+Dali::Texture AtlasManager::GetAtlasContainer( AtlasId atlas ) const
 {
   DALI_ASSERT_DEBUG( atlas && atlas <= mAtlasList.size() );
-  Dali::Atlas atlasContainer;
+  Dali::Texture atlasContainer;
   if ( atlas && atlas-- <= mAtlasList.size() )
   {
     atlasContainer = mAtlasList[ atlas ].mAtlas;

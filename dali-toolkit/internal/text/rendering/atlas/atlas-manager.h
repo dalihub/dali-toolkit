@@ -157,13 +157,13 @@ public:
    *          If an add is made before an atlas is created under this policy,
    *          then a default size atlas will be created
    *
-   * @param[in] image reference to a bitmapimage
+   * @param[in] image PixelData object containing the image data
    * @param[out] slot result of add operation
    * @param[in] atlas optional preferred atlas
    *
    * @return true if a new atlas was created
    */
-  bool Add( const BufferImage& image,
+  bool Add( const PixelData& image,
             AtlasSlot& slot,
             AtlasId atlas = 0 );
 
@@ -196,7 +196,7 @@ public:
    *
    * @return Atlas Handle
    */
-  Dali::Atlas GetAtlasContainer( AtlasId atlas ) const;
+  Dali::Texture GetAtlasContainer( AtlasId atlas ) const;
 
   /**
    * @brief Get the Id of the atlas containing an image
