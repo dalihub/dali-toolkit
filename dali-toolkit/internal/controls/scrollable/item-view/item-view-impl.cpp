@@ -1440,16 +1440,6 @@ void ItemView::CalculateDomainSize(const Vector3& layoutSize)
   }
 }
 
-Vector2 ItemView::GetDomainSize() const
-{
-  Actor self = Self();
-
-  float minScrollPosition = self.GetProperty<float>(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_Y);
-  float maxScrollPosition = self.GetProperty<float>(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX_Y);
-
-  return Vector2(0.0f, fabs(GetScrollPosition(minScrollPosition, self.GetCurrentSize()) - GetScrollPosition(-maxScrollPosition, self.GetCurrentSize())));
-}
-
 bool ItemView::IsLayoutScrollable(const Vector3& layoutSize)
 {
   Actor self = Self();

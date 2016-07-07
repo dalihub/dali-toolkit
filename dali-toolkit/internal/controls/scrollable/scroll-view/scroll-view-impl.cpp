@@ -1175,19 +1175,6 @@ Vector2 ScrollView::GetCurrentScrollPosition() const
   return -GetPropertyPosition();
 }
 
-Vector2 ScrollView::GetDomainSize() const
-{
-  Vector3 size = Self().GetCurrentSize();
-
-  const RulerDomain& xDomain = GetRulerX()->GetDomain();
-  const RulerDomain& yDomain = GetRulerY()->GetDomain();
-
-  Vector2 domainSize;
-  domainSize.x = xDomain.max - xDomain.min - size.x;
-  domainSize.y = yDomain.max - yDomain.min - size.y;
-  return domainSize;
-}
-
 void ScrollView::TransformTo(const Vector2& position,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
