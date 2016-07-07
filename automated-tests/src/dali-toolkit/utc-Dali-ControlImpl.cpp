@@ -25,6 +25,7 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
@@ -941,6 +942,177 @@ int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
   Actor result = controlImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::KeyboardFocus::LEFT, false );
 
   DALI_TEST_EQUALS( result, currentFocusedActor, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplRegisterThenReRegisterVisual(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index index =1;
+  Actor placementActor = Actor::New();
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( index, placementActor, visual );
+
+
+  Property::Map newMap;
+  newMap[Visual::Property::TYPE] = Visual::COLOR;
+  newMap[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+  visual = visualFactory.CreateVisual( newMap );
+  DALI_TEST_CHECK(visual);
+
+  // ReRegister with altered color visual
+  dummyImpl.RegisterVisual( index, placementActor, visual );
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliControlImplRegisterVisaulThenReRegisterToSelf(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index index =1;
+  Actor placementActor = Actor::New();
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( index, placementActor, visual );
+
+  // ReRegister to self
+  dummyImpl.RegisterVisual( index, dummy, visual );
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliControlImplRegisterVisualToSelf(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index index =1;
+  Actor placementActor = Actor::New();
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // ReRegister to self
+  dummyImpl.RegisterVisual( index, dummy, visual );
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+
+int UtcDaliControlImplRegisterTwoVisuals(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index index =1;
+  Actor placementActor = Actor::New();
+
+  Property::Index index2 =2;
+  Actor secondPlacementActor = Actor::New();
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+  Toolkit::Visual::Base secondVisual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( index, placementActor, visual );
+
+  Property::Map newMap;
+  newMap[Visual::Property::TYPE] = Visual::COLOR;
+  newMap[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+  secondVisual = visualFactory.CreateVisual( newMap );
+
+  // ReRegister with altered color visual
+  dummyImpl.RegisterVisual( index2, secondPlacementActor, secondVisual );
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliControlImplRegisterUnregisterVisual(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index index =1;
+  Actor placementActor = Actor::New();
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( index, placementActor, visual );
+
+  // Unregister visual
+  dummyImpl.UnregisterVisual( index );
+
+  tet_result(TET_PASS);
 
   END_TEST;
 }
