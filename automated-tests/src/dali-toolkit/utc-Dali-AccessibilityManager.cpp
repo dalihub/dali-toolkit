@@ -1282,6 +1282,16 @@ int UtcDaliAccessibilityManagerActionActivateSignalP(void)
   AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK( manager );
 
+  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
+  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
+  accAdaptor.HandleActionEnableEvent();
+
+  Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
+  button.SetSize(480, 800);
+  Stage::GetCurrent().Add(button);
+  manager.SetFocusOrder( button, 1 );
+  manager.SetCurrentFocusActor( button );
+
   manager.ActionActivateSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 
   Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
@@ -1530,11 +1540,11 @@ int UtcDaliAccessibilityManagerActionDownSignalP(void)
 
   manager.ActionDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 
-  DummyControl dummyControl = DummyControl::New(true);
-  dummyControl.SetSize(480, 800);
-  manager.SetFocusOrder( dummyControl, 1 );
-  Stage::GetCurrent().Add( dummyControl );
-  manager.SetCurrentFocusActor( dummyControl );
+  Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
+  button.SetSize(480, 800);
+  Stage::GetCurrent().Add(button);
+  manager.SetFocusOrder( button, 1 );
+  manager.SetCurrentFocusActor( button );
 
   accessibilityAdaptor.HandleActionDownEvent();
 
@@ -2054,12 +2064,18 @@ int UtcDaliAccessibilityManagerActionZoomSignalP(void)
 
   AccessibilityManagerSignalHandler callback;
 
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
+  button.SetSize(480, 800);
+  Stage::GetCurrent().Add(button);
+  manager.SetFocusOrder( button, 1 );
+  manager.SetCurrentFocusActor( button );
+
   Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
   Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
   accAdaptor.HandleActionEnableEvent();
-
-  AccessibilityManager manager = AccessibilityManager::Get();
-  DALI_TEST_CHECK( manager );
 
   manager.ActionZoomSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 

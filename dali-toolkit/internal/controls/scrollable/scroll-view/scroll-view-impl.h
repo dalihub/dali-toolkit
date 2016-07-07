@@ -364,11 +364,6 @@ public:
   Vector2 GetCurrentScrollPosition() const;
 
   /**
-   * @copydoc Toolkit::Scrollable::GetDomainSize
-   */
-  Vector2 GetDomainSize() const;
-
-  /**
    * @copydoc ScrollTo(const Vector2&)
    */
   void TransformTo(const Vector2& position,

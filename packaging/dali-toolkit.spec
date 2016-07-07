@@ -37,12 +37,6 @@ BuildRequires:  dali-adaptor-devel
   %define dali_toolkit_profile MOBILE
 %endif
 
-%if 0%{?enable_coverage}
-CXXFLAGS+=" -fprofile-arcs -ftest-coverage --coverage "
-LDFLAGS+=" -fprofile-arcs -ftest-coverage --coverage -lgcov "
-%endif
-
-
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
 user interface functionality.
@@ -87,6 +81,11 @@ done
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
+
+%if 0%{?enable_coverage}
+CXXFLAGS+=" --coverage "
+LDFLAGS+=" --coverage "
+%endif
 
 libtoolize --force
 cd %{_builddir}/dali-toolkit-%{version}/build/tizen
