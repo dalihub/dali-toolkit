@@ -105,11 +105,6 @@ public:
      * pointer semantics
      */
     KeyNodePair operator*();
-
-    /*
-     * pointer semantics
-     */
-    KeyNodePair operator->();
   private:
     TreeNode* mNode;
   };
