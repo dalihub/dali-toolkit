@@ -76,14 +76,14 @@ public:
   bool IsTransitioning();
 
   /**
-   * @copydoc Toolkit::CubeTransitionEffect::SetFirstImage
+   * @copydoc Toolkit::CubeTransitionEffect::SetCurrentTexture
    */
-  void SetCurrentImage( Image image );
+  void SetCurrentTexture( Texture texture );
 
   /**
-   * @copydoc Toolkit::CubeTransitionEffect::SetTargetImage
+   * @copydoc Toolkit::CubeTransitionEffect::SetTargetTexture
    */
-  void SetTargetImage( Image image );
+  void SetTargetTexture( Texture texture );
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::StartTransition(bool)
@@ -214,8 +214,9 @@ protected:
   Renderer                   mCurrentRenderer;
   Renderer                   mTargetRenderer;
 
-  Image                      mCurrentImage;
-  Image                      mTargetImage;
+  Texture                    mCurrentTexture;
+  Texture                    mTargetTexture;
+
   Animation                  mAnimation;
 
   Vector2                    mTileSize;

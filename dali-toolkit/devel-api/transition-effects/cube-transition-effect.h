@@ -21,6 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/rendering/texture.h>
+
 namespace Dali
 {
 
@@ -135,17 +138,17 @@ public:
   bool IsTransitioning();
 
   /**
-   * Set the current image to transition from
+   * Set the current texture to transition from
    * if using this same effect continually, only need to set once
-   * @param[in] image The current image
+   * @param[in] texture The current texture
    */
-  void SetCurrentImage(Image image);
+  void SetCurrentTexture( Texture texture );
 
   /**
-   * Set the target image to transit to
-   * @param[in] image The new Image showing on stage
+   * Set the target texture to transit to
+   * @param[in] texture The new Texture showing on stage
    */
-  void SetTargetImage(Image image);
+  void SetTargetTexture( Texture texture );
 
   /**
    * Activate the transition animation with horizontally left/right panGesture
@@ -184,13 +187,13 @@ public:
 public: //Signal
 
   //Transition animation completed signal
-  typedef Signal< void ( CubeTransitionEffect, Image ) > TransitionCompletedSignalType;
+  typedef Signal< void ( CubeTransitionEffect, Texture ) >  TransitionCompletedSignalType;
 
   /**
    * Signal emitted when the transition has completed animation
    * A callback of the following type may be connected
    * @code
-   *   void YourCallbackName( CubeTransitionEffect cubeEffect, Image currentImage );
+   *   void YourCallbackName( CubeTransitionEffect cubeEffect, Texture currentTexture );
    * @endcode
    * @return The Signal to connect to.
    */
