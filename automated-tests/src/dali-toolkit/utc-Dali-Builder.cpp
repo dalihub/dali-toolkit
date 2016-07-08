@@ -1604,3 +1604,43 @@ int UtcDaliBuilderMappingCycleCheck(void)
 
   END_TEST;
 }
+
+int UtcDaliBuilderTypeCasts(void)
+{
+  ToolkitTestApplication application;
+
+  std::string json(
+    "{"
+       "\"stage\":"
+       "[{"
+         "\"type\": \"Layer\","
+         "\"maximumSize\": { \"typeCast\":\"vector2\", \"value\":[100,15] },"
+         "\"position\":    { \"typeCast\":\"vector3\", \"value\":[100,10,1] },"
+         "\"color\":       { \"typeCast\":\"vector4\", \"value\":[0.5,0.5,0.5,1] },"
+         "\"sensitive\":   { \"typeCast\":\"boolean\", \"value\":false },"
+         "\"orientation\": { \"typeCast\":\"rotation\", \"value\":[10,10,10,10] },"
+         "\"colorMode\":   { \"typeCast\":\"string\", \"value\":\"USE_OWN_MULTIPLY_PARENT_COLOR\" },"
+         "\"clippingBox\": { \"typeCast\":\"rect\", \"value\":[10,10,10,10] }"
+      "}]"
+    "}"
+  );
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+  builder.AddActors( rootActor );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor createdActor = rootActor.GetChildAt( 0 );
+  DALI_TEST_EQUALS( createdActor.GetMaximumSize(), Vector2(100.0f,15.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetCurrentPosition(), Vector3(100.0f,10.0f,1.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetCurrentColor(), Vector4(0.5f,0.5f,0.5f,1.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.IsSensitive(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}
