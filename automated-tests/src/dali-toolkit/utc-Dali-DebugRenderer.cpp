@@ -74,7 +74,7 @@ int UtcDaliDebugRendererGetRenderer1(void)
   Property::Map propertyMap1;
   propertyMap1.Insert("rendererType",  "color");
   propertyMap1.Insert("mixColor",  Color::BLUE);
-  ControlRenderer colorRenderer = factory.GetControlRenderer(propertyMap1);
+  ControlRenderer colorRenderer = factory.CreateControlRenderer(propertyMap1);
   DALI_TEST_CHECK( colorRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( colorRenderer ) );
 
@@ -83,7 +83,7 @@ int UtcDaliDebugRendererGetRenderer1(void)
   propertyMap2.Insert("rendererType",  "border");
   propertyMap2.Insert("borderColor",  Color::BLUE);
   propertyMap2.Insert("borderSize",  2.f);
-  ControlRenderer borderRenderer = factory.GetControlRenderer(propertyMap2);
+  ControlRenderer borderRenderer = factory.CreateControlRenderer(propertyMap2);
   DALI_TEST_CHECK( borderRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( borderRenderer ) );
 
@@ -103,7 +103,7 @@ int UtcDaliDebugRendererGetRenderer1(void)
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
   propertyMap3.Insert("gradientStopColor",   stopColors);
-  ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap3);
+  ControlRenderer gradientRenderer = factory.CreateControlRenderer(propertyMap3);
   DALI_TEST_CHECK( gradientRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( gradientRenderer ) );
 
@@ -111,7 +111,7 @@ int UtcDaliDebugRendererGetRenderer1(void)
   Property::Map propertyMap4;
   propertyMap4.Insert( "rendererType",  "image" );
   propertyMap4.Insert( "url",  TEST_IMAGE_FILE_NAME );
-  ControlRenderer imageRenderer = factory.GetControlRenderer( propertyMap4 );
+  ControlRenderer imageRenderer = factory.CreateControlRenderer( propertyMap4 );
   DALI_TEST_CHECK( imageRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( imageRenderer ) );
 
@@ -119,7 +119,7 @@ int UtcDaliDebugRendererGetRenderer1(void)
   Property::Map propertyMap5;
   propertyMap5.Insert( "rendererType",  "image" );
   propertyMap5.Insert( "url",  TEST_NPATCH_FILE_NAME );
-  ControlRenderer nPatchRenderer = factory.GetControlRenderer( propertyMap4 );
+  ControlRenderer nPatchRenderer = factory.CreateControlRenderer( propertyMap4 );
   DALI_TEST_CHECK( nPatchRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( nPatchRenderer ) );
 
@@ -137,64 +137,33 @@ int UtcDaliDebugRendererGetRenderer2(void)
   DALI_TEST_CHECK( factory );
 
   // Test that color renderer is replaced with debug renderer
-  ControlRenderer colorRenderer = factory.GetControlRenderer(Color::CYAN);
+  Dali::Property::Map map;
+  map[ "rendererType" ] = "color";
+  map[ "mixColor" ] = Color::CYAN;
+
+  ControlRenderer colorRenderer = factory.CreateControlRenderer( map);
   DALI_TEST_CHECK( colorRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( colorRenderer ) );
 
   // Test that border renderer is replaced with debug renderer
-  ControlRenderer borderRenderer = factory.GetControlRenderer(2.f, Color::GREEN);
+  map.Clear();
+  map[ "rendererType" ] = "border";
+  map[ "borderColor"  ] = Color::GREEN;
+  map[ "borderSize"   ] = 2.f;
+  ControlRenderer borderRenderer = factory.CreateControlRenderer( map );
   DALI_TEST_CHECK( borderRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( borderRenderer ) );
 
   // Test that image renderer is replaced with debug renderer
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  ControlRenderer imageRenderer = factory.GetControlRenderer( image );
+  ControlRenderer imageRenderer = factory.CreateControlRenderer( image );
   DALI_TEST_CHECK( imageRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( imageRenderer ) );
 
   // Test that n patch renderer is replaced with debug renderer
-  ControlRenderer nPatchRenderer = factory.GetControlRenderer( TEST_NPATCH_FILE_NAME );
+  ControlRenderer nPatchRenderer = factory.CreateControlRenderer( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( nPatchRenderer );
   DALI_TEST_CHECK( IsDebugRenderer( nPatchRenderer ) );
-
-  EnvironmentVariable::SetTestingEnvironmentVariable(false);
-  END_TEST;
-}
-
-int UtcDaliDebugRendererResetRenderer(void)
-{
-  EnvironmentVariable::SetTestingEnvironmentVariable(true);
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliDebugRendererResetRenderer: Reset renderer with various parameters" );
-
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  // Test that color renderer is replaced with debug renderer
-  ControlRenderer controlRenderer = factory.GetControlRenderer(Color::CYAN);
-  DALI_TEST_CHECK( controlRenderer );
-  DALI_TEST_CHECK( IsDebugRenderer( controlRenderer ) );
-
-  Actor actor;
-  // Reset to render another color
-  // Test that color renderer is replaced with debug renderer
-  factory.ResetRenderer( controlRenderer, actor, Color::BLUE );
-  DALI_TEST_CHECK( IsDebugRenderer( controlRenderer ) );
-
-  // Reset to render an image
-  // Test that image renderer is replaced with debug renderer
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  factory.ResetRenderer( controlRenderer, actor, image );
-  DALI_TEST_CHECK( IsDebugRenderer( controlRenderer ) );
-
-  // Reset with a property map of border renderer
-  // Test that border renderer is replaced with debug renderer
-  Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "border");
-  propertyMap.Insert("borderColor",  Color::BLUE);
-  propertyMap.Insert("borderSize",  2.f);
-  factory.ResetRenderer( controlRenderer, actor, propertyMap );
-  DALI_TEST_CHECK( IsDebugRenderer( controlRenderer ) );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;

@@ -6,9 +6,9 @@ Multi-Touch Events
 
 Touch events are received via signals.
 
-For C++ API see Dali::Actor::TouchedSignal() and Dali::Actor::HoveredSignal() for more details.
+For C++ API see Dali::Actor::TouchSignal() and Dali::Actor::HoveredSignal() for more details.
 
-For JavaScript use actor.connect( "touched", myCallback ) and actor.connect("hovered", myCallback );
+For JavaScript use actor.connect( "touch", myCallback ) and actor.connect("hovered", myCallback );
 
 ### Hit Testing Rules Summary:
 
@@ -115,7 +115,7 @@ Hit Priority of above Actor tree (all overlays): 1 - Lowest. 6 - Highest.
     IF ( TOUCH-SIGNAL-NOT-EMPTY )
     {
       // Only do the emission if touch signal of actor has connections.
-        CONSUMED = TOUCHED-SIGNAL( TOUCH-EVENT )
+        CONSUMED = TOUCH-SIGNAL( TOUCH-DATA )
     }
 
     IF ( NOT-CONSUMED )

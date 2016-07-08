@@ -94,55 +94,19 @@ RendererFactory::RendererFactory(Internal::RendererFactory *impl)
 {
 }
 
-ControlRenderer RendererFactory::GetControlRenderer( const Property::Map& propertyMap )
+ControlRenderer RendererFactory::CreateControlRenderer( const Property::Map& propertyMap )
 {
-  return GetImplementation( *this ).GetControlRenderer( propertyMap );
+  return GetImplementation( *this ).CreateControlRenderer( propertyMap );
 }
 
-ControlRenderer RendererFactory::GetControlRenderer( const Vector4& color )
+ControlRenderer RendererFactory::CreateControlRenderer( const Image& image )
 {
-  return GetImplementation( *this ).GetControlRenderer( color );
+  return GetImplementation( *this ).CreateControlRenderer( image );
 }
 
-void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Vector4& color )
+ControlRenderer RendererFactory::CreateControlRenderer( const std::string& url, ImageDimensions size )
 {
-  GetImplementation( *this ).ResetRenderer( renderer, actor, color );
-}
-
-ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor )
-{
-  return GetImplementation( *this ).GetControlRenderer( borderSize, borderColor, false );
-}
-
-
-ControlRenderer RendererFactory::GetControlRenderer( float borderSize, const Vector4& borderColor, bool antiAliasing )
-{
-  return GetImplementation( *this ).GetControlRenderer( borderSize, borderColor, antiAliasing );
-}
-
-ControlRenderer RendererFactory::GetControlRenderer( const Image& image )
-{
-  return GetImplementation( *this ).GetControlRenderer( image );
-}
-
-void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Image& image )
-{
-  GetImplementation( *this ).ResetRenderer( renderer, actor, image );
-}
-
-ControlRenderer RendererFactory::GetControlRenderer( const std::string& url, ImageDimensions size )
-{
-  return GetImplementation( *this ).GetControlRenderer( url, size );
-}
-
-void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const std::string& url, ImageDimensions size )
-{
-  GetImplementation( *this ).ResetRenderer( renderer, actor, url, size );
-}
-
-void RendererFactory::ResetRenderer( ControlRenderer& renderer, Actor& actor, const Property::Map& propertyMap )
-{
-  GetImplementation( *this ).ResetRenderer( renderer, actor, propertyMap );
+  return GetImplementation( *this ).CreateControlRenderer( url, size );
 }
 
 } // namespace Toolkit

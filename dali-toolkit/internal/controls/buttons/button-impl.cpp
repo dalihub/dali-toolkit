@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -108,7 +108,7 @@ const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 } // unnamed namespace
 
 Button::Button()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mAutoRepeatingTimer(),
   mUnselectedColor( Color::WHITE ), // The natural colors of the specified images will be used by default.
   mSelectedColor( Color::WHITE ),
@@ -942,70 +942,6 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   return connected;
 }
 
-bool Button::OnTouchEvent(const TouchEvent& event)
-{
-  // Only events are processed when the button is not disabled and the touch event has only
-  // one touch point.
-  if( ( !mDisabled ) && ( 1 == event.GetPointCount() ) )
-  {
-    switch( event.GetPoint(0).state )
-    {
-      case TouchPoint::Down:
-      {
-        OnButtonDown(); // Notification for derived classes.
-
-        // Sets the button state to ButtonDown.
-        mState = ButtonDown;
-        break;
-      }
-      case TouchPoint::Up:
-      {
-        OnButtonUp(); // Notification for derived classes.
-
-        // Sets the button state to ButtonUp.
-        mState = ButtonUp;
-        break;
-      }
-      case TouchPoint::Interrupted:
-      {
-        OnTouchPointInterrupted(); // Notification for derived classes.
-
-        // Sets the button state to the default (ButtonUp).
-        mState = ButtonUp;
-        break;
-      }
-      case TouchPoint::Leave:
-      {
-        OnTouchPointLeave(); // Notification for derived classes.
-
-        // Sets the button state to the default (ButtonUp).
-        mState = ButtonUp;
-        break;
-      }
-      case TouchPoint::Motion:
-      case TouchPoint::Stationary: // FALLTHROUGH
-      {
-        // Nothing to do
-        break;
-      }
-      default:
-      {
-        DALI_ASSERT_ALWAYS( !"Point status unhandled." );
-        break;
-      }
-    }
-  }
-  else if( 1 < event.GetPointCount() )
-  {
-    OnTouchPointLeave(); // Notification for derived classes.
-
-    // Sets the button state to the default (ButtonUp).
-    mState = ButtonUp;
-  }
-
-  return false;
-}
-
 void Button::OnInitialize()
 {
   Actor self = Self();
@@ -1015,6 +951,8 @@ void Button::OnInitialize()
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
   self.SetKeyboardFocusable( true );
+
+  self.TouchSignal().Connect( this, &Button::OnTouch );
 }
 
 bool Button::OnAccessibilityActivated()
@@ -1049,6 +987,65 @@ void Button::OnStageDisconnection()
   mState = ButtonUp;
 
   Control::OnStageDisconnection();
+}
+
+bool Button::OnTouch( Actor actor, const TouchData& touch )
+{
+  // Only events are processed when the button is not disabled and the touch event has only
+  // one touch point.
+  if( ( !mDisabled ) && ( 1 == touch.GetPointCount() ) )
+  {
+    switch( touch.GetState( 0 ) )
+    {
+      case PointState::DOWN:
+      {
+        OnButtonDown(); // Notification for derived classes.
+
+        // Sets the button state to ButtonDown.
+        mState = ButtonDown;
+        break;
+      }
+      case PointState::UP:
+      {
+        OnButtonUp(); // Notification for derived classes.
+
+        // Sets the button state to ButtonUp.
+        mState = ButtonUp;
+        break;
+      }
+      case PointState::INTERRUPTED:
+      {
+        OnTouchPointInterrupted(); // Notification for derived classes.
+
+        // Sets the button state to the default (ButtonUp).
+        mState = ButtonUp;
+        break;
+      }
+      case PointState::LEAVE:
+      {
+        OnTouchPointLeave(); // Notification for derived classes.
+
+        // Sets the button state to the default (ButtonUp).
+        mState = ButtonUp;
+        break;
+      }
+      case PointState::MOTION:
+      case PointState::STATIONARY: // FALLTHROUGH
+      {
+        // Nothing to do
+        break;
+      }
+    }
+  }
+  else if( 1 < touch.GetPointCount() )
+  {
+    OnTouchPointLeave(); // Notification for derived classes.
+
+    // Sets the button state to the default (ButtonUp).
+    mState = ButtonUp;
+  }
+
+  return false;
 }
 
 void Button::OnTap(Actor actor, const TapGesture& tap)

@@ -40,7 +40,6 @@ namespace
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
-const unsigned int POINTS_PER_INCH = 72;
 
 const std::string EMPTY_STRING("");
 
@@ -490,15 +489,6 @@ void Controller::SetDefaultPointSize( float pointSize )
 
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
   mImpl->mFontDefaults->sizeDefined = true;
-
-  unsigned int horizontalDpi( 0u );
-  unsigned int verticalDpi( 0u );
-  mImpl->mFontClient.GetDpi( horizontalDpi, verticalDpi );
-
-  // Adjust the metrics if the fixed-size font should be down-scaled
-  int maxEmojiSize( pointSize/POINTS_PER_INCH * verticalDpi );
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultPointSize %p setting MaxEmojiSize %d\n", this, maxEmojiSize );
-  mImpl->mMetrics->SetMaxEmojiSize( maxEmojiSize );
 
   // Clear the font-specific data
   ClearFontData();
@@ -1389,17 +1379,18 @@ float Controller::GetHeightForWidth( float width )
   return layoutSize.height;
 }
 
-bool Controller::Relayout( const Size& size )
+Controller::UpdateTextType Controller::Relayout( const Size& size )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, (mImpl->mAutoScrollEnabled)?"true":"false"  );
 
+  UpdateTextType updateTextType = NONE_UPDATED;
+
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
-    bool glyphsRemoved( false );
     if( 0u != mImpl->mVisualModel->mGlyphPositions.Count() )
     {
       mImpl->mVisualModel->mGlyphPositions.Clear();
-      glyphsRemoved = true;
+      updateTextType = MODEL_UPDATED;
     }
 
     // Clear the update info. This info will be set the next time the text is updated.
@@ -1408,7 +1399,7 @@ bool Controller::Relayout( const Size& size )
     // Not worth to relayout if width or height is equal to zero.
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
 
-    return glyphsRemoved;
+    return updateTextType;
   }
 
   // Whether a new size has been set.
@@ -1447,6 +1438,11 @@ bool Controller::Relayout( const Size& size )
                         mImpl->mOperationsPending,
                         layoutSize ) || updated;
 
+  if( updated )
+  {
+    updateTextType = MODEL_UPDATED;
+  }
+
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
 
@@ -1478,14 +1474,17 @@ bool Controller::Relayout( const Size& size )
     }
 
     // Move the cursor, grab handle etc.
-    updated = mImpl->ProcessInputEvents() || updated;
+    if( mImpl->ProcessInputEvents() )
+    {
+      updateTextType = static_cast<UpdateTextType>( updateTextType | DECORATOR_UPDATED );
+    }
   }
 
   // Clear the update info. This info will be set the next time the text is updated.
   mImpl->mTextUpdateInfo.Clear();
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
 
-  return updated;
+  return updateTextType;
 }
 
 void Controller::ProcessModifyEvents()
@@ -2657,7 +2656,6 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
         mImpl->mEventData->mScrollAfterDelete = true;
 
         requestRelayout = true;
-        retrieveCursor = true;
       }
       break;
     }

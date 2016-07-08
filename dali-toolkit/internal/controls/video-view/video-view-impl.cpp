@@ -119,8 +119,8 @@ void VideoView::SetPropertyMap( Property::Map map )
 {
   mPropertyMap = map;
 
-  Actor self = Self();
-  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mPropertyMap );
+  Actor self( Self() );
+  InitializeControlRenderer( self, mRenderer, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -525,7 +525,7 @@ void VideoView::SetWindowSurfaceTarget()
 
 void VideoView::SetNativeImageTarget()
 {
-  Actor self = Self();
+  Actor self( Self() );
   int curPos = mVideoPlayer.GetPlayPosition();
 
   mSetRenderingTarget = true;
@@ -538,7 +538,7 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
-  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mNativeImage );
+  InitializeControlRenderer( self, mRenderer, mNativeImage );
 
   if( mIsPlay )
   {

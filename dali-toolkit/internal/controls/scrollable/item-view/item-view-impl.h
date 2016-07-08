@@ -392,13 +392,6 @@ private: // From CustomActorImpl
   virtual void OnChildAdd(Actor& child);
 
   /**
-   * From CustomActorImpl; called after a touch-signal is received by the owning actor.
-   * @param[in] event The touch event.
-   * @return True if the event should be consumed.
-   */
-  virtual bool OnTouchEvent(const TouchEvent& event);
-
-  /**
    * From CustomActorImpl; called after a wheel-event is received by the owning actor.
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
@@ -484,14 +477,6 @@ private:
   // Input Handling
 
   /**
-   * Helper to handle pressed (Down) events.
-   * @param[in] x The X coordinate of the touch event.
-   * @param[in] y The Y coordinate of the touch event.
-   * @param[in] timeMs The time-stamp of the touch event.
-   */
-  void OnPressed(float x, float y, unsigned long timeMs);
-
-  /**
    * Helper to clamp the first-item position when dragging/swiping.
    * @param[in] targetPosition The target position of the drag etc.
    * @param[in] targetSize The target ItemView & layout size.
@@ -500,6 +485,14 @@ private:
    * @return The clamped first-item position.
    */
   float ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout, bool updateOvershoot = true);
+
+  /**
+   * Called after a touch-signal is received by the owning actor.
+   * @param[in] actor The touched actor.
+   * @param[in] touch The touch information.
+   * @return True if the event should be consumed.
+   */
+  bool OnTouch( Actor actor, const TouchData& touch );
 
   /**
    * Called upon pan gesture event.

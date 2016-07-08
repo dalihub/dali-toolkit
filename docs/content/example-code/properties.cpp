@@ -79,7 +79,7 @@ public:
     mTagPropertyIndex = mImageView.RegisterProperty( TAG_PROPERTY_NAME, 0, Property::READ_WRITE /* Event-side only, i.e. not animatable */ );
 
     // Connect to the touch-event
-    mImageView.TouchedSignal().Connect( this, &PropertyController::OnTouched );
+    mImageView.TouchSignal().Connect( this, &PropertyController::OnTouched );
 
     // Create text label
     mTagText = Toolkit::TextLabel::New( "0" );
@@ -95,7 +95,7 @@ public:
    * param[in] touch The touch-event
    * return Set to true if the signal was consumed correctly
    */
-  bool OnTouched( Actor actor, const TouchEvent& touch )
+  bool OnTouched( Actor actor, const TouchData& touch )
   {
     int touchedCount = 0;
 

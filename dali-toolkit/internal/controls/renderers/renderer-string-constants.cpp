@@ -43,6 +43,7 @@ const char * const OBJECT_URL( "objectUrl" );
 const char * const MATERIAL_URL( "materialUrl" );
 const char * const TEXTURES_PATH( "texturesPath" );
 const char * const SHADER_TYPE( "shaderType" );
+const char * const USE_MIPMAPPING( "useMipmapping" );
 
 } // namespace Internal
 

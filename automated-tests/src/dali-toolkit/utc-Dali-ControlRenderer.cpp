@@ -54,7 +54,7 @@ int UtcDaliControlRendererCopyAndAssignment(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
 
   ControlRenderer controlRendererCopy( controlRenderer );
   DALI_TEST_CHECK(controlRenderer == controlRendererCopy);
@@ -87,7 +87,7 @@ int UtcDaliControlRendererSetGetDepthIndex(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
 
   controlRenderer.SetDepthIndex( 1.f );
 
@@ -118,7 +118,10 @@ int UtcDaliControlRendererSize(void)
   Vector2 naturalSize;
 
   // color renderer
-  ControlRenderer colorRenderer = factory.GetControlRenderer( Color::MAGENTA );
+  Dali::Property::Map map;
+  map[ "rendererType" ] = "color";
+  map[ "mixColor" ] = Color::MAGENTA;
+  ControlRenderer colorRenderer = factory.CreateControlRenderer( map );
   colorRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( colorRenderer.GetSize(), rendererSize, TEST_LOCATION );
   colorRenderer.GetNaturalSize(naturalSize);
@@ -126,7 +129,7 @@ int UtcDaliControlRendererSize(void)
 
   // image renderer
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  ControlRenderer imageRenderer = factory.GetControlRenderer( image );
+  ControlRenderer imageRenderer = factory.CreateControlRenderer( image );
   imageRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( imageRenderer.GetSize(), rendererSize, TEST_LOCATION );
   imageRenderer.GetNaturalSize(naturalSize);
@@ -137,7 +140,7 @@ int UtcDaliControlRendererSize(void)
   Vector2 testSize(80.f, 160.f);
   platform.SetClosestImageSize(testSize);
   image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
-  ControlRenderer nPatchRenderer = factory.GetControlRenderer( image );
+  ControlRenderer nPatchRenderer = factory.CreateControlRenderer( image );
   nPatchRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( nPatchRenderer.GetSize(), rendererSize, TEST_LOCATION );
   nPatchRenderer.GetNaturalSize(naturalSize);
@@ -145,7 +148,11 @@ int UtcDaliControlRendererSize(void)
 
   // border renderer
   float borderSize = 5.f;
-  ControlRenderer borderRenderer = factory.GetControlRenderer( borderSize, Color::RED );
+  map.Clear();
+  map[ "rendererType" ] = "border";
+  map[ "borderColor"  ] = Color::RED;
+  map[ "borderSize"   ] = borderSize;
+  ControlRenderer borderRenderer = factory.CreateControlRenderer( map );
   borderRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( borderRenderer.GetSize(), rendererSize, TEST_LOCATION );
   borderRenderer.GetNaturalSize(naturalSize);
@@ -163,14 +170,14 @@ int UtcDaliControlRendererSize(void)
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
-  ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer gradientRenderer = factory.CreateControlRenderer(propertyMap);
   gradientRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( gradientRenderer.GetSize(), rendererSize, TEST_LOCATION );
   gradientRenderer.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
 
   //svg renderer
-  ControlRenderer svgRenderer = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
+  ControlRenderer svgRenderer = factory.CreateControlRenderer( TEST_SVG_FILE_NAME, ImageDimensions() );
   svgRenderer.SetSize( rendererSize );
   DALI_TEST_EQUALS( svgRenderer.GetSize(), rendererSize, TEST_LOCATION );
   svgRenderer.GetNaturalSize(naturalSize);
@@ -191,7 +198,7 @@ int UtcDaliControlRendererSetOnOffStage(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  ControlRenderer controlRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
 
   Actor actor = Actor::New();
   actor.SetSize(200.f, 200.f);
@@ -238,7 +245,7 @@ int UtcDaliControlRendererRemoveAndReset(void)
   }
 
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  imageRenderer = factory.GetControlRenderer(image);
+  imageRenderer = factory.CreateControlRenderer(image);
   DALI_TEST_CHECK( imageRenderer );
 
   imageRenderer.SetOnStage( actor );
@@ -264,7 +271,7 @@ int UtcDaliControlRendererGetPropertyMap1(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "color");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  ControlRenderer colorRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer colorRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
   colorRenderer.CreatePropertyMap( resultMap );
@@ -279,7 +286,9 @@ int UtcDaliControlRendererGetPropertyMap1(void)
 
   // change the blend color
   Actor actor;
-  factory.ResetRenderer( colorRenderer, actor, Color::CYAN );
+  colorRenderer.RemoveAndReset( actor );
+  propertyMap["mixColor"] = Color::CYAN;
+  colorRenderer = factory.CreateControlRenderer( propertyMap  );
   colorRenderer.CreatePropertyMap( resultMap );
 
   colorValue = resultMap.Find( "mixColor",  Property::VECTOR4 );
@@ -299,7 +308,7 @@ int UtcDaliControlRendererGetPropertyMap2(void)
   propertyMap.Insert("rendererType",  "border");
   propertyMap.Insert("borderColor",  Color::BLUE);
   propertyMap.Insert("borderSize",  5.f);
-  ControlRenderer borderRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer borderRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
   borderRenderer.CreatePropertyMap( resultMap );
@@ -317,7 +326,11 @@ int UtcDaliControlRendererGetPropertyMap2(void)
   DALI_TEST_CHECK( sizeValue );
   DALI_TEST_CHECK( sizeValue->Get<float>() == 5.f );
 
-  borderRenderer = factory.GetControlRenderer( 10.f, Color::CYAN );
+  Property::Map propertyMap1;
+  propertyMap1[ "rendererType" ] = "border";
+  propertyMap1[ "borderColor"  ] = Color::CYAN;
+  propertyMap1[ "borderSize"   ] = 10.0f;
+  borderRenderer = factory.CreateControlRenderer( propertyMap1 );
   borderRenderer.CreatePropertyMap( resultMap );
 
   typeValue = resultMap.Find( "rendererType",  Property::STRING );
@@ -359,7 +372,7 @@ int UtcDaliControlRendererGetPropertyMap3(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer gradientRenderer = factory.CreateControlRenderer(propertyMap);
 
   Property::Map resultMap;
   gradientRenderer.CreatePropertyMap( resultMap );
@@ -426,7 +439,7 @@ int UtcDaliControlRendererGetPropertyMap4(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  ControlRenderer gradientRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer gradientRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( gradientRenderer );
 
   Property::Map resultMap;
@@ -488,7 +501,7 @@ int UtcDaliControlRendererGetPropertyMap5(void)
   propertyMap.Insert( "samplingMode",   "BOX_THEN_NEAREST" );
   propertyMap.Insert( "synchronousLoading",   true );
 
-  ControlRenderer imageRenderer = factory.GetControlRenderer(propertyMap);
+  ControlRenderer imageRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( imageRenderer );
 
   Property::Map resultMap;
@@ -525,7 +538,7 @@ int UtcDaliControlRendererGetPropertyMap5(void)
 
   // Get an image renderer with an image handle, and test the default property values
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  imageRenderer = factory.GetControlRenderer(image);
+  imageRenderer = factory.CreateControlRenderer(image);
   imageRenderer.CreatePropertyMap( resultMap );
 
   value = resultMap.Find( "rendererType",  Property::STRING );
@@ -569,7 +582,7 @@ int UtcDaliControlRendererGetPropertyMap6(void)
   propertyMap.Insert( "rendererType",  "image" );
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( "borderOnly",  true );
-  ControlRenderer nPatchRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer nPatchRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
   nPatchRenderer.CreatePropertyMap( resultMap );
@@ -600,7 +613,7 @@ int UtcDaliControlRendererGetPropertyMap7(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType",  "image" );
   propertyMap.Insert( "url",  TEST_SVG_FILE_NAME );
-  ControlRenderer svgRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer svgRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
   svgRenderer.CreatePropertyMap( resultMap );
@@ -614,7 +627,7 @@ int UtcDaliControlRendererGetPropertyMap7(void)
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
 
   // request SvgRenderer with an URL
-  ControlRenderer svgRenderer2 = factory.GetControlRenderer( TEST_SVG_FILE_NAME );
+  ControlRenderer svgRenderer2 = factory.CreateControlRenderer( TEST_SVG_FILE_NAME, ImageDimensions() );
   resultMap.Clear();
   svgRenderer2.CreatePropertyMap( resultMap );
   // check the property values from the returned map from control renderer
@@ -643,7 +656,7 @@ int UtcDaliControlRendererGetPropertyMap8(void)
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_LOCATION );
   propertyMap.Insert( "shaderType", "textureless" );
-  ControlRenderer meshRenderer = factory.GetControlRenderer( propertyMap );
+  ControlRenderer meshRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
   meshRenderer.CreatePropertyMap( resultMap );

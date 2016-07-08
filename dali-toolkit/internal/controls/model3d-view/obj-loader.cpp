@@ -592,7 +592,7 @@ Geometry ObjLoader::CreateGeometry( int objectProperties )
   }
 
   //Some need tangent and bitangent
-  if( ( objectProperties & TANGENTS ) && ( objectProperties & BINOMIALS ) && mHasTexturePoints )
+  if( ( objectProperties & TANGENTS ) && ( objectProperties & BINORMALS ) && mHasTexturePoints )
   {
     Property::Map vertexExtFormat;
     vertexExtFormat["aTangent"] = Property::VECTOR3;

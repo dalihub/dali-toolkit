@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <fstream>
 
@@ -33,6 +34,35 @@
 
 namespace Dali
 {
+
+namespace
+{
+  /**
+   * @brief Loads a texture from a file
+   * @param[in] imageUrl The url of the file
+   * @param[in] generateMipmaps Indicates whether to generate mipmaps for the texture
+   * @return A texture if loading succeeds, an empty handle otherwise
+   */
+  Texture LoadTexture( const char* imageUrl, bool generateMipmaps )
+  {
+    Texture texture;
+    Dali::BitmapLoader loader = Dali::BitmapLoader::New( imageUrl );
+    loader.Load();
+    PixelData pixelData = loader.GetPixelData();
+    if( pixelData )
+    {
+      texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+      texture.Upload( pixelData );
+
+      if( generateMipmaps )
+      {
+        texture.GenerateMipmaps();
+      }
+    }
+
+    return texture;
+  }
+}// unnamed namespace
 
 namespace Toolkit
 {
@@ -244,7 +274,8 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 MeshRenderer::MeshRenderer( RendererFactoryCache& factoryCache )
 : ControlRenderer( factoryCache ),
   mShaderType( ALL_TEXTURES ),
-  mUseTexture( true )
+  mUseTexture( true ),
+  mUseMipmapping( true )
 {
 }
 
@@ -273,6 +304,12 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
     //Default behaviour is to assume files are in the same directory,
     // or have their locations detailed in full when supplied.
     mTexturesPath.clear();
+  }
+
+  Property::Value* useMipmapping = propertyMap.Find( USE_MIPMAPPING );
+  if( useMipmapping )
+  {
+    useMipmapping->Get( mUseMipmapping );
   }
 
   Property::Value* shaderType = propertyMap.Find( SHADER_TYPE );
@@ -413,16 +450,13 @@ void MeshRenderer::CreateShader()
 bool MeshRenderer::CreateGeometry()
 {
   //Determine if we need to use a simpler shader to handle the provided data
-  if( mShaderType == ALL_TEXTURES )
-  {
-    if( !mObjLoader.IsNormalMapPresent() || !mObjLoader.IsSpecularMapPresent() )
-    {
-      mShaderType = DIFFUSE_TEXTURE;
-    }
-  }
-  if( !mObjLoader.IsTexturePresent() || !mObjLoader.IsDiffuseMapPresent() || !mUseTexture )
+  if( !mUseTexture || !mObjLoader.IsDiffuseMapPresent() )
   {
     mShaderType = TEXTURELESS;
+  }
+  else if( mShaderType == ALL_TEXTURES && (!mObjLoader.IsNormalMapPresent() || !mObjLoader.IsSpecularMapPresent()) )
+  {
+    mShaderType = DIFFUSE_TEXTURE;
   }
 
   int objectProperties = 0;
@@ -435,7 +469,7 @@ bool MeshRenderer::CreateGeometry()
 
   if( mShaderType == ALL_TEXTURES )
   {
-    objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINOMIALS;
+    objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINORMALS;
   }
 
   //Create geometry with attributes required by shader.
@@ -492,57 +526,68 @@ bool MeshRenderer::LoadTextures()
 {
   mTextureSet = TextureSet::New();
 
-  if( !mDiffuseTextureUrl.empty() )
+  if( mShaderType != TEXTURELESS )
   {
-    std::string imageUrl = mTexturesPath + mDiffuseTextureUrl;
-
-    //Load textures
-    Image diffuseTexture = ResourceImage::New( imageUrl );
-    if( diffuseTexture )
+    Sampler sampler = Sampler::New();
+    if( mUseMipmapping )
     {
-      mTextureSet.SetImage( DIFFUSE_INDEX, diffuseTexture );
+      sampler.SetFilterMode( FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR_MIPMAP_LINEAR );
     }
-    else
+
+    if( !mDiffuseTextureUrl.empty() )
     {
-      DALI_LOG_ERROR( "Failed to load diffuse map texture in mesh renderer.\n");
-      return false;
+      std::string imageUrl = mTexturesPath + mDiffuseTextureUrl;
+
+      //Load textures
+      Texture diffuseTexture = LoadTexture( imageUrl.c_str(), mUseMipmapping );
+      if( diffuseTexture )
+      {
+        mTextureSet.SetTexture( DIFFUSE_INDEX, diffuseTexture );
+        mTextureSet.SetSampler( DIFFUSE_INDEX, sampler );
+      }
+      else
+      {
+        DALI_LOG_ERROR( "Failed to load diffuse map texture in mesh renderer.\n");
+        return false;
+      }
+    }
+
+    if( !mNormalTextureUrl.empty() && ( mShaderType == ALL_TEXTURES ) )
+    {
+      std::string imageUrl = mTexturesPath + mNormalTextureUrl;
+
+      //Load textures
+      Texture normalTexture = LoadTexture( imageUrl.c_str(), mUseMipmapping );
+      if( normalTexture )
+      {
+        mTextureSet.SetTexture( NORMAL_INDEX, normalTexture );
+        mTextureSet.SetSampler( NORMAL_INDEX, sampler );
+      }
+      else
+      {
+        DALI_LOG_ERROR( "Failed to load normal map texture in mesh renderer.\n");
+        return false;
+      }
+    }
+
+    if( !mGlossTextureUrl.empty() && ( mShaderType == ALL_TEXTURES ) )
+    {
+      std::string imageUrl = mTexturesPath + mGlossTextureUrl;
+
+      //Load textures
+      Texture glossTexture = LoadTexture( imageUrl.c_str(), mUseMipmapping );
+      if( glossTexture )
+      {
+        mTextureSet.SetTexture( GLOSS_INDEX, glossTexture );
+        mTextureSet.SetSampler( GLOSS_INDEX, sampler );
+      }
+      else
+      {
+        DALI_LOG_ERROR( "Failed to load gloss map texture in mesh renderer.\n");
+        return false;
+      }
     }
   }
-
-  if( !mNormalTextureUrl.empty() && ( mShaderType == ALL_TEXTURES ) )
-  {
-    std::string imageUrl = mTexturesPath + mNormalTextureUrl;
-
-    //Load textures
-    Image normalTexture = ResourceImage::New( imageUrl );
-    if( normalTexture )
-    {
-      mTextureSet.SetImage( NORMAL_INDEX, normalTexture );
-    }
-    else
-    {
-      DALI_LOG_ERROR( "Failed to load normal map texture in mesh renderer.\n");
-      return false;
-    }
-  }
-
-  if( !mGlossTextureUrl.empty() && ( mShaderType == ALL_TEXTURES ) )
-  {
-    std::string imageUrl = mTexturesPath + mGlossTextureUrl;
-
-    //Load textures
-    Image glossTexture = ResourceImage::New( imageUrl );
-    if( glossTexture )
-    {
-      mTextureSet.SetImage( GLOSS_INDEX, glossTexture );
-    }
-    else
-    {
-      DALI_LOG_ERROR( "Failed to load gloss map texture in mesh renderer.\n");
-      return false;
-    }
-  }
-
   return true;
 }
 

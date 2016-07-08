@@ -137,7 +137,6 @@ Dali::Toolkit::Internal::Control provides several behaviours which are specified
 | Behaviour                            | Description                                                             |
 |--------------------------------------|-------------------------------------------------------------------------|
 | ACTOR_BEHAVIOUR_NONE                 | No behaviour required.                                                  |
-| REQUIRES_TOUCH_EVENTS                | If our control requires [touch events](@ref creating-controls-events).  |
 | REQUIRES_HOVER_EVENTS                | If our control requires [hover events](@ref creating-controls-events).  |
 | REQUIRES_WHEEL_EVENTS                | If our control requires [wheel events](@ref creating-controls-events).  |
 | REQUIRES_STYLE_CHANGE_SIGNALS        | True if need to monitor style change signals such as Theme/Font change. |
@@ -146,25 +145,11 @@ ________________________________________________________________________________
 
 ### Touch, Hover & Wheel Events {#creating-controls-events}
 
-+ A **touch event** is when any touch occurs within the bounds of the custom actor.
++ A **touch** is when any touch occurs within the bounds of the custom actor. Connect to Dali::Actor::TouchSignal().
 + A **hover event** is when a pointer moves within the bounds of a custom actor (e.g. mouse pointer or hover pointer).
 + A **wheel event** is when the mouse wheel (or similar) is moved while hovering over an actor (via a mouse pointer or hover pointer).
  
-If the control should needs to utilise these events, then the correct behaviour flag should be used when constructing the control.
- 
-Then the appropriate method should be overridden.
-~~~{.cpp}
-// C++
-bool MyUIControlImpl::OnTouchEvent( const TouchEvent& event )
-{
-  bool consumed = false;
-
-  // Handle touch event
-
-  // Return true if handled/consumed, false otherwise
-  return consumed;
-}
-~~~
+If the control needs to utilise hover and wheel events, then the correct behaviour flag should be used when constructing the control and then the appropriate method should be overridden.
 ~~~{.cpp}
 // C++
 bool MyUIControlImpl::OnHoverEvent( const HoverEvent& event )

@@ -13,15 +13,15 @@ actor.SetParentOrigin( Dali::ParentOrigin::CENTER );
 actor.SetAnchorPoint( Dali::AnchorPoint::CENTER );
 Dali::Stage::GetCurrent().Add( actor );
 ...
-bool OnPressed( Dali::Actor, const TouchEvent& event )
+bool OnPressed( Dali::Actor, const TouchData& touch )
 {
   Dali::Animation anim = Dali::Animation::New( 1.5f );
-  anim.AnimateTo( Property( actor, Actor::Property::POSITION ), Vector3( 200,-100,0), AlphaFunctions::Bounce );
+  anim.AnimateTo( Property( actor, Actor::Property::POSITION ), Vector3( 200, -100, 0 ), AlphaFunctions::Bounce );
   anim.play();
   return true; // consume the touch event
 }
 ...
-actor.TouchedSignal().Connect( &OnPressed );
+actor.TouchSignal().Connect( &OnPressed );
 ~~~
 
 */
@@ -34,16 +34,16 @@ actor.parentOrigin = dali.CENTER;
 actor.anchorPoint = dali.CENTER;
 dali.stage.add( actor );
 ...
-function onPressed( actor, touchEvent )
+function onPressed( actor, touch )
 {
   var animOptions = { alpha: "bounce", delay: 0, duration: 15 };
   var anim = new dali.Animation();
-  anim.animateTo( actor, "position", [ 200,-100,0], animOptions );
+  anim.animateTo( actor, "position", [ 200, -100, 0 ], animOptions );
   anim.play();
   return true; // consume the touch event
 }
 ...
-actor.connect( "touched", onPressed );
+actor.connect( "touch", onPressed );
 
 ~~~
 
@@ -76,7 +76,7 @@ actor.connect( "touched", onPressed );
       "parentOrigin": "CENTER",
       "signals" :
       [
-        { "name" : "touched", "action": "play", "animation": "move" }
+        { "name" : "touch", "action": "play", "animation": "move" }
       ]
     }
   ]

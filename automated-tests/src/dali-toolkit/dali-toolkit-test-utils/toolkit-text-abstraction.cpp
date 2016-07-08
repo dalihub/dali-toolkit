@@ -149,9 +149,9 @@ public:
   bool IsScalable( const FontDescription& fontDescription ){return true;}
   void GetFixedSizes( const FontPath& path, Dali::Vector< PointSize26Dot6>& sizes ){}
   void GetFixedSizes( const FontDescription& fontDescription, Dali::Vector< PointSize26Dot6 >& sizes ){}
-  void GetFontMetrics( FontId fontId, FontMetrics& metrics, int desiredFixedSize ){}
+  void GetFontMetrics( FontId fontId, FontMetrics& metrics ){}
   GlyphIndex GetGlyphIndex( FontId fontId, Character charcode ){return 0;}
-  bool GetGlyphMetrics( GlyphInfo* array, uint32_t size, bool horizontal, int desiredFixedSize ){return true;}
+  bool GetGlyphMetrics( GlyphInfo* array, uint32_t size, bool horizontal ){return true;}
   BufferImage CreateBitmap( FontId fontId, GlyphIndex glyphIndex ){return BufferImage();}
   void CreateVectorBlob( FontId fontId, GlyphIndex glyphIndex, VectorBlob*& blob,
                          unsigned int& blobLength, unsigned int& nominalWidth, unsigned int& nominalHeight )
@@ -447,9 +447,9 @@ void FontClient::GetFixedSizes( const FontDescription& fontDescription,
   GetImplementation(*this).GetFixedSizes( fontDescription, sizes );
 }
 
-void FontClient::GetFontMetrics( FontId fontId, FontMetrics& metrics, int desiredFixedSize )
+void FontClient::GetFontMetrics( FontId fontId, FontMetrics& metrics )
 {
-  GetImplementation(*this).GetFontMetrics( fontId, metrics, desiredFixedSize );
+  GetImplementation(*this).GetFontMetrics( fontId, metrics );
 }
 
 GlyphIndex FontClient::GetGlyphIndex( FontId fontId, Character charcode )
@@ -457,9 +457,9 @@ GlyphIndex FontClient::GetGlyphIndex( FontId fontId, Character charcode )
   return GetImplementation(*this).GetGlyphIndex( fontId, charcode );
 }
 
-bool FontClient::GetGlyphMetrics( GlyphInfo* array, uint32_t size, GlyphType type, bool horizontal, int desiredFixedSize )
+bool FontClient::GetGlyphMetrics( GlyphInfo* array, uint32_t size, GlyphType type, bool horizontal )
 {
-  return GetImplementation(*this).GetGlyphMetrics( array, size, horizontal, desiredFixedSize );
+  return GetImplementation(*this).GetGlyphMetrics( array, size, horizontal );
 }
 
 BufferImage FontClient::CreateBitmap( FontId fontId, GlyphIndex glyphIndex )

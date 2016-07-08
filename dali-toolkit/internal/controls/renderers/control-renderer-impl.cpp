@@ -56,24 +56,30 @@ ControlRenderer::~ControlRenderer()
   delete mImpl;
 }
 
-void ControlRenderer::Initialize( Actor& actor, const Property::Map& propertyMap )
+void ControlRenderer::SetCustomShader( const Property::Map& shaderMap )
 {
   if( mImpl->mCustomShader )
   {
-    mImpl->mCustomShader->SetPropertyMap( propertyMap );
+    mImpl->mCustomShader->SetPropertyMap( shaderMap );
   }
   else
   {
-    Property::Value* customShaderValue = propertyMap.Find( CUSTOM_SHADER );
-    if( customShaderValue )
+   mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
+  }
+}
+
+void ControlRenderer::Initialize( Actor& actor, const Property::Map& propertyMap )
+{
+  Property::Value* customShaderValue = propertyMap.Find( CUSTOM_SHADER );
+  if( customShaderValue )
+  {
+    Property::Map shaderMap;
+    if( customShaderValue->Get( shaderMap ) )
     {
-      Property::Map customShader;
-      if( customShaderValue->Get( customShader ) )
-      {
-        mImpl->mCustomShader = new Impl::CustomShader( propertyMap );
-      }
+      SetCustomShader( shaderMap );
     }
   }
+
   DoInitialize( actor, propertyMap );
 }
 

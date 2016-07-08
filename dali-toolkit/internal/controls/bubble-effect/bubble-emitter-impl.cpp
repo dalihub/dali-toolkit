@@ -75,7 +75,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
                               Image shapeImage,
                               unsigned int maximumNumberOfBubble,
                               const Vector2& bubbleSizeRange )
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mShapeImage( shapeImage ),
   mMovementArea( movementArea ),
   mBubbleSizeRange( bubbleSizeRange ),
@@ -176,7 +176,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
   mBackgroundImage = bgImage;
   mHSVDelta = hsvDelta;
 
-  Toolkit::ImageView sourceActor = Toolkit::ImageView::New( bgImage );
+  Toolkit::ImageView sourceActor = Toolkit::ImageView::New(bgImage);
   sourceActor.SetSize( mMovementArea );
   sourceActor.SetParentOrigin(ParentOrigin::CENTER);
 

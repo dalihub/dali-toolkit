@@ -196,6 +196,7 @@ private:
   ShaderType mShaderType;
 
   bool mUseTexture;
+  bool mUseMipmapping;
 };
 
 } // namespace Internal

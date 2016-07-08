@@ -94,106 +94,90 @@ Internal::ControlRenderer::Impl::CustomShader::CustomShader( const Property::Map
   SetPropertyMap( map );
 }
 
-void Internal::ControlRenderer::Impl::CustomShader::SetPropertyMap( const Property::Map& propertyMap )
+void Internal::ControlRenderer::Impl::CustomShader::SetPropertyMap( const Property::Map& shaderMap )
 {
-  Property::Value* shaderValue = propertyMap.Find( CUSTOM_SHADER );
-  if( shaderValue )
+  mVertexShader.clear();
+  mFragmentShader.clear();
+  mGridSize = ImageDimensions( 1, 1 );
+  mHints = Shader::HINT_NONE;
+
+  Property::Value* vertexShaderValue = shaderMap.Find( CUSTOM_VERTEX_SHADER );
+  if( vertexShaderValue )
   {
-    mVertexShader.clear();
-    mFragmentShader.clear();
-    mGridSize = ImageDimensions( 1, 1 );
-    mHints = Shader::HINT_NONE;
-
-    Property::Map shaderMap;
-    if( shaderValue->Get( shaderMap ) )
+    if( !vertexShaderValue->Get( mVertexShader ) )
     {
-      Property::Value* vertexShaderValue = shaderMap.Find( CUSTOM_VERTEX_SHADER );
-      if( vertexShaderValue )
-      {
-        if( !vertexShaderValue->Get( mVertexShader ) )
-        {
-          DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string", CUSTOM_VERTEX_SHADER );
-        }
-      }
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string", CUSTOM_VERTEX_SHADER );
+    }
+  }
 
-      Property::Value* fragmentShaderValue = shaderMap.Find( CUSTOM_FRAGMENT_SHADER );
-      if( fragmentShaderValue )
-      {
-        if( !fragmentShaderValue->Get( mFragmentShader ) )
-        {
-          DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string", CUSTOM_FRAGMENT_SHADER );
-        }
-      }
+  Property::Value* fragmentShaderValue = shaderMap.Find( CUSTOM_FRAGMENT_SHADER );
+  if( fragmentShaderValue )
+  {
+    if( !fragmentShaderValue->Get( mFragmentShader ) )
+    {
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string", CUSTOM_FRAGMENT_SHADER );
+    }
+  }
 
-      Property::Value* subdivideXValue = shaderMap.Find( CUSTOM_SUBDIVIDE_GRID_X );
-      if( subdivideXValue )
+  Property::Value* subdivideXValue = shaderMap.Find( CUSTOM_SUBDIVIDE_GRID_X );
+  if( subdivideXValue )
+  {
+    int subdivideX;
+    if( !subdivideXValue->Get( subdivideX ) || subdivideX < 1 )
+    {
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1", CUSTOM_SUBDIVIDE_GRID_X );
+    }
+    else
+    {
+      mGridSize = ImageDimensions( subdivideX, mGridSize.GetY() );
+    }
+  }
+
+  Property::Value* subdivideYValue = shaderMap.Find( CUSTOM_SUBDIVIDE_GRID_Y );
+  if( subdivideYValue )
+  {
+    int subdivideY;
+    if( !subdivideYValue->Get( subdivideY ) || subdivideY < 1 )
+    {
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1", CUSTOM_SUBDIVIDE_GRID_Y );
+    }
+    else
+    {
+      mGridSize = ImageDimensions( mGridSize.GetX(), subdivideY );
+    }
+  }
+
+  Property::Value* hintsValue = shaderMap.Find( CUSTOM_SHADER_HINTS );
+  if( hintsValue )
+  {
+    std::string hintString;
+    Property::Array hintsArray;
+
+    if( hintsValue->Get( hintString ) )
+    {
+      mHints = HintFromString( hintString );
+    }
+    else if( hintsValue->Get( hintsArray ) )
+    {
+      int hints = Shader::HINT_NONE;
+      for( Property::Array::SizeType i = 0; i < hintsArray.Count(); ++i)
       {
-        int subdivideX;
-        if( !subdivideXValue->Get( subdivideX ) || subdivideX < 1 )
+        Property::Value hintValue = hintsArray[ i ];
+        if( hintValue.Get( hintString ) )
         {
-          DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1", CUSTOM_SUBDIVIDE_GRID_X );
+          hints |= static_cast< int >( HintFromString( hintString ) );
         }
         else
         {
-          mGridSize = ImageDimensions( subdivideX, mGridSize.GetY() );
+          DALI_LOG_ERROR( "'%s' parameter does not correctly specify an hint string at index %d", CUSTOM_SHADER_HINTS, i );
         }
-      }
 
-      Property::Value* subdivideYValue = shaderMap.Find( CUSTOM_SUBDIVIDE_GRID_Y );
-      if( subdivideYValue )
-      {
-        int subdivideY;
-        if( !subdivideYValue->Get( subdivideY ) || subdivideY < 1 )
-        {
-          DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1", CUSTOM_SUBDIVIDE_GRID_Y );
-        }
-        else
-        {
-          mGridSize = ImageDimensions( mGridSize.GetX(), subdivideY );
-        }
-      }
-
-      Property::Value* hintsValue = shaderMap.Find( CUSTOM_SHADER_HINTS );
-      if( hintsValue )
-      {
-        std::string hintString;
-        Property::Array hintsArray;
-
-        if( hintsValue->Get( hintString ) )
-        {
-          mHints = HintFromString( hintString );
-        }
-        else if( hintsValue->Get( hintsArray ) )
-        {
-          int hints = Shader::HINT_NONE;
-          for( Property::Array::SizeType i = 0; i < hintsArray.Count(); ++i)
-          {
-            Property::Value hintValue = hintsArray[ i ];
-            if( hintValue.Get( hintString ) )
-            {
-              hints |= static_cast< int >( HintFromString( hintString ) );
-            }
-            else
-            {
-              DALI_LOG_ERROR( "'%s' parameter does not correctly specify an hint string at index %d", CUSTOM_SHADER_HINTS, i );
-            }
-
-            mHints = static_cast< Shader::ShaderHints >( hints );
-          }
-        }
-        else
-        {
-          DALI_LOG_ERROR( "'%s' parameter does not correctly specify a hint string or an array of hint strings", CUSTOM_SHADER_HINTS );
-        }
+        mHints = static_cast< Shader::ShaderHints >( hints );
       }
     }
     else
     {
-      //use value with no type to mean reseting the shader back to default
-      if( shaderValue->GetType() != Dali::Property::NONE )
-      {
-        DALI_LOG_ERROR( "'%s' parameter does not correctly specify a property map", CUSTOM_SHADER );
-      }
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a hint string or an array of hint strings", CUSTOM_SHADER_HINTS );
     }
   }
 }

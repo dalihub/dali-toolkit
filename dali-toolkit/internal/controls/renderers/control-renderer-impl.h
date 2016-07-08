@@ -146,6 +146,12 @@ public:
    */
   bool IsPreMultipliedAlphaEnabled() const;
 
+  /**
+   * @brief Sets properties of custom shader
+   * @param[in] propertyMap Property map containing the custom shader data
+   */
+  void SetCustomShader( const Property::Map& propertyMap );
+
 protected:
 
   /**

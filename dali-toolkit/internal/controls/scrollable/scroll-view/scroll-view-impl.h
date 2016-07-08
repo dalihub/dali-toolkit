@@ -539,7 +539,7 @@ public: //Signals
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
-private: // private overriden functions from CustomActorImpl and Controls
+private: // private overridden functions from CustomActorImpl and Controls
 
   /**
    * @copydoc Dali::CustomActorImpl::OnSizeAnimation(Animation&, const Vector3&)
@@ -562,16 +562,6 @@ private: // private overriden functions from CustomActorImpl and Controls
    * @param[in] child The child being removed.
    */
   virtual void OnChildRemove(Actor& child);
-
-  /**
-   * From CustomActorImpl; called after a touchSignal is received by the owning actor.
-   *
-   * We don't listen to these events as content within the contain may consume events.
-   *
-   * @param[in] event The touch event.
-   * @return True if the event should be consumed.
-   */
-  virtual bool OnTouchEvent(const TouchEvent& event);
 
   /**
    * From CustomActorImpl; called after a wheelEvent is received by the owning actor.
@@ -606,6 +596,17 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void EnableScrollOvershoot(bool enable);
 
 private:
+
+  /**
+   * Called after a touchSignal is received by the owning actor.
+   *
+   * We don't consume these events as content within the container may consume events.
+   *
+   * @param[in] actor The touched actor.
+   * @param[in] touch The touch information.
+   * @return True if the event should be consumed.
+   */
+  bool OnTouch( Actor actor, const TouchData& touch );
 
   /**
    * Start a timer which calls OnTouchDownTimeout()
@@ -894,7 +895,7 @@ private:
   Vector2 mLastVelocity;                ///< Record the last velocity from PanGesture (Finish event doesn't have correct velocity)
   LockAxis mLockAxis;
 
-  Timer mTouchDownTimer;                ///< Used to interrupt snap-animation. This cannot be done in OnTouchEvent without breaking fast flick behavior.
+  Timer mTouchDownTimer;                ///< Used to interrupt snap-animation. This cannot be done in OnTouch without breaking fast flick behavior.
 
   float mScrollUpdateDistance;          ///< Distance for scrolling to travel for the scroll update notifications
   Dali::PropertyNotification mScrollXUpdateNotification; ///< scroll x position update notification

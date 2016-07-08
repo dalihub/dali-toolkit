@@ -442,9 +442,10 @@ int UtcDaliImageViewSyncLoading(void)
 
   // Sync loading, no atlasing for big size image
   {
-    ImageView imageView = ImageView::New( gImage_600_RGB );
+    ImageView imageView = ImageView::New();
 
     // Sync loading is used
+    syncLoadingMap[ "url" ] = gImage_600_RGB;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // BitmapLoader is used, and the loading is started immediately even the actor is not on stage.
@@ -993,7 +994,6 @@ int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
   customShader.Insert( "hints", shaderHints );
 
   Property::Map map;
-  map.Insert( "rendererType", "image" );
   map.Insert( "shader", customShader );
 
   TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
@@ -1002,8 +1002,6 @@ int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
   ImageView imageView = ImageView::New( nativeImage );
   imageView.SetProperty( ImageView::Property::IMAGE, map );
   Stage::GetCurrent().Add( imageView );
-
-  imageView.SetProperty( ImageView::Property::IMAGE, map );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace( true );
@@ -1045,7 +1043,6 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
   customShader.Insert( "hints", shaderHints );
 
   Property::Map map;
-  map.Insert( "rendererType", "image" );
   map.Insert( "shader", customShader );
 
   BufferImage image = CreateBufferImage( width, height, Color::WHITE );
@@ -1053,8 +1050,6 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
   ImageView imageView = ImageView::New( image );
   imageView.SetProperty( ImageView::Property::IMAGE, map );
   Stage::GetCurrent().Add( imageView );
-
-  imageView.SetProperty( ImageView::Property::IMAGE, map );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace( true );

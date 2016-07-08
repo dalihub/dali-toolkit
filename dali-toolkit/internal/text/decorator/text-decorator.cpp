@@ -24,7 +24,7 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/property-notification.h>
@@ -284,7 +284,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    SetupTouchEvents();
+    SetupGestures();
   }
 
   /**
@@ -621,7 +621,7 @@ struct Decorator::Impl : public ConnectionTracker
     return true;
   }
 
-  void SetupTouchEvents()
+  void SetupGestures()
   {
     mTapDetector = TapGestureDetector::New();
     mTapDetector.DetectedSignal().Connect( this, &Decorator::Impl::OnTap );
@@ -694,7 +694,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.actor.Add( grabHandle.grabArea );
         grabHandle.actor.SetColor( mHandleColor );
 
-        grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
+        grabHandle.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
         mTapDetector.Attach( grabHandle.grabArea );
         mPanGestureDetector.Attach( grabHandle.grabArea );
 
@@ -757,7 +757,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         mTapDetector.Attach( primary.grabArea );
         mPanGestureDetector.Attach( primary.grabArea );
-        primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
+        primary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
         primary.actor.Add( primary.grabArea );
 
@@ -794,7 +794,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         mTapDetector.Attach( secondary.grabArea );
         mPanGestureDetector.Attach( secondary.grabArea );
-        secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
+        secondary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
         secondary.actor.Add( secondary.grabArea );
 
@@ -1179,20 +1179,20 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  bool OnGrabHandleTouched( Actor actor, const TouchEvent& event )
+  bool OnGrabHandleTouched( Actor actor, const TouchData& touch )
   {
     // Switch between pressed/release grab-handle images
-    if( event.GetPointCount() > 0 &&
+    if( touch.GetPointCount() > 0 &&
         mHandle[GRAB_HANDLE].actor )
     {
-      const TouchPoint& point = event.GetPoint(0);
+      const PointState::Type state = touch.GetState( 0 );
 
-      if( TouchPoint::Down == point.state )
+      if( PointState::DOWN == state )
       {
         mHandle[GRAB_HANDLE].pressed = true;
       }
-      else if( ( TouchPoint::Up == point.state ) ||
-               ( TouchPoint::Interrupted == point.state ) )
+      else if( ( PointState::UP == state ) ||
+               ( PointState::INTERRUPTED == state ) )
       {
         mHandle[GRAB_HANDLE].pressed = false;
       }
@@ -1204,20 +1204,20 @@ struct Decorator::Impl : public ConnectionTracker
     return true;
   }
 
-  bool OnHandleOneTouched( Actor actor, const TouchEvent& event )
+  bool OnHandleOneTouched( Actor actor, const TouchData& touch )
   {
     // Switch between pressed/release selection handle images
-    if( event.GetPointCount() > 0 &&
+    if( touch.GetPointCount() > 0 &&
         mHandle[LEFT_SELECTION_HANDLE].actor )
     {
-      const TouchPoint& point = event.GetPoint(0);
+      const PointState::Type state = touch.GetState( 0 );
 
-      if( TouchPoint::Down == point.state )
+      if( PointState::DOWN == state )
       {
         mHandle[LEFT_SELECTION_HANDLE].pressed = true;
       }
-      else if( ( TouchPoint::Up == point.state ) ||
-               ( TouchPoint::Interrupted == point.state ) )
+      else if( ( PointState::UP == state ) ||
+               ( PointState::INTERRUPTED == state ) )
       {
         mHandle[LEFT_SELECTION_HANDLE].pressed = false;
         mHandlePreviousCrossed = mHandleCurrentCrossed;
@@ -1231,20 +1231,20 @@ struct Decorator::Impl : public ConnectionTracker
     return true;
   }
 
-  bool OnHandleTwoTouched( Actor actor, const TouchEvent& event )
+  bool OnHandleTwoTouched( Actor actor, const TouchData& touch )
   {
     // Switch between pressed/release selection handle images
-    if( event.GetPointCount() > 0 &&
+    if( touch.GetPointCount() > 0 &&
         mHandle[RIGHT_SELECTION_HANDLE].actor )
     {
-      const TouchPoint& point = event.GetPoint(0);
+      const PointState::Type state = touch.GetState( 0 );
 
-      if( TouchPoint::Down == point.state )
+      if( PointState::DOWN == state )
       {
         mHandle[RIGHT_SELECTION_HANDLE].pressed = true;
       }
-      else if( ( TouchPoint::Up == point.state ) ||
-               ( TouchPoint::Interrupted == point.state ) )
+      else if( ( PointState::UP == state ) ||
+               ( PointState::INTERRUPTED == state ) )
       {
         mHandle[RIGHT_SELECTION_HANDLE].pressed = false;
         mHandlePreviousCrossed = mHandleCurrentCrossed;

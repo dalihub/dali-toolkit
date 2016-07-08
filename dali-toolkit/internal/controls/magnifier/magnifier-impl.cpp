@@ -26,9 +26,11 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 
 namespace Dali
 {
@@ -139,7 +141,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
@@ -261,9 +263,13 @@ void Magnifier::SetFrameVisibility(bool visible)
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
     mFrame.SetSizeModeFactor( sizeOffset );
 
-    //TODO Set the renderer onto the control self when Actor::RemoveRenderer is supported
     Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-    Toolkit::ControlRenderer borderRenderer = rendererFactory.GetControlRenderer(IMAGE_BORDER_INDENT, Color::WHITE);
+
+    Property::Map map;
+    map[ RENDERER_TYPE ] = BORDER_RENDERER;
+    map[ "borderColor"  ] = Color::WHITE;
+    map[ "borderSize"   ] = IMAGE_BORDER_INDENT;
+    Toolkit::ControlRenderer borderRenderer = rendererFactory.CreateControlRenderer( map );
     borderRenderer.SetOnStage( mFrame );
 
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
