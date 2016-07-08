@@ -69,7 +69,7 @@ AtlasGlyphManager::AtlasGlyphManager(Internal::AtlasGlyphManager *impl)
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
-                             const BufferImage& bitmap,
+                             const PixelData& bitmap,
                              AtlasManager::AtlasSlot& slot )
 {
   GetImplementation(*this).Add( glyph, bitmap, slot );

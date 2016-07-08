@@ -289,7 +289,7 @@ struct AtlasRenderer::Impl
           }
 
           // Create a new image for the glyph
-          BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
+          PixelData bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
           if( bitmap )
           {
             MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];

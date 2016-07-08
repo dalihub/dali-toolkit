@@ -84,7 +84,7 @@ public:
    * @param[out] slot information returned by atlas manager for addition
    */
   void Add( const Text::GlyphInfo& glyph,
-            const BufferImage& bitmap,
+            const PixelData& bitmap,
             AtlasManager::AtlasSlot& slot );
 
   /**

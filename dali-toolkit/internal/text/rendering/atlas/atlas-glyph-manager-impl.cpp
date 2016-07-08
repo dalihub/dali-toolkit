@@ -89,7 +89,7 @@ AtlasGlyphManager::AtlasGlyphManager()
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
-                             const BufferImage& bitmap,
+                             const PixelData& bitmap,
                              Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Added glyph, font: %d index: %d\n", glyph.fontId, glyph.index );
@@ -97,9 +97,9 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
   if ( mAtlasManager.Add( bitmap, slot ) )
   {
     // A new atlas was created so set the texture set details for the atlas
-    Dali::Atlas atlas = mAtlasManager.GetAtlasContainer( slot.mAtlasId );
+    Dali::Texture atlas = mAtlasManager.GetAtlasContainer( slot.mAtlasId );
     TextureSet textureSet = TextureSet::New();
-    textureSet.SetImage( 0u, atlas );
+    textureSet.SetTexture( 0u, atlas );
     mAtlasManager.SetTextures( slot.mAtlasId, textureSet );
   }
 

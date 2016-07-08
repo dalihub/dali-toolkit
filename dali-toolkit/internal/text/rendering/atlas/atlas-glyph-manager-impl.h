@@ -70,7 +70,7 @@ public:
    * @copydoc Toolkit::AtlasGlyphManager::Add
    */
   void Add( const Text::GlyphInfo& glyph,
-            const BufferImage& bitmap,
+            const PixelData& bitmap,
             Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
   /**
