@@ -117,7 +117,7 @@ Geometry CreateGeometry( RendererFactoryCache& factoryCache, ImageDimensions gri
     geometry = factoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
     if( !geometry )
     {
-      geometry =  Geometry::QUAD();
+      geometry =  RendererFactoryCache::CreateQuadGeometry();
       factoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
     }
   }
