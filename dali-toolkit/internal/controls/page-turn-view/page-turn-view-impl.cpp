@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -291,7 +292,7 @@ void PageTurnView::Page::SetImage( Image image  )
     textureSet = TextureSet::New();
   }
 
-  textureSet.SetImage( 0u, image );
+  TextureSetImage( textureSet, 0u, image );
 }
 
 void PageTurnView::Page::UseEffect(Shader newShader)

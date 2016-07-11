@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include "image-atlas-manager.h"
 
 // EXTERNAL HEADER
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/public-api/images/resource-image.h>
 
 namespace Dali
@@ -141,7 +142,7 @@ void ImageAtlasManager::CreateNewAtlas()
   }
   mAtlasList.push_back( newAtlas );
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetImage( 0u, newAtlas.GetAtlas() );
+  TextureSetImage( textureSet, 0u, newAtlas.GetAtlas() );
   mTextureSetList.push_back( textureSet );
 }
 
