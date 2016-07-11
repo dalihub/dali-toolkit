@@ -176,7 +176,6 @@ struct AtlasRenderer::Impl
     TextCacheEntry textCacheEntry;
     mDepth = depth;
 
-    const Vector2& actorSize( view.GetControlSize() );
     const Vector2& textSize( view.GetLayoutSize() );
     const Vector2 halfTextSize( textSize * 0.5f );
     const Vector2& shadowOffset( view.GetShadowOffset() );
@@ -393,6 +392,15 @@ struct AtlasRenderer::Impl
     // For each MeshData object, create a mesh actor and add to the renderable actor
     if( !meshContainer.empty() )
     {
+      if( !mActor )
+      {
+        // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
+        mActor = Actor::New();
+        mActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+        mActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+        mActor.SetSize( textSize );
+      }
+
       for( std::vector< MeshRecord >::iterator it = meshContainer.begin(),
               endIt = meshContainer.end();
             it != endIt; ++it )
@@ -401,8 +409,12 @@ struct AtlasRenderer::Impl
 
         Actor actor = CreateMeshActor( meshRecord, textSize );
 
+        // Whether the actor has renderers.
+        const bool hasRenderer = actor.GetRendererCount() > 0u;
+
         // Create an effect if necessary
-        if( style == STYLE_DROP_SHADOW )
+        if( hasRenderer &&
+            ( style == STYLE_DROP_SHADOW ) )
         {
           // Change the color of the vertices.
           for( Vector<AtlasManager::Vertex2D>::Iterator vIt =  meshRecord.mMesh.mVertices.Begin(),
@@ -415,38 +427,21 @@ struct AtlasRenderer::Impl
             vertex.mColor = shadowColor;
           }
 
-          // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
-          Actor containerActor = Actor::New();
-          containerActor.SetParentOrigin( ParentOrigin::CENTER );
-          containerActor.SetSize( actorSize );
-
           Actor shadowActor = CreateMeshActor( meshRecord, textSize );
 #if defined(DEBUG_ENABLED)
           shadowActor.SetName( "Text Shadow renderable actor" );
 #endif
           // Offset shadow in x and y
           shadowActor.RegisterProperty("uOffset", shadowOffset );
-          if( actor.GetRendererCount() )
-          {
-            Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
-            int depthIndex = renderer.GetProperty<int>(Dali::Renderer::Property::DEPTH_INDEX);
-            renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
-            containerActor.Add( shadowActor );
-            containerActor.Add( actor );
-#if defined(DEBUG_ENABLED)
-            containerActor.SetName("TextContainer");
-#endif
-            actor = containerActor;
-          }
+          Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
+          int depthIndex = renderer.GetProperty<int>(Dali::Renderer::Property::DEPTH_INDEX);
+          renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
+          mActor.Add( shadowActor );
         }
 
-        if( mActor )
+        if( hasRenderer )
         {
           mActor.Add( actor );
-        }
-        else
-        {
-          mActor = actor;
         }
       }
     }
