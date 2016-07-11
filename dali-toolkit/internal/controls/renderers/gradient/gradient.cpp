@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ const Matrix3& Gradient::GetAlignmentTransform() const
  *  If the stops have not covered the whole zero to one range,
  *  the REPEAT spread behaves different from the two others in the lookup texture generation.
  */
-BufferImage Gradient::GenerateLookupTexture()
+Dali::Texture Gradient::GenerateLookupTexture()
 {
   std::sort( mGradientStops.Begin(), mGradientStops.End() );
 
@@ -133,8 +133,11 @@ BufferImage Gradient::GenerateLookupTexture()
    * Generate the pixels with the color transit from one stop to next.
    */
   unsigned int resolution = EstimateTextureResolution();
-  BufferImage texture = BufferImage::New( resolution, 1 );
-  PixelBuffer* pixels = texture.GetBuffer();
+
+  unsigned int bufferSize = resolution * 4u;
+  unsigned char* pixels = new unsigned char[ bufferSize ];
+  PixelData pixelData = PixelData::New( pixels, bufferSize, resolution, 1u, Pixel::RGBA8888, PixelData::DELETE_ARRAY );
+
   int segmentStart = 0;
   int segmentEnd = 0;
   int k = 0;
@@ -160,6 +163,9 @@ BufferImage Gradient::GenerateLookupTexture()
     }
     segmentStart = segmentEnd;
   }
+
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, resolution, 1u );
+  texture.Upload( pixelData );
 
   // remove the stops added temporarily for generating the pixels, as the spread method might get changed later
   if( tempLastStop )
