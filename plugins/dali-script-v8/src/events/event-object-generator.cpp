@@ -32,13 +32,33 @@ namespace V8Plugin
 namespace
 {
 
-struct PointState
+struct TouchDataPointState
+{
+  PointState::Type state;
+  const char* name;
+};
+
+const TouchDataPointState TouchDataPointStateLookup[]=
+{
+    { PointState::DOWN,         "DOWN"        },
+    { PointState::UP,           "UP"          },
+    { PointState::MOTION,       "MOTION"      },
+    { PointState::LEAVE,        "LEAVE"       },
+    { PointState::STATIONARY,   "STATIONARY"  },
+    { PointState::INTERRUPTED,  "INTERRUPT"   },
+    { PointState::STARTED,      "STARTED"     },
+    { PointState::FINISHED,     "FINISHED"    },
+};
+
+const unsigned int TouchDataPointStateLookupCount = sizeof(TouchDataPointStateLookup)/sizeof(TouchDataPointStateLookup[0]);
+
+struct TouchPointState
 {
   TouchPoint::State state;
   const char* name;
 };
 
-const PointState PointStateLookup[]=
+const TouchPointState PointStateLookup[]=
 {
     { TouchPoint::Down,         "down"        },       /**< Screen touched */
     { TouchPoint::Up,           "up"          },       /**< Touch stopped */
@@ -69,6 +89,19 @@ const GestureState GestureStateLookup[]=
 };
 
 const unsigned int GestureStateLookupCount = sizeof(GestureStateLookup)/sizeof(GestureStateLookup[0]);
+
+const char* GetTouchDataPointStateName( PointState::Type state )
+{
+  // could use the enum as index, but dali-core may change, so for now just do a lookup
+  for( unsigned int i = 0; i < TouchDataPointStateLookupCount; i++ )
+  {
+    if( TouchDataPointStateLookup[i].state == state )
+    {
+      return TouchDataPointStateLookup[i].name;
+    }
+  }
+  return "error point state not found";
+}
 
 const char* GetTouchPointStateName( TouchPoint::State state )
 {
@@ -146,21 +179,25 @@ v8::Local<v8::Object> CreateTouchPoint( v8::Isolate* isolate, const TouchPoint& 
 } // un-named namespace
 
 
-v8::Handle<v8::Object> EventObjectGenerator::CreateTouchEvent( v8::Isolate* isolate, const TouchEvent& touchEvent)
+v8::Handle<v8::Object> EventObjectGenerator::CreateTouchData( v8::Isolate* isolate, const TouchData& touch )
 {
   // we are creating a touch event object that looks like this
   //
   //  event.pointCount = points touched
   //  event.time       = The time (in ms) that the touch event occurred.
-  //  event.point[]    = array of TouchPoints
+  //  event.point[]    = array of Points
   //
-  // A TouchPoint =
+  // A Point =
   //   { "deviceId",  int }  Each touch point has a unique device ID
   //   { "state",   string } touch state ="Down,Up,Motion,Leave,Stationary, Interrupted }
   //   { "sourceActor", actor }  the actor that is emitting the callback (the actor that is hit maybe a child of it)
   //   { "hitActor", actor } actor that was hit
   //   { "local",  {x,y} } co-ordinates of top left of hit actor
   //   { "screen", {x,y} } co-ordinates of top left of hit actor
+  //   { "radius", float } radius of the press point (average of both the horizontal & vertical radii)
+  //   { "ellipseRadius", {x,y} } both the horizontal and the vertical radii of the press point
+  //   { "pressure", float } the touch pressure
+  //   { "angle", float } angle of the press point relative to the Y-Axis
   //
 
   v8::EscapableHandleScope handleScope( isolate );
@@ -168,19 +205,64 @@ v8::Handle<v8::Object> EventObjectGenerator::CreateTouchEvent( v8::Isolate* isol
   v8::Local<v8::Object> touchObject = v8::Object::New( isolate );
 
   // Set the pointCount
-  touchObject->Set( v8::String::NewFromUtf8( isolate, "pointCount" ), v8::Integer::New( isolate, touchEvent.GetPointCount() ) );
+  touchObject->Set( v8::String::NewFromUtf8( isolate, "pointCount" ), v8::Integer::New( isolate, touch.GetPointCount() ) );
 
   // Set the time
-  touchObject->Set( v8::String::NewFromUtf8( isolate, "time" ), v8::Number::New( isolate, touchEvent.time ) );
+  touchObject->Set( v8::String::NewFromUtf8( isolate, "time" ), v8::Number::New( isolate, touch.GetTime() ) );
 
   // Set the emitting actor
   // touchObject->Set( v8::String::NewFromUtf8( isolate, "sourceActor" ), ActorWrapper::WrapActor(isolate, emittingActor));
 
   // Create the array of touch points
-  v8::Local < v8::Array > pointArrayObject = v8::Array::New( isolate, touchEvent.GetPointCount() );
-  for( unsigned int i = 0 ; i < touchEvent.GetPointCount() ; ++i )
+  v8::Local < v8::Array > pointArrayObject = v8::Array::New( isolate, touch.GetPointCount() );
+  for( unsigned int i = 0 ; i < touch.GetPointCount() ; ++i )
   {
-    v8::Local < v8::Object > pointObject = CreateTouchPoint( isolate, touchEvent.points[i] );
+    v8::Local<v8::Object> pointObject = v8::Object::New( isolate );
+
+    // set device id
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "deviceId" ), v8::Integer::New( isolate, touch.GetDeviceId( i ) ) );
+
+    // set state
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "state" ), v8::String::NewFromUtf8( isolate, GetTouchDataPointStateName( touch.GetState( i ) ) ) );
+
+    Actor hitActor = touch.GetHitActor( i );
+    if( hitActor )
+    {
+      // set the hit actor
+      pointObject->Set( v8::String::NewFromUtf8( isolate, "hitActor" ), ActorWrapper::WrapActor( isolate, hitActor ) );
+    }
+
+    // set the local co-ordinates
+    const Vector2& local = touch.GetLocalPosition( i );
+    v8::Local<v8::Object> localPointObject = v8::Object::New( isolate );
+    localPointObject->Set( v8::String::NewFromUtf8( isolate, "x" ), v8::Integer::New( isolate, local.x ) );
+    localPointObject->Set( v8::String::NewFromUtf8( isolate, "y" ), v8::Integer::New( isolate, local.y ) );
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "local" ),  localPointObject );
+
+    // set the screen co-ordinates
+    const Vector2& screen = touch.GetScreenPosition( i );
+    v8::Local<v8::Object> screenPointObject = v8::Object::New( isolate );
+    screenPointObject->Set( v8::String::NewFromUtf8( isolate, "x" ), v8::Integer::New( isolate, screen.x ) );
+    screenPointObject->Set( v8::String::NewFromUtf8( isolate, "y" ), v8::Integer::New( isolate, screen.y ) );
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "screen" ), screenPointObject );
+
+    // set the radius
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "radius" ), v8::Integer::New( isolate, touch.GetRadius( i ) ) );
+
+    // set the ellipse Radius
+    const Vector2& ellipse = touch.GetEllipseRadius( i );
+    v8::Local<v8::Object> ellipseObject = v8::Object::New( isolate );
+    ellipseObject->Set( v8::String::NewFromUtf8( isolate, "x" ), v8::Integer::New( isolate, ellipse.x ) );
+    ellipseObject->Set( v8::String::NewFromUtf8( isolate, "y" ), v8::Integer::New( isolate, ellipse.y ) );
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "ellipseRadius" ),  ellipseObject );
+
+    // set the pressure
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "pressure" ), v8::Integer::New( isolate, touch.GetPressure( i ) ) );
+
+    // set the angle
+    pointObject->Set( v8::String::NewFromUtf8( isolate, "angle" ), v8::Integer::New( isolate, touch.GetAngle( i ).degree ) );
+
+    // add the point
     pointArrayObject->Set( v8::Number::New( isolate, i ), pointObject  );
   }
 

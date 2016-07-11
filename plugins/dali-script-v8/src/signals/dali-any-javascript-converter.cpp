@@ -66,9 +66,9 @@ v8::Local<v8::Value> DaliAnyConverter::ConvertToJavaScriptObject(v8::Isolate* is
   {
     returnValue = PropertyValueWrapper::WrapDaliProperty( isolate, value.Get<Vector3>() );
   }
-  else if(  typeInfo == typeid( Dali::TouchEvent ) )
+  else if(  typeInfo == typeid( Dali::TouchData ) )
   {
-    returnValue = EventObjectGenerator::CreateTouchEvent( isolate, value.Get<TouchEvent>() );
+    returnValue = EventObjectGenerator::CreateTouchData( isolate, value.Get<TouchData>() );
   }
   else if(  typeInfo == typeid( Dali::HoverEvent ) )
   {
