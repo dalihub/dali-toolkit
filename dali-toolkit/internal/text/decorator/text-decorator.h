@@ -435,7 +435,7 @@ public:
   void SetSelectionHandleFlipState( bool indicesSwapped, bool left, bool right );
 
   /**
-   * @brief Adds a quad to the existing selection highlights.
+   * @brief Adds a quad to the existing selection highlights. Vertices are in decorator's coordinates.
    *
    * @param[in] x1 The top-left x position.
    * @param[in] y1 The top-left y position.
@@ -443,6 +443,18 @@ public:
    * @param[in] y3 The bottom-right y position.
    */
   void AddHighlight( float x1, float y1, float x2, float y2 );
+
+  /**
+   * @brief Sets the min 'x,y' coordinates and the size of the highlighted box.
+   *
+   * It's used to set the size and position of the highlight's actor and to translate each highlight quad from
+   * decorator's coordinates to the local coords of the highlight's actor.
+   *
+   * @param[in] position The position of the highlighted text in decorator's coords.
+   * @param[in] size The size of the highlighted text.
+   */
+  void SetHighLightBox( const Vector2& position,
+                        const Size& size );
 
   /**
    * @brief Removes all of the previously added highlights.
