@@ -113,27 +113,6 @@ Dali::Integration::Point GetPointUpOutside()
   return point;
 }
 
-Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
-{
-  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
-
-  // Create the image
-  PixelBuffer* pixbuf = imageData.GetBuffer();
-  unsigned int size = width * height;
-
-  for( size_t i = 0; i < size; i++ )
-    {
-      pixbuf[i*4+0] = 0xFF * color.r;
-      pixbuf[i*4+1] = 0xFF * color.g;
-      pixbuf[i*4+2] = 0xFF * color.b;
-      pixbuf[i*4+3] = 0xFF * color.a;
-    }
-
-  imageData.Update();
-
-  return imageData;
-}
-
 } //namespace
 
 int UtcDaliPushButtonConstructorP(void)

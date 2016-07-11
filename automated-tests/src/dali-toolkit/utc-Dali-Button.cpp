@@ -64,28 +64,6 @@ struct CallbackFunctor
   bool* mCallbackFlag;
 };
 
-
-Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
-{
-  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
-
-  // Create the image
-  PixelBuffer* pixbuf = imageData.GetBuffer();
-  unsigned int size = width * height;
-
-  for( size_t i = 0; i < size; i++ )
-    {
-      pixbuf[i*4+0] = 0xFF * color.r;
-      pixbuf[i*4+1] = 0xFF * color.g;
-      pixbuf[i*4+2] = 0xFF * color.b;
-      pixbuf[i*4+3] = 0xFF * color.a;
-    }
-
-  imageData.Update();
-
-  return imageData;
-}
-
 Dali::Integration::Point GetPointDownInside()
 {
   Dali::Integration::Point point;
@@ -941,3 +919,56 @@ int UtcDaliButtonSetSelectedImageWithImageN(void)
 
   END_TEST;
 }
+
+int UtcDaliButtonSetSelectedColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetSelectedColorP");
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 SET_COLOR = Color::BLUE;
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetProperty( Button::Property::SELECTED_COLOR, SET_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 color = pushButton.GetProperty<Vector4>( Button::Property::SELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, SET_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetUnSelectedColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetUnSelectedColorP");
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 SET_COLOR = Color::BLUE;
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetProperty( Button::Property::UNSELECTED_COLOR, SET_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 color = pushButton.GetProperty<Vector4>( Button::Property::UNSELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, SET_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}
+

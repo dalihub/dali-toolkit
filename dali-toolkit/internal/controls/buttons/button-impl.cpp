@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 /**
  * Button states and contents
@@ -527,46 +528,48 @@ void Button::SetupContent( Actor& actorToModify, Actor newActor )
   }
 }
 
-void Button::SetUnselectedColor( const Vector4& color )
-{
-  mUnselectedColor = color;
-
-  if( mUnselectedContent && !GetUnselectedImageFilename().empty() )
-  {
-    // If there is existing unselected content, change the color on it directly.
-    mUnselectedContent.SetColor( mUnselectedColor );
-  }
-  else
-  {
-    // If there is no existing content, create a new actor to use for flat color.
-    Toolkit::Control unselectedContentActor = Toolkit::Control::New();
-    unselectedContentActor.SetBackgroundColor( mUnselectedColor );
-    SetupContent( mUnselectedContent, unselectedContentActor );
-    mUnselectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  }
-}
-
 const Vector4 Button::GetUnselectedColor() const
 {
   return mUnselectedColor;
 }
 
-void Button::SetSelectedColor( const Vector4& color )
+void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
 {
-  mSelectedColor = color;
+  Actor& contentActor = mSelectedContent;
+  bool imageFileExists = false;
 
-  if( mSelectedContent && !GetSelectedImageFilename().empty() )
+  if ( selectedState == SelectedState || selectedState == DisabledSelectedState )
+  {
+    mSelectedColor = color;
+    imageFileExists = !GetSelectedImageFilename().empty();
+  }
+  else
+  {
+    mUnselectedColor = color;
+    contentActor = mUnselectedContent;
+    imageFileExists = !GetUnselectedImageFilename().empty();
+  }
+
+  if( contentActor &&  imageFileExists )
   {
     // If there is existing unselected content, change the color on it directly.
-    mSelectedContent.SetColor( mSelectedColor );
+    contentActor.SetColor( color );
   }
   else
   {
     // If there is no existing content, create a new actor to use for flat color.
-    Toolkit::Control selectedContentActor = Toolkit::Control::New();
-    selectedContentActor.SetBackgroundColor( mSelectedColor );
-    SetupContent( mSelectedContent, selectedContentActor );
-    mSelectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    Actor placementActor = Actor::New();
+    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+    Toolkit::ControlRenderer colorRenderer;
+
+    Property::Map map;
+    map["rendererType"] = "color";
+    map["mixColor"] = color;
+
+    colorRenderer = rendererFactory.CreateControlRenderer( map );
+    colorRenderer.SetOnStage( placementActor );
+    SetupContent( contentActor, placementActor );
+    contentActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   }
 }
 
@@ -1386,13 +1389,13 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
 
       case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
-        GetImplementation( button ).SetUnselectedColor( value.Get< Vector4 >() );
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), UnselectedState );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_COLOR:
       {
-        GetImplementation( button ).SetSelectedColor( value.Get< Vector4 >() );
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), SelectedState );
         break;
       }
 
