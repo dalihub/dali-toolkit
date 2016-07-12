@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/text-scroller.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/rendering/geometry.h>
 #include <dali/devel-api/rendering/renderer.h>
 #include <dali/devel-api/rendering/sampler.h>
@@ -171,7 +172,7 @@ void CreateRenderer( FrameBufferImage frameBufferImage, Dali::Renderer& renderer
   sampler.SetFilterMode(FilterMode::NEAREST, FilterMode::NEAREST );
 
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetImage( 0u, frameBufferImage );
+  TextureSetImage( textureSet, 0u, frameBufferImage );
   textureSet.SetSampler( 0u, sampler );
 
   Geometry meshGeometry;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
@@ -185,7 +186,7 @@ void BlurTwoPassFilter::Enable()
 
   // Add effect texture to blend-two-image custom shader
   TextureSet textureSet = mActorForBlending.GetRendererAt(0).GetTextures();
-  textureSet.SetImage( 1u, mInputImage );
+  TextureSetImage( textureSet, 1u, mInputImage );
 
   SetupCamera();
   CreateRenderTasks();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/images/atlas.h>
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/integration-api/debug.h>
 
@@ -465,7 +466,7 @@ TextureSet ImageRenderer::CreateTextureSet( Vector4& textureRect, const std::str
     {
       // use broken image
       textureSet = TextureSet::New();
-      textureSet.SetImage( 0u, RendererFactory::GetBrokenRendererImage() );
+      TextureSetImage( textureSet, 0u, RendererFactory::GetBrokenRendererImage() );
     }
     else
     {
@@ -475,7 +476,7 @@ TextureSet ImageRenderer::CreateTextureSet( Vector4& textureRect, const std::str
         Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
         image.Upload( mPixels, 0, 0 );
         textureSet = TextureSet::New();
-        textureSet.SetImage( 0u, image );
+        TextureSetImage( textureSet, 0u, image );
       }
     }
   }
@@ -487,7 +488,7 @@ TextureSet ImageRenderer::CreateTextureSet( Vector4& textureRect, const std::str
       ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
       resourceImage.LoadingFinishedSignal().Connect( this, &ImageRenderer::OnImageLoaded );
       textureSet = TextureSet::New();
-      textureSet.SetImage( 0u, resourceImage );
+      TextureSetImage( textureSet, 0u, resourceImage );
     }
   }
 
@@ -826,7 +827,7 @@ void ImageRenderer::ApplyImageToSampler( const Image& image )
       textureSet = TextureSet::New();
       mImpl->mRenderer.SetTextures( textureSet );
     }
-    textureSet.SetImage( 0u, image );
+    TextureSetImage( textureSet, 0u, image );
   }
 }
 

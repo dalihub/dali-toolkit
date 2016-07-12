@@ -23,6 +23,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/devel-api/images/atlas.h>
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -230,7 +231,7 @@ void SvgRenderer::ApplyRasterizedImage( PixelData rasterizedPixelData )
 
       if( textureSet )
       {
-        textureSet.SetImage( 0u, texture );
+        TextureSetImage( textureSet, 0u, texture );
       }
     }
   }
