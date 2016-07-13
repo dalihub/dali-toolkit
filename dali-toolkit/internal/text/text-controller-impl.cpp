@@ -1486,9 +1486,15 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       Vector<Character>::Iterator last  = first + lengthOfSelectedText;
       utf32Characters.Erase( first, last );
 
-      // Scroll after delete.
+      // Will show the cursor at the first character of the selection.
       mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mRightSelectionPosition : mEventData->mLeftSelectionPosition;
     }
+    else
+    {
+      // Will show the cursor at the last character of the selection.
+      mEventData->mPrimaryCursorPosition = handlesCrossed ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
+    }
+
     mEventData->mDecoratorUpdated = true;
   }
 }

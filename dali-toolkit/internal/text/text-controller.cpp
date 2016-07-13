@@ -2570,7 +2570,10 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     case Toolkit::TextSelectionPopup::COPY:
     {
       mImpl->SendSelectionToClipboard( false ); // Text not modified
-      mImpl->RequestRelayout(); // Handles, Selection Highlight, Popup
+
+      mImpl->mEventData->mUpdateCursorPosition = true;
+
+      mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
       break;
     }
     case Toolkit::TextSelectionPopup::PASTE:
