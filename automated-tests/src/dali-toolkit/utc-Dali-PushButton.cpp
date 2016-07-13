@@ -928,3 +928,276 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   END_TEST;
 }
+
+int UtcDaliPushButtonSetButtonImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetButtonImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetButtonImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetSelectedBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledSelectedImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
