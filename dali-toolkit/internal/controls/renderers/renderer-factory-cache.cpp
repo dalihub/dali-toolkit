@@ -153,6 +153,32 @@ Renderer RendererFactoryCache::GetDebugRenderer()
   return mDebugRenderer;
 }
 
+Geometry RendererFactoryCache::CreateQuadGeometry()
+{
+  const float halfWidth = 0.5f;
+  const float halfHeight = 0.5f;
+  struct QuadVertex { Vector2 position;};
+  QuadVertex quadVertexData[4] =
+  {
+      { Vector2(-halfWidth, -halfHeight) },
+      { Vector2(-halfWidth, halfHeight)  },
+      { Vector2( halfWidth, -halfHeight) },
+      { Vector2( halfWidth, halfHeight)  }
+  };
+
+  Property::Map quadVertexFormat;
+  quadVertexFormat["aPosition"] = Property::VECTOR2;
+  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
+  quadVertices.SetData( quadVertexData, 4 );
+
+  // Create the geometry object
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( quadVertices );
+  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
+
+  return geometry;
+}
+
 SvgRasterizeThread* RendererFactoryCache::GetSVGRasterizationThread()
 {
   if( !mSvgRasterizeThread )

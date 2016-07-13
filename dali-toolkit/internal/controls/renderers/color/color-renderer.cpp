@@ -119,7 +119,7 @@ void ColorRenderer::InitializeRenderer()
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
   {
-    geometry =  Geometry::QUAD();
+    geometry =  RendererFactoryCache::CreateQuadGeometry();
     mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
 

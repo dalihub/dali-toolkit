@@ -97,7 +97,7 @@ void SvgRenderer::DoSetOnStage( Actor& actor )
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
   {
-    geometry =  Geometry::QUAD();
+    geometry =  mFactoryCache.CreateQuadGeometry();
     mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
   TextureSet textureSet = TextureSet::New();

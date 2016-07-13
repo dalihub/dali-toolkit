@@ -25,6 +25,9 @@
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+
 namespace Dali
 {
 
@@ -245,7 +248,7 @@ void CubeTransitionEffect::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
 
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = RendererFactoryCache::CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
   TextureSet textureSet = TextureSet::New();
