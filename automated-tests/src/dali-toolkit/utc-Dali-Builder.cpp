@@ -29,6 +29,49 @@
 using namespace Dali;
 using namespace Toolkit;
 
+namespace BuilderControlProperty
+{
+
+enum
+{
+  INTEGER_PROPERTY = Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1,
+  MATRIX3_PROPERTY,
+  MATRIX_PROPERTY,
+  NONE_PROPERTY
+};
+
+namespace
+{
+
+BaseHandle Create()
+{
+  return Toolkit::Control::New();
+}
+
+int gSetPropertyCalledCount = 0;
+
+void SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+{
+  ++gSetPropertyCalledCount;
+}
+
+Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  return Property::Value();
+}
+
+} // unnamed namespace
+
+// Properties
+Dali::TypeRegistration typeRegistration( "BuilderControl", typeid( Toolkit::Control ), Create );
+
+Dali::PropertyRegistration propertyInteger( typeRegistration, "integerProperty", INTEGER_PROPERTY, Property::INTEGER, &SetProperty, &GetProperty );
+Dali::PropertyRegistration propertyMatrix3( typeRegistration, "matrix3Property", MATRIX3_PROPERTY, Property::MATRIX3, &SetProperty, &GetProperty );
+Dali::PropertyRegistration propertyMatrix(  typeRegistration, "matrixProperty",  MATRIX_PROPERTY,  Property::MATRIX,  &SetProperty, &GetProperty );
+Dali::PropertyRegistration propertyNone(    typeRegistration, "noneProperty",    NONE_PROPERTY,    Property::NONE,    &SetProperty, &GetProperty );
+
+}
+
 namespace
 {
 
@@ -844,6 +887,32 @@ int UtcDaliBuilderPropertyNotificationP(void)
       "      \"property\": \"visible\",\n"
       "      \"condition\": \"False\",\n"
       "      \"action\": \"show\"\n"
+      "    },\n"
+      "    {\n"
+      "      \"property\": \"positionX\",\n"
+      "      \"condition\": \"LessThan\",\n"
+      "      \"arg0\": 0.0,\n"
+      "      \"action\": \"show\"\n"
+      "    },\n"
+      "    {\n"
+      "      \"property\": \"positionY\",\n"
+      "      \"condition\": \"GreaterThan\",\n"
+      "      \"arg0\": 200.0,\n"
+      "      \"action\": \"show\"\n"
+      "    },\n"
+      "    {\n"
+      "      \"property\": \"positionZ\",\n"
+      "      \"condition\": \"Inside\",\n"
+      "      \"arg0\": 0.0,\n"
+      "      \"arg1\": 10.0,\n"
+      "      \"action\": \"show\"\n"
+      "    },\n"
+      "    {\n"
+      "      \"property\": \"positionZ\",\n"
+      "      \"condition\": \"Outside\",\n"
+      "      \"arg0\": 40.0,\n"
+      "      \"arg1\": 50.0,\n"
+      "      \"action\": \"show\"\n"
       "    }]\n"
       "  }]\n"
       "}\n"
@@ -880,6 +949,42 @@ int UtcDaliBuilderPropertyNotificationP(void)
 
   END_TEST;
 }
+
+int UtcDaliBuilderPropertyNotificationN(void)
+{
+  ToolkitTestApplication application;
+
+  // JSON with a quit event when the actor is touched
+  std::string json(
+      "{\n"
+      "  \"stage\":\n"
+      "  [{\n"
+      "    \"type\": \"Actor\",\n"
+      "    \"notifications\": [{\n"
+      "      \"property\": \"visible\",\n"
+      "      \"condition\": \"ErrorCondition\",\n"
+      "      \"action\": \"show\"\n"
+      "    }]\n"
+      "  }]\n"
+      "}\n"
+  );
+
+  try
+  {
+    Builder builder = Builder::New();
+    builder.LoadFromString( json );
+    builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+
 
 int UtcDaliBuilderCustomPropertyP(void)
 {
@@ -1295,6 +1400,36 @@ int UtcDaliBuilderPathConstraintsP(void)
     "              \"range\": [-300,300]\n"
     "            }\n"
     "          ]\n"
+    "        },\n"
+    "        {\n"
+    "          \"name\": \"offStage\",\n"
+    "          \"action\": \"removeConstraints\",\n"
+    "          \"constrainer\": \"constrainer0\",\n"
+    "          \"properties\":\n"
+    "          [\n"
+    "            {\n"
+    "              \"source\": \"Image1\",\n"
+    "              \"sourceProperty\": \"positionX\",\n"
+    "              \"target\": \"Image1\",\n"
+    "              \"targetProperty\": \"colorRed\",\n"
+    "              \"range\": [-300,300]\n"
+    "            }\n"
+    "          ]\n"
+    "        },\n"
+    "        {\n"
+    "          \"name\": \"offStage\",\n"
+    "          \"action\": \"removeConstraints\",\n"
+    "          \"constrainer\": \"constrainer1\",\n"
+    "          \"properties\":\n"
+    "          [\n"
+    "            {\n"
+    "              \"source\": \"Image1\",\n"
+    "              \"sourceProperty\": \"positionX\",\n"
+    "              \"target\": \"Image1\",\n"
+    "              \"targetProperty\": \"colorBlue\",\n"
+    "              \"range\": [-300,300]\n"
+    "            }\n"
+    "          ]\n"
     "        }\n"
     "      ]\n"
     "    }\n"
@@ -1410,6 +1545,18 @@ int UtcDaliBuilderPathConstraintsP(void)
 
   Dali::LinearConstrainer constrainer1_2 = builder.GetLinearConstrainer( "constrainer1" );
   DALI_TEST_CHECK( constrainer1 == constrainer1_2 );
+
+  // For coverage
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+  builder.AddActors( actor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  actor.GetChildAt( 0 ).Unparent();
 
   END_TEST;
 }
@@ -1641,6 +1788,75 @@ int UtcDaliBuilderTypeCasts(void)
   DALI_TEST_EQUALS( createdActor.GetCurrentColor(), Vector4(0.5f,0.5f,0.5f,1.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( createdActor.IsSensitive(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( createdActor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliBuilderBuilderControl(void)
+{
+  ToolkitTestApplication application;
+
+  std::string json(
+    "{"
+       "\"stage\":"
+       "[{"
+         "\"type\": \"BuilderControl\","
+         "\"integerProperty\": 10,"
+         "\"matrix3Property\": [ 1,2,3,4,5,6,7,8,9 ],"
+         "\"matrixProperty\":  [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 ],"
+         "\"noneProperty\": 10"
+      "}]"
+    "}"
+  );
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+  builder.AddActors( rootActor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( BuilderControlProperty::gSetPropertyCalledCount, 4, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliBuilderActionsWithParams(void)
+{
+  ToolkitTestApplication application;
+
+  // JSON with a quit event when the actor is touched
+  std::string json(
+      "{\n"
+      "\"stage\":\n"
+      "[\n"
+      "  { \n"
+      "    \"type\": \"ImageView\",\n"
+      "    \"name\": \"image\",\n"
+      "    \"size\": [100,100,1],\n"
+      "    \"signals\": [{\n"
+      "      \"name\": \"touch\",\n"
+      "      \"action\": \"show\",\n"
+      "      \"parameters\": {\n"
+      "        \"property1\" : 10,\n"
+      "        \"property2\" : [1,2],\n"
+      "        \"property3\" : [1,2,3],\n"
+      "        \"property4\" : [1,2,3,4]\n"
+      "      }\n"
+      "    }]\n"
+      "  }\n"
+      "]\n"
+      "}\n"
+  );
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+  builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+
+  DALI_TEST_CHECK( true ); // For Coverage
 
   END_TEST;
 }
