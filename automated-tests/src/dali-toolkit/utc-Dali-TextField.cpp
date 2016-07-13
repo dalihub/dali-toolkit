@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -234,6 +235,19 @@ Integration::TapGestureEvent GenerateTap(
   tap.point = point;
 
   return tap;
+}
+
+
+Integration::LongPressGestureEvent GenerateLongPress(
+    Gesture::State state,
+    unsigned int numberOfTouches,
+    Vector2 point)
+{
+  Integration::LongPressGestureEvent longPress( state );
+
+  longPress.numberOfTouches = numberOfTouches;
+  longPress.point = point;
+  return longPress;
 }
 
 // Generate a KeyEvent to send to Core.
@@ -1048,7 +1062,7 @@ int utcDaliTextFieldEvent05(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent05");
 
-  // Checks if the highlight actor is created.
+  // Checks dragging of cursor/grab handle
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
@@ -1112,5 +1126,135 @@ int utcDaliTextFieldEvent05(void)
   Wait(application, RENDER_FRAME_INTERVAL);
 
   Actor offscreenRoot = field.GetChildAt( 1u );
+  END_TEST;
+}
+
+int utcDaliTextFieldEvent06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent06");
+
+  // Checks Longpress when in edit mode
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+  LoadMarkerImages(application, field);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( TextField::Property::TEXT, "Thisisalongtextforthesizeofthetextfield." );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+
+  // Tap first to get the focus.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Long Press
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldEvent07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent06");
+
+  // Checks Longpress to start edit mode
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+  LoadMarkerImages(application, field);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( TextField::Property::TEXT, "Thisisalongtextforthesizeofthetextfield." );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Long Press
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldEvent08(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent06");
+
+  // Checks Longpress when only place holder text
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+  LoadMarkerImages(application, field);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Long Press
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
