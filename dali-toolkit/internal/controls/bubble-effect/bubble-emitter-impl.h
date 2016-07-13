@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H__
-#define __DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H__
+#ifndef DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H
+#define DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/devel-api/object/property-buffer.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/property-buffer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -197,4 +197,4 @@ inline const Internal::BubbleEmitter& GetImpl(const Dali::Toolkit::BubbleEmitter
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H__ */
+#endif // DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H

@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_DATA_IMPL_H__
-#define __DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_DATA_IMPL_H__
+#ifndef DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_DATA_IMPL_H
+#define DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_DATA_IMPL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
 
 namespace Dali
@@ -74,4 +75,4 @@ struct Internal::ControlRenderer::Impl
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_DATA_IMPL_H__ */
+#endif // DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_DATA_IMPL_H

@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H__
-#define __DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H__
+#ifndef DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H_
+#define DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/rendering/shader.h>
 
 namespace Dali
 {
@@ -230,4 +230,4 @@ inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H__
+#endif // DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H

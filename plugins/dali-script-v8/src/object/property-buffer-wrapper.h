@@ -1,8 +1,8 @@
-#ifndef __DALI_V8PLUGIN_PROPERTY_BUFFER_WRAPPER_H__
-#define __DALI_V8PLUGIN_PROPERTY_BUFFER_WRAPPER_H__
+#ifndef DALI_V8PLUGIN_PROPERTY_BUFFER_WRAPPER_H
+#define DALI_V8PLUGIN_PROPERTY_BUFFER_WRAPPER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali/devel-api/object/property-buffer.h>
+#include <dali/public-api/rendering/property-buffer.h>
 
 // INTERNAL INCLUDES
 #include <shared/base-wrapped-object.h>
@@ -54,7 +54,7 @@ public:
    */
   virtual ~PropertyBufferWrapper()
   {
-  };
+  }
 
   /**
    * @brief Creates a new PropertyBuffer wrapped inside a Javascript Object.
@@ -92,4 +92,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_V8PLUGIN_PROPERTY_BUFFER_WRAPPER_H__
+#endif // DALI_V8PLUGIN_PROPERTY_BUFFER_WRAPPER_H

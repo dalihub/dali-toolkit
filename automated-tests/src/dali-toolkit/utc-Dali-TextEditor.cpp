@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>

@@ -1,5 +1,5 @@
-#ifndef __DALI_V8PLUGIN_TEXURE_SET_API_H__
-#define __DALI_V8PLUGIN_TEXURE_SET_API_H__
+#ifndef DALI_V8PLUGIN_TEXURE_SET_API_H
+#define DALI_V8PLUGIN_TEXURE_SET_API_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali/devel-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 
 namespace Dali
@@ -66,4 +66,4 @@ namespace TextureSetApi
 
 } // namespace Dali
 
-#endif // header __DALI_V8PLUGIN_TEXURE_SET_API_H__
+#endif // DALI_V8PLUGIN_TEXURE_SET_API_H

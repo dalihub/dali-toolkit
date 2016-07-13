@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>

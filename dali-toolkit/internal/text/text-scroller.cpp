@@ -19,15 +19,15 @@
 #include <dali-toolkit/internal/text/text-scroller.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/images/texture-set-image.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/shader.h>
-#include <dali/integration-api/debug.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-scroller-interface.h>

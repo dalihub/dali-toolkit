@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H_
-#define __DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H_
+#ifndef DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H
+#define DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/rendering/shader.h>
 
 namespace Dali
 {
@@ -128,4 +128,4 @@ inline Shader CreateBubbleShader( unsigned int numBubble )
 } // namespace Toolkit
 
 } // namespace Dali
-#endif /* __DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H_ */
+#endif // DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H

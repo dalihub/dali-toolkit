@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_GRADIENT_H__
-#define __DALI_TOOLKIT_INTERNAL_GRADIENT_H__
+#ifndef DALI_TOOLKIT_INTERNAL_GRADIENT_H
+#define DALI_TOOLKIT_INTERNAL_GRADIENT_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -19,11 +19,11 @@
  */
 
 //EXTERNAL INCLUDES
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/buffer-image.h>
-#include <dali/devel-api/rendering/texture.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -177,4 +177,4 @@ protected:
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_GRADIENT_RENDERER_H__ */
+#endif // DALI_TOOLKIT_INTERNAL_GRADIENT_RENDERER_H
