@@ -345,6 +345,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
 
   // Create a grid layout and add it to ItemView
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  gridLayout->SetOrientation(ControlOrientation::Down);
   view.AddLayout(*gridLayout);
 
   // Check there is no active layout at the moment
@@ -375,6 +376,7 @@ int UtcDaliItemViewGetItemAndGetItemId(void)
 
   // Create a grid layout and add it to ItemView
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  gridLayout->SetOrientation(ControlOrientation::Left);
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -399,6 +401,7 @@ int UtcDaliItemViewRemoveItem(void)
 
   // Create a grid layout and add it to ItemView
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  gridLayout->SetOrientation(ControlOrientation::Right);
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -430,9 +433,10 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a depth layout and add it to ItemView
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  depthLayout->SetOrientation(ControlOrientation::Up);
+  view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -533,14 +537,14 @@ int UtcDaliItemViewScrollToItem(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
   Vector3 vec(480.0f, 800.0f, 0.0f);
-  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
 
   view.SetName("view actor");
   view.AddLayout(*layout);
   view.SetSize(vec);
 
   Stage::GetCurrent().Add(view);
-  layout->SetOrientation(ControlOrientation::Up);
+  layout->SetOrientation(ControlOrientation::Down);
   view.ActivateLayout(0, vec, 0.0f);
 
   application.SendNotification();
@@ -624,9 +628,10 @@ int UtcDaliItemViewInsertItemP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a depth layout and add it to ItemView
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH);
+  depthLayout->SetOrientation(ControlOrientation::Left);
+  view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -656,9 +661,10 @@ int UtcDaliItemViewInsertItemsP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a depth layout and add it to ItemView
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH);
+  depthLayout->SetOrientation(ControlOrientation::Right);
+  view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -712,9 +718,9 @@ int UtcDaliItemViewReplaceItemP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -736,9 +742,10 @@ int UtcDaliItemViewReplaceItemsP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  spiralLayout->SetOrientation( ControlOrientation::Down );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -773,9 +780,10 @@ int UtcDaliItemViewGetItemsRangeP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  spiralLayout->SetOrientation( ControlOrientation::Left );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -797,9 +805,10 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  spiralLayout->SetOrientation( ControlOrientation::Right );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
