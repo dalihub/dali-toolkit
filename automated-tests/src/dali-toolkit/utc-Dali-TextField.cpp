@@ -1186,7 +1186,7 @@ int utcDaliTextFieldEvent06(void)
 int utcDaliTextFieldEvent07(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldEvent06");
+  tet_infoline(" utcDaliTextFieldEvent07");
 
   // Checks Longpress to start edit mode
 
@@ -1224,7 +1224,7 @@ int utcDaliTextFieldEvent07(void)
 int utcDaliTextFieldEvent08(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldEvent06");
+  tet_infoline(" utcDaliTextFieldEvent08");
 
   // Checks Longpress when only place holder text
 
@@ -1255,6 +1255,81 @@ int utcDaliTextFieldEvent08(void)
   // Render and notify
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextFieldStyleWhilstSelected09(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent09");
+
+  // Change font and styles whilst text is selected whilst word selected
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+  LoadMarkerImages(application, field);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+
+  // Tap first to get the focus.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Double tap to select a word.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"slant\":\"italic\"}", TEST_LOCATION );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"width\":\"expanded\",\"slant\":\"italic\"}" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"width\":\"expanded\",\"slant\":\"italic\"}", TEST_LOCATION );
+
+  field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
+  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  field.SetProperty( TextField::Property::TEXT_COLOR, Color::RED );
+  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::TEXT_COLOR ), Color::RED, TEST_LOCATION );
+
+  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), "{\"weight\":\"bold\",\"slant\":\"italic\"}", TEST_LOCATION );
+
+  field.SetProperty( TextField::Property::FONT_STYLE, "{\"width\":\"expanded\"}" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), "{\"width\":\"expanded\"}", TEST_LOCATION );
 
   END_TEST;
 }
