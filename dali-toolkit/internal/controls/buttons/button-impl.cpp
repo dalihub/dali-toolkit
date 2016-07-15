@@ -535,41 +535,46 @@ const Vector4 Button::GetUnselectedColor() const
 
 void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
 {
-  Actor& contentActor = mSelectedContent;
+  Actor* contentActor = NULL; // Using a pointer as SetupContent assigns the new Actor to this.
   bool imageFileExists = false;
 
   if ( selectedState == SelectedState || selectedState == DisabledSelectedState )
   {
     mSelectedColor = color;
+    contentActor = &mSelectedContent;
     imageFileExists = !GetSelectedImageFilename().empty();
   }
   else
   {
     mUnselectedColor = color;
-    contentActor = mUnselectedContent;
+    contentActor = &mUnselectedContent;
     imageFileExists = !GetUnselectedImageFilename().empty();
   }
 
-  if( contentActor &&  imageFileExists )
+  if ( contentActor )
   {
-    // If there is existing unselected content, change the color on it directly.
-    contentActor.SetColor( color );
-  }
-  else
-  {
-    // If there is no existing content, create a new actor to use for flat color.
-    Actor placementActor = Actor::New();
-    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-    Toolkit::ControlRenderer colorRenderer;
+    if( imageFileExists )
+    {
+      // If there is existing unselected content, change the color on it directly.
+      contentActor->SetColor( color );
+    }
+    else
+    {
+      // If there is no existing content, create a new actor to use for flat color.
+      Actor placementActor = Actor::New();
+      Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+      Toolkit::ControlRenderer colorRenderer;
 
-    Property::Map map;
-    map["rendererType"] = "color";
-    map["mixColor"] = color;
+      Property::Map map;
+      map["rendererType"] = "color";
+      map["mixColor"] = color;
 
-    colorRenderer = rendererFactory.CreateControlRenderer( map );
-    colorRenderer.SetOnStage( placementActor );
-    SetupContent( contentActor, placementActor );
-    contentActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+      colorRenderer = rendererFactory.CreateControlRenderer( map );
+      colorRenderer.SetOnStage( placementActor );
+
+      SetupContent( *contentActor, placementActor ); //
+      contentActor->SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    }
   }
 }
 
