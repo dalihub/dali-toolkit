@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/texture-set.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 using namespace Dali;

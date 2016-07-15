@@ -558,7 +558,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
                                      ( isFirstPositionOfLine && !isRightToLeftParagraph ) );
 
       cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( addGlyphAdvance ? glyphMetrics.advance : 0.f );
-      cursorInfo.secondaryPosition.y = cursorInfo.lineOffset + cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
+      cursorInfo.secondaryPosition.y = cursorInfo.lineOffset + cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight;
 
       // Transform the cursor info from line's coords to text's coords.
       cursorInfo.secondaryPosition.x += line.alignmentOffset;

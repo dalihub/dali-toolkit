@@ -55,12 +55,6 @@ public:
   void SetOvershootEnabled(bool enable);
 
   /**
-   * Gets the size of the domain (minimum/maximum extents for each axis to scroll to)
-   * @return the domain size
-   */
-  virtual Vector2 GetDomainSize() const = 0;
-
-  /**
    * Adds actor as an Overlay to Scrollable
    * This method is called by Add-on UI components
    * such as scroll bars, page indicators.

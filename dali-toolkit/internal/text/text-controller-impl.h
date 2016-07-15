@@ -126,6 +126,8 @@ struct EventData
   CharacterIndex     mPreEditStartPosition;    ///< Used to remove the pre-edit text if necessary.
   Length             mPreEditLength;           ///< Used to remove the pre-edit text if necessary.
 
+  float              mCursorHookPositionX;     ///< Used to move the cursor with the keys or when scrolling the text vertically with the handles.
+
   bool mIsShowingPlaceholderText        : 1;   ///< True if the place-holder text is being displayed.
   bool mPreEditFlag                     : 1;   ///< True if the model contains text in pre-edit state.
   bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
@@ -133,11 +135,12 @@ struct EventData
   bool mGrabHandleEnabled               : 1;   ///< True if grab handle is enabled.
   bool mGrabHandlePopupEnabled          : 1;   ///< True if the grab handle popu-up should be shown.
   bool mSelectionEnabled                : 1;   ///< True if selection handles, highlight etc. are enabled.
-  bool mHorizontalScrollingEnabled      : 1;   ///< True if horizontal scrolling is enabled.
-  bool mVerticalScrollingEnabled        : 1;   ///< True if vertical scrolling is enabled.
+  bool mUpdateCursorHookPosition        : 1;   ///< True if the cursor hook position must be updated. Used to move the cursor with the keys 'up' and 'down'.
   bool mUpdateCursorPosition            : 1;   ///< True if the visual position of the cursor must be recalculated.
+  bool mUpdateGrabHandlePosition        : 1;   ///< True if the visual position of the grab handle must be recalculated.
   bool mUpdateLeftSelectionPosition     : 1;   ///< True if the visual position of the left selection handle must be recalculated.
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
+  bool mUpdateHighlightBox              : 1;   ///< True if the text selection high light box must be updated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
   bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
@@ -647,11 +650,12 @@ struct Controller::Impl
    * @pre mEventData must not be NULL. (there is a text-input or selection capabilities).
    *
    * @param[in] position A position in text coords.
+   * @param[in] lineHeight The line height for the given position.
    *
    * This method is called after inserting text, moving the cursor with the grab handle or the keypad,
    * or moving the selection handles.
    */
-  void ScrollToMakePositionVisible( const Vector2& position );
+  void ScrollToMakePositionVisible( const Vector2& position, float lineHeight );
 
   /**
    * @brief Scrolls the text to make the cursor visible.

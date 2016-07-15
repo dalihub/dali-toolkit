@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/common/loading-state.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 

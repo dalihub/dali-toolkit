@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
@@ -389,7 +390,7 @@ void BloomView::AllocateResources()
     rendererMap[ "shader" ] = customShader;
     mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
     TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
-    textureSet.SetImage( 1u, mBlurExtractTarget );
+    TextureSetImage( textureSet, 1u, mBlurExtractTarget );
 
     // set up target actor for rendering result, i.e. the blurred image
     mTargetImageView.SetImage(mOutputRenderTarget);

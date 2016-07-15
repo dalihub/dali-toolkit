@@ -73,7 +73,7 @@ The actor provides the following call back events
 
 | Name            | Description                            | Parameters passed to call back |
 |-----------------|----------------------------------------|--------------------------|
-|touched          | touch event                            | (actor, touchEvent )     |
+|touch            | touch                                  | (actor, touchData )      |
 |hovered          | mouse or pointer hovering over actor   | (actor, hoverEvent)      |
 |mouseWheelEvent  | mouse wheel events                     | (actor, wheelEvent)      |
 |onStage          | actor has been moved on stage          | (actor)                  |
@@ -83,38 +83,42 @@ The actor provides the following call back events
 #### Touch event
 
 Used to detect multiple touch events on the actor. The state of each touch point can be:
-+ "down"        = touch down
-+ "up"          = Touch up
-+ "motion"      = Finger dragged or hovered
-+ "leave"       =  Leave the boundary of an actor
-+ "stationary"  = No change from last event.  Useful when a multi-point event occurs where
-all points are sent but indicates that this particular point has not changed since the last time
-+ "interrupted"  = A system event has occurred which has interrupted the touch or hover event sequence
++ "DOWN"        = touch down
++ "UP"          = Touch up
++ "MOTION"      = Finger dragged or hovered
++ "LEAVE"       = Leave the boundary of an actor
++ "STATIONARY"  = No change from last event.  Useful when a multi-point event occurs where
+                  all points are sent but indicates that this particular point has not changed
+                  since the last time
++ "INTERRUPTED" = A system event has occurred which has interrupted the touch or hover event sequence
 
 
 
 ```
-touchEvent = {
+touchData = {
   
   pointCount: int,  // number of points touched ( multi-touch )
   time: int,        // The time in milliseconds that the touch event occurred.
-  points = [ touchPoints ],    // array of TouchPoints, to support
+  points = [ Points ],    // array of Points
   
-  TouchPoint = {
-  
-    "deviceId" : int,      // Each touch point has a unique device ID
-    "state" : string,      // touch state ="down,up,motion,leave,stationary, interrupted }
-    "sourceActor" : actor, // the actor that is emitting the callback (the actor that is hit maybe a child of it)
-    "hitActor" : actor,    // actor that was hit
-    "local" :  {x,y},      // co-ordinates of top left of hit actor (local.x, local.y)
-    "screen" : {x,y}       // co-ordinates of top left of hit actor (screen.x, screen.y)
-    }
+  Point = {
+    "deviceId" : int,        // Each touch point has a unique device ID
+    "state" : string,        // touch state ="DOWN","UP","MOTION","LEAVE","STATIONARY","INTERRUPTED"
+    "sourceActor" : actor,   // the actor that is emitting the callback (the actor that is hit maybe a child of it)
+    "hitActor" : actor,      // actor that was hit
+    "local" :  {x,y},        // co-ordinates of top left of hit actor (local.x, local.y)
+    "screen" : {x,y},        // co-ordinates of top left of hit actor (screen.x, screen.y)
+    "radius" : float,        // radius of the press point (average of both the horizontal & vertical radii)
+    "ellipseRadius" : {x,y}, // both the horizontal and the vertical radii of the press point
+    "pressure" : float,      // the touch pressure
+    "angle" : float          // angle of the press point relative to the Y-Axis (in degrees)
+  }
 }
 
-function OnPressed( actor, touchEvent )
+function onPressed( actor, touchData )
 {
-  var firstPoint = touchEvent.points[0];
-  log("first touch point = " + firstPoint.screen.x + "," +firstPoint.screen.x + "actor= "+firstPoint.hitActor );
+  var firstPoint = touchData.points[0];
+  log("first touch point = " + firstPoint.screen.x + "," + firstPoint.screen.x + "actor= " + firstPoint.hitActor );
   
   var anim = new dali.Animation( 4 );
   var rotation = new dali.Rotation( 90, 0, 0 ); // pitch, yaw, roll
@@ -124,7 +128,7 @@ function OnPressed( actor, touchEvent )
 }
   
 // connect to touch events
-myActor.on( "touched", onPressed );
+myActor.on( "touch", onPressed );
 
 ```
 
@@ -138,7 +142,12 @@ hoverEvent = {
   points[]    // array of TouchPoints
   
   TouchPoint = {
-      // See touchEvent TouchPoint object
+    "deviceId" : int,      // Each touch point has a unique device ID
+    "state" : string,      // touch state ="down,up,motion,leave,stationary, interrupted }
+    "sourceActor" : actor, // the actor that is emitting the callback (the actor that is hit maybe a child of it)
+    "hitActor" : actor,    // actor that was hit
+    "local" :  {x,y},      // co-ordinates of top left of hit actor (local.x, local.y)
+    "screen" : {x,y}       // co-ordinates of top left of hit actor (screen.x, screen.y)
   }
 }
 ```
@@ -487,9 +496,9 @@ WORLD_COLOR
 
 /**
  * Actors sensitive flag
- * brief Sets whether an actor should emit touch event signals; @see SignalTouched().
+ * brief Sets whether an actor should emit touch event signals; @see SignalTouch().
  *
- * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouched(),
+ * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouch(),
  * the touch event signal will be emitted.
  *
  * If the application wishes to temporarily disable the touch event signal emission, then they can do so by calling

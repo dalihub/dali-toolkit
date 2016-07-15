@@ -1,5 +1,5 @@
-#ifndef __DALI_V8PLUGIN_TEXTURE_SET_WRAPPER_H__
-#define __DALI_V8PLUGIN_TEXTURE_SET_WRAPPER_H__
+#ifndef DALI_V8PLUGIN_TEXTURE_SET_WRAPPER_H
+#define DALI_V8PLUGIN_TEXTURE_SET_WRAPPER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali/devel-api/rendering/texture-set.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL INCLUDES
 #include <object/handle-wrapper.h>
@@ -104,4 +104,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_V8PLUGIN_TEXTURE_SET_WRAPPER_H__
+#endif // DALI_V8PLUGIN_TEXTURE_SET_WRAPPER_H

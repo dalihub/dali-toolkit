@@ -15,13 +15,15 @@
  *
  */
 
-// HEADER
+// CLASS HEADER
 #include "test-actor-utils.h"
-#include "mesh-builder.h"
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
+
+// INTERNAL INCLUDES
+#include "mesh-builder.h"
 
 namespace Dali
 {
@@ -65,7 +67,7 @@ Actor CreateRenderableActor( Image texture )
 Actor CreateRenderableActor( Image texture, const std::string& vertexShader, const std::string& fragmentShader )
 {
   // Create the geometry
-  Geometry geometry = Geometry::QUAD();
+  Geometry geometry = CreateQuadGeometry();
 
   // Create Shader
   Shader shader = Shader::New( vertexShader, fragmentShader );
@@ -81,7 +83,7 @@ Actor CreateRenderableActor( Image texture, const std::string& vertexShader, con
   if( texture )
   {
     TextureSet textureSet = TextureSet::New();
-    textureSet.SetImage( 0u, texture );
+    TextureSetImage( textureSet, 0u, texture );
     renderer.SetTextures( textureSet );
 
     // Set actor to the size of the texture if set
@@ -102,7 +104,7 @@ Image GetTexture( Actor actor )
       TextureSet textureSet = renderer.GetTextures();
       if( textureSet && textureSet.GetTextureCount() )
       {
-        image = textureSet.GetImage( 0u );
+        image = TextureGetImage( textureSet, 0u );
       }
     }
   }

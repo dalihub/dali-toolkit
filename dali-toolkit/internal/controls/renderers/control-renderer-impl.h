@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_H__
-#define __DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_H__
+#ifndef DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_H
+#define DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,14 @@
  *
  */
 
-
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-object.h>
 #include <dali/public-api/images/image-operations.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
+#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 
 namespace Dali
@@ -251,4 +250,4 @@ inline Internal::ControlRenderer& GetImplementation(Toolkit::ControlRenderer& re
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_H___ */
+#endif // DALI_TOOLKIT_INTERNAL_CONTROL_RENDERER_H

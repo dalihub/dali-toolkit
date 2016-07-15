@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H__
-#define __DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H__
+#ifndef DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H
+#define DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
  * limitations under the License.
  *
  */
+
 // EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
@@ -146,4 +147,4 @@ private:
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H__ */
+#endif // DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H

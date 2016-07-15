@@ -59,11 +59,11 @@ public:
    */
   struct AtlasDescriptor
   {
-    Dali::Atlas mAtlas;                                                 // atlas image
+    Dali::Texture mAtlas;                                                 // atlas image
     Toolkit::AtlasManager::AtlasSize mSize;                             // size of atlas
     Pixel::Format mPixelFormat;                                         // pixel format used by atlas
-    BufferImage mHorizontalStrip;                                       // Image used to pad upload
-    BufferImage mVerticalStrip;                                         // Image used to pad upload
+    PixelData mHorizontalStrip;                                       // Image used to pad upload
+    PixelData mVerticalStrip;                                         // Image used to pad upload
     TextureSet mTextureSet;                                             // Texture set used for atlas texture
     SizeType mTotalBlocks;                                              // total number of blocks in atlas
     SizeType mAvailableBlocks;                                          // number of blocks available in atlas
@@ -101,7 +101,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasManager::Add
    */
-  bool Add( const BufferImage& image,
+  bool Add( const PixelData& image,
             Toolkit::AtlasManager::AtlasSlot& slot,
             Toolkit::AtlasManager::AtlasId atlas );
 
@@ -121,7 +121,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasManager::GetAtlasContainer
    */
-  Dali::Atlas GetAtlasContainer( AtlasId atlas ) const;
+  Dali::Texture GetAtlasContainer( AtlasId atlas ) const;
 
   /**
    * @copydoc Toolkit::AtlasManager::GetAtlas
@@ -185,7 +185,7 @@ private:
                        SizeType height,
                        Pixel::Format pixelFormat );
 
-  void UploadImage( const BufferImage& image,
+  void UploadImage( const PixelData& image,
                     const AtlasSlotDescriptor& desc );
 
 };

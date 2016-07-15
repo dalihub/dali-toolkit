@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H__
-#define __DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H__
+#ifndef DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H
+#define DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -18,16 +18,16 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/devel-api/rendering/texture-set.h>
-#include <dali/devel-api/images/pixel-data.h>
 #include <dali/public-api/images/buffer-image.h>
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/devel-api/adaptor-framework/event-thread-callback.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 struct NSVGimage;
 struct NSVGrasterizer;
@@ -213,4 +213,4 @@ private:
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H__ */
+#endif // DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *
  */
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/geometry.h>
 
 #include <toolkit-environment-variable.h> // for setting environment variable: DALI_DEBUG_RENDERING
 

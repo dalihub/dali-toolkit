@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H__
-#define __DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H__
+#ifndef DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H
+#define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-effect.h>
@@ -76,14 +76,14 @@ public:
   bool IsTransitioning();
 
   /**
-   * @copydoc Toolkit::CubeTransitionEffect::SetFirstImage
+   * @copydoc Toolkit::CubeTransitionEffect::SetCurrentTexture
    */
-  void SetCurrentImage( Image image );
+  void SetCurrentTexture( Texture texture );
 
   /**
-   * @copydoc Toolkit::CubeTransitionEffect::SetTargetImage
+   * @copydoc Toolkit::CubeTransitionEffect::SetTargetTexture
    */
-  void SetTargetImage( Image image );
+  void SetTargetTexture( Texture texture );
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::StartTransition(bool)
@@ -214,8 +214,9 @@ protected:
   Renderer                   mCurrentRenderer;
   Renderer                   mTargetRenderer;
 
-  Image                      mCurrentImage;
-  Image                      mTargetImage;
+  Texture                    mCurrentTexture;
+  Texture                    mTargetTexture;
+
   Animation                  mAnimation;
 
   Vector2                    mTileSize;
@@ -261,4 +262,4 @@ inline const Internal::CubeTransitionEffect& GetImpl(const Dali::Toolkit::CubeTr
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H__ */
+#endif // DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H

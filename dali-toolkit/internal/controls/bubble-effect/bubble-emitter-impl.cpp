@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-actor.h>
@@ -143,8 +144,8 @@ void BubbleEmitter::OnInitialize()
   Shader bubbleShader = CreateBubbleShader (mNumBubblePerActor );
 
   mTextureSet = TextureSet::New();
-  mTextureSet.SetImage( 0u, mEffectImage );
-  mTextureSet.SetImage( 1u, mShapeImage );
+  TextureSetImage( mTextureSet, 0u, mEffectImage );
+  TextureSetImage( mTextureSet, 1u, mShapeImage );
 
   mBubbleActors.resize( mNumActor );
 
@@ -200,7 +201,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
 
 void BubbleEmitter::SetShapeImage( Image shapeImage )
 {
-  mTextureSet.SetImage( 1, shapeImage );
+  TextureSetImage( mTextureSet, 1, shapeImage );
 }
 
 void BubbleEmitter::SetBubbleScale( float scale )

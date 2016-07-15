@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,7 +311,7 @@ void GradientRenderer::InitializeRenderer()
   Geometry geometry = mFactoryCache.GetGeometry( RendererFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
   {
-    geometry =  Geometry::QUAD();
+    geometry =  RendererFactoryCache::CreateQuadGeometry();
     mFactoryCache.SaveGeometry( RendererFactoryCache::QUAD_GEOMETRY, geometry );
   }
 
@@ -326,8 +326,8 @@ void GradientRenderer::InitializeRenderer()
 
   //Set up the texture set
   TextureSet textureSet = TextureSet::New();
-  Dali::BufferImage lookupTexture = mGradient->GenerateLookupTexture();
-  textureSet.SetImage( 0u, lookupTexture );
+  Dali::Texture lookupTexture = mGradient->GenerateLookupTexture();
+  textureSet.SetTexture( 0u, lookupTexture );
   Dali::WrapMode::Type wrap = GetWrapMode( mGradient->GetSpreadMethod() );
   Sampler sampler = Sampler::New();
   sampler.SetWrapMode(  wrap, wrap  );

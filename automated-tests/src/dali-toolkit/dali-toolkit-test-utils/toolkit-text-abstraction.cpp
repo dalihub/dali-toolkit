@@ -152,7 +152,7 @@ public:
   void GetFontMetrics( FontId fontId, FontMetrics& metrics ){}
   GlyphIndex GetGlyphIndex( FontId fontId, Character charcode ){return 0;}
   bool GetGlyphMetrics( GlyphInfo* array, uint32_t size, bool horizontal ){return true;}
-  BufferImage CreateBitmap( FontId fontId, GlyphIndex glyphIndex ){return BufferImage();}
+  PixelData CreateBitmap( FontId fontId, GlyphIndex glyphIndex ){return PixelData();}
   void CreateVectorBlob( FontId fontId, GlyphIndex glyphIndex, VectorBlob*& blob,
                          unsigned int& blobLength, unsigned int& nominalWidth, unsigned int& nominalHeight )
   {
@@ -462,7 +462,7 @@ bool FontClient::GetGlyphMetrics( GlyphInfo* array, uint32_t size, GlyphType typ
   return GetImplementation(*this).GetGlyphMetrics( array, size, horizontal );
 }
 
-BufferImage FontClient::CreateBitmap( FontId fontId, GlyphIndex glyphIndex )
+PixelData FontClient::CreateBitmap( FontId fontId, GlyphIndex glyphIndex )
 {
   return GetImplementation(*this).CreateBitmap( fontId, glyphIndex );
 }

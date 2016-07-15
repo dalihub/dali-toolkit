@@ -23,6 +23,7 @@
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-cross-effect.h>
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-fold-effect.h>
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-wave-effect.h>
+#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/public-api/images/buffer-image.h>
 
 
@@ -77,14 +78,14 @@ void Wait(ToolkitTestApplication& application, float durationToPass)
 class TransitionCompletedCallback : public Dali::ConnectionTracker
 {
 public:
-  TransitionCompletedCallback( bool& signalReceived, CubeTransitionEffect& effect, Image& image )
+  TransitionCompletedCallback( bool& signalReceived, CubeTransitionEffect& effect, Texture& image )
   : mSignalVerified( signalReceived ),
     mCurrentEffect( effect ),
     mActorTransitTo( image )
   {
   }
 
-  void Callback( CubeTransitionEffect effect, Image image )
+  void Callback( CubeTransitionEffect effect, Texture image )
   {
     tet_infoline( "Verifying TransitionCompletedSignal" );
 
@@ -101,7 +102,7 @@ public:
 
   bool&                  mSignalVerified;
   CubeTransitionEffect&  mCurrentEffect;
-  Image&                 mActorTransitTo;
+  Texture&               mActorTransitTo;
 };
 
 } // namespace
@@ -257,13 +258,13 @@ int UtcDaliCubeTransitionEffectGetRoot(void)
 
   unsigned int totalNum = NUM_ROWS*NUM_COLUMNS;
 
-  Image image = BufferImage::New( 40, 40 ) ;
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
   Stage::GetCurrent().Add( waveEffect );
-  waveEffect.SetCurrentImage( image );
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetCurrentTexture( texture );
+  waveEffect.SetTargetTexture( texture );
 
   application.SendNotification();
   application.Render();
@@ -289,7 +290,7 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
   tet_infoline(" UtcDaliCubeTransitionEffectIsTransiting ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image image = BufferImage::New( 40, 40 ) ;
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
@@ -299,8 +300,8 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
   DALI_TEST_CHECK( !waveEffect.IsTransitioning() );
 
-  waveEffect.SetCurrentImage( image );
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetCurrentTexture( texture );
+  waveEffect.SetTargetTexture( texture );
   //transition is started
   waveEffect.StartTransition();
   DALI_TEST_CHECK( waveEffect.IsTransitioning() );
@@ -316,8 +317,8 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
   crossEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
   DALI_TEST_CHECK( !crossEffect.IsTransitioning() );
 
-  crossEffect.SetCurrentImage( image );
-  crossEffect.SetTargetImage( image );
+  crossEffect.SetCurrentTexture( texture );
+  crossEffect.SetTargetTexture( texture );
   //transition is started
   crossEffect.StartTransition(false);
   DALI_TEST_CHECK( crossEffect.IsTransitioning() );
@@ -332,8 +333,8 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
   foldEffect.SetTransitionDuration( TRANSITION_DURATION );
   DALI_TEST_CHECK( !foldEffect.IsTransitioning() );
 
-  foldEffect.SetCurrentImage( image );
-  foldEffect.SetTargetImage( image );
+  foldEffect.SetCurrentTexture( texture );
+  foldEffect.SetTargetTexture( texture );
   //transition is started
   foldEffect.StartTransition(true);
   DALI_TEST_CHECK(foldEffect.IsTransitioning() );
@@ -345,17 +346,17 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
 }
 
 //Test common codes in base class
-int UtcDaliCubeTransitionEffectSetCurrentImage(void)
+int UtcDaliCubeTransitionEffectSetCurrentTexture(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliCubeTransitionEffectSetCurrentImage ");
+  tet_infoline(" UtcDaliCubeTransitionEffectSetCurrentTexture ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image image = BufferImage::New( 40, 40 ) ;
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
-  waveEffect.SetCurrentImage( image );
+  waveEffect.SetCurrentTexture( texture );
 
   Stage::GetCurrent().Add( waveEffect );
 
@@ -384,20 +385,19 @@ int UtcDaliCubeTransitionEffectSetCurrentImage(void)
 }
 
 //Test common codes in base class
-int UtcDaliCubeTransitionEffectSetTargetImage(void)
+int UtcDaliCubeTransitionEffectSetTargetTexture(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliCubeTransitionEffectSetTargetImage ");
+  tet_infoline(" UtcDaliCubeTransitionEffectSetTargetTexture ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image image = BufferImage::New( 30, 30 );
-
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
   Stage::GetCurrent().Add( waveEffect );
 
-  waveEffect.SetCurrentImage( image );
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetCurrentTexture( texture );
+  waveEffect.SetTargetTexture( texture );
 
   Stage::GetCurrent().Add( waveEffect );
 
@@ -430,13 +430,18 @@ int UtcDaliCubeTransitionWaveEffectStartTransition(void)
   tet_infoline(" UtcDaliCubeTransitionWaveEffectStartTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image image = ResourceImage::New( "Image.jpg" );
+
+  BitmapLoader loader = BitmapLoader::New( "Image.jpg" );
+  loader.Load();
+  PixelData pixelData = loader.GetPixelData();
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+  texture.Upload( pixelData );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
   waveEffect.SetTransitionDuration( TRANSITION_DURATION );
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  waveEffect.SetCurrentImage( image );
+  waveEffect.SetCurrentTexture( texture );
 
   Stage::GetCurrent().Add( waveEffect );
 
@@ -448,27 +453,27 @@ int UtcDaliCubeTransitionWaveEffectStartTransition(void)
   Actor cube = waveEffect.GetChildAt(0).GetChildAt(0);
 
   //check the cube rotation value and color values just before the end of different transitions
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetTargetTexture( texture );
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
   DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetTargetTexture( texture );
   waveEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
   DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetTargetTexture( texture );
   waveEffect.StartTransition(false);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
   DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
-  waveEffect.SetTargetImage( image );
+  waveEffect.SetTargetTexture( texture );
   waveEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
@@ -483,14 +488,19 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
   tet_infoline(" UtcDaliCubeTransitionCrossEffectStartTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image image = ResourceImage::New( "Image.jpg" );
+
+  BitmapLoader loader = BitmapLoader::New( "Image.jpg" );
+  loader.Load();
+  PixelData pixelData = loader.GetPixelData();
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+  texture.Upload( pixelData );
 
   CubeTransitionEffect crossEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS );
   crossEffect.SetSize( VIEW_AREA_SIZE );
   crossEffect.SetTransitionDuration( TRANSITION_DURATION );
   crossEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  crossEffect.SetCurrentImage( image );
-  crossEffect.SetTargetImage( image );
+  crossEffect.SetCurrentTexture( texture );
+  crossEffect.SetTargetTexture( texture );
 
   Stage::GetCurrent().Add( crossEffect );
 
@@ -510,7 +520,7 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
 
-  crossEffect.SetTargetImage( image );
+  crossEffect.SetTargetTexture( texture );
   crossEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
@@ -519,7 +529,7 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
 
-  crossEffect.SetTargetImage( image );
+  crossEffect.SetTargetTexture( texture );
   crossEffect.StartTransition(false);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
@@ -527,7 +537,7 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
-  crossEffect.SetTargetImage( image );
+  crossEffect.SetTargetTexture( texture );
   crossEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
@@ -543,13 +553,12 @@ int UtcDaliCubeTransitionFoldEffectStartTransition(void)
   tet_infoline(" UtcDaliCubeTransitionFoldEffectStartTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image image = BufferImage::New( 30, 30 );
-
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
   CubeTransitionEffect foldEffect = CubeTransitionFoldEffect::New( NUM_ROWS, NUM_COLUMNS );
   foldEffect.SetSize( VIEW_AREA_SIZE );
   foldEffect.SetTransitionDuration( TRANSITION_DURATION );
-  foldEffect.SetCurrentImage( image );
-  foldEffect.SetTargetImage( image );
+  foldEffect.SetCurrentTexture( texture );
+  foldEffect.SetTargetTexture( texture );
 
   Stage::GetCurrent().Add( foldEffect );
 
@@ -568,7 +577,7 @@ int UtcDaliCubeTransitionFoldEffectStartTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
-  foldEffect.SetTargetImage( image );
+  foldEffect.SetTargetTexture( texture );
   foldEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
@@ -577,7 +586,7 @@ int UtcDaliCubeTransitionFoldEffectStartTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
 
-  foldEffect.SetTargetImage( image );
+  foldEffect.SetTargetTexture( texture );
   foldEffect.StartTransition(false);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
@@ -585,7 +594,7 @@ int UtcDaliCubeTransitionFoldEffectStartTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(),FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
-  foldEffect.SetTargetImage( image );
+  foldEffect.SetTargetTexture( texture );
   foldEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
   DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
@@ -601,9 +610,9 @@ int UtcDaliCubeTransitionEffectSignalTransitionCompleted(void)
   tet_infoline(" UtcDaliCubeTransitionEffectSignalTransitionCompleted ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image firstImage = BufferImage::New( 30, 30 );
-  Image secondImage = BufferImage::New( 20, 20 );
-  Image thirdImage = BufferImage::New( 40, 40 );
+  Texture firstTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 30, 30 );
+  Texture secondTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 20, 20 );
+  Texture thirdTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
@@ -624,61 +633,61 @@ int UtcDaliCubeTransitionEffectSignalTransitionCompleted(void)
 
   bool signalVerified = false;
   CubeTransitionEffect currentEffect;
-  Image actorTransitTo;
+  Texture actorTransitTo;
   TransitionCompletedCallback callback(signalVerified, currentEffect, actorTransitTo);
   waveEffect.TransitionCompletedSignal().Connect( &callback, &TransitionCompletedCallback::Callback );
   crossEffect.TransitionCompletedSignal().Connect( &callback, &TransitionCompletedCallback::Callback );
   foldEffect.TransitionCompletedSignal().Connect( &callback, &TransitionCompletedCallback::Callback );
 
-  //check that the wave effect is used to transit to secondImage
+  //check that the wave effect is used to transit to secondTexture
   currentEffect = waveEffect;
-  actorTransitTo = secondImage;
-  waveEffect.SetCurrentImage( firstImage );
-  waveEffect.SetTargetImage( secondImage );
+  actorTransitTo = secondTexture;
+  waveEffect.SetCurrentTexture( firstTexture );
+  waveEffect.SetTargetTexture( secondTexture );
   waveEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_DURATION );
   DALI_TEST_CHECK(callback.mSignalVerified);
   callback.Reset();
 
-  //check that the wave effect is used to transit to thirdImage
-  actorTransitTo = thirdImage;
-  waveEffect.SetTargetImage( thirdImage );
+  //check that the wave effect is used to transit to thirdTexture
+  actorTransitTo = thirdTexture;
+  waveEffect.SetTargetTexture( thirdTexture );
   waveEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_DURATION );
   DALI_TEST_CHECK(callback.mSignalVerified);
   callback.Reset();
 
-  //check that the cross effect is used to transit to secondImage
+  //check that the cross effect is used to transit to secondTexture
   currentEffect = crossEffect;
-  actorTransitTo = secondImage;
-  crossEffect.SetCurrentImage( thirdImage );
-  crossEffect.SetTargetImage( secondImage );
+  actorTransitTo = secondTexture;
+  crossEffect.SetCurrentTexture( thirdTexture );
+  crossEffect.SetTargetTexture( secondTexture );
   crossEffect.StartTransition(true);
   Wait( application, TRANSITION_DURATION );
   DALI_TEST_CHECK(callback.mSignalVerified);
   callback.Reset();
 
-  //check that the cross effect is used to transit to firstImage
-  actorTransitTo = firstImage;
-  crossEffect.SetTargetImage( firstImage );
+  //check that the cross effect is used to transit to firstTexture
+  actorTransitTo = firstTexture;
+  crossEffect.SetTargetTexture( firstTexture );
   crossEffect.StartTransition(false);
   Wait( application, TRANSITION_DURATION );
   DALI_TEST_CHECK(callback.mSignalVerified);
   callback.Reset();
 
-  //check that the fold effect is used to transit to secondImage
+  //check that the fold effect is used to transit to secondTexture
   currentEffect = foldEffect;
-  actorTransitTo = secondImage;
-  foldEffect.SetCurrentImage( firstImage );
-  foldEffect.SetTargetImage( secondImage );
+  actorTransitTo = secondTexture;
+  foldEffect.SetCurrentTexture( firstTexture );
+  foldEffect.SetTargetTexture( secondTexture );
   foldEffect.StartTransition();
   Wait( application, TRANSITION_DURATION );
   DALI_TEST_CHECK( callback.mSignalVerified );
   callback.Reset();
 
-  //check that the fold effect is used to transit to thirdImage
-  actorTransitTo = thirdImage;
-  foldEffect.SetTargetImage( thirdImage );
+  //check that the fold effect is used to transit to thirdTexture
+  actorTransitTo = thirdTexture;
+  foldEffect.SetTargetTexture( thirdTexture );
   foldEffect.StartTransition( false );
   Wait( application, TRANSITION_DURATION );
   DALI_TEST_CHECK( callback.mSignalVerified );
@@ -691,8 +700,8 @@ int UtcDaliCubeTransitionEffectPauseResumeTransition(void)
   tet_infoline(" UtcDaliCubeTransitionEffectPauseResumeTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image firstImage = BufferImage::New( 30, 30 );
-  Image secondImage = BufferImage::New( 20, 20 );
+  Texture firstTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 30, 30 );
+  Texture secondTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 20, 20 );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
@@ -713,16 +722,16 @@ int UtcDaliCubeTransitionEffectPauseResumeTransition(void)
 
   bool signalVerified = false;
   CubeTransitionEffect currentEffect;
-  Image actorTransitTo;
+  Texture actorTransitTo;
   TransitionCompletedCallback callback(signalVerified, currentEffect, actorTransitTo);
   waveEffect.TransitionCompletedSignal().Connect( &callback, &TransitionCompletedCallback::Callback );
   crossEffect.TransitionCompletedSignal().Connect( &callback, &TransitionCompletedCallback::Callback );
   foldEffect.TransitionCompletedSignal().Connect( &callback, &TransitionCompletedCallback::Callback );
 
   currentEffect = waveEffect;
-  actorTransitTo = secondImage;
-  waveEffect.SetCurrentImage( firstImage );
-  waveEffect.SetTargetImage( secondImage );
+  actorTransitTo = secondTexture;
+  waveEffect.SetCurrentTexture( firstTexture );
+  waveEffect.SetTargetTexture( secondTexture );
   // start transition; transit for 0.5*duration; pause for 0.5*duration;
   // resume for 0.25*duration; pause for 0.25*duration; resume for another 0.25*duration;
   // only until now the transition finished signal can be received
@@ -744,9 +753,9 @@ int UtcDaliCubeTransitionEffectPauseResumeTransition(void)
   callback.Reset();
 
   currentEffect = crossEffect;
-  actorTransitTo = firstImage;
-  crossEffect.SetCurrentImage( secondImage );
-  crossEffect.SetTargetImage( firstImage );
+  actorTransitTo = firstTexture;
+  crossEffect.SetCurrentTexture( secondTexture );
+  crossEffect.SetTargetTexture( firstTexture );
   // start transition; transit for 0.25*duration; pause for 0.2*duration;
   // resume for 0.5*duration; pause for 0.2*duration; resume for another 0.25*duration;
   // only until now the transition finished signal can be received
@@ -768,9 +777,9 @@ int UtcDaliCubeTransitionEffectPauseResumeTransition(void)
   callback.Reset();
 
   currentEffect = foldEffect;
-  actorTransitTo = secondImage;
-  foldEffect.SetCurrentImage( firstImage );
-  foldEffect.SetTargetImage( secondImage );
+  actorTransitTo = secondTexture;
+  foldEffect.SetCurrentTexture( firstTexture );
+  foldEffect.SetTargetTexture( secondTexture );
   // start transition; transit for 0.5*duration; pause for 0.5*duration;
   // resume for 0.25*duration; pause for 0.25*duration; resume for another 0.25*duration;
   // only until now the transition finished signal can be received
@@ -798,15 +807,15 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   tet_infoline(" UtcDaliCubeTransitionWaveEffectStopTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image firstImage = BufferImage::New( 30, 30 );
-  Image secondImage = BufferImage::New( 20, 20 );
+  Texture firstTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 30, 30 );
+  Texture secondTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 20, 20 );
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetSize( VIEW_AREA_SIZE );
   waveEffect.SetTransitionDuration( TRANSITION_DURATION );
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  waveEffect.SetCurrentImage( firstImage );
-  waveEffect.SetTargetImage( secondImage );
+  waveEffect.SetCurrentTexture( firstTexture );
+  waveEffect.SetTargetTexture( secondTexture );
 
   Stage::GetCurrent().Add( waveEffect );
 
@@ -826,7 +835,7 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  waveEffect.SetTargetImage( firstImage );
+  waveEffect.SetTargetTexture( firstTexture );
   waveEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_DURATION*0.4f );
   waveEffect.StopTransition();
@@ -836,7 +845,7 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  waveEffect.SetTargetImage( secondImage );
+  waveEffect.SetTargetTexture( secondTexture );
   waveEffect.StartTransition(false);
   Wait( application, TRANSITION_DURATION*0.6f );
   waveEffect.StopTransition();
@@ -846,7 +855,7 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  waveEffect.SetTargetImage( firstImage );
+  waveEffect.SetTargetTexture( firstTexture );
   waveEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_DURATION*0.8f );
   waveEffect.StopTransition();
@@ -864,15 +873,15 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   tet_infoline(" UtcDaliCubeTransitionCrossEffectStopTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image firstImage = BufferImage::New( 30, 30 );
-  Image secondImage = BufferImage::New( 20, 20 );
+  Texture firstTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 30, 30 );
+  Texture secondTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 20, 20 );
 
   CubeTransitionEffect crossEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS );
   crossEffect.SetSize( VIEW_AREA_SIZE );
   crossEffect.SetTransitionDuration( TRANSITION_DURATION );
   crossEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  crossEffect.SetCurrentImage( firstImage );
-  crossEffect.SetTargetImage( secondImage );
+  crossEffect.SetCurrentTexture( firstTexture );
+  crossEffect.SetTargetTexture( secondTexture );
 
   Stage::GetCurrent().Add( crossEffect );
 
@@ -894,7 +903,7 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  crossEffect.SetTargetImage( firstImage );
+  crossEffect.SetTargetTexture( firstTexture );
   crossEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_DURATION*0.4f );
   crossEffect.StopTransition();
@@ -905,7 +914,7 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  crossEffect.SetTargetImage( secondImage );
+  crossEffect.SetTargetTexture( secondTexture );
   crossEffect.StartTransition(false);
   Wait( application, TRANSITION_DURATION*0.6f );
   crossEffect.StopTransition();
@@ -916,7 +925,7 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  crossEffect.SetTargetImage( firstImage );
+  crossEffect.SetTargetTexture( firstTexture );
   crossEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_DURATION*0.8f );
   crossEffect.StopTransition();
@@ -935,14 +944,14 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   tet_infoline(" UtcDaliCubeTransitionFoldEffectStopTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  Image firstImage = BufferImage::New( 30, 30 );
-  Image secondImage = BufferImage::New( 20, 20 );
+  Texture firstTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 30, 30 );
+  Texture secondTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 20, 20 );
 
   CubeTransitionEffect foldEffect = CubeTransitionFoldEffect::New( NUM_ROWS, NUM_COLUMNS );
   foldEffect.SetSize( VIEW_AREA_SIZE );
   foldEffect.SetTransitionDuration( TRANSITION_DURATION );
-  foldEffect.SetCurrentImage( firstImage );
-  foldEffect.SetTargetImage( secondImage );
+  foldEffect.SetCurrentTexture( firstTexture );
+  foldEffect.SetTargetTexture( secondTexture );
 
   Stage::GetCurrent().Add( foldEffect );
 
@@ -965,7 +974,7 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  foldEffect.SetTargetImage( firstImage );
+  foldEffect.SetTargetTexture( firstTexture );
   foldEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_DURATION*0.4f );
   foldEffect.StopTransition();
@@ -976,7 +985,7 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  foldEffect.SetTargetImage( secondImage );
+  foldEffect.SetTargetTexture( secondTexture );
   foldEffect.StartTransition(false);
   Wait( application, TRANSITION_DURATION*0.6f );
   foldEffect.StopTransition();
@@ -987,7 +996,7 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
-  foldEffect.SetTargetImage( firstImage );
+  foldEffect.SetTargetTexture( firstTexture );
   foldEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_DURATION*0.8f );
   foldEffect.StopTransition();

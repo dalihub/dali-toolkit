@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,10 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
 
 namespace Dali
@@ -128,12 +131,12 @@ void EmbossFilter::Enable()
   InitializeControlRenderer( mActorForComposite, mRendererForEmboss2, rendererMap );
 
   TextureSet textureSet1 = TextureSet::New();
-  textureSet1.SetImage( 0, mImageForEmboss1 );
+  TextureSetImage( textureSet1, 0, mImageForEmboss1 );
   mActorForComposite.GetRendererAt(0).SetTextures( textureSet1 );
   mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
 
   TextureSet textureSet2 = TextureSet::New();
-  textureSet2.SetImage( 0, mImageForEmboss2 );
+  TextureSetImage( textureSet2, 0, mImageForEmboss2 );
   mActorForComposite.GetRendererAt(1).SetTextures( textureSet2 );
   mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
 

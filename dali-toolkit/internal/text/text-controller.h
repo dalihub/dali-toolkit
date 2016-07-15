@@ -188,6 +188,48 @@ public:
   float GetAutoScrollLineAlignment() const;
 
   /**
+   * @brief Enables the horizontal scrolling.
+   *
+   * @param[in] enable Whether to enable the horizontal scrolling.
+   */
+  void SetHorizontalScrollEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the horizontal scrolling is enabled.
+   *
+   * @return @e true if the horizontal scrolling is enabled, otherwise it returns @e false.
+   */
+  bool IsHorizontalScrollEnabled() const;
+
+  /**
+   * @brief Enables the vertical scrolling.
+   *
+   * @param[in] enable Whether to enable the vertical scrolling.
+   */
+  void SetVerticalScrollEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the verticall scrolling is enabled.
+   *
+   * @return @e true if the vertical scrolling is enabled, otherwise it returns @e false.
+   */
+  bool IsVerticalScrollEnabled() const;
+
+  /**
+   * @brief Enables the smooth handle panning.
+   *
+   * @param[in] enable Whether to enable the smooth handle panning.
+   */
+  void SetSmoothHandlePanEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the smooth handle panning is enabled.
+   *
+   * @return @e true if the smooth handle panning is enabled.
+   */
+  bool IsSmoothHandlePanEnabled() const;
+
+  /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.

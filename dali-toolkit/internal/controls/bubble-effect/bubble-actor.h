@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H_
-#define __DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H_
+#ifndef DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H
+#define DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 
 namespace Dali
 {
@@ -151,4 +151,4 @@ private:
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H_ */
+#endif // DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H

@@ -1114,7 +1114,17 @@ void TextField::OnInitialize()
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
 
+  // Enables the text input.
   mController->EnableTextInput( mDecorator );
+
+  // Enables the horizontal scrolling after the text input has been enabled.
+  mController->SetHorizontalScrollEnabled( true );
+
+  // Disables the vertical scrolling.
+  mController->SetVerticalScrollEnabled( false );
+
+  // Disable the smooth handle panning.
+  mController->SetSmoothHandlePanEnabled( false );
 
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );

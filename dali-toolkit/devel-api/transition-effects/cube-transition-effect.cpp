@@ -76,14 +76,14 @@ bool CubeTransitionEffect::IsTransitioning()
   return GetImpl(*this).IsTransitioning();
 }
 
-void CubeTransitionEffect::SetCurrentImage( Image image )
+void CubeTransitionEffect::SetCurrentTexture( Texture texture )
 {
-  GetImpl(*this).SetCurrentImage( image );
+  GetImpl(*this).SetCurrentTexture( texture );
 }
 
-void CubeTransitionEffect::SetTargetImage( Image image )
+void CubeTransitionEffect::SetTargetTexture( Texture texture )
 {
-  GetImpl(*this).SetTargetImage( image );
+  GetImpl(*this).SetTargetTexture( texture );
 }
 
 void CubeTransitionEffect::StartTransition( bool toNextImage )

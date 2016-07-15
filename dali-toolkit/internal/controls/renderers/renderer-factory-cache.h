@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_RENDERER_FACTORY_CACHE_H__
-#define __DALI_TOOLKIT_RENDERER_FACTORY_CACHE_H__
+#ifndef DALI_TOOLKIT_RENDERER_FACTORY_CACHE_H
+#define DALI_TOOLKIT_RENDERER_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/shader.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/weak-handle.h>
 
@@ -108,6 +108,12 @@ public:
    * @param[in] geometry The geometry for caching.
    */
   void SaveShader( ShaderType type, Shader shader );
+
+  /*
+   * Greate the quad geometry.
+   * Quad geometry is shared by multiple kind of Renderer, so implement it in the factory-cache.
+   */
+  static Geometry CreateQuadGeometry();
 
   /**
    * Create the grid geometry.
@@ -225,4 +231,4 @@ private:
 
 } // namespace Dali
 
-#endif /*__DALI_TOOLKIT_RENDERER_FACTORY_CACHE_H__ */
+#endif // DALI_TOOLKIT_RENDERER_FACTORY_CACHE_H
