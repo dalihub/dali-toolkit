@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -260,8 +261,8 @@ void GaussianBlurView::OnInitialize()
   horizFragmentShaderStringStream << "#define NUM_SAMPLES " << mNumSamples << "\n";
   horizFragmentShaderStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
   Property::Map source;
-  source[ "fragmentShader" ] = horizFragmentShaderStringStream.str();
-  mCustomShader["shader"] = source;
+  source[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = horizFragmentShaderStringStream.str();
+  mCustomShader[ Toolkit::Visual::Property::SHADER ] = source;
 
   //////////////////////////////////////////////////////
   // Create actors

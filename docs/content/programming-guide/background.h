@@ -62,9 +62,9 @@ then the above image will look like:
 The background can be set to use a specified visual, e.g the border visual
 @code
 Property::Map visual;
-visual.Insert("rendererType","BORDER");
-visual.Insert("borderColor",COLOR::RED);
-visual.Insert("borderSize",20.f);
+visual.Insert( Visual::Property::Type,Visual::BORDER );
+visual.Insert( BorderVisual::Property::COLOR, COLOR::RED );
+visual.Insert( BorderVisual::Property::SIZE, 20.f );
 
 control.SetProperty( Control::Property::BACKGROUND, visual);
 @endcode

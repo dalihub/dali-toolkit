@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  *
  */
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <string.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/property-map.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 
 using namespace Dali;
@@ -331,12 +332,12 @@ Property::Map Dali::Toolkit::Internal::CreatePageTurnEffect()
 
   Property::Map customShader;
 
-  customShader[ "vertexShader" ] = vertexShader;
-  customShader[ "fragmentShader" ] = fragmentShader;
-  customShader[ "subdivideGridX" ] = 20;
-  customShader[ "subdivideGridY" ] = 20;
+  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = vertexShader;
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentShader;
+  customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
+  customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
 
-  map[ "shader" ] = customShader;
+  map[ Toolkit::Visual::Property::SHADER ] = customShader;
   return map;
 
 }

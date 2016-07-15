@@ -25,9 +25,12 @@
 #include <dali/devel-api/images/atlas.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADER
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -57,20 +60,24 @@ const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
 
 // fitting modes
-const char * const SHRINK_TO_FIT("SHRINK_TO_FIT");
-const char * const SCALE_TO_FILL("SCALE_TO_FILL");
-const char * const FIT_WIDTH("FIT_WIDTH");
-const char * const FIT_HEIGHT("FIT_HEIGHT");
-const char * const DEFAULT("DEFAULT");
+DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::FittingMode, SHRINK_TO_FIT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::FittingMode, SCALE_TO_FILL )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::FittingMode, FIT_WIDTH )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::FittingMode, FIT_HEIGHT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::FittingMode, DEFAULT )
+DALI_ENUM_TO_STRING_TABLE_END( FITTING_MODE )
 
 // sampling modes
-const char * const BOX("BOX");
-const char * const NEAREST("NEAREST");
-const char * const LINEAR("LINEAR");
-const char * const BOX_THEN_NEAREST("BOX_THEN_NEAREST");
-const char * const BOX_THEN_LINEAR("BOX_THEN_LINEAR");
-const char * const NO_FILTER("NO_FILTER");
-const char * const DONT_CARE("DONT_CARE");
+DALI_ENUM_TO_STRING_TABLE_BEGIN( SAMPLING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, BOX )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, NEAREST )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, LINEAR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, BOX_THEN_NEAREST )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, BOX_THEN_LINEAR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, NO_FILTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, DONT_CARE )
+DALI_ENUM_TO_STRING_TABLE_END( SAMPLING_MODE )
 
 const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
 
@@ -150,7 +157,7 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   std::string oldImageUrl = mImageUrl;
 
-  Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
+  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
   if( imageURLValue )
   {
     imageURLValue->Get( mImageUrl );
@@ -159,103 +166,36 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
       mImage.Reset();
     }
 
-    Property::Value* fittingValue = propertyMap.Find( IMAGE_FITTING_MODE );
+    Property::Value* fittingValue = propertyMap.Find( Toolkit::ImageVisual::Property::FITTING_MODE, IMAGE_FITTING_MODE );
     if( fittingValue )
     {
-      std::string fitting;
-      fittingValue->Get( fitting );
-
-      mFittingMode = FittingMode::DEFAULT;
-      if( fitting == SHRINK_TO_FIT )
-      {
-        mFittingMode = FittingMode::SHRINK_TO_FIT;
-      }
-      else if( fitting == SCALE_TO_FILL )
-      {
-        mFittingMode = FittingMode::SCALE_TO_FILL;
-      }
-      else if( fitting == FIT_WIDTH )
-      {
-        mFittingMode = FittingMode::FIT_WIDTH;
-      }
-      else if( fitting == FIT_HEIGHT )
-      {
-        mFittingMode = FittingMode::FIT_HEIGHT;
-      }
-      else if( fitting == DEFAULT )
-      {
-        mFittingMode = FittingMode::DEFAULT;
-      }
-      else
-      {
-        DALI_ASSERT_ALWAYS("Unknown fitting mode");
-      }
+      Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, mFittingMode );
     }
 
-    Property::Value* samplingValue = propertyMap.Find( IMAGE_SAMPLING_MODE );
+    Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
     if( samplingValue )
     {
-      std::string sampling;
-      samplingValue->Get( sampling );
-
-      mSamplingMode = SamplingMode::DEFAULT;
-      if( sampling == BOX )
-      {
-        mSamplingMode = SamplingMode::BOX;
-      }
-      else if( sampling == NEAREST )
-      {
-        mSamplingMode = SamplingMode::NEAREST;
-      }
-      else if( sampling == LINEAR )
-      {
-        mSamplingMode = SamplingMode::LINEAR;
-      }
-      else if( sampling == BOX_THEN_NEAREST )
-      {
-        mSamplingMode = SamplingMode::BOX_THEN_NEAREST;
-      }
-      else if( sampling == BOX_THEN_LINEAR )
-      {
-        mSamplingMode = SamplingMode::BOX_THEN_LINEAR;
-      }
-      else if( sampling == NO_FILTER )
-      {
-        mSamplingMode = SamplingMode::NO_FILTER;
-      }
-      else if( sampling == DONT_CARE )
-      {
-        mSamplingMode = SamplingMode::DONT_CARE;
-      }
-      else if( sampling == DEFAULT )
-      {
-        mSamplingMode = SamplingMode::DEFAULT;
-      }
-      else
-      {
-        DALI_ASSERT_ALWAYS("Unknown sampling mode");
-      }
+      Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, mSamplingMode );
     }
 
     int desiredWidth = 0;
-    Property::Value* desiredWidthValue = propertyMap.Find( IMAGE_DESIRED_WIDTH );
+    Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
     if( desiredWidthValue )
     {
       desiredWidthValue->Get( desiredWidth );
     }
 
     int desiredHeight = 0;
-    Property::Value* desiredHeightValue = propertyMap.Find( IMAGE_DESIRED_HEIGHT );
+    Property::Value* desiredHeightValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, IMAGE_DESIRED_HEIGHT );
     if( desiredHeightValue )
     {
       desiredHeightValue->Get( desiredHeight );
     }
 
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
-
   }
 
-  Property::Value* syncLoading = propertyMap.Find( SYNCHRONOUS_LOADING );
+  Property::Value* syncLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
   if( syncLoading )
   {
     bool sync;
@@ -442,7 +382,7 @@ Image ImageVisual::LoadImage( const std::string& url, bool synchronousLoading )
     if( !mPixels )
     {
       // use broken image
-      return VisualFactory::GetBrokenRendererImage();
+      return VisualFactory::GetBrokenVisualImage();
     }
     Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
     image.Upload( mPixels, 0, 0 );
@@ -466,7 +406,7 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
     {
       // use broken image
       textureSet = TextureSet::New();
-      TextureSetImage( textureSet, 0u, VisualFactory::GetBrokenRendererImage() );
+      TextureSetImage( textureSet, 0u, VisualFactory::GetBrokenVisualImage() );
     }
     else
     {
@@ -583,100 +523,30 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
   bool sync = IsSynchronousResourceLoading();
   map.Insert( SYNCHRONOUS_LOADING, sync );
   if( !mImageUrl.empty() )
   {
-    map.Insert( IMAGE_URL_NAME, mImageUrl );
-    map.Insert( IMAGE_DESIRED_WIDTH, mDesiredSize.GetWidth() );
-    map.Insert( IMAGE_DESIRED_HEIGHT, mDesiredSize.GetHeight() );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
   }
   else if( mImage )
   {
-    map.Insert( IMAGE_DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
-    map.Insert( IMAGE_DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
 
     ResourceImage resourceImage = ResourceImage::DownCast(mImage);
     if( resourceImage )
     {
-      map.Insert( IMAGE_URL_NAME, resourceImage.GetUrl() );
+      map.Insert( Toolkit::ImageVisual::Property::URL, resourceImage.GetUrl() );
     }
   }
 
-  switch( mFittingMode )
-  {
-    case Dali::FittingMode::FIT_HEIGHT:
-    {
-      map.Insert( IMAGE_FITTING_MODE, FIT_HEIGHT );
-      break;
-    }
-    case Dali::FittingMode::FIT_WIDTH:
-    {
-      map.Insert( IMAGE_FITTING_MODE, FIT_WIDTH );
-      break;
-    }
-    case Dali::FittingMode::SCALE_TO_FILL:
-    {
-      map.Insert( IMAGE_FITTING_MODE, SCALE_TO_FILL );
-      break;
-    }
-    case Dali::FittingMode::SHRINK_TO_FIT:
-    {
-      map.Insert( IMAGE_FITTING_MODE, SHRINK_TO_FIT );
-      break;
-    }
-    default:
-    {
-      map.Insert( IMAGE_FITTING_MODE, DEFAULT );
-      break;
-    }
-  }
-
-  switch( mSamplingMode )
-  {
-    case Dali::SamplingMode::BOX:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, BOX );
-      break;
-    }
-    case Dali::SamplingMode::NEAREST:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, NEAREST );
-      break;
-    }
-    case Dali::SamplingMode::LINEAR:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, LINEAR );
-      break;
-    }
-    case Dali::SamplingMode::BOX_THEN_LINEAR:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, BOX_THEN_LINEAR );
-      break;
-    }
-    case Dali::SamplingMode::BOX_THEN_NEAREST:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, BOX_THEN_NEAREST );
-      break;
-    }
-    case Dali::SamplingMode::NO_FILTER:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, NO_FILTER );
-      break;
-    }
-    case Dali::SamplingMode::DONT_CARE:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, DONT_CARE );
-      break;
-    }
-    default:
-    {
-      map.Insert( IMAGE_SAMPLING_MODE, DEFAULT );
-      break;
-    }
-  }
+  map.Insert( Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode );
+  map.Insert( Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode );
 }
 
 Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache )
@@ -835,7 +705,7 @@ void ImageVisual::OnImageLoaded( ResourceImage image )
 {
   if( image.GetLoadingState() == Dali::ResourceLoadingFailed )
   {
-    Image brokenImage = VisualFactory::GetBrokenRendererImage();
+    Image brokenImage = VisualFactory::GetBrokenVisualImage();
     if( mImpl->mRenderer )
     {
       ApplyImageToSampler( brokenImage );

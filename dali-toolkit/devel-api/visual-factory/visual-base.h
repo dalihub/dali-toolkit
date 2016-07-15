@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_VISUAL_BASE_H
 #define DALI_TOOLKIT_VISUAL_BASE_H
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ class Base;
 namespace Visual
 {
 /**
- * @brief Visual provides renderer for rendering the controls. A control may have multiple ControlRenders.
+ * @brief Visual provides a renderer for rendering the controls. A control may have multiple visuals.
  *
  * Visuals reuses geometry, shader etc. across controls and manages the renderer and texture sets to exist only when control is on-stage.
  * It also responds to actor size and color change, and provides the clipping at the renderer level.
- * Note: The control renderer responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
+ * Note: The visual responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
  */
 class DALI_IMPORT_API Base : public BaseHandle
 {
@@ -85,16 +85,16 @@ public:
   /**
    * @brief Get the size of the painting area.
    *
-   * @return The size of the renderer's painting area.
+   * @return The size of the visual's painting area.
    */
   const Vector2& GetSize() const;
 
   /**
-   * @brief Return the natural size of the renderer.
+   * @brief Return the natural size of the visual.
    *
-   * Deriving classes stipulate the natural size and by default a renderer has a ZERO natural size.
+   * Deriving classes stipulate the natural size and by default a visual has a ZERO natural size.
    *
-   * @param[out] naturalSize The renderer's natural size
+   * @param[out] naturalSize The visual's natural size
    */
   void GetNaturalSize( Vector2& naturalSize ) const;
 
@@ -102,53 +102,53 @@ public:
    * @brief Set the depth index of this visual.
    *
    * Depth-index controls draw-order for overlapping visuals.
-   * Renderer with higher depth indices are rendered in front of other renderer with smaller values
+   * Visuals with higher depth indices are rendered in front of other visual with smaller values
    *
    * @param[in] index The depth index of this visual.
    */
   void SetDepthIndex( float index );
 
   /**
-   * @brief Get the depth index of this renderer
+   * @brief Get the depth index of this visual
    *
-   * @return The depth index of this renderer.
+   * @return The depth index of this visual.
    */
   float GetDepthIndex() const;
 
   /**
-   * @brief Renderer only exists when control is on stage.
+   * @brief Visual needs to know when when the control is put on to the stage to add the renderer.
    *
-   * This function should be called when the control put on stage.
+   * This function should be called when the control is put on to the stage.
    *
-   * @param[in] actor The actor applying this renderer.
+   * @param[in] actor The actor using this visual.
    * @post SetOffStage should be called with the same actor when the control is put off stage otherwise memory will be leaked
    */
   void SetOnStage( Actor& actor );
 
   /**
-   * @brief Renderer is destroyed when control is off stage.
+   * @brief Visual needs to know when when the control is removed from the stage to remove the renderer.
    *
-   * This function should be called when the control removes from stage
+   * This function should be called when the control is removed from the stage
    *
-   * @param[in] actor The actor applying this renderer.
+   * @param[in] actor The actor using this visual.
    */
   void SetOffStage( Actor& actor );
 
   /**
-   * @brief Remove the renderer from actor and reset the control renderer self.
+   * @brief Remove the renderer from the actor and reset the visual self.
    *
-   * This function can be called with an empty handle. If the control renderer is empty, do nothing.
+   * This function can be called with an empty handle. If the visual is empty, this is a no-op.
    *
    * @param[in] actor The actor to be set off stage.
    */
   void RemoveAndReset( Actor& actor );
 
   /**
-   * @brief Create the property map representing this renderer.
+   * @brief Create the property map representing this visual.
    *
-   * @param[out] map The renderer property map.
+   * @param[out] map The visual property map.
    */
-  void CreatePropertyMap( Property::Map& map ) const;
+  void CreatePropertyMap( Dali::Property::Map& map ) const;
 
 public: // Not intended for application developers
 

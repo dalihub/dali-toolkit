@@ -1,7 +1,8 @@
-#ifndef __DALI_TOOLKIT_RENDERER_FACTORY_H__
-#define __DALI_TOOLKIT_RENDERER_FACTORY_H__
+#ifndef DALI_TOOLKIT_VISUAL_FACTORY_H
+#define DALI_TOOLKIT_VISUAL_FACTORY_H
+
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +46,10 @@ class VisualFactory;
  *
  * The visual type is required in the property map for requesting a visual.
  *
- * | %Property Name           | Type             |
- * |--------------------------|------------------|
- * | rendererType             | STRING           |
+ * | %Property Name           | Type              |
+ * |--------------------------|-------------------|
+ * | visualType               | INTEGER or STRING |
+ * | shader                   | MAP               |
  */
 class DALI_IMPORT_API VisualFactory : public BaseHandle
 {
@@ -92,9 +94,9 @@ public:
   /**
    * @brief Request the visual
    *
-   * @param[in] propertyMap The map contains the properties required by the control renderer
-   *            Depends on the content of the map, different kind of renderer would be returned.
-   * @return The pointer pointing to visual
+   * @param[in] propertyMap The map contains the properties required by the visual.
+   *            The content of the map determines the type of visual that will be returned.
+   * @return The handle to the created visual
    */
   Visual::Base CreateVisual( const Property::Map& propertyMap  );
 
@@ -128,10 +130,10 @@ private:
  * @tparam ParameterType0 The type of first argument passed to the CreateVisual()
  * @tparam ParameterType1 The type of second argument passed to the CreateVisual()
  * @SINCE_1_0.39
- * @param[in] actor Actor for which the renderer will be replaced
+ * @param[in] actor Actor for which the visual will be replaced
  * @param[in,out] visual The visual to be replaced
- * @param[in] param0 First template based argument passed to the renderer factory
- * @param[in] param1 Second template based argument passed to the renderer factory
+ * @param[in] param0 First template based argument passed to the visual factory
+ * @param[in] param1 Second template based argument passed to the visual factory
  */
 template< class ParameterType0, class ParameterType1 >
 void InitializeVisual( Actor& actor, Visual::Base& visual, ParameterType0& param0, ParameterType1& param1 )
@@ -149,9 +151,9 @@ void InitializeVisual( Actor& actor, Visual::Base& visual, ParameterType0& param
  *
  * @tparam ParameterType The type of argument passed to the CreateVisual()
  * @SINCE_1_0.39
- * @param[in] actor Actor for which the renderer will be replaced
+ * @param[in] actor Actor for which the visual will be replaced
  * @param[in,out] visual The visual to be replaced
- * @param[in] param Template based argument passed to the renderer factory
+ * @param[in] param Template based argument passed to the visual factory
  */
 template< class ParameterType >
 void InitializeVisual( Actor& actor, Visual::Base& visual, ParameterType& param )
@@ -168,5 +170,4 @@ void InitializeVisual( Actor& actor, Visual::Base& visual, ParameterType& param 
 
 } // namespace Dali
 
-
-#endif /* __DALI_TOOLKIT_RENDERER_FACTORY_H__ */
+#endif // DALI_TOOLKIT_VISUAL_FACTORY_H

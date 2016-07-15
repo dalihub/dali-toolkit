@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+
 
 /**
  * Button states and contents
@@ -566,8 +568,8 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
       Toolkit::Visual::Base colorRenderer;
 
       Property::Map map;
-      map["rendererType"] = "COLOR";
-      map["mixColor"] = color;
+      map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+      map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
       colorRenderer = rendererFactory.CreateVisual( map );
       colorRenderer.SetOnStage( placementActor );

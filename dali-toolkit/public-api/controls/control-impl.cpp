@@ -35,12 +35,12 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
@@ -177,7 +177,7 @@ public:
   Impl(Control& controlImpl)
 : mControlImpl( controlImpl ),
   mStyleName(""),
-  mBackgroundRenderer(),
+  mBackgroundVisual(),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale( NULL ),
   mKeyEventSignal(),
@@ -332,9 +332,9 @@ public:
         {
           DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundRenderer )
+          if( controlImpl.mImpl->mBackgroundVisual )
           {
-            controlImpl.mImpl->mBackgroundRenderer.CreatePropertyMap( map );
+            controlImpl.mImpl->mBackgroundVisual.CreatePropertyMap( map );
           }
           value = map;
           break;
@@ -349,9 +349,9 @@ public:
         case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundRenderer )
+          if( controlImpl.mImpl->mBackgroundVisual )
           {
-            (controlImpl.mImpl->mBackgroundRenderer).CreatePropertyMap( map );
+            (controlImpl.mImpl->mBackgroundVisual).CreatePropertyMap( map );
           }
 
           value = map;
@@ -368,8 +368,8 @@ public:
 
   Control& mControlImpl;
   std::string mStyleName;
-  Toolkit::Visual::Base mBackgroundRenderer;   ///< The control renderer to render the background
-  Vector4 mBackgroundColor;                       ///< The color of the background renderer
+  Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
+  Vector4 mBackgroundColor;                       ///< The color of the background visual
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
@@ -445,12 +445,12 @@ void Control::SetBackgroundColor( const Vector4& color )
   Actor self( Self() );
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ RENDERER_TYPE ] = COLOR_RENDERER;
-  map[ "mixColor" ] = color;
-  InitializeVisual( self, mImpl->mBackgroundRenderer, map );
-  if( mImpl->mBackgroundRenderer )
+  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
+  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  if( mImpl->mBackgroundVisual )
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
@@ -462,27 +462,27 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundRenderer, map );
-  if( mImpl->mBackgroundRenderer )
+  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  if( mImpl->mBackgroundVisual )
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundRenderer, image );
-  if( mImpl->mBackgroundRenderer )
+  InitializeVisual( self, mImpl->mBackgroundVisual, image );
+  if( mImpl->mBackgroundVisual )
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::ClearBackground()
 {
   Actor self( Self() );
-  mImpl->mBackgroundRenderer.RemoveAndReset( self );
+  mImpl->mBackgroundVisual.RemoveAndReset( self );
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -808,19 +808,19 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  if( mImpl->mBackgroundRenderer)
+  if( mImpl->mBackgroundVisual)
   {
     Actor self( Self() );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
+    mImpl->mBackgroundVisual.SetOnStage( self );
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundRenderer )
+  if( mImpl->mBackgroundVisual )
   {
     Actor self( Self() );
-    mImpl->mBackgroundRenderer.SetOffStage( self );
+    mImpl->mBackgroundVisual.SetOffStage( self );
   }
 }
 
@@ -848,10 +848,10 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( mImpl->mBackgroundRenderer )
+  if( mImpl->mBackgroundVisual )
   {
     Vector2 size( targetSize );
-    mImpl->mBackgroundRenderer.SetSize( size );
+    mImpl->mBackgroundVisual.SetSize( size );
   }
 }
 
@@ -894,10 +894,10 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  if( mImpl->mBackgroundRenderer )
+  if( mImpl->mBackgroundVisual )
   {
     Vector2 naturalSize;
-    mImpl->mBackgroundRenderer.GetNaturalSize(naturalSize);
+    mImpl->mBackgroundVisual.GetNaturalSize(naturalSize);
     return Vector3(naturalSize);
   }
   return Vector3::ZERO;

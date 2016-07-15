@@ -46,6 +46,7 @@
 
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
@@ -142,17 +143,6 @@ protected:
   virtual void DoSetOnStage( Actor& actor );
 
 private:
-
-  enum PrimitiveType
-  {
-    SPHERE,
-    CONE,
-    CONICAL_FRUSTRUM,
-    CYLINDER,
-    CUBE,
-    OCTAHEDRON,
-    BEVELLED_CUBE
-  };
 
   //Simple struct to store the position and normal of a single vertex.
   struct Vertex
@@ -321,7 +311,6 @@ private:
   Shader mShader;
   Geometry mGeometry;
 
-  std::string mShape;            //Shape to render, as string.
   Vector4 mColor;                //Color of shape.
   Vector3 mObjectDimensions;     //Dimensions of shape, scaled to be between 0.0 and 1.0.
 
@@ -342,7 +331,7 @@ private:
   int     mSlices;               ///< Number of slices to use when creating certain objects.
   int     mStacks;               ///< Number of stacks to use when creating certain objects.
 
-  PrimitiveType mPrimitiveType;  //Shape to render, as enum.
+  Toolkit::PrimitiveVisual::Shape::Type mPrimitiveType;  //Shape to render, as enum.
 };
 
 } // namespace Internal

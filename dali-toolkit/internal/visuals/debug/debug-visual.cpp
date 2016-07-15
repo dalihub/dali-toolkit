@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 // CLASS HEADER
 #include "debug-visual.h"
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -80,7 +81,7 @@ void DebugVisual::DoSetOnStage( Actor& actor )
 void DebugVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, DEBUG_RENDERER );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::DEBUG );
 }
 
 void DebugVisual::InitializeRenderer()

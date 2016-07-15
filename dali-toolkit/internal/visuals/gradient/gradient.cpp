@@ -36,8 +36,8 @@ namespace Internal
 {
 
 Gradient::Gradient()
-: mGradientUnits( OBJECT_BOUNDING_BOX ),
-  mSpreadMethod( PAD )
+: mGradientUnits( Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX ),
+  mSpreadMethod( Toolkit::GradientVisual::SpreadMethod::PAD )
 {}
 
 Gradient::~Gradient()
@@ -54,22 +54,22 @@ const Vector<Gradient::GradientStop>& Gradient::GetStops()
   return mGradientStops;
 }
 
-void Gradient::SetGradientUnits( GradientUnits gradientUnits )
+void Gradient::SetGradientUnits( Toolkit::GradientVisual::Units::Type gradientUnits )
 {
   mGradientUnits = gradientUnits;
 }
 
-Gradient::GradientUnits Gradient::GetGradientUnits() const
+Toolkit::GradientVisual::Units::Type Gradient::GetGradientUnits() const
 {
   return mGradientUnits;
 }
 
-void Gradient::SetSpreadMethod( SpreadMethod spread )
+void Gradient::SetSpreadMethod( Toolkit::GradientVisual::SpreadMethod::Type spread )
 {
   mSpreadMethod = spread;
 }
 
-Gradient::SpreadMethod Gradient::GetSpreadMethod() const
+Toolkit::GradientVisual::SpreadMethod::Type Gradient::GetSpreadMethod() const
 {
   return mSpreadMethod;
 }
@@ -105,7 +105,7 @@ Dali::Texture Gradient::GenerateLookupTexture()
   {
     tempFirstStop = true;
     Vector4 firstStopColor( mGradientStops[0].mStopColor ); // If spread method is PAD or REFLECT
-    if( mSpreadMethod == REPEAT )
+    if( mSpreadMethod == Toolkit::GradientVisual::SpreadMethod::REPEAT )
     {
       firstStopColor = ( mGradientStops[0].mStopColor * (1.f-mGradientStops[numStops-1].mOffset)
                        + mGradientStops[numStops-1].mStopColor  * mGradientStops[0].mOffset )
@@ -121,7 +121,7 @@ Dali::Texture Gradient::GenerateLookupTexture()
   {
     tempLastStop = true;
     Vector4 lastStopColor( mGradientStops[numStops-1].mStopColor ); // If spread method is PAD or REFLECT
-    if( mSpreadMethod == REPEAT )
+    if( mSpreadMethod == Toolkit::GradientVisual::SpreadMethod::REPEAT )
     {
       lastStopColor = mGradientStops[0].mStopColor;
     }

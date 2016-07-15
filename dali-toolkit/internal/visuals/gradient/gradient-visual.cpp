@@ -24,8 +24,11 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -58,12 +61,16 @@ const char * const STOP_COLOR_NAME("stopColor"); // Property::Array VECTOR4
 const char * const UNITS_NAME("units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
 const char * const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
 
-// string values
-const char * const UNIT_USER_SPACE("USER_SPACE");
-const char * const UNIT_BOUNDING_BOX("OBJECT_BOUNDING_BOX");
-const char * const SPREAD_PAD("PAD");
-const char * const SPREAD_REFLECT("REFLECT");
-const char * const SPREAD_REPEAT("REPEAT");
+DALI_ENUM_TO_STRING_TABLE_BEGIN( UNITS )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::GradientVisual::Units, USER_SPACE )
+DALI_ENUM_TO_STRING_TABLE_END( UNITS )
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( SPREAD_METHOD )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::GradientVisual::SpreadMethod, PAD )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::GradientVisual::SpreadMethod, REFLECT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::GradientVisual::SpreadMethod, REPEAT )
+DALI_ENUM_TO_STRING_TABLE_END( SPREAD_METHOD )
 
 // uniform names
 const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
@@ -72,17 +79,17 @@ const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
 const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
 const unsigned int DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
-VisualFactoryCache::ShaderType GetShaderType( GradientVisual::Type type, Gradient::GradientUnits units)
+VisualFactoryCache::ShaderType GetShaderType( GradientVisual::Type type, Toolkit::GradientVisual::Units::Type units )
 {
-  if( type==GradientVisual::LINEAR )
+  if( type == GradientVisual::LINEAR )
   {
-   if( units == Gradient::USER_SPACE_ON_USE )
+   if( units == Toolkit::GradientVisual::Units::USER_SPACE )
    {
      return VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE;
    }
    return VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX;
   }
-  else if( units == Gradient::USER_SPACE_ON_USE )
+  else if( units == Toolkit::GradientVisual::Units::USER_SPACE )
   {
     return VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE;
   }
@@ -92,24 +99,6 @@ VisualFactoryCache::ShaderType GetShaderType( GradientVisual::Type type, Gradien
 
 const char* VERTEX_SHADER[] =
 {
-// vertex shader for gradient units as USER_SPACE_ON_USE
-DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump mat3 uAlignmentMatrix;\n
-  varying mediump vec2 vTexCoord;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
-  }\n
-),
-
 // vertex shader for gradient units as OBJECT_BOUNDING_BOX
  DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -125,6 +114,24 @@ DALI_COMPOSE_SHADER(
     \n
     vertexPosition.xyz *= uSize;\n
     gl_Position = uMvpMatrix * vertexPosition;\n
+  }\n
+),
+
+// vertex shader for gradient units as USER_SPACE
+DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump mat3 uAlignmentMatrix;\n
+  varying mediump vec2 vTexCoord;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    gl_Position = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
   }\n
 )
 };
@@ -156,19 +163,19 @@ DALI_COMPOSE_SHADER(
 )
 };
 
-Dali::WrapMode::Type GetWrapMode( Gradient::SpreadMethod spread )
+Dali::WrapMode::Type GetWrapMode( Toolkit::GradientVisual::SpreadMethod::Type spread )
 {
   switch(spread)
   {
-    case Gradient::REPEAT:
+    case Toolkit::GradientVisual::SpreadMethod::REPEAT:
     {
       return Dali::WrapMode::REPEAT;
     }
-    case Gradient::REFLECT:
+    case Toolkit::GradientVisual::SpreadMethod::REFLECT:
     {
       return Dali::WrapMode::MIRRORED_REPEAT;
     }
-    case Gradient::PAD:
+    case Toolkit::GradientVisual::SpreadMethod::PAD:
     default:
     {
       return Dali::WrapMode::CLAMP_TO_EDGE;
@@ -176,7 +183,7 @@ Dali::WrapMode::Type GetWrapMode( Gradient::SpreadMethod spread )
   }
 }
 
-}
+} // unnamed namespace
 
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
@@ -192,18 +199,16 @@ GradientVisual::~GradientVisual()
 
 void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Gradient::GradientUnits gradientUnits = Gradient::OBJECT_BOUNDING_BOX;
-  Property::Value* unitsValue = propertyMap.Find( UNITS_NAME );
-  std::string units;
-  // The default unit is OBJECT_BOUNDING_BOX.
-  // Only need to set new units if 'USER_SPACE'
-  if( unitsValue && unitsValue->Get( units ) && units == UNIT_USER_SPACE )
+  Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
+
+  Property::Value* unitsValue = propertyMap.Find( Toolkit::GradientVisual::Property::UNITS, UNITS_NAME );
+  if( unitsValue )
   {
-    gradientUnits = Gradient::USER_SPACE_ON_USE;
+    Scripting::GetEnumerationProperty( *unitsValue, UNITS_TABLE, UNITS_TABLE_COUNT, gradientUnits );
   }
 
   mGradientType = LINEAR;
-  if( propertyMap.Find( RADIUS_NAME ))
+  if( propertyMap.Find( Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME ) )
   {
     mGradientType = RADIAL;
   }
@@ -244,31 +249,9 @@ void GradientVisual::DoSetOnStage( Actor& actor )
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, GRADIENT_RENDERER );
-
-  Gradient::GradientUnits units = mGradient->GetGradientUnits();
-  if( units == Gradient::USER_SPACE_ON_USE )
-  {
-    map.Insert( UNITS_NAME, UNIT_USER_SPACE );
-  }
-  else // if( units == Gradient::OBJECT_BOUNDING_BOX )
-  {
-    map.Insert( UNITS_NAME, UNIT_BOUNDING_BOX );
-  }
-
-  Gradient::SpreadMethod spread = mGradient->GetSpreadMethod();
-  if( spread == Gradient::PAD )
-  {
-    map.Insert( SPREAD_METHOD_NAME, SPREAD_PAD );
-  }
-  else if( spread == Gradient::REFLECT )
-  {
-    map.Insert( SPREAD_METHOD_NAME, SPREAD_REFLECT );
-  }
-  else // if( units == Gradient::REPEAT )
-  {
-    map.Insert( SPREAD_METHOD_NAME, SPREAD_REPEAT );
-  }
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::GRADIENT );
+  map.Insert( Toolkit::GradientVisual::Property::UNITS, mGradient->GetGradientUnits() );
+  map.Insert( Toolkit::GradientVisual::Property::SPREAD_METHOD, mGradient->GetSpreadMethod() );
 
   const Vector<Gradient::GradientStop>& stops( mGradient->GetStops() );
   Property::Array offsets;
@@ -289,20 +272,20 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
     }
   }
 
-  map.Insert( STOP_OFFSET_NAME, offsets );
-  map.Insert( STOP_COLOR_NAME, colors );
+  map.Insert( Toolkit::GradientVisual::Property::STOP_OFFSET, offsets );
+  map.Insert( Toolkit::GradientVisual::Property::STOP_COLOR, colors );
 
   if( &typeid( *mGradient ) == &typeid(LinearGradient) )
   {
     LinearGradient* gradient = static_cast<LinearGradient*>( mGradient.Get() );
-    map.Insert( START_POSITION_NAME, gradient->GetStartPosition() );
-    map.Insert( END_POSITION_NAME, gradient->GetEndPosition() );
+    map.Insert( Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition() );
+    map.Insert( Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition() );
   }
   else // if( &typeid( *mGradient ) == &typeid(RadialGradient) )
   {
     RadialGradient* gradient = static_cast<RadialGradient*>( mGradient.Get() );
-    map.Insert( CENTER_NAME, gradient->GetCenter() );
-    map.Insert( RADIUS_NAME, gradient->GetRadius() );
+    map.Insert( Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter() );
+    map.Insert( Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius() );
   }
 }
 
@@ -315,7 +298,7 @@ void GradientVisual::InitializeRenderer()
     mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
   }
 
-  Gradient::GradientUnits gradientUnits = mGradient->GetGradientUnits();
+  Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
   VisualFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, gradientUnits );
   Shader shader = mFactoryCache.GetShader( shaderType );
   if( !shader )
@@ -341,10 +324,10 @@ void GradientVisual::InitializeRenderer()
 
 bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propertyMap)
 {
-  if( gradientType==LINEAR )
+  if( gradientType == LINEAR )
   {
-    Property::Value* startPositionValue = propertyMap.Find( START_POSITION_NAME );
-    Property::Value* endPositionValue = propertyMap.Find( END_POSITION_NAME );
+    Property::Value* startPositionValue = propertyMap.Find( Toolkit::GradientVisual::Property::START_POSITION, START_POSITION_NAME );
+    Property::Value* endPositionValue = propertyMap.Find( Toolkit::GradientVisual::Property::END_POSITION, END_POSITION_NAME );
     Vector2 startPosition;
     Vector2 endPosition;
 
@@ -360,8 +343,8 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   }
   else // type==RADIAL
   {
-    Property::Value* centerValue = propertyMap.Find( CENTER_NAME );
-    Property::Value* radiusValue = propertyMap.Find( RADIUS_NAME );
+    Property::Value* centerValue = propertyMap.Find( Toolkit::GradientVisual::Property::CENTER, CENTER_NAME );
+    Property::Value* radiusValue = propertyMap.Find( Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME );
     Vector2 center;
     float radius;
     if( centerValue && centerValue->Get(center)
@@ -376,8 +359,8 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   }
 
   unsigned int numValidStop = 0u;
-  Property::Value* stopOffsetValue = propertyMap.Find( STOP_OFFSET_NAME );
-  Property::Value* stopColorValue = propertyMap.Find( STOP_COLOR_NAME );
+  Property::Value* stopOffsetValue = propertyMap.Find( Toolkit::GradientVisual::Property::STOP_OFFSET, STOP_OFFSET_NAME );
+  Property::Value* stopColorValue = propertyMap.Find( Toolkit::GradientVisual::Property::STOP_COLOR, STOP_COLOR_NAME );
   if( stopColorValue )
   {
     Vector<float> offsetArray;
@@ -404,19 +387,14 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
     return false;
   }
 
-  Property::Value* spread = propertyMap.Find( SPREAD_METHOD_NAME );
-  std::string stringValue ;
-  // The default spread method is PAD.
-  // Only need to set new spread if 'reflect' or 'repeat"
-  if( spread && spread->Get( stringValue ))
+  Property::Value* spread = propertyMap.Find( Toolkit::GradientVisual::Property::SPREAD_METHOD, SPREAD_METHOD_NAME );
+  // The default spread method is PAD. Only need to set new spread if it's anything else.
+  if( spread )
   {
-    if( stringValue == SPREAD_REFLECT )
+    Toolkit::GradientVisual::SpreadMethod::Type spreadMethod = Toolkit::GradientVisual::SpreadMethod::PAD;
+    if( Scripting::GetEnumerationProperty( *spread, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod ) );
     {
-      mGradient->SetSpreadMethod( Gradient::REFLECT );
-    }
-    else if( stringValue == SPREAD_REPEAT )
-    {
-      mGradient->SetSpreadMethod( Gradient::REPEAT );
+      mGradient->SetSpreadMethod( spreadMethod );
     }
   }
 

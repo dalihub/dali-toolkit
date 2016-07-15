@@ -18,12 +18,15 @@
  *
  */
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
 
 namespace Dali
 {
@@ -43,25 +46,6 @@ namespace Internal
 class Gradient : public RefObject
 {
 public:
-  /**
-   * Defines the coordinate system of the attributes
-   *     (start and end position for linear gradient, circle center and radius for radial gradient)
-   */
-  enum GradientUnits
-  {
-    USER_SPACE_ON_USE,
-    OBJECT_BOUNDING_BOX
-  };
-
-  /**
-   * Indicates what happens if the gradient starts or ends inside the bounds of the object being painted by the gradient.
-   */
-  enum SpreadMethod
-  {
-    PAD,      // use the terminal colors of the gradient to fill the remainder of the target region
-    REPEAT,   // reflect the gradient pattern start-to-end, end-to-start, start-to-end, etc. continuously until the target rectangle is filled
-    REFLECT   // repeat the gradient pattern start-to-end, start-to-end, start-to-end, etc. continuously until the target region is filled
-  };
 
   /**
    * The stop node tells the gradient what color it should be at certain position.
@@ -101,13 +85,13 @@ public:
    * Set the coordinate system used by the gradient attributes.
    * @param[in] gradientUnits The the attributes are defined using the current user coordinate system or the bounding box of the shape.
    */
-  void SetGradientUnits( GradientUnits gradientUnits );
+  void SetGradientUnits( Toolkit::GradientVisual::Units::Type gradientUnits );
 
   /**
    * Get the coordinate system used by the gradient attributes.
    * @return USER_SPACE_ON_USE or OBJECT_BOUNDING_BOX
    */
-  GradientUnits GetGradientUnits() const;
+  Toolkit::GradientVisual::Units::Type GetGradientUnits() const;
 
   /**
    * Indicates what happens if the gradient starts or ends inside the bounds of the target rectangle.
@@ -115,13 +99,13 @@ public:
    *
    * @param[in] spread The method to fill the remainder of target region which is outside the gradient bounds
    */
-  void SetSpreadMethod( SpreadMethod spread );
+  void SetSpreadMethod( Toolkit::GradientVisual::SpreadMethod::Type spread );
 
   /**
    * Get the filling method for the the remainder of target region which is outside the gradient boun.
    * @return PAD, REFLECT or REPEAT
    */
-  SpreadMethod GetSpreadMethod() const;
+  Toolkit::GradientVisual::SpreadMethod::Type GetSpreadMethod() const;
 
   /**
    * Get the transformation matrix to align the vertices with the gradient line/circle
@@ -164,10 +148,10 @@ protected:
 
 protected:
 
-  Vector<GradientStop>      mGradientStops;
-  Matrix3                   mAlignmentTransform;
-  GradientUnits             mGradientUnits;
-  SpreadMethod              mSpreadMethod;
+  Vector<GradientStop>                        mGradientStops;
+  Matrix3                                     mAlignmentTransform;
+  Toolkit::GradientVisual::Units::Type        mGradientUnits;
+  Toolkit::GradientVisual::SpreadMethod::Type mSpreadMethod;
 
 };
 

@@ -30,6 +30,7 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
@@ -160,8 +161,8 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     RemoveFilters();
 
     Actor self = Self();
-    Property::Map rendererMap;
-    rendererMap.Insert( "rendererType", "IMAGE" );
+    Property::Map visualMap;
+    visualMap.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
     switch( type )
     {
@@ -185,10 +186,10 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     }
 
     Property::Map customShader;
-    customShader[ "vertexShader" ] = EFFECTS_VIEW_VERTEX_SOURCE;
-    customShader[ "fragmentShader" ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
-    rendererMap[ "shader" ] = customShader;
-    InitializeVisual( self, mVisualPostFilter, rendererMap );
+    customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
+    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
+    visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+    InitializeVisual( self, mVisualPostFilter, visualMap );
 
     mEffectType = type;
   }

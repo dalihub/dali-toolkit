@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,10 +66,10 @@ public:
 
     // Set another property to set the image-map
     Property::Map imageMap;
-    imageMap[ "rendererType" ] = "IMAGE";
-    imageMap[ "url" ]          = IMAGE_CARDS;
-    imageMap[ "desiredWidth" ]        = 100;
-    imageMap[ "desiredHeight" ]       = 100;
+    imageMap[ Visual::Property::TYPE ] = Visual::IMAGE;
+    imageMap[ ImageVisual::Property::URL ] = IMAGE_CARDS;
+    imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 100;
+    imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 100;
     mImageView.SetProperty( ImageView::Property::IMAGE, imageMap );
 
     // Add the image view to the stage

@@ -25,6 +25,7 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL IINCLUDES
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -211,11 +212,11 @@ NPatchVisual::~NPatchVisual()
 
 void NPatchVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
+  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
   if( imageURLValue )
   {
     //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
-    Property::Value* borderOnlyValue = propertyMap.Find( BORDER_ONLY );
+    Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
     if( borderOnlyValue )
     {
       borderOnlyValue->Get( mBorderOnly );
@@ -401,16 +402,16 @@ void NPatchVisual::DoSetOffStage( Actor& actor )
 void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
   if( !mImageUrl.empty() )
   {
-    map.Insert( IMAGE_URL_NAME, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
   }
   else if( mImage )
   {
-    map.Insert( IMAGE_URL_NAME, mImage.GetUrl() );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImage.GetUrl() );
   }
-  map.Insert( BORDER_ONLY, mBorderOnly );
+  map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
 }
 
 void NPatchVisual::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY )
@@ -521,7 +522,7 @@ void NPatchVisual::InitializeFromImage( NinePatchImage nPatch )
 
 void NPatchVisual::InitializeFromBrokenImage()
 {
-  mCroppedImage = VisualFactory::GetBrokenRendererImage();
+  mCroppedImage = VisualFactory::GetBrokenVisualImage();
   mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );
 
   mStretchPixelsX.Clear();

@@ -27,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
@@ -76,7 +77,7 @@ bool SvgVisual::IsSvgUrl( const std::string& url )
 
 void SvgVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
+  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
   if( imageURLValue )
   {
     std::string imageUrl;
@@ -143,10 +144,10 @@ void SvgVisual::SetSize( const Vector2& size )
 void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, IMAGE_RENDERER );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
   if( !mImageUrl.empty() )
   {
-    map.Insert( IMAGE_URL_NAME, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
   }
 }
 

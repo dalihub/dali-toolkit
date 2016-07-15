@@ -23,10 +23,11 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <fstream>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
@@ -80,13 +81,25 @@ enum TextureIndex
   GLOSS_INDEX = 2u
 };
 
+//Property names
+const char * const OBJECT_URL_NAME( "objectUrl" );
+const char * const MATERIAL_URL_NAME( "materialUrl" );
+const char * const TEXTURES_PATH_NAME( "texturesPath" );
+const char * const SHADING_MODE_NAME( "shadingMode" );
+const char * const USE_MIPMAPPING_NAME( "useMipmapping" );
+const char * const USE_SOFT_NORMALS_NAME( "useSoftNormals" );
+const char * const LIGHT_POSITION_NAME( "lightPosition" );
+
+//Shading mode
+DALI_ENUM_TO_STRING_TABLE_BEGIN( SHADING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::MeshVisual::ShadingMode, TEXTURELESS_WITH_DIFFUSE_LIGHTING )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::MeshVisual::ShadingMode, TEXTURED_WITH_SPECULAR_LIGHTING )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::MeshVisual::ShadingMode, TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING )
+DALI_ENUM_TO_STRING_TABLE_END( SHADING_MODE )
+
 //Shader properties
 const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
 const char * const STAGE_OFFSET_UNIFORM_NAME( "uStageOffset" );
-
-const char * const SHADER_TYPE_TEXTURELESS( "TEXTURELESS" );
-const char * const SHADER_TYPE_DIFFUSE_TEXTURE( "DIFFUSE_TEXTURE" );
-const char * const SHADER_TYPE_ALL_TEXTURES( "ALL_TEXTURES" );
 
 //Shaders
 //If a shader requires certain textures, they must be listed in order,
@@ -279,7 +292,7 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 MeshVisual::MeshVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
-  mShaderType( ALL_TEXTURES ),
+  mShadingMode( Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING ),
   mUseTexture( true ),
   mUseMipmapping( true ),
   mUseSoftNormals( true )
@@ -292,19 +305,19 @@ MeshVisual::~MeshVisual()
 
 void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* objectUrl = propertyMap.Find( OBJECT_URL );
+  Property::Value* objectUrl = propertyMap.Find( Toolkit::MeshVisual::Property::OBJECT_URL, OBJECT_URL_NAME );
   if( !objectUrl || !objectUrl->Get( mObjectUrl ) )
   {
     DALI_LOG_ERROR( "Fail to provide object URL to the MeshVisual object.\n" );
   }
 
-  Property::Value* materialUrl = propertyMap.Find( MATERIAL_URL );
+  Property::Value* materialUrl = propertyMap.Find( Toolkit::MeshVisual::Property::MATERIAL_URL, MATERIAL_URL_NAME );
   if( !materialUrl || !materialUrl->Get( mMaterialUrl ) || mMaterialUrl.empty() )
   {
     mUseTexture = false;
   }
 
-  Property::Value* imagesUrl = propertyMap.Find( TEXTURES_PATH );
+  Property::Value* imagesUrl = propertyMap.Find( Toolkit::MeshVisual::Property::TEXTURES_PATH, TEXTURES_PATH_NAME );
   if( !imagesUrl || !imagesUrl->Get( mTexturesPath ) )
   {
     //Default behaviour is to assume files are in the same directory,
@@ -312,44 +325,25 @@ void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
     mTexturesPath.clear();
   }
 
-  Property::Value* shaderType = propertyMap.Find( SHADER_TYPE );
-  if( shaderType )
+  Property::Value* shadingMode = propertyMap.Find( Toolkit::MeshVisual::Property::SHADING_MODE, SHADING_MODE_NAME );
+  if( shadingMode )
   {
-    std::string shaderTypeString;
-    if( shaderType->Get( shaderTypeString ) )
-    {
-      if( shaderTypeString == SHADER_TYPE_TEXTURELESS )
-      {
-        mShaderType = TEXTURELESS;
-      }
-      else if( shaderTypeString == SHADER_TYPE_DIFFUSE_TEXTURE )
-      {
-        mShaderType = DIFFUSE_TEXTURE;
-      }
-      else if( shaderTypeString == SHADER_TYPE_ALL_TEXTURES )
-      {
-        mShaderType = ALL_TEXTURES;
-      }
-      else
-      {
-        DALI_LOG_ERROR( "Unknown shader type provided to the MeshVisual object.\n");
-      }
-    }
+    Scripting::GetEnumerationProperty( *shadingMode, SHADING_MODE_TABLE, SHADING_MODE_TABLE_COUNT, mShadingMode );
   }
 
-  Property::Value* useMipmapping = propertyMap.Find( USE_MIPMAPPING );
+  Property::Value* useMipmapping = propertyMap.Find( Toolkit::MeshVisual::Property::USE_MIPMAPPING, USE_MIPMAPPING_NAME );
   if( useMipmapping )
   {
     useMipmapping->Get( mUseMipmapping );
   }
 
-  Property::Value* useSoftNormals = propertyMap.Find( USE_SOFT_NORMALS );
+  Property::Value* useSoftNormals = propertyMap.Find( Toolkit::MeshVisual::Property::USE_SOFT_NORMALS, USE_SOFT_NORMALS_NAME );
   if( useSoftNormals )
   {
     useSoftNormals->Get( mUseSoftNormals );
   }
 
-  Property::Value* lightPosition = propertyMap.Find( LIGHT_POSITION_UNIFORM_NAME );
+  Property::Value* lightPosition = propertyMap.Find( Toolkit::MeshVisual::Property::LIGHT_POSITION, LIGHT_POSITION_NAME );
   if( lightPosition )
   {
     if( !lightPosition->Get( mLightPosition ) )
@@ -395,37 +389,14 @@ void MeshVisual::DoSetOnStage( Actor& actor )
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, MESH_RENDERER );
-  map.Insert( OBJECT_URL, mObjectUrl );
-  map.Insert( MATERIAL_URL, mMaterialUrl );
-  map.Insert( TEXTURES_PATH, mTexturesPath );
-
-  std::string shaderTypeString;
-  switch( mShaderType )
-  {
-    case ALL_TEXTURES:
-    {
-      shaderTypeString = SHADER_TYPE_ALL_TEXTURES;
-      break;
-    }
-
-    case DIFFUSE_TEXTURE:
-    {
-      shaderTypeString = SHADER_TYPE_DIFFUSE_TEXTURE;
-      break;
-    }
-
-    case TEXTURELESS:
-    {
-      shaderTypeString = SHADER_TYPE_TEXTURELESS;
-      break;
-    }
-  }
-  map.Insert( SHADER_TYPE, shaderTypeString );
-
-  map.Insert( USE_MIPMAPPING, mUseMipmapping );
-  map.Insert( USE_SOFT_NORMALS, mUseSoftNormals );
-  map.Insert( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::MESH );
+  map.Insert( Toolkit::MeshVisual::Property::OBJECT_URL, mObjectUrl );
+  map.Insert( Toolkit::MeshVisual::Property::MATERIAL_URL, mMaterialUrl );
+  map.Insert( Toolkit::MeshVisual::Property::TEXTURES_PATH, mTexturesPath );
+  map.Insert( Toolkit::MeshVisual::Property::SHADING_MODE, mShadingMode );
+  map.Insert( Toolkit::MeshVisual::Property::USE_MIPMAPPING, mUseMipmapping );
+  map.Insert( Toolkit::MeshVisual::Property::USE_SOFT_NORMALS, mUseSoftNormals );
+  map.Insert( Toolkit::MeshVisual::Property::LIGHT_POSITION, mLightPosition );
 }
 
 void MeshVisual::InitializeRenderer()
@@ -487,17 +458,17 @@ void MeshVisual::UpdateShaderUniforms()
   scaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
 
   mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
-  mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
+  mShader.RegisterProperty( LIGHT_POSITION_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
 }
 
 void MeshVisual::CreateShader()
 {
-  if( mShaderType == ALL_TEXTURES )
+  if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING )
   {
     mShader = Shader::New( NORMAL_MAP_VERTEX_SHADER, NORMAL_MAP_FRAGMENT_SHADER );
   }
-  else if( mShaderType == DIFFUSE_TEXTURE )
+  else if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING )
   {
     mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
   }
@@ -514,22 +485,22 @@ bool MeshVisual::CreateGeometry()
   //Determine if we need to use a simpler shader to handle the provided data
   if( !mUseTexture || !mObjLoader.IsDiffuseMapPresent() )
   {
-    mShaderType = TEXTURELESS;
+    mShadingMode = Toolkit::MeshVisual::ShadingMode::TEXTURELESS_WITH_DIFFUSE_LIGHTING;
   }
-  else if( mShaderType == ALL_TEXTURES && (!mObjLoader.IsNormalMapPresent() || !mObjLoader.IsSpecularMapPresent()) )
+  else if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING && (!mObjLoader.IsNormalMapPresent() || !mObjLoader.IsSpecularMapPresent()) )
   {
-    mShaderType = DIFFUSE_TEXTURE;
+    mShadingMode = Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING;
   }
 
   int objectProperties = 0;
 
-  if( mShaderType == DIFFUSE_TEXTURE ||
-      mShaderType == ALL_TEXTURES )
+  if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING ||
+      mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING )
   {
     objectProperties |= ObjLoader::TEXTURE_COORDINATES;
   }
 
-  if( mShaderType == ALL_TEXTURES )
+  if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING )
   {
     objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINORMALS;
   }
@@ -588,7 +559,7 @@ bool MeshVisual::LoadTextures()
 {
   mTextureSet = TextureSet::New();
 
-  if( mShaderType != TEXTURELESS )
+  if( mShadingMode != Toolkit::MeshVisual::ShadingMode::TEXTURELESS_WITH_DIFFUSE_LIGHTING )
   {
     Sampler sampler = Sampler::New();
     if( mUseMipmapping )
@@ -614,7 +585,7 @@ bool MeshVisual::LoadTextures()
       }
     }
 
-    if( !mNormalTextureUrl.empty() && ( mShaderType == ALL_TEXTURES ) )
+    if( !mNormalTextureUrl.empty() && ( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING ) )
     {
       std::string imageUrl = mTexturesPath + mNormalTextureUrl;
 
@@ -632,7 +603,7 @@ bool MeshVisual::LoadTextures()
       }
     }
 
-    if( !mGlossTextureUrl.empty() && ( mShaderType == ALL_TEXTURES ) )
+    if( !mGlossTextureUrl.empty() && ( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING ) )
     {
       std::string imageUrl = mTexturesPath + mGlossTextureUrl;
 

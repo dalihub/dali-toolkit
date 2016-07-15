@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,9 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-
-namespace
-{
-//custom shader
-const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
-const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
-const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
-const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hint
-}
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
@@ -73,7 +64,7 @@ void Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Base::Initialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( CUSTOM_SHADER );
+  Property::Value* customShaderValue = propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
     Property::Map shaderMap;

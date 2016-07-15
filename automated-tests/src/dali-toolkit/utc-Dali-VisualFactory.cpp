@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -294,8 +295,8 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
 
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
-  propertyMap.Insert("rendererType",  "COLOR");
-  propertyMap.Insert("mixColor",  testColor);
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  testColor);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
@@ -321,8 +322,8 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
 
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   Dali::Property::Map map;
-  map[ "rendererType" ] = "COLOR";
-  map[ "mixColor" ] = testColor;
+  map[ Visual::Property::TYPE ] = Visual::COLOR;
+  map[ ColorVisual::Property::MIX_COLOR ] = testColor;
   Visual::Base visual = factory.CreateVisual( map );
   DALI_TEST_CHECK( visual );
 
@@ -351,9 +352,9 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   float testSize = 5.f;
-  propertyMap.Insert("rendererType",  "BORDER");
-  propertyMap.Insert("borderColor",  testColor);
-  propertyMap.Insert("borderSize",  testSize);
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::BORDER);
+  propertyMap.Insert(BorderVisual::Property::COLOR,  testColor);
+  propertyMap.Insert(BorderVisual::Property::SIZE,  testSize);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
@@ -399,9 +400,9 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   float testSize = 5.f;
 
   Dali::Property::Map propertyMap;
-  propertyMap[ "rendererType" ] = "BORDER";
-  propertyMap[ "borderColor"  ] = testColor;
-  propertyMap[ "borderSize"   ] = testSize;
+  propertyMap[ Visual::Property::TYPE ] = Visual::BORDER;
+  propertyMap[ BorderVisual::Property::COLOR  ] = testColor;
+  propertyMap[ BorderVisual::Property::SIZE   ] = testSize;
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
@@ -433,10 +434,10 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
 
   // enable the anti-aliasing
   Dali::Property::Map map;
-  map[ "rendererType" ] = "BORDER";
-  map[ "borderColor"  ] = testColor;
-  map[ "borderSize"   ] = testSize;
-  map[ "antiAliasing"   ] = true;
+  map[ Visual::Property::TYPE ] = Visual::BORDER;
+  map[ BorderVisual::Property::COLOR  ] = testColor;
+  map[ BorderVisual::Property::SIZE   ] = testSize;
+  map[ BorderVisual::Property::ANTI_ALIASING   ] = true;
   visual = factory.CreateVisual( map );
   visual.SetOnStage( actor );
 
@@ -457,23 +458,23 @@ int UtcDaliVisualFactoryGetLinearGradientVisual(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "GRADIENT");
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::GRADIENT);
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("startPosition", start);
-  propertyMap.Insert("endPosition", end);
-  propertyMap.Insert("spreadMethod", "REPEAT");
+  propertyMap.Insert(GradientVisual::Property::START_POSITION, start);
+  propertyMap.Insert(GradientVisual::Property::END_POSITION, end);
+  propertyMap.Insert(GradientVisual::Property::SPREAD_METHOD, GradientVisual::SpreadMethod::REPEAT);
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.2f );
   stopOffsets.PushBack( 0.8f );
-  propertyMap.Insert("stopOffset", stopOffsets);
+  propertyMap.Insert(GradientVisual::Property::STOP_OFFSET, stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("stopColor", stopColors);
+  propertyMap.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
@@ -497,23 +498,23 @@ int UtcDaliVisualFactoryGetRadialGradientVisual(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "GRADIENT");
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::GRADIENT);
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
-  propertyMap.Insert("units",  "USER_SPACE");
-  propertyMap.Insert("center",  center);
-  propertyMap.Insert("radius",  radius);
+  propertyMap.Insert(GradientVisual::Property::UNITS,  GradientVisual::Units::USER_SPACE);
+  propertyMap.Insert(GradientVisual::Property::CENTER,  center);
+  propertyMap.Insert(GradientVisual::Property::RADIUS,  radius);
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.0f );
   stopOffsets.PushBack( 1.f );
-  propertyMap.Insert("stopOffset",   stopOffsets);
+  propertyMap.Insert(GradientVisual::Property::STOP_OFFSET,   stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("stopColor",   stopColors);
+  propertyMap.Insert(GradientVisual::Property::STOP_COLOR,   stopColors);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
@@ -542,18 +543,18 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "GRADIENT");
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::GRADIENT);
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("startPosition", start);
-  propertyMap.Insert("endPosition", end);
-  propertyMap.Insert("spreadMethod", "REPEAT");
+  propertyMap.Insert(GradientVisual::Property::START_POSITION, start);
+  propertyMap.Insert(GradientVisual::Property::END_POSITION, end);
+  propertyMap.Insert(GradientVisual::Property::SPREAD_METHOD, GradientVisual::SpreadMethod::REPEAT);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("stopColor", stopColors);
+  propertyMap.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
@@ -577,8 +578,8 @@ int UtcDaliVisualFactoryGetImageVisual1(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "IMAGE" );
-  propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -659,8 +660,8 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "IMAGE" );
-  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -679,7 +680,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   }
 
-  propertyMap.Insert( "borderOnly",  true );
+  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
   {
     tet_infoline( "border only" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -723,8 +724,8 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "IMAGE" );
-  propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   {
     Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
@@ -745,7 +746,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   }
 
-  propertyMap.Insert( "borderOnly",  true );
+  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
   {
     tet_infoline( "border only" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -885,8 +886,8 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  111 );
-  propertyMap.Insert( "url",  "ERROR.9.jpg" );
+  propertyMap.Insert( Visual::Property::TYPE,  111 );
+  propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -1049,8 +1050,8 @@ int UtcDaliVisualFactoryGetMeshVisual1(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1069,10 +1070,10 @@ int UtcDaliVisualFactoryGetMeshVisual2(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", "" );
-  propertyMap.Insert( "texturesPath", "" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, "" );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, "" );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1090,10 +1091,10 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1112,10 +1113,10 @@ int UtcDaliVisualFactoryGetMeshVisual4(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", TEST_SIMPLE_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_SIMPLE_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1134,11 +1135,11 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
-  propertyMap.Insert( "shaderType", "DIFFUSE_TEXTURE" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( MeshVisual::Property::SHADING_MODE, MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1157,11 +1158,11 @@ int UtcDaliVisualFactoryGetMeshVisual6(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
-  propertyMap.Insert( "shaderType", "TEXTURELESS" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( MeshVisual::Property::SHADING_MODE, MeshVisual::ShadingMode::TEXTURELESS_WITH_DIFFUSE_LIGHTING );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1179,11 +1180,11 @@ int UtcDaliVisualFactoryGetMeshVisual7(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
-  propertyMap.Insert( "lightPosition", Vector3( 0.0, 1.0, 2.0 ) );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3( 0.0, 1.0, 2.0 ) );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1202,10 +1203,10 @@ int UtcDaliVisualFactoryGetMeshVisual8(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_SIMPLE_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_SIMPLE_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -1223,9 +1224,9 @@ int UtcDaliVisualFactoryGetMeshVisualN1(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
   //Test to see if mesh doesn't load with these properties, as expected.
   MeshVisualDoesNotLoadCorrectlyTest( propertyMap, application );
@@ -1244,10 +1245,10 @@ int UtcDaliVisualFactoryGetMeshVisualN2(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( "materialUrl", "invalid" );
-  propertyMap.Insert( "texturesPath", "also invalid" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, "invalid" );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, "also invalid" );
 
   //Test to see if mesh doesn't load with these properties, as expected.
   MeshVisualDoesNotLoadCorrectlyTest( propertyMap, application );
@@ -1266,10 +1267,10 @@ int UtcDaliVisualFactoryGetMeshVisualN3(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "MESH" );
-  propertyMap.Insert( "objectUrl", "invalid" );
-  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
-  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, "invalid" );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
   //Test to see if mesh doesn't load with these properties, as expected.
   MeshVisualDoesNotLoadCorrectlyTest( propertyMap, application );
@@ -1324,8 +1325,8 @@ int UtcDaliVisualFactoryGetPrimitiveVisual1(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "CUBE" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1343,18 +1344,18 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "CUBE" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "slices", 10 );
-  propertyMap.Insert( "stacks", 20 );
-  propertyMap.Insert( "scaleTopRadius", 30.0f );
-  propertyMap.Insert( "scaleBottomRadius", 40.0f );
-  propertyMap.Insert( "scaleHeight", 50.0f );
-  propertyMap.Insert( "scaleRadius", 60.0f );
-  propertyMap.Insert( "bevelPercentage", 0.7f );
-  propertyMap.Insert( "bevelSmoothness", 0.8f );
-  propertyMap.Insert( "lightPosition", Vector3( 0.9, 1.0, 1.1 ) );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
+  propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_RADIUS, 60.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, 0.7f );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_SMOOTHNESS, 0.8f );
+  propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3( 0.9, 1.0, 1.1 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1372,11 +1373,11 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "SPHERE" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "slices", 10 );
-  propertyMap.Insert( "stacks", 20 );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
+  propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1394,13 +1395,13 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "CONICAL_FRUSTRUM" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "slices", 10 );
-  propertyMap.Insert( "scaleTopRadius", 30.0f );
-  propertyMap.Insert( "scaleBottomRadius", 40.0f );
-  propertyMap.Insert( "scaleHeight", 50.0f );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTRUM );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1418,10 +1419,10 @@ int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "BEVELLED_CUBE" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "bevelPercentage", 0.7f );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::BEVELLED_CUBE );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, 0.7f );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1439,9 +1440,9 @@ int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "OCTAHEDRON" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::OCTAHEDRON );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1459,12 +1460,12 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "CONE" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "slices", 10 );
-  propertyMap.Insert( "scaleTopRadius", 30.0f );
-  propertyMap.Insert( "scaleHeight", 50.0f );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONE );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1482,10 +1483,10 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
-  propertyMap.Insert( "shape", "SPHERE" );
-  propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "lightPosition", Vector3( 0.0, 1.0, 2.0 ) );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3( 0.0, 1.0, 2.0 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1503,7 +1504,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
 
   //Set up visual properties, without supplying shape.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType", "PRIMITIVE" );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
 
   //Test to see if shape loads regardless of missing input.
   TestPrimitiveVisualWithProperties( propertyMap, application );

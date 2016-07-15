@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,19 +46,6 @@ class VisualFactory : public BaseObject
 {
 public:
 
-  enum RendererType
-  {
-    COLOR,
-    BORDER,
-    GRADIENT,
-    IMAGE,
-    N_PATCH,
-    SVG,
-    MESH,
-    PRIMITIVE,
-    UNDEFINED
-  };
-
   /**
    * @brief Constructor
    *
@@ -83,9 +70,9 @@ public:
 
 public:
   /**
-   * @brief Returns an image to be used when a renderer has failed to correctly render
+   * @brief Returns an image to be used when a visual has failed to correctly render
    */
-  static Image GetBrokenRendererImage();
+  static Image GetBrokenVisualImage();
 
 protected:
 
@@ -95,14 +82,6 @@ protected:
   virtual ~VisualFactory();
 
 private:
-
-  /**
-   * Get the visual type from the property map.
-   *
-   * @param[in] propertyMap The map contains the properties of the visual
-   * @return The rendererType
-   */
-  RendererType GetRendererType( const Property::Map& propertyMap );
 
   /**
    * Prepare the atlas manager

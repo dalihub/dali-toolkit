@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -333,7 +333,7 @@ int UtcDaliSetPropertyP(void)
 
   {
     Property::Map map;
-    map["rendererType"] = "IMAGE";
+    map["visualType"] = "IMAGE";
     map["size"] = Vector2(200, 200);
     map["url"] = "track2.png";
     slider.SetProperty(Slider::Property::TRACK_VISUAL,       map);

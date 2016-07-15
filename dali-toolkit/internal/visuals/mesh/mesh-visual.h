@@ -23,6 +23,7 @@
 #include <string.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
 
@@ -45,7 +46,7 @@ namespace Internal
  * | objectUrl       | STRING      | A URL to the .obj file                                                |
  * | materialUrl     | STRING      | A URL to the .mtl file                                                |
  * | texturesPath    | STRING      | A URL of the path to the texture images                               |
- * | shaderType      | STRING      | An enum of shader types                                               |
+ * | shadingMode     | STRING      | An enum of shading modes                                              |
  * | useMipmapping   | BOOLEAN     | If true, use mipmaps for textures. Default true.                      |
  * | useSoftNormals  | BOOLEAN     | If true, average normals at points for smooth textures. Default true. |
  * | lightPosition   | VECTOR3     | The position (on stage) of the light                                  |
@@ -115,14 +116,6 @@ public:
   void SetUseNormalMap( bool useNormalMap );
 
 private:
-
-  //Corresponds to the shader that will be used by the mesh visual.
-  enum ShaderType
-  {
-    TEXTURELESS,
-    DIFFUSE_TEXTURE,
-    ALL_TEXTURES
-  };
 
   /**
    * @brief Provide an empty geometry for the visual to use.
@@ -196,7 +189,7 @@ private:
   Vector3 mSceneSize;
 
   Vector3 mLightPosition;
-  ShaderType mShaderType;
+  Toolkit::MeshVisual::ShadingMode::Value mShadingMode;
 
   bool mUseTexture;
   bool mUseMipmapping;

@@ -20,6 +20,8 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/geometry.h>
 
+#include <dali-toolkit/dali-toolkit.h>
+
 #include <toolkit-environment-variable.h> // for setting environment variable: DALI_DEBUG_RENDERING
 
 using namespace Dali;
@@ -37,10 +39,10 @@ bool IsDebugVisual( Visual::Base& visual )
 
   Property::Map propertyMap;
   visual.CreatePropertyMap( propertyMap );
-  Property::Value* typeValue = propertyMap.Find( "rendererType",  Property::STRING );
+  Property::Value* typeValue = propertyMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   if ( typeValue )
   {
-    isDebugVisualType = ( typeValue->Get<std::string>() == "DEBUG" );
+    isDebugVisualType = ( typeValue->Get<int>() == Visual::DEBUG );
   }
 
   Actor actor = Actor::New();
@@ -73,53 +75,53 @@ int UtcDaliDebugVisualGetVisual1(void)
 
   // Test that color visual is replaced with debug visual
   Property::Map propertyMap1;
-  propertyMap1.Insert("rendererType",  "COLOR");
-  propertyMap1.Insert("mixColor",  Color::BLUE);
+  propertyMap1.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap1.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap1);
   DALI_TEST_CHECK( colorVisual );
   DALI_TEST_CHECK( IsDebugVisual( colorVisual ) );
 
   // Test that border visual is replaced with debug visual
   Property::Map propertyMap2;
-  propertyMap2.Insert("rendererType",  "BORDER");
-  propertyMap2.Insert("borderColor",  Color::BLUE);
-  propertyMap2.Insert("borderSize",  2.f);
+  propertyMap2.Insert(Visual::Property::TYPE,  Visual::BORDER);
+  propertyMap2.Insert(BorderVisual::Property::COLOR,  Color::BLUE);
+  propertyMap2.Insert(BorderVisual::Property::SIZE,  2.f);
   Visual::Base borderVisual = factory.CreateVisual(propertyMap2);
   DALI_TEST_CHECK( borderVisual );
   DALI_TEST_CHECK( IsDebugVisual( borderVisual ) );
 
   // Test that gradient visual is replaced with debug visual
   Property::Map propertyMap3;
-  propertyMap3.Insert("rendererType",  "GRADIENT");
+  propertyMap3.Insert(Visual::Property::TYPE,  Visual::GRADIENT);
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap3.Insert("startPosition", start);
-  propertyMap3.Insert("endPosition", end);
-  propertyMap3.Insert("spreadMethod", "REPEAT");
+  propertyMap3.Insert(GradientVisual::Property::START_POSITION, start);
+  propertyMap3.Insert(GradientVisual::Property::END_POSITION, end);
+  propertyMap3.Insert(GradientVisual::Property::SPREAD_METHOD, GradientVisual::SpreadMethod::REPEAT);
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.2f );
   stopOffsets.PushBack( 0.8f );
-  propertyMap3.Insert("stopOffset", stopOffsets);
+  propertyMap3.Insert(GradientVisual::Property::STOP_OFFSET, stopOffsets);
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap3.Insert("stopColor", stopColors);
+  propertyMap3.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
   Visual::Base gradientVisual = factory.CreateVisual(propertyMap3);
   DALI_TEST_CHECK( gradientVisual );
   DALI_TEST_CHECK( IsDebugVisual( gradientVisual ) );
 
   // Test that image visual is replaced with debug visual
   Property::Map propertyMap4;
-  propertyMap4.Insert( "rendererType",  "IMAGE" );
-  propertyMap4.Insert( "url",  TEST_IMAGE_FILE_NAME );
+  propertyMap4.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap4.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
   Visual::Base imageVisual = factory.CreateVisual( propertyMap4 );
   DALI_TEST_CHECK( imageVisual );
   DALI_TEST_CHECK( IsDebugVisual( imageVisual ) );
 
   // Test that n patch visual is replaced with debug visual
   Property::Map propertyMap5;
-  propertyMap5.Insert( "rendererType",  "IMAGE" );
-  propertyMap5.Insert( "url",  TEST_NPATCH_FILE_NAME );
+  propertyMap5.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap5.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap4 );
   DALI_TEST_CHECK( nPatchVisual );
   DALI_TEST_CHECK( IsDebugVisual( nPatchVisual ) );
@@ -139,8 +141,8 @@ int UtcDaliDebugVisualGetVisual2(void)
 
   // Test that color visual is replaced with debug visual
   Dali::Property::Map map;
-  map[ "rendererType" ] = "COLOR";
-  map[ "mixColor" ] = Color::CYAN;
+  map[ Visual::Property::TYPE ] = Visual::COLOR;
+  map[ ColorVisual::Property::MIX_COLOR ] = Color::CYAN;
 
   Visual::Base colorVisual = factory.CreateVisual( map);
   DALI_TEST_CHECK( colorVisual );
@@ -148,9 +150,9 @@ int UtcDaliDebugVisualGetVisual2(void)
 
   // Test that border visual is replaced with debug visual
   map.Clear();
-  map[ "rendererType" ] = "BORDER";
-  map[ "borderColor"  ] = Color::GREEN;
-  map[ "borderSize"   ] = 2.f;
+  map[ Visual::Property::TYPE ] = Visual::BORDER;
+  map[ BorderVisual::Property::COLOR  ] = Color::GREEN;
+  map[ BorderVisual::Property::SIZE   ] = 2.f;
   Visual::Base borderVisual = factory.CreateVisual( map );
   DALI_TEST_CHECK( borderVisual );
   DALI_TEST_CHECK( IsDebugVisual( borderVisual ) );

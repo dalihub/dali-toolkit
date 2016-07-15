@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -76,7 +77,7 @@ ColorVisual::~ColorVisual()
 
 void ColorVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* color = propertyMap.Find( COLOR_NAME );
+  Property::Value* color = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME );
   if( !( color && color->Get(mMixColor) ) )
   {
     DALI_LOG_ERROR( "Fail to provide a color to the ColorVisual object" );
@@ -110,8 +111,8 @@ void ColorVisual::DoSetOnStage( Actor& actor )
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, COLOR_RENDERER );
-  map.Insert( COLOR_NAME, mMixColor );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
+  map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mMixColor );
 }
 
 void ColorVisual::InitializeRenderer()

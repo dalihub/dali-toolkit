@@ -38,21 +38,21 @@
  * @endcode
  *
  * <h3 class="pg">The IMAGE property</h3>
- * the IMAGE property allows you to change many aspects of the image that is renderered.
+ * the IMAGE property allows you to change many aspects of the image that is rendered.
  * This property can either be a string for a image url path or a Property::Map that specifies
  * the image in more detail.
  *
- * <h3 class="pg">Renderers</h3>
+ * <h3 class="pg">Visuals</h3>
  * You can specify a specific visual instead of using the default Image Visual, e.g to use the Border Visual.
  *
  * @code
  * Property::Map visual;
- * visual.Insert("rendererType","BORDER");
- * visual.Insert("borderColor",COLOR::RED);
- * visual.Insert("borderSize",20.f);
+ * visual.Insert( Visual::Property::Type,Visual::BORDER );
+ * visual.Insert( BorderVisual::Property::COLOR, COLOR::RED );
+ * visual.Insert( BorderVisual::Property::SIZE, 20.f );
  *
  * Dali::Toolkit::ImageView myImageView = Dali::Toolkit::ImageView::New();
- * myImageView.SetProperty( Control::Property::IMAGE, visual);
+ * myImageView.SetProperty( Control::Property::IMAGE, visual );
  * @endcode
 
  * <h3 class="pg">Resizing at Load Time</h3>

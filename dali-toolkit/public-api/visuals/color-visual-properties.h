@@ -1,4 +1,7 @@
- /*
+#ifndef DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_H
+#define DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_H
+
+/*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +18,8 @@
  *
  */
 
-// CLASS HEADER
-#include "visual-string-constants.h"
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -24,23 +27,29 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace Internal
+namespace ColorVisual
 {
 
-// Custom shader
-const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
-const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
-const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
-const char * const CUSTOM_SHADER_HINTS( "hints" );
+namespace Property
+{
 
-// Image visual
-const char * const IMAGE_URL_NAME("url");
-const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
+enum
+{
+  /**
+   * @brief The solid color required.
+   * @details Name "mixColor", type Property::VECTOR4.
+   * @SINCE_1_1.45
+   * @note Mandatory.
+   */
+  MIX_COLOR = VISUAL_PROPERTY_START_INDEX,
+};
 
-} // namespace Internal
+} // namespace Property
+
+} // namespace ColorVisual
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_H

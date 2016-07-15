@@ -1,4 +1,4 @@
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+// Copyright (c) 2016 Samsung Electronics Co., Ltd.
 
 // CLASS HEADER
 #include "image-view-impl.h"
@@ -11,6 +11,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -299,7 +300,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
         // if its not a string then get a Property::Map from the property if possible.
         else if( value.Get( map ) )
         {
-          Property::Value* shaderValue = map.Find( "shader" );
+          Property::Value* shaderValue = map.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
           // set image only if property map contains image information other than custom shader
           if( map.Count() > 1u ||  !shaderValue )
           {

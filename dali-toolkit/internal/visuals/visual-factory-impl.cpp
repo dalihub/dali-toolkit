@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,12 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/debug/debug-visual.h>
@@ -40,7 +44,7 @@
 
 namespace
 {
-const char * const BROKEN_RENDERER_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
+const char * const BROKEN_VISUAL_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }
 
 namespace Dali
@@ -54,6 +58,18 @@ namespace Internal
 
 namespace
 {
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_TYPE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BORDER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, COLOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, DEBUG )
+DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
+
+const char * const VISUAL_TYPE( "visualType" );
 
 BaseHandle Create()
 {
@@ -76,145 +92,114 @@ VisualFactory::~VisualFactory()
 {
 }
 
-VisualFactory::RendererType VisualFactory::GetRendererType( const Property::Map& propertyMap )
-{
-  RendererType rendererType = UNDEFINED;
-
-  Property::Value* type = propertyMap.Find( RENDERER_TYPE );
-  std::string typeValue ;
-  if( type && type->Get( typeValue ))
-  {
-    if( typeValue == COLOR_RENDERER )
-    {
-      rendererType = COLOR;
-    }
-    else if( typeValue == BORDER_RENDERER )
-    {
-      rendererType = BORDER;
-    }
-    else if( typeValue == GRADIENT_RENDERER )
-    {
-      rendererType = GRADIENT;
-    }
-    else if( typeValue == IMAGE_RENDERER )
-    {
-      rendererType = IMAGE;
-    }
-    else if( typeValue == MESH_RENDERER )
-    {
-      rendererType = MESH;
-    }
-    else if( typeValue == PRIMITIVE_RENDERER )
-    {
-      rendererType = PRIMITIVE;
-    }
-  }
-
-  // check the url if exist, to decide the renderer type
-  if( rendererType == IMAGE || rendererType == UNDEFINED )
-  {
-    Property::Value* imageURLValue = propertyMap.Find( IMAGE_URL_NAME );
-    std::string imageUrl;
-    if( imageURLValue && imageURLValue->Get( imageUrl ))
-    {
-      if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
-      {
-        rendererType = N_PATCH;
-      }
-      else if( SvgVisual::IsSvgUrl( imageUrl ) )
-      {
-        rendererType = SVG;
-      }
-      else
-      {
-        rendererType = IMAGE;
-      }
-    }
-  }
-
-  return rendererType;
-}
-
 Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
 {
-  Visual::Base* rendererPtr = NULL;
-
-  RendererType type = GetRendererType( propertyMap );
-  if( type != UNDEFINED)
+  // Create factory cache if it hasn't already been
+  if( !mFactoryCache )
   {
-    if( !mFactoryCache )
+    mFactoryCache = new VisualFactoryCache();
+  }
+
+  // Return a new DebugVisual if we have debug enabled
+  if( mDebugEnabled )
+  {
+    return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
+  }
+
+  Visual::Base* visualPtr = NULL;
+
+  Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
+  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type
+  if( typeValue )
+  {
+    Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
+  }
+
+  switch( visualType )
+  {
+    case Toolkit::Visual::BORDER:
     {
-      mFactoryCache = new VisualFactoryCache();
+      visualPtr = new BorderVisual( *( mFactoryCache.Get() ) );
+      break;
     }
 
-    if( mDebugEnabled )
+    case Toolkit::Visual::COLOR:
     {
-      return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
+      visualPtr = new ColorVisual( *( mFactoryCache.Get() ) );
+      break;
+    }
+
+    case Toolkit::Visual::GRADIENT:
+    {
+      visualPtr = new GradientVisual( *( mFactoryCache.Get() ) );
+      break;
+    }
+
+    default: // Default to Image type if unknown (check if there is a URL)
+    case Toolkit::Visual::IMAGE:
+    {
+      Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+      std::string imageUrl;
+      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      {
+        if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
+        {
+          visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
+        }
+        else
+        {
+          CreateAtlasManager();
+
+          if( SvgVisual::IsSvgUrl( imageUrl ) )
+          {
+            visualPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+          }
+          else
+          {
+            visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+          }
+        }
+      }
+      else if( propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER ) )
+      {
+        // Create Image Visual if it has a shader
+        // TODO: This is required because of EffectsView which should be fixed
+        CreateAtlasManager();
+        visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+      }
+      break;
+    }
+
+    case Toolkit::Visual::MESH:
+    {
+      visualPtr = new MeshVisual( *( mFactoryCache.Get() ) );
+      break;
+    }
+
+    case Toolkit::Visual::PRIMITIVE:
+    {
+      visualPtr = new PrimitiveVisual( *( mFactoryCache.Get() ) );
+      break;
+    }
+
+    case Toolkit::Visual::DEBUG:
+    {
+      visualPtr = new DebugVisual( *( mFactoryCache.Get() ) );
+      break;
     }
   }
 
-  switch( type )
-  {
-    case COLOR:
-    {
-      rendererPtr = new ColorVisual( *( mFactoryCache.Get() ) );
-      break;
-    }
-     case GRADIENT:
-     {
-       rendererPtr = new GradientVisual( *( mFactoryCache.Get() ) );
-       break;
-     }
-    case BORDER:
-    {
-      rendererPtr = new BorderVisual( *( mFactoryCache.Get() ) );
-      break;
-    }
-    case IMAGE:
-    {
-      CreateAtlasManager();
-      rendererPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-      break;
-    }
-    case N_PATCH:
-    {
-      rendererPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-      break;
-    }
-    case SVG:
-    {
-      CreateAtlasManager();
-      rendererPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-      break;
-    }
-    case MESH:
-    {
-      rendererPtr = new MeshVisual( *( mFactoryCache.Get() ) );
-      break;
-    }
-    case PRIMITIVE:
-    {
-      rendererPtr = new PrimitiveVisual( *( mFactoryCache.Get() ) );
-      break;
-    }
-    case UNDEFINED:
-    default:
-    {
-      break;
-    }
-  }
-
-  if( rendererPtr )
+  if( visualPtr )
   {
     Actor actor;
-    rendererPtr->Initialize( actor, propertyMap );
+    visualPtr->Initialize( actor, propertyMap );
   }
   else
   {
     DALI_LOG_ERROR( "Renderer type unknown" );
   }
 
-  return Toolkit::Visual::Base( rendererPtr );
+  return Toolkit::Visual::Base( visualPtr );
 }
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
@@ -232,19 +217,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
   if( npatchImage )
   {
-    NPatchVisual* rendererPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-    rendererPtr->SetImage( npatchImage );
+    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
+    visualPtr->SetImage( npatchImage );
 
-    return Toolkit::Visual::Base( rendererPtr );
+    return Toolkit::Visual::Base( visualPtr );
   }
   else
   {
     CreateAtlasManager();
-    ImageVisual* rendererPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     Actor actor;
-    rendererPtr->SetImage( actor, image );
+    visualPtr->SetImage( actor, image );
 
-    return Toolkit::Visual::Base( rendererPtr );
+    return Toolkit::Visual::Base( visualPtr );
   }
 }
 
@@ -262,32 +247,32 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
 
   if( NinePatchImage::IsNinePatchUrl( url ) )
   {
-    NPatchVisual* rendererPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-    rendererPtr->SetImage( url );
+    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
+    visualPtr->SetImage( url );
 
-    return Toolkit::Visual::Base( rendererPtr );
+    return Toolkit::Visual::Base( visualPtr );
   }
   else if( SvgVisual::IsSvgUrl( url ) )
   {
     CreateAtlasManager();
-    SvgVisual* rendererPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-    rendererPtr->SetImage( url, size );
-    return Toolkit::Visual::Base( rendererPtr );
+    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    visualPtr->SetImage( url, size );
+    return Toolkit::Visual::Base( visualPtr );
   }
   else
   {
     CreateAtlasManager();
-    ImageVisual* rendererPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     Actor actor;
-    rendererPtr->SetImage( actor, url, size );
+    visualPtr->SetImage( actor, url, size );
 
-    return Toolkit::Visual::Base( rendererPtr );
+    return Toolkit::Visual::Base( visualPtr );
   }
 }
 
-Image VisualFactory::GetBrokenRendererImage()
+Image VisualFactory::GetBrokenVisualImage()
 {
-  return ResourceImage::New( BROKEN_RENDERER_IMAGE_URL );
+  return ResourceImage::New( BROKEN_VISUAL_IMAGE_URL );
 }
 
 void VisualFactory::CreateAtlasManager()
@@ -296,7 +281,7 @@ void VisualFactory::CreateAtlasManager()
   {
     Shader shader = ImageVisual::GetImageShader( *( mFactoryCache.Get() ) );
     mAtlasManager = new ImageAtlasManager();
-    mAtlasManager->SetBrokenImage( BROKEN_RENDERER_IMAGE_URL );
+    mAtlasManager->SetBrokenImage( BROKEN_VISUAL_IMAGE_URL );
   }
 }
 

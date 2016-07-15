@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2016 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,6 +115,7 @@ develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 develapivisualfactorydir =      $(develapidir)/visual-factory
 
 # devel headers
+develapi_HEADERS =                  $(devel_api_header_files)
 develapicontrols_HEADERS =          $(devel_api_controls_header_files)
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
@@ -156,6 +157,7 @@ publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =         $(publicapidir)/focus-manager
 publicapirenderingbackenddir =     $(publicapidir)/text
 publicapisliderdir =               $(publicapicontrolsdir)/slider
+publicapivisualsdir =              $(publicapidir)/visuals
 
 # public api headers
 publicapi_HEADERS =                     $(public_api_header_files)
@@ -180,6 +182,7 @@ publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS =     $(public_api_rendering_backend_header_files)
 publicapislider_HEADERS =               $(public_api_slider_header_files)
+publicapivisuals_HEADERS =              $(public_api_visuals_header_files)
 
 # package doxygen file (contains doxygen grouping information)
 packagedoxydir = $(topleveldir)/doc

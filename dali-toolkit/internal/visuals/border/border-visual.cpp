@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -117,19 +118,19 @@ BorderVisual::~BorderVisual()
 
 void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  Property::Value* color = propertyMap.Find( COLOR_NAME );
+  Property::Value* color = propertyMap.Find( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME );
   if( !( color && color->Get(mBorderColor) ) )
   {
     DALI_LOG_ERROR( "Fail to provide a border color to the BorderVisual object" );
   }
 
-  Property::Value* size = propertyMap.Find( SIZE_NAME );
+  Property::Value* size = propertyMap.Find( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME );
   if( !( size && size->Get(mBorderSize) ) )
   {
     DALI_LOG_ERROR( "Fail to provide a border size to the BorderVisual object" );
   }
 
-  Property::Value* antiAliasing = propertyMap.Find( ANTI_ALIASING );
+  Property::Value* antiAliasing = propertyMap.Find( Toolkit::BorderVisual::Property::ANTI_ALIASING, ANTI_ALIASING );
   if( antiAliasing )
   {
     antiAliasing->Get( mAntiAliasing );
@@ -158,9 +159,10 @@ void BorderVisual::DoSetOnStage( Actor& actor )
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, BORDER_RENDERER );
-  map.Insert( COLOR_NAME, mBorderColor );
-  map.Insert( SIZE_NAME, mBorderSize );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::BORDER );
+  map.Insert( Toolkit::BorderVisual::Property::COLOR, mBorderColor );
+  map.Insert( Toolkit::BorderVisual::Property::SIZE, mBorderSize );
+  map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );
 }
 
 void BorderVisual::InitializeRenderer()

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SHADER_EFFECT_DISTANCEFIELD_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <string.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-map.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -165,10 +168,10 @@ inline Dali::Property::Map CreateDistanceFieldEffect()
   fragmentShaderString.append( fragmentShaderPrefix );
   fragmentShaderString.append( fragmentShader );
 
-  customShader[ "fragmentShader" ] = fragmentShaderString;
-  customShader[ "hints" ] = "outputIsTransparent";
+  customShader[ Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentShaderString;
+  customShader[ Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
 
-  map[ "shader" ] = customShader;
+  map[ Visual::Property::SHADER ] = customShader;
   return map;
 }
 
