@@ -47,12 +47,10 @@ namespace
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
 uniform   mediump mat4    uMvpMatrix;
-uniform   mediump vec3    uSize;
 
 void main()
 {
   mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
-  position.xyz *= uSize;
   gl_Position = uMvpMatrix * position;
 }
 );
@@ -1042,8 +1040,8 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       mHighlightActor.SetName( "HighlightActor" );
 #endif
+      mHighlightActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
       mHighlightActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-      mHighlightActor.SetSize( 1.0f, 1.0f );
       mHighlightActor.SetColor( mHighlightColor );
       mHighlightActor.SetColorMode( USE_OWN_COLOR );
     }
@@ -1056,37 +1054,57 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if ( mHighlightActor )
     {
-      if( !mHighlightQuadList.empty() )
+      // Sets the position of the highlight actor inside the decorator.
+      mHighlightActor.SetPosition( mHighlightPosition.x,
+                                   mHighlightPosition.y );
+
+      const unsigned int numberOfQuads = mHighlightQuadList.size();
+      if( 0u != numberOfQuads )
       {
-        Vector< Vector2 > vertices;
-        Vector< unsigned short> indices;
-        Vector2 vertex;
+        // Set the size of the highlighted text to the actor.
+        mHighlightActor.SetSize( mHighlightSize );
 
-        std::vector<QuadCoordinates>::iterator iter = mHighlightQuadList.begin();
-        std::vector<QuadCoordinates>::iterator endIter = mHighlightQuadList.end();
+        // Used to translate the vertices given in decorator's coords to the mHighlightActor's local coords.
+        const float offsetX = mHighlightPosition.x + 0.5f * mHighlightSize.width;
+        const float offsetY = mHighlightPosition.y + 0.5f * mHighlightSize.height;
 
-        for( std::size_t v = 0; iter != endIter; ++iter,v+=4 )
+        Vector<Vector2> vertices;
+        Vector<unsigned short> indices;
+
+        vertices.Reserve( 4u * numberOfQuads );
+        indices.Reserve( 6u * numberOfQuads );
+
+        // Index to the vertex.
+        unsigned int v = 0u;
+
+        // Traverse all quads.
+        for( std::vector<QuadCoordinates>::iterator it = mHighlightQuadList.begin(),
+               endIt = mHighlightQuadList.end();
+             it != endIt;
+             ++it, v += 4u )
         {
-          QuadCoordinates& quad = *iter;
+          QuadCoordinates& quad = *it;
+
+          Vector2 vertex;
 
           // top-left (v+0)
-          vertex.x = quad.min.x;
-          vertex.y = quad.min.y;
+          vertex.x = quad.min.x - offsetX;
+          vertex.y = quad.min.y - offsetY;
           vertices.PushBack( vertex );
 
           // top-right (v+1)
-          vertex.x = quad.max.x;
-          vertex.y = quad.min.y;
+          vertex.x = quad.max.x - offsetX;
+          vertex.y = quad.min.y - offsetY;
           vertices.PushBack( vertex );
 
           // bottom-left (v+2)
-          vertex.x = quad.min.x;
-          vertex.y = quad.max.y;
+          vertex.x = quad.min.x - offsetX;
+          vertex.y = quad.max.y - offsetY;
           vertices.PushBack( vertex );
 
           // bottom-right (v+3)
-          vertex.x = quad.max.x;
-          vertex.y = quad.max.y;
+          vertex.x = quad.max.x - offsetX;
+          vertex.y = quad.max.y - offsetY;
           vertices.PushBack( vertex );
 
           // triangle A (3, 1, 0)
@@ -1120,9 +1138,6 @@ struct Decorator::Impl : public ConnectionTracker
           mHighlightActor.AddRenderer( mHighlightRenderer );
         }
       }
-
-      mHighlightActor.SetPosition( mHighlightPosition.x,
-                                   mHighlightPosition.y );
 
       mHighlightQuadList.clear();
 
@@ -1768,7 +1783,8 @@ struct Decorator::Impl : public ConnectionTracker
   Vector4             mBoundingBox;               ///< The bounding box in world coords.
   Vector4             mHighlightColor;            ///< Color of the highlight
   Vector2             mHighlightPosition;         ///< The position of the highlight actor.
-  Vector2             mControlSize;               ///< The control's size. Set by the Relayout.
+  Size                mHighlightSize;             ///< The size of the highlighted text.
+  Size                mControlSize;               ///< The control's size. Set by the Relayout.
 
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;
@@ -2040,6 +2056,12 @@ void Decorator::SetSelectionHandleFlipState( bool indicesSwapped, bool left, boo
 void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )
 {
   mImpl->mHighlightQuadList.push_back( QuadCoordinates(x1, y1, x2, y2) );
+}
+
+void Decorator::SetHighLightBox( const Vector2& position, const Size& size )
+{
+  mImpl->mHighlightPosition = position;
+  mImpl->mHighlightSize = size;
 }
 
 void Decorator::ClearHighlights()
