@@ -2494,8 +2494,6 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
 
   if( NULL != mImpl->mEventData )
   {
-    mImpl->ChangeState( EventData::SELECTING );
-
     if( selectAll )
     {
       Event event( Event::SELECT_ALL );

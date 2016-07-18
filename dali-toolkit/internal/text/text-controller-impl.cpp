@@ -1544,13 +1544,6 @@ void Controller::Impl::OnSelectEvent( const Event& event )
     // Calculates the logical position from the x,y coords.
     RepositionSelectionHandles( xPosition,
                                 yPosition );
-
-    mEventData->mUpdateLeftSelectionPosition = true;
-    mEventData->mUpdateRightSelectionPosition = true;
-    mEventData->mUpdateHighlightBox = true;
-    mEventData->mUpdateCursorPosition = false;
-
-    mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
 }
 
@@ -1566,6 +1559,8 @@ void Controller::Impl::OnSelectAllEvent()
 
   if( mEventData->mSelectionEnabled )
   {
+    ChangeState( EventData::SELECTING );
+
     mEventData->mLeftSelectionPosition = 0u;
     mEventData->mRightSelectionPosition = mLogicalModel->mText.Count();
 
@@ -2057,24 +2052,40 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
   // Find which word was selected
   CharacterIndex selectionStart( 0 );
   CharacterIndex selectionEnd( 0 );
-  FindSelectionIndices( mVisualModel,
-                        mLogicalModel,
-                        mMetrics,
-                        visualX,
-                        visualY,
-                        selectionStart,
-                        selectionEnd );
+  const bool indicesFound = FindSelectionIndices( mVisualModel,
+                                                  mLogicalModel,
+                                                  mMetrics,
+                                                  visualX,
+                                                  visualY,
+                                                  selectionStart,
+                                                  selectionEnd );
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p selectionStart %d selectionEnd %d\n", this, selectionStart, selectionEnd );
 
-  if( selectionStart == selectionEnd )
+  if( indicesFound )
   {
-    ChangeState( EventData::EDITING );
-    // Nothing to select. i.e. a white space, out of bounds
-    return;
-  }
+    ChangeState( EventData::SELECTING );
 
-  mEventData->mLeftSelectionPosition = selectionStart;
-  mEventData->mRightSelectionPosition = selectionEnd;
+    mEventData->mLeftSelectionPosition = selectionStart;
+    mEventData->mRightSelectionPosition = selectionEnd;
+
+    mEventData->mUpdateLeftSelectionPosition = true;
+    mEventData->mUpdateRightSelectionPosition = true;
+    mEventData->mUpdateHighlightBox = true;
+
+    mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
+  }
+  else
+  {
+    // Nothing to select. i.e. a white space, out of bounds
+    ChangeState( EventData::EDITING );
+
+    mEventData->mPrimaryCursorPosition = selectionEnd;
+
+    mEventData->mUpdateCursorPosition = true;
+    mEventData->mUpdateGrabHandlePosition = true;
+    mEventData->mScrollAfterUpdatePosition = true;
+    mEventData->mUpdateInputStyle = true;
+  }
 }
 
 void Controller::Impl::SetPopupButtons()
