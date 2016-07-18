@@ -87,6 +87,10 @@ const char * const RENDERER_TYPE_VALUE( "mesh" ); //String label for which type 
 const char * const LIGHT_POSITION( "uLightPosition" ); //Shader property
 const char * const OBJECT_MATRIX( "uObjectMatrix" ); //Shader property
 
+const char * const SHADER_TYPE_TEXTURELESS( "TEXTURELESS" );
+const char * const SHADER_TYPE_DIFFUSE_TEXTURE( "DIFFUSE_TEXTURE" );
+const char * const SHADER_TYPE_ALL_TEXTURES( "ALL_TEXTURES" );
+
 //Shaders
 //If a shader requires certain textures, they must be listed in order,
 //as detailed in the TextureIndex enum documentation.
@@ -313,23 +317,27 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
   }
 
   Property::Value* shaderType = propertyMap.Find( SHADER_TYPE );
-  if( shaderType && shaderType->Get( mShaderTypeString ) )
+  if( shaderType )
   {
-    if( mShaderTypeString == "textureless" )
+    std::string shaderTypeString;
+    if( shaderType->Get( shaderTypeString ) )
     {
-      mShaderType = TEXTURELESS;
-    }
-    else if( mShaderTypeString == "diffuseTexture" )
-    {
-      mShaderType = DIFFUSE_TEXTURE;
-    }
-    else if( mShaderTypeString == "allTextures" )
-    {
-      mShaderType = ALL_TEXTURES;
-    }
-    else
-    {
-      DALI_LOG_ERROR( "Unknown shader type provided to the MeshRenderer object.\n");
+      if( shaderTypeString == SHADER_TYPE_TEXTURELESS )
+      {
+        mShaderType = TEXTURELESS;
+      }
+      else if( shaderTypeString == SHADER_TYPE_DIFFUSE_TEXTURE )
+      {
+        mShaderType = DIFFUSE_TEXTURE;
+      }
+      else if( shaderTypeString == SHADER_TYPE_ALL_TEXTURES )
+      {
+        mShaderType = ALL_TEXTURES;
+      }
+      else
+      {
+        DALI_LOG_ERROR( "Unknown shader type provided to the MeshRenderer object.\n");
+      }
     }
   }
 }
@@ -365,7 +373,29 @@ void MeshRenderer::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( OBJECT_URL, mObjectUrl );
   map.Insert( MATERIAL_URL, mMaterialUrl );
   map.Insert( TEXTURES_PATH, mTexturesPath );
-  map.Insert( SHADER_TYPE, mShaderTypeString );
+
+  std::string shaderTypeString;
+  switch( mShaderType )
+  {
+    case ALL_TEXTURES:
+    {
+      shaderTypeString = SHADER_TYPE_ALL_TEXTURES;
+      break;
+    }
+
+    case DIFFUSE_TEXTURE:
+    {
+      shaderTypeString = SHADER_TYPE_DIFFUSE_TEXTURE;
+      break;
+    }
+
+    case TEXTURELESS:
+    {
+      shaderTypeString = SHADER_TYPE_TEXTURELESS;
+      break;
+    }
+  }
+  map.Insert( SHADER_TYPE, shaderTypeString );
 }
 
 void MeshRenderer::InitializeRenderer()

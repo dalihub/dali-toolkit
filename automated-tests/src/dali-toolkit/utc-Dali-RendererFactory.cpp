@@ -460,19 +460,19 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("startPosition",   start);
-  propertyMap.Insert("endPosition",   end);
-  propertyMap.Insert("spreadMethod",   "repeat");
+  propertyMap.Insert("startPosition", start);
+  propertyMap.Insert("endPosition", end);
+  propertyMap.Insert("spreadMethod", "REPEAT");
 
   Property::Array stopOffsets;
   stopOffsets.PushBack( 0.2f );
   stopOffsets.PushBack( 0.8f );
-  propertyMap.Insert("stopOffset",   stopOffsets);
+  propertyMap.Insert("stopOffset", stopOffsets);
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("stopColor",   stopColors);
+  propertyMap.Insert("stopColor", stopColors);
 
   ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );
@@ -500,7 +500,7 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
-  propertyMap.Insert("units",  "userSpace");
+  propertyMap.Insert("units",  "USER_SPACE");
   propertyMap.Insert("center",  center);
   propertyMap.Insert("radius",  radius);
 
@@ -545,14 +545,14 @@ int UtcDaliRendererFactoryDefaultOffsetsGradientRenderer(void)
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("startPosition",   start);
-  propertyMap.Insert("endPosition",   end);
-  propertyMap.Insert("spreadMethod",   "repeat");
+  propertyMap.Insert("startPosition", start);
+  propertyMap.Insert("endPosition", end);
+  propertyMap.Insert("spreadMethod", "REPEAT");
 
   Property::Array stopColors;
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
-  propertyMap.Insert("stopColor",   stopColors);
+  propertyMap.Insert("stopColor", stopColors);
 
   ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
   DALI_TEST_CHECK( controlRenderer );

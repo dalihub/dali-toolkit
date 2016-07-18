@@ -76,16 +76,16 @@ Both Linear and Radial gradients are supported.
 
 **RendererType:** "gradient"
 
-| Property Name                                                | Type             | Required   | Description                                                             |
-|--------------------------------------------------------------|:----------------:|:----------:|-------------------------------------------------------------------------|
-| startPosition                                                | VECTOR2          | For Linear | The start position of the linear gradient.                              |
-| endPosition                                                  | VECTOR2          | For Linear | The end position of the linear gradient.                                |
-| center                                                       | VECTOR2          | For Radial | The center point of the gradient.                                       |
-| radius                                                       | FLOAT            | For Radial | The size of the radius.                                                 |
-| stopOffset                                                   | ARRAY of FLOAT   | No         | All the stop offsets. If not supplied default is 0.0 and 1.0            |
-| stopColor                                                    | ARRAY of VECTOR4 | Yes        | The color at those stop offsets. At least 2 required to show a gradient |
-| [gradientUnits](@ref gradient-renderer-units)                | STRING           | No         | *objectBoundingBox* or *userSpace*. Default: *objectBoundingBox*.       |
-| [gradientSpreadMethod](@ref gradient-renderer-spread-method) | STRING           | No         | *pad*, *repeat* or *reflect*. Default: *pad*                            |
+| Property Name                                        | Type             | Required   | Description                                                              |
+|------------------------------------------------------|:----------------:|:----------:|--------------------------------------------------------------------------|
+| startPosition                                        | VECTOR2          | For Linear | The start position of the linear gradient.                               |
+| endPosition                                          | VECTOR2          | For Linear | The end position of the linear gradient.                                 |
+| center                                               | VECTOR2          | For Radial | The center point of the gradient.                                        |
+| radius                                               | FLOAT            | For Radial | The size of the radius.                                                  |
+| stopOffset                                           | ARRAY of FLOAT   | No         | All the stop offsets. If not supplied default is 0.0 and 1.0.            |
+| stopColor                                            | ARRAY of VECTOR4 | Yes        | The color at those stop offsets. At least 2 required to show a gradient. |
+| [units](@ref gradient-renderer-units)                | STRING           | No         | *OBJECT_BOUNDING_BOX* or *USER_SPACE*. Default: *OBJECT_BOUNDING_BOX*.   |
+| [spreadMethod](@ref gradient-renderer-spread-method) | STRING           | No         | *PAD*, *REFLECT* or *REPEAT*. Default: *PAD*.                            |
 
 If the *stopOffset* and *stopColor* arrays do not have the same number of elements, then the minimum of the two is used as the stop points.
 
@@ -95,10 +95,10 @@ Defines the coordinate system for the attributes:
  + Start (x1, y1) and End (x2 and y2) points of a line if using a linear gradient.
  + Center point (cx, cy) and radius (r) of a circle if using a radial gradient.
  
-| Value             | Description                                                                                                                                    |
-|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| objectBoundingBox | *Default*. Uses the normals for the start, end & center points, i.e. top-left is (-0.5, -0.5) and bottom-right it (0.5, 0.5).                  |
-| userSpace         | Uses the user coordinates for the start, end & center points, i.e. in a 200 by 200 control, top-left is (0, 0) and bottom-right is (200, 200). |
+| Value               | Description                                                                                                                                    |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| OBJECT_BOUNDING_BOX | *Default*. Uses the normals for the start, end & center points, i.e. top-left is (-0.5, -0.5) and bottom-right is (0.5, 0.5).                  |
+| USER_SPACE          | Uses the user coordinates for the start, end & center points, i.e. in a 200 by 200 control, top-left is (0, 0) and bottom-right is (200, 200). |
 
 ### Spread Method {#gradient-renderer-spread-method}
 
@@ -106,9 +106,9 @@ Indicates what happens if the gradient starts or ends inside the bounds of the t
 
 | Value   | Description                                                                                          |
 |---------|------------------------------------------------------------------------------------------------------|
-| pad     | *Default*. Uses the terminal colors of the gradient to fill the remainder of the quad.               |
-| reflect | Reflect the gradient pattern start-to-end, end-to-start, start-to-end etc. until the quad is filled. |
-| repeat  | Repeat the gradient pattern start-to-end, start-to-end, start-to-end until the quad is filled.       |
+| PAD     | *Default*. Uses the terminal colors of the gradient to fill the remainder of the quad.               |
+| REFLECT | Reflect the gradient pattern start-to-end, end-to-start, start-to-end etc. until the quad is filled. |
+| REPEAT  | Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc. until the quad is filled.  |
 
 ### Usage
 
@@ -234,13 +234,13 @@ Renders a raster image ( jpg, png etc.) into the control's quad.
 
 **RendererType:** "image"
 
-| Property Name      | Type     | Required | Description                                                                                                                                     |
-|--------------------|:--------:|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| url           | STRING   | Yes      | The URL of the image.                                                                                                                           |
-| [fittingMode](@ref resourceimagescaling-fittingmode) | STRING   | No       | *SHRINK_TO_FIT*, *SCALE_TO_FILL*, *FIT_WIDTH* or *FIT_HEIGHT*. Default: *SHRINK_TO_FIT*.                         |
-| [samplingMode](@ref resourceimagescaling-scaling)    | STRING   | No       | *BOX*, *NEAREST*, *LINEAR*, *BOX_THEN_NEAREST*, *BOX_THEN_LINEAR*, *NO_FILTERr* or *DONT_CARE*. Default: *BOX*. |
-| desiredWidth  | INT      | No       | The desired image width. Will use actual image width if not specified.                                                                          |
-| desiredHeight | INT      | No       | The desired image height. Will use actual image height if not specified.                                                                        |
+| Property Name                                        | Type     | Required | Description                                                                                                    |
+|------------------------------------------------------|:--------:|:--------:|----------------------------------------------------------------------------------------------------------------|
+| url                                                  | STRING   | Yes      | The URL of the image.                                                                                          |
+| [fittingMode](@ref resourceimagescaling-fittingmode) | STRING   | No       | *SHRINK_TO_FIT*, *SCALE_TO_FILL*, *FIT_WIDTH* or *FIT_HEIGHT*. Default: *SHRINK_TO_FIT*.                       |
+| [samplingMode](@ref resourceimagescaling-scaling)    | STRING   | No       | *BOX*, *NEAREST*, *LINEAR*, *BOX_THEN_NEAREST*, *BOX_THEN_LINEAR*, *NO_FILTER* or *DONT_CARE*. Default: *BOX*. |
+| desiredWidth                                         | INT      | No       | The desired image width. Will use actual image width if not specified.                                         |
+| desiredHeight                                        | INT      | No       | The desired image height. Will use actual image height if not specified.                                       |
 
 #### Usage
 
@@ -437,12 +437,24 @@ Renders a mesh using a .obj file, optionally with textures provided by a mtl fil
 
 **RendererType** "mesh"
 
-| Property Name | Type    | Required           | Description                                                          |
-|---------------|:-------:|:------------------:|----------------------------------------------------------------------|
-| objectUrl     | STRING  | Yes                | The location of the .obj file.                                       |
-| materialUrl   | STRING  | No                 | The location of the .mtl file. Leave blank for a textureless object. |
-| texturesPath  | STRING  | If using material  | Path to the directory textures (including gloss and normal) are stored in.   |
-| shaderType    | STRING  | No                 | Sets the type of shader to be used with the mesh. Note that if anything the shader requires is missing, it will use a simpler one that it can handle with what has been supplied.\n Possible values: "textureless", "diffuseTexture", "allTextures".  |
+| Property Name                                | Type    | Required           | Description                                                                    |
+|----------------------------------------------|:-------:|:------------------:|--------------------------------------------------------------------------------|
+| objectUrl                                    | STRING  | Yes                | The location of the ".obj" file.                                               |
+| materialUrl                                  | STRING  | No                 | The location of the ".mtl" file. Leave blank for a textureless object.         |
+| texturesPath                                 | STRING  | If using material  | Path to the directory the textures (including gloss and normal) are stored in. |
+| [shaderType](@ref mesh-renderer-shader-type) | STRING  | No                 | Sets the type of shader to be used with the mesh.                              |
+
+### Shader Type {#mesh-renderer-shader-type}
+
+When specifying the shader type, if anything the shader requires is missing, a simpler type that can be handled with what has been supplied will be used instead.
+ 
+**Possible values:**
+ 
+| String Value    | Description                                    |
+|-----------------|------------------------------------------------|
+| TEXTURELESS     | *Simplest*. A flat color with shading is used. |
+| DIFFUSE_TEXTURE | Textured.                                      |
+| ALL_TEXTURES    | Has a gloss, normal map and texture map.       |
 
 ### Usage
 

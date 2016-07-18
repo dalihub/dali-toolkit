@@ -361,9 +361,9 @@ int UtcDaliControlRendererGetPropertyMap3(void)
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
-  propertyMap.Insert("startPosition",   start);
-  propertyMap.Insert("endPosition",   end);
-  propertyMap.Insert("spreadMethod",   "repeat");
+  propertyMap.Insert("startPosition", start);
+  propertyMap.Insert("endPosition", end);
+  propertyMap.Insert("spreadMethod", "REPEAT");
 
   propertyMap.Insert("stopOffset",   Vector2(0.2f, 0.8f));
 
@@ -384,11 +384,11 @@ int UtcDaliControlRendererGetPropertyMap3(void)
 
   value = resultMap.Find( "units",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "objectBoundingBox" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "OBJECT_BOUNDING_BOX" );
 
   value = resultMap.Find( "spreadMethod",   Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "repeat" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "REPEAT" );
 
   value = resultMap.Find( "startPosition",   Property::VECTOR2 );
   DALI_TEST_CHECK( value );
@@ -428,7 +428,7 @@ int UtcDaliControlRendererGetPropertyMap4(void)
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
-  propertyMap.Insert("units",  "userSpace");
+  propertyMap.Insert("units",  "USER_SPACE");
   propertyMap.Insert("center",  center);
   propertyMap.Insert("radius",  radius);
   propertyMap.Insert("stopOffset",   Vector3(0.1f, 0.3f, 1.1f));
@@ -452,11 +452,11 @@ int UtcDaliControlRendererGetPropertyMap4(void)
 
   value = resultMap.Find( "units",  Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "userSpace" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "USER_SPACE" );
 
   value = resultMap.Find( "spreadMethod",   Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "pad" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "PAD" );
 
   value = resultMap.Find( "center",  Property::VECTOR2 );
   DALI_TEST_CHECK( value );
@@ -655,7 +655,7 @@ int UtcDaliControlRendererGetPropertyMap8(void)
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_LOCATION );
-  propertyMap.Insert( "shaderType", "textureless" );
+  propertyMap.Insert( "shaderType", "TEXTURELESS" );
   ControlRenderer meshRenderer = factory.CreateControlRenderer( propertyMap );
 
   Property::Map resultMap;
@@ -680,7 +680,7 @@ int UtcDaliControlRendererGetPropertyMap8(void)
 
   value = resultMap.Find( "shaderType", Property::STRING );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == "textureless" );
+  DALI_TEST_CHECK( value->Get<std::string>() == "TEXTURELESS" );
 
   END_TEST;
 }
