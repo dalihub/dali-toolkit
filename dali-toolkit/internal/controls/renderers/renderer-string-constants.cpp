@@ -28,15 +28,15 @@ namespace Internal
 {
 
 const char * const RENDERER_TYPE("rendererType");
-const char * const COLOR_RENDERER("color");
-const char * const BORDER_RENDERER("border");
-const char * const GRADIENT_RENDERER("gradient");
-const char * const IMAGE_RENDERER("image");
-const char * const MESH_RENDERER("mesh");
+const char * const COLOR_RENDERER("COLOR");
+const char * const BORDER_RENDERER("BORDER");
+const char * const GRADIENT_RENDERER("GRADIENT");
+const char * const IMAGE_RENDERER("IMAGE");
+const char * const MESH_RENDERER("MESH");
+const char * const DEBUG_RENDERER("DEBUG");
 
 const char * const IMAGE_URL_NAME("url");
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
-const char * const COLOR( "color" );
 
 //Mesh properties
 const char * const OBJECT_URL( "objectUrl" );

@@ -396,7 +396,7 @@ int UtcDaliControlBackgroundColor(void)
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "COLOR" );
   DALI_TEST_CHECK( resultMap->Find( "mixColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "mixColor" )->Get<Vector4>() == Color::RED );
 
@@ -427,7 +427,7 @@ int UtcDaliControlBackgroundImage(void)
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "IMAGE" );
   DALI_TEST_CHECK( resultMap->Find( "url" ) );
   DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage" );
 
@@ -451,24 +451,24 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND ).Get< Property::Map >().Empty() );
 
   Property::Map imageMap;
-  imageMap[ "rendererType" ] = "image";
+  imageMap[ "rendererType" ] = "IMAGE";
   imageMap[ "url" ] = "TestImage";
   control.SetProperty( Control::Property::BACKGROUND, imageMap );
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "IMAGE" );
   DALI_TEST_CHECK( resultMap->Find( "url" ) );
   DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage" );
 
   Property::Map rendererMap;
-  rendererMap["rendererType"] = "color";
+  rendererMap["rendererType"] = "COLOR";
   rendererMap["mixColor"] = Color::CYAN;
   control.SetProperty( Control::Property::BACKGROUND, rendererMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
   DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
+  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "COLOR" );
   DALI_TEST_CHECK( resultMap->Find( "mixColor" ) );
   DALI_TEST_CHECK( resultMap->Find( "mixColor" )->Get<Vector4>() == Color::CYAN );
 

@@ -161,7 +161,7 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
 
     Actor self = Self();
     Property::Map rendererMap;
-    rendererMap.Insert( "rendererType", "image" );
+    rendererMap.Insert( "rendererType", "IMAGE" );
 
     switch( type )
     {

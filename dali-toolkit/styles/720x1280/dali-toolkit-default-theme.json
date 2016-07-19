@@ -98,7 +98,7 @@
       "popupIconColor":[1.0,1.0,1.0,1.0],
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
-        "rendererType": "image",
+        "rendererType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
         },
       "popupFadeInDuration":0.25,

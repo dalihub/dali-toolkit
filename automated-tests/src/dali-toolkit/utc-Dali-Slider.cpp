@@ -333,7 +333,7 @@ int UtcDaliSetPropertyP(void)
 
   {
     Property::Map map;
-    map["rendererType"] = "image";
+    map["rendererType"] = "IMAGE";
     map["size"] = Vector2(200, 200);
     map["url"] = "track2.png";
     slider.SetProperty(Slider::Property::TRACK_VISUAL,       map);

@@ -566,7 +566,7 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
       Toolkit::ControlRenderer colorRenderer;
 
       Property::Map map;
-      map["rendererType"] = "color";
+      map["rendererType"] = "COLOR";
       map["mixColor"] = color;
 
       colorRenderer = rendererFactory.CreateControlRenderer( map );

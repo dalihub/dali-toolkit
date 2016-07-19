@@ -293,7 +293,7 @@ int UtcDaliRendererFactoryGetColorRenderer1(void)
 
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
-  propertyMap.Insert("rendererType",  "color");
+  propertyMap.Insert("rendererType",  "COLOR");
   propertyMap.Insert("mixColor",  testColor);
 
   ControlRenderer controlRenderer = factory.CreateControlRenderer(propertyMap);
@@ -320,7 +320,7 @@ int UtcDaliRendererFactoryGetColorRenderer2(void)
 
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   Dali::Property::Map map;
-  map[ "rendererType" ] = "color";
+  map[ "rendererType" ] = "COLOR";
   map[ "mixColor" ] = testColor;
   ControlRenderer controlRenderer = factory.CreateControlRenderer( map );
   DALI_TEST_CHECK( controlRenderer );
@@ -350,7 +350,7 @@ int UtcDaliRendererFactoryGetBorderRenderer1(void)
   Property::Map propertyMap;
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   float testSize = 5.f;
-  propertyMap.Insert("rendererType",  "border");
+  propertyMap.Insert("rendererType",  "BORDER");
   propertyMap.Insert("borderColor",  testColor);
   propertyMap.Insert("borderSize",  testSize);
 
@@ -398,7 +398,7 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
   float testSize = 5.f;
 
   Dali::Property::Map propertyMap;
-  propertyMap[ "rendererType" ] = "border";
+  propertyMap[ "rendererType" ] = "BORDER";
   propertyMap[ "borderColor"  ] = testColor;
   propertyMap[ "borderSize"   ] = testSize;
   ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
@@ -432,7 +432,7 @@ int UtcDaliRendererFactoryGetBorderRenderer2(void)
 
   // enable the anti-aliasing
   Dali::Property::Map map;
-  map[ "rendererType" ] = "border";
+  map[ "rendererType" ] = "BORDER";
   map[ "borderColor"  ] = testColor;
   map[ "borderSize"   ] = testSize;
   map[ "antiAliasing"   ] = true;
@@ -456,7 +456,7 @@ int UtcDaliRendererFactoryGetLinearGradientRenderer(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "gradient");
+  propertyMap.Insert("rendererType",  "GRADIENT");
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
@@ -496,7 +496,7 @@ int UtcDaliRendererFactoryGetRadialGradientRenderer(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "gradient");
+  propertyMap.Insert("rendererType",  "GRADIENT");
 
   Vector2 center(100.f, 100.f);
   float radius = 100.f;
@@ -541,7 +541,7 @@ int UtcDaliRendererFactoryDefaultOffsetsGradientRenderer(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert("rendererType",  "gradient");
+  propertyMap.Insert("rendererType",  "GRADIENT");
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
@@ -576,7 +576,7 @@ int UtcDaliRendererFactoryGetImageRenderer1(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
 
   ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
@@ -658,7 +658,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
@@ -722,7 +722,7 @@ int UtcDaliRendererFactoryGetNPatchRenderer2(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "image" );
+  propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
@@ -960,7 +960,7 @@ int UtcDaliRendererFactoryGetMeshRenderer1(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
 
   ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
@@ -1012,7 +1012,7 @@ int UtcDaliRendererFactoryGetMeshRenderer2(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", "" );
   propertyMap.Insert( "texturesPath", "" );
@@ -1068,7 +1068,7 @@ int UtcDaliRendererFactoryGetMeshRenderer3(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
@@ -1124,7 +1124,7 @@ int UtcDaliRendererFactoryGetMeshRenderer4(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", TEST_SIMPLE_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
@@ -1180,7 +1180,7 @@ int UtcDaliRendererFactoryGetMeshRendererN1(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
@@ -1231,7 +1231,7 @@ int UtcDaliRendererFactoryGetMeshRendererN2(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", "invalid" );
   propertyMap.Insert( "texturesPath", "also invalid" );
@@ -1283,7 +1283,7 @@ int UtcDaliRendererFactoryGetMeshRendererN3(void)
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "mesh" );
+  propertyMap.Insert( "rendererType",  "MESH" );
   propertyMap.Insert( "objectUrl", "invalid" );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );

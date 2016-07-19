@@ -31,7 +31,7 @@ Renders a solid color to the control's quad.
 
 ### Properties Supported
 
-**RendererType:** "color"
+**RendererType:** "COLOR"
 
 | Property Name | Type    | Required | Description               |
 |---------------|:-------:|:--------:|---------------------------|
@@ -44,7 +44,7 @@ Renders a solid color to the control's quad.
 Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
-map[ "rendererType" ] = "color";
+map[ "rendererType" ] = "COLOR";
 map[ "mixColor" ] = Color::RED;
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
@@ -56,7 +56,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "color",
+  rendererType : "COLOR",
   mixColor : dali.COLOR_RED
 };
 ~~~
@@ -74,7 +74,7 @@ Both Linear and Radial gradients are supported.
 
 ### Properties Supported
 
-**RendererType:** "gradient"
+**RendererType:** "GRADIENT"
 
 | Property Name                                        | Type             | Required   | Description                                                              |
 |------------------------------------------------------|:----------------:|:----------:|--------------------------------------------------------------------------|
@@ -118,7 +118,7 @@ Indicates what happens if the gradient starts or ends inside the bounds of the t
 Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
-map[ "rendererType" ] = "gradient";
+map[ "rendererType" ] = "GRADIENT";
 map[ "startPosition" ] = Vector2( 0.5f, 0.5f );
 map[ "endPosition" ] = Vector2( -0.5f, -0.5f );
 
@@ -147,7 +147,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "gradient",
+  rendererType : "GRADIENT",
   startPosition : [ 0.5, 0.5 ],
   endPosition : [ -0.5, -0.5 ],
   stopOffset : [ 0.0, 0.3, 0.6, 0.8, 1.0 ],
@@ -167,7 +167,7 @@ control.background =
 Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
-map[ "rendererType" ] = "gradient";
+map[ "rendererType" ] = "GRADIENT";
 map[ "center" ] = Vector2( 0.5f, 0.5f );
 map[ "radius" ] = 1.414f;
 
@@ -196,7 +196,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "gradient",
+  rendererType : "GRADIENT",
   center : [ 0.5, 0.5 ],
   radius : 1.414,
   stopOffset : [ 0.0, 0.3, 0.6, 0.8, 1.0 ],
@@ -232,7 +232,7 @@ Renders a raster image ( jpg, png etc.) into the control's quad.
 
 #### Properties Supported
 
-**RendererType:** "image"
+**RendererType:** "IMAGE"
 
 | Property Name                                        | Type     | Required | Description                                                                                                    |
 |------------------------------------------------------|:--------:|:--------:|----------------------------------------------------------------------------------------------------------------|
@@ -249,7 +249,7 @@ Renders a raster image ( jpg, png etc.) into the control's quad.
 Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
-map[ "rendererType" ] = "image";
+map[ "rendererType" ] = "IMAGE";
 map[ "url" ] = "path-to-image.jpg";
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
@@ -261,7 +261,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "image",
+  rendererType : "IMAGE",
   url : "path-to-image.jpg"
 };
 ~~~
@@ -276,7 +276,7 @@ Renders an n-patch or a 9-patch image into the control's quad.
 
 #### Properties Supported
 
-**RendererType:** "image"
+**RendererType:** "IMAGE"
 
 | Property Name | Type    | Required | Description                      |
 |---------------|:-------:|:--------:|----------------------------------|
@@ -291,7 +291,7 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "image";
+map[ "rendererType" ] = "IMAGE";
 map[ "url" ] = "path-to-image.9.png";
 
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
@@ -303,7 +303,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "image",
+  rendererType : "IMAGE",
   url : "path-to-image.9.png"
 };
 ~~~
@@ -347,7 +347,7 @@ Renders a svg image into the control's quad.
  
 #### Properties Supported
 
-**RendererType:** "image"
+**RendererType:** "IMAGE"
 
 | Property Name | Type    | Required | Description                      |
 |---------------|:-------:|:--------:|----------------------------------|
@@ -361,7 +361,7 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "image";
+map[ "rendererType" ] = "IMAGE";
 map[ "url" ] = "path-to-image.svg";
 
 control.SetSize( 200.f, 200.f );
@@ -374,7 +374,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "image",
+  rendererType : "IMAGE",
   url : "path-to-image.svg"
 };
 ~~~
@@ -389,7 +389,7 @@ Renders a solid color as an internal border to the control's quad.
 
 ### Properties Supported
 
-**RendererType:** "border"
+**RendererType:** "BORDER"
 
 | Property Name | Type    | Required | Description                                      |
 |---------------|:-------:|:--------:|--------------------------------------------------|
@@ -405,7 +405,7 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "border";
+map[ "rendererType" ] = "BORDER";
 map[ "borderColor"  ] = Color::BLUE;
 map[ "borderSize"   ] = 5.0f;
 
@@ -418,7 +418,7 @@ var control = new dali.Control( "Control" );
 
 control.background =
 {
-  rendererType : "border",
+  rendererType : "BORDER",
   borderColor : dali.COLOR_BLUE,
   borderSize = 5
 };
@@ -435,7 +435,7 @@ Renders a mesh using a .obj file, optionally with textures provided by a mtl fil
 
 ### Properties Supported
 
-**RendererType** "mesh"
+**RendererType** "MESH"
 
 | Property Name                                | Type    | Required           | Description                                                                    |
 |----------------------------------------------|:-------:|:------------------:|--------------------------------------------------------------------------------|
@@ -464,7 +464,7 @@ Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
 
 Dali::Property::Map map;
 
-map[ "rendererType" ] = "mesh";
+map[ "rendererType" ] = "MESH";
 map[ "objectUrl"    ] = "home/models/Dino.obj";
 map[ "materialUrl"  ] = "home/models/Dino.mtl";
 map[ "texturesPath" ] = "home/images/";
