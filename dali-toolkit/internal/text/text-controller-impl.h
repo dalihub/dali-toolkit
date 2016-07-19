@@ -633,16 +633,16 @@ struct Controller::Impl
   /**
    * @biref Clamps the horizontal scrolling to get the control always filled with text.
    *
-   * @param[in] actualSize The size of the laid out text.
+   * @param[in] layoutSize The size of the laid out text.
    */
-  void ClampHorizontalScroll( const Vector2& actualSize );
+  void ClampHorizontalScroll( const Vector2& layoutSize );
 
   /**
    * @biref Clamps the vertical scrolling to get the control always filled with text.
    *
-   * @param[in] actualSize The size of the laid out text.
+   * @param[in] layoutSize The size of the laid out text.
    */
-  void ClampVerticalScroll( const Vector2& actualSize );
+  void ClampVerticalScroll( const Vector2& layoutSize );
 
   /**
    * @brief Scrolls the text to make a position visible.

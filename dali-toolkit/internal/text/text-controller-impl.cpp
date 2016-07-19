@@ -2503,13 +2503,13 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
   mEventData->mAllTextSelected = ( startOfSelection == 0 ) && ( endOfSelection == mLogicalModel->mText.Count() );
 }
 
-void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
+void Controller::Impl::ClampHorizontalScroll( const Vector2& layoutSize )
 {
   // Clamp between -space & 0.
 
-  if( actualSize.width > mVisualModel->mControlSize.width )
+  if( layoutSize.width > mVisualModel->mControlSize.width )
   {
-    const float space = ( actualSize.width - mVisualModel->mControlSize.width );
+    const float space = ( layoutSize.width - mVisualModel->mControlSize.width );
     mScrollPosition.x = ( mScrollPosition.x < -space ) ? -space : mScrollPosition.x;
     mScrollPosition.x = ( mScrollPosition.x > 0.f ) ? 0.f : mScrollPosition.x;
 
@@ -2521,12 +2521,12 @@ void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
   }
 }
 
-void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
+void Controller::Impl::ClampVerticalScroll( const Vector2& layoutSize )
 {
   // Clamp between -space & 0.
-  if( actualSize.height > mVisualModel->mControlSize.height )
+  if( layoutSize.height > mVisualModel->mControlSize.height )
   {
-    const float space = ( actualSize.height - mVisualModel->mControlSize.height );
+    const float space = ( layoutSize.height - mVisualModel->mControlSize.height );
     mScrollPosition.y = ( mScrollPosition.y < -space ) ? -space : mScrollPosition.y;
     mScrollPosition.y = ( mScrollPosition.y > 0.f ) ? 0.f : mScrollPosition.y;
 

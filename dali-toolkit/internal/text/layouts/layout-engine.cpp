@@ -795,6 +795,10 @@ struct LayoutEngine::Impl
         }
       }
 
+      // Calculates the layout size.
+      UpdateLayoutSize( lines,
+                        layoutSize );
+
       // Nothing else do if there are no glyphs to layout.
       return false;
     }
