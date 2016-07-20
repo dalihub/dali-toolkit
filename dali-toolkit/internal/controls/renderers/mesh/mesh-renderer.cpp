@@ -83,7 +83,6 @@ enum TextureIndex
   GLOSS_INDEX = 2u
 };
 
-const char * const RENDERER_TYPE_VALUE( "mesh" ); //String label for which type of control renderer this is.
 const char * const LIGHT_POSITION( "uLightPosition" ); //Shader property
 const char * const OBJECT_MATRIX( "uObjectMatrix" ); //Shader property
 
@@ -369,7 +368,7 @@ void MeshRenderer::DoSetOnStage( Actor& actor )
 void MeshRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, MESH_RENDERER );
   map.Insert( OBJECT_URL, mObjectUrl );
   map.Insert( MATERIAL_URL, mMaterialUrl );
   map.Insert( TEXTURES_PATH, mTexturesPath );

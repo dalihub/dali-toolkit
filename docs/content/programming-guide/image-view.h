@@ -47,7 +47,7 @@
  *
  * @code
  * Property::Map renderer;
- * renderer.Insert("rendererType","border");
+ * renderer.Insert("rendererType","BORDER");
  * renderer.Insert("borderColor",COLOR::RED);
  * renderer.Insert("borderSize",20.f);
  *

@@ -23,6 +23,7 @@
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
+#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
 
 namespace Dali
 {
@@ -35,9 +36,6 @@ namespace Internal
 
 namespace
 {
-const char * const RENDERER_TYPE("rendererType");
-const char * const RENDERER_TYPE_VALUE("debug");
-
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const INDEX_NAME("indices");
 
@@ -82,7 +80,7 @@ void DebugRenderer::DoSetOnStage( Actor& actor )
 void DebugRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, DEBUG_RENDERER );
 }
 
 void DebugRenderer::InitializeRenderer()

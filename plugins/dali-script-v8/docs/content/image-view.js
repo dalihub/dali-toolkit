@@ -45,7 +45,7 @@ imageView.size = imageViewSize; // If not set, it will use either the natural im
 dali.stage.add( imageView );
   
 var image = {
-    "rendererType" : "image",
+    "rendererType" : "IMAGE",
     "url" : "myImage.jpg",
     "desiredWidth" : desiredWidth,   // The desired image width while loading (optional but preferable to set for efficiency)
     "desiredHeight" : desiredHeight,   // The desired image height while loading (optional but preferable to set for efficiency)

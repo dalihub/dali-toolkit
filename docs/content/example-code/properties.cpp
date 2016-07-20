@@ -66,7 +66,7 @@ public:
 
     // Set another property to set the image-map
     Property::Map imageMap;
-    imageMap[ "rendererType" ] = "image";
+    imageMap[ "rendererType" ] = "IMAGE";
     imageMap[ "url" ]          = IMAGE_CARDS;
     imageMap[ "desiredWidth" ]        = 100;
     imageMap[ "desiredHeight" ]       = 100;
