@@ -144,7 +144,7 @@ void Controller::SetAutoScrollEnabled( bool enable )
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                                LAYOUT                    |
                                                                ALIGN                     |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                UPDATE_DIRECTION          |
                                                                REORDER );
 
@@ -155,7 +155,7 @@ void Controller::SetAutoScrollEnabled( bool enable )
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                                LAYOUT                    |
                                                                ALIGN                     |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER );
     }
 
@@ -925,7 +925,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -999,7 +999,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1053,7 +1053,7 @@ void Controller::SetInputFontWidth( FontWidth width )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1107,7 +1107,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1160,7 +1160,7 @@ void Controller::SetInputFontPointSize( float size )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1482,7 +1482,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
                                                              ALIGN                     |
-                                                             UPDATE_ACTUAL_SIZE        |
+                                                             UPDATE_LAYOUT_SIZE        |
                                                              REORDER );
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
@@ -1705,6 +1705,9 @@ bool Controller::DoRelayout( const Size& size,
   const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
   const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
 
+  // Get the current layout size.
+  layoutSize = mImpl->mVisualModel->GetLayoutSize();
+
   if( NO_OPERATION != ( LAYOUT & operations ) )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout LAYOUT & operations\n");
@@ -1726,7 +1729,7 @@ bool Controller::DoRelayout( const Size& size,
 
     if( 0u == totalNumberOfGlyphs )
     {
-      if( NO_OPERATION != ( UPDATE_ACTUAL_SIZE & operations ) )
+      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
       {
         mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
       }
@@ -1772,14 +1775,18 @@ bool Controller::DoRelayout( const Size& size,
     layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
 
     // Update the visual model.
+    Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    mImpl->mVisualModel->mLines,
-                                                   layoutSize );
+                                                   newLayoutSize );
 
+    viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 
     if( viewUpdated )
     {
+      layoutSize = newLayoutSize;
+
       if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
         mImpl->mAutoScrollDirectionRTL = false;
@@ -1826,8 +1833,8 @@ bool Controller::DoRelayout( const Size& size,
         }
       } // REORDER
 
-      // Sets the actual size.
-      if( NO_OPERATION != ( UPDATE_ACTUAL_SIZE & operations ) )
+      // Sets the layout size.
+      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
       {
         mImpl->mVisualModel->SetLayoutSize( layoutSize );
       }
@@ -1835,10 +1842,6 @@ bool Controller::DoRelayout( const Size& size,
 
     // Store the size used to layout the text.
     mImpl->mVisualModel->mControlSize = size;
-  }
-  else
-  {
-    layoutSize = mImpl->mVisualModel->GetLayoutSize();
   }
 
   if( NO_OPERATION != ( ALIGN & operations ) )
@@ -1873,7 +1876,7 @@ void Controller::SetMultiLineEnabled( bool enable )
 
     // Set the flags to redo the layout operations
     const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
-                                                                          UPDATE_ACTUAL_SIZE |
+                                                                          UPDATE_LAYOUT_SIZE |
                                                                           ALIGN              |
                                                                           REORDER );
 
@@ -2921,7 +2924,7 @@ void Controller::ClearFontData()
                                                            SHAPE_TEXT                |
                                                            GET_GLYPH_METRICS         |
                                                            LAYOUT                    |
-                                                           UPDATE_ACTUAL_SIZE        |
+                                                           UPDATE_LAYOUT_SIZE        |
                                                            REORDER                   |
                                                            ALIGN );
 }

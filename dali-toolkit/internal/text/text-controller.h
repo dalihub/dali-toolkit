@@ -82,7 +82,7 @@ public:
     SHAPE_TEXT         = 0x0040,
     GET_GLYPH_METRICS  = 0x0080,
     LAYOUT             = 0x0100,
-    UPDATE_ACTUAL_SIZE = 0x0200,
+    UPDATE_LAYOUT_SIZE = 0x0200,
     REORDER            = 0x0400,
     ALIGN              = 0x0800,
     COLOR              = 0x1000,
