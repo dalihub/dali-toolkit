@@ -538,14 +538,14 @@ Bevel percentage ranges from 0.0 to 1.0. It affects the ratio of the outer face 
 
 ### Slices {#slices-details}
 
-For spheres and conical frustrums, 'slices' determines how many divisions there are as you go around the object. Note that spheres are rendered along the Z-axis, and so will appear rotated.
+For spheres and conical frustrums, 'slices' determines how many divisions there are as you go around the object.
 
 ![ ](../assets/img/renderers/slices.png)
 ![ ](renderers/slices.png)
 
 ### Stacks {#stacks-details}
 
-For spheres, 'stacks' determines how many layers there are as you go down the object. Note that spheres are rendered along the Z-axis, and so will appear rotated.
+For spheres, 'stacks' determines how many layers there are as you go down the object.
 
 ![ ](../assets/img/renderers/stacks.png)
 ![ ](renderers/stacks.png)

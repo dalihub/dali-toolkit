@@ -74,7 +74,7 @@ const char * const BEVELLED_CUBE_LABEL( "BEVELLED_CUBE" );
 const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
 const char * const COLOR_UNIFORM_NAME( "uColor" );
 const char * const OBJECT_DIMENSIONS_UNIFORM_NAME( "uObjectDimensions" );
-const char * const STAGE_SIZE_UNIFORM_NAME( "uStageSize" );
+const char * const STAGE_OFFSET_UNIFORM_NAME( "uStageOffset" );
 
 //Vertex properties
 const char * const POSITION( "aPosition");
@@ -95,7 +95,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform   mediump mat3 uNormalMatrix;\n
   uniform   mediump mat4 uObjectMatrix;\n
   uniform   mediump vec3 uLightPosition;\n
-  uniform   mediump vec3 uStageSize;\n
+  uniform   mediump vec2 uStageOffset;\n
 
   void main()\n
   {\n
@@ -111,8 +111,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
 
-    vec3 stageOffset = vec3( uStageSize.xy, 0 ) / 2.0;\n
-    vec4 lightPosition = vec4( ( uLightPosition - stageOffset ), 1.0 );\n
+    vec4 lightPosition = vec4( ( uLightPosition.xy - uStageOffset ), uLightPosition.z, 1.0 );\n
     lightPosition = uViewMatrix * lightPosition;\n
     vec3 vectorToLight = normalize( lightPosition.xyz - mvVertexPosition.xyz );\n
 
@@ -437,7 +436,7 @@ void PrimitiveRenderer::UpdateShaderUniforms()
   Matrix scaleMatrix;
   scaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
 
-  mShader.RegisterProperty( STAGE_SIZE_UNIFORM_NAME, Vector3( width, height, std::min( width, height ) ) );
+  mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
   mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
   mShader.RegisterProperty( COLOR_UNIFORM_NAME, mColor );
@@ -600,8 +599,8 @@ void PrimitiveRenderer::ComputeSphereVertices( Vector<Vertex>& vertices, int sli
   float z;
 
   //Top stack.
-  vertices[vertexIndex].position = Vector3( 0.0, 0.0, 0.5 );
-  vertices[vertexIndex].normal = Vector3( 0.0, 0.0, 1.0 );
+  vertices[vertexIndex].position = Vector3( 0.0, 0.5, 0.0 );
+  vertices[vertexIndex].normal =   Vector3( 0.0, 1.0, 0.0 );
   vertexIndex++;
 
   //Middle stacks.
@@ -610,8 +609,8 @@ void PrimitiveRenderer::ComputeSphereVertices( Vector<Vertex>& vertices, int sli
     for( int j = 0; j < slices; j++, vertexIndex++ )
     {
       x = cosTable1[j] * sinTable2[i];
-      y = sinTable1[j] * sinTable2[i];
-      z = cosTable2[i];
+      y = cosTable2[i];
+      z = sinTable1[j] * sinTable2[i];
 
       vertices[vertexIndex].position = Vector3( x / 2.0f, y / 2.0f, z / 2.0f );
       vertices[vertexIndex].normal = Vector3( x, y, z );
@@ -619,8 +618,8 @@ void PrimitiveRenderer::ComputeSphereVertices( Vector<Vertex>& vertices, int sli
   }
 
   //Bottom stack.
-  vertices[vertexIndex].position = Vector3( 0.0, 0.0, -0.5 );
-  vertices[vertexIndex].normal = Vector3( 0.0, 0.0, -1.0 );
+  vertices[vertexIndex].position = Vector3( 0.0, -0.5, 0.0 );
+  vertices[vertexIndex].normal =   Vector3( 0.0, -1.0, 0.0 );
 }
 
 void PrimitiveRenderer::FormSphereTriangles( Vector<unsigned short>& indices, int slices, int stacks )
