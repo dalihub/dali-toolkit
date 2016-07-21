@@ -198,10 +198,10 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 
   CharacterIndex logicalIndex = 0u;
 
-  const Length numberOfGlyphs = visualModel->mGlyphs.Count();
-  const Length numberOfLines  = visualModel->mLines.Count();
-  if( ( 0 == numberOfGlyphs ) ||
-      ( 0 == numberOfLines ) )
+  const Length totalNumberOfGlyphs = visualModel->mGlyphs.Count();
+  const Length totalNumberOfLines  = visualModel->mLines.Count();
+  if( ( 0 == totalNumberOfGlyphs ) ||
+      ( 0 == totalNumberOfLines ) )
   {
     return logicalIndex;
   }
@@ -275,14 +275,43 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
       // Get the position of the first glyph.
       const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
 
-      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic ﻻ.
-      const Length numberOfCharacters = *( charactersPerGlyphBuffer + firstLogicalGlyphIndex );
+      // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic (ل + ا).
+      Length numberOfCharacters = *( charactersPerGlyphBuffer + firstLogicalGlyphIndex );
       if( direction != LTR )
       {
         // As characters are being traversed in visual order,
         // for right to left ligatures, the character which contains the
         // number of glyphs in the table is found first.
         // Jump the number of characters to the next glyph is needed.
+
+        if( 0u == numberOfCharacters )
+        {
+          // TODO: This is a workaround to fix an issue with complex characters in the arabic
+          // script like i.e. رّ or الأَبْجَدِيَّة العَرَبِيَّة
+          // There are characters that are not shaped in one glyph but in combination with
+          // the next one generates two of them.
+          // The visual to logical conversion table have characters in different order than
+          // expected even if all of them are arabic.
+
+          // The workaround doesn't fix the issue completely but it prevents the application
+          // to hang in an infinite loop.
+
+          // Find the number of characters.
+          for( GlyphIndex index = firstLogicalGlyphIndex + 1u;
+               ( 0u == numberOfCharacters ) && ( index < totalNumberOfGlyphs ) ;
+               ++index )
+          {
+            numberOfCharacters = *( charactersPerGlyphBuffer + index );
+          }
+
+          if( 2u > numberOfCharacters )
+          {
+            continue;
+          }
+
+          --numberOfCharacters;
+        }
+
         visualIndex += numberOfCharacters - 1u;
       }
 
@@ -355,7 +384,7 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
     {
       // The paragraph direction is right to left.
 
-      if( ( lineIndex != numberOfLines - 1u ) && // is not the last line.
+      if( ( lineIndex != totalNumberOfLines - 1u ) && // is not the last line.
           ( visualIndex == startCharacter ) )
       {
         // It places the cursor just after the first character in visual order.
@@ -376,7 +405,7 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
     // This branch checks if the closest line is the one with the last '\n'. If it is, it decrements the visual index to place
     // the cursor just before the last '\n'.
 
-    if( ( lineIndex != numberOfLines - 1u ) &&
+    if( ( lineIndex != totalNumberOfLines - 1u ) &&
         TextAbstraction::IsNewParagraph( *( logicalModel->mText.Begin() + visualIndex - 1u ) ) )
     {
       --visualIndex;
