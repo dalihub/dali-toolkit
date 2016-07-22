@@ -20,6 +20,12 @@ BuildRequires: gettext
 # Applications or dali-addon will decide which one they will use.
 BuildRequires:  dali-adaptor-devel
 
+#need libtzplatform-config for directory if tizen version is 3.x
+
+%if "%{tizen_version_major}" == "3"
+BuildRequires:  pkgconfig(libtzplatform-config)
+%endif
+
 #############################
 # profile setup
 #############################
@@ -57,8 +63,17 @@ Application development package for the OpenGLES Canvas toolkit - headers and pa
 ##############################
 %prep
 %setup -q
+
+#Use TZ_PATH when tizen version is 3.x
+
+%if "%{tizen_version_major}" == "2"
 %define dali_data_rw_dir            /opt/usr/share/dali/
 %define dali_data_ro_dir            /usr/share/dali/
+%else
+%define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
+%define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
+%endif
+
 %define dali_toolkit_image_files    %{dali_data_ro_dir}/toolkit/images/
 %define dali_toolkit_sound_files    %{dali_data_ro_dir}/toolkit/sounds/
 %define dali_toolkit_style_files    %{dali_data_ro_dir}/toolkit/styles/
