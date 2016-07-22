@@ -42,6 +42,7 @@ SET(TC_SOURCES
    utc-Dali-KeyboardFocusManager.cpp
    utc-Dali-Magnifier.cpp
    utc-Dali-Popup.cpp
+   utc-Dali-ProgressBar.cpp
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp
    utc-Dali-ScrollViewEffect.cpp

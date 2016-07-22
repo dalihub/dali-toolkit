@@ -51,6 +51,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
+   $(toolkit_src_dir)/controls/progress-bar/progress-bar-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/bouncing-effect-actor.cpp \
    $(toolkit_src_dir)/controls/scrollable/item-view/depth-layout.cpp \
