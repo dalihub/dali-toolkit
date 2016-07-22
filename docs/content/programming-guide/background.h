@@ -57,16 +57,16 @@ then the above image will look like:
 </td>
 </table>
 
-@section background-renderer Background Renderer
+@section background-visual Background Visual
 
-The background can be set to use a specified renderer, e.g the border renderer
+The background can be set to use a specified visual, e.g the border visual
 @code
-Property::Map renderer;
-renderer.Insert("rendererType","BORDER");
-renderer.Insert("borderColor",COLOR::RED);
-renderer.Insert("borderSize",20.f);
+Property::Map visual;
+visual.Insert("rendererType","BORDER");
+visual.Insert("borderColor",COLOR::RED);
+visual.Insert("borderSize",20.f);
 
-control.SetProperty( Control::Property::BACKGROUND, renderer);
+control.SetProperty( Control::Property::BACKGROUND, visual);
 @endcode
 
 then the above image will look like:

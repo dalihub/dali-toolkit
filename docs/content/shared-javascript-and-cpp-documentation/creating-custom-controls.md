@@ -28,7 +28,7 @@ ________________________________________________________________________________
 To render content, the required actors can be created and added to the control itself as its children.
 However, this solution is not fully optimised and means extra actors will be added, and thus, need to be processed by DALi.
  
-Controls should be as generic as possible so the recommendation is to re-use control renderers to create the content required as described in the [Control Renderers](@ref control-renderers) section.
+Controls should be as generic as possible so the recommendation is to re-use control renderers to create the content required as described in the [Visuals](@ref visuals) section.
 Currently, this is devel-api though, so is subject to change.
  
 ![ ](../assets/img/creating-custom-controls/rendering.png)

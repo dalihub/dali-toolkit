@@ -27,7 +27,7 @@
 #include <dali-toolkit/devel-api/controls/effects-view/effects-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -216,7 +216,7 @@ private: // attributes/properties
   /////////////////////////////////////////////////////////////
   // for rendering all user added children to offscreen target
   FrameBufferImage mImageForChildren;
-  Toolkit::ControlRenderer mRendererForChildren;
+  Toolkit::Visual mRendererForChildren;
   RenderTask mRenderTaskForChildren;
   CameraActor mCameraForChildren;
   Actor mChildrenRoot; // for creating a subtree for all user added child actors
@@ -232,7 +232,7 @@ private: // attributes/properties
   /////////////////////////////////////////////////////////////
   // post blur image
   FrameBufferImage mImagePostFilter;
-  Toolkit::ControlRenderer mRendererPostFilter;
+  Toolkit::Visual mRendererPostFilter;
 
   Vector<ImageFilter*> mFilters;
 

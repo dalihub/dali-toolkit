@@ -120,7 +120,7 @@ void VideoView::SetPropertyMap( Property::Map map )
   mPropertyMap = map;
 
   Actor self( Self() );
-  InitializeControlRenderer( self, mRenderer, mPropertyMap );
+  InitializeVisual( self, mRenderer, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -538,7 +538,7 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
-  InitializeControlRenderer( self, mRenderer, mNativeImage );
+  InitializeVisual( self, mRenderer, mNativeImage );
 
   if( mIsPlay )
   {

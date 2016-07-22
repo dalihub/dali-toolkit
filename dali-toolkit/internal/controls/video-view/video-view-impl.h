@@ -24,7 +24,7 @@
 #include <dali/devel-api/adaptor-framework/video-player.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
@@ -240,7 +240,7 @@ private:
 
   Dali::VideoPlayer mVideoPlayer;
   Dali::ImageDimensions mVideoSize;
-  Toolkit::ControlRenderer mRenderer;
+  Toolkit::Visual mRenderer;
   Dali::Property::Map mPropertyMap;
   Dali::NativeImage mNativeImage; ///< Native image handle for video rendering by texture streaming
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;

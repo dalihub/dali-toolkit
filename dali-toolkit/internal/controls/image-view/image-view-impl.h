@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -158,7 +158,7 @@ private:
   ImageView& operator=( const ImageView& );
 
 private:
-  Toolkit::ControlRenderer  mRenderer;
+  Toolkit::Visual  mRenderer;
   ImageDimensions  mImageSize;
   Vector2 mSizeSet;
 

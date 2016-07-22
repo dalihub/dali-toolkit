@@ -10,8 +10,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
-  $(devel_api_src_dir)/controls/renderer-factory/renderer-factory.cpp \
-  $(devel_api_src_dir)/controls/renderer-factory/control-renderer.cpp \
+  $(devel_api_src_dir)/controls/visual-factory/visual-factory.cpp \
+  $(devel_api_src_dir)/controls/visual-factory/visual.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
@@ -51,9 +51,9 @@ devel_api_popup_header_files = \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.h \
   $(devel_api_src_dir)/controls/popup/popup.h
 
-devel_api_renderer_factory_header_files = \
-  $(devel_api_src_dir)/controls/renderer-factory/renderer-factory.h \
-  $(devel_api_src_dir)/controls/renderer-factory/control-renderer.h
+devel_api_visual_factory_header_files = \
+  $(devel_api_src_dir)/controls/visual-factory/visual-factory.h \
+  $(devel_api_src_dir)/controls/visual-factory/visual.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h

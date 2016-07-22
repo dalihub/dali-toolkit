@@ -31,7 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/visual-factory-cache.h>
 
 using namespace Dali;
 
@@ -391,7 +391,7 @@ void PageTurnView::OnInitialize()
   // create the grid geometry for pages
   uint16_t width = static_cast<uint16_t>(mPageSize.width / DEFAULT_GRID_DENSITY + 0.5f);
   uint16_t height = static_cast<uint16_t>(mPageSize.height / DEFAULT_GRID_DENSITY + 0.5f);
-  mGeometry = RendererFactoryCache::CreateGridGeometry( Uint16Pair( width, height ) );
+  mGeometry = VisualFactoryCache::CreateGridGeometry( Uint16Pair( width, height ) );
 
   mPages.reserve( NUMBER_OF_CACHED_PAGES );
   for( int i = 0; i < NUMBER_OF_CACHED_PAGES; i++ )

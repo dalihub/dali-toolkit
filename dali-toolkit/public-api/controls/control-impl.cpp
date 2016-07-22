@@ -36,11 +36,11 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
-#include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
+#include <dali-toolkit/internal/controls/renderers/color/color-visual.h>
+#include <dali-toolkit/internal/controls/renderers/visual-string-constants.h>
 
 namespace Dali
 {
@@ -368,7 +368,7 @@ public:
 
   Control& mControlImpl;
   std::string mStyleName;
-  Toolkit::ControlRenderer mBackgroundRenderer;   ///< The control renderer to render the background
+  Toolkit::Visual mBackgroundRenderer;   ///< The control renderer to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background renderer
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
@@ -447,7 +447,7 @@ void Control::SetBackgroundColor( const Vector4& color )
   Property::Map map;
   map[ RENDERER_TYPE ] = COLOR_RENDERER;
   map[ "mixColor" ] = color;
-  InitializeControlRenderer( self, mImpl->mBackgroundRenderer, map );
+  InitializeVisual( self, mImpl->mBackgroundRenderer, map );
   if( mImpl->mBackgroundRenderer )
   {
     mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -462,7 +462,7 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  InitializeControlRenderer( self, mImpl->mBackgroundRenderer, map );
+  InitializeVisual( self, mImpl->mBackgroundRenderer, map );
   if( mImpl->mBackgroundRenderer )
   {
     mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -472,7 +472,7 @@ void Control::SetBackground( const Property::Map& map )
 void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
-  InitializeControlRenderer( self, mImpl->mBackgroundRenderer, image );
+  InitializeVisual( self, mImpl->mBackgroundRenderer, image );
   if( mImpl->mBackgroundRenderer )
   {
     mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );

@@ -22,11 +22,11 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/controls/renderers/visual-factory-cache.h>
 
 namespace Dali
 {
@@ -248,7 +248,7 @@ void CubeTransitionEffect::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
 
-  Geometry geometry = RendererFactoryCache::CreateQuadGeometry();
+  Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
   TextureSet textureSet = TextureSet::New();

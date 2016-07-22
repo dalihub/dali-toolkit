@@ -29,8 +29,8 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/controls/renderers/visual-string-constants.h>
 
 namespace Dali
 {
@@ -263,13 +263,13 @@ void Magnifier::SetFrameVisibility(bool visible)
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
     mFrame.SetSizeModeFactor( sizeOffset );
 
-    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
+    Toolkit::VisualFactory rendererFactory = Toolkit::VisualFactory::Get();
 
     Property::Map map;
     map[ RENDERER_TYPE ] = BORDER_RENDERER;
     map[ "borderColor"  ] = Color::WHITE;
     map[ "borderSize"   ] = IMAGE_BORDER_INDENT;
-    Toolkit::ControlRenderer borderRenderer = rendererFactory.CreateControlRenderer( map );
+    Toolkit::Visual borderRenderer = rendererFactory.CreateVisual( map );
     borderRenderer.SetOnStage( mFrame );
 
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );

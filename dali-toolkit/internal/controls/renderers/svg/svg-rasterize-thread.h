@@ -41,8 +41,8 @@ namespace Toolkit
 namespace Internal
 {
 
-class SvgRenderer;
-typedef IntrusivePtr< SvgRenderer > SvgRendererPtr;
+class SvgVisual;
+typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
 class RasterizingTask;
 typedef IntrusivePtr< RasterizingTask > RasterizingTaskPtr;
 
@@ -50,7 +50,7 @@ typedef IntrusivePtr< RasterizingTask > RasterizingTaskPtr;
  * The svg rasterizing tasks to be processed in the worker thread.
  *
  * Life cycle of a rasterizing task is as follows:
- * 1. Created by SvgRenderer in the main thread
+ * 1. Created by SvgVisual in the main thread
  * 2. Queued in the worked thread waiting to be processed.
  * 3. If this task gets its turn to do the rasterization, it triggers main thread to apply the rasterized image to material then been deleted in main thread call back
  *    Or if this task is been removed ( new image/size set to the renderer or actor off stage) before its turn to be processed, it then been deleted in the worker thread.
@@ -68,7 +68,7 @@ public:
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
    */
-  RasterizingTask( SvgRenderer* svgRenderer, NSVGimage* parsedSvg, unsigned int width, unsigned int height );
+  RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, unsigned int width, unsigned int height );
 
   /**
    * Do the rasterization with the given rasterizer.
@@ -79,7 +79,7 @@ public:
   /**
    * Get the svg renderer
    */
-  SvgRenderer* GetSvgRenderer() const;
+  SvgVisual* GetSvgVisual() const;
 
   /**
    * Get the rasterization result.
@@ -96,7 +96,7 @@ private:
   RasterizingTask& operator=( const RasterizingTask& task );
 
 private:
-  SvgRendererPtr  mSvgRenderer;
+  SvgVisualPtr  mSvgVisual;
   PixelData       mPixelData;
   NSVGimage*      mParsedSvg;
   unsigned int    mWidth;
@@ -144,7 +144,7 @@ public:
    *
    * @param[in] renderer The renderer pointer.
    */
-  void RemoveTask( SvgRenderer* renderer );
+  void RemoveTask( SvgVisual* renderer );
 
   /**
    * Delete the parsed SVG image, called by main thread.

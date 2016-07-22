@@ -29,7 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
 
 /**
  * Button states and contents
@@ -562,14 +562,14 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
     {
       // If there is no existing content, create a new actor to use for flat color.
       Actor placementActor = Actor::New();
-      Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-      Toolkit::ControlRenderer colorRenderer;
+      Toolkit::VisualFactory rendererFactory = Toolkit::VisualFactory::Get();
+      Toolkit::Visual colorRenderer;
 
       Property::Map map;
       map["rendererType"] = "COLOR";
       map["mixColor"] = color;
 
-      colorRenderer = rendererFactory.CreateControlRenderer( map );
+      colorRenderer = rendererFactory.CreateVisual( map );
       colorRenderer.SetOnStage( placementActor );
 
       SetupContent( *contentActor, placementActor ); //

@@ -43,16 +43,16 @@
  * the image in more detail.
  *
  * <h3 class="pg">Renderers</h3>
- * You can specify a specific renderer instead of using the default Image Renderer, e.g to use the Border Renderer.
+ * You can specify a specific visual instead of using the default Image Visual, e.g to use the Border Visual.
  *
  * @code
- * Property::Map renderer;
- * renderer.Insert("rendererType","BORDER");
- * renderer.Insert("borderColor",COLOR::RED);
- * renderer.Insert("borderSize",20.f);
+ * Property::Map visual;
+ * visual.Insert("rendererType","BORDER");
+ * visual.Insert("borderColor",COLOR::RED);
+ * visual.Insert("borderSize",20.f);
  *
  * Dali::Toolkit::ImageView myImageView = Dali::Toolkit::ImageView::New();
- * myImageView.SetProperty( Control::Property::IMAGE, renderer);
+ * myImageView.SetProperty( Control::Property::IMAGE, visual);
  * @endcode
 
  * <h3 class="pg">Resizing at Load Time</h3>

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/third-party/nanosvg/nanosvgrast.h>
-#include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
+#include <dali-toolkit/internal/controls/renderers/svg/svg-visual.h>
 
 namespace Dali
 {
@@ -31,8 +31,8 @@ namespace Toolkit
 namespace Internal
 {
 
-RasterizingTask::RasterizingTask( SvgRenderer* svgRenderer, NSVGimage* parsedSvg, unsigned int width, unsigned int height )
-: mSvgRenderer( svgRenderer ),
+RasterizingTask::RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, unsigned int width, unsigned int height )
+: mSvgVisual( svgRenderer ),
   mParsedSvg( parsedSvg ),
   mWidth( width ),
   mHeight( height )
@@ -58,9 +58,9 @@ void RasterizingTask::Rasterize( NSVGrasterizer* rasterizer )
   }
 }
 
-SvgRenderer* RasterizingTask::GetSvgRenderer() const
+SvgVisual* RasterizingTask::GetSvgVisual() const
 {
-  return mSvgRenderer.Get();
+  return mSvgVisual.Get();
 }
 
 PixelData RasterizingTask::GetPixelData() const
@@ -110,7 +110,7 @@ void SvgRasterizeThread::AddTask( RasterizingTaskPtr task )
       // Older task which waiting to rasterize and apply the svg to the same renderer is expired.
       for( std::vector< RasterizingTaskPtr >::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it )
       {
-        if( (*it) && (*it)->GetSvgRenderer() == task->GetSvgRenderer() )
+        if( (*it) && (*it)->GetSvgVisual() == task->GetSvgVisual() )
         {
           mRasterizeTasks.erase( it );
           break;
@@ -144,7 +144,7 @@ RasterizingTaskPtr SvgRasterizeThread::NextCompletedTask()
   return nextTask;
 }
 
-void SvgRasterizeThread::RemoveTask( SvgRenderer* renderer )
+void SvgRasterizeThread::RemoveTask( SvgVisual* renderer )
 {
   // Lock while remove task from the queue
   ConditionalWait::ScopedLock lock( mConditionalWait );
@@ -152,7 +152,7 @@ void SvgRasterizeThread::RemoveTask( SvgRenderer* renderer )
   {
     for( std::vector< RasterizingTaskPtr >::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it )
     {
-      if( (*it) &&  (*it)->GetSvgRenderer() == renderer )
+      if( (*it) &&  (*it)->GetSvgVisual() == renderer )
       {
         mRasterizeTasks.erase( it );
         break;
