@@ -123,7 +123,7 @@ void EmbossFilter::Enable()
 
   customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
   rendererMap[ "shader"] = customShader;
-  rendererMap[ "rendererType"] = "image";
+  rendererMap[ "rendererType"] = "IMAGE";
 
   mRootActor.Add( mActorForComposite );
 

@@ -58,6 +58,7 @@ class Gradient;
  *
  * | %Property Name          | Type             |
  * |-------------------------|------------------|
+ * | stopOffset              | ARRAY of FLOAT   |
  * | units                   | STRING           |
  * | spreadMethod            | STRING           |
  *

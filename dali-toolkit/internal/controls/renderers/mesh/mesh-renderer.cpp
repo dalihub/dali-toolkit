@@ -28,8 +28,6 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-impl.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/control-renderer-data-impl.h>
 
 namespace Dali
@@ -83,9 +81,12 @@ enum TextureIndex
   GLOSS_INDEX = 2u
 };
 
-const char * const RENDERER_TYPE_VALUE( "mesh" ); //String label for which type of control renderer this is.
 const char * const LIGHT_POSITION( "uLightPosition" ); //Shader property
 const char * const OBJECT_MATRIX( "uObjectMatrix" ); //Shader property
+
+const char * const SHADER_TYPE_TEXTURELESS( "TEXTURELESS" );
+const char * const SHADER_TYPE_DIFFUSE_TEXTURE( "DIFFUSE_TEXTURE" );
+const char * const SHADER_TYPE_ALL_TEXTURES( "ALL_TEXTURES" );
 
 //Shaders
 //If a shader requires certain textures, they must be listed in order,
@@ -112,8 +113,8 @@ const char* SIMPLE_VERTEX_SHADER = DALI_COMPOSE_SHADER(
     //Illumination in Model-View space - Transform attributes and uniforms\n
     vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
-    vec4 centre = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( centre.x, centre.y, uLightPosition.z, 1.0 );\n
+    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
+    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
     vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
 
     float lightDiffuse = max( dot( vecToLight, normal ), 0.0 );\n
@@ -158,8 +159,8 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
     //Illumination in Model-View space - Transform attributes and uniforms\n
     vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
-    vec4 centre = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( centre.x, centre.y, uLightPosition.z, 1.0 );\n
+    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
+    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
     vec3 normal = normalize( uNormalMatrix * mat3( uObjectMatrix ) * aNormal );\n
 
     vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
@@ -220,8 +221,8 @@ const char* NORMAL_MAP_VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
     vec4 vertPos = uModelView * vec4( aPosition.xyz, 1.0 );\n
-    vec4 centre = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
-    vec4 lightPos = vec4( centre.x, centre.y, uLightPosition.z, 1.0 );\n
+    vec4 center = uModelView * vec4( 0.0, 0.0, 0.0, 1.0 );\n
+    vec4 lightPos = vec4( center.x, center.y, uLightPosition.z, 1.0 );\n
 
     vec3 tangent = normalize( uNormalMatrix * aTangent );
     vec3 binormal = normalize( uNormalMatrix * aBiNormal );
@@ -313,23 +314,27 @@ void MeshRenderer::DoInitialize( Actor& actor, const Property::Map& propertyMap 
   }
 
   Property::Value* shaderType = propertyMap.Find( SHADER_TYPE );
-  if( shaderType && shaderType->Get( mShaderTypeString ) )
+  if( shaderType )
   {
-    if( mShaderTypeString == "textureless" )
+    std::string shaderTypeString;
+    if( shaderType->Get( shaderTypeString ) )
     {
-      mShaderType = TEXTURELESS;
-    }
-    else if( mShaderTypeString == "diffuseTexture" )
-    {
-      mShaderType = DIFFUSE_TEXTURE;
-    }
-    else if( mShaderTypeString == "allTextures" )
-    {
-      mShaderType = ALL_TEXTURES;
-    }
-    else
-    {
-      DALI_LOG_ERROR( "Unknown shader type provided to the MeshRenderer object.\n");
+      if( shaderTypeString == SHADER_TYPE_TEXTURELESS )
+      {
+        mShaderType = TEXTURELESS;
+      }
+      else if( shaderTypeString == SHADER_TYPE_DIFFUSE_TEXTURE )
+      {
+        mShaderType = DIFFUSE_TEXTURE;
+      }
+      else if( shaderTypeString == SHADER_TYPE_ALL_TEXTURES )
+      {
+        mShaderType = ALL_TEXTURES;
+      }
+      else
+      {
+        DALI_LOG_ERROR( "Unknown shader type provided to the MeshRenderer object.\n");
+      }
     }
   }
 }
@@ -361,11 +366,33 @@ void MeshRenderer::DoSetOnStage( Actor& actor )
 void MeshRenderer::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( RENDERER_TYPE, RENDERER_TYPE_VALUE );
+  map.Insert( RENDERER_TYPE, MESH_RENDERER );
   map.Insert( OBJECT_URL, mObjectUrl );
   map.Insert( MATERIAL_URL, mMaterialUrl );
   map.Insert( TEXTURES_PATH, mTexturesPath );
-  map.Insert( SHADER_TYPE, mShaderTypeString );
+
+  std::string shaderTypeString;
+  switch( mShaderType )
+  {
+    case ALL_TEXTURES:
+    {
+      shaderTypeString = SHADER_TYPE_ALL_TEXTURES;
+      break;
+    }
+
+    case DIFFUSE_TEXTURE:
+    {
+      shaderTypeString = SHADER_TYPE_DIFFUSE_TEXTURE;
+      break;
+    }
+
+    case TEXTURELESS:
+    {
+      shaderTypeString = SHADER_TYPE_TEXTURELESS;
+      break;
+    }
+  }
+  map.Insert( SHADER_TYPE, shaderTypeString );
 }
 
 void MeshRenderer::InitializeRenderer()

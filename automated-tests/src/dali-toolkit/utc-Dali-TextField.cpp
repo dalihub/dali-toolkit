@@ -867,8 +867,13 @@ int utcDaliTextFieldEvent02(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( renderer );
+  // The offscreen root actor has a container with all the actors which contain the text renderers.
+  Actor container = offscreenRoot.GetChildAt( 1u );
+  for( unsigned int index = 0; index < container.GetChildCount(); ++index )
+  {
+    Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
+    DALI_TEST_CHECK( renderer );
+  }
 
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentPosition();
@@ -991,8 +996,13 @@ int utcDaliTextFieldEvent03(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( renderer );
+  // The offscreen root actor has a container with all the actors which contain the text renderers.
+  Actor container = offscreenRoot.GetChildAt( 1u );
+  for( unsigned int index = 0; index < container.GetChildCount(); ++index )
+  {
+    Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
+    DALI_TEST_CHECK( renderer );
+  }
 
   Renderer highlight = offscreenRoot.GetChildAt( 2u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );

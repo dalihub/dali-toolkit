@@ -128,8 +128,10 @@ void GetCursorPosition( VisualModelPtr visualModel,
  * @param[in] visualY The touch point 'y' in text's coords.
  * @param[out] startIndex Index to the first character of the selected word.
  * @param[out] endIndex Index to the last character of the selected word.
+ *
+ * @return @e true if the indices are found.
  */
-void FindSelectionIndices( VisualModelPtr visualModel,
+bool FindSelectionIndices( VisualModelPtr visualModel,
                            LogicalModelPtr logicalModel,
                            MetricsPtr metrics,
                            float visualX,

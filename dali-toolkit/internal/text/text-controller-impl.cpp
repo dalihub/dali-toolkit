@@ -1544,13 +1544,6 @@ void Controller::Impl::OnSelectEvent( const Event& event )
     // Calculates the logical position from the x,y coords.
     RepositionSelectionHandles( xPosition,
                                 yPosition );
-
-    mEventData->mUpdateLeftSelectionPosition = true;
-    mEventData->mUpdateRightSelectionPosition = true;
-    mEventData->mUpdateHighlightBox = true;
-    mEventData->mUpdateCursorPosition = false;
-
-    mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
 }
 
@@ -1566,6 +1559,8 @@ void Controller::Impl::OnSelectAllEvent()
 
   if( mEventData->mSelectionEnabled )
   {
+    ChangeState( EventData::SELECTING );
+
     mEventData->mLeftSelectionPosition = 0u;
     mEventData->mRightSelectionPosition = mLogicalModel->mText.Count();
 
@@ -1733,11 +1728,19 @@ void Controller::Impl::RepositionSelectionHandles()
   selectionBoxInfo->minX = MAX_FLOAT;
   selectionBoxInfo->maxX = MIN_FLOAT;
 
+  // Keep the min and max 'x' position to calculate the size and position of the highlighed text.
+  float minHighlightX = std::numeric_limits<float>::max();
+  float maxHighlightX = std::numeric_limits<float>::min();
+  Size highLightSize;
+  Vector2 highLightPosition; // The highlight position in decorator's coords.
+
   // Retrieve the first line and get the line's vertical offset, the line's height and the index to the last glyph.
 
   // The line's vertical offset of all the lines before the line where the first glyph is laid-out.
   selectionBoxInfo->lineOffset = CalculateLineOffset( mVisualModel->mLines,
                                                       firstLineIndex );
+
+  // Transform to decorator's (control) coords.
   selectionBoxInfo->lineOffset += mScrollPosition.y;
 
   lineRun += firstLineIndex;
@@ -1873,6 +1876,21 @@ void Controller::Impl::RepositionSelectionHandles()
     }
   }
 
+  // Traverses all the lines and updates the min and max 'x' positions and the total height.
+  // The final width is calculated after 'boxifying' the selection.
+  for( Vector<SelectionBoxInfo>::ConstIterator it = selectionBoxLinesInfo.Begin(),
+         endIt = selectionBoxLinesInfo.End();
+       it != endIt;
+       ++it )
+  {
+    const SelectionBoxInfo& info = *it;
+
+    // Update the size of the highlighted text.
+    highLightSize.height += selectionBoxInfo->lineHeight;
+    minHighlightX = std::min( minHighlightX, info.minX );
+    maxHighlightX = std::max( maxHighlightX, info.maxX );
+  }
+
   // Add extra geometry to 'boxify' the selection.
 
   if( 1u < numberOfLines )
@@ -1891,6 +1909,9 @@ void Controller::Impl::RepositionSelectionHandles()
                                             firstSelectionBoxLineInfo.lineOffset,
                                             firstSelectionBoxLineInfo.minX,
                                             firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
+
+      // Update the size of the highlighted text.
+      minHighlightX = 0.f;
     }
 
     if( boxifyEnd )
@@ -1900,6 +1921,9 @@ void Controller::Impl::RepositionSelectionHandles()
                                             firstSelectionBoxLineInfo.lineOffset,
                                             mVisualModel->mControlSize.width,
                                             firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
+
+      // Update the size of the highlighted text.
+      maxHighlightX = mVisualModel->mControlSize.width;
     }
 
     // Boxify the central lines.
@@ -1922,6 +1946,10 @@ void Controller::Impl::RepositionSelectionHandles()
                                               mVisualModel->mControlSize.width,
                                               info.lineOffset + info.lineHeight );
       }
+
+      // Update the size of the highlighted text.
+      minHighlightX = 0.f;
+      maxHighlightX = mVisualModel->mControlSize.width;
     }
 
     // Boxify the last line.
@@ -1938,6 +1966,9 @@ void Controller::Impl::RepositionSelectionHandles()
                                             lastSelectionBoxLineInfo.lineOffset,
                                             lastSelectionBoxLineInfo.minX,
                                             lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
+
+      // Update the size of the highlighted text.
+      minHighlightX = 0.f;
     }
 
     if( boxifyEnd )
@@ -1947,8 +1978,21 @@ void Controller::Impl::RepositionSelectionHandles()
                                             lastSelectionBoxLineInfo.lineOffset,
                                             mVisualModel->mControlSize.width,
                                             lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
+
+      // Update the size of the highlighted text.
+      maxHighlightX = mVisualModel->mControlSize.width;
     }
   }
+
+  // Sets the highlight's size and position. In decorator's coords.
+  // The highlight's height has been calculated above (before 'boxifying' the highlight).
+  highLightSize.width = maxHighlightX - minHighlightX;
+
+  highLightPosition.x = minHighlightX;
+  const SelectionBoxInfo& firstSelectionBoxLineInfo = *( selectionBoxLinesInfo.Begin() );
+  highLightPosition.y = firstSelectionBoxLineInfo.lineOffset;
+
+  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize );
 
   if( !mEventData->mDecorator->IsSmoothHandlePanEnabled() )
   {
@@ -2008,24 +2052,40 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
   // Find which word was selected
   CharacterIndex selectionStart( 0 );
   CharacterIndex selectionEnd( 0 );
-  FindSelectionIndices( mVisualModel,
-                        mLogicalModel,
-                        mMetrics,
-                        visualX,
-                        visualY,
-                        selectionStart,
-                        selectionEnd );
+  const bool indicesFound = FindSelectionIndices( mVisualModel,
+                                                  mLogicalModel,
+                                                  mMetrics,
+                                                  visualX,
+                                                  visualY,
+                                                  selectionStart,
+                                                  selectionEnd );
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p selectionStart %d selectionEnd %d\n", this, selectionStart, selectionEnd );
 
-  if( selectionStart == selectionEnd )
+  if( indicesFound )
   {
-    ChangeState( EventData::EDITING );
-    // Nothing to select. i.e. a white space, out of bounds
-    return;
-  }
+    ChangeState( EventData::SELECTING );
 
-  mEventData->mLeftSelectionPosition = selectionStart;
-  mEventData->mRightSelectionPosition = selectionEnd;
+    mEventData->mLeftSelectionPosition = selectionStart;
+    mEventData->mRightSelectionPosition = selectionEnd;
+
+    mEventData->mUpdateLeftSelectionPosition = true;
+    mEventData->mUpdateRightSelectionPosition = true;
+    mEventData->mUpdateHighlightBox = true;
+
+    mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
+  }
+  else
+  {
+    // Nothing to select. i.e. a white space, out of bounds
+    ChangeState( EventData::EDITING );
+
+    mEventData->mPrimaryCursorPosition = selectionEnd;
+
+    mEventData->mUpdateCursorPosition = true;
+    mEventData->mUpdateGrabHandlePosition = true;
+    mEventData->mScrollAfterUpdatePosition = true;
+    mEventData->mUpdateInputStyle = true;
+  }
 }
 
 void Controller::Impl::SetPopupButtons()
@@ -2443,13 +2503,13 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
   mEventData->mAllTextSelected = ( startOfSelection == 0 ) && ( endOfSelection == mLogicalModel->mText.Count() );
 }
 
-void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
+void Controller::Impl::ClampHorizontalScroll( const Vector2& layoutSize )
 {
   // Clamp between -space & 0.
 
-  if( actualSize.width > mVisualModel->mControlSize.width )
+  if( layoutSize.width > mVisualModel->mControlSize.width )
   {
-    const float space = ( actualSize.width - mVisualModel->mControlSize.width );
+    const float space = ( layoutSize.width - mVisualModel->mControlSize.width );
     mScrollPosition.x = ( mScrollPosition.x < -space ) ? -space : mScrollPosition.x;
     mScrollPosition.x = ( mScrollPosition.x > 0.f ) ? 0.f : mScrollPosition.x;
 
@@ -2461,12 +2521,12 @@ void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
   }
 }
 
-void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
+void Controller::Impl::ClampVerticalScroll( const Vector2& layoutSize )
 {
   // Clamp between -space & 0.
-  if( actualSize.height > mVisualModel->mControlSize.height )
+  if( layoutSize.height > mVisualModel->mControlSize.height )
   {
-    const float space = ( actualSize.height - mVisualModel->mControlSize.height );
+    const float space = ( layoutSize.height - mVisualModel->mControlSize.height );
     mScrollPosition.y = ( mScrollPosition.y < -space ) ? -space : mScrollPosition.y;
     mScrollPosition.y = ( mScrollPosition.y > 0.f ) ? 0.f : mScrollPosition.y;
 

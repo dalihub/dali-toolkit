@@ -40,7 +40,7 @@ namespace Internal
  *
  * | %Property Name           | Type             |
  * |--------------------------|------------------|
- * | imageUrl                 | STRING           |
+ * | url                      | STRING           |
  *
  */
 class SvgRenderer: public ControlRenderer

@@ -59,11 +59,11 @@ const char * const UNITS_NAME("units"); // Property::String  "userSpaceOnUse | o
 const char * const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
 
 // string values
-const char * const UNIT_USER_SPACE("userSpace");
-const char * const UNIT_BOUNDING_BOX("objectBoundingBox");
-const char * const SPREAD_PAD("pad");
-const char * const SPREAD_REFLECT("reflect");
-const char * const SPREAD_REPEAT("repeat");
+const char * const UNIT_USER_SPACE("USER_SPACE");
+const char * const UNIT_BOUNDING_BOX("OBJECT_BOUNDING_BOX");
+const char * const SPREAD_PAD("PAD");
+const char * const SPREAD_REFLECT("REFLECT");
+const char * const SPREAD_REPEAT("REPEAT");
 
 // uniform names
 const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
@@ -196,7 +196,7 @@ void GradientRenderer::DoInitialize( Actor& actor, const Property::Map& property
   Property::Value* unitsValue = propertyMap.Find( UNITS_NAME );
   std::string units;
   // The default unit is OBJECT_BOUNDING_BOX.
-  // Only need to set new units if 'user-space'
+  // Only need to set new units if 'USER_SPACE'
   if( unitsValue && unitsValue->Get( units ) && units == UNIT_USER_SPACE )
   {
     gradientUnits = Gradient::USER_SPACE_ON_USE;

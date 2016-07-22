@@ -33,10 +33,12 @@ extern const char * const BORDER_RENDERER;
 extern const char * const GRADIENT_RENDERER;
 extern const char * const IMAGE_RENDERER;
 extern const char * const MESH_RENDERER;
+extern const char * const PRIMITIVE_RENDERER;
+extern const char * const DEBUG_RENDERER;
 
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;
-extern const char * const COLOR;
+extern const char * const LIGHT_POSITION_UNIFORM_NAME;
 
 //Mesh properties
 extern const char * const OBJECT_URL;
@@ -44,6 +46,19 @@ extern const char * const MATERIAL_URL;
 extern const char * const TEXTURES_PATH;
 extern const char * const SHADER_TYPE;
 extern const char * const USE_MIPMAPPING;
+
+//Primitive shape properties
+extern const char * const PRIMITIVE_SHAPE;
+extern const char * const SHAPE_COLOR;
+extern const char * const SLICES;
+extern const char * const STACKS;
+extern const char * const SCALE_TOP_RADIUS;
+extern const char * const SCALE_BOTTOM_RADIUS;
+extern const char * const SCALE_HEIGHT;
+extern const char * const SCALE_RADIUS;
+extern const char * const SCALE_DIMENSIONS;
+extern const char * const BEVEL_PERCENTAGE;
+extern const char * const BEVEL_SMOOTHNESS;
 
 } // namespace Internal
 

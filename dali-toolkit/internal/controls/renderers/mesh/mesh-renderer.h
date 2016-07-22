@@ -184,8 +184,6 @@ private:
   std::string mGlossTextureUrl;
   std::string mTexturesPath;
 
-  std::string mShaderTypeString;
-
   Shader mShader;
   Geometry mGeometry;
   TextureSet mTextureSet;
