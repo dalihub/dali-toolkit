@@ -38,7 +38,7 @@ const char * const DEBUG_RENDERER("DEBUG");
 
 const char * const IMAGE_URL_NAME("url");
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
-const char * const LIGHT_POSITION_UNIFORM_NAME( "uLightPosition" );
+const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
 
 //Mesh properties
 const char * const OBJECT_URL( "objectUrl" );

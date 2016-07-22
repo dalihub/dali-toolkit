@@ -950,33 +950,30 @@ int UtcDaliRendererFactoryGetSvgRenderer(void)
   END_TEST;
 }
 
-//Test if mesh loads correctly when supplied with only the bare minimum requirements, an object file.
-int UtcDaliRendererFactoryGetMeshRenderer1(void)
+//Creates a mesh renderer from the given propertyMap and tries to load it on stage in the given application.
+//This is expected to succeed, which will then pass the test.
+void MeshRendererLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplication& application )
 {
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer1:  Request mesh renderer with a valid object file only" );
-
   RendererFactory factory = RendererFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  //Set up renderer properties.
-  Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
-  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
-
+  //Create a mesh renderer.
   ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
   DALI_TEST_CHECK( controlRenderer );
 
+  //Create an actor on stage to house the renderer.
   Actor actor = Actor::New();
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
   controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
   controlRenderer.SetOnStage( actor );
 
+  //Ensure set on stage.
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+
+  //Attempt to render to queue resource load requests.
   application.SendNotification();
   application.Render( 0 );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
   //Tell the platform abstraction that the required resources have been loaded.
   TestPlatformAbstraction& platform = application.GetPlatform();
@@ -986,18 +983,76 @@ int UtcDaliRendererFactoryGetMeshRenderer1(void)
   application.SendNotification();
   application.Render( 0 );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
   Matrix testScaleMatrix;
   testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
   Matrix actualScaleMatrix;
 
   //Test to see if the object has been successfully loaded.
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
+  DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
   DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
+  //Finish by setting off stage, and ensuring this was successful.
   controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+}
+
+//Creates a mesh renderer from the given propertyMap and tries to load it on stage in the given application.
+//This is expected to fail, which will then pass the test.
+void MeshRendererDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplication& application )
+{
+  RendererFactory factory = RendererFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  //Create a mesh renderer.
+  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
+  DALI_TEST_CHECK( controlRenderer );
+
+  //Create an actor on stage to house the renderer.
+  Actor actor = Actor::New();
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
+  controlRenderer.SetOnStage( actor );
+
+  //Ensure set on stage.
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+
+  //Attempt to render to queue resource load requests.
+  application.SendNotification();
+  application.Render( 0 );
+
+  //Tell the platform abstraction that the required resources have been loaded.
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  platform.SetAllResourceRequestsAsLoaded();
+
+  //Render again to upload the now-loaded textures.
+  application.SendNotification();
+  application.Render( 0 );
+
+  //Test to see if the object has not been loaded, as expected.
+  Matrix scaleMatrix;
+  DALI_TEST_CHECK( !application.GetGlAbstraction().GetUniformValue<Matrix>( "uObjectMatrix", scaleMatrix ) );
+
+  //Finish by setting off stage, and ensuring this was successful.
+  controlRenderer.SetOffStage( actor );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+}
+
+//Test if mesh loads correctly when supplied with only the bare minimum requirements, an object file.
+int UtcDaliRendererFactoryGetMeshRenderer1(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer1:  Request mesh renderer with a valid object file only" );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
@@ -1005,111 +1060,41 @@ int UtcDaliRendererFactoryGetMeshRenderer1(void)
 //Test if mesh loads correctly when supplied with an object file as well as a blank material file and images directory.
 int UtcDaliRendererFactoryGetMeshRenderer2(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer2:  Request mesh renderer with blank material file and images directory" );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer2:  Request mesh renderer with blank material file and images directory" );
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "rendererType", "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", "" );
   propertyMap.Insert( "texturesPath", "" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  Matrix testScaleMatrix;
-  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
-  Matrix actualScaleMatrix;
-
-  //Test to see if the object has been successfully loaded.
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
-  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
 
-//Test if mesh loads correctly when supplied with all parameters, an object file, a material file and a directory location.
+//Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location.
 int UtcDaliRendererFactoryGetMeshRenderer3(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer3:  Request mesh renderer with all parameters correct" );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer3:  Request mesh renderer with all parameters correct" );
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "rendererType", "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  Matrix testScaleMatrix;
-  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
-  Matrix actualScaleMatrix;
-
-  //Test to see if the object has been successfully loaded.
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
-  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
@@ -1117,68 +1102,97 @@ int UtcDaliRendererFactoryGetMeshRenderer3(void)
 //Test if mesh renderer can load a correctly supplied mesh without a normal map or gloss map in the material file.
 int UtcDaliRendererFactoryGetMeshRenderer4(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer4:  Request mesh renderer with diffuse texture but not normal or gloss." );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer4:  Request mesh renderer with diffuse texture but not normal or gloss." );
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "rendererType", "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", TEST_SIMPLE_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
+  END_TEST;
+}
 
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+//Test if mesh renderer can load when made to use diffuse textures only.
+int UtcDaliRendererFactoryGetMeshRenderer5(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
 
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer5:  Request mesh renderer and make it only use diffuse textures." );
 
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "MESH" );
+  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
+  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( "shaderType", "DIFFUSE_TEXTURE" );
 
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
+  END_TEST;
+}
 
-  Matrix testScaleMatrix;
-  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
-  Matrix actualScaleMatrix;
+//Test if mesh renderer can load when made to not use the supplied textures.
+int UtcDaliRendererFactoryGetMeshRenderer6(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
 
-  //Test to see if the object has been successfully loaded.
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
-  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer6:  Request mesh renderer and make it not use any textures." );
 
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "MESH" );
+  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
+  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( "shaderType", "TEXTURELESS" );
+
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
+
+  END_TEST;
+}
+//Test if mesh renderer loads correctly when light position is manually set.
+int UtcDaliRendererFactoryGetMeshRenderer7(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer7:  Request mesh renderer with custom light position." );
+
+  //Set up renderer properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( "rendererType", "MESH" );
+  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
+  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( "lightPosition", Vector3( 0.0, 1.0, 2.0 ) );
+
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
 
 //Test if mesh renderer loads correctly when supplied an object file without face normals or texture points.
 //Note that this notably tests object loader functionality.
-int UtcDaliRendererFactoryGetMeshRenderer5(void)
+int UtcDaliRendererFactoryGetMeshRenderer8(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer5:  Request mesh renderer with normal-less object file." );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRenderer5:  Request mesh renderer with normal-less object file." );
 
   //Set up renderer properties.
   Property::Map propertyMap;
@@ -1187,42 +1201,8 @@ int UtcDaliRendererFactoryGetMeshRenderer5(void)
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  Matrix testScaleMatrix;
-  testScaleMatrix.SetIdentityAndScale( Vector3( 1.0, -1.0, 1.0 ) );
-  Matrix actualScaleMatrix;
-
-  //Test to see if the object has been successfully loaded.
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uObjectMatrix", actualScaleMatrix ) );
-  DALI_TEST_EQUALS( actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Test to see if mesh loads correctly.
+  MeshRendererLoadsCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
@@ -1230,50 +1210,19 @@ int UtcDaliRendererFactoryGetMeshRenderer5(void)
 //Test if mesh renderer handles the case of lacking an object file.
 int UtcDaliRendererFactoryGetMeshRendererN1(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRendererN1:  Request mesh renderer without object file" );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRendererN1:  Request mesh renderer without object file" );
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "rendererType", "MESH" );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  //Test to see if the object has not been loaded, as expected.
-  Matrix scaleMatrix;
-  DALI_TEST_CHECK( ! gl.GetUniformValue<Matrix>( "uObjectMatrix", scaleMatrix ) );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Test to see if mesh doesn't load with these properties, as expected.
+  MeshRendererDoesNotLoadCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
@@ -1281,51 +1230,20 @@ int UtcDaliRendererFactoryGetMeshRendererN1(void)
 //Test if mesh renderer handles the case of being passed invalid material and images urls.
 int UtcDaliRendererFactoryGetMeshRendererN2(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRendererN2:  Request mesh renderer with invalid material and images urls" );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRendererN2:  Request mesh renderer with invalid material and images urls" );
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "rendererType", "MESH" );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", "invalid" );
   propertyMap.Insert( "texturesPath", "also invalid" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  //Test to see if the object has not been loaded, as expected.
-  Matrix scaleMatrix;
-  DALI_TEST_CHECK( ! gl.GetUniformValue<Matrix>( "uObjectMatrix", scaleMatrix ) );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Test to see if mesh doesn't load with these properties, as expected.
+  MeshRendererDoesNotLoadCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
@@ -1333,51 +1251,20 @@ int UtcDaliRendererFactoryGetMeshRendererN2(void)
 //Test if mesh renderer handles the case of being passed an invalid object url
 int UtcDaliRendererFactoryGetMeshRendererN3(void)
 {
+  //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliRendererFactoryGetMeshRendererN3:  Request mesh renderer with invalid object url" );
 
-  RendererFactory factory = RendererFactory::Get();
-  DALI_TEST_CHECK( factory );
+  tet_infoline( "UtcDaliRendererFactoryGetMeshRendererN3:  Request mesh renderer with invalid object url" );
 
   //Set up renderer properties.
   Property::Map propertyMap;
-  propertyMap.Insert( "rendererType",  "MESH" );
+  propertyMap.Insert( "rendererType", "MESH" );
   propertyMap.Insert( "objectUrl", "invalid" );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
 
-  ControlRenderer controlRenderer = factory.CreateControlRenderer( propertyMap );
-  DALI_TEST_CHECK( controlRenderer );
-
-  //Add renderer to an actor on stage.
-  Actor actor = Actor::New();
-  actor.SetSize( 200.f, 200.f );
-  Stage::GetCurrent().Add( actor );
-  controlRenderer.SetSize( Vector2( 200.f, 200.f ) );
-  controlRenderer.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  //Attempt to render to queue resource load requests.
-  application.SendNotification();
-  application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
-  //Render again to upload the now-loaded textures.
-  application.SendNotification();
-  application.Render( 0 );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  //Test to see if the object has not been loaded, as expected.
-  Matrix scaleMatrix;
-  DALI_TEST_CHECK( ! gl.GetUniformValue<Matrix>( "uObjectMatrix", scaleMatrix ) );
-
-  controlRenderer.SetOffStage( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  //Test to see if mesh doesn't load with these properties, as expected.
+  MeshRendererDoesNotLoadCorrectlyTest( propertyMap, application );
 
   END_TEST;
 }
@@ -1458,6 +1345,8 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer2(void)
   propertyMap.Insert( "scaleHeight", 50.0f );
   propertyMap.Insert( "scaleRadius", 60.0f );
   propertyMap.Insert( "bevelPercentage", 0.7f );
+  propertyMap.Insert( "bevelSmoothness", 0.8f );
+  propertyMap.Insert( "lightPosition", Vector3( 0.9, 1.0, 1.1 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveRendererWithProperties( propertyMap, application );
@@ -1588,7 +1477,7 @@ int UtcDaliRendererFactoryGetPrimitiveRenderer8(void)
   propertyMap.Insert( "rendererType", "PRIMITIVE" );
   propertyMap.Insert( "shape", "SPHERE" );
   propertyMap.Insert( "shapeColor", Vector4( 0.5, 0.5, 0.5, 1.0 ) );
-  propertyMap.Insert( "uLightPosition", Vector3( 0.0, 1.0, 2.0 ) );
+  propertyMap.Insert( "lightPosition", Vector3( 0.0, 1.0, 2.0 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveRendererWithProperties( propertyMap, application );
