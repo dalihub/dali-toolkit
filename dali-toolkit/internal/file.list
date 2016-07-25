@@ -10,25 +10,25 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/json-parser-impl.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
-   $(toolkit_src_dir)/controls/renderers/visual-impl.cpp \
-   $(toolkit_src_dir)/controls/renderers/visual-data-impl.cpp \
-   $(toolkit_src_dir)/controls/renderers/image-atlas-manager.cpp \
-   $(toolkit_src_dir)/controls/renderers/visual-factory-cache.cpp \
-   $(toolkit_src_dir)/controls/renderers/visual-factory-impl.cpp \
-   $(toolkit_src_dir)/controls/renderers/visual-string-constants.cpp \
-   $(toolkit_src_dir)/controls/renderers/border/border-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/color/color-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/debug/debug-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/image/image-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/npatch/npatch-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/gradient/gradient.cpp \
-   $(toolkit_src_dir)/controls/renderers/gradient/linear-gradient.cpp \
-   $(toolkit_src_dir)/controls/renderers/gradient/radial-gradient.cpp \
-   $(toolkit_src_dir)/controls/renderers/gradient/gradient-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/svg/svg-rasterize-thread.cpp \
-   $(toolkit_src_dir)/controls/renderers/svg/svg-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/mesh/mesh-visual.cpp \
-   $(toolkit_src_dir)/controls/renderers/primitive/primitive-visual.cpp \
+   $(toolkit_src_dir)/visuals/visual-impl.cpp \
+   $(toolkit_src_dir)/visuals/visual-data-impl.cpp \
+   $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
+   $(toolkit_src_dir)/visuals/visual-factory-cache.cpp \
+   $(toolkit_src_dir)/visuals/visual-factory-impl.cpp \
+   $(toolkit_src_dir)/visuals/visual-string-constants.cpp \
+   $(toolkit_src_dir)/visuals/border/border-visual.cpp \
+   $(toolkit_src_dir)/visuals/color/color-visual.cpp \
+   $(toolkit_src_dir)/visuals/debug/debug-visual.cpp \
+   $(toolkit_src_dir)/visuals/image/image-visual.cpp \
+   $(toolkit_src_dir)/visuals/npatch/npatch-visual.cpp \
+   $(toolkit_src_dir)/visuals/gradient/gradient.cpp \
+   $(toolkit_src_dir)/visuals/gradient/linear-gradient.cpp \
+   $(toolkit_src_dir)/visuals/gradient/radial-gradient.cpp \
+   $(toolkit_src_dir)/visuals/gradient/gradient-visual.cpp \
+   $(toolkit_src_dir)/visuals/svg/svg-rasterize-thread.cpp \
+   $(toolkit_src_dir)/visuals/svg/svg-visual.cpp \
+   $(toolkit_src_dir)/visuals/mesh/mesh-visual.cpp \
+   $(toolkit_src_dir)/visuals/primitive/primitive-visual.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \

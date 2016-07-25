@@ -30,7 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL_INCLUDES
-#include <dali-toolkit/internal/controls/renderers/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-impl.h>
 
 namespace //Unnamed namespace
 {

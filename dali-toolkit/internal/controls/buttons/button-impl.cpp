@@ -29,7 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 /**
  * Button states and contents

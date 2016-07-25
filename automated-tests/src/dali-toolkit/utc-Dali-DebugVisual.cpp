@@ -16,7 +16,7 @@
  */
 
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/geometry.h>
 

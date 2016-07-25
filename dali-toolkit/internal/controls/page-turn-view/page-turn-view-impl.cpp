@@ -31,7 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
-#include <dali-toolkit/internal/controls/renderers/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 using namespace Dali;
 

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/visual-factory/visual.h>
+#include <dali-toolkit/devel-api/visual-factory/visual.h>
 #include "image-filter.h"
 
 namespace Dali

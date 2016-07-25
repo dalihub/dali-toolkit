@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H__
-#define __DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H__
+#ifndef DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H
+#define DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -24,7 +24,7 @@
 #include <dali/devel-api/adaptor-framework/video-player.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/renderers/image/image-visual.h>
+#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
@@ -179,7 +179,7 @@ public:
   /**
    * @brief Set the depth index of this image renderer
    *
-   * Renderer with higher depth indices are rendered in front of other renderers with smaller values
+   * Renderer with higher depth indices are rendered in front of other visuals with smaller values
    * @SINCE_1_1.38
    * @param[in] depthIndex The depth index of this renderer
    */
@@ -271,4 +271,4 @@ inline const Toolkit::Internal::VideoView& GetImpl( const Toolkit::VideoView& ha
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_VIDEO_VIEW_H__
+#endif // DALI_TOOLKIT_VIDEO_VIEW_H

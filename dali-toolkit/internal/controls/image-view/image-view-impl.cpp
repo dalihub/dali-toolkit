@@ -11,9 +11,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/controls/renderers/visual-string-constants.h>
-#include <dali-toolkit/internal/controls/renderers/visual-impl.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/visuals/visual-impl.h>
 
 namespace Dali
 {

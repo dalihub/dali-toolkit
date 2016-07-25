@@ -1328,7 +1328,7 @@ void TextEditor::OnStageConnection( int depth )
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
-  // Sets the depth to the renderers inside the text's decorator.
+  // Sets the depth to the visuals inside the text's decorator.
   mDecorator->SetTextDepth( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().

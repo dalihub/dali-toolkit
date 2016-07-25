@@ -21,7 +21,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
-#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 using namespace Dali;
 using namespace Toolkit;

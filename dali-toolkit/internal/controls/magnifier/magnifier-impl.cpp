@@ -29,8 +29,8 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/controls/renderers/visual-string-constants.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {

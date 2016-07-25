@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/renderers/image/image-visual.h>
+#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -114,7 +114,7 @@ public:
   /**
    * @brief Set the depth index of this image renderer
    *
-   * Renderer with higher depth indices are rendered in front of other renderers with smaller values
+   * Renderer with higher depth indices are rendered in front of other visuals with smaller values
    *
    * @param[in] depthIndex The depth index of this renderer
    */
