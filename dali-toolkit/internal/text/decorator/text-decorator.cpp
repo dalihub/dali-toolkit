@@ -104,36 +104,7 @@ const float CURSOR_WIDTH = 1.f; ///< The cursor's width in pixels.
 
 const float POPUP_PADDING = 2.f; ///< Padding space between the highlight box and the text's popup.
 
-/**
- * structure to hold coordinates of each quad, which will make up the mesh.
- */
-struct QuadCoordinates
-{
-  /**
-   * Default constructor
-   */
-  QuadCoordinates()
-  {
-  }
-
-  /**
-   * Constructor
-   * @param[in] x1 left co-ordinate
-   * @param[in] y1 top co-ordinate
-   * @param[in] x2 right co-ordinate
-   * @param[in] y2 bottom co-ordinate
-   */
-  QuadCoordinates(float x1, float y1, float x2, float y2)
-  : min(x1, y1),
-    max(x2, y2)
-  {
-  }
-
-  Dali::Vector2 min;                          ///< top-left (minimum) position of quad
-  Dali::Vector2 max;                          ///< bottom-right (maximum) position of quad
-};
-
-typedef std::vector<QuadCoordinates> QuadContainer;
+typedef Dali::Vector<Dali::Vector4> QuadContainer;
 
 /**
  * @brief Takes a bounding rectangle in the local coordinates of an actor and returns the world coordinates Bounding Box.
@@ -1193,7 +1164,7 @@ struct Decorator::Impl : public ConnectionTracker
       mHighlightActor.SetPosition( mHighlightPosition.x,
                                    mHighlightPosition.y );
 
-      const unsigned int numberOfQuads = mHighlightQuadList.size();
+      const unsigned int numberOfQuads = mHighlightQuadList.Count();
       if( 0u != numberOfQuads )
       {
         // Set the size of the highlighted text to the actor.
@@ -1213,33 +1184,33 @@ struct Decorator::Impl : public ConnectionTracker
         unsigned int v = 0u;
 
         // Traverse all quads.
-        for( std::vector<QuadCoordinates>::iterator it = mHighlightQuadList.begin(),
-               endIt = mHighlightQuadList.end();
+        for( Vector<Vector4>::ConstIterator it = mHighlightQuadList.Begin(),
+               endIt = mHighlightQuadList.End();
              it != endIt;
              ++it, v += 4u )
         {
-          QuadCoordinates& quad = *it;
+          const Vector4& quad = *it;
 
           Vector2 vertex;
 
           // top-left (v+0)
-          vertex.x = quad.min.x - offsetX;
-          vertex.y = quad.min.y - offsetY;
+          vertex.x = quad.x - offsetX;
+          vertex.y = quad.y - offsetY;
           vertices.PushBack( vertex );
 
           // top-right (v+1)
-          vertex.x = quad.max.x - offsetX;
-          vertex.y = quad.min.y - offsetY;
+          vertex.x = quad.z - offsetX;
+          vertex.y = quad.y - offsetY;
           vertices.PushBack( vertex );
 
           // bottom-left (v+2)
-          vertex.x = quad.min.x - offsetX;
-          vertex.y = quad.max.y - offsetY;
+          vertex.x = quad.x - offsetX;
+          vertex.y = quad.w - offsetY;
           vertices.PushBack( vertex );
 
           // bottom-right (v+3)
-          vertex.x = quad.max.x - offsetX;
-          vertex.y = quad.max.y - offsetY;
+          vertex.x = quad.z - offsetX;
+          vertex.y = quad.w - offsetY;
           vertices.PushBack( vertex );
 
           // triangle A (3, 1, 0)
@@ -1274,7 +1245,7 @@ struct Decorator::Impl : public ConnectionTracker
         }
       }
 
-      mHighlightQuadList.clear();
+      mHighlightQuadList.Clear();
 
       if( mHighlightRenderer )
       {
@@ -1932,7 +1903,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   PropertyBuffer      mQuadVertices;
   Geometry            mQuadGeometry;
-  QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
+  QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight.
 
   Vector4             mBoundingBox;               ///< The bounding box in world coords.
   Vector4             mHighlightColor;            ///< Color of the highlight
@@ -2209,9 +2180,9 @@ void Decorator::SetSelectionHandleFlipState( bool indicesSwapped, bool left, boo
   mImpl->mFlipRightSelectionHandleDirection = right;
 }
 
-void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )
+void Decorator::AddHighlight( unsigned int index, const Vector4& quad )
 {
-  mImpl->mHighlightQuadList.push_back( QuadCoordinates(x1, y1, x2, y2) );
+  *( mImpl->mHighlightQuadList.Begin() + index ) = quad;
 }
 
 void Decorator::SetHighLightBox( const Vector2& position, const Size& size )
@@ -2222,8 +2193,13 @@ void Decorator::SetHighLightBox( const Vector2& position, const Size& size )
 
 void Decorator::ClearHighlights()
 {
-  mImpl->mHighlightQuadList.clear();
+  mImpl->mHighlightQuadList.Clear();
   mImpl->mHighlightPosition = Vector2::ZERO;
+}
+
+void Decorator::ResizeHighlightQuads( unsigned int numberOfQuads )
+{
+  mImpl->mHighlightQuadList.Resize( numberOfQuads );
 }
 
 void Decorator::SetHighlightColor( const Vector4& color )
