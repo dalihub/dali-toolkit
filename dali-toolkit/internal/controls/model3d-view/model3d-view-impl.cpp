@@ -328,6 +328,7 @@ void Model3dView::SetProperty( BaseObject* object, Property::Index index, const 
         {
           impl.LoadMaterial();
           impl.CreateMaterial();
+          impl.LoadTextures();
         }
         break;
       }
