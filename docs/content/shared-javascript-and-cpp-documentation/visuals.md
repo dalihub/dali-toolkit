@@ -3,13 +3,13 @@
 
 # Visuals {#visuals}
 
-Visuals provide reusable renderering logic which can be used by all controls.
-This means that custom controls do not have to create actors, they can just reuse the existing renderers which increases performance as well.
+Visuals provide reusable rendering logic which can be used by all controls.
+This means that custom controls do not have to create actors, they can just reuse the existing visuals which increases performance.
  
-Visuals reuse geometry, shader etc. across controls and manages the renderer and material to exist only when the control is on-stage.
+Visuals reuse geometry, shaders etc. across controls and manages the renderer and material to exist only when the control is on-stage.
 Additionaly, they respond to actor size and color change, while also providing clipping at the renderer level.
  
-DALi provides the following renderers:
+DALi provides the following visuals:
  + [Color](@ref color-visual)
  + [Gradient](@ref gradient-visual)
  + [Image](@ref image-visuals)
@@ -18,17 +18,17 @@ DALi provides the following renderers:
  + [Primitive](@ref primitive-visual)
  
 Controls can provide properties that allow users to specify the visual type ( rendererType ).
-Setting renderer properties are done via a property map.
-The **rendererType** field in the property map specifies the renderer to use/create.
-This is required to avoid ambiguity as multiple renderers may be capable of rendering the same contents.
+Setting visual properties are done via a property map.
+The **rendererType** field in the property map specifies the visual to use/create.
+This is required to avoid ambiguity as multiple visuals may be capable of rendering the same contents.
 ___________________________________________________________________________________________________
 
 ## Color Visual {#color-visual}
 
 Renders a solid color to the control's quad.
  
-![ ](../assets/img/renderers/color-visual.png)
-![ ](renderers/color-visual.png)
+![ ](../assets/img/visuals/color-visual.png)
+![ ](visuals/color-visual.png)
 
 ### Properties Supported
 
@@ -71,7 +71,7 @@ Both Linear and Radial gradients are supported.
 
 | Linear | Radial |
 |--------|--------|
-| ![ ](../assets/img/renderers/linear-gradient-visual.png) ![ ](renderers/linear-gradient-visual.png) | ![ ](../assets/img/renderers/radial-gradient-visual.png) ![ ](renderers/radial-gradient-visual.png) |
+| ![ ](../assets/img/visuals/linear-gradient-visual.png) ![ ](visuals/linear-gradient-visual.png) | ![ ](../assets/img/visuals/radial-gradient-visual.png) ![ ](visuals/radial-gradient-visual.png) |
 
 ### Properties Supported
 
@@ -216,7 +216,7 @@ ________________________________________________________________________________
 
 Renders an image into the control's quad.
  
-Depending on the extension of the image, different renderer is provided to render the image onto the screen.
+Depending on the extension of the image, a different visual is provided to render the image onto the screen.
  
  + [Normal](@ref image-visual)
  + [N-Patch](@ref n-patch-visual)
@@ -228,8 +228,8 @@ ___________________________
  
 Renders a raster image ( jpg, png etc.) into the control's quad.
  
-![ ](../assets/img/renderers/image-visual.png)
-![ ](renderers/image-visual.png)
+![ ](../assets/img/visuals/image-visual.png)
+![ ](visuals/image-visual.png)
 
 #### Properties Supported
 
@@ -272,8 +272,8 @@ ________________________________________________________________________________
 
 Renders an n-patch or a 9-patch image into the control's quad.
  
-![ ](../assets/img/renderers/n-patch-renderer.png)
-![ ](renderers/n-patch-renderer.png)
+![ ](../assets/img/visuals/n-patch-visual.png)
+![ ](visuals/n-patch-visual.png)
 
 #### Properties Supported
 
@@ -335,13 +335,13 @@ Renders a svg image into the control's quad.
 
 <div style="width:300px">
  
-![ ](../assets/img/renderers/svg-visual.svg)
+![ ](../assets/img/visuals/svg-visual.svg)
  
 </div>
  
 <div style="width:300px">
  
-![ ](renderers/svg-visual.svg)
+![ ](visuals/svg-visual.svg)
  
 </div>
 
@@ -385,8 +385,8 @@ ________________________________________________________________________________
 
 Renders a solid color as an internal border to the control's quad.
  
-![ ](../assets/img/renderers/border-visual.png)
-![ ](renderers/border-visual.png)
+![ ](../assets/img/visuals/border-visual.png)
+![ ](visuals/border-visual.png)
 
 ### Properties Supported
 
@@ -431,8 +431,8 @@ ________________________________________________________________________________
 
 Renders a mesh using a .obj file, optionally with textures provided by a mtl file. Scaled to fit the control.
 
-![ ](../assets/img/renderers/mesh-visual.png)
-![ ](renderers/mesh-visual.png)
+![ ](../assets/img/visuals/mesh-visual.png)
+![ ](visuals/mesh-visual.png)
 
 ### Properties Supported
 
@@ -446,7 +446,7 @@ Renders a mesh using a .obj file, optionally with textures provided by a mtl fil
 | [shaderType](@ref mesh-visual-shader-type) | STRING  | No                 | Sets the type of shader to be used with the mesh.                                          |
 | useMipmapping                                | BOOLEAN | No                 | Flag for whether to use mipmaps for textures or not. Default true.                         |
 | useSoftNormals                               | BOOLEAN | No                 | Flag for whether to average normals at each point to smooth textures or not. Default true. |
-| lightPosition                                | VECTOR3 | No                 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the upper left corner. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. |
+| lightPosition                                | VECTOR3 | No                 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the top left. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. |
 
 
 ### Shader Type {#mesh-visual-shader-type}
@@ -484,8 +484,8 @@ ________________________________________________________________________________
 
 Renders a simple 3D shape, such as a cube or sphere. Scaled to fit the control.
 
-![ ](../assets/img/renderers/cube.png)
-![ ](renderers/cube.png)
+![ ](../assets/img/visuals/cube.png)
+![ ](visuals/cube.png)
 
 ### Properties Supported
 
@@ -504,7 +504,7 @@ Renders a simple 3D shape, such as a cube or sphere. Scaled to fit the control.
 | scaleDimensions                       | VECTOR3 | The dimensions of a cuboid. Scales in the same fashion as a 9-patch image.      | (1.0, 1.0, 1.0)      | > 0.0 for each                 |
 | [bevelPercentage](@ref bevel-details) | FLOAT   | Determines how bevelled the cuboid should be, based off the smallest dimension. | 0.0 (no bevel)       | 0.0 - 1.0                      |
 | bevelSmoothness                       | FLOAT   | Defines how smooth the bevelled edges should be.                                | 0.0 (sharp edges)    | 0.0 - 1.0                      |
-| lightPosition                        | VECTOR3 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the upper left back corner. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. | (Offset outwards from the center of the screen.) | Unlimited |
+| lightPosition                        | VECTOR3 | The position, in stage space, of the point light that applies lighting to the model. This is based off the stage's dimensions, so using the width and height of the stage halved will correspond to the center, and using all zeroes will place the light at the top left. Note that this corresponds to a shader property, so it can be registered and set in the actor as well. | (Offset outwards from the center of the screen.) | Unlimited |
 
 ### Shapes {#shape-details}
 
@@ -524,14 +524,14 @@ Examples below:
 
 **sphere:**
 
-![ ](../assets/img/renderers/sphere.png)
-![ ](renderers/sphere.png)
+![ ](../assets/img/visuals/sphere.png)
+![ ](visuals/sphere.png)
 
 **conics:**
 
 | Frustrum | Cone | Cylinder |
 |----------|------|----------|
-| ![ ](../assets/img/renderers/conical-frustrum.png) ![ ](renderers/conical-frustrum.png) | ![ ](../assets/img/renderers/cone.png) ![ ](renderers/cone.png) | ![ ](../assets/img/renderers/cylinder.png) ![ ](renderers/cylinder.png) |
+| ![ ](../assets/img/visuals/conical-frustrum.png) ![ ](visuals/conical-frustrum.png) | ![ ](../assets/img/visuals/cone.png) ![ ](visuals/cone.png) | ![ ](../assets/img/visuals/cylinder.png) ![ ](visuals/cylinder.png) |
 
 ### Bevel {#bevel-details}
 
@@ -539,21 +539,21 @@ Bevel percentage ranges from 0.0 to 1.0. It affects the ratio of the outer face 
 
 | 0.0 ( cube) | 0.3 | 0.7 | 1.0 (octahedron) |
 |-------------|-----|-----|------------------|
-| ![ ](../assets/img/renderers/cube.png) ![ ](renderers/cube.png) | ![ ](../assets/img/renderers/bevelled-cube-low.png) ![ ](renderers/bevelled-cube-low.png) | ![ ](../assets/img/renderers/bevelled-cube-high.png) ![ ](renderers/bevelled-cube-high.png) | ![ ](../assets/img/renderers/octahedron.png) ![ ](renderers/octahedron.png) |
+| ![ ](../assets/img/visuals/cube.png) ![ ](visuals/cube.png) | ![ ](../assets/img/visuals/bevelled-cube-low.png) ![ ](visuals/bevelled-cube-low.png) | ![ ](../assets/img/visuals/bevelled-cube-high.png) ![ ](visuals/bevelled-cube-high.png) | ![ ](../assets/img/visuals/octahedron.png) ![ ](visuals/octahedron.png) |
 
 ### Slices {#slices-details}
 
 For spheres and conical frustrums, 'slices' determines how many divisions there are as you go around the object.
 
-![ ](../assets/img/renderers/slices.png)
-![ ](renderers/slices.png)
+![ ](../assets/img/visuals/slices.png)
+![ ](visuals/slices.png)
 
 ### Stacks {#stacks-details}
 
 For spheres, 'stacks' determines how many layers there are as you go down the object.
 
-![ ](../assets/img/renderers/stacks.png)
-![ ](renderers/stacks.png)
+![ ](../assets/img/visuals/stacks.png)
+![ ](visuals/stacks.png)
 
 ### Usage
 
@@ -606,6 +606,6 @@ map[ "bevelPercentage" ] = 0.4f;
 control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
 ~~~
 
-@class _Guide_Control_Renderers
+@class _Guide_Control_Visuals
 
 */
