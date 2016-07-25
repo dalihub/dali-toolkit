@@ -11,9 +11,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>
-#include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/controls/renderers/visual-string-constants.h>
+#include <dali-toolkit/internal/controls/renderers/visual-impl.h>
 
 namespace Dali
 {
@@ -81,7 +81,7 @@ void ImageView::SetImage( Image image )
     mImage = image;
 
     Actor self( Self() );
-    InitializeControlRenderer( self, mRenderer, image );
+    InitializeVisual( self, mRenderer, image );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -95,7 +95,7 @@ void ImageView::SetImage( Property::Map map )
   mPropertyMap = map;
 
   Actor self( Self() );
-  InitializeControlRenderer( self, mRenderer, mPropertyMap );
+  InitializeVisual( self, mRenderer, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -137,7 +137,7 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     }
 
     Actor self( Self() );
-    InitializeControlRenderer( self, mRenderer, url, size );
+    InitializeVisual( self, mRenderer, url, size );
 
     mRenderer.SetSize( mSizeSet );
 
@@ -311,7 +311,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
             Property::Map shaderMap;
             if( shaderValue->Get( shaderMap ) )
             {
-              Internal::ControlRenderer& renderer = GetImplementation( impl.mRenderer );
+              Internal::Visual& renderer = GetImplementation( impl.mRenderer );
               renderer.SetCustomShader( shaderMap );
               if( imageView.OnStage() )
               {

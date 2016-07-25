@@ -58,11 +58,11 @@ inline void SetMotionStretchProperties( Actor& actor )
  *                              its edges. This is used to prevent an unsightly hard edge between the stretched actor and
  *                              the scene. Depends on the values of the vertices in the vertex stream. When the actor is at
  *                              rest this is not applied. Default Vector2(0.25, 0.25), which is half way towards the edge for
- *                              an ImageRenderer::QUAD.
+ *                              an ImageVisual::QUAD.
  *  "uObjectFadeEnd"          - The displacement from the centre of the actor that the actor will finish fading towards its edges.
  *                              This is used to prevent an unsightly hard edge between the stretched actor and the scene. Depends
  *                              on the values of the vertices in the vertex stream. When the actor is at rest this is not applied.
- *                              Default 0.5, which is all the way towards the edge for an ImageRenderer::QUAD.
+ *                              Default 0.5, which is all the way towards the edge for an ImageVisual::QUAD.
  *  "uAlphaScale"             - Global scaler applied to the alpha of the actor. Used to make the stretched actor a bit more subtle
  *                              and reveal a bit of the background behind it as it moves. When the actor is at rest this is not
  *                              applied. Default 0.75.

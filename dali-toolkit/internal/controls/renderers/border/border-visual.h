@@ -1,0 +1,150 @@
+#ifndef DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H
+#define DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H
+
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/rendering/geometry.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/renderers/visual-impl.h>
+
+namespace Dali
+{
+
+namespace Toolkit
+{
+
+namespace Internal
+{
+
+/**
+ * The renderer which renders a solid color to the control's quad border fixed to a specified size.
+ *
+ * The following properties are required for create a BorderRender
+ *
+ * | %Property Name  | Type        |
+ * |-----------------|-------------|
+ * | borderColor     | VECTOR4     |
+ * | borderSize      | FLOAT       |
+ * | antiAliasing    | BOOLEAN     |
+ */
+
+class BorderVisual : public Visual
+{
+public:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   */
+  BorderVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~BorderVisual();
+
+public:  // from Visual
+
+  /**
+   * @copydoc Visual::SetClipRect
+   */
+  virtual void SetClipRect( const Rect<int>& clipRect );
+
+protected:
+
+  /**
+   * @copydoc Visual::DoInitialize
+   */
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Visual::DoSetOnStage
+   */
+  virtual void DoSetOnStage( Actor& actor );
+
+  /**
+   * @copydoc Visual::CreatePropertyMap
+   */
+  virtual void DoCreatePropertyMap( Property::Map& map ) const;
+
+public:
+
+  /**
+   * Set the color of the border.
+   * @param[in] color The border color.
+   */
+  void SetBorderColor( const Vector4& color);
+
+  /**
+   * Set the size of the border.
+   * @param[in] size The border size.
+   */
+  void SetBorderSize( float size );
+
+  /**
+   * Enable/Disable the anti-aliasing.
+   * @param[in] enable Whether the anti-aliasing be enabled or not.
+   */
+  void RequireAntiAliasing( bool antiAliasing );
+
+private:
+
+  /**
+   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   */
+  void InitializeRenderer();
+
+  /**
+   * Request the border shader from the factory cache. If fail, create tha shader and add it to cache.
+   * @return The border shader.
+   */
+  Shader GetBorderShader();
+
+  /**
+   * Create the geometry which presents the border.
+   * @return The border geometry
+   */
+  Geometry CreateBorderGeometry();
+
+  // Undefined
+  BorderVisual( const BorderVisual& borderRenderer );
+
+  // Undefined
+  BorderVisual& operator=( const BorderVisual& borderRenderer );
+
+private:
+
+  Vector4 mBorderColor;
+  float   mBorderSize;
+
+  Property::Index mBorderColorIndex;
+  Property::Index mBorderSizeIndex;
+
+  bool mAntiAliasing;
+};
+
+} // namespace Internal
+
+} // namespace Toolkit
+
+} // namespace Dali
+
+#endif // DALI_TOOLKIT_INTERNAL_BORDER_RENDERER_H

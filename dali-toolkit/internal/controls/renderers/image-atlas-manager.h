@@ -36,7 +36,7 @@ namespace Internal
 {
 
 /**
- * The manager for automatic image atlasing. Owned by RendererFactory
+ * The manager for automatic image atlasing. Owned by VisualFactory
  */
 class ImageAtlasManager : public RefObject
 {

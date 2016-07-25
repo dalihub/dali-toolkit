@@ -77,11 +77,11 @@ inline void SetMotionBlurProperties( Actor& actor, unsigned int numBlurSamples =
  *  "uObjectFadeStart"        - The displacement from the centre of the actor that the actor will start to fade towards its
  *                              edges. This is used to prevent an unsightly hard edge between the blurred actor and the scene.
  *                              Depends on the values of the vertices in the vertex stream. When the actor is at rest this is
- *                              not applied. Default 0.25, which is half way towards the edge for an ImageRenderer::QUAD.
+ *                              not applied. Default 0.25, which is half way towards the edge for an ImageVisual::QUAD.
  *  "uObjectFadeEnd"          - The displacement from the centre of the actor that the actor will finish fading towards its
  *                              edges. This is used to prevent an unsightly hard edge between the blurred actor and the scene.
  *                              Depends on the values of the vertices in the vertex stream. When the actor is at rest this is
- *                              not applied.Default 0.5, which is all the way towards the edge for an ImageRenderer::QUAD.
+ *                              not applied.Default 0.5, which is all the way towards the edge for an ImageVisual::QUAD.
  *  "uAlphaScale"             - Global scaler applied to the alpha of the actor. Used to make the blurred actor a bit more subtle
  *                              (helps to hide discontinuities due to limited number of texture samples) and reveal a bit of the
  *                              background behind it as it moves. When the actor is at rest this is not applied. Default 0.75.

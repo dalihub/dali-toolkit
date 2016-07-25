@@ -21,9 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/control-renderer.h>
-
-// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/visual-factory/visual.h>
 #include "image-filter.h"
 
 namespace Dali
@@ -83,8 +81,8 @@ private: // Attributes
   FrameBufferImage   mImageForEmboss2;
   Toolkit::ImageView mActorForInput1;
   Toolkit::ImageView mActorForInput2;
-  Toolkit::ControlRenderer mRendererForEmboss1;
-  Toolkit::ControlRenderer mRendererForEmboss2;
+  Toolkit::Visual mRendererForEmboss1;
+  Toolkit::Visual mRendererForEmboss2;
   Actor              mActorForComposite;
 }; // class EmbossFilter
 

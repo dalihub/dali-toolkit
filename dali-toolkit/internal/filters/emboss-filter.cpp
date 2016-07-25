@@ -28,7 +28,7 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/controls/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -127,8 +127,8 @@ void EmbossFilter::Enable()
 
   mRootActor.Add( mActorForComposite );
 
-  InitializeControlRenderer( mActorForComposite, mRendererForEmboss1, rendererMap );
-  InitializeControlRenderer( mActorForComposite, mRendererForEmboss2, rendererMap );
+  InitializeVisual( mActorForComposite, mRendererForEmboss1, rendererMap );
+  InitializeVisual( mActorForComposite, mRendererForEmboss2, rendererMap );
 
   TextureSet textureSet1 = TextureSet::New();
   TextureSetImage( textureSet1, 0, mImageForEmboss1 );
