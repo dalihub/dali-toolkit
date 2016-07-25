@@ -59,6 +59,7 @@ public:
     GRADIENT_SHADER_RADIAL_USER_SPACE,
     GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
     IMAGE_SHADER,
+    BATCH_IMAGE_SHADER,
     NINE_PATCH_SHADER,
     SVG_SHADER,
     SHADER_TYPE_MAX = SVG_SHADER
@@ -121,6 +122,13 @@ public:
    * @return The created grid geometry.
    */
   static Geometry CreateGridGeometry( Uint16Pair gridSize );
+
+  /**
+   * Create the batchable geometry
+   * @param[in] texCoords The texture atlas rect coordinates
+   * @return The created batchable geometry
+   */
+  static Geometry CreateBatchQuadGeometry( Vector4 texCoords );
 
 public:
 

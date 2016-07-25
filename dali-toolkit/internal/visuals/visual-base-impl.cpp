@@ -122,6 +122,7 @@ void Base::SetOnStage( Actor& actor )
   mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
   mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
   actor.AddRenderer( mImpl->mRenderer );
+
   mImpl->mFlags |= Impl::IS_ON_STAGE;
 }
 

@@ -490,7 +490,6 @@ void ImageVisual::InitializeRenderer( const Image& image )
   }
 }
 
-
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
   if( !mImageUrl.empty() )

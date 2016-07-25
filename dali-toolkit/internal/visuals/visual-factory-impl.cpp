@@ -41,6 +41,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/batch-image-visual.h>
 
 namespace
 {
@@ -67,9 +68,11 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, DEBUG )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BATCH_IMAGE )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 const char * const VISUAL_TYPE( "visualType" );
+const char * const BATCHING_ENABLED( "batchingEnabled" );
 
 BaseHandle Create()
 {
@@ -109,10 +112,25 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   Visual::Base* visualPtr = NULL;
 
   Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
-  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type
+  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
+  }
+
+  // If the type is IMAGE, either from a default or the TYPE value in the property-map, change it to a BatchImage if required.
+  if( visualType == Toolkit::Visual::IMAGE )
+  {
+    bool batchingEnabled( false );
+    Property::Value* value = propertyMap.Find( Toolkit::Visual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
+    if( value )
+    {
+      value->Get( batchingEnabled );
+      if( batchingEnabled )
+      {
+        visualType = Toolkit::Visual::BATCH_IMAGE;
+      }
+    }
   }
 
   switch( visualType )
@@ -185,6 +203,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     case Toolkit::Visual::DEBUG:
     {
       visualPtr = new DebugVisual( *( mFactoryCache.Get() ) );
+      break;
+    }
+
+    case Toolkit::Visual::BATCH_IMAGE:
+    {
+      CreateAtlasManager();
+      visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
       break;
     }
   }
