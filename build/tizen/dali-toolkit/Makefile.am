@@ -102,7 +102,6 @@ develapibloomviewdir =          $(develapicontrolsdir)/bloom-view
 develapibubbleemitterdir =      $(develapicontrolsdir)/bubble-effect
 develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
-develapivisualfactorydir =      $(develapicontrolsdir)/visual-factory
 develapipopupdir =              $(develapicontrolsdir)/popup
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
@@ -113,6 +112,7 @@ develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
+develapivisualfactorydir =      $(develapidir)/visual-factory
 
 # devel headers
 develapicontrols_HEADERS =          $(devel_api_controls_header_files)
