@@ -58,7 +58,7 @@ namespace Internal
 {
 
 /**
- * The renderer which renders a simple 3D shape to the control's quad
+ * The visual which renders a simple 3D shape to the control's quad
  *
  * The following properties are required to create a PrimitiveRender
  *
@@ -83,7 +83,7 @@ namespace Internal
  *
  * Note: slices and stacks both have an upper limit of 255.
  *
- * Finally, the following can be used to affect the renderer's shader
+ * Finally, the following can be used to affect the visual's shader
  *
  * | %Property Name  | Type        | Representing                            |
  * |-----------------|-------------|-----------------------------------------|

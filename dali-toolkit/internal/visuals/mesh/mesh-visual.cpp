@@ -474,7 +474,7 @@ void MeshVisual::SupplyEmptyGeometry()
   mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
   mImpl->mRenderer = Renderer::New( mGeometry, mShader );
 
-  DALI_LOG_ERROR( "Initialisation error in mesh renderer.\n" );
+  DALI_LOG_ERROR( "Initialisation error in mesh visual.\n" );
 }
 
 void MeshVisual::UpdateShaderUniforms()
@@ -542,7 +542,7 @@ bool MeshVisual::CreateGeometry()
     return true;
   }
 
-  DALI_LOG_ERROR( "Failed to load geometry in mesh renderer.\n" );
+  DALI_LOG_ERROR( "Failed to load geometry in mesh visual.\n" );
   return false;
 }
 
@@ -563,7 +563,7 @@ bool MeshVisual::LoadGeometry()
     return true;
   }
 
-  DALI_LOG_ERROR( "Failed to find object to load in mesh renderer.\n" );
+  DALI_LOG_ERROR( "Failed to find object to load in mesh visual.\n" );
   return false;
 }
 
@@ -579,7 +579,7 @@ bool MeshVisual::LoadMaterial()
     return true;
   }
 
-  DALI_LOG_ERROR( "Failed to find texture set to load in mesh renderer.\n" );
+  DALI_LOG_ERROR( "Failed to find texture set to load in mesh visual.\n" );
   mUseTexture = false;
   return false;
 }
@@ -609,7 +609,7 @@ bool MeshVisual::LoadTextures()
       }
       else
       {
-        DALI_LOG_ERROR( "Failed to load diffuse map texture in mesh renderer.\n");
+        DALI_LOG_ERROR( "Failed to load diffuse map texture in mesh visual.\n");
         return false;
       }
     }
@@ -627,7 +627,7 @@ bool MeshVisual::LoadTextures()
       }
       else
       {
-        DALI_LOG_ERROR( "Failed to load normal map texture in mesh renderer.\n");
+        DALI_LOG_ERROR( "Failed to load normal map texture in mesh visual.\n");
         return false;
       }
     }
@@ -645,7 +645,7 @@ bool MeshVisual::LoadTextures()
       }
       else
       {
-        DALI_LOG_ERROR( "Failed to load gloss map texture in mesh renderer.\n");
+        DALI_LOG_ERROR( "Failed to load gloss map texture in mesh visual.\n");
         return false;
       }
     }

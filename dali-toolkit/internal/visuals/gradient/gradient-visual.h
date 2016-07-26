@@ -35,7 +35,7 @@ namespace Internal
 class Gradient;
 
 /**
- * The renderer which renders smooth transition of colors to the control's quad.
+ * The visual which renders smooth transition of colors to the control's quad.
  * It supports two types of gradients: linear and radial.
  *
  * The following properties are essential for create a LINEAR GradientRender
@@ -148,10 +148,10 @@ private:
   static void GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets);
 
   // Undefined
-  GradientVisual( const GradientVisual& gradientRenderer );
+  GradientVisual( const GradientVisual& gradientVisual );
 
   // Undefined
-  GradientVisual& operator=( const GradientVisual& gradientRenderer );
+  GradientVisual& operator=( const GradientVisual& gradientVisual );
 
 private:
 

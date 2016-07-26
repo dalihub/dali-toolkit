@@ -143,14 +143,14 @@ bool VisualFactoryCache::CleanRendererCache( const std::string& key )
   return false;
 }
 
-void VisualFactoryCache::CacheDebugVisual( Renderer& renderer )
+void VisualFactoryCache::CacheDebugRenderer( Renderer& renderer )
 {
-  mDebugVisual = renderer;
+  mDebugRenderer = renderer;
 }
 
-Renderer VisualFactoryCache::GetDebugVisual()
+Renderer VisualFactoryCache::GetDebugRenderer()
 {
-  return mDebugVisual;
+  return mDebugRenderer;
 }
 
 Geometry VisualFactoryCache::CreateQuadGeometry()

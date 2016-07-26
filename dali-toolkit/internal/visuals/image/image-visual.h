@@ -42,7 +42,7 @@ class ImageVisual;
 typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
 
 /**
- * The renderer which renders an image to the control's quad
+ * The visual which renders an image to the control's quad
  *
  * The following properties are optional
  *
@@ -142,8 +142,8 @@ public:
   static Shader GetImageShader( VisualFactoryCache& factoryCache );
 
   /**
-   * @brief Sets the image of this renderer to the resource at imageUrl
-   * The renderer will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   * @brief Sets the image of this visual to the resource at imageUrl
+   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] imageUrl The URL of the image resource to use
@@ -158,7 +158,7 @@ public:
                  Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
 
   /**
-   * @brief Sets the image of this renderer to use
+   * @brief Sets the image to be rendered by this visual
    *
    * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
    * @param[in] image The image to use
@@ -200,7 +200,7 @@ private:
    *
    * @return Returns the created Dali::Renderer
    */
-  Renderer CreateNativeImageVisual() const;
+  Renderer CreateNativeImageRenderer() const;
 
   /**
    * @brief Query whether resources requires to be loaded synchronously.

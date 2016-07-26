@@ -144,7 +144,7 @@ RasterizingTaskPtr SvgRasterizeThread::NextCompletedTask()
   return nextTask;
 }
 
-void SvgRasterizeThread::RemoveTask( SvgVisual* renderer )
+void SvgRasterizeThread::RemoveTask( SvgVisual* visual )
 {
   // Lock while remove task from the queue
   ConditionalWait::ScopedLock lock( mConditionalWait );
@@ -152,7 +152,7 @@ void SvgRasterizeThread::RemoveTask( SvgVisual* renderer )
   {
     for( std::vector< RasterizingTaskPtr >::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it )
     {
-      if( (*it) &&  (*it)->GetSvgVisual() == renderer )
+      if( (*it) &&  (*it)->GetSvgVisual() == visual )
       {
         mRasterizeTasks.erase( it );
         break;

@@ -31,7 +31,7 @@ namespace Internal
 {
 
 /**
- * The renderer which renders a wireframe outline to the control's quad for debugging
+ * The visual which renders a wireframe outline to the control's quad for debugging
  *
  */
 class DebugVisual: public Visual
@@ -78,10 +78,10 @@ private:
 private:
 
   // Undefined
-  DebugVisual( const DebugVisual& debugRenderer );
+  DebugVisual( const DebugVisual& debugVisual);
 
   // Undefined
-  DebugVisual& operator=( const DebugVisual& debugRenderer );
+  DebugVisual& operator=( const DebugVisual& debugVisual );
 
 };
 

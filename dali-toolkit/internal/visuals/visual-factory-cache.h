@@ -154,12 +154,12 @@ public:
   /**
    * @brief Cache the debug renderer
    */
-  void CacheDebugVisual( Renderer& renderer );
+  void CacheDebugRenderer( Renderer& renderer );
 
   /**
    * @brief Request the debug renderer;
    */
-  Renderer GetDebugVisual();
+  Renderer GetDebugRenderer();
 
   /**
    * Get the SVG rasterization thread.
@@ -220,7 +220,7 @@ private:
   HashVector mRendererHashes;
   CachedRenderers mRenderers;
 
-  Renderer mDebugVisual;
+  Renderer mDebugRenderer;
 
   SvgRasterizeThread*  mSvgRasterizeThread;
 };

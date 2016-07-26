@@ -39,7 +39,7 @@ namespace Internal
 {
 
 /**
- * The renderer which renders an 9 patch image to the control's quad
+ * The visual which renders an 9 patch image to the control's quad
  *
  * The following properties are optional
  *
@@ -107,8 +107,8 @@ protected:
 public:
 
   /**
-   * @brief Sets the 9 patch image of this renderer to the resource at imageUrl
-   * The renderer will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   * @brief Sets the 9 patch image of this visual to the resource at imageUrl
+   * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
@@ -116,7 +116,7 @@ public:
   void SetImage( const std::string& imageUrl, bool borderOnly = false );
 
   /**
-   * @brief Sets the 9 patch image of this renderer to the 9 patch image
+   * @brief Sets the 9 patch image of this viusal to the 9 patch image
    *
    * @param[in] image The NinePatchImage to use
    * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
@@ -204,10 +204,10 @@ private:
 
 private:
 
-  NinePatchImage mImage; ///< The image to render if the renderer was set from an NinePatchImage, empty otherwise
+  NinePatchImage mImage; ///< The image to render if the visual was set from an NinePatchImage, empty otherwise
   Image mCroppedImage;
 
-  std::string mImageUrl; ///< The url to the image resource to render if the renderer was set from an image resource url, empty otherwise
+  std::string mImageUrl; ///< The url to the image resource to render if the visual was set from an image resource url, empty otherwise
   NinePatchImage::StretchRanges mStretchPixelsX;
   NinePatchImage::StretchRanges mStretchPixelsY;
   ImageDimensions mImageSize;

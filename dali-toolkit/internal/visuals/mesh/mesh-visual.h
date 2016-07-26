@@ -36,9 +36,9 @@ namespace Internal
 {
 
 /**
- * The renderer which renders a 3D object to the control's quad
+ * The visual which renders a 3D object to the control's quad
  *
- * The following Property::Map keys are required to create a MeshRender
+ * The following Property::Map keys are required to create a MeshVisual
  *
  * | %Property Name  | Type        | Representing                                                          |
  * |-----------------|-------------|-----------------------------------------------------------------------|
@@ -116,7 +116,7 @@ public:
 
 private:
 
-  //Corresponds to the shader that will be used by the mesh renderer.
+  //Corresponds to the shader that will be used by the mesh visual.
   enum ShaderType
   {
     TEXTURELESS,
@@ -125,13 +125,13 @@ private:
   };
 
   /**
-   * @brief Provide an empty geometry for the renderer to use.
+   * @brief Provide an empty geometry for the visual to use.
    * @details For use in error cases where the initialisation has failed for varying reasons.
    */
   void SupplyEmptyGeometry();
 
   /**
-   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
+   * @brief Initialize the visual with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
    */
   void InitializeRenderer();
 
@@ -146,19 +146,19 @@ private:
   void UpdateShaderUniforms();
 
   /**
-   * @brief Use the object URL stored in the renderer to load and create the geometry of the object.
+   * @brief Use the object URL stored in the mesh visual to load and create the geometry of the object.
    * @return Boolean of success of operation.
    */
   bool CreateGeometry();
 
   /**
-   * @brief Use the object URL stored in the renderer to load the geometry of the object.
+   * @brief Use the object URL stored in the visual to load the geometry of the object.
    * @return Boolean of success of operation.
    */
   bool LoadGeometry();
 
   /**
-   * @brief Use the material URL stored in the renderer to load the material of the object.
+   * @brief Use the material URL stored in the mesh visual to load the material of the object.
    * @return Boolean of success of operation.
    */
   bool LoadMaterial();
@@ -172,10 +172,10 @@ private:
 private:
 
   // Undefined
-  MeshVisual( const MeshVisual& meshRenderer );
+  MeshVisual( const MeshVisual& meshVisual );
 
   // Undefined
-  MeshVisual& operator=( const MeshVisual& meshRenderer );
+  MeshVisual& operator=( const MeshVisual& meshVisual );
 
 private:
 

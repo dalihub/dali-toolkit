@@ -31,7 +31,7 @@ namespace Internal
 {
 
 /**
- * The renderer which renders a solid color to the control's quad
+ * The visual which renders a solid color to the control's quad
  *
  * The following properties are required for create a ColorRender
  *

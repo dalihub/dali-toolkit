@@ -34,7 +34,7 @@ namespace Internal
 {
 
 /**
- * The renderer which renders a solid color to the control's quad border fixed to a specified size.
+ * The visual which renders a solid color to the control's quad border fixed to a specified size.
  *
  * The following properties are required for create a BorderRender
  *

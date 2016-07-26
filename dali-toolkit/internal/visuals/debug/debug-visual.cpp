@@ -85,14 +85,14 @@ void DebugVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void DebugVisual::InitializeRenderer()
 {
-  mImpl->mRenderer = mFactoryCache.GetDebugVisual();
+  mImpl->mRenderer = mFactoryCache.GetDebugRenderer();
   if( !mImpl->mRenderer )
   {
     Geometry geometry = CreateQuadWireframeGeometry();
     Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
     mImpl->mRenderer = Renderer::New( geometry, shader);
-    mFactoryCache.CacheDebugVisual( mImpl->mRenderer );
+    mFactoryCache.CacheDebugRenderer( mImpl->mRenderer );
   }
 }
 

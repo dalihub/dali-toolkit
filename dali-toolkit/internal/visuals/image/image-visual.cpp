@@ -352,7 +352,7 @@ Renderer ImageVisual::CreateRenderer() const
   // Renderer can't be shared between NativeImage and other image types.
   if( !mNativeFragmentShaderCode.empty() )
   {
-    return CreateNativeImageVisual();
+    return CreateNativeImageRenderer();
   }
 
   if( !mImpl->mCustomShader )
@@ -386,7 +386,7 @@ Renderer ImageVisual::CreateRenderer() const
   return renderer;
 }
 
-Renderer ImageVisual::CreateNativeImageVisual() const
+Renderer ImageVisual::CreateNativeImageRenderer() const
 {
   Geometry geometry;
   Shader shader;

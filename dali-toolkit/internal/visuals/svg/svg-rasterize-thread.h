@@ -53,7 +53,7 @@ typedef IntrusivePtr< RasterizingTask > RasterizingTaskPtr;
  * 1. Created by SvgVisual in the main thread
  * 2. Queued in the worked thread waiting to be processed.
  * 3. If this task gets its turn to do the rasterization, it triggers main thread to apply the rasterized image to material then been deleted in main thread call back
- *    Or if this task is been removed ( new image/size set to the renderer or actor off stage) before its turn to be processed, it then been deleted in the worker thread.
+ *    Or if this task is been removed ( new image/size set to the visual or actor off stage) before its turn to be processed, it then been deleted in the worker thread.
  */
 class RasterizingTask : public RefObject
 {
@@ -77,7 +77,7 @@ public:
   void Rasterize( NSVGrasterizer* rasterizer );
 
   /**
-   * Get the svg renderer
+   * Get the svg visual
    */
   SvgVisual* GetSvgVisual() const;
 
@@ -138,13 +138,13 @@ public:
   RasterizingTaskPtr NextCompletedTask();
 
   /**
-   * Remove the task with the given renderer from the waiting queue, called by main thread.
+   * Remove the task with the given visual from the waiting queue, called by main thread.
    *
    * Typically called when the actor is put off stage, so the renderer is not needed anymore.
    *
-   * @param[in] renderer The renderer pointer.
+   * @param[in] visual The visual pointer.
    */
-  void RemoveTask( SvgVisual* renderer );
+  void RemoveTask( SvgVisual* visual );
 
   /**
    * Delete the parsed SVG image, called by main thread.

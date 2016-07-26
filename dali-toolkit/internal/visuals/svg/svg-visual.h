@@ -34,7 +34,7 @@ namespace Internal
 {
 
 /**
- * The renderer which renders a svg image
+ * The visual which renders a svg image
  *
  * The following property is essential
  *
@@ -104,8 +104,8 @@ public:
   static bool IsSvgUrl( const std::string& url );
 
   /**
-   * @brief Sets the svg image of this renderer to the resource at imageUrl
-   * The renderer will parse the svg image once it is set.
+   * @brief Sets the svg image of this visual to the resource at imageUrl
+   * The visual will parse the svg image once it is set.
    * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
    *
    * @param[in] imageUrl The URL to svg resource to use
@@ -113,7 +113,7 @@ public:
   void SetImage( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
 
   /**
-   * @bried Apply the rasterized image to the renderer.
+   * @bried Apply the rasterized image to the visual.
    *
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    */
@@ -121,7 +121,7 @@ public:
 
 private:
   /**
-   * @bried Rasterize the svg with the given size, and add it to the renderer.
+   * @bried Rasterize the svg with the given size, and add it to the visual.
    *
    * @param[in] size The target size of the SVG rasterization.
    */
