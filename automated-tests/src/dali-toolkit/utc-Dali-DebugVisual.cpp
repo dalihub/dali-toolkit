@@ -46,7 +46,7 @@ bool IsDebugVisual( Visual::Base& visual )
   Actor actor = Actor::New();
   visual.SetOnStage( actor );
   Geometry geometry = actor.GetRendererAt( 0 ).GetGeometry();
-  isGeometryLineType = ( geometry.GetGeometryType() == Geometry::LINES );
+  isGeometryLineType = ( geometry.GetType() == Geometry::LINES );
 
   return isDebugVisualType && isGeometryLineType;
 }

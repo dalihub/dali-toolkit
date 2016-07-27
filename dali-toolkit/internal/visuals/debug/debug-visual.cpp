@@ -121,7 +121,7 @@ Geometry DebugVisual::CreateQuadWireframeGeometry()
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( quadVertices );
   geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
-  geometry.SetGeometryType( Geometry::LINES );
+  geometry.SetType( Geometry::LINES );
 
   return geometry;
 }

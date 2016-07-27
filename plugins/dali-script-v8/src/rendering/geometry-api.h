@@ -61,8 +61,8 @@ namespace GeometryApi
    void GetNumberOfVertexBuffers( const v8::FunctionCallbackInfo< v8::Value >& args );
    void RemoveVertexBuffer( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetIndexBuffer( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void SetGeometryType( const v8::FunctionCallbackInfo< v8::Value >& args );
-   void GetGeometryType( const v8::FunctionCallbackInfo< v8::Value >& args );
+   void SetType( const v8::FunctionCallbackInfo< v8::Value >& args );
+   void GetType( const v8::FunctionCallbackInfo< v8::Value >& args );
 
 }; // namespace GeometryApi
 
