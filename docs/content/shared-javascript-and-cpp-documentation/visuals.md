@@ -484,6 +484,8 @@ ________________________________________________________________________________
 
 Renders a simple 3D shape, such as a cube or sphere. Scaled to fit the control.
 
+The shapes are generated with clockwise winding and back-face culling on by default.
+
 ![ ](../assets/img/visuals/cube.png)
 ![ ](visuals/cube.png)
 

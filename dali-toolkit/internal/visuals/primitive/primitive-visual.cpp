@@ -424,6 +424,7 @@ void PrimitiveVisual::InitializeRenderer()
   }
 
   mImpl->mRenderer = Renderer::New( mGeometry, mShader );
+  mImpl->mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK );
 }
 
 void PrimitiveVisual::UpdateShaderUniforms()
@@ -644,16 +645,16 @@ void PrimitiveVisual::FormSphereTriangles( Vector<unsigned short>& indices, int 
   for( int i = 1; i <= slices; i++, indiceIndex += 3 )
   {
     indices[indiceIndex] = 0;
-    indices[indiceIndex + 1] = i;
     if( i == slices )
     {
       //End, so loop around.
-      indices[indiceIndex + 2] = 1;
+      indices[indiceIndex + 1] = 1;
     }
     else
     {
-      indices[indiceIndex + 2] = i + 1;
+      indices[indiceIndex + 1] = i + 1;
     }
+    indices[indiceIndex + 2] = i;
   }
 
   //Middle Stacks. Want to form triangles between the top and bottom stacks, so loop up to the number of stacks - 2.
@@ -665,20 +666,20 @@ void PrimitiveVisual::FormSphereTriangles( Vector<unsigned short>& indices, int 
       {
         //End, so loop around.
         indices[indiceIndex] =     previousCycleBeginning + j;
-        indices[indiceIndex + 1] = currentCycleBeginning + j;
-        indices[indiceIndex + 2] = previousCycleBeginning;
+        indices[indiceIndex + 1] = previousCycleBeginning;
+        indices[indiceIndex + 2] = currentCycleBeginning + j;
         indices[indiceIndex + 3] = currentCycleBeginning + j;
-        indices[indiceIndex + 4] = currentCycleBeginning;
-        indices[indiceIndex + 5] = previousCycleBeginning;
+        indices[indiceIndex + 4] = previousCycleBeginning;
+        indices[indiceIndex + 5] = currentCycleBeginning;
       }
       else
       {
         indices[indiceIndex] =     previousCycleBeginning + j;
-        indices[indiceIndex + 1] = currentCycleBeginning + j;
-        indices[indiceIndex + 2] = previousCycleBeginning + 1 + j;
+        indices[indiceIndex + 1] = previousCycleBeginning + 1 + j;
+        indices[indiceIndex + 2] = currentCycleBeginning + j;
         indices[indiceIndex + 3] = currentCycleBeginning + j;
-        indices[indiceIndex + 4] = currentCycleBeginning + 1 + j;
-        indices[indiceIndex + 5] = previousCycleBeginning + 1 + j;
+        indices[indiceIndex + 4] = previousCycleBeginning + 1 + j;
+        indices[indiceIndex + 5] = currentCycleBeginning + 1 + j;
       }
     }
   }
@@ -866,16 +867,16 @@ void PrimitiveVisual::FormConicTriangles( Vector<unsigned short>& indices, float
     for( int i = 0; i < slices; i++, indiceIndex += 3 )
     {
       indices[indiceIndex] = bottomFaceCycleBeginning;
-      indices[indiceIndex + 1] = bottomFaceCycleBeginning + i;
       if( i == slices - 1 )
       {
         //End, so loop around.
-        indices[indiceIndex + 2] = bottomFaceCycleBeginning;
+        indices[indiceIndex + 1] = bottomFaceCycleBeginning;
       }
       else
       {
-        indices[indiceIndex + 2] = bottomFaceCycleBeginning + i + 1;
+        indices[indiceIndex + 1] = bottomFaceCycleBeginning + i + 1;
       }
+      indices[indiceIndex + 2] = bottomFaceCycleBeginning + i;
     }
   }
   else if( !coneTop || !coneBottom )
@@ -900,16 +901,16 @@ void PrimitiveVisual::FormConicTriangles( Vector<unsigned short>& indices, float
     for( int i = 1; i <= slices; i++, indiceIndex += 3 )
     {
       indices[indiceIndex] = 2 * slices + 1;
-      indices[indiceIndex + 1] = slices + i;
       if( i == slices )
       {
         //End, so loop around.
-        indices[indiceIndex + 2] = slices + 1;
+        indices[indiceIndex + 1] = slices + 1;
       }
       else
       {
-        indices[indiceIndex + 2] = slices + i + 1;
+        indices[indiceIndex + 1] = slices + i + 1;
       }
+      indices[indiceIndex + 2] = slices + i;
     }
   }
 }
@@ -1006,11 +1007,11 @@ void PrimitiveVisual::FormCubeTriangles( Vector<unsigned short>& indices )
 
   //Top face.
   indices[triangleIndex] =     0;
-  indices[triangleIndex + 1] = 1;
-  indices[triangleIndex + 2] = 2;
+  indices[triangleIndex + 1] = 2;
+  indices[triangleIndex + 2] = 1;
   indices[triangleIndex + 3] = 2;
-  indices[triangleIndex + 4] = 3;
-  indices[triangleIndex + 5] = 0;
+  indices[triangleIndex + 4] = 0;
+  indices[triangleIndex + 5] = 3;
   triangleIndex += 6;
 
   int topFaceStart = 4;
@@ -1020,11 +1021,11 @@ void PrimitiveVisual::FormCubeTriangles( Vector<unsigned short>& indices )
   for( int i = 0; i < 8; i += 2, triangleIndex += 6 )
   {
     indices[triangleIndex    ] = i + topFaceStart;
-    indices[triangleIndex + 1] = i + bottomFaceStart + 1;
-    indices[triangleIndex + 2] = i + topFaceStart + 1;
+    indices[triangleIndex + 1] = i + topFaceStart + 1;
+    indices[triangleIndex + 2] = i + bottomFaceStart + 1;
     indices[triangleIndex + 3] = i + topFaceStart;
-    indices[triangleIndex + 4] = i + bottomFaceStart;
-    indices[triangleIndex + 5] = i + bottomFaceStart + 1;
+    indices[triangleIndex + 4] = i + bottomFaceStart + 1;
+    indices[triangleIndex + 5] = i + bottomFaceStart;
   }
 
   //Bottom face.
@@ -1084,19 +1085,19 @@ void PrimitiveVisual::ComputeOctahedronVertices( Vector<Vertex>& vertices, Vecto
       //End, so loop around.
       vertices[vertexIndex    ].position = positions[0];
       vertices[vertexIndex    ].normal = outerNormals[0] * smoothness + normals[i] * (1 - smoothness);
-      vertices[vertexIndex + 1].position = positions[i + 1];
-      vertices[vertexIndex + 1].normal = outerNormals[i + 1] * smoothness + normals[i] * (1 - smoothness);
-      vertices[vertexIndex + 2].position = positions[1];
-      vertices[vertexIndex + 2].normal = outerNormals[1] * smoothness + normals[i] * (1 - smoothness);
+      vertices[vertexIndex + 1].position = positions[1];
+      vertices[vertexIndex + 1].normal = outerNormals[1] * smoothness + normals[i] * (1 - smoothness);
+      vertices[vertexIndex + 2].position = positions[i + 1];
+      vertices[vertexIndex + 2].normal = outerNormals[i + 1] * smoothness + normals[i] * (1 - smoothness);
     }
     else
     {
       vertices[vertexIndex    ].position = positions[0];
       vertices[vertexIndex    ].normal = outerNormals[0] * smoothness + normals[i] * (1 - smoothness);
-      vertices[vertexIndex + 1].position = positions[i + 1];
-      vertices[vertexIndex + 1].normal = outerNormals[i + 1] * smoothness + normals[i] * (1 - smoothness);
-      vertices[vertexIndex + 2].position = positions[i + 2];
-      vertices[vertexIndex + 2].normal = outerNormals[i + 2] * smoothness + normals[i] * (1 - smoothness);
+      vertices[vertexIndex + 1].position = positions[i + 2];
+      vertices[vertexIndex + 1].normal = outerNormals[i + 2] * smoothness + normals[i] * (1 - smoothness);
+      vertices[vertexIndex + 2].position = positions[i + 1];
+      vertices[vertexIndex + 2].normal = outerNormals[i + 1] * smoothness + normals[i] * (1 - smoothness);
     }
   }
 
@@ -1392,11 +1393,11 @@ void PrimitiveVisual::FormBevelledCubeTriangles( Vector<unsigned short>& indices
 
   //Top face.
   indices[indiceIndex    ] = vertexIndex;
-  indices[indiceIndex + 1] = vertexIndex + 1;
-  indices[indiceIndex + 2] = vertexIndex + 2;
+  indices[indiceIndex + 1] = vertexIndex + 2;
+  indices[indiceIndex + 2] = vertexIndex + 1;
   indices[indiceIndex + 3] = vertexIndex + 0;
-  indices[indiceIndex + 4] = vertexIndex + 2;
-  indices[indiceIndex + 5] = vertexIndex + 3;
+  indices[indiceIndex + 4] = vertexIndex + 3;
+  indices[indiceIndex + 5] = vertexIndex + 2;
   indiceIndex += 6;
   vertexIndex += 4;
 
@@ -1405,16 +1406,16 @@ void PrimitiveVisual::FormBevelledCubeTriangles( Vector<unsigned short>& indices
   {
     //Triangle part.
     indices[indiceIndex    ] = vertexIndex;
-    indices[indiceIndex + 1] = vertexIndex + 1;
-    indices[indiceIndex + 2] = vertexIndex + 2;
+    indices[indiceIndex + 1] = vertexIndex + 2;
+    indices[indiceIndex + 2] = vertexIndex + 1;
 
     //Rectangle part.
     indices[indiceIndex + 3] = vertexIndex + 3;
     indices[indiceIndex + 4] = vertexIndex + 4;
     indices[indiceIndex + 5] = vertexIndex + 5;
     indices[indiceIndex + 6] = vertexIndex + 4;
-    indices[indiceIndex + 7] = vertexIndex + 5;
-    indices[indiceIndex + 8] = vertexIndex + 6;
+    indices[indiceIndex + 7] = vertexIndex + 6;
+    indices[indiceIndex + 8] = vertexIndex + 5;
   }
 
   //Side faces.
@@ -1424,8 +1425,8 @@ void PrimitiveVisual::FormBevelledCubeTriangles( Vector<unsigned short>& indices
     indices[indiceIndex + 1] = vertexIndex + 1;
     indices[indiceIndex + 2] = vertexIndex + 2;
     indices[indiceIndex + 3] = vertexIndex + 1;
-    indices[indiceIndex + 4] = vertexIndex + 2;
-    indices[indiceIndex + 5] = vertexIndex + 3;
+    indices[indiceIndex + 4] = vertexIndex + 3;
+    indices[indiceIndex + 5] = vertexIndex + 2;
   }
 
   //Bottom slopes.
@@ -1441,8 +1442,8 @@ void PrimitiveVisual::FormBevelledCubeTriangles( Vector<unsigned short>& indices
     indices[indiceIndex + 4] = vertexIndex + 4;
     indices[indiceIndex + 5] = vertexIndex + 5;
     indices[indiceIndex + 6] = vertexIndex + 4;
-    indices[indiceIndex + 7] = vertexIndex + 5;
-    indices[indiceIndex + 8] = vertexIndex + 6;
+    indices[indiceIndex + 7] = vertexIndex + 6;
+    indices[indiceIndex + 8] = vertexIndex + 5;
   }
 
   //Bottom face.
