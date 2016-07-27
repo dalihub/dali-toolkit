@@ -62,16 +62,16 @@ void dali_debug_renderer_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-int UtcDaliDebugVisualGetRenderer1(void)
+int UtcDaliDebugVisualGetVisual1(void)
 {
   EnvironmentVariable::SetTestingEnvironmentVariable(true);
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliDebugVisualGetRenderer1:  Request renderer with a Property::Map" );
+  tet_infoline( "UtcDaliDebugVisualGetVisual1:  Request visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  // Test that color renderer is replaced with debug renderer
+  // Test that color visual is replaced with debug visual
   Property::Map propertyMap1;
   propertyMap1.Insert("rendererType",  "COLOR");
   propertyMap1.Insert("mixColor",  Color::BLUE);
@@ -79,16 +79,16 @@ int UtcDaliDebugVisualGetRenderer1(void)
   DALI_TEST_CHECK( colorVisual );
   DALI_TEST_CHECK( IsDebugVisual( colorVisual ) );
 
-  // Test that border renderer is replaced with debug renderer
+  // Test that border visual is replaced with debug visual
   Property::Map propertyMap2;
   propertyMap2.Insert("rendererType",  "BORDER");
   propertyMap2.Insert("borderColor",  Color::BLUE);
   propertyMap2.Insert("borderSize",  2.f);
-  Visual::Base borderRenderer = factory.CreateVisual(propertyMap2);
-  DALI_TEST_CHECK( borderRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( borderRenderer ) );
+  Visual::Base borderVisual = factory.CreateVisual(propertyMap2);
+  DALI_TEST_CHECK( borderVisual );
+  DALI_TEST_CHECK( IsDebugVisual( borderVisual ) );
 
-  // Test that gradient renderer is replaced with debug renderer
+  // Test that gradient visual is replaced with debug visual
   Property::Map propertyMap3;
   propertyMap3.Insert("rendererType",  "GRADIENT");
   Vector2 start(-1.f, -1.f);
@@ -104,40 +104,40 @@ int UtcDaliDebugVisualGetRenderer1(void)
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
   propertyMap3.Insert("stopColor", stopColors);
-  Visual::Base gradientRenderer = factory.CreateVisual(propertyMap3);
-  DALI_TEST_CHECK( gradientRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( gradientRenderer ) );
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap3);
+  DALI_TEST_CHECK( gradientVisual );
+  DALI_TEST_CHECK( IsDebugVisual( gradientVisual ) );
 
-  // Test that image renderer is replaced with debug renderer
+  // Test that image visual is replaced with debug visual
   Property::Map propertyMap4;
   propertyMap4.Insert( "rendererType",  "IMAGE" );
   propertyMap4.Insert( "url",  TEST_IMAGE_FILE_NAME );
-  Visual::Base imageRenderer = factory.CreateVisual( propertyMap4 );
-  DALI_TEST_CHECK( imageRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( imageRenderer ) );
+  Visual::Base imageVisual = factory.CreateVisual( propertyMap4 );
+  DALI_TEST_CHECK( imageVisual );
+  DALI_TEST_CHECK( IsDebugVisual( imageVisual ) );
 
-  // Test that n patch renderer is replaced with debug renderer
+  // Test that n patch visual is replaced with debug visual
   Property::Map propertyMap5;
   propertyMap5.Insert( "rendererType",  "IMAGE" );
   propertyMap5.Insert( "url",  TEST_NPATCH_FILE_NAME );
-  Visual::Base nPatchRenderer = factory.CreateVisual( propertyMap4 );
-  DALI_TEST_CHECK( nPatchRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( nPatchRenderer ) );
+  Visual::Base nPatchVisual = factory.CreateVisual( propertyMap4 );
+  DALI_TEST_CHECK( nPatchVisual );
+  DALI_TEST_CHECK( IsDebugVisual( nPatchVisual ) );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;
 }
 
-int UtcDaliDebugVisualGetRenderer2(void)
+int UtcDaliDebugVisualGetVisual2(void)
 {
   EnvironmentVariable::SetTestingEnvironmentVariable(true);
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliDebugVisualGetRenderer2: Request renderer with various parameters" );
+  tet_infoline( "UtcDaliDebugVisualGetVisual2: Request visual with various parameters" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  // Test that color renderer is replaced with debug renderer
+  // Test that color visual is replaced with debug visual
   Dali::Property::Map map;
   map[ "rendererType" ] = "COLOR";
   map[ "mixColor" ] = Color::CYAN;
@@ -146,25 +146,25 @@ int UtcDaliDebugVisualGetRenderer2(void)
   DALI_TEST_CHECK( colorVisual );
   DALI_TEST_CHECK( IsDebugVisual( colorVisual ) );
 
-  // Test that border renderer is replaced with debug renderer
+  // Test that border visual is replaced with debug visual
   map.Clear();
   map[ "rendererType" ] = "BORDER";
   map[ "borderColor"  ] = Color::GREEN;
   map[ "borderSize"   ] = 2.f;
-  Visual::Base borderRenderer = factory.CreateVisual( map );
-  DALI_TEST_CHECK( borderRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( borderRenderer ) );
+  Visual::Base borderVisual = factory.CreateVisual( map );
+  DALI_TEST_CHECK( borderVisual );
+  DALI_TEST_CHECK( IsDebugVisual( borderVisual ) );
 
-  // Test that image renderer is replaced with debug renderer
+  // Test that image visual is replaced with debug visual
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  Visual::Base imageRenderer = factory.CreateVisual( image );
-  DALI_TEST_CHECK( imageRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( imageRenderer ) );
+  Visual::Base imageVisual = factory.CreateVisual( image );
+  DALI_TEST_CHECK( imageVisual );
+  DALI_TEST_CHECK( IsDebugVisual( imageVisual ) );
 
-  // Test that n patch renderer is replaced with debug renderer
-  Visual::Base nPatchRenderer = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
-  DALI_TEST_CHECK( nPatchRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( nPatchRenderer ) );
+  // Test that n patch visual is replaced with debug visual
+  Visual::Base nPatchVisual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
+  DALI_TEST_CHECK( nPatchVisual );
+  DALI_TEST_CHECK( IsDebugVisual( nPatchVisual ) );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;
