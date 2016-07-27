@@ -49,7 +49,7 @@ struct Internal::Visual::Impl
     std::string mVertexShader;
     std::string mFragmentShader;
     Dali::ImageDimensions mGridSize;
-    Dali::Shader::ShaderHints mHints; //(bitfield) values from enum Shader::Hints
+    Dali::Shader::Hint::Value mHints; //(bitfield) values from enum Shader::Hint
 
     CustomShader( const Property::Map& map );
     void SetPropertyMap( const Property::Map& map );

@@ -46,31 +46,31 @@ const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type STRING for a hint f
 
 /**
  * where hints should be contain strings of the following shader hints:
- *   "none"                    | corresponds to HINT_NONE
- *   "outputIsTransparent"     | corresponds to HINT_OUTPUT_IS_TRANSPARENT
- *   "modifiesGeometry"        | corresponds to HINT_MODIFIES_GEOMETRY
+ *   "none"                    | corresponds to Shader::Hint::NONE
+ *   "outputIsTransparent"     | corresponds to Shader::Hint::OUTPUT_IS_TRANSPARENT
+ *   "modifiesGeometry"        | corresponds to Shader::Hint::MODIFIES_GEOMETRY
  */
 
-Shader::ShaderHints HintFromString( std::string hintString )
+Shader::Hint::Value HintFromString( std::string hintString )
 {
   if( hintString == "none" )
   {
-    return Shader::HINT_NONE;
+    return Shader::Hint::NONE;
   }
   else if( hintString == "outputIsTransparent" )
   {
-    return Shader::HINT_OUTPUT_IS_TRANSPARENT;
+    return Shader::Hint::OUTPUT_IS_TRANSPARENT;
   }
   else if( hintString == "modifiesGeometry" )
   {
-    return Shader::HINT_MODIFIES_GEOMETRY;
+    return Shader::Hint::MODIFIES_GEOMETRY;
   }
   else
   {
     DALI_LOG_ERROR( "'%s' hint string is not recognised", hintString.c_str() );
   }
 
-  return Shader::HINT_NONE;
+  return Shader::Hint::NONE;
 }
 
 }// unnamed namespace
@@ -89,7 +89,7 @@ Internal::Visual::Impl::~Impl()
 
 Internal::Visual::Impl::CustomShader::CustomShader( const Property::Map& map )
 : mGridSize( 1, 1 ),
-  mHints( Shader::HINT_NONE )
+  mHints( Shader::Hint::NONE )
 {
   SetPropertyMap( map );
 }
@@ -99,7 +99,7 @@ void Internal::Visual::Impl::CustomShader::SetPropertyMap( const Property::Map& 
   mVertexShader.clear();
   mFragmentShader.clear();
   mGridSize = ImageDimensions( 1, 1 );
-  mHints = Shader::HINT_NONE;
+  mHints = Shader::Hint::NONE;
 
   Property::Value* vertexShaderValue = shaderMap.Find( CUSTOM_VERTEX_SHADER );
   if( vertexShaderValue )
@@ -159,7 +159,7 @@ void Internal::Visual::Impl::CustomShader::SetPropertyMap( const Property::Map& 
     }
     else if( hintsValue->Get( hintsArray ) )
     {
-      int hints = Shader::HINT_NONE;
+      int hints = Shader::Hint::NONE;
       for( Property::Array::SizeType i = 0; i < hintsArray.Count(); ++i)
       {
         Property::Value hintValue = hintsArray[ i ];
@@ -172,7 +172,7 @@ void Internal::Visual::Impl::CustomShader::SetPropertyMap( const Property::Map& 
           DALI_LOG_ERROR( "'%s' parameter does not correctly specify an hint string at index %d", CUSTOM_SHADER_HINTS, i );
         }
 
-        mHints = static_cast< Shader::ShaderHints >( hints );
+        mHints = static_cast< Shader::Hint::Value >( hints );
       }
     }
     else
@@ -205,7 +205,7 @@ void Internal::Visual::Impl::CustomShader::CreatePropertyMap( Property::Map& map
       customShader.Insert(CUSTOM_SUBDIVIDE_GRID_Y, mGridSize.GetHeight() );
     }
 
-    if( mHints != Dali::Shader::HINT_NONE )
+    if( mHints != Dali::Shader::Hint::NONE )
     {
       customShader.Insert(CUSTOM_SHADER_HINTS, static_cast< int >(mHints) );
     }
