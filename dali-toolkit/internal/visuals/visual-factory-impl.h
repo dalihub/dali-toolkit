@@ -22,7 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/visual.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 namespace Dali
 {
@@ -69,17 +69,17 @@ public:
   /**
    * @copydoc Toolkit::RenderFactory::CreateVisual( const Property::Map& )
    */
-  Toolkit::Visual CreateVisual( const Property::Map& propertyMap );
+  Toolkit::Visual::Base CreateVisual( const Property::Map& propertyMap );
 
   /**
    * @copydoc Toolkit::RenderFactory::CreateVisual( const Image& )
    */
-  Toolkit::Visual CreateVisual( const Image& image );
+  Toolkit::Visual::Base CreateVisual( const Image& image );
 
   /**
    * @copydoc Toolkit::RenderFactory::CreateVisual( const std::string&, ImageDimensions )
    */
-  Toolkit::Visual CreateVisual( const std::string& image, ImageDimensions size );
+  Toolkit::Visual::Base CreateVisual( const std::string& image, ImageDimensions size );
 
 public:
   /**

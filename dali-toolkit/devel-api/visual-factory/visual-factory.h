@@ -23,7 +23,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/visual.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 namespace Dali
 {
@@ -41,9 +41,9 @@ class VisualFactory;
 /**
  * @brief VisualFactory is a singleton object that provides and shares visuals between controls
  *
- * By setting environment variable 'DALI_DEBUG_RENDERING', all concrete renderer is replaced with the debug renderer which renders a quad wireframe.
+ * By setting environment variable 'DALI_DEBUG_RENDERING', a debug visual is used which renders a quad wireframe.
  *
- * The renderer type is required in the property map for requesting a control renderer.
+ * The visual type is required in the property map for requesting a visual.
  *
  * | %Property Name           | Type             |
  * |--------------------------|------------------|
@@ -90,30 +90,30 @@ public:
   VisualFactory& operator=( const VisualFactory& handle );
 
   /**
-   * @brief Request the control renderer
+   * @brief Request the visual
    *
    * @param[in] propertyMap The map contains the properties required by the control renderer
    *            Depends on the content of the map, different kind of renderer would be returned.
-   * @return The pointer pointing to control renderer
+   * @return The pointer pointing to visual
    */
-  Visual CreateVisual( const Property::Map& propertyMap  );
+  Visual::Base CreateVisual( const Property::Map& propertyMap  );
 
   /**
-   * @brief Request the control renderer to render the image.
+   * @brief Request the visual to render the image.
    *
    * @param[in] image The image to be rendered.
-   * @return The pointer pointing to the control renderer
+   * @return The pointer pointing to the visual
    */
-  Visual CreateVisual( const Image& image );
+  Visual::Base CreateVisual( const Image& image );
 
   /**
-   * @brief Request the control renderer to render the given resource at the url.
+   * @brief Request the visual to render the given resource at the url.
    *
    * @param[in] url The URL to the resource to be rendered.
    * @param[in] size The width and height to fit the loaded image to.
-   * @return The pointer pointing to the control renderer
+   * @return The pointer pointing to the visual
    */
-  Visual CreateVisual( const std::string& url, ImageDimensions size );
+  Visual::Base CreateVisual( const std::string& url, ImageDimensions size );
 
 private:
 
@@ -123,44 +123,44 @@ private:
 
 
 /**
- * @brief Template to allow discard old renderer, get new one and set it on stage if possible
+ * @brief Template to allow discard old visual, get new one and set it on stage if possible
  *
  * @tparam ParameterType0 The type of first argument passed to the CreateVisual()
  * @tparam ParameterType1 The type of second argument passed to the CreateVisual()
  * @SINCE_1_0.39
  * @param[in] actor Actor for which the renderer will be replaced
- * @param[in,out] renderer The renderer object to be replaced
+ * @param[in,out] visual The visual to be replaced
  * @param[in] param0 First template based argument passed to the renderer factory
  * @param[in] param1 Second template based argument passed to the renderer factory
  */
 template< class ParameterType0, class ParameterType1 >
-void InitializeVisual( Actor& actor, Visual& renderer, ParameterType0& param0, ParameterType1& param1 )
+void InitializeVisual( Actor& actor, Visual::Base& visual, ParameterType0& param0, ParameterType1& param1 )
 {
-  renderer.RemoveAndReset( actor );
-  renderer = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
-  if( renderer && actor && actor.OnStage() )
+  visual.RemoveAndReset( actor );
+  visual = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
+  if( visual && actor && actor.OnStage() )
   {
-    renderer.SetOnStage( actor );
+    visual.SetOnStage( actor );
   }
 }
 
 /**
- * @brief Template to allow discard old renderer, get new one and set it on stage if possible
+ * @brief Template to allow discard old visual, get new one and set it on stage if possible
  *
  * @tparam ParameterType The type of argument passed to the CreateVisual()
  * @SINCE_1_0.39
  * @param[in] actor Actor for which the renderer will be replaced
- * @param[in,out] renderer The renderer object to be replaced
+ * @param[in,out] visual The visual to be replaced
  * @param[in] param Template based argument passed to the renderer factory
  */
 template< class ParameterType >
-void InitializeVisual( Actor& actor, Visual& renderer, ParameterType& param )
+void InitializeVisual( Actor& actor, Visual::Base& visual, ParameterType& param )
 {
-  renderer.RemoveAndReset( actor );
-  renderer =  Toolkit::VisualFactory::Get().CreateVisual( param );
-  if( renderer && actor && actor.OnStage() )
+  visual.RemoveAndReset( actor );
+  visual =  Toolkit::VisualFactory::Get().CreateVisual( param );
+  if( visual && actor && actor.OnStage() )
   {
-    renderer.SetOnStage( actor );
+    visual.SetOnStage( actor );
   }
 }
 

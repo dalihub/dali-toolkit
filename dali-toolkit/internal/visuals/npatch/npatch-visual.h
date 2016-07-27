@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
@@ -49,7 +49,7 @@ namespace Internal
  * | borderOnly               | BOOLEAN
  *
  */
-class NPatchVisual: public Visual
+class NPatchVisual: public Visual::Base
 {
 public:
 

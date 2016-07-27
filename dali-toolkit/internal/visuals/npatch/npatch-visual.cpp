@@ -28,8 +28,8 @@
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-impl.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 
 namespace Dali
@@ -200,7 +200,7 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 /////////////////NPatchVisual////////////////
 
 NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mBorderOnly( false )
 {
 }
@@ -255,7 +255,7 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize ) const
 
 void NPatchVisual::SetClipRect( const Rect<int>& clipRect )
 {
-  Visual::SetClipRect( clipRect );
+  Visual::Base::SetClipRect( clipRect );
   //ToDo: renderer responds to the clipRect change
 }
 

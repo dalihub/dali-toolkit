@@ -27,7 +27,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
 {
@@ -278,7 +278,7 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 } // namespace
 
 MeshVisual::MeshVisual( VisualFactoryCache& factoryCache )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mShaderType( ALL_TEXTURES ),
   mUseTexture( true ),
   mUseMipmapping( true ),
@@ -370,14 +370,14 @@ void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 
 void MeshVisual::SetSize( const Vector2& size )
 {
-  Visual::SetSize( size );
+  Visual::Base::SetSize( size );
 
   // ToDo: renderer responds to the size change
 }
 
 void MeshVisual::SetClipRect( const Rect<int>& clipRect )
 {
-  Visual::SetClipRect( clipRect );
+  Visual::Base::SetClipRect( clipRect );
 
   //ToDo: renderer responds to the clipRect change
 }

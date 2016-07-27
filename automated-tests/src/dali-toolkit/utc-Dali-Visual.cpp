@@ -54,20 +54,20 @@ int UtcDaliVisualCopyAndAssignment(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "COLOR");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
 
-  Visual visualCopy( visual );
+  Visual::Base visualCopy( visual );
   DALI_TEST_CHECK(visual == visualCopy);
 
-  Visual emptyVisual;
-  Visual emptyVisualCopy( emptyVisual );
+  Visual::Base emptyVisual;
+  Visual::Base emptyVisualCopy( emptyVisual );
   DALI_TEST_CHECK(emptyVisual == emptyVisualCopy);
 
-  Visual visualEquals;
+  Visual::Base visualEquals;
   visualEquals = visual;
   DALI_TEST_CHECK(visual == visualEquals);
 
-  Visual emptyVisualEquals;
+  Visual::Base emptyVisualEquals;
   emptyVisualEquals = emptyVisual;
   DALI_TEST_CHECK( emptyVisual == emptyVisualEquals );
 
@@ -87,7 +87,7 @@ int UtcDaliVisualSetGetDepthIndex(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "COLOR");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
 
   visual.SetDepthIndex( 1.f );
 
@@ -117,11 +117,11 @@ int UtcDaliVisualSize(void)
   Vector2 visualSize( 20.f, 30.f );
   Vector2 naturalSize;
 
-  // color colorVisual 
+  // color colorVisual
   Dali::Property::Map map;
   map[ "rendererType" ] = "COLOR";
   map[ "mixColor" ] = Color::MAGENTA;
-  Visual colorVisual = factory.CreateVisual( map );
+  Visual::Base colorVisual = factory.CreateVisual( map );
   colorVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( colorVisual.GetSize(), visualSize, TEST_LOCATION );
   colorVisual.GetNaturalSize(naturalSize);
@@ -129,7 +129,7 @@ int UtcDaliVisualSize(void)
 
   // image visual
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  Visual imageVisual = factory.CreateVisual( image );
+  Visual::Base imageVisual = factory.CreateVisual( image );
   imageVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( imageVisual.GetSize(), visualSize, TEST_LOCATION );
   imageVisual.GetNaturalSize(naturalSize);
@@ -140,7 +140,7 @@ int UtcDaliVisualSize(void)
   Vector2 testSize(80.f, 160.f);
   platform.SetClosestImageSize(testSize);
   image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
-  Visual nPatchVisual = factory.CreateVisual( image );
+  Visual::Base nPatchVisual = factory.CreateVisual( image );
   nPatchVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( nPatchVisual.GetSize(), visualSize, TEST_LOCATION );
   nPatchVisual.GetNaturalSize(naturalSize);
@@ -152,7 +152,7 @@ int UtcDaliVisualSize(void)
   map[ "rendererType" ] = "BORDER";
   map[ "borderColor"  ] = Color::RED;
   map[ "borderSize"   ] = borderSize;
-  Visual borderVisual = factory.CreateVisual( map );
+  Visual::Base borderVisual = factory.CreateVisual( map );
   borderVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( borderVisual.GetSize(), visualSize, TEST_LOCATION );
   borderVisual.GetNaturalSize(naturalSize);
@@ -170,14 +170,14 @@ int UtcDaliVisualSize(void)
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
-  Visual gradientVisual = factory.CreateVisual(propertyMap);
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
   gradientVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( gradientVisual.GetSize(), visualSize, TEST_LOCATION );
   gradientVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
 
   //svg visual
-  Visual svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
+  Visual::Base svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
   svgVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( svgVisual.GetSize(), visualSize, TEST_LOCATION );
   svgVisual.GetNaturalSize(naturalSize);
@@ -198,7 +198,7 @@ int UtcDaliVisualSetOnOffStage(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "COLOR");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
 
   Actor actor = Actor::New();
   actor.SetSize(200.f, 200.f);
@@ -232,7 +232,7 @@ int UtcDaliVisualRemoveAndReset(void)
   actor.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( actor );
 
-  Visual imageVisual;
+  Visual::Base imageVisual;
   // test calling RemoveAndReset with an empty handle
   try
   {
@@ -271,7 +271,7 @@ int UtcDaliVisualGetPropertyMap1(void)
   Property::Map propertyMap;
   propertyMap.Insert("rendererType",  "COLOR");
   propertyMap.Insert("mixColor",  Color::BLUE);
-  Visual colorVisual = factory.CreateVisual( propertyMap );
+  Visual::Base colorVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
   colorVisual.CreatePropertyMap( resultMap );
@@ -308,7 +308,7 @@ int UtcDaliVisualGetPropertyMap2(void)
   propertyMap.Insert("rendererType",  "BORDER");
   propertyMap.Insert("borderColor",  Color::BLUE);
   propertyMap.Insert("borderSize",  5.f);
-  Visual borderVisual = factory.CreateVisual( propertyMap );
+  Visual::Base borderVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
   borderVisual.CreatePropertyMap( resultMap );
@@ -372,7 +372,7 @@ int UtcDaliVisualGetPropertyMap3(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  Visual gradientVisual = factory.CreateVisual(propertyMap);
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
 
   Property::Map resultMap;
   gradientVisual.CreatePropertyMap( resultMap );
@@ -439,7 +439,7 @@ int UtcDaliVisualGetPropertyMap4(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  Visual gradientVisual = factory.CreateVisual(propertyMap);
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( gradientVisual );
 
   Property::Map resultMap;
@@ -501,7 +501,7 @@ int UtcDaliVisualGetPropertyMap5(void)
   propertyMap.Insert( "samplingMode",   "BOX_THEN_NEAREST" );
   propertyMap.Insert( "synchronousLoading",   true );
 
-  Visual imageVisual = factory.CreateVisual(propertyMap);
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( imageVisual );
 
   Property::Map resultMap;
@@ -582,7 +582,7 @@ int UtcDaliVisualGetPropertyMap6(void)
   propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( "borderOnly",  true );
-  Visual nPatchVisual = factory.CreateVisual( propertyMap );
+  Visual::Base nPatchVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
   nPatchVisual.CreatePropertyMap( resultMap );
@@ -613,7 +613,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   Property::Map propertyMap;
   propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_SVG_FILE_NAME );
-  Visual svgVisual = factory.CreateVisual( propertyMap );
+  Visual::Base svgVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
   svgVisual.CreatePropertyMap( resultMap );
@@ -627,7 +627,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
 
   // request SvgVisual with an URL
-  Visual svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
+  Visual::Base svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
   resultMap.Clear();
   svgVisual2.CreatePropertyMap( resultMap );
   // check the property values from the returned map from a visual
@@ -657,7 +657,7 @@ int UtcDaliVisualGetPropertyMap8(void)
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_LOCATION );
   propertyMap.Insert( "shaderType", "TEXTURELESS" );
   propertyMap.Insert( "lightPosition", Vector3( 5.0f, 10.0f, 15.0f) );
-  Visual meshVisual = factory.CreateVisual( propertyMap );
+  Visual::Base meshVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
   meshVisual.CreatePropertyMap( resultMap );
@@ -715,7 +715,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   propertyMap.Insert( "bevelPercentage", 0.3f );
   propertyMap.Insert( "bevelSmoothness", 0.6f );
   propertyMap.Insert( "lightPosition", Vector3( 5.0f, 10.0f, 15.0f) );
-  Visual primitiveVisual = factory.CreateVisual( propertyMap );
+  Visual::Base primitiveVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
   primitiveVisual.CreatePropertyMap( resultMap );

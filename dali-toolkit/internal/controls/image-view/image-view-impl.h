@@ -158,9 +158,9 @@ private:
   ImageView& operator=( const ImageView& );
 
 private:
-  Toolkit::Visual  mRenderer;
-  ImageDimensions  mImageSize;
-  Vector2 mSizeSet;
+  Toolkit::Visual::Base  mVisual;
+  ImageDimensions        mImageSize;
+  Vector2                mSizeSet;
 
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise

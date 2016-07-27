@@ -22,8 +22,8 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
 {
@@ -65,7 +65,7 @@ void main()\n
 
 
 DebugVisual::DebugVisual( VisualFactoryCache& factoryCache )
-: Visual( factoryCache )
+: Visual::Base( factoryCache )
 {
 }
 

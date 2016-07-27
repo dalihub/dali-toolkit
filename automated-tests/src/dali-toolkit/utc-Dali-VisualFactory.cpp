@@ -175,7 +175,7 @@ Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
 
 void TestVisualRender( ToolkitTestApplication& application,
                                 Actor& actor,
-                                Visual& visual,
+                                Visual::Base& visual,
                                 std::size_t expectedSamplers = 0,
                                 ImageDimensions imageDimensions = ImageDimensions(),
                                 Integration::ResourcePointer resourcePtr = Integration::ResourcePointer())
@@ -297,7 +297,7 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   propertyMap.Insert("rendererType",  "COLOR");
   propertyMap.Insert("mixColor",  testColor);
 
-  Visual visual = factory.CreateVisual(propertyMap);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -323,7 +323,7 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   Dali::Property::Map map;
   map[ "rendererType" ] = "COLOR";
   map[ "mixColor" ] = testColor;
-  Visual visual = factory.CreateVisual( map );
+  Visual::Base visual = factory.CreateVisual( map );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -355,7 +355,7 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
   propertyMap.Insert("borderColor",  testColor);
   propertyMap.Insert("borderSize",  testSize);
 
-  Visual visual = factory.CreateVisual(propertyMap);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -402,7 +402,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   propertyMap[ "rendererType" ] = "BORDER";
   propertyMap[ "borderColor"  ] = testColor;
   propertyMap[ "borderSize"   ] = testSize;
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -475,7 +475,7 @@ int UtcDaliVisualFactoryGetLinearGradientVisual(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor", stopColors);
 
-  Visual visual = factory.CreateVisual(propertyMap);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
   // A lookup texture is generated and pass to shader as sampler
@@ -515,7 +515,7 @@ int UtcDaliVisualFactoryGetRadialGradientVisual(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor",   stopColors);
 
-  Visual visual = factory.CreateVisual(propertyMap);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
   // A lookup texture is generated and pass to shader as sampler
@@ -555,7 +555,7 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert("stopColor", stopColors);
 
-  Visual visual = factory.CreateVisual(propertyMap);
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
   // A lookup texture is generated and pass to shader as sampler
@@ -580,7 +580,7 @@ int UtcDaliVisualFactoryGetImageVisual1(void)
   propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_IMAGE_FILE_NAME );
 
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -617,7 +617,7 @@ int UtcDaliVisualFactoryGetImageVisual2(void)
   DALI_TEST_CHECK( factory );
 
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  Visual visual = factory.CreateVisual( image );
+  Visual::Base visual = factory.CreateVisual( image );
 
   Actor actor = Actor::New();
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
@@ -663,7 +663,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
-    Visual visual = factory.CreateVisual( propertyMap );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
 
     Actor actor = Actor::New();
@@ -682,7 +682,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   propertyMap.Insert( "borderOnly",  true );
   {
     tet_infoline( "border only" );
-    Visual visual = factory.CreateVisual( propertyMap );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
 
     Actor actor = Actor::New();
@@ -726,7 +726,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Insert( "rendererType",  "IMAGE" );
   propertyMap.Insert( "url",  TEST_NPATCH_FILE_NAME );
   {
-    Visual visual = factory.CreateVisual( propertyMap );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
 
     Actor actor = Actor::New();
@@ -748,7 +748,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Insert( "borderOnly",  true );
   {
     tet_infoline( "border only" );
-    Visual visual = factory.CreateVisual( propertyMap );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -785,7 +785,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
   stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
-  Visual visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
+  Visual::Base visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -824,7 +824,7 @@ int UtcDaliVisualFactoryGetNPatchVisual4(void)
   stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
-  Visual visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
+  Visual::Base visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -852,7 +852,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN1(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  Visual visual = factory.CreateVisual( "ERROR.9.jpg", ImageDimensions() );
+  Visual::Base visual = factory.CreateVisual( "ERROR.9.jpg", ImageDimensions() );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -888,7 +888,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   propertyMap.Insert( "rendererType",  111 );
   propertyMap.Insert( "url",  "ERROR.9.jpg" );
 
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   Actor actor = Actor::New();
@@ -916,7 +916,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   tet_infoline( "UtcDaliVisualFactoryGetSvgVisual: Request svg visual with a svg url" );
 
   VisualFactory factory = VisualFactory::Get();
-  Visual visual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
+  Visual::Base visual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( visual );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -958,7 +958,7 @@ void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplic
   DALI_TEST_CHECK( factory );
 
   //Create a mesh visual.
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   //Create an actor on stage to house the visual.
@@ -1004,7 +1004,7 @@ void MeshVisualDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTest
   DALI_TEST_CHECK( factory );
 
   //Create a mesh visual.
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   //Create an actor on stage to house the visual.
@@ -1284,7 +1284,7 @@ void TestPrimitiveVisualWithProperties( Property::Map& propertyMap, ToolkitTestA
   DALI_TEST_CHECK( factory );
 
   //Create a primitive visual.
-  Visual visual = factory.CreateVisual( propertyMap );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   //Create an actor on stage to house the visual.

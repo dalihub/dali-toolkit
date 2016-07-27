@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient.h>
 
 namespace Dali
@@ -66,7 +66,7 @@ class Gradient;
  * Valid values for spreadMethod are 'pad', 'repeat' and 'reflect.'
  * If not provided, 'objectBoundingBox' is used as default gradient units, and 'pad' is used as default spread method.
  */
-class GradientVisual: public Visual
+class GradientVisual: public Visual::Base
 {
 public:
 

@@ -163,14 +163,14 @@ private:
 
   /**
    * Sets shader effect on the control renderer
-   * @param[in,out] Sets custom shader effect on the given renderer
+   * @param[in,out] Sets custom shader effect on the given visual
    */
-  void SetShaderEffect( Toolkit::Visual& renderer );
+  void SetShaderEffect( Toolkit::Visual::Base& visual );
 
 private:
   std::vector<Toolkit::GaussianBlurView> mGaussianBlurView;
   std::vector<FrameBufferImage>          mBlurredImage;
-  std::vector<Toolkit::Visual>  mRenderers;
+  std::vector<Toolkit::Visual::Base>     mVisuals;
   Image                                  mInputImage;
   Vector2                                mTargetSize;
 

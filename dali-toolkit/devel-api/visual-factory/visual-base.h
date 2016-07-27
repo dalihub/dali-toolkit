@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_CONTROL_RENDERER_H__
-#define __DALI_TOOLKIT_CONTROL_RENDERER_H__
+#ifndef DALI_TOOLKIT_VISUAL_BASE_H
+#define DALI_TOOLKIT_VISUAL_BASE_H
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -29,9 +29,14 @@ namespace Toolkit
 
 namespace Internal DALI_INTERNAL
 {
-class Visual;
+namespace Visual
+{
+class Base;
+}
 }
 
+namespace Visual
+{
 /**
  * @brief Visual provides renderer for rendering the controls. A control may have multiple ControlRenders.
  *
@@ -39,28 +44,28 @@ class Visual;
  * It also responds to actor size and color change, and provides the clipping at the renderer level.
  * Note: The control renderer responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
  */
-class DALI_IMPORT_API Visual : public BaseHandle
+class DALI_IMPORT_API Base : public BaseHandle
 {
 public:
 
   /**
    * @brief Create an empty Visual Handle
    */
-  Visual();
+  Base();
 
   /**
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  ~Visual();
+  ~Base();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @param[in] handle A reference to the copied handle.
    */
-  Visual( const Visual& handle );
+  Base( const Base& handle );
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -68,7 +73,7 @@ public:
    * @param [in] handle  A reference to the copied handle.
    * @return A reference to this.
    */
-  Visual& operator=( const Visual& handle );
+  Base& operator=( const Base& handle );
 
   /**
    * @brief Set the size of the painting area.
@@ -147,12 +152,14 @@ public:
 
 public: // Not intended for application developers
 
-  explicit DALI_INTERNAL Visual(Internal::Visual *impl);
+  explicit DALI_INTERNAL Base(Internal::Visual::Base *impl);
 
 };
+
+} // namespace Visual
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif /*__DALI_TOOLKIT_CONTROL_RENDERER_H__*/
+#endif /*DALI_TOOLKIT_VISUAL_BASE_H*/

@@ -263,14 +263,14 @@ void Magnifier::SetFrameVisibility(bool visible)
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
     mFrame.SetSizeModeFactor( sizeOffset );
 
-    Toolkit::VisualFactory rendererFactory = Toolkit::VisualFactory::Get();
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
 
     Property::Map map;
     map[ RENDERER_TYPE ] = BORDER_RENDERER;
     map[ "borderColor"  ] = Color::WHITE;
     map[ "borderSize"   ] = IMAGE_BORDER_INDENT;
-    Toolkit::Visual borderRenderer = rendererFactory.CreateVisual( map );
-    borderRenderer.SetOnStage( mFrame );
+    Toolkit::Visual::Base borderVisual = visualFactory.CreateVisual( map );
+    borderVisual.SetOnStage( mFrame );
 
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
     constraint.AddSource( ParentSource( Actor::Property::WORLD_POSITION ) );

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 // EXTERNAL INCLUDES
@@ -73,7 +73,7 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DEFAULT"
  *
  */
-class ImageVisual: public Visual, public ConnectionTracker
+class ImageVisual: public Visual::Base, public ConnectionTracker
 {
 public:
 

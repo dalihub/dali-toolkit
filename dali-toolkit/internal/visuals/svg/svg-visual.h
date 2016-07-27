@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 struct NSVGimage;
@@ -43,7 +43,7 @@ namespace Internal
  * | url                      | STRING           |
  *
  */
-class SvgVisual: public Visual
+class SvgVisual: public Visual::Base
 {
 public:
 

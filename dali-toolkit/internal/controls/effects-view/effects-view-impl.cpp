@@ -188,7 +188,7 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     customShader[ "vertexShader" ] = EFFECTS_VIEW_VERTEX_SOURCE;
     customShader[ "fragmentShader" ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
     rendererMap[ "shader" ] = customShader;
-    InitializeVisual( self, mRendererPostFilter, rendererMap );
+    InitializeVisual( self, mVisualPostFilter, rendererMap );
 
     mEffectType = type;
   }
@@ -302,13 +302,13 @@ void EffectsView::OnStageConnection( int depth )
   Enable();
 
   Actor self = Self();
-  if( mRendererPostFilter )
+  if( mVisualPostFilter )
   {
-    mRendererPostFilter.SetOnStage( self );
+    mVisualPostFilter.SetOnStage( self );
   }
-  if( mRendererForChildren )
+  if( mVisualForChildren )
   {
-    mRendererForChildren.SetOnStage( self );
+    mVisualForChildren.SetOnStage( self );
   }
 }
 
@@ -323,13 +323,13 @@ void EffectsView::OnStageDisconnection()
   }
 
   Actor self = Self();
-  if( mRendererPostFilter )
+  if( mVisualPostFilter )
   {
-    mRendererPostFilter.SetOffStage( self );
+    mVisualPostFilter.SetOffStage( self );
   }
-  if( mRendererForChildren )
+  if( mVisualForChildren )
   {
-    mRendererForChildren.SetOffStage( self );
+    mVisualForChildren.SetOffStage( self );
   }
 
   Control::OnStageDisconnection();
@@ -435,14 +435,14 @@ void EffectsView::AllocateResources()
     Actor self( Self() );
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    InitializeVisual( self, mRendererForChildren, mImageForChildren );
-    mRendererForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
+    InitializeVisual( self, mVisualForChildren, mImageForChildren );
+    mVisualForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
     TextureSet textureSet = TextureSet::New();
     TextureSetImage( textureSet, 0u,  mImagePostFilter );
     self.GetRendererAt( 0 ).SetTextures( textureSet );
-    mRendererPostFilter.SetDepthIndex( DepthIndex::CONTENT );
+    mVisualPostFilter.SetDepthIndex( DepthIndex::CONTENT );
 
     SetupFilters();
   }

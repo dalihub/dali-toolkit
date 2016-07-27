@@ -10,8 +10,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/json-parser-impl.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
-   $(toolkit_src_dir)/visuals/visual-impl.cpp \
-   $(toolkit_src_dir)/visuals/visual-data-impl.cpp \
+   $(toolkit_src_dir)/visuals/visual-base-impl.cpp \
+   $(toolkit_src_dir)/visuals/visual-base-data-impl.cpp \
    $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-cache.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-impl.cpp \

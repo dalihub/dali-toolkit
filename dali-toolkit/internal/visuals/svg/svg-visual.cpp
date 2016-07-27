@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 
 namespace
@@ -52,7 +52,7 @@ namespace Internal
 {
 
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mAtlasRect( FULL_TEXTURE_RECT ),
   mAtlasManager( atlasManager ),
   mParsedImage( NULL )

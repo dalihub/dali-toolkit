@@ -127,8 +127,8 @@ void EmbossFilter::Enable()
 
   mRootActor.Add( mActorForComposite );
 
-  InitializeVisual( mActorForComposite, mRendererForEmboss1, rendererMap );
-  InitializeVisual( mActorForComposite, mRendererForEmboss2, rendererMap );
+  InitializeVisual( mActorForComposite, mVisualForEmboss1, rendererMap );
+  InitializeVisual( mActorForComposite, mVisualForEmboss2, rendererMap );
 
   TextureSet textureSet1 = TextureSet::New();
   TextureSetImage( textureSet1, 0, mImageForEmboss1 );
@@ -168,10 +168,10 @@ void EmbossFilter::Disable()
 
     if( mActorForComposite )
     {
-      mRendererForEmboss1.SetOffStage( mActorForComposite );
-      mRendererForEmboss2.SetOffStage( mActorForComposite );
-      mRendererForEmboss1.Reset();
-      mRendererForEmboss2.Reset();
+      mVisualForEmboss1.SetOffStage( mActorForComposite );
+      mVisualForEmboss2.SetOffStage( mActorForComposite );
+      mVisualForEmboss1.Reset();
+      mVisualForEmboss2.Reset();
       mRootActor.Remove( mActorForComposite );
       mActorForComposite.Reset();
     }

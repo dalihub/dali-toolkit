@@ -25,7 +25,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
 {
@@ -137,7 +137,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 } // namespace
 
 PrimitiveVisual::PrimitiveVisual( VisualFactoryCache& factoryCache )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mColor( DEFAULT_COLOR ),
   mScaleDimensions( Vector3::ONE ),
   mScaleTopRadius( DEFAULT_SCALE_TOP_RADIUS ),
@@ -371,14 +371,14 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
 
 void PrimitiveVisual::SetSize( const Vector2& size )
 {
-  Visual::SetSize( size );
+  Visual::Base::SetSize( size );
 
   // ToDo: renderer responds to the size change
 }
 
 void PrimitiveVisual::SetClipRect( const Rect<int>& clipRect )
 {
-  Visual::SetClipRect( clipRect );
+  Visual::Base::SetClipRect( clipRect );
 
   //ToDo: renderer responds to the clipRect change
 }

@@ -30,13 +30,13 @@ namespace
 const char* TEST_IMAGE_FILE_NAME =  "image_01.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "image_01.9.jpg";
 
-bool IsDebugVisual( Visual& renderer )
+bool IsDebugVisual( Visual::Base& visual )
 {
   bool isDebugVisualType = false;
   bool isGeometryLineType = false;
 
   Property::Map propertyMap;
-  renderer.CreatePropertyMap( propertyMap );
+  visual.CreatePropertyMap( propertyMap );
   Property::Value* typeValue = propertyMap.Find( "rendererType",  Property::STRING );
   if ( typeValue )
   {
@@ -44,7 +44,7 @@ bool IsDebugVisual( Visual& renderer )
   }
 
   Actor actor = Actor::New();
-  renderer.SetOnStage( actor );
+  visual.SetOnStage( actor );
   Geometry geometry = actor.GetRendererAt( 0 ).GetGeometry();
   isGeometryLineType = ( geometry.GetGeometryType() == Geometry::LINES );
 
@@ -75,16 +75,16 @@ int UtcDaliDebugVisualGetRenderer1(void)
   Property::Map propertyMap1;
   propertyMap1.Insert("rendererType",  "COLOR");
   propertyMap1.Insert("mixColor",  Color::BLUE);
-  Visual colorRenderer = factory.CreateVisual(propertyMap1);
-  DALI_TEST_CHECK( colorRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( colorRenderer ) );
+  Visual::Base colorVisual = factory.CreateVisual(propertyMap1);
+  DALI_TEST_CHECK( colorVisual );
+  DALI_TEST_CHECK( IsDebugVisual( colorVisual ) );
 
   // Test that border renderer is replaced with debug renderer
   Property::Map propertyMap2;
   propertyMap2.Insert("rendererType",  "BORDER");
   propertyMap2.Insert("borderColor",  Color::BLUE);
   propertyMap2.Insert("borderSize",  2.f);
-  Visual borderRenderer = factory.CreateVisual(propertyMap2);
+  Visual::Base borderRenderer = factory.CreateVisual(propertyMap2);
   DALI_TEST_CHECK( borderRenderer );
   DALI_TEST_CHECK( IsDebugVisual( borderRenderer ) );
 
@@ -104,7 +104,7 @@ int UtcDaliDebugVisualGetRenderer1(void)
   stopColors.PushBack( Color::RED );
   stopColors.PushBack( Color::GREEN );
   propertyMap3.Insert("stopColor", stopColors);
-  Visual gradientRenderer = factory.CreateVisual(propertyMap3);
+  Visual::Base gradientRenderer = factory.CreateVisual(propertyMap3);
   DALI_TEST_CHECK( gradientRenderer );
   DALI_TEST_CHECK( IsDebugVisual( gradientRenderer ) );
 
@@ -112,7 +112,7 @@ int UtcDaliDebugVisualGetRenderer1(void)
   Property::Map propertyMap4;
   propertyMap4.Insert( "rendererType",  "IMAGE" );
   propertyMap4.Insert( "url",  TEST_IMAGE_FILE_NAME );
-  Visual imageRenderer = factory.CreateVisual( propertyMap4 );
+  Visual::Base imageRenderer = factory.CreateVisual( propertyMap4 );
   DALI_TEST_CHECK( imageRenderer );
   DALI_TEST_CHECK( IsDebugVisual( imageRenderer ) );
 
@@ -120,7 +120,7 @@ int UtcDaliDebugVisualGetRenderer1(void)
   Property::Map propertyMap5;
   propertyMap5.Insert( "rendererType",  "IMAGE" );
   propertyMap5.Insert( "url",  TEST_NPATCH_FILE_NAME );
-  Visual nPatchRenderer = factory.CreateVisual( propertyMap4 );
+  Visual::Base nPatchRenderer = factory.CreateVisual( propertyMap4 );
   DALI_TEST_CHECK( nPatchRenderer );
   DALI_TEST_CHECK( IsDebugVisual( nPatchRenderer ) );
 
@@ -142,27 +142,27 @@ int UtcDaliDebugVisualGetRenderer2(void)
   map[ "rendererType" ] = "COLOR";
   map[ "mixColor" ] = Color::CYAN;
 
-  Visual colorRenderer = factory.CreateVisual( map);
-  DALI_TEST_CHECK( colorRenderer );
-  DALI_TEST_CHECK( IsDebugVisual( colorRenderer ) );
+  Visual::Base colorVisual = factory.CreateVisual( map);
+  DALI_TEST_CHECK( colorVisual );
+  DALI_TEST_CHECK( IsDebugVisual( colorVisual ) );
 
   // Test that border renderer is replaced with debug renderer
   map.Clear();
   map[ "rendererType" ] = "BORDER";
   map[ "borderColor"  ] = Color::GREEN;
   map[ "borderSize"   ] = 2.f;
-  Visual borderRenderer = factory.CreateVisual( map );
+  Visual::Base borderRenderer = factory.CreateVisual( map );
   DALI_TEST_CHECK( borderRenderer );
   DALI_TEST_CHECK( IsDebugVisual( borderRenderer ) );
 
   // Test that image renderer is replaced with debug renderer
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  Visual imageRenderer = factory.CreateVisual( image );
+  Visual::Base imageRenderer = factory.CreateVisual( image );
   DALI_TEST_CHECK( imageRenderer );
   DALI_TEST_CHECK( IsDebugVisual( imageRenderer ) );
 
   // Test that n patch renderer is replaced with debug renderer
-  Visual nPatchRenderer = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
+  Visual::Base nPatchRenderer = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( nPatchRenderer );
   DALI_TEST_CHECK( IsDebugVisual( nPatchRenderer ) );
 

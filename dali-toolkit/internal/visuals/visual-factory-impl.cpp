@@ -135,9 +135,9 @@ VisualFactory::RendererType VisualFactory::GetRendererType( const Property::Map&
   return rendererType;
 }
 
-Toolkit::Visual VisualFactory::CreateVisual( const Property::Map& propertyMap )
+Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
 {
-  Visual* rendererPtr = NULL;
+  Visual::Base* rendererPtr = NULL;
 
   RendererType type = GetRendererType( propertyMap );
   if( type != UNDEFINED)
@@ -149,7 +149,7 @@ Toolkit::Visual VisualFactory::CreateVisual( const Property::Map& propertyMap )
 
     if( mDebugEnabled )
     {
-      return Toolkit::Visual( new DebugVisual( *( mFactoryCache.Get() ) ) );
+      return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
     }
   }
 
@@ -214,10 +214,10 @@ Toolkit::Visual VisualFactory::CreateVisual( const Property::Map& propertyMap )
     DALI_LOG_ERROR( "Renderer type unknown" );
   }
 
-  return Toolkit::Visual( rendererPtr );
+  return Toolkit::Visual::Base( rendererPtr );
 }
 
-Toolkit::Visual VisualFactory::CreateVisual( const Image& image )
+Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 {
   if( !mFactoryCache )
   {
@@ -226,7 +226,7 @@ Toolkit::Visual VisualFactory::CreateVisual( const Image& image )
 
   if( mDebugEnabled )
   {
-    return Toolkit::Visual( new DebugVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
   }
 
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
@@ -235,7 +235,7 @@ Toolkit::Visual VisualFactory::CreateVisual( const Image& image )
     NPatchVisual* rendererPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
     rendererPtr->SetImage( npatchImage );
 
-    return Toolkit::Visual( rendererPtr );
+    return Toolkit::Visual::Base( rendererPtr );
   }
   else
   {
@@ -244,11 +244,11 @@ Toolkit::Visual VisualFactory::CreateVisual( const Image& image )
     Actor actor;
     rendererPtr->SetImage( actor, image );
 
-    return Toolkit::Visual( rendererPtr );
+    return Toolkit::Visual::Base( rendererPtr );
   }
 }
 
-Toolkit::Visual VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
+Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
 {
   if( !mFactoryCache )
   {
@@ -257,7 +257,7 @@ Toolkit::Visual VisualFactory::CreateVisual( const std::string& url, ImageDimens
 
   if( mDebugEnabled )
   {
-    return Toolkit::Visual( new DebugVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
   }
 
   if( NinePatchImage::IsNinePatchUrl( url ) )
@@ -265,14 +265,14 @@ Toolkit::Visual VisualFactory::CreateVisual( const std::string& url, ImageDimens
     NPatchVisual* rendererPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
     rendererPtr->SetImage( url );
 
-    return Toolkit::Visual( rendererPtr );
+    return Toolkit::Visual::Base( rendererPtr );
   }
   else if( SvgVisual::IsSvgUrl( url ) )
   {
     CreateAtlasManager();
     SvgVisual* rendererPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
     rendererPtr->SetImage( url, size );
-    return Toolkit::Visual( rendererPtr );
+    return Toolkit::Visual::Base( rendererPtr );
   }
   else
   {
@@ -281,7 +281,7 @@ Toolkit::Visual VisualFactory::CreateVisual( const std::string& url, ImageDimens
     Actor actor;
     rendererPtr->SetImage( actor, url, size );
 
-    return Toolkit::Visual( rendererPtr );
+    return Toolkit::Visual::Base( rendererPtr );
   }
 }
 

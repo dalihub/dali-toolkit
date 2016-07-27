@@ -215,11 +215,11 @@ private: // attributes/properties
 
   /////////////////////////////////////////////////////////////
   // for rendering all user added children to offscreen target
-  FrameBufferImage mImageForChildren;
-  Toolkit::Visual mRendererForChildren;
-  RenderTask mRenderTaskForChildren;
-  CameraActor mCameraForChildren;
-  Actor mChildrenRoot; // for creating a subtree for all user added child actors
+  FrameBufferImage      mImageForChildren;
+  Toolkit::Visual::Base mVisualForChildren;
+  RenderTask            mRenderTaskForChildren;
+  CameraActor           mCameraForChildren;
+  Actor                 mChildrenRoot; // for creating a subtree for all user added child actors
 
   /////////////////////////////////////////////////////////////
   // background fill color
@@ -231,8 +231,8 @@ private: // attributes/properties
   Vector2 mLastSize;
   /////////////////////////////////////////////////////////////
   // post blur image
-  FrameBufferImage mImagePostFilter;
-  Toolkit::Visual mRendererPostFilter;
+  FrameBufferImage      mImagePostFilter;
+  Toolkit::Visual::Base mVisualPostFilter;
 
   Vector<ImageFilter*> mFilters;
 

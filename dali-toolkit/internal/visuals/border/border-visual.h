@@ -22,7 +22,7 @@
 #include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -45,7 +45,7 @@ namespace Internal
  * | antiAliasing    | BOOLEAN     |
  */
 
-class BorderVisual : public Visual
+class BorderVisual : public Visual::Base
 {
 public:
 

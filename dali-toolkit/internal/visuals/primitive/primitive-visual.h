@@ -46,7 +46,7 @@
 
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -89,7 +89,7 @@ namespace Internal
  * |-----------------|-------------|-----------------------------------------|
  * | lightPosition   | VECTOR3     | The position (on stage) of the light    |
  */
-class PrimitiveVisual: public Visual
+class PrimitiveVisual: public Visual::Base
 {
 public:
 

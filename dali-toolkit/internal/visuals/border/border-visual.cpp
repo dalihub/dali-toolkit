@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
 {
@@ -102,7 +102,7 @@ const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
 }
 
 BorderVisual::BorderVisual( VisualFactoryCache& factoryCache )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mBorderColor( Color::TRANSPARENT ),
   mBorderSize( 0.f ),
   mBorderColorIndex( Property::INVALID_INDEX ),
@@ -138,7 +138,7 @@ void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap 
 
 void BorderVisual::SetClipRect( const Rect<int>& clipRect )
 {
-  Visual::SetClipRect( clipRect );
+  Visual::Base::SetClipRect( clipRect );
 
   //ToDo: renderer responds to the clipRect change
 }

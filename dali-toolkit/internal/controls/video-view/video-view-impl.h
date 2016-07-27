@@ -240,7 +240,7 @@ private:
 
   Dali::VideoPlayer mVideoPlayer;
   Dali::ImageDimensions mVideoSize;
-  Toolkit::Visual mRenderer;
+  Toolkit::Visual::Base mVisual;
   Dali::Property::Map mPropertyMap;
   Dali::NativeImage mNativeImage; ///< Native image handle for video rendering by texture streaming
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;

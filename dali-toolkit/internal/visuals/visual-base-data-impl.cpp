@@ -16,14 +16,12 @@
  */
 
 // CLASS HEADER
-#include "visual-data-impl.h"
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
-// EXTERNAL HEADER
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>
-
-// EXTERNAL HEADER
 
 namespace Dali
 {
@@ -75,26 +73,26 @@ Shader::Hint::Value HintFromString( std::string hintString )
 
 }// unnamed namespace
 
-Internal::Visual::Impl::Impl()
+Internal::Visual::Base::Impl::Impl()
 : mCustomShader(NULL),
   mDepthIndex( 0.0f ),
   mFlags( 0 )
 {
 }
 
-Internal::Visual::Impl::~Impl()
+Internal::Visual::Base::Impl::~Impl()
 {
   delete mCustomShader;
 }
 
-Internal::Visual::Impl::CustomShader::CustomShader( const Property::Map& map )
+Internal::Visual::Base::Impl::CustomShader::CustomShader( const Property::Map& map )
 : mGridSize( 1, 1 ),
   mHints( Shader::Hint::NONE )
 {
   SetPropertyMap( map );
 }
 
-void Internal::Visual::Impl::CustomShader::SetPropertyMap( const Property::Map& shaderMap )
+void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property::Map& shaderMap )
 {
   mVertexShader.clear();
   mFragmentShader.clear();
@@ -182,7 +180,7 @@ void Internal::Visual::Impl::CustomShader::SetPropertyMap( const Property::Map& 
   }
 }
 
-void Internal::Visual::Impl::CustomShader::CreatePropertyMap( Property::Map& map ) const
+void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Map& map ) const
 {
   if( !mVertexShader.empty() || !mFragmentShader.empty() )
   {

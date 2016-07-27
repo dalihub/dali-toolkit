@@ -28,10 +28,10 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/gradient/linear-gradient.h>
 #include <dali-toolkit/internal/visuals/gradient/radial-gradient.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
 {
@@ -180,7 +180,7 @@ Dali::WrapMode::Type GetWrapMode( Gradient::SpreadMethod spread )
 
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mGradientType( LINEAR )
 {
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -221,12 +221,12 @@ void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMa
 
 void GradientVisual::SetSize( const Vector2& size )
 {
-  Visual::SetSize( size );
+  Visual::Base::SetSize( size );
 }
 
 void GradientVisual::SetClipRect( const Rect<int>& clipRect )
 {
-  Visual::SetClipRect( clipRect );
+  Visual::Base::SetClipRect( clipRect );
 
   //ToDo: renderer responds to the clipRect change
 }

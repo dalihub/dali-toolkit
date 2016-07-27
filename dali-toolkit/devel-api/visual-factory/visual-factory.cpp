@@ -94,17 +94,17 @@ VisualFactory::VisualFactory(Internal::VisualFactory *impl)
 {
 }
 
-Visual VisualFactory::CreateVisual( const Property::Map& propertyMap )
+Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
 {
   return GetImplementation( *this ).CreateVisual( propertyMap );
 }
 
-Visual VisualFactory::CreateVisual( const Image& image )
+Visual::Base VisualFactory::CreateVisual( const Image& image )
 {
   return GetImplementation( *this ).CreateVisual( image );
 }
 
-Visual VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
+Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
 {
   return GetImplementation( *this ).CreateVisual( url, size );
 }

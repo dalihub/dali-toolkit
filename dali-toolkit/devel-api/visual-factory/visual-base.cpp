@@ -16,8 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/visual-impl.h>
-#include "visual.h"
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+
+// INTERAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -25,66 +27,69 @@ namespace Dali
 namespace Toolkit
 {
 
-Visual::Visual()
+namespace Visual
+{
+
+Base::Base()
 {
 }
 
-Visual::~Visual()
+Base::~Base()
 {
 }
 
-Visual::Visual( const Visual& handle )
+Base::Base( const Base& handle )
 : BaseHandle( handle )
 {
 }
 
-Visual& Visual::operator=( const Visual& handle )
+Base& Base::operator=( const Base& handle )
 {
   BaseHandle::operator=( handle );
   return *this;
 }
 
-Visual::Visual(Internal::Visual *impl)
+Base::Base(Internal::Visual::Base *impl)
 : BaseHandle( impl )
 {
 }
 
-void Visual::SetSize( const Vector2& size )
+void Base::SetSize( const Vector2& size )
 {
   GetImplementation( *this ).SetSize( size );
 }
 
-const Vector2& Visual::GetSize() const
+const Vector2& Base::GetSize() const
 {
   return GetImplementation( *this ).GetSize();
 }
 
-void Visual::GetNaturalSize(Vector2& naturalSize ) const
+void Base::GetNaturalSize(Vector2& naturalSize ) const
 {
   GetImplementation( *this ).GetNaturalSize( naturalSize );
 }
 
-void Visual::SetDepthIndex( float index )
+void Base::SetDepthIndex( float index )
 {
   GetImplementation( *this ).SetDepthIndex( index );
 }
 
-float Visual::GetDepthIndex() const
+float Base::GetDepthIndex() const
 {
   return GetImplementation( *this ).GetDepthIndex();
 }
 
-void Visual::SetOnStage( Actor& actor )
+void Base::SetOnStage( Actor& actor )
 {
   GetImplementation( *this ).SetOnStage( actor );
 }
 
-void Visual::SetOffStage( Actor& actor )
+void Base::SetOffStage( Actor& actor )
 {
   GetImplementation( *this ).SetOffStage( actor );
 }
 
-void Visual::RemoveAndReset( Actor& actor )
+void Base::RemoveAndReset( Actor& actor )
 {
   if( actor && *this )
   {
@@ -93,10 +98,12 @@ void Visual::RemoveAndReset( Actor& actor )
   Reset();
 }
 
-void Visual::CreatePropertyMap( Property::Map& map ) const
+void Base::CreatePropertyMap( Property::Map& map ) const
 {
   GetImplementation( *this ).CreatePropertyMap( map );
 }
+
+} // namespace Visual
 
 } // namespace Toolkit
 

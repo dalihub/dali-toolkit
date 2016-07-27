@@ -23,7 +23,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
   $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
-  $(devel_api_src_dir)/visual-factory/visual.cpp
+  $(devel_api_src_dir)/visual-factory/visual-base.cpp
 
 # Add devel header files here
 
@@ -53,7 +53,7 @@ devel_api_popup_header_files = \
 
 devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
-  $(devel_api_src_dir)/visual-factory/visual.h
+  $(devel_api_src_dir)/visual-factory/visual-base.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h

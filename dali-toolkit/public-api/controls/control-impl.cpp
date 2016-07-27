@@ -368,7 +368,7 @@ public:
 
   Control& mControlImpl;
   std::string mStyleName;
-  Toolkit::Visual mBackgroundRenderer;   ///< The control renderer to render the background
+  Toolkit::Visual::Base mBackgroundRenderer;   ///< The control renderer to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background renderer
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;

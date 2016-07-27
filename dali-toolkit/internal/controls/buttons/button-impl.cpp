@@ -563,7 +563,7 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
       // If there is no existing content, create a new actor to use for flat color.
       Actor placementActor = Actor::New();
       Toolkit::VisualFactory rendererFactory = Toolkit::VisualFactory::Get();
-      Toolkit::Visual colorRenderer;
+      Toolkit::Visual::Base colorRenderer;
 
       Property::Map map;
       map["rendererType"] = "COLOR";

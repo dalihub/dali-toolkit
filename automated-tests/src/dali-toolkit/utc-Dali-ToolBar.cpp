@@ -43,8 +43,8 @@ Actor CreateColorActor( const Vector4& color )
   Dali::Property::Map map;
   map[ "rendererType" ] = "COLOR";
   map[ "mixColor" ] = color;
-  Visual colorRenderer = factory.CreateVisual( map );
-  colorRenderer.SetOnStage( solidColorActor );
+  Visual::Base colorVisual = factory.CreateVisual( map );
+  colorVisual.SetOnStage( solidColorActor );
 
   return solidColorActor;
 }

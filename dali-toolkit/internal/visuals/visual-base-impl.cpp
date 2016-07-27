@@ -16,14 +16,14 @@
  */
 
 // CLASS HEADER
-#include "visual-impl.h"
+#include "visual-base-impl.h"
 
 // EXTERNAL HEADER
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace
 {
@@ -45,18 +45,21 @@ namespace Toolkit
 namespace Internal
 {
 
-Visual::Visual( VisualFactoryCache& factoryCache )
+namespace Visual
+{
+
+Base::Base( VisualFactoryCache& factoryCache )
 : mImpl( new Impl() ),
   mFactoryCache( factoryCache )
 {
 }
 
-Visual::~Visual()
+Base::~Base()
 {
   delete mImpl;
 }
 
-void Visual::SetCustomShader( const Property::Map& shaderMap )
+void Base::SetCustomShader( const Property::Map& shaderMap )
 {
   if( mImpl->mCustomShader )
   {
@@ -68,7 +71,7 @@ void Visual::SetCustomShader( const Property::Map& shaderMap )
   }
 }
 
-void Visual::Initialize( Actor& actor, const Property::Map& propertyMap )
+void Base::Initialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* customShaderValue = propertyMap.Find( CUSTOM_SHADER );
   if( customShaderValue )
@@ -83,31 +86,31 @@ void Visual::Initialize( Actor& actor, const Property::Map& propertyMap )
   DoInitialize( actor, propertyMap );
 }
 
-void Visual::SetSize( const Vector2& size )
+void Base::SetSize( const Vector2& size )
 {
   mImpl->mSize = size;
 }
 
-const Vector2& Visual::GetSize() const
+const Vector2& Base::GetSize() const
 {
   return mImpl->mSize;
 }
 
-void Visual::GetNaturalSize( Vector2& naturalSize ) const
+void Base::GetNaturalSize( Vector2& naturalSize ) const
 {
   naturalSize = Vector2::ZERO;
 }
 
-void Visual::SetClipRect( const Rect<int>& clipRect )
+void Base::SetClipRect( const Rect<int>& clipRect )
 {
 }
 
-void Visual::SetOffset( const Vector2& offset )
+void Base::SetOffset( const Vector2& offset )
 {
   mImpl->mOffset = offset;
 }
 
-void Visual::SetDepthIndex( float index )
+void Base::SetDepthIndex( float index )
 {
   mImpl->mDepthIndex = index;
   if( mImpl->mRenderer )
@@ -116,12 +119,12 @@ void Visual::SetDepthIndex( float index )
   }
 }
 
-float Visual::GetDepthIndex() const
+float Base::GetDepthIndex() const
 {
   return mImpl->mDepthIndex;
 }
 
-void Visual::SetOnStage( Actor& actor )
+void Base::SetOnStage( Actor& actor )
 {
   DoSetOnStage( actor );
 
@@ -131,7 +134,7 @@ void Visual::SetOnStage( Actor& actor )
   mImpl->mFlags |= Impl::IS_ON_STAGE;
 }
 
-void Visual::SetOffStage( Actor& actor )
+void Base::SetOffStage( Actor& actor )
 {
   if( GetIsOnStage() )
   {
@@ -141,7 +144,7 @@ void Visual::SetOffStage( Actor& actor )
   }
 }
 
-void Visual::EnablePreMultipliedAlpha( bool preMultipled )
+void Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
   if(preMultipled)
   {
@@ -158,22 +161,22 @@ void Visual::EnablePreMultipliedAlpha( bool preMultipled )
   }
 }
 
-bool Visual::IsPreMultipliedAlphaEnabled() const
+bool Base::IsPreMultipliedAlphaEnabled() const
 {
   return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
-void Visual::DoSetOnStage( Actor& actor )
+void Base::DoSetOnStage( Actor& actor )
 {
 }
 
-void Visual::DoSetOffStage( Actor& actor )
+void Base::DoSetOffStage( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
 }
 
-void Visual::CreatePropertyMap( Property::Map& map ) const
+void Base::CreatePropertyMap( Property::Map& map ) const
 {
   DoCreatePropertyMap( map );
 
@@ -183,15 +186,17 @@ void Visual::CreatePropertyMap( Property::Map& map ) const
   }
 }
 
-bool Visual::GetIsOnStage() const
+bool Base::GetIsOnStage() const
 {
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
-bool Visual::GetIsFromCache() const
+bool Base::GetIsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }
+
+} // namespace Visual
 
 } // namespace Internal
 

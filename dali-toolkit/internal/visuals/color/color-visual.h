@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -39,7 +39,7 @@ namespace Internal
  * |-----------------|-------------|
  * | mixColor        | VECTOR4     |
  */
-class ColorVisual: public Visual
+class ColorVisual: public Visual::Base
 {
 public:
 

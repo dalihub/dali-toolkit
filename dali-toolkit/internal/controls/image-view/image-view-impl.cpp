@@ -13,7 +13,7 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -81,7 +81,7 @@ void ImageView::SetImage( Image image )
     mImage = image;
 
     Actor self( Self() );
-    InitializeVisual( self, mRenderer, image );
+    InitializeVisual( self, mVisual, image );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -95,7 +95,7 @@ void ImageView::SetImage( Property::Map map )
   mPropertyMap = map;
 
   Actor self( Self() );
-  InitializeVisual( self, mRenderer, mPropertyMap );
+  InitializeVisual( self, mVisual, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -137,9 +137,9 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     }
 
     Actor self( Self() );
-    InitializeVisual( self, mRenderer, url, size );
+    InitializeVisual( self, mVisual, url, size );
 
-    mRenderer.SetSize( mSizeSet );
+    mVisual.SetSize( mSizeSet );
 
     RelayoutRequest();
   }
@@ -152,35 +152,35 @@ Image ImageView::GetImage() const
 
 void ImageView::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  if( mRenderer )
+  if( mVisual )
   {
-     GetImplementation( mRenderer ).EnablePreMultipliedAlpha( preMultipled );
+    Toolkit::GetImplementation( mVisual ).EnablePreMultipliedAlpha( preMultipled );
   }
 }
 
 bool ImageView::IsPreMultipliedAlphaEnabled() const
 {
-  if( mRenderer )
+  if( mVisual )
   {
-    return GetImplementation( mRenderer ).IsPreMultipliedAlphaEnabled();
+    return Toolkit::GetImplementation( mVisual ).IsPreMultipliedAlphaEnabled();
   }
   return false;
 }
 
 void ImageView::SetDepthIndex( int depthIndex )
 {
-  if( mRenderer )
+  if( mVisual )
   {
-    mRenderer.SetDepthIndex( depthIndex );
+    mVisual.SetDepthIndex( depthIndex );
   }
 }
 
 Vector3 ImageView::GetNaturalSize()
 {
-  if( mRenderer )
+  if( mVisual )
   {
     Vector2 rendererNaturalSize;
-    mRenderer.GetNaturalSize( rendererNaturalSize );
+    mVisual.GetNaturalSize( rendererNaturalSize );
     return Vector3( rendererNaturalSize );
   }
 
@@ -234,19 +234,19 @@ void ImageView::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
 
-  if( mRenderer )
+  if( mVisual )
   {
     CustomActor self = Self();
-    mRenderer.SetOnStage( self );
+    mVisual.SetOnStage( self );
   }
 }
 
 void ImageView::OnStageDisconnection()
 {
-  if( mRenderer )
+  if( mVisual )
   {
     CustomActor self = Self();
-    mRenderer.SetOffStage( self );
+    mVisual.SetOffStage( self );
   }
 
   Control::OnStageDisconnection();
@@ -257,10 +257,10 @@ void ImageView::OnSizeSet( const Vector3& targetSize )
   Control::OnSizeSet( targetSize );
   mSizeSet = targetSize;
 
-  if( mRenderer )
+  if( mVisual )
   {
     Vector2 size( targetSize );
-    mRenderer.SetSize( size );
+    mVisual.SetSize( size );
   }
 }
 
@@ -306,18 +306,18 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
             impl.SetImage( map );
           }
           // the property map contains only the custom shader
-          else if(  impl.mRenderer && map.Count() == 1u &&  shaderValue )
+          else if(  impl.mVisual && map.Count() == 1u &&  shaderValue )
           {
             Property::Map shaderMap;
             if( shaderValue->Get( shaderMap ) )
             {
-              Internal::Visual& renderer = GetImplementation( impl.mRenderer );
-              renderer.SetCustomShader( shaderMap );
+              Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
+              visual.SetCustomShader( shaderMap );
               if( imageView.OnStage() )
               {
                 // force to create new core renderer to use the newly set shader
-                renderer.SetOffStage( imageView );
-                renderer.SetOnStage( imageView );
+                visual.SetOffStage( imageView );
+                visual.SetOnStage( imageView );
               }
             }
           }

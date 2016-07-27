@@ -31,9 +31,9 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/visual-impl.h>
-#include <dali-toolkit/internal/visuals/visual-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
 {
@@ -132,7 +132,7 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 } //unnamed namespace
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
-: Visual( factoryCache ),
+: Visual::Base( factoryCache ),
   mAtlasManager( atlasManager ),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
@@ -306,7 +306,7 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 
 void ImageVisual::SetSize( const Vector2& size )
 {
-  Visual::SetSize( size );
+  Visual::Base::SetSize( size );
 }
 
 void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
@@ -336,7 +336,7 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
 
 void ImageVisual::SetClipRect( const Rect<int>& clipRect )
 {
-  Visual::SetClipRect( clipRect );
+  Visual::Base::SetClipRect( clipRect );
 }
 
 void ImageVisual::SetOffset( const Vector2& offset )

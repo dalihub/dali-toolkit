@@ -23,7 +23,7 @@
 #include <string.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
 
 namespace Dali
@@ -50,7 +50,7 @@ namespace Internal
  * | useSoftNormals  | BOOLEAN     | If true, average normals at points for smooth textures. Default true. |
  * | lightPosition   | VECTOR3     | The position (on stage) of the light                                  |
  */
-class MeshVisual: public Visual
+class MeshVisual: public Visual::Base
 {
 public:
 

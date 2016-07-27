@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/devel-api/visual-factory/visual.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 namespace Dali
 {
@@ -35,6 +35,9 @@ namespace Toolkit
 {
 
 namespace Internal
+{
+
+namespace Visual
 {
 
 /**
@@ -57,12 +60,12 @@ namespace Internal
  * | subdivideGridY          | INT              |
  * | shaderHints             | INT              |
  */
-class Visual : public BaseObject
+class Base : public BaseObject
 {
 public:
 
   /**
-   * Initialisation of the visual, this API should only called by the VisualFactory:
+   *  Initialisation of the visual, this API should only called by the VisualFactory:
    *  request the geometry and shader from the cache, if not available, create and save to the cache for sharing;
    *  record the property values.
    *
@@ -72,17 +75,17 @@ public:
   void Initialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Toolkit::Visual::SetSize
+   * @copydoc Toolkit::Visual::Base::SetSize
    */
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Toolkit::Visual::GetSize
+   * @copydoc Toolkit::Visual::Base::GetSize
    */
   const Vector2& GetSize() const;
 
   /**
-   * @copydoc Toolkit::Visual::GetNaturalSize
+   * @copydoc Toolkit::Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
@@ -106,28 +109,28 @@ public:
   virtual void SetOffset( const Vector2& offset );
 
   /**
-   * @copydoc Toolkit::Visual::SetDepthIndex
+   * @copydoc Toolkit::Visual::Base::SetDepthIndex
    */
   void SetDepthIndex( float index );
 
   /**
-   * @copydoc Toolkit::Visual::GetDepthIndex
+   * @copydoc Toolkit::Visual::Base::GetDepthIndex
    */
   float GetDepthIndex() const;
 
   /**
-   * @copydoc Toolkit::Visual::SetOnStage
+   * @copydoc Toolkit::Visual::Base::SetOnStage
    * @pre Impl->mGeometry must be created before this method is called
    */
   void SetOnStage( Actor& actor );
 
   /**
-   * @copydoc Toolkit::Visual::SetOffStage
+   * @copydoc Toolkit::Visual::Base::SetOffStage
    */
   void SetOffStage( Actor& actor );
 
   /**
-   * @copydoc Toolkit::Visual::CreatePropertyMap
+   * @copydoc Toolkit::Visual::Base::CreatePropertyMap
    */
   void CreatePropertyMap( Property::Map& map ) const;
 
@@ -158,12 +161,12 @@ protected:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  Visual( VisualFactoryCache& factoryCache );
+  Base( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
-  virtual ~Visual();
+  virtual ~Base();
 
 protected:
   /**
@@ -215,10 +218,10 @@ protected:
 private:
 
   // Undefined
-  Visual( const Visual& visual );
+  Base( const Visual::Base& visual );
 
   // Undefined
-  Visual& operator=( const Visual& visual );
+  Base& operator=( const Visual::Base& visual );
 
 protected:
   struct Impl;
@@ -226,24 +229,26 @@ protected:
   VisualFactoryCache& mFactoryCache;
 };
 
+} // namspace Visual
+
 } // namespace Internal
 
-inline const Internal::Visual& GetImplementation(const Toolkit::Visual& visual)
+inline const Internal::Visual::Base& GetImplementation(const Toolkit::Visual::Base& visualBase )
 {
-  DALI_ASSERT_ALWAYS( visual && "Visual handle is empty" );
+  DALI_ASSERT_ALWAYS( visualBase && "visual base handle is empty" );
 
-  const BaseObject& handle = visual.GetBaseObject();
+  const BaseObject& handle = visualBase.GetBaseObject();
 
-  return static_cast<const Internal::Visual&>(handle);
+  return static_cast<const Internal::Visual::Base&>(handle);
 }
 
-inline Internal::Visual& GetImplementation(Toolkit::Visual& visual)
+inline Internal::Visual::Base& GetImplementation(Toolkit::Visual::Base& visualBase)
 {
-  DALI_ASSERT_ALWAYS( visual && "Visual handle is empty" );
+  DALI_ASSERT_ALWAYS( visualBase && "visual base handle is empty" );
 
-  BaseObject& handle = visual.GetBaseObject();
+  BaseObject& handle = visualBase.GetBaseObject();
 
-  return static_cast<Internal::Visual&>(handle);
+  return static_cast<Internal::Visual::Base&>(handle);
 }
 
 } // namespace Toolkit

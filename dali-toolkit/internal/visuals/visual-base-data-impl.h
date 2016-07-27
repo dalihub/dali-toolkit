@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_VISUAL_DATA_IMPL_H
-#define DALI_TOOLKIT_INTERNAL_VISUAL_DATA_IMPL_H
+#ifndef DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
+#define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -23,7 +23,7 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -34,7 +34,10 @@ namespace Toolkit
 namespace Internal
 {
 
-struct Internal::Visual::Impl
+namespace Visual
+{
+
+struct Base::Impl
 {
   enum Flags
   {
@@ -69,10 +72,12 @@ struct Internal::Visual::Impl
   ~Impl();
 };
 
+} // namespace Visual
+
 } // namespace Internal
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_VISUAL_DATA_IMPL_H
+#endif // DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H

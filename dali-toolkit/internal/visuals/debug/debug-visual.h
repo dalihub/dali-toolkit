@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -34,7 +34,7 @@ namespace Internal
  * The visual which renders a wireframe outline to the control's quad for debugging
  *
  */
-class DebugVisual: public Visual
+class DebugVisual: public Visual::Base
 {
 public:
 
