@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -380,7 +380,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + nameIndex );
 
     style.familyName = std::string( fontDescriptionRun.familyName, fontDescriptionRun.familyLength );
-    style.familyDefined = true;
+    style.isFamilyDefined = true;
   }
 
   // Set the font's weight if it's overriden.
@@ -389,7 +389,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + weightIndex );
 
     style.weight = fontDescriptionRun.weight;
-    style.weightDefined = true;
+    style.isWeightDefined = true;
   }
 
   // Set the font's width if it's overriden.
@@ -398,7 +398,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + widthIndex );
 
     style.width = fontDescriptionRun.width;
-    style.widthDefined = true;
+    style.isWidthDefined = true;
   }
 
   // Set the font's slant if it's overriden.
@@ -407,7 +407,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + slantIndex );
 
     style.slant = fontDescriptionRun.slant;
-    style.slantDefined = true;
+    style.isSlantDefined = true;
   }
 
   // Set the font's size if it's overriden.
@@ -416,7 +416,7 @@ void LogicalModel::RetrieveStyle( CharacterIndex index, InputStyle& style )
     const FontDescriptionRun& fontDescriptionRun = *( fontDescriptionRunsBuffer + sizeIndex );
 
     style.size = static_cast<float>( fontDescriptionRun.size ) / 64.f;
-    style.sizeDefined = true;
+    style.isSizeDefined = true;
   }
 }
 

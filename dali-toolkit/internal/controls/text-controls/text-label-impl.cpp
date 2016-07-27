@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -806,12 +806,17 @@ void TextLabel::OnStageConnection( int depth )
 
 void TextLabel::TextChanged()
 {
-  // TextLabel does not provide a signal for this
+  // TextLabel does not provide a signal for this.
 }
 
 void TextLabel::MaxLengthReached()
 {
   // Pure Virtual from TextController Interface, only needed when inputting text
+}
+
+void TextLabel::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
+{
+  // TextLabel does not provide a signal for this.
 }
 
 void TextLabel::ScrollingFinished()

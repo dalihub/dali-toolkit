@@ -782,6 +782,19 @@ public:
   void ProcessModifyEvents();
 
   /**
+   * @return Whether the queue of input style changed signals is empty.
+   */
+  bool IsInputStyleChangedSignalsQueueEmpty();
+
+  /**
+   * @brief Process all pending input style changed signals.
+   *
+   * Calls the Text::ControlInterface::InputStyleChanged() method which is overriden by the
+   * text controls. Text controls may send signals to state the input style has changed.
+   */
+  void ProcessInputStyleChangedSignals();
+
+  /**
    * @brief Used to remove placeholder text.
    */
   void ResetText();
