@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,26 +446,6 @@ const std::string& Controller::GetDefaultFontFamily() const
   return EMPTY_STRING;
 }
 
-void Controller::SetDefaultFontStyle( const std::string& style )
-{
-  if( NULL == mImpl->mFontDefaults )
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
-
-  mImpl->mFontDefaults->mFontStyle = style;
-}
-
-const std::string& Controller::GetDefaultFontStyle() const
-{
-  if( NULL != mImpl->mFontDefaults )
-  {
-    return mImpl->mFontDefaults->mFontStyle;
-  }
-
-  return EMPTY_STRING;
-}
-
 void Controller::SetDefaultFontWeight( FontWeight weight )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -480,6 +460,11 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
   ClearFontData();
 
   mImpl->RequestRelayout();
+}
+
+bool Controller::IsDefaultFontWeightDefined() const
+{
+  return mImpl->mFontDefaults->weightDefined;
 }
 
 FontWeight Controller::GetDefaultFontWeight() const
@@ -508,6 +493,11 @@ void Controller::SetDefaultFontWidth( FontWidth width )
   mImpl->RequestRelayout();
 }
 
+bool Controller::IsDefaultFontWidthDefined() const
+{
+  return mImpl->mFontDefaults->widthDefined;
+}
+
 FontWidth Controller::GetDefaultFontWidth() const
 {
   if( NULL != mImpl->mFontDefaults )
@@ -532,6 +522,11 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
   ClearFontData();
 
   mImpl->RequestRelayout();
+}
+
+bool Controller::IsDefaultFontSlantDefined() const
+{
+  return mImpl->mFontDefaults->slantDefined;
 }
 
 FontSlant Controller::GetDefaultFontSlant() const
@@ -955,25 +950,6 @@ const std::string& Controller::GetInputFontFamily() const
   return GetDefaultFontFamily();
 }
 
-void Controller::SetInputFontStyle( const std::string& fontStyle )
-{
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mInputStyle.fontStyle = fontStyle;
-  }
-}
-
-const std::string& Controller::GetInputFontStyle() const
-{
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mInputStyle.fontStyle;
-  }
-
-  // Return the default font's style if there is no EventData.
-  return GetDefaultFontStyle();
-}
-
 void Controller::SetInputFontWeight( FontWeight weight )
 {
   if( NULL != mImpl->mEventData )
@@ -1016,6 +992,18 @@ void Controller::SetInputFontWeight( FontWeight weight )
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
+}
+
+bool Controller::IsInputFontWeightDefined() const
+{
+  bool defined = false;
+
+  if( NULL != mImpl->mEventData )
+  {
+    defined = mImpl->mEventData->mInputStyle.weightDefined;
+  }
+
+  return defined;
 }
 
 FontWeight Controller::GetInputFontWeight() const
@@ -1072,6 +1060,18 @@ void Controller::SetInputFontWidth( FontWidth width )
   }
 }
 
+bool Controller::IsInputFontWidthDefined() const
+{
+  bool defined = false;
+
+  if( NULL != mImpl->mEventData )
+  {
+    defined = mImpl->mEventData->mInputStyle.widthDefined;
+  }
+
+  return defined;
+}
+
 FontWidth Controller::GetInputFontWidth() const
 {
   if( NULL != mImpl->mEventData )
@@ -1124,6 +1124,18 @@ void Controller::SetInputFontSlant( FontSlant slant )
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
+}
+
+bool Controller::IsInputFontSlantDefined() const
+{
+  bool defined = false;
+
+  if( NULL != mImpl->mEventData )
+  {
+    defined = mImpl->mEventData->mInputStyle.slantDefined;
+  }
+
+  return defined;
 }
 
 FontSlant Controller::GetInputFontSlant() const

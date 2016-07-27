@@ -53,22 +53,6 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
     const std::string style = value.Get< std::string >();
     DALI_LOG_INFO( gLogFilter, Debug::General, "Text Control %p FONT_STYLE %s\n", controller.Get(), style.c_str() );
 
-    switch( type )
-    {
-      case FontStyle::DEFAULT:
-      {
-        // Stores the default font's style string to be recovered by the GetFontStyleProperty() function.
-        controller->SetDefaultFontStyle( style );
-        break;
-      }
-      case FontStyle::INPUT:
-      {
-        // Stores the input font's style string to be recovered by the GetFontStyleProperty() function.
-        controller->SetInputFontStyle( style );
-        break;
-      }
-    }
-
     // Parses and applies the style.
     Property::Map map;
     ParsePropertyString( style, map );
@@ -166,7 +150,7 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
           }
           break;
         }
-      }
+      } // switch
     } // map not empty
     else
     {
@@ -186,27 +170,136 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
           controller->SetInputFontSlant( TextAbstraction::FontSlant::NONE );
           break;
         }
-      }
-    }
-  }
+      } // switch
+    } // map.Empty()
+  } // controller
 }
 
 void GetFontStyleProperty( ControllerPtr controller, Property::Value& value, FontStyle::Type type )
 {
   if( controller )
   {
-    switch( type )
+    const bool isDefaultStyle = FontStyle::DEFAULT == type;
+
+    bool weightDefined = false;
+    bool widthDefined = false;
+    bool slantDefined = false;
+    FontWeight weight = TextAbstraction::FontWeight::NONE;
+    FontWidth width = TextAbstraction::FontWidth::NONE;
+    FontSlant slant = TextAbstraction::FontSlant::NONE;
+
+    if( isDefaultStyle )
     {
-      case FontStyle::DEFAULT:
+      weightDefined = controller->IsDefaultFontWeightDefined();
+      widthDefined = controller->IsDefaultFontWidthDefined();
+      slantDefined = controller->IsDefaultFontSlantDefined();
+
+      if( weightDefined )
       {
-        value = controller->GetDefaultFontStyle();
-        break;
+        weight = controller->GetDefaultFontWeight();
       }
-      case FontStyle::INPUT:
+
+      if( widthDefined )
       {
-        value = controller->GetInputFontStyle();
-        break;
+        width = controller->GetDefaultFontWidth();
       }
+
+      if( slantDefined )
+      {
+        slant = controller->GetDefaultFontSlant();
+      }
+    }
+    else
+    {
+      weightDefined = controller->IsInputFontWeightDefined();
+      widthDefined = controller->IsInputFontWidthDefined();
+      slantDefined = controller->IsInputFontSlantDefined();
+
+      if( weightDefined )
+      {
+        weight = controller->GetInputFontWeight();
+      }
+
+      if( widthDefined )
+      {
+        width = controller->GetInputFontWidth();
+      }
+
+      if( slantDefined )
+      {
+        slant = controller->GetInputFontSlant();
+      }
+    }
+
+    if( weightDefined || widthDefined || slantDefined )
+    {
+      std::string styleString("{");
+      if( weightDefined )
+      {
+        if( TextAbstraction::FontWeight::NONE != weight )
+        {
+          const std::string weightStr( GetEnumerationName( weight,
+                                                           FONT_WEIGHT_STRING_TABLE,
+                                                           FONT_WEIGHT_STRING_TABLE_COUNT ) );
+
+          styleString += "\"weight\":\"" + weightStr + "\"";
+        }
+        else
+        {
+          weightDefined = false;
+        }
+      }
+
+      if( widthDefined )
+      {
+        if( TextAbstraction::FontWidth::NONE != width )
+        {
+          const std::string widthStr( GetEnumerationName( width,
+                                                          FONT_WIDTH_STRING_TABLE,
+                                                          FONT_WIDTH_STRING_TABLE_COUNT ) );
+
+          if( weightDefined )
+          {
+            styleString += ",";
+          }
+          styleString += "\"width\":\"" + widthStr + "\"";
+        }
+        else
+        {
+          widthDefined = false;
+        }
+      }
+
+      if( slantDefined )
+      {
+        if( TextAbstraction::FontSlant::NONE != slant )
+        {
+          const std::string slantStr( GetEnumerationName( slant,
+                                                          FONT_SLANT_STRING_TABLE,
+                                                          FONT_SLANT_STRING_TABLE_COUNT ) );
+
+          if( weightDefined || widthDefined )
+          {
+            styleString += ",";
+          }
+          styleString += "\"slant\":\"" + slantStr + "\"";
+        }
+        else
+        {
+          slantDefined = false;
+        }
+      }
+
+      if( weightDefined || widthDefined || slantDefined )
+      {
+        styleString += "}";
+      }
+      else
+      {
+        styleString.clear();
+      }
+
+      value = styleString;
     }
   }
 }
