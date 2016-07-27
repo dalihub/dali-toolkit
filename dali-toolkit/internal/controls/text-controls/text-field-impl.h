@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,11 @@ public:
    */
   Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
 
+  /**
+   * @copydoc TextField::TextChangedSignal()
+   */
+  Toolkit::TextField::InputStyleChangedSignalType& InputStyleChangedSignal();
+
 private: // From Control
 
   /**
@@ -176,6 +181,11 @@ private: // From Control
    */
   virtual void MaxLengthReached();
 
+  /**
+   * @copydoc Text::ControlInterface::InputStyleChanged()
+   */
+  virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
+
 private: // Implementation
 
   /**
@@ -221,6 +231,13 @@ private: // Implementation
   bool OnTouched( Actor actor, const TouchData& touch );
 
   /**
+   * @brief Callbacks called on idle.
+   *
+   * If there are notifications of change of input style on the queue, Toolkit::TextField::InputStyleChangedSignal() are emitted.
+   */
+  void OnIdleSignal();
+
+  /**
    * Construct a new TextField.
    */
   TextField();
@@ -247,6 +264,7 @@ private: // Data
   // Signals
   Toolkit::TextField::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
+  Toolkit::TextField::InputStyleChangedSignalType mInputStyleChangedSignal;
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
@@ -255,6 +273,7 @@ private: // Data
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
+  CallbackBase* mIdleCallback;
 
   int mRenderingBackend;
   int mExceedPolicy;
