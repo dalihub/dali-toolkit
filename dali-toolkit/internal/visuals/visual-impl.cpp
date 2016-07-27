@@ -33,7 +33,7 @@ const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
 const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
 const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
 const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
-const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hints
+const char * const CUSTOM_SHADER_HINTS( "hints" ); ///< type INTEGER; (bitfield) values from enum Shader::Hint
 }
 
 namespace Dali

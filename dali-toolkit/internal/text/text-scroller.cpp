@@ -166,7 +166,7 @@ void CreateGeometry( Geometry& geometry )
  */
 void CreateRenderer( FrameBufferImage frameBufferImage, Dali::Renderer& renderer )
 {
-  Shader shader = Shader::New( VERTEX_SHADER_SCROLL , FRAGMENT_SHADER, Shader::HINT_NONE );
+  Shader shader = Shader::New( VERTEX_SHADER_SCROLL , FRAGMENT_SHADER, Shader::Hint::NONE );
 
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode(FilterMode::NEAREST, FilterMode::NEAREST );

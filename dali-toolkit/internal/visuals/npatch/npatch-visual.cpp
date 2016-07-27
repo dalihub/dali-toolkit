@@ -324,7 +324,7 @@ Shader NPatchVisual::CreateShader()
   else
   {
     const char* fragmentShader = FRAGMENT_SHADER;
-    Dali::Shader::ShaderHints hints = Dali::Shader::HINT_NONE;
+    Dali::Shader::Hint::Value hints = Dali::Shader::Hint::NONE;
 
     if( !mImpl->mCustomShader->mFragmentShader.empty() )
     {

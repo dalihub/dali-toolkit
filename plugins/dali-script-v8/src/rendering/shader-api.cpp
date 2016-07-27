@@ -69,13 +69,13 @@ typedef  std::vector< std::string > HintsArray;
 struct ShaderHintPair
 {
   const char* name;
-  Shader::ShaderHints hint;
+  Shader::Hint::Value hint;
 };
 
 const ShaderHintPair ShaderHintTable[]=
 {
-    {"outputIsTransparent",    Shader::HINT_OUTPUT_IS_TRANSPARENT },
-    {"modifiesGeometry",       Shader::HINT_MODIFIES_GEOMETRY },
+    {"outputIsTransparent",    Shader::Hint::OUTPUT_IS_TRANSPARENT },
+    {"modifiesGeometry",       Shader::Hint::MODIFIES_GEOMETRY },
 };
 
 const unsigned int ShaderHintTableCount = sizeof(ShaderHintTable)/sizeof(ShaderHintTable[0]);
@@ -83,11 +83,11 @@ const unsigned int ShaderHintTableCount = sizeof(ShaderHintTable)/sizeof(ShaderH
 struct ShaderParameters
 {
   ShaderParameters()
-      : mHints( Shader::HINT_NONE )
+      : mHints( Shader::Hint::NONE )
   {
   }
 
-  Shader::ShaderHints GetShaderHint( const std::string& hint )
+  Shader::Hint::Value GetShaderHint( const std::string& hint )
   {
     for( unsigned int i = 0 ; i < ShaderHintTableCount; ++i )
     {
@@ -96,14 +96,14 @@ struct ShaderParameters
         return ShaderHintTable[i].hint;
       }
     }
-    return Shader::HINT_NONE;
+    return Shader::Hint::NONE;
   }
 
   void ProcessHintsArray( const HintsArray& hintsArray )
   {
     for( HintsArray::const_iterator iter  = hintsArray.begin(); iter != hintsArray.end() ; ++iter )
     {
-      mHints= static_cast<Shader::ShaderHints>( mHints | GetShaderHint( *iter ) );
+      mHints= static_cast<Shader::Hint::Value>( mHints | GetShaderHint( *iter ) );
     }
   }
 
@@ -116,7 +116,7 @@ struct ShaderParameters
 
   std::string mVertex;
   std::string mFragment;
-  Shader::ShaderHints mHints;
+  Shader::Hint::Value mHints;
 };
 
 } // unnamed space
