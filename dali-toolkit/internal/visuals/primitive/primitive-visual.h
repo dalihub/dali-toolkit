@@ -60,6 +60,8 @@ namespace Internal
 /**
  * The visual which renders a simple 3D shape to the control's quad
  *
+ * Primitives are created with clockwise winding and back-face culling by default.
+ *
  * The following properties are required to create a PrimitiveRender
  *
  * | %Property Name  | Type        |
