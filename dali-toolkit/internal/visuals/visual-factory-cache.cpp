@@ -174,7 +174,7 @@ Geometry VisualFactoryCache::CreateQuadGeometry()
   // Create the geometry object
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( quadVertices );
-  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
+  geometry.SetType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }
@@ -261,7 +261,7 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
     geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
   }
 
-  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
+  geometry.SetType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }

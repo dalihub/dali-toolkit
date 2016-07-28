@@ -116,7 +116,7 @@ daliApp.createMeshActor = function() {
       // Create geometry
       var geometry = new dali.Geometry();
       geometry.addVertexBuffer( polyhedraVertices );
-      geometry.setGeometryType( dali.GEOMETRY_POINTS );
+      geometry.setType( dali.GEOMETRY_POINTS );
 
       var renderer = new dali.Renderer(geometry, shader);
       renderer.setTextures(textureSet);

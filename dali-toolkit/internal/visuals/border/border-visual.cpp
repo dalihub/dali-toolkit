@@ -301,7 +301,7 @@ Geometry BorderVisual::CreateBorderGeometry()
   Geometry geometry = Geometry::New();
   geometry.AddVertexBuffer( borderVertices );
   geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
-  geometry.SetGeometryType( Geometry::TRIANGLE_STRIP );
+  geometry.SetType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
 }

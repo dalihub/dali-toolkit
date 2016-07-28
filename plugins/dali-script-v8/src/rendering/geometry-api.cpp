@@ -236,7 +236,7 @@ void GeometryApi::SetIndexBuffer( const v8::FunctionCallbackInfo<v8::Value>& arg
 /**
  * Set the type of primitives this geometry contains
  *
- * @method setGeometryType
+ * @method setType
  * @for Geometry
  * @param {integer} geometryType Type of primitives this geometry contains
  * @example
@@ -249,9 +249,9 @@ void GeometryApi::SetIndexBuffer( const v8::FunctionCallbackInfo<v8::Value>& arg
  *      dali.GEOMETRY_TRIANGLE_FAN
  *      dali.GEOMETRY_TRIANGLE_STRIP
  *
- *      geometry.SetGeometryType( dali.GEOMETRY_LINES );
+ *      geometry.SetType( dali.GEOMETRY_LINES );
  */
-void GeometryApi::SetGeometryType( const v8::FunctionCallbackInfo< v8::Value >& args )
+void GeometryApi::SetType( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
@@ -266,14 +266,14 @@ void GeometryApi::SetGeometryType( const v8::FunctionCallbackInfo< v8::Value >& 
   }
   else
   {
-    geometry.SetGeometryType(static_cast<Geometry::GeometryType>(geometryType));
+    geometry.SetType(static_cast<Geometry::Type>(geometryType));
   }
 }
 
 /**
  * Get the type of primitives this geometry contains
  *
- * @method getGeometryType
+ * @method getType
  * @for Geometry
  * @return {integer} Type of primitives this geometry contains
  * @example
@@ -286,14 +286,14 @@ void GeometryApi::SetGeometryType( const v8::FunctionCallbackInfo< v8::Value >& 
  *      dali.GEOMETRY_TRIANGLE_FAN
  *      dali.GEOMETRY_TRIANGLE_STRIP
  */
-void GeometryApi::GetGeometryType( const v8::FunctionCallbackInfo< v8::Value >& args )
+void GeometryApi::GetType( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
 
   Geometry geometry = GetGeometry( isolate, args );
 
-  args.GetReturnValue().Set( v8::Integer::New( isolate, geometry.GetGeometryType() ) );
+  args.GetReturnValue().Set( v8::Integer::New( isolate, geometry.GetType() ) );
 }
 
 } // namespace V8Plugin
