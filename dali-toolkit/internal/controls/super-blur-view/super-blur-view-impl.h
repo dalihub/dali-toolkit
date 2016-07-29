@@ -22,7 +22,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -163,14 +163,14 @@ private:
 
   /**
    * Sets shader effect on the control renderer
-   * @param[in,out] Sets custom shader effect on the given renderer
+   * @param[in,out] Sets custom shader effect on the given visual
    */
-  void SetShaderEffect( Toolkit::ControlRenderer& renderer );
+  void SetShaderEffect( Toolkit::Visual::Base& visual );
 
 private:
   std::vector<Toolkit::GaussianBlurView> mGaussianBlurView;
   std::vector<FrameBufferImage>          mBlurredImage;
-  std::vector<Toolkit::ControlRenderer>  mRenderers;
+  std::vector<Toolkit::Visual::Base>     mVisuals;
   Image                                  mInputImage;
   Vector2                                mTargetSize;
 

@@ -33,8 +33,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
-#include "../gaussian-blur-view/gaussian-blur-view-impl.h"
+#include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 
 namespace Dali
 {
@@ -375,10 +376,10 @@ void BloomView::AllocateResources()
     mBloomExtractImageView.SetSize(mDownsampledWidth, mDownsampledHeight); // size needs to match render target
     // Create shader used for extracting the bright parts of an image
     Property::Map customShader;
-    customShader[ "fragmentShader" ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
-    Property::Map rendererMap;
-    rendererMap.Insert( "shader", customShader );
-    mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
+    Property::Map visualMap;
+    visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+    mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
     // set GaussianBlurView to blur our extracted bloom
     mGaussianBlurView.SetUserImageAndOutputRenderTarget(mBloomExtractTarget, mBlurExtractTarget);
@@ -386,9 +387,9 @@ void BloomView::AllocateResources()
     // use the completed blur in the first buffer and composite with the original child actors render
     mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
     // Create shader used to composite bloom and original image to output render target
-    customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
-    rendererMap[ "shader" ] = customShader;
-    mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = COMPOSITE_FRAGMENT_SOURCE;
+    visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+    mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
     TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
     TextureSetImage( textureSet, 1u, mBlurExtractTarget );
 

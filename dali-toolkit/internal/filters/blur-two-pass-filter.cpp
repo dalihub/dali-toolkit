@@ -27,6 +27,9 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/images/texture-set-image.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+
 namespace Dali
 {
 
@@ -167,16 +170,16 @@ void BlurTwoPassFilter::Enable()
   fragmentSource << BLUR_TWO_PASS_FRAGMENT_SOURCE;
 
   Property::Map customShader;
-  customShader[ "fragmentShader" ] = fragmentSource.str();
-  Property::Map rendererMap;
-  rendererMap.Insert( "shader", customShader );
-  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
-  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource.str();
+  Property::Map visualMap;
+  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   // Set up blend-two-image custom shader
-  customShader[ "fragmentShader" ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
-  rendererMap[ "shader"] = customShader;
-  mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
+  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+  mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   mRootActor.Add( mActorForInput );
   mRootActor.Add( mActorForHorz );

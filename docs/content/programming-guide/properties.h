@@ -231,7 +231,7 @@ imageView.parentOrigin = dali.CENTER;
 
 // Set an image view property
 imageView.image = {
-  "rendererType" : "IMAGE",
+  "visualType" : "IMAGE",
   "url": "images/icon-0.png",
   "desiredWidth" : 100,
   "desiredHeight" : 100
@@ -260,7 +260,7 @@ This is a basic example of a button defined in JSON by setting the default prope
       "position": [0, 0, 0],
       "image":
       {
-        "rendererType" : "IMAGE",
+        "visualType" : "IMAGE",
         "url" : "images/icon-0.png",
         "desiredWidth" : 100,
         "desiredHeight" : 100

@@ -38,9 +38,9 @@ public:
 
   struct TriIndex
   {
-    int pntIndex[3];
-    int nrmIndex[3];
-    int texIndex[3];
+    int pointIndex[3];
+    int normalIndex[3];
+    int textureIndex[3];
   };
 
   struct Vertex
@@ -111,7 +111,7 @@ public:
   void      LoadMaterial( char* objBuffer, std::streampos fileSize, std::string& diffuseTextureUrl,
                           std::string& normalTextureUrl, std::string& glossTextureUrl );
 
-  Geometry  CreateGeometry( int objectProperties );
+  Geometry  CreateGeometry( int objectProperties, bool useSoftNormals );
 
   Vector3   GetCenter();
   Vector3   GetSize();
@@ -136,27 +136,63 @@ private:
   bool mHasNormalMap;
   bool mHasSpecularMap;
 
-  Dali::Vector<Vector3> mPoints;
-  Dali::Vector<Vector2> mTextures;
-  Dali::Vector<Vector2> mTextures2;
-  Dali::Vector<Vector3> mNormals;
-  Dali::Vector<Vector3> mTangents;
-  Dali::Vector<Vector3> mBiTangents;
+  Dali::Vector<Vector3>  mPoints;
+  Dali::Vector<Vector2>  mTextures;
+  Dali::Vector<Vector2>  mTextures2;
+  Dali::Vector<Vector3>  mNormals;
+  Dali::Vector<Vector3>  mTangents;
+  Dali::Vector<Vector3>  mBiTangents;
   Dali::Vector<TriIndex> mTriangles;
 
-  void CalculateTangentArray( const Dali::Vector<Vector3>& vertex,
-                              const Dali::Vector<Vector2>& texcoord,
-                              Dali::Vector<TriIndex>& triangle,
-                              Dali::Vector<Vector3>& normal,
-                              Dali::Vector<Vector3>& tangent );
+  /**
+   * @brief Calculates normals for each point on a per-face basis.
+   *
+   * There are multiple normals per point, each corresponding to the normal of a face connecting to the point.
+   *
+   * @param[in] vertices The vertices of the object.
+   * @param[in, out] triangles The triangles that form the faces. The normals of each triangle will be updated.
+   * @param[in, out] normals The normals to be calculated.
+   */
+  void CalculateHardFaceNormals( const Dali::Vector<Vector3>& vertices,
+                                 Dali::Vector<TriIndex>& triangles,
+                                 Dali::Vector<Vector3>& normals );
+
+  /**
+   * @brief Calculates smoothed normals for each point.
+   *
+   * There is one normal per point, an average of the connecting faces.
+   *
+   * @param[in] vertices The vertices of the object.
+   * @param[in, out] triangles The triangles that form the faces. The normals of each triangle will be updated.
+   * @param[in, out] normals The normals to be calculated.
+   */
+  void CalculateSoftFaceNormals( const Dali::Vector<Vector3>& vertices,
+                                 Dali::Vector<TriIndex>& triangles,
+                                 Dali::Vector<Vector3>& normals );
+
+  /**
+   * @brief Calculates tangents and bitangents for each point of the object.
+   *
+   * These are calculated using the object's points, texture coordinates and normals, so these must be initialised first.
+   */
+  void CalculateTangentFrame();
 
   void CenterAndScale( bool center, Dali::Vector<Vector3>& points );
 
-
+  /**
+   * @brief Using the data loaded from the file, create arrays of data to be used in creating the geometry.
+   *
+   * @param[in] vertices The vertices of the object.
+   * @param[in] textures The texture coordinates of the object.
+   * @param[in] verticesExt Extension to vertices, storing tangents and bitangents.
+   * @param[in] indices Indices of corresponding values to match triangles to their respective data.
+   * @param[in] useSoftNormals Indicates whether we should average the normals at each point to smooth the surface or not.
+   */
   void CreateGeometryArray( Dali::Vector<Vertex> & vertices,
                             Dali::Vector<Vector2> & textures,
                             Dali::Vector<VertexExt> & verticesExt,
-                            Dali::Vector<unsigned short> & indices );
+                            Dali::Vector<unsigned short> & indices,
+                            bool useSoftNormals );
 
 };
 

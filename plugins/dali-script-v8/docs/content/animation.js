@@ -153,14 +153,12 @@ createColorShiftAndZoomEffect = function() {
   // vertexShader = "";  // vertex shader   ( optional)
   // fragmentShader = "";  // fragment shader   ( optional)
   // hints =   // shader hints   ( optional)
-  //       [ "requiresSelfDepthTest",  // Expects depth testing enabled
-  //         "outputIsTransparent",    // Might generate transparent alpha from opaque inputs
-  //         "outputIsOpaque",         // Outputs opaque colors even if the inputs are transparent
-  //         "modifiesGeometry" ];     // Might change position of vertices, this option disables any culling optimizations
+  //       [ "OUTPUT_IS_TRANSPARENT",   // Might generate transparent alpha from opaque inputs
+  //         "MODIFIES_GEOMETRY" ];     // Might change position of vertices, this option disables any culling optimizations
   
   var shader = {
       "fragmentShader": fragShader,
-      "hints" : "outputIsTransparent"
+      "hints" : "OUTPUT_IS_TRANSPARENT"
   };
   
   return shader;
@@ -190,7 +188,7 @@ var imageView = createImageView();
 var shader = createColorShiftAndZoomEffect();
   
 var image = {
-    "rendererType" : "IMAGE",
+    "visualType" : "IMAGE",
     "url" : getImageDirectory()+"gallery-medium-50.jpg",
     "shader" : shader
 };

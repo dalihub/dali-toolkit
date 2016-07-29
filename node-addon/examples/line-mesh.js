@@ -100,7 +100,7 @@ daliApp.createMeshActor = function() {
       geometry.addVertexBuffer( pentagonVertices );
       geometry.addVertexBuffer( pentacleVertices );
       geometry.setIndexBuffer( indexDataArray, 10 );
-      geometry.setGeometryType( dali.GEOMETRY_LINES );
+      geometry.setType( dali.GEOMETRY_LINES );
 
       var renderer = new dali.Renderer(geometry, shader);
       renderer.depthIndex = 0;

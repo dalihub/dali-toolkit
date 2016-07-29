@@ -49,8 +49,8 @@ const ApiFunction GeometryFunctionTable[]=
    { "GetNumberOfVertexBuffers"    , GeometryApi::GetNumberOfVertexBuffers },
    { "RemoveVertexBuffer"          , GeometryApi::RemoveVertexBuffer },
    { "SetIndexBuffer"              , GeometryApi::SetIndexBuffer },
-   { "SetGeometryType"             , GeometryApi::SetGeometryType },
-   { "GetGeometryType"             , GeometryApi::GetGeometryType },
+   { "SetType"                     , GeometryApi::SetType },
+   { "GetType"                     , GeometryApi::GetType },
 };
 
 const unsigned int GeometryFunctionTableCount = sizeof(GeometryFunctionTable)/sizeof(GeometryFunctionTable[0]);

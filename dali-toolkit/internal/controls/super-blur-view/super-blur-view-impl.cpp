@@ -30,7 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL_INCLUDES
-#include <dali-toolkit/internal/controls/renderers/control-renderer-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace //Unnamed namespace
 {
@@ -132,7 +132,7 @@ SuperBlurView::SuperBlurView( unsigned int blurLevels )
   DALI_ASSERT_ALWAYS( mBlurLevels > 0 && " Minimal blur level is one, otherwise no blur is needed" );
   mGaussianBlurView.assign( blurLevels, Toolkit::GaussianBlurView() );
   mBlurredImage.assign( blurLevels, FrameBufferImage() );
-  mRenderers.assign( blurLevels+1, Toolkit::ControlRenderer() );
+  mVisuals.assign( blurLevels+1, Toolkit::Visual::Base() );
 }
 
 SuperBlurView::~SuperBlurView()
@@ -170,12 +170,12 @@ void SuperBlurView::SetImage(Image inputImage)
 
   mInputImage = inputImage;
   Actor self( Self() );
-  InitializeControlRenderer( self, mRenderers[0], mInputImage );
-  mRenderers[0].SetDepthIndex(0);
-  SetShaderEffect( mRenderers[0] );
+  InitializeVisual( self, mVisuals[0], mInputImage );
+  mVisuals[0].SetDepthIndex(0);
+  SetShaderEffect( mVisuals[0] );
   if( self.OnStage() )
   {
-    mRenderers[0].SetOnStage( self );
+    mVisuals[0].SetOnStage( self );
   }
 
   BlurImage( 0,  inputImage);
@@ -259,13 +259,13 @@ void SuperBlurView::ClearBlurResource()
     mResourcesCleared = true;
   }
 }
-void SuperBlurView::SetShaderEffect( Toolkit::ControlRenderer& renderer )
+void SuperBlurView::SetShaderEffect( Toolkit::Visual::Base& visual )
 {
   Property::Map shaderMap;
   std::stringstream verterShaderString;
   shaderMap[ "fragmentShader" ] = FRAGMENT_SHADER;
 
-  Internal::ControlRenderer& rendererImpl = GetImplementation( renderer );
+  Internal::Visual::Base& rendererImpl = Toolkit::GetImplementation( visual );
   rendererImpl.SetCustomShader( shaderMap );
 }
 
@@ -275,16 +275,15 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
   {
     mTargetSize = Vector2(targetSize);
 
-    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
     Actor self = Self();
     for( unsigned int i = 1; i <= mBlurLevels; i++ )
     {
       float exponent = static_cast<float>(i);
       mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
-      InitializeControlRenderer( self, mRenderers[i], mBlurredImage[i - 1] );
-      mRenderers[ i ].SetDepthIndex( i );
-      SetShaderEffect( mRenderers[ i ] );
+      InitializeVisual( self, mVisuals[i], mBlurredImage[i - 1] );
+      mVisuals[ i ].SetDepthIndex( i );
+      SetShaderEffect( mVisuals[ i ] );
     }
 
     if( mInputImage )
@@ -296,7 +295,7 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
     {
       for( unsigned int i = 1; i <= mBlurLevels; i++ )
       {
-        mRenderers[i].SetOnStage( self );
+        mVisuals[i].SetOnStage( self );
       }
     }
   }
@@ -312,15 +311,15 @@ void SuperBlurView::OnStageConnection( int depth )
   }
 
   Actor self = Self();
-  if( mRenderers[0] )
+  if( mVisuals[0] )
   {
-    mRenderers[0].SetOnStage( self );
+    mVisuals[0].SetOnStage( self );
   }
   for(unsigned int i=1; i<=mBlurLevels;i++)
   {
-    if( mRenderers[i] )
+    if( mVisuals[i] )
     {
-      mRenderers[i].SetOnStage( self );
+      mVisuals[i].SetOnStage( self );
     }
 
     Renderer renderer = self.GetRendererAt( i );
@@ -341,7 +340,7 @@ void SuperBlurView::OnStageDisconnection( )
   Actor self = Self();
   for(unsigned int i=0; i<mBlurLevels+1;i++)
   {
-    mRenderers[i].SetOffStage( self );
+    mVisuals[i].SetOffStage( self );
   }
 
   Control::OnStageDisconnection();

@@ -11,7 +11,7 @@
  * <h2 class="pg">Custom Shader Effects</h2>
  * The custom shader lets the developers create their own shader effects by specifying the vertex and pixel shaders.
  *
- * To set a custom shader to ImageRenderer you have to pass it through as a Property::Map
+ * To set a custom shader to ImageVisual you have to pass it through as a Property::Map
  * @code
  * //an example vertex shader
  * const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(

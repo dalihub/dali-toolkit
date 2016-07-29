@@ -445,7 +445,7 @@ int UtcDaliImageViewSyncLoading(void)
     ImageView imageView = ImageView::New();
 
     // Sync loading is used
-    syncLoadingMap[ "url" ] = gImage_600_RGB;
+    syncLoadingMap[ ImageVisual::Property::URL ] = gImage_600_RGB;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // BitmapLoader is used, and the loading is started immediately even the actor is not on stage.
@@ -462,9 +462,9 @@ int UtcDaliImageViewSyncLoading(void)
 
     ImageView imageView = ImageView::New( );
     // Sync loading is used
-    syncLoadingMap[ "url" ] = gImage_34_RGBA;
-    syncLoadingMap[ "desiredHeight" ] = 34;
-    syncLoadingMap[ "desiredWidth" ] = 34;
+    syncLoadingMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+    syncLoadingMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
+    syncLoadingMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // loading is started even if the actor is offStage

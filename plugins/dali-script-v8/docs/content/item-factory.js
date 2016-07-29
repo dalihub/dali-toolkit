@@ -30,7 +30,7 @@
             "type":"ImageView",
             "image":
             {
-              "rendererType" : "IMAGE",
+              "visualType" : "IMAGE",
               "url": "{icon_path}"
             },
             "position":[20.0, 0.0, 0.0],

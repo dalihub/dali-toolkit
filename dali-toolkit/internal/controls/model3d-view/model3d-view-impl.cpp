@@ -328,6 +328,7 @@ void Model3dView::SetProperty( BaseObject* object, Property::Index index, const 
         {
           impl.LoadMaterial();
           impl.CreateMaterial();
+          impl.LoadTextures();
         }
         break;
       }
@@ -434,7 +435,7 @@ void Model3dView::OnStageConnection( int depth )
 
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ) );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ), true );
 
     CreateMaterial();
     LoadTextures();
@@ -529,7 +530,7 @@ void Model3dView::CreateGeometry()
 {
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ) );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ), true );
 
     if( mRenderer )
     {

@@ -65,34 +65,103 @@ bool ObjLoader::IsMaterialLoaded()
   return mMaterialLoaded;
 }
 
-//TODO: Use a function that can generate more than one normal/tangent per vertex (using angle)
-void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
-                                      const Dali::Vector<Vector2>& texcoord,
-                                      Dali::Vector<TriIndex>& triangle,
-                                      Dali::Vector<Vector3>& normal,
-                                      Dali::Vector<Vector3>& tangent)
+void ObjLoader::CalculateHardFaceNormals( const Dali::Vector<Vector3>& vertices, Dali::Vector<TriIndex>& triangles,
+                                          Dali::Vector<Vector3>& normals )
 {
-  Dali::Vector<Vector3> tangents;
-  tangents.Resize( vertex.Size() );
+  int numFaceVertices = 3 * triangles.Size();  //Vertex per face, as each point has different normals for each face.
+  int normalIndex = 0;  //Tracks progress through the array of normals.
 
-  // Resize of a vector of Vector3 will initialise with the default constructor, setting to all zeros.
+  normals.Clear();
+  normals.Resize( numFaceVertices );
 
-  for ( unsigned long a = 0; a < triangle.Size(); a++ )
+  //For each triangle, calculate the normal by crossing two vectors on the triangle's plane.
+  for( unsigned long i = 0; i < triangles.Size(); i++ )
   {
-    Vector3 tangentVector, normalVector;
+    //Triangle vertices.
+    const Vector3& v0 = vertices[triangles[i].pointIndex[0]];
+    const Vector3& v1 = vertices[triangles[i].pointIndex[1]];
+    const Vector3& v2 = vertices[triangles[i].pointIndex[2]];
 
-    const Vector3& v0 = vertex[triangle[a].pntIndex[0]];
-    const Vector3& v1 = vertex[triangle[a].pntIndex[1]];
-    const Vector3& v2 = vertex[triangle[a].pntIndex[2]];
+    //Triangle edges.
+    Vector3 edge1 = v1 - v0;
+    Vector3 edge2 = v2 - v0;
+
+    //Using edges as vectors on the plane, cross to get the normal.
+    Vector3 normalVector = edge1.Cross(edge2);
+    normalVector.Normalize();
+
+    //Assign normals to points.
+    for( unsigned long j = 0; j < 3; j++, normalIndex++ )
+    {
+      triangles[i].normalIndex[j] = normalIndex;
+      normals[normalIndex] = normalVector;
+    }
+  }
+}
+
+void ObjLoader::CalculateSoftFaceNormals( const Dali::Vector<Vector3>& vertices, Dali::Vector<TriIndex>& triangles,
+                                          Dali::Vector<Vector3>& normals )
+{
+  int normalIndex = 0;  //Tracks progress through the array of normals.
+
+  normals.Clear();
+  normals.Resize( vertices.Size() );  //One (averaged) normal per point.
+
+  //For each triangle, calculate the normal by crossing two vectors on the triangle's plane
+  //We then add the triangle's normal to the cumulative normals at each point of it
+  for( unsigned long i = 0; i < triangles.Size(); i++ )
+  {
+    //Triangle vertices.
+    const Vector3& v0 = vertices[triangles[i].pointIndex[0]];
+    const Vector3& v1 = vertices[triangles[i].pointIndex[1]];
+    const Vector3& v2 = vertices[triangles[i].pointIndex[2]];
+
+    //Triangle edges.
+    Vector3 edge1 = v1 - v0;
+    Vector3 edge2 = v2 - v0;
+
+    //Using edges as vectors on the plane, cross to get the normal.
+    Vector3 normalVector = edge1.Cross(edge2);
+
+    //Add this triangle's normal to the cumulative normal of each constituent point and set the index of the normal accordingly.
+    for( unsigned long j = 0; j < 3; j++, normalIndex++ )
+    {
+      triangles[i].normalIndex[j] = triangles[i].pointIndex[j]; //Normal index matches up to vertex index, as one normal per vertex.
+      normals[triangles[i].normalIndex[j]] += normalVector;
+    }
+  }
+
+  //Normalise the normals.
+  for( unsigned long i = 0; i < normals.Size(); i++ )
+  {
+    normals[i].Normalize();
+  }
+}
+
+//TODO: Use a function that can generate more than one normal/tangent per vertex (using angle)
+void ObjLoader::CalculateTangentFrame()
+{
+  //Reset tangent and bitangent vectors to hold new values.
+  mTangents.Clear();
+  mBiTangents.Clear();
+  mTangents.Resize( mPoints.Size() );
+  mBiTangents.Resize( mPoints.Size() );
+
+  //For each triangle, calculate the tangent vector and then add it to the total tangent vector of each point.
+  for ( unsigned long a = 0; a < mTriangles.Size(); a++ )
+  {
+    Vector3 tangentVector;
+
+    const Vector3& v0 = mPoints[mTriangles[a].pointIndex[0]];
+    const Vector3& v1 = mPoints[mTriangles[a].pointIndex[1]];
+    const Vector3& v2 = mPoints[mTriangles[a].pointIndex[2]];
 
     Vector3 edge1 = v1 - v0;
     Vector3 edge2 = v2 - v0;
 
-    normalVector = edge1.Cross(edge2);
-
-    const Vector2& w0 = texcoord[triangle[a].texIndex[0]];
-    const Vector2& w1 = texcoord[triangle[a].texIndex[1]];
-    const Vector2& w2 = texcoord[triangle[a].texIndex[2]];
+    const Vector2& w0 = mTextures[mTriangles[a].textureIndex[0]];
+    const Vector2& w1 = mTextures[mTriangles[a].textureIndex[1]];
+    const Vector2& w2 = mTextures[mTriangles[a].textureIndex[2]];
 
     float deltaU1 = w1.x - w0.x;
     float deltaV1 = w1.y - w0.y;
@@ -105,37 +174,24 @@ void ObjLoader::CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
     tangentVector.y = f * ( deltaV2 * edge1.y - deltaV1 * edge2.y );
     tangentVector.z = f * ( deltaV2 * edge1.z - deltaV1 * edge2.z );
 
-    tangents[triangle[a].pntIndex[0]] += tangentVector;
-    tangents[triangle[a].pntIndex[1]] += tangentVector;
-    tangents[triangle[a].pntIndex[2]] += tangentVector;
-
-    normal[triangle[a].pntIndex[0]] += normalVector;
-    normal[triangle[a].pntIndex[1]] += normalVector;
-    normal[triangle[a].pntIndex[2]] += normalVector;
+    mTangents[mTriangles[a].pointIndex[0]] += tangentVector;
+    mTangents[mTriangles[a].pointIndex[1]] += tangentVector;
+    mTangents[mTriangles[a].pointIndex[2]] += tangentVector;
   }
 
-  for ( unsigned long a = 0; a < triangle.Size(); a++ )
+  //Orthogonalize tangents and set binormals.
+  for ( unsigned long a = 0; a < mTangents.Size(); a++ )
   {
-    for ( unsigned long j = 0; j < 3; j++ )
-    {
-      triangle[a].nrmIndex[j] = triangle[a].pntIndex[j];
-    }
-  }
-
-  for ( unsigned long a = 0; a < normal.Size(); a++ )
-  {
-    normal[a].Normalize();
-
-    const Vector3& n = normal[a];
-    const Vector3& t = tangents[a];
+    const Vector3& n = mNormals[a];
+    const Vector3& t = mTangents[a];
 
     // Gram-Schmidt orthogonalize
-    Vector3 calc = t - n * n.Dot(t);
-    calc.Normalize();
-    tangent[a] = Vector3( calc.x,calc.y,calc.z );
+    mTangents[a] = t - n * n.Dot(t);
+    mTangents[a].Normalize();
+
+    mBiTangents[a] = mNormals[a].Cross( mTangents[a] );
   }
 }
-
 
 void ObjLoader::CenterAndScale( bool center, Dali::Vector<Vector3>& points )
 {
@@ -153,7 +209,6 @@ void ObjLoader::CenterAndScale( bool center, Dali::Vector<Vector3>& points )
     biggestDimension = sceneSize.z;
   }
 
-
   newAABB.Init();
   for( unsigned int ui = 0; ui < points.Size(); ++ui )
   {
@@ -165,29 +220,39 @@ void ObjLoader::CenterAndScale( bool center, Dali::Vector<Vector3>& points )
   mSceneAABB = newAABB;
 }
 
-void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
-                                    Dali::Vector<Vector2> & textures,
-                                    Dali::Vector<VertexExt> & verticesExt,
-                                    Dali::Vector<unsigned short> & indices)
+void ObjLoader::CreateGeometryArray( Dali::Vector<Vertex> & vertices,
+                                     Dali::Vector<Vector2> & textures,
+                                     Dali::Vector<VertexExt> & verticesExt,
+                                     Dali::Vector<unsigned short> & indices,
+                                     bool useSoftNormals )
 {
-  //If we don't have tangents, calculate them
-  //we need to recalculate the normals too, because we need just one normal,tangent, bitangent per vertex
-  //In the case of a textureless object, we don't need tangents for our shader and so we skip this step
-  //TODO: Use a better function to calculate tangents
-  if( mTangents.Size() == 0 && mHasTexturePoints )
+  //We must calculate the tangents and bitangents if they weren't supplied, or if they don't match up.
+  bool mustCalculateTangents = mTangents.Size() == 0 || mBiTangents.Size() == 0 ||
+                               mTangents.Size() != mBiTangents.Size() || mTangents.Size() != mNormals.Size() ||
+                               mBiTangents.Size() != mNormals.Size();
+
+  //However, we don't need to do this if the object doesn't use textures to begin with.
+  mustCalculateTangents &= mHasTexturePoints;
+
+  //We also have to recalculate the normals if we need to calculate tangents,
+  // as we need just one normal, tangent and bitangent per vertex, rather than the supplied per-face vertices.
+  //Alternatively, we need to calculate the normals if there weren't any to begin with.
+  if( mNormals.Size() == 0 || mustCalculateTangents )
   {
-    mNormals.Clear();
-
-    mNormals.Resize( mPoints.Size() );
-    mTangents.Resize( mPoints.Size() );
-    mBiTangents.Resize( mPoints.Size() );
-
-    CalculateTangentArray( mPoints, mTextures, mTriangles, mNormals, mTangents );
-
-    for ( unsigned int ui = 0 ; ui < mNormals.Size() ; ++ui )
+    if( useSoftNormals || mustCalculateTangents )
     {
-      mBiTangents[ui] = mNormals[ui].Cross(mTangents[ui]);
+      CalculateSoftFaceNormals( mPoints, mTriangles, mNormals );
     }
+    else
+    {
+      CalculateHardFaceNormals( mPoints, mTriangles, mNormals );
+    }
+  }
+
+  //TODO: Use a better function to calculate tangents
+  if( mHasTexturePoints && mustCalculateTangents )
+  {
+    CalculateTangentFrame();
   }
 
   bool mapsCorrespond; //True if the sizes of the arrays necessary for the object agree.
@@ -232,16 +297,16 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
     {
       for ( int j = 0 ; j < 3 ; ++j )
       {
-        indices[indiceIndex] = mTriangles[ui].pntIndex[j];
+        indices[indiceIndex] = mTriangles[ui].pointIndex[j];
         indiceIndex++;
 
-        vertices[mTriangles[ui].pntIndex[j]].normal = mNormals[mTriangles[ui].nrmIndex[j]];
+        vertices[mTriangles[ui].pointIndex[j]].normal = mNormals[mTriangles[ui].normalIndex[j]];
 
         if ( mHasTexturePoints )
         {
-          textures[mTriangles[ui].pntIndex[j]] = mTextures[mTriangles[ui].texIndex[j]];
-          verticesExt[mTriangles[ui].pntIndex[j]].tangent = mTangents[mTriangles[ui].nrmIndex[j]];
-          verticesExt[mTriangles[ui].pntIndex[j]].bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
+          textures[mTriangles[ui].pointIndex[j]] = mTextures[mTriangles[ui].textureIndex[j]];
+          verticesExt[mTriangles[ui].pointIndex[j]].tangent = mTangents[mTriangles[ui].normalIndex[j]];
+          verticesExt[mTriangles[ui].pointIndex[j]].bitangent = mBiTangents[mTriangles[ui].normalIndex[j]];
         }
       }
     }
@@ -261,18 +326,17 @@ void ObjLoader::CreateGeometryArray(Dali::Vector<Vertex> & vertices,
       for ( int j = 0 ; j < 3 ; ++j )
       {
         Vertex vertex;
-        vertex.position = mPoints[mTriangles[ui].pntIndex[j]];
-        vertex.normal = mNormals[mTriangles[ui].nrmIndex[j]];
+        vertex.position = mPoints[mTriangles[ui].pointIndex[j]];
+        vertex.normal = mNormals[mTriangles[ui].normalIndex[j]];
         vertices[index] = vertex;
 
         if ( mHasTexturePoints )
         {
-          textures[index] = mTextures[mTriangles[ui].texIndex[j]];
+          textures[index] = mTextures[mTriangles[ui].textureIndex[j]];
           VertexExt vertexExt;
-          vertexExt.tangent = mTangents[mTriangles[ui].nrmIndex[j]];
-          vertexExt.bitangent = mBiTangents[mTriangles[ui].nrmIndex[j]];
+          vertexExt.tangent = mTangents[mTriangles[ui].normalIndex[j]];
+          vertexExt.bitangent = mBiTangents[mTriangles[ui].normalIndex[j]];
           verticesExt[index] = vertexExt;
-
         }
 
         index++;
@@ -440,9 +504,9 @@ bool ObjLoader::LoadObject( char* objBuffer, std::streampos fileSize )
       {
         for( int i = 0 ; i < 3; i++ )
         {
-          triangle.pntIndex[i] = ptIdx[i] - 1 - pntAcum;
-          triangle.nrmIndex[i] = nrmIdx[i] - 1 - nrmAcum;
-          triangle.texIndex[i] = texIdx[i] - 1 - texAcum;
+          triangle.pointIndex[i] = ptIdx[i] - 1 - pntAcum;
+          triangle.normalIndex[i] = nrmIdx[i] - 1 - nrmAcum;
+          triangle.textureIndex[i] = texIdx[i] - 1 - texAcum;
         }
         mTriangles.PushBack( triangle );
         face++;
@@ -452,9 +516,9 @@ bool ObjLoader::LoadObject( char* objBuffer, std::streampos fileSize )
       {
         for( int i = 0 ; i < 3; i++ )
         {
-          triangle.pntIndex[i] = ptIdx[i] - 1 - pntAcum;
-          triangle.nrmIndex[i] = nrmIdx[i] - 1 - nrmAcum;
-          triangle.texIndex[i] = texIdx[i] - 1 - texAcum;
+          triangle.pointIndex[i] = ptIdx[i] - 1 - pntAcum;
+          triangle.normalIndex[i] = nrmIdx[i] - 1 - nrmAcum;
+          triangle.textureIndex[i] = texIdx[i] - 1 - texAcum;
         }
         mTriangles.PushBack( triangle );
         face++;
@@ -462,9 +526,9 @@ bool ObjLoader::LoadObject( char* objBuffer, std::streampos fileSize )
         for( int i = 0 ; i < 3; i++ )
         {
           int idx = ( i + 2 ) % numIndices;
-          triangle2.pntIndex[i] = ptIdx[idx] - 1 - pntAcum;
-          triangle2.nrmIndex[i] = nrmIdx[idx] - 1 - nrmAcum;
-          triangle2.texIndex[i] = texIdx[idx] - 1 - texAcum;
+          triangle2.pointIndex[i] = ptIdx[idx] - 1 - pntAcum;
+          triangle2.normalIndex[i] = nrmIdx[idx] - 1 - nrmAcum;
+          triangle2.textureIndex[i] = texIdx[idx] - 1 - texAcum;
         }
         mTriangles.PushBack( triangle2 );
         face++;
@@ -561,7 +625,7 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
   mMaterialLoaded = true;
 }
 
-Geometry ObjLoader::CreateGeometry( int objectProperties )
+Geometry ObjLoader::CreateGeometry( int objectProperties, bool useSoftNormals )
 {
   Geometry surface = Geometry::New();
 
@@ -570,7 +634,7 @@ Geometry ObjLoader::CreateGeometry( int objectProperties )
   Dali::Vector<VertexExt> verticesExt;
   Dali::Vector<unsigned short> indices;
 
-  CreateGeometryArray( vertices, textures, verticesExt, indices );
+  CreateGeometryArray( vertices, textures, verticesExt, indices, useSoftNormals );
 
   //All vertices need at least Position and Normal
   Property::Map vertexFormat;

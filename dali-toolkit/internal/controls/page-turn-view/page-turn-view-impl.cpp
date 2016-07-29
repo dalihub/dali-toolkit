@@ -29,9 +29,11 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
-#include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 using namespace Dali;
 
@@ -39,11 +41,6 @@ namespace //Unnamed namespace
 {
 // broken image is loaded if there is no valid image provided for the page
 const char * const BROKEN_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
-
-// names of shader property map
-const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
 
 // properties set on shader, these properties have the constant value in regardless of the page status
 const char * const PROPERTY_SPINE_SHADOW ( "uSpineShadowParameter" ); // uniform for both spine and turn effect
@@ -391,7 +388,7 @@ void PageTurnView::OnInitialize()
   // create the grid geometry for pages
   uint16_t width = static_cast<uint16_t>(mPageSize.width / DEFAULT_GRID_DENSITY + 0.5f);
   uint16_t height = static_cast<uint16_t>(mPageSize.height / DEFAULT_GRID_DENSITY + 0.5f);
-  mGeometry = RendererFactoryCache::CreateGridGeometry( Uint16Pair( width, height ) );
+  mGeometry = VisualFactoryCache::CreateGridGeometry( Uint16Pair( width, height ) );
 
   mPages.reserve( NUMBER_OF_CACHED_PAGES );
   for( int i = 0; i < NUMBER_OF_CACHED_PAGES; i++ )
@@ -428,18 +425,18 @@ void PageTurnView::OnInitialize()
 Shader PageTurnView::CreateShader( const Property::Map& shaderMap )
 {
   Shader shader;
-  Property::Value* shaderValue = shaderMap.Find( CUSTOM_SHADER );
+  Property::Value* shaderValue = shaderMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
   Property::Map shaderSource;
   if( shaderValue && shaderValue->Get( shaderSource ) )
   {
     std::string vertexShader;
-    Property::Value* vertexShaderValue = shaderSource.Find( CUSTOM_VERTEX_SHADER );
+    Property::Value* vertexShaderValue = shaderSource.Find( Toolkit::Visual::Shader::Property::VERTEX_SHADER, CUSTOM_VERTEX_SHADER );
     if( !vertexShaderValue || !vertexShaderValue->Get( vertexShader ) )
     {
       DALI_LOG_ERROR("PageTurnView::CreateShader failed: vertex shader source is not available.\n");
     }
     std::string fragmentShader;
-    Property::Value* fragmentShaderValue = shaderSource.Find( CUSTOM_FRAGMENT_SHADER );
+    Property::Value* fragmentShaderValue = shaderSource.Find( Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, CUSTOM_FRAGMENT_SHADER );
     if( !fragmentShaderValue || !fragmentShaderValue->Get( fragmentShader ) )
     {
       DALI_LOG_ERROR("PageTurnView::CreateShader failed: fragment shader source is not available.\n");
