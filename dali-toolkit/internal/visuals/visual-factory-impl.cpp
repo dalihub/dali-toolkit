@@ -196,7 +196,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   }
   else
   {
-    DALI_LOG_ERROR( "Renderer type unknown" );
+    DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
 
   return Toolkit::Visual::Base( visualPtr );
