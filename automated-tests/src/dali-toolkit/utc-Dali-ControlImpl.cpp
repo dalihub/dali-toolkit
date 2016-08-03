@@ -1011,8 +1011,6 @@ int UtcDaliControlImplRegisterVisaulThenReRegisterToSelf(void)
   // ReRegister to self
   dummyImpl.RegisterVisual( index, dummy, visual );
 
-  tet_result(TET_PASS);
-
   END_TEST;
 }
 
@@ -1020,30 +1018,35 @@ int UtcDaliControlImplRegisterVisualToSelf(void)
 {
   ToolkitTestApplication application;
 
-  DummyControl dummy = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+  Test::ObjectDestructionTracker objectDestructionTracker;
 
-  Property::Index index =1;
-  Actor placementActor = Actor::New();
+  {
+    DummyControl dummy = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+    objectDestructionTracker.Start( dummy );
 
-  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
-  Toolkit::Visual::Base visual;
+    Property::Index index = 1;
+    Actor placementActor = Actor::New();
 
-  Property::Map map;
-  map[Visual::Property::TYPE] = Visual::COLOR;
-  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+    Toolkit::Visual::Base visual;
 
-  visual = visualFactory.CreateVisual( map );
-  DALI_TEST_CHECK(visual);
+    Property::Map map;
+    map[Visual::Property::TYPE] = Visual::COLOR;
+    map[ColorVisual::Property::MIX_COLOR] = Color::RED;
 
-  // ReRegister to self
-  dummyImpl.RegisterVisual( index, dummy, visual );
+    visual = visualFactory.CreateVisual( map );
+    DALI_TEST_CHECK(visual);
 
-  tet_result(TET_PASS);
+    // Register to self
+    dummyImpl.RegisterVisual( index, dummy, visual );
+    DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
+  }
+
+  DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
 
   END_TEST;
 }
-
 
 int UtcDaliControlImplRegisterTwoVisuals(void)
 {
@@ -1077,11 +1080,10 @@ int UtcDaliControlImplRegisterTwoVisuals(void)
   newMap[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
 
   secondVisual = visualFactory.CreateVisual( newMap );
+  DALI_TEST_CHECK( secondVisual );
 
   // ReRegister with altered color visual
   dummyImpl.RegisterVisual( index2, secondPlacementActor, secondVisual );
-
-  tet_result(TET_PASS);
 
   END_TEST;
 }
@@ -1111,8 +1113,6 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
 
   // Unregister visual
   dummyImpl.UnregisterVisual( index );
-
-  tet_result(TET_PASS);
 
   END_TEST;
 }
