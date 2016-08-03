@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 
 namespace Dali
 {
@@ -56,9 +56,9 @@ public:
   bool SetItem(const std::string &itemData);
 
   /**
-   * @copydoc Dali::Clipboard::GetItem()
+   * @copydoc Dali::Clipboard::RequestItem()
    */
-  std::string GetItem( unsigned int index );
+  void RequestItem();
 
   /**
    * @copydoc Dali::Clipboard::NumberOfClipboardItems()
@@ -75,20 +75,29 @@ public:
    */
   void HideClipboard();
 
+  /**
+  * @copydoc Dali::Clipboard::IsVisible()
+  */
+  bool IsVisible() const;
 
 private:
   Clipboard( const Clipboard& );
   Clipboard& operator=( Clipboard& );
 
   static Dali::Clipboard mToolkitClipboard;
+  bool mVisible;
+  std::string mItem;
+  int mCount;
 }; // class clipboard
 
 
 Dali::Clipboard Dali::Internal::Adaptor::Clipboard::mToolkitClipboard;
 
 
-Clipboard::Clipboard( /*Ecore_X_Window ecoreXwin*/)
+Clipboard::Clipboard()
 {
+  mVisible = false;
+  mCount = 0;
 }
 
 Clipboard::~Clipboard()
@@ -106,27 +115,40 @@ Dali::Clipboard Clipboard::Get()
 
 bool Clipboard::SetItem(const std::string &itemData )
 {
+  mItem = itemData;
+  mCount = 1;
   return true;
 }
 
-std::string Clipboard::GetItem( unsigned int index )
+void Clipboard::RequestItem()
 {
-  return "";
+  Dali::ClipboardEventNotifier clipboardEventNotifier(Dali::ClipboardEventNotifier::Get());
+  if ( clipboardEventNotifier )
+  {
+    clipboardEventNotifier.SetContent( mItem );
+    clipboardEventNotifier.EmitContentSelectedSignal();
+  }
 }
 
 unsigned int Clipboard::NumberOfItems()
 {
-  return 0;
+  return mCount;
 }
 
 void Clipboard::ShowClipboard()
 {
+  mVisible = true;
 }
 
 void Clipboard::HideClipboard()
 {
+  mVisible = false;
 }
 
+bool Clipboard::IsVisible() const
+{
+  return mVisible;
+}
 
 } // namespace Adaptor
 
@@ -170,9 +192,9 @@ bool Clipboard::SetItem( const std::string &itemData)
   return GetImplementation(*this).SetItem( itemData );
 }
 
-std::string Clipboard::GetItem( unsigned int index )
+void Clipboard::RequestItem()
 {
-  return GetImplementation(*this).GetItem( index );
+  GetImplementation(*this).RequestItem();
 }
 
 unsigned int Clipboard::NumberOfItems()
@@ -188,6 +210,11 @@ void Clipboard::ShowClipboard()
 void Clipboard::HideClipboard()
 {
   GetImplementation(*this).HideClipboard();
+}
+
+bool Clipboard::IsVisible() const
+{
+  return GetImplementation(*this).IsVisible();
 }
 
 } // namespace Dali
