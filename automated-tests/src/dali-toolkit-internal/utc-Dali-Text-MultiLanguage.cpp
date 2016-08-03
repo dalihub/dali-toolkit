@@ -197,6 +197,12 @@ bool ScriptsTest( const ScriptsData& data )
   if( scripts.Count() != data.scriptRuns.Count() )
   {
     tet_printf("ScriptsTest FAIL: different number of scripts. %d, should be %d\n", scripts.Count(), data.scriptRuns.Count() );
+    for( Vector<ScriptRun>::ConstIterator it = scripts.Begin(); it != scripts.End(); ++it)
+    {
+      const ScriptRun& run = *it;
+
+      std::cout << "  index : " << run.characterRun.characterIndex << ", num chars : " << run.characterRun.numberOfCharacters << ", script : [" << TextAbstraction::ScriptName[run.script] << "]" << std::endl;
+    }
     return false;
   }
 
@@ -695,7 +701,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   {
     {
       0u,
-      16u,
+      15u,
     },
     TextAbstraction::LATIN
   };
@@ -707,7 +713,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   {
     {
       0u,
-      16u,
+      15u,
     },
     TextAbstraction::LATIN
   };
@@ -719,7 +725,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   {
     {
       0u,
-      16u,
+      15u,
     },
     TextAbstraction::LATIN
   };
@@ -1120,23 +1126,23 @@ int UtcDaliTextMultiLanguageSetScripts(void)
     },
     {
       "White spaces. At the beginning of the text.",
-      "    Hello world.",
+      "    Hello world",
       0u,
-      16u,
+      15u,
       scriptRuns04,
     },
     {
       "White spaces. At the end of the text.",
-      "Hello world.    ",
+      "Hello world    ",
       0u,
-      16u,
+      15u,
       scriptRuns05,
     },
     {
       "White spaces. At the middle of the text.",
-      "Hello     world.",
+      "Hello     world",
       0u,
-      16u,
+      15u,
       scriptRuns06,
     },
     {
