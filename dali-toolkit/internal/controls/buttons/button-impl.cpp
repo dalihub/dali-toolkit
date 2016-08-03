@@ -539,6 +539,7 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
 {
   Actor* contentActor = NULL; // Using a pointer as SetupContent assigns the new Actor to this.
   bool imageFileExists = false;
+  Property::Index visualIndex = Toolkit::Button::Property::SELECTED_STATE_IMAGE;
 
   if ( selectedState == SelectedState || selectedState == DisabledSelectedState )
   {
@@ -551,6 +552,7 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
     mUnselectedColor = color;
     contentActor = &mUnselectedContent;
     imageFileExists = !GetUnselectedImageFilename().empty();
+    visualIndex = Toolkit::Button::Property::UNSELECTED_STATE_IMAGE;
   }
 
   if ( contentActor )
@@ -564,15 +566,17 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
     {
       // If there is no existing content, create a new actor to use for flat color.
       Actor placementActor = Actor::New();
-      Toolkit::VisualFactory rendererFactory = Toolkit::VisualFactory::Get();
-      Toolkit::Visual::Base colorRenderer;
+      Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+      Toolkit::Visual::Base visual;
 
       Property::Map map;
       map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
       map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
-      colorRenderer = rendererFactory.CreateVisual( map );
-      colorRenderer.SetOnStage( placementActor );
+      visual = visualFactory.CreateVisual( map );
+
+      RegisterVisual( visualIndex, placementActor, visual );
+      visual.SetOnStage( placementActor );
 
       SetupContent( *contentActor, placementActor ); //
       contentActor->SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
