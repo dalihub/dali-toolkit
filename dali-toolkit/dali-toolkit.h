@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_H__
-#define __DALI_TOOLKIT_H__
+#ifndef DALI_TOOLKIT_H
+#define DALI_TOOLKIT_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -61,6 +61,7 @@
 
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 
+#include <dali-toolkit/public-api/visuals/batch-image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
@@ -73,4 +74,4 @@
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
-#endif // __DALI_TOOLKIT_H__
+#endif // DALI_TOOLKIT_H

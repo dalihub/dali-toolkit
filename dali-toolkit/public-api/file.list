@@ -124,6 +124,7 @@ public_api_video_view_header_files = \
   $(public_api_src_dir)/controls/video-view/video-view.h
 
 public_api_visuals_header_files = \
+  $(public_api_src_dir)/visuals/batch-image-visual-properties.h \
   $(public_api_src_dir)/visuals/border-visual-properties.h \
   $(public_api_src_dir)/visuals/color-visual-properties.h \
   $(public_api_src_dir)/visuals/gradient-visual-properties.h \
