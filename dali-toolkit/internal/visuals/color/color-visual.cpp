@@ -80,7 +80,7 @@ void ColorVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
   Property::Value* color = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME );
   if( !( color && color->Get(mMixColor) ) )
   {
-    DALI_LOG_ERROR( "Fail to provide a color to the ColorVisual object" );
+    DALI_LOG_ERROR( "Fail to provide a color to the ColorVisual object\n" );
   }
 }
 

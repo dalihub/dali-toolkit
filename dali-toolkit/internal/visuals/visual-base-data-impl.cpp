@@ -79,7 +79,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
   {
     if( !vertexShaderValue->Get( mVertexShader ) )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string", CUSTOM_VERTEX_SHADER );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string\n", CUSTOM_VERTEX_SHADER );
     }
   }
 
@@ -88,7 +88,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
   {
     if( !fragmentShaderValue->Get( mFragmentShader ) )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string", CUSTOM_FRAGMENT_SHADER );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string\n", CUSTOM_FRAGMENT_SHADER );
     }
   }
 
@@ -98,7 +98,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
     int subdivideX;
     if( !subdivideXValue->Get( subdivideX ) || subdivideX < 1 )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1", CUSTOM_SUBDIVIDE_GRID_X );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1\n", CUSTOM_SUBDIVIDE_GRID_X );
     }
     else
     {
@@ -112,7 +112,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
     int subdivideY;
     if( !subdivideYValue->Get( subdivideY ) || subdivideY < 1 )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1", CUSTOM_SUBDIVIDE_GRID_Y );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a value greater than 1\n", CUSTOM_SUBDIVIDE_GRID_Y );
     }
     else
     {
@@ -125,7 +125,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
   {
     if ( ! Scripting::GetBitmaskEnumerationProperty( *hintsValue, SHADER_HINT_TABLE, SHADER_HINT_TABLE_COUNT, mHints ) )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a hint or an array of hint strings", CUSTOM_SHADER_HINTS );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a hint or an array of hint strings\n", CUSTOM_SHADER_HINTS );
     }
   }
 }
