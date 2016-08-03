@@ -36,9 +36,6 @@ namespace Internal
 class VisualFactoryCache;
 typedef IntrusivePtr<VisualFactoryCache> VisualFactoryCachePtr;
 
-class ImageAtlasManager;
-typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
-
 /**
  * @copydoc Toolkit::VisualFactory
  */
@@ -68,11 +65,6 @@ public:
    */
   Toolkit::Visual::Base CreateVisual( const std::string& image, ImageDimensions size );
 
-public:
-  /**
-   * @brief Returns an image to be used when a visual has failed to correctly render
-   */
-  static Image GetBrokenVisualImage();
 
 protected:
 
@@ -82,11 +74,6 @@ protected:
   virtual ~VisualFactory();
 
 private:
-
-  /**
-   * Prepare the atlas manager
-   */
-  void CreateAtlasManager();
 
   /**
    * Undefined copy constructor.
@@ -101,7 +88,6 @@ private:
 private:
 
   VisualFactoryCachePtr   mFactoryCache;
-  ImageAtlasManagerPtr    mAtlasManager;
   bool                    mDebugEnabled;
 };
 
