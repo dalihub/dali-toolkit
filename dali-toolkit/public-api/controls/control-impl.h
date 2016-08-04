@@ -296,7 +296,7 @@ protected: // For derived classes to call
    * In the case of the visual being an actor or control deeming controlRenderer not required then controlRenderer should be an empty handle.
    * No parenting is done during registration, this should be done by derived class.
    *
-   * @SINCE_1_1.46
+   * @SINCE_1_2.0
    *
    * @param[in] index The Property index of the visual, used to reference visual
    * @param[in] placementActor The actor used to by the visual.
@@ -308,7 +308,7 @@ protected: // For derived classes to call
     * @brief Erase the entry matching the given index from the list of registered visuals
     * @param[in] index The Property index of the visual, used to reference visual
     *
-    * @SINCE_1_1.46
+    * @SINCE_1_2.0
     */
    void UnregisterVisual( Property::Index index );
 

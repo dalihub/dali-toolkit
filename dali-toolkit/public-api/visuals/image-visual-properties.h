@@ -102,7 +102,7 @@ enum
   /**
    * @brief This enables Image visuals to automatically be converted to Batch-Image visuals.
    * @details Name "batchingEnabled", type Property::BOOLEAN.
-   * @SINCE_1_1.46
+   * @SINCE_1_2.0
    * @note Optional. For Image visuals only. Not to be used with NPatch or SVG images.
    */
   BATCHING_ENABLED,
