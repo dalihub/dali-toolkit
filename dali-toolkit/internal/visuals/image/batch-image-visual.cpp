@@ -31,7 +31,6 @@
 #include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL HEADER
-#include <dali-toolkit/public-api/visuals/batch-image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -103,21 +102,21 @@ BatchImageVisual::~BatchImageVisual()
 void BatchImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   std::string oldImageUrl = mImageUrl;
-  Property::Value* imageURLValue = propertyMap.Find( Dali::Toolkit::BatchImageVisual::Property::URL, Dali::Toolkit::Internal::IMAGE_URL_NAME );
+  Property::Value* imageURLValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::URL, Dali::Toolkit::Internal::IMAGE_URL_NAME );
 
   if( imageURLValue )
   {
     imageURLValue->Get( mImageUrl );
 
     int desiredWidth = 0;
-    Property::Value* desiredWidthValue = propertyMap.Find( Dali::Toolkit::BatchImageVisual::Property::DESIRED_WIDTH, DESIRED_WIDTH );
+    Property::Value* desiredWidthValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH, DESIRED_WIDTH );
     if( desiredWidthValue )
     {
       desiredWidthValue->Get( desiredWidth );
     }
 
     int desiredHeight = 0;
-    Property::Value* desiredHeightValue = propertyMap.Find( Dali::Toolkit::BatchImageVisual::Property::DESIRED_HEIGHT, DESIRED_HEIGHT );
+    Property::Value* desiredHeightValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT, DESIRED_HEIGHT );
     if( desiredHeightValue )
     {
       desiredHeightValue->Get( desiredHeight );
@@ -254,13 +253,14 @@ void BatchImageVisual::DoSetOffStage( Actor& actor )
 void BatchImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::BATCH_IMAGE );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
   if( !mImageUrl.empty() )
   {
-    map.Insert( Toolkit::BatchImageVisual::Property::URL, mImageUrl );
-    map.Insert( Toolkit::BatchImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
-    map.Insert( Toolkit::BatchImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::BATCHING_ENABLED, true );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
   }
 }
 

@@ -1521,8 +1521,9 @@ int UtcDaliVisualFactoryGetBatchImageVisual1(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::BATCH_IMAGE );
-  propertyMap.Insert( BatchImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -1559,10 +1560,10 @@ int UtcDaliVisualFactoryGetBatchImageVisual2(void)
   // Create a normal Image Visual.
   propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
   // Instruct the factory to change Image Visuals to Batch-Image Visuals.
-  propertyMap.Insert( Visual::Property::BATCHING_ENABLED, true );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
 
   // Properties for the Batch-Image Visual.
-  propertyMap.Insert( BatchImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -1573,7 +1574,7 @@ int UtcDaliVisualFactoryGetBatchImageVisual2(void)
 
   Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<int>(), (int)Visual::BATCH_IMAGE, TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION );
 
   Actor actor = Actor::New();
 
@@ -1605,8 +1606,8 @@ int UtcDaliVisualFactoryGetBatchImageVisual3(void)
 
   // Create a property-map that enables batching.
   Property::Map propertyMap;
-  propertyMap.Insert( Dali::Toolkit::BatchImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( Visual::Property::BATCHING_ENABLED, true );
+  propertyMap.Insert( Dali::Toolkit::ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
 
   // Create an ImageView, passing the property-map in to instruct it to use batching.
   Toolkit::ImageView imageView = Toolkit::ImageView::New();

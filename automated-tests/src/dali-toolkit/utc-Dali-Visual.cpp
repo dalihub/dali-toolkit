@@ -190,8 +190,9 @@ int UtcDaliVisualSize(void)
 
   // Batch Image visual
   propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, Visual::BATCH_IMAGE );
-  propertyMap.Insert( BatchImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
   Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
   batchImageVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( batchImageVisual.GetSize(), visualSize, TEST_LOCATION );
@@ -796,10 +797,11 @@ int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::BATCH_IMAGE );
-  propertyMap.Insert( BatchImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( BatchImageVisual::Property::DESIRED_WIDTH, 20 );
-  propertyMap.Insert( BatchImageVisual::Property::DESIRED_HEIGHT, 30 );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 20 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 30 );
 
   Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( batchImageVisual );
@@ -810,17 +812,17 @@ int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
   // Check the property values from the returned map from visual
   Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::BATCH_IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
 
-  value = resultMap.Find( BatchImageVisual::Property::URL, Property::STRING );
+  value = resultMap.Find( ImageVisual::Property::URL, Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
 
-  value = resultMap.Find( BatchImageVisual::Property::DESIRED_WIDTH, Property::INTEGER );
+  value = resultMap.Find( ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 20 );
 
-  value = resultMap.Find( BatchImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER );
+  value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 30 );
 
@@ -834,12 +836,13 @@ int UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas(void)
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::BATCH_IMAGE );
-  propertyMap.Insert( BatchImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
 
   // Set the desired size to be larger than the atlas limit of 1024x1024.
-  propertyMap.Insert( BatchImageVisual::Property::DESIRED_WIDTH, 2048 );
-  propertyMap.Insert( BatchImageVisual::Property::DESIRED_HEIGHT, 2048 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 2048 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 2048 );
 
   // Create the visual.
   Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );

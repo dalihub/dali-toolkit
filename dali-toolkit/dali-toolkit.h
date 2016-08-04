@@ -61,7 +61,6 @@
 
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 
-#include <dali-toolkit/public-api/visuals/batch-image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>

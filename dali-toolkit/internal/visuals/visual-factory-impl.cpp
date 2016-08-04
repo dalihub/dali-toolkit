@@ -68,12 +68,10 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, DEBUG )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BATCH_IMAGE )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 const char * const VISUAL_TYPE( "visualType" );
 const char * const BATCHING_ENABLED( "batchingEnabled" );
-
 BaseHandle Create()
 {
   BaseHandle handle = Toolkit::VisualFactory::Get();
@@ -118,21 +116,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
   }
 
-  // If the type is IMAGE, either from a default or the TYPE value in the property-map, change it to a BatchImage if required.
-  if( visualType == Toolkit::Visual::IMAGE )
-  {
-    bool batchingEnabled( false );
-    Property::Value* value = propertyMap.Find( Toolkit::Visual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
-    if( value )
-    {
-      value->Get( batchingEnabled );
-      if( batchingEnabled )
-      {
-        visualType = Toolkit::Visual::BATCH_IMAGE;
-      }
-    }
-  }
-
   switch( visualType )
   {
     case Toolkit::Visual::BORDER:
@@ -160,7 +143,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
+        Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
+        if( batchingEnabledValue  )
+        {
+          bool batchingEnabled( false );
+          batchingEnabledValue->Get( batchingEnabled );
+          if( batchingEnabled )
+          {
+            CreateAtlasManager();
+            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+            break;
+          }
+        }
+        else if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
         {
           visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
         }
@@ -206,12 +201,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::Visual::BATCH_IMAGE:
-    {
-      CreateAtlasManager();
-      visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-      break;
-    }
   }
 
   if( visualPtr )

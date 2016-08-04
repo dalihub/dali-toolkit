@@ -43,7 +43,6 @@ enum Type
   MESH, ///< Renders a mesh using an "obj" file, optionally with textures provided by an "mtl" file. @SINCE_1_1.45
   PRIMITIVE, ///< Renders a simple 3D shape, such as a cube or sphere. @SINCE_1_1.45
   DEBUG, ///< Renders a simple wire-frame outlining a quad. @SINCE_1_1.45
-  BATCH_IMAGE, ///< Renders an image in the geometry batching mode @SINCE_1_1.46
 };
 
 namespace Property
@@ -69,14 +68,6 @@ enum
    * @see Shader::Property
    */
   SHADER,
-
-  /**
-   * @brief This enables Image visuals to automatically be converted to Batch-Image visuals.
-   * @details Name "batchingEnabled", type Boolean.
-   * @SINCE_1_1.46
-   * @note Optional.
-   */
-  BATCHING_ENABLED,
 };
 
 } // namespace Property
