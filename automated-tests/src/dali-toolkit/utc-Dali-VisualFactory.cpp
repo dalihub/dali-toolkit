@@ -1511,3 +1511,110 @@ int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualFactoryGetBatchImageVisual1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetBatchImageVisual1: Request a Batch Image visual with a Property::Map" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  Actor actor = Actor::New();
+
+  actor.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( actor );
+  visual.SetSize( Vector2( 200.0f, 200.0f ) );
+
+  // Test SetOnStage().
+  visual.SetOnStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  application.SendNotification();
+  application.Render();
+
+  // Test SetOffStage().
+  visual.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetBatchImageVisual2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetBatchImageVisual2: Request Batch Image visual from an Image Visual with batchingEnabled set" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  // Create a normal Image Visual.
+  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  // Instruct the factory to change Image Visuals to Batch-Image Visuals.
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+
+  // Properties for the Batch-Image Visual.
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  // Check that a Batch-Image visual was created instead of an Image visual.
+  Property::Map resultMap;
+  visual.CreatePropertyMap( resultMap );
+
+  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION );
+
+  Actor actor = Actor::New();
+
+  actor.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( actor );
+  visual.SetSize( Vector2( 200.0f, 200.0f ) );
+
+  // Test SetOnStage().
+  visual.SetOnStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  application.SendNotification();
+  application.Render();
+
+  // Test SetOffStage().
+  visual.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetBatchImageVisual3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetBatchImageVisual3: Create an ImageView that uses a batched visual internally" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Create a property-map that enables batching.
+  Property::Map propertyMap;
+  propertyMap.Insert( Dali::Toolkit::ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+
+  // Create an ImageView, passing the property-map in to instruct it to use batching.
+  Toolkit::ImageView imageView = Toolkit::ImageView::New();
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, propertyMap );
+
+  imageView.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( imageView );
+
+  END_TEST;
+}

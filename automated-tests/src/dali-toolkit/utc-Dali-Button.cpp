@@ -972,3 +972,38 @@ int UtcDaliButtonSetUnSelectedColorP(void)
   END_TEST;
 }
 
+int UtcDaliButtonResetSelectedColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetSelectedColorP");
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 FIRST_COLOR = Color::BLUE;
+  const Vector4 SECOND_COLOR = Color::BLUE;
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetProperty( Button::Property::SELECTED_COLOR, FIRST_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 color = pushButton.GetProperty<Vector4>( Button::Property::SELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, FIRST_COLOR, TEST_LOCATION );
+
+  pushButton.SetProperty( Button::Property::SELECTED_COLOR, SECOND_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  color = pushButton.GetProperty<Vector4>( Button::Property::SELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, SECOND_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}

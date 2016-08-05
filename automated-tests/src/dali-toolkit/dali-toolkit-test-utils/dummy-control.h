@@ -28,7 +28,7 @@ namespace Toolkit
 {
 
 class DummyControlImpl;
-
+class ControlRenderer;
 /**
  * Control does not have a New method so use this dummy class for the handle.
  */
@@ -70,6 +70,9 @@ public:
   inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
   inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }
   inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
+
+  void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual);
+  void UnregisterVisual( Property::Index index );
 
   // Used to test signal connections
   void CustomSlot1( Actor actor );

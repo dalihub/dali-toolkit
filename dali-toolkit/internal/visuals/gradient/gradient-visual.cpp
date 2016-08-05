@@ -220,7 +220,7 @@ void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMa
   }
   else
   {
-    DALI_LOG_ERROR( "Fail to provide valid properties to create a GradientVisual object" );
+    DALI_LOG_ERROR( "Fail to provide valid properties to create a GradientVisual object\n" );
   }
 }
 

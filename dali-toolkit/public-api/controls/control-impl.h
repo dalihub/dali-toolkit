@@ -42,6 +42,10 @@ namespace Toolkit
 
 class StyleManager;
 
+namespace Visual
+{
+class Base;
+}
 namespace Internal
 {
 /**
@@ -286,6 +290,27 @@ public:
   DALI_INTERNAL bool EmitKeyEventSignal( const KeyEvent& event );
 
 protected: // For derived classes to call
+
+  /**
+   * @brief Register a visual by Property Index, linking an Actor to controlRenderer when required.
+   * In the case of the visual being an actor or control deeming controlRenderer not required then controlRenderer should be an empty handle.
+   * No parenting is done during registration, this should be done by derived class.
+   *
+   * @SINCE_1_2.0
+   *
+   * @param[in] index The Property index of the visual, used to reference visual
+   * @param[in] placementActor The actor used to by the visual.
+   * @param[in] visual The visual to register
+   */
+   void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual );
+
+   /**
+    * @brief Erase the entry matching the given index from the list of registered visuals
+    * @param[in] index The Property index of the visual, used to reference visual
+    *
+    * @SINCE_1_2.0
+    */
+   void UnregisterVisual( Property::Index index );
 
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal

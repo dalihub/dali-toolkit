@@ -91,7 +91,8 @@ struct EventData
     EDITING_WITH_GRAB_HANDLE,
     EDITING_WITH_PASTE_POPUP,
     GRAB_HANDLE_PANNING,
-    SELECTION_HANDLE_PANNING
+    SELECTION_HANDLE_PANNING,
+    TEXT_PANNING
   };
 
   EventData( DecoratorPtr decorator );
@@ -117,6 +118,7 @@ struct EventData
 
   InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
 
+  State              mPreviousState;           ///< Stores the current state before it's updated with the new one.
   State              mState;                   ///< Selection mode, edit mode etc.
 
   CharacterIndex     mPrimaryCursorPosition;   ///< Index into logical model for primary cursor.
@@ -140,6 +142,7 @@ struct EventData
   bool mUpdateGrabHandlePosition        : 1;   ///< True if the visual position of the grab handle must be recalculated.
   bool mUpdateLeftSelectionPosition     : 1;   ///< True if the visual position of the left selection handle must be recalculated.
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
+  bool mIsLeftHandleSelected            : 1;   ///< Whether is the left handle the one which is selected.
   bool mUpdateHighlightBox              : 1;   ///< True if the text selection high light box must be updated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.

@@ -437,12 +437,10 @@ public:
   /**
    * @brief Adds a quad to the existing selection highlights. Vertices are in decorator's coordinates.
    *
-   * @param[in] x1 The top-left x position.
-   * @param[in] y1 The top-left y position.
-   * @param[in] x2 The bottom-right x position.
-   * @param[in] y3 The bottom-right y position.
+   * @param[in] index Position in the vector where to add the quad.
+   * @param[in] quad The quad. The 'x' and 'y' coordinates store the min 'x' and min 'y'. The 'z' and 'w' coordinates store the max 'x' and max 'y'.
    */
-  void AddHighlight( float x1, float y1, float x2, float y2 );
+  void AddHighlight( unsigned int index, const Vector4& quad );
 
   /**
    * @brief Sets the min 'x,y' coordinates and the size of the highlighted box.
@@ -462,6 +460,13 @@ public:
   void ClearHighlights();
 
   /**
+   * @brief Reserves space for the highlight quads.
+   *
+   * @param[in] numberOfQuads The expected number of quads.
+   */
+  void ResizeHighlightQuads( unsigned int numberOfQuads );
+
+  /**
    * @brief Sets the selection highlight color.
    *
    * @param[in] color The color to use.
@@ -474,6 +479,20 @@ public:
    * @return The color of the highlight
    */
   const Vector4& GetHighlightColor() const;
+
+  /**
+   * @brief Sets whether the highlight is active.
+   *
+   * @param[in] active Whether the highlight is active.
+   */
+  void SetHighlightActive( bool active );
+
+  /**
+   * @brief Retrieves whether the highlight is active.
+   *
+   * @return @e true if the highlight is active, @e false otherwise.
+   */
+  bool IsHighlightActive() const;
 
   /**
    * @brief Sets into the decorator the depth used to render the text.
