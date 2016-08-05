@@ -22,6 +22,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/application.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -39,6 +40,8 @@ const char* FONT_SIZE_QUALIFIER = "FontSize";
 const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
 const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
+const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
+
 const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
 
 } // namespace
@@ -104,12 +107,12 @@ StyleManager::StyleManager()
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
+  mThemeBuilderConstants[ APPLICATION_RESOURCE_PATH_KEY ] = Application::GetResourcePath();
 
   mStyleMonitor = StyleMonitor::Get();
   if( mStyleMonitor )
   {
     mStyleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
-
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 
