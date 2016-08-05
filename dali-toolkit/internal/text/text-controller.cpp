@@ -428,7 +428,7 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 
   mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
-  mImpl->mFontDefaults->familyDefined = true;
+  mImpl->mFontDefaults->familyDefined = !defaultFontFamily.empty();
 
   // Clear the font-specific data
   ClearFontData();
