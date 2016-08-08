@@ -136,7 +136,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    default: // Default to Image type if unknown (check if there is a URL)
     case Toolkit::Visual::IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
@@ -172,13 +171,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
             visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
           }
         }
-      }
-      else if( propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER ) )
-      {
-        // Create Image Visual if it has a shader
-        // TODO: This is required because of EffectsView which should be fixed
-        CreateAtlasManager();
-        visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
       }
       break;
     }
