@@ -382,7 +382,7 @@ Property::Value SuperBlurView::GetProperty( BaseObject* object, Property::Index 
     {
       Property::Map map;
       Image inputImage = superBlurViewImpl.GetImage();
-      if( inputImage )
+      if( !inputImage )
       {
         Scripting::CreatePropertyMap( inputImage, map );
       }

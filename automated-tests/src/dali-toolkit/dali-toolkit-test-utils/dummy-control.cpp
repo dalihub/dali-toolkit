@@ -87,10 +87,8 @@ DummyControlImplOverride::DummyControlImplOverride()
 : DummyControlImpl(),
   initializeCalled(false),
   activatedCalled(false),
-  onAccTouchedCalled(false),
-  onAccValueChangeCalled(false),
-  themeChangeCalled(false),
-  fontChangeCalled(false),
+  themeChangeCalled( false ),
+  fontChangeCalled( false ),
   pinchCalled(false),
   panCalled(false),
   tapCalled(false),
@@ -115,12 +113,6 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
 bool DummyControlImplOverride::OnAccessibilityActivated() { activatedCalled = true; return true; }
-bool DummyControlImplOverride::OnAccessibilityTouch(const TouchEvent& touchEvent) { onAccTouchedCalled = true; return true; }
-bool DummyControlImplOverride::OnAccessibilityValueChange( bool isIncrease )
-{
-  onAccValueChangeCalled = true; return true;
-}
-
 void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   themeChangeCalled = change == StyleChange::THEME_CHANGE;

@@ -1,8 +1,11 @@
-#ifndef __DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
-#define __DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
+// Prevent normal accessibility adaptor declaration from loading
+#define __DALI_ACCESSIBILITY_ADAPTOR_H__
+
+#ifndef __DALI_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
+#define __DALI_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +22,76 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
+#include <string>
+#include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/events/touch-point.h>
 
-namespace Test
+namespace Dali
 {
-namespace AccessibilityAdaptor
+namespace Internal
 {
+namespace Adaptor
+{
+class AccessibilityAdaptor;
+}
+}
+class AccessibilityActionHandler;
+class AccessibilityGestureHandler;
+class TouchPoint;
 
-void MockSetReadPosition( Dali::AccessibilityAdaptor adaptor, Dali::Vector2& position );
-void SetEnabled( Dali::AccessibilityAdaptor adaptor, bool enabled);
-void SendPanGesture( Dali::AccessibilityAdaptor adaptor, const Dali::Integration::PanGestureEvent& panEvent );
+/**
+ * This creates a stubbed AccessibilityAdaptor so that internal Toolkit Adaptor calls work.
+ */
+class AccessibilityAdaptor : public BaseHandle
+{
+public: // Construction & Destruction
+  AccessibilityAdaptor();
+  ~AccessibilityAdaptor();
 
-} // namespace AccessibilityAdaptor
-} // namespace Test
+public: // Mock object setup.
 
-#endif //
+  void MockSetReadPosition( Vector2& position );
+
+public: // Getters
+
+  static AccessibilityAdaptor Get();
+
+  Vector2 GetReadPosition() const;
+  bool IsEnabled() const;
+  void SetActionHandler(AccessibilityActionHandler& handler);
+  void SetGestureHandler(AccessibilityGestureHandler& handler);
+
+  bool HandleActionNextEvent();
+  bool HandleActionPreviousEvent();
+  bool HandleActionActivateEvent();
+  bool HandleActionReadEvent(unsigned int x, unsigned int y, bool allowReadAgain);
+  bool HandleActionReadNextEvent();
+  bool HandleActionReadPreviousEvent();
+  bool HandleActionUpEvent();
+  bool HandleActionDownEvent();
+  bool HandleActionClearFocusEvent();
+  bool HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp);
+  bool HandleActionBackEvent();
+  void HandleActionEnableEvent();
+  void HandleActionDisableEvent();
+  bool HandleActionScrollUpEvent();
+  bool HandleActionScrollDownEvent();
+  bool HandleActionPageLeftEvent();
+  bool HandleActionPageRightEvent();
+  bool HandleActionPageUpEvent();
+  bool HandleActionPageDownEvent();
+  bool HandleActionMoveToFirstEvent();
+  bool HandleActionMoveToLastEvent();
+  bool HandleActionReadFromTopEvent();
+  bool HandleActionReadFromNextEvent();
+  bool HandleActionZoomEvent();
+  bool HandleActionReadIndicatorInformationEvent();
+  bool HandleActionReadPauseResumeEvent();
+  bool HandleActionStartStopEvent();
+
+  AccessibilityAdaptor( Internal::Adaptor::AccessibilityAdaptor* adaptor );
+};
+
+} // namespace Dali
+
+#endif // __DALI_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
