@@ -19,8 +19,8 @@
 #include "svg-rasterize-thread.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/third-party/nanosvg/nanosvgrast.h>
-#include <dali-toolkit/internal/controls/renderers/svg/svg-renderer.h>
+#include "nanosvg/nanosvgrast.h"
+#include "svg-renderer.h"
 
 namespace Dali
 {

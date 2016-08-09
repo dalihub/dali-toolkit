@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <dali-toolkit/third-party/facebook-flexbox/layout.h>
+#include <dali-toolkit/internal/controls/flex-container/layout.h>
 
 void test(const char *name, css_node_t *style, css_node_t *expected_layout);
 bool tests_finished(void);

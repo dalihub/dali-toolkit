@@ -1,4 +1,0 @@
-third_party_src_files = \
-   $(third_party_src_dir)/nanosvg/nanosvg.cc \
-   $(third_party_src_dir)/nanosvg/nanosvgrast.cc \
-   $(third_party_src_dir)/facebook-flexbox/layout.c

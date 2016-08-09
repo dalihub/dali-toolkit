@@ -26,8 +26,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/third-party/nanosvg/nanosvg.h>
-#include <dali-toolkit/internal/controls/renderers/svg/svg-rasterize-thread.h>
+#include "nanosvg/nanosvg.h"
+#include "svg-rasterize-thread.h"
 #include <dali-toolkit/internal/controls/renderers/image/image-renderer.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-factory-cache.h>
 #include <dali-toolkit/internal/controls/renderers/renderer-string-constants.h>

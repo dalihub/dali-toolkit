@@ -25,6 +25,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/renderers/gradient/linear-gradient.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/radial-gradient.cpp \
    $(toolkit_src_dir)/controls/renderers/gradient/gradient-renderer.cpp \
+   $(toolkit_src_dir)/controls/renderers/svg/nanosvg/nanosvg.cc \
+   $(toolkit_src_dir)/controls/renderers/svg/nanosvg/nanosvgrast.cc \
    $(toolkit_src_dir)/controls/renderers/svg/svg-rasterize-thread.cpp \
    $(toolkit_src_dir)/controls/renderers/svg/svg-renderer.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
@@ -36,6 +38,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
+   $(toolkit_src_dir)/controls/flex-container/layout.c \
    $(toolkit_src_dir)/controls/flex-container/flex-container-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
