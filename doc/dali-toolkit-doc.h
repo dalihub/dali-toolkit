@@ -113,18 +113,6 @@
  *    <td>Controls for displaying text or text input.</td>
  * </tr>
  * <tr>
- *    <td style="padding-left:1em">@ref dali_toolkit_controls_flex_container</td>
- *    <td>FlexContainer is a container for Flexbox layout.</td>
- * </tr>
- * <tr>
- *    <td style="padding-left:1em">@ref dali_toolkit_controls_video_view</td>
- *    <td>VideoView is a control for video playback and display.</td>
- * </tr>
- * <tr>
- *    <td style="padding-left:1em">@ref dali_toolkit_controls_slider</td>
- *    <td>Slider is a control to enable sliding an indicator between two values.</td>
- * </tr>
- * <tr>
  *    <td>@ref dali_toolkit_managers</td>
  *    <td>Singleton classes for managing application-wide functionalities.</td>
  * </tr>
@@ -173,9 +161,6 @@
 
  *     @defgroup dali_toolkit_controls_video_view Video View
  *     @brief VideoView is a control for video playback and display.
-
- *     @defgroup dali_toolkit_controls_slider Slider
- *     @brief Slider is a control to enable sliding an indicator between two values.
 
  *   @}
 
