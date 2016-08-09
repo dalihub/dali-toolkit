@@ -824,15 +824,22 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // Validate the fonts set through the mark-up string.
       Vector<FontDescriptionRun>& fontDescriptionRuns = mLogicalModel->mFontDescriptionRuns;
 
-      // Get the default font id.
-      const FontId defaultFontId = ( NULL == mFontDefaults ) ? 0u : mFontDefaults->GetFontId( mFontClient );
+      // Get the default font's description.
+      TextAbstraction::FontDescription defaultFontDescription;
+      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+      if( NULL != mFontDefaults )
+      {
+        defaultFontDescription = mFontDefaults->mFontDescription;
+        defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
+      }
 
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
       multilanguageSupport.ValidateFonts( utf32Characters,
                                           scripts,
                                           fontDescriptionRuns,
-                                          defaultFontId,
+                                          defaultFontDescription,
+                                          defaultPointSize,
                                           startIndex,
                                           requestedNumberOfCharacters,
                                           validFonts );

@@ -78,7 +78,7 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
       /// Weight key
       Property::Value* weightValue = map.Find( WEIGHT_KEY );
 
-      FontWeight weight = TextAbstraction::FontWeight::NORMAL;
+      FontWeight weight = TextAbstraction::FontWeight::NONE;
       const bool weightDefined = weightValue != NULL;
       if( weightDefined )
       {
@@ -93,7 +93,7 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
       /// Width key
       Property::Value* widthValue = map.Find( WIDTH_KEY );
 
-      FontWidth width = TextAbstraction::FontWidth::NORMAL;
+      FontWidth width = TextAbstraction::FontWidth::NONE;
       const bool widthDefined = widthValue != NULL;
       if( widthDefined )
       {
@@ -108,7 +108,7 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
       /// Slant key
       Property::Value* slantValue = map.Find( SLANT_KEY );
 
-      FontSlant slant = TextAbstraction::FontSlant::NORMAL;
+      FontSlant slant = TextAbstraction::FontSlant::NONE;
       const bool slantDefined = slantValue != NULL;
       if( slantDefined )
       {
@@ -125,17 +125,20 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
         case FontStyle::DEFAULT:
         {
           // Sets the default font's style values.
-          if( weightDefined && ( controller->GetDefaultFontWeight() != weight ) )
+          if( !weightDefined ||
+              ( weightDefined && ( controller->GetDefaultFontWeight() != weight ) ) )
           {
             controller->SetDefaultFontWeight( weight );
           }
 
-          if( widthDefined && ( controller->GetDefaultFontWidth() != width ) )
+          if( !widthDefined ||
+              ( widthDefined && ( controller->GetDefaultFontWidth() != width ) ) )
           {
             controller->SetDefaultFontWidth( width );
           }
 
-          if( slantDefined && ( controller->GetDefaultFontSlant() != slant ) )
+          if( !slantDefined ||
+              ( slantDefined && ( controller->GetDefaultFontSlant() != slant ) ) )
           {
             controller->SetDefaultFontSlant( slant );
           }
@@ -144,20 +147,43 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
         case FontStyle::INPUT:
         {
           // Sets the input font's style values.
-          if( weightDefined && ( controller->GetInputFontWeight() != weight ) )
+          if( !weightDefined ||
+              ( weightDefined && ( controller->GetInputFontWeight() != weight ) ) )
           {
             controller->SetInputFontWeight( weight );
           }
 
-          if( widthDefined && ( controller->GetInputFontWidth() != width ) )
+          if( !widthDefined ||
+              ( widthDefined && ( controller->GetInputFontWidth() != width ) ) )
           {
             controller->SetInputFontWidth( width );
           }
 
-          if( slantDefined && ( controller->GetInputFontSlant() != slant ) )
+          if( !slantDefined ||
+              ( slantDefined && ( controller->GetInputFontSlant() != slant ) ) )
           {
             controller->SetInputFontSlant( slant );
           }
+          break;
+        }
+      }
+    } // map not empty
+    else
+    {
+      switch( type )
+      {
+        case FontStyle::DEFAULT:
+        {
+          controller->SetDefaultFontWeight( TextAbstraction::FontWeight::NONE );
+          controller->SetDefaultFontWidth( TextAbstraction::FontWidth::NONE );
+          controller->SetDefaultFontSlant( TextAbstraction::FontSlant::NONE );
+          break;
+        }
+        case FontStyle::INPUT:
+        {
+          controller->SetInputFontWeight( TextAbstraction::FontWeight::NONE );
+          controller->SetInputFontWidth( TextAbstraction::FontWidth::NONE );
+          controller->SetInputFontSlant( TextAbstraction::FontSlant::NONE );
           break;
         }
       }
