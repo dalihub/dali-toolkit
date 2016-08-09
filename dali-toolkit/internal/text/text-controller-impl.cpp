@@ -307,6 +307,15 @@ void Controller::Impl::NotifyImfManager()
   }
 }
 
+void Controller::Impl::NotifyImfMultiLineStatus()
+{
+  if ( mEventData )
+  {
+    LayoutEngine::Layout layout = mLayoutEngine.GetLayout();
+    mEventData->mImfManager.NotifyTextInputMultiLine( layout == LayoutEngine::MULTI_LINE_BOX );
+  }
+}
+
 CharacterIndex Controller::Impl::GetLogicalCursorPosition() const
 {
   CharacterIndex cursorPosition = 0u;

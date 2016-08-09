@@ -441,6 +441,11 @@ struct Controller::Impl
   void NotifyImfManager();
 
   /**
+   * @brief Helper to notify IMF manager with multi line status.
+   */
+  void NotifyImfMultiLineStatus();
+
+  /**
    * @brief Retrieve the current cursor position.
    *
    * @return The cursor position.
