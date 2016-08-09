@@ -54,7 +54,7 @@ JsonParser::~JsonParser()
 {
 }
 
-JsonParser JsonParser::DownCast( BaseHandle handle )
+JsonParser DownCast( BaseHandle handle )
 {
   return JsonParser( dynamic_cast<Internal::JsonParser*>(handle.GetObjectPtr()) );
 }

@@ -182,6 +182,11 @@ TreeNode::KeyNodePair TreeNode::ConstIterator::operator *()
   return KeyNodePair(mNode->mName, *mNode);
 }
 
+TreeNode::KeyNodePair TreeNode::ConstIterator::operator ->()
+{
+  return KeyNodePair(mNode->mName, *mNode);
+}
+
 bool TreeNode::ConstIterator::operator!=( const TreeNode::ConstIterator& rhs ) const
 {
   return mNode != rhs.mNode;
