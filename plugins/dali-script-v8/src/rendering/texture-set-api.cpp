@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,41 +90,6 @@ TextureSet TextureSetApi::GetTextureSetFromParams( int paramIndex,
 TextureSet TextureSetApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   return TextureSet::New();
-}
-
-
-/**
- * Sets the image to be used by a given texture
- * @method setImage
- * @for TextureSet
- * @param {integer} index The index of the texture in the array of textures
- * @param {Object} image The image used by this sampler
- */
-void TextureSetApi::SetImage( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  TextureSet textureSet = GetTextureSet( isolate, args );
-
-  bool found( false );
-  int index = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0 /* default */);
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "invalid index parameter" );
-    return;
-  }
-
-  found = false;
-  Image image = V8Utils::GetImageParameter( PARAMETER_1, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "missing image from param 1" );
-  }
-  else
-  {
-    textureSet.SetImage(index, image);
-  }
 }
 
 /**

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SHADER_EFFECT_MOTION_STRETCH_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,13 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/rendering/shader.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -58,11 +64,11 @@ inline void SetMotionStretchProperties( Actor& actor )
  *                              its edges. This is used to prevent an unsightly hard edge between the stretched actor and
  *                              the scene. Depends on the values of the vertices in the vertex stream. When the actor is at
  *                              rest this is not applied. Default Vector2(0.25, 0.25), which is half way towards the edge for
- *                              an ImageRenderer::QUAD.
+ *                              an ImageVisual::QUAD.
  *  "uObjectFadeEnd"          - The displacement from the centre of the actor that the actor will finish fading towards its edges.
  *                              This is used to prevent an unsightly hard edge between the stretched actor and the scene. Depends
  *                              on the values of the vertices in the vertex stream. When the actor is at rest this is not applied.
- *                              Default 0.5, which is all the way towards the edge for an ImageRenderer::QUAD.
+ *                              Default 0.5, which is all the way towards the edge for an ImageVisual::QUAD.
  *  "uAlphaScale"             - Global scaler applied to the alpha of the actor. Used to make the stretched actor a bit more subtle
  *                              and reveal a bit of the background behind it as it moves. When the actor is at rest this is not
  *                              applied. Default 0.75.
@@ -187,16 +193,15 @@ inline Property::Map CreateMotionStretchEffect()
   Property::Map map;
 
   Property::Map customShader;
-  customShader[ "vertexShader" ] = vertexSource;
-  customShader[ "fragmentShader" ] = fragmentSource;
+  customShader[ Visual::Shader::Property::VERTEX_SHADER ] = vertexSource;
+  customShader[ Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource;
 
-  customShader[ "subdivideGridX" ] = 10;
-  customShader[ "subdivideGridY" ] = 10;
+  customShader[ Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 10;
+  customShader[ Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 10;
 
-  // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
-  customShader[ "hints" ] = "outputIsTransparent";
+  customShader[ Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
 
-  map[ "shader" ] = customShader;
+  map[ Visual::Property::SHADER ] = customShader;
   return map;
 }
 

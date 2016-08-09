@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,12 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -91,28 +93,28 @@ void EmbossFilter::Enable()
   mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
 
   Property::Map customShader;
-  customShader[ "fragmentShader" ] = EMBOSS_FRAGMENT_SOURCE;
-  Property::Map rendererMap;
-  rendererMap.Insert( "shader", customShader );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EMBOSS_FRAGMENT_SOURCE;
+  Property::Map visualMap;
+  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
 
   // create actor to render input with applied emboss effect
-  mActorForInput1 = Toolkit::ImageView::New( mInputImage );
+  mActorForInput1 = Toolkit::ImageView::New(mInputImage);
   mActorForInput1.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput1.SetSize(mTargetSize);
   Vector2 textureScale( 1.5f/mTargetSize.width, 1.5f/mTargetSize.height);
   mActorForInput1.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput1.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( 2.f, -1.f, -1.f ) );
   // set EMBOSS custom shader
-  mActorForInput1.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  mActorForInput1.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
   mRootActor.Add( mActorForInput1 );
 
-  mActorForInput2 = Toolkit::ImageView::New( mInputImage );
+  mActorForInput2 = Toolkit::ImageView::New(mInputImage);
   mActorForInput2.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput2.SetSize(mTargetSize);
   mActorForInput2.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput2.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( -1.f, -1.f, 2.f ) );
   // set EMBOSS custom shader
-  mActorForInput2.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  mActorForInput2.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
   mRootActor.Add( mActorForInput2 );
 
   mActorForComposite = Actor::New();
@@ -120,20 +122,24 @@ void EmbossFilter::Enable()
   mActorForComposite.SetSize(mTargetSize);
   mActorForComposite.SetColor( Color::BLACK );
 
-  customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
-  rendererMap[ "shader"] = customShader;
-  Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-  mRendererForEmboss1 = rendererFactory.GetControlRenderer( mImageForEmboss1 );
-  mRendererForEmboss2 = rendererFactory.GetControlRenderer( mImageForEmboss2 );
-  // set COMPOSITE custom shader to both renderers
-  rendererFactory.ResetRenderer( mRendererForEmboss1, mActorForComposite, rendererMap);
-  rendererFactory.ResetRenderer( mRendererForEmboss2, mActorForComposite, rendererMap);
-  // apply renderers to the actor
-  mRendererForEmboss1.SetOnStage( mActorForComposite );
-  mRendererForEmboss2.SetOnStage( mActorForComposite );
-  mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
-  mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = COMPOSITE_FRAGMENT_SOURCE;
+  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+  visualMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+
   mRootActor.Add( mActorForComposite );
+
+  InitializeVisual( mActorForComposite, mVisualForEmboss1, visualMap );
+  InitializeVisual( mActorForComposite, mVisualForEmboss2, visualMap );
+
+  TextureSet textureSet1 = TextureSet::New();
+  TextureSetImage( textureSet1, 0, mImageForEmboss1 );
+  mActorForComposite.GetRendererAt(0).SetTextures( textureSet1 );
+  mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
+
+  TextureSet textureSet2 = TextureSet::New();
+  TextureSetImage( textureSet2, 0, mImageForEmboss2 );
+  mActorForComposite.GetRendererAt(1).SetTextures( textureSet2 );
+  mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
 
   SetupCamera();
   CreateRenderTasks();
@@ -163,10 +169,10 @@ void EmbossFilter::Disable()
 
     if( mActorForComposite )
     {
-      mRendererForEmboss1.SetOffStage( mActorForComposite );
-      mRendererForEmboss2.SetOffStage( mActorForComposite );
-      mRendererForEmboss1.Reset();
-      mRendererForEmboss2.Reset();
+      mVisualForEmboss1.SetOffStage( mActorForComposite );
+      mVisualForEmboss2.SetOffStage( mActorForComposite );
+      mVisualForEmboss1.Reset();
+      mVisualForEmboss2.Reset();
       mRootActor.Remove( mActorForComposite );
       mActorForComposite.Reset();
     }

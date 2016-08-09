@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 #include <sstream>
 #include <limits>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
@@ -135,7 +135,7 @@ Dali::Toolkit::Slider Slider::New()
 }
 
 Slider::Slider()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mState( NORMAL ),
   mPopupVisual(""),
   mPopupArrowVisual(""),
@@ -201,6 +201,9 @@ void Slider::OnInitialize()
 
   // Size the Slider actor to a default
   self.SetSize( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y );
+
+  // Connect to the touch signal
+  self.TouchSignal().Connect( this, &Slider::OnTouch );
 }
 
 void Slider::OnSizeSet( const Vector3& size )
@@ -210,22 +213,22 @@ void Slider::OnSizeSet( const Vector3& size )
   SetTrackRegion( Vector2( size.x - GetHandleSize().x, GetTrackRegion().y ) );
 }
 
-bool Slider::OnTouchEvent(Actor actor, const TouchEvent& event)
+bool Slider::OnTouch(Actor actor, const TouchData& touch)
 {
   if( mState != DISABLED )
   {
-    TouchPoint::State touchState = event.GetPoint(0).state;
+    const PointState::Type touchState = touch.GetState(0);
 
-    if( touchState == TouchPoint::Down )
+    if( touchState == PointState::DOWN )
     {
       mState = PRESSED;
 
-      float percentage = MapPercentage( event.GetPoint(0).local );
+      float percentage = MapPercentage( touch.GetLocalPosition( 0 ) );
       float value = MapBounds( ( GetSnapToMarks() ) ? SnapToMark( percentage ) : MarkFilter( percentage ), GetLowerBound(), GetUpperBound() );
       SetValue( value );
       DisplayPopup( value );
     }
-    else if( touchState == TouchPoint::Up)
+    else if( touchState == PointState::UP )
     {
       if( mState == PRESSED )
       {
@@ -372,7 +375,7 @@ Actor Slider::CreateHitRegion()
   Actor hitRegion = Actor::New();
   hitRegion.SetParentOrigin( ParentOrigin::CENTER );
   hitRegion.SetAnchorPoint( AnchorPoint::CENTER );
-  hitRegion.TouchedSignal().Connect( this, &Slider::OnTouchEvent );
+  hitRegion.TouchSignal().Connect( this, &Slider::OnTouch );
 
   return hitRegion;
 }

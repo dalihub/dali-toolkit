@@ -23,7 +23,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
@@ -683,6 +683,7 @@ void ScrollView::OnInitialize()
 
   mGestureStackDepth = 0;
 
+  self.TouchSignal().Connect( this, &ScrollView::OnTouch );
   EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
 
   // By default we'll allow the user to freely drag the scroll view,
@@ -1173,19 +1174,6 @@ unsigned int ScrollView::GetCurrentPage() const
 Vector2 ScrollView::GetCurrentScrollPosition() const
 {
   return -GetPropertyPosition();
-}
-
-Vector2 ScrollView::GetDomainSize() const
-{
-  Vector3 size = Self().GetCurrentSize();
-
-  const RulerDomain& xDomain = GetRulerX()->GetDomain();
-  const RulerDomain& yDomain = GetRulerY()->GetDomain();
-
-  Vector2 domainSize;
-  domainSize.x = xDomain.max - xDomain.min - size.x;
-  domainSize.y = yDomain.max - yDomain.min - size.y;
-  return domainSize;
 }
 
 void ScrollView::TransformTo(const Vector2& position,
@@ -2043,7 +2031,7 @@ bool ScrollView::OnTouchDownTimeout()
   return false;
 }
 
-bool ScrollView::OnTouchEvent(const TouchEvent& event)
+bool ScrollView::OnTouch( Actor actor, const TouchData& touch )
 {
   if(!mSensitive)
   {
@@ -2054,21 +2042,21 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
   }
 
   // Ignore events with multiple-touch points
-  if (event.GetPointCount() != 1)
+  if (touch.GetPointCount() != 1)
   {
     DALI_LOG_SCROLL_STATE("[0x%X], multiple touch, ignoring", this);
 
     return false;
   }
 
-  const TouchPoint::State pointState = event.GetPoint(0).state;
-  if( pointState == TouchPoint::Down )
+  const PointState::Type pointState = touch.GetState( 0 );
+  if( pointState == PointState::DOWN )
   {
     DALI_LOG_SCROLL_STATE("[0x%X] Down", this);
 
     if(mGestureStackDepth==0)
     {
-      mTouchDownTime = event.time;
+      mTouchDownTime = touch.GetTime();
 
       // This allows time for a pan-gesture to start, to avoid breaking snap-animation behavior with fast flicks.
       // If touch-down does not become a pan (after timeout interval), then snap-animation can be interrupted.
@@ -2077,8 +2065,8 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
       StartTouchDownTimer();
     }
   }
-  else if( ( pointState == TouchPoint::Up ) ||
-           ( ( pointState == TouchPoint::Interrupted ) && ( event.GetPoint(0).hitActor == Self() ) ) )
+  else if( ( pointState == PointState::UP ) ||
+           ( ( pointState == PointState::INTERRUPTED ) && ( touch.GetHitActor( 0 )== Self() ) ) )
   {
     DALI_LOG_SCROLL_STATE("[0x%X] %s", this, ( ( pointState == TouchPoint::Up ) ? "Up" : "Interrupted" ) );
 
@@ -2089,8 +2077,8 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
     // otherwise our scroll could be stopped (interrupted) half way through an animation.
     if(mGestureStackDepth==0 && mTouchDownTimeoutReached)
     {
-      if( ( event.GetPoint(0).state == TouchPoint::Interrupted ) ||
-          ( ( event.time - mTouchDownTime ) >= MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET ) )
+      if( ( pointState == PointState::INTERRUPTED ) ||
+          ( ( touch.GetTime() - mTouchDownTime ) >= MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET ) )
       {
         // Reset the velocity only if down was received a while ago
         mLastVelocity = Vector2( 0.0f, 0.0f );

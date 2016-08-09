@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2016 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 # Build the Dali Toolkit library
 
-toolkit_images_dir = ../../../dali-toolkit/styles/images-common
-toolkit_sounds_dir = ../../../dali-toolkit/sounds
-toolkit_src_dir    = ../../../dali-toolkit/internal
-public_api_src_dir = ../../../dali-toolkit/public-api
-devel_api_src_dir  = ../../../dali-toolkit/devel-api
+toolkit_images_dir  = ../../../dali-toolkit/styles/images-common
+toolkit_sounds_dir  = ../../../dali-toolkit/sounds
+toolkit_src_dir     = ../../../dali-toolkit/internal
+public_api_src_dir  = ../../../dali-toolkit/public-api
+devel_api_src_dir   = ../../../dali-toolkit/devel-api
+third_party_src_dir = ../../../dali-toolkit/third-party
 
 toolkit_styles_dir = $(STYLE_DIR)
 toolkit_style_images_dir = $(STYLE_DIR)/images
@@ -31,6 +32,7 @@ include ../../../dali-toolkit/styles/images-common/file.list
 include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
 include ../../../dali-toolkit/devel-api/file.list
+include ../../../dali-toolkit/third-party/file.list
 
 vector_based_text_src_dir = ../../../dali-toolkit/internal/text/rendering/vector-based
 include ../../../dali-toolkit/internal/text/rendering/vector-based/file.list
@@ -56,7 +58,8 @@ lib_LTLIBRARIES = libdali-toolkit.la
 libdali_toolkit_la_SOURCES = \
                      $(toolkit_src_files) \
                      $(public_api_src_files) \
-                     $(devel_api_src_files)
+                     $(devel_api_src_files) \
+                     $(third_party_src_files)
 
 dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
 dalistyle_DATA = ${dali_toolkit_style_files}
@@ -99,7 +102,6 @@ develapibloomviewdir =          $(develapicontrolsdir)/bloom-view
 develapibubbleemitterdir =      $(develapicontrolsdir)/bubble-effect
 develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
-develapirendererfactorydir =    $(develapicontrolsdir)/renderer-factory
 develapipopupdir =              $(develapicontrolsdir)/popup
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
@@ -110,8 +112,10 @@ develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
+develapivisualfactorydir =      $(develapidir)/visual-factory
 
 # devel headers
+develapi_HEADERS =                  $(devel_api_header_files)
 develapicontrols_HEADERS =          $(devel_api_controls_header_files)
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
@@ -121,7 +125,7 @@ develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
 develapiimageatlas_HEADERS =        $(devel_api_image_atlas_header_files)
 develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
 develapipopup_HEADERS =             $(devel_api_popup_header_files)
-develapirendererfactory_HEADERS =   $(devel_api_renderer_factory_header_files)
+develapivisualfactory_HEADERS =     $(devel_api_visual_factory_header_files)
 develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
 develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
@@ -153,6 +157,7 @@ publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =         $(publicapidir)/focus-manager
 publicapirenderingbackenddir =     $(publicapidir)/text
 publicapisliderdir =               $(publicapicontrolsdir)/slider
+publicapivisualsdir =              $(publicapidir)/visuals
 
 # public api headers
 publicapi_HEADERS =                     $(public_api_header_files)
@@ -177,6 +182,7 @@ publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS =     $(public_api_rendering_backend_header_files)
 publicapislider_HEADERS =               $(public_api_slider_header_files)
+publicapivisuals_HEADERS =              $(public_api_visuals_header_files)
 
 # package doxygen file (contains doxygen grouping information)
 packagedoxydir = $(topleveldir)/doc

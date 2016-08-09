@@ -27,7 +27,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -220,7 +220,7 @@ Dali::Toolkit::Popup Popup::New()
 }
 
 Popup::Popup()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mTouchedOutsideSignal(),
   mShowingSignal(),
   mShownSignal(),
@@ -318,7 +318,7 @@ void Popup::OnInitialize()
   mPopupLayout.SetFitHeight( 0 ); // Set row to fit.
   mPopupLayout.SetFitHeight( 1 ); // Set row to fit.
 
-  mPopupLayout.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
+  mPopupLayout.TouchSignal().Connect( this, &Popup::OnDialogTouched );
 
   mPopupContainer.Add( mPopupLayout );
 
@@ -578,7 +578,7 @@ void Popup::SetPopupBackgroundImage( Actor image )
   mPopupBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
 
   // OnDialogTouched only consumes the event. It prevents the touch event to be caught by the backing.
-  mPopupBackgroundImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
+  mPopupBackgroundImage.TouchSignal().Connect( this, &Popup::OnDialogTouched );
 
   // Set the popup border to be slightly larger than the layout contents.
   mPopupBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
@@ -902,7 +902,7 @@ Toolkit::Control Popup::CreateBacking()
 
   // Default to being transparent.
   backing.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
-  backing.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
+  backing.TouchSignal().Connect( this, &Popup::OnBackingTouched );
   backing.WheelEventSignal().Connect( this, &Popup::OnBackingWheelEvent );
   return backing;
 }
@@ -1454,7 +1454,7 @@ bool Popup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   return connected;
 }
 
-bool Popup::OnBackingTouched( Actor actor, const TouchEvent& event )
+bool Popup::OnBackingTouched( Actor actor, const TouchData& touch )
 {
   // Allow events to pass through if touch transparency is enabled.
   if( mTouchTransparent )
@@ -1462,11 +1462,9 @@ bool Popup::OnBackingTouched( Actor actor, const TouchEvent& event )
     return false;
   }
 
-  if( event.GetPointCount() > 0 )
+  if( touch.GetPointCount() > 0 )
   {
-    const TouchPoint& point = event.GetPoint( 0 );
-
-    if( point.state == TouchPoint::Down )
+    if( touch.GetState( 0 ) == PointState::DOWN )
     {
       // Guard against destruction during signal emission.
       Toolkit::Popup handle( GetOwner() );
@@ -1493,7 +1491,7 @@ bool Popup::OnBackingWheelEvent( Actor actor, const WheelEvent& event )
   return true;
 }
 
-bool Popup::OnDialogTouched(Actor actor, const TouchEvent& event)
+bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
 {
   // Allow events to pass through if touch transparency is enabled.
   if( mTouchTransparent )

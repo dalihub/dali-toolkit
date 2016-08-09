@@ -48,10 +48,10 @@ public:
     stage.Add( mTextLabel );
 
     // Respond to a click anywhere on the stage
-    stage.GetRootLayer().TouchedSignal().Connect( this, &HelloWorldController::OnTouch );
+    stage.GetRootLayer().TouchSignal().Connect( this, &HelloWorldController::OnTouch );
   }
 
-  bool OnTouch( Actor actor, const TouchEvent& touch )
+  bool OnTouch( Actor actor, const TouchData& touch )
   {
     // quit the application
     mApplication.Quit();

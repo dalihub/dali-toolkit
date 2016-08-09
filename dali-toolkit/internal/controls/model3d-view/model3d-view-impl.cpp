@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
@@ -42,6 +43,35 @@ namespace Internal
 
 namespace
 {
+
+// Texture indices are constants.
+enum TextureIndex
+{
+  DIFFUSE_TEXTURE_INDEX,
+  NORMAL_TEXTURE_INDEX,
+  GLOSS_TEXTURE_INDEX
+};
+
+/**
+ * @brief Loads a texture from a file.
+ * @param[in] imageUrl The URL of the file
+ * @return A texture if loading succeeds, an empty handle otherwise
+ */
+Texture LoadTexture( const char* imageUrl )
+{
+  Texture texture;
+  Dali::BitmapLoader loader = Dali::BitmapLoader::New( imageUrl );
+  loader.Load();
+  PixelData pixelData = loader.GetPixelData();
+  if( pixelData )
+  {
+    texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+    texture.Upload( pixelData );
+    texture.GenerateMipmaps();
+  }
+
+  return texture;
+}
 
 // Type registration
 BaseHandle Create()
@@ -247,28 +277,9 @@ const char* NRMMAP_FRAGMENT_SHADER = MAKE_SHADER(
 
 using namespace Dali;
 
-void LookAt(Matrix& result, const Vector3& eye, const Vector3& target, const Vector3& up)
-{
-  Vector3 vZ = target - eye;
-  vZ.Normalize();
-
-  Vector3 vX = up.Cross(vZ);
-  vX.Normalize();
-
-  Vector3 vY = vZ.Cross(vX);
-  vY.Normalize();
-
-  result.SetInverseTransformComponents(vX, vY, vZ, eye);
-}
-
-
 Model3dView::Model3dView()
   : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
 {
-  mTexture0Url = "";
-  mTexture1Url = "";
-  mTexture2Url = "";
-
   mIlluminationType = Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP;
 
   mCameraFOV = Math::PI_OVER_180 * 45.f;
@@ -317,6 +328,7 @@ void Model3dView::SetProperty( BaseObject* object, Property::Index index, const 
         {
           impl.LoadMaterial();
           impl.CreateMaterial();
+          impl.LoadTextures();
         }
         break;
       }
@@ -423,7 +435,7 @@ void Model3dView::OnStageConnection( int depth )
 
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( mIlluminationType );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ), true );
 
     CreateMaterial();
     LoadTextures();
@@ -462,9 +474,7 @@ void Model3dView::LoadGeometry()
   if (FileLoader::ReadFile(mObjUrl,fileSize,fileContent,FileLoader::TEXT))
   {
     mObjLoader.ClearArrays();
-
-    std::string materialUrl;
-    mObjLoader.Load(fileContent.Begin(), fileSize, materialUrl);
+    mObjLoader.LoadObject(fileContent.Begin(), fileSize);
 
     //Get size information from the obj loaded
     mSceneCenter = mObjLoader.GetCenter();
@@ -520,7 +530,7 @@ void Model3dView::CreateGeometry()
 {
   if( mObjLoader.IsSceneLoaded() )
   {
-    mMesh = mObjLoader.CreateGeometry( mIlluminationType );
+    mMesh = mObjLoader.CreateGeometry( GetShaderProperties( mIlluminationType ), true );
 
     if( mRenderer )
     {
@@ -590,43 +600,74 @@ void Model3dView::CreateMaterial()
 void Model3dView::LoadTextures()
 {
   if( !mTextureSet )
-    return ;
-
-  if( (mTexture0Url != "") && (mIlluminationType != Toolkit::Model3dView::DIFFUSE) )
   {
-    std::string imgUrl = mImagesUrl + mTexture0Url;
+    return;
+  }
+
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR_MIPMAP_LINEAR );
+
+  // Setup diffuse texture.
+  if( !mTexture0Url.empty() && ( mIlluminationType != Toolkit::Model3dView::DIFFUSE ) )
+  {
+    std::string imageUrl = mImagesUrl + mTexture0Url;
 
     //Load textures
-    Image tex0 = ResourceImage::New( imgUrl );
-    if( tex0 )
+    Texture diffuseTexture = LoadTexture( imageUrl.c_str() );
+    if( diffuseTexture )
     {
-      mTextureSet.SetImage( 0u, tex0 );
+      mTextureSet.SetTexture( DIFFUSE_TEXTURE_INDEX, diffuseTexture );
+      mTextureSet.SetSampler( DIFFUSE_TEXTURE_INDEX, sampler );
     }
   }
 
-  if( (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) )
+  if( mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
   {
-    std::string imgUrl = mImagesUrl + mTexture1Url;
-
-    //Load textures
-    Image tex1 = ResourceImage::New( imgUrl );
-    if (tex1)
+    // Setup normal map texture.
+    if( !mTexture1Url.empty() )
     {
-      mTextureSet.SetImage( 1u, tex1 );
+      std::string imageUrl = mImagesUrl + mTexture1Url;
+
+      //Load textures
+      Texture normalTexture = LoadTexture( imageUrl.c_str() );
+      if( normalTexture )
+      {
+        mTextureSet.SetTexture( NORMAL_TEXTURE_INDEX, normalTexture );
+        mTextureSet.SetSampler( NORMAL_TEXTURE_INDEX, sampler );
+      }
+    }
+    if( !mTexture2Url.empty() )
+    {
+      // Setup gloss map texture.
+      std::string imageUrl = mImagesUrl + mTexture2Url;
+
+      //Load textures
+      Texture glossTexture = LoadTexture( imageUrl.c_str() );
+      if( glossTexture )
+      {
+        mTextureSet.SetTexture( GLOSS_TEXTURE_INDEX, glossTexture );
+        mTextureSet.SetSampler( GLOSS_TEXTURE_INDEX, sampler );
+      }
     }
   }
+}
 
-  if( (mTexture2Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) )
+int Model3dView::GetShaderProperties( Toolkit::Model3dView::IlluminationType illuminationType )
+{
+  int objectProperties = 0;
+
+  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ||
+      illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
   {
-    std::string imgUrl = mImagesUrl + mTexture2Url;
-
-    //Load textures
-    Image tex2 = ResourceImage::New( imgUrl );
-    if( tex2 )
-    {
-      mTextureSet.SetImage( 2u, tex2 );
-    }
+    objectProperties |= ObjLoader::TEXTURE_COORDINATES;
   }
+
+  if( illuminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
+  {
+    objectProperties |= ObjLoader::TANGENTS | ObjLoader::BINORMALS;
+  }
+
+  return objectProperties;
 }
 
 } // namespace Internal

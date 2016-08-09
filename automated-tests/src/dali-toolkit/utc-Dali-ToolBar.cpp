@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -39,9 +39,12 @@ Actor CreateColorActor( const Vector4& color )
 {
   Actor solidColorActor = Actor::New();
 
-  RendererFactory factory = RendererFactory::Get();
-  ControlRenderer colorRenderer = factory.GetControlRenderer( color );
-  colorRenderer.SetOnStage( solidColorActor );
+  VisualFactory factory = VisualFactory::Get();
+  Dali::Property::Map map;
+  map[ Visual::Property::TYPE ] = Visual::COLOR;
+  map[ ColorVisual::Property::MIX_COLOR ] = color;
+  Visual::Base colorVisual = factory.CreateVisual( map );
+  colorVisual.SetOnStage( solidColorActor );
 
   return solidColorActor;
 }

@@ -284,7 +284,7 @@ public:
   /**
    * @brief Retrieves the blink-interval for a cursor.
    *
-   * @return The cursor blink-interval.
+   * @return The cursor blink-interval in seconds.
    */
   float GetCursorBlinkInterval() const;
 
@@ -298,7 +298,7 @@ public:
   /**
    * @brief Retrieves the blink-duration for a cursor.
    *
-   * @return The cursor blink-duration.
+   * @return The cursor blink-duration in seconds.
    */
   float GetCursorBlinkDuration() const;
 
@@ -435,19 +435,36 @@ public:
   void SetSelectionHandleFlipState( bool indicesSwapped, bool left, bool right );
 
   /**
-   * @brief Adds a quad to the existing selection highlights.
+   * @brief Adds a quad to the existing selection highlights. Vertices are in decorator's coordinates.
    *
-   * @param[in] x1 The top-left x position.
-   * @param[in] y1 The top-left y position.
-   * @param[in] x2 The bottom-right x position.
-   * @param[in] y3 The bottom-right y position.
+   * @param[in] index Position in the vector where to add the quad.
+   * @param[in] quad The quad. The 'x' and 'y' coordinates store the min 'x' and min 'y'. The 'z' and 'w' coordinates store the max 'x' and max 'y'.
    */
-  void AddHighlight( float x1, float y1, float x2, float y2 );
+  void AddHighlight( unsigned int index, const Vector4& quad );
+
+  /**
+   * @brief Sets the min 'x,y' coordinates and the size of the highlighted box.
+   *
+   * It's used to set the size and position of the highlight's actor and to translate each highlight quad from
+   * decorator's coordinates to the local coords of the highlight's actor.
+   *
+   * @param[in] position The position of the highlighted text in decorator's coords.
+   * @param[in] size The size of the highlighted text.
+   */
+  void SetHighLightBox( const Vector2& position,
+                        const Size& size );
 
   /**
    * @brief Removes all of the previously added highlights.
    */
   void ClearHighlights();
+
+  /**
+   * @brief Reserves space for the highlight quads.
+   *
+   * @param[in] numberOfQuads The expected number of quads.
+   */
+  void ResizeHighlightQuads( unsigned int numberOfQuads );
 
   /**
    * @brief Sets the selection highlight color.
@@ -462,6 +479,20 @@ public:
    * @return The color of the highlight
    */
   const Vector4& GetHighlightColor() const;
+
+  /**
+   * @brief Sets whether the highlight is active.
+   *
+   * @param[in] active Whether the highlight is active.
+   */
+  void SetHighlightActive( bool active );
+
+  /**
+   * @brief Retrieves whether the highlight is active.
+   *
+   * @return @e true if the highlight is active, @e false otherwise.
+   */
+  bool IsHighlightActive() const;
 
   /**
    * @brief Sets into the decorator the depth used to render the text.
@@ -501,14 +532,14 @@ public:
    * It defines a square area inside the control, close to the edge.
    * When the cursor enters this area, the decorator starts to send scroll events.
    *
-   * @param[in] threshold The scroll threshold.
+   * @param[in] threshold The scroll threshold in pixels.
    */
   void SetScrollThreshold( float threshold );
 
   /**
    * @brief Retrieves the scroll threshold.
    *
-   * @retunr The scroll threshold.
+   * @retunr The scroll threshold in pixels.
    */
   float GetScrollThreshold() const;
 
@@ -517,14 +548,14 @@ public:
    *
    * Is the distance the text is going to be scrolled during a scroll interval.
    *
-   * @param[in] speed The scroll speed.
+   * @param[in] speed The scroll speed in pixels/second.
    */
   void SetScrollSpeed( float speed );
 
   /**
    * @brief Retrieves the scroll speed.
    *
-   * @return The scroll speed.
+   * @return The scroll speed in pixels/second.
    */
   float GetScrollSpeed() const;
 
@@ -532,6 +563,36 @@ public:
    * @brief Notifies the decorator the whole text has been scrolled.
    */
   void NotifyEndOfScroll();
+
+  /**
+   * @copydoc Text::Controller::SetHorizontalScrollEnabled()
+   */
+  void SetHorizontalScrollEnabled( bool enable );
+
+  /**
+   * @copydoc Text::Controller::IsHorizontalScrollEnabled()
+   */
+  bool IsHorizontalScrollEnabled() const;
+
+  /**
+   * @copydoc Text::Controller::SetVerticalScrollEnabled()
+   */
+  void SetVerticalScrollEnabled( bool enable );
+
+  /**
+   * @copydoc Text::Controller::IsVerticalScrollEnabled()
+   */
+  bool IsVerticalScrollEnabled() const;
+
+  /**
+   * @copydoc Text::Controller::SetSmoothHandlePanEnabled()
+   */
+  void SetSmoothHandlePanEnabled( bool enable );
+
+  /**
+   * @copydoc Text::Controller::IsSmoothHandlePanEnabled()
+   */
+  bool IsSmoothHandlePanEnabled() const;
 
 protected:
 

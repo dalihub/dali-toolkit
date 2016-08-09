@@ -119,8 +119,8 @@ void VideoView::SetPropertyMap( Property::Map map )
 {
   mPropertyMap = map;
 
-  Actor self = Self();
-  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mPropertyMap );
+  Actor self( Self() );
+  InitializeVisual( self, mVisual, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -430,9 +430,9 @@ Property::Value VideoView::GetProperty( BaseObject* object, Property::Index prop
 
 void VideoView::SetDepthIndex( int depthIndex )
 {
-  if( mRenderer )
+  if( mVisual )
   {
-    mRenderer.SetDepthIndex( depthIndex );
+    mVisual.SetDepthIndex( depthIndex );
   }
 }
 
@@ -440,19 +440,19 @@ void VideoView::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
 
-  if( mRenderer )
+  if( mVisual )
   {
     CustomActor self = Self();
-    mRenderer.SetOnStage( self );
+    mVisual.SetOnStage( self );
   }
 }
 
 void VideoView::OnStageDisconnection()
 {
-  if( mRenderer )
+  if( mVisual )
   {
     CustomActor self = Self();
-    mRenderer.SetOffStage( self );
+    mVisual.SetOffStage( self );
   }
 
   Control::OnStageDisconnection();
@@ -505,7 +505,7 @@ void VideoView::SetWindowSurfaceTarget()
   int curPos = mVideoPlayer.GetPlayPosition();
 
   mSetRenderingTarget = true;
-  mRenderer.RemoveAndReset( self );
+  mVisual.RemoveAndReset( self );
 
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );
@@ -525,7 +525,7 @@ void VideoView::SetWindowSurfaceTarget()
 
 void VideoView::SetNativeImageTarget()
 {
-  Actor self = Self();
+  Actor self( Self() );
   int curPos = mVideoPlayer.GetPlayPosition();
 
   mSetRenderingTarget = true;
@@ -538,7 +538,7 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
-  Toolkit::RendererFactory::Get().ResetRenderer( mRenderer, self, mNativeImage );
+  InitializeVisual( self, mVisual, mNativeImage );
 
   if( mIsPlay )
   {

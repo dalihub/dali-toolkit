@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H__
-#define __DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H__
+#ifndef DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H
+#define DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -135,17 +138,17 @@ public:
   bool IsTransitioning();
 
   /**
-   * Set the current image to transition from
+   * Set the current texture to transition from
    * if using this same effect continually, only need to set once
-   * @param[in] image The current image
+   * @param[in] texture The current texture
    */
-  void SetCurrentImage(Image image);
+  void SetCurrentTexture( Texture texture );
 
   /**
-   * Set the target image to transit to
-   * @param[in] image The new Image showing on stage
+   * Set the target texture to transit to
+   * @param[in] texture The new Texture showing on stage
    */
-  void SetTargetImage(Image image);
+  void SetTargetTexture( Texture texture );
 
   /**
    * Activate the transition animation with horizontally left/right panGesture
@@ -184,13 +187,13 @@ public:
 public: //Signal
 
   //Transition animation completed signal
-  typedef Signal< void ( CubeTransitionEffect, Image ) > TransitionCompletedSignalType;
+  typedef Signal< void ( CubeTransitionEffect, Texture ) >  TransitionCompletedSignalType;
 
   /**
    * Signal emitted when the transition has completed animation
    * A callback of the following type may be connected
    * @code
-   *   void YourCallbackName( CubeTransitionEffect cubeEffect, Image currentImage );
+   *   void YourCallbackName( CubeTransitionEffect cubeEffect, Texture currentTexture );
    * @endcode
    * @return The Signal to connect to.
    */
@@ -218,4 +221,4 @@ public: // Not intended for developer use
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H__ */
+#endif // DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H

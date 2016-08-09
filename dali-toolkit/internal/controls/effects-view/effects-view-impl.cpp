@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,13 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
@@ -157,8 +161,8 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     RemoveFilters();
 
     Actor self = Self();
-    Property::Map rendererMap;
-    rendererMap.Insert( "rendererType", "image" );
+    Property::Map visualMap;
+    visualMap.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
     switch( type )
     {
@@ -182,10 +186,10 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     }
 
     Property::Map customShader;
-    customShader[ "vertexShader" ] = EFFECTS_VIEW_VERTEX_SOURCE;
-    customShader[ "fragmentShader" ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
-    rendererMap[ "shader" ] = customShader;
-    Toolkit::RendererFactory::Get().ResetRenderer( mRendererPostFilter, self, rendererMap );
+    customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
+    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
+    visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+    InitializeVisual( self, mVisualPostFilter, visualMap );
 
     mEffectType = type;
   }
@@ -299,13 +303,13 @@ void EffectsView::OnStageConnection( int depth )
   Enable();
 
   Actor self = Self();
-  if( mRendererPostFilter )
+  if( mVisualPostFilter )
   {
-    mRendererPostFilter.SetOnStage( self );
+    mVisualPostFilter.SetOnStage( self );
   }
-  if( mRendererForChildren )
+  if( mVisualForChildren )
   {
-    mRendererForChildren.SetOnStage( self );
+    mVisualForChildren.SetOnStage( self );
   }
 }
 
@@ -320,13 +324,13 @@ void EffectsView::OnStageDisconnection()
   }
 
   Actor self = Self();
-  if( mRendererPostFilter )
+  if( mVisualPostFilter )
   {
-    mRendererPostFilter.SetOffStage( self );
+    mVisualPostFilter.SetOffStage( self );
   }
-  if( mRendererForChildren )
+  if( mVisualForChildren )
   {
-    mRendererForChildren.SetOffStage( self );
+    mVisualForChildren.SetOffStage( self );
   }
 
   Control::OnStageDisconnection();
@@ -429,16 +433,17 @@ void EffectsView::AllocateResources()
     mLastSize = mTargetSize;
     SetupCameras();
 
-    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-    Actor self = Self();
+    Actor self( Self() );
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    rendererFactory.ResetRenderer(mRendererForChildren, self, mImageForChildren);
-    mRendererForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
+    InitializeVisual( self, mVisualForChildren, mImageForChildren );
+    mVisualForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
-    rendererFactory.ResetRenderer(mRendererPostFilter, self, mImagePostFilter);
-    mRendererPostFilter.SetDepthIndex( DepthIndex::CONTENT );
+    TextureSet textureSet = TextureSet::New();
+    TextureSetImage( textureSet, 0u,  mImagePostFilter );
+    self.GetRendererAt( 0 ).SetTextures( textureSet );
+    mVisualPostFilter.SetDepthIndex( DepthIndex::CONTENT );
 
     SetupFilters();
   }

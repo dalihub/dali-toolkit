@@ -46,11 +46,11 @@
  + [9 Patch Image](@ref resource-9-patch)
  + [Buffer Image](@ref resource-buffer)
 
-### Control Base Class & Renderers
+### Control Base Class & Visuals
  + [Background Feature](@ref background)
  + Keyboard Focus
  + [Accessibility](@ref accessibility)
- + [Control Renderers](@ref control-renderers)
+ + [Visuals](@ref visuals)
 
 ### UI Components
  + Buttons
@@ -77,7 +77,7 @@
  + Environment Variables
  + [Resource Tracking](@ref resourcetracking)
  + Logging
- + [Debug Renderer](@ref debugrenderer)
+ + [Debug Visual](@ref debugvisual)
  + [Stagehand - DALi Visual Debugger](@ref stagehand)
 
 ### Viewing Modes

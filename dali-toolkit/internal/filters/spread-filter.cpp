@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -100,13 +101,13 @@ void SpreadFilter::Enable()
   mActorForHorz.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 0.0f, 1.0f / mTargetSize.height ) );
 
   Property::Map customShader;
-  customShader[ "fragmentShader" ] = SPREAD_FRAGMENT_SOURCE;
-  Property::Map rendererMap;
-  rendererMap.Insert( "shader", customShader );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SPREAD_FRAGMENT_SOURCE;
+  Property::Map visualMap;
+  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
 
   // set SPREAD custom shader
-  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
-  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   mRootActor.Add( mActorForInput );
   mRootActor.Add( mActorForHorz );

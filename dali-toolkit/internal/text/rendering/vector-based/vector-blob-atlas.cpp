@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-blob-atlas.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
 namespace
@@ -78,7 +79,7 @@ VectorBlobAtlas::VectorBlobAtlas( unsigned int textureWidth,
   mAtlasTexture = BufferImage::New( textureWidth, textureHeight, Pixel::RGBA8888 );
 
   mTextureSet = TextureSet::New();
-  mTextureSet.SetImage( 0, mAtlasTexture );
+  TextureSetImage( mTextureSet, 0, mAtlasTexture );
 }
 
 bool VectorBlobAtlas::IsFull() const

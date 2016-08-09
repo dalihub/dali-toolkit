@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -29,6 +29,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+
 
 /**
  * Button states and contents
@@ -108,7 +111,7 @@ const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 } // unnamed namespace
 
 Button::Button()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mAutoRepeatingTimer(),
   mUnselectedColor( Color::WHITE ), // The natural colors of the specified images will be used by default.
   mSelectedColor( Color::WHITE ),
@@ -527,46 +530,57 @@ void Button::SetupContent( Actor& actorToModify, Actor newActor )
   }
 }
 
-void Button::SetUnselectedColor( const Vector4& color )
-{
-  mUnselectedColor = color;
-
-  if( mUnselectedContent && !GetUnselectedImageFilename().empty() )
-  {
-    // If there is existing unselected content, change the color on it directly.
-    mUnselectedContent.SetColor( mUnselectedColor );
-  }
-  else
-  {
-    // If there is no existing content, create a new actor to use for flat color.
-    Toolkit::Control unselectedContentActor = Toolkit::Control::New();
-    unselectedContentActor.SetBackgroundColor( mUnselectedColor );
-    SetupContent( mUnselectedContent, unselectedContentActor );
-    mUnselectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  }
-}
-
 const Vector4 Button::GetUnselectedColor() const
 {
   return mUnselectedColor;
 }
 
-void Button::SetSelectedColor( const Vector4& color )
+void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
 {
-  mSelectedColor = color;
+  Actor* contentActor = NULL; // Using a pointer as SetupContent assigns the new Actor to this.
+  bool imageFileExists = false;
+  Property::Index visualIndex = Toolkit::Button::Property::SELECTED_STATE_IMAGE;
 
-  if( mSelectedContent && !GetSelectedImageFilename().empty() )
+  if ( selectedState == SelectedState || selectedState == DisabledSelectedState )
   {
-    // If there is existing unselected content, change the color on it directly.
-    mSelectedContent.SetColor( mSelectedColor );
+    mSelectedColor = color;
+    contentActor = &mSelectedContent;
+    imageFileExists = !GetSelectedImageFilename().empty();
   }
   else
   {
-    // If there is no existing content, create a new actor to use for flat color.
-    Toolkit::Control selectedContentActor = Toolkit::Control::New();
-    selectedContentActor.SetBackgroundColor( mSelectedColor );
-    SetupContent( mSelectedContent, selectedContentActor );
-    mSelectedContent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    mUnselectedColor = color;
+    contentActor = &mUnselectedContent;
+    imageFileExists = !GetUnselectedImageFilename().empty();
+    visualIndex = Toolkit::Button::Property::UNSELECTED_STATE_IMAGE;
+  }
+
+  if ( contentActor )
+  {
+    if( imageFileExists )
+    {
+      // If there is existing unselected content, change the color on it directly.
+      contentActor->SetColor( color );
+    }
+    else
+    {
+      // If there is no existing content, create a new actor to use for flat color.
+      Actor placementActor = Actor::New();
+      Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+      Toolkit::Visual::Base visual;
+
+      Property::Map map;
+      map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+      map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
+
+      visual = visualFactory.CreateVisual( map );
+
+      RegisterVisual( visualIndex, placementActor, visual );
+      visual.SetOnStage( placementActor );
+
+      SetupContent( *contentActor, placementActor ); //
+      contentActor->SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    }
   }
 }
 
@@ -722,63 +736,11 @@ std::string Button::GetSelectedImageFilename() const
   return std::string();
 }
 
-std::string Button::GetBackgroundImageFilename() const
-{
-  if( mBackgroundContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mBackgroundContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetSelectedBackgroundImageFilename() const
-{
-  if( mSelectedBackgroundContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mSelectedBackgroundContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
 std::string Button::GetDisabledImageFilename() const
 {
   if( mDisabledContent )
   {
     ResourceImage image = ResourceImage::DownCast( mDisabledContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetDisabledSelectedImageFilename() const
-{
-  if( mDisabledSelectedContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mDisabledSelectedContent );
-    if( image )
-    {
-      return image.GetUrl();
-    }
-  }
-  return std::string();
-}
-
-std::string Button::GetDisabledBackgroundImageFilename() const
-{
-  if( mDisabledBackgroundContent )
-  {
-    ResourceImage image = ResourceImage::DownCast( mDisabledBackgroundContent );
     if( image )
     {
       return image.GetUrl();
@@ -942,70 +904,6 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   return connected;
 }
 
-bool Button::OnTouchEvent(const TouchEvent& event)
-{
-  // Only events are processed when the button is not disabled and the touch event has only
-  // one touch point.
-  if( ( !mDisabled ) && ( 1 == event.GetPointCount() ) )
-  {
-    switch( event.GetPoint(0).state )
-    {
-      case TouchPoint::Down:
-      {
-        OnButtonDown(); // Notification for derived classes.
-
-        // Sets the button state to ButtonDown.
-        mState = ButtonDown;
-        break;
-      }
-      case TouchPoint::Up:
-      {
-        OnButtonUp(); // Notification for derived classes.
-
-        // Sets the button state to ButtonUp.
-        mState = ButtonUp;
-        break;
-      }
-      case TouchPoint::Interrupted:
-      {
-        OnTouchPointInterrupted(); // Notification for derived classes.
-
-        // Sets the button state to the default (ButtonUp).
-        mState = ButtonUp;
-        break;
-      }
-      case TouchPoint::Leave:
-      {
-        OnTouchPointLeave(); // Notification for derived classes.
-
-        // Sets the button state to the default (ButtonUp).
-        mState = ButtonUp;
-        break;
-      }
-      case TouchPoint::Motion:
-      case TouchPoint::Stationary: // FALLTHROUGH
-      {
-        // Nothing to do
-        break;
-      }
-      default:
-      {
-        DALI_ASSERT_ALWAYS( !"Point status unhandled." );
-        break;
-      }
-    }
-  }
-  else if( 1 < event.GetPointCount() )
-  {
-    OnTouchPointLeave(); // Notification for derived classes.
-
-    // Sets the button state to the default (ButtonUp).
-    mState = ButtonUp;
-  }
-
-  return false;
-}
-
 void Button::OnInitialize()
 {
   Actor self = Self();
@@ -1015,6 +913,8 @@ void Button::OnInitialize()
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
   self.SetKeyboardFocusable( true );
+
+  self.TouchSignal().Connect( this, &Button::OnTouch );
 }
 
 bool Button::OnAccessibilityActivated()
@@ -1049,6 +949,65 @@ void Button::OnStageDisconnection()
   mState = ButtonUp;
 
   Control::OnStageDisconnection();
+}
+
+bool Button::OnTouch( Actor actor, const TouchData& touch )
+{
+  // Only events are processed when the button is not disabled and the touch event has only
+  // one touch point.
+  if( ( !mDisabled ) && ( 1 == touch.GetPointCount() ) )
+  {
+    switch( touch.GetState( 0 ) )
+    {
+      case PointState::DOWN:
+      {
+        OnButtonDown(); // Notification for derived classes.
+
+        // Sets the button state to ButtonDown.
+        mState = ButtonDown;
+        break;
+      }
+      case PointState::UP:
+      {
+        OnButtonUp(); // Notification for derived classes.
+
+        // Sets the button state to ButtonUp.
+        mState = ButtonUp;
+        break;
+      }
+      case PointState::INTERRUPTED:
+      {
+        OnTouchPointInterrupted(); // Notification for derived classes.
+
+        // Sets the button state to the default (ButtonUp).
+        mState = ButtonUp;
+        break;
+      }
+      case PointState::LEAVE:
+      {
+        OnTouchPointLeave(); // Notification for derived classes.
+
+        // Sets the button state to the default (ButtonUp).
+        mState = ButtonUp;
+        break;
+      }
+      case PointState::MOTION:
+      case PointState::STATIONARY: // FALLTHROUGH
+      {
+        // Nothing to do
+        break;
+      }
+    }
+  }
+  else if( 1 < touch.GetPointCount() )
+  {
+    OnTouchPointLeave(); // Notification for derived classes.
+
+    // Sets the button state to the default (ButtonUp).
+    mState = ButtonUp;
+  }
+
+  return false;
 }
 
 void Button::OnTap(Actor actor, const TapGesture& tap)
@@ -1441,13 +1400,13 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
 
       case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
-        GetImplementation( button ).SetUnselectedColor( value.Get< Vector4 >() );
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), UnselectedState );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_COLOR:
       {
-        GetImplementation( button ).SetSelectedColor( value.Get< Vector4 >() );
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), SelectedState );
         break;
       }
 

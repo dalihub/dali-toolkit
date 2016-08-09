@@ -18,6 +18,7 @@
 #include "dummy-control.h"
 
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -74,6 +75,16 @@ DummyControlImpl::~DummyControlImpl()
 {
 }
 
+void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+{
+  Control::RegisterVisual( index, placementActor, visual );
+}
+
+void DummyControlImpl::UnregisterVisual( Property::Index index )
+{
+  Control::UnregisterVisual( index );
+}
+
 DummyControl DummyControlImplOverride::New()
 {
   IntrusivePtr< DummyControlImplOverride > impl = new DummyControlImplOverride;
@@ -87,8 +98,10 @@ DummyControlImplOverride::DummyControlImplOverride()
 : DummyControlImpl(),
   initializeCalled(false),
   activatedCalled(false),
-  themeChangeCalled( false ),
-  fontChangeCalled( false ),
+  onAccTouchedCalled(false),
+  onAccValueChangeCalled(false),
+  themeChangeCalled(false),
+  fontChangeCalled(false),
   pinchCalled(false),
   panCalled(false),
   tapCalled(false),
@@ -113,6 +126,12 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
 bool DummyControlImplOverride::OnAccessibilityActivated() { activatedCalled = true; return true; }
+bool DummyControlImplOverride::OnAccessibilityTouch(const TouchEvent& touchEvent) { onAccTouchedCalled = true; return true; }
+bool DummyControlImplOverride::OnAccessibilityValueChange( bool isIncrease )
+{
+  onAccValueChangeCalled = true; return true;
+}
+
 void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   themeChangeCalled = change == StyleChange::THEME_CHANGE;

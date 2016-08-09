@@ -221,3 +221,21 @@ int UtcDaliVideoViewTypeRegistry(void)
 
   END_TEST;
 }
+
+int UtcDaliVideoViewMethodsForCoverage(void)
+{
+  ToolkitTestApplication application;
+
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK( videoView );
+
+  videoView.Play();
+  videoView.Pause();
+  videoView.Stop();
+  videoView.Forward(10);
+  videoView.Backward(10);
+  VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
+  DALI_TEST_EQUALS( 0, signal.GetConnectionCount(), TEST_LOCATION );
+
+  END_TEST;
+}

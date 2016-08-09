@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ const ApiFunction GeometryFunctionTable[]=
    { "GetNumberOfVertexBuffers"    , GeometryApi::GetNumberOfVertexBuffers },
    { "RemoveVertexBuffer"          , GeometryApi::RemoveVertexBuffer },
    { "SetIndexBuffer"              , GeometryApi::SetIndexBuffer },
-   { "SetGeometryType"             , GeometryApi::SetGeometryType },
-   { "GetGeometryType"             , GeometryApi::GetGeometryType },
+   { "SetType"                     , GeometryApi::SetType },
+   { "GetType"                     , GeometryApi::GetType },
 };
 
 const unsigned int GeometryFunctionTableCount = sizeof(GeometryFunctionTable)/sizeof(GeometryFunctionTable[0]);

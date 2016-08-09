@@ -22,8 +22,10 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
-
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/pan-gesture-event.h>
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -57,6 +59,48 @@ static void TestCallback(BaseHandle handle)
 static void OnLayoutActivated()
 {
   gOnLayoutActivatedCalled = true;
+}
+
+// Generate a PanGestureEvent to send to Core
+Integration::PanGestureEvent GeneratePan(
+    Gesture::State state,
+    const Vector2& previousPosition,
+    const Vector2& currentPosition,
+    unsigned long timeDelta,
+    unsigned int numberOfTouches = 1)
+{
+  Integration::PanGestureEvent pan(state);
+
+  pan.previousPosition = previousPosition;
+  pan.currentPosition = currentPosition;
+  pan.timeDelta = timeDelta;
+  pan.numberOfTouches = numberOfTouches;
+
+  return pan;
+}
+
+/**
+ * Helper to generate PanGestureEvent
+ *
+ * @param[in] application Application instance
+ * @param[in] state The Gesture State
+ * @param[in] pos The current position of touch.
+ */
+static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
+{
+  static Vector2 last;
+
+  if( (state == Gesture::Started) ||
+      (state == Gesture::Possible) )
+  {
+    last.x = pos.x;
+    last.y = pos.y;
+  }
+
+  application.ProcessEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
+
+  last.x = pos.x;
+  last.y = pos.y;
 }
 
 /*
@@ -301,6 +345,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
 
   // Create a grid layout and add it to ItemView
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  gridLayout->SetOrientation(ControlOrientation::Down);
   view.AddLayout(*gridLayout);
 
   // Check there is no active layout at the moment
@@ -331,6 +376,7 @@ int UtcDaliItemViewGetItemAndGetItemId(void)
 
   // Create a grid layout and add it to ItemView
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  gridLayout->SetOrientation(ControlOrientation::Left);
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -355,6 +401,7 @@ int UtcDaliItemViewRemoveItem(void)
 
   // Create a grid layout and add it to ItemView
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  gridLayout->SetOrientation(ControlOrientation::Right);
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -386,9 +433,10 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a depth layout and add it to ItemView
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  depthLayout->SetOrientation(ControlOrientation::Up);
+  view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -489,14 +537,14 @@ int UtcDaliItemViewScrollToItem(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
   Vector3 vec(480.0f, 800.0f, 0.0f);
-  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
 
   view.SetName("view actor");
   view.AddLayout(*layout);
   view.SetSize(vec);
 
   Stage::GetCurrent().Add(view);
-  layout->SetOrientation(ControlOrientation::Up);
+  layout->SetOrientation(ControlOrientation::Down);
   view.ActivateLayout(0, vec, 0.0f);
 
   application.SendNotification();
@@ -580,9 +628,10 @@ int UtcDaliItemViewInsertItemP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a depth layout and add it to ItemView
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH);
+  depthLayout->SetOrientation(ControlOrientation::Left);
+  view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -612,9 +661,10 @@ int UtcDaliItemViewInsertItemsP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a depth layout and add it to ItemView
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH);
+  depthLayout->SetOrientation(ControlOrientation::Right);
+  view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -668,9 +718,9 @@ int UtcDaliItemViewReplaceItemP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -692,9 +742,10 @@ int UtcDaliItemViewReplaceItemsP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  spiralLayout->SetOrientation( ControlOrientation::Down );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -729,9 +780,10 @@ int UtcDaliItemViewGetItemsRangeP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  spiralLayout->SetOrientation( ControlOrientation::Left );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -753,9 +805,10 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
+  // Create a spiral layout and add it to ItemView
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  spiralLayout->SetOrientation( ControlOrientation::Right );
+  view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
@@ -926,3 +979,126 @@ int UtcDaliItemViewSetGetProperty(void)
   END_TEST;
 }
 
+
+int UtcDaliItemViewOvershootVertical(void)
+{
+  ToolkitTestApplication application;
+  Dali::Stage stage = Dali::Stage::GetCurrent();
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+  stage.Add(view);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(stage.GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, true );
+  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), true, TEST_LOCATION );
+
+  view.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, Vector2(30, 30) );
+
+  Wait(application);
+
+  // Do a pan starting from 100,100 and moving down
+  Vector2 pos(100.0f, 100.0f);
+  SendPan(application, Gesture::Possible, pos);
+  SendPan(application, Gesture::Started, pos);
+  pos.y += 5.0f;
+  Wait(application, 100);
+
+  for(int i = 0;i<200;i++)
+  {
+    SendPan(application, Gesture::Continuing, pos);
+    pos.y += 5.0f;
+    Wait(application);
+  }
+
+  SendPan(application, Gesture::Finished, pos);
+  Wait(application, 100);
+
+  // Do a pan starting from 100,100 and moving up
+  pos = Vector2(100.0f, 300.0f);
+  SendPan(application, Gesture::Possible, pos);
+  SendPan(application, Gesture::Started, pos);
+  pos.y -= 5.0f;
+  Wait(application, 100);
+
+  for(int i = 0;i<200;i++)
+  {
+    SendPan(application, Gesture::Continuing, pos);
+    pos.y -= 5.0f;
+    Wait(application);
+  }
+
+  SendPan(application, Gesture::Finished, pos);
+  Wait(application, 100);
+  END_TEST;
+}
+
+int UtcDaliItemViewOvershootHorizontal(void)
+{
+  ToolkitTestApplication application;
+  Dali::Stage stage = Dali::Stage::GetCurrent();
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  view.AddLayout(*gridLayout);
+  stage.Add(view);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(stage.GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, true );
+  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), true, TEST_LOCATION );
+
+  view.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, Vector2(30, 30) );
+
+  Wait(application);
+
+  // Do a pan starting from 100,100 and moving left
+  Vector2 pos(100.0f, 100.0f);
+  SendPan(application, Gesture::Possible, pos);
+  SendPan(application, Gesture::Started, pos);
+  pos.x -= 5.0f;
+  Wait(application, 100);
+
+  for(int i = 0;i<200;i++)
+  {
+    SendPan(application, Gesture::Continuing, pos);
+    pos.x -= 5.0f;
+    Wait(application);
+  }
+
+  SendPan(application, Gesture::Finished, pos);
+  Wait(application, 100);
+
+  // Do a pan starting from 100,100 and moving right
+  pos = Vector2(100.0f, 100.0f);
+  SendPan(application, Gesture::Possible, pos);
+  SendPan(application, Gesture::Started, pos);
+  pos.x += 5.0f;
+  Wait(application, 100);
+
+  for(int i = 0;i<200;i++)
+  {
+    SendPan(application, Gesture::Continuing, pos);
+    pos.x += 5.0f;
+    Wait(application);
+  }
+
+  SendPan(application, Gesture::Finished, pos);
+  Wait(application, 100);
+
+  END_TEST;
+}

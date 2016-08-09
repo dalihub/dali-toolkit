@@ -91,7 +91,8 @@ struct EventData
     EDITING_WITH_GRAB_HANDLE,
     EDITING_WITH_PASTE_POPUP,
     GRAB_HANDLE_PANNING,
-    SELECTION_HANDLE_PANNING
+    SELECTION_HANDLE_PANNING,
+    TEXT_PANNING
   };
 
   EventData( DecoratorPtr decorator );
@@ -117,6 +118,7 @@ struct EventData
 
   InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
 
+  State              mPreviousState;           ///< Stores the current state before it's updated with the new one.
   State              mState;                   ///< Selection mode, edit mode etc.
 
   CharacterIndex     mPrimaryCursorPosition;   ///< Index into logical model for primary cursor.
@@ -126,6 +128,8 @@ struct EventData
   CharacterIndex     mPreEditStartPosition;    ///< Used to remove the pre-edit text if necessary.
   Length             mPreEditLength;           ///< Used to remove the pre-edit text if necessary.
 
+  float              mCursorHookPositionX;     ///< Used to move the cursor with the keys or when scrolling the text vertically with the handles.
+
   bool mIsShowingPlaceholderText        : 1;   ///< True if the place-holder text is being displayed.
   bool mPreEditFlag                     : 1;   ///< True if the model contains text in pre-edit state.
   bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
@@ -133,11 +137,13 @@ struct EventData
   bool mGrabHandleEnabled               : 1;   ///< True if grab handle is enabled.
   bool mGrabHandlePopupEnabled          : 1;   ///< True if the grab handle popu-up should be shown.
   bool mSelectionEnabled                : 1;   ///< True if selection handles, highlight etc. are enabled.
-  bool mHorizontalScrollingEnabled      : 1;   ///< True if horizontal scrolling is enabled.
-  bool mVerticalScrollingEnabled        : 1;   ///< True if vertical scrolling is enabled.
+  bool mUpdateCursorHookPosition        : 1;   ///< True if the cursor hook position must be updated. Used to move the cursor with the keys 'up' and 'down'.
   bool mUpdateCursorPosition            : 1;   ///< True if the visual position of the cursor must be recalculated.
+  bool mUpdateGrabHandlePosition        : 1;   ///< True if the visual position of the grab handle must be recalculated.
   bool mUpdateLeftSelectionPosition     : 1;   ///< True if the visual position of the left selection handle must be recalculated.
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
+  bool mIsLeftHandleSelected            : 1;   ///< Whether is the left handle the one which is selected.
+  bool mUpdateHighlightBox              : 1;   ///< True if the text selection high light box must be updated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
   bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
@@ -429,6 +435,37 @@ struct Controller::Impl
     }
   }
 
+  /**
+   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
+   */
+  void NotifyImfManager();
+
+  /**
+   * @brief Retrieve the current cursor position.
+   *
+   * @return The cursor position.
+   */
+  CharacterIndex GetLogicalCursorPosition() const;
+
+  /**
+   * @brief Retrieves the number of consecutive white spaces starting from the given @p index.
+   *
+   * @param[in] index The character index from where to count the number of consecutive white spaces.
+   *
+   * @return The number of consecutive white spaces.
+   */
+  Length GetNumberOfWhiteSpaces( CharacterIndex index ) const;
+
+  /**
+   * @brief Retrieve any text previously set starting from the given @p index.
+   *
+   * @param[in] index The character index from where to retrieve the text.
+   * @param[out] text A string of UTF-8 characters.
+   *
+   * @see Dali::Toolkit::Text::Controller::GetText()
+   */
+  void GetText( CharacterIndex index, std::string& text ) const;
+
   bool IsClipboardEmpty()
   {
     bool result( mClipboard && mClipboard.NumberOfItems() );
@@ -599,16 +636,16 @@ struct Controller::Impl
   /**
    * @biref Clamps the horizontal scrolling to get the control always filled with text.
    *
-   * @param[in] actualSize The size of the laid out text.
+   * @param[in] layoutSize The size of the laid out text.
    */
-  void ClampHorizontalScroll( const Vector2& actualSize );
+  void ClampHorizontalScroll( const Vector2& layoutSize );
 
   /**
    * @biref Clamps the vertical scrolling to get the control always filled with text.
    *
-   * @param[in] actualSize The size of the laid out text.
+   * @param[in] layoutSize The size of the laid out text.
    */
-  void ClampVerticalScroll( const Vector2& actualSize );
+  void ClampVerticalScroll( const Vector2& layoutSize );
 
   /**
    * @brief Scrolls the text to make a position visible.
@@ -616,11 +653,12 @@ struct Controller::Impl
    * @pre mEventData must not be NULL. (there is a text-input or selection capabilities).
    *
    * @param[in] position A position in text coords.
+   * @param[in] lineHeight The line height for the given position.
    *
    * This method is called after inserting text, moving the cursor with the grab handle or the keypad,
    * or moving the selection handles.
    */
-  void ScrollToMakePositionVisible( const Vector2& position );
+  void ScrollToMakePositionVisible( const Vector2& position, float lineHeight );
 
   /**
    * @brief Scrolls the text to make the cursor visible.

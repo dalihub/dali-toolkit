@@ -50,26 +50,19 @@ static bool ButtonCallback( Button button )
   return false;
 }
 
-Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
+struct CallbackFunctor
 {
-  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag( callbackFlag )
+  {
+  }
 
-  // Create the image
-  PixelBuffer* pixbuf = imageData.GetBuffer();
-  unsigned int size = width * height;
-
-  for( size_t i = 0; i < size; i++ )
-    {
-      pixbuf[i*4+0] = 0xFF * color.r;
-      pixbuf[i*4+1] = 0xFF * color.g;
-      pixbuf[i*4+2] = 0xFF * color.b;
-      pixbuf[i*4+3] = 0xFF * color.a;
-    }
-
-  imageData.Update();
-
-  return imageData;
-}
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
 
 Dali::Integration::Point GetPointDownInside()
 {
@@ -437,8 +430,13 @@ int UtcDaliButtonPressedSignalP(void)
   application.Render();
 
   // connect to its touch signal
+  ConnectionTracker* testTracker = new ConnectionTracker();
   button.PressedSignal().Connect( &ButtonCallback );
   button.ReleasedSignal().Connect( &ButtonCallback );
+  bool pressedSignal = false;
+  bool releasedSignal = false;
+  button.ConnectSignal( testTracker, "pressed",   CallbackFunctor(&pressedSignal) );
+  button.ConnectSignal( testTracker, "released",  CallbackFunctor(&releasedSignal) );
 
   Dali::Integration::TouchEvent event;
 
@@ -450,6 +448,7 @@ int UtcDaliButtonPressedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( pressedSignal );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
@@ -457,15 +456,19 @@ int UtcDaliButtonPressedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( releasedSignal );
 
   // Test2. Touch point down and up outside the button.
 
+  pressedSignal = false;
+  releasedSignal = false;
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !pressedSignal );
 
   gIsCalledButtonCallback = false;
   event = Dali::Integration::TouchEvent();
@@ -473,6 +476,7 @@ int UtcDaliButtonPressedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !releasedSignal );
 
   // Test3. Touch point down inside and up outside the button.
 
@@ -534,6 +538,9 @@ int UtcDaliButtonClickedSignalP(void)
 
   // connect to its touch signal
   button.ClickedSignal().Connect( &ButtonCallback );
+  bool clickedSignal = false;
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  button.ConnectSignal( testTracker, "clicked",   CallbackFunctor(&clickedSignal) );
 
   Dali::Integration::TouchEvent event;
 
@@ -549,10 +556,12 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( clickedSignal );
 
   // Test2. Touch point down and up outside the button.
 
   gIsCalledButtonCallback = false;
+  clickedSignal = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
@@ -562,10 +571,12 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !clickedSignal );
 
   // Test3. Touch point down inside and up outside the button.
 
   gIsCalledButtonCallback = false;
+  clickedSignal = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownInside() );
   application.ProcessEvent( event );
@@ -579,10 +590,12 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !clickedSignal );
 
   // Test4. Touch point down outside and up inside the button.
 
   gIsCalledButtonCallback = false;
+  clickedSignal = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointDownOutside() );
   application.ProcessEvent( event );
@@ -596,6 +609,7 @@ int UtcDaliButtonClickedSignalP(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  DALI_TEST_CHECK( !clickedSignal );
   END_TEST;
 }
 
@@ -614,16 +628,23 @@ int UtcDaliButtonStateChangedSignalP(void)
 
   // connect to its signal
   button.StateChangedSignal().Connect( &ButtonCallback );
+  bool stateChangedSignal = false;
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  button.ConnectSignal( testTracker, "stateChanged",   CallbackFunctor(&stateChangedSignal) );
 
   gIsCalledButtonCallback = false;
   button.SetSelected( true );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( stateChangedSignal );
 
   gIsCalledButtonCallback = false;
+  stateChangedSignal = false;
+
   button.SetSelected( false );
 
   DALI_TEST_CHECK( gIsCalledButtonCallback );
+  DALI_TEST_CHECK( stateChangedSignal );
   END_TEST;
 }
 
@@ -662,5 +683,327 @@ int UtcDaliButtonSize(void)
 
   DALI_TEST_EQUALS( size.width, 10.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 10.f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetSelectedBackgroundImage( "TestImage.jpg");
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedBackgroundImage( "TestImage.jpg");
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetDisabledImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledImage( "TestImage.jpg");
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetDisabledImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledImage( "TestImage.jpg");
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetDisabledSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledSelectedImage( "TestImage.jpg");
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetDisabledSelectedImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledSelectedImage( "TestImage.jpg");
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetLabelP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetLabel( TextLabel::New("Hello") );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetLabelN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetLabel( TextLabel::New("Hello") );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetButtonImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetButtonImage( CreateBufferImage( 10, 10, Color::WHITE ) );
+    DALI_TEST_CHECK( ImageView::DownCast( button.GetButtonImage() ) );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetButtonImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetButtonImage( CreateBufferImage( 10, 10, Color::WHITE ) );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedImageWithImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetSelectedImage( CreateBufferImage( 10, 10, Color::WHITE ) );
+    DALI_TEST_CHECK( ImageView::DownCast( button.GetSelectedImage() ) );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedImageWithImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedImage( CreateBufferImage( 10, 10, Color::WHITE ) );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetSelectedColorP");
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 SET_COLOR = Color::BLUE;
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetProperty( Button::Property::SELECTED_COLOR, SET_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 color = pushButton.GetProperty<Vector4>( Button::Property::SELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, SET_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetUnSelectedColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetUnSelectedColorP");
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 SET_COLOR = Color::BLUE;
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetProperty( Button::Property::UNSELECTED_COLOR, SET_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 color = pushButton.GetProperty<Vector4>( Button::Property::UNSELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, SET_COLOR, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliButtonResetSelectedColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetSelectedColorP");
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector4 FIRST_COLOR = Color::BLUE;
+  const Vector4 SECOND_COLOR = Color::BLUE;
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetProperty( Button::Property::SELECTED_COLOR, FIRST_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 color = pushButton.GetProperty<Vector4>( Button::Property::SELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, FIRST_COLOR, TEST_LOCATION );
+
+  pushButton.SetProperty( Button::Property::SELECTED_COLOR, SECOND_COLOR );
+
+  application.SendNotification();
+  application.Render();
+
+  color = pushButton.GetProperty<Vector4>( Button::Property::SELECTED_COLOR );
+
+  DALI_TEST_EQUALS( color, SECOND_COLOR, TEST_LOCATION );
+
   END_TEST;
 }

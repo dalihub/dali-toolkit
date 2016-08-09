@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_SHADOW_VIEW_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ private:
 
   CameraActor mCameraActor; // Constrained to same position as mPointLight and pointing at mShadowPlane
 
-  Property::Map mShadowRenderShader;
+  Property::Map mShadowVisualMap;
   BlurTwoPassFilter mBlurFilter;
 
   Vector4 mCachedShadowColor;                               ///< Cached Shadow color.

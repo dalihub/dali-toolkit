@@ -40,7 +40,6 @@ namespace
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
-const unsigned int POINTS_PER_INCH = 72;
 
 const std::string EMPTY_STRING("");
 
@@ -94,6 +93,7 @@ FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
   // Recalculate the selection highlight as the metrics may have changed.
   eventData->mUpdateLeftSelectionPosition = true;
   eventData->mUpdateRightSelectionPosition = true;
+  eventData->mUpdateHighlightBox = true;
 
   return fontDescriptionRun;
 }
@@ -144,7 +144,7 @@ void Controller::SetAutoScrollEnabled( bool enable )
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                                LAYOUT                    |
                                                                ALIGN                     |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                UPDATE_DIRECTION          |
                                                                REORDER );
 
@@ -155,7 +155,7 @@ void Controller::SetAutoScrollEnabled( bool enable )
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                                LAYOUT                    |
                                                                ALIGN                     |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER );
     }
 
@@ -164,7 +164,7 @@ void Controller::SetAutoScrollEnabled( bool enable )
   }
   else
   {
-    DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored" );
+    DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n" );
     mImpl->mAutoScrollEnabled = false;
   }
 }
@@ -192,6 +192,69 @@ float Controller::GetAutoScrollLineAlignment() const
   }
 
   return offset;
+}
+
+void Controller::SetHorizontalScrollEnabled( bool enable )
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    mImpl->mEventData->mDecorator->SetHorizontalScrollEnabled( enable );
+  }
+}
+
+bool Controller::IsHorizontalScrollEnabled() const
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    return mImpl->mEventData->mDecorator->IsHorizontalScrollEnabled();
+  }
+
+  return false;
+}
+
+void Controller::SetVerticalScrollEnabled( bool enable )
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    if( mImpl->mEventData->mDecorator )
+    {
+      mImpl->mEventData->mDecorator->SetVerticalScrollEnabled( enable );
+    }
+  }
+}
+
+bool Controller::IsVerticalScrollEnabled() const
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    return mImpl->mEventData->mDecorator->IsVerticalScrollEnabled();
+  }
+
+  return false;
+}
+
+void Controller::SetSmoothHandlePanEnabled( bool enable )
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    mImpl->mEventData->mDecorator->SetSmoothHandlePanEnabled( enable );
+  }
+}
+
+bool Controller::IsSmoothHandlePanEnabled() const
+{
+  if( ( NULL != mImpl->mEventData ) &&
+      mImpl->mEventData->mDecorator )
+  {
+    return mImpl->mEventData->mDecorator->IsSmoothHandlePanEnabled();
+  }
+
+  return false;
 }
 
 void Controller::SetText( const std::string& text )
@@ -292,9 +355,6 @@ void Controller::SetText( const std::string& text )
     mImpl->mEventData->mEventQueue.clear();
   }
 
-  // Notify IMF as text changed
-  NotifyImfManager();
-
   // Do this last since it provides callbacks into application code
   mImpl->mControlInterface.TextChanged();
 }
@@ -303,27 +363,13 @@ void Controller::GetText( std::string& text ) const
 {
   if( !mImpl->IsShowingPlaceholderText() )
   {
-    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-
-    if( 0u != utf32Characters.Count() )
-    {
-      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), text );
-    }
+    // Retrieves the text string.
+    mImpl->GetText( 0u, text );
   }
   else
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::GetText %p empty (but showing placeholder)\n", this );
   }
-}
-
-unsigned int Controller::GetLogicalCursorPosition() const
-{
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mPrimaryCursorPosition;
-  }
-
-  return 0u;
 }
 
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
@@ -508,15 +554,6 @@ void Controller::SetDefaultPointSize( float pointSize )
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
   mImpl->mFontDefaults->sizeDefined = true;
 
-  unsigned int horizontalDpi( 0u );
-  unsigned int verticalDpi( 0u );
-  mImpl->mFontClient.GetDpi( horizontalDpi, verticalDpi );
-
-  // Adjust the metrics if the fixed-size font should be down-scaled
-  int maxEmojiSize( pointSize/POINTS_PER_INCH * verticalDpi );
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultPointSize %p setting MaxEmojiSize %d\n", this, maxEmojiSize );
-  mImpl->mMetrics->SetMaxEmojiSize( maxEmojiSize );
-
   // Clear the font-specific data
   ClearFontData();
 
@@ -535,7 +572,7 @@ float Controller::GetDefaultPointSize() const
 
 void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange");
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
 
   if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
   {
@@ -888,7 +925,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -901,6 +938,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
       // As the font changes, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -961,7 +999,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -974,6 +1012,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1014,7 +1053,7 @@ void Controller::SetInputFontWidth( FontWidth width )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1027,6 +1066,7 @@ void Controller::SetInputFontWidth( FontWidth width )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1067,7 +1107,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1080,6 +1120,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1119,7 +1160,7 @@ void Controller::SetInputFontPointSize( float size )
                                                                SHAPE_TEXT                |
                                                                GET_GLYPH_METRICS         |
                                                                LAYOUT                    |
-                                                               UPDATE_ACTUAL_SIZE        |
+                                                               UPDATE_LAYOUT_SIZE        |
                                                                REORDER                   |
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
@@ -1132,6 +1173,7 @@ void Controller::SetInputFontPointSize( float size )
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
       mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox = true;
       mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
   }
@@ -1406,17 +1448,18 @@ float Controller::GetHeightForWidth( float width )
   return layoutSize.height;
 }
 
-bool Controller::Relayout( const Size& size )
+Controller::UpdateTextType Controller::Relayout( const Size& size )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, (mImpl->mAutoScrollEnabled)?"true":"false"  );
 
+  UpdateTextType updateTextType = NONE_UPDATED;
+
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
-    bool glyphsRemoved( false );
     if( 0u != mImpl->mVisualModel->mGlyphPositions.Count() )
     {
       mImpl->mVisualModel->mGlyphPositions.Clear();
-      glyphsRemoved = true;
+      updateTextType = MODEL_UPDATED;
     }
 
     // Clear the update info. This info will be set the next time the text is updated.
@@ -1425,7 +1468,7 @@ bool Controller::Relayout( const Size& size )
     // Not worth to relayout if width or height is equal to zero.
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
 
-    return glyphsRemoved;
+    return updateTextType;
   }
 
   // Whether a new size has been set.
@@ -1439,7 +1482,7 @@ bool Controller::Relayout( const Size& size )
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
                                                              ALIGN                     |
-                                                             UPDATE_ACTUAL_SIZE        |
+                                                             UPDATE_LAYOUT_SIZE        |
                                                              REORDER );
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
@@ -1463,6 +1506,11 @@ bool Controller::Relayout( const Size& size )
   updated = DoRelayout( size,
                         mImpl->mOperationsPending,
                         layoutSize ) || updated;
+
+  if( updated )
+  {
+    updateTextType = MODEL_UPDATED;
+  }
 
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
@@ -1495,14 +1543,17 @@ bool Controller::Relayout( const Size& size )
     }
 
     // Move the cursor, grab handle etc.
-    updated = mImpl->ProcessInputEvents() || updated;
+    if( mImpl->ProcessInputEvents() )
+    {
+      updateTextType = static_cast<UpdateTextType>( updateTextType | DECORATOR_UPDATED );
+    }
   }
 
   // Clear the update info. This info will be set the next time the text is updated.
   mImpl->mTextUpdateInfo.Clear();
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
 
-  return updated;
+  return updateTextType;
 }
 
 void Controller::ProcessModifyEvents()
@@ -1654,6 +1705,9 @@ bool Controller::DoRelayout( const Size& size,
   const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
   const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
 
+  // Get the current layout size.
+  layoutSize = mImpl->mVisualModel->GetLayoutSize();
+
   if( NO_OPERATION != ( LAYOUT & operations ) )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout LAYOUT & operations\n");
@@ -1675,7 +1729,7 @@ bool Controller::DoRelayout( const Size& size,
 
     if( 0u == totalNumberOfGlyphs )
     {
-      if( NO_OPERATION != ( UPDATE_ACTUAL_SIZE & operations ) )
+      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
       {
         mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
       }
@@ -1721,14 +1775,18 @@ bool Controller::DoRelayout( const Size& size,
     layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
 
     // Update the visual model.
+    Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    mImpl->mVisualModel->mLines,
-                                                   layoutSize );
+                                                   newLayoutSize );
 
+    viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 
     if( viewUpdated )
     {
+      layoutSize = newLayoutSize;
+
       if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
         mImpl->mAutoScrollDirectionRTL = false;
@@ -1775,8 +1833,8 @@ bool Controller::DoRelayout( const Size& size,
         }
       } // REORDER
 
-      // Sets the actual size.
-      if( NO_OPERATION != ( UPDATE_ACTUAL_SIZE & operations ) )
+      // Sets the layout size.
+      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
       {
         mImpl->mVisualModel->SetLayoutSize( layoutSize );
       }
@@ -1784,10 +1842,6 @@ bool Controller::DoRelayout( const Size& size,
 
     // Store the size used to layout the text.
     mImpl->mVisualModel->mControlSize = size;
-  }
-  else
-  {
-    layoutSize = mImpl->mVisualModel->GetLayoutSize();
   }
 
   if( NO_OPERATION != ( ALIGN & operations ) )
@@ -1822,7 +1876,7 @@ void Controller::SetMultiLineEnabled( bool enable )
 
     // Set the flags to redo the layout operations
     const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
-                                                                          UPDATE_ACTUAL_SIZE |
+                                                                          UPDATE_LAYOUT_SIZE |
                                                                           ALIGN              |
                                                                           REORDER );
 
@@ -2018,9 +2072,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    if( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
-        ( mImpl->mEventData->mState != EventData::INACTIVE ) )
+    if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
+         ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
+         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) )
     {
+      // Should not change the state if the key is the shift send by the imf manager.
+      // Otherwise, when the state is SELECTING the text controller can't send the right
+      // surrounding info to the imf.
       mImpl->ChangeState( EventData::EDITING );
     }
 
@@ -2114,7 +2172,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     {
       if( !mImpl->mEventData->mPreEditFlag )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state\n" );
 
         // Record the start of the pre-edit text
         mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
@@ -2327,6 +2385,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
         }
         else
         {
+          // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
           mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
         }
         relayoutNeeded = true;
@@ -2377,7 +2436,6 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
-        // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
 
@@ -2439,8 +2497,6 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
 
   if( NULL != mImpl->mEventData )
   {
-    mImpl->ChangeState( EventData::SELECTING );
-
     if( selectAll )
     {
       Event event( Event::SELECT_ALL );
@@ -2564,12 +2620,6 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
       mImpl->mOperationsPending = ALL_OPERATIONS;
 
-      // This is to reset the virtual keyboard to Upper-case
-      if( 0u == mImpl->mLogicalModel->mText.Count() )
-      {
-        NotifyImfManager();
-      }
-
       if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
           !mImpl->IsPlaceholderAvailable() )
       {
@@ -2590,7 +2640,10 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     case Toolkit::TextSelectionPopup::COPY:
     {
       mImpl->SendSelectionToClipboard( false ); // Text not modified
-      mImpl->RequestRelayout(); // Handles, Selection Highlight, Popup
+
+      mImpl->mEventData->mUpdateCursorPosition = true;
+
+      mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
       break;
     }
     case Toolkit::TextSelectionPopup::PASTE:
@@ -2632,35 +2685,36 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
 
 ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
-  bool update = false;
+  // Whether the text needs to be relaid-out.
   bool requestRelayout = false;
 
-  std::string text;
-  unsigned int cursorPosition = 0u;
+  // Whether to retrieve the text and cursor position to be sent to the IMF manager.
+  bool retrieveText = false;
+  bool retrieveCursor = false;
 
   switch( imfEvent.eventName )
   {
     case ImfManager::COMMIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
-      update = true;
       requestRelayout = true;
+      retrieveCursor = true;
       break;
     }
     case ImfManager::PREEDIT:
     {
       InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
-      update = true;
       requestRelayout = true;
+      retrieveCursor = true;
       break;
     }
     case ImfManager::DELETESURROUNDING:
     {
-      update = RemoveText( imfEvent.cursorOffset,
-                           imfEvent.numberOfChars,
-                           DONT_UPDATE_INPUT_STYLE );
+      const bool textDeleted = RemoveText( imfEvent.cursorOffset,
+                                           imfEvent.numberOfChars,
+                                           DONT_UPDATE_INPUT_STYLE );
 
-      if( update )
+      if( textDeleted )
       {
         if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
             !mImpl->IsPlaceholderAvailable() )
@@ -2673,17 +2727,15 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
         }
         mImpl->mEventData->mUpdateCursorPosition = true;
         mImpl->mEventData->mScrollAfterDelete = true;
+
+        requestRelayout = true;
       }
-      requestRelayout = true;
       break;
     }
     case ImfManager::GETSURROUNDING:
     {
-      GetText( text );
-      cursorPosition = GetLogicalCursorPosition();
-
-      imfManager.SetSurroundingText( text );
-      imfManager.SetCursorPosition( cursorPosition );
+      retrieveText = true;
+      retrieveCursor = true;
       break;
     }
     case ImfManager::VOID:
@@ -2692,12 +2744,6 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
       break;
     }
   } // end switch
-
-  if( ImfManager::GETSURROUNDING != imfEvent.eventName )
-  {
-    GetText( text );
-    cursorPosition = GetLogicalCursorPosition();
-  }
 
   if( requestRelayout )
   {
@@ -2708,7 +2754,32 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     mImpl->mControlInterface.TextChanged();
   }
 
-  ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
+  std::string text;
+  CharacterIndex cursorPosition = 0u;
+  Length numberOfWhiteSpaces = 0u;
+
+  if( retrieveCursor )
+  {
+    numberOfWhiteSpaces = mImpl->GetNumberOfWhiteSpaces( 0u );
+
+    cursorPosition = mImpl->GetLogicalCursorPosition();
+
+    if( cursorPosition < numberOfWhiteSpaces )
+    {
+      cursorPosition = 0u;
+    }
+    else
+    {
+      cursorPosition -= numberOfWhiteSpaces;
+    }
+  }
+
+  if( retrieveText )
+  {
+    mImpl->GetText( numberOfWhiteSpaces, text );
+  }
+
+  ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
 
   return callbackData;
 }
@@ -2746,11 +2817,6 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE RemovedText\n", this );
-    // Notifiy the IMF manager after text changed
-    // Automatic  Upper-case and restarting prediction on an existing word require this.
-    NotifyImfManager();
-
     if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
         !mImpl->IsPlaceholderAvailable() )
     {
@@ -2765,23 +2831,6 @@ bool Controller::BackspaceKeyEvent()
   }
 
   return removed;
-}
-
-void Controller::NotifyImfManager()
-{
-  if( NULL != mImpl->mEventData )
-  {
-    if( mImpl->mEventData->mImfManager )
-    {
-      // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
-      std::string text;
-      GetText( text );
-      mImpl->mEventData->mImfManager.SetSurroundingText( text );
-
-      mImpl->mEventData->mImfManager.SetCursorPosition( GetLogicalCursorPosition() );
-      mImpl->mEventData->mImfManager.NotifyCursorPosition();
-    }
-  }
 }
 
 void Controller::ShowPlaceholderText()
@@ -2875,7 +2924,7 @@ void Controller::ClearFontData()
                                                            SHAPE_TEXT                |
                                                            GET_GLYPH_METRICS         |
                                                            LAYOUT                    |
-                                                           UPDATE_ACTUAL_SIZE        |
+                                                           UPDATE_LAYOUT_SIZE        |
                                                            REORDER                   |
                                                            ALIGN );
 }

@@ -396,10 +396,10 @@ private:
   /**
    * Signal occurs when the dimmed backing for the Popup is touched.
    * @param[in] actor The Actor Touched
-   * @param[in] event The Touch Event.
+   * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnBackingTouched(Actor actor, const TouchEvent& event);
+  bool OnBackingTouched(Actor actor, const TouchData& touch);
 
   /**
    * Signal occurs when a mouse wheel event occurs on the dimmed backing.
@@ -412,10 +412,10 @@ private:
   /**
    * Signal occurs when the dialog has been touched.
    * @param[in] actor The Actor Touched
-   * @param[in] event The Touch Event.
+   * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnDialogTouched(Actor actor, const TouchEvent& event);
+  bool OnDialogTouched( Actor actor, const TouchData& touch );
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

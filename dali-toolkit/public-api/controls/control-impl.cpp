@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -35,11 +35,12 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
-#include <dali-toolkit/internal/controls/renderers/color/color-renderer.h>
+#include <dali-toolkit/internal/visuals/color/color-visual.h>
 
 namespace Dali
 {
@@ -49,6 +50,33 @@ namespace Toolkit
 
 namespace
 {
+
+/**
+ * Struct used to store Visual within the control, index is a unique key for each visual.
+ */
+struct RegisteredVisual
+{
+  Property::Index index;
+  Toolkit::Visual::Base visual;
+  Actor placementActor;
+
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor) : index(aIndex), visual(aVisual), placementActor(aPlacementActor) {}
+};
+
+/**
+ *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
+ */
+bool FindVisual( Property::Index targetIndex, std::vector<RegisteredVisual>& visuals, std::vector<RegisteredVisual>::iterator& iter )
+{
+  for ( iter = visuals.begin(); iter != visuals.end(); iter++ )
+  {
+    if ( (*iter).index ==  targetIndex )
+    {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Creates control through type registry
@@ -176,7 +204,7 @@ public:
   Impl(Control& controlImpl)
 : mControlImpl( controlImpl ),
   mStyleName(""),
-  mBackgroundRenderer(),
+  mBackgroundVisual(),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale( NULL ),
   mKeyEventSignal(),
@@ -331,9 +359,9 @@ public:
         {
           DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundRenderer )
+          if( controlImpl.mImpl->mBackgroundVisual )
           {
-            controlImpl.mImpl->mBackgroundRenderer.CreatePropertyMap( map );
+            controlImpl.mImpl->mBackgroundVisual.CreatePropertyMap( map );
           }
           value = map;
           break;
@@ -348,9 +376,9 @@ public:
         case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundRenderer )
+          if( controlImpl.mImpl->mBackgroundVisual )
           {
-            (controlImpl.mImpl->mBackgroundRenderer).CreatePropertyMap( map );
+            (controlImpl.mImpl->mBackgroundVisual).CreatePropertyMap( map );
           }
 
           value = map;
@@ -366,9 +394,10 @@ public:
   // Data
 
   Control& mControlImpl;
+  std::vector<RegisteredVisual> mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
-  Toolkit::ControlRenderer mBackgroundRenderer;   ///< The control renderer to render the background
-  Vector4 mBackgroundColor;                       ///< The color of the background renderer
+  Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
+  Vector4 mBackgroundColor;                       ///< The color of the background visual
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
@@ -441,12 +470,16 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  mImpl->mBackgroundColor = color;
-
   Actor self( Self() );
-  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, color );
-  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+  mImpl->mBackgroundColor = color;
+  Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
+  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  if( mImpl->mBackgroundVisual )
+  {
+    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+  }
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -454,31 +487,30 @@ Vector4 Control::GetBackgroundColor() const
   return mImpl->mBackgroundColor;
 }
 
-void Control::SetBackground(const Property::Map& map)
+void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  mImpl->mBackgroundRenderer.RemoveAndReset( self );
-  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-  mImpl->mBackgroundRenderer = factory.GetControlRenderer( map );
-  if( mImpl->mBackgroundRenderer  && self.OnStage() ) // Request control renderer with a property map might return an empty handle
+  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  if( mImpl->mBackgroundVisual )
   {
-    mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
+    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
-  Toolkit::RendererFactory factory = Toolkit::RendererFactory::Get();
-  factory.ResetRenderer( mImpl->mBackgroundRenderer, self, image );
-  mImpl->mBackgroundRenderer.SetDepthIndex( DepthIndex::BACKGROUND );
+  InitializeVisual( self, mImpl->mBackgroundVisual, image );
+  if( mImpl->mBackgroundVisual )
+  {
+    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+  }
 }
 
 void Control::ClearBackground()
 {
   Actor self( Self() );
-  mImpl->mBackgroundRenderer.RemoveAndReset( self );
+  mImpl->mBackgroundVisual.RemoveAndReset( self );
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -618,6 +650,44 @@ void Control::KeyboardEnter()
 {
   // Inform deriving classes
   OnKeyboardEnter();
+}
+
+void Control::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+{
+  bool visualReplaced ( false );
+  Actor actorToRegister; // Null actor, replaced if placement actor not Self
+
+  if ( placementActor != Self() ) // Prevent increasing ref count if actor self
+  {
+    actorToRegister = placementActor;
+  }
+
+  if ( !mImpl->mVisuals.empty() )
+  {
+      std::vector<RegisteredVisual>::iterator iter;
+      // Check if visual (index) is already registered.  Replace if so.
+      if ( FindVisual( index, mImpl->mVisuals, iter ) )
+      {
+        (*iter).visual = visual;
+        (*iter).placementActor = actorToRegister;
+        visualReplaced = true;
+      }
+  }
+
+  if ( !visualReplaced ) // New registration entry
+  {
+    RegisteredVisual newVisual = RegisteredVisual( index, visual, actorToRegister );
+    mImpl->mVisuals.push_back( newVisual );
+  }
+}
+
+void Control::UnregisterVisual( Property::Index index )
+{
+   std::vector< RegisteredVisual >::iterator iter;
+   if ( FindVisual( index, mImpl->mVisuals, iter ) )
+   {
+     mImpl->mVisuals.erase( iter );
+   }
 }
 
 bool Control::OnAccessibilityActivated()
@@ -804,19 +874,19 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  if( mImpl->mBackgroundRenderer)
+  if( mImpl->mBackgroundVisual)
   {
     Actor self( Self() );
-    mImpl->mBackgroundRenderer.SetOnStage( self );
+    mImpl->mBackgroundVisual.SetOnStage( self );
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundRenderer )
+  if( mImpl->mBackgroundVisual )
   {
     Actor self( Self() );
-    mImpl->mBackgroundRenderer.SetOffStage( self );
+    mImpl->mBackgroundVisual.SetOffStage( self );
   }
 }
 
@@ -844,10 +914,10 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( mImpl->mBackgroundRenderer )
+  if( mImpl->mBackgroundVisual )
   {
     Vector2 size( targetSize );
-    mImpl->mBackgroundRenderer.SetSize( size );
+    mImpl->mBackgroundVisual.SetSize( size );
   }
 }
 
@@ -890,10 +960,10 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  if( mImpl->mBackgroundRenderer )
+  if( mImpl->mBackgroundVisual )
   {
     Vector2 naturalSize;
-    mImpl->mBackgroundRenderer.GetNaturalSize(naturalSize);
+    mImpl->mBackgroundVisual.GetNaturalSize(naturalSize);
     return Vector3(naturalSize);
   }
   return Vector3::ZERO;

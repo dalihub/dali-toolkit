@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -32,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -218,6 +218,7 @@ void GaussianBlurView::SetUserImageAndOutputRenderTarget(Image inputImage, Frame
 
   mUserInputImage = inputImage;
   mImageViewHorizBlur.SetImage( mUserInputImage );
+  mImageViewHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, mCustomShader );
 
   mUserOutputRenderTarget = outputRenderTarget;
 }
@@ -259,11 +260,9 @@ void GaussianBlurView::OnInitialize()
   std::ostringstream horizFragmentShaderStringStream;
   horizFragmentShaderStringStream << "#define NUM_SAMPLES " << mNumSamples << "\n";
   horizFragmentShaderStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
-  Property::Map customShader;
-  customShader[ "fragmentShader" ] = horizFragmentShaderStringStream.str();
-  Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "image" );
-  rendererMap.Insert( "shader", customShader );
+  Property::Map source;
+  source[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = horizFragmentShaderStringStream.str();
+  mCustomShader[ Toolkit::Visual::Property::SHADER ] = source;
 
   //////////////////////////////////////////////////////
   // Create actors
@@ -271,12 +270,10 @@ void GaussianBlurView::OnInitialize()
   // Create an image view for performing a horizontal blur on the texture
   mImageViewHorizBlur = Toolkit::ImageView::New();
   mImageViewHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
-  mImageViewHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Create an image view for performing a vertical blur on the texture
   mImageViewVertBlur = Toolkit::ImageView::New();
   mImageViewVertBlur.SetParentOrigin(ParentOrigin::CENTER);
-  mImageViewVertBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Register a property that the user can control to fade the blur in / out via the GaussianBlurView object
   Actor self = Self();
@@ -414,6 +411,7 @@ void GaussianBlurView::AllocateResources()
 
       // Set image view for performing a horizontal blur on the texture
       mImageViewHorizBlur.SetImage( mRenderTargetForRenderingChildren );
+      mImageViewHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, mCustomShader );
 
       // Create offscreen buffer for vert blur pass
       mRenderTarget1 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
@@ -433,6 +431,7 @@ void GaussianBlurView::AllocateResources()
 
     // size needs to match render target
     mImageViewVertBlur.SetImage( mRenderTarget2 );
+    mImageViewVertBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, mCustomShader );
     mImageViewVertBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
 
     // set gaussian blur up for new sized render targets

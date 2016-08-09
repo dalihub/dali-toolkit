@@ -21,7 +21,7 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/key-event.h>
@@ -42,7 +42,7 @@ namespace V8Plugin
 namespace EventObjectGenerator
 {
 
-  v8::Handle<v8::Object> CreateTouchEvent( v8::Isolate* isolate, const TouchEvent& touchEvent);
+  v8::Handle<v8::Object> CreateTouchData( v8::Isolate* isolate, const TouchData& touch );
   v8::Handle<v8::Object> CreateHoverEvent( v8::Isolate* isolate, const HoverEvent& hoverEvent);
   v8::Handle<v8::Object> CreateWheelEvent( v8::Isolate* isolate, const WheelEvent& wheelEvent);
   v8::Handle<v8::Object> CreateKeyEvent( v8::Isolate* isolate, const KeyEvent& keyEvent);

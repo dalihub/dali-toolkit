@@ -1,8 +1,8 @@
-#ifndef __DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H__
-#define __DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H__
+#ifndef DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H
+#define DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -98,10 +101,10 @@ inline Property::Map CreatePageTurnBookSpineEffect()
 
   Property::Map customShader;
 
-  customShader[ "vertexShader" ] = vertexSource;
-  customShader[ "fragmentShader" ] = fragmentSource;
+  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = vertexSource;
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource;
 
-  map[ "shader" ] = customShader;
+  map[ Toolkit::Visual::Property::SHADER ] = customShader;
   return map;
 }
 
@@ -111,4 +114,4 @@ inline Property::Map CreatePageTurnBookSpineEffect()
 
 } // namespace Dali
 
-#endif /* __DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H__ */
+#endif // DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H

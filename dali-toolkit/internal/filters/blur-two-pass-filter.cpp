@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,11 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -168,16 +170,16 @@ void BlurTwoPassFilter::Enable()
   fragmentSource << BLUR_TWO_PASS_FRAGMENT_SOURCE;
 
   Property::Map customShader;
-  customShader[ "fragmentShader" ] = fragmentSource.str();
-  Property::Map rendererMap;
-  rendererMap.Insert( "shader", customShader );
-  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
-  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource.str();
+  Property::Map visualMap;
+  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   // Set up blend-two-image custom shader
-  customShader[ "fragmentShader" ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
-  rendererMap[ "shader"] = customShader;
-  mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
+  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+  mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   mRootActor.Add( mActorForInput );
   mRootActor.Add( mActorForHorz );
@@ -185,7 +187,7 @@ void BlurTwoPassFilter::Enable()
 
   // Add effect texture to blend-two-image custom shader
   TextureSet textureSet = mActorForBlending.GetRendererAt(0).GetTextures();
-  textureSet.SetImage( 1u, mInputImage );
+  TextureSetImage( textureSet, 1u, mInputImage );
 
   SetupCamera();
   CreateRenderTasks();

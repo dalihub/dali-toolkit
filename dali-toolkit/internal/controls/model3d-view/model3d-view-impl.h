@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_MODEL3D_VIEW_H__
-#define __DALI_TOOLKIT_INTERNAL_MODEL3D_VIEW_H__
+#ifndef DALI_TOOLKIT_INTERNAL_MODEL3D_VIEW_H
+#define DALI_TOOLKIT_INTERNAL_MODEL3D_VIEW_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -146,6 +146,15 @@ private:
   void UpdateShaderUniforms();
 
 
+  /*
+   * @brief Given a specific shader type, find out which properties are necessary for it.
+   *
+   * @param[in] illuminationType The type of shader we intend to use.
+   * @return A bitmask of the properties we require to be loaded to use the given shader.
+   */
+  int GetShaderProperties( Toolkit::Model3dView::IlluminationType illuminationType );
+
+
   ObjLoader mObjLoader;
 
   //Properties
@@ -192,4 +201,4 @@ inline const Toolkit::Internal::Model3dView& GetImpl( const Toolkit::Model3dView
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_MODEL_VIEW_H__
+#endif // DALI_TOOLKIT_INTERNAL_MODEL_VIEW_H

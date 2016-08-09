@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@
 #include <dali-toolkit/devel-api/shader-effects/swirl-effect.h>
 
 using namespace Dali;
+using namespace Dali::Toolkit;
 
 int UtcDaliCreateAlphaDiscardEffect(void)
 {
@@ -54,29 +55,29 @@ int UtcDaliCreateAlphaDiscardEffect(void)
   Property::Map effect = Toolkit::CreateAlphaDiscardEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( "shader" );
+  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  Property::Value* vertexShaderValue = customShader.Find( Visual::Shader::Property::VERTEX_SHADER );
   DALI_TEST_CHECK( !vertexShaderValue );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  Property::Value* fragmentShaderValue = customShader.Find( Visual::Shader::Property::FRAGMENT_SHADER );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  Property::Value* gridXValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_X );
   DALI_TEST_CHECK( !gridXValue );
 
-  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  Property::Value* gridYValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_Y );
   DALI_TEST_CHECK( !gridYValue );
 
-  Property::Value* hintsValue = customShader.Find( "hints" );
+  Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( !hintsValue );
 
   END_TEST;
@@ -154,46 +155,46 @@ int UtcDaliCreateDissolveEffect( bool highPrecision )
   Property::Map effect = Toolkit::CreateDissolveEffect( highPrecision );
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( "shader" );
+  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  Property::Value* vertexShaderValue = customShader.Find( Visual::Shader::Property::VERTEX_SHADER );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  Property::Value* fragmentShaderValue = customShader.Find( Visual::Shader::Property::FRAGMENT_SHADER );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  Property::Value* gridXValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_X );
   DALI_TEST_CHECK( gridXValue );
 
   int gridX = 0;
   DALI_TEST_CHECK( gridXValue->Get( gridX ) );
   DALI_TEST_CHECK( gridX > 1 );
 
-  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  Property::Value* gridYValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_Y );
   DALI_TEST_CHECK( gridYValue );
 
   int gridY = 0;
   DALI_TEST_CHECK( gridYValue->Get( gridY ) );
   DALI_TEST_CHECK( gridY > 1 );
 
-  Property::Value* hintsValue = customShader.Find( "hints" );
+  Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( hintsValue );
 
-  std::string hints;
+  int hints;;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "outputIsTransparent" );
+  DALI_TEST_CHECK( hints == Shader::Hint::OUTPUT_IS_TRANSPARENT );
 
   Actor actor = Actor::New();
   Toolkit::DissolveEffectSetCentralLine( actor, Vector2::ONE, Vector2::ONE, 0.0f );
@@ -229,31 +230,31 @@ int UtcDaliCreateDissolveEffect(void)
   Property::Map effect = Toolkit::CreateDistanceFieldEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( "shader" );
+  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  Property::Value* vertexShaderValue = customShader.Find( Visual::Shader::Property::VERTEX_SHADER );
   DALI_TEST_CHECK( !vertexShaderValue );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  Property::Value* fragmentShaderValue = customShader.Find( Visual::Shader::Property::FRAGMENT_SHADER );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  Property::Value* gridXValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_X );
   DALI_TEST_CHECK( !gridXValue );
 
-  Property::Value* hintsValue = customShader.Find( "hints" );
+  Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( hintsValue );
 
-  std::string hints;
+  int hints;;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "outputIsTransparent" );
+  DALI_TEST_CHECK( hints == Shader::Hint::OUTPUT_IS_TRANSPARENT );
 
   END_TEST;
 }
@@ -265,29 +266,29 @@ int UtcDaliCreateImageRegionEffect(void)
   Property::Map effect = Toolkit::CreateImageRegionEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( "shader" );
+  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  Property::Value* vertexShaderValue = customShader.Find( Visual::Shader::Property::VERTEX_SHADER );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  Property::Value* fragmentShaderValue = customShader.Find( Visual::Shader::Property::FRAGMENT_SHADER );
   DALI_TEST_CHECK( !fragmentShaderValue );
 
-  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  Property::Value* gridXValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_X );
   DALI_TEST_CHECK( !gridXValue );
 
-  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  Property::Value* gridYValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_Y );
   DALI_TEST_CHECK( !gridYValue );
 
-  Property::Value* hintsValue = customShader.Find( "hints" );
+  Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( !hintsValue );
 
   END_TEST;
@@ -332,46 +333,46 @@ int UtcDaliCreateMotionBlurEffect(void)
   Property::Map effect = Toolkit::CreateMotionBlurEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( "shader" );
+  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  Property::Value* vertexShaderValue = customShader.Find( Visual::Shader::Property::VERTEX_SHADER );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  Property::Value* fragmentShaderValue = customShader.Find( Visual::Shader::Property::FRAGMENT_SHADER );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  Property::Value* gridXValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_X );
   DALI_TEST_CHECK( gridXValue );
 
   int gridX = 0;
   DALI_TEST_CHECK( gridXValue->Get( gridX ) );
   DALI_TEST_CHECK( gridX > 1 );
 
-  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  Property::Value* gridYValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_Y );
   DALI_TEST_CHECK( gridYValue );
 
   int gridY = 0;
   DALI_TEST_CHECK( gridYValue->Get( gridY ) );
   DALI_TEST_CHECK( gridY > 1 );
 
-  Property::Value* hintsValue = customShader.Find( "hints" );
+  Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( hintsValue );
 
-  std::string hints;
+  int hints;;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "outputIsTransparent" );
+  DALI_TEST_CHECK( hints == Shader::Hint::OUTPUT_IS_TRANSPARENT );
 
   unsigned int sampleCount( 4 );
   Actor actor = Actor::New();
@@ -395,46 +396,46 @@ int UtcDaliCreateMotionStretchEffect(void)
   Property::Map effect = Toolkit::CreateMotionStretchEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( "shader" );
+  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
   DALI_TEST_CHECK( customShaderValue->Get( customShader ) );
 
-  Property::Value* vertexShaderValue = customShader.Find( "vertexShader" );
+  Property::Value* vertexShaderValue = customShader.Find( Visual::Shader::Property::VERTEX_SHADER );
   DALI_TEST_CHECK( vertexShaderValue );
 
   std::string vertexShader;
   DALI_TEST_CHECK( vertexShaderValue->Get( vertexShader ) );
   DALI_TEST_CHECK( !vertexShader.empty() );
 
-  Property::Value* fragmentShaderValue = customShader.Find( "fragmentShader" );
+  Property::Value* fragmentShaderValue = customShader.Find( Visual::Shader::Property::FRAGMENT_SHADER );
   DALI_TEST_CHECK( fragmentShaderValue );
 
   std::string fragmentShader;
   DALI_TEST_CHECK( fragmentShaderValue->Get( fragmentShader ) );
   DALI_TEST_CHECK( !fragmentShader.empty() );
 
-  Property::Value* gridXValue = customShader.Find( "subdivideGridX" );
+  Property::Value* gridXValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_X );
   DALI_TEST_CHECK( gridXValue );
 
   int gridX = 0;
   DALI_TEST_CHECK( gridXValue->Get( gridX ) );
   DALI_TEST_CHECK( gridX > 1 );
 
-  Property::Value* gridYValue = customShader.Find( "subdivideGridY" );
+  Property::Value* gridYValue = customShader.Find( Visual::Shader::Property::SUBDIVIDE_GRID_Y );
   DALI_TEST_CHECK( gridYValue );
 
   int gridY = 0;
   DALI_TEST_CHECK( gridYValue->Get( gridY ) );
   DALI_TEST_CHECK( gridY > 1 );
 
-  Property::Value* hintsValue = customShader.Find( "hints" );
+  Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( hintsValue );
 
-  std::string hints;
+  int hints;;
   DALI_TEST_CHECK( hintsValue->Get( hints ) );
-  DALI_TEST_CHECK( hints == "outputIsTransparent" );
+  DALI_TEST_CHECK( hints == Shader::Hint::OUTPUT_IS_TRANSPARENT );
 
   Actor actor = Actor::New();
   Toolkit::SetMotionStretchProperties( actor );

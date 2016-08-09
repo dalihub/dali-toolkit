@@ -186,6 +186,53 @@ int UtcDaliToolkitFlexContainerSetPropertyP(void)
   END_TEST;
 }
 
+
+int UtcDaliToolkitFlexContainerSetPropertyEnumP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitFlexContainerSetPropertyEnumP");
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_CHECK( flexContainer );
+
+  // Add flex container to the stage
+  Stage::GetCurrent().Add( flexContainer );
+
+  // Create two actors and add them to the container
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexContainer.Add(actor1);
+  flexContainer.Add(actor2);
+
+  // Check content direction property.
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "RTL" );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::RTL, TEST_LOCATION );
+
+  // Check flex direction property.
+  flexContainer.SetProperty( FlexContainer::Property::FLEX_DIRECTION, "columnReverse" );
+  DALI_TEST_EQUALS( (FlexContainer::FlexDirection)flexContainer.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ), FlexContainer::COLUMN_REVERSE, TEST_LOCATION );
+
+  // Check flex wrap property.
+  flexContainer.SetProperty( FlexContainer::Property::FLEX_WRAP, "wrap" );
+  DALI_TEST_EQUALS( (FlexContainer::WrapType)flexContainer.GetProperty<int>( FlexContainer::Property::FLEX_WRAP ), FlexContainer::WRAP, TEST_LOCATION );
+
+  // Check justify content property.
+  flexContainer.SetProperty( FlexContainer::Property::JUSTIFY_CONTENT, "spaceBetween" );
+  DALI_TEST_EQUALS( (FlexContainer::Justification)flexContainer.GetProperty<int>( FlexContainer::Property::JUSTIFY_CONTENT ), FlexContainer::JUSTIFY_SPACE_BETWEEN, TEST_LOCATION );
+
+  // Check align items property.
+  flexContainer.SetProperty( FlexContainer::Property::ALIGN_ITEMS, "flexStart" );
+  DALI_TEST_EQUALS( (FlexContainer::Alignment)flexContainer.GetProperty<int>( FlexContainer::Property::ALIGN_ITEMS ), FlexContainer::ALIGN_FLEX_START, TEST_LOCATION );
+
+  // Check align content property.
+  flexContainer.SetProperty( FlexContainer::Property::ALIGN_CONTENT, "stretch" );
+  DALI_TEST_EQUALS( (FlexContainer::Alignment)flexContainer.GetProperty<int>( FlexContainer::Property::ALIGN_CONTENT ), FlexContainer::ALIGN_STRETCH, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliToolkitFlexContainerSetChildPropertyP(void)
 {
   ToolkitTestApplication application;
@@ -217,6 +264,233 @@ int UtcDaliToolkitFlexContainerSetChildPropertyP(void)
   DALI_TEST_EQUALS( actor.GetProperty<Vector4>( FlexContainer::ChildProperty::FLEX_MARGIN ), Vector4( 10.0f, 10.0f, 10.0f, 10.0f ), TEST_LOCATION );
   DALI_TEST_CHECK( actor.GetPropertyIndex( CHILD_PROPERTY_NAME_FLEX_MARGIN ) == FlexContainer::ChildProperty::FLEX_MARGIN );
 
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
+
+
+//Functor to test whether RelayoutSignal is emitted
+class RelayoutSignalHandler : public Dali::ConnectionTracker
+{
+public:
+
+  RelayoutSignalHandler( FlexContainer& actor )
+  : mSignalVerified( false ),
+    mActor( actor )
+  {
+  }
+
+  // callback to be connected to RelayoutSignal
+  void RelayoutCallback( Actor actor  )
+  {
+    if( mActor == actor )
+    {
+      mSignalVerified = true;
+    }
+  }
+
+  void Reset()
+  {
+    mSignalVerified = false;
+  }
+
+  bool   mSignalVerified;
+  Actor& mActor;
+};
+
+int UtcDaliToolkitFlexContainerRemoveChildP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitFlexContainerSetPropertyP");
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_CHECK( flexContainer );
+
+  // Add flex container to the stage
+  Stage::GetCurrent().Add( flexContainer );
+
+  RelayoutSignalHandler relayoutSignal(flexContainer);
+  flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );
+
+  // Create two actors and add them to the container
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexContainer.Add(actor1);
+  flexContainer.Add(actor2);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( relayoutSignal.mSignalVerified, true, TEST_LOCATION );
+  relayoutSignal.Reset();
+
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexContainer.Remove(actor1);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( relayoutSignal.mSignalVerified, true, TEST_LOCATION );
+  relayoutSignal.Reset();
+
+  flexContainer.Remove(actor2);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( relayoutSignal.mSignalVerified, true, TEST_LOCATION );
+  relayoutSignal.Reset();
+
+  END_TEST;
+}
+
+namespace
+{
+
+// Functors to test whether PreFocusChange signal is emitted when the keyboard focus is about to change
+class PreFocusChangeCallback : public Dali::ConnectionTracker
+{
+public:
+  PreFocusChangeCallback(bool& signalReceived, Actor firstFocusActor)
+  : mSignalVerified(signalReceived),
+    mFirstFocusActor(firstFocusActor),
+    mDirection(Control::KeyboardFocus::LEFT)
+  {
+  }
+
+  Actor Callback(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction)
+  {
+    tet_infoline("Verifying PreFocusChangeCallback()");
+
+    mSignalVerified = true;
+    mDirection = direction;
+    if( ! proposedActorToFocus )
+    {
+      return mFirstFocusActor;
+    }
+    else
+    {
+      return proposedActorToFocus;
+    }
+  }
+
+  void Reset()
+  {
+    mSignalVerified = false;
+    mDirection = Control::KeyboardFocus::LEFT;
+  }
+
+  bool& mSignalVerified;
+  Actor mFirstFocusActor;
+  Control::KeyboardFocus::Direction mDirection;
+};
+
+// Functors to test whether focus changed signal is emitted when the keyboard focus is changed
+class FocusChangedCallback : public Dali::ConnectionTracker
+{
+public:
+  FocusChangedCallback(bool& signalReceived)
+  : mSignalVerified(signalReceived),
+    mOriginalFocusedActor(),
+    mCurrentFocusedActor()
+  {
+  }
+
+  void Callback(Actor originalFocusedActor, Actor currentFocusedActor)
+  {
+    tet_infoline("Verifying FocusChangedCallback()");
+
+    if(originalFocusedActor == mCurrentFocusedActor)
+    {
+      mSignalVerified = true;
+    }
+
+    mOriginalFocusedActor = originalFocusedActor;
+    mCurrentFocusedActor = currentFocusedActor;
+  }
+
+  void Reset()
+  {
+    mSignalVerified = false;
+  }
+
+  bool& mSignalVerified;
+  Actor mOriginalFocusedActor;
+  Actor mCurrentFocusedActor;
+};
+
+} // anonymous namespace
+
+
+int UtcDaliToolkitFlexContainerMoveFocus(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitFlexContainerSetPropertyP");
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_CHECK( flexContainer );
+
+  flexContainer.SetProperty( FlexContainer::Property::FLEX_DIRECTION, FlexContainer::ROW );
+
+  // Add flex container to the stage
+  Stage::GetCurrent().Add( flexContainer );
+  Size stageSize = Stage::GetCurrent().GetSize();
+
+  RelayoutSignalHandler relayoutSignal(flexContainer);
+  flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );
+  flexContainer.SetSize( stageSize );
+
+  // Create two actors and add them to the container
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  actor1.SetKeyboardFocusable(true);
+  actor2.SetKeyboardFocusable(true);
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexContainer.Add(actor1);
+  flexContainer.Add(actor2);
+
+  application.SendNotification();
+  application.Render();
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool preFocusChangeSignalVerified = false;
+  PreFocusChangeCallback preFocusChangeCallback(preFocusChangeSignalVerified, actor1);
+  manager.PreFocusChangeSignal().Connect( &preFocusChangeCallback, &PreFocusChangeCallback::Callback );
+
+  bool focusChangedSignalVerified = false;
+  FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
+  manager.FocusChangedSignal().Connect( &focusChangedCallback, &FocusChangedCallback::Callback );
+
+  // Move the focus to the right
+  DALI_TEST_EQUALS(manager.MoveFocus(Control::KeyboardFocus::RIGHT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_EQUALS(manager.GetCurrentFocusActor(), actor1, TEST_LOCATION);
+  preFocusChangeCallback.Reset();
+  DALI_TEST_EQUALS(focusChangedCallback.mCurrentFocusedActor, actor1, TEST_LOCATION);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards right
+  DALI_TEST_EQUALS(manager.MoveFocus(Control::KeyboardFocus::RIGHT), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(preFocusChangeCallback.mSignalVerified, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(manager.GetCurrentFocusActor(), actor2, TEST_LOCATION);
+  DALI_TEST_EQUALS(focusChangedCallback.mSignalVerified, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(focusChangedCallback.mCurrentFocusedActor, actor2, TEST_LOCATION);
+
+  preFocusChangeCallback.Reset();
+  focusChangedCallback.Reset();
+
+  // Move the focus towards left
+  DALI_TEST_EQUALS(manager.MoveFocus(Control::KeyboardFocus::LEFT), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(preFocusChangeCallback.mSignalVerified, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(manager.GetCurrentFocusActor(), actor1, TEST_LOCATION);
+  DALI_TEST_EQUALS(focusChangedCallback.mSignalVerified, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(focusChangedCallback.mCurrentFocusedActor, actor1, TEST_LOCATION);
+
+  END_TEST;
+}

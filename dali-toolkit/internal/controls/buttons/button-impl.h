@@ -43,18 +43,6 @@ namespace Internal
 class Button : public Control
 {
 
-protected:
-
-  /**
-   * Construct a new Button.
-   */
-  Button();
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  virtual ~Button();
-
 public:
 
   /**
@@ -285,6 +273,42 @@ public: // Deprecated API
 
 protected:
 
+  enum ButtonState
+  {
+    ButtonUp,                                  ///< The button is up.
+    ButtonDown,                                ///< The button is down.
+  };
+
+  /**
+   * Button paint states.
+   */
+  enum PaintState
+  {
+    UnselectedState,              ///< The button is unselected.
+    SelectedState,                ///< The button is selected.
+    DisabledUnselectedState,      ///< The button is disabled and unselected.
+    DisabledSelectedState,        ///< The button is disabled and selected.
+  };
+
+  /**
+   * Enum to specify which decoration when getting and setting decorations.
+   */
+  enum DecorationState
+  {
+    UNSELECTED_DECORATION = 0,
+    SELECTED_DECORATION,
+    DECORATION_STATES
+  };
+
+  /**
+   * Construct a new Button.
+   */
+  Button();
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~Button();
   /**
    * @return A reference to the label actor.
    */
@@ -376,26 +400,25 @@ private:
   virtual void OnDisabledBackgroundImageSet() {}
 
   /**
-   * This method is called from the OnTouchEvent method when the button is down.
+   * This method is called the button is down.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnButtonDown();
 
   /**
-   * This method is called from the OnTouchEvent method when the button is up.
+   * This method is called when the button is up.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnButtonUp();
 
   /**
-   * This method is called from the OnTouchEvent method when the touch point leaves the boundary of the button or
-   * more than one touch points are received.
+   * This method is called when touch leaves the boundary of the button or several touch points are received.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnTouchPointLeave();
 
   /**
-   * This method is called from the OnTouchEvent method when the touch point is interrupted.
+   * This method is called when the touch is interrupted.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnTouchPointInterrupted();
@@ -474,11 +497,6 @@ public:
 protected: // From Control
 
   /**
-   * @copydoc Dali::Control::OnTouchEvent( const TouchEvent& event )
-   */
-  virtual bool OnTouchEvent( const TouchEvent& event );
-
-  /**
    * @copydoc Toolkit::Control::OnInitialize()
    * @note If overridden by deriving button classes, then an up-call to Button::OnInitialize MUST be made at the start.
    */
@@ -500,7 +518,16 @@ protected: // From Control
    */
   void OnStageDisconnection();
 
+
 private:
+
+  /**
+   * @brief Handler for touch data
+   * @param[in]  actor  The touched actor.
+   * @param[in]  touch  The touch info.
+   * @return true, if consumed, false otherwise.
+   */
+  bool OnTouch( Actor actor, const TouchData& touch );
 
   /**
    * Handler for tap events.
@@ -549,24 +576,18 @@ private:
   void SetupContent( Actor& actorToModify, Actor newActor );
 
   /**
-   * Sets the color of the unselected image.
-   * If no image exists, it is created.
-   * @param[in]  color The color to use.
-   */
-  void SetUnselectedColor( const Vector4& color );
-
-  /**
    * Gets the unselected content color.
    * @return     The currently used unselected color.
    */
   const Vector4 GetUnselectedColor() const;
 
   /**
-   * Sets the color of the selected image.
-   * If no image exists, it is created.
+   * Sets the color of button in selected or unselected state, if image also supplied this color will be appplied to it.
+   * If no visual exists, it is created.
    * @param[in]  color The color to use.
+   * @param[in]  selectedState The state to apply the color to, SelectedState or DisabledUnselectedState.
    */
-  void SetSelectedColor( const Vector4& color );
+  void SetColor( const Vector4& color, PaintState selectedState );
 
   /**
    * Gets the selected content color.
@@ -575,33 +596,6 @@ private:
   const Vector4 GetSelectedColor() const;
 
 protected:
-
-  enum ButtonState
-  {
-    ButtonUp,                                  ///< The button is up.
-    ButtonDown,                                ///< The button is down.
-  };
-
-  /**
-   * Button paint states.
-   */
-  enum PaintState
-  {
-    UnselectedState,              ///< The button is unselected.
-    SelectedState,                ///< The button is selected.
-    DisabledUnselectedState,      ///< The button is disabled and unselected.
-    DisabledSelectedState,        ///< The button is disabled and selected.
-  };
-
-  /**
-   * Enum to specify which decoration when getting and setting decorations.
-   */
-  enum DecorationState
-  {
-    UNSELECTED_DECORATION = 0,
-    SELECTED_DECORATION,
-    DECORATION_STATES
-  };
 
   ButtonState GetState();
   PaintState GetPaintState();

@@ -68,7 +68,7 @@ public:
     unsigned char* buffer = static_cast<unsigned char*>(malloc(bufferSize));
     memset(buffer, 0, bufferSize);
 
-    mPixelData = Dali::PixelData::New( buffer, mSize.GetWidth(), mSize.GetHeight(), Pixel::RGBA8888, Dali::PixelData::FREE);
+    mPixelData = Dali::PixelData::New( buffer, bufferSize, mSize.GetWidth(), mSize.GetHeight(), Pixel::RGBA8888, Dali::PixelData::FREE);
 
     sem_post( &mySemaphore );
   }

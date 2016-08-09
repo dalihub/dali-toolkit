@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -395,10 +395,10 @@ int UtcDaliControlBackgroundColor(void)
 
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
-  DALI_TEST_CHECK( resultMap->Find( "mixColor" ) );
-  DALI_TEST_CHECK( resultMap->Find( "mixColor" )->Get<Vector4>() == Color::RED );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE )->Get<int>() == Visual::COLOR );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>() == Color::RED );
 
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
 
@@ -406,8 +406,8 @@ int UtcDaliControlBackgroundColor(void)
 
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "mixColor" ) );
-  DALI_TEST_CHECK( resultMap->Find( "mixColor" )->Get<Vector4>() == Color::YELLOW );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>() == Color::YELLOW );
 
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::YELLOW, TEST_LOCATION );
 
@@ -426,18 +426,18 @@ int UtcDaliControlBackgroundImage(void)
 
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
-  DALI_TEST_CHECK( resultMap->Find( "url" ) );
-  DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage" );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE )->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL ) );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>() == "TestImage" );
 
   image = ResourceImage::New("TestImage2");
   control.SetBackgroundImage( image );
 
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "url" ) );
-  DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage2" );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL ) );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>() == "TestImage2" );
 
   END_TEST;
 }
@@ -451,26 +451,26 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND ).Get< Property::Map >().Empty() );
 
   Property::Map imageMap;
-  imageMap[ "rendererType" ] = "image";
-  imageMap[ "url" ] = "TestImage";
+  imageMap[ Visual::Property::TYPE ] = Visual::IMAGE;
+  imageMap[ ImageVisual::Property::URL ] = "TestImage";
   control.SetProperty( Control::Property::BACKGROUND, imageMap );
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "image" );
-  DALI_TEST_CHECK( resultMap->Find( "url" ) );
-  DALI_TEST_CHECK( resultMap->Find( "url" )->Get<std::string>() == "TestImage" );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE )->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL ) );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>() == "TestImage" );
 
   Property::Map rendererMap;
-  rendererMap["rendererType"] = "color";
-  rendererMap["mixColor"] = Color::CYAN;
+  rendererMap[Visual::Property::TYPE] = Visual::COLOR;
+  rendererMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
   control.SetProperty( Control::Property::BACKGROUND, rendererMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" ) );
-  DALI_TEST_CHECK( resultMap->Find( "rendererType" )->Get<std::string>() == "color" );
-  DALI_TEST_CHECK( resultMap->Find( "mixColor" ) );
-  DALI_TEST_CHECK( resultMap->Find( "mixColor" )->Get<Vector4>() == Color::CYAN );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE )->Get<int>() == Visual::COLOR );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>() == Color::CYAN );
 
   Property::Map emptyMap;
   control.SetProperty( Control::Property::BACKGROUND, emptyMap );
@@ -487,7 +487,7 @@ int UtcDaliControlBackgroundProperties(void)
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, deprecatedImageMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( "url" )->Get< std::string >() == "TestImage" );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL )->Get< std::string >() == "TestImage" );
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
 

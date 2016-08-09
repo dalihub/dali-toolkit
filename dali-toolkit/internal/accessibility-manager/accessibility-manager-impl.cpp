@@ -1313,7 +1313,7 @@ bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& 
 
     if(!mCurrentGesturedActor)
     {
-      DALI_LOG_ERROR("Gesture detected, but no hit actor");
+      DALI_LOG_ERROR("Gesture detected, but no hit actor\n");
     }
   }
 
@@ -1362,7 +1362,7 @@ bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& 
 
       if(!mCurrentGesturedActor)
       {
-        DALI_LOG_ERROR("no more gestured actor");
+        DALI_LOG_ERROR("no more gestured actor\n");
       }
     }
     else
@@ -1388,35 +1388,6 @@ Toolkit::AccessibilityManager::FocusOvershotSignalType& AccessibilityManager::Fo
 Toolkit::AccessibilityManager::FocusedActorActivatedSignalType& AccessibilityManager::FocusedActorActivatedSignal()
 {
   return mFocusedActorActivatedSignal;
-}
-
-bool AccessibilityManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  bool connected( true );
-  AccessibilityManager* manager = dynamic_cast<AccessibilityManager*>( object );
-
-  if( manager )
-  {
-    if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
-    {
-      manager->FocusChangedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_OVERSHOT ) )
-    {
-      manager->FocusOvershotSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ACTIVATED ) )
-    {
-      manager->FocusedActorActivatedSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
-    }
-  }
-
-  return connected;
 }
 
 } // namespace Internal

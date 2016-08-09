@@ -216,9 +216,9 @@ private: // Implementation
    * @brief Callback when TextField is touched
    *
    * @param[in] actor TextField touched
-   * @param[in] event TouchEvent information
+   * @param[in] touch Touch information
    */
-  bool OnTouched( Actor actor, const TouchEvent& event );
+  bool OnTouched( Actor actor, const TouchData& touch );
 
   /**
    * Construct a new TextField.
@@ -237,7 +237,7 @@ private: // Implementation
   /**
    * @brief Render view, create and attach actor(s) to this Text Field.
    */
-  void RenderText();
+  void RenderText( Text::Controller::UpdateTextType updateTextType );
 
   // Connection needed to re-render text, when a Text Field returns to the stage.
   void OnStageConnect( Dali::Actor actor );

@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H_
-#define __DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H_
+#ifndef DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H
+#define DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/property-map.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -89,10 +94,10 @@ inline Property::Map CreateColorAdjuster()
   );
 
   Property::Map customShader;
-  customShader[ "fragmentShader" ] = fragmentShader;
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentShader;
 
   Property::Map map;
-  map[ "shader" ] = customShader;
+  map[ Toolkit::Visual::Property::SHADER ] = customShader;
 
   return map;
 }
@@ -103,4 +108,4 @@ inline Property::Map CreateColorAdjuster()
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H_ */
+#endif // DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H

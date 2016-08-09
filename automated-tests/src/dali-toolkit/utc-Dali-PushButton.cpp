@@ -113,27 +113,6 @@ Dali::Integration::Point GetPointUpOutside()
   return point;
 }
 
-Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
-{
-  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
-
-  // Create the image
-  PixelBuffer* pixbuf = imageData.GetBuffer();
-  unsigned int size = width * height;
-
-  for( size_t i = 0; i < size; i++ )
-    {
-      pixbuf[i*4+0] = 0xFF * color.r;
-      pixbuf[i*4+1] = 0xFF * color.g;
-      pixbuf[i*4+2] = 0xFF * color.b;
-      pixbuf[i*4+3] = 0xFF * color.a;
-    }
-
-  imageData.Update();
-
-  return imageData;
-}
-
 } //namespace
 
 int UtcDaliPushButtonConstructorP(void)
@@ -925,6 +904,279 @@ int UtcDaliPushButtonAlignmentLayout(void)
    *  +---------+
    */
   DALI_TEST_EQUALS( size, compareSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetButtonImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetButtonImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetButtonImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetSelectedBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetSelectedBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledBackgroundImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledBackgroundImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  try
+  {
+    button.SetDisabledSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( true );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( false );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledSelectedImageN(void)
+{
+  ToolkitTestApplication application;
+
+  PushButton button;
+
+  try
+  {
+    button.SetDisabledSelectedImage( ImageView::New() );
+    DALI_TEST_CHECK( false );
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK( true );
+  }
 
   END_TEST;
 }

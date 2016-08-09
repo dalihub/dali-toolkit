@@ -55,7 +55,7 @@ void AtlasManager::SetAddPolicy( AddFailPolicy policy )
   GetImplementation(*this).SetAddPolicy( policy );
 }
 
-bool AtlasManager::Add( const BufferImage& image,
+bool AtlasManager::Add( const PixelData& image,
                         AtlasManager::AtlasSlot& slot,
                         AtlasManager::AtlasId atlas )
 {
@@ -78,7 +78,7 @@ void AtlasManager::GenerateMeshData( ImageId id,
                                              addReference );
 }
 
-Dali::Atlas AtlasManager::GetAtlasContainer( AtlasId atlas ) const
+Dali::Texture AtlasManager::GetAtlasContainer( AtlasId atlas ) const
 {
   return GetImplementation(*this).GetAtlasContainer( atlas );
 }

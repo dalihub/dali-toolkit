@@ -113,6 +113,7 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
             controller->SetUnderlineHeight( thickness );
             update = true;
           }
+          break;
         }
         case EffectStyle::INPUT:
         {
@@ -226,6 +227,7 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
             controller->SetShadowOffset( offset );
             update = true;
           }
+          break;
         }
         case EffectStyle::INPUT:
         {

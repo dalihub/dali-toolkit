@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/rendering/shader.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 
@@ -151,13 +153,12 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
 {
   mShadowPlaneBg = shadowPlaneBackground;
 
-  mShadowPlane = Toolkit::ImageView::New();
+  mShadowPlane = Toolkit::ImageView::New( mOutputImage );
   mShadowPlane.SetName( "SHADOW_PLANE" );
   mShadowPlane.SetParentOrigin(ParentOrigin::CENTER);
   mShadowPlane.SetAnchorPoint(AnchorPoint::CENTER);
 
-  mShadowPlane.SetImage(mOutputImage);
-  mShadowPlane.SetProperty( Toolkit::ImageView::Property::IMAGE, mShadowRenderShader );
+  mShadowPlane.SetProperty( Toolkit::ImageView::Property::IMAGE, mShadowVisualMap );
   SetShaderConstants();
 
   // Rather than parent the shadow plane drawable and have constraints to move it to the same
@@ -243,15 +244,15 @@ void ShadowView::OnInitialize()
 
 
   Property::Map customShader;
-  customShader[ "vertexShader" ] = RENDER_SHADOW_VERTEX_SOURCE;
-  customShader[ "fragmentShader" ] = RENDER_SHADOW_FRAGMENT_SOURCE;
+  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = RENDER_SHADOW_VERTEX_SOURCE;
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = RENDER_SHADOW_FRAGMENT_SOURCE;
 
-  customShader[ "subdivideGridX" ] = 20;
-  customShader[ "subdivideGridY" ] = 20;
+  customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
+  customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
 
-  customShader[ "hints" ] = "outputIsTransparent";
+  customShader[ Toolkit::Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
 
-  mShadowRenderShader[ "shader" ] = customShader;
+  mShadowVisualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
 
   // Create render targets needed for rendering from light's point of view
   mSceneFromLightRenderTarget = FrameBufferImage::New( stageSize.width, stageSize.height, Pixel::RGBA8888 );

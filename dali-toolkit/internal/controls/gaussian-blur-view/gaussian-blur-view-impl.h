@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <cmath>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -168,6 +169,8 @@ private:
 
   Toolkit::ImageView mImageViewHorizBlur;
   Toolkit::ImageView mImageViewVertBlur;
+
+  Property::Map mCustomShader;
 
   RenderTask mHorizBlurTask;
   RenderTask mVertBlurTask;

@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <string>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
@@ -117,6 +118,20 @@ static void OnPanFinished()
   gOnPanFinishedCalled = true;
 }
 
+struct CallbackFunctor
+{
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag( callbackFlag )
+  {
+  }
+
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
+
 /**
  * Invoked when the current scroll position of the scrollable content goes above or below the values
  * specified by SCROLL_POSITION_INTERVALS property.
@@ -212,9 +227,47 @@ int UtcDaliToolkitScrollBarNewP(void)
   DALI_TEST_CHECK( vertical );
   DALI_TEST_CHECK( vertical.GetScrollDirection() == ScrollBar::Vertical );
 
+  Property::Value value = vertical.GetProperty(ScrollBar::Property::SCROLL_DIRECTION);
+  std::string scrollDirection = value.Get<std::string>();
+  DALI_TEST_EQUALS( scrollDirection, "Vertical", TEST_LOCATION );
+
   ScrollBar horizontal = ScrollBar::New(ScrollBar::Horizontal);
   DALI_TEST_CHECK( horizontal );
   DALI_TEST_CHECK( horizontal.GetScrollDirection() == ScrollBar::Horizontal );
+  value = vertical.GetProperty(ScrollBar::Property::SCROLL_DIRECTION);
+  scrollDirection = value.Get<std::string>();
+  DALI_TEST_EQUALS( scrollDirection, "Horizontal", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollBarCreateP(void)
+{
+  ToolkitTestApplication application;
+
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+  DALI_TEST_CHECK( typeRegistry );
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "ScrollBar" );
+  DALI_TEST_CHECK( typeInfo );
+
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
+  ScrollBar scrollBar = ScrollBar::DownCast( handle );
+  DALI_TEST_CHECK( scrollBar );
+
+  scrollBar.SetProperty(ScrollBar::Property::SCROLL_DIRECTION, "Vertical");
+  scrollBar.SetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY, "Fixed");
+
+  DALI_TEST_EQUALS( scrollBar.GetScrollDirection(), Toolkit::ScrollBar::Vertical, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::Fixed, TEST_LOCATION );
+
+  scrollBar.SetProperty(ScrollBar::Property::SCROLL_DIRECTION, "Horizontal");
+  scrollBar.SetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY, "Variable");
+
+  DALI_TEST_EQUALS( scrollBar.GetScrollDirection(), Toolkit::ScrollBar::Horizontal, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::Variable, TEST_LOCATION );
 
   END_TEST;
 }
@@ -704,6 +757,9 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
+  Property::Value value = scrollBar.GetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY);
+  DALI_TEST_EQUALS(value.Get<std::string>(), "Fixed", TEST_LOCATION );
+
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -714,6 +770,8 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
 
   // Set the indicator height to be variable
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Variable);
+  value = scrollBar.GetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY);
+  DALI_TEST_EQUALS(value.Get<std::string>(), "Variable", TEST_LOCATION );
 
   // Render and notify
   application.SendNotification();
@@ -1344,7 +1402,10 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   Stage::GetCurrent().Add( scrollBar );
 
   // Connect the pan finished signal
+  ConnectionTracker connectionTracker;
+  bool panFinished = false;
   scrollBar.PanFinishedSignal().Connect( &OnPanFinished );
+  scrollBar.ConnectSignal( &connectionTracker, "panFinished", CallbackFunctor(&panFinished));
 
   // Render and notify
   application.SendNotification();
@@ -1375,6 +1436,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   // Perform a swipe gesture on the indicator
   PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( panFinished, true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1398,7 +1460,10 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   Stage::GetCurrent().Add( scrollBar );
 
   // Connect the pan finished signal
+  ConnectionTracker connectionTracker;
+  bool panFinished = false;
   scrollBar.PanFinishedSignal().Connect( &OnPanFinished );
+  scrollBar.ConnectSignal( &connectionTracker, "panFinished", CallbackFunctor(&panFinished));
 
   // Render and notify
   application.SendNotification();
@@ -1433,10 +1498,12 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   // Perform a swipe gesture on the scroll bar but not on the indicator
   PerformGestureSwipe(application, Vector2(1.0f, 780.0f), Vector2(Vector2::YAXIS * -1.0f), 20);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( panFinished, false, TEST_LOCATION );
 
   // Perform a swipe gesture on the indicator
   PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( panFinished, true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1454,9 +1521,12 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
   scrollBar.SetSize(20.0f, 800.0f, 0.0f);
 
   Stage::GetCurrent().Add( scrollBar );
+  ConnectionTracker connectionTracker;
 
   // Connect to the ScrollPositionIntervalReached signal
+  bool intervalReached = false;
   scrollBar.ScrollPositionIntervalReachedSignal().Connect( &OnScrollPositionIntervalReached );
+  scrollBar.ConnectSignal( &connectionTracker, "scrollPositionIntervalReached", CallbackFunctor(&intervalReached));
 
   // Render and notify
   application.SendNotification();
@@ -1509,9 +1579,11 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
 
   // Check that the signal callback is called
   DALI_TEST_EQUALS( gOnScrollPositionIntervalReachedSignalCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( intervalReached, true, TEST_LOCATION );
 
   // Reset the flag
   gOnScrollPositionIntervalReachedSignalCalled = false;
+  intervalReached = false;
 
   // Rest and clear the animation
   animation.Clear();
@@ -1527,9 +1599,11 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
 
   // Check that the signal callback is called
   DALI_TEST_EQUALS( gOnScrollPositionIntervalReachedSignalCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( intervalReached, true, TEST_LOCATION );
 
   // Reset the flag
   gOnScrollPositionIntervalReachedSignalCalled = false;
+  intervalReached = false;
 
   // Rest and clear the animation
   animation.Clear();
@@ -1545,6 +1619,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
 
   // Check that the signal callback is called
   DALI_TEST_EQUALS( gOnScrollPositionIntervalReachedSignalCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( intervalReached, true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1635,5 +1710,3 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
 
   END_TEST;
 }
-
-

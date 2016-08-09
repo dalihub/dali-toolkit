@@ -27,10 +27,8 @@ dali.stage.add( imageView );
 // vertexShader = "";  // vertex shader   ( optional)
 // fragmentShader = "";  // fragment shader   ( optional)
 // hints =   // shader hints   ( optional)
-//       [ "requiresSelfDepthTest",  // Expects depth testing enabled
-//         "outputIsTransparent",    // Might generate transparent alpha from opaque inputs
-//         "outputIsOpaque",         // Outputs opaque colors even if the inputs are transparent
-//         "modifiesGeometry" ];     // Might change position of vertices, this option disables any culling optimizations
+//       [ "OUTPUT_IS_TRANSPARENT",   // Might generate transparent alpha from opaque inputs
+//         "MODIFIES_GEOMETRY" ];     // Might change position of vertices, this option disables any culling optimizations
   
 var shader = {
     "vertexShader": myVertexShader,
@@ -45,7 +43,7 @@ imageView.size = imageViewSize; // If not set, it will use either the natural im
 dali.stage.add( imageView );
   
 var image = {
-    "rendererType" : "image",
+    "visualType" : "IMAGE",
     "url" : "myImage.jpg",
     "desiredWidth" : desiredWidth,   // The desired image width while loading (optional but preferable to set for efficiency)
     "desiredHeight" : desiredHeight,   // The desired image height while loading (optional but preferable to set for efficiency)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,14 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
-#include "../gaussian-blur-view/gaussian-blur-view-impl.h"
+#include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 
 namespace Dali
 {
@@ -231,22 +233,9 @@ void BloomView::OnInitialize()
   mBloomExtractImageView = Toolkit::ImageView::New();
   mBloomExtractImageView.SetParentOrigin( ParentOrigin::CENTER );
 
-  // Create shader used for extracting the bright parts of an image
-  Property::Map customShader;
-  customShader[ "fragmentShader" ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
-  Property::Map rendererMap;
-  rendererMap.Insert( "rendererType", "image" );
-  rendererMap.Insert( "shader", customShader );
-  mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
-
   // Create an image view for compositing the result (scene and bloom textures) to output
   mCompositeImageView = Toolkit::ImageView::New();
   mCompositeImageView.SetParentOrigin( ParentOrigin::CENTER );
-
-  // Create shader used to composite bloom and original image to output render target
-  customShader[ "fragmentShader" ] = COMPOSITE_FRAGMENT_SOURCE;
-  rendererMap[ "shader" ] = customShader;
-  mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, rendererMap );
 
   // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
   mTargetImageView = Toolkit::ImageView::New();
@@ -385,14 +374,24 @@ void BloomView::AllocateResources()
 
     mBloomExtractImageView.SetImage( mRenderTargetForRenderingChildren );
     mBloomExtractImageView.SetSize(mDownsampledWidth, mDownsampledHeight); // size needs to match render target
+    // Create shader used for extracting the bright parts of an image
+    Property::Map customShader;
+    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
+    Property::Map visualMap;
+    visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+    mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
     // set GaussianBlurView to blur our extracted bloom
     mGaussianBlurView.SetUserImageAndOutputRenderTarget(mBloomExtractTarget, mBlurExtractTarget);
 
     // use the completed blur in the first buffer and composite with the original child actors render
     mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
+    // Create shader used to composite bloom and original image to output render target
+    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = COMPOSITE_FRAGMENT_SOURCE;
+    visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+    mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
     TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
-    textureSet.SetImage( 1u, mBlurExtractTarget );
+    TextureSetImage( textureSet, 1u, mBlurExtractTarget );
 
     // set up target actor for rendering result, i.e. the blurred image
     mTargetImageView.SetImage(mOutputRenderTarget);

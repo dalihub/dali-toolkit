@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/renderer-factory/renderer-factory.h>
+#include <dali-toolkit/public-api/visuals/border-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -139,7 +141,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
@@ -261,10 +263,14 @@ void Magnifier::SetFrameVisibility(bool visible)
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
     mFrame.SetSizeModeFactor( sizeOffset );
 
-    //TODO Set the renderer onto the control self when Actor::RemoveRenderer is supported
-    Toolkit::RendererFactory rendererFactory = Toolkit::RendererFactory::Get();
-    Toolkit::ControlRenderer borderRenderer = rendererFactory.GetControlRenderer(IMAGE_BORDER_INDENT, Color::WHITE);
-    borderRenderer.SetOnStage( mFrame );
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+
+    Property::Map map;
+    map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::BORDER;
+    map[ Toolkit::BorderVisual::Property::COLOR ] = Color::WHITE;
+    map[ Toolkit::BorderVisual::Property::SIZE   ] = IMAGE_BORDER_INDENT;
+    Toolkit::Visual::Base borderVisual = visualFactory.CreateVisual( map );
+    borderVisual.SetOnStage( mFrame );
 
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
     constraint.AddSource( ParentSource( Actor::Property::WORLD_POSITION ) );

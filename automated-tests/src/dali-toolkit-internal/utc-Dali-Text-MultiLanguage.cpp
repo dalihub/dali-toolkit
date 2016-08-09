@@ -37,6 +37,7 @@ using namespace Text;
 //
 // void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
 //                             Vector<FontId>& fontIds,
+//                             Vector<bool>& isDefaultFont,
 //                             const TextAbstraction::FontDescription& defaultFontDescription,
 //                             TextAbstraction::PointSize26Dot6 defaultPointSize,
 //                             CharacterIndex startIndex,
@@ -79,6 +80,7 @@ struct MergeFontDescriptionsData
   unsigned int startIndex;                                 ///< The start index.
   unsigned int numberOfCharacters;                         ///< The number of characters.
   Vector<FontId> expectedFontIds;                          ///< The expected font ids.
+  Vector<bool> expectedIsDefault;                          ///< The expected font ids.
 };
 
 struct ScriptsData
@@ -108,9 +110,12 @@ bool MergeFontDescriptionsTest( const MergeFontDescriptionsData& data )
 {
   Vector<FontId> fontIds;
   fontIds.Resize( data.startIndex + data.numberOfCharacters, 0u );
+  Vector<bool> isDefaultFont;
+  isDefaultFont.Resize( data.startIndex + data.numberOfCharacters, true );
 
   MergeFontDescriptions( data.fontDescriptionRuns,
                          fontIds,
+                         isDefaultFont,
                          data.defaultFontDescription,
                          data.defaultPointSize,
                          data.startIndex,
@@ -139,6 +144,12 @@ bool MergeFontDescriptionsTest( const MergeFontDescriptionsData& data )
         std::cout << data.expectedFontIds[i] << " ";
       }
       std::cout << std::endl;
+      return false;
+    }
+
+    if( isDefaultFont[index] != data.expectedIsDefault[index] )
+    {
+      std::cout << data.description << " Different 'is font default' at index : " << index << ", is font default : " << isDefaultFont[index] << ", expected : " << data.expectedIsDefault[index] << std::endl;
       return false;
     }
   }
@@ -413,12 +424,16 @@ int UtcDaliTextMergeFontDescriptions(void)
   TextAbstraction::FontDescription defaultFontDescription01;
   Vector<FontDescriptionRun> fontDescriptionRuns01;
   Vector<FontId> expectedFontIds01;
+  Vector<bool> expectedIsFontDefault01;
 
   TextAbstraction::FontDescription defaultFontDescription02;
   Vector<FontDescriptionRun> fontDescriptionRuns02;
   Vector<FontId> expectedFontIds02;
   expectedFontIds02.PushBack( 0u );
   expectedFontIds02.PushBack( 0u );
+  Vector<bool> expectedIsFontDefault02;
+  expectedIsFontDefault02.PushBack( true );
+  expectedIsFontDefault02.PushBack( true );
 
   TextAbstraction::FontDescription defaultFontDescription03;
   defaultFontDescription03.family = "DejaVu Serif";
@@ -532,6 +547,17 @@ int UtcDaliTextMergeFontDescriptions(void)
   expectedFontIds03.PushBack( 3u );
   expectedFontIds03.PushBack( 6u );
   expectedFontIds03.PushBack( 6u );
+  Vector<bool> expectedIsFontDefault03;
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
+  expectedIsFontDefault03.PushBack( false );
 
   const MergeFontDescriptionsData data[] =
   {
@@ -542,7 +568,8 @@ int UtcDaliTextMergeFontDescriptions(void)
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
       0u,
       0u,
-      expectedFontIds01
+      expectedFontIds01,
+      expectedIsFontDefault01
     },
     {
       "No description runs.",
@@ -551,7 +578,8 @@ int UtcDaliTextMergeFontDescriptions(void)
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
       0u,
       2u,
-      expectedFontIds02
+      expectedFontIds02,
+      expectedIsFontDefault02
     },
     {
       "Some description runs.",
@@ -560,7 +588,8 @@ int UtcDaliTextMergeFontDescriptions(void)
       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
       0u,
       10u,
-      expectedFontIds03
+      expectedFontIds03,
+      expectedIsFontDefault03
     }
   };
   const unsigned int numberOfTests = 3u;

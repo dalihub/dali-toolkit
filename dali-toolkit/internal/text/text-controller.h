@@ -82,7 +82,7 @@ public:
     SHAPE_TEXT         = 0x0040,
     GET_GLYPH_METRICS  = 0x0080,
     LAYOUT             = 0x0100,
-    UPDATE_ACTUAL_SIZE = 0x0200,
+    UPDATE_LAYOUT_SIZE = 0x0200,
     REORDER            = 0x0400,
     ALIGN              = 0x0800,
     COLOR              = 0x1000,
@@ -106,6 +106,13 @@ public:
   {
     UPDATE_INPUT_STYLE,
     DONT_UPDATE_INPUT_STYLE
+  };
+
+  enum UpdateTextType
+  {
+    NONE_UPDATED      = 0x0,
+    MODEL_UPDATED     = 0x1,
+    DECORATOR_UPDATED = 0x2
   };
 
   /**
@@ -181,6 +188,48 @@ public:
   float GetAutoScrollLineAlignment() const;
 
   /**
+   * @brief Enables the horizontal scrolling.
+   *
+   * @param[in] enable Whether to enable the horizontal scrolling.
+   */
+  void SetHorizontalScrollEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the horizontal scrolling is enabled.
+   *
+   * @return @e true if the horizontal scrolling is enabled, otherwise it returns @e false.
+   */
+  bool IsHorizontalScrollEnabled() const;
+
+  /**
+   * @brief Enables the vertical scrolling.
+   *
+   * @param[in] enable Whether to enable the vertical scrolling.
+   */
+  void SetVerticalScrollEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the verticall scrolling is enabled.
+   *
+   * @return @e true if the vertical scrolling is enabled, otherwise it returns @e false.
+   */
+  bool IsVerticalScrollEnabled() const;
+
+  /**
+   * @brief Enables the smooth handle panning.
+   *
+   * @param[in] enable Whether to enable the smooth handle panning.
+   */
+  void SetSmoothHandlePanEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether the smooth handle panning is enabled.
+   *
+   * @return @e true if the smooth handle panning is enabled.
+   */
+  bool IsSmoothHandlePanEnabled() const;
+
+  /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.
@@ -191,7 +240,7 @@ public:
   /**
    * @brief Retrieve any text previously set.
    *
-   * @return A string of UTF-8 characters.
+   * @param[out] text A string of UTF-8 characters.
    */
   void GetText( std::string& text ) const;
 
@@ -210,13 +259,6 @@ public:
   bool RemoveText( int cursorOffset,
                    int numberOfCharacters,
                    UpdateInputStyleType type  );
-
-  /**
-   * @brief Retrieve the current cursor position.
-   *
-   * @return The cursor position.
-   */
-  unsigned int GetLogicalCursorPosition() const;
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -729,9 +771,10 @@ public:
    *
    * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
    * @param[in] size A the size of a bounding box to layout text within.
-   * @return True if the text model or decorations were updated.
+   *
+   * @return Whether the text model or decorations were updated.
    */
-  bool Relayout( const Size& size );
+  UpdateTextType Relayout( const Size& size );
 
   /**
    * @brief Process queued events which modify the model.
@@ -961,11 +1004,6 @@ private:
    * @return True if a character was deleted.
    */
   bool BackspaceKeyEvent();
-
-  /**
-   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
-   */
-  void NotifyImfManager();
 
   /**
    * @brief Helper to clear font-specific data.

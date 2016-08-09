@@ -63,7 +63,7 @@ class TableView;
  * | cellHorizontalAlignment | string      |
  * | cellVerticalAlignment   | string      |
  *
- * The row-span or column span has integer value, but its type is float here due to the limitation of the builder's ability to differentiate integer and float from Json string.
+ * The rowSpan or columnSpan has integer value, but its type is float here due to the limitation of the builder's ability to differentiate integer and float from Json string.
  * The available values for cellHorizontalAlignment are: left, center, right.
  * The available values for cellVerticalAlignment are: top, center, bottom.
  *
@@ -114,7 +114,7 @@ public:
    *       }
    * @endcode
    *
-   * LayoutColumns: set the height of the rows.
+   * LayoutColumns: set the width of the columns.
    * It has the format as follows in script:
    * @code
    * "layoutColumns":

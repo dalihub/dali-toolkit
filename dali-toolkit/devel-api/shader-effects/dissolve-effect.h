@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H__
-#define __DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H__
+#ifndef DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H_
+#define DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <string.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/rendering/shader.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -214,15 +217,15 @@ inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
   vertexShaderString.append( vertexShader );
   fragmentShaderString.append( fragmentShader );
 
-  customShader[ "vertexShader" ] = vertexShaderString;
-  customShader[ "fragmentShader" ] = fragmentShaderString;
+  customShader[ Visual::Shader::Property::VERTEX_SHADER ] = vertexShaderString;
+  customShader[ Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentShaderString;
 
-  customShader[ "subdivideGridX" ] = 20;
-  customShader[ "subdivideGridY" ] = 20;
+  customShader[ Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
+  customShader[ Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
 
-  customShader[ "hints" ] = "outputIsTransparent";
+  customShader[ Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
 
-  map[ "shader" ] = customShader;
+  map[ Visual::Property::SHADER ] = customShader;
   return map;
 }
 
@@ -230,4 +233,4 @@ inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H__
+#endif // DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H

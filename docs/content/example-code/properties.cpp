@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,10 +66,10 @@ public:
 
     // Set another property to set the image-map
     Property::Map imageMap;
-    imageMap[ "rendererType" ] = "image";
-    imageMap[ "url" ]          = IMAGE_CARDS;
-    imageMap[ "desiredWidth" ]        = 100;
-    imageMap[ "desiredHeight" ]       = 100;
+    imageMap[ Visual::Property::TYPE ] = Visual::IMAGE;
+    imageMap[ ImageVisual::Property::URL ] = IMAGE_CARDS;
+    imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 100;
+    imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 100;
     mImageView.SetProperty( ImageView::Property::IMAGE, imageMap );
 
     // Add the image view to the stage
@@ -79,7 +79,7 @@ public:
     mTagPropertyIndex = mImageView.RegisterProperty( TAG_PROPERTY_NAME, 0, Property::READ_WRITE /* Event-side only, i.e. not animatable */ );
 
     // Connect to the touch-event
-    mImageView.TouchedSignal().Connect( this, &PropertyController::OnTouched );
+    mImageView.TouchSignal().Connect( this, &PropertyController::OnTouched );
 
     // Create text label
     mTagText = Toolkit::TextLabel::New( "0" );
@@ -95,7 +95,7 @@ public:
    * param[in] touch The touch-event
    * return Set to true if the signal was consumed correctly
    */
-  bool OnTouched( Actor actor, const TouchEvent& touch )
+  bool OnTouched( Actor actor, const TouchData& touch )
   {
     int touchedCount = 0;
 

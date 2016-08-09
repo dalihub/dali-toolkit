@@ -26,6 +26,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
@@ -78,9 +79,9 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::KeyboardFocusManager, Dali::BaseHandle, Create, true )
 
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardPreFocusChange",           SIGNAL_PRE_FOCUS_CHANGE        )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusChanged",             SIGNAL_FOCUS_CHANGED           )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusGroupChanged",        SIGNAL_FOCUS_GROUP_CHANGED     )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardPreFocusChange",           SIGNAL_PRE_FOCUS_CHANGE )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusChanged",             SIGNAL_FOCUS_CHANGED )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusGroupChanged",        SIGNAL_FOCUS_GROUP_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusedActorEnterKey",     SIGNAL_FOCUSED_ACTOR_ENTER_KEY )
 
 DALI_TYPE_REGISTRATION_END()
@@ -120,7 +121,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   OnPhysicalKeyboardStatusChanged(PhysicalKeyboard::Get());
 
   Toolkit::KeyInputFocusManager::Get().UnhandledKeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-  Stage::GetCurrent().TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouched);
+  Stage::GetCurrent().TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
   PhysicalKeyboard::Get().StatusChangedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnPhysicalKeyboardStatusChanged);
 }
 
@@ -681,11 +682,11 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   }
 }
 
-void KeyboardFocusManager::OnTouched(const TouchEvent& touchEvent)
+void KeyboardFocusManager::OnTouch(const TouchData& touch)
 {
   // Clear the focus when user touch the screen.
   // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
-  if( ( touchEvent.GetPointCount() < 1 ) || ( touchEvent.GetPoint( 0 ).state == TouchPoint::Down ) )
+  if( ( touch.GetPointCount() < 1 ) || ( touch.GetState( 0 ) == PointState::DOWN ) )
   {
     ClearFocus();
   }

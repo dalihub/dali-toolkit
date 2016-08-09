@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-map.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -61,10 +64,11 @@ inline Property::Map CreateAlphaDiscardEffect()
   Property::Map map;
 
   Property::Map customShader;
-  customShader[ "fragmentShader" ] = ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE;
+  customShader[ Visual::Shader::Property::FRAGMENT_SHADER ] = ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE;
 
-  map[ "shader" ] = customShader;
-  return map;}
+  map[ Visual::Property::SHADER ] = customShader;
+  return map;
+}
 
 } // namespace Toolkit
 

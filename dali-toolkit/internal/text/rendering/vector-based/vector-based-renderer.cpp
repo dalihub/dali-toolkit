@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-based-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/glyph-run.h>

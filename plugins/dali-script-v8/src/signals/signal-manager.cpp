@@ -25,7 +25,7 @@
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/key-event.h>
@@ -54,7 +54,7 @@ namespace V8Plugin
 
 namespace // un-named namespace
 {
-const char* const SIGNAL_TOUCHED = "touched";
+const char* const SIGNAL_TOUCH = "touch";
 const char* const SIGNAL_HOVERED = "hovered";
 const char* const SIGNAL_WHEEL_EVENT = "wheelEvent";
 const char* const SIGNAL_ON_STAGE = "onStage";
@@ -64,7 +64,7 @@ const char* const SIGNAL_PAN_DETECTED = "panDetected";
 
 const char* const STAGE_SIGNAL_KEY_EVENT = "keyEvent";
 const char* const STAGE_SIGNAL_EVENT_PROCESSING_FINISHED = "eventProcessingFinished";
-const char* const STAGE_SIGNAL_TOUCHED = "touched";
+const char* const STAGE_SIGNAL_TOUCH = "touch";
 const char* const SIGNAL_IMAGE_LOADING_FINISHED = "imageLoadingFinished";
 const char* const SIGNAL_IMAGE_UPLOADED = "uploaded";
 
@@ -185,12 +185,12 @@ public:
     mActor(actor)
   {
   }
-  bool OnTouch( Actor actor, const TouchEvent& event)
+  bool OnTouch( Actor actor, const TouchData& touch )
   {
     std::vector< Dali::Any > arguments;  // Dali::Vector considers Dali::Any to be a non trivial type so won't compile
     Dali::Any returnValue(false);
     arguments.push_back( actor );
-    arguments.push_back( event );
+    arguments.push_back( touch );
     CallJavaScript( returnValue, arguments );
     bool ret;
     returnValue.Get(ret);
@@ -308,11 +308,11 @@ public:
     Dali::Any returnValue;  //no return
     CallJavaScript( returnValue, arguments );
   }
-  void TouchedSignal( const TouchEvent& touchEvent)
+  void TouchSignal( const TouchData& touch )
   {
     std::vector< Dali::Any > arguments;
     Dali::Any returnValue;   //no return
-    arguments.push_back( touchEvent );
+    arguments.push_back( touch );
     CallJavaScript( returnValue, arguments );
   }
 };
@@ -398,9 +398,9 @@ void ActorConnection( v8::Isolate* isolate,
 
   ActorCallback* callback =new ActorCallback( isolate, javaScriptCallback, signalName, actor );
 
-  if( strcmp( signalName.c_str(), SIGNAL_TOUCHED ) == 0 )
+  if( strcmp( signalName.c_str(), SIGNAL_TOUCH ) == 0 )
   {
-    actor.TouchedSignal().Connect( callback, &ActorCallback::OnTouch );
+    actor.TouchSignal().Connect( callback, &ActorCallback::OnTouch );
   }
   else if( strcmp( signalName.c_str(), SIGNAL_HOVERED ) == 0 )
   {
@@ -494,9 +494,9 @@ void StageConnection( v8::Isolate* isolate,
   {
     stage.EventProcessingFinishedSignal().Connect( callback, &StageCallback::EventProcessingFinishedSignal );
   }
-  else if (strcmp( signalName.c_str(), STAGE_SIGNAL_TOUCHED ) == 0 )
+  else if (strcmp( signalName.c_str(), STAGE_SIGNAL_TOUCH ) == 0 )
   {
-    stage.TouchedSignal().Connect( callback, &StageCallback::TouchedSignal );
+    stage.TouchSignal().Connect( callback, &StageCallback::TouchSignal );
   }
   else
   {
@@ -598,10 +598,10 @@ void SignalManager::SignalConnect( const v8::FunctionCallbackInfo< v8::Value >& 
   // first paramter =  signal to connect to
   // Second parameter = function ( to run )
   // args.This() = myActor
-  // e.g. myActor.Connect("touched", myJavaScriptActorTouched );
+  // e.g. myActor.Connect("touch", myJavaScriptActorTouched );
 
   // Inside Callback on myJavaScriptActorTouched
-  // myActor.Disconnect("touched", myJavaScriptActorTouched );
+  // myActor.Disconnect("touch", myJavaScriptActorTouched );
 
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );

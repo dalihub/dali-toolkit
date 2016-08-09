@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H__
-#define __DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H__
+#ifndef DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H
+#define DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -20,7 +20,7 @@
 
 // INTERNEL INCLUDES
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/rendering/shader.h>
+#include <dali/public-api/rendering/shader.h>
 
 namespace Dali
 {
@@ -71,4 +71,4 @@ private: // Not intended for application developer
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H__
+#endif // DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H

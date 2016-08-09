@@ -1114,13 +1114,23 @@ void TextField::OnInitialize()
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
 
+  // Enables the text input.
   mController->EnableTextInput( mDecorator );
+
+  // Enables the horizontal scrolling after the text input has been enabled.
+  mController->SetHorizontalScrollEnabled( true );
+
+  // Disables the vertical scrolling.
+  mController->SetVerticalScrollEnabled( false );
+
+  // Disable the smooth handle panning.
+  mController->SetSmoothHandlePanEnabled( false );
 
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
-  self.TouchedSignal().Connect( this, &TextField::OnTouched );
+  self.TouchSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
   Rect<int> boundingBox;
@@ -1189,12 +1199,15 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField OnRelayout\n");
 
-  if( mController->Relayout( size ) ||
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+
+  if( ( Text::Controller::NONE_UPDATED != updateTextType ) ||
       !mRenderer )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnRelayout %p Displaying new contents\n", mController.Get() );
 
-    if( mDecorator )
+    if( mDecorator &&
+        ( Text::Controller::NONE_UPDATED != ( Text::Controller::DECORATOR_UPDATED & updateTextType ) ) )
     {
       mDecorator->Relayout( size );
     }
@@ -1204,24 +1217,28 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    EnableClipping( (Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy), size );
-    RenderText();
+    EnableClipping( ( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy ), size );
+    RenderText( updateTextType );
   }
 }
 
-void TextField::RenderText()
+void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 {
   Actor self = Self();
   Actor renderableActor;
-  if( mRenderer )
-  {
-    renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
-  }
 
-  if( renderableActor != mRenderableActor )
+  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
   {
-    UnparentAndReset( mRenderableActor );
-    mRenderableActor = renderableActor;
+    if( mRenderer )
+    {
+      renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
+    }
+
+    if( renderableActor != mRenderableActor )
+    {
+      UnparentAndReset( mRenderableActor );
+      mRenderableActor = renderableActor;
+    }
   }
 
   if( mRenderableActor )
@@ -1405,7 +1422,7 @@ void TextField::OnStageConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
   {
-    RenderText();
+    RenderText( static_cast<Text::Controller::UpdateTextType>( Text::Controller::MODEL_UPDATED | Text::Controller::DECORATOR_UPDATED ) );
   }
   else
   {
@@ -1493,13 +1510,13 @@ void TextField::OnStageConnection( int depth )
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
-  // Sets the depth to the renderers inside the text's decorator.
+  // Sets the depth to the visuals inside the text's decorator.
   mDecorator->SetTextDepth( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
-bool TextField::OnTouched( Actor actor, const TouchEvent& event )
+bool TextField::OnTouched( Actor actor, const TouchData& touch )
 {
   return true;
 }

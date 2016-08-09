@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 
 #include <test-native-image.h>
 #include <sstream>
@@ -425,8 +425,10 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
 
   callStack.Enable(false);
 
-  DALI_TEST_CHECK(  callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 34, 34" ) );
-
+  TraceCallStack::NamedParams params;
+  params["width"] = ToString(34);
+  params["height"] = ToString(34);
+  DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -440,9 +442,10 @@ int UtcDaliImageViewSyncLoading(void)
 
   // Sync loading, no atlasing for big size image
   {
-    ImageView imageView = ImageView::New( gImage_600_RGB );
+    ImageView imageView = ImageView::New();
 
     // Sync loading is used
+    syncLoadingMap[ ImageVisual::Property::URL ] = gImage_600_RGB;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // BitmapLoader is used, and the loading is started immediately even the actor is not on stage.
@@ -459,9 +462,9 @@ int UtcDaliImageViewSyncLoading(void)
 
     ImageView imageView = ImageView::New( );
     // Sync loading is used
-    syncLoadingMap[ "url" ] = gImage_34_RGBA;
-    syncLoadingMap[ "desiredHeight" ] = 34;
-    syncLoadingMap[ "desiredWidth" ] = 34;
+    syncLoadingMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+    syncLoadingMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
+    syncLoadingMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // loading is started even if the actor is offStage
@@ -475,9 +478,13 @@ int UtcDaliImageViewSyncLoading(void)
     Stage::GetCurrent().Add( imageView );
     application.SendNotification();
     application.Render(16);
-    DALI_TEST_CHECK(  callStack.FindMethodAndParams("TexSubImage2D", "0, 0, 34, 34" ) );
-  }
 
+    TraceCallStack::NamedParams params;
+    params["width"] = ToString(34);
+    params["height"] = ToString(34);
+    DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
+                      true, TEST_LOCATION );
+  }
   END_TEST;
 }
 
@@ -987,7 +994,6 @@ int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
   customShader.Insert( "hints", shaderHints );
 
   Property::Map map;
-  map.Insert( "rendererType", "image" );
   map.Insert( "shader", customShader );
 
   TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
@@ -996,8 +1002,6 @@ int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
   ImageView imageView = ImageView::New( nativeImage );
   imageView.SetProperty( ImageView::Property::IMAGE, map );
   Stage::GetCurrent().Add( imageView );
-
-  imageView.SetProperty( ImageView::Property::IMAGE, map );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace( true );
@@ -1039,7 +1043,6 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
   customShader.Insert( "hints", shaderHints );
 
   Property::Map map;
-  map.Insert( "rendererType", "image" );
   map.Insert( "shader", customShader );
 
   BufferImage image = CreateBufferImage( width, height, Color::WHITE );
@@ -1047,8 +1050,6 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
   ImageView imageView = ImageView::New( image );
   imageView.SetProperty( ImageView::Property::IMAGE, map );
   Stage::GetCurrent().Add( imageView );
-
-  imageView.SetProperty( ImageView::Property::IMAGE, map );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   gl.EnableTextureCallTrace( true );
@@ -1128,4 +1129,3 @@ int UtcDaliImageViewGetImageN(void)
 
   END_TEST;
 }
-

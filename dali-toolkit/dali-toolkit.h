@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_H__
-#define __DALI_TOOLKIT_H__
+#ifndef DALI_TOOLKIT_H
+#define DALI_TOOLKIT_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 #include <dali/dali.h>
 
-// Toolkit
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
@@ -53,11 +52,25 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
+
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+
 #include <dali-toolkit/public-api/styling/style-manager.h>
+
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+
+#include <dali-toolkit/public-api/visuals/border-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+
 #include <dali-toolkit/public-api/dali-toolkit-version.h>
 #include <dali-toolkit/public-api/enums.h>
+#include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
-#endif // __DALI_TOOLKIT_H__
+#endif // DALI_TOOLKIT_H

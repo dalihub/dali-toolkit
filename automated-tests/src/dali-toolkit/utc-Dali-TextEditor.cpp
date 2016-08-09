@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <dali/devel-api/rendering/renderer.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
@@ -597,17 +597,14 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image view
-  DALI_TEST_EQUALS( editor.GetChildCount(), 3u, TEST_LOCATION );
+  // Check there are the expected number of children ( offscreen root actor, and the offscreen image view
+  DALI_TEST_EQUALS( editor.GetChildCount(), 2u, TEST_LOCATION );
 
-  Actor layer = editor.GetChildAt( 0u );
-  DALI_TEST_CHECK( layer.IsLayer() );
-
-  Actor offscreenRoot = editor.GetChildAt( 1u );
+  Actor offscreenRoot = editor.GetChildAt( 0u );
   DALI_TEST_CHECK( offscreenRoot.IsLayer() );
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
 
-  Actor offscreenImage = editor.GetChildAt( 2u );
+  Actor offscreenImage = editor.GetChildAt( 1u );
   DALI_TEST_CHECK( offscreenImage );
 
   // Create a tap event to touch the text editor.
@@ -617,6 +614,9 @@ int utcDaliTextEditorEvent02(void)
   // Render and notify
   application.SendNotification();
   application.Render();
+
+  Actor layer = editor.GetChildAt( 2u );
+  DALI_TEST_CHECK( layer.IsLayer() );
 
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
@@ -639,8 +639,13 @@ int utcDaliTextEditorEvent02(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( renderer );
+  // The offscreen root actor has a container with all the actors which contain the text renderers.
+  Actor container = offscreenRoot.GetChildAt( 1u );
+  for( unsigned int index = 0; index < container.GetChildCount(); ++index )
+  {
+    Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
+    DALI_TEST_CHECK( renderer );
+  }
 
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentPosition();
@@ -756,14 +761,19 @@ int utcDaliTextEditorEvent03(void)
   application.Render();
 
   // The offscreen root actor should have three actors: the camera, a renderer and the highlight actor.
-  Actor offscreenRoot = editor.GetChildAt( 1u );
+  Actor offscreenRoot = editor.GetChildAt( 0u );
   DALI_TEST_CHECK( offscreenRoot.IsLayer() );
 
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( renderer );
+  // The offscreen root actor has a container with all the actors which contain the text renderers.
+  Actor container = offscreenRoot.GetChildAt( 1u );
+  for( unsigned int index = 0; index < container.GetChildCount(); ++index )
+  {
+    Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
+    DALI_TEST_CHECK( renderer );
+  }
 
   Renderer highlight = offscreenRoot.GetChildAt( 2u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );

@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H__
-#define __DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H__
+#ifndef DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H
+#define DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
-
+#include <dali/public-api/rendering/renderer.h>
+#include <limits>
 
 namespace Dali
 {
@@ -41,9 +38,9 @@ public:
 
   struct TriIndex
   {
-    int pntIndex[3];
-    int nrmIndex[3];
-    int texIndex[3];
+    int pointIndex[3];
+    int normalIndex[3];
+    int textureIndex[3];
   };
 
   struct Vertex
@@ -65,7 +62,7 @@ public:
     {}
 
     VertexExt( const Vector3& tangent, const Vector3& binormal )
-    : tangent( tangent), bitangent (binormal)
+    : tangent( tangent), bitangent( binormal )
     {}
 
     Vector3 tangent;
@@ -76,23 +73,31 @@ public:
   {
     void Init()
     {
-      pointMin = Vector3(999999.9,999999.9,999999.9);
-      pointMax = Vector3(-999999.9,-999999.9,-999999.9);
+      pointMin = Vector3( std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() );
+      pointMax = Vector3( std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() );
     }
 
-    void ConsiderNewPointInVolume(const Vector3& position)
+    void ConsiderNewPointInVolume( const Vector3& position )
     {
-      pointMin.x = std::min(position.x, pointMin.x);
-      pointMin.y = std::min(position.y, pointMin.y);
-      pointMin.z = std::min(position.z, pointMin.z);
+      pointMin.x = std::min( position.x, pointMin.x );
+      pointMin.y = std::min( position.y, pointMin.y );
+      pointMin.z = std::min( position.z, pointMin.z );
 
-      pointMax.x = std::max(position.x, pointMax.x);
-      pointMax.y = std::max(position.y, pointMax.y);
-      pointMax.z = std::max(position.z, pointMax.z);
+      pointMax.x = std::max( position.x, pointMax.x );
+      pointMax.y = std::max( position.y, pointMax.y );
+      pointMax.z = std::max( position.z, pointMax.z );
     }
 
     Vector3 pointMin;
     Vector3 pointMax;
+  };
+
+  //Defines bit masks to declare which properties are needed by anyone requesting a geometry.
+  enum ObjectProperties
+  {
+    TEXTURE_COORDINATES = 1 << 0,
+    TANGENTS = 1 << 1,
+    BINORMALS = 1 << 2
   };
 
   ObjLoader();
@@ -101,11 +106,12 @@ public:
   bool      IsSceneLoaded();
   bool      IsMaterialLoaded();
 
-  bool      Load(char* objBuffer, std::streampos fileSize, std::string& materialFile);
+  bool      LoadObject( char* objBuffer, std::streampos fileSize );
 
-  void      LoadMaterial(char* objBuffer, std::streampos fileSize, std::string& texture0Url, std::string& texture1Url, std::string& texture2Url);
+  void      LoadMaterial( char* objBuffer, std::streampos fileSize, std::string& diffuseTextureUrl,
+                          std::string& normalTextureUrl, std::string& glossTextureUrl );
 
-  Geometry  CreateGeometry(Toolkit::Model3dView::IlluminationType illuminationType);
+  Geometry  CreateGeometry( int objectProperties, bool useSoftNormals );
 
   Vector3   GetCenter();
   Vector3   GetSize();
@@ -130,27 +136,63 @@ private:
   bool mHasNormalMap;
   bool mHasSpecularMap;
 
-  Dali::Vector<Vector3> mPoints;
-  Dali::Vector<Vector2> mTextures;
-  Dali::Vector<Vector2> mTextures2;
-  Dali::Vector<Vector3> mNormals;
-  Dali::Vector<Vector3> mTangents;
-  Dali::Vector<Vector3> mBiTangents;
+  Dali::Vector<Vector3>  mPoints;
+  Dali::Vector<Vector2>  mTextures;
+  Dali::Vector<Vector2>  mTextures2;
+  Dali::Vector<Vector3>  mNormals;
+  Dali::Vector<Vector3>  mTangents;
+  Dali::Vector<Vector3>  mBiTangents;
   Dali::Vector<TriIndex> mTriangles;
 
-  void CalculateTangentArray(const Dali::Vector<Vector3>& vertex,
-                             const Dali::Vector<Vector2>& texcoord,
-                             Dali::Vector<TriIndex>& triangle,
-                             Dali::Vector<Vector3>& normal,
-                             Dali::Vector<Vector3>& tangent);
+  /**
+   * @brief Calculates normals for each point on a per-face basis.
+   *
+   * There are multiple normals per point, each corresponding to the normal of a face connecting to the point.
+   *
+   * @param[in] vertices The vertices of the object.
+   * @param[in, out] triangles The triangles that form the faces. The normals of each triangle will be updated.
+   * @param[in, out] normals The normals to be calculated.
+   */
+  void CalculateHardFaceNormals( const Dali::Vector<Vector3>& vertices,
+                                 Dali::Vector<TriIndex>& triangles,
+                                 Dali::Vector<Vector3>& normals );
 
-  void CenterAndScale(bool center, Dali::Vector<Vector3>& points);
+  /**
+   * @brief Calculates smoothed normals for each point.
+   *
+   * There is one normal per point, an average of the connecting faces.
+   *
+   * @param[in] vertices The vertices of the object.
+   * @param[in, out] triangles The triangles that form the faces. The normals of each triangle will be updated.
+   * @param[in, out] normals The normals to be calculated.
+   */
+  void CalculateSoftFaceNormals( const Dali::Vector<Vector3>& vertices,
+                                 Dali::Vector<TriIndex>& triangles,
+                                 Dali::Vector<Vector3>& normals );
 
+  /**
+   * @brief Calculates tangents and bitangents for each point of the object.
+   *
+   * These are calculated using the object's points, texture coordinates and normals, so these must be initialised first.
+   */
+  void CalculateTangentFrame();
 
-  void CreateGeometryArray(Dali::Vector<Vertex> & vertices,
-                           Dali::Vector<Vector2> & textures,
-                           Dali::Vector<VertexExt> & verticesExt,
-                           Dali::Vector<unsigned short> & indices);
+  void CenterAndScale( bool center, Dali::Vector<Vector3>& points );
+
+  /**
+   * @brief Using the data loaded from the file, create arrays of data to be used in creating the geometry.
+   *
+   * @param[in] vertices The vertices of the object.
+   * @param[in] textures The texture coordinates of the object.
+   * @param[in] verticesExt Extension to vertices, storing tangents and bitangents.
+   * @param[in] indices Indices of corresponding values to match triangles to their respective data.
+   * @param[in] useSoftNormals Indicates whether we should average the normals at each point to smooth the surface or not.
+   */
+  void CreateGeometryArray( Dali::Vector<Vertex> & vertices,
+                            Dali::Vector<Vector2> & textures,
+                            Dali::Vector<VertexExt> & verticesExt,
+                            Dali::Vector<unsigned short> & indices,
+                            bool useSoftNormals );
 
 };
 
@@ -165,4 +207,4 @@ private:
 
 
 
-#endif // __DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H__
+#endif // DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H
