@@ -237,7 +237,6 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
@@ -246,7 +245,6 @@ public: // Not intended for application developers
   DALI_INTERNAL Alignment( Internal::Alignment& implementation );
 
   /**
-   * @internal
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
