@@ -100,28 +100,21 @@ int UtcDaliSliderDownCast(void)
   END_TEST;
 }
 
-static bool gSliderValueChangedCallBackCalled=false;
+static bool gSliderValueChangedCallBackCalled;
 static bool OnSliderValueChanged( Slider slider, float value )
 {
   gSliderValueChangedCallBackCalled = true;
   return true;
 }
 
-static bool gSliderMarkCallBackCalled=false;
+static bool gSliderMarkCallBackCalled;
 static bool OnSliderMark( Slider slider, int value )
 {
   gSliderMarkCallBackCalled = true;
   return true;
 }
 
-static bool gSliderSlidingFinishedCallBackCalled=false;
-static bool OnSlidingFinished( Slider slider, float value )
-{
-  gSliderSlidingFinishedCallBackCalled = true;
-  return true;
-}
-
-int UtcDaliSliderSignals1(void)
+int UtcDaliSliderSignals(void)
 {
   ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
   tet_infoline(" UtcDaliSliderSignals");
@@ -147,55 +140,42 @@ int UtcDaliSliderSignals1(void)
 
   slider.ValueChangedSignal().Connect( &OnSliderValueChanged );
   slider.MarkReachedSignal().Connect( &OnSliderMark );
-  slider.SlidingFinishedSignal().Connect( &OnSlidingFinished );
 
   application.SendNotification();
   application.Render();
 
   gSliderValueChangedCallBackCalled = false;
   gSliderMarkCallBackCalled = false;
-  gSliderSlidingFinishedCallBackCalled = false;
 
-  {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point pointDown;
-    pointDown.SetState( PointState::DOWN );
-    pointDown.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-    event.AddPoint( pointDown );
+  Dali::Integration::TouchEvent event;
 
-    application.ProcessEvent( event );
-    application.SendNotification();
-    application.Render();
-  }
+  event = Dali::Integration::TouchEvent();
+
+  Integration::Point pointDown;
+  pointDown.SetState( PointState::DOWN );
+  pointDown.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  event.AddPoint( pointDown );
 
   for( int i = 0; i < 5; ++i )
   {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
     Integration::Point pointMotion;
     pointMotion.SetState( PointState::MOTION );
     pointMotion.SetScreenPosition( Vector2( 10.0f + i * 10.0f, 10.0f ) );
     event.AddPoint( pointMotion );
-
-    application.ProcessEvent( event );
-    application.SendNotification();
-    application.Render();
   }
 
-  {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point pointUp;
-    pointUp.SetState( PointState::UP );
-    pointUp.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
-    event.AddPoint( pointUp );
+  Integration::Point pointUp;
+  pointUp.SetState( PointState::UP );
+  pointUp.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  event.AddPoint( pointUp );
 
-    application.ProcessEvent( event );
-    application.SendNotification();
-    application.Render();
-  }
+  application.ProcessEvent( event );
+
+  application.SendNotification();
+  application.Render();
 
   DALI_TEST_CHECK(gSliderValueChangedCallBackCalled);
   DALI_TEST_CHECK(gSliderMarkCallBackCalled);
-  DALI_TEST_CHECK(gSliderSlidingFinishedCallBackCalled);
   END_TEST;
 }
 

@@ -138,7 +138,9 @@ else
             ret=$?
             if [ $ret -ne 6 ] ; then
                 if [ $opt_debug -ne 0 ] ; then
-                    gdb --args build/src/$mod/tct-$mod-core $1
+                    if [ $ret -eq 0 ] ; then
+                        gdb --args build/src/$mod/tct-$mod-core $1
+                    fi
                 else
                     echo $output
                     if [ $ret -eq 0 ] ; then echo -e "\nPassed" ; fi

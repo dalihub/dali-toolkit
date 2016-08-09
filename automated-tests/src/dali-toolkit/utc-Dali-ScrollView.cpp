@@ -44,24 +44,10 @@ static void TestCallback(BaseHandle handle)
   gObjectCreatedCallBackCalled = true;
 }
 
-struct CallbackFunctor
-{
-  CallbackFunctor(bool* callbackFlag)
-  : mCallbackFlag( callbackFlag )
-  {
-  }
-
-  void operator()()
-  {
-    *mCallbackFlag = true;
-  }
-  bool* mCallbackFlag;
-};
 
 const int MILLISECONDS_PER_SECOND = 1000;
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
 const int RENDER_ANIMATION_TEST_DURATION_MS = 1000;             ///< 1000ms to test animation
-
 const int RENDER_DELAY_SCROLL = 1000;                           ///< duration to wait for any scroll to complete.
 
 // For Clamp Signal testing...
@@ -325,10 +311,10 @@ int UtcDaliScrollViewDestructorP(void)
   END_TEST;
 }
 
-int UtcDaliToolkitScrollViewNewP1(void)
+int UtcDaliToolkitScrollViewNewP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitScrollViewNewP1");
+  tet_infoline(" UtcDaliToolkitScrollViewNewP");
 
   ScrollView scrollView;
 
@@ -352,25 +338,6 @@ int UtcDaliToolkitScrollViewNewP1(void)
     ScrollView scrollView = ScrollView::New();
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
-  END_TEST;
-}
-
-int UtcDaliToolkitScrollViewNewP2(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitScrollViewNewP2 - create thru type registry");
-
-  ScrollView scrollView;
-  DALI_TEST_CHECK( !scrollView );
-
-  TypeRegistry typeRegistry = TypeRegistry::Get();
-  TypeInfo scrollViewType = typeRegistry.GetTypeInfo("ScrollView");
-  BaseHandle handle = scrollViewType.CreateInstance();
-  DALI_TEST_CHECK( handle );
-
-  scrollView = ScrollView::DownCast(handle);
-  DALI_TEST_CHECK( scrollView );
-
   END_TEST;
 }
 
@@ -426,9 +393,6 @@ int UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP(void)
   scrollView.SetRulerY( rulerY );
 
   scrollView.SetWrapMode(true);
-
-  Property::Value wrapMode = scrollView.GetProperty( Toolkit::ScrollView::Property::WRAP_ENABLED );
-  DALI_TEST_EQUALS( wrapMode.Get<bool>(), true, TEST_LOCATION );
 
   const Vector2 target = Vector2(50.0f, 50.0f);
   const Vector2 target2 = Vector2(150.0f, 150.0f);
@@ -821,7 +785,7 @@ int UtcDaliToolkitScrollViewSignalsStartComplete(void)
   END_TEST;
 }
 
-int UtcDaliToolkitScrollViewSignalsUpdate01(void)
+int UtcDaliToolkitScrollViewSignalsUpdate(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewSignalsUpdate");
@@ -878,73 +842,6 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
   DALI_TEST_CHECK(gOnScrollStartCalled);
   DALI_TEST_CHECK(gOnScrollUpdateCalled);
   DALI_TEST_CHECK(gOnScrollCompleteCalled);
-  END_TEST;
-}
-
-int UtcDaliToolkitScrollViewSignalsUpdate02(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitScrollViewSignalsUpdate");
-
-  gOnScrollStartCalled = false;
-  gOnScrollUpdateCalled = false;
-  gOnScrollCompleteCalled = false;
-
-  ScrollView scrollView = ScrollView::New();
-  Stage::GetCurrent().Add( scrollView );
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
-  scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-
-  // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
-  rulerX->SetDomain( RulerDomain(0.0f, 1000.0f, false) );
-  rulerY->SetDomain( RulerDomain(0.0f, 1000.0f, false) );
-  scrollView.SetRulerX(rulerX);
-  scrollView.SetRulerY(rulerY);
-  Dali::ConnectionTracker tracker;
-  bool scrollStarted=false;
-  bool scrollUpdated=false;
-  bool scrollCompleted=false;
-  DALI_TEST_CHECK(scrollView.ConnectSignal( &tracker, "scrollStarted", CallbackFunctor(&scrollStarted) ));
-  DALI_TEST_CHECK(scrollView.ConnectSignal( &tracker, "scrollUpdated", CallbackFunctor(&scrollUpdated) ));
-  DALI_TEST_CHECK(scrollView.ConnectSignal( &tracker, "scrollCompleted", CallbackFunctor(&scrollCompleted) ));
-
-  Actor image = Actor::New();
-  image.SetSize(stageSize);
-  image.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  image.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  scrollView.Add(image);
-
-  Wait(application);
-
-  // Do a pan starting from 100,100 and moving down diagonally.
-  Vector2 pos(100.0f, 100.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
-  pos.x += 5.0f;
-  pos.y += 5.0f;
-  Wait(application, 100);
-
-  for(int i = 0;i<20;i++)
-  {
-    SendPan(application, Gesture::Continuing, pos);
-    pos.x += 5.0f;
-    pos.y += 5.0f;
-    Wait(application);
-  }
-
-  SendPan(application, Gesture::Finished, pos);
-  Wait(application, RENDER_DELAY_SCROLL);
-
-  DALI_TEST_CHECK(scrollStarted);
-  DALI_TEST_CHECK(scrollUpdated);
-  DALI_TEST_CHECK(scrollCompleted);
-
-  Stage::GetCurrent().Remove( scrollView );
-
   END_TEST;
 }
 
@@ -2387,9 +2284,6 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
   scrollView.ScrollTo( target2 );
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
-
-  scrollView.Remove(a);
-  Wait(application);
 
   END_TEST;
 }

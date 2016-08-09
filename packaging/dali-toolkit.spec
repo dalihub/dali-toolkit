@@ -82,11 +82,6 @@ PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
 
-%if 0%{?enable_coverage}
-CXXFLAGS+=" --coverage "
-LDFLAGS+=" --coverage "
-%endif
-
 libtoolize --force
 cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 autoreconf --install

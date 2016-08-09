@@ -216,6 +216,11 @@ public:
   void ReplaceItems(const ItemContainer& replacementItems, float durationSeconds);
 
   /**
+   * @copydoc Toolkit::Scrollable::GetDomainSize
+   */
+  Vector2 GetDomainSize() const;
+
+  /**
    * @copydoc Toolkit::Scrollable::GetCurrentScrollPosition
    */
   Vector2 GetCurrentScrollPosition() const;

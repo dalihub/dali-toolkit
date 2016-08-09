@@ -247,6 +247,21 @@ const char* NRMMAP_FRAGMENT_SHADER = MAKE_SHADER(
 
 using namespace Dali;
 
+void LookAt(Matrix& result, const Vector3& eye, const Vector3& target, const Vector3& up)
+{
+  Vector3 vZ = target - eye;
+  vZ.Normalize();
+
+  Vector3 vX = up.Cross(vZ);
+  vX.Normalize();
+
+  Vector3 vY = vZ.Cross(vX);
+  vY.Normalize();
+
+  result.SetInverseTransformComponents(vX, vY, vZ, eye);
+}
+
+
 Model3dView::Model3dView()
   : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
 {

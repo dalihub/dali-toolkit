@@ -320,3 +320,4 @@ int UtcDaliScrollViewPagePathEffectTest(void)
   CleanupTest();
   END_TEST;
 }
+
