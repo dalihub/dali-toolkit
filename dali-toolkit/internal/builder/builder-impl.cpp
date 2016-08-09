@@ -1014,13 +1014,10 @@ bool Builder::ConvertChildValue( const TreeNode& mappingRoot, KeyStack& keyStack
     case Property::MAP:
     {
       Property::Map* map = child.GetMap();
-      if( map )
+      for( Property::Map::SizeType i=0; i < map->Count(); ++i )
       {
-        for( Property::Map::SizeType i=0; i < map->Count(); ++i )
-        {
-          Property::Value& child = map->GetValue(i);
-          ConvertChildValue(mappingRoot, keyStack, child);
-        }
+        Property::Value& child = map->GetValue(i);
+        ConvertChildValue(mappingRoot, keyStack, child);
       }
       break;
     }
@@ -1028,13 +1025,10 @@ bool Builder::ConvertChildValue( const TreeNode& mappingRoot, KeyStack& keyStack
     case Property::ARRAY:
     {
       Property::Array* array = child.GetArray();
-      if( array )
+      for( Property::Array::SizeType i=0; i < array->Count(); ++i )
       {
-        for( Property::Array::SizeType i=0; i < array->Count(); ++i )
-        {
-          Property::Value& child = array->GetElementAt(i);
-          ConvertChildValue(mappingRoot, keyStack, child);
-        }
+        Property::Value& child = array->GetElementAt(i);
+        ConvertChildValue(mappingRoot, keyStack, child);
       }
       break;
     }
