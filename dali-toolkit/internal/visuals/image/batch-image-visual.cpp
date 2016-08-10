@@ -88,9 +88,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 } //unnamed namespace
 
-BatchImageVisual::BatchImageVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
+BatchImageVisual::BatchImageVisual( VisualFactoryCache& factoryCache )
   : Visual::Base( factoryCache ),
-    mAtlasManager( atlasManager ),
     mDesiredSize()
 {
 }
@@ -191,7 +190,7 @@ void BatchImageVisual::InitializeRenderer( const std::string& imageUrl )
   {
     if( !mImpl->mRenderer )
     {
-      TextureSet textureSet = mAtlasManager.Add(
+      TextureSet textureSet = mFactoryCache.GetAtlasManager()->Add(
             mAtlasRect,
             imageUrl,
             mDesiredSize );
@@ -281,7 +280,7 @@ void BatchImageVisual::CleanCache(const std::string& url)
   mImpl->mRenderer.Reset();
   if( mFactoryCache.CleanRendererCache( url ) )
   {
-    mAtlasManager.Remove( textureSet, mAtlasRect );
+    mFactoryCache.GetAtlasManager()->Remove( textureSet, mAtlasRect );
   }
 }
 

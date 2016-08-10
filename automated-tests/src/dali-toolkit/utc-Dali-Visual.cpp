@@ -512,6 +512,9 @@ int UtcDaliVisualGetPropertyMap5(void)
   propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
   propertyMap.Insert( ImageVisual::Property::FITTING_MODE,   FittingMode::FIT_HEIGHT );
   propertyMap.Insert( ImageVisual::Property::SAMPLING_MODE,   SamplingMode::BOX_THEN_NEAREST );
+  propertyMap.Insert( ImageVisual::Property::PIXEL_AREA, Vector4( 0.25f, 0.25f, 0.5f, 0.5f ) );
+  propertyMap.Insert( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT );
+  propertyMap.Insert( ImageVisual::Property::WRAP_MODE_V, WrapMode::MIRRORED_REPEAT );
   propertyMap.Insert( "synchronousLoading",   true );
 
   Visual::Base imageVisual = factory.CreateVisual(propertyMap);
@@ -545,6 +548,18 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 30 );
 
+  value = resultMap.Find( ImageVisual::Property::PIXEL_AREA, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4( 0.25f, 0.25f, 0.5f, 0.5f ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( ImageVisual::Property::WRAP_MODE_U, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK(  value->Get<int>() == WrapMode::REPEAT);
+
+  value = resultMap.Find( ImageVisual::Property::WRAP_MODE_V, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK(  value->Get<int>() == WrapMode::MIRRORED_REPEAT);
+
   value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == true );
@@ -577,6 +592,18 @@ int UtcDaliVisualGetPropertyMap5(void)
   value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT,   Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 200 );
+
+  value = resultMap.Find( ImageVisual::Property::PIXEL_AREA, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4( 0.f, 0.f, 1.f, 1.f ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( ImageVisual::Property::WRAP_MODE_U, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK(  value->Get<int>() == WrapMode::DEFAULT);
+
+  value = resultMap.Find( ImageVisual::Property::WRAP_MODE_V, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK(  value->Get<int>() == WrapMode::DEFAULT);
 
   value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
   DALI_TEST_CHECK( value );

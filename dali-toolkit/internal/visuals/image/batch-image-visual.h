@@ -40,9 +40,8 @@ public:
    * @brief Constructor.
    *
    * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] atlasManager The atlasManager object
    */
-  BatchImageVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager );
+  BatchImageVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -110,7 +109,6 @@ private:
 
 private:
 
-  ImageAtlasManager&      mAtlasManager;
   Vector4                 mAtlasRect;
   std::string             mImageUrl;
   Dali::ImageDimensions   mDesiredSize;
