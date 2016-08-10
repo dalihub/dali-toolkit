@@ -182,6 +182,7 @@ public: //Signal
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_1.4
@@ -195,6 +196,7 @@ public: // Not intended for application developers
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL PageTurnView(Dali::Internal::CustomActor* internal);
+  /// @endcond
 };
 
 } // namespace Toolkit

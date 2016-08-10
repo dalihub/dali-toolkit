@@ -251,6 +251,7 @@ public:
    */
   bool IsKeyboardFocusGroup();
 
+  /// @cond internal
   /**
    * @brief Called by the AccessibilityManager to activate the Control.
    * @SINCE_1_0.0
@@ -262,6 +263,7 @@ public:
    * @SINCE_1_0.0
    */
   DALI_INTERNAL void KeyboardEnter();
+  /// @endcond
 
   // Signals
 
@@ -280,6 +282,7 @@ public:
    */
   Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusLostSignal();
 
+  /// @cond internal
   /**
    * @brief Called by the KeyInputFocusManager to emit key event signals.
    *
@@ -288,6 +291,7 @@ public:
    * @return True if the event was consumed.
    */
   DALI_INTERNAL bool EmitKeyEventSignal( const KeyEvent& event );
+  /// @endcond
 
 protected: // For derived classes to call
 
@@ -685,12 +689,14 @@ public: // API for derived classes to override
 
 private:
 
+  /// @cond internal
   // Undefined
   DALI_INTERNAL Control( const Control& );
   DALI_INTERNAL Control& operator=( const Control& );
 
   class Impl;
   Impl* mImpl;
+  /// @endcond
 
 };
 

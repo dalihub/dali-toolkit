@@ -172,6 +172,7 @@ public: // Signals
 
 public:
 
+  /// @cond internal
   /**
    * @brief Allows the creation of a StyleManager handle from an internal pointer.
    *
@@ -180,6 +181,7 @@ public:
    * @param[in] impl A pointer to the object.
    */
   explicit DALI_INTERNAL StyleManager( Internal::StyleManager *impl );
+  /// @endcond
 
 }; // class StyleManager
 
