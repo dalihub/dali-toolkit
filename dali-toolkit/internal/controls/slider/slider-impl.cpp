@@ -317,9 +317,9 @@ Slider::Domain Slider::CalcDomain( const Vector2& currentSize )
 
 void Slider::DisplayValue( float value, bool raiseSignals )
 {
-  float clampledValue = Clamp( value, GetLowerBound(), GetUpperBound() );
+  float clampedValue = Clamp( value, GetLowerBound(), GetUpperBound() );
 
-  float percent = MapValuePercentage( clampledValue );
+  float percent = MapValuePercentage( clampedValue );
 
   float x = mDomain.from.x + percent * ( mDomain.to.x - mDomain.from.x );
 
@@ -335,7 +335,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   if( raiseSignals )
   {
     Toolkit::Slider self = Toolkit::Slider::DownCast( Self() );
-    mValueChangedSignal.Emit( self, clampledValue );
+    mValueChangedSignal.Emit( self, clampedValue );
 
     int markIndex;
     if( MarkReached( percent, markIndex ) )
@@ -348,9 +348,13 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   {
     std::stringstream ss;
     ss.precision( GetValuePrecision() );
-    ss << std::fixed << clampledValue;
+    ss << std::fixed << clampedValue;
 
-    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
+    std::string label = mHandleValueTextLabel.GetProperty<std::string>( Toolkit::TextLabel::Property::TEXT );
+    if( label.compare(ss.str()) )
+    {
+      mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
+    }
   }
 }
 
