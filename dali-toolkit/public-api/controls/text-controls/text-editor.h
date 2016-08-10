@@ -173,6 +173,7 @@ public:
 public: // Not intended for application developers
 
   /**
+   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in] implementation The Control implementation.
@@ -180,6 +181,7 @@ public: // Not intended for application developers
   DALI_INTERNAL TextEditor( Internal::TextEditor& implementation );
 
   /**
+   * @internal
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.

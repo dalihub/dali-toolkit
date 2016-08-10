@@ -108,6 +108,7 @@ public:
 protected:
 
   /**
+   * @internal
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
    * @param [in] impl A pointer to a newly allocated Dali resource

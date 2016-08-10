@@ -299,6 +299,7 @@ public: // Signals
 public:
 
   /**
+   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
    * @param[in]  implementation  The UI Control implementation.
@@ -306,6 +307,7 @@ public:
   DALI_INTERNAL GaussianBlurView( Internal::GaussianBlurView& implementation );
 
   /**
+   * @internal
    * @brief Allows the creation of this UI Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.

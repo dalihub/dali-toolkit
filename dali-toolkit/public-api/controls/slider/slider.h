@@ -267,14 +267,18 @@ public:  // Signals
 public: // Not intended for application developers
 
   /**
+   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @SINCE_1_1.39
    * @param[in]  implementation  The Control implementation
    */
   DALI_INTERNAL Slider(Internal::Slider& implementation);
 
   /**
+   * @internal
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+
    * @SINCE_1_1.39
    * @param[in]  internal  A pointer to the internal CustomActor
    */
