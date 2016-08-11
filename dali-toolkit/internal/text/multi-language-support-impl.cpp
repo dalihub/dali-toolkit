@@ -67,25 +67,32 @@ FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient,
                                const TextAbstraction::FontDescription& description,
                                PointSize26Dot6 size ) const
 {
-  for( Vector<FontId>::ConstIterator it = mFonts.Begin(),
-         endIt = mFonts.End();
+  for( std::vector<CacheItem>::const_iterator it = mFonts.begin(),
+         endIt = mFonts.end();
        it != endIt;
        ++it )
   {
-    const FontId fontId = *it;
-    TextAbstraction::FontDescription fontDescription;
-    fontClient.GetDescription( fontId, fontDescription );
+    const CacheItem& item = *it;
 
-    if( ( size == fontClient.GetPointSize( fontId ) ) &&
-        ( description.weight == fontDescription.weight ) &&
-        ( description.width == fontDescription.width ) &&
-        ( description.slant == fontDescription.slant ) )
+    if( ( ( TextAbstraction::FontWeight::NONE == description.weight ) || ( description.weight == item.description.weight ) ) &&
+        ( ( TextAbstraction::FontWidth::NONE == description.width )   || ( description.width == item.description.width ) ) &&
+        ( ( TextAbstraction::FontSlant::NONE == description.slant )   || ( description.slant == item.description.slant ) ) &&
+        ( size == fontClient.GetPointSize( item.fontId ) ) &&
+        ( description.family.empty() || ( description.family == item.description.family ) ) )
     {
-      return fontId;
+      return item.fontId;
     }
   }
 
   return 0u;
+}
+
+void DefaultFonts::Cache( const TextAbstraction::FontDescription& description, FontId fontId )
+{
+  CacheItem item;
+  item.description = description;
+  item.fontId = fontId;
+  mFonts.push_back( item );
 }
 
 MultilanguageSupport::MultilanguageSupport()
@@ -654,7 +661,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                   *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
                 }
               }
-              defaultFontsPerScript->mFonts.PushBack( fontId );
+              defaultFontsPerScript->Cache( currentFontDescription, fontId );
             }
           } // !isValidFont (3)
         } // !isValidFont (2)
