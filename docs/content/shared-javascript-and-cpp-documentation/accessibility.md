@@ -11,7 +11,7 @@
 Accessibility describes functionality designed to aid usage by the visually impaired.
   
 This includes:
-- Reading out selections or other on-screen items via text-to-speach.
+- Reading out selections or other on-screen items via text-to-speech.
 - Item selection being controlled with gestures to aid selecting other small hard to select entities.
   
 
@@ -19,7 +19,7 @@ This includes:
 
 DALi will pick up the system's current accessibility state (and subsequent changes to it) and enable its internal accessibility mode based on this.
   
-DALi includes an Accessibility Manager which prodives public API control of the order of object selection by gesture, and text to be read out per actor or control.
+DALi includes an Accessibility Manager which provides public API control of the order of object selection by gesture, and text to be read out per actor or control.
   
 It further provides many signals that represent accessibility gestures. These gestures can range from a simple actor selection through to a more control-specific concept like "page-up", which an application developer may want to provide an implementation for.
   
@@ -35,17 +35,17 @@ The AccessibilityManager lives within DALi Toolkit. Please see accessibility-man
     ![ ](../assets/img/accessibility/accessibility-focus.png) ![ ](./accessibility-focus.png)
 </div>
 
-Visibily, when enabled, accessibility will typically show an actor (or actors) as focused. This is represented by default with yellow rectangular frame around the actor. See this section for [modifying the appearance of the accessibility focus](#accessibilityfocusappearance).
+Visibly, when enabled, accessibility will typically show an actor (or actors) as focused. This is represented by default with yellow rectangular frame around the actor. See this section for [modifying the appearance of the accessibility focus](#accessibilityfocusappearance).
   
 Once in accessibility mode, normal control is disabled and accessibility gestures must be used to access content.
 DALi actors and controls will no longer receive tap gestures or click events when they are touched once (as they normally would).
   
-Note: The accessibility focus is also refered to as the Focus Indicator.
+Note: The accessibility focus is also referred to as the Focus Indicator.
 
 
 ### Moving the focus with gestures {#accessibilitygestures}
 
-Accessibility recognises many gesture types to move the accessibility focus from actor to actor.
+Accessibility recognizes many gesture types to move the accessibility focus from actor to actor.
   
 Note:
   
@@ -68,7 +68,7 @@ Note: The gestures that perform these actions are platform specific. These are t
 Activation describes an operation performed on a selected actor, typically an on-tap or on-click event.
   
 Activating an actor in accessibility mode will call a virtual function, as well as signal, for that actor.
-Depending on the platform this can br triggered in different ways.
+Depending on the platform this can be triggered in different ways.
 When activated, the built in actor types (like PushButton) will do the equivalent of a tap.
   
 Custom-built actor types will need to implement activation in order to perform a specific behaviour. See the [Custom Controls](#accessibilitycustomcontrol) section.
@@ -128,7 +128,7 @@ accessibilityManager.SetCurrentFocusActor( table.GetChildAt( 0 ) );
 
 ### Modifying the appearance of the accessibility focus {#accessibilityfocusappearance}
 
-The focus graphic itself can be customised.
+The focus graphic itself can be customized.
 It can be an image (EG. A nine-patch border) or any other type of actor.
   
 It can be set using this method within C++:
@@ -185,7 +185,7 @@ accessibilityManager.SetGroupMode( true );
 
 Wrap mode allows the focus to wrap back to the beginning once the end is reached.
   
-In group mode this will move to the beggining of the current focus group.
+In group mode this will move to the beginning of the current focus group.
   
 ~~~{.cpp}
 AccessibilityManager accessibilityManager = AccessibilityManager::Get();
@@ -202,7 +202,7 @@ accessibilityManager.SetWrapMode( true );
 This example sets up a 3 by 3 grid of actors with the following accessibility functionality:
   
   - They have a focus order that moves from top left to bottom right (when using the accessibility next and previous gestures).
-  - They contain text that will be spoken out loud (via text-to-speach) when the focus changes.
+  - They contain text that will be spoken out loud (via text-to-speech) when the focus changes.
   
 Note that all the above is set via the AccessibilityManager and not as properties within the actors.
   
@@ -226,7 +226,7 @@ for( int row = 0; row < 3; ++row )
     // Set the focus order of this actor.
     accessibilityManager.SetFocusOrder( tile, tileNumber );
 
-    // Set up the accessibility information for this actor (this will be read out with text-to-speach).
+    // Set up the accessibility information for this actor (this will be read out with text-to-speech).
     accessibilityManager.SetAccessibilityAttribute( tile, Dali::Toolkit::AccessibilityManager::ACCESSIBILITY_LABEL, tileNames[tileNumber] );
     accessibilityManager.SetAccessibilityAttribute( tile, Dali::Toolkit::AccessibilityManager::ACCESSIBILITY_TRAIT, "Tile" );
     accessibilityManager.SetAccessibilityAttribute( tile, Dali::Toolkit::AccessibilityManager::ACCESSIBILITY_HINT, "You can run this example");
@@ -247,10 +247,10 @@ Accessibility behaviour can be customized in a custom UI control by overriding a
 | Method                     | Description                                                                                                                                                                |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | OnAccessibilityActivated   | When the control is *activated* or selected, in accessibility mode.                                                                                                        |
-| OnAccessibilityPan         | When an accessibility pan gesture occurs while this control is focussed.                                                                                                   |
+| OnAccessibilityPan         | When an accessibility pan gesture occurs while this control is focused.                                                                                                   |
 | OnAccessibilityTouch       | Touch events are delivered differently in Accessibility mode. This method should be overridden if some special behaviour is required when these touch events are received. |
-| OnAccessibilityValueChange | When a value is changed while this control is focussed (e.g. value change of a slider control).                                                                            |
-| OnAccessibilityZoom        | Should be overridden if behaviour is required when the magnification level changes when this control is focussed.                                                          |
+| OnAccessibilityValueChange | When a value is changed while this control is focused (e.g. value change of a slider control).                                                                            |
+| OnAccessibilityZoom        | Should be overridden if behaviour is required when the magnification level changes when this control is focused.                                                          |
  
 If these events are consumed, then the method should return true.
 The default behaviour in the control base classes returns false, i.e. not consumed.
@@ -259,7 +259,7 @@ The default behaviour in the control base classes returns false, i.e. not consum
 
 For more specific control of functionality when accessibility is enabled, there are several signals within the accessibility manager's public API that can be connected to.
   
-The main catagories of signals are:
+The main categories of signals are:
   
 - The signal when the accessibility status is detected as being toggled on or off: StatusChangedSignal()
 - Focus changes can cause FocusChangedSignal() and FocusOvershotSignal(). These can be connected to in order to provide custom actions when the focus is moved around the screen.

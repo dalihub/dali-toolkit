@@ -7,7 +7,7 @@ Visuals provide reusable rendering logic which can be used by all controls.
 This means that custom controls do not have to create actors, they can just reuse the existing visuals which increases performance.
  
 Visuals reuse geometry, shaders etc. across controls and manages the renderer and material to exist only when the control is on-stage.
-Additionaly, they respond to actor size and color change, while also providing clipping at the renderer level.
+Additionally, they respond to actor size and color change, while also providing clipping at the renderer level.
  
 DALi provides the following visuals:
  + [Color](@ref color-visual)

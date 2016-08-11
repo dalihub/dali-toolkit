@@ -12,7 +12,7 @@
  * The Image View is constructed by passing a Dali::Image object or by a url path.<br>
  *
  * <h3 class="pg">Loading from a url path</h3>
- * Image View will load a file from a given url path. Using a url path is the prefered way of displaying an image as the Dali engine can do optimsations to
+ * Image View will load a file from a given url path. Using a url path is the prefered way of displaying an image as the DALi engine can do optimisations to
  * reuse shaders and perform automatic image atlassing.<br>
  * This can be a path to a image file:
  * @code

@@ -342,14 +342,14 @@ item1.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::ALIGN_SELF, Dali
 flexContainer.Add( item1 );
 
 Dali::Toolkit::Control item2 = Dali::Toolkit::Control::New();
-flexContainer.Add( item2 ); // item2 is aligned at the beginning of ther container
+flexContainer.Add( item2 ); // item2 is aligned at the beginning of the container
 
 Dali::Toolkit::Control item3 = Dali::Toolkit::Control::New();
 item3.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::ALIGN_SELF, Dali::Toolkit::FlexContainer::ALIGN_FLEX_END ); // Align item3 at the bottom of the container
 flexContainer.Add( item3 );
 
 Dali::Toolkit::Control item4 = Dali::Toolkit::Control::New();
-flexContainer.Add( item4 ); // item4 is aligned at the beginning of ther container
+flexContainer.Add( item4 ); // item4 is aligned at the beginning of the container
 
 ~~~
 
@@ -371,14 +371,14 @@ item1.alignSelf = "center"; // Align item1 at the center of the container
 flexContainer.add(item1);
 
 var item2 = new dali.Control();
-flexContainer.add(item2); // item2 is aligned at the beginning of ther container
+flexContainer.add(item2); // item2 is aligned at the beginning of the container
 
 var item3 = new dali.Control();
 item1.alignSelf = "flexEnd"; // Align item3 at the bottom of the container
 flexContainer.add(item3);
 
 var item4 = new dali.Control();
-flexContainer.add(item4); // item4 is aligned at the beginning of ther container
+flexContainer.add(item4); // item4 is aligned at the beginning of the container
 
 ~~~
 ___________________________________________________________________________________________________
