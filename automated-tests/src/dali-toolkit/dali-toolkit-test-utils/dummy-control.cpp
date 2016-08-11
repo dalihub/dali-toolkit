@@ -85,6 +85,16 @@ void DummyControlImpl::UnregisterVisual( Property::Index index )
   Control::UnregisterVisual( index );
 }
 
+Toolkit::Visual::Base DummyControlImpl::GetVisual( Property::Index index )
+{
+  return Control::GetVisual( index );
+}
+
+Actor DummyControlImpl::GetPlacementActor( Property::Index index )
+{
+  return Control::GetPlacementActor( index );
+}
+
 DummyControl DummyControlImplOverride::New()
 {
   IntrusivePtr< DummyControlImplOverride > impl = new DummyControlImplOverride;

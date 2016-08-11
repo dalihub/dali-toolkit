@@ -316,6 +316,28 @@ protected: // For derived classes to call
     */
    void UnregisterVisual( Property::Index index );
 
+   /**
+    * @brief Retrieve the visual associated with the given property index.
+    *
+    * @SINCE_1_2.2
+    *
+    * @param[in] index The Property index of the visual.
+    * @return The registered visual if exist, otherwise empty handle.
+    * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
+    */
+   Toolkit::Visual::Base GetVisual( Property::Index index );
+
+   /**
+    * @brief Retrieve the placement actor associated with the given index.
+    *
+    * @SINCE_1_2.2
+    *
+    * @@param[in] index The Property index of the visual.
+    * @return Then placement actor if exist, otherwise empty handle.
+    * @note For managing object life-cycle, do not store the returned placement actor as a member which increments its reference count.
+    */
+   Actor GetPlacementActor( Property::Index index );
+
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
    *

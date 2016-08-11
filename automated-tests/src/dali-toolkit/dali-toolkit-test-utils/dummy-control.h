@@ -73,6 +73,8 @@ public:
 
   void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual);
   void UnregisterVisual( Property::Index index );
+  Toolkit::Visual::Base GetVisual( Property::Index index );
+  Actor GetPlacementActor( Property::Index index );
 
   // Used to test signal connections
   void CustomSlot1( Actor actor );

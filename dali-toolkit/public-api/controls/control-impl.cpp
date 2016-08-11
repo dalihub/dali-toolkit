@@ -691,6 +691,35 @@ void Control::UnregisterVisual( Property::Index index )
    }
 }
 
+Toolkit::Visual::Base Control::GetVisual( Property::Index index )
+{
+  std::vector< RegisteredVisual >::iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    return (*iter).visual;
+  }
+
+  return Toolkit::Visual::Base();
+}
+
+Actor Control::GetPlacementActor( Property::Index index )
+{
+  std::vector< RegisteredVisual >::iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    if( (*iter).placementActor )
+    {
+      return (*iter).placementActor;
+    }
+    else
+    {
+      return Self();
+    }
+  }
+
+  return Actor();
+}
+
 bool Control::OnAccessibilityActivated()
 {
   return false; // Accessibility activation is not handled by default
