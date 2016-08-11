@@ -14,7 +14,7 @@ DALi has:
 - JavaScript to support:
  - Rapid Application Development
  - Hybrid C++/JavaScript applications
- - Leaverage third party JavaScript modules (backbone.js etc)
+ - Leverage third party JavaScript modules (backbone.js etc)
 
 JSON support is built in to DALi.
 

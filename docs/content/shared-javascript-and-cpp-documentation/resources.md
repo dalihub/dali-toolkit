@@ -1,6 +1,6 @@
 <!--
 /**-->
-# Resources {#resoources}
+# Resources {#resources}
 
 ## Resource Image {#resource-image}
 
@@ -16,7 +16,7 @@ Resources are loaded in separate threads.
 The application can connect to the Dali::ResourceImage::LoadingFinishedSignal() to get notified when the image has loaded.
 
 By default, resource images start loading immediately and the data is released only when the ResourceImage handle is destroyed.
-To optimise an application's memory footprint, the application can ask resources to be only loaded when actually required and
+To optimize an application's memory footprint, the application can ask resources to be only loaded when actually required and
 their data to be released automatically when they are no longer being used (not being used by Actors).
 ~~~{.cpp}
 Dali::ResourceImage image = Dali::ResourceImage::New( "/my-path/my-image.png", Dali::ResourceImage::ON_DEMAND, Dali::Image::UNUSED );

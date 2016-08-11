@@ -18,7 +18,7 @@ Each Dali::Object contains a single reference counted object which can be intiti
 This means that C++ new/delete operators do not have to be used (or paired) in the user code (RAII idiom).
 Of course there's no way of stopping users from allocating heap memory, but calls to the new operator can be minimised.
 
-<h2 class="pg">What does 'implicit smart-pointer semantics' mean in the case of Dali?</h2>
+<h2 class="pg">What does 'implicit smart-pointer semantics' mean in the case of DALi?</h2>
 
 Since DALi objects are just handles, they can be copied by value. When a DALi object is copied, both the copy and original will point to the same DALi resource.
 The internal DALi resources are reference counted; copying a DALi object will increase the reference count. A resource will not be deleted until all its Dali::Object handles are destroyed, or reset.
@@ -99,4 +99,3 @@ To sum up implicit pointer semantics, Objects can be:
 - returned from functions
 
 */
-

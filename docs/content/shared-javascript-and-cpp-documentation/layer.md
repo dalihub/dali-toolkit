@@ -166,7 +166,7 @@ Currently Layer::TREE_DEPTH_MULTIPLIER == 1000:
  +++-> Actor3   ( depth Index offset of 3000)
  +++-> Actor4   ( depth Index offset of 3000)
  +++-> Actor5   ( depth Index offset of 3000)
- +++-> Layer1   ( depth Index has no meaning for layers, layer draw order is independent of the heirachy).
+ +++-> Layer1   ( depth Index has no meaning for layers, layer draw order is independent of the hierarchy).
  ++++-> Actor6   ( depth Index offset of 4000)
  ++++-> Actor7   ( depth Index offset of 4000)
  ++++-> Actor8   ( depth Index offset of 4000)
@@ -266,7 +266,7 @@ myActor3.add( myActor5);  // the depth index of actor 4 and 5 renderers will det
 
 ### Layer Actor Specific Properties
 
-| Name                   |    Type    | Writeable     | Animatable|
+| Name                   |    Type    | Writable     | Animatable|
 |------------------------|------------|--------------|-----------|
 | clippingEnable         |BOOLEAN     | 0     |  X |
 | clippingBox            | ARRAY [0,0,400,600]) | 0 | X|

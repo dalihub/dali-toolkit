@@ -15,7 +15,7 @@ Dali::Animation animation = Animation::New( 3.0f );
 
 ### Animating Properties
 
-There are two distint ways in which properties can be animated within DALi:
+There are two distinct ways in which properties can be animated within DALi:
 - **AnimateTo:** The property will animate **TO** the value in the given time.
 - **AnimateBy:** The property will animate **BY** the value in the given time.
 
