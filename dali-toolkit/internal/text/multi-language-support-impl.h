@@ -77,6 +77,12 @@ struct ValidateFontsPerScript
  */
 struct DefaultFonts
 {
+  struct CacheItem
+  {
+    TextAbstraction::FontDescription description;
+    FontId fontId ;
+  };
+
   /**
    * Default constructor.
    */
@@ -103,7 +109,9 @@ struct DefaultFonts
                    const TextAbstraction::FontDescription& description,
                    PointSize26Dot6 size ) const;
 
-  Vector<FontId> mFonts;
+  void Cache( const TextAbstraction::FontDescription& description, FontId fontId );
+
+  std::vector<CacheItem> mFonts;
 };
 
 /**
