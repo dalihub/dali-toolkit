@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 
 AccessibilityManager::AccessibilityManager()
 : mCurrentFocusActor(FocusIDPair(0, 0)),
-  mFocusIndicatorActor(Actor()),
+  mFocusIndicatorActor(),
   mRecursiveFocusMoveCounter(0),
   mIsWrapped(false),
   mIsFocusWithinGroup(false),
@@ -127,8 +127,6 @@ AccessibilityManager::~AccessibilityManager()
 
 void AccessibilityManager::Initialise()
 {
-  CreateDefaultFocusIndicatorActor();
-
   AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
   adaptor.SetActionHandler(*this);
   adaptor.SetGestureHandler(*this);
@@ -341,9 +339,9 @@ bool AccessibilityManager::DoSetCurrentFocusActor(const unsigned int actorID)
     if(actorVisible && actorFocusable && actorOpaque)
     {
       // Draw the focus indicator upon the focused actor
-      if(mIsFocusIndicatorEnabled && mFocusIndicatorActor)
+      if( mIsFocusIndicatorEnabled )
       {
-        actor.Add(mFocusIndicatorActor);
+        actor.Add( GetFocusIndicatorActor() );
       }
 
       // Send notification for the change of focus actor
@@ -479,9 +477,9 @@ void AccessibilityManager::DoActivate(Actor actor)
 void AccessibilityManager::ClearFocus()
 {
   Actor actor = GetCurrentFocusActor();
-  if(actor)
+  if( actor && mFocusIndicatorActor )
   {
-    actor.Remove(mFocusIndicatorActor);
+    actor.Remove( mFocusIndicatorActor );
   }
 
   mCurrentFocusActor = FocusIDPair(0, 0);
@@ -569,11 +567,40 @@ bool AccessibilityManager::GetWrapMode() const
 
 void AccessibilityManager::SetFocusIndicatorActor(Actor indicator)
 {
-  mFocusIndicatorActor = indicator;
+  if( mFocusIndicatorActor != indicator )
+  {
+    Actor currentFocusActor = GetCurrentFocusActor();
+    if( currentFocusActor )
+    {
+      // The new focus indicator should be added to the current focused actor immediately
+      if( mFocusIndicatorActor )
+      {
+        currentFocusActor.Remove( mFocusIndicatorActor );
+      }
+
+      if( indicator )
+      {
+        currentFocusActor.Add( indicator );
+      }
+    }
+
+    mFocusIndicatorActor = indicator;
+  }
 }
 
 Actor AccessibilityManager::GetFocusIndicatorActor()
 {
+  if( ! mFocusIndicatorActor )
+  {
+    // Create the default if it hasn't been set and one that's shared by all the keyboard focusable actors
+    mFocusIndicatorActor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
+    mFocusIndicatorActor.SetParentOrigin( ParentOrigin::CENTER );
+    mFocusIndicatorActor.SetZ( 1.0f );
+
+    // Apply size constraint to the focus indicator
+    mFocusIndicatorActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  }
+
   return mFocusIndicatorActor;
 }
 
@@ -660,19 +687,6 @@ void AccessibilityManager::SetFocusable(Actor actor, bool focusable)
   }
 }
 
-void AccessibilityManager::CreateDefaultFocusIndicatorActor()
-{
-  // Create a focus indicator actor shared by all the focusable actors
-  Toolkit::ImageView focusIndicator = Toolkit::ImageView::New(FOCUS_BORDER_IMAGE_PATH);
-  focusIndicator.SetParentOrigin( ParentOrigin::CENTER );
-  focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
-
-  // Apply size constraint to the focus indicator
-  focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-  SetFocusIndicatorActor(focusIndicator);
-}
-
 bool AccessibilityManager::ChangeAccessibilityStatus()
 {
   AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
@@ -685,10 +699,7 @@ bool AccessibilityManager::ChangeAccessibilityStatus()
     Actor actor = GetCurrentFocusActor();
     if(actor)
     {
-      if(mFocusIndicatorActor)
-      {
-        actor.Add(mFocusIndicatorActor);
-      }
+      actor.Add( GetFocusIndicatorActor() );
     }
     mIsFocusIndicatorEnabled = true;
 
@@ -701,9 +712,9 @@ bool AccessibilityManager::ChangeAccessibilityStatus()
   {
     // Hide indicator when tts turned off
     Actor actor = GetCurrentFocusActor();
-    if(actor)
+    if( actor && mFocusIndicatorActor )
     {
-      actor.Remove(mFocusIndicatorActor);
+      actor.Remove( mFocusIndicatorActor );
     }
     mIsFocusIndicatorEnabled = false;
 

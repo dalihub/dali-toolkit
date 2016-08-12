@@ -57,6 +57,8 @@ const char * const IMAGE_FITTING_MODE( "fittingMode" );
 const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
+const char * const IMAGE_WRAP_MODE_U("wrapModeU");
+const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
 const char * const BATCHING_ENABLED( "batchingEnabled" );
 
@@ -80,7 +82,16 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, NO_FILTER )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::SamplingMode, DONT_CARE )
 DALI_ENUM_TO_STRING_TABLE_END( SAMPLING_MODE )
 
+// wrap modes
+DALI_ENUM_TO_STRING_TABLE_BEGIN( WRAP_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, DEFAULT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, CLAMP_TO_EDGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, REPEAT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, MIRRORED_REPEAT )
+DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
+
 const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
+const std::string WRAP_MODE_UNIFORM_NAME = "wrapMode";
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
@@ -90,7 +101,6 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
   \n
@@ -100,12 +110,12 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vertexPosition.xyz *= uSize;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
-    vTexCoord = mix( uAtlasRect.xy, uAtlasRect.zw, pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) ) );\n
+    vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
 );
 
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+const char* FRAGMENT_SHADER_NO_ATLAS = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
@@ -114,6 +124,42 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   {\n
     gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
   }\n
+);
+
+const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
+    varying mediump vec2 vTexCoord;\n
+    uniform sampler2D sTexture;\n
+    uniform mediump vec4 uAtlasRect;\n
+    uniform lowp vec4 uColor;\n
+    \n
+    void main()\n
+    {\n
+      mediump vec2 texCoord = mix( uAtlasRect.xy, uAtlasRect.zw, clamp( vTexCoord, 0.0, 1.0 ) );\n
+      gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
+    }\n
+);
+
+const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
+    varying mediump vec2 vTexCoord;\n
+    uniform sampler2D sTexture;\n
+    uniform mediump vec4 uAtlasRect;\n
+    // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
+    uniform lowp vec2 wrapMode;\n
+    uniform lowp vec4 uColor;\n
+    \n
+    mediump float wrapCoordinate( mediump float coordinate, lowp float wrap )\n
+    {\n
+      if( abs(wrap-2.0) < 0.5 )\n // REFLECT
+        return 1.0-abs(fract(coordinate*0.5)*2.0 - 1.0);\n
+      else \n// warp == 0 or 1
+        return mix( clamp( coordinate, 0.0, 1.0 ), fract( coordinate ), wrap);\n
+    }\n
+    void main()\n
+    {\n
+      mediump vec2 texCoord = mix( uAtlasRect.xy, uAtlasRect.zw,
+                              vec2( wrapCoordinate( vTexCoord.x, wrapMode.x ), wrapCoordinate( vTexCoord.y, wrapMode.y ) ) );\n
+      gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
+    }\n
 );
 
 Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridSize )
@@ -139,12 +185,14 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 } //unnamed namespace
 
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
+ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
-  mAtlasManager( atlasManager ),
+  mPixelArea( FULL_TEXTURE_RECT ),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
+  mWrapModeU( WrapMode::DEFAULT ),
+  mWrapModeV( WrapMode::DEFAULT ),
   mNativeFragmentShaderCode( ),
   mNativeImageFlag( false )
 {
@@ -191,6 +239,24 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
     if( desiredHeightValue )
     {
       desiredHeightValue->Get( desiredHeight );
+    }
+
+    Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
+    if( pixelAreaValue )
+    {
+      pixelAreaValue->Get( mPixelArea );
+    }
+
+    Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
+    if( wrapModeValueU )
+    {
+      Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, mWrapModeU );
+    }
+
+    Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
+    if( wrapModeValueV )
+    {
+      Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, mWrapModeV );
     }
 
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
@@ -245,11 +311,6 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
   }
 }
 
-void ImageVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-}
-
 void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
 {
   if(mImage)
@@ -275,15 +336,6 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
   naturalSize = Vector2::ZERO;
 }
 
-void ImageVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-}
-
-void ImageVisual::SetOffset( const Vector2& offset )
-{
-}
-
 Renderer ImageVisual::CreateRenderer() const
 {
   Geometry geometry;
@@ -300,23 +352,24 @@ Renderer ImageVisual::CreateRenderer() const
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
 
-    shader = GetImageShader(mFactoryCache);
+    shader = GetImageShader( mFactoryCache,
+                             mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
+                             mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE );
   }
   else
   {
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
     if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
     {
-      shader = GetImageShader(mFactoryCache);
+      shader = GetImageShader(mFactoryCache, false, true);
     }
     else
     {
       shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
-                             mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER : mImpl->mCustomShader->mFragmentShader,
+                             mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER_NO_ATLAS : mImpl->mCustomShader->mFragmentShader,
                              mImpl->mCustomShader->mHints );
       if( mImpl->mCustomShader->mVertexShader.empty() )
       {
-        shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
         shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       }
     }
@@ -337,7 +390,6 @@ Renderer ImageVisual::CreateNativeImageRenderer() const
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
 
     shader  = Shader::New( VERTEX_SHADER, mNativeFragmentShaderCode );
-    shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
     shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }
   else
@@ -348,7 +400,6 @@ Renderer ImageVisual::CreateNativeImageRenderer() const
                            mImpl->mCustomShader->mHints );
     if( mImpl->mCustomShader->mVertexShader.empty() )
     {
-      shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
     }
   }
@@ -356,7 +407,6 @@ Renderer ImageVisual::CreateNativeImageRenderer() const
   TextureSet textureSet = TextureSet::New();
   Renderer renderer = Renderer::New( geometry, shader );
   renderer.SetTextures( textureSet );
-
   return renderer;
 }
 
@@ -383,7 +433,7 @@ Image ImageVisual::LoadImage( const std::string& url, bool synchronousLoading )
     if( !mPixels )
     {
       // use broken image
-      return VisualFactory::GetBrokenVisualImage();
+      return VisualFactoryCache::GetBrokenVisualImage();
     }
     Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
     image.Upload( mPixels, 0, 0 );
@@ -407,13 +457,15 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
     {
       // use broken image
       textureSet = TextureSet::New();
-      TextureSetImage( textureSet, 0u, VisualFactory::GetBrokenVisualImage() );
+      TextureSetImage( textureSet, 0u, VisualFactoryCache::GetBrokenVisualImage() );
     }
     else
     {
-      textureSet = mAtlasManager.Add(textureRect, mPixels );
+      textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, mPixels );
+      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
       if( !textureSet ) // big image, no atlasing
       {
+        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
         Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
         image.Upload( mPixels, 0, 0 );
         textureSet = TextureSet::New();
@@ -423,14 +475,23 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
   }
   else
   {
-    textureSet = mAtlasManager.Add(textureRect, url, mDesiredSize, mFittingMode, mSamplingMode );
+    textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, mSamplingMode );
+    mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
     if( !textureSet ) // big image, no atlasing
     {
+      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
       ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
       resourceImage.LoadingFinishedSignal().Connect( this, &ImageVisual::OnImageLoaded );
       textureSet = TextureSet::New();
       TextureSetImage( textureSet, 0u, resourceImage );
     }
+  }
+
+  if( !(mImpl->mFlags & Impl::IS_ATLASING_APPLIED) )
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+    textureSet.SetSampler( 0u, sampler );
   }
 
   return textureSet;
@@ -450,28 +511,46 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
       ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // ignore remote images
       ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
   {
-    mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
-    if( !mImpl->mRenderer )
+    bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+    bool cacheable =  defaultWrapMode &&  mPixelArea == FULL_TEXTURE_RECT;
+
+    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
+    if( cacheable ) // fetch the renderer from cache if exist
+    {
+      mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
+      mImpl->mFlags |= Impl::IS_FROM_CACHE;
+    }
+
+    if( !mImpl->mRenderer ) // new renderer is needed
     {
       Vector4 atlasRect;
       TextureSet textureSet = CreateTextureSet(atlasRect, imageUrl, IsSynchronousResourceLoading() );
       Geometry geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-      Shader shader( GetImageShader(mFactoryCache) );
+      Shader shader( GetImageShader(mFactoryCache, mImpl->mFlags & Impl::IS_ATLASING_APPLIED, defaultWrapMode) );
       mImpl->mRenderer = Renderer::New( geometry, shader );
       mImpl->mRenderer.SetTextures( textureSet );
-      if( atlasRect != FULL_TEXTURE_RECT )
+
+      if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
       {
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
+        if( !defaultWrapMode ) // custom wrap mode, renderer is not cached.
+        {
+          Vector2 wrapMode(mWrapModeU-WrapMode::CLAMP_TO_EDGE, mWrapModeV-WrapMode::CLAMP_TO_EDGE);
+          wrapMode.Clamp( Vector2::ZERO, Vector2( 2.f, 2.f ) );
+          mImpl->mRenderer.RegisterProperty( WRAP_MODE_UNIFORM_NAME, wrapMode );
+        }
       }
-      mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
-    }
 
-    mImpl->mFlags |= Impl::IS_FROM_CACHE;
+      // save the renderer to cache only when default wrap mode and default pixel area is used
+      if( cacheable )
+      {
+        mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
+      }
+    }
   }
   else
   {
     // for custom shader or remote image, renderer is not cached and atlas is not applied
-
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     mImpl->mRenderer = CreateRenderer();
     Image image = LoadImage( imageUrl, IsSynchronousResourceLoading() );
@@ -502,6 +581,10 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     InitializeRenderer( mImage );
   }
 
+  if( mPixelArea != FULL_TEXTURE_RECT )
+  {
+    mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
+  }
 }
 
 void ImageVisual::DoSetOffStage( Actor& actor )
@@ -547,18 +630,46 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode );
   map.Insert( Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode );
+
+  map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
+  map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
+  map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 }
 
-Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache )
+Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )
 {
-  Shader shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER );
-  if( !shader )
+  Shader shader;
+  if( atlasing )
   {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
-    shader.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, FULL_TEXTURE_RECT );
-    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    if( defaultTextureWrapping )
+    {
+      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
+      if( !shader )
+      {
+        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+      }
+    }
+    else
+    {
+      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP );
+      if( !shader )
+      {
+        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP );
+        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader );
+      }
+    }
   }
+  else
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_NO_ATLAS );
+      factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
+    }
+  }
+  shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   return shader;
 }
 
@@ -698,6 +809,9 @@ void ImageVisual::ApplyImageToSampler( const Image& image )
       mImpl->mRenderer.SetTextures( textureSet );
     }
     TextureSetImage( textureSet, 0u, image );
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+    textureSet.SetSampler( 0u, sampler );
   }
 }
 
@@ -705,7 +819,7 @@ void ImageVisual::OnImageLoaded( ResourceImage image )
 {
   if( image.GetLoadingState() == Dali::ResourceLoadingFailed )
   {
-    Image brokenImage = VisualFactory::GetBrokenVisualImage();
+    Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
     if( mImpl->mRenderer )
     {
       ApplyImageToSampler( brokenImage );
@@ -728,7 +842,7 @@ void ImageVisual::CleanCache(const std::string& url)
   mImpl->mRenderer.Reset();
   if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
   {
-    mAtlasManager.Remove( textureSet, atlasRect );
+    mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
   }
 }
 
@@ -749,7 +863,7 @@ void ImageVisual::SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage )
   }
   else
   {
-    mNativeFragmentShaderCode += FRAGMENT_SHADER;
+    mNativeFragmentShaderCode += FRAGMENT_SHADER_NO_ATLAS;
   }
 
   if( customSamplerTypename )

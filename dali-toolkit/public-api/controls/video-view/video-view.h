@@ -209,6 +209,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
@@ -224,6 +225,7 @@ public: // Not intended for application developers
    * @param[in] internal A pointer to the internal CustomActor.
    */
   DALI_INTERNAL VideoView( Dali::Internal::CustomActor* internal );
+  /// @endcond
 
 };
 

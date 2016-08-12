@@ -961,7 +961,7 @@ int UtcDaliTextLayoutMultilineText02(void)
   // Set a known font description
   FontDescriptionRun fontDescriptionRun2;
   fontDescriptionRun2.characterRun.characterIndex = 17u;
-  fontDescriptionRun2.characterRun.numberOfCharacters = 11u;
+  fontDescriptionRun2.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun2.familyLength = fontFamily2.size();
   fontDescriptionRun2.familyName = new char[fontDescriptionRun2.familyLength];
   memcpy( fontDescriptionRun2.familyName, fontFamily2.c_str(), fontDescriptionRun2.familyLength );
@@ -971,12 +971,12 @@ int UtcDaliTextLayoutMultilineText02(void)
   fontDescriptionRun2.slantDefined = false;
   fontDescriptionRun2.sizeDefined = false;
 
-  const std::string fontFamily3( "TizenSansHebrew" );
+  const std::string fontFamily3( "TizenSans" );
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun3;
-  fontDescriptionRun3.characterRun.characterIndex = 28u;
-  fontDescriptionRun3.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun3.characterRun.characterIndex = 26u;
+  fontDescriptionRun3.characterRun.numberOfCharacters = 2u;
   fontDescriptionRun3.familyLength = fontFamily3.size();
   fontDescriptionRun3.familyName = new char[fontDescriptionRun3.familyLength];
   memcpy( fontDescriptionRun3.familyName, fontFamily3.c_str(), fontDescriptionRun3.familyLength );
@@ -986,12 +986,12 @@ int UtcDaliTextLayoutMultilineText02(void)
   fontDescriptionRun3.slantDefined = false;
   fontDescriptionRun3.sizeDefined = false;
 
-  const std::string fontFamily4( "TizenSans" );
+  const std::string fontFamily4( "TizenSansHebrew" );
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun4;
-  fontDescriptionRun4.characterRun.characterIndex = 38u;
-  fontDescriptionRun4.characterRun.numberOfCharacters = 17u;
+  fontDescriptionRun4.characterRun.characterIndex = 28u;
+  fontDescriptionRun4.characterRun.numberOfCharacters = 10u;
   fontDescriptionRun4.familyLength = fontFamily4.size();
   fontDescriptionRun4.familyName = new char[fontDescriptionRun4.familyLength];
   memcpy( fontDescriptionRun4.familyName, fontFamily4.c_str(), fontDescriptionRun4.familyLength );
@@ -1001,20 +1001,36 @@ int UtcDaliTextLayoutMultilineText02(void)
   fontDescriptionRun4.slantDefined = false;
   fontDescriptionRun4.sizeDefined = false;
 
+  const std::string fontFamily5( "TizenSans" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun5;
+  fontDescriptionRun5.characterRun.characterIndex = 38u;
+  fontDescriptionRun5.characterRun.numberOfCharacters = 17u;
+  fontDescriptionRun5.familyLength = fontFamily5.size();
+  fontDescriptionRun5.familyName = new char[fontDescriptionRun5.familyLength];
+  memcpy( fontDescriptionRun5.familyName, fontFamily5.c_str(), fontDescriptionRun5.familyLength );
+  fontDescriptionRun5.familyDefined = true;
+  fontDescriptionRun5.weightDefined = false;
+  fontDescriptionRun5.widthDefined = false;
+  fontDescriptionRun5.slantDefined = false;
+  fontDescriptionRun5.sizeDefined = false;
+
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun1 );
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   fontDescriptionRuns.PushBack( fontDescriptionRun3 );
   fontDescriptionRuns.PushBack( fontDescriptionRun4 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun5 );
   Size textArea(100.f, 300.f);
   Size layoutSize(81.f, 120.f);
   float positions[] =
   {
     1.f, -12.f, 12.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f,  -9.f, 51.f,  -9.f, 61.f,  -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
     0.f, -13.f, 10.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f,  -0.f,
-    1.f, -10.f,  9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -10.f,  9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f,  -0.f,
-    1.f, -13.f, 10.f,  -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f,  -0.f, 39.f,  -9.f, 50.f,  -9.f, 60.f,  -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f,  -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f,  -0.f, 38.f,  -9.f, 49.f,  -9.f, 59.f,  -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -13.f, 10.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -3.f,
   };
   struct LineRun line0 =
@@ -1045,7 +1061,7 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -1069,10 +1085,10 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 38u, 12u },
     { 38u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -1103,7 +1119,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     "Hello world demo שלום עולם.\n"
     "שלום עולם hello world demo.",
     textArea,
-    4u,
+    5u,
     fontDescriptionRuns.Begin(),
     layoutSize,
     55u,
@@ -1454,7 +1470,7 @@ int UtcDaliTextUpdateLayout01(void)
   // Set a known font description
   FontDescriptionRun fontDescriptionRun02;
   fontDescriptionRun02.characterRun.characterIndex = 17u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 11u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun02.familyLength = fontHebrew.size();
   fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
   memcpy( fontDescriptionRun02.familyName, fontHebrew.c_str(), fontDescriptionRun02.familyLength );
@@ -1466,11 +1482,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 28u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
+  fontDescriptionRun03.characterRun.characterIndex = 26u;
+  fontDescriptionRun03.characterRun.numberOfCharacters = 2u;
+  fontDescriptionRun03.familyLength = fontLatin.size();
   fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
+  memcpy( fontDescriptionRun03.familyName, fontLatin.c_str(), fontDescriptionRun03.familyLength );
   fontDescriptionRun03.familyDefined = true;
   fontDescriptionRun03.weightDefined = false;
   fontDescriptionRun03.widthDefined = false;
@@ -1479,11 +1495,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 42u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 12u;
-  fontDescriptionRun04.familyLength = fontLatin.size();
+  fontDescriptionRun04.characterRun.characterIndex = 28u;
+  fontDescriptionRun04.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun04.familyLength = fontArabic.size();
   fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontLatin.c_str(), fontDescriptionRun04.familyLength );
+  memcpy( fontDescriptionRun04.familyName, fontArabic.c_str(), fontDescriptionRun04.familyLength );
   fontDescriptionRun04.familyDefined = true;
   fontDescriptionRun04.weightDefined = false;
   fontDescriptionRun04.widthDefined = false;
@@ -1492,11 +1508,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 54u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun05.familyLength = fontHebrew.size();
+  fontDescriptionRun05.characterRun.characterIndex = 42u;
+  fontDescriptionRun05.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun05.familyLength = fontLatin.size();
   fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontHebrew.c_str(), fontDescriptionRun05.familyLength );
+  memcpy( fontDescriptionRun05.familyName, fontLatin.c_str(), fontDescriptionRun05.familyLength );
   fontDescriptionRun05.familyDefined = true;
   fontDescriptionRun05.weightDefined = false;
   fontDescriptionRun05.widthDefined = false;
@@ -1505,7 +1521,7 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 64u;
+  fontDescriptionRun06.characterRun.characterIndex = 54u;
   fontDescriptionRun06.characterRun.numberOfCharacters = 10u;
   fontDescriptionRun06.familyLength = fontHebrew.size();
   fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
@@ -1518,11 +1534,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun07;
-  fontDescriptionRun07.characterRun.characterIndex = 74u;
-  fontDescriptionRun07.characterRun.numberOfCharacters = 18u;
-  fontDescriptionRun07.familyLength = fontLatin.size();
+  fontDescriptionRun07.characterRun.characterIndex = 64u;
+  fontDescriptionRun07.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun07.familyLength = fontHebrew.size();
   fontDescriptionRun07.familyName = new char[fontDescriptionRun07.familyLength];
-  memcpy( fontDescriptionRun07.familyName, fontLatin.c_str(), fontDescriptionRun07.familyLength );
+  memcpy( fontDescriptionRun07.familyName, fontHebrew.c_str(), fontDescriptionRun07.familyLength );
   fontDescriptionRun07.familyDefined = true;
   fontDescriptionRun07.weightDefined = false;
   fontDescriptionRun07.widthDefined = false;
@@ -1531,8 +1547,8 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun08;
-  fontDescriptionRun08.characterRun.characterIndex = 92u;
-  fontDescriptionRun08.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun08.characterRun.characterIndex = 74u;
+  fontDescriptionRun08.characterRun.numberOfCharacters = 18u;
   fontDescriptionRun08.familyLength = fontLatin.size();
   fontDescriptionRun08.familyName = new char[fontDescriptionRun08.familyLength];
   memcpy( fontDescriptionRun08.familyName, fontLatin.c_str(), fontDescriptionRun08.familyLength );
@@ -1544,11 +1560,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun09;
-  fontDescriptionRun09.characterRun.characterIndex = 104u;
-  fontDescriptionRun09.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun09.familyLength = fontArabic.size();
+  fontDescriptionRun09.characterRun.characterIndex = 92u;
+  fontDescriptionRun09.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun09.familyLength = fontLatin.size();
   fontDescriptionRun09.familyName = new char[fontDescriptionRun09.familyLength];
-  memcpy( fontDescriptionRun09.familyName, fontArabic.c_str(), fontDescriptionRun09.familyLength );
+  memcpy( fontDescriptionRun09.familyName, fontLatin.c_str(), fontDescriptionRun09.familyLength );
   fontDescriptionRun09.familyDefined = true;
   fontDescriptionRun09.weightDefined = false;
   fontDescriptionRun09.widthDefined = false;
@@ -1557,11 +1573,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun10;
-  fontDescriptionRun10.characterRun.characterIndex = 118u;
-  fontDescriptionRun10.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun10.familyLength = fontHebrew.size();
+  fontDescriptionRun10.characterRun.characterIndex = 104u;
+  fontDescriptionRun10.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun10.familyLength = fontArabic.size();
   fontDescriptionRun10.familyName = new char[fontDescriptionRun10.familyLength];
-  memcpy( fontDescriptionRun10.familyName, fontHebrew.c_str(), fontDescriptionRun10.familyLength );
+  memcpy( fontDescriptionRun10.familyName, fontArabic.c_str(), fontDescriptionRun10.familyLength );
   fontDescriptionRun10.familyDefined = true;
   fontDescriptionRun10.weightDefined = false;
   fontDescriptionRun10.widthDefined = false;
@@ -1570,11 +1586,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun11;
-  fontDescriptionRun11.characterRun.characterIndex = 128u;
-  fontDescriptionRun11.characterRun.numberOfCharacters = 17u;
-  fontDescriptionRun11.familyLength = fontLatin.size();
+  fontDescriptionRun11.characterRun.characterIndex = 118u;
+  fontDescriptionRun11.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun11.familyLength = fontHebrew.size();
   fontDescriptionRun11.familyName = new char[fontDescriptionRun11.familyLength];
-  memcpy( fontDescriptionRun11.familyName, fontLatin.c_str(), fontDescriptionRun11.familyLength );
+  memcpy( fontDescriptionRun11.familyName, fontHebrew.c_str(), fontDescriptionRun11.familyLength );
   fontDescriptionRun11.familyDefined = true;
   fontDescriptionRun11.weightDefined = false;
   fontDescriptionRun11.widthDefined = false;
@@ -1583,11 +1599,11 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun12;
-  fontDescriptionRun12.characterRun.characterIndex = 145u;
-  fontDescriptionRun12.characterRun.numberOfCharacters = 11u;
-  fontDescriptionRun12.familyLength = fontHebrew.size();
+  fontDescriptionRun12.characterRun.characterIndex = 128u;
+  fontDescriptionRun12.characterRun.numberOfCharacters = 17u;
+  fontDescriptionRun12.familyLength = fontLatin.size();
   fontDescriptionRun12.familyName = new char[fontDescriptionRun12.familyLength];
-  memcpy( fontDescriptionRun12.familyName, fontHebrew.c_str(), fontDescriptionRun12.familyLength );
+  memcpy( fontDescriptionRun12.familyName, fontLatin.c_str(), fontDescriptionRun12.familyLength );
   fontDescriptionRun12.familyDefined = true;
   fontDescriptionRun12.weightDefined = false;
   fontDescriptionRun12.widthDefined = false;
@@ -1596,8 +1612,8 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun13;
-  fontDescriptionRun13.characterRun.characterIndex = 156u;
-  fontDescriptionRun13.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun13.characterRun.characterIndex = 145u;
+  fontDescriptionRun13.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun13.familyLength = fontHebrew.size();
   fontDescriptionRun13.familyName = new char[fontDescriptionRun13.familyLength];
   memcpy( fontDescriptionRun13.familyName, fontHebrew.c_str(), fontDescriptionRun13.familyLength );
@@ -1609,8 +1625,8 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun14;
-  fontDescriptionRun14.characterRun.characterIndex = 166u;
-  fontDescriptionRun14.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun14.characterRun.characterIndex = 154u;
+  fontDescriptionRun14.characterRun.numberOfCharacters = 2u;
   fontDescriptionRun14.familyLength = fontLatin.size();
   fontDescriptionRun14.familyName = new char[fontDescriptionRun14.familyLength];
   memcpy( fontDescriptionRun14.familyName, fontLatin.c_str(), fontDescriptionRun14.familyLength );
@@ -1622,16 +1638,42 @@ int UtcDaliTextUpdateLayout01(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun15;
-  fontDescriptionRun15.characterRun.characterIndex = 178u;
-  fontDescriptionRun15.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun15.familyLength = fontArabic.size();
+  fontDescriptionRun15.characterRun.characterIndex = 156u;
+  fontDescriptionRun15.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun15.familyLength = fontHebrew.size();
   fontDescriptionRun15.familyName = new char[fontDescriptionRun15.familyLength];
-  memcpy( fontDescriptionRun15.familyName, fontArabic.c_str(), fontDescriptionRun15.familyLength );
+  memcpy( fontDescriptionRun15.familyName, fontHebrew.c_str(), fontDescriptionRun15.familyLength );
   fontDescriptionRun15.familyDefined = true;
   fontDescriptionRun15.weightDefined = false;
   fontDescriptionRun15.widthDefined = false;
   fontDescriptionRun15.slantDefined = false;
   fontDescriptionRun15.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun16;
+  fontDescriptionRun16.characterRun.characterIndex = 166u;
+  fontDescriptionRun16.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun16.familyLength = fontLatin.size();
+  fontDescriptionRun16.familyName = new char[fontDescriptionRun16.familyLength];
+  memcpy( fontDescriptionRun16.familyName, fontLatin.c_str(), fontDescriptionRun16.familyLength );
+  fontDescriptionRun16.familyDefined = true;
+  fontDescriptionRun16.weightDefined = false;
+  fontDescriptionRun16.widthDefined = false;
+  fontDescriptionRun16.slantDefined = false;
+  fontDescriptionRun16.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun17;
+  fontDescriptionRun17.characterRun.characterIndex = 178u;
+  fontDescriptionRun17.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun17.familyLength = fontArabic.size();
+  fontDescriptionRun17.familyName = new char[fontDescriptionRun17.familyLength];
+  memcpy( fontDescriptionRun17.familyName, fontArabic.c_str(), fontDescriptionRun17.familyLength );
+  fontDescriptionRun17.familyDefined = true;
+  fontDescriptionRun17.weightDefined = false;
+  fontDescriptionRun17.widthDefined = false;
+  fontDescriptionRun17.slantDefined = false;
+  fontDescriptionRun17.sizeDefined = false;
 
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun01 );
@@ -1649,29 +1691,32 @@ int UtcDaliTextUpdateLayout01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun13 );
   fontDescriptionRuns.PushBack( fontDescriptionRun14 );
   fontDescriptionRuns.PushBack( fontDescriptionRun15 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun16 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
   Size layoutSize(92.f, 380.f);
   float positions[] =
   {
     1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
     0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 68.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
     0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
     1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -3.f, 42.f, -11.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -3.f, 42.f, -12.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
     1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 80.f, -0.f,
-    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 45.f, -10.f, 56.f, -13.f, 63.f, -10.f, 68.f, -10.f, 76.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
+    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
   };
+
   struct LineRun line01 =
   {
     { 0u, 12u },
@@ -1700,7 +1745,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -1715,7 +1760,7 @@ int UtcDaliTextUpdateLayout01(void)
     92.f,
     15.f,
     -5.f,
-    5.f,
+    4.f,
     0.f,
     false,
     false
@@ -1760,10 +1805,10 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 74u, 12u },
     { 74u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -1784,10 +1829,10 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 92u, 12u },
     { 92u, 12u },
-    79.f,
+    78.f,
     15.f,
     -5.f,
-    5.f,
+    4.f,
     0.f,
     false,
     false
@@ -1820,10 +1865,10 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 128u, 12u },
     { 128u, 12u },
-    82.f,
+    81.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -1832,7 +1877,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    77.f,
+    76.f,
     15.f,
     -5.f,
     4.f,
@@ -1844,7 +1889,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -1868,7 +1913,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 166u, 12u },
     { 166u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
     4.f,
@@ -1931,7 +1976,7 @@ int UtcDaliTextUpdateLayout01(void)
     "Hello world demo שלום עולם.\n"
     "שלום עולם hello world مرحبا بالعالم\n",
     textArea,
-    15u,
+    17u,
     fontDescriptionRuns.Begin(),
     layoutSize,
     192u,
@@ -1981,7 +2026,7 @@ int UtcDaliTextUpdateLayout02(void)
   // Set a known font description
   FontDescriptionRun fontDescriptionRun02;
   fontDescriptionRun02.characterRun.characterIndex = 17u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 11u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun02.familyLength = fontHebrew.size();
   fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
   memcpy( fontDescriptionRun02.familyName, fontHebrew.c_str(), fontDescriptionRun02.familyLength );
@@ -1993,11 +2038,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 28u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
+  fontDescriptionRun03.characterRun.characterIndex = 26u;
+  fontDescriptionRun03.characterRun.numberOfCharacters = 2u;
+  fontDescriptionRun03.familyLength = fontLatin.size();
   fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
+  memcpy( fontDescriptionRun03.familyName, fontLatin.c_str(), fontDescriptionRun03.familyLength );
   fontDescriptionRun03.familyDefined = true;
   fontDescriptionRun03.weightDefined = false;
   fontDescriptionRun03.widthDefined = false;
@@ -2006,11 +2051,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 42u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 12u;
-  fontDescriptionRun04.familyLength = fontLatin.size();
+  fontDescriptionRun04.characterRun.characterIndex = 28u;
+  fontDescriptionRun04.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun04.familyLength = fontArabic.size();
   fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontLatin.c_str(), fontDescriptionRun04.familyLength );
+  memcpy( fontDescriptionRun04.familyName, fontArabic.c_str(), fontDescriptionRun04.familyLength );
   fontDescriptionRun04.familyDefined = true;
   fontDescriptionRun04.weightDefined = false;
   fontDescriptionRun04.widthDefined = false;
@@ -2019,11 +2064,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 54u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun05.familyLength = fontHebrew.size();
+  fontDescriptionRun05.characterRun.characterIndex = 42u;
+  fontDescriptionRun05.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun05.familyLength = fontLatin.size();
   fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontHebrew.c_str(), fontDescriptionRun05.familyLength );
+  memcpy( fontDescriptionRun05.familyName, fontLatin.c_str(), fontDescriptionRun05.familyLength );
   fontDescriptionRun05.familyDefined = true;
   fontDescriptionRun05.weightDefined = false;
   fontDescriptionRun05.widthDefined = false;
@@ -2032,7 +2077,7 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 64u;
+  fontDescriptionRun06.characterRun.characterIndex = 54u;
   fontDescriptionRun06.characterRun.numberOfCharacters = 10u;
   fontDescriptionRun06.familyLength = fontHebrew.size();
   fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
@@ -2045,11 +2090,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun07;
-  fontDescriptionRun07.characterRun.characterIndex = 74u;
-  fontDescriptionRun07.characterRun.numberOfCharacters = 18u;
-  fontDescriptionRun07.familyLength = fontLatin.size();
+  fontDescriptionRun07.characterRun.characterIndex = 64u;
+  fontDescriptionRun07.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun07.familyLength = fontHebrew.size();
   fontDescriptionRun07.familyName = new char[fontDescriptionRun07.familyLength];
-  memcpy( fontDescriptionRun07.familyName, fontLatin.c_str(), fontDescriptionRun07.familyLength );
+  memcpy( fontDescriptionRun07.familyName, fontHebrew.c_str(), fontDescriptionRun07.familyLength );
   fontDescriptionRun07.familyDefined = true;
   fontDescriptionRun07.weightDefined = false;
   fontDescriptionRun07.widthDefined = false;
@@ -2058,8 +2103,8 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun08;
-  fontDescriptionRun08.characterRun.characterIndex = 92u;
-  fontDescriptionRun08.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun08.characterRun.characterIndex = 74u;
+  fontDescriptionRun08.characterRun.numberOfCharacters = 18u;
   fontDescriptionRun08.familyLength = fontLatin.size();
   fontDescriptionRun08.familyName = new char[fontDescriptionRun08.familyLength];
   memcpy( fontDescriptionRun08.familyName, fontLatin.c_str(), fontDescriptionRun08.familyLength );
@@ -2071,11 +2116,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun09;
-  fontDescriptionRun09.characterRun.characterIndex = 104u;
-  fontDescriptionRun09.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun09.familyLength = fontArabic.size();
+  fontDescriptionRun09.characterRun.characterIndex = 92u;
+  fontDescriptionRun09.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun09.familyLength = fontLatin.size();
   fontDescriptionRun09.familyName = new char[fontDescriptionRun09.familyLength];
-  memcpy( fontDescriptionRun09.familyName, fontArabic.c_str(), fontDescriptionRun09.familyLength );
+  memcpy( fontDescriptionRun09.familyName, fontLatin.c_str(), fontDescriptionRun09.familyLength );
   fontDescriptionRun09.familyDefined = true;
   fontDescriptionRun09.weightDefined = false;
   fontDescriptionRun09.widthDefined = false;
@@ -2084,11 +2129,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun10;
-  fontDescriptionRun10.characterRun.characterIndex = 118u;
-  fontDescriptionRun10.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun10.familyLength = fontHebrew.size();
+  fontDescriptionRun10.characterRun.characterIndex = 104u;
+  fontDescriptionRun10.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun10.familyLength = fontArabic.size();
   fontDescriptionRun10.familyName = new char[fontDescriptionRun10.familyLength];
-  memcpy( fontDescriptionRun10.familyName, fontHebrew.c_str(), fontDescriptionRun10.familyLength );
+  memcpy( fontDescriptionRun10.familyName, fontArabic.c_str(), fontDescriptionRun10.familyLength );
   fontDescriptionRun10.familyDefined = true;
   fontDescriptionRun10.weightDefined = false;
   fontDescriptionRun10.widthDefined = false;
@@ -2097,11 +2142,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun11;
-  fontDescriptionRun11.characterRun.characterIndex = 128u;
-  fontDescriptionRun11.characterRun.numberOfCharacters = 17u;
-  fontDescriptionRun11.familyLength = fontLatin.size();
+  fontDescriptionRun11.characterRun.characterIndex = 118u;
+  fontDescriptionRun11.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun11.familyLength = fontHebrew.size();
   fontDescriptionRun11.familyName = new char[fontDescriptionRun11.familyLength];
-  memcpy( fontDescriptionRun11.familyName, fontLatin.c_str(), fontDescriptionRun11.familyLength );
+  memcpy( fontDescriptionRun11.familyName, fontHebrew.c_str(), fontDescriptionRun11.familyLength );
   fontDescriptionRun11.familyDefined = true;
   fontDescriptionRun11.weightDefined = false;
   fontDescriptionRun11.widthDefined = false;
@@ -2110,11 +2155,11 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun12;
-  fontDescriptionRun12.characterRun.characterIndex = 145u;
-  fontDescriptionRun12.characterRun.numberOfCharacters = 11u;
-  fontDescriptionRun12.familyLength = fontHebrew.size();
+  fontDescriptionRun12.characterRun.characterIndex = 128u;
+  fontDescriptionRun12.characterRun.numberOfCharacters = 17u;
+  fontDescriptionRun12.familyLength = fontLatin.size();
   fontDescriptionRun12.familyName = new char[fontDescriptionRun12.familyLength];
-  memcpy( fontDescriptionRun12.familyName, fontHebrew.c_str(), fontDescriptionRun12.familyLength );
+  memcpy( fontDescriptionRun12.familyName, fontLatin.c_str(), fontDescriptionRun12.familyLength );
   fontDescriptionRun12.familyDefined = true;
   fontDescriptionRun12.weightDefined = false;
   fontDescriptionRun12.widthDefined = false;
@@ -2123,8 +2168,8 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun13;
-  fontDescriptionRun13.characterRun.characterIndex = 156u;
-  fontDescriptionRun13.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun13.characterRun.characterIndex = 145u;
+  fontDescriptionRun13.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun13.familyLength = fontHebrew.size();
   fontDescriptionRun13.familyName = new char[fontDescriptionRun13.familyLength];
   memcpy( fontDescriptionRun13.familyName, fontHebrew.c_str(), fontDescriptionRun13.familyLength );
@@ -2136,8 +2181,8 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun14;
-  fontDescriptionRun14.characterRun.characterIndex = 166u;
-  fontDescriptionRun14.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun14.characterRun.characterIndex = 154u;
+  fontDescriptionRun14.characterRun.numberOfCharacters = 2u;
   fontDescriptionRun14.familyLength = fontLatin.size();
   fontDescriptionRun14.familyName = new char[fontDescriptionRun14.familyLength];
   memcpy( fontDescriptionRun14.familyName, fontLatin.c_str(), fontDescriptionRun14.familyLength );
@@ -2149,16 +2194,42 @@ int UtcDaliTextUpdateLayout02(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun15;
-  fontDescriptionRun15.characterRun.characterIndex = 178u;
-  fontDescriptionRun15.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun15.familyLength = fontArabic.size();
+  fontDescriptionRun15.characterRun.characterIndex = 156u;
+  fontDescriptionRun15.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun15.familyLength = fontHebrew.size();
   fontDescriptionRun15.familyName = new char[fontDescriptionRun15.familyLength];
-  memcpy( fontDescriptionRun15.familyName, fontArabic.c_str(), fontDescriptionRun15.familyLength );
+  memcpy( fontDescriptionRun15.familyName, fontHebrew.c_str(), fontDescriptionRun15.familyLength );
   fontDescriptionRun15.familyDefined = true;
   fontDescriptionRun15.weightDefined = false;
   fontDescriptionRun15.widthDefined = false;
   fontDescriptionRun15.slantDefined = false;
   fontDescriptionRun15.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun16;
+  fontDescriptionRun16.characterRun.characterIndex = 166u;
+  fontDescriptionRun16.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun16.familyLength = fontLatin.size();
+  fontDescriptionRun16.familyName = new char[fontDescriptionRun16.familyLength];
+  memcpy( fontDescriptionRun16.familyName, fontLatin.c_str(), fontDescriptionRun16.familyLength );
+  fontDescriptionRun16.familyDefined = true;
+  fontDescriptionRun16.weightDefined = false;
+  fontDescriptionRun16.widthDefined = false;
+  fontDescriptionRun16.slantDefined = false;
+  fontDescriptionRun16.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun17;
+  fontDescriptionRun17.characterRun.characterIndex = 178u;
+  fontDescriptionRun17.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun17.familyLength = fontArabic.size();
+  fontDescriptionRun17.familyName = new char[fontDescriptionRun17.familyLength];
+  memcpy( fontDescriptionRun17.familyName, fontArabic.c_str(), fontDescriptionRun17.familyLength );
+  fontDescriptionRun17.familyDefined = true;
+  fontDescriptionRun17.weightDefined = false;
+  fontDescriptionRun17.widthDefined = false;
+  fontDescriptionRun17.slantDefined = false;
+  fontDescriptionRun17.sizeDefined = false;
 
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun01 );
@@ -2176,29 +2247,32 @@ int UtcDaliTextUpdateLayout02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun13 );
   fontDescriptionRuns.PushBack( fontDescriptionRun14 );
   fontDescriptionRuns.PushBack( fontDescriptionRun15 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun16 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
   Size layoutSize(92.f, 380.f);
   float positions[] =
   {
     1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
     0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 68.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
     0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
     1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -3.f, 42.f, -11.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -3.f, 42.f, -12.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
     1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 80.f, -0.f,
-    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 45.f, -10.f, 56.f, -13.f, 63.f, -10.f, 68.f, -10.f, 76.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
+    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
   };
+
   struct LineRun line01 =
   {
     { 0u, 12u },
@@ -2227,7 +2301,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -2242,7 +2316,7 @@ int UtcDaliTextUpdateLayout02(void)
     92.f,
     15.f,
     -5.f,
-    5.f,
+    4.f,
     0.f,
     false,
     false
@@ -2287,10 +2361,10 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 74u, 12u },
     { 74u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -2311,10 +2385,10 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 92u, 12u },
     { 92u, 12u },
-    79.f,
+    78.f,
     15.f,
     -5.f,
-    5.f,
+    4.f,
     0.f,
     false,
     false
@@ -2347,10 +2421,10 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 128u, 12u },
     { 128u, 12u },
-    82.f,
+    81.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -2359,7 +2433,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    77.f,
+    76.f,
     15.f,
     -5.f,
     4.f,
@@ -2371,7 +2445,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -2395,7 +2469,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 166u, 12u },
     { 166u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
     4.f,
@@ -2458,7 +2532,7 @@ int UtcDaliTextUpdateLayout02(void)
     "Hello world demo שלום עולם.\n"
     "שלום עולם hello world مرحبا بالعالم\n",
     textArea,
-    15u,
+    17u,
     fontDescriptionRuns.Begin(),
     layoutSize,
     192u,
@@ -2508,7 +2582,7 @@ int UtcDaliTextUpdateLayout03(void)
   // Set a known font description
   FontDescriptionRun fontDescriptionRun02;
   fontDescriptionRun02.characterRun.characterIndex = 17u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 11u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun02.familyLength = fontHebrew.size();
   fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
   memcpy( fontDescriptionRun02.familyName, fontHebrew.c_str(), fontDescriptionRun02.familyLength );
@@ -2520,11 +2594,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 28u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
+  fontDescriptionRun03.characterRun.characterIndex = 26u;
+  fontDescriptionRun03.characterRun.numberOfCharacters = 2u;
+  fontDescriptionRun03.familyLength = fontLatin.size();
   fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
+  memcpy( fontDescriptionRun03.familyName, fontLatin.c_str(), fontDescriptionRun03.familyLength );
   fontDescriptionRun03.familyDefined = true;
   fontDescriptionRun03.weightDefined = false;
   fontDescriptionRun03.widthDefined = false;
@@ -2533,11 +2607,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 42u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 12u;
-  fontDescriptionRun04.familyLength = fontLatin.size();
+  fontDescriptionRun04.characterRun.characterIndex = 28u;
+  fontDescriptionRun04.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun04.familyLength = fontArabic.size();
   fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontLatin.c_str(), fontDescriptionRun04.familyLength );
+  memcpy( fontDescriptionRun04.familyName, fontArabic.c_str(), fontDescriptionRun04.familyLength );
   fontDescriptionRun04.familyDefined = true;
   fontDescriptionRun04.weightDefined = false;
   fontDescriptionRun04.widthDefined = false;
@@ -2546,11 +2620,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 54u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun05.familyLength = fontHebrew.size();
+  fontDescriptionRun05.characterRun.characterIndex = 42u;
+  fontDescriptionRun05.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun05.familyLength = fontLatin.size();
   fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontHebrew.c_str(), fontDescriptionRun05.familyLength );
+  memcpy( fontDescriptionRun05.familyName, fontLatin.c_str(), fontDescriptionRun05.familyLength );
   fontDescriptionRun05.familyDefined = true;
   fontDescriptionRun05.weightDefined = false;
   fontDescriptionRun05.widthDefined = false;
@@ -2559,7 +2633,7 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 64u;
+  fontDescriptionRun06.characterRun.characterIndex = 54u;
   fontDescriptionRun06.characterRun.numberOfCharacters = 10u;
   fontDescriptionRun06.familyLength = fontHebrew.size();
   fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
@@ -2572,11 +2646,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun07;
-  fontDescriptionRun07.characterRun.characterIndex = 74u;
-  fontDescriptionRun07.characterRun.numberOfCharacters = 18u;
-  fontDescriptionRun07.familyLength = fontLatin.size();
+  fontDescriptionRun07.characterRun.characterIndex = 64u;
+  fontDescriptionRun07.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun07.familyLength = fontHebrew.size();
   fontDescriptionRun07.familyName = new char[fontDescriptionRun07.familyLength];
-  memcpy( fontDescriptionRun07.familyName, fontLatin.c_str(), fontDescriptionRun07.familyLength );
+  memcpy( fontDescriptionRun07.familyName, fontHebrew.c_str(), fontDescriptionRun07.familyLength );
   fontDescriptionRun07.familyDefined = true;
   fontDescriptionRun07.weightDefined = false;
   fontDescriptionRun07.widthDefined = false;
@@ -2585,8 +2659,8 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun08;
-  fontDescriptionRun08.characterRun.characterIndex = 92u;
-  fontDescriptionRun08.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun08.characterRun.characterIndex = 74u;
+  fontDescriptionRun08.characterRun.numberOfCharacters = 18u;
   fontDescriptionRun08.familyLength = fontLatin.size();
   fontDescriptionRun08.familyName = new char[fontDescriptionRun08.familyLength];
   memcpy( fontDescriptionRun08.familyName, fontLatin.c_str(), fontDescriptionRun08.familyLength );
@@ -2598,11 +2672,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun09;
-  fontDescriptionRun09.characterRun.characterIndex = 104u;
-  fontDescriptionRun09.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun09.familyLength = fontArabic.size();
+  fontDescriptionRun09.characterRun.characterIndex = 92u;
+  fontDescriptionRun09.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun09.familyLength = fontLatin.size();
   fontDescriptionRun09.familyName = new char[fontDescriptionRun09.familyLength];
-  memcpy( fontDescriptionRun09.familyName, fontArabic.c_str(), fontDescriptionRun09.familyLength );
+  memcpy( fontDescriptionRun09.familyName, fontLatin.c_str(), fontDescriptionRun09.familyLength );
   fontDescriptionRun09.familyDefined = true;
   fontDescriptionRun09.weightDefined = false;
   fontDescriptionRun09.widthDefined = false;
@@ -2611,11 +2685,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun10;
-  fontDescriptionRun10.characterRun.characterIndex = 118u;
-  fontDescriptionRun10.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun10.familyLength = fontHebrew.size();
+  fontDescriptionRun10.characterRun.characterIndex = 104u;
+  fontDescriptionRun10.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun10.familyLength = fontArabic.size();
   fontDescriptionRun10.familyName = new char[fontDescriptionRun10.familyLength];
-  memcpy( fontDescriptionRun10.familyName, fontHebrew.c_str(), fontDescriptionRun10.familyLength );
+  memcpy( fontDescriptionRun10.familyName, fontArabic.c_str(), fontDescriptionRun10.familyLength );
   fontDescriptionRun10.familyDefined = true;
   fontDescriptionRun10.weightDefined = false;
   fontDescriptionRun10.widthDefined = false;
@@ -2624,11 +2698,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun11;
-  fontDescriptionRun11.characterRun.characterIndex = 128u;
-  fontDescriptionRun11.characterRun.numberOfCharacters = 17u;
-  fontDescriptionRun11.familyLength = fontLatin.size();
+  fontDescriptionRun11.characterRun.characterIndex = 118u;
+  fontDescriptionRun11.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun11.familyLength = fontHebrew.size();
   fontDescriptionRun11.familyName = new char[fontDescriptionRun11.familyLength];
-  memcpy( fontDescriptionRun11.familyName, fontLatin.c_str(), fontDescriptionRun11.familyLength );
+  memcpy( fontDescriptionRun11.familyName, fontHebrew.c_str(), fontDescriptionRun11.familyLength );
   fontDescriptionRun11.familyDefined = true;
   fontDescriptionRun11.weightDefined = false;
   fontDescriptionRun11.widthDefined = false;
@@ -2637,11 +2711,11 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun12;
-  fontDescriptionRun12.characterRun.characterIndex = 145u;
-  fontDescriptionRun12.characterRun.numberOfCharacters = 11u;
-  fontDescriptionRun12.familyLength = fontHebrew.size();
+  fontDescriptionRun12.characterRun.characterIndex = 128u;
+  fontDescriptionRun12.characterRun.numberOfCharacters = 17u;
+  fontDescriptionRun12.familyLength = fontLatin.size();
   fontDescriptionRun12.familyName = new char[fontDescriptionRun12.familyLength];
-  memcpy( fontDescriptionRun12.familyName, fontHebrew.c_str(), fontDescriptionRun12.familyLength );
+  memcpy( fontDescriptionRun12.familyName, fontLatin.c_str(), fontDescriptionRun12.familyLength );
   fontDescriptionRun12.familyDefined = true;
   fontDescriptionRun12.weightDefined = false;
   fontDescriptionRun12.widthDefined = false;
@@ -2650,8 +2724,8 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun13;
-  fontDescriptionRun13.characterRun.characterIndex = 156u;
-  fontDescriptionRun13.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun13.characterRun.characterIndex = 145u;
+  fontDescriptionRun13.characterRun.numberOfCharacters = 9u;
   fontDescriptionRun13.familyLength = fontHebrew.size();
   fontDescriptionRun13.familyName = new char[fontDescriptionRun13.familyLength];
   memcpy( fontDescriptionRun13.familyName, fontHebrew.c_str(), fontDescriptionRun13.familyLength );
@@ -2663,8 +2737,8 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun14;
-  fontDescriptionRun14.characterRun.characterIndex = 166u;
-  fontDescriptionRun14.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun14.characterRun.characterIndex = 154u;
+  fontDescriptionRun14.characterRun.numberOfCharacters = 2u;
   fontDescriptionRun14.familyLength = fontLatin.size();
   fontDescriptionRun14.familyName = new char[fontDescriptionRun14.familyLength];
   memcpy( fontDescriptionRun14.familyName, fontLatin.c_str(), fontDescriptionRun14.familyLength );
@@ -2676,16 +2750,42 @@ int UtcDaliTextUpdateLayout03(void)
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun15;
-  fontDescriptionRun15.characterRun.characterIndex = 178u;
-  fontDescriptionRun15.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun15.familyLength = fontArabic.size();
+  fontDescriptionRun15.characterRun.characterIndex = 156u;
+  fontDescriptionRun15.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun15.familyLength = fontHebrew.size();
   fontDescriptionRun15.familyName = new char[fontDescriptionRun15.familyLength];
-  memcpy( fontDescriptionRun15.familyName, fontArabic.c_str(), fontDescriptionRun15.familyLength );
+  memcpy( fontDescriptionRun15.familyName, fontHebrew.c_str(), fontDescriptionRun15.familyLength );
   fontDescriptionRun15.familyDefined = true;
   fontDescriptionRun15.weightDefined = false;
   fontDescriptionRun15.widthDefined = false;
   fontDescriptionRun15.slantDefined = false;
   fontDescriptionRun15.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun16;
+  fontDescriptionRun16.characterRun.characterIndex = 166u;
+  fontDescriptionRun16.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun16.familyLength = fontLatin.size();
+  fontDescriptionRun16.familyName = new char[fontDescriptionRun16.familyLength];
+  memcpy( fontDescriptionRun16.familyName, fontLatin.c_str(), fontDescriptionRun16.familyLength );
+  fontDescriptionRun16.familyDefined = true;
+  fontDescriptionRun16.weightDefined = false;
+  fontDescriptionRun16.widthDefined = false;
+  fontDescriptionRun16.slantDefined = false;
+  fontDescriptionRun16.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun17;
+  fontDescriptionRun17.characterRun.characterIndex = 178u;
+  fontDescriptionRun17.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun17.familyLength = fontArabic.size();
+  fontDescriptionRun17.familyName = new char[fontDescriptionRun17.familyLength];
+  memcpy( fontDescriptionRun17.familyName, fontArabic.c_str(), fontDescriptionRun17.familyLength );
+  fontDescriptionRun17.familyDefined = true;
+  fontDescriptionRun17.weightDefined = false;
+  fontDescriptionRun17.widthDefined = false;
+  fontDescriptionRun17.slantDefined = false;
+  fontDescriptionRun17.sizeDefined = false;
 
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun01 );
@@ -2703,29 +2803,32 @@ int UtcDaliTextUpdateLayout03(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun13 );
   fontDescriptionRuns.PushBack( fontDescriptionRun14 );
   fontDescriptionRuns.PushBack( fontDescriptionRun15 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun16 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
   Size layoutSize(92.f, 380.f);
   float positions[] =
   {
     1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
     0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 68.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
     0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
     1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -3.f, 42.f, -11.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -3.f, 42.f, -12.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
     1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 80.f, -0.f,
-    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 45.f, -10.f, 56.f, -13.f, 63.f, -10.f, 68.f, -10.f, 76.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 32.f, -2.f, 35.f, -11.f,
+    1.f, -12.f, 12.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -13.f, 10.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
+    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -3.f, 33.f, -12.f,
     1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
+    1.f, -13.f, 10.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -7.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 37.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
   };
+
   struct LineRun line01 =
   {
     { 0u, 12u },
@@ -2754,7 +2857,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -2769,7 +2872,7 @@ int UtcDaliTextUpdateLayout03(void)
     92.f,
     15.f,
     -5.f,
-    5.f,
+    4.f,
     0.f,
     false,
     false
@@ -2814,10 +2917,10 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 74u, 12u },
     { 74u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -2838,10 +2941,10 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 92u, 12u },
     { 92u, 12u },
-    79.f,
+    78.f,
     15.f,
     -5.f,
-    5.f,
+    4.f,
     0.f,
     false,
     false
@@ -2874,10 +2977,10 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 128u, 12u },
     { 128u, 12u },
-    82.f,
+    81.f,
     15.f,
     -5.f,
-    4.f,
+    3.f,
     0.f,
     false,
     false
@@ -2886,7 +2989,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    77.f,
+    76.f,
     15.f,
     -5.f,
     4.f,
@@ -2898,7 +3001,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    36.f,
+    34.f,
     15.f,
     -5.f,
     0.f,
@@ -2922,7 +3025,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 166u, 12u },
     { 166u, 12u },
-    80.f,
+    79.f,
     15.f,
     -5.f,
     4.f,
@@ -2954,7 +3057,6 @@ int UtcDaliTextUpdateLayout03(void)
     false,
     false
   };
-
   Vector<LineRun> lines;
   lines.PushBack( line01 );
   lines.PushBack( line02 );
@@ -2986,7 +3088,7 @@ int UtcDaliTextUpdateLayout03(void)
     "Hello world demo שלום עולם.\n"
     "שלום עולם hello world مرحبا بالعالم\n",
     textArea,
-    15u,
+    17u,
     fontDescriptionRuns.Begin(),
     layoutSize,
     192u,

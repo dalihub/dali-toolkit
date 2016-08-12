@@ -522,7 +522,7 @@ void NPatchVisual::InitializeFromImage( NinePatchImage nPatch )
 
 void NPatchVisual::InitializeFromBrokenImage()
 {
-  mCroppedImage = VisualFactory::GetBrokenVisualImage();
+  mCroppedImage = VisualFactoryCache::GetBrokenVisualImage();
   mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );
 
   mStretchPixelsX.Clear();

@@ -511,6 +511,7 @@ void Control::ClearBackground()
 {
   Actor self( Self() );
   mImpl->mBackgroundVisual.RemoveAndReset( self );
+  mImpl->mBackgroundColor = Color::TRANSPARENT;
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -820,6 +821,7 @@ void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Ty
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
+  RelayoutRequest();
 }
 
 void Control::OnPinch(const PinchGesture& pinch)

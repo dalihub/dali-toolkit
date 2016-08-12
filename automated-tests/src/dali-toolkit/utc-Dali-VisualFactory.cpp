@@ -17,6 +17,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-bitmap-loader.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -33,12 +34,16 @@ typedef NinePatchImage::StretchRanges StretchRanges;
 
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.png";
-
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_SIMPLE_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube-Points-Only.obj";
 const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simple.mtl";
+
+// resolution: 34*34, pixel format: RGBA8888
+static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
+// resolution: 600*600, pixel format: RGB888
+static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 
 Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
 {
@@ -251,7 +256,7 @@ int UtcDaliVisualFactoryGet(void)
   VisualFactory newFactory = VisualFactory::Get();
   DALI_TEST_CHECK( newFactory );
 
-  // Check that renderer factory is a singleton
+  // Check that visual factory is a singleton
   DALI_TEST_CHECK(factory == newFactory);
 
   END_TEST;
@@ -572,7 +577,7 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
 int UtcDaliVisualFactoryGetImageVisual1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetImageVisual1: Request image renderer with a Property::Map" );
+  tet_infoline( "UtcDaliVisualFactoryGetImageVisual1: Request image visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -612,7 +617,7 @@ int UtcDaliVisualFactoryGetImageVisual1(void)
 int UtcDaliVisualFactoryGetImageVisual2(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetImageVisual2: Request image renderer with an image handle" );
+  tet_infoline( "UtcDaliVisualFactoryGetImageVisual2: Request image visual with an image handle" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -643,10 +648,170 @@ int UtcDaliVisualFactoryGetImageVisual2(void)
   END_TEST;
 }
 
+int UtcDaliVisualFactoryGetImageVisual3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetImageVisual3: Request image visual with a Property::Map, test custom wrap mode and pixel area with atlasing" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Test wrap mode with atlasing. Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+  const int width=34;
+  const int height=34;
+  const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  gImage_34_RGBA );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, width );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, height );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+  propertyMap.Insert( ImageVisual::Property::PIXEL_AREA, pixelArea );
+  propertyMap.Insert( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT );
+  propertyMap.Insert( ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  Actor actor = Actor::New();
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Enable( true );
+
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  visual.SetOnStage( actor );
+
+  // loading started
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+  BitmapLoader loader = BitmapLoader::GetLatestCreated();
+  DALI_TEST_CHECK( loader );
+  loader.WaitForLoading();// waiting until the image to be loaded
+  DALI_TEST_CHECK( loader.IsLoaded() );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  // WITH atlasing, the wrapping is handled manually in shader, so the following gl function should not be called
+  std::stringstream out;
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
+  DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+
+  // test the uniforms which used to handle the wrap mode
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Value pixelAreaValue = renderer.GetProperty( renderer.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelArea, TEST_LOCATION );
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelArea, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  Property::Value wrapModeValue = renderer.GetProperty( renderer.GetPropertyIndex( "wrapMode" ) );
+  Vector2 wrapMode( WrapMode::MIRRORED_REPEAT-1, WrapMode::REPEAT-1 );
+  DALI_TEST_EQUALS( wrapModeValue.Get<Vector2>(), wrapMode, TEST_LOCATION );
+  Vector2 wrapModeUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector2>( "wrapMode", wrapModeUniform ) );
+  DALI_TEST_EQUALS( wrapMode, wrapModeUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  visual.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetImageVisual4(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetImageVisual4: Request image visual with a Property::Map, test custom wrap mode and pixel area without atlasing" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Test wrap mode without atlasing. Image with a size bigger than 512*512 will NOT be uploaded as a part of the atlas.
+  const int width=600;
+  const int height=600;
+  const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  gImage_600_RGB );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, width );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, height );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+  propertyMap.Insert( ImageVisual::Property::PIXEL_AREA, pixelArea );
+  propertyMap.Insert( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT );
+  propertyMap.Insert( ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  Actor actor = Actor::New();
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Enable( true );
+
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  visual.SetOnStage( actor );
+
+  // loading started
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+  BitmapLoader loader = BitmapLoader::GetLatestCreated();
+  DALI_TEST_CHECK( loader );
+  loader.WaitForLoading();// waiting until the image to be loaded
+  DALI_TEST_CHECK( loader.IsLoaded() );
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  // WITHOUT atlasing, the wrapping is handled by setting gl texture parameters
+  std::stringstream out;
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  DALI_TEST_CHECK( texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
+  DALI_TEST_CHECK( texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+
+  // test the uniforms which used to handle the wrap mode
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Value pixelAreaValue = renderer.GetProperty( renderer.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelArea, TEST_LOCATION );
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelArea, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  Property::Index wrapModeIndex = renderer.GetPropertyIndex( "wrapMode" );
+  DALI_TEST_CHECK(wrapModeIndex == Property::INVALID_INDEX);
+
+  visual.SetOffStage( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
 int UtcDaliVisualFactoryGetNPatchVisual1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual1: Request 9-patch renderer with a Property::Map" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual1: Request 9-patch visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -705,7 +870,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
 int UtcDaliVisualFactoryGetNPatchVisual2(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual2: Request n-patch renderer with a Property::Map" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual2: Request n-patch visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -773,7 +938,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
 int UtcDaliVisualFactoryGetNPatchVisual3(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual3: Request 9-patch renderer with an image url" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual3: Request 9-patch visual with an image url" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -880,13 +1045,13 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   //This should still load but display an error image
 
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid Property::Map" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid URL" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  111 );
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -907,6 +1072,26 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
                              Integration::ResourcePointer(bitmap) );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetNPatchVisualN3(void)
+{
+  // Passing in an invalid visual type so we should not get a visual
+
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid visual type" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  111 );
+  propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( !visual );
 
   END_TEST;
 }
@@ -951,7 +1136,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   END_TEST;
 }
 
-//Creates a mesh renderer from the given propertyMap and tries to load it on stage in the given application.
+//Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
 //This is expected to succeed, which will then pass the test.
 void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplication& application )
 {
@@ -1494,7 +1679,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
   END_TEST;
 }
 
-//Test if primitive shape renderer handles the case of not being passed a specific shape to use.
+//Test if primitive shape visual handles the case of not being passed a specific shape to use.
 int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
 {
   //Set up test application first, so everything else can be handled.

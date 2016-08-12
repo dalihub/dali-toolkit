@@ -287,6 +287,7 @@ public: // Signals
 
   // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a new handle from the implementation.
    *
@@ -294,6 +295,7 @@ public: // Signals
    * @param[in] impl A pointer to the object.
    */
   explicit DALI_INTERNAL KeyboardFocusManager(Internal::KeyboardFocusManager *impl);
+  /// @endcond
 
 }; // class KeyboardFocusManager
 

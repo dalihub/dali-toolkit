@@ -314,10 +314,18 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check font properties.
   editor.SetProperty( TextEditor::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::FONT_STYLE, "Setting font style" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("Setting font style"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}"), TEST_LOCATION );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Reset font style.
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"slant\":\"roman\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, "" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
 
   // Check that the Alignment properties can be correctly set
   editor.SetProperty( TextEditor::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -379,10 +387,18 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check input font properties.
   editor.SetProperty( TextEditor::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "Setting input font style" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), "Setting input font style", TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}", TEST_LOCATION );
   editor.SetProperty( TextEditor::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Reset input font style.
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"slant\":\"roman\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), std::string(""), TEST_LOCATION );
 
   // Check the line spacing property
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );

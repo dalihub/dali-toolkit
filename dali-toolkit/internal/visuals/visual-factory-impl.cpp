@@ -40,13 +40,7 @@
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image/batch-image-visual.h>
-
-namespace
-{
-const char * const BROKEN_VISUAL_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
-}
 
 namespace Dali
 {
@@ -136,7 +130,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    default: // Default to Image type if unknown (check if there is a URL)
     case Toolkit::Visual::IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
@@ -150,8 +143,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
           batchingEnabledValue->Get( batchingEnabled );
           if( batchingEnabled )
           {
-            CreateAtlasManager();
-            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ) );
             break;
           }
         }
@@ -159,27 +151,16 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
         {
           visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
         }
+        else if( SvgVisual::IsSvgUrl( imageUrl ) )
+        {
+          visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
+        }
         else
         {
-          CreateAtlasManager();
-
-          if( SvgVisual::IsSvgUrl( imageUrl ) )
-          {
-            visualPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-          }
-          else
-          {
-            visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-          }
+          visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
         }
       }
-      else if( propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER ) )
-      {
-        // Create Image Visual if it has a shader
-        // TODO: This is required because of EffectsView which should be fixed
-        CreateAtlasManager();
-        visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
-      }
+
       break;
     }
 
@@ -238,8 +219,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
   }
   else
   {
-    CreateAtlasManager();
-    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
     Actor actor;
     visualPtr->SetImage( actor, image );
 
@@ -268,34 +248,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   }
   else if( SvgVisual::IsSvgUrl( url ) )
   {
-    CreateAtlasManager();
-    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
     visualPtr->SetImage( url, size );
     return Toolkit::Visual::Base( visualPtr );
   }
   else
   {
-    CreateAtlasManager();
-    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ));
     Actor actor;
     visualPtr->SetImage( actor, url, size );
 
     return Toolkit::Visual::Base( visualPtr );
-  }
-}
-
-Image VisualFactory::GetBrokenVisualImage()
-{
-  return ResourceImage::New( BROKEN_VISUAL_IMAGE_URL );
-}
-
-void VisualFactory::CreateAtlasManager()
-{
-  if( !mAtlasManager )
-  {
-    Shader shader = ImageVisual::GetImageShader( *( mFactoryCache.Get() ) );
-    mAtlasManager = new ImageAtlasManager();
-    mAtlasManager->SetBrokenImage( BROKEN_VISUAL_IMAGE_URL );
   }
 }
 
