@@ -134,7 +134,7 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     \n
     void main()\n
     {\n
-      mediump vec2 texCoord = mix( uAtlasRect.xy, uAtlasRect.zw, clamp( vTexCoord, 0.0, 1.0 ) );\n
+      mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
       gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
     }\n
 );
@@ -147,17 +147,20 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
     uniform lowp vec2 wrapMode;\n
     uniform lowp vec4 uColor;\n
     \n
-    mediump float wrapCoordinate( mediump float coordinate, lowp float wrap )\n
+    mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )\n
     {\n
-      if( abs(wrap-2.0) < 0.5 )\n // REFLECT
-        return 1.0-abs(fract(coordinate*0.5)*2.0 - 1.0);\n
+      mediump float coord;\n
+      if( wrap > 1.5 )\n // REFLECT
+        coord = 1.0-abs(fract(coordinate*0.5)*2.0 - 1.0);\n
       else \n// warp == 0 or 1
-        return mix( clamp( coordinate, 0.0, 1.0 ), fract( coordinate ), wrap);\n
+        coord = mix(coordinate, fract( coordinate ), wrap);\n
+      return clamp( mix(range.x, range.y, coord), range.x, range.y );
     }\n
+    \n
     void main()\n
     {\n
-      mediump vec2 texCoord = mix( uAtlasRect.xy, uAtlasRect.zw,
-                              vec2( wrapCoordinate( vTexCoord.x, wrapMode.x ), wrapCoordinate( vTexCoord.y, wrapMode.y ) ) );\n
+      mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
+                                    wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );\n
       gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
     }\n
 );
