@@ -133,7 +133,7 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mMixColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mMixColor );
+  mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME, mMixColor );
   if( mMixColor.a < 1.f )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );

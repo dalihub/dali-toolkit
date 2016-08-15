@@ -148,12 +148,12 @@ void BorderVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
 
-  mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_NAME, mBorderColor );
+  mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
   if( mBorderColor.a < 1.f || mAntiAliasing)
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
-  mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
+  mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize );
 }
 
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
