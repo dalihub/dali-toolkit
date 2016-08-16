@@ -367,18 +367,6 @@ void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize ) const
   naturalSize.y = mObjectDimensions.y;
 }
 
-void PrimitiveVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void PrimitiveVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void PrimitiveVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

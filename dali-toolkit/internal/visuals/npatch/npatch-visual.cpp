@@ -254,17 +254,6 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize ) const
   }
 }
 
-void NPatchVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-  //ToDo: renderer responds to the clipRect change
-}
-
-void NPatchVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 Geometry NPatchVisual::CreateGeometry()
 {
   Geometry geometry;

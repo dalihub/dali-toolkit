@@ -137,13 +137,6 @@ void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap 
   }
 }
 
-void BorderVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
 void BorderVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

@@ -229,18 +229,6 @@ void GradientVisual::SetSize( const Vector2& size )
   Visual::Base::SetSize( size );
 }
 
-void GradientVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void GradientVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void GradientVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

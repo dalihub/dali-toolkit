@@ -91,18 +91,6 @@ void ColorVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void ColorVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void ColorVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

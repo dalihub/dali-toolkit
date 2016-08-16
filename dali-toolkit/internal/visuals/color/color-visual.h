@@ -63,16 +63,6 @@ public:  // from Visual
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::SetClipRect
-   */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
-  /**
-   * @copydoc Visual::SetOffset
-   */
-  virtual void SetOffset( const Vector2& offset );
-
-  /**
    * @copydoc Visual::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
