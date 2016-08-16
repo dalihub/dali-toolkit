@@ -1067,3 +1067,26 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualWireframeVisual(void)
+{
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::WIREFRAME );
+
+  // Create the visual.
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  DALI_TEST_CHECK( visual );
+
+  Property::Map resultMap;
+  visual.CreatePropertyMap( resultMap );
+
+  // Check the property values from the returned map from visual
+  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::WIREFRAME );
+  END_TEST;
+}

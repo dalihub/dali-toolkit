@@ -1,8 +1,8 @@
-#ifndef DALI_TOOLKIT_INTERNAL_DEBUG_VISUAL_H
-#define DALI_TOOLKIT_INTERNAL_DEBUG_VISUAL_H
+#ifndef DALI_TOOLKIT_INTERNAL_WIREFRAME_VISUAL_H
+#define DALI_TOOLKIT_INTERNAL_WIREFRAME_VISUAL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ namespace Internal
 {
 
 /**
- * The visual which renders a wireframe outline to the control's quad for debugging
+ * The visual which renders a wireframe outline to the control's quad.
  *
  */
-class DebugVisual: public Visual::Base
+class WireframeVisual: public Visual::Base
 {
 public:
 
@@ -43,12 +43,12 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  DebugVisual( VisualFactoryCache& factoryCache );
+  WireframeVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
-  virtual ~DebugVisual();
+  virtual ~WireframeVisual();
 
 protected:
 
@@ -78,10 +78,10 @@ private:
 private:
 
   // Undefined
-  DebugVisual( const DebugVisual& debugVisual);
+  WireframeVisual( const WireframeVisual& visual);
 
   // Undefined
-  DebugVisual& operator=( const DebugVisual& debugVisual );
+  WireframeVisual& operator=( const WireframeVisual& visual );
 
 };
 
@@ -91,4 +91,4 @@ private:
 
 } // namespace Dali
 
-#endif /* DALI_TOOLKIT_INTERNAL_DEBUG_VISUAL_H */
+#endif // DALI_TOOLKIT_INTERNAL_WIREFRAME_VISUAL_H
