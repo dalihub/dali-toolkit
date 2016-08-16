@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -135,6 +136,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                 
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -1080,6 +1082,10 @@ bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   {
     field.MaxLengthReachedSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED ) )
+  {
+    field.InputStyleChangedSignal().Connect( tracker, functor );
+  }
   else
   {
     // signalName does not match any signal
@@ -1097,6 +1103,11 @@ Toolkit::TextField::TextChangedSignalType& TextField::TextChangedSignal()
 Toolkit::TextField::MaxLengthReachedSignalType& TextField::MaxLengthReachedSignal()
 {
   return mMaxLengthReachedSignal;
+}
+
+Toolkit::TextField::InputStyleChangedSignalType& TextField::InputStyleChangedSignal()
+{
+  return mInputStyleChangedSignal;
 }
 
 void TextField::OnInitialize()
@@ -1214,9 +1225,28 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
     EnableClipping( ( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy ), size );
     RenderText( updateTextType );
   }
+
+  // The text-field emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  if( !mController->IsInputStyleChangedSignalsQueueEmpty() )
+  {
+    if( Adaptor::IsAvailable() )
+    {
+      Adaptor& adaptor = Adaptor::Get();
+
+      if( NULL == mIdleCallback )
+      {
+        // @note: The callback manager takes the ownership of the callback object.
+        mIdleCallback = MakeCallback( this, &TextField::OnIdleSignal );
+        adaptor.AddIdle( mIdleCallback );
+      }
+    }
+  }
 }
 
-void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
+  void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 {
   Actor self = Self();
   Actor renderableActor;
@@ -1412,6 +1442,56 @@ void TextField::TextChanged()
   mTextChangedSignal.Emit( handle );
 }
 
+void TextField::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+
+  Toolkit::TextField::InputStyle::Mask fieldInputStyleMask = Toolkit::TextField::InputStyle::NONE;
+
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_COLOR ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::COLOR );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_FAMILY ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_FAMILY );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_POINT_SIZE ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::POINT_SIZE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WEIGHT ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WIDTH ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_SLANT ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_UNDERLINE ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::UNDERLINE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_SHADOW ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::SHADOW );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_EMBOSS ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::EMBOSS );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_OUTLINE ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::OUTLINE );
+  }
+
+  mInputStyleChangedSignal.Emit( handle, fieldInputStyleMask );
+}
+
 void TextField::OnStageConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
@@ -1515,8 +1595,18 @@ bool TextField::OnTouched( Actor actor, const TouchData& touch )
   return true;
 }
 
+void TextField::OnIdleSignal()
+{
+  // Emits the change of input style signals.
+  mController->ProcessInputStyleChangedSignals();
+
+  // Set the pointer to null as the callback manager deletes the callback after execute it.
+  mIdleCallback = NULL;
+}
+
 TextField::TextField()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mIdleCallback( NULL ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
   mHasBeenStaged( false )
@@ -1526,6 +1616,11 @@ TextField::TextField()
 TextField::~TextField()
 {
   mClipper.Reset();
+
+  if( ( NULL != mIdleCallback ) && Adaptor::IsAvailable() )
+  {
+    Adaptor::Get().RemoveIdle( mIdleCallback );
+  }
 }
 
 } // namespace Internal

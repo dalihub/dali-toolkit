@@ -87,6 +87,11 @@ public:
    */
   Toolkit::TextEditor::TextChangedSignalType&  TextChangedSignal();
 
+  /**
+   * @copydoc TextEditor::TextChangedSignal()
+   */
+  Toolkit::TextEditor::InputStyleChangedSignalType& InputStyleChangedSignal();
+
 private: // From Control
 
   /**
@@ -171,6 +176,11 @@ private: // From Control
    */
   virtual void MaxLengthReached();
 
+  /**
+   * @copydoc Text::ControlInterface::InputStyleChanged()
+   */
+  virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
+
 private: // Implementation
 
   /**
@@ -216,6 +226,13 @@ private: // Implementation
   bool OnTouched( Actor actor, const TouchData& touch );
 
   /**
+   * @brief Callbacks called on idle.
+   *
+   * If there are notifications of change of input style on the queue, Toolkit::TextEditor::InputStyleChangedSignal() are emitted.
+   */
+  void OnIdleSignal();
+
+  /**
    * Construct a new TextEditor.
    */
   TextEditor();
@@ -241,6 +258,7 @@ private: // Data
 
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
+  Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
@@ -249,6 +267,7 @@ private: // Data
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
+  CallbackBase* mIdleCallback;
 
   int mRenderingBackend;
   bool mHasBeenStaged:1;
