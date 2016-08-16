@@ -27,69 +27,66 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace Visual
-{
-
-Base::Base()
+Visual::Base::Base()
 {
 }
 
-Base::~Base()
+Visual::Base::~Base()
 {
 }
 
-Base::Base( const Base& handle )
+Visual::Base::Base( const Visual::Base& handle )
 : BaseHandle( handle )
 {
 }
 
-Base& Base::operator=( const Base& handle )
+Visual::Base& Visual::Base::operator=( const Visual::Base& handle )
 {
   BaseHandle::operator=( handle );
   return *this;
 }
 
-Base::Base(Internal::Visual::Base *impl)
+Visual::Base::Base(Internal::Visual::Base *impl)
 : BaseHandle( impl )
 {
 }
 
-void Base::SetSize( const Vector2& size )
+void Visual::Base::SetSize( const Vector2& size )
 {
   GetImplementation( *this ).SetSize( size );
 }
 
-const Vector2& Base::GetSize() const
+const Vector2& Visual::Base::GetSize() const
 {
   return GetImplementation( *this ).GetSize();
 }
 
-void Base::GetNaturalSize(Vector2& naturalSize ) const
+void Visual::Base::GetNaturalSize(Vector2& naturalSize ) const
 {
   GetImplementation( *this ).GetNaturalSize( naturalSize );
 }
 
-void Base::SetDepthIndex( float index )
+void Visual::Base::SetDepthIndex( float index )
 {
   GetImplementation( *this ).SetDepthIndex( index );
 }
 
-float Base::GetDepthIndex() const
+float Visual::Base::GetDepthIndex() const
 {
   return GetImplementation( *this ).GetDepthIndex();
 }
 
-void Base::SetOnStage( Actor& actor )
+void Visual::Base::SetOnStage( Actor& actor )
 {
   GetImplementation( *this ).SetOnStage( actor );
 }
 
-void Base::SetOffStage( Actor& actor )
+void Visual::Base::SetOffStage( Actor& actor )
 {
   GetImplementation( *this ).SetOffStage( actor );
 }
 
-void Base::RemoveAndReset( Actor& actor )
+void Visual::Base::RemoveAndReset( Actor& actor )
 {
   if( actor && *this )
   {
@@ -98,12 +95,10 @@ void Base::RemoveAndReset( Actor& actor )
   Reset();
 }
 
-void Base::CreatePropertyMap( Property::Map& map ) const
+void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 {
   GetImplementation( *this ).CreatePropertyMap( map );
 }
-
-} // namespace Visual
 
 } // namespace Toolkit
 

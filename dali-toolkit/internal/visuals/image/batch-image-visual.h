@@ -61,11 +61,6 @@ public:  // from Visual
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
-   * @copydoc Visual::Base::SetClipRect
-   */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
-  /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;

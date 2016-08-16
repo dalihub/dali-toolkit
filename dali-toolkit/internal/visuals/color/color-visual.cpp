@@ -91,18 +91,6 @@ void ColorVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void ColorVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void ColorVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
@@ -133,7 +121,7 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mMixColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mMixColor );
+  mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME, mMixColor );
   if( mMixColor.a < 1.f )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );

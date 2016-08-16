@@ -369,18 +369,6 @@ void MeshVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void MeshVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void MeshVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void MeshVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
