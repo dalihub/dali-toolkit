@@ -777,3 +777,211 @@ int UtcDaliVisualGetPropertyMap9(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualAnimateBorderVisual01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimateBorderVisual Color" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::BORDER);
+  propertyMap.Insert(BorderVisual::Property::COLOR,  Color::BLUE);
+  propertyMap.Insert(BorderVisual::Property::SIZE,  5.f);
+  Visual::Base borderVisual = factory.CreateVisual( propertyMap );
+
+  Actor actor = Actor::New();
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  Stage::GetCurrent().Add(actor);
+  borderVisual.SetOnStage( actor );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::COLOR );
+
+  Animation animation = Animation::New(4.0f);
+  animation.AnimateTo( Property(renderer, index), Color::WHITE );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(2000u); // halfway point between blue and white
+
+  Vector4 color = renderer.GetProperty<Vector4>( index );
+  Vector4 testColor = (Color::BLUE + Color::WHITE)*0.5f;
+  DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", testColor ), true, TEST_LOCATION );
+
+  application.Render(2000u); // halfway point between blue and white
+
+  color = renderer.GetProperty<Vector4>( index );
+  DALI_TEST_EQUALS( color, Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", Color::WHITE ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliVisualAnimateBorderVisual02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimateBorderVisual Size" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::BORDER);
+  propertyMap.Insert(BorderVisual::Property::COLOR,  Color::BLUE);
+  propertyMap.Insert(BorderVisual::Property::SIZE,  5.f);
+  Visual::Base borderVisual = factory.CreateVisual( propertyMap );
+
+  Actor actor = Actor::New();
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  Stage::GetCurrent().Add(actor);
+  borderVisual.SetOnStage( actor );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::SIZE );
+
+  Animation animation = Animation::New(4.0f);
+  animation.AnimateTo( Property(renderer, index), 9.0f );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(2000u); // halfway point
+
+  float size = renderer.GetProperty<float>( index );
+  DALI_TEST_EQUALS( size, 7.0f, 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("borderSize", 7.0f ), true, TEST_LOCATION );
+
+  application.Render(2000u); // halfway point between blue and white
+
+  size = renderer.GetProperty<float>( index );
+  DALI_TEST_EQUALS( size, 9.0f, 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("borderSize", 9.0f ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualAnimateColorVisual(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimateColorVisual mixColor" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+  Visual::Base borderVisual = factory.CreateVisual( propertyMap );
+
+  Actor actor = Actor::New();
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  Stage::GetCurrent().Add(actor);
+  borderVisual.SetOnStage( actor );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index index = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
+
+  Animation animation = Animation::New(4.0f);
+  animation.AnimateTo( Property(renderer, index), Color::WHITE );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(2000u); // halfway point
+
+  Vector4 color = renderer.GetProperty<Vector4>( index );
+  Vector4 testColor = (Color::BLUE + Color::WHITE)*0.5f;
+  DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", testColor ), true, TEST_LOCATION );
+
+  application.Render(2000u); // halfway point between blue and white
+
+  color = renderer.GetProperty<Vector4>( index );
+  DALI_TEST_EQUALS( color, Color::WHITE, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", Color::WHITE ), true, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
+int UtcDaliVisualAnimatePrimitiveVisual(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatePrimitiveVisual color" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+  Visual::Base borderVisual = factory.CreateVisual( propertyMap );
+
+  Actor actor = Actor::New();
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetColor(Color::BLACK);
+  Stage::GetCurrent().Add(actor);
+  borderVisual.SetOnStage( actor );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index index = renderer.GetPropertyIndex( PrimitiveVisual::Property::COLOR );
+
+  // The property isn't registered on the renderer, it's instead registered on the shader.
+  DALI_TEST_EQUALS( index, Property::INVALID_INDEX, TEST_LOCATION );
+
+  Animation animation = Animation::New(4.0f);
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR), Color::WHITE );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(2000u); // halfway point
+
+  // Actor color overrides renderer color.
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 1.0f )), true, TEST_LOCATION );
+
+  application.Render(2000u); // halfway point between blue and white
+
+  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE ), true, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliVisualWireframeVisual(void)
+{
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::WIREFRAME );
+
+  // Create the visual.
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  DALI_TEST_CHECK( visual );
+
+  Property::Map resultMap;
+  visual.CreatePropertyMap( resultMap );
+
+  // Check the property values from the returned map from visual
+  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::WIREFRAME );
+  END_TEST;
+}
+

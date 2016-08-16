@@ -50,7 +50,7 @@ SET(TC_SOURCES
    utc-Dali-Model3dView.cpp
    utc-Dali-Visual.cpp
    utc-Dali-VisualFactory.cpp
-   utc-Dali-DebugVisual.cpp
+   utc-Dali-DebugRendering.cpp
    utc-Dali-ImageAtlas.cpp
    utc-Dali-VideoView.cpp
 )
