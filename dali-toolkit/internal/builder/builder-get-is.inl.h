@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,34 @@ inline OptionalChild IsChild(const TreeNode* node, const std::string& childName)
   }
 }
 
+inline OptionalChild IsChildIgnoreCase(const TreeNode* node, const std::string& childName)
+{
+  if( node )
+  {
+    const TreeNode* c = node->GetChildIgnoreCase(childName);
+    if( NULL != c )
+    {
+      return OptionalChild( *c );
+    }
+    else
+    {
+      return OptionalChild();
+    }
+  }
+  else
+  {
+    return OptionalChild();
+  }
+}
+
 inline OptionalChild IsChild(const TreeNode& node, const std::string& childName)
 {
   return IsChild(&node, childName);
+}
+
+inline OptionalChild IsChildIgnoreCase(const TreeNode& node, const std::string& childName)
+{
+  return IsChildIgnoreCase(&node, childName);
 }
 
 inline OptionalString IsString(const OptionalChild& node)

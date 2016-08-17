@@ -117,7 +117,7 @@ void CollectAllStyles( const TreeNode& stylesCollection, const TreeNode& style, 
     {
       if( OptionalString styleName = IsString( (*iter).second ) )
       {
-        if( OptionalChild node = IsChild( stylesCollection, *styleName) )
+        if( OptionalChild node = IsChildIgnoreCase( stylesCollection, *styleName) )
         {
           styleList.push_back( &(*node) );
 
@@ -1231,7 +1231,9 @@ bool Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Re
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
 
   OptionalChild styles = IsChild( *mParser.GetRoot(), KEYNAME_STYLES );
-  OptionalChild style  = IsChild( *styles, styleName );
+
+  std::string styleNameLower(styleName);
+  OptionalChild style  = IsChildIgnoreCase( *styles, styleNameLower );
 
   if( styles && style )
   {
