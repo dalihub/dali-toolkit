@@ -305,8 +305,9 @@ protected: // For derived classes to call
    * @param[in] index The Property index of the visual, used to reference visual
    * @param[in] placementActor The actor used to by the visual.
    * @param[in] visual The visual to register
+   * @note Derived class must NOT call visual.SetOnStage(placementActor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
    */
-   void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual );
+   void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual );
 
    /**
     * @brief Erase the entry matching the given index from the list of registered visuals
@@ -325,7 +326,7 @@ protected: // For derived classes to call
     * @return The registered visual if exist, otherwise empty handle.
     * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
     */
-   Toolkit::Visual::Base GetVisual( Property::Index index );
+   Toolkit::Visual::Base GetVisual( Property::Index index ) const;
 
    /**
     * @brief Retrieve the placement actor associated with the given index.
@@ -336,7 +337,7 @@ protected: // For derived classes to call
     * @return Then placement actor if exist, otherwise empty handle.
     * @note For managing object life-cycle, do not store the returned placement actor as a member which increments its reference count.
     */
-   Actor GetPlacementActor( Property::Index index );
+   Actor GetPlacementActor( Property::Index index ) const;
 
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal

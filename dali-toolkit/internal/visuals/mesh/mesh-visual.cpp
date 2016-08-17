@@ -372,6 +372,8 @@ void MeshVisual::SetSize( const Vector2& size )
 void MeshVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const

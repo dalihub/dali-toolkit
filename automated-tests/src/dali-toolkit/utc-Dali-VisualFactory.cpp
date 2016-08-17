@@ -1117,7 +1117,8 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  // renderer is not added to actor until the rasterization is completed.
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   EventThreadCallback* eventTrigger = EventThreadCallback::Get();
   CallbackBase* callback = eventTrigger->GetCallback();
@@ -1125,6 +1126,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
   CallbackBase::Execute( *callback );
 
+  // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
   // waiting for the resource uploading

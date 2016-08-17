@@ -383,6 +383,8 @@ void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize ) const
 void PrimitiveVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const

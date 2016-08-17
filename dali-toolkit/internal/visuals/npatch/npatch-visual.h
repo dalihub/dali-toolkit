@@ -68,29 +68,29 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::GetNaturalSize
+   * @copydoc Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
-   * @copydoc Visual::CreatePropertyMap
+   * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
 
   /**
-   * @copydoc Visual::DoInitialize
+   * @copydoc Visual::Base::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::DoSetOffStage
+   * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
 

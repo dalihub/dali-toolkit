@@ -232,6 +232,8 @@ void GradientVisual::SetSize( const Vector2& size )
 void GradientVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
