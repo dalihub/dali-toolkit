@@ -28,7 +28,7 @@
 {
   "styles":
   {
-    "textlabel":
+    "TextLabel":
     {
       "pointSize":18,
       "enableAutoScroll":false,
@@ -37,27 +37,27 @@
       "autoScrollSpeed":80
     },
 
-    "textlabelFontSize0":
+    "TextLabelFontSize0":
     {
       "pointSize":8
     },
-    "textlabelFontSize1":
+    "TextLabelFontSize1":
     {
       "pointSize":10
     },
-    "textlabelFontSize2":
+    "TextLabelFontSize2":
     {
       "pointSize":15
     },
-    "textlabelFontSize3":
+    "TextLabelFontSize3":
     {
       "pointSize":19
     },
-    "textlabelFontSize4":
+    "TextLabelFontSize4":
     {
       "pointSize":25
     },
-    "radiobutton":
+    "RadioButton":
     {
       "unselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected.png",
       "selectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected.png",
@@ -65,7 +65,7 @@
       "disabledSelectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
     },
 
-    "textfield":
+    "TextField":
     {
       "pointSize":18,
       "primaryCursorColor":[0.0,0.72,0.9,1.0],
@@ -77,27 +77,27 @@
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
     },
 
-    "textfieldFontSize0":
+    "TextFieldFontSize0":
     {
       "pointSize":10
     },
-    "textfieldFontSize1":
+    "TextFieldFontSize1":
     {
       "pointSize":10
     },
-    "textfieldFontSize2":
+    "TextFieldFontSize2":
     {
       "pointSize":10
     },
-    "textfieldFontSize3":
+    "TextFieldFontSize3":
     {
       "pointSize":10
     },
-    "textfieldFontSize4":
+    "TextFieldFontSize4":
     {
       "pointSize":10
     },
-    "textselectionpopup":
+    "TextSelectionPopup":
     {
       "popupMaxSize":[400,100],
       "optionDividerSize":[2,0],
@@ -111,7 +111,7 @@
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
     },
-    "textselectionpopupbutton":
+    "TextSelectionPopupButton":
     {
       "label":
       {
@@ -119,7 +119,7 @@
         "fontStyle":"{\"weight\":\"light\"}"
       }
     },
-    "textselectiontoolbar":
+    "TextSelectionToolbar":
     {
       "enableOvershoot":true,
       "scrollView":
@@ -128,19 +128,19 @@
         "overshootSize":[480.0,42.0]
       }
     },
-    "scrollview":
+    "ScrollView":
     {
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":120.0,
       "overshootSize":[480.0,42.0]
     },
-    "itemview":
+    "ItemView":
     {
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":120.0,
       "overshootSize":[480.0,42.0]
     },
-    "texteditor":
+    "TextEditor":
     {
       "pointSize":18,
       "primaryCursorColor":[0.0,0.72,0.9,1.0],
@@ -151,15 +151,15 @@
       "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
     },
-    "popup":
+    "Popup":
     {
       "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
     },
-    "confirmationpopup":
+    "ConfirmationPopup":
     {
       "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
     },
-    "slider":
+    "Slider":
     {
       "showPopup": true,
       "showValue": true,

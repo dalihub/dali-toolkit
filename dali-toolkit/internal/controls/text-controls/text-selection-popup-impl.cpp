@@ -49,7 +49,7 @@ namespace
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
 
-const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "textselectionpopupbutton" );
+const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "TextSelectionPopupButton" );
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 1.0f ) );
 
 #if defined(DEBUG_ENABLED)
@@ -836,5 +836,3 @@ TextSelectionPopup::~TextSelectionPopup()
 } // namespace Toolkit
 
 } // namespace Dali
-
-

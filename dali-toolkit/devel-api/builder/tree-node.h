@@ -2,7 +2,7 @@
 #define __DALI_SCRIPT_TREE_NODE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,11 +182,18 @@ public:
   bool HasSubstitution() const;
 
   /*
-   * Gets a child of the node
-   * @param name The name of the child
+   * Gets a child of the node (using case sensitive matching)
+   * @param name The name of the child.
    * @return The child if found, else NULL
    */
   const TreeNode* GetChild(const std::string& name) const;
+
+  /*
+   * Gets a child of the node (using case insensitive matching)
+   * @param name The name of the child in lower case
+   * @return The child if found, else NULL
+   */
+  const TreeNode* GetChildIgnoreCase(const std::string& name) const;
 
   /*
    * Recursively search for a child of the node
