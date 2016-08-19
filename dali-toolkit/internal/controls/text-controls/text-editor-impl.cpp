@@ -26,6 +26,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -121,6 +122,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                     
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         STRING,    INPUT_OUTLINE                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -904,6 +906,10 @@ bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   {
     editor.TextChangedSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED ) )
+  {
+    editor.InputStyleChangedSignal().Connect( tracker, functor );
+  }
   else
   {
     // signalName does not match any signal
@@ -916,6 +922,11 @@ bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
 Toolkit::TextEditor::TextChangedSignalType& TextEditor::TextChangedSignal()
 {
   return mTextChangedSignal;
+}
+
+Toolkit::TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedSignal()
+{
+  return mInputStyleChangedSignal;
 }
 
 void TextEditor::OnInitialize()
@@ -988,13 +999,7 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
-
-      if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
-      {
-        // Property system did not set the PointSize so should update it.
-        // todo instruct text-controller to update model
-      }
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
       break;
     }
     case StyleChange::THEME_CHANGE:
@@ -1039,6 +1044,25 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     EnableClipping( true, size );
     RenderText( updateTextType );
+  }
+
+  // The text-editor emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-editor adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  if( !mController->IsInputStyleChangedSignalsQueueEmpty() )
+  {
+    if( Adaptor::IsAvailable() )
+    {
+      Adaptor& adaptor = Adaptor::Get();
+
+      if( NULL == mIdleCallback )
+      {
+        // @note: The callback manager takes the ownership of the callback object.
+        mIdleCallback = MakeCallback( this, &TextEditor::OnIdleSignal );
+        adaptor.AddIdle( mIdleCallback );
+      }
+    }
   }
 }
 
@@ -1237,6 +1261,60 @@ void TextEditor::TextChanged()
   mTextChangedSignal.Emit( handle );
 }
 
+void TextEditor::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
+{
+  Dali::Toolkit::TextEditor handle( GetOwner() );
+
+  Toolkit::TextEditor::InputStyle::Mask editorInputStyleMask = Toolkit::TextEditor::InputStyle::NONE;
+
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_COLOR ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::COLOR );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_FAMILY ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_FAMILY );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_POINT_SIZE ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::POINT_SIZE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WEIGHT ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WIDTH ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_SLANT ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_LINE_SPACING ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::LINE_SPACING );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_UNDERLINE ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::UNDERLINE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_SHADOW ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::SHADOW );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_EMBOSS ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::EMBOSS );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_OUTLINE ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::OUTLINE );
+  }
+
+  mInputStyleChangedSignal.Emit( handle, editorInputStyleMask );
+}
+
 void TextEditor::MaxLengthReached()
 {
   // Nothing to do as TextEditor doesn't emit a max length reached signal.
@@ -1339,8 +1417,18 @@ bool TextEditor::OnTouched( Actor actor, const TouchData& touch )
   return true;
 }
 
+void TextEditor::OnIdleSignal()
+{
+  // Emits the change of input style signals.
+  mController->ProcessInputStyleChangedSignals();
+
+  // Set the pointer to null as the callback manager deletes the callback after execute it.
+  mIdleCallback = NULL;
+}
+
 TextEditor::TextEditor()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mIdleCallback( NULL ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false )
 {
@@ -1349,6 +1437,12 @@ TextEditor::TextEditor()
 TextEditor::~TextEditor()
 {
   mClipper.Reset();
+
+  if( ( NULL != mIdleCallback ) && Adaptor::IsAvailable() )
+  {
+    // Removes the callback from the callback manager in case the text-editor is destroyed before the callback is executed.
+    Adaptor::Get().RemoveIdle( mIdleCallback );
+  }
 }
 
 } // namespace Internal

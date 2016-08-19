@@ -149,7 +149,7 @@ ________________________________________________________________________________
 + A **hover event** is when a pointer moves within the bounds of a custom actor (e.g. mouse pointer or hover pointer).
 + A **wheel event** is when the mouse wheel (or similar) is moved while hovering over an actor (via a mouse pointer or hover pointer).
  
-If the control needs to utilise hover and wheel events, then the correct behaviour flag should be used when constructing the control and then the appropriate method should be overridden.
+If the control needs to utilize hover and wheel events, then the correct behaviour flag should be used when constructing the control and then the appropriate method should be overridden.
 ~~~{.cpp}
 // C++
 bool MyUIControlImpl::OnHoverEvent( const HoverEvent& event )

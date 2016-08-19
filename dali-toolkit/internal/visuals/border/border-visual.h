@@ -61,13 +61,6 @@ public:
    */
   virtual ~BorderVisual();
 
-public:  // from Visual
-
-  /**
-   * @copydoc Visual::SetClipRect
-   */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
 protected:
 
   /**

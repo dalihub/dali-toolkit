@@ -956,6 +956,9 @@ int UtcDaliControlImplRegisterThenReRegisterVisual(void)
   Property::Index index =1;
   Actor placementActor = Actor::New();
 
+  DALI_TEST_CHECK( !dummyImpl.GetVisual( index )  );
+  DALI_TEST_CHECK( !dummyImpl.GetPlacementActor( index ) );
+
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base visual;
 
@@ -969,6 +972,8 @@ int UtcDaliControlImplRegisterThenReRegisterVisual(void)
   // Register index with a color visual
   dummyImpl.RegisterVisual( index, placementActor, visual );
 
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
 
   Property::Map newMap;
   newMap[Visual::Property::TYPE] = Visual::COLOR;
@@ -979,6 +984,9 @@ int UtcDaliControlImplRegisterThenReRegisterVisual(void)
 
   // ReRegister with altered color visual
   dummyImpl.RegisterVisual( index, placementActor, visual );
+
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
 
   tet_result(TET_PASS);
 
@@ -1008,8 +1016,14 @@ int UtcDaliControlImplRegisterVisaulThenReRegisterToSelf(void)
   // Register index with a color visual
   dummyImpl.RegisterVisual( index, placementActor, visual );
 
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
+
   // ReRegister to self
   dummyImpl.RegisterVisual( index, dummy, visual );
+
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == dummy );
 
   END_TEST;
 }
@@ -1041,6 +1055,8 @@ int UtcDaliControlImplRegisterVisualToSelf(void)
     // Register to self
     dummyImpl.RegisterVisual( index, dummy, visual );
     DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
+    DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+    DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == dummy );
   }
 
   DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
@@ -1085,6 +1101,12 @@ int UtcDaliControlImplRegisterTwoVisuals(void)
   // ReRegister with altered color visual
   dummyImpl.RegisterVisual( index2, secondPlacementActor, secondVisual );
 
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
+
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index2 ) == secondVisual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index2 ) == secondPlacementActor );
+
   END_TEST;
 }
 
@@ -1111,8 +1133,14 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
   // Register index with a color visual
   dummyImpl.RegisterVisual( index, placementActor, visual );
 
+  DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
+
   // Unregister visual
   dummyImpl.UnregisterVisual( index );
+
+  DALI_TEST_CHECK( !dummyImpl.GetVisual( index ) );
+  DALI_TEST_CHECK( !dummyImpl.GetPlacementActor( index ) );
 
   END_TEST;
 }

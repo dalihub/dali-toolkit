@@ -1,7 +1,7 @@
 <!--
 /**-->
 
-# Writing documentation for the DALi programing guide  {#documentationguide}
+# Writing documentation for the DALi programming guide  {#documentationguide}
 
 To allow documentation to be shared between C++ and JavaScript, please follow these guidelines:
 
@@ -41,7 +41,7 @@ Which will allow you to link to this section as follows:
 [Go To MyChapter](@ref my-chapter)
 ~~~
 
-Code blocks can be enclosed within 2 blocks of 3 tildas(~).
+Code blocks can be enclosed within 2 blocks of 3 tildes(~).
 
 You can even specify your language type, for example:
 ~~~{.md}

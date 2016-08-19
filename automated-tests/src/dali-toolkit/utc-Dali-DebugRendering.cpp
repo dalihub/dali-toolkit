@@ -42,7 +42,7 @@ bool IsDebugVisual( Visual::Base& visual )
   Property::Value* typeValue = propertyMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   if ( typeValue )
   {
-    isDebugVisualType = ( typeValue->Get<int>() == Visual::DEBUG );
+    isDebugVisualType = ( typeValue->Get<int>() == Visual::WIREFRAME ); // Debug Rendering uses the WireframeVisual
   }
 
   Actor actor = Actor::New();
@@ -54,21 +54,21 @@ bool IsDebugVisual( Visual::Base& visual )
 }
 }
 
-void dali_debug_renderer_startup(void)
+void dali_debug_rendering_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void dali_debug_renderer_cleanup(void)
+void dali_debug_rendering_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
 
-int UtcDaliDebugVisualGetVisual1(void)
+int UtcDaliDebugRenderingGetVisual1(void)
 {
   EnvironmentVariable::SetTestingEnvironmentVariable(true);
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliDebugVisualGetVisual1:  Request visual with a Property::Map" );
+  tet_infoline( "UtcDaliDebugRenderingGetVisual1:  Request visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -130,11 +130,11 @@ int UtcDaliDebugVisualGetVisual1(void)
   END_TEST;
 }
 
-int UtcDaliDebugVisualGetVisual2(void)
+int UtcDaliDebugRenderingGetVisual2(void)
 {
   EnvironmentVariable::SetTestingEnvironmentVariable(true);
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliDebugVisualGetVisual2: Request visual with various parameters" );
+  tet_infoline( "UtcDaliDebugRenderingGetVisual2: Request visual with various parameters" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );

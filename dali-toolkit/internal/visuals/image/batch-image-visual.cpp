@@ -168,11 +168,6 @@ void BatchImageVisual::GetNaturalSize( Vector2& naturalSize ) const
   naturalSize = Vector2::ZERO;
 }
 
-void BatchImageVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-}
-
 void BatchImageVisual::InitializeRenderer( const std::string& imageUrl )
 {
   if( imageUrl.empty() )

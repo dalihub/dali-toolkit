@@ -1,6 +1,6 @@
 /*! \page hello-world Hello World - explained
 
-The following steps are required for displaying the sentence 'Hello World' with Dali:
+The following steps are required for displaying the sentence 'Hello World' with DALi:
 
 - initialize the DALi library
 - create an Actor showing text

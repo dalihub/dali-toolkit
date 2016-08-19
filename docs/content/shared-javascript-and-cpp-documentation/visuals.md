@@ -7,7 +7,7 @@ Visuals provide reusable rendering logic which can be used by all controls.
 This means that custom controls do not have to create actors, they can just reuse the existing visuals which increases performance.
  
 Visuals reuse geometry, shaders etc. across controls and manages the renderer and material to exist only when the control is on-stage.
-Additionaly, they respond to actor size and color change, while also providing clipping at the renderer level.
+Additionally, they respond to actor size and color change, while also providing clipping at the renderer level.
  
 DALi provides the following visuals:
  + [Color](@ref color-visual)
@@ -16,6 +16,7 @@ DALi provides the following visuals:
  + [Border](@ref border-visual)
  + [Mesh](@ref mesh-visual)
  + [Primitive](@ref primitive-visual)
+ + [Wireframe](@ref wireframe-visual)
  
 Controls can provide properties that allow users to specify the visual type ( visualType ).
 Setting visual properties are done via a property map.
@@ -606,6 +607,42 @@ map[ PrimitiveVisual::Property::BEVEL_PERCENTAGE ] = 0.4f;
 
 control.SetProperty( Control::Property::BACKGROUND, map );
 ~~~
+___________________________________________________________________________________________________
+
+## Wireframe Visual {#wireframe-visual}
+
+Renders a wireframe around a control's quad.
+Is mainly used for debugging and is the visual that replaces all other visuals when [Visual Debug Rendering](@ref debugrendering) is turned on.
+ 
+![ ](../assets/img/visuals/wireframe-visual.png)
+![ ](visuals/wireframe-visual.png)
+
+### Properties
+
+**VisualType:** Dali::Toolkit::Visual::WIREFRAME, "WIREFRAME"
+
+### Usage
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+Dali::Property::Map map;
+map[ Visual::Property::TYPE ] = Dali::Toolkit::Visual::WIREFRAME;
+
+control.SetProperty( Control::Property::BACKGROUND, map );
+~~~
+
+~~~{.js}
+// JavaScript
+var control = new dali.Control( "Control" );
+
+control.background =
+{
+  visualType : "WIREFRAME"
+};
+~~~
+
 
 @class _Guide_Control_Visuals
 

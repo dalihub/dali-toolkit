@@ -16,7 +16,7 @@ If loop count is set to 3 for example it will scroll the text 3 times.
 
 ### Usage
 
-At version 1.1.35 auto scrolling is only supported in single line, mutliline text will not scroll and Text should be BEGIN aligned.
+At version 1.1.35 auto scrolling is only supported in single line, multiline text will not scroll and Text should be BEGIN aligned.
 
 The ENABLE_AUTO_SCROLL property should be set to TRUE to enable scrolling.
 
@@ -25,7 +25,7 @@ The scroll speed, gap and loop count can be set in the stylesheet or provided by
 Once enabled it will start scrolling until the loop count is completed or the ENABLE_AUTO_SCROLL set to false, setting ENABLE_AUTO_SCROLL to false will let the
 text complete it's current scrolling loop then stop.
 
-## The additional properties below can be set to customise the scrolling behaviour
+## The additional properties below can be set to customize the scrolling behaviour
 
 #### AUTO_SCROLL_SPEED
 
@@ -48,7 +48,7 @@ Provide the distance in pixels.
 
 ### Scroll Direction
 
-The scroll direction is choosen automatically with the following rules:
+The scroll direction is chosen automatically with the following rules:
 
 If the text is single-lined it will scroll left when the text is Left to Right (LTR) or scroll right if text is Right to Left (RTL).
 

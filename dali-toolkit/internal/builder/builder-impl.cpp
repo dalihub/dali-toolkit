@@ -102,7 +102,7 @@ bool GetMappingKey( const std::string& str, std::string& key )
 }
 
 /*
- * Recursively collects all stylesin a node (An array of style names).
+ * Recursively collects all styles in a node (An array of style names).
  *
  * stylesCollection The set of styles from the json file (a json object of named styles)
  * style The style array to begin the collection from

@@ -367,18 +367,6 @@ void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize ) const
   naturalSize.y = mObjectDimensions.y;
 }
 
-void PrimitiveVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void PrimitiveVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void PrimitiveVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
@@ -431,7 +419,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
   mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
   mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
-  mShader.RegisterProperty( COLOR_UNIFORM_NAME, mColor );
+  mShader.RegisterProperty( Toolkit::PrimitiveVisual::Property::COLOR, COLOR_UNIFORM_NAME, mColor );
   mShader.RegisterProperty( OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions );
 }
 

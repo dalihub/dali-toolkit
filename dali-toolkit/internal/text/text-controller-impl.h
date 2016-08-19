@@ -116,6 +116,8 @@ struct EventData
    */
   std::vector<Event> mEventQueue;              ///< The queue of touch events etc.
 
+  Vector<InputStyle::Mask> mInputStyleChangedQueue; ///< Queue of changes in the input style. Used to emit the signal in the iddle callback.
+
   InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
 
   State              mPreviousState;           ///< Stores the current state before it's updated with the new one.
@@ -437,6 +439,11 @@ struct Controller::Impl
    * @brief Helper to notify IMF manager with surrounding text & cursor changes.
    */
   void NotifyImfManager();
+
+  /**
+   * @brief Helper to notify IMF manager with multi line status.
+   */
+  void NotifyImfMultiLineStatus();
 
   /**
    * @brief Retrieve the current cursor position.

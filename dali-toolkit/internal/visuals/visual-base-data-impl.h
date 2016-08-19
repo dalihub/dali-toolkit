@@ -65,7 +65,6 @@ struct Base::Impl
   CustomShader* mCustomShader;
 
   Vector2   mSize;
-  Vector2   mOffset;
   float     mDepthIndex;
   int       mFlags;
 

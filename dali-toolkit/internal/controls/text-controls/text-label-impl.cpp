@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -680,13 +680,7 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
-
-      if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
-      {
-        // Property system did not set the PointSize so should update it.
-        // todo instruct text-controller to update model
-      }
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
       break;
     }
     case StyleChange::THEME_CHANGE:
@@ -812,12 +806,17 @@ void TextLabel::OnStageConnection( int depth )
 
 void TextLabel::TextChanged()
 {
-  // TextLabel does not provide a signal for this
+  // TextLabel does not provide a signal for this.
 }
 
 void TextLabel::MaxLengthReached()
 {
   // Pure Virtual from TextController Interface, only needed when inputting text
+}
+
+void TextLabel::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
+{
+  // TextLabel does not provide a signal for this.
 }
 
 void TextLabel::ScrollingFinished()
