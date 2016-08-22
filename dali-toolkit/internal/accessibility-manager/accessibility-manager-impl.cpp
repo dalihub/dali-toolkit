@@ -1313,7 +1313,7 @@ bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& 
 
     if(!mCurrentGesturedActor)
     {
-      DALI_LOG_ERROR("Gesture detected, but no hit actor\n");
+      DALI_LOG_ERROR("Gesture detected, but no hit actor");
     }
   }
 
@@ -1362,7 +1362,7 @@ bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& 
 
       if(!mCurrentGesturedActor)
       {
-        DALI_LOG_ERROR("no more gestured actor\n");
+        DALI_LOG_ERROR("no more gestured actor");
       }
     }
     else

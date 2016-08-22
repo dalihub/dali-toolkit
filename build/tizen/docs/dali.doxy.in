@@ -344,11 +344,9 @@ ALIASES += clip{3}="\dontinclude \1 \n \skip \2 \n \until \3"
 # For Open Source DALi API Reference
 ALIASES += SINCE_1_0="@since 1.0"
 ALIASES += SINCE_1_1="@since 1.1"
-ALIASES += SINCE_1_2="@since 1.2"
 
 ALIASES += DEPRECATED_1_0="@deprecated Deprecated since 1.0"
 ALIASES += DEPRECATED_1_1="@deprecated Deprecated since 1.1"
-ALIASES += DEPRECATED_1_2="@deprecated Deprecated since 1.2"
 
 ALIASES += PLATFORM=""
 ALIASES += PRIVLEVEL_PLATFORM=""

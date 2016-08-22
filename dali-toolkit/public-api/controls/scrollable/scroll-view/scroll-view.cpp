@@ -190,7 +190,7 @@ FixedRuler::FixedRuler(float spacing)
 {
   if(fabsf(mSpacing) <= Math::MACHINE_EPSILON_1)
   {
-    DALI_LOG_ERROR( "Page spacing too small (%f).\n", double(spacing) );
+    DALI_LOG_ERROR( "Page spacing too small (%f).", double(spacing) );
     mSpacing = spacing >= 0.0f ? Math::MACHINE_EPSILON_1 : -Math::MACHINE_EPSILON_1;
   }
   mType = Fixed;
@@ -257,7 +257,7 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
       if(pagesPerVolume < 1u)
       {
         pagesPerVolume = 1u;
-        DALI_LOG_ERROR("Ruler domain(%f) is smaller than its spacing(%f).\n", mDomain.GetSize() * 1.0, mSpacing * 1.0 );
+        DALI_LOG_ERROR("Ruler domain(%f) is smaller than its spacing(%f).", mDomain.GetSize() * 1.0, mSpacing * 1.0 );
       }
       page %= pagesPerVolume;
     }

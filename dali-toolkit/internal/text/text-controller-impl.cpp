@@ -91,7 +91,6 @@ EventData::EventData( DecoratorPtr decorator )
   mUpdateGrabHandlePosition( false ),
   mUpdateLeftSelectionPosition( false ),
   mUpdateRightSelectionPosition( false ),
-  mIsLeftHandleSelected( false ),
   mUpdateHighlightBox( false ),
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
@@ -219,12 +218,16 @@ bool Controller::Impl::ProcessInputEvents()
       GetCursorPosition( mEventData->mRightSelectionPosition,
                          rightHandleInfo );
 
-      if( mEventData->mScrollAfterUpdatePosition && ( mEventData->mIsLeftHandleSelected ? mEventData->mUpdateLeftSelectionPosition : mEventData->mUpdateRightSelectionPosition ) )
+      if( mEventData->mScrollAfterUpdatePosition && mEventData->mUpdateLeftSelectionPosition )
       {
-        CursorInfo& info = mEventData->mIsLeftHandleSelected ? leftHandleInfo : rightHandleInfo;
+        const Vector2 currentCursorPosition( leftHandleInfo.primaryPosition.x, leftHandleInfo.lineOffset );
+        ScrollToMakePositionVisible( currentCursorPosition, leftHandleInfo.lineHeight );
+       }
 
-        const Vector2 currentCursorPosition( info.primaryPosition.x, info.lineOffset );
-        ScrollToMakePositionVisible( currentCursorPosition, info.lineHeight );
+      if( mEventData->mScrollAfterUpdatePosition && mEventData->mUpdateRightSelectionPosition )
+      {
+        const Vector2 currentCursorPosition( rightHandleInfo.primaryPosition.x, rightHandleInfo.lineOffset );
+        ScrollToMakePositionVisible( currentCursorPosition, rightHandleInfo.lineHeight );
       }
     }
 
@@ -1200,31 +1203,17 @@ void Controller::Impl::OnPanEvent( const Event& event )
     return;
   }
 
-  const bool isHorizontalScrollEnabled = mEventData->mDecorator->IsHorizontalScrollEnabled();
-  const bool isVerticalScrollEnabled = mEventData->mDecorator->IsVerticalScrollEnabled();
+  int state = event.p1.mInt;
 
-  if( !isHorizontalScrollEnabled && !isVerticalScrollEnabled )
+  if( ( Gesture::Started == state ) ||
+      ( Gesture::Continuing == state ) )
   {
-    // Nothing to do if scrolling is not enabled.
-    return;
-  }
-
-  const int state = event.p1.mInt;
-
-  switch( state )
-  {
-    case Gesture::Started:
-    {
-      // Will remove the cursor, handles or text's popup, ...
-      ChangeState( EventData::TEXT_PANNING );
-      break;
-    }
-    case Gesture::Continuing:
+    if( mEventData->mDecorator )
     {
       const Vector2& layoutSize = mVisualModel->GetLayoutSize();
       const Vector2 currentScroll = mScrollPosition;
 
-      if( isHorizontalScrollEnabled )
+      if( mEventData->mDecorator->IsHorizontalScrollEnabled() )
       {
         const float displacementX = event.p2.mFloat;
         mScrollPosition.x += displacementX;
@@ -1232,7 +1221,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
         ClampHorizontalScroll( layoutSize );
       }
 
-      if( isVerticalScrollEnabled )
+      if( mEventData->mDecorator->IsVerticalScrollEnabled() )
       {
         const float displacementY = event.p3.mFloat;
         mScrollPosition.y += displacementY;
@@ -1241,17 +1230,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
       }
 
       mEventData->mDecorator->UpdatePositions( mScrollPosition - currentScroll );
-      break;
     }
-    case Gesture::Finished:
-    case Gesture::Cancelled: // FALLTHROUGH
-    {
-      // Will go back to the previous state to show the cursor, handles, the text's popup, ...
-      ChangeState( mEventData->mPreviousState );
-      break;
-    }
-    default:
-      break;
   }
 }
 
@@ -1323,9 +1302,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
       mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-
-      // Will define the order to scroll the text to match the handle position.
-      mEventData->mIsLeftHandleSelected = true;
     }
     else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
     {
@@ -1343,9 +1319,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
       mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-
-      // Will define the order to scroll the text to match the handle position.
-      mEventData->mIsLeftHandleSelected = false;
     }
   } // end ( HANDLE_PRESSED == state )
   else if( ( HANDLE_RELEASED == state ) ||
@@ -1388,7 +1361,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       mEventData->mUpdateHighlightBox = true;
       mEventData->mUpdateLeftSelectionPosition = true;
-      mEventData->mUpdateRightSelectionPosition = true;
 
       if( handleStopScrolling || isSmoothHandlePanEnabled )
       {
@@ -1407,7 +1379,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       mEventData->mUpdateHighlightBox = true;
       mEventData->mUpdateRightSelectionPosition = true;
-      mEventData->mUpdateLeftSelectionPosition = true;
 
       if( handleStopScrolling || isSmoothHandlePanEnabled )
       {
@@ -1788,14 +1759,6 @@ void Controller::Impl::RepositionSelectionHandles()
   const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
   bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
 
-  // The number of quads of the selection box.
-  const unsigned int numberOfQuads = 1u + ( glyphEnd - glyphStart ) + ( ( numberOfLines > 1u ) ? 2u * numberOfLines : 0u );
-  mEventData->mDecorator->ResizeHighlightQuads( numberOfQuads );
-
-  // Count the actual number of quads.
-  unsigned int actualNumberOfQuads = 0u;
-  Vector4 quad;
-
   // Traverse the glyphs.
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
   {
@@ -1819,17 +1782,18 @@ void Controller::Impl::RepositionSelectionHandles()
       // Calculate the number of characters selected.
       const Length numberOfCharacters = ( glyphStart == glyphEnd ) ? ( selectionEnd - selectionStart ) : ( numberOfCharactersStart - interGlyphIndex );
 
-      quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
-      quad.y = selectionBoxInfo->lineOffset;
-      quad.z = quad.x + static_cast<float>( numberOfCharacters ) * glyphAdvance;
-      quad.w = selectionBoxInfo->lineOffset + selectionBoxInfo->lineHeight;
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+      const float xPositionAdvance = xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset;
 
       // Store the min and max 'x' for each line.
-      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, quad.x );
-      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, quad.z );
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads, quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitStartGlyph = false;
       continue;
@@ -1850,35 +1814,35 @@ void Controller::Impl::RepositionSelectionHandles()
 
       const Length numberOfCharacters = numberOfCharactersEnd - interGlyphIndex;
 
-      quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
-      quad.y = selectionBoxInfo->lineOffset;
-      quad.z = quad.x + static_cast<float>( interGlyphIndex ) * glyphAdvance;
-      quad.w = quad.y + selectionBoxInfo->lineHeight;
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      const float xPositionAdvance = xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset;
 
       // Store the min and max 'x' for each line.
-      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, quad.x );
-      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, quad.z );
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitEndGlyph = false;
       continue;
     }
 
-    quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
-    quad.y = selectionBoxInfo->lineOffset;
-    quad.z = quad.x + glyph.advance;
-    quad.w = quad.y + selectionBoxInfo->lineHeight;
+    const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
+    const float xPositionAdvance = xPosition + glyph.advance;
+    const float yPosition = selectionBoxInfo->lineOffset;
 
     // Store the min and max 'x' for each line.
-    selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, quad.x );
-    selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, quad.z );
+    selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+    selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
-    mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                          quad );
-    ++actualNumberOfQuads;
+    mEventData->mDecorator->AddHighlight( xPosition,
+                                          yPosition,
+                                          xPositionAdvance,
+                                          yPosition + selectionBoxInfo->lineHeight );
 
     // Whether to retrieve the next line.
     if( index == lastGlyphOfLine )
@@ -1922,7 +1886,7 @@ void Controller::Impl::RepositionSelectionHandles()
     const SelectionBoxInfo& info = *it;
 
     // Update the size of the highlighted text.
-    highLightSize.height += info.lineHeight;
+    highLightSize.height += selectionBoxInfo->lineHeight;
     minHighlightX = std::min( minHighlightX, info.minX );
     maxHighlightX = std::max( maxHighlightX, info.maxX );
   }
@@ -1940,15 +1904,11 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyBegin )
     {
-      quad.x = 0.f;
-      quad.y = firstSelectionBoxLineInfo.lineOffset;
-      quad.z = firstSelectionBoxLineInfo.minX;
-      quad.w = firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the beginning of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            firstSelectionBoxLineInfo.minX,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       minHighlightX = 0.f;
@@ -1956,15 +1916,11 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyEnd )
     {
-      quad.x = firstSelectionBoxLineInfo.maxX;
-      quad.y = firstSelectionBoxLineInfo.lineOffset;
-      quad.z = mVisualModel->mControlSize.width;
-      quad.w = firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the end of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( firstSelectionBoxLineInfo.maxX,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       maxHighlightX = mVisualModel->mControlSize.width;
@@ -1980,23 +1936,15 @@ void Controller::Impl::RepositionSelectionHandles()
       {
         const SelectionBoxInfo& info = *it;
 
-        quad.x = 0.f;
-        quad.y = info.lineOffset;
-        quad.z = info.minX;
-        quad.w = info.lineOffset + info.lineHeight;
+        mEventData->mDecorator->AddHighlight( 0.f,
+                                              info.lineOffset,
+                                              info.minX,
+                                              info.lineOffset + info.lineHeight );
 
-        mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                              quad );
-        ++actualNumberOfQuads;
-
-        quad.x = info.maxX;
-        quad.y = info.lineOffset;
-        quad.z = mVisualModel->mControlSize.width;
-        quad.w = info.lineOffset + info.lineHeight;
-
-        mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                              quad );
-        ++actualNumberOfQuads;
+        mEventData->mDecorator->AddHighlight( info.maxX,
+                                              info.lineOffset,
+                                              mVisualModel->mControlSize.width,
+                                              info.lineOffset + info.lineHeight );
       }
 
       // Update the size of the highlighted text.
@@ -2013,15 +1961,11 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyBegin )
     {
-      quad.x = 0.f;
-      quad.y = lastSelectionBoxLineInfo.lineOffset;
-      quad.z = lastSelectionBoxLineInfo.minX;
-      quad.w = lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the beginning of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            lastSelectionBoxLineInfo.minX,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       minHighlightX = 0.f;
@@ -2029,23 +1973,16 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyEnd )
     {
-      quad.x = lastSelectionBoxLineInfo.maxX;
-      quad.y = lastSelectionBoxLineInfo.lineOffset;
-      quad.z = mVisualModel->mControlSize.width;
-      quad.w = lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the end of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( lastSelectionBoxLineInfo.maxX,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       maxHighlightX = mVisualModel->mControlSize.width;
     }
   }
-
-  // Set the actual number of quads.
-  mEventData->mDecorator->ResizeHighlightQuads( actualNumberOfQuads );
 
   // Sets the highlight's size and position. In decorator's coords.
   // The highlight's height has been calculated above (before 'boxifying' the highlight).
@@ -2215,201 +2152,158 @@ void Controller::Impl::ChangeState( EventData::State newState )
 
   if( mEventData->mState != newState )
   {
-    mEventData->mPreviousState = mEventData->mState;
     mEventData->mState = newState;
 
-    switch( mEventData->mState )
+    if( EventData::INACTIVE == mEventData->mState )
     {
-      case EventData::INACTIVE:
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetPopupActive( false );
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::INTERRUPTED  == mEventData->mState)
+    {
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetPopupActive( false );
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::SELECTING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
+      }
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      // Grab handle is not shown until a tap is received whilst EDITING
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
         mEventData->mDecorator->SetPopupActive( false );
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
       }
-      case EventData::INTERRUPTED:
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
       {
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      if( mEventData->mSelectionEnabled )
+      {
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
+      }
+      else
+      {
+        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      }
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
+      }
+      HideClipboard();
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      // Grab handle is not shown until a tap is received whilst EDITING
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
         mEventData->mDecorator->SetPopupActive( false );
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
       }
-      case EventData::SELECTING:
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHighlightActive( true );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive( true );
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
+        mEventData->mDecorator->SetPopupActive( false );
       }
-      case EventData::EDITING:
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::GRAB_HANDLE_PANNING == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
+        mEventData->mDecorator->StartCursorBlink();
       }
-      case EventData::EDITING_WITH_POPUP:
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        if( mEventData->mSelectionEnabled )
-        {
-          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHighlightActive( false );
-        }
-        else
-        {
-          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        }
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive( true );
-        }
-        HideClipboard();
-        mEventData->mDecoratorUpdated = true;
-        break;
+        mEventData->mDecorator->SetPopupActive( false );
       }
-      case EventData::EDITING_WITH_GRAB_HANDLE:
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING_WITH_PASTE_POPUP == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
+        mEventData->mDecorator->StartCursorBlink();
       }
-      case EventData::SELECTION_HANDLE_PANNING:
+
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHighlightActive( true );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
       }
-      case EventData::GRAB_HANDLE_PANNING:
-      {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::EDITING_WITH_PASTE_POPUP:
-      {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
-
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive( true );
-        }
-        HideClipboard();
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::TEXT_PANNING:
-      {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        if( mEventData->mDecorator->IsHandleActive( LEFT_SELECTION_HANDLE ) ||
-            mEventData->mDecorator->IsHandleActive( RIGHT_SELECTION_HANDLE ) )
-        {
-          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHighlightActive( true );
-        }
-
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
+      HideClipboard();
+      mEventData->mDecoratorUpdated = true;
     }
   }
 }

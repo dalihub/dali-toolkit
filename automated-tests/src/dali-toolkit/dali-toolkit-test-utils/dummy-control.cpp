@@ -18,7 +18,6 @@
 #include "dummy-control.h"
 
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -73,16 +72,6 @@ DummyControlImpl::DummyControlImpl()
 
 DummyControlImpl::~DummyControlImpl()
 {
-}
-
-void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
-{
-  Control::RegisterVisual( index, placementActor, visual );
-}
-
-void DummyControlImpl::UnregisterVisual( Property::Index index )
-{
-  Control::UnregisterVisual( index );
 }
 
 DummyControl DummyControlImplOverride::New()

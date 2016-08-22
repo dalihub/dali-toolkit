@@ -182,7 +182,7 @@ protected:
    * @param[in] actor The Actor the visual is applied to if, empty if the visual has not been applied to any Actor
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) {}
+  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) {};
 
 protected:
 

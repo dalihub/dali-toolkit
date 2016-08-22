@@ -36,7 +36,7 @@ const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" );
 
 // Image visual
-const char * const IMAGE_URL_NAME( "url" );
+const char * const IMAGE_URL_NAME("url");
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
 
 } // namespace Internal

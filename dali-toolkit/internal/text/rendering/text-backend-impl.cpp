@@ -106,7 +106,7 @@ RendererPtr Backend::NewRenderer( unsigned int renderingType )
 
     default:
     {
-      DALI_LOG_WARNING( "Unknown renderer type: %d\n", renderingType );
+      DALI_LOG_WARNING( "Unknown renderer type: %d", renderingType );
       break;
     }
   }

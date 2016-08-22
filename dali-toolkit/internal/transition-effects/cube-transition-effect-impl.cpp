@@ -353,7 +353,7 @@ void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisp
 {
   if( !mCurrentRenderer )
   {
-    DALI_LOG_ERROR( "Trying to transition a cube transition without an image set\n" );
+    DALI_LOG_ERROR( "Trying to transition a cube transition without an image set" );
     return;
   }
 

@@ -177,7 +177,7 @@ int UtcDaliVisualSize(void)
   gradientVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
 
-  // svg visual
+  //svg visual
   Visual::Base svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
   svgVisual.SetSize( visualSize );
   DALI_TEST_EQUALS( svgVisual.GetSize(), visualSize, TEST_LOCATION );
@@ -187,18 +187,6 @@ int UtcDaliVisualSize(void)
   //  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
   //  </svg>
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION );
-
-  // Batch Image visual
-  propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  batchImageVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( batchImageVisual.GetSize(), visualSize, TEST_LOCATION );
-  batchImageVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Vector2( 80.0f, 160.0f ), TEST_LOCATION );
-
   END_TEST;
 }
 
@@ -786,73 +774,6 @@ int UtcDaliVisualGetPropertyMap9(void)
   value = resultMap.Find( PrimitiveVisual::Property::LIGHT_POSITION, Property::VECTOR3 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMapBatchImageVisual:" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 20 );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 30 );
-
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  DALI_TEST_CHECK( batchImageVisual );
-
-  Property::Map resultMap;
-  batchImageVisual.CreatePropertyMap( resultMap );
-
-  // Check the property values from the returned map from visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL, Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 20 );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 30 );
-
-  END_TEST;
-}
-
-int UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas:" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-
-  // Set the desired size to be larger than the atlas limit of 1024x1024.
-  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 2048 );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 2048 );
-
-  // Create the visual.
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-
-  DALI_TEST_CHECK( batchImageVisual );
-
-  Actor actor = Actor::New();
-  batchImageVisual.SetOnStage( actor );
-
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
   END_TEST;
 }

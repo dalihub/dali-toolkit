@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_H
-#define DALI_TOOLKIT_H
+#ifndef __DALI_TOOLKIT_H__
+#define __DALI_TOOLKIT_H__
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -73,4 +73,4 @@
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
-#endif // DALI_TOOLKIT_H
+#endif // __DALI_TOOLKIT_H__
