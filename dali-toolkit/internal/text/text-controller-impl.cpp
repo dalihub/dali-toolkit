@@ -1747,11 +1747,11 @@ void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
   ChangeState( EventData::EDITING );
 }
 
-void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString )
+void Controller::Impl::RequestGetTextFromClipboard()
 {
   if ( mClipboard )
   {
-    retrievedString =  mClipboard.GetItem( itemIndex );
+    mClipboard.RequestItem();
   }
 }
 
@@ -2289,7 +2289,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHighlightActive( false );
         mEventData->mDecorator->SetPopupActive( false );
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::INTERRUPTED:
@@ -2300,7 +2299,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHighlightActive( false );
         mEventData->mDecorator->SetPopupActive( false );
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::SELECTING:
@@ -2336,7 +2334,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetPopupActive( false );
         }
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::EDITING_WITH_POPUP:
@@ -2363,7 +2360,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           SetPopupButtons();
           mEventData->mDecorator->SetPopupActive( true );
         }
-        HideClipboard();
         mEventData->mDecoratorUpdated = true;
         break;
       }
@@ -2386,7 +2382,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetPopupActive( false );
         }
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::SELECTION_HANDLE_PANNING:
@@ -2444,7 +2439,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           SetPopupButtons();
           mEventData->mDecorator->SetPopupActive( true );
         }
-        HideClipboard();
         mEventData->mDecoratorUpdated = true;
         break;
       }

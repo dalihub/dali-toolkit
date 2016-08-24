@@ -27,6 +27,7 @@
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include "toolkit-clipboard.h"
 
 using namespace Dali;
 using namespace Toolkit;
@@ -211,6 +212,22 @@ static int Wait(ToolkitTestApplication& application, int duration = 0)
   }
 
   return time;
+}
+
+Dali::Integration::Point GetPointDownInside( Vector2& pos )
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( pos );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpInside( Vector2& pos )
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( pos );
+  return point;
 }
 
 struct CallbackFunctor
@@ -1724,6 +1741,9 @@ int utcDaliTextFieldEvent08(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent08");
 
+  Dali::Clipboard clipboard = Clipboard::Get();
+  clipboard.SetItem("testTextFieldEvent");
+
   // Checks Longpress when only place holder text
 
   TextField field = TextField::New();
@@ -1754,6 +1774,28 @@ int utcDaliTextFieldEvent08(void)
   application.SendNotification();
   application.Render();
 
+  Wait(application, 500);
+
+  Stage stage = Stage::GetCurrent();
+  Layer layer = stage.GetRootLayer();
+  Actor actor = layer.FindChildByName("optionPaste");
+
+  if (actor)
+  {
+    Vector3 worldPosition = actor.GetCurrentWorldPosition();
+    Vector2 halfStageSize = stage.GetSize() / 2.0f;
+    Vector2 position(worldPosition.x + halfStageSize.width, worldPosition.y + halfStageSize.height);
+
+    Dali::Integration::TouchEvent event;
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint( GetPointDownInside( position ) );
+    application.ProcessEvent( event );
+
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint( GetPointUpInside( position ) );
+    application.ProcessEvent( event );
+  }
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("testTextFieldEvent"), TEST_LOCATION );
   END_TEST;
 }
 
