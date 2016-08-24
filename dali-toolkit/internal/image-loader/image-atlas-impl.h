@@ -20,12 +20,14 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/signals/connection-tracker.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/images/atlas.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-atlas/image-atlas.h>
-#include <dali-toolkit/internal/image-atlas/atlas-packer.h>
-#include <dali-toolkit/internal/image-atlas/image-load-thread.h>
+#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
+#include <dali-toolkit/devel-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/internal/image-loader/atlas-packer.h>
 
 namespace Dali
 {
@@ -37,7 +39,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class ImageAtlas : public BaseObject
+class ImageAtlas : public BaseObject, public ConnectionTracker
 {
 public:
 
@@ -59,7 +61,12 @@ public:
   /**
    * @copydoc Toolkit::ImageAtlas::GetAtlas
    */
-  Image GetAtlas();
+  Texture GetAtlas();
+
+  /**
+   * @copydoc Toolkit::ImageAtlas::GetOccupancyRate
+   */
+  float GetOccupancyRate() const;
 
   /**
    * @copydoc Toolkit::ImageAtlas::SetBrokenImage
@@ -95,16 +102,16 @@ protected:
 private:
 
   /**
-   * Upload the bitmap to atlas when the image is loaded in the worker thread.
+   * @copydoc PixelDataRequester::ProcessPixels
    */
-  void UploadToAtlas();
+  void UploadToAtlas( unsigned int id, PixelData pixelData );
 
   /**
    * Upload broken image
    *
    * @param[in] area The pixel area for uploading.
    */
-  void UploadBrokenImage( const Rect<SizeType>& area );
+  void UploadBrokenImage( const Rect<unsigned int>& area );
 
   // Undefined
   ImageAtlas( const ImageAtlas& imageAtlas);
@@ -114,19 +121,31 @@ private:
 
 private:
 
-  Atlas                mAtlas;
-  AtlasPacker          mPacker;
+  struct IdRectPair
+  {
+    IdRectPair( unsigned short loadTaskId,
+                unsigned int packPositionX,
+                unsigned int packPositionY,
+                unsigned int width,
+                unsigned int height )
+    : loadTaskId( loadTaskId ),
+      packRect( packPositionX, packPositionY, width, height )
+    {}
 
-  LoadQueue            mLoadQueue;
-  CompleteQueue        mCompleteQueue;
-  ImageLoadThread      mLoadingThread;
+    unsigned short loadTaskId;
+    Rect<unsigned int> packRect;
+  };
 
-  std::string          mBrokenImageUrl;
-  ImageDimensions      mBrokenImageSize;
-  float                mWidth;
-  float                mHeight;
-  Pixel::Format        mPixelFormat;
-  bool                 mLoadingThreadStarted;
+  OwnerContainer<IdRectPair*> mIdRectContainer;
+
+  Texture                   mAtlas;
+  AtlasPacker               mPacker;
+  Toolkit::AsyncImageLoader mAsyncLoader;
+  std::string               mBrokenImageUrl;
+  ImageDimensions           mBrokenImageSize;
+  float                     mWidth;
+  float                     mHeight;
+  Pixel::Format             mPixelFormat;
 
 };
 

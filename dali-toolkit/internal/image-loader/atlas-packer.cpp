@@ -148,24 +148,22 @@ void AtlasPacker::SplitNode( Node* node, SizeType blockWidth, SizeType blockHeig
 
 AtlasPacker::Node* AtlasPacker::SearchNode( Node* node, SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight  )
 {
-  if( node == NULL )
+  if( node != NULL )
   {
-    return NULL;
-  }
-
-  if( node->child[0] != NULL) //not a leaf
-  {
-    Node* newNode = SearchNode(node->child[0], packPositionX, packPositionY, blockWidth, blockHeight);
-    if( newNode == NULL )// try search from the second child.
+    if( node->child[0] != NULL) //not a leaf
     {
-      newNode = SearchNode(node->child[1], packPositionX, packPositionY, blockWidth, blockHeight);
+      Node* newNode = SearchNode(node->child[0], packPositionX, packPositionY, blockWidth, blockHeight);
+      if( newNode == NULL )// try search from the second child.
+      {
+        newNode = SearchNode(node->child[1], packPositionX, packPositionY, blockWidth, blockHeight);
+      }
+      return newNode;
     }
-    return newNode;
-  }
-  else if( ApproximatelyEqual(node->rectArea.x, packPositionX) && ApproximatelyEqual(node->rectArea.y, packPositionY )
-           && ApproximatelyEqual(node->rectArea.width, blockWidth) && ApproximatelyEqual( node->rectArea.height, blockHeight) )
-  {
-    return node;
+    else if( ApproximatelyEqual(node->rectArea.x, packPositionX) && ApproximatelyEqual(node->rectArea.y, packPositionY )
+        && ApproximatelyEqual(node->rectArea.width, blockWidth) && ApproximatelyEqual( node->rectArea.height, blockHeight) )
+    {
+      return node;
+    }
   }
 
   return NULL;

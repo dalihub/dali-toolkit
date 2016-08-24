@@ -417,6 +417,7 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   loader.WaitForLoading();// waiting until the image to be loaded
   DALI_TEST_CHECK( loader.IsLoaded() );
 
+  eventTrigger->WaitingForTrigger( 1 );
   CallbackBase* callback = eventTrigger->GetCallback();
   CallbackBase::Execute( *callback );
 

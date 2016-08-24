@@ -142,7 +142,7 @@ void ImageAtlasManager::CreateNewAtlas()
   }
   mAtlasList.push_back( newAtlas );
   TextureSet textureSet = TextureSet::New();
-  TextureSetImage( textureSet, 0u, newAtlas.GetAtlas() );
+  textureSet.SetTexture( 0u, newAtlas.GetAtlas() );
   mTextureSetList.push_back( textureSet );
 }
 

@@ -20,8 +20,7 @@
 #include <dali/dali.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/devel-api/images/atlas.h>
-#include <dali-toolkit/devel-api/image-atlas/image-atlas.h>
+#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 using namespace Dali;
@@ -120,15 +119,31 @@ int UtcDaliImageAtlasGetAtlas(void)
   ToolkitTestApplication application;
 
   ImageAtlas atlas = ImageAtlas::New( 32, 32 );
-  Image image = atlas.GetAtlas();
+  Texture image = atlas.GetAtlas();
 
   // test the atlas created
   DALI_TEST_EQUALS( (bool)image, true, TEST_LOCATION );
   DALI_TEST_CHECK( image.GetHeight() == 32u );
   DALI_TEST_CHECK( image.GetWidth() == 32u );
 
-  Atlas coreAtlas = Atlas::DownCast( image );
-  DALI_TEST_EQUALS( (bool)coreAtlas, true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliImageAtlasGetOccupancyRate(void)
+{
+  ToolkitTestApplication application;
+
+  ImageAtlas atlas = ImageAtlas::New( 100, 100 );
+
+  DALI_TEST_EQUALS( atlas.GetOccupancyRate(), 0.f, TEST_LOCATION );
+
+  Vector4 textureRect1;
+  atlas.Upload( textureRect1, gImage_34_RGBA, ImageDimensions(34, 34) );
+  DALI_TEST_EQUALS( atlas.GetOccupancyRate(), 34.f*34.f/10000.f, 0.001f, TEST_LOCATION );
+
+  Vector4 textureRect2;
+  atlas.Upload( textureRect2, gImage_50_RGBA, ImageDimensions(50, 50) );
+  DALI_TEST_EQUALS( atlas.GetOccupancyRate(), (34.f*34.f+50.f*50.f)/10000.f, 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -165,9 +180,6 @@ int UtcDaliImageAtlasUploadP(void)
   unsigned int size = 200;
   ImageAtlas atlas = ImageAtlas::New( size, size );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
   callStack.Reset();
   callStack.Enable(true);
@@ -178,6 +190,9 @@ int UtcDaliImageAtlasUploadP(void)
   atlas.Upload( textureRect2, gImage_50_RGBA, ImageDimensions(50, 50) );
   Vector4 textureRect3;
   atlas.Upload( textureRect3, gImage_128_RGB, ImageDimensions(128, 128) );
+
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  CallbackBase* callback = eventTrigger->GetCallback();
 
   eventTrigger->WaitingForTrigger( 3 );// waiting until all three images are loaded
 

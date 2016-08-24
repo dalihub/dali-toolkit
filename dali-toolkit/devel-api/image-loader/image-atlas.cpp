@@ -19,7 +19,7 @@
 #include "image-atlas.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/image-atlas/image-atlas-impl.h>
+#include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 
 namespace Dali
 {
@@ -58,10 +58,16 @@ ImageAtlas ImageAtlas::New(SizeType width, SizeType height,
   return ImageAtlas( internal.Get() );
 }
 
-Image ImageAtlas::GetAtlas()
+Texture ImageAtlas::GetAtlas()
 {
   return GetImplementation( *this ).GetAtlas();
 }
+
+float ImageAtlas::GetOccupancyRate() const
+{
+  return GetImplementation( *this ).GetOccupancyRate();
+}
+
 
 void ImageAtlas::SetBrokenImage( const std::string& brokenImageUrl )
 {

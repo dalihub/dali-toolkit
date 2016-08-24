@@ -21,10 +21,10 @@
 #include <string>
 #include <stdint.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -37,10 +37,10 @@ class ImageAtlas;
 }
 
 /**
- * @brief An ImageAtlas is a large image containing multiple smaller images.
+ * @brief An ImageAtlas is a large texture containing multiple smaller images.
  *
- * Only images with url provided are supported for uploading.
- * The image are loaded by a worker thread to avoid blocking the main event thread.
+ * Only images with url provided or pixel data are supported for uploading.
+ * The images are loaded by a worker thread to avoid blocking the main event thread.
  */
 class DALI_IMPORT_API ImageAtlas : public BaseHandle
 {
@@ -91,11 +91,18 @@ public:
   /**
    * @brief Get the atlas image.
    *
-   * This atlas image is still valid after destroying the ImageAtlas object.
+   * This atlas texture is still valid after destroying the ImageAtlas object.
    *
-   * @return the atlas image with type of Dali::Atlas
+   * @return The atlas texture
    */
-  Image GetAtlas();
+  Texture GetAtlas();
+
+  /*
+   * @brief Query what percentage of space is been occupied in the atlas.
+   *
+   * @return The occupancy rate of the atlas.
+   */
+  float GetOccupancyRate() const;
 
   /**
    * @brief Set the broken image which is used to replace the image if loading fails.

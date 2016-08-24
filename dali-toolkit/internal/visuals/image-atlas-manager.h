@@ -24,7 +24,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-atlas/image-atlas.h>
+#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 
 namespace Dali
 {
