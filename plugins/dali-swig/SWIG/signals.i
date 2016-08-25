@@ -55,6 +55,36 @@
  * so we have make them ourselves
  */
 
+%define SIGNAL_TEMPLATE_HELPER_0( returnType,  returnFunc)
+  template<> class Signal< returnType () >
+  {
+  public:
+    %extend
+    {
+      bool Empty() const
+      {
+         return $self->Empty();
+      }
+      std::size_t GetConnectionCount() const
+      {
+        return $self->GetConnectionCount();
+      }
+      void Connect( returnType ( *func ) () )
+      {
+          $self->Connect( func );
+      }
+      void Disconnect( returnType ( *func ) () )
+      {
+          $self->Disconnect( func );
+      }
+      returnType Emit()
+      {
+          returnFunc $self->Emit();
+      }
+    }
+  };
+%enddef
+
 %define SIGNAL_TEMPLATE_HELPER_1( returnType,  returnFunc, argumentType )
   template<> class Signal< returnType ( argumentType ) >
   {
@@ -156,6 +186,13 @@
 %enddef
 
 // Macro to define a csharp signal.
+// 0 param signals ( no return )
+%define DALI_SIGNAL_0_PARAM()
+
+  SIGNAL_TYPEMAP_HELPER( void (*func) () );
+  SIGNAL_TEMPLATE_HELPER_0( void, NO_RETURN_FUNC);
+%enddef
+
 // 1 param signals ( no return )
 %define DALI_SIGNAL_1_PARAM( argumentType1 )
 
@@ -209,6 +246,9 @@
 
 namespace Dali
 {
+// Signal< void () >
+DALI_SIGNAL_0_PARAM();
+
 // Signal< void (Actor) >
 DALI_SIGNAL_1_PARAM( Dali::Actor );
 
@@ -279,7 +319,7 @@ DALI_SIGNAL_1_PARAM( const Dali::RefObject* );
 DALI_SIGNAL_1_PARAM( const Dali::RenderTask& );
 
 // Signal< bool ( const Dali::Toolkit::AccessibilityManager& ) >
-DALI_SIGNAL_1_PARAM_RETURN( bool ,const Dali::Toolkit::AccessibilityManager& );
+DALI_SIGNAL_1_PARAM_RETURN( bool ,Dali::Toolkit::AccessibilityManager& );
 
 // Signal< bool ( const Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent& ) >
 DALI_SIGNAL_2_PARAM_RETURN( bool ,const Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent& );
@@ -305,6 +345,9 @@ DALI_SIGNAL_3_PARAM_RETURN( Dali::Actor, Dali::Actor, Dali::Actor, Dali::Toolkit
 // void Signal<  Dali::Actor, bool >;
 DALI_SIGNAL_2_PARAM( Dali::Actor, bool);
 
+// void Signal<  Dali::Actor, Dali::Actor >;
+DALI_SIGNAL_2_PARAM( Dali::Actor, Dali::Actor);
+
 // bool Signal< Dali::Toolkit::Button >;
 DALI_SIGNAL_1_PARAM_RETURN( bool, Dali::Toolkit::Button);
 
@@ -327,7 +370,7 @@ DALI_SIGNAL_1_PARAM( const Dali::Vector2& );
 DALI_SIGNAL_1_PARAM( Dali::Toolkit::TextEditor );
 
 // void Signal< Dali::Toolkit::TextField >;
-DALI_SIGNAL_1_PARAM( Dali::Toolkit::TextField )
+DALI_SIGNAL_1_PARAM( Dali::Toolkit::TextField );
 
 // bool Signal< Dali::Toolkit::Control, const Dali::KeyEvent& >;
 DALI_SIGNAL_2_PARAM_RETURN( bool, Dali::Toolkit::Control, const Dali::KeyEvent& );

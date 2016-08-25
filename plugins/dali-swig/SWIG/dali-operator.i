@@ -70,13 +70,20 @@
       return ValueOfIndex(index);
     }
   }
+
+  public static Vector2 GetVector2FromPtr(global::System.IntPtr cPtr) {
+    Vector2 ret = new Vector2(cPtr, false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+       return ret;
+  }
+
 %}
 
 %typemap(cscode) Dali::Vector3 %{
   public static Vector3 operator+(Vector3 arg1, Vector3 arg2) {
     return arg1.Add(arg2);
   }
-  
+
   public static Vector3 operator-(Vector3 arg1, Vector3 arg2) {
     return arg1.Subtract(arg2);
   }
@@ -108,6 +115,13 @@
       return ValueOfIndex(index);
     }
   }
+
+  public static Vector3 GetVector3FromPtr(global::System.IntPtr cPtr) {
+    Vector3 ret = new Vector3(cPtr, false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+       return ret;
+  }
+
 %}
 
 %typemap(cscode) Dali::Vector4 %{
@@ -146,6 +160,13 @@
       return ValueOfIndex(index);
     }
   }
+
+  public static Vector4 GetVector4FromPtr(global::System.IntPtr cPtr) {
+    Vector4 ret = new Vector4(cPtr, false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+       return ret;
+  }
+
 %}
 
 %typemap(cscode) Dali::Matrix %{

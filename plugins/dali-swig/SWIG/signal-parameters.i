@@ -81,6 +81,7 @@ DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali::Toolkit, TextField );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali::Toolkit, TextField );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali::Toolkit, VideoView );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali::Toolkit, Slider );
+DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali::Toolkit::ScrollView, SnapEvent );
  
   
 

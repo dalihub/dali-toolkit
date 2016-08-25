@@ -40,19 +40,16 @@ namespace MyCSharpExample
         public Example(Dali.Application application)
         {
             _application = application;
-
-            CallbackDelegate initializeCallback = new CallbackDelegate( Initialize );
-            _application.InitSignal().Connect( initializeCallback );
+            _application.Initialized += new Dali.AUIApplicationInitEventHandler(Initialize);
         }
 
-        private void Initialize(IntPtr appPtr)
+        public void Initialize(object source, AUIApplicationInitEventArgs e)
         {
+            Console.WriteLine("Customized Application Initialize event handler");
             Stage stage = Stage.GetCurrent();
             stage.SetBackgroundColor( NDalic.WHITE );
 
-            // Connect the signal callback for stage touched signal
-            TouchCallbackDelegate stageTouchedCallback = new TouchCallbackDelegate( OnStageTouched );
-            stage.TouchSignal().Connect( stageTouchedCallback );
+            stage.Touched += new Dali.Stage.TouchEventHandler(OnStageTouched);
 
             // Add a _text label to the stage
             _text = new TextLabel("Hello Mono World");
@@ -65,20 +62,21 @@ namespace MyCSharpExample
         }
 
         // Callback for _animation finished signal handling
-        private void AnimationFinished(IntPtr data)
+        public void AnimationFinished(object source, Animation.FinishedEventArgs e)
         {
-            Animation _animation = Animation.GetAnimationFromPtr( data );
-            Console.WriteLine("Animation finished: duration = " + _animation.GetDuration());
+            Console.WriteLine("Customized Animation Finished Event handler");
+            Console.WriteLine("Animation finished: duration = " + e.Animation.GetDuration());
         }
 
         // Callback for stage touched signal handling
-        private void OnStageTouched(IntPtr data)
+        public void OnStageTouched(object source, Stage.TouchEventArgs e)
         {
-            TouchData touchData = TouchData.GetTouchDataFromPtr( data );
+            //TouchData touchData = TouchData.GetTouchDataFromPtr( data );
 
             // Only animate the _text label when touch down happens
-            if( touchData.GetState(0) == PointStateType.DOWN )
+            if( e.TouchData.GetState(0) == PointStateType.DOWN )
             {
+                Console.WriteLine("Customized Stage Touch event handler");
                 // Create a new _animation
                 if( _animation )
                 {
@@ -91,8 +89,7 @@ namespace MyCSharpExample
                 _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
 
                 // Connect the signal callback for animaiton finished signal
-                AnimationCallbackDelegate animFinishedDelegate = new AnimationCallbackDelegate( AnimationFinished );
-                _animation.FinishedSignal().Connect( animFinishedDelegate );
+      _animation.Finished += new Dali.Animation.FinishedEventHandler(AnimationFinished);
 
                 // Play the _animation
                 _animation.Play();

@@ -93,6 +93,7 @@
 %rename(MeshVisualShadingModeValue) Dali::Toolkit::MeshVisual::ShadingMode::Value;
 %rename(PrimitiveVisualShapeType) Dali::Toolkit::PrimitiveVisual::Shape::Type;
 %rename(PRIMITIVE_VISUAL_COLOR) Dali::Toolkit::PrimitiveVisual::Property::COLOR;
+%rename(PRIMITIVE_VISUAL_MIX_COLOR) Dali::Toolkit::PrimitiveVisual::Property::MIX_COLOR;
 %rename(PRIMITIVE_VISUAL_LIGHT_POSITION) Dali::Toolkit::PrimitiveVisual::Property::LIGHT_POSITION;
 %rename(VISUAL_PROPERTY_TYPE) Dali::Toolkit::Visual::Property::TYPE;
 %rename(VISUAL_PROPERTY_SHADER) Dali::Toolkit::Visual::Property::SHADER;
@@ -103,6 +104,7 @@
 %rename(IMAGE_VISUAL_DESIRED_HEIGHT) Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT;
 %rename(IMAGE_VISUAL_SYNCHRONOUS_LOADING) Dali::Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING;
 %rename(IMAGE_VISUAL_BORDER_ONLY) Dali::Toolkit::ImageVisual::Property::BORDER_ONLY;
+%rename(COLOR_VISUAL_MIX_COLOR) Dali::Toolkit::Color::Visual::Property::MIX_COLOR;
 
 %csconstvalue("PropertyRanges.PROPERTY_REGISTRATION_START_INDEX") PROPERTY_START_INDEX;
 %csconstvalue("Control.PropertyRange.PROPERTY_START_INDEX+1000") PROPERTY_END_INDEX;
