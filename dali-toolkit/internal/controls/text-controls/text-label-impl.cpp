@@ -33,7 +33,7 @@
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
-using Dali::Toolkit::Text::LayoutEngine;
+using namespace Dali::Toolkit::Text;
 
 namespace Dali
 {
@@ -58,17 +58,17 @@ namespace
 
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_END    },
+  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
+  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
 const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "TOP",    Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_TOP    },
-  { "CENTER", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_CENTER },
-  { "BOTTOM", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_BOTTOM },
+  { "TOP",    Toolkit::Text::Layout::VERTICAL_ALIGN_TOP    },
+  { "CENTER", Toolkit::Text::Layout::VERTICAL_ALIGN_CENTER },
+  { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
 };
 const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
@@ -170,7 +170,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string fontFamily = value.Get< std::string >();
+          const std::string& fontFamily = value.Get< std::string >();
 
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str() );
           impl.mController->SetDefaultFontFamily( fontFamily );
@@ -207,11 +207,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
-                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                             alignment ) )
+          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
+          if( Scripting::GetEnumeration< Toolkit::Text::Layout::HorizontalAlignment >( value.Get< std::string >().c_str(),
+                                                                                       HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                       HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                                       alignment ) )
           {
             impl.mController->SetHorizontalAlignment( alignment );
           }
@@ -222,11 +222,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
-          if( Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
-                                                                                           VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                           VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                           alignment ) )
+          Layout::VerticalAlignment alignment( Layout::VERTICAL_ALIGN_BOTTOM );
+          if( Scripting::GetEnumeration< Toolkit::Text::Layout::VerticalAlignment >( value.Get< std::string >().c_str(),
+                                                                                     VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                     VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                                     alignment ) )
           {
             impl.mController->SetVerticalAlignment( alignment );
           }
@@ -238,10 +238,10 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector4 textColor = value.Get< Vector4 >();
-          if( impl.mController->GetTextColor() != textColor )
+          const Vector4& textColor = value.Get< Vector4 >();
+          if( impl.mController->GetDefaultColor() != textColor )
           {
-            impl.mController->SetTextColor( textColor );
+            impl.mController->SetDefaultColor( textColor );
             impl.mRenderer.Reset();
           }
         }
@@ -252,7 +252,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector2 shadowOffset = value.Get< Vector2 >();
+          const Vector2& shadowOffset = value.Get< Vector2 >();
           if ( impl.mController->GetShadowOffset() != shadowOffset )
           {
             impl.mController->SetShadowOffset( shadowOffset );
@@ -265,7 +265,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector4 shadowColor = value.Get< Vector4 >();
+          const Vector4& shadowColor = value.Get< Vector4 >();
           if ( impl.mController->GetShadowColor() != shadowColor )
           {
             impl.mController->SetShadowColor( shadowColor );
@@ -278,7 +278,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector4 color = value.Get< Vector4 >();
+          const Vector4& color = value.Get< Vector4 >();
           if ( impl.mController->GetUnderlineColor() != color )
           {
             impl.mController->SetUnderlineColor( color );
@@ -342,7 +342,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
              // If request is enable (true) then start autoscroll as not already running
              else
              {
-               impl.mController->GetLayoutEngine().SetTextEllipsisEnabled( false );
+               impl.mController->SetTextElideEnabled( false );
                impl.mController->SetAutoScrollEnabled( enableAutoScroll );
              }
           }
@@ -485,9 +485,9 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
-                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
+                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
           if( name )
           {
             value = std::string( name );
@@ -499,9 +499,9 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
-                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
+                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
           if( name )
           {
             value = std::string( name );
@@ -513,7 +513,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if ( impl.mController )
         {
-          value = impl.mController->GetTextColor();
+          value = impl.mController->GetDefaultColor();
         }
         break;
       }
@@ -652,9 +652,9 @@ void TextLabel::OnInitialize()
   self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 
   // Enable the text ellipsis.
-  LayoutEngine& engine = mController->GetLayoutEngine();
+  mController->SetTextElideEnabled( true );   // If false then text larger than control will overflow
 
-  engine.SetTextEllipsisEnabled( true );   // If false then text larger than control will overflow
+  Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
 
   self.OnStageSignal().Connect( this, &TextLabel::OnStageConnect );
@@ -737,7 +737,7 @@ void TextLabel::RenderText()
 
     if( renderableActor )
     {
-      const Vector2& scrollOffset = mController->GetScrollPosition();
+      const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
       renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
       self.Add( renderableActor );
@@ -800,7 +800,7 @@ void TextLabel::ScrollingFinished()
   // Pure Virtual from TextScroller Interface
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
   mController->SetAutoScrollEnabled( false );
-  mController->GetLayoutEngine().SetTextEllipsisEnabled( true );
+  mController->SetTextElideEnabled( true );
   RequestTextRelayout();
 }
 

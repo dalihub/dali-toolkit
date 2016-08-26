@@ -313,10 +313,10 @@ public:
   Vector<Vector4>        mColors;               ///< Colors of the glyphs.
   Vector<ColorIndex>     mColorIndices;         ///< Indices to the vector of colors for each glyphs.
 
-  Vector2                mControlSize;           ///< The size of the UI control the decorator is adding it's decorations to.
   Vector4                mTextColor;            ///< The text color
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
+  Size                   mControlSize;          ///< The size of the UI control.
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
 

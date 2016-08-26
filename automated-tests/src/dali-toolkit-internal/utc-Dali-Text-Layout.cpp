@@ -24,7 +24,7 @@
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <toolkit-text-model.h>
+#include <toolkit-text-utils.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -51,7 +51,7 @@ struct LayoutTextData
   float*               positions;
   unsigned int         numberOfLines;
   LineRun*             lines;
-  LayoutEngine::Layout layout;
+  Layout::Engine::Type layout;
   unsigned int         startIndex;
   unsigned int         numberOfGlyphs;
   bool                 ellipsis:1;
@@ -152,24 +152,24 @@ bool LayoutTextTest( const LayoutTextData& data )
                         glyphPositions.Begin() + data.startIndex + data.numberOfGlyphs );
 
   // 3) Layout
-  LayoutEngine engine;
+  Layout::Engine engine;
   engine.SetMetrics( metrics );
-  engine.SetTextEllipsisEnabled( data.ellipsis );
   engine.SetLayout( data.layout );
 
   const Length totalNumberOfGlyphs = visualModel->mGlyphs.Count();
 
-  LayoutParameters layoutParameters( data.textArea,
-                                     logicalModel->mText.Begin(),
-                                     logicalModel->mLineBreakInfo.Begin(),
-                                     logicalModel->mWordBreakInfo.Begin(),
-                                     ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL,
-                                     visualModel->mGlyphs.Begin(),
-                                     visualModel->mGlyphsToCharacters.Begin(),
-                                     visualModel->mCharactersPerGlyph.Begin(),
-                                     visualModel->mCharactersToGlyph.Begin(),
-                                     visualModel->mGlyphsPerCharacter.Begin(),
-                                     totalNumberOfGlyphs );
+  Layout::Parameters layoutParameters( data.textArea,
+                                       logicalModel->mText.Begin(),
+                                       logicalModel->mLineBreakInfo.Begin(),
+                                       logicalModel->mWordBreakInfo.Begin(),
+                                       ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL,
+                                       visualModel->mGlyphs.Begin(),
+                                       visualModel->mGlyphsToCharacters.Begin(),
+                                       visualModel->mCharactersPerGlyph.Begin(),
+                                       visualModel->mCharactersToGlyph.Begin(),
+                                       visualModel->mGlyphsPerCharacter.Begin(),
+                                       totalNumberOfGlyphs,
+                                       Layout::HORIZONTAL_ALIGN_BEGIN );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -184,7 +184,8 @@ bool LayoutTextTest( const LayoutTextData& data )
   const bool updated = engine.LayoutText( layoutParameters,
                                           glyphPositions,
                                           lines,
-                                          layoutSize );
+                                          layoutSize,
+                                          data.ellipsis );
 
   // 4) Compare the results.
 
@@ -369,20 +370,21 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                    metrics );
 
   // 2) Call the ReLayoutRightToLeftLines() method.
-  LayoutEngine engine;
+  Layout::Engine engine;
   engine.SetMetrics( metrics );
 
-  LayoutParameters layoutParameters( data.textArea,
-                                     logicalModel->mText.Begin(),
-                                     logicalModel->mLineBreakInfo.Begin(),
-                                     logicalModel->mWordBreakInfo.Begin(),
-                                     ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL,
-                                     visualModel->mGlyphs.Begin(),
-                                     visualModel->mGlyphsToCharacters.Begin(),
-                                     visualModel->mCharactersPerGlyph.Begin(),
-                                     visualModel->mCharactersToGlyph.Begin(),
-                                     visualModel->mGlyphsPerCharacter.Begin(),
-                                     visualModel->mGlyphs.Count() );
+  Layout::Parameters layoutParameters( data.textArea,
+                                       logicalModel->mText.Begin(),
+                                       logicalModel->mLineBreakInfo.Begin(),
+                                       logicalModel->mWordBreakInfo.Begin(),
+                                       ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL,
+                                       visualModel->mGlyphs.Begin(),
+                                       visualModel->mGlyphsToCharacters.Begin(),
+                                       visualModel->mCharactersPerGlyph.Begin(),
+                                       visualModel->mCharactersToGlyph.Begin(),
+                                       visualModel->mGlyphsPerCharacter.Begin(),
+                                       visualModel->mGlyphs.Count(),
+                                       Layout::HORIZONTAL_ALIGN_BEGIN  );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
@@ -424,17 +426,17 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
 
 struct AlignData
 {
-  std::string                       description;
-  std::string                       text;
-  Size                              textArea;
-  unsigned int                      numberOfFonts;
-  FontDescriptionRun*               fontDescriptions;
-  LayoutEngine::HorizontalAlignment horizontalAlignment;
-  LayoutEngine::VerticalAlignment   verticalAlignment;
-  unsigned int                      startIndex;
-  unsigned int                      numberOfCharacters;
-  unsigned int                      numberOfLines;
-  float*                            lineOffsets;
+  std::string                 description;
+  std::string                 text;
+  Size                        textArea;
+  unsigned int                numberOfFonts;
+  FontDescriptionRun*         fontDescriptions;
+  Layout::HorizontalAlignment horizontalAlignment;
+  Layout::VerticalAlignment   verticalAlignment;
+  unsigned int                startIndex;
+  unsigned int                numberOfCharacters;
+  unsigned int                numberOfLines;
+  float*                      lineOffsets;
 };
 
 bool AlignTest( const AlignData& data )
@@ -477,15 +479,13 @@ bool AlignTest( const AlignData& data )
                    metrics );
 
   // Call the Align method.
-  LayoutEngine engine;
+  Layout::Engine engine;
   engine.SetMetrics( metrics );
-
-  engine.SetHorizontalAlignment( data.horizontalAlignment );
-  engine.SetVerticalAlignment( data.verticalAlignment );
 
   engine.Align( data.textArea,
                 data.startIndex,
                 data.numberOfCharacters,
+                data.horizontalAlignment,
                 visualModel->mLines );
 
   // Compare results.
@@ -556,61 +556,12 @@ int UtcDaliTextLayoutSetGetLayout(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextLayoutSetGetLayout");
 
-  LayoutEngine engine;
+  Layout::Engine engine;
 
-  DALI_TEST_CHECK( LayoutEngine::SINGLE_LINE_BOX == engine.GetLayout() );
+  DALI_TEST_CHECK( Layout::Engine::SINGLE_LINE_BOX == engine.GetLayout() );
 
-  engine.SetLayout( LayoutEngine::MULTI_LINE_BOX );
-  DALI_TEST_CHECK( LayoutEngine::MULTI_LINE_BOX == engine.GetLayout() );
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextLayoutSetGetTextEllipsisEnabled(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextLayoutSetGetTextEllipsisEnabled");
-
-  LayoutEngine engine;
-
-  DALI_TEST_CHECK( !engine.GetTextEllipsisEnabled() );
-
-  engine.SetTextEllipsisEnabled( true );
-  DALI_TEST_CHECK( engine.GetTextEllipsisEnabled() );
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextLayoutSetGetHorizontalAlignment(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" ");
-
-  LayoutEngine engine;
-
-  DALI_TEST_CHECK( LayoutEngine::HORIZONTAL_ALIGN_BEGIN == engine.GetHorizontalAlignment() );
-
-  engine.SetHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_END );
-  DALI_TEST_CHECK( LayoutEngine::HORIZONTAL_ALIGN_END == engine.GetHorizontalAlignment() );
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextLayoutSetGetVerticalAlignment(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextLayoutSetGetVerticalAlignment");
-
-  LayoutEngine engine;
-
-  DALI_TEST_CHECK( LayoutEngine::VERTICAL_ALIGN_TOP == engine.GetVerticalAlignment() );
-
-  engine.SetVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP );
-  DALI_TEST_CHECK( LayoutEngine::VERTICAL_ALIGN_TOP == engine.GetVerticalAlignment() );
-
+  engine.SetLayout( Layout::Engine::MULTI_LINE_BOX );
+  DALI_TEST_CHECK( Layout::Engine::MULTI_LINE_BOX == engine.GetLayout() );
 
   tet_result(TET_PASS);
   END_TEST;
@@ -621,7 +572,7 @@ int UtcDaliTextLayoutSetGetCursorWidth(void)
   ToolkitTestApplication application;
   tet_infoline(" ");
 
-  LayoutEngine engine;
+  Layout::Engine engine;
 
   DALI_TEST_EQUALS( 1, engine.GetCursorWidth(), TEST_LOCATION );
 
@@ -651,7 +602,7 @@ int UtcDaliTextLayoutNoText(void)
     NULL,
     0u,
     NULL,
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     0u,
     false,
@@ -705,7 +656,7 @@ int UtcDaliTextLayoutSmallTextArea01(void)
     NULL,
     0u,
     NULL,
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     11u,
     false,
@@ -775,7 +726,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
     positions,
     1u,
     lines.Begin(),
-    LayoutEngine::SINGLE_LINE_BOX,
+    Layout::Engine::SINGLE_LINE_BOX,
     0u,
     11u,
     false,
@@ -918,7 +869,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     positions,
     5u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     48u,
     false,
@@ -1126,7 +1077,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     positions,
     6u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     55u,
     false,
@@ -1227,7 +1178,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     positions,
     3u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     29u,
     false,
@@ -1313,7 +1264,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     positions,
     2u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     13u,
     false,
@@ -1427,7 +1378,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     positions,
     2u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     17u,
     false,
@@ -1983,7 +1934,7 @@ int UtcDaliTextUpdateLayout01(void)
     positions,
     19u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     64u,
     false,
@@ -2539,7 +2490,7 @@ int UtcDaliTextUpdateLayout02(void)
     positions,
     19u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     64u,
     64u,
     false,
@@ -3095,7 +3046,7 @@ int UtcDaliTextUpdateLayout03(void)
     positions,
     19u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     128u,
     64u,
     false,
@@ -3171,7 +3122,7 @@ int UtcDaliTextLayoutEllipsis01(void)
     positions,
     1u,
     lines.Begin(),
-    LayoutEngine::SINGLE_LINE_BOX,
+    Layout::Engine::SINGLE_LINE_BOX,
     0u,
     51u,
     true,
@@ -3261,7 +3212,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     positions,
     2u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     51u,
     true,
@@ -3403,7 +3354,7 @@ int UtcDaliTextLayoutEllipsis03(void)
     positions,
     1u,
     lines.Begin(),
-    LayoutEngine::SINGLE_LINE_BOX,
+    Layout::Engine::SINGLE_LINE_BOX,
     0u,
     72u,
     true,
@@ -3559,7 +3510,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     positions,
     2u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     72u,
     true,
@@ -3633,7 +3584,7 @@ int UtcDaliTextLayoutEllipsis05(void)
     positions,
     1u,
     lines.Begin(),
-    LayoutEngine::MULTI_LINE_BOX,
+    Layout::Engine::MULTI_LINE_BOX,
     0u,
     11u,
     true,
@@ -4186,8 +4137,8 @@ int UtcDaliTextAlign01(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_BEGIN,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_BEGIN,
+    Layout::VERTICAL_ALIGN_TOP,
     0u,
     22u,
     6u,
@@ -4305,8 +4256,8 @@ int UtcDaliTextAlign02(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_BEGIN,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_BEGIN,
+    Layout::VERTICAL_ALIGN_TOP,
     22u,
     26u,
     6u,
@@ -4424,8 +4375,8 @@ int UtcDaliTextAlign03(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_BEGIN,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_BEGIN,
+    Layout::VERTICAL_ALIGN_TOP,
     48u,
     26u,
     6u,
@@ -4543,8 +4494,8 @@ int UtcDaliTextAlign04(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_CENTER,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_CENTER,
+    Layout::VERTICAL_ALIGN_TOP,
     0u,
     22u,
     6u,
@@ -4662,8 +4613,8 @@ int UtcDaliTextAlign05(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_CENTER,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_CENTER,
+    Layout::VERTICAL_ALIGN_TOP,
     22u,
     26u,
     6u,
@@ -4781,8 +4732,8 @@ int UtcDaliTextAlign06(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_CENTER,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_CENTER,
+    Layout::VERTICAL_ALIGN_TOP,
     48u,
     26u,
     6u,
@@ -4900,8 +4851,8 @@ int UtcDaliTextAlign07(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_END,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_END,
+    Layout::VERTICAL_ALIGN_TOP,
     0u,
     22u,
     6u,
@@ -5019,8 +4970,8 @@ int UtcDaliTextAlign08(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_END,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_END,
+    Layout::VERTICAL_ALIGN_TOP,
     22u,
     26u,
     6u,
@@ -5138,8 +5089,8 @@ int UtcDaliTextAlign09(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    LayoutEngine::HORIZONTAL_ALIGN_END,
-    LayoutEngine::VERTICAL_ALIGN_TOP,
+    Layout::HORIZONTAL_ALIGN_END,
+    Layout::VERTICAL_ALIGN_TOP,
     48u,
     26u,
     6u,
@@ -5150,6 +5101,21 @@ int UtcDaliTextAlign09(void)
   {
     tet_result(TET_FAIL);
   }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextLayoutSetGetDefaultLineSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLayoutSetGetDefaultLineSpacing");
+
+  Layout::Engine engine;
+  DALI_TEST_EQUALS( 0.f, engine.GetDefaultLineSpacing(), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  engine.SetDefaultLineSpacing( 10.f );
+  DALI_TEST_EQUALS( 10.f, engine.GetDefaultLineSpacing(), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   tet_result(TET_PASS);
   END_TEST;

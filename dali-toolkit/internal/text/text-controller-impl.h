@@ -24,11 +24,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/input-style.h>
-#include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
-#include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
 {
@@ -289,8 +287,7 @@ struct Controller::Impl
         EditableControlInterface* editableControlInterface )
   : mControlInterface( controlInterface ),
     mEditableControlInterface( editableControlInterface ),
-    mLogicalModel(),
-    mVisualModel(),
+    mModel(),
     mFontDefaults( NULL ),
     mUnderlineDefaults( NULL ),
     mShadowDefaults( NULL ),
@@ -301,10 +298,8 @@ struct Controller::Impl
     mClipboard(),
     mView(),
     mMetrics(),
-    mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
-    mScrollPosition(),
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
@@ -314,21 +309,20 @@ struct Controller::Impl
     mIsAutoScrollEnabled( false ),
     mAutoScrollDirectionRTL( false )
   {
-    mLogicalModel = LogicalModel::New();
-    mVisualModel  = VisualModel::New();
+    mModel = Model::New();
 
     mFontClient = TextAbstraction::FontClient::Get();
     mClipboard = Clipboard::Get();
 
-    mView.SetVisualModel( mVisualModel );
+    mView.SetVisualModel( mModel->mVisualModel );
 
     // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
     mMetrics = Metrics::New( mFontClient );
     mLayoutEngine.SetMetrics( mMetrics );
 
     // Set the text properties to default
-    mVisualModel->SetUnderlineEnabled( false );
-    mVisualModel->SetUnderlineHeight( 0.0f );
+    mModel->mVisualModel->SetUnderlineEnabled( false );
+    mModel->mVisualModel->SetUnderlineHeight( 0.0f );
   }
 
   ~Impl()
@@ -399,7 +393,7 @@ struct Controller::Impl
   bool IsShowingRealText() const
   {
     return ( !IsShowingPlaceholderText() &&
-             0u != mLogicalModel->mText.Count() );
+             0u != mModel->mLogicalModel->mText.Count() );
   }
 
   /**
@@ -412,7 +406,7 @@ struct Controller::Impl
       mEventData->mIsShowingPlaceholderText = false;
 
       // Remove mPlaceholderTextColor
-      mVisualModel->SetTextColor( mTextColor );
+      mModel->mVisualModel->SetTextColor( mTextColor );
     }
   }
 
@@ -693,8 +687,7 @@ public:
 
   ControlInterface* mControlInterface;     ///< Reference to the text controller.
   EditableControlInterface* mEditableControlInterface; ///< Reference to the editable text controller.
-  LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
-  VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
+  ModelPtr mModel;                         ///< Pointer to the text's model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
   UnderlineDefaults* mUnderlineDefaults;   ///< Avoid allocating this when the user does not specify underline parameters.
   ShadowDefaults* mShadowDefaults;         ///< Avoid allocating this when the user does not specify shadow parameters.
@@ -705,14 +698,9 @@ public:
   Clipboard mClipboard;                    ///< Handle to the system clipboard
   View mView;                              ///< The view interface to the rendering back-end.
   MetricsPtr mMetrics;                     ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
-  LayoutEngine mLayoutEngine;              ///< The layout engine.
+  Layout::Engine mLayoutEngine;            ///< The layout engine.
   Vector<ModifyEvent> mModifyEvents;       ///< Temporary stores the text set until the next relayout.
   Vector4 mTextColor;                      ///< The regular text color
-  /**
-   * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
-   * Typically this will have a negative value with scrolling occurs.
-   */
-  Vector2 mScrollPosition;                 ///< The text is offset by this position when scrolling.
   TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.

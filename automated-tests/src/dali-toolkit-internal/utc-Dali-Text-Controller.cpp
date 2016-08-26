@@ -23,6 +23,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <toolkit-text-utils.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -45,32 +46,6 @@ const Size CONTROL_SIZE( 300.f, 60.f );
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
-class ControlImpl : public ControlInterface, public Text::EditableControlInterface
-{
-public:
-  ControlImpl()
-  : ControlInterface()
-  {}
-
-  virtual ~ControlImpl()
-  {}
-
-  virtual void AddDecoration( Actor& actor, bool needsClipping )
-  {}
-
-  virtual void RequestTextRelayout()
-  {}
-
-  virtual void TextChanged()
-  {}
-
-  virtual void MaxLengthReached()
-  {}
-
-  virtual void InputStyleChanged( InputStyle::Mask inputStyleMask )
-  {}
-};
-
 std::string gClipboardText;
 void ContentSelectedCallback( ClipboardEventNotifier& notifier )
 {
@@ -86,8 +61,72 @@ int UtcDaliTextController(void)
 
   // Creates a text controller.
   ControllerPtr controller = Controller::New();
-
   DALI_TEST_CHECK( controller );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetScrollEnabled(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetScrollEnabled");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+  DALI_TEST_CHECK( controller );
+
+  // Configures the text controller similarly to the text-editor.
+  ConfigureTextEditor( controller );
+
+  DALI_TEST_CHECK( !controller->IsHorizontalScrollEnabled() );
+  DALI_TEST_CHECK( controller->IsVerticalScrollEnabled() );
+
+  // Configures the text controller similarly to the text-field.
+  ConfigureTextField( controller );
+
+  DALI_TEST_CHECK( controller->IsHorizontalScrollEnabled() );
+  DALI_TEST_CHECK( !controller->IsVerticalScrollEnabled() );
+
+  // Configures the text controller similarly to the text-label.
+  ConfigureTextLabel( controller );
+
+  DALI_TEST_CHECK( !controller->IsHorizontalScrollEnabled() );
+  DALI_TEST_CHECK( !controller->IsVerticalScrollEnabled() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetIsTextElide(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetIsTextElide");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+  DALI_TEST_CHECK( controller );
+
+  // Configures the text controller similarly to the text-editor.
+  ConfigureTextEditor( controller );
+  DALI_TEST_EQUALS( false, controller->IsTextElideEnabled(), TEST_LOCATION );
+
+  controller->SetTextElideEnabled( true );
+  DALI_TEST_EQUALS( true, controller->IsTextElideEnabled(), TEST_LOCATION );
+
+  // Configures the text controller similarly to the text-field.
+  ConfigureTextField( controller );
+  DALI_TEST_EQUALS( false, controller->IsTextElideEnabled(), TEST_LOCATION );
+
+  controller->SetTextElideEnabled( true );
+  DALI_TEST_EQUALS( true, controller->IsTextElideEnabled(), TEST_LOCATION );
+
+  // Configures the text controller similarly to the text-label.
+  ConfigureTextLabel( controller );
+  DALI_TEST_EQUALS( true, controller->IsTextElideEnabled(), TEST_LOCATION );
+
+  controller->SetTextElideEnabled( false );
+  DALI_TEST_EQUALS( false, controller->IsTextElideEnabled(), TEST_LOCATION );
 
   tet_result(TET_PASS);
   END_TEST;
@@ -100,7 +139,6 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
 
   // Creates a text controller.
   ControllerPtr controller = Controller::New();
-
   DALI_TEST_CHECK( controller );
 
   // There is no text input enabled.

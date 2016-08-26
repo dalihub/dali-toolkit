@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_MODEL_H__
-#define __DALI_TOOLKIT_TEXT_MODEL_H__
+#ifndef __DALI_TOOLKIT_TEXT_UTILS_H__
+#define __DALI_TOOLKIT_TEXT_UTILS_H__
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -18,12 +18,11 @@
  *
  */
 
-// EXTERNAL INCLUDES
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/metrics.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
+#include <dali-toolkit/internal/text/text-controller.h>
 
 namespace Dali
 {
@@ -70,10 +69,31 @@ void CreateTextModel( const std::string& text,
                       VisualModelPtr& visualModel,
                       MetricsPtr& metrics );
 
+/**
+ * @brief Configures the text @p controller similarly to the one configured by the text-label.
+ *
+ * @param[in,out] The text controller to configure.
+ */
+void ConfigureTextLabel( ControllerPtr controller );
+
+/**
+ * @brief Configures the text @p controller similarly to the one configured by the text-field.
+ *
+ * @param[in,out] The text controller to configure.
+ */
+void ConfigureTextField( ControllerPtr controller );
+
+/**
+ * @brief Configures the text @p controller similarly to the one configured by the text-editor.
+ *
+ * @param[in,out] The text controller to configure.
+ */
+void ConfigureTextEditor( ControllerPtr controller );
+
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_MODEL_H__
+#endif // __DALI_TOOLKIT_TEXT_UTILS_H__

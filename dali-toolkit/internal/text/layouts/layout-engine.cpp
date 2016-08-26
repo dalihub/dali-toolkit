@@ -38,6 +38,9 @@ namespace Toolkit
 namespace Text
 {
 
+namespace Layout
+{
+
 namespace
 {
 
@@ -99,15 +102,12 @@ struct LineLayout
   float          descender;          ///< The minimum descender of all fonts in the line.
 };
 
-struct LayoutEngine::Impl
+struct Engine::Impl
 {
   Impl()
-  : mLayout( LayoutEngine::SINGLE_LINE_BOX ),
-    mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
-    mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP ),
+  : mLayout( Layout::Engine::SINGLE_LINE_BOX ),
     mCursorWidth( CURSOR_WIDTH ),
-    mDefaultLineSpacing( LINE_SPACING ),
-    mEllipsisEnabled( false )
+    mDefaultLineSpacing( LINE_SPACING )
   {
   }
 
@@ -187,7 +187,7 @@ struct LayoutEngine::Impl
    * @param[in,out] paragraphDirection in: the current paragraph's direction, out: the next paragraph's direction. Is set after a must break.
    * @param[in] completelyFill Whether to completely fill the line ( even if the last word exceeds the boundaries ).
    */
-  void GetLineLayoutForBox( const LayoutParameters& parameters,
+  void GetLineLayoutForBox( const Parameters& parameters,
                             LineLayout& lineLayout,
                             CharacterDirection& paragraphDirection,
                             bool completelyFill )
@@ -538,7 +538,7 @@ struct LayoutEngine::Impl
    *
    * return Whether the line is ellipsized.
    */
-  bool EllipsisLine( const LayoutParameters& layoutParameters,
+  bool EllipsisLine( const Parameters& layoutParameters,
                      const LineLayout& layout,
                      Size& layoutSize,
                      LineRun* linesBuffer,
@@ -620,7 +620,7 @@ struct LayoutEngine::Impl
    * @param[in,out] numberOfLines The number of laid-out lines.
    * @param[in] isLastLine Whether the laid-out line is the last one.
    */
-  void UpdateTextLayout( const LayoutParameters& layoutParameters,
+  void UpdateTextLayout( const Parameters& layoutParameters,
                          const LineLayout& layout,
                          Size& layoutSize,
                          LineRun* linesBuffer,
@@ -678,7 +678,7 @@ struct LayoutEngine::Impl
    * @param[in,out] linesBuffer Pointer to the line's buffer.
    * @param[in,out] numberOfLines The number of laid-out lines.
    */
-  void UpdateTextLayout( const LayoutParameters& layoutParameters,
+  void UpdateTextLayout( const Parameters& layoutParameters,
                          CharacterIndex characterIndex,
                          GlyphIndex glyphIndex,
                          Size& layoutSize,
@@ -742,7 +742,7 @@ struct LayoutEngine::Impl
    * @param[in] characterOffset The offset to be added to the runs of characters.
    * @param[in] glyphOffset The offset to be added to the runs of glyphs.
    */
-  void UpdateLineIndexOffsets( const LayoutParameters& layoutParameters,
+  void UpdateLineIndexOffsets( const Parameters& layoutParameters,
                                Vector<LineRun>& lines,
                                Length characterOffset,
                                Length glyphOffset )
@@ -763,10 +763,11 @@ struct LayoutEngine::Impl
     }
   }
 
-  bool LayoutText( const LayoutParameters& layoutParameters,
+  bool LayoutText( const Parameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
-                   Size& layoutSize )
+                   Size& layoutSize,
+                   bool elideTextEnabled )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height );
@@ -890,7 +891,7 @@ struct LayoutEngine::Impl
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  pen y %f\n", penY );
 
       bool ellipsis = false;
-      if( mEllipsisEnabled )
+      if( elideTextEnabled )
       {
         // Does the ellipsis of the last line.
         ellipsis = EllipsisLine( layoutParameters,
@@ -1014,7 +1015,7 @@ struct LayoutEngine::Impl
     return true;
   }
 
-  void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+  void ReLayoutRightToLeftLines( const Parameters& layoutParameters,
                                  CharacterIndex startIndex,
                                  Length numberOfCharacters,
                                  Vector<Vector2>& glyphPositions )
@@ -1076,6 +1077,7 @@ struct LayoutEngine::Impl
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
+              HorizontalAlignment horizontalAlignment,
               Vector<LineRun>& lines )
   {
     const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
@@ -1102,18 +1104,20 @@ struct LayoutEngine::Impl
       // Calculate the line's alignment offset accordingly with the align option,
       // the box width, line length, and the paragraph's direction.
       CalculateHorizontalAlignment( size.width,
+                                    horizontalAlignment,
                                     line );
     }
   }
 
   void CalculateHorizontalAlignment( float boxWidth,
+                                     HorizontalAlignment horizontalAlignment,
                                      LineRun& line )
   {
     line.alignmentOffset = 0.f;
     const bool isRTL = RTL == line.direction;
     float lineLength = line.width;
 
-    HorizontalAlignment alignment = mHorizontalAlignment;
+    HorizontalAlignment alignment = horizontalAlignment;
     if( isRTL )
     {
       // Swap the alignment type if the line is right to left.
@@ -1191,100 +1195,67 @@ struct LayoutEngine::Impl
     line.ellipsis = false;
   }
 
-  LayoutEngine::Layout mLayout;
-  LayoutEngine::HorizontalAlignment mHorizontalAlignment;
-  LayoutEngine::VerticalAlignment mVerticalAlignment;
+  Type mLayout;
   float mCursorWidth;
   float mDefaultLineSpacing;
 
   IntrusivePtr<Metrics> mMetrics;
-
-  bool mEllipsisEnabled:1;
 };
 
-LayoutEngine::LayoutEngine()
+Engine::Engine()
 : mImpl( NULL )
 {
-  mImpl = new LayoutEngine::Impl();
+  mImpl = new Engine::Impl();
 }
 
-LayoutEngine::~LayoutEngine()
+Engine::~Engine()
 {
   delete mImpl;
 }
 
-void LayoutEngine::SetMetrics( MetricsPtr& metrics )
+void Engine::SetMetrics( MetricsPtr& metrics )
 {
   mImpl->mMetrics = metrics;
 }
 
-void LayoutEngine::SetLayout( Layout layout )
+void Engine::SetLayout( Type layout )
 {
   mImpl->mLayout = layout;
 }
 
-LayoutEngine::Layout LayoutEngine::GetLayout() const
+Engine::Type Engine::GetLayout() const
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetLayout[%d]\n", mImpl->mLayout);
   return mImpl->mLayout;
 }
 
-void LayoutEngine::SetTextEllipsisEnabled( bool enabled )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::General, "-->LayoutEngine::SetTextEllipsisEnabled[%s]\n", (enabled)?"true":"false" );
-  mImpl->mEllipsisEnabled = enabled;
-}
-
-bool LayoutEngine::GetTextEllipsisEnabled() const
-{
-  return mImpl->mEllipsisEnabled;
-}
-
-void LayoutEngine::SetHorizontalAlignment( HorizontalAlignment alignment )
-{
-  mImpl->mHorizontalAlignment = alignment;
-}
-
-LayoutEngine::HorizontalAlignment LayoutEngine::GetHorizontalAlignment() const
-{
-  return mImpl->mHorizontalAlignment;
-}
-
-void LayoutEngine::SetVerticalAlignment( VerticalAlignment alignment )
-{
-  mImpl->mVerticalAlignment = alignment;
-}
-
-LayoutEngine::VerticalAlignment LayoutEngine::GetVerticalAlignment() const
-{
-  return mImpl->mVerticalAlignment;
-}
-
-void LayoutEngine::SetCursorWidth( int width )
+void Engine::SetCursorWidth( int width )
 {
   mImpl->mCursorWidth = static_cast<float>( width );
 }
 
-int LayoutEngine::GetCursorWidth() const
+int Engine::GetCursorWidth() const
 {
   return static_cast<int>( mImpl->mCursorWidth );
 }
 
-bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,
-                               Vector<Vector2>& glyphPositions,
-                               Vector<LineRun>& lines,
-                               Size& layoutSize )
+bool Engine::LayoutText( const Parameters& layoutParameters,
+                         Vector<Vector2>& glyphPositions,
+                         Vector<LineRun>& lines,
+                         Size& layoutSize,
+                         bool elideTextEnabled )
 {
   return mImpl->LayoutText( layoutParameters,
                             glyphPositions,
                             lines,
-                            layoutSize );
+                            layoutSize,
+                            elideTextEnabled );
 }
 
-void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
-                                             CharacterIndex startIndex,
-                                             Length numberOfCharacters,
-                                             Vector<Vector2>& glyphPositions )
+void Engine::ReLayoutRightToLeftLines( const Parameters& layoutParameters,
+                                       CharacterIndex startIndex,
+                                       Length numberOfCharacters,
+                                       Vector<Vector2>& glyphPositions )
 {
   mImpl->ReLayoutRightToLeftLines( layoutParameters,
                                    startIndex,
@@ -1292,26 +1263,30 @@ void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParam
                                    glyphPositions );
 }
 
-void LayoutEngine::Align( const Size& size,
-                          CharacterIndex startIndex,
-                          Length numberOfCharacters,
-                          Vector<LineRun>& lines )
+void Engine::Align( const Size& size,
+                    CharacterIndex startIndex,
+                    Length numberOfCharacters,
+                    Layout::HorizontalAlignment horizontalAlignment,
+                    Vector<LineRun>& lines )
 {
   mImpl->Align( size,
                 startIndex,
                 numberOfCharacters,
+                horizontalAlignment,
                 lines );
 }
 
-void LayoutEngine::SetDefaultLineSpacing( float lineSpacing )
+void Engine::SetDefaultLineSpacing( float lineSpacing )
 {
   mImpl->mDefaultLineSpacing = lineSpacing;
 }
 
-float LayoutEngine::GetDefaultLineSpacing() const
+float Engine::GetDefaultLineSpacing() const
 {
   return mImpl->mDefaultLineSpacing;
 }
+
+} // namespace Layout
 
 } // namespace Text
 

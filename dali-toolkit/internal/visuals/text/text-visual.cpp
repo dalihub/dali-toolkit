@@ -20,21 +20,19 @@
 
 // EXTERNAL HEADER
 #include <dali/devel-api/scripting/enum-helper.h>
-// #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-effects-style.h>
+#include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-#include <dali-toolkit/internal/text/text-font-style.h>
-#include <dali-toolkit/internal/text/text-effects-style.h>
-
-using Dali::Toolkit::Text::LayoutEngine;
 
 namespace Dali
 {
@@ -71,34 +69,34 @@ const char * const BATCHING_ENABLED_PROPERTY( "batchingEnabled" );
 
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_END    },
+  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
+  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
 const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "TOP",    Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_TOP    },
-  { "CENTER", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_CENTER },
-  { "BOTTOM", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_BOTTOM },
+  { "TOP",    Toolkit::Text::Layout::VERTICAL_ALIGN_TOP    },
+  { "CENTER", Toolkit::Text::Layout::VERTICAL_ALIGN_CENTER },
+  { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
 };
 const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
-std::string GetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment )
+std::string GetHorizontalAlignment( Toolkit::Text::Layout::HorizontalAlignment alignment )
 {
-  const char* name = Scripting::GetEnumerationName<Toolkit::Text::LayoutEngine::HorizontalAlignment>( alignment,
-                                                                                                      HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                      HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+  const char* name = Scripting::GetEnumerationName<Toolkit::Text::Layout::HorizontalAlignment>( alignment,
+                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
 
   return std::string( name );
 }
 
-std::string GetVerticalAlignment( LayoutEngine::VerticalAlignment alignment )
+std::string GetVerticalAlignment( Toolkit::Text::Layout::VerticalAlignment alignment )
 {
-  const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( alignment,
-                                                                                                      VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                      VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+  const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( alignment,
+                                                                                                VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
 
   return std::string( name );
 }
@@ -198,7 +196,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, GetVerticalAlignment( mController->GetVerticalAlignment() ) );
 
-  map.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, mController->GetTextColor() );
+  map.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, mController->GetDefaultColor() );
 
   map.Insert( Toolkit::TextVisual::Property::ENABLE_MARKUP, mController->IsMarkupProcessorEnabled() );
 
@@ -327,11 +325,11 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
     }
   }
 
-  // Retrieve the layout engine to set whether to elide the text and set the cursor's width.
-  Text::LayoutEngine& engine = mController->GetLayoutEngine();
-
   // Elide the text if it exceeds the boundaries.
-  engine.SetTextEllipsisEnabled( true );
+  mController->SetTextElideEnabled( true );
+
+  // Retrieve the layout engine to set the cursor's width.
+  Text::Layout::Engine& engine = mController->GetLayoutEngine();
 
   // Sets 0 as cursor's width.
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
@@ -429,11 +427,11 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     }
     case Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT:
     {
-      LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
-      if( Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( propertyValue.Get< std::string >().c_str(),
-                                                                                         HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                         HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                         alignment ) )
+      Toolkit::Text::Layout::HorizontalAlignment alignment( Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN );
+      if( Scripting::GetEnumeration< Toolkit::Text::Layout::HorizontalAlignment >( propertyValue.Get< std::string >().c_str(),
+                                                                                   HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                   HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                                   alignment ) )
       {
         mController->SetHorizontalAlignment( alignment );
       }
@@ -441,11 +439,11 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     }
     case Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT:
     {
-      LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
-      if( Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( propertyValue.Get< std::string >().c_str(),
-                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                       alignment ) )
+      Toolkit::Text::Layout::VerticalAlignment alignment( Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM );
+      if( Scripting::GetEnumeration< Toolkit::Text::Layout::VerticalAlignment >( propertyValue.Get< std::string >().c_str(),
+                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                                 alignment ) )
       {
         mController->SetVerticalAlignment( alignment );
       }
@@ -453,10 +451,10 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     }
     case Toolkit::TextVisual::Property::TEXT_COLOR:
     {
-      const Vector4 textColor = propertyValue.Get< Vector4 >();
-      if( mController->GetTextColor() != textColor )
+      const Vector4& textColor = propertyValue.Get< Vector4 >();
+      if( mController->GetDefaultColor() != textColor )
       {
-        mController->SetTextColor( textColor );
+        mController->SetDefaultColor( textColor );
         mRenderer.Reset();
       }
       break;
@@ -502,7 +500,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       {
         case Property::VECTOR4:
         {
-          const Vector4 color = propertyValue.Get<Vector4>();
+          const Vector4& color = propertyValue.Get<Vector4>();
           if( mController->GetUnderlineColor() != color )
           {
             mController->SetUnderlineColor( color );
@@ -556,7 +554,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       {
         case Property::VECTOR2:
         {
-          const Vector2 shadowOffset = propertyValue.Get<Vector2>();
+          const Vector2& shadowOffset = propertyValue.Get<Vector2>();
           if( mController->GetShadowOffset() != shadowOffset )
           {
             mController->SetShadowOffset( shadowOffset );
@@ -566,7 +564,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
         }
         case Property::VECTOR4:
         {
-          const Vector4 shadowColor = propertyValue.Get<Vector4>();
+          const Vector4& shadowColor = propertyValue.Get<Vector4>();
           if( mController->GetShadowColor() != shadowColor )
           {
             mController->SetShadowColor( shadowColor );
@@ -662,9 +660,9 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
     }
     case Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT:
     {
-      const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( mController->GetHorizontalAlignment(),
-                                                                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+      const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( mController->GetHorizontalAlignment(),
+                                                                                                      HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                      HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
       if( name )
       {
         value = std::string( name );
@@ -673,9 +671,9 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
     }
     case Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT:
     {
-      const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( mController->GetVerticalAlignment(),
-                                                                                                          VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                          VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+      const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( mController->GetVerticalAlignment(),
+                                                                                                    VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                    VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
       if( name )
       {
         value = std::string( name );
@@ -684,7 +682,7 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
     }
     case Toolkit::TextVisual::Property::TEXT_COLOR:
     {
-      value = mController->GetTextColor();
+      value = mController->GetDefaultColor();
       break;
     }
     case Toolkit::TextVisual::Property::ENABLE_MARKUP:
@@ -794,7 +792,7 @@ void TextVisual::RenderText()
 
     if( renderableActor )
     {
-      const Vector2& scrollOffset = mController->GetScrollPosition();
+      const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
       renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
       self.Add( renderableActor );

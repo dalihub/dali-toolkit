@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H__
-#define __DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H__
+#ifndef DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H
+#define DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,13 @@ namespace Text
 
 struct BidirectionalLineInfoRun;
 
+namespace Layout
+{
+
 /**
  * @brief Struct used to pass parameters.
  */
-struct LayoutParameters
+struct Parameters
 {
   /**
    * Constructor with the needed parameters to layout the text.
@@ -54,18 +57,20 @@ struct LayoutParameters
    * @param[in] charactersToGlyphsBuffer Vector with indices pointing the first glyph of each character.
    * @param[in] glyphsPerCharacterBuffer Vector with the number of glyphs shaped from the character.
    * @param[in] totalNumberOfGlyphs The number of glyphs.
+   * @param[in] horizontalAlignment The horizontal alignment.
    */
-  LayoutParameters( const Vector2& boundingBox,
-                    const Character* const textBuffer,
-                    const LineBreakInfo* const lineBreakInfoBuffer,
-                    const WordBreakInfo* const wordBreakInfoBuffer,
-                    const CharacterDirection* const characterDirectionBuffer,
-                    const GlyphInfo* const glyphsBuffer,
-                    const CharacterIndex* const glyphsToCharactersBuffer,
-                    const Length* const charactersPerGlyphBuffer,
-                    const GlyphIndex* const charactersToGlyphsBuffer,
-                    const Length* const glyphsPerCharacterBuffer,
-                    Length totalNumberOfGlyphs )
+  Parameters( const Vector2& boundingBox,
+              const Character* const textBuffer,
+              const LineBreakInfo* const lineBreakInfoBuffer,
+              const WordBreakInfo* const wordBreakInfoBuffer,
+              const CharacterDirection* const characterDirectionBuffer,
+              const GlyphInfo* const glyphsBuffer,
+              const CharacterIndex* const glyphsToCharactersBuffer,
+              const Length* const charactersPerGlyphBuffer,
+              const GlyphIndex* const charactersToGlyphsBuffer,
+              const Length* const glyphsPerCharacterBuffer,
+              Length totalNumberOfGlyphs,
+              HorizontalAlignment horizontalAlignment )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
@@ -81,6 +86,7 @@ struct LayoutParameters
     startGlyphIndex( 0u ),
     numberOfGlyphs( 0u ),
     totalNumberOfGlyphs( totalNumberOfGlyphs ),
+    horizontalAlignment( horizontalAlignment ),
     startLineIndex( 0u ),
     estimatedNumberOfLines( 0u ),
     isLastNewParagraph( false )
@@ -101,10 +107,13 @@ struct LayoutParameters
   GlyphIndex                      startGlyphIndex;                 ///< Index to the first glyph to layout.
   Length                          numberOfGlyphs;                  ///< The number of glyphs to layout.
   Length                          totalNumberOfGlyphs;             ///< The number of glyphs.
+  HorizontalAlignment             horizontalAlignment;             ///< The horizontal alignment.
   LineIndex                       startLineIndex;                  ///< The line index where to insert the new lines.
   Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
   bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
 };
+
+} // namespace Layout
 
 } // namespace Text
 
@@ -112,4 +121,4 @@ struct LayoutParameters
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H__
+#endif // DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H
