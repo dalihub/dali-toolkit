@@ -53,7 +53,7 @@ DALI_ENUM_TO_STRING_TABLE_END( SHAPE_TYPE )
 
 //Property names
 const char * const PRIMITIVE_SHAPE( "shape" );
-const char * const SHAPE_COLOR( "shapeColor" );
+const char * const SHAPE_COLOR( "mixColor" );
 const char * const SLICES( "slices" );
 const char * const STACKS( "stacks" );
 const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
@@ -195,7 +195,7 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
 
   //Read in other potential properties.
 
-  Property::Value* color = propertyMap.Find( Toolkit::PrimitiveVisual::Property::COLOR, SHAPE_COLOR );
+  Property::Value* color = propertyMap.Find( Toolkit::PrimitiveVisual::Property::MIX_COLOR, SHAPE_COLOR );
   if( color && !color->Get( mColor ) )
   {
     DALI_LOG_ERROR( "Invalid type for color in PrimitiveVisual.\n" );
@@ -389,7 +389,7 @@ void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Clear();
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
   map.Insert( Toolkit::PrimitiveVisual::Property::SHAPE, mPrimitiveType );
-  map.Insert( Toolkit::PrimitiveVisual::Property::COLOR, mColor );
+  map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SLICES, mSlices );
   map.Insert( Toolkit::PrimitiveVisual::Property::STACKS, mStacks );
   map.Insert( Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS, mScaleTopRadius );

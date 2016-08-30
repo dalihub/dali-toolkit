@@ -496,7 +496,7 @@ The shapes are generated with clockwise winding and back-face culling on by defa
 | Property                                                      | String            | Type               | Description                                                                                                     | Default Value                                           | Range                          |
 |---------------------------------------------------------------|-------------------|:------------------:|-----------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------:|:------------------------------:|
 | Dali::Toolkit::PrimitiveVisual::Property::SHAPE               | shape             | INTEGER or STRING  | The specific shape to render. [More info](@ref shape-details)                                                   | Dali::Toolkit::PrimitiveVisual::Shape::SPHERE, "SPHERE" | [See list](@ref shape-details) |
-| Dali::Toolkit::PrimitiveVisual::Property::COLOR               | shapeColor        | VECTOR4            | The color of the shape.                                                                                         | (0.5, 0.5, 0.5, 1.0)                                    | 0.0 - 1.0 for each             |
+| Dali::Toolkit::PrimitiveVisual::Property::MIX_COLOR           | mixColor          | VECTOR4            | The color of the shape.                                                                                         | (0.5, 0.5, 0.5, 1.0)                                    | 0.0 - 1.0 for each             |
 | Dali::Toolkit::PrimitiveVisual::Property::SLICES              | slices            | INTEGER            | The number of slices as you go around the shape. [More info](@ref slices-details)                               | 128                                                     | 1 - 255                        |
 | Dali::Toolkit::PrimitiveVisual::Property::STACKS              | stacks            | INTEGER            | The number of stacks as you go down the shape. [More info](@ref stacks-details)                                 | 128                                                     | 1 - 255                        |
 | Dali::Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS    | scaleTopRadius    | FLOAT              | The scale of the radius of the top circle of a conical frustrum.                                                | 1.0                                                     | ≥ 0.0                          |
@@ -569,7 +569,7 @@ Dali::Property::Map map;
 
 map[ Visual::Property::TYPE ] = Dali::Toolkit::Visual::PRIMITIVE;
 map[ PrimitiveVisual::Property::SHAPE ] = PrimitiveVisual::Shape::SPHERE;
-map[ PrimitiveVisual::Property::COLOR ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ PrimitiveVisual::Property::MIX_COLOR ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
 
 control.SetProperty( Control::Property::BACKGROUND, map );
 ~~~
@@ -584,7 +584,7 @@ Dali::Property::Map map;
 
 map[ Visual::Property::TYPE ] = Dali::Toolkit::Visual::PRIMITIVE;
 map[ PrimitiveVisual::Property::SHAPE ] = PrimitiveVisual::Shape::CONICAL_FRUSTRUM;
-map[ PrimitiveVisual::Property::COLOR ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ PrimitiveVisual::Property::MIX_COLOR ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
 map[ PrimitiveVisual::Property::SCALE_TOP_RADIUS ] = 1.0f;
 map[ PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS ] = 1.5f;
 map[ PrimitiveVisual::Property::SCALE_HEIGHT ] = 3.0f;
@@ -602,7 +602,7 @@ Dali::Property::Map map;
 
 map[ Visual::Property::TYPE ] = Dali::Toolkit::Visual::PRIMITIVE;
 map[ PrimitiveVisual::Property::SHAPE ] = PrimitiveVisual::Shape::BEVELLED_CUBE;
-map[ PrimitiveVisual::Property::COLOR ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
+map[ PrimitiveVisual::Property::MIX_COLOR ] = Vector4( 1.0, 0.5, 0.0, 1.0 );
 map[ PrimitiveVisual::Property::BEVEL_PERCENTAGE ] = 0.4f;
 
 control.SetProperty( Control::Property::BACKGROUND, map );
