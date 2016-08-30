@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace
 
 const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
-const char* FONT_SIZE_QUALIFIER = "FontSize";
+const char* FONT_SIZE_QUALIFIER = "fontsize";
 
 const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
@@ -332,9 +332,7 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
 
   if( styleName.empty() )
   {
-    // Convert control name to lower case
     styleName = control.GetTypeName();
-    std::transform( styleName.begin(), styleName.end(), styleName.begin(), ::tolower );
   }
 
   // Apply the style after choosing the correct actual style (e.g. landscape or portrait)
