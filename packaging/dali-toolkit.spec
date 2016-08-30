@@ -34,15 +34,13 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 %define profile %{tizen_profile_name}
 %endif
 
-%if "%{profile}" == "mobile"
-%define dali_toolkit_profile MOBILE
-%define dali_style_folder 720x1280
-# dali_style to be provided by build system as with dali_toolkit_profile or by passing --define 'dali_style 470x800' to the rpm build command
-%endif
-
 %if "%{profile}" == "tv"
 %define dali_toolkit_profile TV
 %define dali_style_folder 1920x1080
+%else
+%define dali_toolkit_profile MOBILE
+%define dali_style_folder 720x1280
+# dali_style to be provided by build system as with dali_toolkit_profile or by passing --define 'dali_style 470x800' to the rpm build command
 %endif
 
 %if "%{?dali_style}"
