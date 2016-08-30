@@ -1531,7 +1531,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
@@ -1560,7 +1560,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
 
@@ -1582,7 +1582,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTRUM );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f );
@@ -1606,7 +1606,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::BEVELLED_CUBE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, 0.7f );
 
   //Test to see if shape loads correctly.
@@ -1627,7 +1627,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::OCTAHEDRON );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1647,7 +1647,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f );
@@ -1670,7 +1670,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3( 0.0, 1.0, 2.0 ) );
 
   //Test to see if shape loads correctly.
