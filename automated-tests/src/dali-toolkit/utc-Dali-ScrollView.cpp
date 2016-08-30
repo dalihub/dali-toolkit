@@ -439,7 +439,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP(void)
 
   scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DirectionBiasLeft, Dali::Toolkit::DirectionBiasLeft );
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
   scrollView.ScrollTo( target, 0.0f );
   Wait(application, RENDER_DELAY_SCROLL);
@@ -508,7 +508,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP(v
 
   scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DirectionBiasLeft, Dali::Toolkit::DirectionBiasLeft );
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
   scrollView.ScrollTo( target, 0.0f );
   Wait(application, RENDER_DELAY_SCROLL);
