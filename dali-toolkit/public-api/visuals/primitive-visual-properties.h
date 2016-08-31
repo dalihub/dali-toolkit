@@ -47,7 +47,7 @@ enum
   /**
    * @brief The color of the shape.
    * @details Name "mixColor", type Property::VECTOR4.
-   * @SINCE_1_1.45
+   * @SINCE_1_2_4
    * @note Optional. If not specified, the default is Vector4(0.5, 0.5, 0.5, 1.0).
    * @note Applies to ALL shapes.
    */
