@@ -43,7 +43,7 @@ class TextEditor;
  * | %Signal Name         | Method                         |                    |
  * |----------------------|--------------------------------|--------------------|
  * | textChanged          | @ref TextChangedSignal()       | @SINCE_1_1.37      |
- * | inputStyleChanged    | @ref InputStyleChangedSignal() | @SINCE_1_2.2       |
+ * | inputStyleChanged    | @ref InputStyleChangedSignal() | @SINCE_1_2_2       |
  *
  */
 class DALI_IMPORT_API TextEditor : public Control
@@ -114,22 +114,22 @@ public:
   /**
    * @brief Mask used by the signal InputStyleChangedSignal(). Notifies which parameters of the input style have changed.
    *
-   * @SINCE_1_2.2
+   * @SINCE_1_2_2
    */
   struct InputStyle
   {
     enum Mask
     {
-      NONE         = 0x0000, ///< @SINCE_1_2.2
-      COLOR        = 0x0001, ///< @SINCE_1_2.2
-      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2.2
-      POINT_SIZE   = 0x0004, ///< @SINCE_1_2.2
-      FONT_STYLE   = 0x0008, ///< @SINCE_1_2.2
-      LINE_SPACING = 0x0010, ///< @SINCE_1_2.2
-      UNDERLINE    = 0x0020, ///< @SINCE_1_2.2
-      SHADOW       = 0x0040, ///< @SINCE_1_2.2
-      EMBOSS       = 0x0080, ///< @SINCE_1_2.2
-      OUTLINE      = 0x0100  ///< @SINCE_1_2.2
+      NONE         = 0x0000, ///< @SINCE_1_2_2
+      COLOR        = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
+      LINE_SPACING = 0x0010, ///< @SINCE_1_2_2
+      UNDERLINE    = 0x0020, ///< @SINCE_1_2_2
+      SHADOW       = 0x0040, ///< @SINCE_1_2_2
+      EMBOSS       = 0x0080, ///< @SINCE_1_2_2
+      OUTLINE      = 0x0100  ///< @SINCE_1_2_2
     };
   };
 
@@ -143,7 +143,7 @@ public:
 
   /**
    * @brief Input Style changed signal type.
-   * @SINCE_1_2.2
+   * @SINCE_1_2_2
    */
   typedef Signal<void ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
 
@@ -223,7 +223,7 @@ public:
    *   void YourCallbackName( TextEditor textEditor, TextEditor::InputStyle::Mask mask );
    * @endcode
    *
-   * @SINCE_1_2.2
+   * @SINCE_1_2_2
    * @return The signal to connect to.
    */
   InputStyleChangedSignalType& InputStyleChangedSignal();
