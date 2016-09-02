@@ -98,10 +98,14 @@ FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
   return fontDescriptionRun;
 }
 
+// public : Constructor.
+
 ControllerPtr Controller::New( ControlInterface& controlInterface )
 {
   return ControllerPtr( new Controller( controlInterface ) );
 }
+
+// public : Configure the text controller.
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
 {
@@ -257,6 +261,107 @@ bool Controller::IsSmoothHandlePanEnabled() const
   return false;
 }
 
+void Controller::SetMaximumNumberOfCharacters( Length maxCharacters )
+{
+  mImpl->mMaximumNumberOfCharacters = maxCharacters;
+}
+
+int Controller::GetMaximumNumberOfCharacters()
+{
+  return mImpl->mMaximumNumberOfCharacters;
+}
+
+void Controller::SetEnableCursorBlink( bool enable )
+{
+  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "TextInput disabled" );
+
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mCursorBlinkEnabled = enable;
+
+    if( !enable &&
+        mImpl->mEventData->mDecorator )
+    {
+      mImpl->mEventData->mDecorator->StopCursorBlink();
+    }
+  }
+}
+
+bool Controller::GetEnableCursorBlink() const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mCursorBlinkEnabled;
+  }
+
+  return false;
+}
+
+void Controller::SetMultiLineEnabled( bool enable )
+{
+  const LayoutEngine::Layout layout = enable ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
+
+  if( layout != mImpl->mLayoutEngine.GetLayout() )
+  {
+    // Set the layout type.
+    mImpl->mLayoutEngine.SetLayout( layout );
+
+    // Set the flags to redo the layout operations
+    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
+                                                                          UPDATE_LAYOUT_SIZE |
+                                                                          ALIGN              |
+                                                                          REORDER );
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsMultiLineEnabled() const
+{
+  return LayoutEngine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
+}
+
+void Controller::SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment )
+{
+  if( alignment != mImpl->mLayoutEngine.GetHorizontalAlignment() )
+  {
+    // Set the alignment.
+    mImpl->mLayoutEngine.SetHorizontalAlignment( alignment );
+
+    // Set the flag to redo the alignment operation.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+LayoutEngine::HorizontalAlignment Controller::GetHorizontalAlignment() const
+{
+  return mImpl->mLayoutEngine.GetHorizontalAlignment();
+}
+
+void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment )
+{
+  if( alignment != mImpl->mLayoutEngine.GetVerticalAlignment() )
+  {
+    // Set the alignment.
+    mImpl->mLayoutEngine.SetVerticalAlignment( alignment );
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
+{
+  return mImpl->mLayoutEngine.GetVerticalAlignment();
+}
+
+// public : Update
+
 void Controller::SetText( const std::string& text )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
@@ -409,15 +514,22 @@ void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) c
   }
 }
 
-void Controller::SetMaximumNumberOfCharacters( Length maxCharacters )
+void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
 {
-  mImpl->mMaximumNumberOfCharacters = maxCharacters;
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
+
+  if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
+    mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
+
+    ClearFontData();
+
+    mImpl->RequestRelayout();
+  }
 }
 
-int Controller::GetMaximumNumberOfCharacters()
-{
-  return mImpl->mMaximumNumberOfCharacters;
-}
+// public : Default style & Input style
 
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 {
@@ -565,21 +677,6 @@ float Controller::GetDefaultPointSize() const
   return 0.0f;
 }
 
-void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
-
-  if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str() );
-    mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
-
-    ClearFontData();
-
-    mImpl->RequestRelayout();
-  }
-}
-
 void Controller::SetTextColor( const Vector4& textColor )
 {
   mImpl->mTextColor = textColor;
@@ -595,92 +692,6 @@ void Controller::SetTextColor( const Vector4& textColor )
 const Vector4& Controller::GetTextColor() const
 {
   return mImpl->mTextColor;
-}
-
-bool Controller::RemoveText( int cursorOffset,
-                             int numberOfCharacters,
-                             UpdateInputStyleType type )
-{
-  bool removed = false;
-
-  if( NULL == mImpl->mEventData )
-  {
-    return removed;
-  }
-
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfCharacters %d\n",
-                 this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfCharacters );
-
-  if( !mImpl->IsShowingPlaceholderText() )
-  {
-    // Delete at current cursor position
-    Vector<Character>& currentText = mImpl->mLogicalModel->mText;
-    CharacterIndex& oldCursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
-
-    CharacterIndex cursorIndex = oldCursorIndex;
-
-    // Validate the cursor position & number of characters
-    if( static_cast< CharacterIndex >( std::abs( cursorOffset ) ) <= cursorIndex )
-    {
-      cursorIndex = oldCursorIndex + cursorOffset;
-    }
-
-    if( ( cursorIndex + numberOfCharacters ) > currentText.Count() )
-    {
-      numberOfCharacters = currentText.Count() - cursorIndex;
-    }
-
-    if( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
-    {
-      // Mark the paragraphs to be updated.
-      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
-
-      // Update the input style and remove the text's style before removing the text.
-
-      if( UPDATE_INPUT_STYLE == type )
-      {
-        // Keep a copy of the current input style.
-        InputStyle currentInputStyle;
-        currentInputStyle.Copy( mImpl->mEventData->mInputStyle );
-
-        // Set first the default input style.
-        mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
-
-        // Update the input style.
-        mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
-
-        // Compare if the input style has changed.
-        const bool hasInputStyleChanged = !currentInputStyle.Equal( mImpl->mEventData->mInputStyle );
-
-        if( hasInputStyleChanged )
-        {
-          const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mImpl->mEventData->mInputStyle );
-          // Queue the input style changed signal.
-          mImpl->mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
-        }
-      }
-
-      // Updates the text style runs by removing characters. Runs with no characters are removed.
-      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
-
-      // Remove the characters.
-      Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
-      Vector<Character>::Iterator last  = first + numberOfCharacters;
-
-      currentText.Erase( first, last );
-
-      // Cursor position retreat
-      oldCursorIndex = cursorIndex;
-
-      mImpl->mEventData->mScrollAfterDelete = true;
-
-      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
-      removed = true;
-    }
-  }
-
-  return removed;
 }
 
 void Controller::SetPlaceholderTextColor( const Vector4& textColor )
@@ -1308,30 +1319,16 @@ const std::string& Controller::GetInputOutlineProperties() const
   return GetDefaultOutlineProperties();
 }
 
-void Controller::SetEnableCursorBlink( bool enable )
+// public : Queries & retrieves.
+
+LayoutEngine& Controller::GetLayoutEngine()
 {
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "TextInput disabled" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mCursorBlinkEnabled = enable;
-
-    if( !enable &&
-        mImpl->mEventData->mDecorator )
-    {
-      mImpl->mEventData->mDecorator->StopCursorBlink();
-    }
-  }
+  return mImpl->mLayoutEngine;
 }
 
-bool Controller::GetEnableCursorBlink() const
+View& Controller::GetView()
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mCursorBlinkEnabled;
-  }
-
-  return false;
+  return mImpl->mView;
 }
 
 const Vector2& Controller::GetScrollPosition() const
@@ -1476,6 +1473,8 @@ float Controller::GetHeightForWidth( float width )
   return layoutSize.height;
 }
 
+// public : Relayout.
+
 Controller::UpdateTextType Controller::Relayout( const Size& size )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, (mImpl->mAutoScrollEnabled)?"true":"false"  );
@@ -1584,53 +1583,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   return updateTextType;
 }
 
-void Controller::ProcessModifyEvents()
-{
-  Vector<ModifyEvent>& events = mImpl->mModifyEvents;
-
-  if( 0u == events.Count() )
-  {
-    // Nothing to do.
-    return;
-  }
-
-  for( Vector<ModifyEvent>::ConstIterator it = events.Begin(),
-         endIt = events.End();
-       it != endIt;
-       ++it )
-  {
-    const ModifyEvent& event = *it;
-
-    if( ModifyEvent::TEXT_REPLACED == event.type )
-    {
-      // A (single) replace event should come first, otherwise we wasted time processing NOOP events
-      DALI_ASSERT_DEBUG( it == events.Begin() && "Unexpected TEXT_REPLACED event" );
-
-      TextReplacedEvent();
-    }
-    else if( ModifyEvent::TEXT_INSERTED == event.type )
-    {
-      TextInsertedEvent();
-    }
-    else if( ModifyEvent::TEXT_DELETED == event.type )
-    {
-      // Placeholder-text cannot be deleted
-      if( !mImpl->IsShowingPlaceholderText() )
-      {
-        TextDeletedEvent();
-      }
-    }
-  }
-
-  if( NULL != mImpl->mEventData )
-  {
-    // When the text is being modified, delay cursor blinking
-    mImpl->mEventData->mDecorator->DelayCursorBlink();
-  }
-
-  // Discard temporary text
-  events.Clear();
-}
+// public : Input style change signals.
 
 bool Controller::IsInputStyleChangedSignalsQueueEmpty()
 {
@@ -1659,369 +1612,7 @@ void Controller::ProcessInputStyleChangedSignals()
   mImpl->mEventData->mInputStyleChangedQueue.Clear();
 }
 
-void Controller::ResetText()
-{
-  // Reset buffers.
-  mImpl->mLogicalModel->mText.Clear();
-
-  // We have cleared everything including the placeholder-text
-  mImpl->PlaceholderCleared();
-
-  mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = 0u;
-
-  // Clear any previous text.
-  mImpl->mTextUpdateInfo.mClearAll = true;
-
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // Apply modifications to the model
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-}
-
-void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
-{
-  // Reset the cursor position
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
-
-    // Update the cursor if it's in editing mode.
-    if( EventData::IsEditingState( mImpl->mEventData->mState )  )
-    {
-      mImpl->mEventData->mUpdateCursorPosition = true;
-    }
-  }
-}
-
-void Controller::ResetScrollPosition()
-{
-  if( NULL != mImpl->mEventData )
-  {
-    // Reset the scroll position.
-    mImpl->mScrollPosition = Vector2::ZERO;
-    mImpl->mEventData->mScrollAfterUpdatePosition = true;
-  }
-}
-
-void Controller::TextReplacedEvent()
-{
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // Apply modifications to the model
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-}
-
-void Controller::TextInsertedEvent()
-{
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextInsertedEvent" );
-
-  if( NULL == mImpl->mEventData )
-  {
-    return;
-  }
-
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // Apply modifications to the model; TODO - Optimize this
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-}
-
-void Controller::TextDeletedEvent()
-{
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextDeletedEvent" );
-
-  if( NULL == mImpl->mEventData )
-  {
-    return;
-  }
-
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // Apply modifications to the model; TODO - Optimize this
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-}
-
-bool Controller::DoRelayout( const Size& size,
-                             OperationsMask operationsRequired,
-                             Size& layoutSize )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout %p size %f,%f\n", this, size.width, size.height );
-  bool viewUpdated( false );
-
-  // Calculate the operations to be done.
-  const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
-
-  const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
-  const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
-
-  // Get the current layout size.
-  layoutSize = mImpl->mVisualModel->GetLayoutSize();
-
-  if( NO_OPERATION != ( LAYOUT & operations ) )
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout LAYOUT & operations\n");
-
-    // Some vectors with data needed to layout and reorder may be void
-    // after the first time the text has been laid out.
-    // Fill the vectors again.
-
-    // Calculate the number of glyphs to layout.
-    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mVisualModel->mCharactersToGlyph;
-    const Vector<Length>& glyphsPerCharacter = mImpl->mVisualModel->mGlyphsPerCharacter;
-    const GlyphIndex* const charactersToGlyphBuffer = charactersToGlyph.Begin();
-    const Length* const glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
-
-    const CharacterIndex lastIndex = startIndex + ( ( requestedNumberOfCharacters > 0u ) ? requestedNumberOfCharacters - 1u : 0u );
-    const GlyphIndex startGlyphIndex = mImpl->mTextUpdateInfo.mStartGlyphIndex;
-    const Length numberOfGlyphs = ( requestedNumberOfCharacters > 0u ) ? *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex : 0u;
-    const Length totalNumberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
-
-    if( 0u == totalNumberOfGlyphs )
-    {
-      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
-      {
-        mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
-      }
-
-      // Nothing else to do if there is no glyphs.
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
-      return true;
-    }
-
-    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
-    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
-    const Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
-    const Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
-    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
-    const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
-    const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
-
-    // Set the layout parameters.
-    LayoutParameters layoutParameters( size,
-                                       textBuffer,
-                                       lineBreakInfo.Begin(),
-                                       wordBreakInfo.Begin(),
-                                       ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
-                                       glyphs.Begin(),
-                                       glyphsToCharactersMap.Begin(),
-                                       charactersPerGlyph.Begin(),
-                                       charactersToGlyphBuffer,
-                                       glyphsPerCharacterBuffer,
-                                       totalNumberOfGlyphs );
-
-    // Resize the vector of positions to have the same size than the vector of glyphs.
-    Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
-    glyphPositions.Resize( totalNumberOfGlyphs );
-
-    // Whether the last character is a new paragraph character.
-    mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
-    layoutParameters.isLastNewParagraph = mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph;
-
-    // The initial glyph and the number of glyphs to layout.
-    layoutParameters.startGlyphIndex = startGlyphIndex;
-    layoutParameters.numberOfGlyphs = numberOfGlyphs;
-    layoutParameters.startLineIndex = mImpl->mTextUpdateInfo.mStartLineIndex;
-    layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
-
-    // Update the visual model.
-    Size newLayoutSize;
-    viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
-                                                   glyphPositions,
-                                                   mImpl->mVisualModel->mLines,
-                                                   newLayoutSize );
-
-    viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
-
-    if( viewUpdated )
-    {
-      layoutSize = newLayoutSize;
-
-      if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
-      {
-        mImpl->mAutoScrollDirectionRTL = false;
-      }
-
-      // Reorder the lines
-      if( NO_OPERATION != ( REORDER & operations ) )
-      {
-        Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mLogicalModel->mBidirectionalParagraphInfo;
-        Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mLogicalModel->mBidirectionalLineInfo;
-
-        // Check first if there are paragraphs with bidirectional info.
-        if( 0u != bidirectionalInfo.Count() )
-        {
-          // Get the lines
-          const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
-
-          // Reorder the lines.
-          bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
-          ReorderLines( bidirectionalInfo,
-                        startIndex,
-                        requestedNumberOfCharacters,
-                        mImpl->mVisualModel->mLines,
-                        bidirectionalLineInfo );
-
-          // Set the bidirectional info per line into the layout parameters.
-          layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
-          layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-          // Re-layout the text. Reorder those lines with right to left characters.
-          mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                                         startIndex,
-                                                         requestedNumberOfCharacters,
-                                                         glyphPositions );
-
-          if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
-          {
-            const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
-            if ( firstline )
-            {
-              mImpl->mAutoScrollDirectionRTL = firstline->direction;
-            }
-          }
-        }
-      } // REORDER
-
-      // Sets the layout size.
-      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
-      {
-        mImpl->mVisualModel->SetLayoutSize( layoutSize );
-      }
-    } // view updated
-
-    // Store the size used to layout the text.
-    mImpl->mVisualModel->mControlSize = size;
-  }
-
-  if( NO_OPERATION != ( ALIGN & operations ) )
-  {
-    // The laid-out lines.
-    Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
-
-    mImpl->mLayoutEngine.Align( size,
-                                startIndex,
-                                requestedNumberOfCharacters,
-                                lines );
-
-    viewUpdated = true;
-  }
-#if defined(DEBUG_ENABLED)
-  std::string currentText;
-  GetText( currentText );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
-#endif
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
-  return viewUpdated;
-}
-
-void Controller::SetMultiLineEnabled( bool enable )
-{
-  const LayoutEngine::Layout layout = enable ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
-
-  if( layout != mImpl->mLayoutEngine.GetLayout() )
-  {
-    // Set the layout type.
-    mImpl->mLayoutEngine.SetLayout( layout );
-
-    // Set the flags to redo the layout operations
-    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
-                                                                          UPDATE_LAYOUT_SIZE |
-                                                                          ALIGN              |
-                                                                          REORDER );
-
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
-
-    mImpl->RequestRelayout();
-  }
-}
-
-bool Controller::IsMultiLineEnabled() const
-{
-  return LayoutEngine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
-}
-
-void Controller::SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment )
-{
-  if( alignment != mImpl->mLayoutEngine.GetHorizontalAlignment() )
-  {
-    // Set the alignment.
-    mImpl->mLayoutEngine.SetHorizontalAlignment( alignment );
-
-    // Set the flag to redo the alignment operation.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
-
-    mImpl->RequestRelayout();
-  }
-}
-
-LayoutEngine::HorizontalAlignment Controller::GetHorizontalAlignment() const
-{
-  return mImpl->mLayoutEngine.GetHorizontalAlignment();
-}
-
-void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment )
-{
-  if( alignment != mImpl->mLayoutEngine.GetVerticalAlignment() )
-  {
-    // Set the alignment.
-    mImpl->mLayoutEngine.SetVerticalAlignment( alignment );
-
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
-
-    mImpl->RequestRelayout();
-  }
-}
-
-LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
-{
-  return mImpl->mLayoutEngine.GetVerticalAlignment();
-}
-
-void Controller::CalculateVerticalOffset( const Size& controlSize )
-{
-  Size layoutSize = mImpl->mVisualModel->GetLayoutSize();
-
-  if( fabsf( layoutSize.height ) < Math::MACHINE_EPSILON_1000 )
-  {
-    // Get the line height of the default font.
-    layoutSize.height = mImpl->GetDefaultFontLineHeight();
-  }
-
-  switch( mImpl->mLayoutEngine.GetVerticalAlignment() )
-  {
-    case LayoutEngine::VERTICAL_ALIGN_TOP:
-    {
-      mImpl->mScrollPosition.y = 0.f;
-      break;
-    }
-    case LayoutEngine::VERTICAL_ALIGN_CENTER:
-    {
-      mImpl->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
-      break;
-    }
-    case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
-    {
-      mImpl->mScrollPosition.y = controlSize.height - layoutSize.height;
-      break;
-    }
-  }
-}
-
-LayoutEngine& Controller::GetLayoutEngine()
-{
-  return mImpl->mLayoutEngine;
-}
-
-View& Controller::GetView()
-{
-  return mImpl->mView;
-}
+// public : Text-input Event Queuing.
 
 void Controller::KeyboardFocusGainEvent()
 {
@@ -2148,6 +1739,403 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
   return true;
 }
+
+void Controller::TapEvent( unsigned int tapCount, float x, float y )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected TapEvent" );
+
+  if( NULL != mImpl->mEventData )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TapEvent state:%d \n", mImpl->mEventData->mState );
+    EventData::State state( mImpl->mEventData->mState );
+    bool relayoutNeeded( false );   // to avoid unnecessary relayouts when tapping an empty text-field
+
+    if( mImpl->IsClipboardVisible() )
+    {
+      if( EventData::INACTIVE == state || EventData::EDITING == state)
+      {
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+      }
+      relayoutNeeded = true;
+    }
+    else if( 1u == tapCount )
+    {
+      if( EventData::EDITING_WITH_POPUP == state || EventData::EDITING_WITH_PASTE_POPUP == state )
+      {
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );  // If Popup shown hide it here so can be shown again if required.
+      }
+
+      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != state ) )
+      {
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        relayoutNeeded = true;
+      }
+      else
+      {
+        if( mImpl->IsShowingPlaceholderText() && !mImpl->IsFocusedPlaceholderAvailable() )
+        {
+          // Hide placeholder text
+          ResetText();
+        }
+
+        if( EventData::INACTIVE == state )
+        {
+          mImpl->ChangeState( EventData::EDITING );
+        }
+        else if( !mImpl->IsClipboardEmpty() )
+        {
+          mImpl->ChangeState( EventData::EDITING_WITH_POPUP );
+        }
+        relayoutNeeded = true;
+      }
+    }
+    else if( 2u == tapCount )
+    {
+      if( mImpl->mEventData->mSelectionEnabled &&
+          mImpl->IsShowingRealText() )
+      {
+        SelectEvent( x, y, false );
+      }
+    }
+    // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+    if( relayoutNeeded )
+    {
+      Event event( Event::TAP_EVENT );
+      event.p1.mUint = tapCount;
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+
+      mImpl->RequestRelayout();
+    }
+  }
+
+  // Reset keyboard as tap event has occurred.
+  mImpl->ResetImfManager();
+}
+
+void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
+
+  if( NULL != mImpl->mEventData )
+  {
+    Event event( Event::PAN_EVENT );
+    event.p1.mInt = state;
+    event.p2.mFloat = displacement.x;
+    event.p3.mFloat = displacement.y;
+    mImpl->mEventData->mEventQueue.push_back( event );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+void Controller::LongPressEvent( Gesture::State state, float x, float y  )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
+
+  if( ( state == Gesture::Started ) &&
+      ( NULL != mImpl->mEventData ) )
+  {
+    if( !mImpl->IsShowingRealText() )
+    {
+      Event event( Event::LONG_PRESS_EVENT );
+      event.p1.mInt = state;
+      mImpl->mEventData->mEventQueue.push_back( event );
+      mImpl->RequestRelayout();
+    }
+    else
+    {
+      // The 1st long-press on inactive text-field is treated as tap
+      if( EventData::INACTIVE == mImpl->mEventData->mState )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = 1;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
+
+        mImpl->RequestRelayout();
+      }
+      else if( !mImpl->IsClipboardVisible() )
+      {
+        // Reset the imf manger to commit the pre-edit before selecting the text.
+        mImpl->ResetImfManager();
+
+        SelectEvent( x, y, false );
+      }
+    }
+  }
+}
+
+ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+{
+  // Whether the text needs to be relaid-out.
+  bool requestRelayout = false;
+
+  // Whether to retrieve the text and cursor position to be sent to the IMF manager.
+  bool retrieveText = false;
+  bool retrieveCursor = false;
+
+  switch( imfEvent.eventName )
+  {
+    case ImfManager::COMMIT:
+    {
+      InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
+      requestRelayout = true;
+      retrieveCursor = true;
+      break;
+    }
+    case ImfManager::PREEDIT:
+    {
+      InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
+      requestRelayout = true;
+      retrieveCursor = true;
+      break;
+    }
+    case ImfManager::DELETESURROUNDING:
+    {
+      const bool textDeleted = RemoveText( imfEvent.cursorOffset,
+                                           imfEvent.numberOfChars,
+                                           DONT_UPDATE_INPUT_STYLE );
+
+      if( textDeleted )
+      {
+        if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
+            !mImpl->IsPlaceholderAvailable() )
+        {
+          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+        }
+        else
+        {
+          ShowPlaceholderText();
+        }
+        mImpl->mEventData->mUpdateCursorPosition = true;
+        mImpl->mEventData->mScrollAfterDelete = true;
+
+        requestRelayout = true;
+      }
+      break;
+    }
+    case ImfManager::GETSURROUNDING:
+    {
+      retrieveText = true;
+      retrieveCursor = true;
+      break;
+    }
+    case ImfManager::VOID:
+    {
+      // do nothing
+      break;
+    }
+  } // end switch
+
+  if( requestRelayout )
+  {
+    mImpl->mOperationsPending = ALL_OPERATIONS;
+    mImpl->RequestRelayout();
+  }
+
+  std::string text;
+  CharacterIndex cursorPosition = 0u;
+  Length numberOfWhiteSpaces = 0u;
+
+  if( retrieveCursor )
+  {
+    numberOfWhiteSpaces = mImpl->GetNumberOfWhiteSpaces( 0u );
+
+    cursorPosition = mImpl->GetLogicalCursorPosition();
+
+    if( cursorPosition < numberOfWhiteSpaces )
+    {
+      cursorPosition = 0u;
+    }
+    else
+    {
+      cursorPosition -= numberOfWhiteSpaces;
+    }
+  }
+
+  if( retrieveText )
+  {
+    mImpl->GetText( numberOfWhiteSpaces, text );
+  }
+
+  ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
+
+  if( requestRelayout )
+  {
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.TextChanged();
+  }
+
+  return callbackData;
+}
+
+void Controller::PasteClipboardItemEvent()
+{
+  // Retrieve the clipboard contents first
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  std::string stringToPaste( notifier.GetContent() );
+
+  // Commit the current pre-edit text; the contents of the clipboard should be appended
+  mImpl->ResetImfManager();
+
+  // Temporary disable hiding clipboard
+  mImpl->SetClipboardHideEnable( false );
+
+  // Paste
+  PasteText( stringToPaste );
+
+  mImpl->SetClipboardHideEnable( true );
+}
+
+// protected : Inherit from Text::Decorator::ControllerInterface.
+
+void Controller::GetTargetSize( Vector2& targetSize )
+{
+  targetSize = mImpl->mVisualModel->mControlSize;
+}
+
+void Controller::AddDecoration( Actor& actor, bool needsClipping )
+{
+  mImpl->mControlInterface.AddDecoration( actor, needsClipping );
+}
+
+void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
+
+  if( NULL != mImpl->mEventData )
+  {
+    switch( handleType )
+    {
+      case GRAB_HANDLE:
+      {
+        Event event( Event::GRAB_HANDLE_EVENT );
+        event.p1.mUint  = state;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+
+        mImpl->mEventData->mEventQueue.push_back( event );
+        break;
+      }
+      case LEFT_SELECTION_HANDLE:
+      {
+        Event event( Event::LEFT_SELECTION_HANDLE_EVENT );
+        event.p1.mUint  = state;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+
+        mImpl->mEventData->mEventQueue.push_back( event );
+        break;
+      }
+      case RIGHT_SELECTION_HANDLE:
+      {
+        Event event( Event::RIGHT_SELECTION_HANDLE_EVENT );
+        event.p1.mUint  = state;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+
+        mImpl->mEventData->mEventQueue.push_back( event );
+        break;
+      }
+      case LEFT_SELECTION_HANDLE_MARKER:
+      case RIGHT_SELECTION_HANDLE_MARKER:
+      {
+        // Markers do not move the handles.
+        break;
+      }
+      case HANDLE_TYPE_COUNT:
+      {
+        DALI_ASSERT_DEBUG( !"Controller::HandleEvent. Unexpected handle type" );
+      }
+    }
+
+    mImpl->RequestRelayout();
+  }
+}
+
+// protected : Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
+
+void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
+{
+  if( NULL == mImpl->mEventData )
+  {
+    return;
+  }
+
+  switch( button )
+  {
+    case Toolkit::TextSelectionPopup::CUT:
+    {
+      mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+
+      if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
+          !mImpl->IsPlaceholderAvailable() )
+      {
+        mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+      }
+      else
+      {
+        ShowPlaceholderText();
+      }
+
+      mImpl->mEventData->mUpdateCursorPosition = true;
+      mImpl->mEventData->mScrollAfterDelete = true;
+
+      mImpl->RequestRelayout();
+      mImpl->mControlInterface.TextChanged();
+      break;
+    }
+    case Toolkit::TextSelectionPopup::COPY:
+    {
+      mImpl->SendSelectionToClipboard( false ); // Text not modified
+
+      mImpl->mEventData->mUpdateCursorPosition = true;
+
+      mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
+      break;
+    }
+    case Toolkit::TextSelectionPopup::PASTE:
+    {
+      mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
+      break;
+    }
+    case Toolkit::TextSelectionPopup::SELECT:
+    {
+      const Vector2& currentCursorPosition = mImpl->mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
+
+      if( mImpl->mEventData->mSelectionEnabled )
+      {
+        // Creates a SELECT event.
+        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, false );
+      }
+      break;
+    }
+    case Toolkit::TextSelectionPopup::SELECT_ALL:
+    {
+      // Creates a SELECT_ALL event
+      SelectEvent( 0.f, 0.f, true );
+      break;
+    }
+    case Toolkit::TextSelectionPopup::CLIPBOARD:
+    {
+      mImpl->ShowClipboard();
+      break;
+    }
+    case Toolkit::TextSelectionPopup::NONE:
+    {
+      // Nothing to do.
+      break;
+    }
+  }
+}
+
+// private : Update.
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
 {
@@ -2392,6 +2380,102 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   }
 }
 
+void Controller::PasteText( const std::string& stringToPaste )
+{
+  InsertText( stringToPaste, Text::Controller::COMMIT );
+  mImpl->ChangeState( EventData::EDITING );
+  mImpl->RequestRelayout();
+
+  // Do this last since it provides callbacks into application code
+  mImpl->mControlInterface.TextChanged();
+}
+
+bool Controller::RemoveText( int cursorOffset,
+                             int numberOfCharacters,
+                             UpdateInputStyleType type )
+{
+  bool removed = false;
+
+  if( NULL == mImpl->mEventData )
+  {
+    return removed;
+  }
+
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfCharacters %d\n",
+                 this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfCharacters );
+
+  if( !mImpl->IsShowingPlaceholderText() )
+  {
+    // Delete at current cursor position
+    Vector<Character>& currentText = mImpl->mLogicalModel->mText;
+    CharacterIndex& oldCursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
+
+    CharacterIndex cursorIndex = oldCursorIndex;
+
+    // Validate the cursor position & number of characters
+    if( static_cast< CharacterIndex >( std::abs( cursorOffset ) ) <= cursorIndex )
+    {
+      cursorIndex = oldCursorIndex + cursorOffset;
+    }
+
+    if( ( cursorIndex + numberOfCharacters ) > currentText.Count() )
+    {
+      numberOfCharacters = currentText.Count() - cursorIndex;
+    }
+
+    if( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
+    {
+      // Mark the paragraphs to be updated.
+      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+
+      // Update the input style and remove the text's style before removing the text.
+
+      if( UPDATE_INPUT_STYLE == type )
+      {
+        // Keep a copy of the current input style.
+        InputStyle currentInputStyle;
+        currentInputStyle.Copy( mImpl->mEventData->mInputStyle );
+
+        // Set first the default input style.
+        mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
+
+        // Update the input style.
+        mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+
+        // Compare if the input style has changed.
+        const bool hasInputStyleChanged = !currentInputStyle.Equal( mImpl->mEventData->mInputStyle );
+
+        if( hasInputStyleChanged )
+        {
+          const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mImpl->mEventData->mInputStyle );
+          // Queue the input style changed signal.
+          mImpl->mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
+        }
+      }
+
+      // Updates the text style runs by removing characters. Runs with no characters are removed.
+      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
+
+      // Remove the characters.
+      Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
+      Vector<Character>::Iterator last  = first + numberOfCharacters;
+
+      currentText.Erase( first, last );
+
+      // Cursor position retreat
+      oldCursorIndex = cursorIndex;
+
+      mImpl->mEventData->mScrollAfterDelete = true;
+
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
+      removed = true;
+    }
+  }
+
+  return removed;
+}
+
 bool Controller::RemoveSelectedText()
 {
   bool textRemoved( false );
@@ -2411,134 +2495,300 @@ bool Controller::RemoveSelectedText()
   return textRemoved;
 }
 
-void Controller::TapEvent( unsigned int tapCount, float x, float y )
+// private : Relayout.
+
+bool Controller::DoRelayout( const Size& size,
+                             OperationsMask operationsRequired,
+                             Size& layoutSize )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected TapEvent" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout %p size %f,%f\n", this, size.width, size.height );
+  bool viewUpdated( false );
+
+  // Calculate the operations to be done.
+  const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
+
+  const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
+  const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
+
+  // Get the current layout size.
+  layoutSize = mImpl->mVisualModel->GetLayoutSize();
+
+  if( NO_OPERATION != ( LAYOUT & operations ) )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout LAYOUT & operations\n");
+
+    // Some vectors with data needed to layout and reorder may be void
+    // after the first time the text has been laid out.
+    // Fill the vectors again.
+
+    // Calculate the number of glyphs to layout.
+    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mVisualModel->mCharactersToGlyph;
+    const Vector<Length>& glyphsPerCharacter = mImpl->mVisualModel->mGlyphsPerCharacter;
+    const GlyphIndex* const charactersToGlyphBuffer = charactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
+
+    const CharacterIndex lastIndex = startIndex + ( ( requestedNumberOfCharacters > 0u ) ? requestedNumberOfCharacters - 1u : 0u );
+    const GlyphIndex startGlyphIndex = mImpl->mTextUpdateInfo.mStartGlyphIndex;
+    const Length numberOfGlyphs = ( requestedNumberOfCharacters > 0u ) ? *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex : 0u;
+    const Length totalNumberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
+
+    if( 0u == totalNumberOfGlyphs )
+    {
+      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
+      {
+        mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
+      }
+
+      // Nothing else to do if there is no glyphs.
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
+      return true;
+    }
+
+    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
+    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
+    const Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
+    const Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
+    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
+    const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
+    const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
+
+    // Set the layout parameters.
+    LayoutParameters layoutParameters( size,
+                                       textBuffer,
+                                       lineBreakInfo.Begin(),
+                                       wordBreakInfo.Begin(),
+                                       ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
+                                       glyphs.Begin(),
+                                       glyphsToCharactersMap.Begin(),
+                                       charactersPerGlyph.Begin(),
+                                       charactersToGlyphBuffer,
+                                       glyphsPerCharacterBuffer,
+                                       totalNumberOfGlyphs );
+
+    // Resize the vector of positions to have the same size than the vector of glyphs.
+    Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
+    glyphPositions.Resize( totalNumberOfGlyphs );
+
+    // Whether the last character is a new paragraph character.
+    mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
+    layoutParameters.isLastNewParagraph = mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph;
+
+    // The initial glyph and the number of glyphs to layout.
+    layoutParameters.startGlyphIndex = startGlyphIndex;
+    layoutParameters.numberOfGlyphs = numberOfGlyphs;
+    layoutParameters.startLineIndex = mImpl->mTextUpdateInfo.mStartLineIndex;
+    layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
+
+    // Update the visual model.
+    Size newLayoutSize;
+    viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
+                                                   glyphPositions,
+                                                   mImpl->mVisualModel->mLines,
+                                                   newLayoutSize );
+
+    viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
+
+    if( viewUpdated )
+    {
+      layoutSize = newLayoutSize;
+
+      if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
+      {
+        mImpl->mAutoScrollDirectionRTL = false;
+      }
+
+      // Reorder the lines
+      if( NO_OPERATION != ( REORDER & operations ) )
+      {
+        Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mLogicalModel->mBidirectionalParagraphInfo;
+        Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mLogicalModel->mBidirectionalLineInfo;
+
+        // Check first if there are paragraphs with bidirectional info.
+        if( 0u != bidirectionalInfo.Count() )
+        {
+          // Get the lines
+          const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
+
+          // Reorder the lines.
+          bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
+          ReorderLines( bidirectionalInfo,
+                        startIndex,
+                        requestedNumberOfCharacters,
+                        mImpl->mVisualModel->mLines,
+                        bidirectionalLineInfo );
+
+          // Set the bidirectional info per line into the layout parameters.
+          layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
+          layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
+
+          // Re-layout the text. Reorder those lines with right to left characters.
+          mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
+                                                         startIndex,
+                                                         requestedNumberOfCharacters,
+                                                         glyphPositions );
+
+          if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
+          {
+            const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
+            if ( firstline )
+            {
+              mImpl->mAutoScrollDirectionRTL = firstline->direction;
+            }
+          }
+        }
+      } // REORDER
+
+      // Sets the layout size.
+      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
+      {
+        mImpl->mVisualModel->SetLayoutSize( layoutSize );
+      }
+    } // view updated
+
+    // Store the size used to layout the text.
+    mImpl->mVisualModel->mControlSize = size;
+  }
+
+  if( NO_OPERATION != ( ALIGN & operations ) )
+  {
+    // The laid-out lines.
+    Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
+
+    mImpl->mLayoutEngine.Align( size,
+                                startIndex,
+                                requestedNumberOfCharacters,
+                                lines );
+
+    viewUpdated = true;
+  }
+#if defined(DEBUG_ENABLED)
+  std::string currentText;
+  GetText( currentText );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
+#endif
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
+  return viewUpdated;
+}
+
+void Controller::CalculateVerticalOffset( const Size& controlSize )
+{
+  Size layoutSize = mImpl->mVisualModel->GetLayoutSize();
+
+  if( fabsf( layoutSize.height ) < Math::MACHINE_EPSILON_1000 )
+  {
+    // Get the line height of the default font.
+    layoutSize.height = mImpl->GetDefaultFontLineHeight();
+  }
+
+  switch( mImpl->mLayoutEngine.GetVerticalAlignment() )
+  {
+    case LayoutEngine::VERTICAL_ALIGN_TOP:
+    {
+      mImpl->mScrollPosition.y = 0.f;
+      break;
+    }
+    case LayoutEngine::VERTICAL_ALIGN_CENTER:
+    {
+      mImpl->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
+      break;
+    }
+    case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
+    {
+      mImpl->mScrollPosition.y = controlSize.height - layoutSize.height;
+      break;
+    }
+  }
+}
+
+// private : Events.
+
+void Controller::ProcessModifyEvents()
+{
+  Vector<ModifyEvent>& events = mImpl->mModifyEvents;
+
+  if( 0u == events.Count() )
+  {
+    // Nothing to do.
+    return;
+  }
+
+  for( Vector<ModifyEvent>::ConstIterator it = events.Begin(),
+         endIt = events.End();
+       it != endIt;
+       ++it )
+  {
+    const ModifyEvent& event = *it;
+
+    if( ModifyEvent::TEXT_REPLACED == event.type )
+    {
+      // A (single) replace event should come first, otherwise we wasted time processing NOOP events
+      DALI_ASSERT_DEBUG( it == events.Begin() && "Unexpected TEXT_REPLACED event" );
+
+      TextReplacedEvent();
+    }
+    else if( ModifyEvent::TEXT_INSERTED == event.type )
+    {
+      TextInsertedEvent();
+    }
+    else if( ModifyEvent::TEXT_DELETED == event.type )
+    {
+      // Placeholder-text cannot be deleted
+      if( !mImpl->IsShowingPlaceholderText() )
+      {
+        TextDeletedEvent();
+      }
+    }
+  }
 
   if( NULL != mImpl->mEventData )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TapEvent state:%d \n", mImpl->mEventData->mState );
-    EventData::State state( mImpl->mEventData->mState );
-    bool relayoutNeeded( false );   // to avoid unnecessary relayouts when tapping an empty text-field
-
-    if( mImpl->IsClipboardVisible() )
-    {
-      if( EventData::INACTIVE == state || EventData::EDITING == state)
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
-      }
-      relayoutNeeded = true;
-    }
-    else if( 1u == tapCount )
-    {
-      if( EventData::EDITING_WITH_POPUP == state || EventData::EDITING_WITH_PASTE_POPUP == state )
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );  // If Popup shown hide it here so can be shown again if required.
-      }
-
-      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != state ) )
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
-        relayoutNeeded = true;
-      }
-      else
-      {
-        if( mImpl->IsShowingPlaceholderText() && !mImpl->IsFocusedPlaceholderAvailable() )
-        {
-          // Hide placeholder text
-          ResetText();
-        }
-
-        if( EventData::INACTIVE == state )
-        {
-          mImpl->ChangeState( EventData::EDITING );
-        }
-        else if( !mImpl->IsClipboardEmpty() )
-        {
-          mImpl->ChangeState( EventData::EDITING_WITH_POPUP );
-        }
-        relayoutNeeded = true;
-      }
-    }
-    else if( 2u == tapCount )
-    {
-      if( mImpl->mEventData->mSelectionEnabled &&
-          mImpl->IsShowingRealText() )
-      {
-        SelectEvent( x, y, false );
-      }
-    }
-    // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
-    if( relayoutNeeded )
-    {
-      Event event( Event::TAP_EVENT );
-      event.p1.mUint = tapCount;
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-
-      mImpl->RequestRelayout();
-    }
+    // When the text is being modified, delay cursor blinking
+    mImpl->mEventData->mDecorator->DelayCursorBlink();
   }
 
-  // Reset keyboard as tap event has occurred.
-  mImpl->ResetImfManager();
+  // Discard temporary text
+  events.Clear();
 }
 
-void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
+void Controller::TextReplacedEvent()
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
 
-  if( NULL != mImpl->mEventData )
-  {
-    Event event( Event::PAN_EVENT );
-    event.p1.mInt = state;
-    event.p2.mFloat = displacement.x;
-    event.p3.mFloat = displacement.y;
-    mImpl->mEventData->mEventQueue.push_back( event );
-
-    mImpl->RequestRelayout();
-  }
+  // Apply modifications to the model
+  mImpl->mOperationsPending = ALL_OPERATIONS;
 }
 
-void Controller::LongPressEvent( Gesture::State state, float x, float y  )
+void Controller::TextInsertedEvent()
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
+  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextInsertedEvent" );
 
-  if( ( state == Gesture::Started ) &&
-      ( NULL != mImpl->mEventData ) )
+  if( NULL == mImpl->mEventData )
   {
-    if( !mImpl->IsShowingRealText() )
-    {
-      Event event( Event::LONG_PRESS_EVENT );
-      event.p1.mInt = state;
-      mImpl->mEventData->mEventQueue.push_back( event );
-      mImpl->RequestRelayout();
-    }
-    else
-    {
-      // The 1st long-press on inactive text-field is treated as tap
-      if( EventData::INACTIVE == mImpl->mEventData->mState )
-      {
-        mImpl->ChangeState( EventData::EDITING );
-
-        Event event( Event::TAP_EVENT );
-        event.p1.mUint = 1;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-        mImpl->mEventData->mEventQueue.push_back( event );
-
-        mImpl->RequestRelayout();
-      }
-      else if( !mImpl->IsClipboardVisible() )
-      {
-        // Reset the imf manger to commit the pre-edit before selecting the text.
-        mImpl->ResetImfManager();
-
-        SelectEvent( x, y, false );
-      }
-    }
+    return;
   }
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model; TODO - Optimize this
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+}
+
+void Controller::TextDeletedEvent()
+{
+  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextDeletedEvent" );
+
+  if( NULL == mImpl->mEventData )
+  {
+    return;
+  }
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model; TODO - Optimize this
+  mImpl->mOperationsPending = ALL_OPERATIONS;
 }
 
 void Controller::SelectEvent( float x, float y, bool selectAll )
@@ -2562,282 +2812,6 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
 
     mImpl->RequestRelayout();
   }
-}
-
-void Controller::GetTargetSize( Vector2& targetSize )
-{
-  targetSize = mImpl->mVisualModel->mControlSize;
-}
-
-void Controller::AddDecoration( Actor& actor, bool needsClipping )
-{
-  mImpl->mControlInterface.AddDecoration( actor, needsClipping );
-}
-
-void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
-{
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    switch( handleType )
-    {
-      case GRAB_HANDLE:
-      {
-        Event event( Event::GRAB_HANDLE_EVENT );
-        event.p1.mUint  = state;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-
-        mImpl->mEventData->mEventQueue.push_back( event );
-        break;
-      }
-      case LEFT_SELECTION_HANDLE:
-      {
-        Event event( Event::LEFT_SELECTION_HANDLE_EVENT );
-        event.p1.mUint  = state;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-
-        mImpl->mEventData->mEventQueue.push_back( event );
-        break;
-      }
-      case RIGHT_SELECTION_HANDLE:
-      {
-        Event event( Event::RIGHT_SELECTION_HANDLE_EVENT );
-        event.p1.mUint  = state;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-
-        mImpl->mEventData->mEventQueue.push_back( event );
-        break;
-      }
-      case LEFT_SELECTION_HANDLE_MARKER:
-      case RIGHT_SELECTION_HANDLE_MARKER:
-      {
-        // Markers do not move the handles.
-        break;
-      }
-      case HANDLE_TYPE_COUNT:
-      {
-        DALI_ASSERT_DEBUG( !"Controller::HandleEvent. Unexpected handle type" );
-      }
-    }
-
-    mImpl->RequestRelayout();
-  }
-}
-
-void Controller::PasteText( const std::string& stringToPaste )
-{
-  InsertText( stringToPaste, Text::Controller::COMMIT );
-  mImpl->ChangeState( EventData::EDITING );
-  mImpl->RequestRelayout();
-
-  // Do this last since it provides callbacks into application code
-  mImpl->mControlInterface.TextChanged();
-}
-
-void Controller::PasteClipboardItemEvent()
-{
-  // Retrieve the clipboard contents first
-  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-  std::string stringToPaste( notifier.GetContent() );
-
-  // Commit the current pre-edit text; the contents of the clipboard should be appended
-  mImpl->ResetImfManager();
-
-  // Temporary disable hiding clipboard
-  mImpl->SetClipboardHideEnable( false );
-
-  // Paste
-  PasteText( stringToPaste );
-
-  mImpl->SetClipboardHideEnable( true );
-}
-
-void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
-{
-  if( NULL == mImpl->mEventData )
-  {
-    return;
-  }
-
-  switch( button )
-  {
-    case Toolkit::TextSelectionPopup::CUT:
-    {
-      mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
-      mImpl->mOperationsPending = ALL_OPERATIONS;
-
-      if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
-          !mImpl->IsPlaceholderAvailable() )
-      {
-        mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-      }
-      else
-      {
-        ShowPlaceholderText();
-      }
-
-      mImpl->mEventData->mUpdateCursorPosition = true;
-      mImpl->mEventData->mScrollAfterDelete = true;
-
-      mImpl->RequestRelayout();
-      mImpl->mControlInterface.TextChanged();
-      break;
-    }
-    case Toolkit::TextSelectionPopup::COPY:
-    {
-      mImpl->SendSelectionToClipboard( false ); // Text not modified
-
-      mImpl->mEventData->mUpdateCursorPosition = true;
-
-      mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
-      break;
-    }
-    case Toolkit::TextSelectionPopup::PASTE:
-    {
-      mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
-      break;
-    }
-    case Toolkit::TextSelectionPopup::SELECT:
-    {
-      const Vector2& currentCursorPosition = mImpl->mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
-
-      if( mImpl->mEventData->mSelectionEnabled )
-      {
-        // Creates a SELECT event.
-        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, false );
-      }
-      break;
-    }
-    case Toolkit::TextSelectionPopup::SELECT_ALL:
-    {
-      // Creates a SELECT_ALL event
-      SelectEvent( 0.f, 0.f, true );
-      break;
-    }
-    case Toolkit::TextSelectionPopup::CLIPBOARD:
-    {
-      mImpl->ShowClipboard();
-      break;
-    }
-    case Toolkit::TextSelectionPopup::NONE:
-    {
-      // Nothing to do.
-      break;
-    }
-  }
-}
-
-ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
-{
-  // Whether the text needs to be relaid-out.
-  bool requestRelayout = false;
-
-  // Whether to retrieve the text and cursor position to be sent to the IMF manager.
-  bool retrieveText = false;
-  bool retrieveCursor = false;
-
-  switch( imfEvent.eventName )
-  {
-    case ImfManager::COMMIT:
-    {
-      InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
-      requestRelayout = true;
-      retrieveCursor = true;
-      break;
-    }
-    case ImfManager::PREEDIT:
-    {
-      InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
-      requestRelayout = true;
-      retrieveCursor = true;
-      break;
-    }
-    case ImfManager::DELETESURROUNDING:
-    {
-      const bool textDeleted = RemoveText( imfEvent.cursorOffset,
-                                           imfEvent.numberOfChars,
-                                           DONT_UPDATE_INPUT_STYLE );
-
-      if( textDeleted )
-      {
-        if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
-            !mImpl->IsPlaceholderAvailable() )
-        {
-          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-        }
-        else
-        {
-          ShowPlaceholderText();
-        }
-        mImpl->mEventData->mUpdateCursorPosition = true;
-        mImpl->mEventData->mScrollAfterDelete = true;
-
-        requestRelayout = true;
-      }
-      break;
-    }
-    case ImfManager::GETSURROUNDING:
-    {
-      retrieveText = true;
-      retrieveCursor = true;
-      break;
-    }
-    case ImfManager::VOID:
-    {
-      // do nothing
-      break;
-    }
-  } // end switch
-
-  if( requestRelayout )
-  {
-    mImpl->mOperationsPending = ALL_OPERATIONS;
-    mImpl->RequestRelayout();
-  }
-
-  std::string text;
-  CharacterIndex cursorPosition = 0u;
-  Length numberOfWhiteSpaces = 0u;
-
-  if( retrieveCursor )
-  {
-    numberOfWhiteSpaces = mImpl->GetNumberOfWhiteSpaces( 0u );
-
-    cursorPosition = mImpl->GetLogicalCursorPosition();
-
-    if( cursorPosition < numberOfWhiteSpaces )
-    {
-      cursorPosition = 0u;
-    }
-    else
-    {
-      cursorPosition -= numberOfWhiteSpaces;
-    }
-  }
-
-  if( retrieveText )
-  {
-    mImpl->GetText( numberOfWhiteSpaces, text );
-  }
-
-  ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
-
-  if( requestRelayout )
-  {
-    // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.TextChanged();
-  }
-
-  return callbackData;
-}
-
-Controller::~Controller()
-{
-  delete mImpl;
 }
 
 bool Controller::BackspaceKeyEvent()
@@ -2882,6 +2856,30 @@ bool Controller::BackspaceKeyEvent()
   }
 
   return removed;
+}
+
+// private : Helpers.
+
+void Controller::ResetText()
+{
+  // Reset buffers.
+  mImpl->mLogicalModel->mText.Clear();
+
+  // We have cleared everything including the placeholder-text
+  mImpl->PlaceholderCleared();
+
+  mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = 0u;
+
+  // Clear any previous text.
+  mImpl->mTextUpdateInfo.mClearAll = true;
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model
+  mImpl->mOperationsPending = ALL_OPERATIONS;
 }
 
 void Controller::ShowPlaceholderText()
@@ -2986,10 +2984,46 @@ void Controller::ClearStyleData()
   mImpl->mLogicalModel->ClearFontDescriptionRuns();
 }
 
+void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
+{
+  // Reset the cursor position
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
+
+    // Update the cursor if it's in editing mode.
+    if( EventData::IsEditingState( mImpl->mEventData->mState )  )
+    {
+      mImpl->mEventData->mUpdateCursorPosition = true;
+    }
+  }
+}
+
+void Controller::ResetScrollPosition()
+{
+  if( NULL != mImpl->mEventData )
+  {
+    // Reset the scroll position.
+    mImpl->mScrollPosition = Vector2::ZERO;
+    mImpl->mEventData->mScrollAfterUpdatePosition = true;
+  }
+}
+
+// private : Private contructors & copy operator.
+
 Controller::Controller( ControlInterface& controlInterface )
 : mImpl( NULL )
 {
   mImpl = new Controller::Impl( controlInterface );
+}
+
+// The copy constructor and operator are left unimplemented.
+
+// protected : Destructor.
+
+Controller::~Controller()
+{
+  delete mImpl;
 }
 
 } // namespace Text

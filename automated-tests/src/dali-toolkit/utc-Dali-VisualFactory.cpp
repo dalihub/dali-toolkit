@@ -1531,7 +1531,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
@@ -1560,7 +1560,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
 
@@ -1582,7 +1582,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTRUM );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f );
@@ -1606,7 +1606,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::BEVELLED_CUBE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, 0.7f );
 
   //Test to see if shape loads correctly.
@@ -1627,7 +1627,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::OCTAHEDRON );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1647,7 +1647,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f );
@@ -1670,8 +1670,188 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3( 0.0, 1.0, 2.0 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too many slices.
+int UtcDaliVisualFactoryGetPrimitiveVisual9(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual9:  Request primitive visual with above-cap slices." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, Property::Value( 1000000 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too few slices. (2 slices or less.)
+int UtcDaliVisualFactoryGetPrimitiveVisual10(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual10:  Request primitive visual with too few slices." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, Property::Value( 2 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too many stacks.
+int UtcDaliVisualFactoryGetPrimitiveVisual11(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual11:  Request primitive visual with too many stacks." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::STACKS, Property::Value( 1000000 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too few stacks. (1 stack or less.)
+int UtcDaliVisualFactoryGetPrimitiveVisual12(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual12:  Request primitive visual with too few stacks." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::STACKS, Property::Value( 1 ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use invalid (zero or negative) dimensions.
+int UtcDaliVisualFactoryGetPrimitiveVisual13(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual13:  Request primitive visual with invalid scale dimensions." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_DIMENSIONS, Vector3::ZERO );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too low a bevel percentage.
+int UtcDaliVisualFactoryGetPrimitiveVisual14(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual14:  Request primitive visual with too low a bevel percentage." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, Property::Value( -1.0f ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too high a bevel percentage.
+int UtcDaliVisualFactoryGetPrimitiveVisual15(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual15:  Request primitive visual with too high a bevel percentage." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, Property::Value( 2.0f ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too low a bevel smoothness.
+int UtcDaliVisualFactoryGetPrimitiveVisual16(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual16:  Request primitive visual with too low a bevel smoothness." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_SMOOTHNESS, Property::Value( -1.0f ) );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
+//Test if primitive shape loads correctly when told to use too high a bevel smoothness.
+int UtcDaliVisualFactoryGetPrimitiveVisual17(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual17:  Request primitive visual with too high a bevel smoothness." );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
+  propertyMap.Insert( PrimitiveVisual::Property::BEVEL_SMOOTHNESS, Property::Value( 2.0f ) );
 
   //Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties( propertyMap, application );

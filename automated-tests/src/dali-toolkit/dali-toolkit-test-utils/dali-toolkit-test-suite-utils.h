@@ -23,5 +23,7 @@
 #include <dali-test-suite-utils.h>
 #include "toolkit-test-application.h"
 #include "toolkit-application.h"
+#include "toolkit-imf-manager.h"
+#include "toolkit-clipboard-event-notifier.h"
 
 #endif // __DALI_TOOLKIT_TEST_SUITE_UTILS_H__

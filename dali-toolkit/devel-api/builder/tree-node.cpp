@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,36 @@
 
 // EXTERNAL INCLUDES
 #include <cstring>
+#include <algorithm>
 
 // INTERNAL INCLUDES
 #include "dali-toolkit/devel-api/builder/tree-node.h"
 #include "dali-toolkit/internal/builder/tree-node-manipulator.h"
+
+namespace
+{
+
+bool CaseInsensitiveCharacterCompare( unsigned char a, unsigned char b )
+{
+  // Converts to lower case in the current locale.
+  return std::tolower( a ) == std::tolower( b );
+}
+
+/**
+ * return true if the lower cased ASCII strings are equal.
+ */
+bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b )
+{
+  bool result = false;
+  if( a.length() == b.length() )
+  {
+    result = std::equal( a.begin(), a.end(), b.begin(), CaseInsensitiveCharacterCompare );
+  }
+  return result;
+}
+
+} // anonymous namespace
+
 
 namespace Dali
 {
@@ -80,7 +106,6 @@ bool TreeNode::GetBoolean() const
   return mIntValue == 1 ? true : false;
 }
 
-
 size_t TreeNode::Size() const
 {
   size_t c = 0;
@@ -114,6 +139,25 @@ const TreeNode* TreeNode::GetChild(const std::string& childName) const
     if(p->mName && (std::string(p->mName) == childName) )
     {
       return p;
+    }
+    p = p->mNextSibling;
+  }
+  return NULL;
+}
+
+
+const TreeNode* TreeNode::GetChildIgnoreCase(const std::string& childName) const
+{
+  const TreeNode* p = mFirstChild;
+  while(p)
+  {
+    if(p->mName)
+    {
+      std::string nodeName(p->mName);
+      if( CaseInsensitiveStringCompare( nodeName, childName) )
+      {
+        return p;
+      }
     }
     p = p->mNextSibling;
   }

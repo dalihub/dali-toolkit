@@ -53,7 +53,7 @@ DALI_ENUM_TO_STRING_TABLE_END( SHAPE_TYPE )
 
 //Property names
 const char * const PRIMITIVE_SHAPE( "shape" );
-const char * const SHAPE_COLOR( "shapeColor" );
+const char * const SHAPE_COLOR( "mixColor" );
 const char * const SLICES( "slices" );
 const char * const STACKS( "stacks" );
 const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
@@ -77,8 +77,8 @@ const float   DEFAULT_BEVEL_SMOOTHNESS =    0.0; ///< For bevelled cubes
 const Vector4 DEFAULT_COLOR =               Vector4( 0.5, 0.5, 0.5, 0.0 ); ///< Grey, for all.
 
 //Property limits
-const int   MIN_SLICES =           1;   ///< Minimum number of slices for spheres and conics
-const int   MIN_STACKS =           1;   ///< Minimum number of stacks for spheres and conics
+const int   MIN_SLICES =           3;   ///< Minimum number of slices for spheres and conics
+const int   MIN_STACKS =           2;   ///< Minimum number of stacks for spheres and conics
 const int   MAX_PARTITIONS =       255; ///< Maximum number of slices or stacks for spheres and conics
 const float MIN_BEVEL_PERCENTAGE = 0.0; ///< Minimum bevel percentage for bevelled cubes
 const float MAX_BEVEL_PERCENTAGE = 1.0; ///< Maximum bevel percentage for bevelled cubes
@@ -195,7 +195,7 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
 
   //Read in other potential properties.
 
-  Property::Value* color = propertyMap.Find( Toolkit::PrimitiveVisual::Property::COLOR, SHAPE_COLOR );
+  Property::Value* color = propertyMap.Find( Toolkit::PrimitiveVisual::Property::MIX_COLOR, SHAPE_COLOR );
   if( color && !color->Get( mColor ) )
   {
     DALI_LOG_ERROR( "Invalid type for color in PrimitiveVisual.\n" );
@@ -210,10 +210,12 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
       if( mSlices > MAX_PARTITIONS )
       {
         mSlices = MAX_PARTITIONS;
+        DALI_LOG_WARNING( "Value for slices clamped.\n" );
       }
       else if ( mSlices < MIN_SLICES )
       {
         mSlices = MIN_SLICES;
+        DALI_LOG_WARNING( "Value for slices clamped.\n" );
       }
     }
     else
@@ -231,10 +233,12 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
       if( mStacks > MAX_PARTITIONS )
       {
         mStacks = MAX_PARTITIONS;
+        DALI_LOG_WARNING( "Value for stacks clamped.\n" );
       }
       else if ( mStacks < MIN_STACKS )
       {
         mStacks = MIN_STACKS;
+        DALI_LOG_WARNING( "Value for stacks clamped.\n" );
       }
     }
     else
@@ -276,14 +280,17 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
       if( mScaleDimensions.x <= 0.0 )
       {
         mScaleDimensions.x = 1.0;
+        DALI_LOG_WARNING( "Value for scale dimensions clamped. Must be greater than zero.\n" );
       }
       if( mScaleDimensions.y <= 0.0 )
       {
         mScaleDimensions.y = 1.0;
+        DALI_LOG_WARNING( "Value for scale dimensions clamped. Must be greater than zero.\n" );
       }
       if( mScaleDimensions.z <= 0.0 )
       {
         mScaleDimensions.z = 1.0;
+        DALI_LOG_WARNING( "Value for scale dimensions clamped. Must be greater than zero.\n" );
       }
     }
     else
@@ -301,10 +308,12 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
       if( mBevelPercentage < MIN_BEVEL_PERCENTAGE )
       {
         mBevelPercentage = MIN_BEVEL_PERCENTAGE;
+        DALI_LOG_WARNING( "Value for bevel percentage clamped.\n" );
       }
       else if( mBevelPercentage > MAX_BEVEL_PERCENTAGE )
       {
         mBevelPercentage = MAX_BEVEL_PERCENTAGE;
+        DALI_LOG_WARNING( "Value for bevel percentage clamped.\n" );
       }
     }
     else
@@ -322,10 +331,12 @@ void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyM
       if( mBevelSmoothness < MIN_SMOOTHNESS )
       {
         mBevelSmoothness = MIN_SMOOTHNESS;
+        DALI_LOG_WARNING( "Value for bevel smoothness clamped.\n" );
       }
       else if( mBevelSmoothness > MAX_SMOOTHNESS )
       {
         mBevelSmoothness = MAX_SMOOTHNESS;
+        DALI_LOG_WARNING( "Value for bevel smoothness clamped.\n" );
       }
     }
     else
@@ -377,7 +388,7 @@ void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Clear();
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
   map.Insert( Toolkit::PrimitiveVisual::Property::SHAPE, mPrimitiveType );
-  map.Insert( Toolkit::PrimitiveVisual::Property::COLOR, mColor );
+  map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SLICES, mSlices );
   map.Insert( Toolkit::PrimitiveVisual::Property::STACKS, mStacks );
   map.Insert( Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS, mScaleTopRadius );
@@ -419,7 +430,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
   mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
   mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
-  mShader.RegisterProperty( Toolkit::PrimitiveVisual::Property::COLOR, COLOR_UNIFORM_NAME, mColor );
+  mShader.RegisterProperty( Toolkit::PrimitiveVisual::Property::MIX_COLOR, COLOR_UNIFORM_NAME, mColor );
   mShader.RegisterProperty( OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions );
 }
 
@@ -1129,16 +1140,17 @@ void PrimitiveVisual::ComputeBevelledCubeVertices( Vector<Vertex>& vertices, Vec
   int normalIndex = 0;  //Track progress through normals, as vertices are calculated per face.
 
   float minDimension = std::min( std::min( dimensions.x, dimensions.y ), dimensions.z );
-  float bevelScale = 1.0 - bevelPercentage;
-  float bevelAmount = 0.5 * bevelScale * minDimension;
+  float bevelAmount = 0.5 * std::min( bevelPercentage, minDimension ); //Cap bevel amount if necessary.
 
+  //Distances from centre to outer edge points.
   float outerX = 0.5 * dimensions.x;
   float outerY = 0.5 * dimensions.y;
   float outerZ = 0.5 * dimensions.z;
 
-  float bevelX = outerX - ( 0.5 * minDimension - bevelAmount );
-  float bevelY = outerY - ( 0.5 * minDimension - bevelAmount );
-  float bevelZ = outerZ - ( 0.5 * minDimension - bevelAmount );
+  //Distances from centre to bevelled points.
+  float bevelX = outerX - bevelAmount;
+  float bevelY = outerY - bevelAmount;
+  float bevelZ = outerZ - bevelAmount;
 
   Vector<Vector3> positions;  //Holds object points, to be shared between vertexes.
   positions.Resize( numPositions );
