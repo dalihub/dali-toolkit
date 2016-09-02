@@ -705,7 +705,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
-  propertyMap.Insert( PrimitiveVisual::Property::COLOR, color );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, color );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, 20 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
@@ -730,7 +730,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), (int)PrimitiveVisual::Shape::CUBE, TEST_LOCATION );
 
-  value = resultMap.Find( PrimitiveVisual::Property::COLOR, Property::VECTOR4 );
+  value = resultMap.Find( PrimitiveVisual::Property::MIX_COLOR, Property::VECTOR4 );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<Vector4>() == color );
   DALI_TEST_EQUALS( value->Get<Vector4>(), color, Math::MACHINE_EPSILON_100, TEST_LOCATION );
@@ -937,7 +937,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( PrimitiveVisual::Property::COLOR );
+  Property::Index index = renderer.GetPropertyIndex( PrimitiveVisual::Property::MIX_COLOR );
 
   // The property isn't registered on the renderer, it's instead registered on the shader.
   DALI_TEST_EQUALS( index, Property::INVALID_INDEX, TEST_LOCATION );
