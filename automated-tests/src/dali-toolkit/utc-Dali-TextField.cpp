@@ -17,6 +17,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
@@ -105,8 +107,13 @@ const float TO_SECONDS = 1.f / TO_MILLISECONDS;
 const float SCROLL_THRESHOLD = 10.f;
 const float SCROLL_SPEED = 300.f;
 
+const unsigned int DEFAULT_FONT_SIZE = 1152u;
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+
 static bool gTextChangedCallBackCalled;
 static bool gMaxCharactersCallBackCalled;
+static bool gInputStyleChangedCallbackCalled;
+static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
 static void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
 {
@@ -206,6 +213,19 @@ static int Wait(ToolkitTestApplication& application, int duration = 0)
   return time;
 }
 
+struct CallbackFunctor
+{
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag( callbackFlag )
+  {
+  }
+
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
 
 static void TestTextChangedCallback( TextField control )
 {
@@ -219,6 +239,14 @@ static void TestMaxLengthReachedCallback( TextField control )
   tet_infoline(" TestMaxLengthReachedCallback");
 
   gMaxCharactersCallBackCalled = true;
+}
+
+static void TestInputStyleChangedCallback( TextField control, TextField::InputStyle::Mask mask )
+{
+  tet_infoline(" TestInputStyleChangedCallback");
+
+  gInputStyleChangedCallbackCalled = true;
+  gInputStyleMask = mask;
 }
 
 // Generate a TapGestureEvent to send to Core.
@@ -641,11 +669,16 @@ int utcDaliTextFieldTextChangedP(void)
 
   Stage::GetCurrent().Add( field );
 
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
+  bool textChangedSignal = false;
+  field.ConnectSignal( testTracker, "textChanged",   CallbackFunctor(&textChangedSignal) );
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::TEXT, "ABC" );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_CHECK( textChangedSignal );
 
   application.SendNotification();
 
@@ -668,11 +701,16 @@ int utcDaliTextFieldTextChangedN(void)
 
   Stage::GetCurrent().Add( field );
 
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
+  bool textChangedSignal = false;
+  field.ConnectSignal( testTracker, "textChanged",   CallbackFunctor(&textChangedSignal) );
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "ABC" ); // Setting placeholder, not TEXT
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+  DALI_TEST_CHECK( !textChangedSignal );
 
   END_TEST;
 }
@@ -692,13 +730,19 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
 
   field.SetKeyInputFocus();
 
-  gMaxCharactersCallBackCalled = false;
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
+  bool maxLengthReachedSignal = false;
+  field.ConnectSignal( testTracker, "maxLengthReached",   CallbackFunctor(&maxLengthReachedSignal) );
+
+  gMaxCharactersCallBackCalled = false;
 
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( maxLengthReachedSignal );
 
   END_TEST;
 }
@@ -718,13 +762,441 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   field.SetKeyInputFocus();
 
-  gMaxCharactersCallBackCalled = false;
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
+  bool maxLengthReachedSignal = false;
+  field.ConnectSignal( testTracker, "maxLengthReached",   CallbackFunctor(&maxLengthReachedSignal) );
+
+  gMaxCharactersCallBackCalled = false;
 
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( !maxLengthReachedSignal );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldInputStyleChanged01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged01");
+
+  // The text-field emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
+  application.CreateAdaptor();
+
+  // Load some fonts.
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE );
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>" );
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  field.InputStyleChangedSignal().Connect( &TestInputStyleChangedCallback );
+  bool inputStyleChangedSignal = false;
+  field.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
+
+  Stage::GetCurrent().Add( field );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 18.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 18.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::FONT_FAMILY | TextField::InputStyle::POINT_SIZE ), TEST_LOCATION );
+
+    const std::string fontFamily = field.GetProperty( TextField::Property::INPUT_FONT_FAMILY ).Get<std::string>();
+    DALI_TEST_EQUALS( fontFamily, "DejaVuSerif", TEST_LOCATION );
+
+    const float pointSize = field.GetProperty( TextField::Property::INPUT_POINT_SIZE ).Get<float>();
+    DALI_TEST_EQUALS( pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 43.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 43.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::COLOR ), TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::GREEN, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 88.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 88.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::COLOR | TextField::InputStyle::FONT_STYLE ), TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+
+    const std::string style = field.GetProperty( TextField::Property::INPUT_FONT_STYLE ).Get<std::string>();
+    DALI_TEST_EQUALS( style, "{\"weight\":\"bold\"}", TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 115.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 115.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 164.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 164.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::FONT_STYLE ), TEST_LOCATION );
+
+    const std::string style = field.GetProperty( TextField::Property::INPUT_FONT_STYLE ).Get<std::string>();
+    DALI_TEST_CHECK( style.empty() );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 191.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 191.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldInputStyleChanged02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged02");
+
+  // The text-field emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
+  application.CreateAdaptor();
+
+  // Load some fonts.
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE );
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>" );
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  field.InputStyleChangedSignal().Connect( &TestInputStyleChangedCallback );
+  bool inputStyleChangedSignal = false;
+  field.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
+
+  Stage::GetCurrent().Add( field );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 53.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 53.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 53.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 53.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::FONT_FAMILY |
+                                                 TextField::InputStyle::POINT_SIZE  |
+                                                 TextField::InputStyle::COLOR ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::GREEN, TEST_LOCATION );
+
+    const std::string fontFamily = field.GetProperty( TextField::Property::INPUT_FONT_FAMILY ).Get<std::string>();
+    DALI_TEST_EQUALS( fontFamily, "DejaVuSerif", TEST_LOCATION );
+
+    const float pointSize = field.GetProperty( TextField::Property::INPUT_POINT_SIZE ).Get<float>();
+    DALI_TEST_EQUALS( pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::COLOR ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLUE, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::COLOR ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  field.SetProperty( TextField::Property::INPUT_COLOR, Color::YELLOW );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+  field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 20.f );
+
+  field.SetProperty( TextField::Property::INPUT_UNDERLINE, "underline" );
+  field.SetProperty( TextField::Property::INPUT_SHADOW, "shadow" );
+  field.SetProperty( TextField::Property::INPUT_EMBOSS, "emboss" );
+  field.SetProperty( TextField::Property::INPUT_OUTLINE, "outline" );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 63.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 63.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::COLOR |
+                                                 TextField::InputStyle::POINT_SIZE |
+                                                 TextField::InputStyle::FONT_STYLE |
+                                                 TextField::InputStyle::UNDERLINE |
+                                                 TextField::InputStyle::SHADOW |
+                                                 TextField::InputStyle::EMBOSS |
+                                                 TextField::InputStyle::OUTLINE ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
 
   END_TEST;
 }
