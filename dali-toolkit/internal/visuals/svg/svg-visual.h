@@ -95,14 +95,6 @@ protected:
 public:
 
   /**
-   * @brief Helper method to determine whether the url indicate that it is a svg image.
-   *
-   * @param [in] url The URL of the image file.
-   * @return true if it is a svg image
-   */
-  static bool IsSvgUrl( const std::string& url );
-
-  /**
    * @brief Sets the svg image of this visual to the resource at imageUrl
    * The visual will parse the svg image once it is set.
    * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage

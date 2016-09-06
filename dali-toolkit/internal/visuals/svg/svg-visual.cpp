@@ -70,11 +70,6 @@ SvgVisual::~SvgVisual()
   }
 }
 
-bool SvgVisual::IsSvgUrl( const std::string& url )
-{
-  return url.substr( url.find_last_of(".") + 1 ) == "svg";
-}
-
 void SvgVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
