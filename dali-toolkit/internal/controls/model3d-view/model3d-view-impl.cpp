@@ -536,6 +536,7 @@ void Model3dView::CreateGeometry()
     {
       mRenderer.SetGeometry( mMesh );
       mRenderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
+      mRenderer.SetProperty( Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON );
     }
   }
 }
