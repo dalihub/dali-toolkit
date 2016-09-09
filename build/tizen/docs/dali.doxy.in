@@ -350,7 +350,10 @@ ALIASES += DEPRECATED_1_1="@deprecated Deprecated since 1.1"
 
 ALIASES += PLATFORM=""
 ALIASES += PRIVLEVEL_PLATFORM=""
+ALIASES += PRIVLEVEL_PUBLIC=""
 ALIASES += PRIVILEGE_KEYGRAB=""
+ALIASES += PRIVILEGE_DISPLAY=""
+ALIASES += REMARK_INTERNET=""
 
 ############################################
 ## For Tizen Native API Reference
@@ -364,7 +367,10 @@ ALIASES += PRIVILEGE_KEYGRAB=""
 
 #ALIASES += PLATFORM="@platform"
 #ALIASES += PRIVLEVEL_PLATFORM="\par Privilege Level:\n platform"
+#ALIASES += PRIVLEVEL_PUBLIC="\par Privilege Level:\n public"
 #ALIASES += PRIVILEGE_KEYGRAB="\par Privilege:\n http://tizen.org/privilege/keygrab"
+#ALIASES += PRIVILEGE_DISPLAY="\par Privilege:\n http://tizen.org/privilege/display"
+#ALIASES += REMARK_INTERNET="@remarks %http://tizen.org/privilege/internet is needed if @a url is a http or https address."
 
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
