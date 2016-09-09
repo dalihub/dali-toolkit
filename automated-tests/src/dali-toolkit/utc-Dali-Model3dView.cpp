@@ -38,9 +38,9 @@ void model_view_cleanup(void)
 
 namespace
 {
-const char * TEST_OBJ_FILE_NAME = "Dino.obj";
-const char * TEST_MTL_FILE_NAME = "Dino.mtl";
-//const char * TEST_IMG_PATH = "";
+const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
+const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
+const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
 }
 
 // Negative test case for a method
@@ -118,8 +118,12 @@ int UtcDaliModelViewPropertyNames(void)
   DALI_TEST_CHECK( val.Get( obj_file_name ) );
   DALI_TEST_EQUALS( obj_file_name, TEST_MTL_FILE_NAME, TEST_LOCATION );
 
-  //modelView.SetProperty( Model3dView::Property::MTL_URL, Dali::Property::Value( mtlUrl ) );
-  //modelView.SetProperty( Model3dView::Property::IMAGES_URL, Dali::Property::Value( imagesUrl ) );
+  view.SetProperty( Model3dView::Property::IMAGES_URL, Dali::Property::Value( TEST_RESOURCE_LOCATION ) );
+  val = view.GetProperty( Model3dView::Property::IMAGES_URL );
+  DALI_TEST_CHECK( val.Get( obj_file_name ) );
+  DALI_TEST_EQUALS( obj_file_name, TEST_RESOURCE_LOCATION, TEST_LOCATION );
+
+  Stage::GetCurrent().Add(view);
 
   END_TEST;
 }

@@ -82,7 +82,8 @@ void ImageView::SetImage( Image image )
     mImage = image;
 
     Actor self( Self() );
-    InitializeVisual( self, mVisual, image );
+    mVisual =  Toolkit::VisualFactory::Get().CreateVisual( image );
+    RegisterVisual( Toolkit::ImageView::Property::IMAGE, self, mVisual  );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -96,7 +97,8 @@ void ImageView::SetImage( Property::Map map )
   mPropertyMap = map;
 
   Actor self( Self() );
-  InitializeVisual( self, mVisual, mPropertyMap );
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
+  RegisterVisual( Toolkit::ImageView::Property::IMAGE, self, mVisual  );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -138,7 +140,8 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     }
 
     Actor self( Self() );
-    InitializeVisual( self, mVisual, url, size );
+    mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
+    RegisterVisual( Toolkit::ImageView::Property::IMAGE, self, mVisual  );
 
     mVisual.SetSize( mSizeSet );
 
@@ -230,28 +233,6 @@ float ImageView::GetWidthForHeight( float height )
 //
 // Private methods
 //
-
-void ImageView::OnStageConnection( int depth )
-{
-  Control::OnStageConnection( depth );
-
-  if( mVisual )
-  {
-    CustomActor self = Self();
-    mVisual.SetOnStage( self );
-  }
-}
-
-void ImageView::OnStageDisconnection()
-{
-  if( mVisual )
-  {
-    CustomActor self = Self();
-    mVisual.SetOffStage( self );
-  }
-
-  Control::OnStageDisconnection();
-}
 
 void ImageView::OnSizeSet( const Vector3& targetSize )
 {

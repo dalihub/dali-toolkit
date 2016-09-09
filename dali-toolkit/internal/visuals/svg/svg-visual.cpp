@@ -70,11 +70,6 @@ SvgVisual::~SvgVisual()
   }
 }
 
-bool SvgVisual::IsSvgUrl( const std::string& url )
-{
-  return url.substr( url.find_last_of(".") + 1 ) == "svg";
-}
-
 void SvgVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
   Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
@@ -109,6 +104,9 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   {
     AddRasterizationTask( mImpl->mSize );
   }
+
+  // Hold the weak handle of the placement actor and delay the adding of renderer until the svg rasterization is finished.
+  mPlacementActor = actor;
 }
 
 void SvgVisual::DoSetOffStage( Actor& actor )
@@ -117,6 +115,7 @@ void SvgVisual::DoSetOffStage( Actor& actor )
 
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
+  mPlacementActor.Reset();
 }
 
 void SvgVisual::GetNaturalSize( Vector2& naturalSize ) const
@@ -237,9 +236,17 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
         TextureSetImage( textureSet, 0u, texture );
       }
     }
+
+    // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+    Actor actor = mPlacementActor.GetHandle();
+    if( actor )
+    {
+      actor.AddRenderer( mImpl->mRenderer );
+      // reset the weak handle so that the renderer only get added to actor once
+      mPlacementActor.Reset();
+    }
   }
 }
-
 
 
 } // namespace Internal

@@ -588,6 +588,8 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   {
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void ImageVisual::DoSetOffStage( Actor& actor )

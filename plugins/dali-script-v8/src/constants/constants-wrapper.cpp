@@ -159,7 +159,6 @@ const IntegerPair EnumTable[] =
 
     { "DRAW_MODE_NORMAL",                                   DrawMode::NORMAL     },
     { "DRAW_MODE_OVERLAY_2D",                               DrawMode::OVERLAY_2D },
-    { "DRAW_MODE_STENCIL",                                  DrawMode::STENCIL    },
 
     { "RESOURCE_LOADING",                                   Dali::ResourceLoading },
     { "RESOURCE_LOADING_SUCCEEDED",                         Dali::ResourceLoadingSucceeded  },
@@ -278,13 +277,10 @@ const IntegerPair EnumTable[] =
     { "ALPHA_FUNCTION_SIN",                   AlphaFunction::SIN                  },
     { "ALPHA_FUNCTION_EASE_OUT_BACK",         AlphaFunction::EASE_OUT_BACK        },
 
+    { "CLIPPING_MODE_DISABLED",                     ClippingMode::DISABLED                     },
+    { "CLIPPING_MODE_CLIP_CHILDREN",                ClippingMode::CLIP_CHILDREN                },
 };
 const unsigned int EnumTableCount = sizeof(EnumTable)/sizeof(EnumTable[0]);
-
-
-
-
-
 
 } // un-named name space
 

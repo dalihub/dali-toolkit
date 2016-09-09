@@ -18,6 +18,9 @@
  *
  */
 
+//EXTERNAL INCLUDES
+#include <dali/devel-api/object/weak-handle.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
@@ -61,46 +64,38 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::GetNaturalSize
+   * @copydoc Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
-   * @copydoc Visual::SetSize
+   * @copydoc Visual::Base::SetSize
    */
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::CreatePropertyMap
+   * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
 
   /**
-   * @copydoc Visual::DoInitialize
+   * @copydoc Visual::Base::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::DoSetOffStage
+   * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
 
 public:
-
-  /**
-   * @brief Helper method to determine whether the url indicate that it is a svg image.
-   *
-   * @param [in] url The URL of the image file.
-   * @return true if it is a svg image
-   */
-  static bool IsSvgUrl( const std::string& url );
 
   /**
    * @brief Sets the svg image of this visual to the resource at imageUrl
@@ -137,6 +132,7 @@ private:
   Vector4              mAtlasRect;
   std::string          mImageUrl;
   NSVGimage*           mParsedImage;
+  WeakHandle<Actor>    mPlacementActor;
 
 };
 

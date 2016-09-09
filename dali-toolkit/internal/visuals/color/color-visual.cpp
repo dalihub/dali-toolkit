@@ -94,6 +94,8 @@ void ColorVisual::SetSize( const Vector2& size )
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const

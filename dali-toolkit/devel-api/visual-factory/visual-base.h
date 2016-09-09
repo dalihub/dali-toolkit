@@ -116,7 +116,7 @@ public:
   float GetDepthIndex() const;
 
   /**
-   * @brief Visual needs to know when when the control is put on to the stage to add the renderer.
+   * @brief Visual needs to know when the control is put on to the stage to add the renderer.
    *
    * This function should be called when the control is put on to the stage.
    *
@@ -126,7 +126,7 @@ public:
   void SetOnStage( Actor& actor );
 
   /**
-   * @brief Visual needs to know when when the control is removed from the stage to remove the renderer.
+   * @brief Visual needs to know when the control is removed from the stage to remove the renderer.
    *
    * This function should be called when the control is removed from the stage
    *

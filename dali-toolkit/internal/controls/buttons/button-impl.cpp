@@ -576,7 +576,6 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
       visual = visualFactory.CreateVisual( map );
 
       RegisterVisual( visualIndex, placementActor, visual );
-      visual.SetOnStage( placementActor );
 
       SetupContent( *contentActor, placementActor ); //
       contentActor->SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );

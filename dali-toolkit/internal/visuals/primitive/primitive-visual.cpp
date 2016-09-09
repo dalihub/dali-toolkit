@@ -74,7 +74,7 @@ const float   DEFAULT_SCALE_HEIGHT =        3.0; ///< For all conics
 const float   DEFAULT_SCALE_RADIUS =        1.0; ///< For cylinders
 const float   DEFAULT_BEVEL_PERCENTAGE =    0.0; ///< For bevelled cubes
 const float   DEFAULT_BEVEL_SMOOTHNESS =    0.0; ///< For bevelled cubes
-const Vector4 DEFAULT_COLOR =               Vector4( 0.5, 0.5, 0.5, 0.0 ); ///< Grey, for all.
+const Vector4 DEFAULT_COLOR =               Vector4( 0.5, 0.5, 0.5, 1.0 ); ///< Grey, for all.
 
 //Property limits
 const int   MIN_SLICES =           3;   ///< Minimum number of slices for spheres and conics
@@ -96,7 +96,7 @@ const char * const BEVELLED_CUBE_LABEL( "BEVELLED_CUBE" );
 
 //Shader properties
 const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
-const char * const COLOR_UNIFORM_NAME( "uColor" );
+const char * const COLOR_UNIFORM_NAME( "mixColor" );
 const char * const OBJECT_DIMENSIONS_UNIFORM_NAME( "uObjectDimensions" );
 const char * const STAGE_OFFSET_UNIFORM_NAME( "uStageOffset" );
 
@@ -151,10 +151,12 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   precision mediump float;\n
   varying   mediump vec3  vIllumination;\n
   uniform   lowp    vec4  uColor;\n
+  uniform   lowp    vec4  mixColor;\n
 
   void main()\n
   {\n
-    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a );\n
+    vec4 baseColor = mixColor * uColor;\n
+    gl_FragColor = vec4( vIllumination.rgb * baseColor.rgb, baseColor.a );\n
   }\n
 );
 
@@ -381,6 +383,8 @@ void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize ) const
 void PrimitiveVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const

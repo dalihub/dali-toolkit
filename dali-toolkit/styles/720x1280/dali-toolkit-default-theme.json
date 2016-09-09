@@ -188,6 +188,22 @@
     "SliderHandleTextLabel":
     {
       "textColor":[0.8,0.8,1,1]
+    },
+    "ProgressBar":
+    {
+      "progressValue": 0,
+      "trackVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin.9.png",
+        "size":[24,24]
+      },
+      "progressVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin-progress.9.png",
+        "size":[24,24]
+      }
+    },
+    "ProgressBarValueTextLabel":
+    {
+      "textColor":[0.8,0.8,1,1]
     }
   }
 }

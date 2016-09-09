@@ -227,6 +227,8 @@ void BatchImageVisual::DoSetOnStage( Actor& actor )
   }
   // Turn batching on, to send message it must be on stage
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::BATCHING_ENABLED, true );
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void BatchImageVisual::DoSetOffStage( Actor& actor )

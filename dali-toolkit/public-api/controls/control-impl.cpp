@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -63,14 +64,16 @@ struct RegisteredVisual
   RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor) : index(aIndex), visual(aVisual), placementActor(aPlacementActor) {}
 };
 
+typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisuals;
+
 /**
  *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
  */
-bool FindVisual( Property::Index targetIndex, std::vector<RegisteredVisual>& visuals, std::vector<RegisteredVisual>::iterator& iter )
+bool FindVisual( Property::Index targetIndex, RegisteredVisuals& visuals, RegisteredVisuals::Iterator& iter )
 {
-  for ( iter = visuals.begin(); iter != visuals.end(); iter++ )
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
-    if ( (*iter).index ==  targetIndex )
+    if ( (*iter)->index ==  targetIndex )
     {
       return true;
     }
@@ -394,7 +397,7 @@ public:
   // Data
 
   Control& mControlImpl;
-  std::vector<RegisteredVisual> mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
+  RegisteredVisuals mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -475,7 +478,8 @@ void Control::SetBackgroundColor( const Vector4& color )
   Property::Map map;
   map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -490,7 +494,8 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -500,7 +505,8 @@ void Control::SetBackground( const Property::Map& map )
 void Control::SetBackgroundImage( Image image )
 {
   Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundVisual, image );
+  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -653,63 +659,79 @@ void Control::KeyboardEnter()
   OnKeyboardEnter();
 }
 
-void Control::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+void Control::RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual )
 {
   bool visualReplaced ( false );
   Actor actorToRegister; // Null actor, replaced if placement actor not Self
+  Actor self = Self();
 
-  if ( placementActor != Self() ) // Prevent increasing ref count if actor self
+  if ( placementActor != self ) // Prevent increasing ref count if actor self
   {
     actorToRegister = placementActor;
   }
 
-  if ( !mImpl->mVisuals.empty() )
+  if ( !mImpl->mVisuals.Empty() )
   {
-      std::vector<RegisteredVisual>::iterator iter;
+      RegisteredVisuals::Iterator iter;
       // Check if visual (index) is already registered.  Replace if so.
       if ( FindVisual( index, mImpl->mVisuals, iter ) )
       {
-        (*iter).visual = visual;
-        (*iter).placementActor = actorToRegister;
+        if( (*iter)->visual && self.OnStage() )
+        {
+          if( (*iter)->placementActor )
+          {
+            (*iter)->visual.SetOffStage( (*iter)->placementActor );
+          }
+          else
+          {
+            (*iter)->visual.SetOffStage( self );
+          }
+        }
+        (*iter)->visual = visual;
+        (*iter)->placementActor = actorToRegister;
         visualReplaced = true;
       }
   }
 
   if ( !visualReplaced ) // New registration entry
   {
-    RegisteredVisual newVisual = RegisteredVisual( index, visual, actorToRegister );
-    mImpl->mVisuals.push_back( newVisual );
+    mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, actorToRegister ) );
+  }
+
+  if( visual && self.OnStage() )
+  {
+    visual.SetOnStage( placementActor );
   }
 }
 
 void Control::UnregisterVisual( Property::Index index )
 {
-   std::vector< RegisteredVisual >::iterator iter;
+   RegisteredVisuals::Iterator iter;
    if ( FindVisual( index, mImpl->mVisuals, iter ) )
    {
-     mImpl->mVisuals.erase( iter );
+     mImpl->mVisuals.Erase( iter );
    }
 }
 
-Toolkit::Visual::Base Control::GetVisual( Property::Index index )
+Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
 {
-  std::vector< RegisteredVisual >::iterator iter;
+  RegisteredVisuals::Iterator iter;
   if ( FindVisual( index, mImpl->mVisuals, iter ) )
   {
-    return (*iter).visual;
+    return (*iter)->visual;
   }
 
   return Toolkit::Visual::Base();
 }
 
-Actor Control::GetPlacementActor( Property::Index index )
+Actor Control::GetPlacementActor( Property::Index index ) const
 {
-  std::vector< RegisteredVisual >::iterator iter;
+  RegisteredVisuals::Iterator iter;
   if ( FindVisual( index, mImpl->mVisuals, iter ) )
   {
-    if( (*iter).placementActor )
+    if( (*iter)->placementActor )
     {
-      return (*iter).placementActor;
+      return (*iter)->placementActor;
     }
     else
     {
@@ -905,19 +927,41 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  if( mImpl->mBackgroundVisual)
+  for(RegisteredVisuals::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    Actor self( Self() );
-    mImpl->mBackgroundVisual.SetOnStage( self );
+    // Check whether the visual is empty, as it is allowed to register a placement actor without visual.
+    if( (*iter)->visual )
+    {
+      if( (*iter)->placementActor )
+      {
+        (*iter)->visual.SetOnStage( (*iter)->placementActor );
+      }
+      else
+      {
+        Actor self( Self() );
+        (*iter)->visual.SetOnStage( self );
+      }
+    }
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundVisual )
+  for(RegisteredVisuals::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    Actor self( Self() );
-    mImpl->mBackgroundVisual.SetOffStage( self );
+    // Check whether the visual is empty, as it is allowed to register a placement actor without visual.
+    if( (*iter)->visual )
+    {
+      if( (*iter)->placementActor )
+      {
+        (*iter)->visual.SetOffStage( (*iter)->placementActor );
+      }
+      else
+      {
+        Actor self( Self() );
+        (*iter)->visual.SetOffStage( self );
+      }
+    }
   }
 }
 

@@ -40,6 +40,7 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-resolve-url.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
@@ -136,28 +137,33 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
-        if( batchingEnabledValue  )
-        {
-          bool batchingEnabled( false );
-          batchingEnabledValue->Get( batchingEnabled );
-          if( batchingEnabled )
-          {
-            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ) );
-            break;
-          }
-        }
-        else if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
+        // first resolve url type to know which visual to create
+        UrlType::Type type = ResolveUrlType( imageUrl );
+        if( UrlType::N_PATCH == type )
         {
           visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
         }
-        else if( SvgVisual::IsSvgUrl( imageUrl ) )
+        else if( UrlType::SVG == type )
         {
           visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
         }
-        else
+        else // Regular image
         {
-          visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
+          Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
+          if( batchingEnabledValue  )
+          {
+            bool batchingEnabled( false );
+            batchingEnabledValue->Get( batchingEnabled );
+            if( batchingEnabled )
+            {
+              visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ) );
+              break;
+            }
+          }
+          else
+          {
+            visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
+          }
         }
       }
 
@@ -239,20 +245,22 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
     return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
   }
 
-  if( NinePatchImage::IsNinePatchUrl( url ) )
+  // first resolve url type to know which visual to create
+  UrlType::Type type = ResolveUrlType( url );
+  if( UrlType::N_PATCH == type )
   {
     NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
     visualPtr->SetImage( url );
 
     return Toolkit::Visual::Base( visualPtr );
   }
-  else if( SvgVisual::IsSvgUrl( url ) )
+  else if( UrlType::SVG == type )
   {
     SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
     visualPtr->SetImage( url, size );
     return Toolkit::Visual::Base( visualPtr );
   }
-  else
+  else // Regular image
   {
     ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ));
     Actor actor;
