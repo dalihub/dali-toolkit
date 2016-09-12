@@ -23,7 +23,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
   $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
-  $(devel_api_src_dir)/visual-factory/visual-base.cpp
+  $(devel_api_src_dir)/visual-factory/visual-base.cpp \
+  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp
 
 # Add devel header files here
 
@@ -109,3 +110,6 @@ devel_api_transition_effects_header_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.h \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.h \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.h
+
+devel_api_gaussian_blur_view_header_files = \
+  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h

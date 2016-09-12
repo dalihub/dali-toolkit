@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_CHECK_BOX_BUTTON_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/devel-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
-#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 #include "button-impl.h"
 
