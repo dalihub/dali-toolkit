@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_EFFECTS_VIEW_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/effects-view/effects-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali

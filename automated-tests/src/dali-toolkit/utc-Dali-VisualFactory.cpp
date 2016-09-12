@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -372,7 +373,7 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( static_cast<BlendingMode::Type>(blendMode), BlendingMode::ON, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<BlendMode::Type>(blendMode), BlendMode::ON, TEST_LOCATION );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -425,7 +426,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   application.Render(0);
 
   int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( static_cast<BlendingMode::Type>(blendMode), BlendingMode::AUTO, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<BlendMode::Type>(blendMode), BlendMode::AUTO, TEST_LOCATION );
 
   Vector4 actualColor(Vector4::ZERO);
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "borderColor", actualColor ) );
@@ -449,7 +450,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   application.SendNotification();
   application.Render(0);
   blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( static_cast<BlendingMode::Type>(blendMode), BlendingMode::ON, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<BlendMode::Type>(blendMode), BlendMode::ON, TEST_LOCATION );
 
   END_TEST;
 }

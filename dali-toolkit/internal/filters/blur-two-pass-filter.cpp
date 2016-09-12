@@ -132,14 +132,14 @@ void BlurTwoPassFilter::Enable()
   mActorForInput.SetSize( mTargetSize );
 
   // create internal offscreen for result of horizontal pass
-  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
+  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = Toolkit::ImageView::New( mImageForHorz );
   mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
   mActorForHorz.SetSize( mTargetSize );
 
   // create internal offscreen for result of the two pass blurred image
-  mBlurredImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED);
+  mBlurredImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
   // create an actor to blend the blurred image and the input image with the given blur strength
   mActorForBlending.SetImage( mBlurredImage );
   mActorForBlending.SetParentOrigin( ParentOrigin::CENTER );
