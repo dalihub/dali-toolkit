@@ -501,6 +501,8 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer( mImage );
   }
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void ImageVisual::DoSetOffStage( Actor& actor )

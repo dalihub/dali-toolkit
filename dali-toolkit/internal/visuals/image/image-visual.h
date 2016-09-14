@@ -93,43 +93,43 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::SetSize
+   * @copydoc Visual::Base::SetSize
    */
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::GetNaturalSize
+   * @copydoc Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
-   * @copydoc Visual::SetClipRect
+   * @copydoc Visual::Base::SetClipRect
    */
   virtual void SetClipRect( const Rect<int>& clipRect );
 
   /**
-   * @copydoc Visual::SetOffset
+   * @copydoc Visual::Base::SetOffset
    */
   virtual void SetOffset( const Vector2& offset );
 
   /**
-   * @copydoc Visual::CreatePropertyMap
+   * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
   /**
-   * @copydoc Visual::DoInitialize
+   * @copydoc Visual::Base::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::DoSetOffStage
+   * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
 

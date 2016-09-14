@@ -106,6 +106,8 @@ void ColorVisual::SetOffset( const Vector2& offset )
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const

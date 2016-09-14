@@ -76,6 +76,8 @@ WireframeVisual::~WireframeVisual()
 void WireframeVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const

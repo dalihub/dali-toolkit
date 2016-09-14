@@ -244,6 +244,8 @@ void GradientVisual::SetOffset( const Vector2& offset )
 void GradientVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const

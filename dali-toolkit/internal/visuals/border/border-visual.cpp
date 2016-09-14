@@ -154,6 +154,8 @@ void BorderVisual::DoSetOnStage( Actor& actor )
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
   mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const

@@ -390,6 +390,8 @@ void NPatchVisual::DoSetOnStage( Actor& actor )
   {
     ApplyImageToSampler();
   }
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void NPatchVisual::DoSetOffStage( Actor& actor )

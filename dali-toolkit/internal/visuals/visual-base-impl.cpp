@@ -117,11 +117,12 @@ float Base::GetDepthIndex() const
 
 void Base::SetOnStage( Actor& actor )
 {
+  // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
+  // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
   DoSetOnStage( actor );
 
   mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
   mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-  actor.AddRenderer( mImpl->mRenderer );
   mImpl->mFlags |= Impl::IS_ON_STAGE;
 }
 
@@ -155,10 +156,6 @@ void Base::EnablePreMultipliedAlpha( bool preMultipled )
 bool Base::IsPreMultipliedAlphaEnabled() const
 {
   return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
-}
-
-void Base::DoSetOnStage( Actor& actor )
-{
 }
 
 void Base::DoSetOffStage( Actor& actor )
