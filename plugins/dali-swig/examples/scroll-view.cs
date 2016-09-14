@@ -65,7 +65,7 @@ namespace MyCSharpExample
             {
                 for(int pageColumn = 0; pageColumn < pageColumns; pageColumn++)
                 {
-                    Control pageActor = new Control();
+                    View pageActor = new View();
                     pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
                     pageActor.ParentOrigin = NDalic.ParentOriginCenter;
                     pageActor.AnchorPoint = NDalic.AnchorPointCenter;
@@ -118,10 +118,10 @@ namespace MyCSharpExample
             _scrollView.Add(_scrollBar);
 
             // Connect to the OnRelayout signal
-            _scrollView.OnRelayoutEvent += new Dali.Actor.OnRelayoutEventHandler(OnScrollViewRelayout);
+            _scrollView.OnRelayoutEvent += new Dali.View.OnRelayoutEventHandler(OnScrollViewRelayout);
         }
 
-        private void OnScrollViewRelayout(object source, Actor.OnRelayoutEventArgs e)
+        private void OnScrollViewRelayout(object source, View.OnRelayoutEventArgs e)
         {
           // Set the correct scroll bar size after size negotiation of scroll view is done
             _scrollBar.Size = new Vector3(0.0f, _scrollView.GetRelayoutSize(DimensionType.WIDTH), 0.0f);

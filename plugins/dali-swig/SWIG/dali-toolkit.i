@@ -92,7 +92,8 @@
 %ignore *::Button::SetTogglableButton(bool);
 %ignore *::Button::SetUnselectedImage(const std::string &);
 
-%rename(ControlImpl) Dali::Toolkit::Internal::Control;
+%rename(View) Dali::Toolkit::Control;
+%rename(ViewImpl) Dali::Toolkit::Internal::Control;
 %rename(VisualBase) Dali::Toolkit::Visual::Base;
 %rename(ControlOrientationType) Dali::Toolkit::ControlOrientation::Type;
 %rename(DefaultItemLayoutType) Dali::Toolkit::DefaultItemLayout::Type;
@@ -127,7 +128,7 @@
 %rename(COLOR_VISUAL_MIX_COLOR) Dali::Toolkit::Color::Visual::Property::MIX_COLOR;
 
 %csconstvalue("PropertyRanges.PROPERTY_REGISTRATION_START_INDEX") PROPERTY_START_INDEX;
-%csconstvalue("Control.PropertyRange.PROPERTY_START_INDEX+1000") PROPERTY_END_INDEX;
+%csconstvalue("View.PropertyRange.PROPERTY_START_INDEX+1000") PROPERTY_END_INDEX;
 %csconstvalue("PropertyRanges.CHILD_PROPERTY_REGISTRATION_START_INDEX") CHILD_PROPERTY_START_INDEX;
 %csconstvalue("PropertyRanges.CHILD_PROPERTY_REGISTRATION_START_INDEX+1000") CHILD_PROPERTY_END_INDEX;
 %csconstvalue("PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX") ANIMATABLE_PROPERTY_START_INDEX;

@@ -34,21 +34,21 @@ using System.Runtime.InteropServices;
   */
 public class KeyInputFocusGainedEventArgs : EventArgs
 {
-   private Control _control;
+   private View _view;
 
    /**
-     * @brief Control - is the control that gets Key Input Focus
+     * @brief View - is the view that gets Key Input Focus
      *
      */
-   public Control Control
+   public View View
    {
       get
       {
-         return _control;
+         return _view;
       }
       set
       {
-         _control = value;
+         _view = value;
       }
    }
 }
@@ -59,21 +59,21 @@ public class KeyInputFocusGainedEventArgs : EventArgs
   */
 public class KeyInputFocusLostEventArgs : EventArgs
 {
-   private Control _control;
+   private View _view;
 
    /**
-     * @brief Control - is the control that loses Key Input Focus
+     * @brief View - is the view that loses Key Input Focus
      *
      */
-   public Control Control
+   public View View
    {
       get
       {
-         return _control;
+         return _view;
       }
       set
       {
-         _control = value;
+         _view = value;
       }
    }
 }
@@ -84,27 +84,27 @@ public class KeyInputFocusLostEventArgs : EventArgs
   */
 public class KeyEventArgs : EventArgs
 {
-   private Control _control;
+   private View _view;
    private KeyEvent _keyEvent;
 
    /**
-     * @brief Control - is the control that recieves the keyevent.
+     * @brief View - is the view that recieves the keyevent.
      *
      */
-   public Control Control
+   public View View
    {
       get
       {
-         return _control;
+         return _view;
       }
       set
       {
-         _control = value;
+         _view = value;
       }
    }
 
    /**
-     * @brief KeyEvent - is the keyevent sent to the Control.
+     * @brief KeyEvent - is the keyevent sent to the View.
      *
      */
    public KeyEvent KeyEvent
@@ -130,24 +130,24 @@ public class KeyEventArgs : EventArgs
   public delegate bool KeyEventHandler(object source, KeyEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate void KeyInputFocusGainedCallbackDelegate(IntPtr control);
+  private delegate void KeyInputFocusGainedCallbackDelegate(IntPtr view);
   private KeyInputFocusGainedEventHandler _KeyInputFocusGainedEventHandler;
   private KeyInputFocusGainedCallbackDelegate _KeyInputFocusGainedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate void KeyInputFocusLostCallbackDelegate(IntPtr control);
+  private delegate void KeyInputFocusLostCallbackDelegate(IntPtr view);
   private KeyInputFocusLostEventHandler _KeyInputFocusLostEventHandler;
   private KeyInputFocusLostCallbackDelegate _KeyInputFocusLostCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate bool KeyCallbackDelegate(IntPtr control, IntPtr keyEvent);
+  private delegate bool KeyCallbackDelegate(IntPtr view, IntPtr keyEvent);
   private KeyEventHandler _KeyEventHandler;
   private KeyCallbackDelegate _KeyCallbackDelegate;
 
   /**
     * @brief Event for KeyInputFocusGained signal which can be used to subscribe/unsubscribe the event handler
     * (in the type of KeyInputFocusGainedEventHandler) provided by the user.
-    * KeyInputFocusGained signal is emitted when the control gets Key Input Focus.
+    * KeyInputFocusGained signal is emitted when the view gets Key Input Focus.
     */
   public event KeyInputFocusGainedEventHandler KeyInputFocusGained
   {
@@ -180,12 +180,12 @@ public class KeyEventArgs : EventArgs
      }
   }
 
- private void OnKeyInputFocusGained(IntPtr control)
+ private void OnKeyInputFocusGained(IntPtr view)
   {
    KeyInputFocusGainedEventArgs e = new KeyInputFocusGainedEventArgs();
 
    // Populate all members of "e" (KeyInputFocusGainedEventArgs) with real data
-   e.Control = Dali.Control.GetControlFromPtr(control);
+   e.View = Dali.View.GetViewFromPtr(view);
 
    if (_KeyInputFocusGainedEventHandler != null)
    {
@@ -198,7 +198,7 @@ public class KeyEventArgs : EventArgs
   /**
     * @brief Event for KeyInputFocusLost signal which can be used to subscribe/unsubscribe the event handler
     * (in the type of KeyInputFocusLostEventHandler) provided by the user.
-    * KeyInputFocusLost signal is emitted when the control loses Key Input Focus.
+    * KeyInputFocusLost signal is emitted when the view loses Key Input Focus.
     */
   public event KeyInputFocusLostEventHandler KeyInputFocusLost
   {
@@ -231,12 +231,12 @@ public class KeyEventArgs : EventArgs
      }
   }
 
- private void OnKeyInputFocusLost(IntPtr control)
+ private void OnKeyInputFocusLost(IntPtr view)
   {
    KeyInputFocusLostEventArgs e = new KeyInputFocusLostEventArgs();
 
    // Populate all members of "e" (KeyInputFocusLostEventArgs) with real data
-   e.Control = Dali.Control.GetControlFromPtr(control);
+   e.View = Dali.View.GetViewFromPtr(view);
 
    if (_KeyInputFocusLostEventHandler != null)
    {
@@ -281,13 +281,13 @@ public class KeyEventArgs : EventArgs
      }
   }
 
- private bool OnKeyEvent(IntPtr control, IntPtr keyEvent)
+ private bool OnKeyEvent(IntPtr view, IntPtr keyEvent)
   {
    KeyEventArgs e = new KeyEventArgs();
 
    // Populate all members of "e" (KeyEventArgs) with real data
-   e.Control = Dali.Control.GetControlFromPtr(control);
-        e.KeyEvent = Dali.KeyEvent.GetKeyEventFromPtr(keyEvent);
+   e.View = Dali.View.GetViewFromPtr(view);
+   e.KeyEvent = Dali.KeyEvent.GetKeyEventFromPtr(keyEvent);
 
    if (_KeyEventHandler != null)
    {
@@ -298,8 +298,8 @@ public class KeyEventArgs : EventArgs
 
   }
 
- public static ClassName Get ## ClassName ## FromPtr(global::System.IntPtr cPtr) {
-    ClassName ret = new ClassName(cPtr, false);
+ public static View GetViewFromPtr(global::System.IntPtr cPtr) {
+    View ret = new View(cPtr, false);
    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
