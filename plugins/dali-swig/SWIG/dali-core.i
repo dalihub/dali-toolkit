@@ -80,8 +80,9 @@
 %ignore *::GetExtension();
 %ignore *::Initialize(Internal::CustomActor&);
 %ignore *::GetOwner() const;
+%ignore *::ParentOrigin::DEFAULT;
+%ignore *::AnchorPoint::DEFAULT;
 
-%rename(ParentOriginDefault) Dali::ParentOrigin::DEFAULT;
 %rename(ParentOriginTop) Dali::ParentOrigin::TOP;
 %rename(ParentOriginBottom) Dali::ParentOrigin::BOTTOM;
 %rename(ParentOriginLeft) Dali::ParentOrigin::LEFT;
@@ -96,7 +97,6 @@
 %rename(ParentOriginBottomLeft) Dali::ParentOrigin::BOTTOM_LEFT;
 %rename(ParentOriginBottomCenter) Dali::ParentOrigin::BOTTOM_CENTER;
 %rename(ParentOriginBottomRight) Dali::ParentOrigin::BOTTOM_RIGHT;
-%rename(AnchorPointDefault) Dali::AnchorPoint::DEFAULT;
 %rename(AnchorPointTop) Dali::AnchorPoint::TOP;
 %rename(AnchorPointBottom) Dali::AnchorPoint::BOTTOM;
 %rename(AnchorPointLeft) Dali::AnchorPoint::LEFT;
