@@ -25,8 +25,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
 namespace Dali
