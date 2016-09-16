@@ -36,12 +36,11 @@ namespace MyCSharpExample
         public Example(Dali.Application application)
         {
             _application = application;
-
-            CallbackDelegate initializeCallback = new CallbackDelegate( Initialize );
-            _application.InitSignal().Connect( initializeCallback );
+            _application.Initialized += new Dali.AUIApplicationInitEventHandler(Initialize);
         }
 
-        private void Initialize(IntPtr appPtr)
+
+        public void Initialize(object source, AUIApplicationInitEventArgs e)
         {
             CreateScrollView();
         }
@@ -119,11 +118,10 @@ namespace MyCSharpExample
             _scrollView.Add(_scrollBar);
 
             // Connect to the OnRelayout signal
-            ActorCallbackDelegate ScrollViewRelayoutCallback = new ActorCallbackDelegate( OnScrollViewRelayout );
-            _scrollView.OnRelayoutSignal().Connect( ScrollViewRelayoutCallback );
+            _scrollView.OnRelayoutEvent += new Dali.Actor.OnRelayoutEventHandler(OnScrollViewRelayout);
         }
 
-        private void OnScrollViewRelayout(IntPtr data)
+        private void OnScrollViewRelayout(object source, Actor.OnRelayoutEventArgs e)
         {
           // Set the correct scroll bar size after size negotiation of scroll view is done
             _scrollBar.Size = new Vector3(0.0f, _scrollView.GetRelayoutSize(DimensionType.WIDTH), 0.0f);

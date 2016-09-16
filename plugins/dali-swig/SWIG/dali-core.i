@@ -80,8 +80,9 @@
 %ignore *::GetExtension();
 %ignore *::Initialize(Internal::CustomActor&);
 %ignore *::GetOwner() const;
+%ignore *::ParentOrigin::DEFAULT;
+%ignore *::AnchorPoint::DEFAULT;
 
-%rename(ParentOriginDefault) Dali::ParentOrigin::DEFAULT;
 %rename(ParentOriginTop) Dali::ParentOrigin::TOP;
 %rename(ParentOriginBottom) Dali::ParentOrigin::BOTTOM;
 %rename(ParentOriginLeft) Dali::ParentOrigin::LEFT;
@@ -96,7 +97,6 @@
 %rename(ParentOriginBottomLeft) Dali::ParentOrigin::BOTTOM_LEFT;
 %rename(ParentOriginBottomCenter) Dali::ParentOrigin::BOTTOM_CENTER;
 %rename(ParentOriginBottomRight) Dali::ParentOrigin::BOTTOM_RIGHT;
-%rename(AnchorPointDefault) Dali::AnchorPoint::DEFAULT;
 %rename(AnchorPointTop) Dali::AnchorPoint::TOP;
 %rename(AnchorPointBottom) Dali::AnchorPoint::BOTTOM;
 %rename(AnchorPointLeft) Dali::AnchorPoint::LEFT;
@@ -118,6 +118,7 @@
 %rename(SizeScalePolicyType) Dali::SizeScalePolicy::Type;
 %rename(HorizontalAlignmentType) Dali::HorizontalAlignment::Type;
 %rename(VerticalAlignmentType) Dali::VerticalAlignment::Type;
+%rename(ClippingModeType) Dali::ClippingMode::Type;
 %rename(FilterModeType) Dali::FilterMode::Type;
 %rename(WrapModeType) Dali::WrapMode::Type;
 %rename(PixelFormat) Dali::Pixel::Format;
@@ -129,6 +130,7 @@
 %rename(DepthWriteModeType) Dali::DepthWriteMode::Type;
 %rename(DepthTestModeType) Dali::DepthTestMode::Type;
 %rename(DepthFunctionType) Dali::DepthFunction::Type;
+%rename(RenderModeType) Dali::RenderMode::Type;
 %rename(StencilFunctionType) Dali::StencilFunction::Type;
 %rename(StencilModeType) Dali::StencilMode::Type;
 %rename(StencilOperationType) Dali::StencilOperation::Type;

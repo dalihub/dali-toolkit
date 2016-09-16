@@ -27,7 +27,6 @@
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL HEADER

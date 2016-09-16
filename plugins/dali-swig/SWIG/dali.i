@@ -172,6 +172,38 @@ using namespace Dali::Toolkit;
 
 %include signal-parameters.i
 %include signals.i
+
+%include events/actor-event.i
+%include events/accessibilitymanager-event.i
+%include events/application-event.i
+%include events/animation-event.i
+%include events/button-event.i
+%include events/builder-event.i
+%include events/control-event.i
+%include events/gaussian-blur-view-event.i
+%include events/image-event.i
+%include events/itemview-event.i
+%include events/keyboardFocusManager-event.i
+%include events/objectregistry-event.i
+%include events/popup-event.i
+%include events/pinchgesture-event.i
+%include events/pageturnview-event.i
+%include events/pangesture-event.i
+%include events/propertynotification-event.i
+%include events/longpressgesture-event.i
+%include events/resourceimage-event.i
+%include events/scrollable-event.i
+%include events/scrollbar-event.i
+%include events/scrollview-event.i
+%include events/slider-event.i
+%include events/stage-event.i
+%include events/stylemanager-event.i
+%include events/tapgesture-event.i
+%include events/texteditor-event.i
+%include events/textfield-event.i
+%include events/timer-event.i
+%include events/videoview-event.i
+
 %include dali-operator.i
 %include dali-core.i
 %include dali-adaptor.i
