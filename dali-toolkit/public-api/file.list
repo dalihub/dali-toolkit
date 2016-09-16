@@ -11,9 +11,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/flex-container/flex-container.cpp \
   $(public_api_src_dir)/controls/image-view/image-view.cpp \
   $(public_api_src_dir)/controls/model3d-view/model3d-view.cpp \
-  $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
-  $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
-  $(public_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
   $(public_api_src_dir)/controls/scroll-bar/scroll-bar.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/default-item-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-layout.cpp \
@@ -63,12 +60,6 @@ public_api_flex_container_header_files = \
 
 public_api_image_view_header_files = \
   $(public_api_src_dir)/controls/image-view/image-view.h
-
-public_api_page_turn_view_header_files = \
-  $(public_api_src_dir)/controls/page-turn-view/page-factory.h \
-  $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
-  $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
-  $(public_api_src_dir)/controls/page-turn-view/page-turn-view.h
 
 public_api_item_view_header_files = \
   $(public_api_src_dir)/controls/scrollable/item-view/default-item-layout.h \
