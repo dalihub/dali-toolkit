@@ -137,7 +137,7 @@ Toolkit::EffectsView EffectsView::New()
 }
 
 EffectsView::EffectsView()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mChildrenRoot(Actor::New()),
   mBackgroundColor( EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR ),
   mTargetSize( Vector2::ZERO ),

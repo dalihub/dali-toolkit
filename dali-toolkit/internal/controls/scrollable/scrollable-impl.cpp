@@ -81,7 +81,7 @@ const Vector2 OVERSHOOT_DEFAULT_SIZE( 720.0f, 42.0f );
 // Scrollable controls are not layout containers so they dont need size negotiation..
 // we dont want size negotiation while scrolling if we can avoid it
 Scrollable::Scrollable()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS | DISABLE_SIZE_NEGOTIATION ) ),
+: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
@@ -91,7 +91,7 @@ Scrollable::Scrollable()
 }
 
 Scrollable::Scrollable( ControlBehaviour behaviourFlags )
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS | behaviourFlags ) ),
+: Control( ControlBehaviour( behaviourFlags ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),

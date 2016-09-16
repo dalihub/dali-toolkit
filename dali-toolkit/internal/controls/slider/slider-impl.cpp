@@ -134,7 +134,7 @@ Dali::Toolkit::Slider Slider::New()
 }
 
 Slider::Slider()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mState( NORMAL ),
   mPopupVisual(""),
   mPopupArrowVisual(""),

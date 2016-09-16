@@ -47,7 +47,7 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
 {
 }
 

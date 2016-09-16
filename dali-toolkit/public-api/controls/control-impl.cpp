@@ -185,7 +185,7 @@ public:
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
-  mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+  mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
   mIsKeyboardFocusGroup( false )
 {
@@ -381,7 +381,7 @@ public:
   TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
-  ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
+  ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
@@ -403,7 +403,7 @@ const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "backgro
 Toolkit::Control Control::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) );
+  IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) );
 
   // Pass ownership to handle
   Toolkit::Control handle( *controlImpl );
@@ -713,7 +713,8 @@ void Control::Initialize()
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();
 
-  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
+  if( (mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS) ||
+      !(mImpl->mFlags & DISABLE_STYLE_CHANGE_SIGNALS) )
   {
     Toolkit::StyleManager styleManager = StyleManager::Get();
 

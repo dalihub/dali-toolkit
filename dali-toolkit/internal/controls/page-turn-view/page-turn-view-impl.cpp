@@ -341,7 +341,7 @@ void PageTurnView::Page::SetCurrentCenter( const Vector2& value )
 }
 
 PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mPageFactory( &pageFactory ),
   mPageSize( pageSize ),
   mSpineShadowParameter( DEFAULT_SPINE_SHADOW_PARAMETER ),

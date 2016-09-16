@@ -220,7 +220,7 @@ Dali::Toolkit::Popup Popup::New()
 }
 
 Popup::Popup()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mTouchedOutsideSignal(),
   mShowingSignal(),
   mShownSignal(),

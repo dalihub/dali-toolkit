@@ -175,7 +175,7 @@ const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
 }
 
 ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIndicatorShowAlpha(1.0f),
   mDirection(direction),
   mScrollableObject(WeakHandleBase()),

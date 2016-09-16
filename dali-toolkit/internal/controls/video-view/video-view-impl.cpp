@@ -73,7 +73,7 @@ const char* const NATIVE_IMAGE_TARGET( "nativeImageTarget" );
 } // anonymous namepsace
 
 VideoView::VideoView()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
   mCurrentVideoPlayPosition( 0 ),
   mSetRenderingTarget( false ),
   mIsPlay( false ),

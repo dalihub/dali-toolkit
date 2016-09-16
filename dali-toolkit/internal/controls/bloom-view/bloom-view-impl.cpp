@@ -138,49 +138,49 @@ const char* const COMPOSITE_FRAGMENT_SOURCE =
 
 
 BloomView::BloomView()
-  : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
-  , mBlurNumSamples(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)
-  , mBlurBellCurveWidth(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH)
-  , mPixelFormat(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT)
-  , mDownsampleWidthScale(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE)
-  , mDownsampleHeightScale(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE)
-  , mDownsampledWidth( 0.0f )
-  , mDownsampledHeight( 0.0f )
-  , mTargetSize(Vector2::ZERO)
-  , mLastSize(Vector2::ZERO)
-  , mChildrenRoot(Actor::New())
-  , mInternalRoot(Actor::New() )
-  , mBloomThresholdPropertyIndex(Property::INVALID_INDEX)
-  , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
-  , mBloomIntensityPropertyIndex(Property::INVALID_INDEX)
-  , mBloomSaturationPropertyIndex(Property::INVALID_INDEX)
-  , mImageIntensityPropertyIndex(Property::INVALID_INDEX)
-  , mImageSaturationPropertyIndex(Property::INVALID_INDEX)
-  , mActivated( false )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mBlurNumSamples(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES),
+  mBlurBellCurveWidth(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH),
+  mPixelFormat(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT),
+  mDownsampleWidthScale(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE),
+  mDownsampleHeightScale(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE),
+  mDownsampledWidth( 0.0f ),
+  mDownsampledHeight( 0.0f ),
+  mTargetSize(Vector2::ZERO),
+  mLastSize(Vector2::ZERO),
+  mChildrenRoot(Actor::New()),
+  mInternalRoot(Actor::New() ),
+  mBloomThresholdPropertyIndex(Property::INVALID_INDEX),
+  mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
+  mBloomIntensityPropertyIndex(Property::INVALID_INDEX),
+  mBloomSaturationPropertyIndex(Property::INVALID_INDEX),
+  mImageIntensityPropertyIndex(Property::INVALID_INDEX),
+  mImageSaturationPropertyIndex(Property::INVALID_INDEX),
+  mActivated( false )
 {
 }
 
 BloomView::BloomView( const unsigned int blurNumSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
                                     const float downsampleWidthScale, const float downsampleHeightScale)
-  : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
-  , mBlurNumSamples(blurNumSamples)
-  , mBlurBellCurveWidth(blurBellCurveWidth)
-  , mPixelFormat(renderTargetPixelFormat)
-  , mDownsampleWidthScale(downsampleWidthScale)
-  , mDownsampleHeightScale(downsampleHeightScale)
-  , mDownsampledWidth( 0.0f )
-  , mDownsampledHeight( 0.0f )
-  , mTargetSize(Vector2::ZERO)
-  , mLastSize(Vector2::ZERO)
-  , mChildrenRoot(Actor::New())
-  , mInternalRoot(Actor::New())
-  , mBloomThresholdPropertyIndex(Property::INVALID_INDEX)
-  , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
-  , mBloomIntensityPropertyIndex(Property::INVALID_INDEX)
-  , mBloomSaturationPropertyIndex(Property::INVALID_INDEX)
-  , mImageIntensityPropertyIndex(Property::INVALID_INDEX)
-  , mImageSaturationPropertyIndex(Property::INVALID_INDEX)
-  , mActivated( false )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mBlurNumSamples(blurNumSamples),
+  mBlurBellCurveWidth(blurBellCurveWidth),
+  mPixelFormat(renderTargetPixelFormat),
+  mDownsampleWidthScale(downsampleWidthScale),
+  mDownsampleHeightScale(downsampleHeightScale),
+  mDownsampledWidth( 0.0f ),
+  mDownsampledHeight( 0.0f ),
+  mTargetSize(Vector2::ZERO),
+  mLastSize(Vector2::ZERO),
+  mChildrenRoot(Actor::New()),
+  mInternalRoot(Actor::New()),
+  mBloomThresholdPropertyIndex(Property::INVALID_INDEX),
+  mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
+  mBloomIntensityPropertyIndex(Property::INVALID_INDEX),
+  mBloomSaturationPropertyIndex(Property::INVALID_INDEX),
+  mImageIntensityPropertyIndex(Property::INVALID_INDEX),
+  mImageSaturationPropertyIndex(Property::INVALID_INDEX),
+  mActivated( false )
 {
 }
 
