@@ -285,7 +285,7 @@ void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties 
 
 
 TextSelectionToolbar::TextSelectionToolbar()
-: Control( ControlBehaviour( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ) ),
+: Control( ControlBehaviour( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ) ),
   mMaxSize (),
   mIndexInTable( 0 ),
   mDividerIndexes()

@@ -93,7 +93,7 @@ const Vector4 CubeTransitionEffect::FULL_BRIGHTNESS( 1.0f, 1.0f, 1.0f, 1.0f );
 const Vector4 CubeTransitionEffect::HALF_BRIGHTNESS( 0.5f, 0.5f, 0.5f, 1.0f );
 
 CubeTransitionEffect::CubeTransitionEffect( unsigned int rows, unsigned int columns )
-: Control( ControlBehaviour( 0 ) ),
+: Control( ControlBehaviour( DISABLE_STYLE_CHANGE_SIGNALS ) ),
   mRows( rows ),
   mColumns( columns ),
   mIsAnimating( false ),

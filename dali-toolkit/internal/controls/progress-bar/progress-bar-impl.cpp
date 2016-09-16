@@ -83,7 +83,7 @@ Dali::Toolkit::ProgressBar ProgressBar::New()
 }
 
 ProgressBar::ProgressBar()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mTrackVisual(""),
   mProgressVisual(""),
   mTrackMap(),

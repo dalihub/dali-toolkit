@@ -111,7 +111,7 @@ const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 } // unnamed namespace
 
 Button::Button()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mAutoRepeatingTimer(),
   mUnselectedColor( Color::WHITE ), // The natural colors of the specified images will be used by default.
   mSelectedColor( Color::WHITE ),
