@@ -206,7 +206,30 @@ int UtcDaliAsyncImageLoaderCancel(void)
   END_TEST;
 }
 
-int UtcDaliAsyncImageLoaderCancelAll(void)
+int UtcDaliAsncImageLoaderCancelAll01(void)
+{
+  ToolkitTestApplication application;
+
+  AsyncImageLoader loader = AsyncImageLoader::New();
+
+  // Test that it is safe to call CancelAll even there is no loading task requested.
+  try
+  {
+    loader.CancelAll();
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "AsyncImageLoader::LoadAll", TEST_LOCATION);
+  }
+
+  // Test that cancelling a non-existing loading task will return false
+  uint32_t id = 1;
+  DALI_TEST_CHECK( !(loader.Cancel( id )) );
+
+  END_TEST;
+}
+
+int UtcDaliAsyncImageLoaderCancelAll02(void)
 {
   ToolkitTestApplication application;
 

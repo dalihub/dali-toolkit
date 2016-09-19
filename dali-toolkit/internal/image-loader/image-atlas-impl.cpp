@@ -49,7 +49,19 @@ ImageAtlas::ImageAtlas( SizeType width, SizeType height, Pixel::Format pixelForm
 
 ImageAtlas::~ImageAtlas()
 {
-  mIdRectContainer.Clear();
+  const std::size_t count = mLoadingTaskInfoContainer.Count();
+  for( std::size_t i=0; i < count; ++i )
+  {
+    // Call unregister to every observer in the list.
+    // Note that, the Atlas can be registered to same observer multiple times, and the Unregister method only remove one item each time.
+    // In this way, the atlas is actually detached from a observer either every upload call invoked by this observer is completed or atlas is destroyed.
+    if( mLoadingTaskInfoContainer[i]->observer )
+    {
+      mLoadingTaskInfoContainer[i]->observer->Unregister( *this );
+    }
+  }
+
+  mLoadingTaskInfoContainer.Clear();
 }
 
 IntrusivePtr<ImageAtlas> ImageAtlas::New( SizeType width, SizeType height, Pixel::Format pixelFormat )
@@ -82,7 +94,8 @@ bool ImageAtlas::Upload( Vector4& textureRect,
                          const std::string& url,
                          ImageDimensions size,
                          FittingMode::Type fittingMode,
-                         bool orientationCorrection )
+                         bool orientationCorrection,
+                         AtlasUploadObserver* atlasUploadObserver )
 {
   ImageDimensions dimensions = size;
   ImageDimensions zero;
@@ -93,7 +106,7 @@ bool ImageAtlas::Upload( Vector4& textureRect,
     {
       if( !mBrokenImageUrl.empty() )
       {
-        return Upload( textureRect, mBrokenImageUrl, mBrokenImageSize, FittingMode::DEFAULT, true );
+        return Upload( textureRect, mBrokenImageUrl, mBrokenImageSize, FittingMode::DEFAULT, true, atlasUploadObserver );
       }
       else
       {
@@ -108,13 +121,19 @@ bool ImageAtlas::Upload( Vector4& textureRect,
   if( mPacker.Pack( dimensions.GetWidth(), dimensions.GetHeight(), packPositionX, packPositionY ) )
   {
     unsigned short loadId = mAsyncLoader.Load( url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection );
-    mIdRectContainer.PushBack( new IdRectPair( loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight() ) );
-
+    mLoadingTaskInfoContainer.PushBack( new LoadingTaskInfo( loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight(), atlasUploadObserver ) );
     // apply the half pixel correction
     textureRect.x = ( static_cast<float>( packPositionX ) +0.5f ) / mWidth; // left
     textureRect.y = ( static_cast<float>( packPositionY ) +0.5f ) / mHeight; // right
     textureRect.z = ( static_cast<float>( packPositionX + dimensions.GetX() )-0.5f ) / mWidth; // right
     textureRect.w = ( static_cast<float>( packPositionY + dimensions.GetY() )-0.5f ) / mHeight;// bottom
+
+    if( atlasUploadObserver )
+    {
+      // register to the observer,
+      // Not that a matching unregister call should be invoked in UploadToAtlas if the observer is still alive by then.
+      atlasUploadObserver->Register( *this );
+    }
 
     return true;
   }
@@ -150,33 +169,51 @@ void ImageAtlas::Remove( const Vector4& textureRect )
                        static_cast<SizeType>((textureRect.w-textureRect.y)*mHeight+1.f) );
 }
 
-void ImageAtlas::UploadToAtlas( unsigned int id, PixelData pixelData )
+void ImageAtlas::ObserverDestroyed( AtlasUploadObserver* observer )
 {
-  if(  mIdRectContainer[0]->loadTaskId == id)
+  const std::size_t count = mLoadingTaskInfoContainer.Count();
+  for( std::size_t i=0; i < count; ++i )
   {
+    if( mLoadingTaskInfoContainer[i]->observer == observer )
+    {
+      // the observer is destructing, so its member function should not be called anymore
+      mLoadingTaskInfoContainer[i]->observer = NULL;
+    }
+  }
+}
+
+void ImageAtlas::UploadToAtlas( uint32_t id, PixelData pixelData )
+{
+  if(  mLoadingTaskInfoContainer[0]->loadTaskId == id)
+  {
+    Rect<unsigned int> packRect( mLoadingTaskInfoContainer[0]->packRect  );
     if( !pixelData || ( pixelData.GetWidth() ==0 && pixelData.GetHeight() == 0 ))
     {
       if(!mBrokenImageUrl.empty()) // replace with the broken image
       {
-        UploadBrokenImage( mIdRectContainer[0]->packRect );
+        UploadBrokenImage( packRect );
       }
     }
     else
     {
-      if( pixelData.GetWidth() < mIdRectContainer[0]->packRect.width || pixelData.GetHeight() < mIdRectContainer[0]->packRect.height  )
+      if( pixelData.GetWidth() < packRect.width || pixelData.GetHeight() < packRect.height  )
       {
         DALI_LOG_ERROR( "Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
-                        pixelData.GetWidth(), pixelData.GetHeight(),
-                        mIdRectContainer[0]->packRect.width,  mIdRectContainer[0]->packRect.height );
+            pixelData.GetWidth(), pixelData.GetHeight(),
+            packRect.width, packRect.height );
       }
 
-      mAtlas.Upload( pixelData, 0u, 0u,
-                    mIdRectContainer[0]->packRect.x, mIdRectContainer[0]->packRect.y,
-                    mIdRectContainer[0]->packRect.width, mIdRectContainer[0]->packRect.height );
+      mAtlas.Upload( pixelData, 0u, 0u, packRect.x, packRect.y, packRect.width, packRect.height );
     }
-  }
 
-  mIdRectContainer.Erase( mIdRectContainer.Begin() );
+    if( mLoadingTaskInfoContainer[0]->observer )
+    {
+      mLoadingTaskInfoContainer[0]->observer->UploadCompleted();
+      mLoadingTaskInfoContainer[0]->observer->Unregister( *this );
+    }
+
+    mLoadingTaskInfoContainer.Erase( mLoadingTaskInfoContainer.Begin() );
+  }
 }
 
 void ImageAtlas::UploadBrokenImage( const Rect<unsigned int>& area )

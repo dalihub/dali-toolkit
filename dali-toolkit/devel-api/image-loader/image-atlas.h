@@ -26,6 +26,9 @@
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/texture.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
+
 namespace Dali
 {
 
@@ -114,7 +117,7 @@ public:
   /**
    * @brief Upload a resource image to the atlas.
    *
-   * @note To make the atlasing efficient, an valid size should be provided.
+   * @note To make the atlasing efficient, a valid size should be provided.
    *       If size is not provided, then the image file will be opened to read the actual size for loading.
    *       Do not set a size that is bigger than the actual image size, as the up-scaling is not available,
    *       the content of the area not covered by actual image is undefined, it will not be cleared.
@@ -133,6 +136,32 @@ public:
                ImageDimensions size = ImageDimensions(),
                FittingMode::Type fittingMode = FittingMode::DEFAULT,
                bool orientationCorrection = true );
+
+  /**
+   * @brief Upload a resource image to the atlas.
+   *
+   * @note To make the atlasing efficient, a valid size should be provided.
+   *       If size is not provided, then the image file will be opened to read the actual size for loading.
+   *       Do not set a size that is bigger than the actual image size, as the up-scaling is not available,
+   *       the content of the area not covered by actual image is undefined, it will not be cleared.
+   *
+   * SamplingMode::BOX_THEN_LINEAR is used to sampling pixels from the input image while fitting it to desired size.
+   *
+   * @param [out] textureRect The texture area of the resource image in the atlas.
+   * @param [in] url The URL of the resource image file to use.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @param[in] atlasUploadObserver The observer to observe the upload state inside the ImageAtlas.
+   * @return True if there is enough space to fit this image in,false otherwise.
+   * @note The valid callback function here is required to have the signature of void( void ).
+   */
+  bool Upload( Vector4& textureRect,
+               const std::string& url,
+               ImageDimensions size,
+               FittingMode::Type fittingMode,
+               bool orientationCorrection,
+               AtlasUploadObserver* atlasUploadObserver );
 
   /**
    * @brief Upload a pixel buffer to atlas

@@ -32,6 +32,8 @@ namespace Dali
 namespace Toolkit
 {
 
+class AtlasUploadObserver;
+
 namespace Internal
 {
 
@@ -65,14 +67,15 @@ public:
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @param [in] atlasUploadObserver The object to observe the uploading state inside ImageAtlas.
    * @return The texture set containing the image.
    */
   TextureSet Add( Vector4& textureRect,
-                const std::string& url,
-                ImageDimensions size = ImageDimensions(),
-                FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                bool orientationCorrection = true );
-
+                  const std::string& url,
+                  ImageDimensions size = ImageDimensions(),
+                  FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                  bool orientationCorrection = true,
+                  AtlasUploadObserver* atlasUploadObserver = NULL );
   /**
    * @brief Add a pixel buffer to the atlas
    *

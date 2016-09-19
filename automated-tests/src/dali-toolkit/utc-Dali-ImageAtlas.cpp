@@ -60,6 +60,22 @@ bool IsOverlap( Rect<int> rect1, Rect<int> rect2 )
      && rect2.y < rect1.y+rect1.height;
 }
 
+static unsigned int gCountOfTestFuncCall;
+class TestUploadObserver : public AtlasUploadObserver
+{
+public:
+  TestUploadObserver()
+  {}
+
+  virtual ~TestUploadObserver()
+  {}
+
+  void UploadCompleted()
+  {
+    gCountOfTestFuncCall++;
+  }
+};
+
 } // anonymous namespace
 
 void dali_image_atlas_startup(void)
@@ -237,6 +253,100 @@ int UtcDaliImageAtlasUploadP(void)
   DALI_TEST_CHECK( ! IsOverlap(pixelArea1, pixelArea2) );
   DALI_TEST_CHECK( ! IsOverlap(pixelArea1, pixelArea3) );
   DALI_TEST_CHECK( ! IsOverlap(pixelArea2, pixelArea3) );
+
+  END_TEST;
+}
+
+int UtcDaliImageAtlasUploadWithObserver01(void)
+{
+  TestApplication application;
+  ImageAtlas atlas = ImageAtlas::New( 200, 200 );
+
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  CallbackBase* callback = eventTrigger->GetCallback();
+
+  gCountOfTestFuncCall = 0;
+  TestUploadObserver uploadObserver;
+
+  Vector4 textureRect1;
+  atlas.Upload( textureRect1, gImage_34_RGBA, ImageDimensions(34, 34), FittingMode::DEFAULT, true, &uploadObserver );
+  Vector4 textureRect2;
+  atlas.Upload( textureRect2, gImage_50_RGBA, ImageDimensions(50, 50), FittingMode::DEFAULT, true, NULL );
+  Vector4 textureRect3;
+  atlas.Upload( textureRect3, gImage_128_RGB, ImageDimensions(128, 128), FittingMode::DEFAULT, true, &uploadObserver );
+
+  // waiting until all three images are loaded and uploaded to atlas
+  eventTrigger->WaitingForTrigger( 3 );
+  CallbackBase::Execute( *callback );
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+
+  // Check that TestFunc is called twice
+  DALI_TEST_EQUALS( gCountOfTestFuncCall, 2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageAtlasUploadWithObserver02(void)
+{
+  TestApplication application;
+  ImageAtlas atlas = ImageAtlas::New( 200, 200 );
+
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  CallbackBase* callback = eventTrigger->GetCallback();
+
+  gCountOfTestFuncCall = 0;
+  TestUploadObserver* uploadObserver = new TestUploadObserver;
+
+  Vector4 textureRect1;
+  atlas.Upload( textureRect1, gImage_34_RGBA, ImageDimensions(34, 34), FittingMode::DEFAULT, true, uploadObserver );
+  Vector4 textureRect2;
+  atlas.Upload( textureRect2, gImage_50_RGBA, ImageDimensions(50, 50), FittingMode::DEFAULT, true, uploadObserver );
+  Vector4 textureRect3;
+  atlas.Upload( textureRect3, gImage_128_RGB, ImageDimensions(128, 128), FittingMode::DEFAULT, true, uploadObserver );
+
+  // destroy the object.
+  delete uploadObserver;
+
+ // waiting until all three images are loaded and uploaded to atlas
+  eventTrigger->WaitingForTrigger( 3 );
+  CallbackBase::Execute( *callback );
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+
+  // Check that TestFunc is called twice
+  DALI_TEST_EQUALS( gCountOfTestFuncCall, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageAtlasUploadWithObserver03(void)
+{
+  TestApplication application;
+
+  gCountOfTestFuncCall = 0;
+  TestUploadObserver* uploadObserver = new TestUploadObserver;
+
+  {
+    ImageAtlas atlas = ImageAtlas::New( 200, 200 );
+
+    Vector4 textureRect1;
+    atlas.Upload( textureRect1, gImage_34_RGBA, ImageDimensions(34, 34), FittingMode::DEFAULT, true, uploadObserver );
+    Vector4 textureRect2;
+    atlas.Upload( textureRect2, gImage_50_RGBA, ImageDimensions(50, 50), FittingMode::DEFAULT, true, uploadObserver );
+    Vector4 textureRect3;
+    atlas.Upload( textureRect3, gImage_128_RGB, ImageDimensions(128, 128), FittingMode::DEFAULT, true, uploadObserver );
+  }
+
+  //ImageAtlas is out of scope, so it will get destroyed
+
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+  application.SendNotification();
+  application.Render(RENDER_FRAME_INTERVAL);
+
+  // Check that TestFunc is called twice
+  DALI_TEST_EQUALS( gCountOfTestFuncCall, 0, TEST_LOCATION );
 
   END_TEST;
 }

@@ -23,6 +23,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/images/atlas.h>
+#include <dali/devel-api/common/owner-container.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
@@ -80,7 +81,8 @@ public:
                const std::string& url,
                ImageDimensions size,
                FittingMode::Type fittingMode,
-               bool orientationCorrection);
+               bool orientationCorrection,
+               AtlasUploadObserver* atlasUploadObserver );
 
   /**
    * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, PixelData )
@@ -91,6 +93,11 @@ public:
    * @copydoc Toolkit::ImageAtlas::Remove
    */
   void Remove( const Vector4& textureRect );
+
+  /**
+   * Resets the destroying observer pointer so that we know not to call methods of this object any more.
+   */
+  void ObserverDestroyed( AtlasUploadObserver* observer );
 
 protected:
 
@@ -104,7 +111,7 @@ private:
   /**
    * @copydoc PixelDataRequester::ProcessPixels
    */
-  void UploadToAtlas( unsigned int id, PixelData pixelData );
+  void UploadToAtlas( uint32_t id, PixelData pixelData );
 
   /**
    * Upload broken image
@@ -121,22 +128,29 @@ private:
 
 private:
 
-  struct IdRectPair
+  /**
+   * Each loading task( identified with an ID ) is associated with a rect region for packing the loaded pixel data into the atlas,
+   * and an AtlasUploadObserver whose UploadCompleted method should get executed once the sub texture is ready.
+   */
+  struct LoadingTaskInfo
   {
-    IdRectPair( unsigned short loadTaskId,
-                unsigned int packPositionX,
-                unsigned int packPositionY,
-                unsigned int width,
-                unsigned int height )
+    LoadingTaskInfo( unsigned short loadTaskId,
+                     unsigned int packPositionX,
+                     unsigned int packPositionY,
+                     unsigned int width,
+                     unsigned int height,
+                     AtlasUploadObserver* observer )
     : loadTaskId( loadTaskId ),
-      packRect( packPositionX, packPositionY, width, height )
+      packRect( packPositionX, packPositionY, width, height ),
+      observer( observer )
     {}
 
     unsigned short loadTaskId;
     Rect<unsigned int> packRect;
+    AtlasUploadObserver* observer;
   };
 
-  OwnerContainer<IdRectPair*> mIdRectContainer;
+  OwnerContainer<LoadingTaskInfo*> mLoadingTaskInfoContainer;
 
   Texture                   mAtlas;
   AtlasPacker               mPacker;
@@ -146,6 +160,7 @@ private:
   float                     mWidth;
   float                     mHeight;
   Pixel::Format             mPixelFormat;
+
 
 };
 

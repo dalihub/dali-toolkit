@@ -51,7 +51,8 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
                                  const std::string& url,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
-                                 bool orientationCorrection )
+                                 bool orientationCorrection,
+                                 AtlasUploadObserver* atlasUploadObserver )
 {
   ImageDimensions dimensions = size;
   ImageDimensions zero;
@@ -71,7 +72,7 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
   unsigned int i = 0;
   for( AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
   {
-    if( (*iter).Upload( textureRect, url, size, fittingMode, orientationCorrection ) )
+    if( (*iter).Upload( textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver ) )
     {
       return mTextureSetList[i];
     }
@@ -79,12 +80,12 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
   }
 
   CreateNewAtlas();
-  mAtlasList.back().Upload( textureRect, url, size, fittingMode, orientationCorrection );
+  mAtlasList.back().Upload( textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver );
   return mTextureSetList.back();
 }
 
 TextureSet ImageAtlasManager::Add( Vector4& textureRect,
-                                 PixelData pixelData )
+                                   PixelData pixelData )
 {
 
   // big buffer, atlasing is not applied

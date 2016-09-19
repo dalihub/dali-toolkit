@@ -478,7 +478,7 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
   }
   else
   {
-    textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, mSamplingMode );
+    textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, true, this );
     mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
     if( !textureSet ) // big image, no atlasing
     {
@@ -509,6 +509,7 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 
   mImageUrl = imageUrl;
   mImpl->mRenderer.Reset();
+  mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
   if( !mImpl->mCustomShader &&
       ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // ignore remote images
@@ -573,8 +574,22 @@ void ImageVisual::InitializeRenderer( const Image& image )
   }
 }
 
+void ImageVisual::UploadCompleted()
+{
+  // Resource image is loaded. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+  Actor actor = mPlacementActor.GetHandle();
+  if( actor )
+  {
+    actor.AddRenderer( mImpl->mRenderer );
+    // reset the weak handle so that the renderer only get added to actor once
+    mPlacementActor.Reset();
+  }
+}
+
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
+  mPlacementActor = actor;
+
   if( !mImageUrl.empty() )
   {
     InitializeRenderer( mImageUrl );
@@ -589,7 +604,11 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
 
-  actor.AddRenderer( mImpl->mRenderer );
+  if( IsSynchronousResourceLoading() || !(mImpl->mFlags & Impl::IS_ATLASING_APPLIED) )
+  {
+    actor.AddRenderer( mImpl->mRenderer );
+    mPlacementActor.Reset();
+  }
 }
 
 void ImageVisual::DoSetOffStage( Actor& actor )
@@ -606,6 +625,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
     actor.RemoveRenderer( mImpl->mRenderer );
     mImpl->mRenderer.Reset();
   }
+  mPlacementActor.Reset();
 }
 
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const

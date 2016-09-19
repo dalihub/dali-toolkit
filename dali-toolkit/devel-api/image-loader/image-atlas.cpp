@@ -80,7 +80,17 @@ bool ImageAtlas::Upload( Vector4& textureRect,
                          FittingMode::Type fittingMode,
                          bool orientationCorrection )
 {
-  return GetImplementation(*this).Upload( textureRect, url, size, fittingMode, orientationCorrection );
+  return Upload( textureRect, url, size, fittingMode, orientationCorrection, NULL );
+}
+
+bool ImageAtlas::Upload( Vector4& textureRect,
+                         const std::string& url,
+                         ImageDimensions size,
+                         FittingMode::Type fittingMode,
+                         bool orientationCorrection,
+                         AtlasUploadObserver* atlasUploadObserver )
+{
+  return GetImplementation(*this).Upload( textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver );
 }
 
 bool ImageAtlas::Upload( Vector4& textureRect, PixelData pixelData )

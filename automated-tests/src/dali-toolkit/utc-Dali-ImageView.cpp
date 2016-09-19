@@ -393,6 +393,7 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   callStack.Reset();
   callStack.Enable(true);
 
+  BitmapLoader::ResetLatestCreated();
   ImageView imageView = ImageView::New( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
 
   // By default, Aysnc loading is used
