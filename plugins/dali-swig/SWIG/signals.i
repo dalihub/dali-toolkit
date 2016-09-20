@@ -319,10 +319,10 @@ DALI_SIGNAL_1_PARAM( const Dali::RefObject* );
 DALI_SIGNAL_1_PARAM( const Dali::RenderTask& );
 
 // Signal< bool ( const Dali::Toolkit::AccessibilityManager& ) >
-DALI_SIGNAL_1_PARAM_RETURN( bool ,Dali::Toolkit::AccessibilityManager& );
+DALI_SIGNAL_1_PARAM_RETURN( bool, Dali::Toolkit::AccessibilityManager& );
 
 // Signal< bool ( const Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent& ) >
-DALI_SIGNAL_2_PARAM_RETURN( bool ,const Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent& );
+DALI_SIGNAL_2_PARAM_RETURN( bool, const Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent& );
 
 // Signal< void ( const Dali::Actor Dali::Toolkit::AccessibilityManager::FocusOvershotDirection ) >
 DALI_SIGNAL_2_PARAM( Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection );
