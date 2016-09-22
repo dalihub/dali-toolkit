@@ -533,7 +533,8 @@ void PrimitiveVisual::CreateConic( Vector<Vertex>& vertices, Vector<unsigned sho
 void PrimitiveVisual::CreateBevelledCube( Vector<Vertex>& vertices, Vector<unsigned short>& indices,
                                             Vector3 dimensions, float bevelPercentage, float bevelSmoothness )
 {
-  dimensions.Normalize();
+  float maxDimension = std::max( std::max( dimensions.x, dimensions.y ), dimensions.z );
+  dimensions = dimensions / maxDimension;
 
   if( bevelPercentage <= MIN_BEVEL_PERCENTAGE ) //No bevel, form a cube.
   {
