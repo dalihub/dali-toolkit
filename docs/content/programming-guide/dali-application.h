@@ -39,8 +39,8 @@ void CreateProgram(Application& app)
 
 int main (int argc, char **argv)
 {
-  Dali::Application app = Application::New(argc, argv);
-  app.SignalInit().Connect(&CreateProgram);
+  Dali::Application app = Application::New(&argc, &argv);
+  app.InitSignal().Connect(&CreateProgram);
   app.MainLoop();
 }
 @endcode
@@ -60,7 +60,7 @@ bool Tick()
 
 // Elsewhere
 Dali::Timer timer = Dali::Timer::New(2000); // 2 second timeout
-timer.SignalTick().Connect(&Tick);
+timer.TickSignal().Connect(&Tick);
 ...
 @endcode
 

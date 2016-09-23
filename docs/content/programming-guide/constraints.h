@@ -202,7 +202,7 @@ struct MyFunctor
     else
     {
       // Otherwise it will blend between fully opaque and transparent
-      current.a = ( 100.0f - mDistance ) / 100.0f;
+      current.a = ( mDistance - distance ) / mDistance;
     }
   }
 
