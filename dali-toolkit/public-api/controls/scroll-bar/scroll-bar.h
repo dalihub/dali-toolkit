@@ -167,12 +167,15 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] scrollBar Handle to an object
    */
   ScrollBar( const ScrollBar& scrollBar );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] scrollBar Handle to an object
+   * @return A reference to this
    */
   ScrollBar& operator=( const ScrollBar& scrollBar );
 
