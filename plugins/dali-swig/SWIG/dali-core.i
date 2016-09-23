@@ -82,6 +82,8 @@
 %ignore *::GetOwner() const;
 %ignore *::ParentOrigin::DEFAULT;
 %ignore *::AnchorPoint::DEFAULT;
+%ignore *::SetPositionInheritanceMode(PositionInheritanceMode);
+%ignore *::GetKeyValue(SizeType) const;
 
 %rename(ParentOriginTop) Dali::ParentOrigin::TOP;
 %rename(ParentOriginBottom) Dali::ParentOrigin::BOTTOM;
@@ -172,6 +174,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/object/property-index-ranges.h>
 %include <dali/public-api/object/property.h>
 %include <dali/public-api/object/property-array.h>
+%include <dali/public-api/object/property-key.h>
 %include <dali/public-api/object/property-map.h>
 %include <dali/public-api/object/property-types.h>
 %include <dali/public-api/object/property-value.h>
@@ -254,10 +257,9 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/images/native-image.h>
 %include <dali/public-api/images/native-image-interface.h>
 %include <dali/public-api/images/resource-image.h>
-%include <dali/public-api/images/nine-patch-image.h>
 %include <dali/public-api/images/frame-buffer-image.h>
+%include <dali/devel-api/images/nine-patch-image.h>
 
-%include <dali/public-api/actors/blending.h>
 %include <dali/public-api/actors/camera-actor.h>
 
 %template(StringValuePair) std::pair<std::string, Dali::Property::Value>;

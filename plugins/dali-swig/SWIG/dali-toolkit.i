@@ -43,6 +43,8 @@
 %ignore *::PageTurnView(Dali::Internal::CustomActor*);
 %ignore *::Popup(Internal::Popup&);
 %ignore *::Popup(Dali::Internal::CustomActor*);
+%ignore *::ProgressBar(Internal::ProgressBar&);
+%ignore *::ProgressBar(Dali::Internal::CustomActor*);
 %ignore *::PushButton(Internal::PushButton&);
 %ignore *::PushButton(Dali::Internal::CustomActor*);
 %ignore *::RadioButton(Internal::RadioButton&);
@@ -71,6 +73,25 @@
 %ignore *::Base(Dali::Internal::Visual::Base*);
 %ignore *::GetExtension();
 %ignore *::GetControlExtension();
+
+%ignore *::Button::SetAnimationTime(float animationTime);
+%ignore *::Button::SetAutoRepeating(bool);
+%ignore *::Button::SetBackgroundImage(const std::string &);
+%ignore *::Button::SetButtonImage(Dali::Image);
+%ignore *::Button::SetDisabled(bool);
+%ignore *::Button::SetDisabledBackgroundImage(const std::string &);
+%ignore *::Button::SetDisabledImage(const std::string &);
+%ignore *::Button::SetDisabledSelectedImage(const std::string &);
+%ignore *::Button::SetInitialAutoRepeatingDelay(float);
+%ignore *::Button::SetLabel(Dali::Actor);
+%ignore *::Button::SetLabelText(const std::string &);
+%ignore *::Button::SetNextAutoRepeatingDelay(float);
+%ignore *::Button::SetSelected(bool);
+%ignore *::Button::SetSelectedBackgroundImage(const std::string &);
+%ignore *::Button::SetSelectedImage(const std::string &);
+%ignore *::Button::SetSelectedImage(Dali::Image);
+%ignore *::Button::SetTogglableButton(bool);
+%ignore *::Button::SetUnselectedImage(const std::string &);
 
 %rename(ControlImpl) Dali::Toolkit::Internal::Control;
 %rename(VisualBase) Dali::Toolkit::Visual::Base;
@@ -143,19 +164,14 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/controls/buttons/push-button.h>
 %include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 %include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
-%include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 %include <dali-toolkit/public-api/controls/image-view/image-view.h>
 %include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
-%include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
-%include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
-%include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
-%include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
 %include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 %include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 %include <dali-toolkit/public-api/enums.h>
+%include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
-%include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 %include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
@@ -172,7 +188,14 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/styling/style-manager.h>
 %include <dali-toolkit/public-api/controls/slider/slider.h>
 %include <dali-toolkit/public-api/controls/video-view/video-view.h>
+
 %include <dali-toolkit/devel-api/controls/popup/popup.h>
+%include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
+%include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+%include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+%include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+%include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
+%include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
 
 %include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 %include <dali-toolkit/devel-api/visual-factory/visual-factory.h>

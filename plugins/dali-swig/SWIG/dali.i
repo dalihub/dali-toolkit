@@ -51,6 +51,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/viewport.h>
+#include <dali/public-api/object/property-key.h>
 
 
 #include <dali/public-api/adaptor-framework/timer.h>
@@ -58,8 +59,16 @@
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/devel-api/adaptor-framework/drag-and-drop-detector.h>
 
+#include <dali/devel-api/images/nine-patch-image.h>
+
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
+#include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
+#include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
 
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>

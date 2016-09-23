@@ -38,7 +38,7 @@
   public static Vector2 operator+(Vector2 arg1, Vector2 arg2) {
     return arg1.Add(arg2);
   }
-  
+
   public static Vector2 operator-(Vector2 arg1, Vector2 arg2) {
     return arg1.Subtract(arg2);
   }
@@ -128,7 +128,7 @@
   public static Vector4 operator+(Vector4 arg1, Vector4 arg2) {
     return arg1.Add(arg2);
   }
-  
+
   public static Vector4 operator-(Vector4 arg1, Vector4 arg2) {
     return arg1.Subtract(arg2);
   }
@@ -179,7 +179,7 @@
   public static Quaternion operator+(Quaternion arg1, Quaternion arg2) {
     return arg1.Add(arg2);
   }
-  
+
   public static Quaternion operator-(Quaternion arg1, Quaternion arg2) {
     return arg1.Subtract(arg2);
   }
@@ -241,11 +241,10 @@
   public static bool operator<(Uint16Pair arg1, Uint16Pair arg2) {
     return arg1.LessThan(arg2);
   }
-  
+
   public static bool operator>(Uint16Pair arg1, Uint16Pair arg2) {
     return arg1.GreaterThan(arg2);
   }
- 
 %}
 
 /**
