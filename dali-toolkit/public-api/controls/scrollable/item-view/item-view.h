@@ -68,6 +68,10 @@ class DALI_IMPORT_API ItemView : public Scrollable
 {
 public:
 
+  /**
+   * @brief The start and end property ranges for this control.
+   * @SINCE_1_1.18
+   */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1,                        ///< @SINCE_1_1.18
@@ -119,12 +123,15 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] itemView Handle to an object
    */
   ItemView( const ItemView& itemView );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] itemView Handle to an object
+   * @return A reference to this
    */
   ItemView& operator=( const ItemView& itemView );
 

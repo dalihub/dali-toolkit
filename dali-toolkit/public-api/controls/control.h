@@ -130,6 +130,10 @@ public:
    */
   struct KeyboardFocus
   {
+    /**
+     * @brief Keyboard focus direction
+     * @SINCE_1_0.0
+     */
     enum Direction
     {
       LEFT,   ///< Move keyboard focus towards the left direction @SINCE_1_0.0
