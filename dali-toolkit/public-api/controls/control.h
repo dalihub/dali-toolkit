@@ -329,6 +329,8 @@ public:
   Vector4 GetBackgroundColor() const;
 
   /**
+   * @DEPRECATED_1_2_8, use Property::BACKGROUND instead
+   *
    * @brief Sets an image as the background of the control.
    *
    * @SINCE_1_0.0
