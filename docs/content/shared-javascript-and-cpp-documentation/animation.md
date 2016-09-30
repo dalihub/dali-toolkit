@@ -75,7 +75,7 @@ void ExampleCallback( Animation& source )
   std::cout << "Animation has finished" << std::endl;
 }
 ...
-animation.FinishedSignal().Connect( ExampleCallback );
+animation.FinishedSignal().Connect( &ExampleCallback );
 ~~~
 
 ### Alpha Functions
