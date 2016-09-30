@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H__
-#define __DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H
+#define DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -18,13 +18,8 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/input-style.h>
-
 namespace Dali
 {
-
-class Actor;
 
 namespace Toolkit
 {
@@ -40,44 +35,15 @@ class ControlInterface
 public:
 
   /**
-   * @brief Constructor.
-   */
-  ControlInterface();
-
-  /**
    * @brief Virtual destructor.
    */
-  virtual ~ControlInterface();
-
-  /**
-   * @brief Add a decoration.
-   *
-   * @param[in] decoration The actor displaying a decoration.
-   * @param[in] needsClipping Whether the actor needs clipping.
-   */
-  virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
+  virtual ~ControlInterface()
+  {}
 
   /**
    * @brief Called to request a text relayout.
    */
   virtual void RequestTextRelayout() = 0;
-
-  /**
-   * @brief Called to signal that text has been inserted or deleted.
-   */
-  virtual void TextChanged() = 0;
-
-  /**
-   * @brief Called when the number of characters to be inserted exceeds the maximum limit
-   */
-  virtual void MaxLengthReached() = 0;
-
-  /**
-   * @brief Called to signal that input style has been changed.
-   *
-   * @param[in] inputStyleMask Mask with the bits of the input style that has changed.
-   */
-  virtual void InputStyleChanged( InputStyle::Mask inputStyleMask ) = 0;
 };
 
 } // namespace Text
@@ -86,4 +52,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H

@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROLLER_H__
-#define __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROLLER_H
+#define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -26,7 +26,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/text-control-interface.h>
 
 namespace Dali
 {
@@ -38,10 +37,11 @@ namespace Text
 {
 
 class Controller;
+class ControlInterface;
+class EditableControlInterface;
 class View;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
-typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
 
 /**
  * @brief A Text Controller is used by UI Controls which display text.
@@ -123,10 +123,29 @@ public: // Constructor.
   /**
    * @brief Create a new instance of a Controller.
    *
-   * @param[in] controlInterface An interface used to request a text relayout.
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New( ControlInterface& controlInterface );
+  static ControllerPtr New();
+
+  /**
+   * @brief Create a new instance of a Controller.
+   *
+   * @param[in] controlInterface The control's interface.
+   *
+   * @return A pointer to a new Controller.
+   */
+  static ControllerPtr New( ControlInterface* controlInterface );
+
+  /**
+   * @brief Create a new instance of a Controller.
+   *
+   * @param[in] controlInterface The control's interface.
+   * @param[in] editableControlInterface The editable control's interface.
+   *
+   * @return A pointer to a new Controller.
+   */
+  static ControllerPtr New( ControlInterface* controlInterface,
+                            EditableControlInterface* editableControlInterface );
 
 public: // Configure the text controller.
 
@@ -1058,7 +1077,18 @@ private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
    */
-  Controller( ControlInterface& controlInterface );
+  Controller();
+
+  /**
+   * @brief Private constructor.
+   */
+  Controller( ControlInterface* controlInterface );
+
+  /**
+   * @brief Private constructor.
+   */
+  Controller( ControlInterface* controlInterface,
+              EditableControlInterface* editableControlInterface );
 
   // Undefined
   Controller( const Controller& handle );
@@ -1085,4 +1115,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

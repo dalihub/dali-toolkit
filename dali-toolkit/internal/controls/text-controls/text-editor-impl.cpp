@@ -933,7 +933,7 @@ void TextEditor::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( *this );
+  mController = Text::Controller::New( this, this );
 
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
@@ -1042,7 +1042,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    EnableClipping( true, size );
+    EnableClipping( size );
     RenderText( updateTextType );
   }
 
@@ -1235,21 +1235,6 @@ bool TextEditor::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
-{
-  if( actor )
-  {
-    if( needsClipping )
-    {
-      mClippingDecorationActors.push_back( actor );
-    }
-    else
-    {
-      Self().Add( actor );
-    }
-  }
-}
-
 void TextEditor::RequestTextRelayout()
 {
   RelayoutRequest();
@@ -1259,6 +1244,11 @@ void TextEditor::TextChanged()
 {
   Dali::Toolkit::TextEditor handle( GetOwner() );
   mTextChangedSignal.Emit( handle );
+}
+
+void TextEditor::MaxLengthReached()
+{
+  // Nothing to do as TextEditor doesn't emit a max length reached signal.
 }
 
 void TextEditor::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
@@ -1315,9 +1305,19 @@ void TextEditor::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
   mInputStyleChangedSignal.Emit( handle, editorInputStyleMask );
 }
 
-void TextEditor::MaxLengthReached()
+void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
 {
-  // Nothing to do as TextEditor doesn't emit a max length reached signal.
+  if( actor )
+  {
+    if( needsClipping )
+    {
+      mClippingDecorationActors.push_back( actor );
+    }
+    else
+    {
+      Self().Add( actor );
+    }
+  }
 }
 
 void TextEditor::OnStageConnect( Dali::Actor actor )
@@ -1353,31 +1353,23 @@ void TextEditor::GetHandleImagePropertyValue(  Property::Value& value, Text::Han
   }
 }
 
-void TextEditor::EnableClipping( bool clipping, const Vector2& size )
+void TextEditor::EnableClipping( const Vector2& size )
 {
-  if( clipping )
+  // Not worth to created clip actor if width or height is equal to zero.
+  if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
   {
-    // Not worth to created clip actor if width or height is equal to zero.
-    if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
+    if( !mClipper )
     {
-      if( !mClipper )
-      {
-        Actor self = Self();
+      Actor self = Self();
 
-        mClipper = Clipper::New( size );
-        self.Add( mClipper->GetRootActor() );
-        self.Add( mClipper->GetImageView() );
-      }
-      else if ( mClipper )
-      {
-        mClipper->Refresh( size );
-      }
+      mClipper = Clipper::New( size );
+      self.Add( mClipper->GetRootActor() );
+      self.Add( mClipper->GetImageView() );
     }
-  }
-  else
-  {
-    // Note - this will automatically remove the root actor & the image view
-    mClipper.Reset();
+    else if ( mClipper )
+    {
+      mClipper->Refresh( size );
+    }
   }
 }
 

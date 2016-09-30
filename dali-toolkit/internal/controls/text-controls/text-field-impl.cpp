@@ -1114,7 +1114,7 @@ void TextField::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( *this );
+  mController = Text::Controller::New( this, this );
 
   // When using the vector-based rendering, the size of the GLyphs are different
   TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
@@ -1222,7 +1222,7 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    EnableClipping( ( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy ), size );
+    EnableClipping( size );
     RenderText( updateTextType );
   }
 
@@ -1416,21 +1416,6 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-void TextField::AddDecoration( Actor& actor, bool needsClipping )
-{
-  if( actor )
-  {
-    if( needsClipping )
-    {
-      mClippingDecorationActors.push_back( actor );
-    }
-    else
-    {
-      Self().Add( actor );
-    }
-  }
-}
-
 void TextField::RequestTextRelayout()
 {
   RelayoutRequest();
@@ -1440,6 +1425,12 @@ void TextField::TextChanged()
 {
   Dali::Toolkit::TextField handle( GetOwner() );
   mTextChangedSignal.Emit( handle );
+}
+
+void TextField::MaxLengthReached()
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+  mMaxLengthReachedSignal.Emit( handle );
 }
 
 void TextField::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
@@ -1492,6 +1483,21 @@ void TextField::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
   mInputStyleChangedSignal.Emit( handle, fieldInputStyleMask );
 }
 
+void TextField::AddDecoration( Actor& actor, bool needsClipping )
+{
+  if( actor )
+  {
+    if( needsClipping )
+    {
+      mClippingDecorationActors.push_back( actor );
+    }
+    else
+    {
+      Self().Add( actor );
+    }
+  }
+}
+
 void TextField::OnStageConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
@@ -1502,12 +1508,6 @@ void TextField::OnStageConnect( Dali::Actor actor )
   {
     mHasBeenStaged = true;
   }
-}
-
-void TextField::MaxLengthReached()
-{
-  Dali::Toolkit::TextField handle( GetOwner() );
-  mMaxLengthReachedSignal.Emit( handle );
 }
 
 ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
@@ -1531,9 +1531,9 @@ void TextField::GetHandleImagePropertyValue(  Property::Value& value, Text::Hand
   }
 }
 
-void TextField::EnableClipping( bool clipping, const Vector2& size )
+void TextField::EnableClipping( const Vector2& size )
 {
-  if( clipping )
+  if( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy )
   {
     // Not worth to created clip actor if width or height is equal to zero.
     if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )

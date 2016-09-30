@@ -103,7 +103,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/property-string-parser.cpp \
    $(toolkit_src_dir)/text/segmentation.cpp \
    $(toolkit_src_dir)/text/shaper.cpp \
-   $(toolkit_src_dir)/text/text-control-interface.cpp \
    $(toolkit_src_dir)/text/text-controller.cpp \
    $(toolkit_src_dir)/text/text-controller-impl.cpp \
    $(toolkit_src_dir)/text/text-effects-style.cpp \

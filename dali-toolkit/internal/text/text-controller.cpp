@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
 {
@@ -100,9 +101,21 @@ FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
 
 // public : Constructor.
 
-ControllerPtr Controller::New( ControlInterface& controlInterface )
+ControllerPtr Controller::New()
+{
+  return ControllerPtr( new Controller() );
+}
+
+ControllerPtr Controller::New( ControlInterface* controlInterface )
 {
   return ControllerPtr( new Controller( controlInterface ) );
+}
+
+ControllerPtr Controller::New( ControlInterface* controlInterface,
+                               EditableControlInterface* editableControlInterface )
+{
+  return ControllerPtr( new Controller( controlInterface,
+                                        editableControlInterface ) );
 }
 
 // public : Configure the text controller.
@@ -460,8 +473,11 @@ void Controller::SetText( const std::string& text )
     mImpl->mEventData->mEventQueue.clear();
   }
 
-  // Do this last since it provides callbacks into application code
-  mImpl->mControlInterface.TextChanged();
+  // Do this last since it provides callbacks into application code.
+  if( NULL != mImpl->mEditableControlInterface )
+  {
+    mImpl->mEditableControlInterface->TextChanged();
+  }
 }
 
 void Controller::GetText( std::string& text ) const
@@ -1605,8 +1621,11 @@ void Controller::ProcessInputStyleChangedSignals()
   {
     const InputStyle::Mask mask = *it;
 
-    // Emit the input style changed signal.
-    mImpl->mControlInterface.InputStyleChanged( mask );
+    if( NULL != mImpl->mEditableControlInterface )
+    {
+      // Emit the input style changed signal.
+      mImpl->mEditableControlInterface->InputStyleChanged( mask );
+    }
   }
 
   mImpl->mEventData->mInputStyleChangedQueue.Clear();
@@ -1732,10 +1751,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     mImpl->RequestRelayout();
   }
 
-  if( textChanged )
+  if( textChanged &&
+      ( NULL != mImpl->mEditableControlInterface ) )
   {
     // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.TextChanged();
+    mImpl->mEditableControlInterface->TextChanged();
   }
 
   return true;
@@ -1966,10 +1986,11 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
   ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
 
-  if( requestRelayout )
+  if( requestRelayout &&
+      ( NULL != mImpl->mEditableControlInterface ) )
   {
     // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.TextChanged();
+    mImpl->mEditableControlInterface->TextChanged();
   }
 
   return callbackData;
@@ -2002,7 +2023,10 @@ void Controller::GetTargetSize( Vector2& targetSize )
 
 void Controller::AddDecoration( Actor& actor, bool needsClipping )
 {
-  mImpl->mControlInterface.AddDecoration( actor, needsClipping );
+  if( NULL != mImpl->mEditableControlInterface )
+  {
+    mImpl->mEditableControlInterface->AddDecoration( actor, needsClipping );
+  }
 }
 
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
@@ -2089,7 +2113,11 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       mImpl->mEventData->mScrollAfterDelete = true;
 
       mImpl->RequestRelayout();
-      mImpl->mControlInterface.TextChanged();
+
+      if( NULL != mImpl->mEditableControlInterface )
+      {
+        mImpl->mEditableControlInterface->TextChanged();
+      }
       break;
     }
     case Toolkit::TextSelectionPopup::COPY:
@@ -2376,8 +2404,11 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     mImpl->ResetImfManager();
 
-    // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.MaxLengthReached();
+    if( NULL != mImpl->mEditableControlInterface )
+    {
+      // Do this last since it provides callbacks into application code
+      mImpl->mEditableControlInterface->MaxLengthReached();
+    }
   }
 }
 
@@ -2387,8 +2418,11 @@ void Controller::PasteText( const std::string& stringToPaste )
   mImpl->ChangeState( EventData::EDITING );
   mImpl->RequestRelayout();
 
-  // Do this last since it provides callbacks into application code
-  mImpl->mControlInterface.TextChanged();
+  if( NULL != mImpl->mEditableControlInterface )
+  {
+    // Do this last since it provides callbacks into application code
+    mImpl->mEditableControlInterface->TextChanged();
+  }
 }
 
 bool Controller::RemoveText( int cursorOffset,
@@ -3012,10 +3046,22 @@ void Controller::ResetScrollPosition()
 
 // private : Private contructors & copy operator.
 
-Controller::Controller( ControlInterface& controlInterface )
+Controller::Controller()
 : mImpl( NULL )
 {
-  mImpl = new Controller::Impl( controlInterface );
+  mImpl = new Controller::Impl( NULL, NULL );
+}
+
+Controller::Controller( ControlInterface* controlInterface )
+{
+  mImpl = new Controller::Impl( controlInterface, NULL );
+}
+
+Controller::Controller( ControlInterface* controlInterface,
+                        EditableControlInterface* editableControlInterface )
+{
+  mImpl = new Controller::Impl( controlInterface,
+                                editableControlInterface );
 }
 
 // The copy constructor and operator are left unimplemented.

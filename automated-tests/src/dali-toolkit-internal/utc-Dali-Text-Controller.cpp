@@ -23,6 +23,8 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -40,7 +42,7 @@ const char* const OPTION_CLIPBOARD("optionClipboard");      // "Clipboard" popup
 
 const Size CONTROL_SIZE( 300.f, 60.f );
 
-class ControlImpl : public ControlInterface
+class ControlImpl : public ControlInterface, public Text::EditableControlInterface
 {
 public:
   ControlImpl()
@@ -80,8 +82,7 @@ int UtcDaliTextController(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   DALI_TEST_CHECK( controller );
 
@@ -95,8 +96,7 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   DALI_TEST_CHECK( controller );
 
@@ -131,8 +131,7 @@ int UtcDaliTextControllerImfEvent(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   std::string text;
   ImfManager::ImfEventData imfEvent;
@@ -214,8 +213,7 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   DALI_TEST_CHECK( controller );
 
