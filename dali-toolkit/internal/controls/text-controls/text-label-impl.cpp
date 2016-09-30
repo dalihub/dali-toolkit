@@ -644,7 +644,7 @@ void TextLabel::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( *this );
+  mController = Text::Controller::New( this );
 
   // When using the vector-based rendering, the size of the GLyphs are different
   TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
@@ -791,32 +791,12 @@ void TextLabel::OnStageConnect( Dali::Actor actor )
   }
 }
 
-void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
-{
-  // TextLabel does not show decorations
-}
-
 void TextLabel::OnStageConnection( int depth )
 {
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
-}
-
-void TextLabel::TextChanged()
-{
-  // TextLabel does not provide a signal for this.
-}
-
-void TextLabel::MaxLengthReached()
-{
-  // Pure Virtual from TextController Interface, only needed when inputting text
-}
-
-void TextLabel::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
-{
-  // TextLabel does not provide a signal for this.
 }
 
 void TextLabel::ScrollingFinished()

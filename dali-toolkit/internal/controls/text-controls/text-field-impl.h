@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -24,6 +24,7 @@
 #include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
@@ -42,7 +43,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextField : public Control, public Text::ControlInterface
+class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface
 {
 public:
 
@@ -162,14 +163,11 @@ private: // From Control
 // From ControlInterface
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
-   */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
-
-  /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
+
+// From EditableControlInterface
 
   /**
    * @copydoc Text::ControlInterface::TextChanged()
@@ -185,6 +183,11 @@ private: // From Control
    * @copydoc Text::ControlInterface::InputStyleChanged()
    */
   virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
+
+  /**
+   * @copydoc Text::ControlInterface::AddDecoration()
+   */
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
 private: // Implementation
 
@@ -210,10 +213,9 @@ private: // Implementation
   /**
    * @brief Enable or disable clipping.
    *
-   * @param[in] clipping True if clipping should be enabled.
    * @param[in] size The area to clip within.
    */
-  void EnableClipping( bool clipping, const Vector2& size );
+  void EnableClipping( const Vector2& size );
 
   /**
    * @brief Callback when keyboard is shown/hidden.
@@ -306,4 +308,4 @@ inline const Toolkit::Internal::TextField& GetImpl( const Toolkit::TextField& te
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
