@@ -29,6 +29,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
+  $(devel_api_src_dir)/visual-factory/transition-data.cpp \
   $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
   $(devel_api_src_dir)/visual-factory/visual-base.cpp \
   $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp
@@ -72,6 +73,7 @@ devel_api_progress_bar_header_files = \
   $(devel_api_src_dir)/controls/progress-bar/progress-bar.h
 
 devel_api_visual_factory_header_files = \
+  $(devel_api_src_dir)/visual-factory/transition-data.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
 

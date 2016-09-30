@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include "dummy-control.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -75,6 +76,25 @@ int UtcDaliVisualCopyAndAssignment(void)
   //self assignment
   visual = visual;
   DALI_TEST_CHECK( visual = visualCopy );
+
+  END_TEST;
+}
+
+int UtcDaliVisualSetName01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualSetName" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  const char* visualName = "backgroundVisual";
+  visual.SetName( visualName );
+
+  DALI_TEST_EQUALS( visual.GetName(), visualName, TEST_LOCATION );
 
   END_TEST;
 }

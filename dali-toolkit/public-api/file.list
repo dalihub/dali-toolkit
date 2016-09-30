@@ -25,10 +25,10 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/text-controls/text-editor.cpp \
   $(public_api_src_dir)/controls/text-controls/text-label.cpp \
   $(public_api_src_dir)/controls/text-controls/text-field.cpp \
+  $(public_api_src_dir)/controls/video-view/video-view.cpp \
   $(public_api_src_dir)/styling/style-manager.cpp \
   $(public_api_src_dir)/accessibility-manager/accessibility-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
-  $(public_api_src_dir)/controls/video-view/video-view.cpp \
   $(public_api_src_dir)/dali-toolkit-version.cpp \
   $(public_api_src_dir)/enums.cpp
 

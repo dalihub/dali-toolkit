@@ -75,6 +75,16 @@ public:
   void Initialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
+   * @copydoc Toolkit::Visual::Base::SetName
+   */
+  void SetName( const std::string& name );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::GetName
+   */
+  const std::string& GetName();
+
+  /**
    * @copydoc Toolkit::Visual::Base::SetSize
    */
   virtual void SetSize( const Vector2& size );
