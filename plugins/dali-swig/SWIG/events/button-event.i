@@ -17,7 +17,7 @@
 
 // Example from Swig MACRO
 
-%define EVENTHANDLER_TYPEMAP_EVENTARG(NameSpace, ClassName)
+%define BUTTON_EVENTHANDLER_TYPEMAP_EVENTARG(NameSpace, ClassName)
 %typemap(csimports) NameSpace::ClassName %{
 using System;
 using System.Runtime.InteropServices;
@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 
 %enddef
 
-%define EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
+%define BUTTON_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
 %typemap(cscode) NameSpace::ClassName %{
 
 public class ClickedEventArgs : EventArgs
@@ -164,7 +164,7 @@ public class StateChangedEventArgs : EventArgs
   // Callback for button click signal
   private bool OnClicked (IntPtr data)
   {
-     Button##ClickedEventArgs e = new ClickedEventArgs();
+     ClickedEventArgs e = new ClickedEventArgs();
 
      e.Button = Button.GetButtonFromPtr(data);
 
@@ -211,7 +211,7 @@ public class StateChangedEventArgs : EventArgs
   // Callback for button click signal
   private bool OnPressed (IntPtr data)
   {
-     Button##PressedEventArgs e = new PressedEventArgs();
+     PressedEventArgs e = new PressedEventArgs();
 
      e.Button = Button.GetButtonFromPtr(data);
 
@@ -258,7 +258,7 @@ public class StateChangedEventArgs : EventArgs
   // Callback for button click signal
   private bool OnReleased (IntPtr data)
   {
-     Button##ReleasedEventArgs e = new ReleasedEventArgs();
+     ReleasedEventArgs e = new ReleasedEventArgs();
 
      e.Button = Button.GetButtonFromPtr(data);
 
@@ -305,7 +305,7 @@ public class StateChangedEventArgs : EventArgs
   // Callback for button click signal
   private bool OnStateChanged (IntPtr data)
   {
-     Button##StateChangedEventArgs e = new StateChangedEventArgs();
+     StateChangedEventArgs e = new StateChangedEventArgs();
 
      e.Button = Button.GetButtonFromPtr(data);
 
