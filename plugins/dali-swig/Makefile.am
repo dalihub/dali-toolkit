@@ -12,24 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CLEANFILES = cpp/dali_wrap.* csharp/*.cs *.so *.dll \
+CLEANFILES = automatic/cpp/dali_wrap.* automatic/csharp/*.cs *.so *.dll \
+             manual/cpp/*.o \
              examples/*.so examples/*.dll examples/*.exe
 
-BUILT_SOURCES = cpp/dali_wrap.cpp cpp/dali_wrap.h
+BUILT_SOURCES = automatic/cpp/dali_wrap.cpp automatic/cpp/dali_wrap.h
 
 if HAVE_MCS
 if BUILD_MCS
 
 all-local: libNDalic.so NDali.dll
 
-libNDalic.so: cpp/dali_wrap.o
-	g++ -shared cpp/dali_wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
+libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o
+	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
 
-cpp/dali_wrap.o: $(BUILT_SOURCES)
-	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) cpp/dali_wrap.cpp -o cpp/dali_wrap.o
+automatic/cpp/dali_wrap.o: $(BUILT_SOURCES)
+	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) automatic/cpp/dali_wrap.cpp -o automatic/cpp/dali_wrap.o
+
+manual/cpp/keyboard_focus_manager_wrap.o: $(BUILT_SOURCES)
+	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/keyboard_focus_manager_wrap.cpp -o manual/cpp/keyboard_focus_manager_wrap.o
 
 NDali.dll: $(BUILT_SOURCES)
-	$(MCS) -nologo -target:library -out:NDali.dll csharp/*.cs
+	$(MCS) -nologo -target:library -out:NDali.dll automatic/csharp/*.cs manual/csharp/*.cs
 
 check-local: examples/dali-test.exe \
              examples/hello-world.exe \
@@ -51,25 +55,25 @@ endif
 # use swig to generate the CS wrapper code
 # then call our property-wrapper to inject DALi property getters / setters
 $(BUILT_SOURCES): SWIG/*.i
-	rm -f csharp/*.cs
-	$(SWIG) -csharp -c++ -outdir csharp \
-            $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o cpp/dali_wrap.cpp SWIG/dali.i
+	rm -f automatic/csharp/*.cs
+	$(SWIG) -csharp -c++ -outdir automatic/csharp \
+            $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o automatic/cpp/dali_wrap.cpp SWIG/dali.i
 	./property-wrapper.rb
 	./constructor-generator.rb
 
 dist-hook: $(BUILT_SOURCES)
-	mkdir -p $(distdir)/cpp
-	cp ./cpp/dali_wrap.cpp $(distdir)/cpp
-	cp ./cpp/dali_wrap.h $(distdir)/cpp
-	cp ./cpp/DaliWrapper.h ./cpp/DaliWrapper.cpp $(distdir)/cpp
-	cp ./cpp/stdafx.h $(distdir)/cpp
-	mkdir -p $(distdir)/csharp
-	cp ./csharp/*.csproj $(distdir)/csharp
-	cp ./csharp/*.cs $(distdir)/csharp
+	mkdir -p $(distdir)/automatic/cpp
+	cp ./automatic/cpp/*.cpp $(distdir)/automatic/cpp
+	cp ./automatic/cpp/*.h $(distdir)/automatic/cpp
+	mkdir -p $(distdir)/manual/cpp
+	cp ./manual/cpp/*.cpp $(distdir)/manual/cpp
+	cp ./manual/cpp/*.h $(distdir)/manual/cpp
+	mkdir -p $(distdir)/automatic/csharp
+	cp ./automatic/csharp/*.cs $(distdir)/automatic/csharp
+	mkdir -p $(distdir)/manual/csharp
+	cp ./manual/csharp/*.cs $(distdir)/manual/csharp
 	mkdir -p $(distdir)/examples
 	cp ./examples/*.csproj $(distdir)/examples
 	cp ./examples/*.cs $(distdir)/examples
 
-EXTRA_DIST = \
-    swig.cmd
 
