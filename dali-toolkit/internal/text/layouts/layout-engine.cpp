@@ -596,7 +596,10 @@ struct LayoutEngine::Impl
       lineRun->ellipsis = true;
 
       layoutSize.width = layoutParameters.boundingBox.width;
-      layoutSize.height += ( lineRun->ascender + -lineRun->descender );
+      if( layoutSize.height < Math::MACHINE_EPSILON_1000 )
+      {
+        layoutSize.height += ( lineRun->ascender + -lineRun->descender );
+      }
 
       SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
                          ellipsisLayout.numberOfGlyphs,

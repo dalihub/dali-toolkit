@@ -413,3 +413,35 @@ int UtcDaliToolkitTextlabelScrollingP(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextlabelEllipsis(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsis");
+
+  TextLabel label = TextLabel::New("Hello world");
+  DALI_TEST_CHECK( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  Stage::GetCurrent().Add( label );
+
+  // Turn on all the effects
+  label.SetAnchorPoint( AnchorPoint::CENTER );
+  label.SetParentOrigin( ParentOrigin::CENTER );
+  label.SetSize( 360.0f, 10.f );
+
+  try
+  {
+    // Render the text.
+    application.SendNotification();
+    application.Render();
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
