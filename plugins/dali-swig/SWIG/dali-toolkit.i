@@ -32,7 +32,6 @@
 %ignore *::ImageView(Dali::Internal::CustomActor*);
 %ignore *::ItemView(Internal::ItemView&);
 %ignore *::ItemView(Dali::Internal::CustomActor*);
-%ignore *::KeyboardFocusManager(Internal::KeyboardFocusManager*);
 %ignore *::Model3dView(Internal::Model3dView&);
 %ignore *::Model3dView(Dali::Internal::CustomActor*);
 %ignore *::PageTurnLandscapeView(Internal::PageTurnLandscapeView&);
@@ -184,7 +183,6 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 %include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 %include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
-%include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 %include <dali-toolkit/public-api/styling/style-manager.h>
 %include <dali-toolkit/public-api/controls/slider/slider.h>
 %include <dali-toolkit/public-api/controls/video-view/video-view.h>
@@ -208,7 +206,6 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %template(AccessibilityActionScrollSignal) Dali::Signal<bool(Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&)>;
 %template(AccessibilityFocusOvershotSignal) Dali::Signal<void(Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection)>;
 %template(FocusChangedSignal) Dali::Signal<void(Dali::Actor, Dali::Actor)>;
-%template(KeyboardPreFocusChangeSignal) Dali::Signal<Dali::Actor(Dali::Actor, Dali::Actor, Dali::Toolkit::Control::KeyboardFocus::Direction)>;
 %template(FocusGroupChangedSignal) Dali::Signal<void(Dali::Actor, bool)>;
 %template(StyleChangedSignal) Dali::Signal<void(Dali::Toolkit::StyleManager, Dali::StyleChange::Type)>;
 %template(ButtonSignal) Dali::Signal<bool(Dali::Toolkit::Button)>;
