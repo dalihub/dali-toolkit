@@ -1033,7 +1033,16 @@
     }
 
     public static Application NewApplication() {
-      Application ret = New(1);
+      return NewApplication("",Application.WINDOW_MODE.OPAQUE);
+    }
+
+    public static Application NewApplication(string stylesheet) {
+      return NewApplication(stylesheet, Application.WINDOW_MODE.OPAQUE);
+    }
+
+    public static Application NewApplication(string stylesheet, Application.WINDOW_MODE windowMode) {
+
+      Application ret = New(1, stylesheet, windowMode);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
 
       // we've got an application now connect the signals
@@ -1042,6 +1051,7 @@
 
       return ret;
     }
+
 
     %}
     %enddef
