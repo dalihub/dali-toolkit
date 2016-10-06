@@ -48,11 +48,11 @@ namespace MyCSharpExample
         private void CreateScrollView()
         {
             Stage stage = Stage.GetCurrent();
-            stage.SetBackgroundColor(NDalic.WHITE);
+            stage.BackgroundColor = NDalic.WHITE;
 
             // Create a scroll view
             _scrollView = new ScrollView();
-            Vector2 stageSize = stage.GetSize();
+            Vector2 stageSize = stage.Size;
             _scrollView.Size = new Vector3(stageSize.x, stageSize.y, 0.0f);
             _scrollView.ParentOrigin = NDalic.ParentOriginCenter;
             _scrollView.AnchorPoint = NDalic.AnchorPointCenter;

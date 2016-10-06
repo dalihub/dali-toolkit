@@ -16,16 +16,15 @@
  */
 
 %define Animation_EVENTHANDLER_TYPEMAP_EVENTARG(NameSpace, ClassName)
-  %typemap(csimports) NameSpace::ClassName %{
-    using System;
-    using System.Runtime.InteropServices;
+%typemap(csimports) NameSpace::ClassName %{
+using System;
+using System.Runtime.InteropServices;
+%}
 
-    %}
-    %enddef
+%enddef
 
 %define Animation_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
   %typemap(cscode) NameSpace::ClassName %{
-
 
     /**
       * @brief Event arguments that passed via Finished signal
@@ -112,15 +111,51 @@
     }
 
 
-    public static ClassName Get ## ClassName ## FromPtr(global::System.IntPtr cPtr) {
-      ClassName ret = new ClassName(cPtr, false);
-      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-      return ret;
+  public static ClassName Get ## ClassName ## FromPtr(global::System.IntPtr cPtr) {
+    ClassName ret = new ClassName(cPtr, false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+
+  public float Duration
+  {
+    set
+    {
+       SetDuration(value);
     }
+    get
+    {
+       float ret = GetDuration();
+       return ret;
+    }
+  }
 
-    %}
+  public AlphaFunction DefaultAlphaFunction
+  {
+    set
+    {
+       SetDefaultAlphaFunction(value);
+    }
+    get
+    {
+       AlphaFunction ret = GetDefaultAlphaFunction();
+       return ret;
+    }
+  }
 
-    %enddef
+  public Animation.State Status
+  {
+    get
+    {
+       Animation.State ret = GetState();
+       return ret;
+    }
+  }
+
+%}
+
+%enddef
 
 
 %define DALI_animation_EVENTHANDLER_PARAM( NameSpace, ClassName)

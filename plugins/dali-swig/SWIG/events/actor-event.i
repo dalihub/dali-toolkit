@@ -603,18 +603,67 @@
     {
        return (IntPtr)swigCPtr;
     }
-    %}
 
-    %enddef
+    public Actor Parent
+    {
+      get
+      {
+        Actor parent = GetParent();
+        return parent;
+      }
+    }
+
+   public bool Vibility
+   {
+      get
+      {
+        bool visibility = IsVisible();
+        return visibility;
+      }
+    }
+
+   public float Opacity
+   {
+      set
+      {
+        SetOpacity(value);
+      }
+    }
+
+   public float CurrentOpacity
+   {
+      get
+      {
+        float ret = GetCurrentOpacity();
+        return ret;
+      }
+    }
+
+    public bool StateFocusEnable
+    {
+      set
+      {
+        SetKeyboardFocusable(value);
+      }
+      get
+      {
+        bool focusable = IsKeyboardFocusable();
+        return focusable;
+      }
+    }
+
+%}
+
+%enddef
 
 %define DALI_ACTOR_EVENTHANDLER_PARAM( NameSpace, ClassName)
 
-  ACTOR_EVENTHANDLER_TYPEMAP_EVENTARG( NameSpace, ClassName);
-  ACTOR_EVENTHANDLER_TYPEMAP_HELPER( NameSpace, ClassName);
+ACTOR_EVENTHANDLER_TYPEMAP_EVENTARG( NameSpace, ClassName);
+ACTOR_EVENTHANDLER_TYPEMAP_HELPER( NameSpace, ClassName);
 
-  %enddef
+%enddef
 
-  namespace Dali
+namespace Dali
 {
   DALI_ACTOR_EVENTHANDLER_PARAM( Dali, Actor);
 }

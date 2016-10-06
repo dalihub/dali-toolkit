@@ -544,6 +544,28 @@ public class SceneCreatedEventArgs : EventArgs
      }
   }
 
+  public Vector2 Size
+  {
+     get
+     {
+        Vector2 ret = GetSize();
+        return ret;
+     }
+  }
+
+  public Vector4 BackgroundColor
+  {
+     set
+     {
+        SetBackgroundColor(value);
+     }
+     get
+     {
+        Vector4 ret = GetBackgroundColor();
+        return ret;
+     }
+   }
+
 %}
 
 %enddef

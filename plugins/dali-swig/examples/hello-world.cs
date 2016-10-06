@@ -47,7 +47,7 @@ namespace MyCSharpExample
         {
             Console.WriteLine("Customized Application Initialize event handler");
             Stage stage = Stage.GetCurrent();
-            stage.SetBackgroundColor( NDalic.WHITE );
+            stage.BackgroundColor = NDalic.WHITE;
 
             stage.Touched += new Dali.Stage.TouchEventHandler(OnStageTouched);
 
@@ -65,7 +65,7 @@ namespace MyCSharpExample
         public void AnimationFinished(object source, Animation.FinishedEventArgs e)
         {
             Console.WriteLine("Customized Animation Finished Event handler");
-            Console.WriteLine("Animation finished: duration = " + e.Animation.GetDuration());
+            Console.WriteLine("Animation finished: duration = " + e.Animation.Duration);
         }
 
         // Callback for stage touched signal handling
