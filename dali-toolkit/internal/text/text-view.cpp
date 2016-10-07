@@ -190,6 +190,24 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
 
         if( lastLine.ellipsis )
         {
+          if( ( 1u == numberOfLines ) &&
+              ( lastLine.ascender - lastLine.descender > mImpl->mVisualModel->mControlSize.height ) )
+          {
+            // Get the first glyph which is going to be replaced and the ellipsis glyph.
+            GlyphInfo& glyphInfo = *glyphs;
+            const GlyphInfo& ellipsisGlyph = mImpl->mFontClient.GetEllipsisGlyph( mImpl->mFontClient.GetPointSize( glyphInfo.fontId ) );
+
+            // Change the 'x' and 'y' position of the ellipsis glyph.
+            Vector2& position = *glyphPositions;
+            position.x = ellipsisGlyph.xBearing;
+            position.y = mImpl->mVisualModel->mControlSize.height - ellipsisGlyph.yBearing;
+
+            // Replace the glyph by the ellipsis glyph.
+            glyphInfo = ellipsisGlyph;
+
+             return 1u;
+          }
+
           // firstPenX, penY and firstPenSet are used to position the ellipsis glyph if needed.
           float firstPenX = 0.f; // Used if rtl text is elided.
           float penY = 0.f;

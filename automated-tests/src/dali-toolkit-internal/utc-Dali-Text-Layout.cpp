@@ -3247,7 +3247,7 @@ int UtcDaliTextLayoutEllipsis02(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 60.f );
+  Size layoutSize( 100.f, 40.f );
 
   LayoutTextData data =
   {
@@ -3545,7 +3545,7 @@ int UtcDaliTextLayoutEllipsis04(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 60.f );
+  Size layoutSize( 100.f, 40.f );
 
   LayoutTextData data =
   {
@@ -3562,6 +3562,80 @@ int UtcDaliTextLayoutEllipsis04(void)
     LayoutEngine::MULTI_LINE_BOX,
     0u,
     72u,
+    true,
+    true
+  };
+
+  if( !LayoutTextTest( data ) )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextLayoutEllipsis05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLayoutEllipsis05");
+
+  const std::string fontLatin( "TizenSans" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun01;
+  fontDescriptionRun01.characterRun.characterIndex = 0u;
+  fontDescriptionRun01.characterRun.numberOfCharacters = 51u;
+  fontDescriptionRun01.familyLength = fontLatin.size();
+  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
+  memcpy( fontDescriptionRun01.familyName, fontLatin.c_str(), fontDescriptionRun01.familyLength );
+  fontDescriptionRun01.familyDefined = true;
+  fontDescriptionRun01.weightDefined = false;
+  fontDescriptionRun01.widthDefined = false;
+  fontDescriptionRun01.slantDefined = false;
+  fontDescriptionRun01.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
+
+  struct LineRun line01 =
+  {
+    { 0u, 11u },
+    { 0u, 11u },
+    80.f,
+    15.f,
+    -5.f,
+    0.f,
+    0.f,
+    false,
+    true
+  };
+  Vector<LineRun> lines;
+  lines.PushBack( line01 );
+
+  float positions[] =
+  {
+    1.f, -12.f
+  };
+
+  Size textArea( 100.f, 19.f );
+  Size layoutSize( 100.f, 20.f );
+
+  LayoutTextData data =
+  {
+    "Not enough height.",
+    "Hello world",
+    textArea,
+    1u,
+    fontDescriptionRuns.Begin(),
+    layoutSize,
+    1u,
+    positions,
+    1u,
+    lines.Begin(),
+    LayoutEngine::MULTI_LINE_BOX,
+    0u,
+    11u,
     true,
     true
   };
