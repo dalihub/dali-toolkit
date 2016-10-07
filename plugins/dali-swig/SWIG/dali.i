@@ -53,7 +53,6 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/property-key.h>
 
-
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/adaptor-framework/style-change.h>

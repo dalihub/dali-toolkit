@@ -36,7 +36,21 @@ Stagehand connects to DALi via the network using a TCP/IP connection.
 ![ ](../assets/img/stage-hand/inner-workings.png)
 ![ ](inner-workings.png)
 
-## Network setup
+## Connecting Stagehand to your DALi application
+
+### Preparing DALi
+
+Stagehand connects to DALi via network using a TCP/IP connection, to enable this, your dali-adaptor RPM must be built with a configure option: `--enable-networklogging`
+
+Here is an example dali-adaptor configure line:
+~~~
+$ CXXFLAGS="-g -O0 -Wno-unused-local-typedefs" CXX="ccache g++" ./configure --prefix=$DESKTOP_PREFIX --enable-debug=yes --enable-profile=UBUNTU --enable-gles=20 --enable-networklogging
+~~~
+
+Once this RPM is installed, you can run your DALi application and connect Stagehand to it.
+  
+
+### Network setup
 
 To enable network control on DALi, an environment variable must be set:
 
@@ -61,7 +75,7 @@ $ netstat -tlpn
 ![ ](netstat.png)
 
 
-## Connecting with Stagehand
+### Connecting with Stagehand
 
 Click the settings icons below
   

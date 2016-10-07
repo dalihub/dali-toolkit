@@ -330,17 +330,8 @@ DALI_SIGNAL_2_PARAM( Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOver
 // Signal< bool ( Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent& ) >
 DALI_SIGNAL_2_PARAM_RETURN( bool ,Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&);
 
-// Signal< void ( Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection) >
-//DALI_SIGNAL_2_PARAM( Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection );
-
 // Signal< void (  Dali::Toolkit::StyleManager, Dali::StyleChange::Type) >
 DALI_SIGNAL_2_PARAM( Dali::Toolkit::StyleManager, Dali::StyleChange::Type);
-
-// Signal< void (  Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection )>
-//DALI_SIGNAL_2_PARAM( Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection );
-
-// Signal<  Dali::Actor (  Dali::Actor, Dali::Actor, Dali::Actor, Dali::Toolkit::Control::KeyboardFocus::Direction) >
-DALI_SIGNAL_3_PARAM_RETURN( Dali::Actor, Dali::Actor, Dali::Actor, Dali::Toolkit::Control::KeyboardFocus::Direction);
 
 // void Signal<  Dali::Actor, bool >;
 DALI_SIGNAL_2_PARAM( Dali::Actor, bool);

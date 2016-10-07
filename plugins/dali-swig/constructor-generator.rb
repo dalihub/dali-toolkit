@@ -60,7 +60,7 @@ def init
     fullPath = pn.to_s
 
     $rootPath = fullPath.slice(0..( fullPath.index('/dali-toolkit')))
-    $daliCSharpPath = $rootPath + "dali-toolkit/plugins/dali-swig/csharp"
+    $daliCSharpPath = $rootPath + "dali-toolkit/plugins/dali-swig/automatic/csharp"
     puts("--------------------------------------------")
     puts("Modifying constructors for DALi C# files ")
     puts("E.g. modify TextLabel::New() ==>  new TextLabel() ")

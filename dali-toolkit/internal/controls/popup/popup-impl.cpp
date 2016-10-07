@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -703,6 +703,9 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
     // Update the state to indicate the current intent.
     mDisplayState = Toolkit::Popup::SHOWING;
 
+    // We want the popup to have key input focus when it is displayed
+    SetKeyInputFocus();
+
     // We are displaying so bring the popup layer to the front, and set it visible so it is rendered.
     mLayer.RaiseToTop();
     mLayer.SetVisible( true );
@@ -744,7 +747,6 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
 
         if( focusActor )
         {
-          SetKeyInputFocus();
           keyboardFocusManager.SetCurrentFocusActor( focusActor );
         }
       }
