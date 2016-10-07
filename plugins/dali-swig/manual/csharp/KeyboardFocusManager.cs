@@ -150,7 +150,7 @@ public class PreFocusChangeEventArgs : EventArgs
 {
    private Actor _current;
    private Actor _proposed;
-   private Control.KeyboardFocus.Direction _direction;
+   private View.KeyboardFocus.Direction _direction;
 
    /**
     * @brief Actor - is the current focused Actor.
@@ -188,7 +188,7 @@ public class PreFocusChangeEventArgs : EventArgs
     * @brief Direction - is the direction of Focus change.
     *
     */
-    public Control.KeyboardFocus.Direction Direction
+    public View.KeyboardFocus.Direction Direction
     {
         get
         {
@@ -214,7 +214,7 @@ public class PreFocusChangeEventArgs : EventArgs
   public delegate Actor PreFocusChangeEventHandler(object source, PreFocusChangeEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate IntPtr PreFocusChangeEventCallbackDelegate(IntPtr current, IntPtr proposed, Control.KeyboardFocus.Direction direction);
+  public delegate IntPtr PreFocusChangeEventCallbackDelegate(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction);
   private PreFocusChangeEventHandler _keyboardFocusManagerPreFocusChangeEventHandler;
   private PreFocusChangeEventCallbackDelegate _keyboardFocusManagerPreFocusChangeEventCallbackDelegate;
 
@@ -265,7 +265,7 @@ public class PreFocusChangeEventArgs : EventArgs
   }
 
   // Callback for KeyboardFocusManager PreFocusChangeSignal
-  private IntPtr OnPreFocusChange(IntPtr current, IntPtr proposed, Control.KeyboardFocus.Direction direction)
+  private IntPtr OnPreFocusChange(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction)
   {
       Actor actor = null;
       PreFocusChangeEventArgs e = new PreFocusChangeEventArgs();
@@ -461,7 +461,7 @@ public class PreFocusChangeEventArgs : EventArgs
     return ret;
   }
 
-  public bool MoveFocus(Control.KeyboardFocus.Direction direction) {
+  public bool MoveFocus(View.KeyboardFocus.Direction direction) {
     bool ret = NDalicManualPINVOKE.KeyboardFocusManager_MoveFocus(swigCPtr, (int)direction);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
