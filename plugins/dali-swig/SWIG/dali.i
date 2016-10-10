@@ -57,6 +57,7 @@
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/devel-api/adaptor-framework/drag-and-drop-detector.h>
+#include <dali/devel-api/adaptor-framework/application-extensions.h>
 
 #include <dali/devel-api/images/nine-patch-image.h>
 
