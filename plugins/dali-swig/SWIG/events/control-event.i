@@ -121,35 +121,26 @@ public class KeyEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void KeyInputFocusGainedEventHandler(object source, KeyInputFocusGainedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void KeyInputFocusLostEventHandler(object source, KeyInputFocusLostEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool KeyEventHandler(object source, KeyEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate void KeyInputFocusGainedCallbackDelegate(IntPtr view);
-  private KeyInputFocusGainedEventHandler _KeyInputFocusGainedEventHandler;
+  private delegate void KeyInputFocusGainedCallbackDelegate(IntPtr control);
+  private DaliEventHandler<object,KeyInputFocusGainedEventArgs> _KeyInputFocusGainedEventHandler;
   private KeyInputFocusGainedCallbackDelegate _KeyInputFocusGainedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate void KeyInputFocusLostCallbackDelegate(IntPtr view);
-  private KeyInputFocusLostEventHandler _KeyInputFocusLostEventHandler;
+  private delegate void KeyInputFocusLostCallbackDelegate(IntPtr control);
+  private DaliEventHandler<object,KeyInputFocusLostEventArgs> _KeyInputFocusLostEventHandler;
   private KeyInputFocusLostCallbackDelegate _KeyInputFocusLostCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate bool KeyCallbackDelegate(IntPtr view, IntPtr keyEvent);
-  private KeyEventHandler _KeyEventHandler;
+  private delegate bool KeyCallbackDelegate(IntPtr control, IntPtr keyEvent);
+  private DaliEventHandlerWithReturnType<object,KeyEventArgs,bool> _KeyEventHandler;
   private KeyCallbackDelegate _KeyCallbackDelegate;
 
   /**
     * @brief Event for KeyInputFocusGained signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of KeyInputFocusGainedEventHandler) provided by the user.
-    * KeyInputFocusGained signal is emitted when the view gets Key Input Focus.
+    * (in the type of KeyInputFocusGainedEventHandler-DaliEventHandler<object,KeyInputFocusGainedEventArgs>) 
+    * provided by the user. KeyInputFocusGained signal is emitted when the control gets Key Input Focus.
     */
-  public event KeyInputFocusGainedEventHandler KeyInputFocusGained
+  public event DaliEventHandler<object,KeyInputFocusGainedEventArgs> KeyInputFocusGained
   {
      add
      {
@@ -197,10 +188,10 @@ public class KeyEventArgs : EventArgs
 
   /**
     * @brief Event for KeyInputFocusLost signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of KeyInputFocusLostEventHandler) provided by the user.
-    * KeyInputFocusLost signal is emitted when the view loses Key Input Focus.
+    * (in the type of KeyInputFocusLostEventHandler-DaliEventHandler<object,KeyInputFocusLostEventArgs>) 
+    * provided by the user. KeyInputFocusLost signal is emitted when the control loses Key Input Focus.
     */
-  public event KeyInputFocusLostEventHandler KeyInputFocusLost
+  public event DaliEventHandler<object,KeyInputFocusLostEventArgs> KeyInputFocusLost
   {
      add
      {
@@ -247,10 +238,10 @@ public class KeyEventArgs : EventArgs
 
   /**
     * @brief Event for KeyPressed signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of KeyEventEventHandler) provided by the user.
-    * KeyPressed signal is emitted when key event is received.
+    * (in the type of KeyEventEventHandler-DaliEventHandlerWithReturnType<object,KeyEventArgs,bool>) 
+    * provided by the user. KeyPressed signal is emitted when key event is received.
     */
-  public event KeyEventHandler KeyPressed
+  public event DaliEventHandlerWithReturnType<object,KeyEventArgs,bool> KeyPressed
   {
      add
      {
@@ -292,7 +283,7 @@ public class KeyEventArgs : EventArgs
    if (_KeyEventHandler != null)
    {
       //here we send all data to user event handlers
-      return _KeyEventHandler(this, e);
+      return _KeyEventHandler(this, e, true);
    }
    return false;
 

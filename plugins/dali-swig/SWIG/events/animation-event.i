@@ -52,19 +52,16 @@ using System.Runtime.InteropServices;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void FinishedEventHandler(object source, FinishedEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void FinishedEventCallbackDelegate(IntPtr Animation);
-    private FinishedEventHandler _animationFinishedEventHandler;
+    private DaliEventHandler<object,FinishedEventArgs> _animationFinishedEventHandler;
     private FinishedEventCallbackDelegate _animationFinishedEventCallbackDelegate;
 
     /**
       * @brief Event for Finished signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of FinishedEventHandler) provided by the user.
+      * (in the type of FinishedEventHandler - DaliEventHandler<object,FinishedEventArgs>) provided by the user.
       * Finished signal is emitted when an Animation's animations have finished.
       */
-    public event FinishedEventHandler Finished
+    public event DaliEventHandler<object,FinishedEventArgs> Finished
     {
       add
       {

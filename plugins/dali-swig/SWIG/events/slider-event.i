@@ -116,31 +116,23 @@ public class MarkReachedEventArgs : EventArgs
    }
 }
 
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool ValueChangedEventHandler(object source, ValueChangedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool SlidingFinishedEventHandler(object source, SlidingFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool MarkReachedEventHandler(object source, MarkReachedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool ValueChangedCallbackDelegate(IntPtr slider, float slideValue);
-  private ValueChangedEventHandler _sliderValueChangedEventHandler;
+  private DaliEventHandlerWithReturnType<object,ValueChangedEventArgs,bool> _sliderValueChangedEventHandler;
   private ValueChangedCallbackDelegate _sliderValueChangedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool SlidingFinishedCallbackDelegate(IntPtr slider, float slideValue);
-  private SlidingFinishedEventHandler _sliderSlidingFinishedEventHandler;
+  private DaliEventHandlerWithReturnType<object,SlidingFinishedEventArgs,bool> _sliderSlidingFinishedEventHandler;
   private SlidingFinishedCallbackDelegate _sliderSlidingFinishedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool MarkReachedCallbackDelegate(IntPtr slider, int slideValue);
-  private MarkReachedEventHandler _sliderMarkReachedEventHandler;
+  private DaliEventHandlerWithReturnType<object,MarkReachedEventArgs,bool> _sliderMarkReachedEventHandler;
   private MarkReachedCallbackDelegate _sliderMarkReachedCallbackDelegate;
 
-  public event ValueChangedEventHandler ValueChanged
+  public event DaliEventHandlerWithReturnType<object,ValueChangedEventArgs,bool> ValueChanged
   {
      add
      {
@@ -183,12 +175,12 @@ public class MarkReachedEventArgs : EventArgs
      if (_sliderValueChangedEventHandler != null)
      {
         //here we send all page to user event handlers
-      return _sliderValueChangedEventHandler(this, e);
+      return _sliderValueChangedEventHandler(this, e, true);
      }
      return false;
   }
 
-  public event SlidingFinishedEventHandler SlidingFinished
+  public event DaliEventHandlerWithReturnType<object,SlidingFinishedEventArgs,bool> SlidingFinished
   {
      add
      {
@@ -231,12 +223,12 @@ public class MarkReachedEventArgs : EventArgs
      if (_sliderSlidingFinishedEventHandler != null)
      {
         //here we send all page to user event handlers
-      return _sliderSlidingFinishedEventHandler(this, e);
+      return _sliderSlidingFinishedEventHandler(this, e, true);
      }
      return false;
   }
 
-  public event MarkReachedEventHandler MarkReached
+  public event DaliEventHandlerWithReturnType<object,MarkReachedEventArgs,bool> MarkReached
   {
      add
      {
@@ -279,7 +271,7 @@ public class MarkReachedEventArgs : EventArgs
      if (_sliderMarkReachedEventHandler != null)
      {
         //here we send all page to user event handlers
-      return _sliderMarkReachedEventHandler(this, e);
+      return _sliderMarkReachedEventHandler(this, e, true);
      }
      return false;
   }

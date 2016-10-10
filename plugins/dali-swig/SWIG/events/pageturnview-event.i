@@ -149,38 +149,26 @@ public class PageTurnFinishedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void PagePanStartedEventHandler(object source, PagePanStartedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void PagePanFinishedEventHandler(object source, PagePanFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void PageTurnStartedEventHandler(object source, PageTurnStartedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void PageTurnFinishedEventHandler(object source, PageTurnFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void PagePanStartedCallbackDelegate(IntPtr page);
-  private PagePanStartedEventHandler _pageTurnViewPagePanStartedEventHandler;
+  private DaliEventHandler<object,PagePanStartedEventArgs> _pageTurnViewPagePanStartedEventHandler;
   private PagePanStartedCallbackDelegate _pageTurnViewPagePanStartedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void PagePanFinishedCallbackDelegate(IntPtr page);
-  private PagePanFinishedEventHandler _pageTurnViewPagePanFinishedEventHandler;
+  private DaliEventHandler<object,PagePanFinishedEventArgs> _pageTurnViewPagePanFinishedEventHandler;
   private PagePanFinishedCallbackDelegate _pageTurnViewPagePanFinishedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void PageTurnStartedCallbackDelegate(IntPtr page, uint pageIndex, bool isTurningForward);
-  private PageTurnStartedEventHandler _pageTurnViewPageTurnStartedEventHandler;
+  private DaliEventHandler<object,PageTurnStartedEventArgs> _pageTurnViewPageTurnStartedEventHandler;
   private PageTurnStartedCallbackDelegate _pageTurnViewPageTurnStartedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void PageTurnFinishedCallbackDelegate(IntPtr page, uint pageIndex, bool isTurningForward);
-  private PageTurnFinishedEventHandler _pageTurnViewPageTurnFinishedEventHandler;
+  private DaliEventHandler<object,PageTurnFinishedEventArgs> _pageTurnViewPageTurnFinishedEventHandler;
   private PageTurnFinishedCallbackDelegate _pageTurnViewPageTurnFinishedCallbackDelegate;
 
-  public event PagePanStartedEventHandler PagePanStarted
+  public event DaliEventHandler<object,PagePanStartedEventArgs> PagePanStarted
   {
      add
      {
@@ -226,7 +214,7 @@ public class PageTurnFinishedEventArgs : EventArgs
      }
   }
 
-  public event PagePanFinishedEventHandler PagePanFinished
+  public event DaliEventHandler<object,PagePanFinishedEventArgs> PagePanFinished
   {
      add
      {
@@ -273,7 +261,7 @@ public class PageTurnFinishedEventArgs : EventArgs
   }
 
 
-  public event PageTurnStartedEventHandler PageTurnStarted
+  public event DaliEventHandler<object,PageTurnStartedEventArgs> PageTurnStarted
   {
      add
      {
@@ -323,7 +311,7 @@ public class PageTurnFinishedEventArgs : EventArgs
   }
 
 
-  public event PageTurnFinishedEventHandler PageTurnFinished
+  public event DaliEventHandler<object,PageTurnFinishedEventArgs> PageTurnFinished
   {
      add
      {

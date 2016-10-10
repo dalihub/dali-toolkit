@@ -35,19 +35,16 @@ using System.Runtime.InteropServices;
   }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool TickEventHandler(object source, TickEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool TickCallbackDelegate(IntPtr data);
-  private TickEventHandler _timerTickEventHandler;
+  private DaliEventHandlerWithReturnType<object,TickEventArgs,bool> _timerTickEventHandler;
   private TickCallbackDelegate _timerTickCallbackDelegate;
 
   /**
     * @brief Event for Ticked signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of TickEventHandler) provided by the user.
-    * Ticked signal is emitted after specified time interval.
+    * (in the type of TickEventHandler-DaliEventHandlerWithReturnType<object,TickEventArgs,bool>) 
+    * provided by the user. Ticked signal is emitted after specified time interval.
     */
-  public event TickEventHandler Ticked
+  public event DaliEventHandlerWithReturnType<object,TickEventArgs,bool> Ticked
   {
      add
      {
@@ -86,7 +83,7 @@ using System.Runtime.InteropServices;
      if (_timerTickEventHandler != null)
      {
         //here we send all data to user event handlers
-        return _timerTickEventHandler(this, e);
+        return _timerTickEventHandler(this, e, true);
      }
      return false;
   }

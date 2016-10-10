@@ -97,40 +97,29 @@ public class StateChangedEventArgs : EventArgs
    }
 }
 
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool ClickedEventHandler(object source, ClickedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool PressedEventHandler(object source, PressedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool ReleasedEventHandler(object source, ReleasedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool StateChangedEventHandler(object source, StateChangedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool ClickedCallbackDelegate(global::System.IntPtr data);
-  private ClickedEventHandler   _buttonClickedEventHandler;
+  private DaliEventHandlerWithReturnType<object,ClickedEventArgs,bool> _buttonClickedEventHandler;
   private ClickedCallbackDelegate _buttonClickedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool PressedCallbackDelegate(global::System.IntPtr data);
-  private PressedEventHandler   _buttonPressedEventHandler;
+  private DaliEventHandlerWithReturnType<object,PressedEventArgs,bool> _buttonPressedEventHandler;
   private PressedCallbackDelegate _buttonPressedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool ReleasedCallbackDelegate(global::System.IntPtr data);
-  private ReleasedEventHandler   _buttonReleasedEventHandler;
+  private DaliEventHandlerWithReturnType<object,ReleasedEventArgs,bool>  _buttonReleasedEventHandler;
   private ReleasedCallbackDelegate _buttonReleasedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool StateChangedCallbackDelegate(global::System.IntPtr data);
-  private StateChangedEventHandler   _buttonStateChangedEventHandler;
+  private DaliEventHandlerWithReturnType<object,StateChangedEventArgs,bool> _buttonStateChangedEventHandler;
   private StateChangedCallbackDelegate _buttonStateChangedCallbackDelegate;
 
 
-  public event ClickedEventHandler Clicked
+  public event DaliEventHandlerWithReturnType<object,ClickedEventArgs,bool> Clicked
   {
      add
      {
@@ -171,13 +160,13 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonClickedEventHandler != null)
      {
         //here we send all data to user event handlers
-        return _buttonClickedEventHandler(this, e);
+        return _buttonClickedEventHandler(this, e,true);
      }
      return false;
   }
 
 
-  public event PressedEventHandler Pressed
+  public event DaliEventHandlerWithReturnType<object,PressedEventArgs,bool> Pressed
   {
      add
      {
@@ -218,13 +207,13 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonPressedEventHandler != null)
      {
         //here we send all data to user event handlers
-       return _buttonPressedEventHandler(this, e);
+       return _buttonPressedEventHandler(this, e,true);
      }
      return false;
   }
 
 
-  public event ReleasedEventHandler Released
+  public event DaliEventHandlerWithReturnType<object,ReleasedEventArgs,bool> Released
   {
      add
      {
@@ -265,13 +254,13 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonReleasedEventHandler != null)
      {
         //here we send all data to user event handlers
-       return _buttonReleasedEventHandler(this, e);
+       return _buttonReleasedEventHandler(this, e, true);
      }
      return false;
   }
 
 
-  public event StateChangedEventHandler StateChanged
+  public event DaliEventHandlerWithReturnType<object,StateChangedEventArgs,bool> StateChanged
   {
      add
      {
@@ -312,7 +301,7 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonStateChangedEventHandler != null)
      {
         //here we send all data to user event handlers
-       return _buttonStateChangedEventHandler(this, e);
+       return _buttonStateChangedEventHandler(this, e, true);
      }
      return false;
   }

@@ -40,7 +40,7 @@ namespace MyCSharpExample
         public Example(Dali.Application application)
         {
             _application = application;
-            _application.Initialized += new Dali.AUIApplicationInitEventHandler(Initialize);
+            _application.Initialized += Initialize;
         }
 
         public void Initialize(object source, AUIApplicationInitEventArgs e)
@@ -49,7 +49,7 @@ namespace MyCSharpExample
             Stage stage = Stage.GetCurrent();
             stage.BackgroundColor = NDalic.WHITE;
 
-            stage.Touched += new Dali.Stage.TouchEventHandler(OnStageTouched);
+	    stage.Touched += OnStageTouched;
 
             // Add a _text label to the stage
             _text = new TextLabel("Hello Mono World");
@@ -89,7 +89,7 @@ namespace MyCSharpExample
                 _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
 
                 // Connect the signal callback for animaiton finished signal
-      _animation.Finished += new Dali.Animation.FinishedEventHandler(AnimationFinished);
+                _animation.Finished += AnimationFinished;
 
                 // Play the _animation
                 _animation.Play();

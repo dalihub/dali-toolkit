@@ -52,19 +52,16 @@ public class UploadedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void UploadedEventHandler(object source, UploadedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void UploadedEventCallbackDelegate(IntPtr image);
-  private UploadedEventHandler _imageUploadedEventHandler;
+  private DaliEventHandler<object,UploadedEventArgs> _imageUploadedEventHandler;
   private UploadedEventCallbackDelegate _imageUploadedEventCallbackDelegate;
 
   /**
     * @brief Event for Uploaded signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of UploadedEventHandler) provided by the user.
-    * Uploaded signal is emitted when the image data gets uploaded to GL.
+    * (in the type of UploadedEventHandler-DaliEventHandler<object,UploadedEventArgs>) 
+    * provided by the user. Uploaded signal is emitted when the image data gets uploaded to GL.
     */
-  public event UploadedEventHandler Uploaded
+  public event DaliEventHandler<object,UploadedEventArgs> Uploaded
   {
      add
      {

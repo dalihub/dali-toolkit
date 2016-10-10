@@ -57,15 +57,12 @@ public class DetectedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void DetectedEventHandler(object source, DetectedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void DetectedCallbackDelegate(IntPtr actor, IntPtr longPressGesture);
-  private DetectedEventHandler _longPressGestureEventHandler;
+  private DaliEventHandler<object,DetectedEventArgs> _longPressGestureEventHandler;
   private DetectedCallbackDelegate _longPressGestureCallbackDelegate;
 
 
-  public event DetectedEventHandler Detected
+  public event DaliEventHandler<object,DetectedEventArgs> Detected
   {
      add
      {
