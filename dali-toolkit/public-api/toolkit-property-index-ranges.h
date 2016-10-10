@@ -27,6 +27,10 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @brief The start and end property ranges.
+ * @SINCE_1_1.45
+ */
 enum PropertyRanges
 {
   VISUAL_PROPERTY_BASE_START_INDEX  = CORE_PROPERTY_MAX_INDEX + 1,             ///< Visual Property Base Start Index. @SINCE_1_1.45

@@ -235,6 +235,8 @@ public:
   /**
    * @brief Assignment operator. Changes this handle to point to another real object
    * @SINCE_1_1.35
+   * @param[in] handle Handle to an object
+   * @return A reference to this
    */
   FlexContainer& operator=( const FlexContainer& handle );
 
