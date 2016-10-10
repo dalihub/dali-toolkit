@@ -78,30 +78,21 @@ public class CompletedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void StartedEventHandler(object source, StartedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void UpdatedEventHandler(object source, UpdatedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void CompletedEventHandler(object source, CompletedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void StartedCallbackDelegate(IntPtr vector2);
-  private StartedEventHandler _scrollableStartedEventHandler;
+  private DaliEventHandler<object,StartedEventArgs> _scrollableStartedEventHandler;
   private StartedCallbackDelegate _scrollableStartedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void UpdatedCallbackDelegate(IntPtr vector2);
-  private UpdatedEventHandler _scrollableUpdatedEventHandler;
+  private DaliEventHandler<object,UpdatedEventArgs> _scrollableUpdatedEventHandler;
   private UpdatedCallbackDelegate _scrollableUpdatedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void CompletedCallbackDelegate(IntPtr vector2);
-  private CompletedEventHandler _scrollableCompletedEventHandler;
+  private DaliEventHandler<object,CompletedEventArgs> _scrollableCompletedEventHandler;
   private CompletedCallbackDelegate _scrollableCompletedCallbackDelegate;
 
-  public event StartedEventHandler ScrollStarted
+  public event DaliEventHandler<object,StartedEventArgs> ScrollStarted
   {
      add
      {
@@ -147,7 +138,7 @@ public class CompletedEventArgs : EventArgs
 
   }
 
-  public event UpdatedEventHandler ScrollUpdated
+  public event DaliEventHandler<object,UpdatedEventArgs> ScrollUpdated
   {
      add
      {
@@ -193,7 +184,7 @@ public class CompletedEventArgs : EventArgs
 
   }
 
-  public event CompletedEventHandler ScrollCompleted
+  public event DaliEventHandler<object,CompletedEventArgs> ScrollCompleted
   {
      add
      {

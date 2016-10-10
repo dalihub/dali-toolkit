@@ -33,7 +33,7 @@ namespace MyCSharpExample
       _application = application;
       Console.WriteLine( "InitSignal connection count = " + _application.InitSignal().GetConnectionCount() );
 
-      _application.Initialized += new Dali.AUIApplicationInitEventHandler(Initialize);
+      _application.Initialized += Initialize;
       Console.WriteLine( "InitSignal connection count = " + _application.InitSignal().GetConnectionCount() );
     }
 

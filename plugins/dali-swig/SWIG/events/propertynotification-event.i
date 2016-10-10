@@ -54,19 +54,16 @@ public class NotifyEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void NotifyEventHandler(object source, NotifyEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void NotifyEventCallbackDelegate(IntPtr propertyNotification);
-  private NotifyEventHandler _propertyNotificationNotifyEventHandler;
+  private DaliEventHandler<object,NotifyEventArgs> _propertyNotificationNotifyEventHandler;
   private NotifyEventCallbackDelegate _propertyNotificationNotifyEventCallbackDelegate;
 
   /**
     * @brief Event for Notified signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of NotifyEventHandler) provided by the user.
+    * (in the type of NotifyEventHandler-DaliEventHandler<object,NotifyEventArgs>) provided by the user.
     * Notified signal is emitted when the notification upon a condition of the property being met, has occurred.
     */
-  public event NotifyEventHandler Notified
+  public event DaliEventHandler<object,NotifyEventArgs> Notified
   {
      add
      {

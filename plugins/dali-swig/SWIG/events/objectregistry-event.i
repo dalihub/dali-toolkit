@@ -63,24 +63,18 @@ public class ObjectDestroyedEventArgs : EventArgs
    }
 }
 
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ObjectCreatedEventHandler(object source, ObjectCreatedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ObjectDestroyedEventHandler(object source, ObjectDestroyedEventArgs e);
-
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ObjectCreatedEventCallbackDelegate(IntPtr baseHandle);
-  private ObjectCreatedEventHandler _objectRegistryObjectCreatedEventHandler;
+  private DaliEventHandler<object,ObjectCreatedEventArgs> _objectRegistryObjectCreatedEventHandler;
   private ObjectCreatedEventCallbackDelegate _objectRegistryObjectCreatedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ObjectDestroyedEventCallbackDelegate(IntPtr fefObject);
-  private ObjectDestroyedEventHandler _objectRegistryObjectDestroyedEventHandler;
+  private DaliEventHandler<object,ObjectDestroyedEventArgs> _objectRegistryObjectDestroyedEventHandler;
   private ObjectDestroyedEventCallbackDelegate _objectRegistryObjectDestroyedEventCallbackDelegate;
 
-  public event ObjectCreatedEventHandler ObjectCreated
+  public event DaliEventHandler<object,ObjectCreatedEventArgs> ObjectCreated
   {
      add
      {
@@ -126,7 +120,7 @@ public class ObjectDestroyedEventArgs : EventArgs
      }
   }
 
-  public event ObjectDestroyedEventHandler ObjectDestroyed
+  public event DaliEventHandler<object,ObjectDestroyedEventArgs> ObjectDestroyed
   {
      add
      {

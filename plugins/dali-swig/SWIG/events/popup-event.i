@@ -49,46 +49,31 @@ using System.Runtime.InteropServices;
   }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void OutsideTouchedEventHandler(object source, OutsideTouchedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ShowingEventHandler(object source, ShowingEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ShownEventHandler(object source, ShownEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void HidingEventHandler(object source, HidingEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void HiddenEventHandler(object source, HiddenEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void OutsideTouchedEventCallbackDelegate();
-  private OutsideTouchedEventHandler _popUpOutsideTouchedEventHandler;
+  private DaliEventHandler<object,OutsideTouchedEventArgs> _popUpOutsideTouchedEventHandler;
   private OutsideTouchedEventCallbackDelegate _popUpOutsideTouchedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ShowingEventCallbackDelegate();
-  private ShowingEventHandler _popUpShowingEventHandler;
+  private DaliEventHandler<object,ShowingEventArgs> _popUpShowingEventHandler;
   private ShowingEventCallbackDelegate _popUpShowingEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ShownEventCallbackDelegate();
-  private ShownEventHandler _popUpShownEventHandler;
+  private DaliEventHandler<object,ShownEventArgs> _popUpShownEventHandler;
   private ShownEventCallbackDelegate _popUpShownEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void HidingEventCallbackDelegate();
-  private HidingEventHandler _popUpHidingEventHandler;
+  private DaliEventHandler<object,HidingEventArgs> _popUpHidingEventHandler;
   private HidingEventCallbackDelegate _popUpHidingEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void HiddenEventCallbackDelegate();
-  private HiddenEventHandler _popUpHiddenEventHandler;
+  private DaliEventHandler<object,HiddenEventArgs> _popUpHiddenEventHandler;
   private HiddenEventCallbackDelegate _popUpHiddenEventCallbackDelegate;
 
-  public event OutsideTouchedEventHandler OutsideTouched
+  public event DaliEventHandler<object,OutsideTouchedEventArgs> OutsideTouched
   {
      add
      {
@@ -131,7 +116,7 @@ using System.Runtime.InteropServices;
      }
   }
 
-  public event ShowingEventHandler Showing
+  public event DaliEventHandler<object,ShowingEventArgs> Showing
   {
      add
      {
@@ -175,7 +160,7 @@ using System.Runtime.InteropServices;
   }
 
 
-  public event ShownEventHandler Shown
+  public event DaliEventHandler<object,ShownEventArgs> Shown
   {
      add
      {
@@ -218,7 +203,7 @@ using System.Runtime.InteropServices;
      }
   }
 
-  public event HidingEventHandler Hiding
+  public event DaliEventHandler<object,HidingEventArgs> Hiding
   {
      add
      {
@@ -261,7 +246,7 @@ using System.Runtime.InteropServices;
      }
   }
 
-  public event HiddenEventHandler Hidden
+  public event DaliEventHandler<object,HiddenEventArgs> Hidden
   {
      add
      {

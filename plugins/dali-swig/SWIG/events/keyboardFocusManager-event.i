@@ -137,35 +137,26 @@ public class FocusedActorEnterKeyEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void FocusChangedEventHandler(object source, FocusChangedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void FocusGroupChangedEventHandler(object source, FocusGroupChangedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void FocusedActorEnterKeyEventHandler(object source, FocusedActorEnterKeyEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FocusChangedEventCallbackDelegate(IntPtr actorCurrent, IntPtr actorNext);
-  private FocusChangedEventHandler _keyboardFocusManagerFocusChangedEventHandler;
+  private DaliEventHandler<object,FocusChangedEventArgs> _keyboardFocusManagerFocusChangedEventHandler;
   private FocusChangedEventCallbackDelegate _keyboardFocusManagerFocusChangedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FocusGroupChangedEventCallbackDelegate(IntPtr currentFocusedActor, bool forwardDirection);
-  private FocusGroupChangedEventHandler _keyboardFocusManagerFocusGroupChangedEventHandler;
+  private DaliEventHandler<object,FocusGroupChangedEventArgs> _keyboardFocusManagerFocusGroupChangedEventHandler;
   private FocusGroupChangedEventCallbackDelegate _keyboardFocusManagerFocusGroupChangedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FocusedActorEnterKeyEventCallbackDelegate(IntPtr actor);
-  private FocusedActorEnterKeyEventHandler _keyboardFocusManagerFocusedActorEnterKeyEventHandler;
+  private DaliEventHandler<object,FocusedActorEnterKeyEventArgs> _keyboardFocusManagerFocusedActorEnterKeyEventHandler;
   private FocusedActorEnterKeyEventCallbackDelegate _keyboardFocusManagerFocusedActorEnterKeyEventCallbackDelegate;
 
   /**
     * @brief Event for FocusChanged signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of FocusChangedEventHandler) provided by the user.
+    * (in the type of FocusChangedEventHandler-DaliEventHandler<object,FocusChangedEventArgs>) provided by the user.
     * FocusChanged signal is emitted after the current focused actor has been changed.
     */
-  public event FocusChangedEventHandler FocusChanged
+  public event DaliEventHandler<object,FocusChangedEventArgs> FocusChanged
   {
      add
      {
@@ -214,10 +205,10 @@ public class FocusedActorEnterKeyEventArgs : EventArgs
 
   /**
     * @brief Event for FocusGroupChanged signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of FocusGroupChangedEventHandler) provided by the user.
-    * FocusGroupChanged signal is emitted when the focus group has been changed.
+    * (in the type of FocusGroupChangedEventHandler-DaliEventHandler<object,FocusGroupChangedEventArgs>)
+    *  provided by the user. FocusGroupChanged signal is emitted when the focus group has been changed.
     */
-  public event FocusGroupChangedEventHandler FocusGroupChanged
+  public event DaliEventHandler<object,FocusGroupChangedEventArgs> FocusGroupChanged
   {
      add
      {
@@ -266,10 +257,10 @@ public class FocusedActorEnterKeyEventArgs : EventArgs
 
   /**
     * @brief Event for FocusedActorEnterKeyPressed signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of FocusedActorEnterKeyEventHandler) provided by the user.
+    * (in the type of FocusedActorEnterKeyEventHandler-DaliEventHandler<object,FocusedActorEnterKeyEventArgs>) provided by the user.
     * FocusedActorEnterKeyPressed signal is emitted when the current focused actor has the enter key pressed on it.
     */
-  public event FocusedActorEnterKeyEventHandler FocusedActorEnterKeyPressed
+  public event DaliEventHandler<object,FocusedActorEnterKeyEventArgs> FocusedActorEnterKeyPressed
   {
      add
      {

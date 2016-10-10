@@ -50,20 +50,18 @@ public class TextChangedEventArgs : EventArgs
       }
    }
 }
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void TextChangedEventHandler(object source, TextChangedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void TextChangedCallbackDelegate(IntPtr textEditor);
-  private TextChangedEventHandler _textEditorTextChangedEventHandler;
+  private DaliEventHandler<object,TextChangedEventArgs> _textEditorTextChangedEventHandler;
   private TextChangedCallbackDelegate _textEditorTextChangedCallbackDelegate;
 
   /**
     * @brief Event for TextChanged signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of TextChangedEventHandler) provided by the user.
-    * TextChanged signal is emitted when the text changes.
+    * (in the type of TextChangedEventHandler-DaliEventHandler<object,TextChangedEventArgs>) 
+    * provided by the user. TextChanged signal is emitted when the text changes.
     */
-  public event TextChangedEventHandler TextChanged
+  public event DaliEventHandler<object,TextChangedEventArgs> TextChanged
   {
      add
      {

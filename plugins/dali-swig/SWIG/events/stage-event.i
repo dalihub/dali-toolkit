@@ -134,70 +134,50 @@ public class SceneCreatedEventArgs : EventArgs
 {
 }
 
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void TouchEventHandler(object source, TouchEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void WheelEventHandler(object source, WheelEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void KeyEventHandler(object source, KeyEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void EventProcessingFinishedEventHandler(object source, EventProcessingFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ContextLostEventHandler(object source, ContextLostEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ContextRegainedEventHandler(object source, ContextRegainedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void SceneCreatedEventHandler(object source, SceneCreatedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void StageTouchCallbackDelegate(IntPtr data);
-  private TouchEventHandler _stageTouchEventHandler;
+  private DaliEventHandler<object,TouchEventArgs> _stageTouchEventHandler;
   private StageTouchCallbackDelegate _stageTouchCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void WheelCallbackDelegate(IntPtr data);
-  private WheelEventHandler _stageWheelEventHandler;
+  private DaliEventHandler<object,WheelEventArgs> _stageWheelEventHandler;
   private WheelCallbackDelegate _stageWheelCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void KeyCallbackDelegate(IntPtr data);
-  private KeyEventHandler _stageKeyEventHandler;
+  private DaliEventHandler<object,KeyEventArgs> _stageKeyEventHandler;
   private KeyCallbackDelegate _stageKeyCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void EventProcessingFinishedEventCallbackDelegate();
-  private EventProcessingFinishedEventHandler _stageEventProcessingFinishedEventHandler;
+  private DaliEventHandler<object,EventProcessingFinishedEventArgs> _stageEventProcessingFinishedEventHandler;
   private EventProcessingFinishedEventCallbackDelegate _stageEventProcessingFinishedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ContextLostEventCallbackDelegate();
-  private ContextLostEventHandler _stageContextLostEventHandler;
+  private DaliEventHandler<object,ContextLostEventArgs> _stageContextLostEventHandler;
   private ContextLostEventCallbackDelegate _stageContextLostEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ContextRegainedEventCallbackDelegate();
-  private ContextRegainedEventHandler _stageContextRegainedEventHandler;
+  private DaliEventHandler<object,ContextRegainedEventArgs> _stageContextRegainedEventHandler;
   private ContextRegainedEventCallbackDelegate _stageContextRegainedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void SceneCreatedEventCallbackDelegate();
-  private SceneCreatedEventHandler _stageSceneCreatedEventHandler;
+  private DaliEventHandler<object,SceneCreatedEventArgs> _stageSceneCreatedEventHandler;
   private SceneCreatedEventCallbackDelegate _stageSceneCreatedEventCallbackDelegate;
 
   /**
     * @brief Event for Touched signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of TouchEventHandler) provided by the user.
+    * (in the type of TouchEventHandler-DaliEventHandler<object,TouchEventArgs>) provided by the user.
     * Touched signal is emitted when the screen is touched and when the touch ends
     * (i.e. the down & up touch events only).
     *
     */
-  public event TouchEventHandler Touched
+  public event DaliEventHandler<object,TouchEventArgs> Touched
   {
      add
      {
@@ -245,11 +225,11 @@ public class SceneCreatedEventArgs : EventArgs
 
   /**
     * @brief Event for WheelMoved signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of WheelEventHandler) provided by the user.
+    * (in the type of WheelEventHandler-DaliEventHandler<object,WheelEventArgs>) provided by the user.
     * WheelMoved signal is emitted is emitted when wheel event is received.
     *
     */
-  public event WheelEventHandler WheelMoved
+  public event DaliEventHandler<object,WheelEventArgs> WheelMoved
   {
      add
      {
@@ -297,11 +277,11 @@ public class SceneCreatedEventArgs : EventArgs
 
   /**
     * @brief Event for KeyPressed signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of KeyEventHandler) provided by the user.
+    * (in the type of KeyEventHandler-DaliEventHandler<object,KeyEventArgs>) provided by the user.
     * KeyPressed signal is emitted is emitted when key event is received.
     *
     */
-  public event KeyEventHandler KeyPressed
+  public event DaliEventHandler<object,KeyEventArgs> KeyPressed
   {
      add
      {
@@ -349,11 +329,11 @@ public class SceneCreatedEventArgs : EventArgs
 
   /**
     * @brief Event for EventProcessingFinished signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of EventProcessingFinishedEventHandler) provided by the user.
-    * EventProcessingFinished signal is emitted just after the event processing is finished.
+    * (in the type of EventProcessingFinishedEventHandler-DaliEventHandler<object,EventProcessingFinishedEventArgs>) 
+    * provided by the user. EventProcessingFinished signal is emitted just after the event processing is finished.
     *
     */
-  public event EventProcessingFinishedEventHandler EventProcessingFinished
+  public event DaliEventHandler<object,EventProcessingFinishedEventArgs> EventProcessingFinished
   {
      add
      {
@@ -398,11 +378,11 @@ public class SceneCreatedEventArgs : EventArgs
 
   /**
     * @brief Event for ContextLost signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of ContextLostEventHandler) provided by the user.
+    * (in the type of ContextLostEventHandler-DaliEventHandler<object,ContextLostEventArgs>) provided by the user.
     * ContextLost signal is emitted when the GL context is lost (Platform specific behaviour).
     *
     */
-  public event ContextLostEventHandler ContextLost
+  public event DaliEventHandler<object,ContextLostEventArgs> ContextLost
   {
      add
      {
@@ -447,12 +427,12 @@ public class SceneCreatedEventArgs : EventArgs
 
   /**
     * @brief Event for ContextRegained signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of ContextRegainedEventHandler) provided by the user.
-    * ContextRegained signal is emitted when the GL context is regained (Platform specific
+    * (in the type of ContextRegainedEventHandler-DaliEventHandler<object,ContextRegainedEventArgs>) 
+    * provided by the user. ContextRegained signal is emitted when the GL context is regained (Platform specific
     * behaviour).
     *
     */
-  public event ContextRegainedEventHandler ContextRegained
+  public event DaliEventHandler<object,ContextRegainedEventArgs> ContextRegained
   {
      add
      {
@@ -497,11 +477,11 @@ public class SceneCreatedEventArgs : EventArgs
 
   /**
     * @brief Event for SceneCreated signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of SceneCreatedEventHandler) provided by the user.
+    * (in the type of SceneCreatedEventHandler-DaliEventHandler<object,SceneCreatedEventArgs>) provided by the user.
     * SceneCreated signal is emitted after the initial scene is created.
     *
     */
-  public event SceneCreatedEventHandler SceneCreated
+  public event DaliEventHandler<object,SceneCreatedEventArgs> SceneCreated
   {
      add
      {

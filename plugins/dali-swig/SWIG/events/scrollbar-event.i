@@ -51,22 +51,16 @@ public class ScrollPositionIntervalReachedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void PanFinishedEventHandler(object source, PanFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void ScrollPositionIntervalReachedEventHandler(object source, ScrollPositionIntervalReachedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void PanFinishedEventCallbackDelegate();
-  private PanFinishedEventHandler _scrollBarPanFinishedEventHandler;
+  private DaliEventHandler<object,PanFinishedEventArgs> _scrollBarPanFinishedEventHandler;
   private PanFinishedEventCallbackDelegate _scrollBarPanFinishedEventCallbackDelegate;
-
+  
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ScrollPositionIntervalReachedEventCallbackDelegate();
-  private ScrollPositionIntervalReachedEventHandler _scrollBarScrollPositionIntervalReachedEventHandler;
+  private DaliEventHandler<object,ScrollPositionIntervalReachedEventArgs> _scrollBarScrollPositionIntervalReachedEventHandler;
   private ScrollPositionIntervalReachedEventCallbackDelegate _scrollBarScrollPositionIntervalReachedEventCallbackDelegate;
 
-  public event PanFinishedEventHandler PanFinished
+  public event DaliEventHandler<object,PanFinishedEventArgs> PanFinished
   {
      add
      {
@@ -110,7 +104,7 @@ public class ScrollPositionIntervalReachedEventArgs : EventArgs
   }
 
 
-  public event ScrollPositionIntervalReachedEventHandler ScrollPositionIntervalReached
+  public event DaliEventHandler<object,ScrollPositionIntervalReachedEventArgs> ScrollPositionIntervalReached
   {
      add
      {

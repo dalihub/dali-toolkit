@@ -36,7 +36,7 @@ namespace MyCSharpExample
         public Example(Dali.Application application)
         {
             _application = application;
-            _application.Initialized += new Dali.AUIApplicationInitEventHandler(Initialize);
+            _application.Initialized += Initialize;
         }
 
 
@@ -118,7 +118,7 @@ namespace MyCSharpExample
             _scrollView.Add(_scrollBar);
 
             // Connect to the OnRelayout signal
-            _scrollView.OnRelayoutEvent += new Dali.View.OnRelayoutEventHandler(OnScrollViewRelayout);
+	    _scrollView.OnRelayoutEvent += OnScrollViewRelayout;
         }
 
         private void OnScrollViewRelayout(object source, View.OnRelayoutEventArgs e)

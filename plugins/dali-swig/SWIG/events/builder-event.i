@@ -33,14 +33,11 @@
     }
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void QuitEventHandler(object source, QuitEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void QuitEventCallbackDelegate();
-    private QuitEventHandler _builderQuitEventHandler;
+    private DaliEventHandler<object,QuitEventArgs> _builderQuitEventHandler;
     private QuitEventCallbackDelegate _builderQuitEventCallbackDelegate;
 
-    public event QuitEventHandler Quit
+    public event DaliEventHandler<object,QuitEventArgs> Quit
     {
       add
       {

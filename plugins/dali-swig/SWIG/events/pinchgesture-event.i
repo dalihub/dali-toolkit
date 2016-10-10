@@ -57,16 +57,13 @@ public class DetectedEventArgs : EventArgs
    }
 }
 
-[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-public delegate void DetectedEventHandler(object source, DetectedEventArgs e);
-
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void DetectedCallbackDelegate(IntPtr actor, IntPtr pinchGesture);
-  private DetectedEventHandler _pinchGestureEventHandler;
+  private DaliEventHandler<object,DetectedEventArgs> _pinchGestureEventHandler;
   private DetectedCallbackDelegate _pinchGestureCallbackDelegate;
 
 
-  public event DetectedEventHandler Detected
+  public event DaliEventHandler<object,DetectedEventArgs> Detected
   {
      add
      {

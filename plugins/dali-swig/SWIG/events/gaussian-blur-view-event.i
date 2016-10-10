@@ -46,14 +46,11 @@ public class FinishedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void FinishedEventHandler(object source, FinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FinishedEventCallbackDelegate(IntPtr application);
-  private FinishedEventHandler _gaussianFinishedEventHandler;
+  private DaliEventHandler<object,FinishedEventArgs> _gaussianFinishedEventHandler;
   private FinishedEventCallbackDelegate _gaussianFinishedEventCallbackDelegate;
 
-  public event FinishedEventHandler Finished
+  public event DaliEventHandler<object,FinishedEventArgs> Finished
   {
      add
      {

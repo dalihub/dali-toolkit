@@ -300,40 +300,6 @@
         }
       }
     }
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationInitEventHandler(object source, AUIApplicationInitEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationTerminateEventHandler(object source, AUIApplicationTerminateEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationPauseEventHandler(object source, AUIApplicationPauseEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationResumeEventHandler(object source, AUIApplicationResumeEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationResetEventHandler(object source, AUIApplicationResetEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationResizeEventHandler(object source, AUIApplicationResizeEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationLanguageChangedEventHandler(object source, AUIApplicationLanguageChangedEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationRegionChangedEventHandler(object source, AUIApplicationRegionChangedEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationBatteryLowEventHandler(object source, AUIApplicationBatteryLowEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationMemoryLowEventHandler(object source, AUIApplicationMemoryLowEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void AUIApplicationAppControlEventHandler(object source, AUIApplicationAppControlEventArgs e);
-
 %}
 
 %enddef
@@ -343,68 +309,68 @@
   %typemap(cscode) NameSpace::ClassName %{
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationInitEventCallbackDelegate(IntPtr application);
-    private AUIApplicationInitEventHandler _applicationInitEventHandler;
+    private DaliEventHandler<object,AUIApplicationInitEventArgs> _applicationInitEventHandler;
     private AUIApplicationInitEventCallbackDelegate _applicationInitEventCallbackDelegate;
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationTerminateEventCallbackDelegate(IntPtr application);
-    private AUIApplicationTerminateEventHandler _applicationTerminateEventHandler;
+    private DaliEventHandler<object,AUIApplicationTerminateEventArgs> _applicationTerminateEventHandler;
     private AUIApplicationTerminateEventCallbackDelegate _applicationTerminateEventCallbackDelegate;
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationPauseEventCallbackDelegate(IntPtr application);
-    private AUIApplicationPauseEventHandler _applicationPauseEventHandler;
+    private DaliEventHandler<object,AUIApplicationPauseEventArgs> _applicationPauseEventHandler;
     private AUIApplicationPauseEventCallbackDelegate _applicationPauseEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationResumeEventCallbackDelegate(IntPtr application);
-    private AUIApplicationResumeEventHandler _applicationResumeEventHandler;
+    private DaliEventHandler<object,AUIApplicationResumeEventArgs> _applicationResumeEventHandler;
     private AUIApplicationResumeEventCallbackDelegate _applicationResumeEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationResetEventCallbackDelegate(IntPtr application);
-    private AUIApplicationResetEventHandler _applicationResetEventHandler;
+    private DaliEventHandler<object,AUIApplicationResetEventArgs> _applicationResetEventHandler;
     private AUIApplicationResetEventCallbackDelegate _applicationResetEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationResizeEventCallbackDelegate(IntPtr application);
-    private AUIApplicationResizeEventHandler _applicationResizeEventHandler;
+    private DaliEventHandler<object,AUIApplicationResizeEventArgs> _applicationResizeEventHandler;
     private AUIApplicationResizeEventCallbackDelegate _applicationResizeEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationLanguageChangedEventCallbackDelegate(IntPtr application);
-    private AUIApplicationLanguageChangedEventHandler _applicationLanguageChangedEventHandler;
+    private DaliEventHandler<object,AUIApplicationLanguageChangedEventArgs> _applicationLanguageChangedEventHandler;
     private AUIApplicationLanguageChangedEventCallbackDelegate _applicationLanguageChangedEventCallbackDelegate;
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationRegionChangedEventCallbackDelegate(IntPtr application);
-    private AUIApplicationRegionChangedEventHandler _applicationRegionChangedEventHandler;
+    private DaliEventHandler<object,AUIApplicationRegionChangedEventArgs> _applicationRegionChangedEventHandler;
     private AUIApplicationRegionChangedEventCallbackDelegate _applicationRegionChangedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationBatteryLowEventCallbackDelegate(IntPtr application);
-    private AUIApplicationBatteryLowEventHandler _applicationBatteryLowEventHandler;
+    private DaliEventHandler<object,AUIApplicationBatteryLowEventArgs> _applicationBatteryLowEventHandler;
     private AUIApplicationBatteryLowEventCallbackDelegate _applicationBatteryLowEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationMemoryLowEventCallbackDelegate(IntPtr application);
-    private AUIApplicationMemoryLowEventHandler _applicationMemoryLowEventHandler;
+    private DaliEventHandler<object,AUIApplicationMemoryLowEventArgs> _applicationMemoryLowEventHandler;
     private AUIApplicationMemoryLowEventCallbackDelegate _applicationMemoryLowEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void AUIApplicationAppControlEventCallbackDelegate(IntPtr application, IntPtr voidp);
-    private AUIApplicationAppControlEventHandler _applicationAppControlEventHandler;
+    private DaliEventHandler<object,AUIApplicationAppControlEventArgs> _applicationAppControlEventHandler;
     private AUIApplicationAppControlEventCallbackDelegate _applicationAppControlEventCallbackDelegate;
 
     /**
       * @brief Event for Initialized signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationInitEventHandler) provided by the user.
-      * Initialized signal is emitted when application is initialised
+      * (in the type of AUIApplicationInitEventHandler - DaliEventHandler<object,AUIApplicationInitEventArgs>)
+      *  provided by the user. Initialized signal is emitted when application is initialised
       */
-    public event AUIApplicationInitEventHandler Initialized
+    public event DaliEventHandler<object,AUIApplicationInitEventArgs> Initialized
     {
       add
       {
@@ -452,10 +418,10 @@
 
     /**
       * @brief Event for Terminated signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationTerminateEventHandler) provided by the user.
-      * Terminated signal is emitted when application is terminated
+      * (in the type of AUIApplicationTerminateEventHandler-DaliEventHandler<object,AUIApplicationTerminateEventArgs>)
+      *  provided by the user. Terminated signal is emitted when application is terminated
       */
-    public event AUIApplicationTerminateEventHandler Terminated
+    public event DaliEventHandler<object,AUIApplicationTerminateEventArgs> Terminated
     {
       add
       {
@@ -503,10 +469,10 @@
 
     /**
       * @brief Event for Paused signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationPauseEventHandler) provided by the user.
-      * Paused signal is emitted when application is paused
+      * (in the type of AUIApplicationPauseEventHandler-DaliEventHandler<object,AUIApplicationPauseEventArgs>)
+      * provided by the user. Paused signal is emitted when application is paused
       */
-    public event AUIApplicationPauseEventHandler Paused
+    public event DaliEventHandler<object,AUIApplicationPauseEventArgs> Paused
     {
       add
       {
@@ -554,10 +520,10 @@
 
     /**
       * @brief Event for Resumed signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationResumeEventHandler) provided by the user.
-      * Resumed signal is emitted when application is resumed
+      * (in the type of AUIApplicationResumeEventHandler-DaliEventHandler<object,AUIApplicationResumeEventArgs>)
+      *  provided by the user. Resumed signal is emitted when application is resumed
       */
-    public event AUIApplicationResumeEventHandler Resumed
+    public event DaliEventHandler<object,AUIApplicationResumeEventArgs> Resumed
     {
       add
       {
@@ -605,10 +571,10 @@
 
     /**
       * @brief Event for Reset signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationResetEventHandler) provided by the user.
-      * Reset signal is emitted when application is reset
+      * (in the type of AUIApplicationResetEventHandler-DaliEventHandler<object,AUIApplicationResetEventArgs>)
+      *  provided by the user. Reset signal is emitted when application is reset
       */
-    public event AUIApplicationResetEventHandler Reset
+    public event DaliEventHandler<object,AUIApplicationResetEventArgs> Reset
     {
       add
       {
@@ -656,10 +622,10 @@
 
     /**
       * @brief Event for Resized signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationResizeEventHandler) provided by the user.
-      * Resized signal is emitted when application is resized
+      * (in the type of AUIApplicationResizeEventHandler-DaliEventHandler<object,AUIApplicationResizeEventArgs>)
+      *  provided by the user. Resized signal is emitted when application is resized
       */
-    public event AUIApplicationResizeEventHandler Resized
+    public event DaliEventHandler<object,AUIApplicationResizeEventArgs> Resized
     {
       add
       {
@@ -707,10 +673,10 @@
 
     /**
       * @brief Event for LanguageChanged signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationLanguageChangedEventHandler) provided by the user.
-      * LanguageChanged signal is emitted when the region of the device is changed.
+      * (in the type of AUIApplicationLanguageChangedEventHandler-DaliEventHandler<object,AUIApplicationLanguageChangedEventArgs>)
+      *  provided by the user. LanguageChanged signal is emitted when the region of the device is changed.
       */
-    public event AUIApplicationLanguageChangedEventHandler LanguageChanged
+    public event DaliEventHandler<object,AUIApplicationLanguageChangedEventArgs> LanguageChanged
     {
       add
       {
@@ -758,10 +724,10 @@
 
     /**
       * @brief Event for RegionChanged signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationRegionChangedEventHandler) provided by the user.
-      * RegionChanged signal is emitted when the region of the device is changed.
+      * (in the type of AUIApplicationRegionChangedEventHandler-DaliEventHandler<object,AUIApplicationRegionChangedEventArgs>)
+      *  provided by the user. RegionChanged signal is emitted when the region of the device is changed.
       */
-    public event AUIApplicationRegionChangedEventHandler RegionChanged
+    public event DaliEventHandler<object,AUIApplicationRegionChangedEventArgs> RegionChanged
     {
       add
       {
@@ -809,10 +775,10 @@
 
     /**
       * @brief Event for BatteryLow signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationBatteryLowEventHandler) provided by the user.
-      * BatteryLow signal is emitted when the battery level of the device is low.
+      * (in the type of AUIApplicationBatteryLowEventHandler-DaliEventHandler<object,AUIApplicationBatteryLowEventArgs>) 
+      * provided by the user. BatteryLow signal is emitted when the battery level of the device is low.
       */
-    public event AUIApplicationBatteryLowEventHandler BatteryLow
+    public event DaliEventHandler<object,AUIApplicationBatteryLowEventArgs> BatteryLow
     {
       add
       {
@@ -860,10 +826,10 @@
 
     /**
       * @brief Event for MemoryLow signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationMemoryLowEventHandler) provided by the user.
-      * MemoryLow signal is emitted when the memory level of the device is low.
+      * (in the type of AUIApplicationMemoryLowEventHandler-DaliEventHandler<object,AUIApplicationMemoryLowEventArgs>)
+      *  provided by the user. MemoryLow signal is emitted when the memory level of the device is low.
       */
-    public event AUIApplicationMemoryLowEventHandler MemoryLow
+    public event DaliEventHandler<object,AUIApplicationMemoryLowEventArgs> MemoryLow
     {
       add
       {
@@ -911,10 +877,10 @@
 
     /**
       * @brief Event for AppControl signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationAppControlEventHandler) provided by the user.
-      * AppControl signal is emitted when another application sends a launch request to the application.
+      * (in the type of AUIApplicationAppControlEventHandler-DaliEventHandler<object,AUIApplicationAppControlEventArgs>)
+      *  provided by the user. AppControl signal is emitted when another application sends a launch request to the application.
       */
-    public event AUIApplicationAppControlEventHandler AppControl
+    public event DaliEventHandler<object,AUIApplicationAppControlEventArgs> AppControl
     {
       add
       {
