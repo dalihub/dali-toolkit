@@ -215,27 +215,25 @@ int UtcDaliAsyncImageLoaderCancelAll(void)
 
   loader.ImageLoadedSignal().Connect( &loadedSignalVerifier, &ImageLoadedSignalVerifier::ImageLoaded );
 
-  uint32_t id01 = loader.Load( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
+  loader.Load( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
   uint32_t id02 = loader.Load( gImage_50_RGBA, ImageDimensions( 25, 25 ) );
 
-  // cancel the loading of the first and second image
+  // try to cancel the loading of the first and second image, however the cancellation of the first image is not guaranteed
   loader.CancelAll();
 
   uint32_t id03 = loader.Load( gImage_128_RGB, ImageDimensions( 100, 100 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
+  loader.Load( gImage_128_RGB, ImageDimensions( 128, 128 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
 
   EventThreadCallback* eventTrigger = EventThreadCallback::Get();
   CallbackBase* callback = eventTrigger->GetCallback();
 
-  eventTrigger->WaitingForTrigger( 1 );// waiting until the third images is loaded
+  eventTrigger->WaitingForTrigger( 2 );// waiting until the third images is loaded
 
   CallbackBase::Execute( *callback );
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( loadedSignalVerifier.LoadedImageCount() == 1 );
-
-  DALI_TEST_CHECK( !loadedSignalVerifier.Verify( id01, 34, 34 ) );  // first image is not loaded
   DALI_TEST_CHECK( !loadedSignalVerifier.Verify( id02, 25, 25 ) ); // second image is not loaded
   DALI_TEST_CHECK( loadedSignalVerifier.Verify( id03, 100, 100 ) ); // third image is successfully loaded
 
