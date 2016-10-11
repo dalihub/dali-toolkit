@@ -121,7 +121,7 @@ const char* const RENDER_SHADOW_FRAGMENT_SOURCE =
 } // namespace
 
 ShadowView::ShadowView( float downsampleWidthScale, float downsampleHeightScale )
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mChildrenRoot(Actor::New()),
   mCachedShadowColor(DEFAULT_SHADOW_COLOR),
   mCachedBackgroundColor(DEFAULT_SHADOW_COLOR.r, DEFAULT_SHADOW_COLOR.g, DEFAULT_SHADOW_COLOR.b, 0.0f),

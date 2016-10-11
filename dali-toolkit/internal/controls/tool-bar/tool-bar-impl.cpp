@@ -275,7 +275,7 @@ void ToolBar::RemoveControl( Actor control )
 }
 
 ToolBar::ToolBar()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mLayout(),
   mLeftOffset( 0 ),
   mCenterBase( 1 ),

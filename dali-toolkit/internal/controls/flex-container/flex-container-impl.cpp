@@ -754,7 +754,7 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
 }
 
 FlexContainer::FlexContainer()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mContentDirection( Toolkit::FlexContainer::INHERIT ),
   mFlexDirection( Toolkit::FlexContainer::COLUMN ),
   mFlexWrap( Toolkit::FlexContainer::NO_WRAP ),

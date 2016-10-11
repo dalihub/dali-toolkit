@@ -117,47 +117,50 @@ const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE =
 
 
 GaussianBlurView::GaussianBlurView()
-  : Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) )
-  , mNumSamples(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)
-  , mBlurBellCurveWidth( 0.001f )
-  , mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT)
-  , mDownsampleWidthScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE)
-  , mDownsampleHeightScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE)
-  , mDownsampledWidth( 0.0f )
-  , mDownsampledHeight( 0.0f )
-  , mBlurUserImage( false )
-  , mRenderOnce( false )
-  , mBackgroundColor( Color::BLACK )
-  , mTargetSize(Vector2::ZERO)
-  , mLastSize(Vector2::ZERO)
-  , mChildrenRoot(Actor::New())
-  , mInternalRoot(Actor::New())
-  , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
-  , mActivated( false )
+: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS ) ),
+  mNumSamples(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES),
+  mBlurBellCurveWidth( 0.001f ),
+  mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT),
+  mDownsampleWidthScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE),
+  mDownsampleHeightScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE),
+  mDownsampledWidth( 0.0f ),
+  mDownsampledHeight( 0.0f ),
+  mBlurUserImage( false ),
+  mRenderOnce( false ),
+  mBackgroundColor( Color::BLACK ),
+  mTargetSize(Vector2::ZERO),
+  mLastSize(Vector2::ZERO),
+  mChildrenRoot(Actor::New()),
+  mInternalRoot(Actor::New()),
+  mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
+  mActivated( false )
 {
   SetBlurBellCurveWidth(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH);
 }
 
-GaussianBlurView::GaussianBlurView( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                                    const float downsampleWidthScale, const float downsampleHeightScale,
+GaussianBlurView::GaussianBlurView( const unsigned int numSamples,
+                                    const float blurBellCurveWidth,
+                                    const Pixel::Format renderTargetPixelFormat,
+                                    const float downsampleWidthScale,
+                                    const float downsampleHeightScale,
                                     bool blurUserImage)
-  : Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) )
-  , mNumSamples(numSamples)
-  , mBlurBellCurveWidth( 0.001f )
-  , mPixelFormat(renderTargetPixelFormat)
-  , mDownsampleWidthScale(downsampleWidthScale)
-  , mDownsampleHeightScale(downsampleHeightScale)
-  , mDownsampledWidth( 0.0f )
-  , mDownsampledHeight( 0.0f )
-  , mBlurUserImage( blurUserImage )
-  , mRenderOnce( false )
-  , mBackgroundColor( Color::BLACK )
-  , mTargetSize(Vector2::ZERO)
-  , mLastSize(Vector2::ZERO)
-  , mChildrenRoot(Actor::New())
-  , mInternalRoot(Actor::New())
-  , mBlurStrengthPropertyIndex(Property::INVALID_INDEX)
-  , mActivated( false )
+: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS ) ),
+  mNumSamples(numSamples),
+  mBlurBellCurveWidth( 0.001f ),
+  mPixelFormat(renderTargetPixelFormat),
+  mDownsampleWidthScale(downsampleWidthScale),
+  mDownsampleHeightScale(downsampleHeightScale),
+  mDownsampledWidth( 0.0f ),
+  mDownsampledHeight( 0.0f ),
+  mBlurUserImage( blurUserImage ),
+  mRenderOnce( false ),
+  mBackgroundColor( Color::BLACK ),
+  mTargetSize(Vector2::ZERO),
+  mLastSize(Vector2::ZERO),
+  mChildrenRoot(Actor::New()),
+  mInternalRoot(Actor::New()),
+  mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
+  mActivated( false )
 {
   SetBlurBellCurveWidth(blurBellCurveWidth);
 }
