@@ -150,6 +150,17 @@ void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
+void SvgVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value SvgVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
 void SvgVisual::SetImage( const std::string& imageUrl, ImageDimensions size )
 {
   if( mImageUrl != imageUrl )

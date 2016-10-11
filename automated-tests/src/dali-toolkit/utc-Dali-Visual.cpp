@@ -308,6 +308,10 @@ int UtcDaliVisualGetPropertyMap1(void)
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
 
+  // Test the properties. TODO: to be completed.
+  colorVisual.SetProperty( ColorVisual::Property::MIX_COLOR, Color::RED );
+  Property::Value value = colorVisual.GetProperty( ColorVisual::Property::MIX_COLOR );
+
   END_TEST;
 }
 
@@ -357,6 +361,10 @@ int UtcDaliVisualGetPropertyMap2(void)
   colorValue = resultMap.Find( BorderVisual::Property::SIZE,  Property::FLOAT );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<float>() == 10.f );
+
+  // Test the properties. TODO: to be completed.
+  borderVisual.SetProperty( BorderVisual::Property::COLOR, Color::RED );
+  Property::Value value = borderVisual.GetProperty( BorderVisual::Property::COLOR );
 
   END_TEST;
 }
@@ -424,6 +432,10 @@ int UtcDaliVisualGetPropertyMap3(void)
   DALI_TEST_CHECK( colorArray->Count() == 2 );
   DALI_TEST_EQUALS( colorArray->GetElementAt(0).Get<Vector4>(), Color::RED , Math::MACHINE_EPSILON_100, TEST_LOCATION );
   DALI_TEST_EQUALS( colorArray->GetElementAt(1).Get<Vector4>(), Color::GREEN , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // Test the properties. TODO: to be completed.
+  gradientVisual.SetProperty( GradientVisual::Property::STOP_COLOR, Color::RED );
+  Property::Value gradientValue = gradientVisual.GetProperty( GradientVisual::Property::STOP_COLOR );
 
   END_TEST;
 }
@@ -609,6 +621,10 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == false );
 
+  // Test the properties. TODO: to be completed.
+  imageVisual.SetProperty( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  Property::Value imageValue = imageVisual.GetProperty( ImageVisual::Property::URL );
+
   END_TEST;
 }
 
@@ -640,6 +656,10 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() );
 
+  // Test the properties. TODO: to be completed.
+  nPatchVisual.SetProperty( ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME );
+  Property::Value nPatchValue = nPatchVisual.GetProperty( ImageVisual::Property::URL );
+
   END_TEST;
 }
 
@@ -652,7 +672,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::URL,  TEST_SVG_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
   Visual::Base svgVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -678,6 +698,10 @@ int UtcDaliVisualGetPropertyMap7(void)
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
+
+  // Test the properties. TODO: to be completed.
+  svgVisual.SetProperty( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
+  Property::Value svgValue = svgVisual.GetProperty( ImageVisual::Property::URL );
 
   END_TEST;
 }
@@ -726,6 +750,10 @@ int UtcDaliVisualGetPropertyMap8(void)
   value = resultMap.Find( MeshVisual::Property::LIGHT_POSITION, Property::VECTOR3 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // Test the properties. TODO: to be completed.
+  meshVisual.SetProperty( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  Property::Value meshValue = meshVisual.GetProperty( MeshVisual::Property::OBJECT_URL );
 
   END_TEST;
 }
@@ -814,6 +842,10 @@ int UtcDaliVisualGetPropertyMap9(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
+  // Test the properties. TODO: to be completed.
+  primitiveVisual.SetProperty( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
+  Property::Value primitiveValue = primitiveVisual.GetProperty( PrimitiveVisual::Property::SHAPE );
+
   END_TEST;
 }
 
@@ -852,6 +884,10 @@ int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
   value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 30 );
+
+  // Test the properties. TODO: to be completed.
+  batchImageVisual.SetProperty( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  Property::Value primitiveValue = batchImageVisual.GetProperty( ImageVisual::Property::URL );
 
   END_TEST;
 }
@@ -1088,5 +1124,9 @@ int UtcDaliVisualWireframeVisual(void)
   Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == Visual::WIREFRAME );
+
+  // Test the properties. TODO: to be completed.
+  Property::Value primitiveValue = visual.GetProperty( Visual::Property::TYPE );
+
   END_TEST;
 }
