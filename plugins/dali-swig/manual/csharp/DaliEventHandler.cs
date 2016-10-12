@@ -7,6 +7,6 @@ namespace Dali {
 	public delegate void DaliEventHandler<T,U>(T source, U e);
 
 	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-	public delegate R DaliEventHandlerWithReturnType<T,U,R>(T source, U e, R ret);
+	public delegate R DaliEventHandlerWithReturnType<T,U,R>(T source, U e);
 
 }

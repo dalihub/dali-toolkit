@@ -283,7 +283,7 @@ public class KeyEventArgs : EventArgs
    if (_KeyEventHandler != null)
    {
       //here we send all data to user event handlers
-      return _KeyEventHandler(this, e, true);
+      return _KeyEventHandler(this, e);
    }
    return false;
 
