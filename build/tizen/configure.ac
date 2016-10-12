@@ -59,10 +59,21 @@ AC_ARG_ENABLE([i18n],
 #  no setting                // enable_javascript = automatic ( enable if v8 present)
 AC_ARG_ENABLE([javascript],
               [AC_HELP_STRING([--enable-javascript],
-               [Enable JavaScript plugin])] ,
-               [enable_javascript=$enableval],
-               [enable_javascript=automatic])
+                [Enable JavaScript plugin])],
+              [enable_javascript=$enableval],
+              [enable_javascript=automatic])
 
+# option to build C# plugin
+# configure settings and output
+# --enable-csharp        // enable_csharp = yes
+# --enable-csharp=yes    // enable_csharp = yes
+# --enable-csharp=no     // enable_csharp = no
+#  no setting            // enable_csharp = no
+AC_ARG_ENABLE([csharp],
+              [AC_HELP_STRING([--enable-csharp],
+                [Enable csharp plugin])],
+              [enable_csharp=$enableval],
+              [enable_csharp=automatic])
 
 if test "x$enable_debug" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
@@ -162,10 +173,45 @@ DOXYGEN_ROOT_DIR=../../..
 AC_SUBST(DOXYGEN_DOCS_DIR)
 AC_SUBST(DOXYGEN_ROOT_DIR)
 
+# Enable csharp plugin
+build_csharp_plugin=no
+build_ruby_flag=no
+if test x$enable_csharp = xyes; then
+  [build_csharp_plugin=yes]
+  AC_MSG_NOTICE(Building DALi csharp plugin ...)
+
+  PKG_CHECK_MODULES(DALIADAPTOR, dali-adaptor)
+  AC_PATH_PROG([SWIG], [swig])
+
+  # if gbs enable, then only use swig, without ruby or mcs
+  if test "x$dali_profile" = "xUBUNTU"; then
+    [build_ruby_flag=yes]
+    AC_PATH_PROG([RUBY], [ruby])
+    AC_PATH_PROGS([MCS], [mcs gmcs gmcs2])
+    AC_MSG_NOTICE(swig ruby mcs working ...)
+  else
+    [build_ruby_flag=no]
+    AC_PATH_PROG([RUBY], [ruby])
+    #AC_PATH_PROGS([MCS], [mcs gmcs gmcs2])
+    #AC_MSG_NOTICE(swig only working ...)
+  fi
+
+  # Set varaibles for dali-toolkit
+  DALITOOLKIT_CFLAGS="-I${prefix}/include -I${prefix}/include/dali-toolkit"
+  DALITOOLKIT_LIBS="-L${prefix}/lib -ldali-toolkit -ldali-core"
+  AC_SUBST(DALITOOLKIT_CFLAGS)
+  AC_SUBST(DALITOOLKIT_LIBS)
+fi
+
+#set a variable for the makefile to force compile the csharp plugin
+AM_CONDITIONAL([ENABLE_CSHARP_PLUGIN], [test x$build_csharp_plugin = xyes])
+AM_CONDITIONAL([ENABLE_RUBY_FLAG], [test x$build_ruby_flag = xyes])
+
 AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
- plugins/Makefile
+ plugins/javascript/Makefile
+ plugins/csharp/Makefile
  dali-toolkit.pc
  docs/Makefile
  docs/dali.doxy
@@ -181,6 +227,7 @@ Configuration
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
   JavaScript support (V8 required)  $build_javascript_plugin
+  CSharp support                    $build_csharp_plugin
   Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir

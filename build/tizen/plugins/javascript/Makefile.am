@@ -16,9 +16,9 @@
 
 # Build the Dali Toolkit library
 
-plugin_src_dir = ../../../plugins
+plugin_src_dir = ../../../../plugins
 
-include ../../../plugins/dali-script-v8/file.list
+include ../../../../plugins/dali-script-v8/file.list
 
 
 lib_LTLIBRARIES = libdali-script-plugin-v8.la
@@ -29,8 +29,8 @@ lib_LTLIBRARIES = libdali-script-plugin-v8.la
 # install path for dali-toolkit.h, is dali-toolkit.h is not installed yet.
 # It won't be installed until the rpm is installed, and unfortunately the
 # plugin is part of the same rpm
-script_plugin_v8_includes = -I../../../plugins/dali-script-v8/src \
-                            -I../../../plugins/dali-script-v8/src/utils
+script_plugin_v8_includes = -I../../../../plugins/dali-script-v8/src \
+                            -I../../../../plugins/dali-script-v8/src/utils
 
 
 libdali_script_plugin_v8_la_SOURCES = \
@@ -39,7 +39,7 @@ libdali_script_plugin_v8_la_SOURCES = \
 libdali_script_plugin_v8_la_DEPENDENCIES =
 
 libdali_script_plugin_v8_la_CXXFLAGS = -DDALI_COMPILATION \
-                            -I../../../ \
+                            -I../../../../ \
                             $(V8_CFLAGS) \
                             $(DALI_TOOLKIT_CFLAGS) \
                             $(DALICORE_CFLAGS) \

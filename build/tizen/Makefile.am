@@ -17,7 +17,11 @@
 SUBDIRS = dali-toolkit
 
 if ENABLE_JAVASCRIPT_PLUGIN
-SUBDIRS +=plugins
+SUBDIRS +=plugins/javascript
+endif
+
+if ENABLE_CSHARP_PLUGIN
+SUBDIRS +=plugins/csharp
 endif
 
 # perform documentation last, so it doesn't prevent code from building if there's an error
