@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2016 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -110,9 +110,10 @@ fi
 DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDALI_PROFILE_${dali_profile}"
 
 # Style folder
-STYLE_DIR=../../../dali-toolkit/styles
-STYLE_DIR=$STYLE_DIR/$dali_style
+STYLE_BASE_DIR=../../../dali-toolkit/styles
+STYLE_DIR=$STYLE_BASE_DIR/$dali_style
 
+AC_SUBST(STYLE_BASE_DIR)
 AC_SUBST(STYLE_DIR)
 
 # v8 version 4+ requires c++11
