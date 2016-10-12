@@ -1,6 +1,6 @@
 Name:       NDalic
 Summary:    dali wrapper
-Version:    1.2.9
+Version:    1.0.0
 Release:    1
 Group:      uifw/graphic
 License:    TO_BE_FILLED_IN
@@ -29,6 +29,7 @@ BuildRequires: dali-integration-devel
 BuildRequires: dali-adaptor-devel
 BuildRequires: dali-adaptor-integration-devel
 BuildRequires: dali-toolkit-devel
+
 
 %description
 dali wrapper
@@ -129,6 +130,8 @@ echo "----------------" %{_buildrootdir}
 cd "%{daliPluginsDir}"
 make DESTDIR=%{_buildrootdir}/%{name}-%{version}-%{release}.arm/usr/lib/ gbs-install
 
+#mv %{_builddir}/%{name}-%{version}/plugins/dali-swig/NDali.dll %{_buildrootdir}/%{name}-%{version}-%{release}.arm/usr/lib/
+
 ##############################
 # Post Install
 ##############################
@@ -142,5 +145,5 @@ make DESTDIR=%{_buildrootdir}/%{name}-%{version}-%{release}.arm/usr/lib/ gbs-ins
 %manifest dali-csharp-wrapper.manifest
 %defattr(-,root,root,-)
 %{_libdir}/lib*
-
+%{_libdir}/NDali.dll
 
