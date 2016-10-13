@@ -83,7 +83,7 @@ using System.Runtime.InteropServices;
      if (_timerTickEventHandler != null)
      {
         //here we send all data to user event handlers
-        return _timerTickEventHandler(this, e, true);
+        return _timerTickEventHandler(this, e);
      }
      return false;
   }

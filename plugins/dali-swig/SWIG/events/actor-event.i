@@ -308,7 +308,7 @@
       if (_actorTouchDataEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _actorTouchDataEventHandler(this, e, true);
+        return _actorTouchDataEventHandler(this, e);
       }
 
       return false;
@@ -362,7 +362,7 @@
       if (_actorHoverEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _actorHoverEventHandler(this, e, true);
+        return _actorHoverEventHandler(this, e);
       }
 
       return false;
@@ -416,7 +416,7 @@
       if (_actorWheelEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _actorWheelEventHandler(this, e, true);
+        return _actorWheelEventHandler(this, e);
       }
 
       return false;
