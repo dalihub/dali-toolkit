@@ -296,8 +296,8 @@ public:
 protected: // For derived classes to call
 
   /**
-   * @brief Register a visual by Property Index, linking an Actor to controlRenderer when required.
-   * In the case of the visual being an actor or control deeming controlRenderer not required then controlRenderer should be an empty handle.
+   * @brief Register a visual by Property Index, linking an Actor to visual when required.
+   * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
    * No parenting is done during registration, this should be done by derived class.
    *
    * @SINCE_1_2.0
@@ -305,9 +305,26 @@ protected: // For derived classes to call
    * @param[in] index The Property index of the visual, used to reference visual
    * @param[in] placementActor The actor used to by the visual.
    * @param[in] visual The visual to register
-   * @note Derived class must NOT call visual.SetOnStage(placementActor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+   * @note Derived class should not call visual.SetOnStage(placementActor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+   *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
    */
    void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual );
+
+   /**
+    * @brief Register a visual by Property Index, linking an Actor to visual when required.
+    * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+    * If enabled is false then the visual is not set on stage until enabled by the derived class.
+    * @see EnableVisual
+    *
+    * @SINCE_1_2.11
+    *
+    * @param[in] index The Property index of the visual, used to reference visual
+    * @param[in] placementActor The actor used to by the visual.
+    * @param[in] visual The visual to register
+    * @param[in] enabled false if derived class wants to control when visual is set on stage.
+    *
+    */
+   void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual, bool enabled );
 
    /**
     * @brief Erase the entry matching the given index from the list of registered visuals
@@ -327,6 +344,26 @@ protected: // For derived classes to call
     * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
     */
    Toolkit::Visual::Base GetVisual( Property::Index index ) const;
+
+   /**
+    * @brief Sets the given visual to be displayed or not when parent staged.
+    *
+    * @SINCE_1_2.11
+    *
+    * @param[in] index The Property index of the visual
+    * @param[in] enable flag to set enabled or disabled.
+    */
+   void EnableVisual( Property::Index index, bool enable );
+
+   /**
+    * @brief Queries if the given visual is to be displayed when parent staged.
+    *
+    * @SINCE_1_2.11
+    *
+    * @param[in] index The Property index of the visual
+    * @return bool whether visual is enabled or not
+    */
+   bool IsVisualEnabled( Property::Index index ) const;
 
    /**
     * @brief Retrieve the placement actor associated with the given index.

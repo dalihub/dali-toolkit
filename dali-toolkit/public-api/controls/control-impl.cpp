@@ -60,16 +60,18 @@ struct RegisteredVisual
   Property::Index index;
   Toolkit::Visual::Base visual;
   Actor placementActor;
+  bool enabled;
 
-  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor) : index(aIndex), visual(aVisual), placementActor(aPlacementActor) {}
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor, bool aEnabled) :
+                   index(aIndex), visual(aVisual), placementActor(aPlacementActor), enabled(aEnabled) {}
 };
 
-typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisuals;
+typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 
 /**
  *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
  */
-bool FindVisual( Property::Index targetIndex, RegisteredVisuals& visuals, RegisteredVisuals::Iterator& iter )
+bool FindVisual( Property::Index targetIndex, RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter )
 {
   for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
@@ -397,7 +399,7 @@ public:
   // Data
 
   Control& mControlImpl;
-  RegisteredVisuals mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
+  RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -661,6 +663,11 @@ void Control::KeyboardEnter()
 
 void Control::RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual )
 {
+  RegisterVisual( index, placementActor, visual, true );
+}
+
+void Control::RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual, bool enabled )
+{
   bool visualReplaced ( false );
   Actor actorToRegister; // Null actor, replaced if placement actor not Self
   Actor self = Self();
@@ -672,7 +679,7 @@ void Control::RegisterVisual( Property::Index index, Actor& placementActor, Tool
 
   if ( !mImpl->mVisuals.Empty() )
   {
-      RegisteredVisuals::Iterator iter;
+      RegisteredVisualContainer::Iterator iter;
       // Check if visual (index) is already registered.  Replace if so.
       if ( FindVisual( index, mImpl->mVisuals, iter ) )
       {
@@ -695,10 +702,10 @@ void Control::RegisterVisual( Property::Index index, Actor& placementActor, Tool
 
   if ( !visualReplaced ) // New registration entry
   {
-    mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, actorToRegister ) );
+    mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, actorToRegister, enabled ) );
   }
 
-  if( visual && self.OnStage() )
+  if( visual && self.OnStage() && enabled )
   {
     visual.SetOnStage( placementActor );
   }
@@ -706,7 +713,7 @@ void Control::RegisterVisual( Property::Index index, Actor& placementActor, Tool
 
 void Control::UnregisterVisual( Property::Index index )
 {
-   RegisteredVisuals::Iterator iter;
+   RegisteredVisualContainer::Iterator iter;
    if ( FindVisual( index, mImpl->mVisuals, iter ) )
    {
      mImpl->mVisuals.Erase( iter );
@@ -715,7 +722,7 @@ void Control::UnregisterVisual( Property::Index index )
 
 Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
 {
-  RegisteredVisuals::Iterator iter;
+  RegisteredVisualContainer::Iterator iter;
   if ( FindVisual( index, mImpl->mVisuals, iter ) )
   {
     return (*iter)->visual;
@@ -724,9 +731,51 @@ Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
   return Toolkit::Visual::Base();
 }
 
+void Control::EnableVisual( Property::Index index, bool enable )
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    if (  (*iter)->enabled == enable )
+    {
+      return;
+    }
+
+    (*iter)->enabled = enable;
+    Actor parentActor = Self();
+    if ( (*iter)->placementActor )
+    {
+      parentActor = (*iter)->placementActor;
+    }
+
+    if ( Self().OnStage() ) // If control not on Stage then Visual will be added when StageConnection is called.
+    {
+      if ( enable )
+      {
+
+        (*iter)->visual.SetOnStage( parentActor );
+      }
+      else
+      {
+        (*iter)->visual.SetOffStage( parentActor );  // No need to call if control not staged.
+      }
+    }
+  }
+}
+
+bool Control::IsVisualEnabled( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    return (*iter)->enabled;
+  }
+  return false;
+}
+
 Actor Control::GetPlacementActor( Property::Index index ) const
 {
-  RegisteredVisuals::Iterator iter;
+  RegisteredVisualContainer::Iterator iter;
   if ( FindVisual( index, mImpl->mVisuals, iter ) )
   {
     if( (*iter)->placementActor )
@@ -928,10 +977,10 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  for(RegisteredVisuals::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
     // Check whether the visual is empty, as it is allowed to register a placement actor without visual.
-    if( (*iter)->visual )
+    if( (*iter)->visual && (*iter)->enabled )
     {
       if( (*iter)->placementActor )
       {
@@ -948,7 +997,7 @@ void Control::OnStageConnection( int depth )
 
 void Control::OnStageDisconnection()
 {
-  for(RegisteredVisuals::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
     // Check whether the visual is empty, as it is allowed to register a placement actor without visual.
     if( (*iter)->visual )
