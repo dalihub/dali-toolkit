@@ -72,20 +72,17 @@ public class StyleChangedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void StyleChangedEventHandler(object source, StyleChangedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void StyleChangedCallbackDelegate(IntPtr styleManager, Dali.StyleChangeType styleChange);
-  private StyleChangedEventHandler _styleManagerStyleChangedEventHandler;
+  private DaliEventHandler<object,StyleChangedEventArgs> _styleManagerStyleChangedEventHandler;
   private StyleChangedCallbackDelegate _styleManagerStyleChangedCallbackDelegate;
 
   /**
     * @brief Event for StyleChanged signal which can be used to subscribe/unsubscribe the
-    * event handler (in the type of StyleChangedEventHandler) provided by the user.
-    * StyleChanged signal is is emitted after the style (e.g. theme/font change) has changed
+    * event handler (in the type of StyleChangedEventHandler-DaliEventHandler<object,StyleChangedEventArgs>) 
+    * provided by the user. StyleChanged signal is is emitted after the style (e.g. theme/font change) has changed
     * and the controls have been informed.
     */
-  public event StyleChangedEventHandler StyleChanged
+  public event DaliEventHandler<object,StyleChangedEventArgs> StyleChanged
   {
      add
      {

@@ -116,31 +116,23 @@ public class MarkReachedEventArgs : EventArgs
    }
 }
 
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool ValueChangedEventHandler(object source, ValueChangedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool SlidingFinishedEventHandler(object source, SlidingFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate bool MarkReachedEventHandler(object source, MarkReachedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool ValueChangedCallbackDelegate(IntPtr slider, float slideValue);
-  private ValueChangedEventHandler _sliderValueChangedEventHandler;
+  private DaliEventHandlerWithReturnType<object,ValueChangedEventArgs,bool> _sliderValueChangedEventHandler;
   private ValueChangedCallbackDelegate _sliderValueChangedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool SlidingFinishedCallbackDelegate(IntPtr slider, float slideValue);
-  private SlidingFinishedEventHandler _sliderSlidingFinishedEventHandler;
+  private DaliEventHandlerWithReturnType<object,SlidingFinishedEventArgs,bool> _sliderSlidingFinishedEventHandler;
   private SlidingFinishedCallbackDelegate _sliderSlidingFinishedCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate bool MarkReachedCallbackDelegate(IntPtr slider, int slideValue);
-  private MarkReachedEventHandler _sliderMarkReachedEventHandler;
+  private DaliEventHandlerWithReturnType<object,MarkReachedEventArgs,bool> _sliderMarkReachedEventHandler;
   private MarkReachedCallbackDelegate _sliderMarkReachedCallbackDelegate;
 
-  public event ValueChangedEventHandler ValueChanged
+  public event DaliEventHandlerWithReturnType<object,ValueChangedEventArgs,bool> ValueChanged
   {
      add
      {
@@ -188,7 +180,7 @@ public class MarkReachedEventArgs : EventArgs
      return false;
   }
 
-  public event SlidingFinishedEventHandler SlidingFinished
+  public event DaliEventHandlerWithReturnType<object,SlidingFinishedEventArgs,bool> SlidingFinished
   {
      add
      {
@@ -236,7 +228,7 @@ public class MarkReachedEventArgs : EventArgs
      return false;
   }
 
-  public event MarkReachedEventHandler MarkReached
+  public event DaliEventHandlerWithReturnType<object,MarkReachedEventArgs,bool> MarkReached
   {
      add
      {

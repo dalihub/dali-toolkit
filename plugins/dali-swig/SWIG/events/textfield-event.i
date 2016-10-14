@@ -61,23 +61,18 @@ public class MaxLengthReachedEventArgs : EventArgs
    }
 }
 
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void TextChangedEventHandler(object source, TextChangedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void MaxLengthReachedEventHandler(object source, MaxLengthReachedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void TextChangedCallbackDelegate(IntPtr textField);
-  private TextChangedEventHandler _textFieldTextChangedEventHandler;
+  private DaliEventHandler<object,TextChangedEventArgs> _textFieldTextChangedEventHandler;
   private TextChangedCallbackDelegate _textFieldTextChangedCallbackDelegate;
-
+  
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void MaxLengthReachedCallbackDelegate(IntPtr textField);
-  private MaxLengthReachedEventHandler _textFieldMaxLengthReachedEventHandler;
+  private DaliEventHandler<object,MaxLengthReachedEventArgs> _textFieldMaxLengthReachedEventHandler;
   private MaxLengthReachedCallbackDelegate _textFieldMaxLengthReachedCallbackDelegate;
 
-  public event TextChangedEventHandler TextChanged
+  public event DaliEventHandler<object,TextChangedEventArgs> TextChanged
   {
      add
      {
@@ -123,7 +118,7 @@ public class MaxLengthReachedEventArgs : EventArgs
 
   }
 
-  public event MaxLengthReachedEventHandler MaxLengthReached
+  public event DaliEventHandler<object,MaxLengthReachedEventArgs> MaxLengthReached
   {
      add
      {

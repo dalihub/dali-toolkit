@@ -46,15 +46,12 @@ public class FinishedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void RenderTaskEventHandler(object source, FinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void RenderTaskCallbackDelegate(IntPtr renderTask);
-  private RenderTaskEventHandler _renderTaskEventHandler;
+  private DaliEventHandler<object,FinishedEventArgs> _renderTaskEventHandler;
   private RenderTaskCallbackDelegate _renderTaskCallbackDelegate;
 
 
-  public event RenderTaskEventHandler Finished
+  public event DaliEventHandler<object,FinishedEventArgs> Finished
   {
      add
      {

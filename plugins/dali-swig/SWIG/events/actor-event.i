@@ -231,59 +231,41 @@
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool TouchEventHandler(object source, TouchEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool HoverEventHandler(object source, HoverEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool WheelEventHandler(object source, WheelEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void OnStageEventHandler(object source, OnStageEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void OffStageEventHandler(object source, OffStageEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void OnRelayoutEventHandler(object source, OnRelayoutEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool TouchCallbackDelegate(IntPtr actor, IntPtr touchData);
-    private TouchEventHandler _actorTouchDataEventHandler;
+    private DaliEventHandlerWithReturnType<object,TouchEventArgs,bool> _actorTouchDataEventHandler;
     private TouchCallbackDelegate _actorTouchDataCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool HoverEventCallbackDelegate(IntPtr actor, IntPtr hoverEvent);
-    private HoverEventHandler _actorHoverEventHandler;
+    private DaliEventHandlerWithReturnType<object,HoverEventArgs,bool> _actorHoverEventHandler;
     private HoverEventCallbackDelegate _actorHoverEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool WheelEventCallbackDelegate(IntPtr actor, IntPtr wheelEvent);
-    private WheelEventHandler _actorWheelEventHandler;
+    private DaliEventHandlerWithReturnType<object,WheelEventArgs,bool> _actorWheelEventHandler;
     private WheelEventCallbackDelegate _actorWheelEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void OnStageEventCallbackDelegate(IntPtr actor);
-    private OnStageEventHandler _actorOnStageEventHandler;
+    private DaliEventHandler<object,OnStageEventArgs> _actorOnStageEventHandler;
     private OnStageEventCallbackDelegate _actorOnStageEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void OffStageEventCallbackDelegate(IntPtr actor);
-    private OffStageEventHandler _actorOffStageEventHandler;
+    private DaliEventHandler<object,OffStageEventArgs> _actorOffStageEventHandler;
     private OffStageEventCallbackDelegate _actorOffStageEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void OnRelayoutEventCallbackDelegate(IntPtr actor);
-    private OnRelayoutEventHandler _actorOnRelayoutEventHandler;
+    private DaliEventHandler<object,OnRelayoutEventArgs> _actorOnRelayoutEventHandler;
     private OnRelayoutEventCallbackDelegate _actorOnRelayoutEventCallbackDelegate;
 
     /**
       * @brief Event for Touched signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of TouchEventHandler) provided by the user.
-      * Touched signal is emitted when touch input is received.
+      * (in the type of TouchEventHandler-DaliEventHandlerWithReturnType<object,TouchEventArgs,bool>)
+      * provided by the user. Touched signal is emitted when touch input is received.
       */
-    public event TouchEventHandler Touched
+    public event DaliEventHandlerWithReturnType<object,TouchEventArgs,bool> Touched
     {
       add
       {
@@ -334,10 +316,10 @@
 
     /**
       * @brief Event for Hovered signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of HoverEventHandler) provided by the user.
-      * Hovered signal is emitted when hover input is received.
+      * (in the type of HoverEventHandler-DaliEventHandlerWithReturnType<object,HoverEventArgs,bool>)
+      * provided by the user. Hovered signal is emitted when hover input is received.
       */
-    public event HoverEventHandler Hovered
+    public event DaliEventHandlerWithReturnType<object,HoverEventArgs,bool> Hovered
     {
       add
       {
@@ -388,10 +370,10 @@
 
     /**
       * @brief Event for WheelMoved signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of WheelEventHandler) provided by the user.
-      * WheelMoved signal is emitted when wheel event is received.
+      * (in the type of WheelEventHandler-DaliEventHandlerWithReturnType<object,WheelEventArgs,bool>)
+      * provided by the user. WheelMoved signal is emitted when wheel event is received.
       */
-    public event WheelEventHandler WheelMoved
+    public event DaliEventHandlerWithReturnType<object,WheelEventArgs,bool> WheelMoved
     {
       add
       {
@@ -445,7 +427,7 @@
       * (in the type of OnStageEventHandler) provided by the user.
       * OnStage signal is emitted after the actor has been connected to the stage.
       */
-    public event OnStageEventHandler OnStageEvent
+    public event DaliEventHandler<object,OnStageEventArgs> OnStageEvent
     {
       add
       {
@@ -496,7 +478,7 @@
       * (in the type of OffStageEventHandler) provided by the user.
       * OffStage signal is emitted after the actor has been disconnected from the stage.
       */
-    public event OffStageEventHandler OffStageEvent
+    public event DaliEventHandler<object,OffStageEventArgs> OffStageEvent
     {
       add
       {
@@ -547,7 +529,7 @@
       * (in the type of OnRelayoutEventHandler) provided by the user.
       * OnRelayout signal is emitted after the size has been set on the actor during relayout.
       */
-    public event OnRelayoutEventHandler OnRelayoutEvent
+    public event DaliEventHandler<object,OnRelayoutEventArgs> OnRelayoutEvent
     {
       add
       {
@@ -603,18 +585,67 @@
     {
        return (IntPtr)swigCPtr;
     }
-    %}
 
-    %enddef
+    public Actor Parent
+    {
+      get
+      {
+        Actor parent = GetParent();
+        return parent;
+      }
+    }
+
+   public bool Vibility
+   {
+      get
+      {
+        bool visibility = IsVisible();
+        return visibility;
+      }
+    }
+
+   public float Opacity
+   {
+      set
+      {
+        SetOpacity(value);
+      }
+    }
+
+   public float CurrentOpacity
+   {
+      get
+      {
+        float ret = GetCurrentOpacity();
+        return ret;
+      }
+    }
+
+    public bool StateFocusEnable
+    {
+      set
+      {
+        SetKeyboardFocusable(value);
+      }
+      get
+      {
+        bool focusable = IsKeyboardFocusable();
+        return focusable;
+      }
+    }
+
+%}
+
+%enddef
 
 %define DALI_ACTOR_EVENTHANDLER_PARAM( NameSpace, ClassName)
 
-  ACTOR_EVENTHANDLER_TYPEMAP_EVENTARG( NameSpace, ClassName);
-  ACTOR_EVENTHANDLER_TYPEMAP_HELPER( NameSpace, ClassName);
+ACTOR_EVENTHANDLER_TYPEMAP_EVENTARG( NameSpace, ClassName);
+ACTOR_EVENTHANDLER_TYPEMAP_HELPER( NameSpace, ClassName);
 
-  %enddef
+%enddef
 
-  namespace Dali
+namespace Dali
 {
   DALI_ACTOR_EVENTHANDLER_PARAM( Dali, Actor);
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace Dali {
 
-public delegate IntPtr SwigDelegateKeyboardPreFocusChangeSignal(IntPtr current, IntPtr proposed, Control.KeyboardFocus.Direction direction);
+public delegate IntPtr SwigDelegateKeyboardPreFocusChangeSignal(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction);
 
 public class KeyboardPreFocusChangeSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
@@ -59,7 +59,7 @@ public class KeyboardPreFocusChangeSignal : global::System.IDisposable {
     }
   }
 
-  public Actor Emit(Actor arg1, Actor arg2, Control.KeyboardFocus.Direction arg3) {
+  public Actor Emit(Actor arg1, Actor arg2, View.KeyboardFocus.Direction arg3) {
     Actor ret = new Actor(NDalicManualPINVOKE.KeyboardPreFocusChangeSignal_Emit(swigCPtr, Actor.getCPtr(arg1), Actor.getCPtr(arg2), (int)arg3), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;

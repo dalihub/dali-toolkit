@@ -53,19 +53,16 @@ public class FinishedEventArgs : EventArgs
 
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void FinishedEventHandler(object source, FinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FinishedCallbackDelegate(IntPtr data);
-  private FinishedEventHandler _videoViewFinishedEventHandler;
+  private DaliEventHandler<object,FinishedEventArgs> _videoViewFinishedEventHandler;
   private FinishedCallbackDelegate _videoViewFinishedCallbackDelegate;
 
   /**
     * @brief Event for Finished signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of FinishedEventHandler) provided by the user.
+    * (in the type of FinishedEventHandler-DaliEventHandler<object,FinishedEventArgs>) provided by the user.
     * Finished signal is emitted when a video playback have finished.
     */
-  public event FinishedEventHandler Finished
+  public event DaliEventHandler<object,FinishedEventArgs> Finished
   {
      add
      {

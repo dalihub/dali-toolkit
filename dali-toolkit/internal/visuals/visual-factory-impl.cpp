@@ -149,16 +149,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
         }
         else // Regular image
         {
+          bool batchingEnabled( false );
           Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
           if( batchingEnabledValue  )
           {
-            bool batchingEnabled( false );
             batchingEnabledValue->Get( batchingEnabled );
-            if( batchingEnabled )
-            {
-              visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ) );
-              break;
-            }
+          }
+
+          if( batchingEnabled )
+          {
+            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ) );
+            break;
           }
           else
           {

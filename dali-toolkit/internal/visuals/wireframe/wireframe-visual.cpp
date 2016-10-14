@@ -86,6 +86,17 @@ void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::WIREFRAME );
 }
 
+void WireframeVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value WireframeVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
 void WireframeVisual::InitializeRenderer()
 {
   mImpl->mRenderer = mFactoryCache.GetWireframeRenderer();

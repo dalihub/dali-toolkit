@@ -141,7 +141,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)

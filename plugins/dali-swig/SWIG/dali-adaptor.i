@@ -25,6 +25,7 @@
 %include <dali/public-api/adaptor-framework/style-change.h>
 %include <dali/public-api/adaptor-framework/timer.h>
 %include <dali/devel-api/adaptor-framework/drag-and-drop-detector.h>
+%include <dali/devel-api/adaptor-framework/application-extensions.h>
 %include <dali/public-api/adaptor-framework/window.h>
 
 #if defined(SWIGCSHARP)

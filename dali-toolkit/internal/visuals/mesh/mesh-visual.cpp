@@ -389,6 +389,17 @@ void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::MeshVisual::Property::LIGHT_POSITION, mLightPosition );
 }
 
+void MeshVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value MeshVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
 void MeshVisual::InitializeRenderer()
 {
   //Try to load the geometry from the file.

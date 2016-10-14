@@ -33,7 +33,7 @@ namespace MyCSharpExample
       _application = application;
       Console.WriteLine( "InitSignal connection count = " + _application.InitSignal().GetConnectionCount() );
 
-      _application.Initialized += new Dali.AUIApplicationInitEventHandler(Initialize);
+      _application.Initialized += Initialize;
       Console.WriteLine( "InitSignal connection count = " + _application.InitSignal().GetConnectionCount() );
     }
 
@@ -59,9 +59,9 @@ namespace MyCSharpExample
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();
-      stage.SetBackgroundColor( NDalic.WHITE );
+      stage.BackgroundColor =  NDalic.WHITE ;
 
-      Vector2 stageSize = stage.GetSize();
+      Vector2 stageSize = stage.Size;
       Console.WriteLine("Stage size: " + stageSize.x + ", " + stageSize.y);
       stage.Add(actor);
 

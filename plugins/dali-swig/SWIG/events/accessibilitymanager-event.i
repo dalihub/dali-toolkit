@@ -700,245 +700,156 @@
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool StatusChangedEventHandler(object source, StatusChangedEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionNextEventHandler(object source, ActionNextEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionPreviousEventHandler(object source, ActionPreviousEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionActivateEventHandler(object source, ActionActivateEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadEventHandler(object source, ActionReadEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionOverEventHandler(object source, ActionOverEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadNextEventHandler(object source, ActionReadNextEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadPreviousEventHandler(object source, ActionReadPreviousEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionUpEventHandler(object source, ActionUpEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionDownEventHandler(object source, ActionDownEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionClearFocusEventHandler(object source, ActionClearFocusEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionBackEventHandler(object source, ActionBackEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionScrollUpEventHandler(object source, ActionScrollUpEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionScrollDownEventHandler(object source, ActionScrollDownEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionPageLeftEventHandler(object source, ActionPageLeftEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionPageRightEventHandler(object source, ActionPageRightEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionPageUpEventHandler(object source, ActionPageUpEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionPageDownEventHandler(object source, ActionPageDownEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionMoveToFirstEventHandler(object source, ActionMoveToFirstEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionMoveToLastEventHandler(object source, ActionMoveToLastEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadFromTopEventHandler(object source, ActionReadFromTopEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadFromNextEventHandler(object source, ActionReadFromNextEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionZoomEventHandler(object source, ActionZoomEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadIndicatorInformationEventHandler(object source, ActionReadIndicatorInformationEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionReadPauseResumeEventHandler(object source, ActionReadPauseResumeEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionStartStopEventHandler(object source, ActionStartStopEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate bool ActionScrollEventHandler(object source, ActionScrollEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void FocusChangedEventHandler(object source, FocusChangedEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void FocusedActorActivatedEventHandler(object source, FocusedActorActivatedEventArgs e);
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void FocusOvershotEventHandler(object source, FocusOvershotEventArgs e);
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool StatusChangedEventCallbackDelegate(IntPtr accessibilityManager);
-    private StatusChangedEventHandler _accessibilityManagerStatusChangedEventHandler;
+    private DaliEventHandlerWithReturnType<object,StatusChangedEventArgs,bool> _accessibilityManagerStatusChangedEventHandler;
     private StatusChangedEventCallbackDelegate _accessibilityManagerStatusChangedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionNextEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionNextEventHandler _accessibilityManagerActionNextEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionNextEventArgs,bool> _accessibilityManagerActionNextEventHandler;
     private ActionNextEventCallbackDelegate _accessibilityManagerActionNextEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionPreviousEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionPreviousEventHandler _accessibilityManagerActionPreviousEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionPreviousEventArgs,bool> _accessibilityManagerActionPreviousEventHandler;
     private ActionPreviousEventCallbackDelegate _accessibilityManagerActionPreviousEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionActivateEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionActivateEventHandler _accessibilityManagerActionActivateEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionActivateEventArgs,bool> _accessibilityManagerActionActivateEventHandler;
     private ActionActivateEventCallbackDelegate _accessibilityManagerActionActivateEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadEventHandler _accessibilityManagerActionReadEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadEventArgs,bool> _accessibilityManagerActionReadEventHandler;
     private ActionReadEventCallbackDelegate _accessibilityManagerActionReadEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionOverEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionOverEventHandler _accessibilityManagerActionOverEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionOverEventArgs,bool> _accessibilityManagerActionOverEventHandler;
     private ActionOverEventCallbackDelegate _accessibilityManagerActionOverEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadNextEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadNextEventHandler _accessibilityManagerActionReadNextEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadNextEventArgs,bool> _accessibilityManagerActionReadNextEventHandler;
     private ActionReadNextEventCallbackDelegate _accessibilityManagerActionReadNextEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadPreviousEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadPreviousEventHandler _accessibilityManagerActionReadPreviousEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadPreviousEventArgs,bool> _accessibilityManagerActionReadPreviousEventHandler;
     private ActionReadPreviousEventCallbackDelegate _accessibilityManagerActionReadPreviousEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionUpEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionUpEventHandler _accessibilityManagerActionUpEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionUpEventArgs,bool> _accessibilityManagerActionUpEventHandler;
     private ActionUpEventCallbackDelegate _accessibilityManagerActionUpEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionDownEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionDownEventHandler _accessibilityManagerActionDownEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionDownEventArgs,bool> _accessibilityManagerActionDownEventHandler;
     private ActionDownEventCallbackDelegate _accessibilityManagerActionDownEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionClearFocusEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionClearFocusEventHandler _accessibilityManagerActionClearFocusEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionClearFocusEventArgs,bool> _accessibilityManagerActionClearFocusEventHandler;
     private ActionClearFocusEventCallbackDelegate _accessibilityManagerActionClearFocusEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionBackEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionBackEventHandler _accessibilityManagerActionBackEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionBackEventArgs,bool> _accessibilityManagerActionBackEventHandler;
     private ActionBackEventCallbackDelegate _accessibilityManagerActionBackEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionScrollUpEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionScrollUpEventHandler _accessibilityManagerActionScrollUpEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionScrollUpEventArgs,bool> _accessibilityManagerActionScrollUpEventHandler;
     private ActionScrollUpEventCallbackDelegate _accessibilityManagerActionScrollUpEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionScrollDownEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionScrollDownEventHandler _accessibilityManagerActionScrollDownEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionScrollDownEventArgs,bool> _accessibilityManagerActionScrollDownEventHandler;
     private ActionScrollDownEventCallbackDelegate _accessibilityManagerActionScrollDownEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionPageLeftEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionPageLeftEventHandler _accessibilityManagerActionPageLeftEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionPageLeftEventArgs,bool> _accessibilityManagerActionPageLeftEventHandler;
     private ActionPageLeftEventCallbackDelegate _accessibilityManagerActionPageLeftEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionPageRightEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionPageRightEventHandler _accessibilityManagerActionPageRightEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionPageRightEventArgs,bool> _accessibilityManagerActionPageRightEventHandler;
     private ActionPageRightEventCallbackDelegate _accessibilityManagerActionPageRightEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionPageUpEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionPageUpEventHandler _accessibilityManagerActionPageUpEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionPageUpEventArgs,bool> _accessibilityManagerActionPageUpEventHandler;
     private ActionPageUpEventCallbackDelegate _accessibilityManagerActionPageUpEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionPageDownEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionPageDownEventHandler _accessibilityManagerActionPageDownEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionPageDownEventArgs,bool> _accessibilityManagerActionPageDownEventHandler;
     private ActionPageDownEventCallbackDelegate _accessibilityManagerActionPageDownEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionMoveToFirstEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionMoveToFirstEventHandler _accessibilityManagerActionMoveToFirstEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionMoveToFirstEventArgs,bool> _accessibilityManagerActionMoveToFirstEventHandler;
     private ActionMoveToFirstEventCallbackDelegate _accessibilityManagerActionMoveToFirstEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionMoveToLastEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionMoveToLastEventHandler _accessibilityManagerActionMoveToLastEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionMoveToLastEventArgs,bool> _accessibilityManagerActionMoveToLastEventHandler;
     private ActionMoveToLastEventCallbackDelegate _accessibilityManagerActionMoveToLastEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadFromTopEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadFromTopEventHandler _accessibilityManagerActionReadFromTopEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadFromTopEventArgs,bool> _accessibilityManagerActionReadFromTopEventHandler;
     private ActionReadFromTopEventCallbackDelegate _accessibilityManagerActionReadFromTopEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadFromNextEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadFromNextEventHandler _accessibilityManagerActionReadFromNextEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadFromNextEventArgs,bool> _accessibilityManagerActionReadFromNextEventHandler;
     private ActionReadFromNextEventCallbackDelegate _accessibilityManagerActionReadFromNextEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionZoomEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionZoomEventHandler _accessibilityManagerActionZoomEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionZoomEventArgs,bool> _accessibilityManagerActionZoomEventHandler;
     private ActionZoomEventCallbackDelegate _accessibilityManagerActionZoomEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadIndicatorInformationEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadIndicatorInformationEventHandler _accessibilityManagerActionReadIndicatorInformationEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadIndicatorInformationEventArgs,bool> _accessibilityManagerActionReadIndicatorInformationEventHandler;
     private ActionReadIndicatorInformationEventCallbackDelegate _accessibilityManagerActionReadIndicatorInformationEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionReadPauseResumeEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionReadPauseResumeEventHandler _accessibilityManagerActionReadPauseResumeEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionReadPauseResumeEventArgs,bool> _accessibilityManagerActionReadPauseResumeEventHandler;
     private ActionReadPauseResumeEventCallbackDelegate _accessibilityManagerActionReadPauseResumeEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionStartStopEventCallbackDelegate(IntPtr accessibilityManager);
-    private ActionStartStopEventHandler _accessibilityManagerActionStartStopEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionStartStopEventArgs,bool> _accessibilityManagerActionStartStopEventHandler;
     private ActionStartStopEventCallbackDelegate _accessibilityManagerActionStartStopEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionScrollEventCallbackDelegate(IntPtr accessibilityManager, IntPtr touchEvent);
-    private ActionScrollEventHandler _accessibilityManagerActionScrollEventHandler;
+    private DaliEventHandlerWithReturnType<object,ActionScrollEventArgs,bool> _accessibilityManagerActionScrollEventHandler;
     private ActionScrollEventCallbackDelegate _accessibilityManagerActionScrollEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void FocusChangedEventCallbackDelegate(IntPtr actor1, IntPtr actor2);
-    private FocusChangedEventHandler _accessibilityManagerFocusChangedEventHandler;
+    private DaliEventHandler<object,FocusChangedEventArgs> _accessibilityManagerFocusChangedEventHandler;
     private FocusChangedEventCallbackDelegate _accessibilityManagerFocusChangedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void FocusedActorActivatedEventCallbackDelegate(IntPtr actor);
-    private FocusedActorActivatedEventHandler _accessibilityManagerFocusedActorActivatedEventHandler;
+    private DaliEventHandler<object,FocusedActorActivatedEventArgs> _accessibilityManagerFocusedActorActivatedEventHandler;
     private FocusedActorActivatedEventCallbackDelegate _accessibilityManagerFocusedActorActivatedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void FocusOvershotEventCallbackDelegate(IntPtr currentFocusedActor, AccessibilityManager.FocusOvershotDirection direction);
-    private FocusOvershotEventHandler _accessibilityManagerFocusOvershotEventHandler;
+    private DaliEventHandler<object,FocusOvershotEventArgs> _accessibilityManagerFocusOvershotEventHandler;
     private FocusOvershotEventCallbackDelegate _accessibilityManagerFocusOvershotEventCallbackDelegate;
 
-    public event StatusChangedEventHandler StatusChanged
+    public event DaliEventHandlerWithReturnType<object,StatusChangedEventArgs,bool> StatusChanged
     {
       add
       {
@@ -985,7 +896,7 @@
       return false;
     }
 
-    public event ActionNextEventHandler ActionNext
+    public event DaliEventHandlerWithReturnType<object,ActionNextEventArgs,bool> ActionNext
     {
       add
       {
@@ -1032,7 +943,7 @@
       return false;
     }
 
-    public event ActionPreviousEventHandler ActionPrevious
+    public event DaliEventHandlerWithReturnType<object,ActionPreviousEventArgs,bool> ActionPrevious
     {
       add
       {
@@ -1079,7 +990,7 @@
       return false;
     }
 
-    public event ActionActivateEventHandler ActionActivate
+    public event DaliEventHandlerWithReturnType<object,ActionActivateEventArgs,bool> ActionActivate
     {
       add
       {
@@ -1126,7 +1037,7 @@
       return false;
     }
 
-    public event ActionReadEventHandler ActionRead
+    public event DaliEventHandlerWithReturnType<object,ActionReadEventArgs,bool> ActionRead
     {
       add
       {
@@ -1173,7 +1084,7 @@
       return false;
     }
 
-    public event ActionOverEventHandler ActionOver
+    public event DaliEventHandlerWithReturnType<object,ActionOverEventArgs,bool> ActionOver
     {
       add
       {
@@ -1220,7 +1131,7 @@
       return false;
     }
 
-    public event ActionReadNextEventHandler ActionReadNext
+    public event DaliEventHandlerWithReturnType<object,ActionReadNextEventArgs,bool> ActionReadNext
     {
       add
       {
@@ -1268,7 +1179,7 @@
     }
 
 
-    public event ActionReadPreviousEventHandler ActionReadPrevious
+    public event DaliEventHandlerWithReturnType<object,ActionReadPreviousEventArgs,bool> ActionReadPrevious
     {
       add
       {
@@ -1315,7 +1226,7 @@
       return false;
     }
 
-    public event ActionUpEventHandler ActionUp
+    public event DaliEventHandlerWithReturnType<object,ActionUpEventArgs,bool> ActionUp
     {
       add
       {
@@ -1362,7 +1273,7 @@
       return false;
     }
 
-    public event ActionDownEventHandler ActionDown
+    public event DaliEventHandlerWithReturnType<object,ActionDownEventArgs,bool> ActionDown
     {
       add
       {
@@ -1409,7 +1320,7 @@
       return false;
     }
 
-    public event ActionClearFocusEventHandler ActionClearFocus
+    public event DaliEventHandlerWithReturnType<object,ActionClearFocusEventArgs,bool> ActionClearFocus
     {
       add
       {
@@ -1456,7 +1367,7 @@
       return false;
     }
 
-    public event ActionBackEventHandler ActionBack
+    public event DaliEventHandlerWithReturnType<object,ActionBackEventArgs,bool> ActionBack
     {
       add
       {
@@ -1503,7 +1414,7 @@
       return false;
     }
 
-    public event ActionScrollUpEventHandler ActionScrollUp
+    public event DaliEventHandlerWithReturnType<object,ActionScrollUpEventArgs,bool> ActionScrollUp
     {
       add
       {
@@ -1550,7 +1461,7 @@
       return false;
     }
 
-    public event ActionScrollDownEventHandler ActionScrollDown
+    public event DaliEventHandlerWithReturnType<object,ActionScrollDownEventArgs,bool> ActionScrollDown
     {
       add
       {
@@ -1598,7 +1509,7 @@
     }
 
 
-    public event ActionPageLeftEventHandler ActionPageLeft
+    public event DaliEventHandlerWithReturnType<object,ActionPageLeftEventArgs,bool> ActionPageLeft
     {
       add
       {
@@ -1645,7 +1556,7 @@
       return false;
     }
 
-    public event ActionPageRightEventHandler ActionPageRight
+    public event DaliEventHandlerWithReturnType<object,ActionPageRightEventArgs,bool> ActionPageRight
     {
       add
       {
@@ -1692,7 +1603,7 @@
       return false;
     }
 
-    public event ActionPageUpEventHandler ActionPageUp
+    public event DaliEventHandlerWithReturnType<object,ActionPageUpEventArgs, bool> ActionPageUp
     {
       add
       {
@@ -1740,7 +1651,7 @@
     }
 
 
-    public event ActionPageDownEventHandler ActionPageDown
+    public event DaliEventHandlerWithReturnType<object,ActionPageDownEventArgs,bool> ActionPageDown
     {
       add
       {
@@ -1788,7 +1699,7 @@
     }
 
 
-    public event ActionMoveToFirstEventHandler ActionMoveToFirst
+    public event DaliEventHandlerWithReturnType<object,ActionMoveToFirstEventArgs,bool> ActionMoveToFirst
     {
       add
       {
@@ -1835,7 +1746,7 @@
       return false;
     }
 
-    public event ActionMoveToLastEventHandler ActionMoveToLast
+    public event DaliEventHandlerWithReturnType<object,ActionMoveToLastEventArgs,bool> ActionMoveToLast
     {
       add
       {
@@ -1882,7 +1793,7 @@
       return false;
     }
 
-    public event ActionReadFromTopEventHandler ActionReadFromTop
+    public event DaliEventHandlerWithReturnType<object,ActionReadFromTopEventArgs,bool> ActionReadFromTop
     {
       add
       {
@@ -1929,7 +1840,7 @@
       return false;
     }
 
-    public event ActionReadFromNextEventHandler ActionReadFromNext
+    public event DaliEventHandlerWithReturnType<object,ActionReadFromNextEventArgs,bool> ActionReadFromNext
     {
       add
       {
@@ -1976,7 +1887,7 @@
       return false;
     }
 
-    public event ActionZoomEventHandler ActionZoom
+    public event DaliEventHandlerWithReturnType<object,ActionZoomEventArgs,bool> ActionZoom
     {
       add
       {
@@ -2023,7 +1934,7 @@
       return false;
     }
 
-    public event ActionReadIndicatorInformationEventHandler ActionReadIndicatorInformation
+    public event DaliEventHandlerWithReturnType<object,ActionReadIndicatorInformationEventArgs,bool> ActionReadIndicatorInformation
     {
       add
       {
@@ -2070,7 +1981,7 @@
       return false;
     }
 
-    public event ActionReadPauseResumeEventHandler ActionReadPauseResume
+    public event DaliEventHandlerWithReturnType<object,ActionReadPauseResumeEventArgs,bool> ActionReadPauseResume
     {
       add
       {
@@ -2117,7 +2028,7 @@
       return false;
     }
 
-    public event ActionStartStopEventHandler ActionStartStop
+    public event DaliEventHandlerWithReturnType<object,ActionStartStopEventArgs,bool> ActionStartStop
     {
       add
       {
@@ -2164,7 +2075,7 @@
       return false;
     }
 
-    public event ActionScrollEventHandler ActionScroll
+    public event DaliEventHandlerWithReturnType<object,ActionScrollEventArgs,bool> ActionScroll
     {
       add
       {
@@ -2212,7 +2123,7 @@
       return false;
     }
 
-    public event FocusChangedEventHandler FocusChanged
+    public event DaliEventHandler<object,FocusChangedEventArgs> FocusChanged
     {
       add
       {
@@ -2259,7 +2170,7 @@
       }
     }
 
-    public event FocusedActorActivatedEventHandler FocusedActorActivated
+    public event DaliEventHandler<object,FocusedActorActivatedEventArgs> FocusedActorActivated
     {
       add
       {
@@ -2306,7 +2217,7 @@
     }
 
 
-    public event FocusOvershotEventHandler FocusOvershot
+    public event DaliEventHandler<object,FocusOvershotEventArgs> FocusOvershot
     {
       add
       {

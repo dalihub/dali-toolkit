@@ -298,7 +298,7 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 }
 
 ItemView::ItemView(ItemFactory& factory)
-: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
+: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
   mItemsParentOrigin(ParentOrigin::CENTER),
   mItemsAnchorPoint(AnchorPoint::CENTER),

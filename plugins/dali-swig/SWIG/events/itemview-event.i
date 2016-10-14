@@ -32,14 +32,11 @@ using System.Runtime.InteropServices;
   }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void LayoutActivatedEventHandler(object source, LayoutActivatedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void LayoutActivatedEventCallbackDelegate();
-  private LayoutActivatedEventHandler _itemViewLayoutActivatedEventHandler;
+  private DaliEventHandler<object,LayoutActivatedEventArgs> _itemViewLayoutActivatedEventHandler;
   private LayoutActivatedEventCallbackDelegate _itemViewLayoutActivatedEventCallbackDelegate;
 
-  public event LayoutActivatedEventHandler LayoutActivated
+  public event DaliEventHandler<object,LayoutActivatedEventArgs> LayoutActivated
   {
      add
      {

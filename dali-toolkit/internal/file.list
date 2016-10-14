@@ -43,6 +43,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
+   $(toolkit_src_dir)/controls/navigation-view/navigation-view-impl.cpp \
    $(toolkit_src_dir)/controls/popup/confirmation-popup-impl.cpp \
    $(toolkit_src_dir)/controls/model3d-view/model3d-view-impl.cpp \
    $(toolkit_src_dir)/controls/model3d-view/obj-loader.cpp \
@@ -85,9 +86,10 @@ toolkit_src_files = \
    $(toolkit_src_dir)/filters/emboss-filter.cpp \
    $(toolkit_src_dir)/filters/image-filter.cpp \
    $(toolkit_src_dir)/filters/spread-filter.cpp \
-   $(toolkit_src_dir)/image-atlas/atlas-packer.cpp \
-   $(toolkit_src_dir)/image-atlas/image-atlas-impl.cpp \
-   $(toolkit_src_dir)/image-atlas/image-load-thread.cpp \
+   $(toolkit_src_dir)/image-loader/async-image-loader-impl.cpp \
+   $(toolkit_src_dir)/image-loader/atlas-packer.cpp \
+   $(toolkit_src_dir)/image-loader/image-atlas-impl.cpp \
+   $(toolkit_src_dir)/image-loader/image-load-thread.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
    $(toolkit_src_dir)/text/bidirectional-support.cpp \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \

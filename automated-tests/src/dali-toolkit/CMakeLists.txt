@@ -41,6 +41,7 @@ SET(TC_SOURCES
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
    utc-Dali-Magnifier.cpp
+   utc-Dali-NavigationView.cpp
    utc-Dali-Popup.cpp
    utc-Dali-ProgressBar.cpp
    utc-Dali-PushButton.cpp
@@ -54,6 +55,7 @@ SET(TC_SOURCES
    utc-Dali-DebugRendering.cpp
    utc-Dali-ImageAtlas.cpp
    utc-Dali-VideoView.cpp
+   utc-Dali-AsyncImageLoader.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

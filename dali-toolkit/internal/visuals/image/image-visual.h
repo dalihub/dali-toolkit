@@ -20,11 +20,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/object/weak-handle.h>
 
 namespace Dali
 {
@@ -72,7 +74,7 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DEFAULT"
  *
  */
-class ImageVisual: public Visual::Base, public ConnectionTracker
+class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver
 {
 public:
 
@@ -99,6 +101,16 @@ public:  // from Visual
    * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::DoSetProperty
+   */
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @copydoc Visual::Base::DoGetProperty
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
   /**
@@ -149,6 +161,14 @@ public:
    * @param[in] image The image to use
    */
   void SetImage( Actor& actor, const Image& image );
+
+  /**
+   * @copydoc AtlasUploadObserver::UploadCompleted
+   *
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the loading is finished.
+   */
+  virtual void UploadCompleted();
 
 private:
 
@@ -239,6 +259,7 @@ private:
   Image mImage;
   PixelData mPixels;
   Vector4 mPixelArea;
+  WeakHandle<Actor> mPlacementActor;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;

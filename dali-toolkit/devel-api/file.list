@@ -8,6 +8,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
   $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
+  $(devel_api_src_dir)/controls/navigation-view/navigation-view.cpp \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
@@ -20,7 +21,9 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
-  $(devel_api_src_dir)/image-atlas/image-atlas.cpp \
+  $(devel_api_src_dir)/image-loader/async-image-loader.cpp \
+  $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
+  $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
@@ -52,6 +55,9 @@ devel_api_effects_view_header_files = \
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
 
+devel_api_navigation_view_header_files = \
+  $(devel_api_src_dir)/controls/navigation-view/navigation-view.h
+
 devel_api_page_turn_view_header_files = \
   $(devel_api_src_dir)/controls/page-turn-view/page-factory.h \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
@@ -75,8 +81,10 @@ devel_api_shadow_view_header_files = \
 devel_api_focus_manager_header_files = \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h
 
-devel_api_image_atlas_header_files = \
-  $(devel_api_src_dir)/image-atlas/image-atlas.h
+devel_api_image_loader_header_files = \
+  $(devel_api_src_dir)/image-loader/async-image-loader.h \
+  $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
+  $(devel_api_src_dir)/image-loader/image-atlas.h
 
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \

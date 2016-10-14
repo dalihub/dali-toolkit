@@ -51,23 +51,19 @@ public class SnapStartedEventArgs : EventArgs
    }
 }
 
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void SnapStartedEventHandler(object source, SnapStartedEventArgs e);
-
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void SnapStartedCallbackDelegate(IntPtr data);
-  private SnapStartedEventHandler _scrollViewSnapStartedEventHandler;
+  private DaliEventHandler<object,SnapStartedEventArgs> _scrollViewSnapStartedEventHandler;
   private SnapStartedCallbackDelegate _scrollViewSnapStartedCallbackDelegate;
 
   /**
     * @brief Event for SnapStarted signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of SnapStartedEventHandler) provided by the user.
+    * (in the type of SnapStartedEventHandler-DaliEventHandler<object,SnapStartedEventArgs>) provided by the user.
     * SnapStarted signal is emitted hen the ScrollView has started to snap or flick (it tells the target
     * position, scale, rotation for the snap or flick).
     *
     */
- public event SnapStartedEventHandler SnapStarted
+ public event DaliEventHandler<object,SnapStartedEventArgs> SnapStarted
   {
      add
      {

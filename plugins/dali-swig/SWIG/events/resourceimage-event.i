@@ -44,14 +44,11 @@ public class LoadingFinishedEventArgs : EventArgs
 }
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void LoadingFinishedEventHandler(object source, LoadingFinishedEventArgs e);
-
-  [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void LoadingFinishedEventCallbackDelegate(IntPtr ResourceImage);
-  private LoadingFinishedEventHandler _resourceImageLoadingFinishedEventHandler;
+  private DaliEventHandler<object,LoadingFinishedEventArgs> _resourceImageLoadingFinishedEventHandler;
   private LoadingFinishedEventCallbackDelegate _resourceImageLoadingFinishedEventCallbackDelegate;
 
-  public event LoadingFinishedEventHandler LoadingFinished
+  public event DaliEventHandler<object,LoadingFinishedEventArgs> LoadingFinished
   {
      add
      {

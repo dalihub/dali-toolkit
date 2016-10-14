@@ -1071,7 +1071,7 @@ void TableView::OnChildRemove( Actor& child )
 }
 
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mCellData( initialRows, initialColumns ),
   mLayoutingChild( false ),
   mRowDirty( true ),     // Force recalculation first time

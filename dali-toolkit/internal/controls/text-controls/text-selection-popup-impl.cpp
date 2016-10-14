@@ -804,7 +804,7 @@ std::string TextSelectionPopup::GetPressedImage() const
  }
 
 TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface )
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mToolbar(),
   mPopupMaxSize(),
   mOptionMaxSize(),

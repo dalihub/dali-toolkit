@@ -624,7 +624,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS ) ),   // Enable size negotiation
+: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS | DISABLE_STYLE_CHANGE_SIGNALS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
