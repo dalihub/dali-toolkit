@@ -80,6 +80,11 @@ void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementAct
   Control::RegisterVisual( index, placementActor, visual );
 }
 
+void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual, bool enabled )
+{
+  Control::RegisterVisual( index, placementActor, visual, enabled );
+}
+
 void DummyControlImpl::UnregisterVisual( Property::Index index )
 {
   Control::UnregisterVisual( index );
@@ -88,6 +93,16 @@ void DummyControlImpl::UnregisterVisual( Property::Index index )
 Toolkit::Visual::Base DummyControlImpl::GetVisual( Property::Index index )
 {
   return Control::GetVisual( index );
+}
+
+void DummyControlImpl::EnableVisual( Property::Index index, bool enabled )
+{
+  Control::EnableVisual( index, enabled );
+}
+
+bool DummyControlImpl::IsVisualEnabled( Property::Index index )
+{
+  return Control::IsVisualEnabled( index );
 }
 
 Actor DummyControlImpl::GetPlacementActor( Property::Index index )
