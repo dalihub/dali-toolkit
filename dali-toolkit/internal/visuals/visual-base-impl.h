@@ -85,6 +85,11 @@ public:
   const Vector2& GetSize() const;
 
   /**
+   * @copydoc Toolkit::Visual::Base::GetHeightForWidth
+   */
+  virtual float GetHeightForWidth( float width ) const;
+
+  /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
@@ -120,7 +125,7 @@ public:
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha(  bool preMultipled );
+  void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
    * @brief Query whether alpha is pre-multiplied.

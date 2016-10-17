@@ -29,6 +29,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/primitive/primitive-visual.cpp \
    $(toolkit_src_dir)/visuals/svg/svg-rasterize-thread.cpp \
    $(toolkit_src_dir)/visuals/svg/svg-visual.cpp \
+   $(toolkit_src_dir)/visuals/text/text-visual.cpp \
    $(toolkit_src_dir)/visuals/wireframe/wireframe-visual.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
@@ -112,6 +113,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/text-font-style.cpp \
    $(toolkit_src_dir)/text/text-io.cpp \
    $(toolkit_src_dir)/text/text-scroller.cpp \
+   $(toolkit_src_dir)/text/text-scroller-data.cpp \
    $(toolkit_src_dir)/text/text-scroller-interface.cpp \
    $(toolkit_src_dir)/text/text-view.cpp \
    $(toolkit_src_dir)/text/text-view-interface.cpp \

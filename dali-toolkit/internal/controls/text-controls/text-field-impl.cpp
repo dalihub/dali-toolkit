@@ -1246,7 +1246,7 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
-  void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
+void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 {
   Actor self = Self();
   Actor renderableActor;

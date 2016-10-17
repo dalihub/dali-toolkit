@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-controller.h>
-#include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {
@@ -88,6 +87,14 @@ namespace FontStyle
     INPUT    ///< The input font's style.
   };
 };
+
+/**
+ * @brief Sets the font family property.
+ *
+ * @param[in] controller The text's controller.
+ * @param[in] value The value of the font's family.
+ */
+void SetFontFamilyProperty( ControllerPtr controller, const Property::Value& value );
 
 /**
  * @brief Sets the font's style property.

@@ -84,6 +84,11 @@ const Vector2& Visual::Base::GetSize() const
   return mImpl->mSize;
 }
 
+float Visual::Base::GetHeightForWidth( float width ) const
+{
+  return 0.f;
+}
+
 void Visual::Base::GetNaturalSize( Vector2& naturalSize ) const
 {
   naturalSize = Vector2::ZERO;
@@ -124,6 +129,16 @@ void Visual::Base::SetOffStage( Actor& actor )
   }
 }
 
+void Visual::Base::CreatePropertyMap( Property::Map& map ) const
+{
+  DoCreatePropertyMap( map );
+
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->CreatePropertyMap( map );
+  }
+}
+
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
   if(preMultipled)
@@ -150,16 +165,6 @@ void Visual::Base::DoSetOffStage( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
-}
-
-void Visual::Base::CreatePropertyMap( Property::Map& map ) const
-{
-  DoCreatePropertyMap( map );
-
-  if( mImpl->mCustomShader )
-  {
-    mImpl->mCustomShader->CreatePropertyMap( map );
-  }
 }
 
 bool Visual::Base::GetIsOnStage() const

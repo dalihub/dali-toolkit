@@ -22,10 +22,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/text-controller.h>
-#include <dali-toolkit/internal/text/text-scroller-interface.h>
-#include <dali-toolkit/internal/text/rendering/text-renderer.h>
-#include <dali-toolkit/internal/text/text-scroller.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
 
 namespace Dali
 {
@@ -39,7 +36,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface
+class TextLabel : public Control, public Text::ControlInterface
 {
 public:
 
@@ -107,13 +104,6 @@ private: // From Control
    */
   virtual void RequestTextRelayout();
 
-private: // from TextScroller
-
-  /**
-   * @copydoc Text::ScrollerInterface::ScrollingFinished()
-   */
-  virtual void ScrollingFinished();
-
 private: // Implementation
 
   /**
@@ -132,27 +122,9 @@ private:
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
 
-  // Connection needed to re-render text, when a Text Label returns to the stage
-  void OnStageConnect( Dali::Actor actor );
-
-  /**
-   * @brief Render view, create and attach actor(s) to this Text Label
-   */
-  void RenderText();
-
-  /**
-   * @brief Set up Autoscrolling
-   */
-  void SetUpAutoScrolling();
-
 private: // Data
 
-  Text::ControllerPtr mController;
-  Text::RendererPtr mRenderer;
-  Text::TextScrollerPtr mTextScroller;
-  Actor mRenderableActor;
-  int mRenderingBackend;
-  bool mHasBeenStaged:1;
+  Toolkit::Visual::Base mVisual;
 };
 
 } // namespace Internal

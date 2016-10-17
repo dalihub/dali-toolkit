@@ -90,6 +90,15 @@ public:
   const Vector2& GetSize() const;
 
   /**
+   * @brief Returns the height for a given width.
+   *
+   * @param[in] width Width to use.
+   *
+   * @return The height based on the width.
+   */
+  float GetHeightForWidth( float width ) const;
+
+  /**
    * @brief Return the natural size of the visual.
    *
    * Deriving classes stipulate the natural size and by default a visual has a ZERO natural size.
