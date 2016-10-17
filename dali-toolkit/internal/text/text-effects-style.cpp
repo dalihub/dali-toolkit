@@ -35,7 +35,9 @@ namespace
 {
 const std::string COLOR_KEY( "color" );
 const std::string OFFSET_KEY( "offset" );
-const std::string THICKNESS_KEY( "thickness" );
+const std::string HEIGHT_KEY( "height" );
+const std::string ENABLE_KEY( "enable" );
+const std::string TRUE_TOKEN( "true" );
 }
 
 bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type )
@@ -44,23 +46,7 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
 
   if( controller )
   {
-    const std::string properties = value.Get< std::string >();
-
-    switch( type )
-    {
-      case EffectStyle::DEFAULT:
-      {
-        // Stores the default underline's properties string to be recovered by the GetUnderlineProperties() function.
-        controller->SetDefaultUnderlineProperties( properties );
-        break;
-      }
-      case EffectStyle::INPUT:
-      {
-        // Stores the input underline's properties string to be recovered by the GetUnderlineProperties() function.
-        controller->SetInputUnderlineProperties( properties );
-        break;
-      }
-    }
+    const std::string properties = value.Get<std::string>();
 
     // Parses and applies the style.
     Property::Map map;
@@ -68,7 +54,18 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
 
     if( !map.Empty() )
     {
-      /// Color key
+      /// Enable key.
+      Property::Value* enableValue = map.Find( ENABLE_KEY );
+
+      bool enabled = false;
+      const bool enabledDefined = enableValue != NULL;
+      if( enabledDefined )
+      {
+        const std::string enableStr = enableValue->Get<std::string>();
+        enabled = TokenComparison( TRUE_TOKEN, enableStr.c_str(), enableStr.size() );
+      }
+
+      /// Color key.
       Property::Value* colorValue = map.Find( COLOR_KEY );
 
       Vector4 color;
@@ -80,25 +77,25 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
         ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
       }
 
-      /// Thickness key
-      Property::Value* thicknessValue = map.Find( THICKNESS_KEY );
+      /// Height key.
+      Property::Value* heightValue = map.Find( HEIGHT_KEY );
 
-      float thickness = 0.f;
-      const bool thicknessDefined = thicknessValue != NULL;
-      if( thicknessDefined )
+      float height = 0.f;
+      const bool heightDefined = heightValue != NULL;
+      if( heightDefined )
       {
-        const std::string thicknessStr = thicknessValue->Get<std::string>();
+        const std::string heightStr = heightValue->Get<std::string>();
 
-        thickness = StringToFloat( thicknessStr.c_str() );
+        height = StringToFloat( heightStr.c_str() );
       }
 
       switch( type )
       {
         case EffectStyle::DEFAULT:
         {
-          if( !controller->IsUnderlineEnabled() )
+          if( enabled != controller->IsUnderlineEnabled() )
           {
-            controller->SetUnderlineEnabled( true );
+            controller->SetUnderlineEnabled( enabled );
             update = true;
           }
           // Sets the default underline values.
@@ -108,9 +105,9 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
             update = true;
           }
 
-          if( thicknessDefined &&  fabsf( controller->GetUnderlineHeight() - thickness ) > Math::MACHINE_EPSILON_1000 )
+          if( heightDefined && fabsf( controller->GetUnderlineHeight() - height ) > Math::MACHINE_EPSILON_1000 )
           {
-            controller->SetUnderlineHeight( thickness );
+            controller->SetUnderlineHeight( height );
             update = true;
           }
           break;
@@ -125,11 +122,25 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
     }
     else
     {
-      // Disable underline.
-      if( controller->IsUnderlineEnabled() )
+      switch( type )
       {
-        controller->SetUnderlineEnabled( false );
-        update = true;
+        case EffectStyle::DEFAULT:
+        {
+          // Disable underline.
+          if( controller->IsUnderlineEnabled() )
+          {
+            controller->SetUnderlineEnabled( false );
+            update = true;
+          }
+          break;
+        }
+        case EffectStyle::INPUT:
+        {
+          // Sets the input underline values.
+          // TODO: to be implemented.
+          controller->SetInputUnderlineProperties( properties );
+          break;
+        }
       }
     }
   }
@@ -145,7 +156,23 @@ void GetUnderlineProperties( ControllerPtr controller, Property::Value& value, E
     {
       case EffectStyle::DEFAULT:
       {
-        value = controller->GetDefaultUnderlineProperties();
+        const bool enabled = controller->IsUnderlineEnabled();
+        const Vector4& color = controller->GetUnderlineColor();
+        const float height = controller->GetUnderlineHeight();
+
+        std::string underlineProperties = "{\"enable\":";
+        const std::string enabledStr = enabled ? "true" : "false";
+        underlineProperties += "\"" + enabledStr + "\",";
+
+        std::string colorStr;
+        Vector4ToColorString( color, colorStr );
+        underlineProperties += "\"color\":\"" + colorStr + "\",";
+
+        std::string heightStr;
+        FloatToString( height, heightStr );
+        underlineProperties += "\"height\":\"" + heightStr + "\"}";
+
+        value = underlineProperties;
         break;
       }
       case EffectStyle::INPUT:
@@ -164,22 +191,6 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
   if( controller )
   {
     const std::string properties = value.Get< std::string >();
-
-    switch( type )
-    {
-      case EffectStyle::DEFAULT:
-      {
-        // Stores the default shadow's properties string to be recovered by the GetShadowProperties() function.
-        controller->SetDefaultShadowProperties( properties );
-        break;
-      }
-      case EffectStyle::INPUT:
-      {
-        // Stores the input shadow's properties string to be recovered by the GetShadowProperties() function.
-        controller->SetInputShadowProperties( properties );
-        break;
-      }
-    }
 
     // Parses and applies the style.
     Property::Map map;
@@ -208,7 +219,7 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
       {
         const std::string offsetStr = offsetValue->Get<std::string>();
 
-        StringOffsetToVector2( offsetStr, offset );
+        StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
       }
 
       switch( type )
@@ -237,6 +248,28 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
         }
       }
     }
+    else
+    {
+      switch( type )
+      {
+        case EffectStyle::DEFAULT:
+        {
+          // Disable shadow.
+          if( Vector2::ZERO != controller->GetShadowOffset() )
+          {
+            controller->SetShadowOffset( Vector2::ZERO );
+          }
+          break;
+        }
+        case EffectStyle::INPUT:
+        {
+          // Sets the input shadow values.
+          // TODO: to be implemented.
+          controller->SetInputShadowProperties( properties );
+          break;
+        }
+      }
+    }
   }
 
   return update;
@@ -250,7 +283,20 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
     {
       case EffectStyle::DEFAULT:
       {
-        value = controller->GetDefaultShadowProperties();
+        const Vector4& color = controller->GetShadowColor();
+        const Vector2& offset = controller->GetShadowOffset();
+
+        std::string shadowProperties = "{";
+
+        std::string colorStr;
+        Vector4ToColorString( color, colorStr );
+        shadowProperties += "\"color\":\"" + colorStr + "\",";
+
+        std::string offsetStr;
+        Vector2ToString( offset, offsetStr );
+        shadowProperties += "\"offset\":\"" + offsetStr + "\"}";
+
+        value = shadowProperties;
         break;
       }
       case EffectStyle::INPUT:
