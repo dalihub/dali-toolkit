@@ -116,7 +116,7 @@ void Visual::Base::SetOnStage( Actor& actor )
 
 void Visual::Base::SetOffStage( Actor& actor )
 {
-  if( GetIsOnStage() )
+  if( IsOnStage() )
   {
     DoSetOffStage( actor );
 
@@ -162,12 +162,12 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   }
 }
 
-bool Visual::Base::GetIsOnStage() const
+bool Visual::Base::IsOnStage() const
 {
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
-bool Visual::Base::GetIsFromCache() const
+bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }

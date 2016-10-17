@@ -194,19 +194,20 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
 protected:
+
   /**
    * @brief Gets the on stage state for this Visual
    *
    * @return Returns true if this Visual is on stage, false if it is off the stage
    */
-  bool GetIsOnStage() const;
+  bool IsOnStage() const;
 
   /**
    * @brief Gets whether the Dali::Renderer is from a shared cache (and therefore any modifications will affect other users of that renderer)
    *
    * @return Returns true if the renderer is from shared cache, false otherwise
    */
-  bool GetIsFromCache() const;
+  bool IsFromCache() const;
 
 protected:
   /**

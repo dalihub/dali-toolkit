@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,31 @@ public:
   ImageVisual( VisualFactoryCache& factoryCache );
 
   /**
+   * @brief Constructor with a URL.
+   *
+   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] imageUrl The URL of the image resource to use
+   * @param[in] size The width and height to fit the loaded image to.
+   * @param[in] fittingMode The FittingMode of the resource to load
+   * @param[in] samplingMode The SamplingMode of the resource to load
+   */
+  ImageVisual( VisualFactoryCache& factoryCache,
+               const std::string& imageUrl,
+               ImageDimensions size=ImageDimensions(),
+               FittingMode::Type fittingMode = FittingMode::DEFAULT,
+               Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
+
+  /**
+   * @brief Constructor with an Image type.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] image The image to use
+   */
+  ImageVisual( VisualFactoryCache& factoryCache, const Image& image );
+
+  /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   ~ImageVisual();
@@ -139,30 +164,6 @@ public:
   static Shader GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping );
 
   /**
-   * @brief Sets the image of this visual to the resource at imageUrl
-   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
-   *
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
-   * @param[in] imageUrl The URL of the image resource to use
-   * @param[in] size The width and height to fit the loaded image to.
-   * @param[in] fittingMode The FittingMode of the resource to load
-   * @param[in] samplingMode The SamplingMode of the resource to load
-   */
-  void SetImage( Actor& actor,
-                 const std::string& imageUrl,
-                 ImageDimensions size=ImageDimensions(),
-                 FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                 Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
-
-  /**
-   * @brief Sets the image to be rendered by this visual
-   *
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
-   * @param[in] image The image to use
-   */
-  void SetImage( Actor& actor, const Image& image );
-
-  /**
    * @copydoc AtlasUploadObserver::UploadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
@@ -209,14 +210,14 @@ private:
 
   /**
    * @brief Query whether resources requires to be loaded synchronously.
-   * @return Returns true if synchronoud resource loading is required, false otherwise.
+   * @return Returns true if synchronous resource loading is required, false otherwise.
    */
   bool IsSynchronousResourceLoading() const;
 
   /**
-   * @brief Do the synchronous resource loading
+   * @brief Load the resource synchronously
    */
-  void DoSynchronousResourceLoading();
+  void LoadResourceSynchronously();
 
   /**
    * Load the image.

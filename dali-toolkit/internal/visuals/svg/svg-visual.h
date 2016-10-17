@@ -57,6 +57,17 @@ public:
   SvgVisual( VisualFactoryCache& factoryCache );
 
   /**
+   * @brief Constructor which creates the SVG Visual using the image URL.
+   *
+   * The visual will parse the SVG image once it is set.
+   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] imageUrl The URL to svg resource to use
+   */
+  SvgVisual( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
+
+  /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   ~SvgVisual();
@@ -108,15 +119,6 @@ protected:
 public:
 
   /**
-   * @brief Sets the svg image of this visual to the resource at imageUrl
-   * The visual will parse the svg image once it is set.
-   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
-   *
-   * @param[in] imageUrl The URL to svg resource to use
-   */
-  void SetImage( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
-
-  /**
    * @bried Apply the rasterized image to the visual.
    *
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
@@ -124,6 +126,15 @@ public:
   void ApplyRasterizedImage( PixelData rasterizedPixelData );
 
 private:
+
+  /**
+   * @brief Parses the SVG Image from the set URL.
+   *
+   * @param[in] imageUrl The URL of the image to parse the SVG from.
+   * @param[in] size The required size of the SVG
+   */
+  void ParseFromUrl( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
+
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
    *

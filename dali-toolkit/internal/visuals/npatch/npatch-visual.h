@@ -61,6 +61,26 @@ public:
   NPatchVisual( VisualFactoryCache& factoryCache );
 
   /**
+   * @brief Constructor which creates an N-patch visual using an image URL.
+   *
+   * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] imageUrl The URL to 9 patch image resource to use
+   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
+   */
+  NPatchVisual( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly = false );
+
+  /**
+   * @brief Constructor which creates an N-patch viusal with a NinePatchImage resource.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] image The NinePatchImage to use
+   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
+   */
+  NPatchVisual( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly = false );
+
+  /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   ~NPatchVisual();
@@ -103,25 +123,6 @@ protected:
    * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
-
-public:
-
-  /**
-   * @brief Sets the 9 patch image of this visual to the resource at imageUrl
-   * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
-   *
-   * @param[in] imageUrl The URL to 9 patch image resource to use
-   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
-   */
-  void SetImage( const std::string& imageUrl, bool borderOnly = false );
-
-  /**
-   * @brief Sets the 9 patch image of this viusal to the 9 patch image
-   *
-   * @param[in] image The NinePatchImage to use
-   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
-   */
-  void SetImage( NinePatchImage image, bool borderOnly = false );
 
 private:
 

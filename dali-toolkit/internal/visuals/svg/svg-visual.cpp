@@ -56,10 +56,25 @@ namespace Internal
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mAtlasRect( FULL_TEXTURE_RECT ),
-  mParsedImage( NULL )
+  mImageUrl(),
+  mParsedImage( NULL ),
+  mPlacementActor()
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+}
+
+SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size )
+: Visual::Base( factoryCache ),
+  mAtlasRect( FULL_TEXTURE_RECT ),
+  mImageUrl(),
+  mParsedImage( NULL ),
+  mPlacementActor()
+{
+  // the rasterized image is with pre-multiplied alpha format
+  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+
+  ParseFromUrl( imageUrl, size );
 }
 
 SvgVisual::~SvgVisual()
@@ -78,7 +93,7 @@ void SvgVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
     std::string imageUrl;
     if( imageURLValue->Get( imageUrl ) )
     {
-      SetImage( imageUrl );
+      ParseFromUrl( imageUrl );
     }
     else
     {
@@ -133,7 +148,7 @@ void SvgVisual::GetNaturalSize( Vector2& naturalSize ) const
 
 void SvgVisual::SetSize( const Vector2& size )
 {
-  if(mImpl->mSize != size && mParsedImage && GetIsOnStage() )
+  if(mImpl->mSize != size && mParsedImage && IsOnStage() )
   {
     AddRasterizationTask( size );
   }
@@ -161,30 +176,18 @@ Dali::Property::Value SvgVisual::DoGetProperty( Dali::Property::Index index )
   return Dali::Property::Value();
 }
 
-void SvgVisual::SetImage( const std::string& imageUrl, ImageDimensions size )
+void SvgVisual::ParseFromUrl( const std::string& imageUrl, ImageDimensions size )
 {
-  if( mImageUrl != imageUrl )
+  mImageUrl = imageUrl;
+
+  Vector2 dpi = Stage::GetCurrent().GetDpi();
+  float meanDpi = (dpi.height + dpi.width) * 0.5f;
+  mParsedImage = nsvgParseFromFile( imageUrl.c_str(), UNITS, meanDpi );
+
+  if( size.GetWidth() != 0u && size.GetHeight() != 0u)
   {
-    mImageUrl = imageUrl;
-
-    NSVGimage* parsedImageOld = mParsedImage;
-
-    Vector2 dpi = Stage::GetCurrent().GetDpi();
-    float meanDpi = (dpi.height + dpi.width) * 0.5f;
-    mParsedImage = nsvgParseFromFile(mImageUrl.c_str(), UNITS, meanDpi);
-
-    if( size.GetWidth() != 0u && size.GetHeight() != 0u)
-    {
-      mImpl->mSize.x = size.GetWidth();
-      mImpl->mSize.y = size.GetHeight();
-    }
-
-    if( mImpl->mSize != Vector2::ZERO && GetIsOnStage() )
-    {
-      AddRasterizationTask( mImpl->mSize );
-    }
-
-    mFactoryCache.GetSVGRasterizationThread()->DeleteImage( parsedImageOld );
+    mImpl->mSize.x = size.GetWidth();
+    mImpl->mSize.y = size.GetHeight();
   }
 }
 
@@ -203,7 +206,7 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
 
 void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 {
-  if( GetIsOnStage()  )
+  if( IsOnStage()  )
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if( mAtlasRect != FULL_TEXTURE_RECT )

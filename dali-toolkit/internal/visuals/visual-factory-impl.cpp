@@ -219,17 +219,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
   if( npatchImage )
   {
-    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-    visualPtr->SetImage( npatchImage );
-
+    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ), npatchImage );
     return Toolkit::Visual::Base( visualPtr );
   }
   else
   {
-    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
-    Actor actor;
-    visualPtr->SetImage( actor, image );
-
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ), image );
     return Toolkit::Visual::Base( visualPtr );
   }
 }
@@ -250,23 +245,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   UrlType::Type type = ResolveUrlType( url );
   if( UrlType::N_PATCH == type )
   {
-    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-    visualPtr->SetImage( url );
-
+    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ), url );
     return Toolkit::Visual::Base( visualPtr );
   }
   else if( UrlType::SVG == type )
   {
-    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
-    visualPtr->SetImage( url, size );
+    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ), url, size );
     return Toolkit::Visual::Base( visualPtr );
   }
   else // Regular image
   {
-    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ));
-    Actor actor;
-    visualPtr->SetImage( actor, url, size );
-
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ), url, size );
     return Toolkit::Visual::Base( visualPtr );
   }
 }

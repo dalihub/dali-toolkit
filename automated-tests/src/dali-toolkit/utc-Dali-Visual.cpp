@@ -188,6 +188,12 @@ int UtcDaliVisualSize(void)
   //  </svg>
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION );
 
+  // svg visual with a size
+  Visual::Base svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions(200, 200) );
+  DALI_TEST_EQUALS( svgVisual2.GetSize(), Vector2( 200.f, 200.f ), TEST_LOCATION );
+  svgVisual2.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION ); // Natural size should still be 100, 100
+
   // Batch Image visual
   propertyMap.Clear();
   propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );

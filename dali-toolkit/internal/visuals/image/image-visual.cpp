@@ -190,15 +190,67 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
+  mImage(),
+  mPixels(),
   mPixelArea( FULL_TEXTURE_RECT ),
+  mPlacementActor(),
+  mImageUrl(),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
-  mNativeFragmentShaderCode( ),
+  mNativeFragmentShaderCode(),
   mNativeImageFlag( false )
 {
+}
+
+ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
+                          const std::string& imageUrl,
+                          ImageDimensions size,
+                          FittingMode::Type fittingMode,
+                          Dali::SamplingMode::Type samplingMode )
+: Visual::Base( factoryCache ),
+  mImage(),
+  mPixels(),
+  mPixelArea( FULL_TEXTURE_RECT ),
+  mPlacementActor(),
+  mImageUrl( imageUrl ),
+  mDesiredSize( size ),
+  mFittingMode( fittingMode ),
+  mSamplingMode( samplingMode ),
+  mWrapModeU( WrapMode::DEFAULT ),
+  mWrapModeV( WrapMode::DEFAULT ),
+  mNativeFragmentShaderCode(),
+  mNativeImageFlag( false )
+{
+}
+
+ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
+: Visual::Base( factoryCache ),
+  mImage( image ),
+  mPixels(),
+  mPixelArea( FULL_TEXTURE_RECT ),
+  mPlacementActor(),
+  mImageUrl(),
+  mDesiredSize(),
+  mFittingMode( FittingMode::DEFAULT ),
+  mSamplingMode( SamplingMode::DEFAULT ),
+  mWrapModeU( WrapMode::DEFAULT ),
+  mWrapModeV( WrapMode::DEFAULT ),
+  mNativeFragmentShaderCode(),
+  mNativeImageFlag( false )
+{
+  NativeImage newNativeImage = NativeImage::DownCast( image );
+  if( newNativeImage )
+  {
+    SetNativeFragmentShaderCode( newNativeImage );
+    mNativeImageFlag = true;
+  }
+  else
+  {
+    mNativeImageFlag = false;
+  }
 }
 
 ImageVisual::~ImageVisual()
@@ -282,22 +334,9 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 
   // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
   // ( for on-stage actor with image url unchanged, resource loading is already finished)
-  if( ( !mImpl->mRenderer || imageURLValue) && IsSynchronousResourceLoading() )
+  if( imageURLValue && IsSynchronousResourceLoading() )
   {
-    DoSynchronousResourceLoading();
-  }
-
-  // remove old renderer if exit
-  if( mImpl->mRenderer )
-  {
-    if( actor ) //remove old renderer from actor
-    {
-      actor.RemoveRenderer( mImpl->mRenderer );
-    }
-    if( !oldImageUrl.empty() ) //clean old renderer from cache
-    {
-      CleanCache( oldImageUrl );
-    }
+    LoadResourceSynchronously();
   }
 
   NativeImage nativeImage = NativeImage::DownCast( mImage );
@@ -419,7 +458,7 @@ bool ImageVisual::IsSynchronousResourceLoading() const
   return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 }
 
-void ImageVisual::DoSynchronousResourceLoading()
+void ImageVisual::LoadResourceSynchronously()
 {
   if( !mImageUrl.empty() )
   {
@@ -709,131 +748,6 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
   return shader;
 }
 
-void ImageVisual::SetImage( Actor& actor, const std::string& imageUrl, ImageDimensions size, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode )
-{
-  if( mImageUrl != imageUrl )
-  {
-    std::string oldImageUrl = mImageUrl;
-    mImageUrl = imageUrl;
-    mDesiredSize = size;
-    mFittingMode = fittingMode;
-    mSamplingMode = samplingMode;
-    mImage.Reset();
-
-    if( IsSynchronousResourceLoading() )
-    {
-      DoSynchronousResourceLoading();
-    }
-
-    if( mImpl->mRenderer )
-    {
-      if( GetIsFromCache() ) // if renderer is from cache, remove the old one
-      {
-        //remove old renderer
-        if( actor )
-        {
-          actor.RemoveRenderer( mImpl->mRenderer );
-        }
-
-        //clean the cache
-        if( !oldImageUrl.empty() )
-        {
-          CleanCache(oldImageUrl);
-        }
-
-        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
-        {
-          SetOnStage(actor);
-        }
-      }
-      else // if renderer is not from cache, reuse the same renderer and only change the texture
-      {
-        Image image = LoadImage( imageUrl, IsSynchronousResourceLoading() );
-        ApplyImageToSampler( image );
-      }
-    }
-  }
-}
-
-void ImageVisual::SetImage( Actor& actor, const Image& image )
-{
-  if( mImage != image )
-  {
-    NativeImage newNativeImage = NativeImage::DownCast( image );
-    bool newRendererFlag = true;
-
-    if( newNativeImage && !mNativeImageFlag )
-    {
-      SetNativeFragmentShaderCode( newNativeImage );
-    }
-
-    if( ( newNativeImage && mNativeImageFlag ) || ( !newNativeImage && !mNativeImageFlag ) )
-    {
-      newRendererFlag = false;
-    }
-
-    if( newNativeImage )
-    {
-      mNativeImageFlag = true;
-    }
-    else
-    {
-      mNativeFragmentShaderCode.clear();
-      mNativeImageFlag = false;
-    }
-
-    mImage = image;
-
-    if( mImpl->mRenderer )
-    {
-      // if renderer is from cache, remove the old one, and create new renderer
-      if( GetIsFromCache() )
-      {
-        //remove old renderer
-        if( actor )
-        {
-          actor.RemoveRenderer( mImpl->mRenderer );
-        }
-
-        //clean the cache
-        if( !mImageUrl.empty() )
-        {
-          CleanCache(mImageUrl);
-        }
-        mImageUrl.clear();
-
-        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
-        {
-          SetOnStage(actor);
-        }
-      }
-      // if input image is nativeImage and mImage is regular image or the reverse, remove the old one, and create new renderer
-      else if( newRendererFlag )
-      {
-        //remove old renderer
-        if( actor )
-        {
-          actor.RemoveRenderer( mImpl->mRenderer );
-        }
-
-        if( actor && actor.OnStage() ) // if actor on stage, create a new renderer and apply to actor
-        {
-          SetOnStage(actor);
-        }
-      }
-      else // if renderer is not from cache, reuse the same renderer and only change the texture
-      {
-        ApplyImageToSampler( image );
-      }
-    }
-
-    mImageUrl.clear();
-    mDesiredSize = ImageDimensions();
-    mFittingMode = FittingMode::DEFAULT;
-    mSamplingMode = SamplingMode::DEFAULT;
-  }
-}
-
 void ImageVisual::ApplyImageToSampler( const Image& image )
 {
   if( image )
@@ -865,20 +779,23 @@ void ImageVisual::OnImageLoaded( ResourceImage image )
 
 void ImageVisual::CleanCache(const std::string& url)
 {
-  TextureSet textureSet = mImpl->mRenderer.GetTextures();
-
-  Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
-  Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
-  if( index != Property::INVALID_INDEX )
+  if( IsFromCache() )
   {
-    Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
-    atlasRectValue.Get( atlasRect );
-  }
+    TextureSet textureSet = mImpl->mRenderer.GetTextures();
 
-  mImpl->mRenderer.Reset();
-  if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
-  {
-    mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
+    Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+    if( index != Property::INVALID_INDEX )
+    {
+      Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
+      atlasRectValue.Get( atlasRect );
+    }
+
+    mImpl->mRenderer.Reset();
+    if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
+    {
+      mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    }
   }
 }
 
