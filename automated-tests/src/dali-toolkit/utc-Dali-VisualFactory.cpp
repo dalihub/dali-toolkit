@@ -1139,6 +1139,46 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   END_TEST;
 }
 
+int UtcDaliVisualFactoryGetSvgVisualLarge(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetSvgVisual: Request svg visual with a svg url" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions( 2000, 2000 ) );
+  DALI_TEST_CHECK( visual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+  visual.SetOnStage( actor );
+  application.SendNotification();
+  application.Render();
+
+  // renderer is not added to actor until the rasterization is completed.
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
+  CallbackBase* callback = eventTrigger->GetCallback();
+
+  eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
+  CallbackBase::Execute( *callback );
+
+  // renderer is added to actor
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  // waiting for the resource uploading
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 //Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
 //This is expected to succeed, which will then pass the test.
 void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplication& application )

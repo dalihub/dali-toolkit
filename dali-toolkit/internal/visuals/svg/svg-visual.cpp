@@ -228,8 +228,9 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
     }
     else // no atlasing
     {
-      Atlas texture = Atlas::New( rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight() );
-      texture.Upload( rasterizedPixelData, 0, 0 );
+      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888,
+                                      rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight() );
+      texture.Upload( rasterizedPixelData );
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
       if( mAtlasRect == FULL_TEXTURE_RECT )
@@ -247,7 +248,7 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 
       if( textureSet )
       {
-        TextureSetImage( textureSet, 0u, texture );
+        textureSet.SetTexture( 0, texture );
       }
     }
 
