@@ -196,17 +196,13 @@ private:
 
   /**
    * @brief Creates the Dali::Renderer (potentially from the renderer cache), initializing it
-   *
-   * @return Returns the created Dali::Renderer
    */
-  Renderer CreateRenderer() const;
+  void CreateRenderer();
 
   /**
    * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
-   *
-   * @return Returns the created Dali::Renderer
    */
-  Renderer CreateNativeImageRenderer() const;
+  void CreateNativeImageRenderer();
 
   /**
    * @brief Query whether resources requires to be loaded synchronously.
@@ -220,19 +216,13 @@ private:
   void LoadResourceSynchronously();
 
   /**
-   * Load the image.
+   * Creates the texture set and adds the texture to it
+   * @param[out] textureRect The texture area of the texture in the atlas.
    * @param[in] url The URL of the image resource to use.
    * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
+   * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
    */
-  Image LoadImage( const std::string& url, bool synchronousLoading );
-
-  /**
-   * Load the image and create a texture set to hold the texture, with automatic atlasing applied.
-   * @param [out] textureRect The texture area of the resource image in the atlas.
-   * @param[in] url The URL of the image resource to use.
-   * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
-   */
-  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading );
+  void CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing );
 
   /**
    * Callback function of image resource loading succeed
@@ -257,20 +247,21 @@ private:
   void SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage );
 
 private:
+
   Image mImage;
   PixelData mPixels;
+  TextureSet mTextureSet;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
-
   std::string mImageUrl;
-  Dali::ImageDimensions mDesiredSize;
-  Dali::FittingMode::Type mFittingMode;
-  Dali::SamplingMode::Type mSamplingMode;
-  Dali::WrapMode::Type mWrapModeU;
-  Dali::WrapMode::Type mWrapModeV;
-
   std::string mNativeFragmentShaderCode;
-  bool mNativeImageFlag;
+
+  Dali::ImageDimensions mDesiredSize;
+  Dali::FittingMode::Type mFittingMode:3;
+  Dali::SamplingMode::Type mSamplingMode:4;
+  Dali::WrapMode::Type mWrapModeU:3;
+  Dali::WrapMode::Type mWrapModeV:3;
+  bool mNativeImageFlag:1;
 };
 
 } // namespace Internal
