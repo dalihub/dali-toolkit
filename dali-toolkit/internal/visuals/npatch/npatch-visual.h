@@ -18,16 +18,17 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/devel-api/images/nine-patch-image.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -37,6 +38,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class NPatchVisual;
+typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
 
 /**
  * The visual which renders an 9 patch image to the control's quad
@@ -54,14 +58,15 @@ class NPatchVisual: public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new n-patch visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  NPatchVisual( VisualFactoryCache& factoryCache );
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache );
 
   /**
-   * @brief Constructor which creates an N-patch visual using an image URL.
+   * @brief Create an N-patch visual using an image URL.
    *
    * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
@@ -69,21 +74,16 @@ public:
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
    */
-  NPatchVisual( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly = false );
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly = false );
 
   /**
-   * @brief Constructor which creates an N-patch viusal with a NinePatchImage resource.
+   * @brief Create an N-patch visual with a NinePatchImage resource.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] image The NinePatchImage to use
    * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
    */
-  NPatchVisual( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly = false );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  ~NPatchVisual();
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly = false );
 
 public:  // from Visual
 
@@ -108,6 +108,19 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
+   */
+  NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly = false );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~NPatchVisual();
 
   /**
    * @copydoc Visual::Base::DoInitialize

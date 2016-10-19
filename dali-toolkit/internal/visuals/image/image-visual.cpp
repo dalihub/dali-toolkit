@@ -186,7 +186,26 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
   return geometry;
 }
 
-} //unnamed namespace
+} // unnamed namespace
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new ImageVisual( factoryCache );
+}
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 const std::string& imageUrl,
+                                 ImageDimensions size,
+                                 FittingMode::Type fittingMode,
+                                 Dali::SamplingMode::Type samplingMode )
+{
+  return new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode );
+}
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, const Image& image )
+{
+  return new ImageVisual( factoryCache, image );
+}
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),

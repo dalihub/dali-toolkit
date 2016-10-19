@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_VISUAL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
@@ -29,6 +32,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class ColorVisual;
+typedef IntrusivePtr< ColorVisual > ColorVisualPtr;
 
 /**
  * The visual which renders a solid color to the control's quad
@@ -44,16 +50,12 @@ class ColorVisual: public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new color visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  ColorVisual( VisualFactoryCache& factoryCache );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  virtual ~ColorVisual();
+  static ColorVisualPtr New( VisualFactoryCache& factoryCache );
 
 public:  // from Visual
 
@@ -78,6 +80,18 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   */
+  ColorVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~ColorVisual();
 
   /**
    * @copydoc Visual::Base::DoInitialize

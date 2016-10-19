@@ -53,6 +53,18 @@ namespace Toolkit
 namespace Internal
 {
 
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new SvgVisual( factoryCache );
+}
+
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size )
+{
+  SvgVisual* svgVisual = new SvgVisual( factoryCache );
+  svgVisual->ParseFromUrl( imageUrl, size );
+  return svgVisual;
+}
+
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mAtlasRect( FULL_TEXTURE_RECT ),
@@ -62,19 +74,6 @@ SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
-}
-
-SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size )
-: Visual::Base( factoryCache ),
-  mAtlasRect( FULL_TEXTURE_RECT ),
-  mImageUrl(),
-  mParsedImage( NULL ),
-  mPlacementActor()
-{
-  // the rasterized image is with pre-multiplied alpha format
-  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
-
-  ParseFromUrl( imageUrl, size );
 }
 
 SvgVisual::~SvgVisual()

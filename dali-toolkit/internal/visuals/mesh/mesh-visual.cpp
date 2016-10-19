@@ -288,7 +288,12 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-} // namespace
+} // unnamed namespace
+
+MeshVisualPtr MeshVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new MeshVisual( factoryCache );
+}
 
 MeshVisual::MeshVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),

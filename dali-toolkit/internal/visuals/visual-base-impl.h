@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/shader.h>
@@ -245,6 +246,8 @@ protected:
   Impl* mImpl;
   VisualFactoryCache& mFactoryCache;
 };
+
+typedef IntrusivePtr<Base> BasePtr;
 
 } // namspace Visual
 

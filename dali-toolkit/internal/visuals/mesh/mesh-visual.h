@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <fstream>
 #include <string.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
@@ -35,6 +36,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class MeshVisual;
+typedef IntrusivePtr< MeshVisual > MeshVisualPtr;
 
 /**
  * The visual which renders a 3D object to the control's quad
@@ -56,16 +60,12 @@ class MeshVisual: public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new mesh visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  MeshVisual( VisualFactoryCache& factoryCache );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  virtual ~MeshVisual();
+  static MeshVisualPtr New( VisualFactoryCache& factoryCache );
 
 public:  // from Visual
 
@@ -90,6 +90,18 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   */
+  MeshVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~MeshVisual();
 
   /**
    * @copydoc Visual::Base::DoInitialize

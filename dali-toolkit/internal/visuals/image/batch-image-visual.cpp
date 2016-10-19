@@ -85,11 +85,16 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-} //unnamed namespace
+} // unnamed namespace
+
+BatchImageVisualPtr BatchImageVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new BatchImageVisual( factoryCache );
+}
 
 BatchImageVisual::BatchImageVisual( VisualFactoryCache& factoryCache )
-  : Visual::Base( factoryCache ),
-    mDesiredSize()
+: Visual::Base( factoryCache ),
+  mDesiredSize()
 {
 }
 
