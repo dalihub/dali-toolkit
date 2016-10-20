@@ -154,18 +154,11 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
   return geometry;
 }
 
-} // namespace
+} // unnamed namespace
 
-TextVisual::TextVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
-  mController( Text::Controller::New() ),
-  mRenderingBackend( Toolkit::Text::DEFAULT_RENDERING_BACKEND ),
-  mHasBeenStaged( false )
+TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache )
 {
-}
-
-TextVisual::~TextVisual()
-{
+  return new TextVisual( factoryCache );
 }
 
 void TextVisual::SetTextControlInterface( Text::ControlInterface* controlInterface )
@@ -252,6 +245,18 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::TextVisual::Property::OUTLINE, value );
 
   map.Insert( Toolkit::TextVisual::Property::BATCHING_ENABLED, false ); // TODO
+}
+
+TextVisual::TextVisual( VisualFactoryCache& factoryCache )
+: Visual::Base( factoryCache ),
+  mController( Text::Controller::New() ),
+  mRenderingBackend( Toolkit::Text::DEFAULT_RENDERING_BACKEND ),
+  mHasBeenStaged( false )
+{
+}
+
+TextVisual::~TextVisual()
+{
 }
 
 void TextVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )

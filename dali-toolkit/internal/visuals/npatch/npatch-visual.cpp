@@ -200,7 +200,33 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new NPatchVisual( factoryCache );
+}
+
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly )
+{
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  nPatchVisual->mImageUrl = imageUrl;
+
+  NinePatchImage image = NinePatchImage::New( imageUrl );
+  nPatchVisual->InitializeFromImage( image );
+
+  return nPatchVisual;
+}
+
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly )
+{
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  nPatchVisual->mImage = image;
+
+  nPatchVisual->InitializeFromImage( image );
+
+  return nPatchVisual;
+}
+
+NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly )
 : Visual::Base( factoryCache ),
   mImage(),
   mCroppedImage(),
@@ -208,35 +234,8 @@ NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
   mStretchPixelsX(),
   mStretchPixelsY(),
   mImageSize(),
-  mBorderOnly( false )
-{
-}
-
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly )
-: Visual::Base( factoryCache ),
-  mImage(),
-  mCroppedImage(),
-  mImageUrl( imageUrl ),
-  mStretchPixelsX(),
-  mStretchPixelsY(),
-  mImageSize(),
   mBorderOnly( borderOnly )
 {
-  NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-  InitializeFromImage( nPatch );
-}
-
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly )
-: Visual::Base( factoryCache ),
-  mImage( image ),
-  mCroppedImage(),
-  mImageUrl(),
-  mStretchPixelsX(),
-  mStretchPixelsY(),
-  mImageSize(),
-  mBorderOnly( borderOnly )
-{
-  InitializeFromImage( image );
 }
 
 NPatchVisual::~NPatchVisual()

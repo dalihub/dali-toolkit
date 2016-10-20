@@ -65,6 +65,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 );
 }
 
+ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new ColorVisual( factoryCache );
+}
+
 ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mMixColorIndex( Property::INVALID_INDEX )

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
@@ -69,19 +72,16 @@ class TextVisual : public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new text visual.
    *
-   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  TextVisual( VisualFactoryCache& factoryCache );
+  static TextVisualPtr New( VisualFactoryCache& factoryCache );
 
   /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  ~TextVisual();
-
-  /**
-   *
+   * @brief Sets the text control interface which is needed to communicate with a control.
+   * @param[in] controlInterface Pointer to the control-interface.
    */
   void SetTextControlInterface( Text::ControlInterface* controlInterface );
 
@@ -107,7 +107,22 @@ public: // from Visual::Base
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
-protected: // from Visual::Base
+protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   */
+  TextVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~TextVisual();
+
+  // from Visual::Base
+
   /**
    * @copydoc Visual::Base::DoInitialize()
    */

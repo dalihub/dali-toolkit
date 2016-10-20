@@ -18,12 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+
 // INTERNAL HEADER
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
-
-// EXTERNAL INCLUDES
-#include <dali/public-api/images/resource-image.h>
 
 namespace Dali
 {
@@ -32,21 +32,20 @@ namespace Toolkit
 namespace Internal
 {
 
+class BatchImageVisual;
+typedef IntrusivePtr< BatchImageVisual > BatchImageVisualPtr;
+
 class BatchImageVisual: public Visual::Base, public ConnectionTracker
 {
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new batch-image visual.
    *
-   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  BatchImageVisual( VisualFactoryCache& factoryCache );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  ~BatchImageVisual();
+  static BatchImageVisualPtr New( VisualFactoryCache& factoryCache );
 
 public:  // from Visual
 
@@ -76,6 +75,18 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   */
+  BatchImageVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  ~BatchImageVisual();
 
   /**
    * @copydoc Visua::Base::DoInitialize

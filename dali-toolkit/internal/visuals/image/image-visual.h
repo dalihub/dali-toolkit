@@ -18,15 +18,16 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/weak-handle.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 
 namespace Dali
 {
@@ -79,14 +80,15 @@ class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUp
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new image visual.
    *
-   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  ImageVisual( VisualFactoryCache& factoryCache );
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache );
 
   /**
-   * @brief Constructor with a URL.
+   * @brief Create a new image visual with a URL.
    *
    * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
@@ -96,24 +98,19 @@ public:
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
-  ImageVisual( VisualFactoryCache& factoryCache,
-               const std::string& imageUrl,
-               ImageDimensions size=ImageDimensions(),
-               FittingMode::Type fittingMode = FittingMode::DEFAULT,
-               Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
+                             const std::string& imageUrl,
+                             ImageDimensions size = ImageDimensions(),
+                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
 
   /**
-   * @brief Constructor with an Image type.
+   * @brief Create a new image visual with an Image type.
    *
    * @param[in] factoryCache The VisualFactoryCache object
    * @param[in] image The image to use
    */
-  ImageVisual( VisualFactoryCache& factoryCache, const Image& image );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  ~ImageVisual();
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache, const Image& image );
 
 public:  // from Visual
 
@@ -138,6 +135,44 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   */
+  ImageVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief Constructor with a URL.
+   *
+   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] imageUrl The URL of the image resource to use
+   * @param[in] size The width and height to fit the loaded image to.
+   * @param[in] fittingMode The FittingMode of the resource to load
+   * @param[in] samplingMode The SamplingMode of the resource to load
+   */
+  ImageVisual( VisualFactoryCache& factoryCache,
+               const std::string& imageUrl,
+               ImageDimensions size,
+               FittingMode::Type fittingMode,
+               Dali::SamplingMode::Type samplingMode );
+
+  /**
+   * @brief Constructor with an Image type.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] image The image to use
+   */
+  ImageVisual( VisualFactoryCache& factoryCache, const Image& image );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~ImageVisual();
+
   /**
    * @copydoc Visual::Base::DoInitialize
    */
