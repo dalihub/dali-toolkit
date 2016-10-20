@@ -118,6 +118,11 @@ ControllerPtr Controller::New( ControlInterface* controlInterface,
                                         editableControlInterface ) );
 }
 
+void Controller::SetTextControlInterface( ControlInterface* controlInterface )
+{
+  mImpl->mControlInterface = controlInterface;
+}
+
 // public : Configure the text controller.
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
@@ -153,9 +158,9 @@ void Controller::SetAutoScrollEnabled( bool enable )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable)?"true":"false", ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX)?"true":"false", this );
 
-  if ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX )
+  if( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX )
   {
-    if ( enable )
+    if( enable )
     {
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n" );
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -165,6 +170,10 @@ void Controller::SetAutoScrollEnabled( bool enable )
                                                                UPDATE_DIRECTION          |
                                                                REORDER );
 
+      if( NULL == mImpl->mAutoScrollData )
+      {
+        mImpl->mAutoScrollData = new ScrollerData();
+      }
     }
     else
     {
@@ -176,39 +185,104 @@ void Controller::SetAutoScrollEnabled( bool enable )
                                                                REORDER );
     }
 
-    mImpl->mAutoScrollEnabled = enable;
+    mImpl->mIsAutoScrollEnabled = enable;
     mImpl->RequestRelayout();
   }
   else
   {
     DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n" );
-    mImpl->mAutoScrollEnabled = false;
+    mImpl->mIsAutoScrollEnabled = false;
   }
 }
 
 bool Controller::IsAutoScrollEnabled() const
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", (mImpl->mAutoScrollEnabled)?"true":"false" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", mImpl->mIsAutoScrollEnabled?"true":"false" );
 
-  return mImpl->mAutoScrollEnabled;
+  return mImpl->mIsAutoScrollEnabled;
 }
 
-CharacterDirection Controller::GetAutoScrollDirection() const
+void Controller::SetAutoscrollSpeed( int scrollSpeed )
 {
-  return mImpl->mAutoScrollDirectionRTL;
-}
-
-float Controller::GetAutoScrollLineAlignment() const
-{
-  float offset = 0.f;
-
-  if( mImpl->mVisualModel &&
-      ( 0u != mImpl->mVisualModel->mLines.Count() ) )
+  if( NULL == mImpl->mAutoScrollData )
   {
-    offset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+    mImpl->mAutoScrollData = new ScrollerData();
   }
 
-  return offset;
+  mImpl->mAutoScrollData->mScrollSpeed = scrollSpeed;
+}
+
+int Controller::GetAutoScrollSpeed() const
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    return mImpl->mAutoScrollData->mScrollSpeed;
+  }
+
+  return 0;
+}
+
+void Controller::SetAutoScrollLoopCount( int loopCount )
+{
+  if( NULL == mImpl->mAutoScrollData )
+  {
+    mImpl->mAutoScrollData = new ScrollerData();
+  }
+
+  mImpl->mAutoScrollData->mLoopCount = loopCount;
+}
+
+int Controller::GetAutoScrollLoopCount() const
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    return mImpl->mAutoScrollData->mLoopCount;
+  }
+
+  return 0;
+}
+
+void Controller::SetAutoScrollWrapGap( float wrapGap )
+{
+  if( NULL == mImpl->mAutoScrollData )
+  {
+    mImpl->mAutoScrollData = new ScrollerData();
+  }
+
+  mImpl->mAutoScrollData->mWrapGap = wrapGap;
+}
+
+float Controller::GetAutoScrollWrapGap() const
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    return mImpl->mAutoScrollData->mWrapGap;
+  }
+
+  return 0.f;
+}
+
+const ScrollerData* const Controller::GetAutoScrollData()
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    // Need to update the data with the latest layout.
+    if( mImpl->mVisualModel )
+    {
+      mImpl->mAutoScrollData->mControlSize = mImpl->mVisualModel->mControlSize;
+      mImpl->mAutoScrollData->mOffscreenSize = GetNaturalSize().GetVectorXY();
+
+      mImpl->mAutoScrollData->mAlignmentOffset = 0.f;
+      if( 0u != mImpl->mVisualModel->mLines.Count() )
+      {
+        mImpl->mAutoScrollData->mAlignmentOffset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+      }
+    }
+
+    return mImpl->mAutoScrollData;
+  }
+
+  return NULL;
 }
 
 void Controller::SetHorizontalScrollEnabled( bool enable )
@@ -1453,7 +1527,7 @@ float Controller::GetHeightForWidth( float width )
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, (mImpl->mAutoScrollEnabled)?"true":"false"  );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, mImpl->mIsAutoScrollEnabled ?"true":"false"  );
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
@@ -1557,6 +1631,11 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
 
   return updateTextType;
+}
+
+void Controller::RequestRelayout()
+{
+  mImpl->RequestRelayout();
 }
 
 // public : Input style change signals.
@@ -2123,6 +2202,17 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
   }
 }
 
+// private : Inherit from TextScroller.
+
+void Controller::ScrollingFinished()
+{
+  // Pure Virtual from TextScroller Interface
+  SetAutoScrollEnabled( false );
+  GetLayoutEngine().SetTextEllipsisEnabled( true );
+
+  mImpl->RequestRelayout();
+}
+
 // private : Update.
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
@@ -2588,7 +2678,10 @@ bool Controller::DoRelayout( const Size& size,
 
       if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
-        mImpl->mAutoScrollDirectionRTL = false;
+        if( NULL != mImpl->mAutoScrollData )
+        {
+          mImpl->mAutoScrollData->mAutoScrollDirectionRTL = false;
+        }
       }
 
       // Reorder the lines
@@ -2624,9 +2717,11 @@ bool Controller::DoRelayout( const Size& size,
           if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
           {
             const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
-            if ( firstline )
+            if( firstline &&
+                mImpl->mIsAutoScrollEnabled &&
+                ( NULL != mImpl->mAutoScrollData ) )
             {
-              mImpl->mAutoScrollDirectionRTL = firstline->direction;
+              mImpl->mAutoScrollData->mAutoScrollDirectionRTL = firstline->direction;
             }
           }
         }
@@ -2658,7 +2753,7 @@ bool Controller::DoRelayout( const Size& size,
 #if defined(DEBUG_ENABLED)
   std::string currentText;
   GetText( currentText );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, ( ( NULL != mImpl->mAutoScrollData ) && mImpl->mAutoScrollData->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
 #endif
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;

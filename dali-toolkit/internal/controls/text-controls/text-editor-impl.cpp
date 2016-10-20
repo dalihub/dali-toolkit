@@ -949,6 +949,7 @@ void TextEditor::OnInitialize()
   // Disables the horizontal scrolling.
   mController->SetHorizontalScrollEnabled( false );
 
+  // Sets the maximum number of characters.
   mController->SetMaximumNumberOfCharacters( std::numeric_limits<Length>::max() );
 
   // Enable the smooth handle panning.

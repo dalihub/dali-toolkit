@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -34,6 +36,8 @@ const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
+
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 }
 
 void dali_visual_startup(void)
@@ -204,6 +208,31 @@ int UtcDaliVisualSize(void)
   DALI_TEST_EQUALS( batchImageVisual.GetSize(), visualSize, TEST_LOCATION );
   batchImageVisual.GetNaturalSize( naturalSize );
   DALI_TEST_EQUALS( naturalSize, Vector2( 80.0f, 160.0f ), TEST_LOCATION );
+
+  // Text visual.
+
+  // Load some fonts to get the same metrics on different platforms.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 96u, 96u );
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
+
+  propertyMap.Clear();
+  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
+  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
+  propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
+
+  Visual::Base textVisual = factory.CreateVisual( propertyMap );
+  textVisual.GetNaturalSize( naturalSize );
+  DALI_TEST_EQUALS( naturalSize, Size( 80.f, 20.f ), TEST_LOCATION );
+
+  const float height = textVisual.GetHeightForWidth( 40.f );
+  DALI_TEST_EQUALS( height, 40.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
@@ -894,6 +923,95 @@ int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
   // Test the properties. TODO: to be completed.
   batchImageVisual.SetProperty( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
   Property::Value primitiveValue = batchImageVisual.GetProperty( ImageVisual::Property::URL );
+
+  END_TEST;
+}
+
+//Text shape visual
+int UtcDaliVisualGetPropertyMap10(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetPropertyMap10: TextVisual" );
+
+  //Request PrimitiveVisual using a property map.
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "text", "Hello world" );
+  propertyMap.Insert( "fontFamily", "TizenSans" );
+  propertyMap.Insert( "fontStyle", "{\"weight\":\"bold\"}" );
+  propertyMap.Insert( "pointSize", 12.f );
+  propertyMap.Insert( "multiLine", true );
+  propertyMap.Insert( "horizontalAlignment", "CENTER" );
+  propertyMap.Insert( "verticalAlignment", "CENTER" );
+  propertyMap.Insert( "textColor", Color::RED );
+  propertyMap.Insert( "enableMarkup", false );
+  propertyMap.Insert( "enableAutoScroll", false );
+  propertyMap.Insert( "lineSpacing", 0.f );
+  propertyMap.Insert( "batchingEnabled", false );
+  Visual::Base textVisual = factory.CreateVisual( propertyMap );
+
+  Property::Map resultMap;
+  textVisual.CreatePropertyMap( resultMap );
+
+  //Check values in the result map are identical to the initial map's values.
+  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)Visual::TEXT, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::RENDERING_BACKEND, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), Toolkit::Text::DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::TEXT, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "Hello world", TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::FONT_FAMILY, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "TizenSans", TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::FONT_STYLE, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "{\"weight\":\"bold\"}", TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::POINT_SIZE, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::MULTI_LINE, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<bool>() );
+
+  value = resultMap.Find( TextVisual::Property::HORIZONTAL_ALIGNMENT, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "CENTER", TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::VERTICAL_ALIGNMENT, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "CENTER", TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::TEXT_COLOR, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Color::RED, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( !value->Get<bool>() );
+
+  value = resultMap.Find( TextVisual::Property::ENABLE_AUTO_SCROLL, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( !value->Get<bool>() );
+
+  value = resultMap.Find( TextVisual::Property::LINE_SPACING, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::BATCHING_ENABLED, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( !value->Get<bool>() );
 
   END_TEST;
 }

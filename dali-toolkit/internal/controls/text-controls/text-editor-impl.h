@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
@@ -27,9 +30,6 @@
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-
-// EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 
 namespace Dali
 {

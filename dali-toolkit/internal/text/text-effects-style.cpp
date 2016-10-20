@@ -40,6 +40,99 @@ const std::string ENABLE_KEY( "enable" );
 const std::string TRUE_TOKEN( "true" );
 }
 
+bool ParseProperties( const std::string& shadowProperties,
+                      bool& colorDefined,
+                      Vector4& color,
+                      bool& offsetDefined,
+                      Vector2& offset )
+{
+  // Parses and applies the style.
+  Property::Map map;
+  Text::ParsePropertyString( shadowProperties, map );
+
+  const bool empty = map.Empty();
+
+  if( !empty )
+  {
+    /// Color key.
+    Property::Value* colorValue = map.Find( COLOR_KEY );
+
+    colorDefined = colorValue != NULL;
+    if( colorDefined )
+    {
+      const std::string colorStr = colorValue->Get<std::string>();
+
+      Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+    }
+
+    /// Offset key.
+    Property::Value* offsetValue = map.Find( OFFSET_KEY );
+
+    offsetDefined = offsetValue != NULL;
+    if( offsetDefined )
+    {
+      const std::string offsetStr = offsetValue->Get<std::string>();
+
+      StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
+    }
+  }
+
+  return empty;
+}
+
+bool ParseProperties( const std::string& underlineProperties,
+                      bool& enabled,
+                      bool& colorDefined,
+                      Vector4& color,
+                      bool& heightDefined,
+                      float& height )
+{
+  // Parses and applies the style.
+  Property::Map map;
+  Text::ParsePropertyString( underlineProperties, map );
+
+  const bool empty = map.Empty();
+
+  if( !empty )
+  {
+    /// Enable key.
+    Property::Value* enableValue = map.Find( ENABLE_KEY );
+
+    enabled = false;
+    const bool enabledDefined = enableValue != NULL;
+    if( enabledDefined )
+    {
+      const std::string enableStr = enableValue->Get<std::string>();
+      enabled = Text::TokenComparison( TRUE_TOKEN, enableStr.c_str(), enableStr.size() );
+    }
+
+    /// Color key.
+    Property::Value* colorValue = map.Find( COLOR_KEY );
+
+    colorDefined = colorValue != NULL;
+    if( colorDefined )
+    {
+      const std::string colorStr = colorValue->Get<std::string>();
+
+      Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+    }
+
+    /// Height key.
+    Property::Value* heightValue = map.Find( HEIGHT_KEY );
+
+    height = 0.f;
+    heightDefined = heightValue != NULL;
+    if( heightDefined )
+    {
+      const std::string heightStr = heightValue->Get<std::string>();
+
+      height = StringToFloat( heightStr.c_str() );
+    }
+  }
+
+  return empty;
+}
+
 bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type )
 {
   bool update = false;
@@ -48,47 +141,21 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
   {
     const std::string properties = value.Get<std::string>();
 
-    // Parses and applies the style.
-    Property::Map map;
-    ParsePropertyString( properties, map );
+    bool enabled = false;
+    bool colorDefined = false;
+    Vector4 color;
+    bool heightDefined = false;
+    float height = 0.f;
 
-    if( !map.Empty() )
+    const bool empty = ParseProperties( properties,
+                                        enabled,
+                                        colorDefined,
+                                        color,
+                                        heightDefined,
+                                        height );
+
+    if( !empty )
     {
-      /// Enable key.
-      Property::Value* enableValue = map.Find( ENABLE_KEY );
-
-      bool enabled = false;
-      const bool enabledDefined = enableValue != NULL;
-      if( enabledDefined )
-      {
-        const std::string enableStr = enableValue->Get<std::string>();
-        enabled = TokenComparison( TRUE_TOKEN, enableStr.c_str(), enableStr.size() );
-      }
-
-      /// Color key.
-      Property::Value* colorValue = map.Find( COLOR_KEY );
-
-      Vector4 color;
-      const bool colorDefined = colorValue != NULL;
-      if( colorDefined )
-      {
-        const std::string colorStr = colorValue->Get<std::string>();
-
-        ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
-      }
-
-      /// Height key.
-      Property::Value* heightValue = map.Find( HEIGHT_KEY );
-
-      float height = 0.f;
-      const bool heightDefined = heightValue != NULL;
-      if( heightDefined )
-      {
-        const std::string heightStr = heightValue->Get<std::string>();
-
-        height = StringToFloat( heightStr.c_str() );
-      }
-
       switch( type )
       {
         case EffectStyle::DEFAULT:
@@ -98,6 +165,7 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
             controller->SetUnderlineEnabled( enabled );
             update = true;
           }
+
           // Sets the default underline values.
           if( colorDefined && ( controller->GetUnderlineColor() != color ) )
           {
@@ -105,7 +173,7 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
             update = true;
           }
 
-          if( heightDefined && fabsf( controller->GetUnderlineHeight() - height ) > Math::MACHINE_EPSILON_1000 )
+          if( heightDefined && ( fabsf( controller->GetUnderlineHeight() - height ) > Math::MACHINE_EPSILON_1000 ) )
           {
             controller->SetUnderlineHeight( height );
             update = true;
@@ -192,36 +260,19 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
   {
     const std::string properties = value.Get< std::string >();
 
-    // Parses and applies the style.
-    Property::Map map;
-    ParsePropertyString( properties, map );
+    bool colorDefined = false;
+    Vector4 color;
+    bool offsetDefined = false;
+    Vector2 offset;
 
-    if( !map.Empty() )
+    const bool empty = ParseProperties( properties,
+                                        colorDefined,
+                                        color,
+                                        offsetDefined,
+                                        offset );
+
+    if( !empty )
     {
-      /// Color key
-      Property::Value* colorValue = map.Find( COLOR_KEY );
-
-      Vector4 color;
-      const bool colorDefined = colorValue != NULL;
-      if( colorDefined )
-      {
-        const std::string colorStr = colorValue->Get<std::string>();
-
-        ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
-      }
-
-      /// Offset key
-      Property::Value* offsetValue = map.Find( OFFSET_KEY );
-
-      Vector2 offset;
-      const bool offsetDefined = offsetValue != NULL;
-      if( offsetDefined )
-      {
-        const std::string offsetStr = offsetValue->Get<std::string>();
-
-        StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
-      }
-
       switch( type )
       {
         case EffectStyle::DEFAULT:

@@ -38,6 +38,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-resolve-url.h>
@@ -186,6 +187,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     case Toolkit::Visual::WIREFRAME:
     {
       visualPtr = new WireframeVisual( *( mFactoryCache.Get() ) );
+      break;
+    }
+
+    case Toolkit::Visual::TEXT:
+    {
+      visualPtr = new TextVisual( *( mFactoryCache.Get() ) );
       break;
     }
 

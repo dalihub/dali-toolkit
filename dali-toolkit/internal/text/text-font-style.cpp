@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/property-string-parser.h>
+#include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 
 namespace Dali
 {
@@ -39,12 +40,69 @@ const std::string STYLE_KEY( "style" );
 const std::string WEIGHT_KEY( "weight" );
 const std::string WIDTH_KEY( "width" );
 const std::string SLANT_KEY( "slant" );
+const std::string FAMILY_KEY( "family" );
+const std::string TYPE_KEY( "type" );
+
+const std::string SYSTEM_TOKEN( "system" );
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
 #endif
 
 } // namespace
+
+void SetFontFamilyProperty( ControllerPtr controller, const Property::Value& value )
+{
+  if( controller )
+  {
+    const std::string fontFamilyValue = value.Get<std::string>();
+
+    if( fontFamilyValue.empty() )
+    {
+      // Resets the default's font family name.
+      controller->SetDefaultFontFamily( "" );
+      return;
+    }
+
+    Property::Map map;
+    ParsePropertyString( fontFamilyValue, map );
+
+    if( map.Empty() )
+    {
+      // There is no map. The font has been passed as a font's family name with no format.
+      controller->SetDefaultFontFamily( fontFamilyValue );
+    }
+    else
+    {
+      /// Family key
+      Property::Value* familyValue = map.Find( FAMILY_KEY );
+
+      std::string fontFamilyName;
+      if( NULL != familyValue )
+      {
+        fontFamilyName = familyValue->Get<std::string>();
+      }
+
+      /// Type key
+      Property::Value* typeValue = map.Find( TYPE_KEY );
+
+      std::string typeStr;
+      if( NULL != typeValue )
+      {
+        typeStr = typeValue->Get<std::string>();
+      }
+
+      if( TokenComparison( SYSTEM_TOKEN, typeStr.c_str(), typeStr.size() ) )
+      {
+        controller->UpdateAfterFontChange( fontFamilyName );
+      }
+      else
+      {
+        controller->SetDefaultFontFamily( fontFamilyName );
+      }
+    }
+  }
+}
 
 void SetFontStyleProperty( ControllerPtr controller, const Property::Value& value, FontStyle::Type type )
 {

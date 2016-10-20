@@ -61,6 +61,11 @@ const Vector2& Visual::Base::GetSize() const
   return GetImplementation( *this ).GetSize();
 }
 
+float Visual::Base::GetHeightForWidth( float width ) const
+{
+  return GetImplementation( *this ).GetHeightForWidth( width );
+}
+
 void Visual::Base::GetNaturalSize(Vector2& naturalSize ) const
 {
   GetImplementation( *this ).GetNaturalSize( naturalSize );

@@ -403,14 +403,14 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   Stage::GetCurrent().Add( label );
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::MULTI_LINE, false );
-  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
-  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
-  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
 
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty(  TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
     application.SendNotification();
     application.Render();
   }
@@ -418,6 +418,37 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   {
     tet_result(TET_FAIL);
   }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingN");
+
+  TextLabel label = TextLabel::New("Some text to scroll");
+  DALI_TEST_CHECK( label );
+
+  Stage::GetCurrent().Add( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // The text scrolling works only on single line text.
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+
+  // Turn on all the effects.
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+
+  // Enable the auto scrolling effect.
+  label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+
+  // The auto scrolling shouldn't be enabled.
+  const bool enabled = label.GetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL ).Get<bool>();
+  DALI_TEST_CHECK( !enabled );
 
   END_TEST;
 }
