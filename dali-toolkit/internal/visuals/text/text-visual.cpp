@@ -259,10 +259,8 @@ TextVisual::~TextVisual()
 {
 }
 
-void TextVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void TextVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  mSelf = actor;
-
   for( Property::Map::SizeType index = 0u, count = propertyMap.Count(); index < count; ++index )
   {
     const KeyValuePair& keyValue = propertyMap.GetKeyValue( index );

@@ -78,6 +78,11 @@ WireframeVisual::~WireframeVisual()
 {
 }
 
+void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
+{
+  // no properties supported at the moment
+}
+
 void WireframeVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

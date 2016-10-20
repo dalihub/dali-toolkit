@@ -121,7 +121,7 @@ BorderVisual::~BorderVisual()
 {
 }
 
-void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void BorderVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME );
   if( !( color && color->Get(mBorderColor) ) )

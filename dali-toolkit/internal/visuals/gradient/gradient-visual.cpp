@@ -201,7 +201,7 @@ GradientVisual::~GradientVisual()
 {
 }
 
-void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void GradientVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
 

@@ -59,7 +59,7 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
   }
 }
 
-void Visual::Base::Initialize( Actor& actor, const Property::Map& propertyMap )
+void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
   Property::Value* customShaderValue = propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
@@ -71,7 +71,7 @@ void Visual::Base::Initialize( Actor& actor, const Property::Map& propertyMap )
     }
   }
 
-  DoInitialize( actor, propertyMap );
+  DoSetProperties( propertyMap );
 }
 
 void Visual::Base::SetName( const std::string& name )

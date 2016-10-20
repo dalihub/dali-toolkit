@@ -308,7 +308,7 @@ MeshVisual::~MeshVisual()
 {
 }
 
-void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void MeshVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* objectUrl = propertyMap.Find( Toolkit::MeshVisual::Property::OBJECT_URL, OBJECT_URL_NAME );
   if( !objectUrl || !objectUrl->Get( mObjectUrl ) )

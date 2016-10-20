@@ -199,8 +199,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
   if( visualPtr )
   {
-    Actor actor;
-    visualPtr->Initialize( actor, propertyMap );
+    visualPtr->SetProperties( propertyMap );
   }
   else
   {

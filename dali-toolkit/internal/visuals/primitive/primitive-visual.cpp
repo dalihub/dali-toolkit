@@ -187,7 +187,7 @@ PrimitiveVisual::~PrimitiveVisual()
 {
 }
 
-void PrimitiveVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   //Find out which shape to renderer.
   Property::Value* primitiveTypeValue = propertyMap.Find( Toolkit::PrimitiveVisual::Property::SHAPE, PRIMITIVE_SHAPE );

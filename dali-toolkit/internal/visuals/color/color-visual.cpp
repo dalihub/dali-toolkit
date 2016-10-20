@@ -80,7 +80,7 @@ ColorVisual::~ColorVisual()
 {
 }
 
-void ColorVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME );
   if( !( color && color->Get(mMixColor) ) )

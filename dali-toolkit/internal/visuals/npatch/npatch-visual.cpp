@@ -242,7 +242,7 @@ NPatchVisual::~NPatchVisual()
 {
 }
 
-void NPatchVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
   if( imageURLValue )

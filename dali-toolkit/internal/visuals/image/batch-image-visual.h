@@ -89,9 +89,9 @@ protected:
   ~BatchImageVisual();
 
   /**
-   * @copydoc Visua::Base::DoInitialize
+   * @copydoc Visua::Base::DoSetProperties
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
+  virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
    * @copydoc Visual::Base::DoSetOnStage

@@ -102,7 +102,7 @@ BatchImageVisual::~BatchImageVisual()
 {
 }
 
-void BatchImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void BatchImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   std::string oldImageUrl = mImageUrl;
   Property::Value* imageURLValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::URL, Dali::Toolkit::Internal::IMAGE_URL_NAME );
@@ -126,25 +126,6 @@ void BatchImageVisual::DoInitialize( Actor& actor, const Property::Map& property
     }
 
     mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
-  }
-
-  // Remove old renderer if exit.
-  if( mImpl->mRenderer )
-  {
-    if( actor ) // Remove old renderer from actor.
-    {
-      actor.RemoveRenderer( mImpl->mRenderer );
-    }
-    if( !oldImageUrl.empty() ) // Clean old renderer from cache.
-    {
-      CleanCache( oldImageUrl );
-    }
-  }
-
-  // If actor is on stage, create new renderer and apply to actor.
-  if( actor && actor.OnStage() )
-  {
-    SetOnStage( actor );
   }
 }
 

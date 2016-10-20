@@ -260,7 +260,7 @@ ImageVisual::~ImageVisual()
 {
 }
 
-void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
   if( imageURLValue )
