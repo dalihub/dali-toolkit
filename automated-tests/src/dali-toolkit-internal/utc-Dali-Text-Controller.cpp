@@ -328,3 +328,39 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   tet_result(TET_PASS);
   END_TEST;
 }
+
+int UtcDaliTextControllerGetInputShadowProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerGetInputShadowProperty");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  const std::string& shadowProperties = controller->GetInputShadowProperties();
+
+  DALI_TEST_CHECK( shadowProperties.empty() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerGetInputUnderlineProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerGetInputUnderlineProperty");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  const std::string& underlineProperties = controller->GetInputUnderlineProperties();
+
+  DALI_TEST_CHECK( underlineProperties.empty() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}

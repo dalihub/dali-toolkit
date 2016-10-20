@@ -222,6 +222,8 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // The underline color is changed as well.
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLUE, TEST_LOCATION );
 
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"false\",\"color\":\"blue\",\"height\":\"0\"}"), TEST_LOCATION );
+
   // Check that shadow parameters can be correctly set
   label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 3.0f, 3.0f ) );
   DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2( 3.0f, 3.0f ), TEST_LOCATION );
@@ -266,12 +268,18 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-  label.SetProperty( TextLabel::Property::UNDERLINE, "Underline properties" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::UNDERLINE, "" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"false\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
 
   // Check the shadow property
-  label.SetProperty( TextLabel::Property::SHADOW, "Shadow properties" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::SHADOW, "" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"0 0\"}"), TEST_LOCATION );
 
   // Check the emboss property
   label.SetProperty( TextLabel::Property::EMBOSS, "Emboss properties" );

@@ -441,16 +441,16 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_LINE_SPACING ), 20.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-  editor.SetProperty( TextEditor::Property::UNDERLINE, "Underline properties" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
 
   // Check the input underline property
   editor.SetProperty( TextEditor::Property::INPUT_UNDERLINE, "Underline input properties" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
 
   // Check the shadow property
-  editor.SetProperty( TextEditor::Property::SHADOW, "Shadow properties" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
 
   // Check the input shadow property
   editor.SetProperty( TextEditor::Property::INPUT_SHADOW, "Shadow input properties" );

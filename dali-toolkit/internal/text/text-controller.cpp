@@ -758,26 +758,6 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mVisualModel->GetShadowColor();
 }
 
-void Controller::SetDefaultShadowProperties( const std::string& shadowProperties )
-{
-  if( NULL == mImpl->mShadowDefaults )
-  {
-    mImpl->mShadowDefaults = new ShadowDefaults();
-  }
-
-  mImpl->mShadowDefaults->properties = shadowProperties;
-}
-
-const std::string& Controller::GetDefaultShadowProperties() const
-{
-  if( NULL != mImpl->mShadowDefaults )
-  {
-    return mImpl->mShadowDefaults->properties;
-  }
-
-  return EMPTY_STRING;
-}
-
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mVisualModel->SetUnderlineColor( color );
@@ -812,26 +792,6 @@ void Controller::SetUnderlineHeight( float height )
 float Controller::GetUnderlineHeight() const
 {
   return mImpl->mVisualModel->GetUnderlineHeight();
-}
-
-void Controller::SetDefaultUnderlineProperties( const std::string& underlineProperties )
-{
-  if( NULL == mImpl->mUnderlineDefaults )
-  {
-    mImpl->mUnderlineDefaults = new UnderlineDefaults();
-  }
-
-  mImpl->mUnderlineDefaults->properties = underlineProperties;
-}
-
-const std::string& Controller::GetDefaultUnderlineProperties() const
-{
-  if( NULL != mImpl->mUnderlineDefaults )
-  {
-    return mImpl->mUnderlineDefaults->properties;
-  }
-
-  return EMPTY_STRING;
 }
 
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
@@ -1278,7 +1238,7 @@ const std::string& Controller::GetInputShadowProperties() const
     return mImpl->mEventData->mInputStyle.shadowProperties;
   }
 
-  return GetDefaultShadowProperties();
+  return EMPTY_STRING;
 }
 
 void Controller::SetInputUnderlineProperties( const std::string& underlineProperties )
@@ -1296,7 +1256,7 @@ const std::string& Controller::GetInputUnderlineProperties() const
     return mImpl->mEventData->mInputStyle.underlineProperties;
   }
 
-  return GetDefaultUnderlineProperties();
+  return EMPTY_STRING;
 }
 
 void Controller::SetInputEmbossProperties( const std::string& embossProperties )

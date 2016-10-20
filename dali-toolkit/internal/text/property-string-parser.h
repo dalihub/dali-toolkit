@@ -56,16 +56,6 @@ void CreatePropertyMap( const TreeNode* const node, Property::Map& map );
  */
 void ParsePropertyString( const std::string& property, Property::Map& map );
 
-/**
- * @brief Converts an offset packed inside a string into a Vector2.
- *
- * @param[in] offsetStr The offset packed inside a string.
- * @param[out] offset The offset packed in a Vector2.
- *
- */
-void StringOffsetToVector2( const std::string& offsetStr,
-                            Vector2& offset );
-
 } //namespace Text
 
 } //namespace Toolkit
