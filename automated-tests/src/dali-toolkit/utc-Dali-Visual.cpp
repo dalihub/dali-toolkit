@@ -24,6 +24,8 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
@@ -278,7 +280,7 @@ int UtcDaliVisualSize(void)
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
 
   propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
   propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
   propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
@@ -948,7 +950,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   VisualFactory factory = VisualFactory::Get();
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
@@ -963,9 +965,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
   propertyMap.Insert( "enableMarkup", false );
-  propertyMap.Insert( "enableAutoScroll", false );
-  propertyMap.Insert( "lineSpacing", 0.f );
-  propertyMap.Insert( "batchingEnabled", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -974,11 +973,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   //Check values in the result map are identical to the initial map's values.
   Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<int>(), (int)Visual::TEXT, TEST_LOCATION );
-
-  value = resultMap.Find( TextVisual::Property::RENDERING_BACKEND, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<int>(), Toolkit::Text::DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)DevelVisual::TEXT, TEST_LOCATION );
 
   value = resultMap.Find( TextVisual::Property::TEXT, Property::STRING );
   DALI_TEST_CHECK( value );
@@ -1016,17 +1011,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   DALI_TEST_EQUALS( value->Get<Vector4>(), Color::RED, TEST_LOCATION );
 
   value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( !value->Get<bool>() );
-
-  value = resultMap.Find( TextVisual::Property::ENABLE_AUTO_SCROLL, Property::BOOLEAN );
-  DALI_TEST_CHECK( !value );
-
-  value = resultMap.Find( TextVisual::Property::LINE_SPACING, Property::FLOAT );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<float>(), 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  value = resultMap.Find( TextVisual::Property::BATCHING_ENABLED, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( !value->Get<bool>() );
 
@@ -1695,7 +1679,7 @@ int UtcDaliVisualTextVisualRender(void)
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
@@ -1710,9 +1694,6 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
   propertyMap.Insert( "enableMarkup", false );
-  propertyMap.Insert( "enableAutoScroll", false );
-  propertyMap.Insert( "lineSpacing", 0.f );
-  propertyMap.Insert( "batchingEnabled", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
   textVisual.SetDepthIndex( 1.f );
 

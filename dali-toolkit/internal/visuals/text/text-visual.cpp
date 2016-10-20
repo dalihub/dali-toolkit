@@ -18,21 +18,16 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 
-// EXTERNAL HEADER
-#include <dali/devel-api/scripting/enum-helper.h>
-
 // INTERNAL HEADER
-#include <dali-toolkit/public-api/text/rendering-backend.h>
-#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
-#include <dali-toolkit/internal/text/rendering/text-backend.h>
-#include <dali-toolkit/internal/text/text-effects-style.h>
-#include <dali-toolkit/internal/text/text-font-style.h>
-#include <dali-toolkit/internal/text/text-view.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/text/text-font-style.h>
 
 namespace Dali
 {
@@ -47,7 +42,6 @@ namespace
 {
 
 // Property names.
-const char * const RENDERING_BACKEND_PROPERTY( "renderingBackend" );
 const char * const TEXT_PROPERTY( "text" );
 const char * const FONT_FAMILY_PROPERTY( "fontFamily" );
 const char * const FONT_STYLE_PROPERTY( "fontStyle" );
@@ -57,15 +51,8 @@ const char * const HORIZONTAL_ALIGNMENT_PROPERTY( "horizontalAlignment" );
 const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
 const char * const TEXT_COLOR_PROPERTY( "textColor" );
 const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
-const char * const ENABLE_AUTO_SCROLL_PROPERTY( "enableAutoScroll" );
-const char * const AUTO_SCROLL_SPEED_PROPERTY( "autoScrollSpeed" );
-const char * const AUTO_SCROLL_LOOP_COUNT_PROPERTY( "autoScrollLoopCount" );
-const char * const AUTO_SCROLL_GAP_PROPERTY( "autoScrollGap" );
-const char * const LINE_SPACING_PROPERTY( "lineSpacing" );
-const char * const UNDERLINE_PROPERTY( "underline" );
-const char * const SHADOW_PROPERTY( "shadow" );
-const char * const OUTLINE_PROPERTY( "outline" );
-const char * const BATCHING_ENABLED_PROPERTY( "batchingEnabled" );
+
+const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
 
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
@@ -82,6 +69,8 @@ const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
   { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
 };
 const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
+
+const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
 std::string GetHorizontalAlignment( Toolkit::Text::Layout::HorizontalAlignment alignment )
 {
@@ -108,12 +97,24 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
+    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -131,27 +132,6 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
       gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
     }\n
 );
-
-Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridSize )
-{
-  Geometry geometry;
-
-  if( gridSize == ImageDimensions( 1, 1 ) )
-  {
-    geometry = factoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-    if( !geometry )
-    {
-      geometry =  VisualFactoryCache::CreateQuadGeometry();
-      factoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-    }
-  }
-  else
-  {
-    geometry = VisualFactoryCache::CreateGridGeometry( gridSize );
-  }
-
-  return geometry;
-}
 
 } // unnamed namespace
 
@@ -175,9 +155,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   Property::Value value;
 
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::TEXT );
-
-  map.Insert( Toolkit::TextVisual::Property::RENDERING_BACKEND, mRenderingBackend );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::DevelVisual::TEXT );
 
   std::string text;
   mController->GetText( text );
@@ -199,26 +177,12 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, mController->GetDefaultColor() );
 
   map.Insert( Toolkit::TextVisual::Property::ENABLE_MARKUP, mController->IsMarkupProcessorEnabled() );
-
-  map.Insert( Toolkit::TextVisual::Property::LINE_SPACING, mController->GetDefaultLineSpacing() );
-
-  GetUnderlineProperties( mController, value, Text::EffectStyle::DEFAULT );
-  map.Insert( Toolkit::TextVisual::Property::UNDERLINE, value );
-
-  GetShadowProperties( mController, value, Text::EffectStyle::DEFAULT );
-  map.Insert( Toolkit::TextVisual::Property::SHADOW, value );
-
-  GetOutlineProperties( mController, value, Text::EffectStyle::DEFAULT );
-  map.Insert( Toolkit::TextVisual::Property::OUTLINE, value );
-
-  map.Insert( Toolkit::TextVisual::Property::BATCHING_ENABLED, false ); // TODO
 }
 
 TextVisual::TextVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mController( Text::Controller::New() ),
-  mRenderingBackend( Toolkit::Text::DEFAULT_RENDERING_BACKEND ),
-  mHasBeenStaged( false )
+  mTypesetter( Text::Typesetter::New( mController->GetTextModel() ) )
 {
 }
 
@@ -244,11 +208,7 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
       }
       case Property::Key::STRING:
       {
-        if( keyValue.first.stringKey == RENDERING_BACKEND_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::RENDERING_BACKEND, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == TEXT_PROPERTY )
+        if( keyValue.first.stringKey == TEXT_PROPERTY )
         {
           DoSetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
         }
@@ -284,42 +244,6 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
         {
           DoSetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
         }
-        else if( keyValue.first.stringKey == ENABLE_AUTO_SCROLL_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == AUTO_SCROLL_SPEED_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == AUTO_SCROLL_LOOP_COUNT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == AUTO_SCROLL_GAP_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::AUTO_SCROLL_GAP, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == LINE_SPACING_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::LINE_SPACING, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == UNDERLINE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::UNDERLINE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == SHADOW_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::SHADOW, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == OUTLINE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::OUTLINE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == BATCHING_ENABLED_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::BATCHING_ENABLED, keyValue.second );
-        }
         break;
       }
     }
@@ -337,64 +261,29 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
 
 void TextVisual::DoSetOnStage( Actor& actor )
 {
-  // TODO Create the actual renderer(s) for the text!!!!
-  //      Will crash if no mImpl->mRenderer is set.
-  Geometry geometry;
-  Shader shader;
+  mControl = actor;
 
-  geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-
-  shader = mFactoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-  if( !shader )
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-    mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
-  }
-
-  mImpl->mRenderer = Renderer::New( geometry, shader );
-
-  mSelf = actor;
-
-  if( mHasBeenStaged )
-  {
-    RenderText();
-  }
-  else
-  {
-    mHasBeenStaged = true;
-  }
+  CreateRenderer();
 }
 
 void TextVisual::DoSetOffStage( Actor& actor )
 {
-  mSelf.Reset();
+  if( mImpl->mRenderer )
+  {
+    // Removes the renderer from the actor.
+    actor.RemoveRenderer( mImpl->mRenderer );
+
+    DestroyRenderer();
+  }
+
+  // Resets the control handle.
+  mControl.Reset();
 }
 
 void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
   switch( index )
   {
-    case Toolkit::TextVisual::Property::RENDERING_BACKEND:
-    {
-      int backend = propertyValue.Get<int>();
-
-#ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
-      if( Text::RENDERING_VECTOR_BASED == backend )
-      {
-        backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
-      }
-#endif
-      if( mRenderingBackend != backend )
-      {
-        mRenderingBackend = backend;
-        mRenderer.Reset();
-
-        // When using the vector-based rendering, the size of the GLyphs are different
-        TextAbstraction::GlyphType glyphType = ( Text::RENDERING_VECTOR_BASED == mRenderingBackend ) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
-        mController->SetGlyphType( glyphType );
-      }
-      break;
-    }
     case Toolkit::TextVisual::Property::TEXT:
     {
       mController->SetText( propertyValue.Get<std::string>() );
@@ -455,7 +344,6 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       if( mController->GetDefaultColor() != textColor )
       {
         mController->SetDefaultColor( textColor );
-        mRenderer.Reset();
       }
       break;
     }
@@ -463,153 +351,6 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     {
       const bool enableMarkup = propertyValue.Get<bool>();
       mController->SetMarkupProcessorEnabled( enableMarkup );
-      break;
-    }
-    case Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::AUTO_SCROLL_GAP:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::LINE_SPACING:
-    {
-      const float lineSpacing = propertyValue.Get<float>();
-      mController->SetDefaultLineSpacing( lineSpacing );
-      mRenderer.Reset();
-      break;
-    }
-    case Toolkit::TextVisual::Property::UNDERLINE:
-    {
-      // TODO : This switch can be removed when the deprecated SHADOW_OFFSET and SHADOW_COLOR properties are finally removed.
-      //        Only the code for the MAP case should be kept.
-      switch( propertyValue.GetType() )
-      {
-        case Property::VECTOR4:
-        {
-          const Vector4& color = propertyValue.Get<Vector4>();
-          if( mController->GetUnderlineColor() != color )
-          {
-            mController->SetUnderlineColor( color );
-            mRenderer.Reset();
-          }
-          break;
-        }
-        case Property::FLOAT:
-        {
-          float height = propertyValue.Get<float>();
-          if( fabsf( mController->GetUnderlineHeight() - height ) > Math::MACHINE_EPSILON_1000 )
-          {
-            mController->SetUnderlineHeight( height );
-            mRenderer.Reset();
-          }
-          break;
-        }
-        case Property::BOOLEAN:
-        {
-          const bool enabled = propertyValue.Get<bool>();
-          if( mController->IsUnderlineEnabled() != enabled )
-          {
-            mController->SetUnderlineEnabled( enabled );
-            mRenderer.Reset();
-          }
-          break;
-        }
-        case Property::MAP:
-        {
-          const bool update = SetUnderlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
-          if( update )
-          {
-            mRenderer.Reset();
-          }
-          break;
-        }
-        default:
-        {
-          // Nothing to do.
-          break;
-        }
-      }
-
-      break;
-    }
-    case Toolkit::TextVisual::Property::SHADOW:
-    {
-      // TODO : This switch can be removed when the deprecated SHADOW_OFFSET and SHADOW_COLOR properties are finally removed.
-      //        Only the code for the MAP case should be kept.
-      switch( propertyValue.GetType() )
-      {
-        case Property::VECTOR2:
-        {
-          const Vector2& shadowOffset = propertyValue.Get<Vector2>();
-          if( mController->GetShadowOffset() != shadowOffset )
-          {
-            mController->SetShadowOffset( shadowOffset );
-            mRenderer.Reset();
-          }
-          break;
-        }
-        case Property::VECTOR4:
-        {
-          const Vector4& shadowColor = propertyValue.Get<Vector4>();
-          if( mController->GetShadowColor() != shadowColor )
-          {
-            mController->SetShadowColor( shadowColor );
-            mRenderer.Reset();
-          }
-          break;
-        }
-        case Property::MAP:
-        {
-          const bool update = SetShadowProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
-          if( update )
-          {
-            mRenderer.Reset();
-          }
-          break;
-        }
-        default:
-        {
-          // Nothing to do.
-          break;
-        }
-      }
-      break;
-    }
-    case Toolkit::TextVisual::Property::EMBOSS:
-    {
-      const bool update = SetEmbossProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
-      if( update )
-      {
-        mRenderer.Reset();
-     }
-      break;
-    }
-    case Toolkit::TextVisual::Property::OUTLINE:
-    {
-      const bool update = SetOutlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
-      if( update )
-      {
-        mRenderer.Reset();
-      }
-      break;
-    }
-    case Toolkit::TextVisual::Property::BATCHING_ENABLED:
-    {
-      // TODO
       break;
     }
     default:
@@ -626,11 +367,6 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
 
   switch( index )
   {
-    case Toolkit::TextVisual::Property::RENDERING_BACKEND:
-    {
-      value = mRenderingBackend;
-      break;
-    }
     case Toolkit::TextVisual::Property::TEXT:
     {
       std::string text;
@@ -690,56 +426,6 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
       value = mController->IsMarkupProcessorEnabled();
       break;
     }
-    case Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::AUTO_SCROLL_GAP:
-    {
-      // nothing to do.
-      break;
-    }
-    case Toolkit::TextVisual::Property::LINE_SPACING:
-    {
-      value = mController->GetDefaultLineSpacing();
-      break;
-    }
-    case Toolkit::TextVisual::Property::UNDERLINE:
-    {
-      GetUnderlineProperties( mController, value, Text::EffectStyle::DEFAULT );
-      break;
-    }
-    case Toolkit::TextVisual::Property::SHADOW:
-    {
-      GetShadowProperties( mController, value, Text::EffectStyle::DEFAULT );
-      break;
-    }
-    case Toolkit::TextVisual::Property::EMBOSS:
-    {
-      GetEmbossProperties( mController, value, Text::EffectStyle::DEFAULT );
-      break;
-    }
-    case Toolkit::TextVisual::Property::OUTLINE:
-    {
-      GetOutlineProperties( mController, value, Text::EffectStyle::DEFAULT );
-      break;
-    }
-    case Toolkit::TextVisual::Property::BATCHING_ENABLED:
-    {
-      // TODO
-      break;
-    }
     default:
     {
       // Should not arrive here.
@@ -752,53 +438,121 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
 
 void TextVisual::OnSetTransform()
 {
-  Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
-
-  // Note, the direction should come from the layout of the parent control
-  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( visualSize );
-
-  if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) ) ||
-      !mRenderer )
-  {
-    if( !mRenderer )
-    {
-      mRenderer = Text::Backend::Get().NewRenderer( mRenderingBackend );
-    }
-    RenderText();
-  }
+  CreateRenderer();
 }
 
-void TextVisual::RenderText()
+void TextVisual::CreateRenderer()
 {
-  Actor self = mSelf.GetHandle();
-  if( !self )
+  Actor control = mControl.GetHandle();
+  if( !control )
   {
-    // Nothing to do if the handle is not initialized.
+    // Nothing to do.
     return;
   }
 
-  Actor renderableActor;
+  // Calculates the size to be used to relayout.
+  Vector2 relayoutSize;
 
-  if( mRenderer )
+  const bool isWidthRelative = fabsf( mImpl->mTransform.mOffsetSizeMode.z ) < Math::MACHINE_EPSILON_1000;
+  const bool isHeightRelative = fabsf( mImpl->mTransform.mOffsetSizeMode.w ) < Math::MACHINE_EPSILON_1000;
+
+  // Round the size and offset to avoid pixel alignement issues.
+  relayoutSize.width = floorf( 0.5f + ( isWidthRelative ? mImpl->mControlSize.width * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width ) );
+  relayoutSize.height = floorf( 0.5f + ( isHeightRelative ? mImpl->mControlSize.height * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height ) );
+
+  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), Toolkit::DepthIndex::TEXT );
-  }
-
-  if( renderableActor != mRenderableActor )
-  {
-    UnparentAndReset( mRenderableActor );
-
-    if( renderableActor )
+    // Remove any renderer previously set.
+    if( mImpl->mRenderer )
     {
-      const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
-      renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
+      control.RemoveRenderer( mImpl->mRenderer );
 
-      self.Add( renderableActor );
+      DestroyRenderer();
     }
-    mRenderableActor = renderableActor;
+
+    // Nothing else to do if the relayout size is zero.
+    return;
   }
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( relayoutSize );
+
+  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
+  {
+    // Remove any renderer previously set.
+    if( mImpl->mRenderer )
+    {
+      control.RemoveRenderer( mImpl->mRenderer );
+
+      DestroyRenderer();
+    }
+
+    if( ( relayoutSize.width > Math::MACHINE_EPSILON_1000 ) &&
+        ( relayoutSize.height > Math::MACHINE_EPSILON_1000 ) )
+    {
+      PixelData data = mTypesetter->Render( relayoutSize );
+
+      Geometry geometry;
+      Shader shader;
+      TextureSet textureSet;
+
+      Vector4 atlasRect;
+
+      textureSet = mFactoryCache.GetAtlasManager()->Add( atlasRect, data );
+      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+
+      // Filter mode needs to be set to nearest to avoid blurry text.
+      Sampler sampler = Sampler::New();
+      sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+      textureSet.SetSampler( 0u, sampler );
+
+      geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
+      if( !geometry )
+      {
+        geometry =  VisualFactoryCache::CreateQuadGeometry();
+        mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY , geometry );
+      }
+
+      shader = mFactoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
+      if( !shader )
+      {
+        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+        mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+      }
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+
+      mImpl->mRenderer = Renderer::New( geometry, shader );
+      mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
+      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
+
+      mImpl->mRenderer.SetTextures( textureSet );
+
+      control.AddRenderer( mImpl->mRenderer );
+
+      //Register transform properties
+      mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+
+      mImpl->mFlags |= Impl::IS_FROM_CACHE;
+    }
+  }
+}
+
+void TextVisual::DestroyRenderer()
+{
+  // Removes the text's image from the texture atlas.
+  Vector4 atlasRect;
+
+  const Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+  if( index != Property::INVALID_INDEX )
+  {
+    const Property::Value& atlasRectValue = mImpl->mRenderer.GetProperty( index );
+    atlasRectValue.Get( atlasRect );
+
+    const TextureSet& textureSet = mImpl->mRenderer.GetTextures();
+    mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+  }
+
+  // Resets the renderer.
+  mImpl->mRenderer.Reset();
 }
 
 } // namespace Internal

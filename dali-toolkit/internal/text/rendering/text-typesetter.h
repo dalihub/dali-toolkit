@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/images/pixel-data.h>
 
 namespace Dali
 {
@@ -60,6 +61,22 @@ public:
    * @return A pointer to the view model.
    */
   ViewModel* GetViewModel();
+
+  /**
+   * @brief Renders the text.
+   *
+   * Does the following operations:
+   * - Finds the visible pages needed to be rendered.
+   * - Elide glyphs if needed.
+   * - Retrieves the data buffers from the text model.
+   * - Creates the pixel data used to generate the final image with the given size.
+   * - Traverse the visible glyphs, retrieve their bitmaps and compose the final pixel data.
+   *
+   * @param[in] size The renderer size.
+   *
+   * @return A pixel data with the text rendered.
+   */
+  PixelData Render( const Vector2& size );
 
 private:
   /**

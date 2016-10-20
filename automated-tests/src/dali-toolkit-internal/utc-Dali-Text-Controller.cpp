@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <limits>
-#include <unistd.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -43,8 +42,6 @@ const char* const OPTION_PASTE("optionPaste");              // "Paste" popup opt
 const char* const OPTION_CLIPBOARD("optionClipboard");      // "Clipboard" popup option.
 
 const Size CONTROL_SIZE( 300.f, 60.f );
-
-const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
 std::string gClipboardText;
 void ContentSelectedCallback( ClipboardEventNotifier& notifier )

@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_VISUAL_PROPERTIES_DEVEL_H
+#define DALI_TOOLKIT_VISUAL_PROPERTIES_DEVEL_H
+
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
@@ -15,8 +18,8 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/internal/text/text-scroller-interface.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -24,19 +27,28 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace Text
+namespace DevelVisual
 {
 
-ScrollerInterface::ScrollerInterface()
+/**
+ * @brief All the visual types.
+ */
+enum Type
 {
-}
+  BORDER = Dali::Toolkit::Visual::BORDER,
+  COLOR = Dali::Toolkit::Visual::COLOR,
+  GRADIENT = Dali::Toolkit::Visual::GRADIENT,
+  IMAGE = Dali::Toolkit::Visual::IMAGE,
+  MESH = Dali::Toolkit::Visual::MESH,
+  PRIMITIVE = Dali::Toolkit::Visual::PRIMITIVE,
+  WIREFRAME = Dali::Toolkit::Visual::WIREFRAME,
+  TEXT = Dali::Toolkit::Visual::WIREFRAME + 1, ///< Renders text.
+};
 
-ScrollerInterface::~ScrollerInterface()
-{
-}
-
-} // namespace Text
+} // namespace DevelVisual
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_VISUAL_PROPERTIES_DEVEL_H

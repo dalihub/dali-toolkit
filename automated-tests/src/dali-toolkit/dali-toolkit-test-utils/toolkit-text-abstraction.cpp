@@ -152,6 +152,7 @@ public:
   void GetFontMetrics( FontId fontId, FontMetrics& metrics ){}
   GlyphIndex GetGlyphIndex( FontId fontId, Character charcode ){return 0;}
   bool GetGlyphMetrics( GlyphInfo* array, uint32_t size, bool horizontal ){return true;}
+  void CreateBitmap( FontId fontId, GlyphIndex glyphIndex, Dali::TextAbstraction::FontClient::GlyphBufferData& data ){}
   PixelData CreateBitmap( FontId fontId, GlyphIndex glyphIndex ){return PixelData();}
   void CreateVectorBlob( FontId fontId, GlyphIndex glyphIndex, VectorBlob*& blob,
                          unsigned int& blobLength, unsigned int& nominalWidth, unsigned int& nominalHeight )
@@ -159,6 +160,7 @@ public:
     blobLength = 0;
   }
   const GlyphInfo& GetEllipsisGlyph( PointSize26Dot6 pointSize ){return mGlyphInfo;}
+  bool IsColorGlyph( FontId fontId, GlyphIndex glyphIndex ){return false;}
 private:
   unsigned int mDpiHorizontal;
   unsigned int mDpiVertical;
@@ -356,6 +358,14 @@ FontClient::FontClient( const FontClient& handle )
 {
 }
 
+FontClient::GlyphBufferData::GlyphBufferData()
+{
+}
+
+FontClient::GlyphBufferData::~GlyphBufferData()
+{
+}
+
 FontClient& FontClient::operator=( const FontClient& handle )
 {
   BaseHandle::operator=( handle );
@@ -462,11 +472,15 @@ bool FontClient::GetGlyphMetrics( GlyphInfo* array, uint32_t size, GlyphType typ
   return GetImplementation(*this).GetGlyphMetrics( array, size, horizontal );
 }
 
+void FontClient::CreateBitmap( FontId fontId, GlyphIndex glyphIndex, Dali::TextAbstraction::FontClient::GlyphBufferData& data )
+{
+  GetImplementation(*this).CreateBitmap( fontId, glyphIndex, data );
+}
+
 PixelData FontClient::CreateBitmap( FontId fontId, GlyphIndex glyphIndex )
 {
   return GetImplementation(*this).CreateBitmap( fontId, glyphIndex );
 }
-
 
 void FontClient::CreateVectorBlob( FontId fontId,
                                    GlyphIndex glyphIndex,
@@ -481,6 +495,11 @@ void FontClient::CreateVectorBlob( FontId fontId,
 const GlyphInfo& FontClient::GetEllipsisGlyph( PointSize26Dot6 pointSize )
 {
   return GetImplementation(*this).GetEllipsisGlyph( pointSize );
+}
+
+bool FontClient::IsColorGlyph( FontId fontId, GlyphIndex glyphIndex )
+{
+  return GetImplementation(*this).IsColorGlyph( fontId, glyphIndex );
 }
 
 FontClient::FontClient( Internal::FontClient* internal )
