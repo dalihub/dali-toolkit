@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
-#define __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
+#define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -285,8 +285,10 @@ struct OutlineDefaults
 
 struct Controller::Impl
 {
-  Impl( ControlInterface& controlInterface )
+  Impl( ControlInterface* controlInterface,
+        EditableControlInterface* editableControlInterface )
   : mControlInterface( controlInterface ),
+    mEditableControlInterface( editableControlInterface ),
     mLogicalModel(),
     mVisualModel(),
     mFontDefaults( NULL ),
@@ -686,7 +688,8 @@ private:
 
 public:
 
-  ControlInterface& mControlInterface;     ///< Reference to the text controller.
+  ControlInterface* mControlInterface;     ///< Reference to the text controller.
+  EditableControlInterface* mEditableControlInterface; ///< Reference to the editable text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
@@ -725,4 +728,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

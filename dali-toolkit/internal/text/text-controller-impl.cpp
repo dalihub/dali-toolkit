@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
 namespace
@@ -2749,7 +2750,10 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
 
 void Controller::Impl::RequestRelayout()
 {
-  mControlInterface.RequestTextRelayout();
+  if( NULL != mControlInterface )
+  {
+    mControlInterface->RequestTextRelayout();
+  }
 }
 
 } // namespace Text
