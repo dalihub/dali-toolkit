@@ -211,17 +211,14 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mImage(),
   mPixels(),
-  mTextureSet(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl(),
-  mNativeFragmentShaderCode(),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT ),
-  mNativeImageFlag( false )
+  mWrapModeV( WrapMode::DEFAULT )
 {
 }
 
@@ -233,17 +230,14 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 : Visual::Base( factoryCache ),
   mImage(),
   mPixels(),
-  mTextureSet(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl( imageUrl ),
-  mNativeFragmentShaderCode(),
   mDesiredSize( size ),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT ),
-  mNativeImageFlag( false )
+  mWrapModeV( WrapMode::DEFAULT )
 {
 }
 
@@ -254,24 +248,12 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl(),
-  mNativeFragmentShaderCode(),
   mDesiredSize(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT ),
-  mNativeImageFlag( false )
+  mWrapModeV( WrapMode::DEFAULT )
 {
-  NativeImage newNativeImage = NativeImage::DownCast( image );
-  if( newNativeImage )
-  {
-    SetNativeFragmentShaderCode( newNativeImage );
-    mNativeImageFlag = true;
-  }
-  else
-  {
-    mNativeImageFlag = false;
-  }
 }
 
 ImageVisual::~ImageVisual()
@@ -280,8 +262,6 @@ ImageVisual::~ImageVisual()
 
 void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-  std::string oldImageUrl = mImageUrl;
-
   Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
   if( imageURLValue )
   {
@@ -354,31 +334,17 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
     if( sync )
     {
       mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+      // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
+      // ( for on-stage actor with image url unchanged, resource loading is already finished)
+      if( imageURLValue )
+      {
+        LoadResourceSynchronously();
+      }
     }
     else
     {
       mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
     }
-  }
-
-  // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
-  // ( for on-stage actor with image url unchanged, resource loading is already finished)
-  if( imageURLValue && IsSynchronousResourceLoading() )
-  {
-    LoadResourceSynchronously();
-  }
-
-  NativeImage nativeImage = NativeImage::DownCast( mImage );
-
-  if( nativeImage )
-  {
-    SetNativeFragmentShaderCode( nativeImage );
-  }
-
-  // if actor is on stage, create new renderer and apply to actor
-  if( actor && actor.OnStage() )
-  {
-    SetOnStage( actor );
   }
 }
 
@@ -407,18 +373,10 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
   naturalSize = Vector2::ZERO;
 }
 
-void ImageVisual::CreateRenderer()
+void ImageVisual::CreateRenderer( TextureSet& textures )
 {
   Geometry geometry;
   Shader shader;
-
-  // If mImage is nativeImage with custom sampler or prefix, mNativeFragmentShaderCode will be applied.
-  // Renderer can't be shared between NativeImage and other image types.
-  if( !mNativeFragmentShaderCode.empty() )
-  {
-    CreateNativeImageRenderer();
-    return;
-  }
 
   if( !mImpl->mCustomShader )
   {
@@ -433,7 +391,7 @@ void ImageVisual::CreateRenderer()
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
     if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
     {
-      shader = GetImageShader(mFactoryCache, false, true);
+      shader = GetImageShader( mFactoryCache, false, true );
     }
     else
     {
@@ -448,28 +406,48 @@ void ImageVisual::CreateRenderer()
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
-  // apply the texture set as well so it's only done in one place
-  DALI_ASSERT_DEBUG( mTextureSet );
-  mImpl->mRenderer.SetTextures( mTextureSet );
+  DALI_ASSERT_DEBUG( textures );
+  mImpl->mRenderer.SetTextures( textures );
 }
 
-void ImageVisual::CreateNativeImageRenderer()
+void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
 {
   Geometry geometry;
   Shader shader;
+
+  std::string fragmentShader;
+  const char* fragmentPreFix = nativeImage.GetCustomFragmentPreFix();
+  const char* customSamplerTypename = nativeImage.GetCustomSamplerTypename();
+  if( fragmentPreFix )
+  {
+    fragmentShader = fragmentPreFix;
+    fragmentShader += "\n";
+  }
+  if( mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty() )
+  {
+    fragmentShader += mImpl->mCustomShader->mFragmentShader;
+  }
+  else
+  {
+    fragmentShader += FRAGMENT_SHADER_NO_ATLAS;
+  }
+  if( customSamplerTypename )
+  {
+    fragmentShader.replace( fragmentShader.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
+  }
 
   if( !mImpl->mCustomShader )
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
 
-    shader  = Shader::New( VERTEX_SHADER, mNativeFragmentShaderCode );
+    shader  = Shader::New( VERTEX_SHADER, fragmentShader );
     shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }
   else
   {
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
     shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
-                           mNativeFragmentShaderCode,
+                           fragmentShader,
                            mImpl->mCustomShader->mHints );
     if( mImpl->mCustomShader->mVertexShader.empty() )
     {
@@ -478,9 +456,6 @@ void ImageVisual::CreateNativeImageRenderer()
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
-  // apply the texture set as well so it's only done in one place
-  DALI_ASSERT_DEBUG( mTextureSet );
-  mImpl->mRenderer.SetTextures( mTextureSet );
 }
 
 
@@ -499,32 +474,33 @@ void ImageVisual::LoadResourceSynchronously()
   }
 }
 
-void ImageVisual::CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing )
+TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing )
 {
+  TextureSet textureSet;
   textureRect = FULL_TEXTURE_RECT;
   if( synchronousLoading )
   {
     if( !mPixels )
     {
       // use broken image
-      mTextureSet = TextureSet::New();
-      TextureSetImage( mTextureSet, 0u, VisualFactoryCache::GetBrokenVisualImage() );
+      textureSet = TextureSet::New();
+      TextureSetImage( textureSet, 0u, VisualFactoryCache::GetBrokenVisualImage() );
     }
     else
     {
       if( attemptAtlasing )
       {
-        mTextureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, mPixels );
+        textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, mPixels );
         mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
       }
-      if( !mTextureSet ) // big image, no atlasing or atlasing failed
+      if( !textureSet ) // big image, no atlasing or atlasing failed
       {
         mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
         Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, mPixels.GetPixelFormat(),
                                         mPixels.GetWidth(), mPixels.GetHeight() );
         texture.Upload( mPixels );
-        mTextureSet = TextureSet::New();
-        mTextureSet.SetTexture( 0u, texture );
+        textureSet = TextureSet::New();
+        textureSet.SetTexture( 0u, texture );
       }
     }
   }
@@ -532,16 +508,16 @@ void ImageVisual::CreateTextureSet( Vector4& textureRect, const std::string& url
   {
     if( attemptAtlasing )
     {
-      mTextureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, true, this );
+      textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, true, this );
       mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
     }
-    if( !mTextureSet ) // big image, no atlasing or atlasing failed
+    if( !textureSet ) // big image, no atlasing or atlasing failed
     {
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
       ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
       resourceImage.LoadingFinishedSignal().Connect( this, &ImageVisual::OnImageLoaded );
-      mTextureSet = TextureSet::New();
-      TextureSetImage( mTextureSet, 0u, resourceImage );
+      textureSet = TextureSet::New();
+      TextureSetImage( textureSet, 0u, resourceImage );
     }
   }
 
@@ -549,8 +525,9 @@ void ImageVisual::CreateTextureSet( Vector4& textureRect, const std::string& url
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-    mTextureSet.SetSampler( 0u, sampler );
+    textureSet.SetSampler( 0u, sampler );
   }
+  return textureSet;
 }
 
 void ImageVisual::InitializeRenderer( const std::string& imageUrl )
@@ -583,8 +560,8 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
       Vector4 atlasRect;
       // texture set has to be created first as we need to know if atlasing succeeded or not
       // when selecting the shader
-      CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), true );
-      CreateRenderer();
+      TextureSet textures = CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), true );
+      CreateRenderer( textures );
 
       if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
       {
@@ -609,8 +586,8 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
     // for custom shader or remote image, renderer is not cached and atlas is not applied
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     Vector4 atlasRect; // ignored in this case
-    CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), false );
-    CreateRenderer();
+    TextureSet textures = CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), false );
+    CreateRenderer( textures );
   }
 }
 
@@ -619,8 +596,20 @@ void ImageVisual::InitializeRenderer( const Image& image )
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
 
   // don't reuse CreateTextureSet
-  mTextureSet = TextureSet::New();
-  CreateRenderer();
+  TextureSet textures = TextureSet::New();
+  // Renderer can't be shared if mImage is NativeImage
+  NativeImage nativeImage = NativeImage::DownCast( image );
+  if( nativeImage )
+  {
+    CreateNativeImageRenderer( nativeImage );
+    DALI_ASSERT_DEBUG( textures );
+    mImpl->mRenderer.SetTextures( textures );
+  }
+  else
+  {
+    // reuse existing code for regular images
+    CreateRenderer( textures );
+  }
 
   if( image )
   {
@@ -680,7 +669,6 @@ void ImageVisual::DoSetOffStage( Actor& actor )
     mImpl->mRenderer.Reset();
   }
   mPlacementActor.Reset();
-  mTextureSet.Reset(); // release texture when going offstage
 }
 
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
@@ -768,12 +756,13 @@ void ImageVisual::ApplyImageToSampler( const Image& image )
 {
   if( image )
   {
-    DALI_ASSERT_DEBUG( mTextureSet ); // texture set should always exist by this time
+    TextureSet textureSet = mImpl->mRenderer.GetTextures();
+    DALI_ASSERT_DEBUG( textureSet ); // texture set should always exist by this time
 
-    TextureSetImage( mTextureSet, 0u, image );
+    TextureSetImage( textureSet, 0u, image );
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-    mTextureSet.SetSampler( 0u, sampler );
+    textureSet.SetSampler( 0u, sampler );
   }
 }
 
@@ -801,37 +790,12 @@ void ImageVisual::CleanCache(const std::string& url)
       atlasRectValue.Get( atlasRect );
     }
 
+    TextureSet textureSet = mImpl->mRenderer.GetTextures();
     mImpl->mRenderer.Reset();
     if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
     {
-      mFactoryCache.GetAtlasManager()->Remove( mTextureSet, atlasRect );
+      mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
     }
-  }
-}
-
-void ImageVisual::SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage )
-{
-  const char* fragmentPreFix = nativeImage.GetCustomFragmentPreFix();
-  const char* customSamplerTypename = nativeImage.GetCustomSamplerTypename();
-
-  if( fragmentPreFix )
-  {
-    mNativeFragmentShaderCode = fragmentPreFix;
-    mNativeFragmentShaderCode += "\n";
-  }
-
-  if( mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty() )
-  {
-    mNativeFragmentShaderCode += mImpl->mCustomShader->mFragmentShader;
-  }
-  else
-  {
-    mNativeFragmentShaderCode += FRAGMENT_SHADER_NO_ATLAS;
-  }
-
-  if( customSamplerTypename )
-  {
-    mNativeFragmentShaderCode.replace( mNativeFragmentShaderCode.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
   }
 }
 
