@@ -24,7 +24,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
 
-// INTERNAL IINCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -55,6 +55,14 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
   uniform mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
   void main()\n
   {\n
     mediump vec2 fixedFactor  = vec2( uNinePatchFactorsX[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uNinePatchFactorsY[ int( ( aPosition.y + 1.0 ) * 0.5 ) ].x );\n
@@ -63,8 +71,13 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );\n
     mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );\n
     \n
-    mediump vec4 vertexPosition = vec4( ( fixedFactor + ( uSize.xy - fixedTotal ) * stretch / stretchTotal ), 0.0, 1.0 );\n
-    vertexPosition.xy -= uSize.xy * vec2( 0.5, 0.5 );\n
+
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+
+    mediump vec4 vertexPosition = vec4( ( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal ) +  anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+    vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );\n
+
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
     vTexCoord = ( fixedFactor + stretch ) / ( fixedTotal + stretchTotal );\n
@@ -82,17 +95,28 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     uniform mediump vec2 uFixed[ 3 ];\n
     uniform mediump vec2 uStretchTotal;\n
     \n
+
+    //Visual size and offset
+    uniform mediump vec2 offset;\n
+    uniform mediump vec2 size;\n
+    uniform mediump vec4 offsetSizeMode;\n
+    uniform mediump vec2 origin;\n
+    uniform mediump vec2 anchorPoint;\n
+
     void main()\n
     {\n
+      vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+      vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+
       mediump vec2 scale        = vec2( length( uModelMatrix[ 0 ].xyz ), length( uModelMatrix[ 1 ].xyz ) );\n
-      mediump vec2 size         = uSize.xy * scale;\n
+      mediump vec2 size         = visualSize.xy * scale;\n
       \n
       mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
       mediump vec2 stretch      = floor( aPosition * 0.5 );\n
       mediump vec2 fixedTotal   = uFixed[ 2 ];\n
       \n
-      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );\n
-      vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
+      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+      vertexPosition.xy -= visualSize * vec2( 0.5, 0.5 );\n
       vertexPosition.xy =  vertexPosition.xy / scale;\n
       \n
       vertexPosition = uMvpMatrix * vertexPosition;\n
@@ -387,6 +411,9 @@ void NPatchVisual::InitializeRenderer()
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 
@@ -448,6 +475,15 @@ Dali::Property::Value NPatchVisual::DoGetProperty( Dali::Property::Index index )
   // TODO
   return Dali::Property::Value();
 }
+
+void NPatchVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 
 void NPatchVisual::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY )
 {

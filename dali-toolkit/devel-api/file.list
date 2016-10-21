@@ -36,6 +36,9 @@ devel_api_src_files = \
 
 # Add devel header files here
 
+devel_api_header_files = \
+  $(devel_api_src_dir)/align-enums.h
+
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h
 
@@ -74,6 +77,7 @@ devel_api_progress_bar_header_files = \
 
 devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.h \
+  $(devel_api_src_dir)/visual-factory/devel-visual-properties.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
 

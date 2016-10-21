@@ -71,6 +71,16 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
     }
   }
 
+  Property::Value* transform = propertyMap.Find( Toolkit::Visual::DevelProperty::TRANSFORM, TRANSFORM );
+  if( transform )
+  {
+    Property::Map map;
+    if( transform->Get( map ) )
+    {
+      mImpl->mTransform.SetPropertyMap( map );
+    }
+  }
+
   DoSetProperties( propertyMap );
 }
 
@@ -147,6 +157,10 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   {
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
+
+  Property::Map transform;
+  mImpl->mTransform.GetPropertyMap( transform );
+  map.Insert( Toolkit::Visual::DevelProperty::TRANSFORM, transform );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
@@ -195,6 +209,16 @@ void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Propert
 
   if( index < VISUAL_PROPERTY_START_INDEX )
   {
+    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
+    {
+      Property::Map* map = propertyValue.GetMap();
+      if( map )
+      {
+        mImpl->mTransform.SetPropertyMap( *map );
+        OnSetTransform();
+      }
+    }
+
     // TODO set the properties of the visual base.
   }
   else
@@ -213,6 +237,12 @@ Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
 
   if( index < VISUAL_PROPERTY_START_INDEX )
   {
+    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
+    {
+      Property::Map map;
+      mImpl->mTransform.GetPropertyMap( map );
+      return map;
+    }
     // TODO retrieve the properties of the visual base.
   }
   else

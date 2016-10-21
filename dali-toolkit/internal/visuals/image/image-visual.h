@@ -188,6 +188,11 @@ protected:
    */
   virtual void DoSetOffStage( Actor& actor );
 
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
 public:
 
   /**

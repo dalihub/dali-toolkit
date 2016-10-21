@@ -105,12 +105,24 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
+    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -409,6 +421,9 @@ void ImageVisual::CreateRenderer( TextureSet& textures )
   mImpl->mRenderer = Renderer::New( geometry, shader );
   DALI_ASSERT_DEBUG( textures );
   mImpl->mRenderer.SetTextures( textures );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
@@ -457,6 +472,9 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 
@@ -547,7 +565,14 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
       ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-    bool cacheable =  defaultWrapMode &&  mPixelArea == FULL_TEXTURE_RECT;
+    bool defaultTransform = mImpl->mTransform.mSize == Vector2::ONE &&
+                            mImpl->mTransform.mOffset == Vector2::ZERO &&
+                            mImpl->mTransform.mOffsetSizeMode == Vector4::ZERO &&
+                            mImpl->mTransform.mOrigin == Toolkit::Align::CENTER &&
+                            mImpl->mTransform.mAnchorPoint == Toolkit::Align::CENTER;
+
+    bool cacheable =  defaultWrapMode && defaultTransform &&  mPixelArea == FULL_TEXTURE_RECT;
+
 
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     if( cacheable ) // fetch the renderer from cache if exist
@@ -714,6 +739,14 @@ Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
 {
   // TODO
   return Dali::Property::Value();
+}
+
+void ImageVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
 }
 
 Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )

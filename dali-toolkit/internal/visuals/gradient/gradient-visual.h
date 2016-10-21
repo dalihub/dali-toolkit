@@ -134,6 +134,11 @@ protected:
   virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
+  /**
    * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );

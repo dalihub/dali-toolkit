@@ -160,6 +160,11 @@ protected:
    */
   virtual void DoSetOnStage( Actor& actor );
 
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
 private:
 
   //Simple struct to store the position and normal of a single vertex.

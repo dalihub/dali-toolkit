@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
@@ -122,13 +123,26 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform   mediump vec3 lightPosition;\n
   uniform   mediump vec2 uStageOffset;\n
 
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    float scaleFactor = min( visualSize.x / uObjectDimensions.x, visualSize.y / uObjectDimensions.y );\n
+    vec3 originFlipY =  vec3(origin.x, -origin.y, 0.0);
+    vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
+    vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);\n
+    return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
-    float xRatio = uSize.x / uObjectDimensions.x;\n
-    float yRatio = uSize.y / uObjectDimensions.y;\n
-    float scaleFactor = min( xRatio, yRatio );\n
-
-    vec4 normalisedVertexPosition = vec4( aPosition * scaleFactor, 1.0 );\n
+    vec4 normalisedVertexPosition = ComputeVertexPosition();\n
     vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
@@ -422,6 +436,14 @@ Dali::Property::Value PrimitiveVisual::DoGetProperty( Dali::Property::Index inde
   return Dali::Property::Value();
 }
 
+void PrimitiveVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 void PrimitiveVisual::InitializeRenderer()
 {
   if( !mGeometry )
@@ -436,6 +458,9 @@ void PrimitiveVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( mGeometry, mShader );
   mImpl->mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 void PrimitiveVisual::UpdateShaderUniforms()

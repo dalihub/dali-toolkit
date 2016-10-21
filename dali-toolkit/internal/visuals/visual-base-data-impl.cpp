@@ -46,10 +46,44 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Shader::Hint, OUTPUT_IS_TRANSPARENT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Shader::Hint, MODIFIES_GEOMETRY )
 DALI_ENUM_TO_STRING_TABLE_END( SHADER_HINT )
 
+DALI_ENUM_TO_STRING_TABLE_BEGIN( ALIGN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, TOP_BEGIN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, TOP_CENTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, TOP_END )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, CENTER_BEGIN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, CENTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, CENTER_END )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, BOTTOM_BEGIN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, BOTTOM_CENTER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, BOTTOM_END )
+DALI_ENUM_TO_STRING_TABLE_END( ALIGN )
+
+Dali::Vector2 PointToVector2( Toolkit::Align::Type point, Toolkit::Direction::Type direction )
+{
+  static const float pointToVector2[] = { 0.0f,0.0f,
+                                          0.5f,0.0f,
+                                          1.0f,0.0f,
+                                          0.0f,0.5f,
+                                          0.5f,0.5f,
+                                          1.0f,0.5f,
+                                          0.0f,1.0f,
+                                          0.5f,1.0f,
+                                          1.0f,1.0f };
+
+  Vector2 result( &pointToVector2[point*2] );
+  if( direction == Direction::RIGHT_TO_LEFT )
+  {
+    result.x = 1.0f - result.x;
+  }
+
+  return result;
+}
+
 } // unnamed namespace
 
 Internal::Visual::Base::Impl::Impl()
 : mCustomShader(NULL),
+  mTransform(),
   mDepthIndex( 0.0f ),
   mFlags( 0 )
 {
@@ -160,6 +194,77 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Ma
 
     map.Insert( Toolkit::VisualProperty::SHADER, customShader );
   }
+}
+
+Internal::Visual::Base::Impl::Transform::Transform()
+: mOffset(0.0f,0.0f),
+  mSize(1.0f,1.0f),
+  mOffsetSizeMode(0.0f,0.0f,0.0f,0.0f),
+  mOrigin(Toolkit::Align::CENTER),
+  mAnchorPoint(Toolkit::Align::CENTER)
+{
+}
+
+void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Map& map )
+{
+  //Set default values
+  mOffset = Vector2(0.0f,0.0f);
+  mSize = Vector2(1.0f,1.0f);
+  mOffsetSizeMode = Vector4(0.0f,0.0f,0.0f,0.0f);
+  mOrigin = Toolkit::Align::CENTER;
+  mAnchorPoint = Toolkit::Align::CENTER;
+
+  for( Property::Map::SizeType i(0); i<map.Count(); ++i )
+  {
+    KeyValuePair keyValue = map.GetKeyValue( i );
+    if( keyValue.first == Toolkit::Visual::DevelProperty::Transform::Property::OFFSET )
+    {
+      keyValue.second.Get( mOffset );
+    }
+    else if( keyValue.first == Toolkit::Visual::DevelProperty::Transform::Property::SIZE )
+    {
+      keyValue.second.Get( mSize );
+    }
+    else if( keyValue.first == Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN )
+    {
+      Toolkit::Align::Type align(Toolkit::Align::CENTER);
+      if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+      {
+        mOrigin = align;
+      }
+    }
+    else if( keyValue.first == Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT )
+    {
+      Toolkit::Align::Type align(Toolkit::Align::CENTER);
+      if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+      {
+        mAnchorPoint = align;
+      }
+    }
+    else if( keyValue.first == Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE )
+    {
+      keyValue.second.Get( mOffsetSizeMode );
+    }
+  }
+}
+
+void Internal::Visual::Base::Impl::Transform::GetPropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET, mOffset )
+     .Add( Toolkit::Visual::DevelProperty::Transform::Property::SIZE, mSize )
+     .Add( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN, mOrigin )
+     .Add( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT, mAnchorPoint )
+     .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, mOffsetSizeMode );
+}
+
+void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer renderer, Toolkit::Direction::Type direction )
+{
+  renderer.RegisterProperty( SIZE, mSize );
+  renderer.RegisterProperty( OFFSET, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f,1.0f));
+  renderer.RegisterProperty( OFFSET_SIZE_MODE, mOffsetSizeMode );
+  renderer.RegisterProperty( ORIGIN, PointToVector2( mOrigin, direction ) - Vector2(0.5,0.5) );
+  renderer.RegisterProperty( ANCHOR_POINT, Vector2(0.5,0.5) - PointToVector2( mAnchorPoint, direction ) );
 }
 
 } // namespace Internal
