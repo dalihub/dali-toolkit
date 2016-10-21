@@ -810,6 +810,13 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
 
 void TextVisual::RenderText()
 {
+  Actor self = mSelf.GetHandle();
+  if( !self )
+  {
+    // Nothing to do if the handle is not initialized.
+    return;
+  }
+
   Actor renderableActor;
 
   if( mRenderer )
@@ -826,7 +833,7 @@ void TextVisual::RenderText()
       const Vector2& scrollOffset = mController->GetScrollPosition();
       renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
-      mSelf.Add( renderableActor );
+      self.Add( renderableActor );
     }
     mRenderableActor = renderableActor;
 
@@ -847,6 +854,13 @@ void TextVisual::StopTextAutoScrolling()
 
 void TextVisual::SetUpAutoScrolling()
 {
+  Actor self = mSelf.GetHandle();
+  if( !self )
+  {
+    // Nothing to do if the handle is not initialized.
+    return;
+  }
+
   const Text::ScrollerData* const data = mController->GetAutoScrollData();
 
   if( NULL != data )
@@ -860,8 +874,8 @@ void TextVisual::SetUpAutoScrolling()
     mTextScroller->StartScrolling( mRenderableActor,
                                    *data );
 
-    mSelf.Add( mTextScroller->GetScrollingText() );
-    mSelf.Add( mTextScroller->GetSourceCamera() );
+    self.Add( mTextScroller->GetScrollingText() );
+    self.Add( mTextScroller->GetSourceCamera() );
   }
 }
 

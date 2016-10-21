@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/weak-handle.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
@@ -168,7 +169,7 @@ private:
 
 private:
   Text::ControllerPtr          mController;               ///< The text's controller.
-  Actor                        mSelf;
+  WeakHandle<Actor>            mSelf;
 
   Text::RendererPtr            mRenderer;
   Text::TextScrollerPtr        mTextScroller;
