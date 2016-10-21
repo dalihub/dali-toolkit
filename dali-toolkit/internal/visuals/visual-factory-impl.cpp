@@ -38,6 +38,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-resolve-url.h>
@@ -99,10 +100,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   // Return a new WireframeVisual if we have debug enabled
   if( mDebugEnabled )
   {
-    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( WireframeVisual::New( *( mFactoryCache.Get() ) ).Get() );
   }
 
-  Visual::Base* visualPtr = NULL;
+  Visual::BasePtr visualPtr;
 
   Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
   Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
@@ -115,19 +116,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   {
     case Toolkit::Visual::BORDER:
     {
-      visualPtr = new BorderVisual( *( mFactoryCache.Get() ) );
+      visualPtr = BorderVisual::New( *( mFactoryCache.Get() ) );
       break;
     }
 
     case Toolkit::Visual::COLOR:
     {
-      visualPtr = new ColorVisual( *( mFactoryCache.Get() ) );
+      visualPtr = ColorVisual::New( *( mFactoryCache.Get() ) );
       break;
     }
 
     case Toolkit::Visual::GRADIENT:
     {
-      visualPtr = new GradientVisual( *( mFactoryCache.Get() ) );
+      visualPtr = GradientVisual::New( *( mFactoryCache.Get() ) );
       break;
     }
 
@@ -141,11 +142,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
         UrlType::Type type = ResolveUrlType( imageUrl );
         if( UrlType::N_PATCH == type )
         {
-          visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
+          visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ) );
         }
         else if( UrlType::SVG == type )
         {
-          visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
+          visualPtr = SvgVisual::New( *( mFactoryCache.Get() ) );
         }
         else // Regular image
         {
@@ -158,12 +159,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
           if( batchingEnabled )
           {
-            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ) );
+            visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ) );
             break;
           }
           else
           {
-            visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
+            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ) );
           }
         }
       }
@@ -173,22 +174,27 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
     case Toolkit::Visual::MESH:
     {
-      visualPtr = new MeshVisual( *( mFactoryCache.Get() ) );
+      visualPtr = MeshVisual::New( *( mFactoryCache.Get() ) );
       break;
     }
 
     case Toolkit::Visual::PRIMITIVE:
     {
-      visualPtr = new PrimitiveVisual( *( mFactoryCache.Get() ) );
+      visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ) );
       break;
     }
 
     case Toolkit::Visual::WIREFRAME:
     {
-      visualPtr = new WireframeVisual( *( mFactoryCache.Get() ) );
+      visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ) );
       break;
     }
 
+    case Toolkit::Visual::TEXT:
+    {
+      visualPtr = TextVisual::New( *( mFactoryCache.Get() ) );
+      break;
+    }
   }
 
   if( visualPtr )
@@ -201,7 +207,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
 
-  return Toolkit::Visual::Base( visualPtr );
+  return Toolkit::Visual::Base( visualPtr.Get() );
 }
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
@@ -213,25 +219,22 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 
   if( mDebugEnabled )
   {
-    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( WireframeVisual::New( *( mFactoryCache.Get() ) ).Get() );
   }
+
+  Visual::BasePtr visualPtr;
 
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
   if( npatchImage )
   {
-    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-    visualPtr->SetImage( npatchImage );
-
-    return Toolkit::Visual::Base( visualPtr );
+    visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), npatchImage );
   }
   else
   {
-    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
-    Actor actor;
-    visualPtr->SetImage( actor, image );
-
-    return Toolkit::Visual::Base( visualPtr );
+    visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), image );
   }
+
+  return Toolkit::Visual::Base( visualPtr.Get() );
 }
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
@@ -243,32 +246,27 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
 
   if( mDebugEnabled )
   {
-    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( WireframeVisual::New( *( mFactoryCache.Get() ) ).Get() );
   }
+
+  Visual::BasePtr visualPtr;
 
   // first resolve url type to know which visual to create
   UrlType::Type type = ResolveUrlType( url );
   if( UrlType::N_PATCH == type )
   {
-    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
-    visualPtr->SetImage( url );
-
-    return Toolkit::Visual::Base( visualPtr );
+    visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), url );
   }
   else if( UrlType::SVG == type )
   {
-    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
-    visualPtr->SetImage( url, size );
-    return Toolkit::Visual::Base( visualPtr );
+    visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url, size );
   }
   else // Regular image
   {
-    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ));
-    Actor actor;
-    visualPtr->SetImage( actor, url, size );
-
-    return Toolkit::Visual::Base( visualPtr );
+    visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), url, size );
   }
+
+  return Toolkit::Visual::Base( visualPtr.Get() );
 }
 
 } // namespace Internal

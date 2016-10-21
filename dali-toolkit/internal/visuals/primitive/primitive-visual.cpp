@@ -160,7 +160,12 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-} // namespace
+} // unnamed namespace
+
+PrimitiveVisualPtr PrimitiveVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new PrimitiveVisual( factoryCache );
+}
 
 PrimitiveVisual::PrimitiveVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),

@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/shader.h>
@@ -85,6 +86,11 @@ public:
   const Vector2& GetSize() const;
 
   /**
+   * @copydoc Toolkit::Visual::Base::GetHeightForWidth
+   */
+  virtual float GetHeightForWidth( float width ) const;
+
+  /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
@@ -120,7 +126,7 @@ public:
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha(  bool preMultipled );
+  void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
    * @brief Query whether alpha is pre-multiplied.
@@ -194,19 +200,20 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
 protected:
+
   /**
    * @brief Gets the on stage state for this Visual
    *
    * @return Returns true if this Visual is on stage, false if it is off the stage
    */
-  bool GetIsOnStage() const;
+  bool IsOnStage() const;
 
   /**
    * @brief Gets whether the Dali::Renderer is from a shared cache (and therefore any modifications will affect other users of that renderer)
    *
    * @return Returns true if the renderer is from shared cache, false otherwise
    */
-  bool GetIsFromCache() const;
+  bool IsFromCache() const;
 
 protected:
   /**
@@ -239,6 +246,8 @@ protected:
   Impl* mImpl;
   VisualFactoryCache& mFactoryCache;
 };
+
+typedef IntrusivePtr<Base> BasePtr;
 
 } // namspace Visual
 

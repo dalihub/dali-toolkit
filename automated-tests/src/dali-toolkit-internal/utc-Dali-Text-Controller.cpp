@@ -19,10 +19,14 @@
 
 #include <stdlib.h>
 #include <limits>
+#include <unistd.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-scroller-data.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -40,7 +44,9 @@ const char* const OPTION_CLIPBOARD("optionClipboard");      // "Clipboard" popup
 
 const Size CONTROL_SIZE( 300.f, 60.f );
 
-class ControlImpl : public ControlInterface
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+
+class ControlImpl : public ControlInterface, public Text::EditableControlInterface
 {
 public:
   ControlImpl()
@@ -80,8 +86,7 @@ int UtcDaliTextController(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   DALI_TEST_CHECK( controller );
 
@@ -95,8 +100,7 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   DALI_TEST_CHECK( controller );
 
@@ -131,8 +135,7 @@ int UtcDaliTextControllerImfEvent(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   std::string text;
   ImfManager::ImfEventData imfEvent;
@@ -214,8 +217,7 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControlImpl controlImpl;
-  ControllerPtr controller = Controller::New( controlImpl );
+  ControllerPtr controller = Controller::New();
 
   DALI_TEST_CHECK( controller );
 
@@ -326,6 +328,196 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   DALI_TEST_CHECK( button );
 
   button.DoAction( "buttonClick", attributes );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerGetInputShadowProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerGetInputShadowProperty");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  const std::string& shadowProperties = controller->GetInputShadowProperties();
+
+  DALI_TEST_CHECK( shadowProperties.empty() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerGetInputUnderlineProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerGetInputUnderlineProperty");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  const std::string& underlineProperties = controller->GetInputUnderlineProperties();
+
+  DALI_TEST_CHECK( underlineProperties.empty() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetAutoScrollEnabled(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetAutoScrollEnabled");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  DALI_TEST_CHECK( !controller->IsAutoScrollEnabled() );
+
+  // The auto scrolling shouldn't be enabled if the multi-line is enabled.
+
+  // Enable multi-line.
+  controller->SetMultiLineEnabled( true );
+
+  // Enable text scrolling.
+  controller->SetAutoScrollEnabled( true );
+
+  DALI_TEST_CHECK( !controller->IsAutoScrollEnabled() );
+
+  // Disable multi-line.
+  controller->SetMultiLineEnabled( false );
+
+  // Enable text scrolling.
+  controller->SetAutoScrollEnabled( true );
+
+  // Should be ebabled now.
+  DALI_TEST_CHECK( controller->IsAutoScrollEnabled() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetAutoScrollSpeed(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetAutoScrollSpeed");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  // Check the default value.
+  DALI_TEST_EQUALS( 0, controller->GetAutoScrollSpeed(), TEST_LOCATION );
+
+  // Set the auto scroll speed.
+  controller->SetAutoscrollSpeed( 10 );
+
+  DALI_TEST_EQUALS( 10, controller->GetAutoScrollSpeed(), TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetAutoScrollLoopCount(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetAutoScrollLoopCount");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  // Check the default value.
+  DALI_TEST_EQUALS( 0, controller->GetAutoScrollLoopCount(), TEST_LOCATION );
+
+  // Set the auto scroll loop count.
+  controller->SetAutoScrollLoopCount( 5 );
+
+  DALI_TEST_EQUALS( 5, controller->GetAutoScrollLoopCount(), TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetAutoScrollWrapGap(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetAutoScrollWrapGap");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  // Check the default value.
+  DALI_TEST_EQUALS( 0.f, controller->GetAutoScrollWrapGap(), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Set the auto scroll loop count.
+  controller->SetAutoScrollWrapGap( 25.f );
+
+  DALI_TEST_EQUALS( 25.f, controller->GetAutoScrollWrapGap(), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerGetAutoScrollData(void)
+{
+  tet_infoline(" UtcDaliTextControllerGetAutoScrollData");
+  ToolkitTestApplication application;
+
+  // Load some fonts to get the same metrics on different platforms.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 96u, 96u );
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  DALI_TEST_CHECK( NULL == controller->GetAutoScrollData() );
+
+  // Set and check some values.
+  controller->SetAutoscrollSpeed( 10 );
+  controller->SetAutoScrollLoopCount( 5 );
+  controller->SetAutoScrollWrapGap( 25.f );
+
+  const ScrollerData* scrollerData = controller->GetAutoScrollData();
+  DALI_TEST_CHECK( NULL != controller->GetAutoScrollData() );
+
+  DALI_TEST_EQUALS( Size::ZERO, scrollerData->mControlSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Size::ZERO, scrollerData->mOffscreenSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( 10, scrollerData->mScrollSpeed, TEST_LOCATION );
+  DALI_TEST_EQUALS( 5, scrollerData->mLoopCount, TEST_LOCATION );
+  DALI_TEST_EQUALS( 25.f, scrollerData->mWrapGap, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( 0.f, scrollerData->mAlignmentOffset, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_CHECK( !scrollerData->mAutoScrollDirectionRTL );
+
+  // Set some text and layout.
+  controller->SetMarkupProcessorEnabled( true );
+  controller->SetHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_END );
+  controller->SetText( "<font family='TizenSans' size='12'>Hello world</font>" );
+  controller->Relayout( Size( 100.f, 20.f ) );
+
+  scrollerData = controller->GetAutoScrollData();
+  DALI_TEST_EQUALS( Size( 100.f, 20.f ), scrollerData->mControlSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Size( 80.f, 20.f ), scrollerData->mOffscreenSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( 20.f, scrollerData->mAlignmentOffset, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   tet_result(TET_PASS);
   END_TEST;

@@ -18,7 +18,8 @@
  *
  */
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
@@ -35,6 +36,9 @@ namespace Toolkit
 namespace Internal
 {
 
+class SvgVisual;
+typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
+
 /**
  * The visual which renders a svg image
  *
@@ -50,16 +54,24 @@ class SvgVisual: public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new SVG visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  SvgVisual( VisualFactoryCache& factoryCache );
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache );
 
   /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
+   * @brief Create the SVG Visual using the image URL.
+   *
+   * The visual will parse the SVG image once it is set.
+   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] imageUrl The URL to svg resource to use
+   * @param[in] size The required size for the SVG
    */
-  ~SvgVisual();
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
 
 public:  // from Visual
 
@@ -91,6 +103,18 @@ public:  // from Visual
 protected:
 
   /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   */
+  SvgVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~SvgVisual();
+
+  /**
    * @copydoc Visual::Base::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
@@ -108,15 +132,6 @@ protected:
 public:
 
   /**
-   * @brief Sets the svg image of this visual to the resource at imageUrl
-   * The visual will parse the svg image once it is set.
-   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
-   *
-   * @param[in] imageUrl The URL to svg resource to use
-   */
-  void SetImage( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
-
-  /**
    * @bried Apply the rasterized image to the visual.
    *
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
@@ -124,6 +139,15 @@ public:
   void ApplyRasterizedImage( PixelData rasterizedPixelData );
 
 private:
+
+  /**
+   * @brief Parses the SVG Image from the set URL.
+   *
+   * @param[in] imageUrl The URL of the image to parse the SVG from.
+   * @param[in] size The required size of the SVG
+   */
+  void ParseFromUrl( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
+
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
    *

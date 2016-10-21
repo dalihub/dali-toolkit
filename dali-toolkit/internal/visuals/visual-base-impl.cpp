@@ -84,6 +84,11 @@ const Vector2& Visual::Base::GetSize() const
   return mImpl->mSize;
 }
 
+float Visual::Base::GetHeightForWidth( float width ) const
+{
+  return 0.f;
+}
+
 void Visual::Base::GetNaturalSize( Vector2& naturalSize ) const
 {
   naturalSize = Vector2::ZERO;
@@ -116,11 +121,21 @@ void Visual::Base::SetOnStage( Actor& actor )
 
 void Visual::Base::SetOffStage( Actor& actor )
 {
-  if( GetIsOnStage() )
+  if( IsOnStage() )
   {
     DoSetOffStage( actor );
 
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
+  }
+}
+
+void Visual::Base::CreatePropertyMap( Property::Map& map ) const
+{
+  DoCreatePropertyMap( map );
+
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->CreatePropertyMap( map );
   }
 }
 
@@ -152,22 +167,12 @@ void Visual::Base::DoSetOffStage( Actor& actor )
   mImpl->mRenderer.Reset();
 }
 
-void Visual::Base::CreatePropertyMap( Property::Map& map ) const
-{
-  DoCreatePropertyMap( map );
-
-  if( mImpl->mCustomShader )
-  {
-    mImpl->mCustomShader->CreatePropertyMap( map );
-  }
-}
-
-bool Visual::Base::GetIsOnStage() const
+bool Visual::Base::IsOnStage() const
 {
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
-bool Visual::Base::GetIsFromCache() const
+bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }

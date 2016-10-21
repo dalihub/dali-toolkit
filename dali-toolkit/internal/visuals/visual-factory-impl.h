@@ -65,7 +65,6 @@ public:
    */
   Toolkit::Visual::Base CreateVisual( const std::string& image, ImageDimensions size );
 
-
 protected:
 
   /**

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
@@ -30,13 +33,25 @@ namespace Toolkit
 namespace Internal
 {
 
+class WireframeVisual;
+typedef IntrusivePtr< WireframeVisual > WireframeVisualPtr;
+
 /**
- * The visual which renders a wireframe outline to the control's quad.
- *
+ * @brief Renders a wireframe outline to the control's quad.
  */
 class WireframeVisual: public Visual::Base
 {
 public:
+
+  /**
+   * @brief Create a new wireframe visual.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static WireframeVisualPtr New( VisualFactoryCache& factoryCache );
+
+protected:
 
   /**
    * @brief Constructor.
@@ -49,8 +64,6 @@ public:
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~WireframeVisual();
-
-protected:
 
   /**
    * @copydoc Visual::Base::DoSetOnStage

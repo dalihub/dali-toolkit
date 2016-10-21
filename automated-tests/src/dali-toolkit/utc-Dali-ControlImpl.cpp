@@ -1054,6 +1054,7 @@ int UtcDaliControlImplRegisterVisualToSelf(void)
 
     // Register to self
     dummyImpl.RegisterVisual( index, dummy, visual );
+
     DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
     DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
     DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == dummy );
@@ -1144,3 +1145,215 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
 
   END_TEST;
 }
+
+int UtcDaliControlImplRegisterDisabledVisual(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index TEST_PROPERTY =1;
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( TEST_PROPERTY, dummy, visual, false );
+
+  DALI_TEST_CHECK( dummyImpl.GetVisual( TEST_PROPERTY ) == visual );
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
+
+  Stage::GetCurrent().Add(dummy);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
+
+  DALI_TEST_CHECK( dummy.OnStage() == true );
+
+  dummyImpl.EnableVisual( TEST_PROPERTY, true );
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == true );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplDisableRegisteredVisual(void)
+{
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index TEST_PROPERTY =1;
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( TEST_PROPERTY, dummy, visual );
+
+  Stage::GetCurrent().Add(dummy);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == true);
+
+  DALI_TEST_CHECK( dummy.OnStage() == true );
+
+  dummyImpl.EnableVisual( TEST_PROPERTY, false );
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplEnabledVisualParentRemovedFromStage(void)
+{
+  // Visual enabled but then parent removed from stage, test ensures visual/renderer are also removed from stage.
+  // Then adding parent back to stage should automatically put visual/renderer back
+
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index TEST_PROPERTY =1;
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( TEST_PROPERTY, dummy, visual, false );
+
+  Stage::GetCurrent().Add(dummy);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
+  DALI_TEST_CHECK( dummy.OnStage() == true );
+  dummyImpl.EnableVisual( TEST_PROPERTY, true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 1u );
+
+  // Remove control from stage, visual should be removed from stage too
+  Stage::GetCurrent().Remove(dummy);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 0u );
+
+  Stage::GetCurrent().Add(dummy);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 1u );
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == true );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
+{
+  // Register 2 visuals and enable by default
+  // Disable 1 visual
+  // Remove control from stage then put it back
+  // Check that only 1 visual/renderer is staged.
+
+  ToolkitTestApplication application;
+
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+
+  Property::Index TEST_PROPERTY1 =1;
+  Property::Index TEST_PROPERTY2 =2;
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual1;
+  Toolkit::Visual::Base visual2;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  Property::Map map2;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+  visual1 = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual1);
+
+  visual2 = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual2);
+
+  // Register index with a color visual
+  dummyImpl.RegisterVisual( TEST_PROPERTY1, dummy, visual1 );
+  // Register second index with a color visual
+  dummyImpl.RegisterVisual( TEST_PROPERTY2, dummy, visual2 );
+
+  Stage::GetCurrent().Add(dummy);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 2u );
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY1 ) == true );
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY1 ) == true);
+  DALI_TEST_CHECK( dummy.OnStage() == true );
+  dummyImpl.EnableVisual( TEST_PROPERTY2, false );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 1u );
+
+  // Remove control from stage, visual should be removed from stage too
+  Stage::GetCurrent().Remove(dummy);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 0u );
+
+  Stage::GetCurrent().Add(dummy);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( dummy.GetRendererCount() == 1u );
+
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY1 ) == true );
+  DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY2 ) == false );
+
+  END_TEST;
+}
+

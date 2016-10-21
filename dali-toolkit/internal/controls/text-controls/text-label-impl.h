@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -21,10 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/internal/text/text-controller.h>
-#include <dali-toolkit/internal/text/text-scroller-interface.h>
-#include <dali-toolkit/internal/text/rendering/text-renderer.h>
-#include <dali-toolkit/internal/text/text-scroller.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
 
 namespace Dali
 {
@@ -38,7 +36,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface
+class TextLabel : public Control, public Text::ControlInterface
 {
 public:
 
@@ -95,41 +93,16 @@ private: // From Control
   virtual float GetHeightForWidth( float width );
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
-   */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
-
-  /**
    * @copydoc Control::OnStageConnection()
    */
   virtual void OnStageConnection( int depth );
+
+// From ControlInterface
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
-
-  /**
-   * @copydoc Text::ControlInterface::TextChanged()
-   */
-  virtual void TextChanged();
-
-  /**
-   * @copydoc Text::ControlInterface::MaxLengthReached()
-   */
-  virtual void MaxLengthReached();
-
-  /**
-   * @copydoc Text::ControlInterface::InputStyleChanged()
-   */
-  virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
-
-private: // from TextScroller
-
-  /**
-   * @copydoc Text::ScrollerInterface::ScrollingFinished()
-   */
-  virtual void ScrollingFinished();
 
 private: // Implementation
 
@@ -149,27 +122,9 @@ private:
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
 
-  // Connection needed to re-render text, when a Text Label returns to the stage
-  void OnStageConnect( Dali::Actor actor );
-
-  /**
-   * @brief Render view, create and attach actor(s) to this Text Label
-   */
-  void RenderText();
-
-  /**
-   * @brief Set up Autoscrolling
-   */
-  void SetUpAutoScrolling();
-
 private: // Data
 
-  Text::ControllerPtr mController;
-  Text::RendererPtr mRenderer;
-  Text::TextScrollerPtr mTextScroller;
-  Actor mRenderableActor;
-  int mRenderingBackend;
-  bool mHasBeenStaged:1;
+  Toolkit::Visual::Base mVisual;
 };
 
 } // namespace Internal
@@ -198,4 +153,4 @@ inline const Toolkit::Internal::TextLabel& GetImpl( const Toolkit::TextLabel& te
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H

@@ -122,7 +122,7 @@ public:
 
       /**
        * @brief The single-line or multi-line layout option
-       * @details name "multiLine", type FLOAT, default SINGLE_LINE_BOX
+       * @details name "multiLine", type BOOLEAN, default false
        * @SINCE_1_0.0
        */
       MULTI_LINE,
@@ -150,7 +150,7 @@ public:
 
       /**
        * @brief The drop shadow offset 0 indicates no shadow
-       * @details name "shadowOffset", type VECTOR4
+       * @details name "shadowOffset", type VECTOR2
        * @DEPRECATED_1_1.37 Use SHADOW instead
        */
       SHADOW_OFFSET,
@@ -192,13 +192,13 @@ public:
 
       /**
        * @brief  Start or stop auto scrolling,
-       * @details name "enableMarkup", type BOOLEAN, default is false
+       * @details name "enableAutoScroll", type BOOLEAN, default is false
        * @SINCE_1_1.35
        */
       ENABLE_AUTO_SCROLL,
 
       /**
-       * @brief  Start or stop auto scrolling,
+       * @brief Sets the speed of scrolling in pixels per second,
        * @details name "autoScrollSpeed", type INT, default in style sheet
        * @SINCE_1_1.35
        */

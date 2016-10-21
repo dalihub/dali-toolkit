@@ -44,6 +44,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
@@ -57,6 +59,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class PrimitiveVisual;
+typedef IntrusivePtr< PrimitiveVisual > PrimitiveVisualPtr;
 
 /**
  * The visual which renders a simple 3D shape to the control's quad
@@ -97,16 +102,12 @@ class PrimitiveVisual: public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new primitive visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
    */
-  PrimitiveVisual( VisualFactoryCache& factoryCache );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  virtual ~PrimitiveVisual();
+  static PrimitiveVisualPtr New( VisualFactoryCache& factoryCache );
 
 public:  // from Visual
 
@@ -136,6 +137,18 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   */
+  PrimitiveVisual( VisualFactoryCache& factoryCache );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~PrimitiveVisual();
 
   /**
    * @copydoc Visual::Base::DoInitialize

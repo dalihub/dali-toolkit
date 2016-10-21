@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/internal/text/text-control-interface.h>
+// FILE HEADER
+#include <dali-toolkit/internal/text/text-scroller-data.h>
 
 namespace Dali
 {
@@ -27,13 +27,18 @@ namespace Toolkit
 namespace Text
 {
 
-ControlInterface::ControlInterface()
-{
-}
+const int MINIMUM_SCROLL_SPEED = 1;
 
-ControlInterface::~ControlInterface()
-{
-}
+ScrollerData::ScrollerData()
+: mScrollSpeed( MINIMUM_SCROLL_SPEED ),
+  mLoopCount( 1 ),
+  mWrapGap( 0.f ),
+  mAlignmentOffset( 0.f ),
+  mAutoScrollDirectionRTL( false )
+{}
+
+ScrollerData::~ScrollerData()
+{}
 
 } // namespace Text
 

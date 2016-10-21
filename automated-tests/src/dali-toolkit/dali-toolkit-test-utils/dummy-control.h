@@ -72,7 +72,11 @@ public:
   inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
 
   void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual);
+  void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual, bool enabled );
   void UnregisterVisual( Property::Index index );
+  void EnableVisual( Property::Index index, bool enabled );
+  bool IsVisualEnabled( Property::Index index );
+
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Actor GetPlacementActor( Property::Index index );
 

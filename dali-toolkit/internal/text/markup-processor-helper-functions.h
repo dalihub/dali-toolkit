@@ -28,6 +28,7 @@
 namespace Dali
 {
 
+struct Vector2;
 struct Vector4;
 
 namespace Toolkit
@@ -78,11 +79,20 @@ bool TokenComparison( const std::string& string1, const char* const stringBuffer
 /**
  * @brief Skips any unnecessary white space.
  *
- * @param[in,out] markupStringBuffer The mark-up string buffer. It's a const iterator pointing the current character.
- * @param[in] markupStringEndBuffer Pointer to one character after the end of the mark-up string buffer.
+ * @param[in,out] stringBuffer The string buffer. It's a const iterator pointing the current character.
+ * @param[in] stringEndBuffer Pointer to one character after the end of the string buffer.
  */
-void SkipWhiteSpace( const char*& markupStringBuffer,
-                     const char* const markupStringEndBuffer );
+void SkipWhiteSpace( const char*& stringBuffer,
+                     const char* const stringEndBuffer );
+
+/**
+ * @Brief Jumps to the next white space.
+ *
+ * @param[in,out] stringBuffer The string buffer. It's a const iterator pointing the current character.
+ * @param[in] stringEndBuffer Pointer to one character after the end of the string buffer.
+ */
+void JumpToWhiteSpace( const char*& stringBuffer,
+                       const char* const stringEndBuffer );
 
 /**
  * @brief Converts a string into an hexadecimal unsigned int.
@@ -103,6 +113,14 @@ unsigned int StringToHex( const char* const uintStr );
 float StringToFloat( const char* const floatStr );
 
 /**
+ * @brief Converts a float into a string.
+ *
+ * @param[in] value The float value.
+ * @param[out] floatStr The string.
+ */
+void FloatToString( float value, std::string& floatStr );
+
+/**
  * @brief Converts an ARGB color packed in 4 byte unsigned int into a Vector4 color used in Dali.
  *
  * @param[in] color An ARGB color packed in an unsigned int.
@@ -114,13 +132,42 @@ void UintColorToVector4( unsigned int color, Vector4& retColor );
  * @brief Converts a color packed inside a string into an ARGB Vector4 color.
  *
  * The string color could be in hexadecimal ( 0xFF0000FF ), webcolor ( #0000FF or #00F ) or some constant values:
- * black, white, red, green, blue, yellow, magenta, cyan, transparent.
+ * black, white, red, green, blue, yellow, magenta, cyan or transparent.
  *
  * @param[in] colorStr A color packed inside a string.
  * @param[in] length The length of the color string.
  * @param[out] retColor A color packed inside a Vector4.
  */
 void ColorStringToVector4( const char* const colorStr, Length length, Vector4& retColor );
+
+/**
+ * @brief Converts a color packed in a Vector4 into a string.
+ *
+ * Constant colors will be converted to the strings black, white, red, green, blue, yellow, magenta, cyan or transparent.
+ *
+ * If is not a constant color it will be converted to a string with hexadecimal ARGB content.
+ *
+ * @param[in] value The color value.
+ * @param[out] colorStr The string.
+ */
+void Vector4ToColorString( const Vector4& value, std::string& vector2Str );
+
+/**
+ * @brief Converts a two dimension vector packed inside a string into a Vector2.
+ *
+ * @param[in] vectorStr The two dimension vector packed inside a string.
+ * @param[in] length The length of the string.
+ * @param[out] vector2 The Vector2.
+ */
+void StringToVector2( const char* const vectorStr, Length length, Vector2& vector2 );
+
+/**
+ * @brief Converts a Vector2 into a string.
+ *
+ * @param[in] value The vector2 value.
+ * @param[out] vector2Str The string.
+ */
+void Vector2ToString( const Vector2& value, std::string& vector2Str );
 
 } // namespace Text
 

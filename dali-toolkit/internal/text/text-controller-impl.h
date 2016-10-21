@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
-#define __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
+#define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
+#include <dali-toolkit/internal/text/text-scroller-data.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
@@ -285,8 +286,10 @@ struct OutlineDefaults
 
 struct Controller::Impl
 {
-  Impl( ControlInterface& controlInterface )
+  Impl( ControlInterface* controlInterface,
+        EditableControlInterface* editableControlInterface )
   : mControlInterface( controlInterface ),
+    mEditableControlInterface( editableControlInterface ),
     mLogicalModel(),
     mVisualModel(),
     mFontDefaults( NULL ),
@@ -295,6 +298,7 @@ struct Controller::Impl
     mEmbossDefaults( NULL ),
     mOutlineDefaults( NULL ),
     mEventData( NULL ),
+    mAutoScrollData( NULL ),
     mFontClient(),
     mClipboard(),
     mView(),
@@ -302,14 +306,14 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
+    mScrollPosition(),
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
-    mAutoScrollEnabled( false ),
-    mAutoScrollDirectionRTL( false )
+    mIsAutoScrollEnabled( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -336,10 +340,13 @@ struct Controller::Impl
     delete mEmbossDefaults;
     delete mOutlineDefaults;
     delete mEventData;
+    delete mAutoScrollData;
   }
 
+  // Text Controller Implementation.
+
   /**
-   * @brief Request a relayout using the ControlInterface.
+   * @copydoc Text::Controller::RequestRelayout()
    */
   void RequestRelayout();
 
@@ -686,7 +693,8 @@ private:
 
 public:
 
-  ControlInterface& mControlInterface;     ///< Reference to the text controller.
+  ControlInterface* mControlInterface;     ///< Reference to the text controller.
+  EditableControlInterface* mEditableControlInterface; ///< Reference to the editable text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
@@ -695,6 +703,7 @@ public:
   EmbossDefaults* mEmbossDefaults;         ///< Avoid allocating this when the user does not specify emboss parameters.
   OutlineDefaults* mOutlineDefaults;       ///< Avoid allocating this when the user does not specify outline parameters.
   EventData* mEventData;                   ///< Avoid allocating everything for text input until EnableTextInput().
+  ScrollerData* mAutoScrollData;           ///< Avoid allocating this when the user does not specify the auto text scrolling feature.
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
   Clipboard mClipboard;                    ///< Handle to the system clipboard
   View mView;                              ///< The view interface to the rendering back-end.
@@ -713,10 +722,8 @@ public:
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
-  bool mClipboardHideEnabled:1;            ///< Whether the ClipboardHide function work or not
-  bool mAutoScrollEnabled:1;               ///< Whether auto text scrolling is enabled.
-  CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
-
+  bool mClipboardHideEnabled:1;            ///< Whether the ClipboardHide function work or not.
+  bool mIsAutoScrollEnabled:1;             ///< Whether auto text scrolling is enabled.
 };
 
 } // namespace Text
@@ -725,4 +732,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

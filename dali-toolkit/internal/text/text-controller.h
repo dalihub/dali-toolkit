@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROLLER_H__
-#define __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROLLER_H
+#define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -26,7 +26,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-scroller-interface.h>
 
 namespace Dali
 {
@@ -38,10 +38,12 @@ namespace Text
 {
 
 class Controller;
+class ControlInterface;
+class EditableControlInterface;
 class View;
+struct ScrollerData;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
-typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
 
 /**
  * @brief A Text Controller is used by UI Controls which display text.
@@ -54,7 +56,7 @@ typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
  *
  * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface
+class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public Text::ScrollerInterface
 {
 public: // Enumerated types.
 
@@ -123,10 +125,36 @@ public: // Constructor.
   /**
    * @brief Create a new instance of a Controller.
    *
-   * @param[in] controlInterface An interface used to request a text relayout.
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New( ControlInterface& controlInterface );
+  static ControllerPtr New();
+
+  /**
+   * @brief Create a new instance of a Controller.
+   *
+   * @param[in] controlInterface The control's interface.
+   *
+   * @return A pointer to a new Controller.
+   */
+  static ControllerPtr New( ControlInterface* controlInterface );
+
+  /**
+   * @brief Create a new instance of a Controller.
+   *
+   * @param[in] controlInterface The control's interface.
+   * @param[in] editableControlInterface The editable control's interface.
+   *
+   * @return A pointer to a new Controller.
+   */
+  static ControllerPtr New( ControlInterface* controlInterface,
+                            EditableControlInterface* editableControlInterface );
+
+  /**
+   * @brief Sets the text-control interface.
+   *
+   * @param[in] controlInterface The text-control interface.
+   */
+  void SetTextControlInterface( ControlInterface* controlInterface );
 
 public: // Configure the text controller.
 
@@ -182,17 +210,53 @@ public: // Configure the text controller.
   bool IsAutoScrollEnabled() const;
 
   /**
-   * @brief Get direction of the text from the first line of text,
-   * @return bool rtl (right to left) is true
+   * @brief Sets the speed the text should automatically scroll at.
+   *
+   * @param[in] scrollSpeed The speed of scrolling in pixels per second.
    */
-  CharacterDirection GetAutoScrollDirection() const;
+  void SetAutoscrollSpeed( int scrollSpeed );
 
   /**
-   * @brief Get the alignment offset of the first line of text.
+   * @brief Retrieves the auto scroll speed.
    *
-   * @return The alignment offset.
+   * @return The auto scroll speed in pixels per second.
    */
-  float GetAutoScrollLineAlignment() const;
+  int GetAutoScrollSpeed() const;
+
+  /**
+   * @brief Sets the number of loops the text should scroll.
+   *
+   * @param[in] loopCount The number of loops.
+   */
+  void SetAutoScrollLoopCount( int loopCount );
+
+  /**
+   * @brief Retrieves the number of loops the text should scroll.
+   *
+   * @return The numebr of loops.
+   */
+  int GetAutoScrollLoopCount() const;
+
+  /**
+   * @brief Sets the gap before text wraps around when scrolling.
+   *
+   * @param[in] wrapGap The gap in pixels.
+   */
+  void SetAutoScrollWrapGap( float wrapGap );
+
+  /**
+   * @brief Retrieves the gap before text wraps around when scrolling.
+   *
+   * @return The gap in pixels.
+   */
+  float GetAutoScrollWrapGap() const;
+
+  /**
+   * @brief Retrieves the text's autoscroll data.
+   *
+   * @return The text's autoscroll data.
+   */
+  const ScrollerData* const GetAutoScrollData();
 
   /**
    * @brief Enables the horizontal scrolling.
@@ -480,22 +544,6 @@ public: // Default style & Input style
   const Vector4& GetShadowColor() const;
 
   /**
-   * @brief Sets the shadow's properties string.
-   *
-   * @note The string is stored to be recovered.
-   *
-   * @param[in] shadowProperties The shadow's properties string.
-   */
-  void SetDefaultShadowProperties( const std::string& shadowProperties );
-
-  /**
-   * @brief Retrieves the shadow's properties string.
-   *
-   * @return The shadow's properties string.
-   */
-  const std::string& GetDefaultShadowProperties() const;
-
-  /**
    * @brief Set the underline color.
    *
    * @param[in] color color of underline.
@@ -536,22 +584,6 @@ public: // Default style & Input style
    * @return The height of the underline, or 0 if height is not overrided.
    */
   float GetUnderlineHeight() const;
-
-  /**
-   * @brief Sets the underline's properties string.
-   *
-   * @note The string is stored to be recovered.
-   *
-   * @param[in] underlineProperties The underline's properties string.
-   */
-  void SetDefaultUnderlineProperties( const std::string& underlineProperties );
-
-  /**
-   * @brief Retrieves the underline's properties string.
-   *
-   * @return The underline's properties string.
-   */
-  const std::string& GetDefaultUnderlineProperties() const;
 
   /**
    * @brief Sets the emboss's properties string.
@@ -821,6 +853,11 @@ public: // Relayout.
    */
   UpdateTextType Relayout( const Size& size );
 
+  /**
+   * @brief Request a relayout using the ControlInterface.
+   */
+  void RequestRelayout();
+
 public: // Input style change signals.
 
   /**
@@ -918,6 +955,13 @@ protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
   virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
+
+private: // Inherit from TextScroller
+
+  /**
+   * @copydoc Text::ScrollerInterface::ScrollingFinished()
+   */
+  virtual void ScrollingFinished();
 
 private: // Update.
 
@@ -1058,7 +1102,18 @@ private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
    */
-  Controller( ControlInterface& controlInterface );
+  Controller();
+
+  /**
+   * @brief Private constructor.
+   */
+  Controller( ControlInterface* controlInterface );
+
+  /**
+   * @brief Private constructor.
+   */
+  Controller( ControlInterface* controlInterface,
+              EditableControlInterface* editableControlInterface );
 
   // Undefined
   Controller( const Controller& handle );
@@ -1085,4 +1140,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

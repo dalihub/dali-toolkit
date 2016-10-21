@@ -222,6 +222,8 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // The underline color is changed as well.
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLUE, TEST_LOCATION );
 
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"false\",\"color\":\"blue\",\"height\":\"0\"}"), TEST_LOCATION );
+
   // Check that shadow parameters can be correctly set
   label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 3.0f, 3.0f ) );
   DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2( 3.0f, 3.0f ), TEST_LOCATION );
@@ -266,12 +268,18 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-  label.SetProperty( TextLabel::Property::UNDERLINE, "Underline properties" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::UNDERLINE, "" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"false\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
 
   // Check the shadow property
-  label.SetProperty( TextLabel::Property::SHADOW, "Shadow properties" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::SHADOW, "" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"0 0\"}"), TEST_LOCATION );
 
   // Check the emboss property
   label.SetProperty( TextLabel::Property::EMBOSS, "Emboss properties" );
@@ -395,14 +403,14 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   Stage::GetCurrent().Add( label );
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::MULTI_LINE, false );
-  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
-  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
-  label.SetProperty(  TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
 
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty(  TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
     application.SendNotification();
     application.Render();
   }
@@ -410,6 +418,37 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   {
     tet_result(TET_FAIL);
   }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingN");
+
+  TextLabel label = TextLabel::New("Some text to scroll");
+  DALI_TEST_CHECK( label );
+
+  Stage::GetCurrent().Add( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // The text scrolling works only on single line text.
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+
+  // Turn on all the effects.
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+
+  // Enable the auto scrolling effect.
+  label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+
+  // The auto scrolling shouldn't be enabled.
+  const bool enabled = label.GetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL ).Get<bool>();
+  DALI_TEST_CHECK( !enabled );
 
   END_TEST;
 }

@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
 {
@@ -100,9 +101,26 @@ FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
 
 // public : Constructor.
 
-ControllerPtr Controller::New( ControlInterface& controlInterface )
+ControllerPtr Controller::New()
+{
+  return ControllerPtr( new Controller() );
+}
+
+ControllerPtr Controller::New( ControlInterface* controlInterface )
 {
   return ControllerPtr( new Controller( controlInterface ) );
+}
+
+ControllerPtr Controller::New( ControlInterface* controlInterface,
+                               EditableControlInterface* editableControlInterface )
+{
+  return ControllerPtr( new Controller( controlInterface,
+                                        editableControlInterface ) );
+}
+
+void Controller::SetTextControlInterface( ControlInterface* controlInterface )
+{
+  mImpl->mControlInterface = controlInterface;
 }
 
 // public : Configure the text controller.
@@ -140,9 +158,9 @@ void Controller::SetAutoScrollEnabled( bool enable )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable)?"true":"false", ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX)?"true":"false", this );
 
-  if ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX )
+  if( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX )
   {
-    if ( enable )
+    if( enable )
     {
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n" );
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -152,6 +170,10 @@ void Controller::SetAutoScrollEnabled( bool enable )
                                                                UPDATE_DIRECTION          |
                                                                REORDER );
 
+      if( NULL == mImpl->mAutoScrollData )
+      {
+        mImpl->mAutoScrollData = new ScrollerData();
+      }
     }
     else
     {
@@ -163,39 +185,104 @@ void Controller::SetAutoScrollEnabled( bool enable )
                                                                REORDER );
     }
 
-    mImpl->mAutoScrollEnabled = enable;
+    mImpl->mIsAutoScrollEnabled = enable;
     mImpl->RequestRelayout();
   }
   else
   {
     DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n" );
-    mImpl->mAutoScrollEnabled = false;
+    mImpl->mIsAutoScrollEnabled = false;
   }
 }
 
 bool Controller::IsAutoScrollEnabled() const
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", (mImpl->mAutoScrollEnabled)?"true":"false" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", mImpl->mIsAutoScrollEnabled?"true":"false" );
 
-  return mImpl->mAutoScrollEnabled;
+  return mImpl->mIsAutoScrollEnabled;
 }
 
-CharacterDirection Controller::GetAutoScrollDirection() const
+void Controller::SetAutoscrollSpeed( int scrollSpeed )
 {
-  return mImpl->mAutoScrollDirectionRTL;
-}
-
-float Controller::GetAutoScrollLineAlignment() const
-{
-  float offset = 0.f;
-
-  if( mImpl->mVisualModel &&
-      ( 0u != mImpl->mVisualModel->mLines.Count() ) )
+  if( NULL == mImpl->mAutoScrollData )
   {
-    offset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+    mImpl->mAutoScrollData = new ScrollerData();
   }
 
-  return offset;
+  mImpl->mAutoScrollData->mScrollSpeed = scrollSpeed;
+}
+
+int Controller::GetAutoScrollSpeed() const
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    return mImpl->mAutoScrollData->mScrollSpeed;
+  }
+
+  return 0;
+}
+
+void Controller::SetAutoScrollLoopCount( int loopCount )
+{
+  if( NULL == mImpl->mAutoScrollData )
+  {
+    mImpl->mAutoScrollData = new ScrollerData();
+  }
+
+  mImpl->mAutoScrollData->mLoopCount = loopCount;
+}
+
+int Controller::GetAutoScrollLoopCount() const
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    return mImpl->mAutoScrollData->mLoopCount;
+  }
+
+  return 0;
+}
+
+void Controller::SetAutoScrollWrapGap( float wrapGap )
+{
+  if( NULL == mImpl->mAutoScrollData )
+  {
+    mImpl->mAutoScrollData = new ScrollerData();
+  }
+
+  mImpl->mAutoScrollData->mWrapGap = wrapGap;
+}
+
+float Controller::GetAutoScrollWrapGap() const
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    return mImpl->mAutoScrollData->mWrapGap;
+  }
+
+  return 0.f;
+}
+
+const ScrollerData* const Controller::GetAutoScrollData()
+{
+  if( NULL != mImpl->mAutoScrollData )
+  {
+    // Need to update the data with the latest layout.
+    if( mImpl->mVisualModel )
+    {
+      mImpl->mAutoScrollData->mControlSize = mImpl->mVisualModel->mControlSize;
+      mImpl->mAutoScrollData->mOffscreenSize = GetNaturalSize().GetVectorXY();
+
+      mImpl->mAutoScrollData->mAlignmentOffset = 0.f;
+      if( 0u != mImpl->mVisualModel->mLines.Count() )
+      {
+        mImpl->mAutoScrollData->mAlignmentOffset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+      }
+    }
+
+    return mImpl->mAutoScrollData;
+  }
+
+  return NULL;
 }
 
 void Controller::SetHorizontalScrollEnabled( bool enable )
@@ -460,8 +547,11 @@ void Controller::SetText( const std::string& text )
     mImpl->mEventData->mEventQueue.clear();
   }
 
-  // Do this last since it provides callbacks into application code
-  mImpl->mControlInterface.TextChanged();
+  // Do this last since it provides callbacks into application code.
+  if( NULL != mImpl->mEditableControlInterface )
+  {
+    mImpl->mEditableControlInterface->TextChanged();
+  }
 }
 
 void Controller::GetText( std::string& text ) const
@@ -742,26 +832,6 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mVisualModel->GetShadowColor();
 }
 
-void Controller::SetDefaultShadowProperties( const std::string& shadowProperties )
-{
-  if( NULL == mImpl->mShadowDefaults )
-  {
-    mImpl->mShadowDefaults = new ShadowDefaults();
-  }
-
-  mImpl->mShadowDefaults->properties = shadowProperties;
-}
-
-const std::string& Controller::GetDefaultShadowProperties() const
-{
-  if( NULL != mImpl->mShadowDefaults )
-  {
-    return mImpl->mShadowDefaults->properties;
-  }
-
-  return EMPTY_STRING;
-}
-
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mVisualModel->SetUnderlineColor( color );
@@ -796,26 +866,6 @@ void Controller::SetUnderlineHeight( float height )
 float Controller::GetUnderlineHeight() const
 {
   return mImpl->mVisualModel->GetUnderlineHeight();
-}
-
-void Controller::SetDefaultUnderlineProperties( const std::string& underlineProperties )
-{
-  if( NULL == mImpl->mUnderlineDefaults )
-  {
-    mImpl->mUnderlineDefaults = new UnderlineDefaults();
-  }
-
-  mImpl->mUnderlineDefaults->properties = underlineProperties;
-}
-
-const std::string& Controller::GetDefaultUnderlineProperties() const
-{
-  if( NULL != mImpl->mUnderlineDefaults )
-  {
-    return mImpl->mUnderlineDefaults->properties;
-  }
-
-  return EMPTY_STRING;
 }
 
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
@@ -1262,7 +1312,7 @@ const std::string& Controller::GetInputShadowProperties() const
     return mImpl->mEventData->mInputStyle.shadowProperties;
   }
 
-  return GetDefaultShadowProperties();
+  return EMPTY_STRING;
 }
 
 void Controller::SetInputUnderlineProperties( const std::string& underlineProperties )
@@ -1280,7 +1330,7 @@ const std::string& Controller::GetInputUnderlineProperties() const
     return mImpl->mEventData->mInputStyle.underlineProperties;
   }
 
-  return GetDefaultUnderlineProperties();
+  return EMPTY_STRING;
 }
 
 void Controller::SetInputEmbossProperties( const std::string& embossProperties )
@@ -1477,7 +1527,7 @@ float Controller::GetHeightForWidth( float width )
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, (mImpl->mAutoScrollEnabled)?"true":"false"  );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, mImpl->mIsAutoScrollEnabled ?"true":"false"  );
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
@@ -1583,6 +1633,11 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   return updateTextType;
 }
 
+void Controller::RequestRelayout()
+{
+  mImpl->RequestRelayout();
+}
+
 // public : Input style change signals.
 
 bool Controller::IsInputStyleChangedSignalsQueueEmpty()
@@ -1605,8 +1660,11 @@ void Controller::ProcessInputStyleChangedSignals()
   {
     const InputStyle::Mask mask = *it;
 
-    // Emit the input style changed signal.
-    mImpl->mControlInterface.InputStyleChanged( mask );
+    if( NULL != mImpl->mEditableControlInterface )
+    {
+      // Emit the input style changed signal.
+      mImpl->mEditableControlInterface->InputStyleChanged( mask );
+    }
   }
 
   mImpl->mEventData->mInputStyleChangedQueue.Clear();
@@ -1731,10 +1789,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     mImpl->RequestRelayout();
   }
 
-  if( textChanged )
+  if( textChanged &&
+      ( NULL != mImpl->mEditableControlInterface ) )
   {
     // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.TextChanged();
+    mImpl->mEditableControlInterface->TextChanged();
   }
 
   return true;
@@ -1965,10 +2024,11 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
   ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
 
-  if( requestRelayout )
+  if( requestRelayout &&
+      ( NULL != mImpl->mEditableControlInterface ) )
   {
     // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.TextChanged();
+    mImpl->mEditableControlInterface->TextChanged();
   }
 
   return callbackData;
@@ -2001,7 +2061,10 @@ void Controller::GetTargetSize( Vector2& targetSize )
 
 void Controller::AddDecoration( Actor& actor, bool needsClipping )
 {
-  mImpl->mControlInterface.AddDecoration( actor, needsClipping );
+  if( NULL != mImpl->mEditableControlInterface )
+  {
+    mImpl->mEditableControlInterface->AddDecoration( actor, needsClipping );
+  }
 }
 
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
@@ -2088,7 +2151,11 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       mImpl->mEventData->mScrollAfterDelete = true;
 
       mImpl->RequestRelayout();
-      mImpl->mControlInterface.TextChanged();
+
+      if( NULL != mImpl->mEditableControlInterface )
+      {
+        mImpl->mEditableControlInterface->TextChanged();
+      }
       break;
     }
     case Toolkit::TextSelectionPopup::COPY:
@@ -2133,6 +2200,17 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       break;
     }
   }
+}
+
+// private : Inherit from TextScroller.
+
+void Controller::ScrollingFinished()
+{
+  // Pure Virtual from TextScroller Interface
+  SetAutoScrollEnabled( false );
+  GetLayoutEngine().SetTextEllipsisEnabled( true );
+
+  mImpl->RequestRelayout();
 }
 
 // private : Update.
@@ -2375,8 +2453,11 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     mImpl->ResetImfManager();
 
-    // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.MaxLengthReached();
+    if( NULL != mImpl->mEditableControlInterface )
+    {
+      // Do this last since it provides callbacks into application code
+      mImpl->mEditableControlInterface->MaxLengthReached();
+    }
   }
 }
 
@@ -2386,8 +2467,11 @@ void Controller::PasteText( const std::string& stringToPaste )
   mImpl->ChangeState( EventData::EDITING );
   mImpl->RequestRelayout();
 
-  // Do this last since it provides callbacks into application code
-  mImpl->mControlInterface.TextChanged();
+  if( NULL != mImpl->mEditableControlInterface )
+  {
+    // Do this last since it provides callbacks into application code
+    mImpl->mEditableControlInterface->TextChanged();
+  }
 }
 
 bool Controller::RemoveText( int cursorOffset,
@@ -2594,7 +2678,10 @@ bool Controller::DoRelayout( const Size& size,
 
       if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
-        mImpl->mAutoScrollDirectionRTL = false;
+        if( NULL != mImpl->mAutoScrollData )
+        {
+          mImpl->mAutoScrollData->mAutoScrollDirectionRTL = false;
+        }
       }
 
       // Reorder the lines
@@ -2630,9 +2717,11 @@ bool Controller::DoRelayout( const Size& size,
           if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
           {
             const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
-            if ( firstline )
+            if( firstline &&
+                mImpl->mIsAutoScrollEnabled &&
+                ( NULL != mImpl->mAutoScrollData ) )
             {
-              mImpl->mAutoScrollDirectionRTL = firstline->direction;
+              mImpl->mAutoScrollData->mAutoScrollDirectionRTL = firstline->direction;
             }
           }
         }
@@ -2664,7 +2753,7 @@ bool Controller::DoRelayout( const Size& size,
 #if defined(DEBUG_ENABLED)
   std::string currentText;
   GetText( currentText );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, ( ( NULL != mImpl->mAutoScrollData ) && mImpl->mAutoScrollData->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
 #endif
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
@@ -3011,10 +3100,22 @@ void Controller::ResetScrollPosition()
 
 // private : Private contructors & copy operator.
 
-Controller::Controller( ControlInterface& controlInterface )
+Controller::Controller()
 : mImpl( NULL )
 {
-  mImpl = new Controller::Impl( controlInterface );
+  mImpl = new Controller::Impl( NULL, NULL );
+}
+
+Controller::Controller( ControlInterface* controlInterface )
+{
+  mImpl = new Controller::Impl( controlInterface, NULL );
+}
+
+Controller::Controller( ControlInterface* controlInterface,
+                        EditableControlInterface* editableControlInterface )
+{
+  mImpl = new Controller::Impl( controlInterface,
+                                editableControlInterface );
 }
 
 // The copy constructor and operator are left unimplemented.

@@ -200,9 +200,41 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new NPatchVisual( factoryCache );
+}
+
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly )
+{
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  nPatchVisual->mImageUrl = imageUrl;
+
+  NinePatchImage image = NinePatchImage::New( imageUrl );
+  nPatchVisual->InitializeFromImage( image );
+
+  return nPatchVisual;
+}
+
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly )
+{
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  nPatchVisual->mImage = image;
+
+  nPatchVisual->InitializeFromImage( image );
+
+  return nPatchVisual;
+}
+
+NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly )
 : Visual::Base( factoryCache ),
-  mBorderOnly( false )
+  mImage(),
+  mCroppedImage(),
+  mImageUrl(),
+  mStretchPixelsX(),
+  mStretchPixelsY(),
+  mImageSize(),
+  mBorderOnly( borderOnly )
 {
 }
 
@@ -448,60 +480,6 @@ void NPatchVisual::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t o
         InitializeFromBrokenImage();
       }
       mImpl->mRenderer.SetShader( shader );
-    }
-  }
-}
-
-void NPatchVisual::SetImage( const std::string& imageUrl, bool borderOnly )
-{
-  bool oldBorderOnly = mBorderOnly;
-  size_t oldGridX = mStretchPixelsX.Size();
-  size_t oldGridY = mStretchPixelsY.Size();
-
-  mBorderOnly = borderOnly;
-  mImage.Reset();
-  if( mImageUrl == imageUrl )
-  {
-    return;
-  }
-
-  mImageUrl = imageUrl;
-  if( mImpl->mRenderer )
-  {
-    NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-    InitializeFromImage( nPatch );
-
-    ChangeRenderer( oldBorderOnly, oldGridX, oldGridY );
-
-    if( mCroppedImage )
-    {
-      ApplyImageToSampler();
-    }
-  }
-}
-
-void NPatchVisual::SetImage( NinePatchImage image, bool borderOnly )
-{
-  bool oldBorderOnly = mBorderOnly;
-  size_t oldGridX = mStretchPixelsX.Size();
-  size_t oldGridY = mStretchPixelsY.Size();
-
-  mBorderOnly = borderOnly;
-  mImageUrl.empty();
-  if( mImage == image )
-  {
-    return;
-  }
-
-  mImage = image;
-  if( mImpl->mRenderer )
-  {
-    InitializeFromImage( mImage );
-    ChangeRenderer( oldBorderOnly, oldGridX, oldGridY );
-
-    if( mCroppedImage )
-    {
-      ApplyImageToSampler();
     }
   }
 }

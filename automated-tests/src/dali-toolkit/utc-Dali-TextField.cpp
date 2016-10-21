@@ -612,16 +612,16 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string(""), TEST_LOCATION );
 
   // Check the underline property
-  field.SetProperty( TextField::Property::UNDERLINE, "Underline properties" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+  field.SetProperty( TextField::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
 
   // Check the input underline property
   field.SetProperty( TextField::Property::INPUT_UNDERLINE, "Underline input properties" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
 
   // Check the shadow property
-  field.SetProperty( TextField::Property::SHADOW, "Shadow properties" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+  field.SetProperty( TextField::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
 
   // Check the input shadow property
   field.SetProperty( TextField::Property::INPUT_SHADOW, "Shadow input properties" );

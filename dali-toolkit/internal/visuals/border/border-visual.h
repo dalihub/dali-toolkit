@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -33,6 +34,9 @@ namespace Toolkit
 namespace Internal
 {
 
+class BorderVisual;
+typedef IntrusivePtr< BorderVisual > BorderVisualPtr;
+
 /**
  * The visual which renders a solid color to the control's quad border fixed to a specified size.
  *
@@ -44,10 +48,19 @@ namespace Internal
  * | borderSize      | FLOAT       |
  * | antiAliasing    | BOOLEAN     |
  */
-
 class BorderVisual : public Visual::Base
 {
 public:
+
+  /**
+   * @brief Create a new border visual.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static BorderVisualPtr New( VisualFactoryCache& factoryCache );
+
+protected:
 
   /**
    * @brief Constructor.
@@ -60,8 +73,6 @@ public:
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~BorderVisual();
-
-protected:
 
   /**
    * @copydoc Visual::Base::DoInitialize

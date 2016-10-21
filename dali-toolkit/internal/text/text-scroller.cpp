@@ -31,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
+#include <dali-toolkit/internal/text/text-scroller-data.h>
 
 namespace Dali
 {
@@ -38,14 +39,17 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace Text
+{
+extern const int MINIMUM_SCROLL_SPEED;
+} // namespace
+
 namespace
 {
 
 #if defined ( DEBUG_ENABLED )
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_SCROLLING");
 #endif
-
-const int MINIMUM_SCROLL_SPEED = 1; // Speed should be set by Property system.
 
 const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -195,50 +199,6 @@ TextScrollerPtr TextScroller::New( ScrollerInterface& scrollerInterface )
   return textScroller;
 }
 
-void TextScroller::SetGap( int gap )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetGap gap[%d]\n", gap );
-  mWrapGap = static_cast<float>(gap);
-}
-
-int TextScroller::GetGap() const
-{
-  return static_cast<int>(mWrapGap);
-}
-
-void TextScroller::SetSpeed( int scrollSpeed )
-{
-  mScrollSpeed = std::max( MINIMUM_SCROLL_SPEED, scrollSpeed );
-}
-
-int TextScroller::GetSpeed() const
-{
-  return mScrollSpeed;
-}
-
-void TextScroller::SetLoopCount( int loopCount )
-{
-  if ( loopCount > 0 )
-  {
-    mLoopCount = loopCount;
-  }
-
-  if (  mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING )
-  {
-    if ( loopCount == 0 ) // Request to stop looping
-    {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount Single loop forced\n" );
-      mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
-    }
-  }
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount [%d] Status[%s]\n", mLoopCount, (loopCount)?"looping":"stop" );
-}
-
-int TextScroller::GetLoopCount() const
-{
-  return mLoopCount;
-}
-
 Actor TextScroller::GetSourceCamera() const
 {
   return mOffscreenCameraActor;
@@ -249,11 +209,9 @@ Actor TextScroller::GetScrollingText() const
   return mScrollingTextActor;
 }
 
-TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerInterface( scrollerInterface ),
-                            mScrollDeltaIndex( Property::INVALID_INDEX ),
-                            mScrollSpeed( MINIMUM_SCROLL_SPEED ),
-                            mLoopCount( 1 ),
-                            mWrapGap( 0.0f )
+TextScroller::TextScroller( ScrollerInterface& scrollerInterface )
+: mScrollerInterface( scrollerInterface ),
+  mScrollDeltaIndex( Property::INVALID_INDEX )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
@@ -263,49 +221,71 @@ TextScroller::~TextScroller()
   CleanUp();
 }
 
-void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset )
+void TextScroller::StartScrolling( Actor sourceActor,
+                                   const ScrollerData& data )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
-                 controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset );
+  DALI_LOG_INFO( gLogFilter,
+                 Debug::Verbose,
+                 "TextScroller::StartScrolling controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
+                 data.mControlSize.x, data.mControlSize.y,
+                 data.mOffscreenSize.x, data.mOffscreenSize.y,
+                 data.mAutoScrollDirectionRTL,
+                 data.mAlignmentOffset );
 
-  FrameBufferImage offscreenRenderTargetForText = FrameBufferImage::New( offScreenSize.width, offScreenSize.height, Pixel::RGBA8888 );
+  FrameBufferImage offscreenRenderTargetForText = FrameBufferImage::New( data.mOffscreenSize.width, data.mOffscreenSize.height, Pixel::RGBA8888 );
   Renderer renderer;
 
-  CreateCameraActor( offScreenSize, mOffscreenCameraActor );
+  CreateCameraActor( data.mOffscreenSize, mOffscreenCameraActor );
   CreateRenderer( offscreenRenderTargetForText, renderer );
   CreateRenderTask( sourceActor, mOffscreenCameraActor, offscreenRenderTargetForText, mRenderTask );
 
   // Reposition camera to match alignment of target, RTL text has direction=true
-  if ( direction )
+  if( data.mAutoScrollDirectionRTL )
   {
-    mOffscreenCameraActor.SetX( alignmentOffset + offScreenSize.width*0.5f );
+    mOffscreenCameraActor.SetX( data.mAlignmentOffset + data.mOffscreenSize.width * 0.5f );
   }
   else
   {
-    mOffscreenCameraActor.SetX( offScreenSize.width * 0.5f );
+    mOffscreenCameraActor.SetX( data.mOffscreenSize.width * 0.5f );
   }
 
-  mOffscreenCameraActor.SetY( offScreenSize.height * 0.5f );
+  mOffscreenCameraActor.SetY( data.mOffscreenSize.height * 0.5f );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", data.mWrapGap )
 
   mScrollingTextActor = Actor::New();
   mScrollingTextActor.AddRenderer( renderer );
-  mScrollingTextActor.RegisterProperty( "uTextureSize", offScreenSize );
-  mScrollingTextActor.RegisterProperty( "uRtl", ((direction)?1.0f:0.0f) );
-  mScrollingTextActor.RegisterProperty( "uGap", mWrapGap );
-  mScrollingTextActor.SetSize( controlSize.width, std::min( offScreenSize.height, controlSize.height ) );
+  mScrollingTextActor.RegisterProperty( "uTextureSize", data.mOffscreenSize );
+  mScrollingTextActor.RegisterProperty( "uRtl", ( data.mAutoScrollDirectionRTL ? 1.f : 0.f ) );
+  mScrollingTextActor.RegisterProperty( "uGap", data.mWrapGap );
+  mScrollingTextActor.SetSize( data.mControlSize.width, std::min( data.mOffscreenSize.height, data.mControlSize.height ) );
   mScrollDeltaIndex = mScrollingTextActor.RegisterProperty( "uDelta", 0.0f );
 
-  float scrollAmount = std::max( offScreenSize.width + mWrapGap, controlSize.width );
-  float scrollDuration =  scrollAmount / mScrollSpeed;
+  float scrollAmount = std::max( data.mOffscreenSize.width + data.mWrapGap, data.mControlSize.width );
+  float scrollSpeed = std::max( MINIMUM_SCROLL_SPEED, data.mScrollSpeed );
+  float scrollDuration =  scrollAmount / scrollSpeed;
 
-  if ( direction  )
+  if( data.mAutoScrollDirectionRTL )
   {
      scrollAmount = -scrollAmount; // reverse direction of scrollung
   }
 
-  StartScrolling( scrollAmount, scrollDuration, mLoopCount );
+  mScrollAnimation = Animation::New( scrollDuration );
+  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount );
+  mScrollAnimation.SetEndAction( Animation::Discard );
+  mScrollAnimation.SetLoopCount( data.mLoopCount );
+  mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );
+  mScrollAnimation.Play();
+}
+
+void TextScroller::StopScrolling()
+{
+  if( mScrollAnimation &&
+      ( mScrollAnimation.GetState() == Animation::PLAYING ) )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount Single loop forced\n" );
+    mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+  }
 }
 
 void TextScroller::AutoScrollAnimationFinished( Dali::Animation& animation )
@@ -313,18 +293,6 @@ void TextScroller::AutoScrollAnimationFinished( Dali::Animation& animation )
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::AutoScrollAnimationFinished\n" );
   CleanUp();
   mScrollerInterface.ScrollingFinished();
-}
-
-void TextScroller::StartScrolling( float scrollAmount, float scrollDuration, int loopCount )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
-
-  mScrollAnimation = Animation::New( scrollDuration );
-  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount );
-  mScrollAnimation.SetEndAction( Animation::Discard );
-  mScrollAnimation.SetLoopCount( loopCount );
-  mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );
-  mScrollAnimation.Play();
 }
 
 void TextScroller::CleanUp()

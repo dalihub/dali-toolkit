@@ -64,6 +64,10 @@ void main()\n
 
 }
 
+WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new WireframeVisual( factoryCache );
+}
 
 WireframeVisual::WireframeVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache )
@@ -71,7 +75,8 @@ WireframeVisual::WireframeVisual( VisualFactoryCache& factoryCache )
 }
 
 WireframeVisual::~WireframeVisual()
-{}
+{
+}
 
 void WireframeVisual::DoSetOnStage( Actor& actor )
 {
