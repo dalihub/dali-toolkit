@@ -231,13 +231,15 @@ private:
 
   /**
    * @brief Creates the Dali::Renderer (potentially from the renderer cache), initializing it
+   * @param[in] textures to use
    */
-  void CreateRenderer();
+  void CreateRenderer( TextureSet& textures );
 
   /**
    * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
+   * @param NativeImageRenderer
    */
-  void CreateNativeImageRenderer();
+  void CreateNativeImageRenderer( NativeImage& nativeImage );
 
   /**
    * @brief Query whether resources requires to be loaded synchronously.
@@ -256,8 +258,9 @@ private:
    * @param[in] url The URL of the image resource to use.
    * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
    * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
+   * @return the texture set to use
    */
-  void CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing );
+  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing );
 
   /**
    * Callback function of image resource loading succeed
@@ -276,27 +279,20 @@ private:
    */
   void CleanCache(const std::string& url);
 
-  /**
-   * Set shader code for nativeimage if it exists
-   */
-  void SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage );
-
 private:
 
   Image mImage;
   PixelData mPixels;
-  TextureSet mTextureSet;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   std::string mImageUrl;
-  std::string mNativeFragmentShaderCode;
 
   Dali::ImageDimensions mDesiredSize;
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  bool mNativeImageFlag:1;
+
 };
 
 } // namespace Internal
