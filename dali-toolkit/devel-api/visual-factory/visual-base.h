@@ -76,6 +76,22 @@ public:
   Base& operator=( const Base& handle );
 
   /**
+   * @brief Set the name of the visual
+   *
+   * Used by the styling system to animate properties
+   * @param[in] name The name to give the visual
+   */
+  void SetName( const std::string& name );
+
+  /**
+   * @brief Get the name of the visual
+   *
+   * Used by the styling system to animate properties
+   * @return The name of the visual
+   */
+  const std::string& GetName();
+
+  /**
    * @brief Set the size of the painting area.
    *
    * @param[in] size The size of the painting area.

@@ -42,6 +42,7 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/transition-data-impl.h>
 
 namespace Dali
 {
@@ -51,6 +52,10 @@ namespace Toolkit
 
 namespace
 {
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::General, false, "LOG_CONTROL_VISUALS");
+#endif
 
 /**
  * Struct used to store Visual within the control, index is a unique key for each visual.
@@ -65,6 +70,25 @@ struct RegisteredVisual
   RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor, bool aEnabled) :
                    index(aIndex), visual(aVisual), placementActor(aPlacementActor), enabled(aEnabled) {}
 };
+
+struct VisualProperty
+{
+  Handle handle; ///< a handle to the target object
+  Property::Index index; ///< The index of a property provided by the referenced object
+
+  VisualProperty( )
+  : handle(),
+    index( Property::INVALID_INDEX )
+  {
+  }
+
+  VisualProperty( Handle& handle, Property::Index index )
+  : handle( handle ),
+    index( index )
+  {
+  }
+};
+
 
 typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 
@@ -82,6 +106,71 @@ bool FindVisual( Property::Index targetIndex, RegisteredVisualContainer& visuals
   }
   return false;
 }
+
+VisualProperty GetVisualProperty(
+  Internal::Control& controlImpl,
+  RegisteredVisualContainer& visuals,
+  const std::string& visualName,
+  Property::Key propertyKey )
+{
+#if defined(DEBUG_ENABLED)
+  std::ostringstream oss;
+  oss << "Control::GetVisualProperty(" << visualName << ", " << propertyKey << ")" << std::endl;
+  DALI_LOG_INFO( gLogFilter, Debug::General, oss.str().c_str() );
+#endif
+
+  // Find visualName in the control
+  RegisteredVisualContainer::Iterator iter;
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
+  {
+    if ( (*iter)->visual.GetName() == visualName )
+    {
+      break;
+    }
+  }
+
+  // Does either it's renderer or placement actor have an associated property?
+  if( iter != visuals.End() )
+  {
+    Actor placementActor = (*iter)->placementActor;
+    if( !placementActor )
+    {
+      placementActor = controlImpl.Self();
+    }
+
+    Property::Index index = placementActor.GetPropertyIndex( propertyKey );
+    if( index != Property::INVALID_INDEX )
+    {
+      // It's a placement actor property:
+      return VisualProperty( placementActor, index );
+    }
+    else
+    {
+      // Check if it is a renderer property:
+      if( placementActor.GetRendererCount() > 0 )
+      {
+        // @todo Need to use correct renderer index when placement actors
+        // are removed
+        Renderer renderer = placementActor.GetRendererAt(0);
+        Property::Index index = renderer.GetPropertyIndex( propertyKey );
+        if( index != Property::INVALID_INDEX )
+        {
+          // It's a renderer property:
+          return VisualProperty( renderer, index );
+        }
+      }
+      else
+      {
+        std::ostringstream oss;
+        oss << propertyKey;
+        DALI_LOG_WARNING( "Control::GetVisualProperty(%s, %s) No renderers\n", visualName.c_str(), oss.str().c_str() );
+      }
+    }
+  }
+  Handle handle;
+  return VisualProperty( handle, Property::INVALID_INDEX );
+}
+
 
 /**
  * Creates control through type registry
@@ -207,21 +296,21 @@ public:
 
   // Construction & Destruction
   Impl(Control& controlImpl)
-: mControlImpl( controlImpl ),
-  mStyleName(""),
-  mBackgroundVisual(),
-  mBackgroundColor(Color::TRANSPARENT),
-  mStartingPinchScale( NULL ),
-  mKeyEventSignal(),
-  mPinchGestureDetector(),
-  mPanGestureDetector(),
-  mTapGestureDetector(),
-  mLongPressGestureDetector(),
-  mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
-  mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false )
-{
-}
+  : mControlImpl( controlImpl ),
+    mStyleName(""),
+    mBackgroundVisual(),
+    mBackgroundColor(Color::TRANSPARENT),
+    mStartingPinchScale( NULL ),
+    mKeyEventSignal(),
+    mPinchGestureDetector(),
+    mPanGestureDetector(),
+    mTapGestureDetector(),
+    mLongPressGestureDetector(),
+    mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+    mIsKeyboardNavigationSupported( false ),
+    mIsKeyboardFocusGroup( false )
+  {
+  }
 
   ~Impl()
   {
@@ -790,6 +879,73 @@ Actor Control::GetPlacementActor( Property::Index index ) const
 
   return Actor();
 }
+
+Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle )
+{
+  Dali::Animation transition;
+  const Internal::TransitionData& transitionData = Toolkit::GetImplementation( handle );
+
+  if( transitionData.Count() > 0 )
+  {
+    // Setup a Transition from TransitionData.
+    TransitionData::Iterator end = transitionData.End();
+    for( TransitionData::Iterator iter = transitionData.Begin() ;
+         iter != end; ++iter )
+    {
+      TransitionData::Animator* animator = (*iter);
+      VisualProperty visualProperty;
+
+      // Attempt to find the object name as a child actor
+      Actor child = Self().FindChildByName( animator->objectName );
+      if( child )
+      {
+        Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
+        visualProperty = VisualProperty( child, propertyIndex );
+      }
+      else
+      {
+        // Is it a placement actor/visual pair?;
+        visualProperty = GetVisualProperty( *this, mImpl->mVisuals,
+                                            animator->objectName,
+                                            animator->propertyKey );
+      }
+
+      if( visualProperty.handle && visualProperty.index != Property::INVALID_INDEX )
+      {
+        if( animator->animate == false )
+        {
+          if( animator->targetValue.GetType() != Property::NONE )
+          {
+            visualProperty.handle.SetProperty( visualProperty.index, animator->targetValue );
+          }
+        }
+        else
+        {
+          if( animator->initialValue.GetType() != Property::NONE )
+          {
+            visualProperty.handle.SetProperty( visualProperty.index, animator->initialValue );
+          }
+
+          if( ! transition )
+          {
+            // Create an animation with a default .1 second duration - the animators
+            // will automatically force it to the 'right' duration.
+            transition = Dali::Animation::New( 0.1f );
+          }
+
+          transition.AnimateTo( Property( visualProperty.handle, visualProperty.index ),
+                                animator->targetValue,
+                                animator->alphaFunction,
+                                TimePeriod( animator->timePeriodDelay,
+                                            animator->timePeriodDuration ) );
+        }
+      }
+    }
+  }
+
+  return transition;
+}
+
 
 bool Control::OnAccessibilityActivated()
 {

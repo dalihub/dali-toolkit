@@ -55,7 +55,7 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
   }
   else
   {
-   mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
+    mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
   }
 }
 
@@ -72,6 +72,16 @@ void Visual::Base::Initialize( Actor& actor, const Property::Map& propertyMap )
   }
 
   DoInitialize( actor, propertyMap );
+}
+
+void Visual::Base::SetName( const std::string& name )
+{
+  mImpl->mName = name;
+}
+
+const std::string& Visual::Base::GetName()
+{
+  return mImpl->mName;
 }
 
 void Visual::Base::SetSize( const Vector2& size )
