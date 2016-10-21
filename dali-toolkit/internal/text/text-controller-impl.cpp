@@ -2683,6 +2683,12 @@ void Controller::Impl::ClampHorizontalScroll( const Vector2& layoutSize )
 
 void Controller::Impl::ClampVerticalScroll( const Vector2& layoutSize )
 {
+  if( LayoutEngine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout() )
+  {
+    // Nothing to do if the text is single line.
+    return;
+  }
+
   // Clamp between -space & 0.
   if( layoutSize.height > mVisualModel->mControlSize.height )
   {
