@@ -169,68 +169,119 @@ TransitionData::Animator* TransitionData::ConvertMap( const Property::Map& map)
 
         if( key == TOKEN_ALPHA_FUNCTION )
         {
-          std::string alphaFunctionValue = value.Get< std::string >();
+          if( value.GetType() == Property::ARRAY )
+          {
+            bool valid = true;
+            Vector4 controlPoints;
+            Property::Array *array = value.GetArray();
+            if( array->Count() >= 4 )
+            {
+              for( size_t vecIdx = 0; vecIdx < 4; ++vecIdx )
+              {
+                Property::Value& v = array->GetElementAt(vecIdx);
+                if( v.GetType() == Property::FLOAT )
+                {
+                  controlPoints[vecIdx] = v.Get<float>();
+                }
+                else
+                {
+                  valid = false;
+                  break;
+                }
+              }
+            }
+            else
+            {
+              valid = false;
+            }
 
-          if( alphaFunctionValue == "LINEAR" )
-          {
-            animator->alphaFunction = AlphaFunction::LINEAR;
-          }
-          else if( ! alphaFunctionValue.compare(0, 5, "EASE_" ) )
-          {
-            if( alphaFunctionValue == "EASE_IN" )
+            if( valid )
             {
-              animator->alphaFunction = AlphaFunction::EASE_IN;
+              Vector2 controlPoint1( controlPoints.x, controlPoints.y );
+              Vector2 controlPoint2( controlPoints.z, controlPoints.w );
+              animator->alphaFunction = AlphaFunction( controlPoint1, controlPoint2 );
             }
-            else if( alphaFunctionValue == "EASE_OUT" )
+            else
             {
-              animator->alphaFunction = AlphaFunction::EASE_OUT;
-            }
-            else if( ! alphaFunctionValue.compare( 5, 3, "IN_" ) )
-            {
-              if( ! alphaFunctionValue.compare(8, -1, "SQUARE" ))
-              {
-                animator->alphaFunction = AlphaFunction::EASE_IN_SQUARE;
-              }
-              else if( ! alphaFunctionValue.compare(8, -1, "OUT" ))
-              {
-                animator->alphaFunction = AlphaFunction::EASE_IN_OUT;
-              }
-              else if( ! alphaFunctionValue.compare(8, -1, "OUT_SINE" ))
-              {
-                animator->alphaFunction = AlphaFunction::EASE_IN_OUT_SINE;
-              }
-              else if( ! alphaFunctionValue.compare(8, -1, "SINE" ))
-              {
-                animator->alphaFunction = AlphaFunction::EASE_IN_SINE;
-              }
-            }
-            else if( ! alphaFunctionValue.compare( 5, 4, "OUT_" ) )
-            {
-              if( ! alphaFunctionValue.compare(9, -1, "SQUARE" ) )
-              {
-                animator->alphaFunction = AlphaFunction::EASE_OUT_SQUARE;
-              }
-              else if( ! alphaFunctionValue.compare(9, -1, "SINE" ) )
-              {
-                animator->alphaFunction = AlphaFunction::EASE_OUT_SINE;
-              }
-              else if( ! alphaFunctionValue.compare(9, -1, "BACK" ) )
-              {
-                animator->alphaFunction = AlphaFunction::EASE_OUT_BACK;
-              }
+              animator->animate = false;
             }
           }
-          else if( alphaFunctionValue == "REVERSE" )
+          else if( value.GetType() == Property::VECTOR4 )
           {
-            animator->alphaFunction = AlphaFunction::REVERSE;
+            Vector4 controlPoints = value.Get<Vector4>();
+            Vector2 controlPoint1( controlPoints.x, controlPoints.y );
+            Vector2 controlPoint2( controlPoints.z, controlPoints.w );
+            animator->alphaFunction = AlphaFunction( controlPoint1, controlPoint2 );
           }
-          else if( alphaFunctionValue == "BOUNCE" )
+          else if( value.GetType() == Property::STRING )
           {
-            animator->alphaFunction = AlphaFunction::BOUNCE;
+            std::string alphaFunctionValue = value.Get< std::string >();
+
+            if( alphaFunctionValue == "LINEAR" )
+            {
+              animator->alphaFunction = AlphaFunction(AlphaFunction::LINEAR);
+            }
+            else if( ! alphaFunctionValue.compare(0, 5, "EASE_" ) )
+            {
+              if( alphaFunctionValue == "EASE_IN" )
+              {
+                animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN);
+              }
+              else if( alphaFunctionValue == "EASE_OUT" )
+              {
+                animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT);
+              }
+              else if( ! alphaFunctionValue.compare( 5, 3, "IN_" ) )
+              {
+                if( ! alphaFunctionValue.compare(8, -1, "SQUARE" ))
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_SQUARE);
+                }
+                else if( ! alphaFunctionValue.compare(8, -1, "OUT" ))
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_OUT);
+                }
+                else if( ! alphaFunctionValue.compare(8, -1, "OUT_SINE" ))
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_OUT_SINE);
+                }
+                else if( ! alphaFunctionValue.compare(8, -1, "SINE" ))
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_SINE);
+                }
+              }
+              else if( ! alphaFunctionValue.compare( 5, 4, "OUT_" ) )
+              {
+                if( ! alphaFunctionValue.compare(9, -1, "SQUARE" ) )
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_SQUARE);
+                }
+                else if( ! alphaFunctionValue.compare(9, -1, "SINE" ) )
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_SINE);
+                }
+                else if( ! alphaFunctionValue.compare(9, -1, "BACK" ) )
+                {
+                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_BACK);
+                }
+              }
+            }
+            else if( alphaFunctionValue == "REVERSE" )
+            {
+              animator->alphaFunction = AlphaFunction(AlphaFunction::REVERSE);
+            }
+            else if( alphaFunctionValue == "BOUNCE" )
+            {
+              animator->alphaFunction = AlphaFunction(AlphaFunction::BOUNCE);
+            }
+            else if( alphaFunctionValue == "SIN" )
+            {
+              animator->alphaFunction = AlphaFunction(AlphaFunction::SIN);
+            }
           }
-          else if( alphaFunctionValue == "SIN" )
+          else
           {
-            animator->alphaFunction = AlphaFunction::SIN;
+            animator->animate = false;
           }
         }
         else if( key == TOKEN_TIME_PERIOD )
@@ -306,13 +357,24 @@ Property::Map TransitionData::GetAnimatorAt( size_t index )
   }
   if( animator->animate )
   {
-    map[TOKEN_ANIMATOR] = Property::Map()
-      .Add(TOKEN_ALPHA_FUNCTION, GetEnumerationName( animator->alphaFunction,
-                                                     ALPHA_FUNCTION_BUILTIN_TABLE,
-                                                     ALPHA_FUNCTION_BUILTIN_TABLE_COUNT ))
-      .Add(TOKEN_TIME_PERIOD, Property::Map()
-           .Add( TOKEN_DELAY, animator->timePeriodDelay )
-           .Add( TOKEN_DURATION, animator->timePeriodDuration ));
+    Property::Map animateMap;
+
+    if( animator->alphaFunction.GetMode() == AlphaFunction::BUILTIN_FUNCTION )
+    {
+      animateMap.Add(TOKEN_ALPHA_FUNCTION, GetEnumerationName( animator->alphaFunction.GetBuiltinFunction(),
+                                                               ALPHA_FUNCTION_BUILTIN_TABLE,
+                                                               ALPHA_FUNCTION_BUILTIN_TABLE_COUNT ));
+    }
+    else if( animator->alphaFunction.GetMode() == AlphaFunction::BEZIER )
+    {
+      Vector4 controlPoints = animator->alphaFunction.GetBezierControlPoints();
+      animateMap.Add( TOKEN_ALPHA_FUNCTION, controlPoints );
+    }
+    animateMap.Add(TOKEN_TIME_PERIOD, Property::Map()
+                   .Add( TOKEN_DELAY, animator->timePeriodDelay )
+                   .Add( TOKEN_DURATION, animator->timePeriodDuration ));
+
+    map[TOKEN_ANIMATOR] = animateMap;
   }
 
   return map;
