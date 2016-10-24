@@ -39,6 +39,9 @@ namespace MyCSharpExample
 
     public void Initialize(object source, AUIApplicationInitEventArgs e)
     {
+
+      OperatorTests();
+
       Handle handle = new Handle();
       int myPropertyIndex = handle.RegisterProperty("myProperty", new Property.Value(10.0f), Property.AccessMode.READ_WRITE);
       float myProperty = 0.0f;
@@ -161,6 +164,181 @@ namespace MyCSharpExample
       vector4.w += 10;
       Console.WriteLine( "    Vector4 r =  " + vector4.r + ", g = " + vector4.g + ", b = " + vector4.b + ", a = " + vector4.a );
     }
+
+
+  public void OperatorTests()
+  {
+    Actor actor = new Actor();
+    Actor differentActor = new Actor();
+    Actor actorSame = actor;
+    Actor nullActor = null;
+
+      // test the true operator
+    if ( actor )
+    {
+      Console.WriteLine ("BaseHandle Operator true (actor) : test passed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator true (actor): test failed ");
+    }
+
+    Actor parent = actor.GetParent ();
+
+    if ( parent )
+    {
+      Console.WriteLine ("Handle with Empty body  :failed ");
+    }
+    else
+    {
+      Console.WriteLine ("Valid with Empty body  :passed ");
+    }
+
+    actor.Add( differentActor );
+    // here we test two different C# objects, which on the native side have the same body/ ref-object
+    if ( actor == differentActor.GetParent() )
+    {
+       Console.WriteLine ("actor == differentActor.GetParent() :passed ");
+    }
+    else
+    {
+      Console.WriteLine ("actor == differentActor.GetParent() :failed ");
+    }
+
+    if ( differentActor == differentActor.GetParent() )
+    {
+       Console.WriteLine ("differentActor == differentActor.GetParent() :failed ");
+    }
+    else
+    {
+      Console.WriteLine ("differentActor == differentActor.GetParent() :passed ");
+    }
+
+
+    if ( nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator true (nullActor) : test failed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator true (nullActor): test passed ");
+    }
+
+    // ! operator
+    if ( !actor )
+    {
+      Console.WriteLine ("BaseHandle Operator !(actor) : test failed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator !(actor): test passed ");
+    }
+
+    if ( !nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator !(nullActor) : test passed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator !(nullActor): test failed ");
+    }
+
+    // Note: operator false only used inside & operator
+    // test equality operator ==
+    if ( actor == actorSame )
+    {
+      Console.WriteLine ("BaseHandle Operator  (actor == actorSame) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator  (actor == actorSame) : test failed");
+    }
+
+    if ( actor == differentActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == differentActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == differentActor) : test passed");
+    }
+
+    if ( actor == nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == nullActor) : test passed");
+    }
+
+    if ( nullActor == nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor == nullActor) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor == nullActor) : test failed");
+    }
+
+    // test || operator
+    if ( actor || actorSame )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || actorSame) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || actorSame) : test failed");
+    }
+
+    if ( actor || nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || nullActor) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || nullActor) : test failed");
+    }
+
+    if ( nullActor || nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor || nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor || nullActor) : test passed");
+    }
+
+
+    // test && operator
+    if ( actor && actorSame )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && actorSame) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && actorSame) : test failed");
+    }
+
+    if ( actor && nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && nullActor) : test passed");
+    }
+
+    if ( nullActor && nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor && nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor && nullActor) : test passed");
+    }
+
+  }
 
     public void MainLoop()
     {
