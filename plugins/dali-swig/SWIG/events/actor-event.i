@@ -610,16 +610,12 @@
       {
         SetOpacity(value);
       }
-    }
-
-   public float CurrentOpacity
-   {
       get
       {
         float ret = GetCurrentOpacity();
         return ret;
       }
-    }
+   }
 
     public bool StateFocusEnable
     {
