@@ -26,6 +26,63 @@ using System.Runtime.InteropServices;
 %define Animation_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
   %typemap(cscode) NameSpace::ClassName %{
 
+    public static readonly int PARENT_ORIGIN = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_get();
+    public static readonly int PARENT_ORIGIN_X = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_X_get();
+    public static readonly int PARENT_ORIGIN_Y = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Y_get();
+    public static readonly int PARENT_ORIGIN_Z = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Z_get();
+    public static readonly int ANCHOR_POINT = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_get();
+    public static readonly int ANCHOR_POINT_X = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_X_get();
+    public static readonly int ANCHOR_POINT_Y = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Y_get();
+    public static readonly int ANCHOR_POINT_Z = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Z_get();
+    public static readonly int SIZE = NDalicPINVOKE.Actor_Property_SIZE_get();
+    public static readonly int SIZE_WIDTH = NDalicPINVOKE.Actor_Property_SIZE_WIDTH_get();
+    public static readonly int SIZE_HEIGHT = NDalicPINVOKE.Actor_Property_SIZE_HEIGHT_get();
+    public static readonly int SIZE_DEPTH = NDalicPINVOKE.Actor_Property_SIZE_DEPTH_get();
+    public static readonly int POSITION = NDalicPINVOKE.Actor_Property_POSITION_get();
+    public static readonly int POSITION_X = NDalicPINVOKE.Actor_Property_POSITION_X_get();
+    public static readonly int POSITION_Y = NDalicPINVOKE.Actor_Property_POSITION_Y_get();
+    public static readonly int POSITION_Z = NDalicPINVOKE.Actor_Property_POSITION_Z_get();
+    public static readonly int WORLD_POSITION = NDalicPINVOKE.Actor_Property_WORLD_POSITION_get();
+    public static readonly int WORLD_POSITION_X = NDalicPINVOKE.Actor_Property_WORLD_POSITION_X_get();
+    public static readonly int WORLD_POSITION_Y = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Y_get();
+    public static readonly int WORLD_POSITION_Z = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Z_get();
+    public static readonly int ORIENTATION = NDalicPINVOKE.Actor_Property_ORIENTATION_get();
+    public static readonly int WORLD_ORIENTATION = NDalicPINVOKE.Actor_Property_WORLD_ORIENTATION_get();
+    public static readonly int SCALE = NDalicPINVOKE.Actor_Property_SCALE_get();
+    public static readonly int SCALE_X = NDalicPINVOKE.Actor_Property_SCALE_X_get();
+    public static readonly int SCALE_Y = NDalicPINVOKE.Actor_Property_SCALE_Y_get();
+    public static readonly int SCALE_Z = NDalicPINVOKE.Actor_Property_SCALE_Z_get();
+    public static readonly int WORLD_SCALE = NDalicPINVOKE.Actor_Property_WORLD_SCALE_get();
+    public static readonly int VISIBLE = NDalicPINVOKE.Actor_Property_VISIBLE_get();
+    public static readonly int COLOR = NDalicPINVOKE.Actor_Property_COLOR_get();
+    public static readonly int COLOR_RED = NDalicPINVOKE.Actor_Property_COLOR_RED_get();
+    public static readonly int COLOR_GREEN = NDalicPINVOKE.Actor_Property_COLOR_GREEN_get();
+    public static readonly int COLOR_BLUE = NDalicPINVOKE.Actor_Property_COLOR_BLUE_get();
+    public static readonly int COLOR_ALPHA = NDalicPINVOKE.Actor_Property_COLOR_ALPHA_get();
+    public static readonly int WORLD_COLOR = NDalicPINVOKE.Actor_Property_WORLD_COLOR_get();
+    public static readonly int WORLD_MATRIX = NDalicPINVOKE.Actor_Property_WORLD_MATRIX_get();
+    public static readonly int NAME = NDalicPINVOKE.Actor_Property_NAME_get();
+    public static readonly int SENSITIVE = NDalicPINVOKE.Actor_Property_SENSITIVE_get();
+    public static readonly int LEAVE_REQUIRED = NDalicPINVOKE.Actor_Property_LEAVE_REQUIRED_get();
+    public static readonly int INHERIT_ORIENTATION = NDalicPINVOKE.Actor_Property_INHERIT_ORIENTATION_get();
+    public static readonly int INHERIT_SCALE = NDalicPINVOKE.Actor_Property_INHERIT_SCALE_get();
+    public static readonly int COLOR_MODE = NDalicPINVOKE.Actor_Property_COLOR_MODE_get();
+    public static readonly int POSITION_INHERITANCE = NDalicPINVOKE.Actor_Property_POSITION_INHERITANCE_get();
+    public static readonly int DRAW_MODE = NDalicPINVOKE.Actor_Property_DRAW_MODE_get();
+    public static readonly int SIZE_MODE_FACTOR = NDalicPINVOKE.Actor_Property_SIZE_MODE_FACTOR_get();
+    public static readonly int WIDTH_RESIZE_POLICY = NDalicPINVOKE.Actor_Property_WIDTH_RESIZE_POLICY_get();
+    public static readonly int HEIGHT_RESIZE_POLICY = NDalicPINVOKE.Actor_Property_HEIGHT_RESIZE_POLICY_get();
+    public static readonly int SIZE_SCALE_POLICY = NDalicPINVOKE.Actor_Property_SIZE_SCALE_POLICY_get();
+    public static readonly int WIDTH_FOR_HEIGHT = NDalicPINVOKE.Actor_Property_WIDTH_FOR_HEIGHT_get();
+    public static readonly int HEIGHT_FOR_WIDTH = NDalicPINVOKE.Actor_Property_HEIGHT_FOR_WIDTH_get();
+    public static readonly int PADDING = NDalicPINVOKE.Actor_Property_PADDING_get();
+    public static readonly int MINIMUM_SIZE = NDalicPINVOKE.Actor_Property_MINIMUM_SIZE_get();
+    public static readonly int MAXIMUM_SIZE = NDalicPINVOKE.Actor_Property_MAXIMUM_SIZE_get();
+    public static readonly int INHERIT_POSITION = NDalicPINVOKE.Actor_Property_INHERIT_POSITION_get();
+    public static readonly int CLIPPING_MODE = NDalicPINVOKE.Actor_Property_CLIPPING_MODE_get();
+    public static readonly int BATCH_PARENT = NDalicPINVOKE.Actor_Property_BATCH_PARENT_get();
+
+
     /**
       * @brief Event arguments that passed via Finished signal
       *
@@ -148,6 +205,110 @@ using System.Runtime.InteropServices;
        Animation.State ret = GetState();
        return ret;
     }
+  }
+
+  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(relativeValue);
+	AnimateBy(new Property(target, var), new Property.Value(obj));
+  }
+
+  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue, AlphaFunction alpha)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(relativeValue);
+	AnimateBy(new Property(target, var), new Property.Value(obj),  alpha);
+  }
+
+  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue, TimePeriod period)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(relativeValue);
+	AnimateBy(new Property(target, var), new Property.Value(obj), period);
+  }
+
+  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue, AlphaFunction alpha, TimePeriod period)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(relativeValue);
+	AnimateBy(new Property(target, var), new Property.Value(obj), alpha, period);
+  }
+
+  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(destinationValue);
+	AnimateTo(new Property(target, var), new Property.Value(obj));
+  }
+
+  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue, AlphaFunction alpha)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(destinationValue);
+	AnimateTo(new Property(target, var), new Property.Value(obj), alpha);
+  }
+
+  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue, TimePeriod period)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(destinationValue);
+	AnimateTo(new Property(target, var), new Property.Value(obj), period);
+  }
+
+  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue, AlphaFunction alpha, TimePeriod period)
+  {
+	dynamic var = (object)(propertyIndex);
+	dynamic obj = (object)(destinationValue);
+	AnimateTo(new Property(target, var), new Property.Value(obj), alpha, period);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, Animation.Interpolation interpolation)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames, interpolation);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames, alpha);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha, Animation.Interpolation interpolation)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames, alpha, interpolation);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, TimePeriod period)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames, period);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, TimePeriod period, Animation.Interpolation interpolation)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames,  period, interpolation);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames, alpha, period);
+  }
+
+  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period, Animation.Interpolation interpolation)
+  {
+	dynamic var = (object)(propertyIndex);
+	AnimateBetween(new Property(target, var), keyFrames, alpha, period, interpolation);
   }
 
 %}
