@@ -428,9 +428,9 @@ namespace FirstScreen
         }
 
         // Perform EddenEffect animation on Focused Item specified
-        public void FocusAnimation(EdenEffect edenEffect, EdenEffectDirection direction)
+        public void FocusAnimation(FocusEffect focusEffect, FocusEffectDirection direction)
         {
-            edenEffect.FocusAnimation(_itemList[_focusedItem], _itemSize, 1.0f, direction);
+            focusEffect.FocusAnimation(_itemList[_focusedItem], _itemSize, 1.0f, direction);
         }
 
         public void SetFocused(bool focused)

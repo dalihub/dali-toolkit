@@ -3,9 +3,9 @@ using System;
 
 namespace FirstScreen
 {
-    public class EdenData
+    public class FocusData
     {
-        private string _name;                 // Name used for EdenData object (mainly to differentiate key frame animation )
+        private string _name;                 // Name used for FocusData object (mainly to differentiate key frame animation )
         private string _imageName;            // Image File Name (to be loaded from disk) used for ImageView used in key frame animation
         private Vector3 _parentOrigin;        // ParentOrigin applied to ImageView
         private Vector3 _initSize;            // InitSize used for key frame animation
@@ -15,8 +15,8 @@ namespace FirstScreen
         private Direction _direction;         // Direction used for key frame animation
         private ImageView _imageFocus;        // ImageView used in key frame animation
 
-        // Initialize EdenData used for key frame animation
-        public EdenData(string name, string imageName, Direction direction, Vector3 parentOrigin, Vector3 initSize,
+        // Initialize FocusData used for key frame animation
+        public FocusData(string name, string imageName, Direction direction, Vector3 parentOrigin, Vector3 initSize,
                         Vector3 targetSize, float keyFrameStart, float keyFrameEnd)
         {
             _name = name;
@@ -28,8 +28,8 @@ namespace FirstScreen
             _keyFrameEnd = keyFrameEnd;
             _direction = direction;
 
-            _imageFocus = new ImageView("./images/edeneffect/" + _imageName); // Desktop
-//            _imageFocus = new ImageView("/home/owner/apps_rw/org.tizen.firstscreen/res/images/edeneffect/" + _imageName); // Target
+            _imageFocus = new ImageView("./images/focuseffect/" + _imageName); // Desktop
+//            _imageFocus = new ImageView("/home/owner/apps_rw/org.tizen.firstscreen/res/images/focuseffect/" + _imageName); // Target
 
             _imageFocus.ParentOrigin = _parentOrigin;
             _imageFocus.AnchorPoint = NDalic.AnchorPointCenter;
@@ -42,7 +42,7 @@ namespace FirstScreen
             Vertical
         };
 
-        public Direction EdenDirection
+        public Direction FocusDirection
         {
             get {return _direction;}
             set {_direction = value;}

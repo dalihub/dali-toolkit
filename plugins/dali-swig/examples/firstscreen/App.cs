@@ -24,7 +24,7 @@ namespace FirstScreen
         private View _topContainer;
         private View _bottomContainer;
 
-        private EdenEffect _edenEffect;
+        private FocusEffect _focusEffect;
         private string _imagePath;
 
         private ImageView _keyboardFocusIndicator;
@@ -116,7 +116,7 @@ namespace FirstScreen
                     HideBottomContainer();
 
                     // Also apply Focus animation on Focused item on Poster ScrollContainer
-                    _postersContainer[_currentPostersContainerID].FocusAnimation(_edenEffect, EdenEffectDirection.BottomToTop);
+                    _postersContainer[_currentPostersContainerID].FocusAnimation(_focusEffect, FocusEffectDirection.BottomToTop);
                 }
             }
             else if (e.Direction == View.KeyboardFocus.Direction.DOWN)
@@ -130,7 +130,7 @@ namespace FirstScreen
                     _menuContainer.SetFocused(true);
 
                     // Also apply Focus animation on Focused item on Menu ScrollContainer
-                    _menuContainer.FocusAnimation(_edenEffect, EdenEffectDirection.TopToBottom);
+                    _menuContainer.FocusAnimation(_focusEffect, FocusEffectDirection.TopToBottom);
                 }
             }
             else if (e.Direction == View.KeyboardFocus.Direction.LEFT)
@@ -337,7 +337,7 @@ namespace FirstScreen
             }
 
             // Add a shadow seperator image between last Launcher icon and Menu ScrollContainer
-            _launcherSeparator = new ImageView(_imagePath + "/eden_launcher_shadow_n.png");
+            _launcherSeparator = new ImageView(_imagePath + "/focus_launcher_shadow_n.png");
             _launcherSeparator.Name = "launcherSeparator";
             _launcherSeparator.WidthResizePolicy = "USE_NATURAL_SIZE";
             _launcherSeparator.HeightResizePolicy = "FILL_TO_PARENT";
@@ -357,7 +357,7 @@ namespace FirstScreen
             _menuContainer.OffsetX = Constants.LauncherWidth;
             _menuContainer.Width = _stageSize.width - Constants.LauncherWidth;
             _menuContainer.Height = _stageSize.height * Constants.MenuContainerHeightFactor;
-            _menuContainer.ShadowBorder = new ImageView(_imagePath + "/eden_launcher_shadow.9.png");
+            _menuContainer.ShadowBorder = new ImageView(_imagePath + "/focus_launcher_shadow.9.png");
             _menuContainer.ShadowBorder.Name = "_menuContainer.ShadowBorder";
             _menuContainer.ShadowBorder.Size = new Vector3(_menuContainer.ItemSize.width + 40.0f, _menuContainer.ItemSize.height + 50.0f, 0.0f);
             _menuContainer.ShadowBorder.Position = new Vector3(0.0f, 5.0f, 0.0f);
@@ -381,7 +381,7 @@ namespace FirstScreen
 
             keyboardFocusManager.SetFocusIndicatorActor(_keyboardFocusIndicator);
 
-            _edenEffect = new EdenEffect();
+            _focusEffect = new FocusEffect();
 
             // Move Fcous to Bottom Container (Menu ScrollContainer)
             ShowBottomContainer();
