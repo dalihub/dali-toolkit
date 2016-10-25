@@ -52,6 +52,14 @@ namespace MyCSharpExample
         {
         }
 
+        public Example(string stylesheet):base(stylesheet)
+        {
+        }
+
+        public Example(string stylesheet, Dali.Application.WINDOW_MODE windowMode):base(stylesheet, windowMode)
+        {
+        }
+
         private void Initialize()
         {
             // Connect the signal callback for stage touched signal
@@ -111,7 +119,9 @@ namespace MyCSharpExample
         static void Main(string[] args)
         {
             Console.WriteLine("Hello mono world.");
-            Example example = new Example();
+            //Example example = new Example();
+            //Example example = new Example("stylesheet");
+            Example example = new Example("stylesheet", Dali.Application.WINDOW_MODE.TRANSPARENT);
             example.Run(args);
         }
     }
