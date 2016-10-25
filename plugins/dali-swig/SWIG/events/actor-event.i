@@ -634,6 +634,16 @@
       }
     }
 
+    public void Show()
+    {
+      SetVisible(true);
+    }
+
+    public void Hide()
+    {
+      SetVisible(false);
+    }
+
 %}
 
 %enddef
