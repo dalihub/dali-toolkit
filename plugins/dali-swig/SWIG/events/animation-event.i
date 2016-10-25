@@ -207,56 +207,69 @@ using System.Runtime.InteropServices;
     }
   }
 
-  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue)
+  public int LoopCount
+  {
+    set
+    {
+      SetLoopCount(value);
+    }
+    get
+    {
+      int ret = GetLoopCount();
+      return ret;
+    }
+  }
+
+  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(relativeValue);
 	AnimateBy(new Property(target, var), new Property.Value(obj));
   }
 
-  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue, AlphaFunction alpha)
+  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue, AlphaFunction alpha)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(relativeValue);
 	AnimateBy(new Property(target, var), new Property.Value(obj),  alpha);
   }
 
-  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue, TimePeriod period)
+  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue, TimePeriod period)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(relativeValue);
 	AnimateBy(new Property(target, var), new Property.Value(obj), period);
   }
 
-  public void AnimateBy<T,U>(Actor target, U propertyIndex, T relativeValue, AlphaFunction alpha, TimePeriod period)
+  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue, AlphaFunction alpha, TimePeriod period)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(relativeValue);
 	AnimateBy(new Property(target, var), new Property.Value(obj), alpha, period);
   }
 
-  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue)
+  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(destinationValue);
 	AnimateTo(new Property(target, var), new Property.Value(obj));
   }
 
-  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue, AlphaFunction alpha)
+  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue, AlphaFunction alpha)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(destinationValue);
 	AnimateTo(new Property(target, var), new Property.Value(obj), alpha);
   }
 
-  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue, TimePeriod period)
+  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue, TimePeriod period)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(destinationValue);
 	AnimateTo(new Property(target, var), new Property.Value(obj), period);
   }
 
-  public void AnimateTo<T,U>(Actor target, U propertyIndex, T destinationValue, AlphaFunction alpha, TimePeriod period)
+  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue, AlphaFunction alpha, TimePeriod period)
   {
 	dynamic var = (object)(propertyIndex);
 	dynamic obj = (object)(destinationValue);
