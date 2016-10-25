@@ -185,6 +185,19 @@ using System.Runtime.InteropServices;
     }
   }
 
+  public int DurationMilliSecs
+  {
+    set
+    {
+      SetDuration(value/1000);
+    }
+    get
+    {
+      int ret = (int) GetDuration() * 1000;
+      return ret;
+    }
+  }
+
   public AlphaFunction DefaultAlphaFunction
   {
     set
