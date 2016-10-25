@@ -214,6 +214,8 @@ using namespace Dali::Toolkit;
 %include events/timer-event.i
 %include events/videoview-event.i
 
+%include alphafunction.i
+
 %include dali-operator.i
 %include dali-core.i
 %include dali-adaptor.i
