@@ -26,61 +26,61 @@ using System.Runtime.InteropServices;
 %define Animation_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
   %typemap(cscode) NameSpace::ClassName %{
 
-    public static readonly int PARENT_ORIGIN = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_get();
-    public static readonly int PARENT_ORIGIN_X = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_X_get();
-    public static readonly int PARENT_ORIGIN_Y = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Y_get();
-    public static readonly int PARENT_ORIGIN_Z = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Z_get();
-    public static readonly int ANCHOR_POINT = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_get();
-    public static readonly int ANCHOR_POINT_X = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_X_get();
-    public static readonly int ANCHOR_POINT_Y = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Y_get();
-    public static readonly int ANCHOR_POINT_Z = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Z_get();
-    public static readonly int SIZE = NDalicPINVOKE.Actor_Property_SIZE_get();
-    public static readonly int SIZE_WIDTH = NDalicPINVOKE.Actor_Property_SIZE_WIDTH_get();
-    public static readonly int SIZE_HEIGHT = NDalicPINVOKE.Actor_Property_SIZE_HEIGHT_get();
-    public static readonly int SIZE_DEPTH = NDalicPINVOKE.Actor_Property_SIZE_DEPTH_get();
-    public static readonly int POSITION = NDalicPINVOKE.Actor_Property_POSITION_get();
-    public static readonly int POSITION_X = NDalicPINVOKE.Actor_Property_POSITION_X_get();
-    public static readonly int POSITION_Y = NDalicPINVOKE.Actor_Property_POSITION_Y_get();
-    public static readonly int POSITION_Z = NDalicPINVOKE.Actor_Property_POSITION_Z_get();
-    public static readonly int WORLD_POSITION = NDalicPINVOKE.Actor_Property_WORLD_POSITION_get();
-    public static readonly int WORLD_POSITION_X = NDalicPINVOKE.Actor_Property_WORLD_POSITION_X_get();
-    public static readonly int WORLD_POSITION_Y = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Y_get();
-    public static readonly int WORLD_POSITION_Z = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Z_get();
-    public static readonly int ORIENTATION = NDalicPINVOKE.Actor_Property_ORIENTATION_get();
-    public static readonly int WORLD_ORIENTATION = NDalicPINVOKE.Actor_Property_WORLD_ORIENTATION_get();
-    public static readonly int SCALE = NDalicPINVOKE.Actor_Property_SCALE_get();
-    public static readonly int SCALE_X = NDalicPINVOKE.Actor_Property_SCALE_X_get();
-    public static readonly int SCALE_Y = NDalicPINVOKE.Actor_Property_SCALE_Y_get();
-    public static readonly int SCALE_Z = NDalicPINVOKE.Actor_Property_SCALE_Z_get();
-    public static readonly int WORLD_SCALE = NDalicPINVOKE.Actor_Property_WORLD_SCALE_get();
-    public static readonly int VISIBLE = NDalicPINVOKE.Actor_Property_VISIBLE_get();
-    public static readonly int COLOR = NDalicPINVOKE.Actor_Property_COLOR_get();
-    public static readonly int COLOR_RED = NDalicPINVOKE.Actor_Property_COLOR_RED_get();
-    public static readonly int COLOR_GREEN = NDalicPINVOKE.Actor_Property_COLOR_GREEN_get();
-    public static readonly int COLOR_BLUE = NDalicPINVOKE.Actor_Property_COLOR_BLUE_get();
-    public static readonly int COLOR_ALPHA = NDalicPINVOKE.Actor_Property_COLOR_ALPHA_get();
-    public static readonly int WORLD_COLOR = NDalicPINVOKE.Actor_Property_WORLD_COLOR_get();
-    public static readonly int WORLD_MATRIX = NDalicPINVOKE.Actor_Property_WORLD_MATRIX_get();
-    public static readonly int NAME = NDalicPINVOKE.Actor_Property_NAME_get();
-    public static readonly int SENSITIVE = NDalicPINVOKE.Actor_Property_SENSITIVE_get();
-    public static readonly int LEAVE_REQUIRED = NDalicPINVOKE.Actor_Property_LEAVE_REQUIRED_get();
-    public static readonly int INHERIT_ORIENTATION = NDalicPINVOKE.Actor_Property_INHERIT_ORIENTATION_get();
-    public static readonly int INHERIT_SCALE = NDalicPINVOKE.Actor_Property_INHERIT_SCALE_get();
-    public static readonly int COLOR_MODE = NDalicPINVOKE.Actor_Property_COLOR_MODE_get();
-    public static readonly int POSITION_INHERITANCE = NDalicPINVOKE.Actor_Property_POSITION_INHERITANCE_get();
-    public static readonly int DRAW_MODE = NDalicPINVOKE.Actor_Property_DRAW_MODE_get();
-    public static readonly int SIZE_MODE_FACTOR = NDalicPINVOKE.Actor_Property_SIZE_MODE_FACTOR_get();
-    public static readonly int WIDTH_RESIZE_POLICY = NDalicPINVOKE.Actor_Property_WIDTH_RESIZE_POLICY_get();
-    public static readonly int HEIGHT_RESIZE_POLICY = NDalicPINVOKE.Actor_Property_HEIGHT_RESIZE_POLICY_get();
-    public static readonly int SIZE_SCALE_POLICY = NDalicPINVOKE.Actor_Property_SIZE_SCALE_POLICY_get();
-    public static readonly int WIDTH_FOR_HEIGHT = NDalicPINVOKE.Actor_Property_WIDTH_FOR_HEIGHT_get();
-    public static readonly int HEIGHT_FOR_WIDTH = NDalicPINVOKE.Actor_Property_HEIGHT_FOR_WIDTH_get();
-    public static readonly int PADDING = NDalicPINVOKE.Actor_Property_PADDING_get();
-    public static readonly int MINIMUM_SIZE = NDalicPINVOKE.Actor_Property_MINIMUM_SIZE_get();
-    public static readonly int MAXIMUM_SIZE = NDalicPINVOKE.Actor_Property_MAXIMUM_SIZE_get();
-    public static readonly int INHERIT_POSITION = NDalicPINVOKE.Actor_Property_INHERIT_POSITION_get();
-    public static readonly int CLIPPING_MODE = NDalicPINVOKE.Actor_Property_CLIPPING_MODE_get();
-    public static readonly int BATCH_PARENT = NDalicPINVOKE.Actor_Property_BATCH_PARENT_get();
+    public static readonly int ParentOrigin = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_get();
+    public static readonly int ParentOriginX = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_X_get();
+    public static readonly int ParentOriginY = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Y_get();
+    public static readonly int ParentOriginZ = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Z_get();
+    public static readonly int AnchorPoint = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_get();
+    public static readonly int AnchorPointX = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_X_get();
+    public static readonly int AnchorPointY = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Y_get();
+    public static readonly int AnchorPointZ = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Z_get();
+    public static readonly int Size = NDalicPINVOKE.Actor_Property_SIZE_get();
+    public static readonly int SizeWidth = NDalicPINVOKE.Actor_Property_SIZE_WIDTH_get();
+    public static readonly int SizeHeight = NDalicPINVOKE.Actor_Property_SIZE_HEIGHT_get();
+    public static readonly int SizeDepth = NDalicPINVOKE.Actor_Property_SIZE_DEPTH_get();
+    public static readonly int Position = NDalicPINVOKE.Actor_Property_POSITION_get();
+    public static readonly int PositionX = NDalicPINVOKE.Actor_Property_POSITION_X_get();
+    public static readonly int PositionY = NDalicPINVOKE.Actor_Property_POSITION_Y_get();
+    public static readonly int PositionZ = NDalicPINVOKE.Actor_Property_POSITION_Z_get();
+    public static readonly int WorldPosition = NDalicPINVOKE.Actor_Property_WORLD_POSITION_get();
+    public static readonly int WorldPositionX = NDalicPINVOKE.Actor_Property_WORLD_POSITION_X_get();
+    public static readonly int WorldPositionY = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Y_get();
+    public static readonly int WorldPositionZ = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Z_get();
+    public static readonly int Orientation = NDalicPINVOKE.Actor_Property_ORIENTATION_get();
+    public static readonly int WorldOrientation = NDalicPINVOKE.Actor_Property_WORLD_ORIENTATION_get();
+    public static readonly int Scale = NDalicPINVOKE.Actor_Property_SCALE_get();
+    public static readonly int ScaleX = NDalicPINVOKE.Actor_Property_SCALE_X_get();
+    public static readonly int ScaleY = NDalicPINVOKE.Actor_Property_SCALE_Y_get();
+    public static readonly int ScaleZ = NDalicPINVOKE.Actor_Property_SCALE_Z_get();
+    public static readonly int WorldScale = NDalicPINVOKE.Actor_Property_WORLD_SCALE_get();
+    public static readonly int Visibile = NDalicPINVOKE.Actor_Property_VISIBLE_get();
+    public static readonly int Color = NDalicPINVOKE.Actor_Property_COLOR_get();
+    public static readonly int ColorRed = NDalicPINVOKE.Actor_Property_COLOR_RED_get();
+    public static readonly int ColorGreeb = NDalicPINVOKE.Actor_Property_COLOR_GREEN_get();
+    public static readonly int ColorBlue = NDalicPINVOKE.Actor_Property_COLOR_BLUE_get();
+    public static readonly int ColorAlpha = NDalicPINVOKE.Actor_Property_COLOR_ALPHA_get();
+    public static readonly int WorldColor = NDalicPINVOKE.Actor_Property_WORLD_COLOR_get();
+    public static readonly int WorldMatrix = NDalicPINVOKE.Actor_Property_WORLD_MATRIX_get();
+    public static readonly int Name = NDalicPINVOKE.Actor_Property_NAME_get();
+    public static readonly int Sensitive = NDalicPINVOKE.Actor_Property_SENSITIVE_get();
+    public static readonly int LeaveRequired = NDalicPINVOKE.Actor_Property_LEAVE_REQUIRED_get();
+    public static readonly int InheritOrientation = NDalicPINVOKE.Actor_Property_INHERIT_ORIENTATION_get();
+    public static readonly int InheritScale = NDalicPINVOKE.Actor_Property_INHERIT_SCALE_get();
+    public static readonly int ColorMode = NDalicPINVOKE.Actor_Property_COLOR_MODE_get();
+    public static readonly int PositionInheritance = NDalicPINVOKE.Actor_Property_POSITION_INHERITANCE_get();
+    public static readonly int DrawMode = NDalicPINVOKE.Actor_Property_DRAW_MODE_get();
+    public static readonly int SizeModeFactor = NDalicPINVOKE.Actor_Property_SIZE_MODE_FACTOR_get();
+    public static readonly int WidthResizePolicy = NDalicPINVOKE.Actor_Property_WIDTH_RESIZE_POLICY_get();
+    public static readonly int HeightResizePolicy = NDalicPINVOKE.Actor_Property_HEIGHT_RESIZE_POLICY_get();
+    public static readonly int SizeScalePolicy = NDalicPINVOKE.Actor_Property_SIZE_SCALE_POLICY_get();
+    public static readonly int WidthForHeight = NDalicPINVOKE.Actor_Property_WIDTH_FOR_HEIGHT_get();
+    public static readonly int HeightForWidth = NDalicPINVOKE.Actor_Property_HEIGHT_FOR_WIDTH_get();
+    public static readonly int Padding = NDalicPINVOKE.Actor_Property_PADDING_get();
+    public static readonly int MinimumSize = NDalicPINVOKE.Actor_Property_MINIMUM_SIZE_get();
+    public static readonly int MaximumSize = NDalicPINVOKE.Actor_Property_MAXIMUM_SIZE_get();
+    public static readonly int InheritPosition = NDalicPINVOKE.Actor_Property_INHERIT_POSITION_get();
+    public static readonly int ClippingMode = NDalicPINVOKE.Actor_Property_CLIPPING_MODE_get();
+    public static readonly int BatchParent = NDalicPINVOKE.Actor_Property_BATCH_PARENT_get();
 
 
     /**
@@ -233,6 +233,19 @@ using System.Runtime.InteropServices;
     }
   }
 
+  public bool Looping
+  {
+    set
+    {
+      SetLooping(value);
+    }
+    get
+    {
+      bool ret = IsLooping();
+      return ret;
+    }
+  }
+
   public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue)
   {
 	dynamic var = (object)(propertyIndex);
@@ -337,6 +350,26 @@ using System.Runtime.InteropServices;
 	AnimateBetween(new Property(target, var), keyFrames, alpha, period, interpolation);
   }
 
+  public void Stop(Animation.EndAction action) {
+    SetEndAction(action);
+    NDalicPINVOKE.Animation_Stop(swigCPtr);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  /**
+   * @brief Create an initialized Animation.
+   *
+   * The animation will not loop.
+   * The default end action is "Bake".
+   * The default Alpha function is linear.
+   * @since 1.0.0
+   * @param [in] durationmSeconds The duration in milli seconds (int).
+   * @return A handle to a newly allocated Dali resource.
+   * @pre DurationmSeconds must be greater than zero.
+   */
+  public Animation (int durationmSeconds) : this (NDalicPINVOKE.Animation_New((float)durationmSeconds/1000.0f), true) {
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
 %}
 
 %enddef
