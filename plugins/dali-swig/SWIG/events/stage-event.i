@@ -524,16 +524,17 @@ public class SceneCreatedEventArgs : EventArgs
      }
   }
 
-  public Vector2 Size
+  public Dali.Size Size
   {
      get
      {
-        Vector2 ret = GetSize();
+        Vector2 ret1 = GetSize();
+        Dali.Size ret= new Size(ret1);
         return ret;
      }
   }
 
-  public Vector4 BackgroundColor
+  public Dali.Color BackgroundColor
   {
      set
      {
@@ -541,7 +542,8 @@ public class SceneCreatedEventArgs : EventArgs
      }
      get
      {
-        Vector4 ret = GetBackgroundColor();
+        Vector4 ret1 = GetBackgroundColor();
+        Dali.Color ret = new Color(ret1);
         return ret;
      }
    }

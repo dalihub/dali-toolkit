@@ -50,12 +50,12 @@ namespace MyCSharpExample
     private void CreateScrollView()
     {
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor = NDalic.WHITE;
+      stage.BackgroundColor = new Color("white");
 
       // Create a scroll view
       _scrollView = new ScrollView();
-      Vector2 stageSize = stage.Size;
-      _scrollView.Size = new Vector3(stageSize.x, stageSize.y, 0.0f);
+      Size stageSize = stage.Size;
+      _scrollView.Size = new Position(stageSize.x, stageSize.y, 0.0f);
       _scrollView.ParentOrigin = NDalic.ParentOriginCenter;
       _scrollView.AnchorPoint = NDalic.AnchorPointCenter;
       stage.Add(_scrollView);
@@ -71,13 +71,13 @@ namespace MyCSharpExample
           pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
           pageActor.ParentOrigin = NDalic.ParentOriginCenter;
           pageActor.AnchorPoint = NDalic.AnchorPointCenter;
-          pageActor.Position = new Vector3(pageColumn * stageSize.x, pageRow * stageSize.y, 0.0f);
+          pageActor.Position = new Position(pageColumn * stageSize.x, pageRow * stageSize.y, 0.0f);
 
           // Add images in a 3x4 grid layout for each page
           int imageRows = 4;
           int imageColumns = 3;
           float margin = 10.0f;
-          Vector3 imageSize = new Vector3((stageSize.x / imageColumns) - margin, (stageSize.y / imageRows) - margin, 0.0f);
+          Position imageSize = new Position((stageSize.x / imageColumns) - margin, (stageSize.y / imageRows) - margin, 0.0f);
 
           for(int row = 0; row < imageRows; row++)
           {
@@ -88,7 +88,7 @@ namespace MyCSharpExample
               imageView.ParentOrigin = NDalic.ParentOriginCenter;
               imageView.AnchorPoint = NDalic.AnchorPointCenter;
               imageView.Size = imageSize;
-              imageView.Position = new Vector3( margin * 0.5f + (imageSize.x + margin) * column - stageSize.x * 0.5f + imageSize.x * 0.5f,
+              imageView.Position = new Position( margin * 0.5f + (imageSize.x + margin) * column - stageSize.x * 0.5f + imageSize.x * 0.5f,
                   margin * 0.5f + (imageSize.y + margin) * row - stageSize.y * 0.5f + imageSize.y * 0.5f, 0.0f );
               pageActor.Add(imageView);
             }
@@ -115,7 +115,7 @@ namespace MyCSharpExample
       _scrollBar.AnchorPoint = NDalic.AnchorPointTopLeft;
       _scrollBar.SetResizePolicy(ResizePolicyType.FIT_TO_CHILDREN, DimensionType.WIDTH);
       _scrollBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
-      _scrollBar.Orientation = new Quaternion( new Radian( new Degree( 270.0f ) ), Vector3.ZAXIS );
+      _scrollBar.Orientation = new Quaternion( new Radian( new Degree( 270.0f ) ), Position.ZAXIS );
       _scrollBar.SetScrollDirection(ScrollBar.Direction.Horizontal);
       _scrollView.Add(_scrollBar);
 
@@ -166,8 +166,8 @@ namespace MyCSharpExample
 
         _animation = new Animation(1.0f); // 1 second of duration
 
-        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, 0.5f));
-        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
+        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Position.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, 0.5f));
+        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Position.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
 
         // Connect the signal callback for animaiton finished signal
         _animation.Finished += AnimationFinished;
@@ -183,7 +183,7 @@ namespace MyCSharpExample
       Console.WriteLine("View OnRelayoutEventArgs EVENT callback....");
 
       // Set the correct scroll bar size after size negotiation of scroll view is done
-      _scrollBar.Size = new Vector3(0.0f, _scrollView.GetRelayoutSize(DimensionType.WIDTH), 0.0f);
+      _scrollBar.Size = new Position(0.0f, _scrollView.GetRelayoutSize(DimensionType.WIDTH), 0.0f);
     }
 
     public void MainLoop()

@@ -62,9 +62,9 @@ namespace MyCSharpExample
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor =  NDalic.WHITE ;
+      stage.BackgroundColor =  new Color("white") ;
 
-      Vector2 stageSize = stage.Size;
+      Size stageSize = stage.Size;
       Console.WriteLine("Stage size: " + stageSize.x + ", " + stageSize.y);
       stage.Add(actor);
 
@@ -128,16 +128,16 @@ namespace MyCSharpExample
       Console.WriteLine( "    Area  = " + rd2.Area() );
 
       Console.WriteLine( " *************************" );
-      Vector2 vector2 = new Vector2(100, 50);
-      Console.WriteLine( "    Created " + vector2 );
-      Console.WriteLine( "    Vector2 x =  " + vector2.x + ", y = " + vector2.y );
-      vector2 += new Vector2(20, 20);
-      Console.WriteLine( "    Vector2 x =  " + vector2[0] + ", y = " + vector2[1] );
-      vector2.x += 10;
-      vector2.y += 10;
-      Console.WriteLine( "    Vector2 width =  " + vector2.width + ", height = " + vector2.height );
-      vector2 += new Vector2(15, 15);
-      Console.WriteLine( "    Vector2 width =  " + vector2[0] + ", height = " + vector2[1] );
+      Size Size = new Size(100, 50);
+      Console.WriteLine( "    Created " + Size );
+      Console.WriteLine( "    Size x =  " + Size.x + ", y = " + Size.y );
+      Size += new Size(20, 20);
+      Console.WriteLine( "    Size x =  " + Size[0] + ", y = " + Size[1] );
+      Size.x += 10;
+      Size.y += 10;
+      Console.WriteLine( "    Size width =  " + Size.width + ", height = " + Size.height );
+      Size += new Size(15, 15);
+      Console.WriteLine( "    Size width =  " + Size[0] + ", height = " + Size[1] );
 
       Console.WriteLine( " *************************" );
       Vector3 vector3 = new Vector3(20, 100, 50);
