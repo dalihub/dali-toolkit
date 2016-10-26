@@ -64,6 +64,34 @@ const char* const PROPERTY_NAME_OUTLINE = "outline";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
+bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
+{
+  if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
+  {
+    for( unsigned int index = 0u; index < fontStyleMapGet.Count(); ++index )
+    {
+      const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
+
+      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      if( NULL != valueSet )
+      {
+        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        {
+          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+      }
+      else
+      {
+        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 } // namespace
 
 int UtcDaliToolkitTextLabelConstructorP(void)
@@ -193,18 +221,67 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check font properties.
   label.SetProperty( TextLabel::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}"), TEST_LOCATION );
+
+  Property::Map fontStyleMapSet;
+  Property::Map fontStyleMapGet;
+
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  label.SetProperty( TextLabel::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  // Check the old font style format.
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "thin" );
+  fontStyleMapSet.Insert( "width", "expanded" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+
+  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}" );
+  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   label.SetProperty( TextLabel::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Reset font style.
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+
+  label.SetProperty( TextLabel::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+
+  label.SetProperty( TextLabel::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+
+  // Replace 'roman' for 'normal'.
+  Property::Value* slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  label.SetProperty( TextLabel::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   // Toggle multi-line
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );

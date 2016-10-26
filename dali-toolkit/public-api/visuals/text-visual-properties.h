@@ -58,8 +58,8 @@ enum
 
   /**
    * @brief The requested font style to use,
-   * @details name "fontStyle", type STRING
-   * @SINCE_1_2.11
+   * @details name "fontStyle", type STRING or MAP
+   * @SINCE_1_2.13
    */
   FONT_STYLE,
 
@@ -142,29 +142,29 @@ enum
 
   /**
    * @brief The default underline parameters.
-   * @details name "underline", type STRING.
-   * @SINCE_1_2.11
+   * @details name "underline", type STRING or MAP.
+   * @SINCE_1_2.13
    */
   UNDERLINE,
 
   /**
    * @brief The default shadow parameters.
-   * @details name "shadow", type STRING.
-   * @SINCE_1_2.11
+   * @details name "shadow", type STRING or MAP.
+   * @SINCE_1_2.13
    */
   SHADOW,
 
   /**
    * @brief The default emboss parameters.
-   * @details name "emboss", type STRING.
-   * @SINCE_1_2.11
+   * @details name "emboss", type STRING or MAP.
+   * @SINCE_1_2.13
    */
   EMBOSS,
 
   /**
    * @brief The default outline parameters.
-   * @details name "outline", type STRING.
-   * @SINCE_1_2.11
+   * @details name "outline", type STRING or MAP.
+   * @SINCE_1_2.13
    */
   OUTLINE,
 

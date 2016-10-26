@@ -72,7 +72,7 @@ public:
       TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                             type STRING @SINCE_1_1.37
       TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                  type VECTOR4 @SINCE_1_1.37
       FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                       type STRING @SINCE_1_1.37
-      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                        type STRING @SINCE_1_1.37
+      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                        type STRING or MAP @SINCE_1_2.13
       POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                      type FLOAT @SINCE_1_1.37
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The text horizontal alignment,                                                   type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_1.37
       SCROLL_THRESHOLD,                         ///< name "scrollThreshold"                      Vertical scrolling will occur if the cursor is this close to the control border, type FLOAT @SINCE_1_1.37
@@ -96,18 +96,18 @@ public:
       ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                       type BOOLEAN @SINCE_1_1.37
       INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                                 type VECTOR4 @SINCE_1_1.37
       INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                         type STRING @SINCE_1_1.37
-      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                          type STRING @SINCE_1_1.37
+      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                          type STRING or MAP @SINCE_1_2.13
       INPUT_POINT_SIZE,                         ///< name "inputPointSize",                      The font's size of the new input text in points,                                 type FLOAT @SINCE_1_1.37
       LINE_SPACING,                             ///< name "lineSpacing",                         The default extra space between lines in points,                                 type FLOAT @SINCE_1_1.37
       INPUT_LINE_SPACING,                       ///< name "inputLineSpacing"                     The extra space between lines in points. It affects the whole paragraph where the new input text is inserted, type FLOAT @SINCE_1_1.37
-      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                type STRING @SINCE_1_1.37
-      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                  type STRING @SINCE_1_1.37
-      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                   type STRING @SINCE_1_1.37
-      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                     type STRING @SINCE_1_1.37
-      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                   type STRING @SINCE_1_1.37
-      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                     type STRING @SINCE_1_1.37
-      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                  type STRING @SINCE_1_1.37
-      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                    type STRING @SINCE_1_1.37
+      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                type STRING or MAP @SINCE_1_2.13
+      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                  type STRING or MAP @SINCE_1_2.13
+      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                   type STRING or MAP @SINCE_1_2.13
+      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                     type STRING or MAP @SINCE_1_2.13
+      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                   type STRING or MAP @SINCE_1_2.13
+      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                     type STRING or MAP @SINCE_1_2.13
+      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                  type STRING or MAP @SINCE_1_2.13
+      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                    type STRING or MAP @SINCE_1_2.13
     };
   };
 
