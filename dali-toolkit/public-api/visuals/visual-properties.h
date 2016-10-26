@@ -68,7 +68,7 @@ enum
    * @note Will override the existing shaders.
    * @see Shader::Property
    */
-  SHADER,
+  SHADER
 };
 
 } // namespace Property

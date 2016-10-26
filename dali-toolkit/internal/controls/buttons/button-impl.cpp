@@ -30,6 +30,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 
@@ -570,7 +571,7 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
       Toolkit::Visual::Base visual;
 
       Property::Map map;
-      map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+      map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
       map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
       visual = visualFactory.CreateVisual( map );

@@ -25,6 +25,7 @@
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-view.h>
@@ -200,7 +201,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   Property::Value value;
 
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::TEXT );
 
   map.Insert( Toolkit::TextVisual::Property::RENDERING_BACKEND, mRenderingBackend );
 
@@ -269,7 +270,7 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
     {
       case Property::Key::INDEX:
       {
-        if( Toolkit::Visual::Property::TYPE != keyValue.first.indexKey ) // Toolkit::Visual::Property::TYPE is not a TextVisual's property.
+        if( Toolkit::VisualProperty::TYPE != keyValue.first.indexKey ) // Toolkit::VisualProperty::TYPE is not a TextVisual's property.
         {
           DoSetProperty( keyValue.first.indexKey, keyValue.second );
         }

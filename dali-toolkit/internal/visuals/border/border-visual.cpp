@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -159,7 +160,7 @@ void BorderVisual::DoSetOnStage( Actor& actor )
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::BORDER );
+  map.Insert( VisualProperty::TYPE, Toolkit::Visual::BORDER );
   map.Insert( Toolkit::BorderVisual::Property::COLOR, mBorderColor );
   map.Insert( Toolkit::BorderVisual::Property::SIZE, mBorderSize );
   map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );

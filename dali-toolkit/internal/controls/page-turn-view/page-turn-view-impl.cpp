@@ -29,7 +29,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -425,7 +425,7 @@ void PageTurnView::OnInitialize()
 Shader PageTurnView::CreateShader( const Property::Map& shaderMap )
 {
   Shader shader;
-  Property::Value* shaderValue = shaderMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
+  Property::Value* shaderValue = shaderMap.Find( Toolkit::VisualProperty::SHADER, CUSTOM_SHADER );
   Property::Map shaderSource;
   if( shaderValue && shaderValue->Get( shaderSource ) )
   {

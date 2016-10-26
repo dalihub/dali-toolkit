@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
@@ -395,7 +396,7 @@ void PrimitiveVisual::DoSetOnStage( Actor& actor )
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::PRIMITIVE );
   map.Insert( Toolkit::PrimitiveVisual::Property::SHAPE, mPrimitiveType );
   map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SLICES, mSlices );

@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 
 namespace Dali
 {
@@ -78,7 +78,7 @@ inline Property::Map CreateImageRegionEffect()
   Property::Map customShader;
   customShader[ Visual::Shader::Property::VERTEX_SHADER ] = vertexShader;
 
-  map[ Visual::Property::SHADER ] = customShader;
+  map[ VisualProperty::SHADER ] = customShader;
   return map;
 }
 

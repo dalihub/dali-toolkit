@@ -28,8 +28,8 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
@@ -96,7 +96,7 @@ void EmbossFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EMBOSS_FRAGMENT_SOURCE;
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  visualMap.Insert( Toolkit::VisualProperty::SHADER, customShader );
 
   // create actor to render input with applied emboss effect
   mActorForInput1 = Toolkit::ImageView::New(mInputImage);

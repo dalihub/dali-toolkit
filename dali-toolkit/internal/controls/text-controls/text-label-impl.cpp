@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
@@ -285,7 +286,7 @@ void TextLabel::OnInitialize()
 
   // Creates the text's visual.
   Property::Map visualMap;
-  visualMap[Toolkit::Visual::Property::TYPE] = Toolkit::Visual::TEXT;
+  visualMap[Toolkit::VisualProperty::TYPE] = Toolkit::Visual::TEXT;
   visualMap[Toolkit::TextVisual::Property::RENDERING_BACKEND] = static_cast<int>( DEFAULT_RENDERING_BACKEND );
 
   mVisual =  Toolkit::VisualFactory::Get().CreateVisual( visualMap );

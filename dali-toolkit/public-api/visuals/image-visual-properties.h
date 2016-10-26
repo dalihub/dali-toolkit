@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
 namespace Dali
 {
