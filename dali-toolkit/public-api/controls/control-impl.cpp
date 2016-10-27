@@ -38,6 +38,7 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -71,18 +72,18 @@ struct RegisteredVisual
                    index(aIndex), visual(aVisual), placementActor(aPlacementActor), enabled(aEnabled) {}
 };
 
-struct VisualProperty
+struct HandleIndex
 {
   Handle handle; ///< a handle to the target object
   Property::Index index; ///< The index of a property provided by the referenced object
 
-  VisualProperty( )
+  HandleIndex( )
   : handle(),
     index( Property::INVALID_INDEX )
   {
   }
 
-  VisualProperty( Handle& handle, Property::Index index )
+  HandleIndex( Handle& handle, Property::Index index )
   : handle( handle ),
     index( index )
   {
@@ -107,7 +108,7 @@ bool FindVisual( Property::Index targetIndex, RegisteredVisualContainer& visuals
   return false;
 }
 
-VisualProperty GetVisualProperty(
+HandleIndex GetVisualProperty(
   Internal::Control& controlImpl,
   RegisteredVisualContainer& visuals,
   const std::string& visualName,
@@ -115,7 +116,7 @@ VisualProperty GetVisualProperty(
 {
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
-  oss << "Control::GetVisualProperty(" << visualName << ", " << propertyKey << ")" << std::endl;
+  oss << "Control::GetHandleIndex(" << visualName << ", " << propertyKey << ")" << std::endl;
   DALI_LOG_INFO( gLogFilter, Debug::General, oss.str().c_str() );
 #endif
 
@@ -142,7 +143,7 @@ VisualProperty GetVisualProperty(
     if( index != Property::INVALID_INDEX )
     {
       // It's a placement actor property:
-      return VisualProperty( placementActor, index );
+      return HandleIndex( placementActor, index );
     }
     else
     {
@@ -156,19 +157,19 @@ VisualProperty GetVisualProperty(
         if( index != Property::INVALID_INDEX )
         {
           // It's a renderer property:
-          return VisualProperty( renderer, index );
+          return HandleIndex( renderer, index );
         }
       }
       else
       {
         std::ostringstream oss;
         oss << propertyKey;
-        DALI_LOG_WARNING( "Control::GetVisualProperty(%s, %s) No renderers\n", visualName.c_str(), oss.str().c_str() );
+        DALI_LOG_WARNING( "Control::GetHandleIndex(%s, %s) No renderers\n", visualName.c_str(), oss.str().c_str() );
       }
     }
   }
   Handle handle;
-  return VisualProperty( handle, Property::INVALID_INDEX );
+  return HandleIndex( handle, Property::INVALID_INDEX );
 }
 
 
@@ -567,7 +568,7 @@ void Control::SetBackgroundColor( const Vector4& color )
   Actor self( Self() );
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
   mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
   RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
@@ -893,37 +894,37 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
          iter != end; ++iter )
     {
       TransitionData::Animator* animator = (*iter);
-      VisualProperty visualProperty;
+      HandleIndex handleIndex;
 
       // Attempt to find the object name as a child actor
       Actor child = Self().FindChildByName( animator->objectName );
       if( child )
       {
         Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
-        visualProperty = VisualProperty( child, propertyIndex );
+        handleIndex = HandleIndex( child, propertyIndex );
       }
       else
       {
         // Is it a placement actor/visual pair?;
-        visualProperty = GetVisualProperty( *this, mImpl->mVisuals,
+        handleIndex = GetVisualProperty( *this, mImpl->mVisuals,
                                             animator->objectName,
                                             animator->propertyKey );
       }
 
-      if( visualProperty.handle && visualProperty.index != Property::INVALID_INDEX )
+      if( handleIndex.handle && handleIndex.index != Property::INVALID_INDEX )
       {
         if( animator->animate == false )
         {
           if( animator->targetValue.GetType() != Property::NONE )
           {
-            visualProperty.handle.SetProperty( visualProperty.index, animator->targetValue );
+            handleIndex.handle.SetProperty( handleIndex.index, animator->targetValue );
           }
         }
         else
         {
           if( animator->initialValue.GetType() != Property::NONE )
           {
-            visualProperty.handle.SetProperty( visualProperty.index, animator->initialValue );
+            handleIndex.handle.SetProperty( handleIndex.index, animator->initialValue );
           }
 
           if( ! transition )
@@ -933,7 +934,7 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
             transition = Dali::Animation::New( 0.1f );
           }
 
-          transition.AnimateTo( Property( visualProperty.handle, visualProperty.index ),
+          transition.AnimateTo( Property( handleIndex.handle, handleIndex.index ),
                                 animator->targetValue,
                                 animator->alphaFunction,
                                 TimePeriod( animator->timePeriodDelay,
@@ -945,7 +946,6 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
 
   return transition;
 }
-
 
 bool Control::OnAccessibilityActivated()
 {

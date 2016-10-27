@@ -31,6 +31,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -674,7 +675,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
 
   bool sync = IsSynchronousResourceLoading();
   map.Insert( SYNCHRONOUS_LOADING, sync );

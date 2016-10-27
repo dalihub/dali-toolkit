@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -61,7 +61,7 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
+  Property::Value* customShaderValue = propertyMap.Find( VisualProperty::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
     Property::Map shaderMap;

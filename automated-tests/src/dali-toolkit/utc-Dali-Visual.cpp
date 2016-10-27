@@ -23,6 +23,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
 

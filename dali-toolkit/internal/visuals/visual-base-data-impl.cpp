@@ -25,7 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
@@ -158,7 +158,7 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Ma
       customShader.Insert( Toolkit::Visual::Shader::Property::HINTS, static_cast< int >( mHints ) );
     }
 
-    map.Insert( Toolkit::Visual::Property::SHADER, customShader );
+    map.Insert( Toolkit::VisualProperty::SHADER, customShader );
   }
 }
 

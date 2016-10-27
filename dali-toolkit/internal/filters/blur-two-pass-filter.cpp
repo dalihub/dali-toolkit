@@ -28,7 +28,7 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 
 namespace Dali
 {
@@ -172,13 +172,13 @@ void BlurTwoPassFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource.str();
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  visualMap.Insert( Toolkit::VisualProperty::SHADER, customShader );
   mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
   mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   // Set up blend-two-image custom shader
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
-  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+  visualMap[ Toolkit::VisualProperty::SHADER ] = customShader;
   mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   mRootActor.Add( mActorForInput );

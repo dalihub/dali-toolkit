@@ -31,6 +31,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -234,7 +235,7 @@ void BatchImageVisual::DoSetOffStage( Actor& actor )
 void BatchImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
 
   if( !mImageUrl.empty() )
   {
