@@ -542,16 +542,36 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_LINE_SPACING ), 20.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-  editor.SetProperty( TextEditor::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
+
+  Property::Map underlineMapSet;
+  Property::Map underlineMapGet;
+
+  underlineMapSet.Insert( "enable", "true" );
+  underlineMapSet.Insert( "color", "red" );
+  underlineMapSet.Insert( "height", "1" );
+
+  editor.SetProperty( TextEditor::Property::UNDERLINE, underlineMapSet );
+
+  underlineMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   // Check the input underline property
   editor.SetProperty( TextEditor::Property::INPUT_UNDERLINE, "Underline input properties" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
 
   // Check the shadow property
-  editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
+  Property::Map shadowMapSet;
+  Property::Map shadowMapGet;
+
+  shadowMapSet.Insert( "color", "green" );
+  shadowMapSet.Insert( "offset", "2 2" );
+
+  editor.SetProperty( TextEditor::Property::SHADOW, shadowMapSet );
+
+  shadowMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
 
   // Check the input shadow property
   editor.SetProperty( TextEditor::Property::INPUT_SHADOW, "Shadow input properties" );

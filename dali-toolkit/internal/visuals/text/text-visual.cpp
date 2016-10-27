@@ -554,7 +554,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     case Toolkit::TextVisual::Property::UNDERLINE:
     {
       // TODO : This switch can be removed when the deprecated SHADOW_OFFSET and SHADOW_COLOR properties are finally removed.
-      //        Only the code for the STRING case should be kept.
+      //        Only the code for the MAP case should be kept.
       switch( propertyValue.GetType() )
       {
         case Property::VECTOR4:
@@ -587,7 +587,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
           }
           break;
         }
-        case Property::STRING:
+        case Property::MAP:
         {
           const bool update = SetUnderlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
           if( update )
@@ -608,7 +608,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     case Toolkit::TextVisual::Property::SHADOW:
     {
       // TODO : This switch can be removed when the deprecated SHADOW_OFFSET and SHADOW_COLOR properties are finally removed.
-      //        Only the code for the STRING case should be kept.
+      //        Only the code for the MAP case should be kept.
       switch( propertyValue.GetType() )
       {
         case Property::VECTOR2:
@@ -631,7 +631,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
           }
           break;
         }
-        case Property::STRING:
+        case Property::MAP:
         {
           const bool update = SetShadowProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
           if( update )

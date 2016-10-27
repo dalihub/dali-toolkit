@@ -173,11 +173,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool offsetDefined = false;
           Vector2 offset;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    colorDefined,
-                                                    color,
-                                                    offsetDefined,
-                                                    offset );
+          const bool empty = Text::ParseShadowProperties( value.Get<Property::Map>(),
+                                                          colorDefined,
+                                                          color,
+                                                          offsetDefined,
+                                                          offset );
 
           if( !empty )
           {
@@ -191,11 +191,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool offsetDefined = false;
           Vector2 offset;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    colorDefined,
-                                                    color,
-                                                    offsetDefined,
-                                                    offset );
+          const bool empty = Text::ParseShadowProperties( value.Get<Property::Map>(),
+                                                          colorDefined,
+                                                          color,
+                                                          offsetDefined,
+                                                          offset );
 
           if( !empty )
           {
@@ -210,12 +210,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool heightDefined = false;
           float height = 0.f;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    enabled,
-                                                    colorDefined,
-                                                    color,
-                                                    heightDefined,
-                                                    height );
+          const bool empty = Text::ParseUnderlineProperties( value.Get<Property::Map>(),
+                                                             enabled,
+                                                             colorDefined,
+                                                             color,
+                                                             heightDefined,
+                                                             height );
 
           if( !empty )
           {
@@ -230,12 +230,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool heightDefined = false;
           float height = 0.f;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    enabled,
-                                                    colorDefined,
-                                                    color,
-                                                    heightDefined,
-                                                    height );
+          const bool empty = Text::ParseUnderlineProperties( value.Get<Property::Map>(),
+                                                             enabled,
+                                                             colorDefined,
+                                                             color,
+                                                             heightDefined,
+                                                             height );
 
           if( !empty && colorDefined )
           {
@@ -250,12 +250,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool heightDefined = false;
           float height = 0.f;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    enabled,
-                                                    colorDefined,
-                                                    color,
-                                                    heightDefined,
-                                                    height );
+          const bool empty = Text::ParseUnderlineProperties( value.Get<Property::Map>(),
+                                                             enabled,
+                                                             colorDefined,
+                                                             color,
+                                                             heightDefined,
+                                                             height );
 
           if( !empty && heightDefined )
           {

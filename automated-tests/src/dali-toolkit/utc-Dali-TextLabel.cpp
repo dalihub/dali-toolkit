@@ -299,7 +299,16 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // The underline color is changed as well.
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLUE, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"false\",\"color\":\"blue\",\"height\":\"0\"}"), TEST_LOCATION );
+  Property::Map underlineMapSet;
+  Property::Map underlineMapGet;
+
+  underlineMapSet.Insert( "enable", "false" );
+  underlineMapSet.Insert( "color", "blue" );
+  underlineMapSet.Insert( "height", "0" );
+
+  underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   // Check that shadow parameters can be correctly set
   label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 3.0f, 3.0f ) );
@@ -345,18 +354,54 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-  label.SetProperty( TextLabel::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
 
-  label.SetProperty( TextLabel::Property::UNDERLINE, "" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::UNDERLINE ), std::string("{\"enable\":\"false\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
+  underlineMapSet.Clear();
+  underlineMapSet.Insert( "enable", "true" );
+  underlineMapSet.Insert( "color", "red" );
+  underlineMapSet.Insert( "height", "1" );
+
+  label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
+
+  underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
+
+  underlineMapSet.Clear();
+
+  Property::Map underlineDisabledMapGet;
+  underlineDisabledMapGet.Insert( "enable", "false" );
+  underlineDisabledMapGet.Insert( "color", "red" );
+  underlineDisabledMapGet.Insert( "height", "1" );
+
+  label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
+  underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineDisabledMapGet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineDisabledMapGet ), true, TEST_LOCATION );
 
   // Check the shadow property
-  label.SetProperty( TextLabel::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
 
-  label.SetProperty( TextLabel::Property::SHADOW, "" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"0 0\"}"), TEST_LOCATION );
+  Property::Map shadowMapSet;
+  Property::Map shadowMapGet;
+
+  shadowMapSet.Insert( "color", "green" );
+  shadowMapSet.Insert( "offset", "2 2" );
+
+  label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
+
+  shadowMapGet = label.GetProperty<Property::Map>( TextLabel::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
+
+  shadowMapSet.Clear();
+  Property::Map shadowDisabledMapGet;
+  shadowDisabledMapGet.Insert( "color", "green" );
+  shadowDisabledMapGet.Insert( "offset", "0 0" );
+
+  label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
+
+  shadowMapGet = label.GetProperty<Property::Map>( TextLabel::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowDisabledMapGet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowDisabledMapGet ), true, TEST_LOCATION );
 
   // Check the emboss property
   label.SetProperty( TextLabel::Property::EMBOSS, "Emboss properties" );
