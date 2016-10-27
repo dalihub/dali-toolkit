@@ -48,15 +48,15 @@ namespace MyCSharpExample
       handle.GetProperty(myPropertyIndex).Get(ref myProperty);
       Console.WriteLine( "myProperty value: " + myProperty );
 
-      int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Vector2(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
-      Vector2 myProperty2 = new Vector2(0.0f, 0.0f);
+      int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Size(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
+      Size myProperty2 = new Size(0.0f, 0.0f);
       handle.GetProperty(myPropertyIndex2).Get(myProperty2);
       Console.WriteLine( "myProperty2 value: " + myProperty2.x + ", " + myProperty2.y );
 
       Actor actor = new Actor();
-      actor.Size = new Vector3(200.0f, 200.0f, 0.0f);
+      actor.Size = new Position(200.0f, 200.0f, 0.0f);
       actor.Name = "MyActor";
-      actor.Color = new Vector4(1.0f, 0.0f, 1.0f, 0.8f);
+      actor.Color = new Color(1.0f, 0.0f, 1.0f, 0.8f);
       Console.WriteLine("Actor id: {0}", actor.GetId());
       Console.WriteLine("Actor size: " + actor.Size.x + ", " + actor.Size.y);
       Console.WriteLine("Actor name: " + actor.Name);
@@ -140,29 +140,29 @@ namespace MyCSharpExample
       Console.WriteLine( "    Size width =  " + Size[0] + ", height = " + Size[1] );
 
       Console.WriteLine( " *************************" );
-      Vector3 vector3 = new Vector3(20, 100, 50);
-      Console.WriteLine( "    Created " + vector3 );
-      Console.WriteLine( "    Vector3 x =  " + vector3.x + ", y = " + vector3.y + ", z = " + vector3.z );
-      vector3 += new Vector3(20, 20, 20);
-      Console.WriteLine( "    Vector3 x =  " + vector3[0] + ", y = " + vector3[1] + ", z = " + vector3[2] );
-      vector3.x += 10;
-      vector3.y += 10;
-      vector3.z += 10;
-      Console.WriteLine( "    Vector3 width =  " + vector3.width + ", height = " + vector3.height + ", depth = " + vector3.depth );
-      Vector3 parentOrigin = NDalic.ParentOriginBottomRight;
+      Position Position = new Position(20, 100, 50);
+      Console.WriteLine( "    Created " + Position );
+      Console.WriteLine( "    Position x =  " + Position.x + ", y = " + Position.y + ", z = " + Position.z );
+      Position += new Position(20, 20, 20);
+      Console.WriteLine( "    Position x =  " + Position[0] + ", y = " + Position[1] + ", z = " + Position[2] );
+      Position.x += 10;
+      Position.y += 10;
+      Position.z += 10;
+      Console.WriteLine( "    Position width =  " + Position.width + ", height = " + Position.height + ", depth = " + Position.depth );
+      Position parentOrigin = new Dali.Position(NDalic.ParentOriginBottomRight);
       Console.WriteLine( "    parentOrigin x =  " + parentOrigin.x + ", y = " + parentOrigin.y + ", z = " + parentOrigin.z );
 
       Console.WriteLine( " *************************" );
-      Vector4 vector4 = new Vector4(20, 100, 50, 200);
-      Console.WriteLine( "    Created " + vector4 );
-      Console.WriteLine( "    Vector4 x =  " + vector4.x + ", y = " + vector4.y + ", z = " + vector4.z + ", w = " + vector4.w );
-      vector4 += new Vector4(20, 20, 20, 20);
-      Console.WriteLine( "    Vector4 x =  " + vector4[0] + ", y = " + vector4[1] + ", z = " + vector4[2] + ", w = " + vector4[3] );
-      vector4.x += 10;
-      vector4.y += 10;
-      vector4.z += 10;
-      vector4.w += 10;
-      Console.WriteLine( "    Vector4 r =  " + vector4.r + ", g = " + vector4.g + ", b = " + vector4.b + ", a = " + vector4.a );
+      Color Color = new Color(20, 100, 50, 200);
+      Console.WriteLine( "    Created " + Color );
+      Console.WriteLine( "    Color x =  " + Color.x + ", y = " + Color.y + ", z = " + Color.z + ", w = " + Color.w );
+      Color += new Color(20, 20, 20, 20);
+      Console.WriteLine( "    Color x =  " + Color[0] + ", y = " + Color[1] + ", z = " + Color[2] + ", w = " + Color[3] );
+      Color.x += 10;
+      Color.y += 10;
+      Color.z += 10;
+      Color.w += 10;
+      Console.WriteLine( "    Color r =  " + Color.r + ", g = " + Color.g + ", b = " + Color.b + ", a = " + Color.a );
     }
 
 

@@ -524,6 +524,8 @@ public class SceneCreatedEventArgs : EventArgs
      }
   }
 
+  ///< name "Size", type Dali.Size (Stage Size value)
+  //@since 1.0.0
   public Dali.Size Size
   {
      get
@@ -534,6 +536,8 @@ public class SceneCreatedEventArgs : EventArgs
      }
   }
 
+  ///< name "BackgroundColor", type Dali.Color (Stage background color value)
+  //@since 1.0.0
   public Dali.Color BackgroundColor
   {
      set

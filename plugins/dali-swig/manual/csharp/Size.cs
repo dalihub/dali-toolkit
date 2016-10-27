@@ -9,15 +9,15 @@ public class Size : Vector2
    * @brief constructor
    *
    * @since 1.0.0
-   * @param [in] a The Size X.
-   * @param [in] b The Size Y.
+   * @param [in] a Width value .
+   * @param [in] b Height value.
    */
           public Size(float a, float b)
               : base(a, b)
            {
            }
   /**
-   * @brief constructor
+   * @brief default constructor
    *
    * @since 1.0.0
    */
@@ -27,10 +27,10 @@ public class Size : Vector2
            }   
 
   /**
-   * @brief constructor
+   * @brief constructor with base class object
    *
    * @since 1.0.0
-   * @param [in] o The Vector Size X, Y.
+   * @param [in] o The Vector2 with Width, Height values.
    */
           public Size(Vector2 o)
                : base(o.x, o.y)
@@ -39,17 +39,17 @@ public class Size : Vector2
           }
 
   /**
-   * @brief constructor
+   * @brief Copy constructor
    *
    * @since 1.0.0
-   * @param [in] o The Size X, Y.
+   * @param [in] o The Size having Width & Y.
    */
           public Size(Size a)
               : base(a.width, a.height)
            {
            }
 
-  ///< name "W", type float (Size W value)
+  ///< name "W", type float (Size Width value)
   //@since 1.0.0
            public float W
            {
@@ -57,7 +57,7 @@ public class Size : Vector2
                set { width = value; }
            }
 
-  ///< name "H", type float (Size W value)
+  ///< name "H", type float (Size Height value)
   //@since 1.0.0
            public float H
            {
@@ -82,8 +82,8 @@ public class Size : Vector2
    * @brief operator-
    *
    * @since 1.0.0
-   * @param [in] l The Size to add.
-   * @param [in] r The Size to add
+   * @param [in] l The Size to substract.
+   * @param [in] r The Size to substract
    * @return A reference to this
    */
            public static Size operator -(Size l, Size r)
@@ -95,8 +95,8 @@ public class Size : Vector2
    * @brief operator*
    *
    * @since 1.0.0
-   * @param [in] l The Size to add.
-   * @param [in] r The Size to add
+   * @param [in] a The Size to multiply
+   * @param [in] b The Size to multiply
    * @return A reference to this
    */ 
            public static Size operator *(Size a, double b)
@@ -108,9 +108,9 @@ public class Size : Vector2
    * @brief operator/
    *
    * @since 1.0.0
-   * @param [in] l The Size to add.
-   * @param [in] r The Size to add
-   * @return A reference to this
+   * @param [in] a The Size to divide.
+   * @param [in] b The Size to divide
+   * @return float of the size division
    */
            public static float operator /(Size a, Size b)
            {
@@ -121,8 +121,7 @@ public class Size : Vector2
    * @brief Equals
    *
    * @since 1.0.0
-   * @param [in] o The Size object to compare.
-   * @param [in] r The Size to add
+   * @param [in] obj The Size object to compare.
    * @return bool, whether object equal or not
    */
            public override bool Equals(object obj)
@@ -150,7 +149,7 @@ public class Size : Vector2
    * @brief Clone
    *
    * @since 1.0.0
-   * @return Size object
+   * @return returns a copy of Size object
    */
            public Size Clone()
            {

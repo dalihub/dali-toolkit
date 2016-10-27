@@ -80,8 +80,8 @@ public class Position : Vector3
    * @brief operator-
    *
    * @since 1.0.0
-   * @param [in] l The Position to add.
-   * @param [in] r The Position to add
+   * @param [in] l The Position to substract.
+   * @param [in] r The Position to substract
    * @return A reference to this
    */ 
            public static Position operator -(Position l, Position r)
@@ -93,8 +93,8 @@ public class Position : Vector3
    * @brief operator*
    *
    * @since 1.0.0
-   * @param [in] l The Position to add.
-   * @param [in] r The Position to add
+   * @param [in] a The Position to multiply.
+   * @param [in] b The Position to multiply
    * @return A reference to this
    */ 
            public static Position operator *(Position a, double b)
@@ -106,9 +106,9 @@ public class Position : Vector3
    * @brief operator/
    *
    * @since 1.0.0
-   * @param [in] l The Position to add.
-   * @param [in] r The Position to add
-   * @return A reference to this
+   * @param [in] a The Position to divide.
+   * @param [in] b The Position to divide
+   * @return float value of division operation
    */ 
            public static float operator /(Position a, Position b)
            {
@@ -120,7 +120,6 @@ public class Position : Vector3
    *
    * @since 1.0.0
    * @param [in] o The Position object to compare.
-   * @param [in] r The Position to add
    * @return bool, whether object equal or not
    */
            public override bool Equals(object obj)
@@ -148,7 +147,7 @@ public class Position : Vector3
    * @brief Clone
    *
    * @since 1.0.0
-   * @return Positin object
+   * @return Position object
    */
            public Position Clone()
            {
