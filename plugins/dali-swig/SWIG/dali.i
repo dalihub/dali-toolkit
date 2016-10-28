@@ -25,6 +25,7 @@
 #endif
 
 %include exception.i
+%include dali-gc.i
 
 %exception {
     try {
