@@ -13,13 +13,26 @@ Custom controls are created using the [handle/body idiom](@ref handle-body-idiom
 ![ ](../assets/img/creating-custom-controls/control-handle-body.png)
 ![ ](creating-custom-controls/control-handle-body.png)
  
+Namespaces are important
++ The handle & body classes should have the same name but in different namespaces
++ TypeRegistry relies on this convention
++ Here our custom control requires
+  + MyControl
+  + Internal::MyControl
+ 
 ### General Guidelines:
 + Try to avoid adding C++ APIs as they become difficult to maintain.
   + Use **properties** as much as possible as Controls should be data driven.
   + These controls will be used through JavaScript and JSON files so need to be compatible.
-+ Bear in mind that the Control is required to update when the properties change, not just the first time they are set (to deal with style change).
++ Bear in mind that the Control can be updated when the properties change (e.g. style change)
+  + Ensure control deals with these property changes gracefully
+  + Not just the first time they are set
++ Use Visuals rather than creating several child Actors
+  + DALi rendering pipeline more efficient
 + Accessibility actions should be considered when designing the Control.
 + Consider using signals if the application needs to be react to changes in the control state.
++ Use of Gestures should be preferred over analysing raw touch events
++ Check if you need to chain up to base class if overriding certain methods
  
 ___________________________________________________________________________________________________
 
@@ -125,7 +138,8 @@ This should be overridden by the custom ui control.
 // C++
 void MyUIControlImpl::OnInitialize()
 {
-  // Create visuals, register events etc.
+  // Create visuals using the VisualFactory, register events etc.
+  // Register any created visuals with Control base class
 }
 ~~~
 ___________________________________________________________________________________________________
@@ -134,13 +148,14 @@ ________________________________________________________________________________
 
 Dali::Toolkit::Internal::Control provides several behaviours which are specified through its constructor (@ref Dali::Toolkit::Internal::Control::Control()).
  
-| Behaviour                            | Description                                                             |
-|--------------------------------------|-------------------------------------------------------------------------|
-| ACTOR_BEHAVIOUR_NONE                 | No behaviour required.                                                  |
-| REQUIRES_HOVER_EVENTS                | If our control requires [hover events](@ref creating-controls-events).  |
-| REQUIRES_WHEEL_EVENTS                | If our control requires [wheel events](@ref creating-controls-events).  |
-| REQUIRES_STYLE_CHANGE_SIGNALS        | True if need to monitor style change signals such as Theme/Font change. |
-| REQUIRES_KEYBOARD_NAVIGATION_SUPPORT | True if need to support keyboard navigation.                            |
+| Behaviour                            | Description                                                                                                    |
+|--------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| CONTROL_BEHAVIOUR_DEFAULT              | Default behavior (size negotiation is on, style change is monitored, event callbacks are not called.                                      |
+| DISABLE_SIZE_NEGOTIATION             | If our control does not need size negotiation, i.e. control will be skipped by the size negotiation algorithm. |
+| REQUIRES_HOVER_EVENTS                | If our control requires [hover events](@ref creating-controls-events).                                         |
+| REQUIRES_WHEEL_EVENTS                | If our control requires [wheel events](@ref creating-controls-events).                                         |
+| DISABLE_STYLE_CHANGE_SIGNALS         | True if control should not monitor style change signals such as Theme/Font change.                                         |
+| REQUIRES_KEYBOARD_NAVIGATION_SUPPORT | True if need to support keyboard navigation.                                                                   |
 ___________________________________________________________________________________________________
 
 ### Touch, Hover & Wheel Events {#creating-controls-events}
@@ -373,31 +388,62 @@ void MyUIControlImpl::OnStageDisconnection()
  
 ___________________________________________________________________________________________________
 
-### Size {#creating-controls-size}
+### Size Negotiation {#creating-controls-size-negotiation}
 
-Methods are provided that can be overridden if notification is required when our control's size is manipulated.
-An up call to the Control class is necessary if these methods are overridden.
+The following methods must be overridden for size negotiation to work correctly with a custom control.
  
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnSizeSet( const Vector3& targetSize )
+Vector3 MyUIControlImpl::GetNaturalSize()
 {
-  // Up call to Control
-  Control::OnSizeSet( targetSize );
+  // Return the natural size of the control
+  // This depends on our layout
+  // If we have one visual, then we can return the natural size of that
+  // If we have more visuals, then we need to calculate their positions within our control and work out the overall size we would like our control to be
 
-  // Do any other operations required upon size set
+  // After working out the natural size of visuals that belong to this control,
+  // should also chain up to ensure other visuals belonging to the base class are
+  // also taken into account:
+  Vector2 baseSize = Control::GetNaturalSize(); // returns the size of the background.
 }
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnSizeAnimation( Animation& animation, const Vector3& targetSize )
+float MyUIControlImpl::GetHeightForWidth( float width )
 {
-  // Up call to Control
-  Control::OnSizeAnimation( animation, targetSize );
+  // Called by the size negotiation algorithm if we have a fixed width
+  // We should calculate the height we would like our control to be for that width
 
-  // Do any other operations required upon size animation
+  // Should also chain up to determine the base class's preferred height:
+  float baseHeight = Control::GetHeightForWidth( width );
+
 }
 ~~~
+~~~{.cpp}
+// C++
+float MyUIControlImpl::GetWidthForHeight( float height )
+{
+  // Called by the size negotiation algorithm if we have a fixed height
+  // We should calculate the width we would like our control to be for that height
+
+  // Should also chain up to determine the base class's preferred width:
+  float baseWidth = Control::GetWidth( height );
+}
+~~~
+~~~{.cpp}
+// C++
+void MyUIControlImpl::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  // The size is what we have been given and what our control needs to fit into
+  // Here, we need to set the position and the size of our visuals
+  // If we have other controls/actors as children
+  //  - Add the control/actor to the container paired with the size required
+  //  - To ensure this works, you need to set up the control with a relayout policy of USE_ASSIGNED_SIZE
+  //  - DO NOT CALL SetSize on this control: This will trigger another size negotiation calculation
+  // DO NOT chain up to base class.
+}
+~~~
+More information on size negotiation can be found [here](@ref size-negotiation-controls).
  
 ___________________________________________________________________________________________________
 
