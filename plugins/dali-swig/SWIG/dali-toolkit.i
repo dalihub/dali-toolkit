@@ -125,7 +125,31 @@
 %rename(IMAGE_VISUAL_DESIRED_HEIGHT) Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT;
 %rename(IMAGE_VISUAL_SYNCHRONOUS_LOADING) Dali::Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING;
 %rename(IMAGE_VISUAL_BORDER_ONLY) Dali::Toolkit::ImageVisual::Property::BORDER_ONLY;
+%rename(IMAGE_VISUAL_BATCHING_ENABLED) Dali::Toolkit::ImageVisual::Property::BATCHING_ENABLED;
+%rename(IMAGE_VISUAL_PIXEL_AREA) Dali::Toolkit::ImageVisual::Property::PIXEL_AREA;
+%rename(IMAGE_VISUAL_WRAP_MODE_U) Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U;
+%rename(IMAGE_VISUAL_WRAP_MODE_V) Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V;
 %rename(COLOR_VISUAL_MIX_COLOR) Dali::Toolkit::Color::Visual::Property::MIX_COLOR;
+%rename(TEXT_VISUAL_RENDERING_BACKEND) Dali::Toolkit::Text::Visual::Property::RENDERING_BACKEND;
+%rename(TEXT_VISUAL_TEXT) Dali::Toolkit::Text::Visual::Property::TEXT;
+%rename(TEXT_VISUAL_FONT_FAMILY) Dali::Toolkit::Text::Visual::Property::FONT_FAMILY;
+%rename(TEXT_VISUAL_FONT_STYLE) Dali::Toolkit::Text::Visual::Property::FONT_STYLE;
+%rename(TEXT_VISUAL_POINT_SIZE) Dali::Toolkit::Text::Visual::Property::POINT_SIZE;
+%rename(TEXT_VISUAL_MULTI_LINE) Dali::Toolkit::Text::Visual::Property::MULTI_LINE;
+%rename(TEXT_VISUAL_HORIZONTAL_ALIGNMENT) Dali::Toolkit::Text::Visual::Property::HORIZONTAL_ALIGNMENT;
+%rename(TEXT_VISUAL_VERTICAL_ALIGNMENT) Dali::Toolkit::Text::Visual::Property::VERTICAL_ALIGNMENT;
+%rename(TEXT_VISUAL_TEXT_COLOR) Dali::Toolkit::Text::Visual::Property::TEXT_COLOR;
+%rename(TEXT_VISUAL_ENABLE_MARKUP) Dali::Toolkit::Text::Visual::Property::ENABLE_MARKUP;
+%rename(TEXT_VISUAL_ENABLE_AUTO_SCROLL) Dali::Toolkit::Text::Visual::Property::ENABLE_AUTO_SCROLL;
+%rename(TEXT_VISUAL_AUTO_SCROLL_SPEED) Dali::Toolkit::Text::Visual::Property::AUTO_SCROLL_SPEED;
+%rename(TEXT_VISUAL_AUTO_SCROLL_LOOP_COUNT) Dali::Toolkit::Text::Visual::Property::AUTO_SCROLL_LOOP_COUNT;
+%rename(TEXT_VISUAL_AUTO_SCROLL_GAP) Dali::Toolkit::Text::Visual::Property::AUTO_SCROLL_GAP;
+%rename(TEXT_VISUAL_LINE_SPACING) Dali::Toolkit::Text::Visual::Property::LINE_SPACING;
+%rename(TEXT_VISUAL_UNDERLINE) Dali::Toolkit::Text::Visual::Property::UNDERLINE;
+%rename(TEXT_VISUAL_SHADOW) Dali::Toolkit::Text::Visual::Property::SHADOW;
+%rename(TEXT_VISUAL_EMBOSS) Dali::Toolkit::Text::Visual::Property::EMBOSS;
+%rename(TEXT_VISUAL_OUTLINE) Dali::Toolkit::Text::Visual::Property::OUTLINE;
+%rename(TEXT_VISUAL_BATCHING_ENABLED) Dali::Toolkit::Text::Visual::Property::BATCHING_ENABLED;
 
 %csconstvalue("PropertyRanges.PROPERTY_REGISTRATION_START_INDEX") PROPERTY_START_INDEX;
 %csconstvalue("View.PropertyRange.PROPERTY_START_INDEX+1000") PROPERTY_END_INDEX;
@@ -152,11 +176,16 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
+%include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 
 %include <dali-toolkit/devel-api/builder/builder.h>
 
+%include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+
 %include <dali-toolkit/public-api/controls/control-impl.h>
 %include <dali-toolkit/public-api/controls/control.h>
+
+%include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
 %include <dali-toolkit/public-api/controls/alignment/alignment.h>
 %include <dali-toolkit/public-api/controls/buttons/button.h>
