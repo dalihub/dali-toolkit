@@ -134,9 +134,12 @@ void Visual::Base::SetOnStage( Actor& actor )
   // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
   DoSetOnStage( actor );
 
-  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-  mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-  mImpl->mFlags |= Impl::IS_ON_STAGE;
+  if( mImpl->mRenderer )
+  {
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+    mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+  }
 }
 
 void Visual::Base::SetOffStage( Actor& actor )
@@ -187,8 +190,8 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
 
 void Visual::Base::DoSetOffStage( Actor& actor )
 {
-  actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
+    actor.RemoveRenderer( mImpl->mRenderer );
+    mImpl->mRenderer.Reset();
 }
 
 bool Visual::Base::IsOnStage() const
