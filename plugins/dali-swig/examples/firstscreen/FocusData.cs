@@ -17,7 +17,7 @@ namespace FirstScreen
 
         // Initialize FocusData used for key frame animation
         public FocusData(string name, string imageName, Direction direction, Vector3 parentOrigin, Vector3 initSize,
-                        Vector3 targetSize, float keyFrameStart, float keyFrameEnd)
+                         Vector3 targetSize, float keyFrameStart, float keyFrameEnd)
         {
             _name = name;
             _imageName = imageName;
@@ -29,7 +29,7 @@ namespace FirstScreen
             _direction = direction;
 
             _imageFocus = new ImageView("./images/focuseffect/" + _imageName); // Desktop
-//            _imageFocus = new ImageView("/home/owner/apps_rw/org.tizen.firstscreen/res/images/focuseffect/" + _imageName); // Target
+            // _imageFocus = new ImageView("/home/owner/apps_rw/org.tizen.firstscreen/res/images/focuseffect/" + _imageName); // Target
 
             _imageFocus.ParentOrigin = _parentOrigin;
             _imageFocus.AnchorPoint = NDalic.AnchorPointCenter;
@@ -103,4 +103,3 @@ namespace FirstScreen
         }
     }
 }
-

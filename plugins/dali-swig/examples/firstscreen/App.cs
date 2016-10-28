@@ -7,33 +7,33 @@ namespace FirstScreen
 {
     public class FirstScreenApp
     {
-        private int _currentPostersContainerID;
-        private int _totalPostersContainers;
+        private Application _application;                  // Reference to Dali Application.
+        private Stage _stage;                              // Reference to Dali stage.
+        private Vector2 _stageSize;                        // Reference to Dali stage size.
 
-        private Application _application;
-        private Stage _stage;
-        private Vector2 _stageSize;
+        private View _topContainer;                        // Top Container added to the Stage will contain Poster ScrollContainers.
+        private View _bottomContainer;                     // Bottom Container added to the Stage will contain Menu ScrollContainer.
+        private int _currentPostersContainerID;            // Current Poster Container ID visible on the Top Container / Stage.
+        private int _totalPostersContainers;               // Number of Poster ScrollContainers to be added on Top Container.
+        private List<ScrollContainer> _postersContainer;   // List collection of Poster ScrollContainers used on the Top Container in this demo application.
+        private ScrollContainer _menuContainer;            // Menu ScrollContainer used on the Bottom Container in this demo application.
+        private Layer _bottomClipLayer;                    // Clip layer (Dali Clip Layer instance) used for Bottom Container.
+        private Layer _topClipLayer;                       // Clip layer (Dali Clip Layer instance) used for Top Container.
 
-        private List<ScrollContainer> _postersContainer;
+        private FocusEffect _focusEffect;                  // FocusEffect is used to apply Focus animation effect on any supplied item/image.
+        private string _imagePath;                         // Contains the physical location of all images used in the demo application.
 
-        private ScrollContainer _menuContainer;
-        private Vector3 _menuItemSize;
+        private ImageView _keyboardFocusIndicator;         // Reference to the ImageView (Keyboard Focus indicator) applied to the focused item on ScrollContainer.
+        private ImageView _launcherSeparator;              // Reference to the ImageView used for launcher separation (Launcher consists of three image icons on left of Menu ScrollContainer).
+        private ImageView[] launcherIcon;                  // ImageViews used for launcher Icons.
+        private Animation _showBottomContainerAnimation;   // Animation used to show/unhide Bottom Container (Menu ScrollContainer) when it is focused.
+        private Animation _hideBottomContainerAnimation;   // Animation used to hide Bottom Container (Menu ScrollContainer) when it is focused.
+        private Animation _showAnimation;                  // Animation used to move Poster scrollContainer from bottom to top and make it non-transparent.
+        private Animation _hideAnimation;                  // Animation used to make the unused specified Poster scrollContainer transparent.
+        private ScrollContainer _hideScrollContainer;      // The unused Poster scrollContainer which needs to be transparent.
+        KeyboardFocusManager _keyboardFocusManager;        // Reference to Dali KeyboardFocusManager.
 
-        private Layer _bottomClipLayer;
-        private Layer _topClipLayer;
-        private View _topContainer;
-        private View _bottomContainer;
-
-        private FocusEffect _focusEffect;
-        private string _imagePath;
-
-        private ImageView _keyboardFocusIndicator;
-        private ImageView _launcherSeparator;
-        private ImageView[] launcherIcon;
-        private Animation _showBottomContainerAnimation;
-        private Animation _hideBottomContainerAnimation;
-
-        public FirstScreenApp(Application application)
+        private FirstScreenApp(Application application)
         {
             _application = application;
             _application.Initialized += OnInitialize;
@@ -45,7 +45,7 @@ namespace FirstScreen
             tVApp.MainLoop();
         }
 
-        public void MainLoop()
+        private void MainLoop()
         {
             _application.MainLoop();
         }
@@ -62,23 +62,23 @@ namespace FirstScreen
                     {
                         View item = new ImageView(_imagePath + "/poster"+j+"/"+ (i % 6)+ ".jpg");
                         item.SetName ("poster-item-" + _postersContainer[j].ItemCount);
-                        _postersContainer[j].AddItem(item);
+                        _postersContainer[j].Add(item);
                     }
                     else
                     {
                         View item = new ImageView(_imagePath + "/poster"+j+"/"+ (i % 6)+ ".jpg");
                         item.SetName ("poster-item-" + _postersContainer[j].ItemCount);
-                        _postersContainer[j].AddItem(item);
+                        _postersContainer[j].Add(item);
                     }
                 }
 
                 if (j == 0)
                 {
-                    _postersContainer[j].Show();
+                    Show(_postersContainer[j]);
                 }
                 else
                 {
-                    _postersContainer[j].Hide();
+                    Hide(_postersContainer[j]);
                 }
 
                 _postersContainer[j].SetFocused(false);
@@ -97,13 +97,18 @@ namespace FirstScreen
             {
                 View menuItem = new ImageView(_imagePath + "/menu/" + i % 7 + ".png");
                 menuItem.SetName("menu-item-" + _menuContainer.ItemCount);
-                _menuContainer.AddItem(menuItem);
+                _menuContainer.Add(menuItem);
             }
         }
 
         private Actor OnKeyboardPreFocusChangeSignal(object source, KeyboardFocusManager.PreFocusChangeEventArgs e)
         {
-            Actor actor = _menuContainer.ItemRoot;
+            if (!e.Current && !e.Proposed)
+            {
+                return _menuContainer;
+            }
+
+            Actor actor = _menuContainer.Container;
 
             if (e.Direction == View.KeyboardFocus.Direction.UP)
             {
@@ -116,7 +121,7 @@ namespace FirstScreen
                     HideBottomContainer();
 
                     // Also apply Focus animation on Focused item on Poster ScrollContainer
-                    _postersContainer[_currentPostersContainerID].FocusAnimation(_focusEffect, FocusEffectDirection.BottomToTop);
+                    FocusAnimation(_postersContainer[_currentPostersContainerID], FocusEffectDirection.BottomToTop);
                 }
             }
             else if (e.Direction == View.KeyboardFocus.Direction.DOWN)
@@ -130,54 +135,98 @@ namespace FirstScreen
                     _menuContainer.SetFocused(true);
 
                     // Also apply Focus animation on Focused item on Menu ScrollContainer
-                    _menuContainer.FocusAnimation(_focusEffect, FocusEffectDirection.TopToBottom);
+                    FocusAnimation(_menuContainer, FocusEffectDirection.TopToBottom);
                 }
             }
-            else if (e.Direction == View.KeyboardFocus.Direction.LEFT)
+            else
+            {
+                actor = e.Proposed;
+            }
+
+            if (e.Direction == View.KeyboardFocus.Direction.LEFT)
             {
                 if (_menuContainer.IsFocused)
                 {
-                    // Move the Focus to the left item/image of currently focused item on Menu ScrollContainer
-                    actor = _menuContainer.FocusPrevious();
-
                     int id = _menuContainer.FocusedItemID % _totalPostersContainers;
                     if (id != _currentPostersContainerID)
                     {
-                        _postersContainer[_currentPostersContainerID].Hide();
+                        Hide(_postersContainer[_currentPostersContainerID]);
                         _currentPostersContainerID = id;
 
-                        _postersContainer[_currentPostersContainerID].Show();
+                        Show(_postersContainer[_currentPostersContainerID]);
                     }
-                }
-                else
-                {
-                    // Move the Focus to the left item/image of currently focused item on Poster ScrollContainer
-                    actor = _postersContainer[_currentPostersContainerID].FocusPrevious();
                 }
             }
             else if (e.Direction == View.KeyboardFocus.Direction.RIGHT)
             {
                 if (_menuContainer.IsFocused)
                 {
-                    // Move the Focus to the right item/image of currently focused item on Menu ScrollContainer
-                    actor = _menuContainer.FocusNext();
-
                     int id = _menuContainer.FocusedItemID % _totalPostersContainers;
                     if (id != _currentPostersContainerID)
                     {
-                        _postersContainer[_currentPostersContainerID].Hide();
+                        Hide(_postersContainer[_currentPostersContainerID]);
                         _currentPostersContainerID = id;
-                        _postersContainer[_currentPostersContainerID].Show();
+                        Show(_postersContainer[_currentPostersContainerID]);
                     }
-                }
-                else
-                {
-                    // Move the Focus to the right item/image of currently focused item on Poster ScrollContainer
-                    actor = _postersContainer[_currentPostersContainerID].FocusNext();
                 }
             }
 
             return actor;
+        }
+
+        // Perform Focus animation Effect on the current Focused Item on ScrollContainer.
+        private void FocusAnimation(ScrollContainer scrollContainer, FocusEffectDirection direction)
+        {
+            _focusEffect.FocusAnimation(scrollContainer.GetCurrentFocusedActor(), scrollContainer.ItemSize, 1.0f, direction);
+        }
+
+        // Perform Show animation on ScrollContainer (used only for Poster Container)
+        private void Show(ScrollContainer scrollContainer)
+        {
+            scrollContainer.Add(scrollContainer.Container);
+
+            _hideScrollContainer = null;
+            _showAnimation = new Animation (0.35f);
+
+            // This animation will move Poster scrollContainer from bottom to top and make it non-transparent.
+            _showAnimation.AnimateTo(new Dali.Property(scrollContainer.Container, Actor.Property.COLOR_ALPHA), new Dali.Property.Value(1.0f));
+
+            scrollContainer.Container.PositionY = scrollContainer.Container.Position.y + 200.0f;
+            float targetPositionY = scrollContainer.Container.Position.y - 200.0f;
+            _showAnimation.AnimateTo(new Dali.Property(scrollContainer.Container, Actor.Property.POSITION_Y), new Dali.Property.Value(targetPositionY),
+                                     new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR));
+
+            _showAnimation.Play();
+        }
+
+        // Perform Hide animation on ScrollContainer (used only for Poster Container)
+        private void Hide(ScrollContainer scrollContainer)
+        {
+            if (_hideAnimation)
+            {
+                _hideAnimation.Clear();
+                _hideAnimation.Reset();
+            }
+
+            float duration = 0.35f;
+            _hideAnimation = new Animation(duration);
+
+            _hideAnimation.AnimateTo(new Dali.Property(scrollContainer.Container, Actor.Property.COLOR_ALPHA), new Dali.Property.Value(0.0f),
+                                     new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, duration * 0.75f));
+
+            _hideAnimation.Finished += OnHideAnimationFinished;
+
+            _hideScrollContainer = scrollContainer;
+            _hideAnimation.Play();
+        }
+
+        // This removes all the items from the specified unused Poster ScrollContainer (hence Stage) to improve performance.
+        private void OnHideAnimationFinished(object source, Animation.FinishedEventArgs e)
+        {
+            if (_hideScrollContainer)
+            {
+                _hideScrollContainer.Remove(_hideScrollContainer.Container);
+            }
         }
 
         // Hide Bottom Container (Menu ScrollContainer) when it is not focused
@@ -211,13 +260,14 @@ namespace FirstScreen
         // First screen demo Application initialisation
         private void OnInitialize(object source, AUIApplicationInitEventArgs e)
         {
+            _hideScrollContainer = null;
             _stage = Stage.GetCurrent();
             _stageSize = _stage.GetSize();
-//            _stage.SetBackgroundColor(NDalic.TRANSPARENT);
+            //_stage.SetBackgroundColor(NDalic.TRANSPARENT);
 
             _totalPostersContainers = Constants.TotalPostersContainers;
             _imagePath = "./images/"; // Desktop
-//            _imagePath = "/home/owner/apps_rw/org.tizen.firstscreen/res/images/"; // Target
+            //_imagePath = "/home/owner/apps_rw/org.tizen.firstscreen/res/images/"; // Target
 
             _postersContainer = new List<ScrollContainer> ();
             _menuContainer = new ScrollContainer ();
@@ -297,18 +347,18 @@ namespace FirstScreen
                 }
                 else
                 {
-                    _postersContainer[i].ItemSize = new Vector3(_stageSize.width * Constants.Poster1ItemWidthFactor,
+                    _postersContainer[i].ItemSize = new Vector3((_stageSize.width * Constants.Poster1ItemWidthFactor) - Constants.PostersContainerPadding,
                                                                 _stageSize.height * Constants.PostersItemHeightFactor, 0.0f);
                 }
-                _postersContainer[i].Padding = Constants.PostersContainerPadding;
+                _postersContainer[i].Gap = Constants.PostersContainerPadding;
                 _postersContainer[i].MarginX = Constants.PostersContainerMargin;
-                _postersContainer[i].OffsetY = Constants.PostersContainerOffsetYFactor;
+                _postersContainer[i].OffsetYFator = Constants.PostersContainerOffsetYFactor;
                 _postersContainer[i].Width = _stageSize.width;
                 _postersContainer[i].Height = _stageSize.height * Constants.PostersContainerHeightFactor;
                 _postersContainer[i].ShadowBorder = shadowBorder;
                 _postersContainer[i].ShadowBorder.Position = new Vector3(0.0f, 4.0f, 0.0f);
                 _postersContainer[i].SpotLight = spotLight;
-                _topClipLayer.Add(_postersContainer[i].Container);
+                _topClipLayer.Add(_postersContainer[i]);
             }
 
             // Add a clip layer to Bottom Container
@@ -347,13 +397,13 @@ namespace FirstScreen
             _bottomContainer.Add(_launcherSeparator);
 
             // Create Menu Container and add it to Bottom Clip Layer
-            _menuItemSize = new Vector3((_stageSize.width * Constants.MenuItemWidthFactor) - Constants.MenuContainerPadding,
+            Vector3 menuItemSize = new Vector3((_stageSize.width * Constants.MenuItemWidthFactor) - Constants.MenuContainerPadding,
                                         _stageSize.height * Constants.MenuItemHeightFactor, 0.0f);
             _menuContainer.Container.Name = "menu";
-            _menuContainer.ItemSize = _menuItemSize;
-            _menuContainer.Padding = Constants.MenuContainerPadding;
+            _menuContainer.ItemSize = menuItemSize;
+            _menuContainer.Gap = Constants.MenuContainerPadding;
             _menuContainer.MarginX = Constants.MenuContainerMargin;
-            _menuContainer.OffsetY = Constants.MenuContainerOffsetYFactor;
+            _menuContainer.OffsetYFator = Constants.MenuContainerOffsetYFactor;
             _menuContainer.OffsetX = Constants.LauncherWidth;
             _menuContainer.Width = _stageSize.width - Constants.LauncherWidth;
             _menuContainer.Height = _stageSize.height * Constants.MenuContainerHeightFactor;
@@ -364,14 +414,14 @@ namespace FirstScreen
             _menuContainer.ShadowBorder.ParentOrigin = NDalic.ParentOriginCenter;
             _menuContainer.ShadowBorder.AnchorPoint = NDalic.AnchorPointCenter;
             _menuContainer.SpotLight = spotLight;
-            _bottomClipLayer.Add(_menuContainer.Container);
+            _bottomClipLayer.Add(_menuContainer);
 
             CreatePosters(); // Create Items for Poster ScrollContainer
             CreateMenu();    // Create Items for Menu ScrollContainer
 
             // Initialize PreFocusChange event of KeyboardFocusManager
-            KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.Get();
-            keyboardFocusManager.PreFocusChange += OnKeyboardPreFocusChangeSignal;
+            _keyboardFocusManager = KeyboardFocusManager.Get();
+            _keyboardFocusManager.PreFocusChange += OnKeyboardPreFocusChangeSignal;
 
             _keyboardFocusIndicator = new ImageView(_imagePath + "/highlight_stroke.9.png");
             _keyboardFocusIndicator.ParentOrigin = NDalic.ParentOriginCenter;
@@ -379,7 +429,12 @@ namespace FirstScreen
             _keyboardFocusIndicator.WidthResizePolicy = "FILL_TO_PARENT";
             _keyboardFocusIndicator.HeightResizePolicy = "FILL_TO_PARENT";
 
-            keyboardFocusManager.SetFocusIndicatorActor(_keyboardFocusIndicator);
+            _keyboardFocusManager.SetFocusIndicatorActor(_keyboardFocusIndicator);
+
+            _keyboardFocusManager.SetAsFocusGroup(_menuContainer, true);
+            _keyboardFocusManager.SetAsFocusGroup(_postersContainer[0], true);
+            _keyboardFocusManager.SetAsFocusGroup(_postersContainer[1], true);
+            _keyboardFocusManager.SetFocusGroupLoop(true);
 
             _focusEffect = new FocusEffect();
 
@@ -389,4 +444,5 @@ namespace FirstScreen
         }
     }
 }
+
 

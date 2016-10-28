@@ -1,7 +1,6 @@
 ﻿using Dali;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 
 namespace FirstScreen
 {
@@ -9,14 +8,14 @@ namespace FirstScreen
     {
         private float _frameThickness;
         private FocusData[] _focusData; // Each FocusData is used for one key frame animation (total 6 key frame animations needed for EddenEffect)
-        private Animation _animation;      // Animation used to apply all six key frame animations
+        private Animation _animation;   // Animation used to apply all six key frame animations
 
         public FocusEffect()
         {
             _frameThickness = 10.0f;
             float _bottomFrameTime = 0.6f; // complete the halo/bottom animation 60% of the way through
-            float _sideFrameTime = 0.8f; // Start the side frame  animation after the bottom animation and complete at 80% of the way through
-            float _topFrameTime = 1.0f; // start the top frame animation after the side frame animation and complete at 100% way through
+            float _sideFrameTime = 0.8f;   // Start the side frame  animation after the bottom animation and complete at 80% of the way through
+            float _topFrameTime = 1.0f;    // start the top frame animation after the side frame animation and complete at 100% way through
 
             // Six key frame animations (FocusData objects) needed for EddenEffect
             // Two key frame animations for top horizontal effect
@@ -25,27 +24,27 @@ namespace FirstScreen
             _focusData = new FocusData[6];
 
             FocusData focusData = new FocusData("halo", "halo.png", FocusData.Direction.Horizontal, NDalic.ParentOriginTopCenter,
-                                             new Vector3(50,20,0),  new Vector3(0.0f, 100.0f , 0.0f), 0.0f, _bottomFrameTime);
+                                                new Vector3(50,20,0),  new Vector3(0.0f, 100.0f , 0.0f), 0.0f, _bottomFrameTime);
             _focusData[0] = focusData;
 
             focusData = new FocusData("bottom", "horizontalFrame.png", FocusData.Direction.Horizontal, NDalic.ParentOriginTopCenter,
-                                    new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(0.0f, _frameThickness, 0.0f), 0.0f, _bottomFrameTime);
+                                      new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(0.0f, _frameThickness, 0.0f), 0.0f, _bottomFrameTime);
             _focusData[1] = focusData;
 
             focusData = new FocusData("left", "verticalFrame.png", FocusData.Direction.Vertical, NDalic.ParentOriginBottomLeft,
-                                    new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(_frameThickness, 0.0f, 0.0f), _bottomFrameTime, _sideFrameTime);
+                                      new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(_frameThickness, 0.0f, 0.0f), _bottomFrameTime, _sideFrameTime);
             _focusData[2] = focusData;
 
             focusData = new FocusData("right", "verticalFrame.png", FocusData.Direction.Vertical, NDalic.ParentOriginBottomRight,
-                                    new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(_frameThickness, 0.0f, 0.0f), _bottomFrameTime, _sideFrameTime);
+                                      new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(_frameThickness, 0.0f, 0.0f), _bottomFrameTime, _sideFrameTime);
             _focusData[3] = focusData;
 
             focusData = new FocusData("top-left", "horizontalFrame.png", FocusData.Direction.Horizontal, NDalic.ParentOriginBottomLeft,
-                                    new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(0.0f ,_frameThickness, 0.0f), _sideFrameTime, _topFrameTime);
+                                      new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(0.0f ,_frameThickness, 0.0f), _sideFrameTime, _topFrameTime);
             _focusData[4] = focusData;
 
             focusData = new FocusData("top-right", "horizontalFrame.png", FocusData.Direction.Horizontal, NDalic.ParentOriginBottomRight,
-                                    new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(0.0f, _frameThickness, 0.0f), _sideFrameTime, _topFrameTime);
+                                      new Vector3(0.0f, 0.0f, 0.0f),  new Vector3(0.0f, _frameThickness, 0.0f), _sideFrameTime, _topFrameTime);
             _focusData[5] = focusData;
         }
 
@@ -200,4 +199,3 @@ namespace FirstScreen
         }
     }
 }
-
