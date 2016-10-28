@@ -21,7 +21,6 @@
 #include <sstream>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/public-api/images/buffer-image.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
@@ -35,9 +34,6 @@ namespace
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
 const unsigned int TOTAL_PAGE_NUMBER = 20;
 const Vector2 PAGE_SIZE( 300.f,400.f );
-const unsigned int IMAGE_WIDTH = 30;
-const unsigned int IMAGE_HEIGHT = 30;
-const Vector2 IMAGE_SIZE( static_cast<float>( IMAGE_WIDTH ), static_cast<float>(IMAGE_HEIGHT) );
 const Vector2 SPINE_SHADOW_PARAMETER( 60.0f, 30.0f );
 
 static bool gObjectCreatedCallBackCalled;
@@ -189,8 +185,9 @@ class TestPageFactory : public PageFactory
 {
 public:
 
-  TestPageFactory(ToolkitTestApplication& application)
-  : mApplication( application )
+  TestPageFactory(ToolkitTestApplication& application, bool returnValidTexture = true )
+  : mApplication( application ),
+    mValidTexture( returnValidTexture )
   {
     mTotalPageNumber = TOTAL_PAGE_NUMBER;
   }
@@ -205,18 +202,23 @@ public:
   }
 
   /**
-   * Create an image to represent a page content.
+   * Create an texture to represent a page content.
    * @param[in] pageId The ID of the page to create.
    * @return An image, or an empty handle if the ID is out of range.
    */
-  virtual Image NewPage( unsigned int pageId )
+  virtual Texture NewPage( unsigned int pageId )
   {
-    return BufferImage::WHITE();
+    if( mValidTexture )
+    {
+      return Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGB888, 100, 100 );
+    }
+    return Texture(); // empty handle
   }
 
 private:
   ToolkitTestApplication& mApplication;
   unsigned int            mTotalPageNumber;
+  bool                    mValidTexture;
 };
 
 }// namespace
@@ -689,3 +691,34 @@ int UtcDaliPageImageFactoryGetExtention(void)
   DALI_TEST_CHECK( factory.GetExtension() == NULL );
   END_TEST;
 }
+
+int UtcDaliPageTurnEmptyTextureHandle(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliPageTurnEmptyTextureHandle ");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
+
+  TestPageFactory factory(application, false); // returns empty handles
+  Vector2 size = Stage::GetCurrent().GetSize();
+  try
+  {
+    PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
+    portraitView.SetParentOrigin( ParentOrigin::CENTER );
+    Stage::GetCurrent().Add( portraitView );
+
+    tet_result(TET_FAIL);
+  }
+  catch (DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "must pass in valid texture", TEST_LOCATION );
+  }
+  catch (...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
