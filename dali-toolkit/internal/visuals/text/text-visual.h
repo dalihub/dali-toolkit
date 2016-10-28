@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/weak-handle.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
@@ -124,9 +125,9 @@ protected:
   // from Visual::Base
 
   /**
-   * @copydoc Visual::Base::DoInitialize()
+   * @copydoc Visual::Base::DoSetProperties()
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
+  virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
    * @copydoc Visual::Base::DoSetOnStage()
@@ -168,7 +169,7 @@ private:
 
 private:
   Text::ControllerPtr          mController;               ///< The text's controller.
-  Actor                        mSelf;
+  WeakHandle<Actor>            mSelf;
 
   Text::RendererPtr            mRenderer;
   Text::TextScrollerPtr        mTextScroller;

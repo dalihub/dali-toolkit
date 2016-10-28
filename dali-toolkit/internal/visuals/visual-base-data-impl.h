@@ -60,13 +60,12 @@ struct Base::Impl
     void CreatePropertyMap( Property::Map& map ) const;
   };
 
-  Renderer mRenderer;
-
+  Renderer      mRenderer;
   CustomShader* mCustomShader;
-
-  Vector2   mSize;
-  float     mDepthIndex;
-  int       mFlags;
+  std::string   mName;
+  Vector2       mSize;
+  float         mDepthIndex;
+  int           mFlags;
 
   Impl();
   ~Impl();

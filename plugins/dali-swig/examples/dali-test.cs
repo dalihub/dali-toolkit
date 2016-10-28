@@ -39,29 +39,32 @@ namespace MyCSharpExample
 
     public void Initialize(object source, AUIApplicationInitEventArgs e)
     {
+
+      OperatorTests();
+
       Handle handle = new Handle();
       int myPropertyIndex = handle.RegisterProperty("myProperty", new Property.Value(10.0f), Property.AccessMode.READ_WRITE);
       float myProperty = 0.0f;
       handle.GetProperty(myPropertyIndex).Get(ref myProperty);
       Console.WriteLine( "myProperty value: " + myProperty );
 
-      int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Vector2(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
-      Vector2 myProperty2 = new Vector2(0.0f, 0.0f);
+      int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Size(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
+      Size myProperty2 = new Size(0.0f, 0.0f);
       handle.GetProperty(myPropertyIndex2).Get(myProperty2);
       Console.WriteLine( "myProperty2 value: " + myProperty2.x + ", " + myProperty2.y );
 
       Actor actor = new Actor();
-      actor.Size = new Vector3(200.0f, 200.0f, 0.0f);
+      actor.Size = new Position(200.0f, 200.0f, 0.0f);
       actor.Name = "MyActor";
-      actor.Color = new Vector4(1.0f, 0.0f, 1.0f, 0.8f);
+      actor.Color = new Color(1.0f, 0.0f, 1.0f, 0.8f);
       Console.WriteLine("Actor id: {0}", actor.GetId());
       Console.WriteLine("Actor size: " + actor.Size.x + ", " + actor.Size.y);
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor =  NDalic.WHITE ;
+      stage.BackgroundColor =  new Color("white") ;
 
-      Vector2 stageSize = stage.Size;
+      Size stageSize = stage.Size;
       Console.WriteLine("Stage size: " + stageSize.x + ", " + stageSize.y);
       stage.Add(actor);
 
@@ -125,42 +128,217 @@ namespace MyCSharpExample
       Console.WriteLine( "    Area  = " + rd2.Area() );
 
       Console.WriteLine( " *************************" );
-      Vector2 vector2 = new Vector2(100, 50);
-      Console.WriteLine( "    Created " + vector2 );
-      Console.WriteLine( "    Vector2 x =  " + vector2.x + ", y = " + vector2.y );
-      vector2 += new Vector2(20, 20);
-      Console.WriteLine( "    Vector2 x =  " + vector2[0] + ", y = " + vector2[1] );
-      vector2.x += 10;
-      vector2.y += 10;
-      Console.WriteLine( "    Vector2 width =  " + vector2.width + ", height = " + vector2.height );
-      vector2 += new Vector2(15, 15);
-      Console.WriteLine( "    Vector2 width =  " + vector2[0] + ", height = " + vector2[1] );
+      Size Size = new Size(100, 50);
+      Console.WriteLine( "    Created " + Size );
+      Console.WriteLine( "    Size x =  " + Size.x + ", y = " + Size.y );
+      Size += new Size(20, 20);
+      Console.WriteLine( "    Size x =  " + Size[0] + ", y = " + Size[1] );
+      Size.x += 10;
+      Size.y += 10;
+      Console.WriteLine( "    Size width =  " + Size.width + ", height = " + Size.height );
+      Size += new Size(15, 15);
+      Console.WriteLine( "    Size width =  " + Size[0] + ", height = " + Size[1] );
 
       Console.WriteLine( " *************************" );
-      Vector3 vector3 = new Vector3(20, 100, 50);
-      Console.WriteLine( "    Created " + vector3 );
-      Console.WriteLine( "    Vector3 x =  " + vector3.x + ", y = " + vector3.y + ", z = " + vector3.z );
-      vector3 += new Vector3(20, 20, 20);
-      Console.WriteLine( "    Vector3 x =  " + vector3[0] + ", y = " + vector3[1] + ", z = " + vector3[2] );
-      vector3.x += 10;
-      vector3.y += 10;
-      vector3.z += 10;
-      Console.WriteLine( "    Vector3 width =  " + vector3.width + ", height = " + vector3.height + ", depth = " + vector3.depth );
-      Vector3 parentOrigin = NDalic.ParentOriginBottomRight;
+      Position Position = new Position(20, 100, 50);
+      Console.WriteLine( "    Created " + Position );
+      Console.WriteLine( "    Position x =  " + Position.x + ", y = " + Position.y + ", z = " + Position.z );
+      Position += new Position(20, 20, 20);
+      Console.WriteLine( "    Position x =  " + Position[0] + ", y = " + Position[1] + ", z = " + Position[2] );
+      Position.x += 10;
+      Position.y += 10;
+      Position.z += 10;
+      Console.WriteLine( "    Position width =  " + Position.width + ", height = " + Position.height + ", depth = " + Position.depth );
+      Position parentOrigin = new Dali.Position(NDalic.ParentOriginBottomRight);
       Console.WriteLine( "    parentOrigin x =  " + parentOrigin.x + ", y = " + parentOrigin.y + ", z = " + parentOrigin.z );
 
       Console.WriteLine( " *************************" );
-      Vector4 vector4 = new Vector4(20, 100, 50, 200);
-      Console.WriteLine( "    Created " + vector4 );
-      Console.WriteLine( "    Vector4 x =  " + vector4.x + ", y = " + vector4.y + ", z = " + vector4.z + ", w = " + vector4.w );
-      vector4 += new Vector4(20, 20, 20, 20);
-      Console.WriteLine( "    Vector4 x =  " + vector4[0] + ", y = " + vector4[1] + ", z = " + vector4[2] + ", w = " + vector4[3] );
-      vector4.x += 10;
-      vector4.y += 10;
-      vector4.z += 10;
-      vector4.w += 10;
-      Console.WriteLine( "    Vector4 r =  " + vector4.r + ", g = " + vector4.g + ", b = " + vector4.b + ", a = " + vector4.a );
+      Color Color = new Color(20, 100, 50, 200);
+      Console.WriteLine( "    Created " + Color );
+      Console.WriteLine( "    Color x =  " + Color.x + ", y = " + Color.y + ", z = " + Color.z + ", w = " + Color.w );
+      Color += new Color(20, 20, 20, 20);
+      Console.WriteLine( "    Color x =  " + Color[0] + ", y = " + Color[1] + ", z = " + Color[2] + ", w = " + Color[3] );
+      Color.x += 10;
+      Color.y += 10;
+      Color.z += 10;
+      Color.w += 10;
+      Console.WriteLine( "    Color r =  " + Color.r + ", g = " + Color.g + ", b = " + Color.b + ", a = " + Color.a );
     }
+
+
+  public void OperatorTests()
+  {
+    Actor actor = new Actor();
+    Actor differentActor = new Actor();
+    Actor actorSame = actor;
+    Actor nullActor = null;
+
+      // test the true operator
+    if ( actor )
+    {
+      Console.WriteLine ("BaseHandle Operator true (actor) : test passed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator true (actor): test failed ");
+    }
+
+    Actor parent = actor.GetParent ();
+
+    if ( parent )
+    {
+      Console.WriteLine ("Handle with Empty body  :failed ");
+    }
+    else
+    {
+      Console.WriteLine ("Valid with Empty body  :passed ");
+    }
+
+    actor.Add( differentActor );
+    // here we test two different C# objects, which on the native side have the same body/ ref-object
+    if ( actor == differentActor.GetParent() )
+    {
+       Console.WriteLine ("actor == differentActor.GetParent() :passed ");
+    }
+    else
+    {
+      Console.WriteLine ("actor == differentActor.GetParent() :failed ");
+    }
+
+    if ( differentActor == differentActor.GetParent() )
+    {
+       Console.WriteLine ("differentActor == differentActor.GetParent() :failed ");
+    }
+    else
+    {
+      Console.WriteLine ("differentActor == differentActor.GetParent() :passed ");
+    }
+
+
+    if ( nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator true (nullActor) : test failed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator true (nullActor): test passed ");
+    }
+
+    // ! operator
+    if ( !actor )
+    {
+      Console.WriteLine ("BaseHandle Operator !(actor) : test failed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator !(actor): test passed ");
+    }
+
+    if ( !nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator !(nullActor) : test passed ");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator !(nullActor): test failed ");
+    }
+
+    // Note: operator false only used inside & operator
+    // test equality operator ==
+    if ( actor == actorSame )
+    {
+      Console.WriteLine ("BaseHandle Operator  (actor == actorSame) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator  (actor == actorSame) : test failed");
+    }
+
+    if ( actor == differentActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == differentActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == differentActor) : test passed");
+    }
+
+    if ( actor == nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor == nullActor) : test passed");
+    }
+
+    if ( nullActor == nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor == nullActor) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor == nullActor) : test failed");
+    }
+
+    // test || operator
+    if ( actor || actorSame )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || actorSame) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || actorSame) : test failed");
+    }
+
+    if ( actor || nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || nullActor) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor || nullActor) : test failed");
+    }
+
+    if ( nullActor || nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor || nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor || nullActor) : test passed");
+    }
+
+
+    // test && operator
+    if ( actor && actorSame )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && actorSame) : test passed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && actorSame) : test failed");
+    }
+
+    if ( actor && nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (actor && nullActor) : test passed");
+    }
+
+    if ( nullActor && nullActor )
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor && nullActor) : test failed");
+    }
+    else
+    {
+      Console.WriteLine ("BaseHandle Operator (nullActor && nullActor) : test passed");
+    }
+
+  }
 
     public void MainLoop()
     {

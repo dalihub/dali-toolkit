@@ -66,6 +66,11 @@ protected:
   virtual ~WireframeVisual();
 
   /**
+   * @copydoc Visual::Base::DoSetProperties()
+   */
+  virtual void DoSetProperties( const Property::Map& propertyMap );
+
+  /**
    * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );

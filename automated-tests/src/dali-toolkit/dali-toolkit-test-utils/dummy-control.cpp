@@ -70,7 +70,6 @@ DummyControlImpl::DummyControlImpl()
 {
 }
 
-
 DummyControlImpl::~DummyControlImpl()
 {
 }
@@ -108,6 +107,11 @@ bool DummyControlImpl::IsVisualEnabled( Property::Index index )
 Actor DummyControlImpl::GetPlacementActor( Property::Index index )
 {
   return Control::GetPlacementActor( index );
+}
+
+Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )
+{
+  return Control::CreateTransition( transition );
 }
 
 DummyControl DummyControlImplOverride::New()

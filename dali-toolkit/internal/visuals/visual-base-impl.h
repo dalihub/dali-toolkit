@@ -66,14 +66,20 @@ class Base : public BaseObject
 public:
 
   /**
-   *  Initialisation of the visual, this API should only called by the VisualFactory:
-   *  request the geometry and shader from the cache, if not available, create and save to the cache for sharing;
-   *  record the property values.
-   *
-   * @param[in] actor The Actor the visual is applied to if, empty if the visual has not been applied to any Actor
+   * Setting the properties of the visual, this API should only called by the VisualFactory
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  void Initialize( Actor& actor, const Property::Map& propertyMap );
+  void SetProperties( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::SetName
+   */
+  void SetName( const std::string& name );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::GetName
+   */
+  const std::string& GetName();
 
   /**
    * @copydoc Toolkit::Visual::Base::SetSize
@@ -174,12 +180,11 @@ protected:
   virtual void DoCreatePropertyMap( Property::Map& map ) const = 0;
 
   /**
-   * @brief Called by Initialize() allowing sub classes to respond to the Initialize event
+   * @brief Called by SetProperties() allowing sub classes to set their properties
    *
-   * @param[in] actor The Actor the visual is applied to if, empty if the visual has not been applied to any Actor
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) {}
+  virtual void DoSetProperties( const Property::Map& propertyMap ) = 0;
 
 protected:
 

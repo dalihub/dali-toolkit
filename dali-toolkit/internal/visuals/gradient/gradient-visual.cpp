@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -201,7 +202,7 @@ GradientVisual::~GradientVisual()
 {
 }
 
-void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void GradientVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
 
@@ -243,7 +244,7 @@ void GradientVisual::DoSetOnStage( Actor& actor )
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::GRADIENT );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::GRADIENT );
   map.Insert( Toolkit::GradientVisual::Property::UNITS, mGradient->GetGradientUnits() );
   map.Insert( Toolkit::GradientVisual::Property::SPREAD_METHOD, mGradient->GetSpreadMethod() );
 

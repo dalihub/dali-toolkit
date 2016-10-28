@@ -129,9 +129,9 @@ protected:
   virtual ~GradientVisual();
 
   /**
-   * @copydoc Visual::Base::DoInitialize
+   * @copydoc Visual::Base::DoSetProperties
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
+  virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
    * @copydoc Visual::Base::DoSetOnStage

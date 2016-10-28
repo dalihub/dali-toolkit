@@ -28,7 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
@@ -105,7 +105,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
   Visual::BasePtr visualPtr;
 
-  Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
+  Property::Value* typeValue = propertyMap.Find( Toolkit::VisualProperty::TYPE, VISUAL_TYPE );
   Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
   if( typeValue )
   {
@@ -199,8 +199,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
   if( visualPtr )
   {
-    Actor actor;
-    visualPtr->Initialize( actor, propertyMap );
+    visualPtr->SetProperties( propertyMap );
   }
   else
   {

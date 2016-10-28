@@ -583,4 +583,3 @@ bool Replacement::IsArray( OptionalChild child, Property::Value& out ) const
 } // namespace Toolkit
 
 } // namespace Dali
-

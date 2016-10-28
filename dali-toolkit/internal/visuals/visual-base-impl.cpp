@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -55,13 +55,13 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
   }
   else
   {
-   mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
+    mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
   }
 }
 
-void Visual::Base::Initialize( Actor& actor, const Property::Map& propertyMap )
+void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
+  Property::Value* customShaderValue = propertyMap.Find( VisualProperty::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
     Property::Map shaderMap;
@@ -71,7 +71,17 @@ void Visual::Base::Initialize( Actor& actor, const Property::Map& propertyMap )
     }
   }
 
-  DoInitialize( actor, propertyMap );
+  DoSetProperties( propertyMap );
+}
+
+void Visual::Base::SetName( const std::string& name )
+{
+  mImpl->mName = name;
+}
+
+const std::string& Visual::Base::GetName()
+{
+  return mImpl->mName;
 }
 
 void Visual::Base::SetSize( const Vector2& size )

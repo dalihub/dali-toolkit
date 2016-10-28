@@ -28,6 +28,7 @@
 #include <fstream>
 
 //INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 namespace Dali
@@ -308,7 +309,7 @@ MeshVisual::~MeshVisual()
 {
 }
 
-void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void MeshVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* objectUrl = propertyMap.Find( Toolkit::MeshVisual::Property::OBJECT_URL, OBJECT_URL_NAME );
   if( !objectUrl || !objectUrl->Get( mObjectUrl ) )
@@ -384,7 +385,7 @@ void MeshVisual::DoSetOnStage( Actor& actor )
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::MESH );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::MESH );
   map.Insert( Toolkit::MeshVisual::Property::OBJECT_URL, mObjectUrl );
   map.Insert( Toolkit::MeshVisual::Property::MATERIAL_URL, mMaterialUrl );
   map.Insert( Toolkit::MeshVisual::Property::TEXTURES_PATH, mTexturesPath );

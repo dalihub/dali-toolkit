@@ -23,15 +23,6 @@ namespace MyCSharpExample
 {
     class Example
     {
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void CallbackDelegate(IntPtr data);
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void TouchCallbackDelegate(IntPtr data);
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        delegate void AnimationCallbackDelegate(IntPtr data);
-
         private Dali.Application _application;
 
         private Animation _animation;
@@ -47,7 +38,7 @@ namespace MyCSharpExample
         {
             Console.WriteLine("Customized Application Initialize event handler");
             Stage stage = Stage.GetCurrent();
-            stage.BackgroundColor = NDalic.WHITE;
+            stage.BackgroundColor = new Color("white");
 
 	    stage.Touched += OnStageTouched;
 
@@ -66,6 +57,7 @@ namespace MyCSharpExample
         {
             Console.WriteLine("Customized Animation Finished Event handler");
             Console.WriteLine("Animation finished: duration = " + e.Animation.Duration);
+            Console.WriteLine("End Action = " + e.Animation.GetEndAction());
         }
 
         // Callback for stage touched signal handling
@@ -85,14 +77,17 @@ namespace MyCSharpExample
 
                 _animation = new Animation(1.0f); // 1 second of duration
 
-                _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, 0.5f));
-                _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
+		_animation.AnimateTo(_text, Animation.Orientation, new Quaternion( new Radian( new Degree( 180.0f ) ), Vector3.XAXIS ), new AlphaFunction(Dali.Constants.AlphaFunction.BuiltinFunction.Linear), new TimePeriod(0.0f, 0.5f));
+
+		_animation.AnimateTo(_text, Animation.Orientation, new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS ), new AlphaFunction(Dali.Constants.AlphaFunction.BuiltinFunction.Linear), new TimePeriod(0.5f, 0.5f));
 
                 // Connect the signal callback for animaiton finished signal
                 _animation.Finished += AnimationFinished;
 
                 // Play the _animation
                 _animation.Play();
+
+                Console.WriteLine("Looping:" + _animation.Looping);
             }
         }
 

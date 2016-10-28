@@ -23,6 +23,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -80,7 +81,7 @@ ColorVisual::~ColorVisual()
 {
 }
 
-void ColorVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME );
   if( !( color && color->Get(mMixColor) ) )
@@ -106,7 +107,7 @@ void ColorVisual::DoSetOnStage( Actor& actor )
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mMixColor );
 }
 

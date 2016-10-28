@@ -32,22 +32,25 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
+
 /**
  * @addtogroup dali_toolkit_controls
  * @{
  */
 
 class StyleManager;
+class TransitionData;
 
 namespace Visual
 {
 class Base;
 }
+
 namespace Internal
 {
+
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -308,73 +311,84 @@ protected: // For derived classes to call
    * @note Derived class should not call visual.SetOnStage(placementActor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
    *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
    */
-   void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual );
+  void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual );
 
-   /**
-    * @brief Register a visual by Property Index, linking an Actor to visual when required.
-    * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
-    * If enabled is false then the visual is not set on stage until enabled by the derived class.
-    * @see EnableVisual
-    *
-    * @SINCE_1_2.11
-    *
-    * @param[in] index The Property index of the visual, used to reference visual
-    * @param[in] placementActor The actor used to by the visual.
-    * @param[in] visual The visual to register
-    * @param[in] enabled false if derived class wants to control when visual is set on stage.
-    *
-    */
-   void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual, bool enabled );
+  /**
+   * @brief Register a visual by Property Index, linking an Actor to visual when required.
+   * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+   * If enabled is false then the visual is not set on stage until enabled by the derived class.
+   * @see EnableVisual
+   *
+   * @SINCE_1_2.11
+   *
+   * @param[in] index The Property index of the visual, used to reference visual
+   * @param[in] placementActor The actor used to by the visual.
+   * @param[in] visual The visual to register
+   * @param[in] enabled false if derived class wants to control when visual is set on stage.
+   *
+   */
+  void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual, bool enabled );
 
-   /**
-    * @brief Erase the entry matching the given index from the list of registered visuals
-    * @param[in] index The Property index of the visual, used to reference visual
-    *
-    * @SINCE_1_2.0
-    */
-   void UnregisterVisual( Property::Index index );
+  /**
+   * @brief Erase the entry matching the given index from the list of registered visuals
+   * @param[in] index The Property index of the visual, used to reference visual
+   *
+   * @SINCE_1_2.0
+   */
+  void UnregisterVisual( Property::Index index );
 
-   /**
-    * @brief Retrieve the visual associated with the given property index.
-    *
-    * @SINCE_1_2.2
-    *
-    * @param[in] index The Property index of the visual.
-    * @return The registered visual if exist, otherwise empty handle.
-    * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
-    */
-   Toolkit::Visual::Base GetVisual( Property::Index index ) const;
+  /**
+   * @brief Retrieve the visual associated with the given property index.
+   *
+   * @SINCE_1_2.2
+   *
+   * @param[in] index The Property index of the visual.
+   * @return The registered visual if exist, otherwise empty handle.
+   * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
+   */
+  Toolkit::Visual::Base GetVisual( Property::Index index ) const;
 
-   /**
-    * @brief Sets the given visual to be displayed or not when parent staged.
-    *
-    * @SINCE_1_2.11
-    *
-    * @param[in] index The Property index of the visual
-    * @param[in] enable flag to set enabled or disabled.
-    */
-   void EnableVisual( Property::Index index, bool enable );
+  /**
+   * @brief Sets the given visual to be displayed or not when parent staged.
+   *
+   * @SINCE_1_2.11
+   *
+   * @param[in] index The Property index of the visual
+   * @param[in] enable flag to set enabled or disabled.
+   */
+  void EnableVisual( Property::Index index, bool enable );
 
-   /**
-    * @brief Queries if the given visual is to be displayed when parent staged.
-    *
-    * @SINCE_1_2.11
-    *
-    * @param[in] index The Property index of the visual
-    * @return bool whether visual is enabled or not
-    */
-   bool IsVisualEnabled( Property::Index index ) const;
+  /**
+   * @brief Queries if the given visual is to be displayed when parent staged.
+   *
+   * @SINCE_1_2.11
+   *
+   * @param[in] index The Property index of the visual
+   * @return bool whether visual is enabled or not
+   */
+  bool IsVisualEnabled( Property::Index index ) const;
 
-   /**
-    * @brief Retrieve the placement actor associated with the given index.
-    *
-    * @SINCE_1_2.2
-    *
-    * @@param[in] index The Property index of the visual.
-    * @return Then placement actor if exist, otherwise empty handle.
-    * @note For managing object life-cycle, do not store the returned placement actor as a member which increments its reference count.
-    */
-   Actor GetPlacementActor( Property::Index index ) const;
+  /**
+   * @brief Retrieve the placement actor associated with the given index.
+   *
+   * @SINCE_1_2.2
+   *
+   * @@param[in] index The Property index of the visual.
+   * @return Then placement actor if exist, otherwise empty handle.
+   * @note For managing object life-cycle, do not store the returned placement actor as a member which increments its reference count.
+   */
+  Actor GetPlacementActor( Property::Index index ) const;
+
+  /**
+   * @brief Create a transition effect on the control.
+   *
+   * @SINCE_1_2.12
+   *
+   * @param[in] transitionData The transition data describing the effect to create
+   * @return A handle to an animation defined with the given effect, or an empty
+   * handle if no properties match.
+   */
+  Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
 
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal

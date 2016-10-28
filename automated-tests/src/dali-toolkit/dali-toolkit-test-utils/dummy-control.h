@@ -79,6 +79,7 @@ public:
 
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Actor GetPlacementActor( Property::Index index );
+  Animation CreateTransition( const Toolkit::TransitionData& transition );
 
   // Used to test signal connections
   void CustomSlot1( Actor actor );
