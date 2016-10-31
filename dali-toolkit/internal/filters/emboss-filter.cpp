@@ -127,22 +127,11 @@ void EmbossFilter::Enable()
 
   mRootActor.Add( mActorForComposite );
 
-  Image dummyImage; // Dummy image, force creation of an image visual
-
-  InitializeVisual( mActorForComposite, mVisualForEmboss1, dummyImage );
+  InitializeVisual( mActorForComposite, mVisualForEmboss1, mImageForEmboss1 );
   Toolkit::GetImplementation( mVisualForEmboss1 ).SetCustomShader( customShader );
-
-  InitializeVisual( mActorForComposite, mVisualForEmboss2, dummyImage );
-  Toolkit::GetImplementation( mVisualForEmboss2 ).SetCustomShader( customShader );
-
-  TextureSet textureSet1 = TextureSet::New();
-  TextureSetImage( textureSet1, 0, mImageForEmboss1 );
-  mActorForComposite.GetRendererAt(0).SetTextures( textureSet1 );
   mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
-
-  TextureSet textureSet2 = TextureSet::New();
-  TextureSetImage( textureSet2, 0, mImageForEmboss2 );
-  mActorForComposite.GetRendererAt(1).SetTextures( textureSet2 );
+  InitializeVisual( mActorForComposite, mVisualForEmboss2, mImageForEmboss2 );
+  Toolkit::GetImplementation( mVisualForEmboss2 ).SetCustomShader( customShader );
   mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
 
   SetupCamera();
