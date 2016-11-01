@@ -80,7 +80,7 @@ public:  // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+  virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
@@ -134,11 +134,6 @@ protected:
 private:
 
   /**
-   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
-   */
-  void InitializeRenderer();
-
-  /**
    * @brief Creates a geometry for this renderer's grid size
    *
    * @return Returns the created geometry for this renderer's grid size
@@ -153,12 +148,24 @@ private:
   Shader CreateShader();
 
   /**
+   * @brief Applies texture and related uniforms
+   */
+  void ApplyTextureAndUniforms();
+
+  /**
+   * Helper method to get the default Nine patch geometry from cache or create and store it there
+   * @param subType to use
+   * @return the geometry
+   */
+  Geometry GetNinePatchGeometry( VisualFactoryCache::GeometryType subType );
+
+  /**
    * @brief Creates a geometry for the grid size to be used by this visuals' shaders
    *
    * @param[in] gridSize The grid size of the solid geometry to create
    * @return Returns the created geometry for the grid size
    */
-  Geometry CreateGeometry( Uint16Pair gridSize );
+  Geometry CreateGridGeometry( Uint16Pair gridSize );
 
   /**
    * @brief Creates a geometry with the border only for the grid size to be used by this visuals' shaders
@@ -181,45 +188,15 @@ private:
    * @param[in] gridSize The grid size of the solid geometry to create
    * @return Returns the created geometry for the grid size
    */
-  Geometry CreateGeometryBorder( Uint16Pair gridSize );
-
-  /**
-   * @brief Creates Image from the image url and parses the image for the stretch borders. Will create a error image if the n patch image is invalid
-   *
-   * @param[in] nPatchImage The NinePatchImage to base our cropped images and stretch borders from
-   */
-  void InitializeFromImage( NinePatchImage nPatchImage );
-
-  /**
-   * @brief Creates an error Image to indicate that there was an error in either the image url or the parsing of the image
-   *
-   */
-  void InitializeFromBrokenImage();
-
-  /**
-   * @brief Applies this renderer's image to the sampler to the texture set used for this renderer
-   */
-  void ApplyImageToSampler();
-
-  /**
-   * @brief Changes the current renderer if the n-patch meta data has changed
-   *
-   * @param[in] oldBorderOnly The old flag indicating if the image should omit the centre of the n-patch and only render the border
-   * @param[in] oldGridX The old horizontal grid size of the solid geometry
-   * @param[in] oldGridY The old vertical grid size of the solid geometry
-   */
-  void ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY );
+  Geometry CreateBorderGeometry( Uint16Pair gridSize );
 
 private:
 
-  NinePatchImage mImage; ///< The image to render if the visual was set from an NinePatchImage, empty otherwise
-  Image mCroppedImage;
+  NPatchLoader& mLoader;      ///< reference to N patch loader for fast access
+  std::string mImageUrl;      ///< The url to the N patch to load
+  std::size_t mId;            ///< id of the N patch (from loader/cache)
+  bool mBorderOnly;           ///< if only border is desired
 
-  std::string mImageUrl; ///< The url to the image resource to render if the visual was set from an image resource url, empty otherwise
-  NinePatchImage::StretchRanges mStretchPixelsX;
-  NinePatchImage::StretchRanges mStretchPixelsY;
-  ImageDimensions mImageSize;
-  bool mBorderOnly;
 };
 
 } // namespace Internal

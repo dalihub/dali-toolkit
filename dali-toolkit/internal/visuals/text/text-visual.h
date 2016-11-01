@@ -101,7 +101,7 @@ public: // from Visual::Base
   /**
    * @copydoc Visual::Base::GetNaturalSize()
    */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+  virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap()

@@ -191,7 +191,7 @@ float TextVisual::GetHeightForWidth( float width ) const
   return mController->GetHeightForWidth( width );
 }
 
-void TextVisual::GetNaturalSize( Vector2& naturalSize ) const
+void TextVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize = mController->GetNaturalSize().GetVectorXY();
 }

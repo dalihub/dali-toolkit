@@ -967,6 +967,15 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
+
+  ResourceImage image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
+  Visual::Base nPatchVisual = factory.CreateVisual( image );
+  Vector2 visualSize( 20.f, 30.f ), naturalSize(0,0);
+  nPatchVisual.SetSize( visualSize );
+  DALI_TEST_EQUALS( nPatchVisual.GetSize(), visualSize, TEST_LOCATION );
+  nPatchVisual.GetNaturalSize( naturalSize );
+  DALI_TEST_EQUALS( naturalSize, Vector2( ninePatchImageWidth-2, ninePatchImageHeight-2 ), TEST_LOCATION );
+
   END_TEST;
 }
 

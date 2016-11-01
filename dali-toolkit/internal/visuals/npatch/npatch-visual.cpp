@@ -27,6 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -230,30 +231,100 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
   NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
   nPatchVisual->mImageUrl = imageUrl;
 
-  NinePatchImage image = NinePatchImage::New( imageUrl );
-  nPatchVisual->InitializeFromImage( image );
-
   return nPatchVisual;
 }
 
 NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
 {
   NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
-  nPatchVisual->mImage = image;
-
-  nPatchVisual->InitializeFromImage( image );
+  nPatchVisual->mImageUrl = image.GetUrl();
 
   return nPatchVisual;
 }
 
+void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
+{
+  naturalSize.x = 0u;
+  naturalSize.y = 0u;
+  // load now if not already loaded
+  if( NPatchLoader::UNINITIALIZED_ID == mId )
+  {
+    mId = mLoader.Load( mImageUrl );
+  }
+  const NPatchLoader::Data* data;
+  if( mLoader.GetNPatchData( mId, data ) )
+  {
+    naturalSize.x = data->croppedWidth;
+    naturalSize.y = data->croppedHeight;
+  }
+}
+
+void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
+{
+  // URL is already passed in via constructor
+
+  Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
+  if( borderOnlyValue )
+  {
+    borderOnlyValue->Get( mBorderOnly );
+  }
+}
+
+void NPatchVisual::DoSetOnStage( Actor& actor )
+{
+  // load when first go on stage
+  if( NPatchLoader::UNINITIALIZED_ID == mId )
+  {
+    mId = mLoader.Load( mImageUrl );
+  }
+
+  Geometry geometry = CreateGeometry();
+  Shader shader = CreateShader();
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+
+  ApplyTextureAndUniforms();
+
+  actor.AddRenderer( mImpl->mRenderer );
+}
+
+void NPatchVisual::DoSetOffStage( Actor& actor )
+{
+  actor.RemoveRenderer( mImpl->mRenderer );
+  mImpl->mRenderer.Reset();
+}
+
+void NPatchVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
+void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+  map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
+}
+
+void NPatchVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value NPatchVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
 NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
-  mImage(),
-  mCroppedImage(),
+  mLoader( factoryCache.GetNPatchLoader() ),
   mImageUrl(),
-  mStretchPixelsX(),
-  mStretchPixelsY(),
-  mImageSize(),
+  mId( NPatchLoader::UNINITIALIZED_ID ),
   mBorderOnly( false )
 {
 }
@@ -262,88 +333,70 @@ NPatchVisual::~NPatchVisual()
 {
 }
 
-void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
-{
-  // URL is already passed in via constructor
-  //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
-  Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
-  if( borderOnlyValue )
-  {
-    borderOnlyValue->Get( mBorderOnly );
-  }
-}
-
-void NPatchVisual::GetNaturalSize( Vector2& naturalSize ) const
-{
-  if( mImage )
-  {
-    naturalSize.x = mImage.GetWidth();
-    naturalSize.y = mImage.GetHeight();
-  }
-  else if( !mImageUrl.empty() )
-  {
-    ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
-    naturalSize.x = dimentions.GetWidth();
-    naturalSize.y = dimentions.GetHeight();
-  }
-  else
-  {
-    naturalSize = Vector2::ZERO;
-  }
-}
-
 Geometry NPatchVisual::CreateGeometry()
 {
   Geometry geometry;
-  if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+  const NPatchLoader::Data* data;
+  if( mLoader.GetNPatchData( mId, data ) )
   {
-    if( !mBorderOnly )
+    if( data->stretchPixelsX.Size() == 1 && data->stretchPixelsY.Size() == 1 )
     {
-      geometry = mFactoryCache.GetGeometry( VisualFactoryCache::NINE_PATCH_GEOMETRY );
-      if( !geometry )
+      if( DALI_UNLIKELY( mBorderOnly ) )
       {
-        geometry = CreateGeometry( Uint16Pair( 3, 3 ) );
-        mFactoryCache.SaveGeometry( VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry );
+        geometry = GetNinePatchGeometry( VisualFactoryCache::NINE_PATCH_BORDER_GEOMETRY );
+      }
+      else
+      {
+        geometry = GetNinePatchGeometry( VisualFactoryCache::NINE_PATCH_GEOMETRY );
       }
     }
-    else
+    else if( data->stretchPixelsX.Size() > 0 || data->stretchPixelsY.Size() > 0)
     {
-      geometry = mFactoryCache.GetGeometry( VisualFactoryCache::NINE_PATCH_BORDER_GEOMETRY );
-      if( !geometry )
-      {
-        geometry = CreateGeometryBorder( Uint16Pair( 3, 3 ) );
-        mFactoryCache.SaveGeometry( VisualFactoryCache::NINE_PATCH_BORDER_GEOMETRY, geometry );
-      }
+      Uint16Pair gridSize( 2 * data->stretchPixelsX.Size() + 1,  2 * data->stretchPixelsY.Size() + 1 );
+      geometry = !mBorderOnly ? CreateGridGeometry( gridSize ) : CreateBorderGeometry( gridSize );
     }
   }
-  else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+  else
   {
-    Uint16Pair gridSize( 2 * mStretchPixelsX.Size() + 1,  2 * mStretchPixelsY.Size() + 1 );
-    geometry = !mBorderOnly ? CreateGeometry( gridSize ) : CreateGeometryBorder( gridSize );
+    // no N patch data so use default geometry
+    geometry = GetNinePatchGeometry( VisualFactoryCache::NINE_PATCH_GEOMETRY );
   }
-
   return geometry;
 }
 
 Shader NPatchVisual::CreateShader()
 {
   Shader shader;
-  if( !mImpl->mCustomShader )
+  const NPatchLoader::Data* data;
+  // 0 is either no data (load failed?) or no stretch regions on image
+  // for both cases we use the default shader
+  NinePatchImage::StretchRanges::SizeType xStretchCount = 0;
+  NinePatchImage::StretchRanges::SizeType yStretchCount = 0;
+
+  // ask loader for the regions
+  if( mLoader.GetNPatchData( mId, data ) )
   {
-    if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+    xStretchCount = data->stretchPixelsX.Count();
+    yStretchCount = data->stretchPixelsY.Count();
+  }
+
+  if( DALI_LIKELY( !mImpl->mCustomShader ) )
+  {
+    if( DALI_LIKELY( ( xStretchCount == 1 && yStretchCount == 1 ) ||
+                     ( xStretchCount == 0 && yStretchCount == 0 ) ) )
     {
       shader = mFactoryCache.GetShader( VisualFactoryCache::NINE_PATCH_SHADER );
-      if( !shader )
+      if( DALI_UNLIKELY( !shader ) )
       {
         shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
         mFactoryCache.SaveShader( VisualFactoryCache::NINE_PATCH_SHADER, shader );
       }
     }
-    else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+    else if( xStretchCount > 0 || yStretchCount > 0)
     {
       std::stringstream vertexShader;
-      vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
-                   << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
+      vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
+                   << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << VERTEX_SHADER;
 
       shader = Shader::New( vertexShader.str(), FRAGMENT_SHADER );
@@ -360,15 +413,16 @@ Shader NPatchVisual::CreateShader()
     }
     hints = mImpl->mCustomShader->mHints;
 
-    if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+    if( ( xStretchCount == 1 && yStretchCount == 1 ) ||
+        ( xStretchCount == 0 && yStretchCount == 0 ) )
     {
       shader = Shader::New( VERTEX_SHADER_3X3, fragmentShader, hints );
     }
-    else if( mStretchPixelsX.Size() > 0 || mStretchPixelsY.Size() > 0)
+    else if( xStretchCount > 0 || yStretchCount > 0)
     {
       std::stringstream vertexShader;
-      vertexShader << "#define FACTOR_SIZE_X " << mStretchPixelsX.Size() + 2 << "\n"
-                   << "#define FACTOR_SIZE_Y " << mStretchPixelsY.Size() + 2 << "\n"
+      vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
+                   << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << VERTEX_SHADER;
 
       shader = Shader::New( vertexShader.str(), fragmentShader, hints );
@@ -378,176 +432,25 @@ Shader NPatchVisual::CreateShader()
   return shader;
 }
 
-void NPatchVisual::InitializeRenderer()
+void NPatchVisual::ApplyTextureAndUniforms()
 {
-  Geometry geometry = CreateGeometry();
-  Shader shader = CreateShader();
-
-  if( !geometry || !shader )
+  const NPatchLoader::Data* data;
+  if( mLoader.GetNPatchData( mId, data ) )
   {
-    DALI_LOG_ERROR("The 9 patch image '%s' doesn't have any valid stretch borders and so is not a valid 9 patch image\n", mImageUrl.c_str() );
-    InitializeFromBrokenImage();
-  }
-
-  TextureSet textureSet = TextureSet::New();
-  mImpl->mRenderer = Renderer::New( geometry, shader );
-  mImpl->mRenderer.SetTextures( textureSet );
-
-  //Register transform properties
-  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-}
-
-
-void NPatchVisual::DoSetOnStage( Actor& actor )
-{
-  if( !mCroppedImage )
-  {
-    if( !mImageUrl.empty() )
-    {
-      NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitializeFromImage( nPatch );
-    }
-    else if( mImage )
-    {
-      InitializeFromImage( mImage );
-    }
-  }
-
-  //initialize the renderer after initializing from the image since we need to know the grid size from the image before creating the geometry
-  InitializeRenderer();
-
-  if( mCroppedImage )
-  {
-    ApplyImageToSampler();
-  }
-
-  actor.AddRenderer( mImpl->mRenderer );
-}
-
-void NPatchVisual::DoSetOffStage( Actor& actor )
-{
-  mCroppedImage.Reset();
-  actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
-}
-
-void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
-{
-  map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
-  if( !mImageUrl.empty() )
-  {
-    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
-  }
-  else if( mImage )
-  {
-    map.Insert( Toolkit::ImageVisual::Property::URL, mImage.GetUrl() );
-  }
-  map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
-}
-
-void NPatchVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value NPatchVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
-void NPatchVisual::OnSetTransform()
-{
-  if( mImpl->mRenderer )
-  {
-    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-  }
-}
-
-
-void NPatchVisual::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY )
-{
-  //check to see if the border style has changed
-
-  bool borderOnlyChanged = oldBorderOnly != mBorderOnly;
-  bool gridChanged = oldGridX != mStretchPixelsX.Size() || oldGridY != mStretchPixelsY.Size();
-
-  if( borderOnlyChanged || gridChanged )
-  {
-    Geometry geometry = CreateGeometry();
-    if( geometry )
-    {
-      mImpl->mRenderer.SetGeometry( geometry );
-    }
-    else
-    {
-      InitializeFromBrokenImage();
-    }
-  }
-
-  if( gridChanged )
-  {
-    Shader shader = CreateShader();
-    TextureSet textureSet;
-    if( shader )
-    {
-      textureSet = mImpl->mRenderer.GetTextures();
-      if( !textureSet )
-      {
-        InitializeFromBrokenImage();
-      }
-      mImpl->mRenderer.SetShader( shader );
-    }
-  }
-}
-
-void NPatchVisual::InitializeFromImage( NinePatchImage nPatch )
-{
-  mCroppedImage = nPatch.CreateCroppedBufferImage();
-  if( !mCroppedImage )
-  {
-    DALI_LOG_ERROR("'%s' specify a valid 9 patch image\n", mImageUrl.c_str() );
-    InitializeFromBrokenImage();
-    return;
-  }
-
-  mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );
-
-  mStretchPixelsX = nPatch.GetStretchPixelsX();
-  mStretchPixelsY = nPatch.GetStretchPixelsY();
-}
-
-void NPatchVisual::InitializeFromBrokenImage()
-{
-  mCroppedImage = VisualFactoryCache::GetBrokenVisualImage();
-  mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );
-
-  mStretchPixelsX.Clear();
-  mStretchPixelsX.PushBack( Uint16Pair( 0, mImageSize.GetWidth() ) );
-  mStretchPixelsY.Clear();
-  mStretchPixelsY.PushBack( Uint16Pair( 0, mImageSize.GetHeight() ) );
-}
-
-void NPatchVisual::ApplyImageToSampler()
-{
-  TextureSet textureSet = mImpl->mRenderer.GetTextures();
-  if( textureSet )
-  {
-    TextureSetImage( textureSet, 0u, mCroppedImage );
-
-    if( mStretchPixelsX.Size() == 1 && mStretchPixelsY.Size() == 1 )
+    TextureSet textures( data->textureSet );
+    mImpl->mRenderer.SetTextures( textures );
+    if( data->stretchPixelsX.Size() == 1 && data->stretchPixelsY.Size() == 1 )
     {
       //special case for 9 patch
-      Uint16Pair stretchX = mStretchPixelsX[ 0 ];
-      Uint16Pair stretchY = mStretchPixelsY[ 0 ];
+      Uint16Pair stretchX = data->stretchPixelsX[ 0 ];
+      Uint16Pair stretchY = data->stretchPixelsY[ 0 ];
 
       uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
       uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
 
       mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
-      mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2( mImageSize.GetWidth() - stretchWidth, mImageSize.GetHeight() - stretchHeight ) );
+      mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2( data->croppedWidth - stretchWidth, data->croppedHeight - stretchHeight ) );
       mImpl->mRenderer.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
     }
     else
@@ -555,13 +458,46 @@ void NPatchVisual::ApplyImageToSampler()
       mImpl->mRenderer.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
 
-      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsX", mStretchPixelsX, mImageSize.GetWidth() );
-      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsY", mStretchPixelsY, mImageSize.GetHeight() );
+      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsX", data->stretchPixelsX, data->croppedWidth );
+      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsY", data->stretchPixelsY, data->croppedHeight );
     }
   }
+  else
+  {
+    DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.c_str() );
+    TextureSet textureSet = TextureSet::New();
+    mImpl->mRenderer.SetTextures( textureSet );
+    Image croppedImage = VisualFactoryCache::GetBrokenVisualImage();
+    TextureSetImage( textureSet, 0u, croppedImage );
+    mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
+    mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2::ZERO );
+    mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2::ZERO );
+    mImpl->mRenderer.RegisterProperty( "uStretchTotal", Vector2( croppedImage.GetWidth(), croppedImage.GetHeight() ) );
+  }
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
-Geometry NPatchVisual::CreateGeometry( Uint16Pair gridSize )
+Geometry NPatchVisual::GetNinePatchGeometry( VisualFactoryCache::GeometryType subType )
+{
+  Geometry geometry = mFactoryCache.GetGeometry( subType );
+  if( !geometry )
+  {
+    if( DALI_LIKELY( VisualFactoryCache::NINE_PATCH_GEOMETRY == subType ) )
+    {
+      geometry = CreateGridGeometry( Uint16Pair( 3, 3 ) );
+    }
+    else if( VisualFactoryCache::NINE_PATCH_BORDER_GEOMETRY == subType )
+    {
+      geometry = CreateBorderGeometry( Uint16Pair( 3, 3 ) );
+    }
+    mFactoryCache.SaveGeometry( subType, geometry );
+  }
+  return geometry;
+}
+
+Geometry NPatchVisual::CreateGridGeometry( Uint16Pair gridSize )
 {
   uint16_t gridWidth = gridSize.GetWidth();
   uint16_t gridHeight = gridSize.GetHeight();
@@ -579,7 +515,6 @@ Geometry NPatchVisual::CreateGeometry( Uint16Pair gridSize )
   }
 
   // Create indices
-  //TODO: compare performance with triangle strip when Geometry supports it
   Vector< unsigned short > indices;
   indices.Reserve( gridWidth * gridHeight * 6 );
 
@@ -596,7 +531,7 @@ Geometry NPatchVisual::CreateGeometry( Uint16Pair gridSize )
   return GenerateGeometry( vertices, indices );
 }
 
-Geometry NPatchVisual::CreateGeometryBorder( Uint16Pair gridSize )
+Geometry NPatchVisual::CreateBorderGeometry( Uint16Pair gridSize )
 {
   uint16_t gridWidth = gridSize.GetWidth();
   uint16_t gridHeight = gridSize.GetHeight();
@@ -636,7 +571,6 @@ Geometry NPatchVisual::CreateGeometryBorder( Uint16Pair gridSize )
   }
 
   // Create indices
-  //TODO: compare performance with triangle strip when Geometry supports it
   Vector< unsigned short > indices;
   indices.Reserve( gridWidth * gridHeight * 6 );
 

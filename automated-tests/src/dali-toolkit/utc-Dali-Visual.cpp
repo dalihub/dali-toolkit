@@ -191,16 +191,7 @@ int UtcDaliVisualSize(void)
   imageVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 200.f), TEST_LOCATION );
 
-  // n patch visual
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  Vector2 testSize(80.f, 160.f);
-  platform.SetClosestImageSize(testSize);
-  image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
-  Visual::Base nPatchVisual = factory.CreateVisual( image );
-  nPatchVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( nPatchVisual.GetSize(), visualSize, TEST_LOCATION );
-  nPatchVisual.GetNaturalSize(naturalSize);
-  DALI_TEST_EQUALS( naturalSize, testSize, TEST_LOCATION );
+  // n patch visual is tested in the utc-Dali-VisualFactory.cpp
 
   // border visual
   float borderSize = 5.f;
@@ -250,6 +241,9 @@ int UtcDaliVisualSize(void)
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION ); // Natural size should still be 100, 100
 
   // Batch Image visual
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  Vector2 testSize(80.f, 160.f);
+  platform.SetClosestImageSize(testSize);
   propertyMap.Clear();
   propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
@@ -707,10 +701,6 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == false );
 
-  // Test the properties. TODO: to be completed.
-  imageVisual.SetProperty( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  Property::Value imageValue = imageVisual.GetProperty( ImageVisual::Property::URL );
-
   END_TEST;
 }
 
@@ -742,9 +732,6 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() );
 
-  // Test the properties. TODO: to be completed.
-  nPatchVisual.SetProperty( ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME );
-  Property::Value nPatchValue = nPatchVisual.GetProperty( ImageVisual::Property::URL );
 
   END_TEST;
 }
@@ -1592,6 +1579,39 @@ int UtcDaliVisualSetTransform7(void)
   Image image = ResourceImage::New(TEST_NPATCH_FILE_NAME, ImageDimensions(100, 200));
   Visual::Base visual = factory.CreateVisual(image);
   TestTransform( application, visual );
+
+  END_TEST;
+}
+
+int UtcDaliNPatchVisualCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "NPatchVisual with custom shader" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  Property::Map shader;
+  const std::string fragmentShader = "Foobar";
+  shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  properties[Dali::Toolkit::Visual::Property::TYPE] = Dali::Toolkit::Visual::IMAGE;
+  properties[Dali::Toolkit::Visual::Property::SHADER]=shader;
+  properties[Dali::Toolkit::ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+
+  Visual::Base visual = factory.CreateVisual( properties );
+  Actor dummy = Actor::New();
+  // trigger creation through setting on stage
+  visual.SetOnStage( dummy );
+
+  Renderer renderer = dummy.GetRendererAt( 0 );
+  Shader shader2 = renderer.GetShader();
+  Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK( map );
+
+  Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+  // *map["vertex"]; is default here so not verifying it
+
+  DALI_TEST_EQUALS( fragmentShader, fragment->Get<std::string>(), TEST_LOCATION );
 
   END_TEST;
 }

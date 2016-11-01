@@ -121,7 +121,7 @@ public:
    *
    * @param[out] naturalSize The visual's natural size
    */
-  void GetNaturalSize( Vector2& naturalSize ) const;
+  void GetNaturalSize( Vector2& naturalSize );
 
   /**
    * @brief Set the depth index of this visual.

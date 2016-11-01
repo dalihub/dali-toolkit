@@ -109,7 +109,7 @@ float Visual::Base::GetHeightForWidth( float width ) const
   return 0.f;
 }
 
-void Visual::Base::GetNaturalSize( Vector2& naturalSize ) const
+void Visual::Base::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize = Vector2::ZERO;
 }
@@ -190,8 +190,8 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
 
 void Visual::Base::DoSetOffStage( Actor& actor )
 {
-    actor.RemoveRenderer( mImpl->mRenderer );
-    mImpl->mRenderer.Reset();
+  actor.RemoveRenderer( mImpl->mRenderer );
+  mImpl->mRenderer.Reset();
 }
 
 bool Visual::Base::IsOnStage() const

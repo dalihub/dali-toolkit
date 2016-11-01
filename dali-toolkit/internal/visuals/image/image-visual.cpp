@@ -332,7 +332,7 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
+void ImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if(mImage)
   {

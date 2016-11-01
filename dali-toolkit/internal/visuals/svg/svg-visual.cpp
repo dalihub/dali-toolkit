@@ -116,7 +116,7 @@ void SvgVisual::DoSetOffStage( Actor& actor )
   mPlacementActor.Reset();
 }
 
-void SvgVisual::GetNaturalSize( Vector2& naturalSize ) const
+void SvgVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if( mParsedImage )
   {
