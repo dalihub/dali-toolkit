@@ -74,7 +74,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    gl_FragColor = mixColor;\n
+    gl_FragColor = mixColor*uColor;\n
   }\n
 );
 }
