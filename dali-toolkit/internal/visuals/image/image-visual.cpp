@@ -201,11 +201,6 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 } // unnamed namespace
 
-ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache )
-{
-  return new ImageVisual( factoryCache );
-}
-
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
                                  const std::string& imageUrl,
                                  ImageDimensions size,
@@ -218,21 +213,6 @@ ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, const Image& image )
 {
   return new ImageVisual( factoryCache, image );
-}
-
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
-  mImage(),
-  mPixels(),
-  mPixelArea( FULL_TEXTURE_RECT ),
-  mPlacementActor(),
-  mImageUrl(),
-  mDesiredSize(),
-  mFittingMode( FittingMode::DEFAULT ),
-  mSamplingMode( SamplingMode::DEFAULT ),
-  mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT )
-{
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
@@ -275,69 +255,60 @@ ImageVisual::~ImageVisual()
 
 void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-  if( imageURLValue )
+  // Url is already received in constructor
+  Property::Value* fittingValue = propertyMap.Find( Toolkit::ImageVisual::Property::FITTING_MODE, IMAGE_FITTING_MODE );
+  if( fittingValue )
   {
-    imageURLValue->Get( mImageUrl );
-    if( !mImageUrl.empty() )
-    {
-      mImage.Reset();
-    }
-
-    Property::Value* fittingValue = propertyMap.Find( Toolkit::ImageVisual::Property::FITTING_MODE, IMAGE_FITTING_MODE );
-    if( fittingValue )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, value );
-      mFittingMode = Dali::FittingMode::Type( value );
-    }
-
-    Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
-    if( samplingValue )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, value );
-      mSamplingMode = Dali::SamplingMode::Type( value );
-    }
-
-    int desiredWidth = 0;
-    Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
-    if( desiredWidthValue )
-    {
-      desiredWidthValue->Get( desiredWidth );
-    }
-
-    int desiredHeight = 0;
-    Property::Value* desiredHeightValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, IMAGE_DESIRED_HEIGHT );
-    if( desiredHeightValue )
-    {
-      desiredHeightValue->Get( desiredHeight );
-    }
-
-    Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
-    if( pixelAreaValue )
-    {
-      pixelAreaValue->Get( mPixelArea );
-    }
-
-    Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
-    if( wrapModeValueU )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
-      mWrapModeU = Dali::WrapMode::Type( value );
-    }
-
-    Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
-    if( wrapModeValueV )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
-      mWrapModeV = Dali::WrapMode::Type( value );
-    }
-
-    mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+    int value;
+    Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, value );
+    mFittingMode = Dali::FittingMode::Type( value );
   }
+
+  Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
+  if( samplingValue )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, value );
+    mSamplingMode = Dali::SamplingMode::Type( value );
+  }
+
+  int desiredWidth = 0;
+  Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
+  if( desiredWidthValue )
+  {
+    desiredWidthValue->Get( desiredWidth );
+  }
+
+  int desiredHeight = 0;
+  Property::Value* desiredHeightValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, IMAGE_DESIRED_HEIGHT );
+  if( desiredHeightValue )
+  {
+    desiredHeightValue->Get( desiredHeight );
+  }
+
+  Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
+  if( pixelAreaValue )
+  {
+    pixelAreaValue->Get( mPixelArea );
+  }
+
+  Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
+  if( wrapModeValueU )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
+    mWrapModeU = Dali::WrapMode::Type( value );
+  }
+
+  Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
+  if( wrapModeValueV )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
+    mWrapModeV = Dali::WrapMode::Type( value );
+  }
+
+  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 
   Property::Value* syncLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
   if( syncLoading )
@@ -349,7 +320,7 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
       // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
       // ( for on-stage actor with image url unchanged, resource loading is already finished)
-      if( imageURLValue )
+      if( mImageUrl.size() > 0u )
       {
         LoadResourceSynchronously();
       }

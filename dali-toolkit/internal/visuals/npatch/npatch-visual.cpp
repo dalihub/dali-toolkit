@@ -225,14 +225,9 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
 {
-  return new NPatchVisual( factoryCache );
-}
-
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly )
-{
-  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
   nPatchVisual->mImageUrl = imageUrl;
 
   NinePatchImage image = NinePatchImage::New( imageUrl );
@@ -241,9 +236,9 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
   return nPatchVisual;
 }
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
 {
-  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
   nPatchVisual->mImage = image;
 
   nPatchVisual->InitializeFromImage( image );
@@ -251,7 +246,7 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchIm
   return nPatchVisual;
 }
 
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly )
+NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mImage(),
   mCroppedImage(),
@@ -259,7 +254,7 @@ NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly )
   mStretchPixelsX(),
   mStretchPixelsY(),
   mImageSize(),
-  mBorderOnly( borderOnly )
+  mBorderOnly( false )
 {
 }
 
@@ -269,26 +264,12 @@ NPatchVisual::~NPatchVisual()
 
 void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-  if( imageURLValue )
+  // URL is already passed in via constructor
+  //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
+  Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
+  if( borderOnlyValue )
   {
-    //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
-    Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
-    if( borderOnlyValue )
-    {
-      borderOnlyValue->Get( mBorderOnly );
-    }
-
-    if( imageURLValue->Get( mImageUrl ) )
-    {
-      NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitializeFromImage( nPatch );
-    }
-    else
-    {
-      InitializeFromBrokenImage();
-      DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
-    }
+    borderOnlyValue->Get( mBorderOnly );
   }
 }
 

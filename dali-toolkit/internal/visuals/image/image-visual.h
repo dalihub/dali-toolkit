@@ -80,14 +80,6 @@ class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUp
 public:
 
   /**
-   * @brief Create a new image visual.
-   *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @return A smart-pointer to the newly allocated visual.
-   */
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache );
-
-  /**
    * @brief Create a new image visual with a URL.
    *
    * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
@@ -135,13 +127,6 @@ public:  // from Visual
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
-
-  /**
-   * @brief Constructor.
-   *
-   * @param[in] factoryCache The VisualFactoryCache object
-   */
-  ImageVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief Constructor with a URL.
