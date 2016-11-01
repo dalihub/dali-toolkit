@@ -116,7 +116,7 @@
       "label":
       {
         "pointSize":8,
-        "fontStyle":"{\"weight\":\"light\"}"
+        "fontStyle":{"weight":"light"}
       }
     },
     "TextSelectionToolbar":

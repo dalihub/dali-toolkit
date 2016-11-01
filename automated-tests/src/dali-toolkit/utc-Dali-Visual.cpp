@@ -41,7 +41,36 @@ const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+
+bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
+{
+  if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
+  {
+    for( unsigned int index = 0u; index < fontStyleMapGet.Count(); ++index )
+    {
+      const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
+
+      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      if( NULL != valueSet )
+      {
+        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        {
+          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+      }
+      else
+      {
+        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
+
+} //namespace
 
 void dali_visual_startup(void)
 {
@@ -963,7 +992,11 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
-  propertyMap.Insert( "fontStyle", "{\"weight\":\"bold\"}" );
+
+  Property::Map fontStyleMapSet;
+  fontStyleMapSet.Insert( "weight", "bold" );
+  propertyMap.Insert( "fontStyle", fontStyleMapSet );
+
   propertyMap.Insert( "pointSize", 12.f );
   propertyMap.Insert( "multiLine", true );
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
@@ -995,9 +1028,12 @@ int UtcDaliVisualGetPropertyMap10(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<std::string>(), "TizenSans", TEST_LOCATION );
 
-  value = resultMap.Find( TextVisual::Property::FONT_STYLE, Property::STRING );
+  value = resultMap.Find( TextVisual::Property::FONT_STYLE, Property::MAP );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<std::string>(), "{\"weight\":\"bold\"}", TEST_LOCATION );
+
+  Property::Map fontStyleMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   value = resultMap.Find( TextVisual::Property::POINT_SIZE, Property::FLOAT );
   DALI_TEST_CHECK( value );

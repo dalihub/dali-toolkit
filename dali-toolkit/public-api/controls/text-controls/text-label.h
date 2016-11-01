@@ -42,24 +42,24 @@ class TextLabel;
  * Text labels are lightweight, non-editable and do not respond to user input.
  *
  * @section TextLabelProperties Properties
- * |%Property enum                    |String name          |Type          |Writable|Animatable|
- * |----------------------------------|---------------------|--------------|--------|----------|
- * | Property::RENDERING_BACKEND      | renderingBackend    |  INTEGER     | O      | X        |
- * | Property::TEXT                   | text                |  STRING      | O      | X        |
- * | Property::FONT_FAMILY            | fontFamily          |  STRING      | O      | X        |
- * | Property::FONT_STYLE             | fontStyle           |  STRING      | O      | X        |
- * | Property::POINT_SIZE             | pointSize           |  FLOAT       | O      | X        |
- * | Property::MULTI_LINE             | multiLine           |  BOOLEAN     | O      | X        |
- * | Property::HORIZONTAL_ALIGNMENT   | horizontalAlignment |  STRING      | O      | X        |
- * | Property::VERTICAL_ALIGNMENT     | verticalAlignment   |  STRING      | O      | X        |
- * | Property::TEXT_COLOR             | textColor           |  VECTOR4     | O      | X        |
- * | Property::ENABLE_MARKUP          | enableMarkup        |  BOOLEAN     | O      | X        |
- * | Property::ENABLE_AUTO_SCROLL     | enableAutoScroll    |  BOOLEAN     | O      | X        |
- * | Property::AUTO_SCROLL_SPEED      | autoScrollSpeed     |  INTEGER     | O      | X        |
- * | Property::AUTO_SCROLL_LOOP_COUNT | autoScrollLoopCount |  INTEGER     | O      | X        |
- * | Property::AUTO_SCROLL_GAP        | autoScrollGap       |  INTEGER     | O      | X        |
- * | Property::SHADOW                 | shadow              |  STRING      | O      | X        |
- * | Property::UNDERLINE              | underline           |  STRING      | O      | X        |
+ * |%Property enum                    |String name          |Type            |Writable|Animatable|
+ * |----------------------------------|---------------------|----------------|--------|----------|
+ * | Property::RENDERING_BACKEND      | renderingBackend    |  INTEGER       | O      | X        |
+ * | Property::TEXT                   | text                |  STRING        | O      | X        |
+ * | Property::FONT_FAMILY            | fontFamily          |  STRING        | O      | X        |
+ * | Property::FONT_STYLE             | fontStyle           |  STRING or MAP | O      | X        |
+ * | Property::POINT_SIZE             | pointSize           |  FLOAT         | O      | X        |
+ * | Property::MULTI_LINE             | multiLine           |  BOOLEAN       | O      | X        |
+ * | Property::HORIZONTAL_ALIGNMENT   | horizontalAlignment |  STRING        | O      | X        |
+ * | Property::VERTICAL_ALIGNMENT     | verticalAlignment   |  STRING        | O      | X        |
+ * | Property::TEXT_COLOR             | textColor           |  VECTOR4       | O      | X        |
+ * | Property::ENABLE_MARKUP          | enableMarkup        |  BOOLEAN       | O      | X        |
+ * | Property::ENABLE_AUTO_SCROLL     | enableAutoScroll    |  BOOLEAN       | O      | X        |
+ * | Property::AUTO_SCROLL_SPEED      | autoScrollSpeed     |  INTEGER       | O      | X        |
+ * | Property::AUTO_SCROLL_LOOP_COUNT | autoScrollLoopCount |  INTEGER       | O      | X        |
+ * | Property::AUTO_SCROLL_GAP        | autoScrollGap       |  INTEGER       | O      | X        |
+ * | Property::SHADOW                 | shadow              |  STRING or MAP | O      | X        |
+ * | Property::UNDERLINE              | underline           |  STRING or MAP | O      | X        |
  *
  * @SINCE_1_0.0
  */
@@ -108,8 +108,8 @@ public:
 
       /**
        * @brief The requested font style to use,
-       * @details name "fontStyle", type STRING
-       * @SINCE_1_0.0
+       * @details name "fontStyle", type STRING or MAP
+       * @SINCE_1_2.13
        */
       FONT_STYLE,
 
@@ -227,29 +227,29 @@ public:
 
       /**
        * @brief The default underline parameters.
-       * @details name "underline", type STRING.
-       * @SINCE_1_1.37
+       * @details name "underline", type MAP.
+       * @SINCE_1_2.13
        */
       UNDERLINE,
 
       /**
        * @brief The default shadow parameters.
-       * @details name "shadow", type STRING.
-       * @SINCE_1_1.37
+       * @details name "shadow", type MAP.
+       * @SINCE_1_2.13
        */
       SHADOW,
 
       /**
        * @brief The default emboss parameters.
-       * @details name "emboss", type STRING.
-       * @SINCE_1_1.37
+       * @details name "emboss", type MAP.
+       * @SINCE_1_2.13
        */
       EMBOSS,
 
       /**
        * @brief The default outline parameters.
-       * @details name "outline", type STRING.
-       * @SINCE_1_1.37
+       * @details name "outline", type MAP.
+       * @SINCE_1_2.13
        */
       OUTLINE,
     };
