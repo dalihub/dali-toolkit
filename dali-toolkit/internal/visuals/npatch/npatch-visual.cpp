@@ -115,9 +115,9 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
       mediump vec2 stretch      = floor( aPosition * 0.5 );\n
       mediump vec2 fixedTotal   = uFixed[ 2 ];\n
       \n
-      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-      vertexPosition.xy -= visualSize * vec2( 0.5, 0.5 );\n
-      vertexPosition.xy =  vertexPosition.xy / scale;\n
+      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
+      vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
+      vertexPosition.xy =  vertexPosition.xy / scale + anchorPoint*size + (visualOffset + origin)*uSize.xy;\
       \n
       vertexPosition = uMvpMatrix * vertexPosition;\n
       \n
