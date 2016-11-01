@@ -88,13 +88,16 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 } // unnamed namespace
 
-BatchImageVisualPtr BatchImageVisual::New( VisualFactoryCache& factoryCache )
+BatchImageVisualPtr BatchImageVisual::New( VisualFactoryCache& factoryCache, const std::string& url )
 {
-  return new BatchImageVisual( factoryCache );
+  BatchImageVisualPtr visual = new BatchImageVisual( factoryCache );
+  visual->mImageUrl = url;
+  return visual;
 }
 
 BatchImageVisual::BatchImageVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
+  mImageUrl(""),
   mDesiredSize()
 {
 }
@@ -105,29 +108,23 @@ BatchImageVisual::~BatchImageVisual()
 
 void BatchImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  std::string oldImageUrl = mImageUrl;
-  Property::Value* imageURLValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::URL, Dali::Toolkit::Internal::IMAGE_URL_NAME );
+  // url already passed in constructor
 
-  if( imageURLValue )
+  int desiredWidth = 0;
+  Property::Value* desiredWidthValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH, DESIRED_WIDTH );
+  if( desiredWidthValue )
   {
-    imageURLValue->Get( mImageUrl );
-
-    int desiredWidth = 0;
-    Property::Value* desiredWidthValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH, DESIRED_WIDTH );
-    if( desiredWidthValue )
-    {
-      desiredWidthValue->Get( desiredWidth );
-    }
-
-    int desiredHeight = 0;
-    Property::Value* desiredHeightValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT, DESIRED_HEIGHT );
-    if( desiredHeightValue )
-    {
-      desiredHeightValue->Get( desiredHeight );
-    }
-
-    mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+    desiredWidthValue->Get( desiredWidth );
   }
+
+  int desiredHeight = 0;
+  Property::Value* desiredHeightValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT, DESIRED_HEIGHT );
+  if( desiredHeightValue )
+  {
+    desiredHeightValue->Get( desiredHeight );
+  }
+
+  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 }
 
 void BatchImageVisual::SetSize( const Vector2& size )
