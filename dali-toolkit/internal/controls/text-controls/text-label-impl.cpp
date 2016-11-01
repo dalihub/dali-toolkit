@@ -290,7 +290,7 @@ void TextLabel::OnInitialize()
   visualMap[Toolkit::TextVisual::Property::RENDERING_BACKEND] = static_cast<int>( DEFAULT_RENDERING_BACKEND );
 
   mVisual =  Toolkit::VisualFactory::Get().CreateVisual( visualMap );
-  RegisterVisual( Toolkit::TextLabel::Property::TEXT, self, mVisual );
+  RegisterVisual( Toolkit::TextLabel::Property::TEXT, mVisual );
 
   Internal::Visual::Base& visualBase = Toolkit::GetImplementation( mVisual );
   TextVisual* textVisual = static_cast<TextVisual*>( &visualBase );

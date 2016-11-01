@@ -306,12 +306,11 @@ protected: // For derived classes to call
    * @SINCE_1_2.0
    *
    * @param[in] index The Property index of the visual, used to reference visual
-   * @param[in] placementActor The actor used to by the visual.
    * @param[in] visual The visual to register
-   * @note Derived class should not call visual.SetOnStage(placementActor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+   * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
    *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
    */
-  void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual );
 
   /**
    * @brief Register a visual by Property Index, linking an Actor to visual when required.
@@ -322,12 +321,11 @@ protected: // For derived classes to call
    * @SINCE_1_2.11
    *
    * @param[in] index The Property index of the visual, used to reference visual
-   * @param[in] placementActor The actor used to by the visual.
    * @param[in] visual The visual to register
    * @param[in] enabled false if derived class wants to control when visual is set on stage.
    *
    */
-  void RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual, bool enabled );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
 
   /**
    * @brief Erase the entry matching the given index from the list of registered visuals
@@ -367,17 +365,6 @@ protected: // For derived classes to call
    * @return bool whether visual is enabled or not
    */
   bool IsVisualEnabled( Property::Index index ) const;
-
-  /**
-   * @brief Retrieve the placement actor associated with the given index.
-   *
-   * @SINCE_1_2.2
-   *
-   * @@param[in] index The Property index of the visual.
-   * @return Then placement actor if exist, otherwise empty handle.
-   * @note For managing object life-cycle, do not store the returned placement actor as a member which increments its reference count.
-   */
-  Actor GetPlacementActor( Property::Index index ) const;
 
   /**
    * @brief Create a transition effect on the control.

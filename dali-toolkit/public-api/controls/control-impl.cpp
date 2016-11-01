@@ -65,11 +65,10 @@ struct RegisteredVisual
 {
   Property::Index index;
   Toolkit::Visual::Base visual;
-  Actor placementActor;
   bool enabled;
 
-  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor, bool aEnabled) :
-                   index(aIndex), visual(aVisual), placementActor(aPlacementActor), enabled(aEnabled) {}
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled) :
+                   index(aIndex), visual(aVisual), enabled(aEnabled) {}
 };
 
 struct HandleIndex
@@ -130,29 +129,23 @@ HandleIndex GetVisualProperty(
     }
   }
 
-  // Does either it's renderer or placement actor have an associated property?
+  // Does it's renderer have an associated property?
   if( iter != visuals.End() )
   {
-    Actor placementActor = (*iter)->placementActor;
-    if( !placementActor )
-    {
-      placementActor = controlImpl.Self();
-    }
-
-    Property::Index index = placementActor.GetPropertyIndex( propertyKey );
+    Actor self = controlImpl.Self();
+    Property::Index index = self.GetPropertyIndex( propertyKey );
     if( index != Property::INVALID_INDEX )
     {
-      // It's a placement actor property:
-      return HandleIndex( placementActor, index );
+      // It's an actor property:
+      return HandleIndex( self, index );
     }
     else
     {
       // Check if it is a renderer property:
-      if( placementActor.GetRendererCount() > 0 )
+      if( self.GetRendererCount() > 0 )
       {
-        // @todo Need to use correct renderer index when placement actors
-        // are removed
-        Renderer renderer = placementActor.GetRendererAt(0);
+        // @todo Need to use correct renderer index
+        Renderer renderer = self.GetRendererAt(0);
         Property::Index index = renderer.GetPropertyIndex( propertyKey );
         if( index != Property::INVALID_INDEX )
         {
@@ -565,13 +558,12 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  Actor self( Self() );
   mImpl->mBackgroundColor = color;
   Property::Map map;
   map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
   mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -585,9 +577,8 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground( const Property::Map& map )
 {
-  Actor self( Self() );
   mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -596,9 +587,8 @@ void Control::SetBackground( const Property::Map& map )
 
 void Control::SetBackgroundImage( Image image )
 {
-  Actor self( Self() );
   mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, self, mImpl->mBackgroundVisual );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -751,21 +741,15 @@ void Control::KeyboardEnter()
   OnKeyboardEnter();
 }
 
-void Control::RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual )
+void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
 {
-  RegisterVisual( index, placementActor, visual, true );
+  RegisterVisual( index, visual, true );
 }
 
-void Control::RegisterVisual( Property::Index index, Actor& placementActor, Toolkit::Visual::Base& visual, bool enabled )
+void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
   bool visualReplaced ( false );
-  Actor actorToRegister; // Null actor, replaced if placement actor not Self
   Actor self = Self();
-
-  if ( placementActor != self ) // Prevent increasing ref count if actor self
-  {
-    actorToRegister = placementActor;
-  }
 
   if ( !mImpl->mVisuals.Empty() )
   {
@@ -775,29 +759,21 @@ void Control::RegisterVisual( Property::Index index, Actor& placementActor, Tool
       {
         if( (*iter)->visual && self.OnStage() )
         {
-          if( (*iter)->placementActor )
-          {
-            (*iter)->visual.SetOffStage( (*iter)->placementActor );
-          }
-          else
-          {
-            (*iter)->visual.SetOffStage( self );
-          }
+          (*iter)->visual.SetOffStage( self );
         }
         (*iter)->visual = visual;
-        (*iter)->placementActor = actorToRegister;
         visualReplaced = true;
       }
   }
 
   if ( !visualReplaced ) // New registration entry
   {
-    mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, actorToRegister, enabled ) );
+    mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
   }
 
   if( visual && self.OnStage() && enabled )
   {
-    visual.SetOnStage( placementActor );
+    visual.SetOnStage( self );
   }
 }
 
@@ -833,11 +809,6 @@ void Control::EnableVisual( Property::Index index, bool enable )
 
     (*iter)->enabled = enable;
     Actor parentActor = Self();
-    if ( (*iter)->placementActor )
-    {
-      parentActor = (*iter)->placementActor;
-    }
-
     if ( Self().OnStage() ) // If control not on Stage then Visual will be added when StageConnection is called.
     {
       if ( enable )
@@ -861,24 +832,6 @@ bool Control::IsVisualEnabled( Property::Index index ) const
     return (*iter)->enabled;
   }
   return false;
-}
-
-Actor Control::GetPlacementActor( Property::Index index ) const
-{
-  RegisteredVisualContainer::Iterator iter;
-  if ( FindVisual( index, mImpl->mVisuals, iter ) )
-  {
-    if( (*iter)->placementActor )
-    {
-      return (*iter)->placementActor;
-    }
-    else
-    {
-      return Self();
-    }
-  }
-
-  return Actor();
 }
 
 Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle )
@@ -905,7 +858,6 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
       }
       else
       {
-        // Is it a placement actor/visual pair?;
         handleIndex = GetVisualProperty( *this, mImpl->mVisuals,
                                             animator->objectName,
                                             animator->propertyKey );
@@ -1135,18 +1087,11 @@ void Control::OnStageConnection( int depth )
 {
   for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    // Check whether the visual is empty, as it is allowed to register a placement actor without visual.
+    // Check whether the visual is empty and enabled
     if( (*iter)->visual && (*iter)->enabled )
     {
-      if( (*iter)->placementActor )
-      {
-        (*iter)->visual.SetOnStage( (*iter)->placementActor );
-      }
-      else
-      {
-        Actor self( Self() );
-        (*iter)->visual.SetOnStage( self );
-      }
+      Actor self( Self() );
+      (*iter)->visual.SetOnStage( self );
     }
   }
 }
@@ -1155,18 +1100,11 @@ void Control::OnStageDisconnection()
 {
   for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    // Check whether the visual is empty, as it is allowed to register a placement actor without visual.
+    // Check whether the visual is empty
     if( (*iter)->visual )
     {
-      if( (*iter)->placementActor )
-      {
-        (*iter)->visual.SetOffStage( (*iter)->placementActor );
-      }
-      else
-      {
-        Actor self( Self() );
-        (*iter)->visual.SetOffStage( self );
-      }
+      Actor self( Self() );
+      (*iter)->visual.SetOffStage( self );
     }
   }
 }

@@ -954,10 +954,8 @@ int UtcDaliControlImplRegisterThenReRegisterVisual(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
   Property::Index index =1;
-  Actor placementActor = Actor::New();
 
   DALI_TEST_CHECK( !dummyImpl.GetVisual( index )  );
-  DALI_TEST_CHECK( !dummyImpl.GetPlacementActor( index ) );
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base visual;
@@ -970,10 +968,9 @@ int UtcDaliControlImplRegisterThenReRegisterVisual(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( index, placementActor, visual );
+  dummyImpl.RegisterVisual( index, visual );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
 
   Property::Map newMap;
   newMap[Visual::Property::TYPE] = Visual::COLOR;
@@ -983,10 +980,9 @@ int UtcDaliControlImplRegisterThenReRegisterVisual(void)
   DALI_TEST_CHECK(visual);
 
   // ReRegister with altered color visual
-  dummyImpl.RegisterVisual( index, placementActor, visual );
+  dummyImpl.RegisterVisual( index, visual );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
 
   tet_result(TET_PASS);
 
@@ -1001,7 +997,6 @@ int UtcDaliControlImplRegisterVisaulThenReRegisterToSelf(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
   Property::Index index =1;
-  Actor placementActor = Actor::New();
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base visual;
@@ -1014,16 +1009,14 @@ int UtcDaliControlImplRegisterVisaulThenReRegisterToSelf(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( index, placementActor, visual );
+  dummyImpl.RegisterVisual( index, visual );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
 
   // ReRegister to self
-  dummyImpl.RegisterVisual( index, dummy, visual );
+  dummyImpl.RegisterVisual( index, visual );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == dummy );
 
   END_TEST;
 }
@@ -1040,7 +1033,6 @@ int UtcDaliControlImplRegisterVisualToSelf(void)
     objectDestructionTracker.Start( dummy );
 
     Property::Index index = 1;
-    Actor placementActor = Actor::New();
 
     Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
     Toolkit::Visual::Base visual;
@@ -1053,11 +1045,10 @@ int UtcDaliControlImplRegisterVisualToSelf(void)
     DALI_TEST_CHECK(visual);
 
     // Register to self
-    dummyImpl.RegisterVisual( index, dummy, visual );
+    dummyImpl.RegisterVisual( index, visual );
 
     DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
     DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-    DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == dummy );
   }
 
   DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
@@ -1073,10 +1064,7 @@ int UtcDaliControlImplRegisterTwoVisuals(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
   Property::Index index =1;
-  Actor placementActor = Actor::New();
-
   Property::Index index2 =2;
-  Actor secondPlacementActor = Actor::New();
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base visual;
@@ -1090,7 +1078,7 @@ int UtcDaliControlImplRegisterTwoVisuals(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( index, placementActor, visual );
+  dummyImpl.RegisterVisual( index, visual );
 
   Property::Map newMap;
   newMap[Visual::Property::TYPE] = Visual::COLOR;
@@ -1100,13 +1088,10 @@ int UtcDaliControlImplRegisterTwoVisuals(void)
   DALI_TEST_CHECK( secondVisual );
 
   // ReRegister with altered color visual
-  dummyImpl.RegisterVisual( index2, secondPlacementActor, secondVisual );
+  dummyImpl.RegisterVisual( index2, secondVisual );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
-
   DALI_TEST_CHECK( dummyImpl.GetVisual( index2 ) == secondVisual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index2 ) == secondPlacementActor );
 
   END_TEST;
 }
@@ -1119,7 +1104,6 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
   Property::Index index =1;
-  Actor placementActor = Actor::New();
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base visual;
@@ -1132,16 +1116,14 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( index, placementActor, visual );
+  dummyImpl.RegisterVisual( index, visual );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
-  DALI_TEST_CHECK( dummyImpl.GetPlacementActor( index ) == placementActor );
 
   // Unregister visual
   dummyImpl.UnregisterVisual( index );
 
   DALI_TEST_CHECK( !dummyImpl.GetVisual( index ) );
-  DALI_TEST_CHECK( !dummyImpl.GetPlacementActor( index ) );
 
   END_TEST;
 }
@@ -1166,7 +1148,7 @@ int UtcDaliControlImplRegisterDisabledVisual(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( TEST_PROPERTY, dummy, visual, false );
+  dummyImpl.RegisterVisual( TEST_PROPERTY, visual, false );
 
   DALI_TEST_CHECK( dummyImpl.GetVisual( TEST_PROPERTY ) == visual );
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
@@ -1208,7 +1190,7 @@ int UtcDaliControlImplDisableRegisteredVisual(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( TEST_PROPERTY, dummy, visual );
+  dummyImpl.RegisterVisual( TEST_PROPERTY, visual );
 
   Stage::GetCurrent().Add(dummy);
 
@@ -1250,7 +1232,7 @@ int UtcDaliControlImplEnabledVisualParentRemovedFromStage(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( TEST_PROPERTY, dummy, visual, false );
+  dummyImpl.RegisterVisual( TEST_PROPERTY, visual, false );
 
   Stage::GetCurrent().Add(dummy);
   // Render and notify
@@ -1318,9 +1300,9 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
   DALI_TEST_CHECK(visual2);
 
   // Register index with a color visual
-  dummyImpl.RegisterVisual( TEST_PROPERTY1, dummy, visual1 );
+  dummyImpl.RegisterVisual( TEST_PROPERTY1, visual1 );
   // Register second index with a color visual
-  dummyImpl.RegisterVisual( TEST_PROPERTY2, dummy, visual2 );
+  dummyImpl.RegisterVisual( TEST_PROPERTY2, visual2 );
 
   Stage::GetCurrent().Add(dummy);
   // Render and notify

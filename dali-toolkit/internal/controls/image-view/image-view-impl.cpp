@@ -81,9 +81,8 @@ void ImageView::SetImage( Image image )
 
     mImage = image;
 
-    Actor self( Self() );
     mVisual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-    RegisterVisual( Toolkit::ImageView::Property::IMAGE, self, mVisual  );
+    RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -96,9 +95,8 @@ void ImageView::SetImage( Property::Map map )
   mImage.Reset();
   mPropertyMap = map;
 
-  Actor self( Self() );
   mVisual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
-  RegisterVisual( Toolkit::ImageView::Property::IMAGE, self, mVisual  );
+  RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -139,9 +137,8 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
       mImageSize = size;
     }
 
-    Actor self( Self() );
     mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
-    RegisterVisual( Toolkit::ImageView::Property::IMAGE, self, mVisual  );
+    RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
 
     mVisual.SetSize( mSizeSet );
 
