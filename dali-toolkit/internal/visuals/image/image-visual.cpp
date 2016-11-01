@@ -551,13 +551,9 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
 
 void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 {
-  if( imageUrl.empty() )
-  {
-    return;
-  }
+  mImpl->mRenderer.Reset();
 
   mImageUrl = imageUrl;
-  mImpl->mRenderer.Reset();
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
   if( !mImpl->mCustomShader &&
@@ -620,6 +616,7 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 void ImageVisual::InitializeRenderer( const Image& image )
 {
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
+  mImpl->mRenderer.Reset();
 
   // don't reuse CreateTextureSet
   TextureSet textures = TextureSet::New();
@@ -636,11 +633,7 @@ void ImageVisual::InitializeRenderer( const Image& image )
     // reuse existing code for regular images
     CreateRenderer( textures );
   }
-
-  if( image )
-  {
-    ApplyImageToSampler( image );
-  }
+  ApplyImageToSampler( image );
 }
 
 void ImageVisual::UploadCompleted()
@@ -657,16 +650,21 @@ void ImageVisual::UploadCompleted()
 
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
-  mPlacementActor = actor;
-
   if( !mImageUrl.empty() )
   {
     InitializeRenderer( mImageUrl );
   }
-  else
+  else if ( mImage )
   {
     InitializeRenderer( mImage );
   }
+
+  if ( !mImpl->mRenderer)
+  {
+    return;
+  }
+
+  mPlacementActor = actor;
 
   if( mPixelArea != FULL_TEXTURE_RECT )
   {
@@ -682,18 +680,17 @@ void ImageVisual::DoSetOnStage( Actor& actor )
 
 void ImageVisual::DoSetOffStage( Actor& actor )
 {
+  // Visual::Base::SetOffStage only calls DoSetOffStage if mRenderer exists (is on onstage)
+
   //If we own the image then make sure we release it when we go off stage
+  actor.RemoveRenderer( mImpl->mRenderer);
   if( !mImageUrl.empty() )
   {
-    actor.RemoveRenderer( mImpl->mRenderer );
     CleanCache(mImageUrl);
     mImage.Reset();
   }
-  else
-  {
-    actor.RemoveRenderer( mImpl->mRenderer );
-    mImpl->mRenderer.Reset();
-  }
+
+  mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
 
