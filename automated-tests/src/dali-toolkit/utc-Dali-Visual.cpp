@@ -1532,6 +1532,15 @@ int UtcDaliNPatchVisualCustomShader(void)
   Property::Map shader;
   const std::string fragmentShader = "Foobar";
   shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+
+  Property::Map transformMap;
+  transformMap["size"] = Vector2( 0.5f, 0.5f ) ;
+  transformMap["offset"] = Vector2( 20.0f, 0.0f ) ;
+  transformMap["offsetSizeMode"] = Vector4( 1.0f, 1.0f, 0.0f, 0.0f );
+  transformMap["anchorPoint"] = Align::CENTER;
+  transformMap["origin"] = Align::CENTER;
+  properties[DevelVisual::Property::TRANSFORM] = transformMap;
+
   properties[Dali::Toolkit::Visual::Property::TYPE] = Dali::Toolkit::Visual::IMAGE;
   properties[Dali::Toolkit::Visual::Property::SHADER]=shader;
   properties[Dali::Toolkit::ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
@@ -1545,12 +1554,16 @@ int UtcDaliNPatchVisualCustomShader(void)
   dummy.SetSize(2000, 2000);
   dummy.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add(dummy);
+  application.SendNotification();
 
   Renderer renderer = dummy.GetRendererAt( 0 );
   Shader shader2 = renderer.GetShader();
   Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
   Property::Map* map = value.GetMap();
   DALI_TEST_CHECK( map );
+
+  Property::Index index = renderer.GetPropertyIndex("size");
+  DALI_TEST_EQUALS( renderer.GetProperty( index ), Property::Value(Vector2(0.5, 0.5)), 0.001, TEST_LOCATION );
 
   Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
   // *map["vertex"]; is default here so not verifying it
@@ -1677,6 +1690,7 @@ int UtcDaliVisualTextVisualRender(void)
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
 
   dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetParentOrigin( ParentOrigin::CENTER );
 
   Stage::GetCurrent().Add( dummyControl );
   application.SendNotification();
@@ -1691,7 +1705,7 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
 
   Property::Map transformMap;
-  transformMap.Insert( DevelVisual::Transform::Property::SIZE, Vector2( 720.f, 640.f ) );
+  transformMap.Insert( "size", Vector2( 0.5f, 0.5f ) );
   propertyMap.Insert( DevelVisual::Property::TRANSFORM, transformMap );
 
   textVisual = factory.CreateVisual( propertyMap );
@@ -1700,8 +1714,15 @@ int UtcDaliVisualTextVisualRender(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, textVisual );
   dummyControl.SetSize( 720.f, 640.f );
 
-  application.SendNotification();
+  application.SendNotification(); // force process events to ensure text visual
+  // adds renderer to the dummy control in OnRelayout
   application.Render();
+
+  Renderer renderer = dummyControl.GetRendererAt(0u);
+  Property::Index index = renderer.GetPropertyIndex("size");
+
+  tet_infoline( "Test that the TextVisual overrides anything set by developer" );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(index), Vector2( 1.0, 1.0 ), 0.001f, TEST_LOCATION );
 
   END_TEST;
 }

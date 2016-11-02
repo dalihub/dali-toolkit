@@ -22,6 +22,7 @@
 #include <cstring> // for strcmp
 #include <limits>
 #include <stack>
+#include <typeinfo>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
@@ -57,7 +58,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New( Debug::General, false, "LOG_CONTROL_VISUALS");
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
 #endif
 
 /**
@@ -117,7 +118,7 @@ HandleIndex GetVisualProperty(
 {
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
-  oss << "Control::GetHandleIndex(" << visualName << ", " << propertyKey << ")" << std::endl;
+  oss << "Control::GetVisualProperty(" << visualName << ", " << propertyKey << ")" << std::endl;
   DALI_LOG_INFO( gLogFilter, Debug::General, oss.str().c_str() );
 #endif
 
@@ -125,44 +126,25 @@ HandleIndex GetVisualProperty(
   RegisteredVisualContainer::Iterator iter;
   for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
-    if ( (*iter)->visual.GetName() == visualName )
+    Toolkit::Visual::Base visual = (*iter)->visual;
+    if( visual && visual.GetName() == visualName )
     {
-      break;
-    }
-  }
-
-  // Does it's renderer have an associated property?
-  if( iter != visuals.End() )
-  {
-    Actor self = controlImpl.Self();
-    Property::Index index = DevelHandle::GetPropertyIndex( self, propertyKey );
-    if( index != Property::INVALID_INDEX )
-    {
-      // It's an actor property:
-      return HandleIndex( self, index );
-    }
-    else
-    {
-      // Check if it is a renderer property:
-      if( self.GetRendererCount() > 0 )
+      Internal::Visual::Base& visualImpl = GetImplementation(visual);
+      Renderer renderer = visualImpl.GetRenderer();
+      if( renderer )
       {
-        // @todo Need to use correct renderer index
-        Renderer renderer = self.GetRendererAt(0);
         Property::Index index = DevelHandle::GetPropertyIndex( renderer, propertyKey );
         if( index != Property::INVALID_INDEX )
         {
-          // It's a renderer property:
           return HandleIndex( renderer, index );
         }
       }
-      else
-      {
-        std::ostringstream oss;
-        oss << propertyKey;
-        DALI_LOG_WARNING( "Control::GetHandleIndex(%s, %s) No renderers\n", visualName.c_str(), oss.str().c_str() );
-      }
     }
   }
+
+  std::ostringstream noRenderers;
+  noRenderers << propertyKey;
+  DALI_LOG_WARNING( "Control::GetVisualProperty(%s, %s) No renderers\n", visualName.c_str(), noRenderers.str().c_str() );
   Handle handle;
   return HandleIndex( handle, Property::INVALID_INDEX );
 }
@@ -782,6 +764,27 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
       }
       (*iter)->visual = visual;
       visualReplaced = true;
+    }
+  }
+
+  // If not set, set the name of the visual to the same name as the control's property.
+  // ( If the control has been type registered )
+  if( visual.GetName().empty() )
+  {
+    // Check if the control has been type registered:
+    TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(*this) );
+    if( typeInfo )
+    {
+      // Check if the property index has been registered:
+      Property::IndexContainer indices;
+      typeInfo.GetPropertyIndices( indices );
+      Property::IndexContainer::Iterator iter = std::find( indices.Begin(), indices.End(), index );
+      if( iter != indices.End() )
+      {
+        // If it has, then get it's name and use that for the visual
+        std::string visualName = typeInfo.GetPropertyName( index );
+        visual.SetName( visualName );
+      }
     }
   }
 
