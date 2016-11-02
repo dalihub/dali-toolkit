@@ -700,13 +700,27 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void ImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
-  // TODO
+  // This is where specific Properties can be set.
 }
 
 Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
 {
-  // TODO
-  return Dali::Property::Value();
+  Dali::Property::Value value;
+
+  switch( index )
+  {
+    case Toolkit::ImageVisual::Property::URL:
+    {
+      value = mImageUrl;
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return value;
 }
 
 void ImageVisual::OnSetTransform()
