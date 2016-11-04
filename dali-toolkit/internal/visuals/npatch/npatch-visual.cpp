@@ -448,32 +448,13 @@ void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void NPatchVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
-  // This is where specific Properties can be set.
+  // TODO
 }
 
 Dali::Property::Value NPatchVisual::DoGetProperty( Dali::Property::Index index )
 {
-  Dali::Property::Value value;
-
-  switch( index )
-  {
-    case Toolkit::ImageVisual::Property::URL:
-    {
-      value = mImageUrl;
-      break;
-    }
-    case Toolkit::ImageVisual::Property::BORDER_ONLY:
-    {
-      value = mBorderOnly;
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  return value;
+  // TODO
+  return Dali::Property::Value();
 }
 
 void NPatchVisual::OnSetTransform()

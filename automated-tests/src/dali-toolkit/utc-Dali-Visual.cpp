@@ -662,19 +662,6 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == true );
 
-  // Test the properties..
-  Property::Value imageValue = imageVisual.GetProperty( ImageVisual::Property::URL );
-  DALI_TEST_CHECK( imageValue.Get<std::string>() == TEST_IMAGE_FILE_NAME );
-
-  // Other Properties for Image Visual can be tested here once implemented in the Visual
-
-  tet_infoline( "UtcDaliVisualGetPropertyMap5 Ensuring Property without a Getter is not problematic" );
-  imageValue = imageVisual.GetProperty( ImageVisual::Property::DESIRED_HEIGHT );
-  DALI_TEST_CHECK( imageValue.Get<int>()  != 30 );
-
-
-  // Rest of test uses Image not an url ( legacy )
-
   // Get an image visual with an image handle, and test the default property values
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
   imageVisual = factory.CreateVisual(image);
@@ -720,6 +707,10 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == false );
 
+  // Test the properties. TODO: to be completed.
+  imageVisual.SetProperty( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  Property::Value imageValue = imageVisual.GetProperty( ImageVisual::Property::URL );
+
   END_TEST;
 }
 
@@ -728,13 +719,11 @@ int UtcDaliVisualGetPropertyMap6(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetPropertyMap6: NPatchVisual" );
 
-  bool BORDER_ONLY_SETTING = true;
-
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  BORDER_ONLY_SETTING );
+  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -753,19 +742,9 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() );
 
-  // Test the properties via Index.
-  nPatchVisual.SetProperty( ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME ); // May not able to change URL in future using SetProperty
+  // Test the properties. TODO: to be completed.
+  nPatchVisual.SetProperty( ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME );
   Property::Value nPatchValue = nPatchVisual.GetProperty( ImageVisual::Property::URL );
-  DALI_TEST_CHECK( nPatchValue.Get<std::string>() == TEST_NPATCH_FILE_NAME );
-
-  nPatchValue = nPatchVisual.GetProperty( ImageVisual::Property::BORDER_ONLY );
-  DALI_TEST_CHECK( nPatchValue.Get<bool>() == BORDER_ONLY_SETTING );
-
-  // Other Properties for N-Patch Visual can be tested here once implemented in the Visual
-
-  tet_infoline( "UtcDaliVisualGetPropertyMap6 Ensuring Property without a Getter is not problematic" );
-  nPatchValue = nPatchVisual.GetProperty( ImageVisual::Property::DESIRED_HEIGHT );
-  DALI_TEST_CHECK( nPatchValue.Get<int>()  != 30 );
 
   END_TEST;
 }
