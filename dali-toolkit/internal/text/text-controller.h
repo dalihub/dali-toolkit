@@ -26,7 +26,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/text-scroller-interface.h>
 
 namespace Dali
 {
@@ -41,7 +40,6 @@ class Controller;
 class ControlInterface;
 class EditableControlInterface;
 class View;
-struct ScrollerData;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
 
@@ -56,7 +54,7 @@ typedef IntrusivePtr<Controller> ControllerPtr;
  *
  * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public Text::ScrollerInterface
+class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface
 {
 public: // Enumerated types.
 
@@ -149,13 +147,6 @@ public: // Constructor.
   static ControllerPtr New( ControlInterface* controlInterface,
                             EditableControlInterface* editableControlInterface );
 
-  /**
-   * @brief Sets the text-control interface.
-   *
-   * @param[in] controlInterface The text-control interface.
-   */
-  void SetTextControlInterface( ControlInterface* controlInterface );
-
 public: // Configure the text controller.
 
   /**
@@ -210,53 +201,17 @@ public: // Configure the text controller.
   bool IsAutoScrollEnabled() const;
 
   /**
-   * @brief Sets the speed the text should automatically scroll at.
-   *
-   * @param[in] scrollSpeed The speed of scrolling in pixels per second.
+   * @brief Get direction of the text from the first line of text,
+   * @return bool rtl (right to left) is true
    */
-  void SetAutoscrollSpeed( int scrollSpeed );
+  CharacterDirection GetAutoScrollDirection() const;
 
   /**
-   * @brief Retrieves the auto scroll speed.
+   * @brief Get the alignment offset of the first line of text.
    *
-   * @return The auto scroll speed in pixels per second.
+   * @return The alignment offset.
    */
-  int GetAutoScrollSpeed() const;
-
-  /**
-   * @brief Sets the number of loops the text should scroll.
-   *
-   * @param[in] loopCount The number of loops.
-   */
-  void SetAutoScrollLoopCount( int loopCount );
-
-  /**
-   * @brief Retrieves the number of loops the text should scroll.
-   *
-   * @return The numebr of loops.
-   */
-  int GetAutoScrollLoopCount() const;
-
-  /**
-   * @brief Sets the gap before text wraps around when scrolling.
-   *
-   * @param[in] wrapGap The gap in pixels.
-   */
-  void SetAutoScrollWrapGap( float wrapGap );
-
-  /**
-   * @brief Retrieves the gap before text wraps around when scrolling.
-   *
-   * @return The gap in pixels.
-   */
-  float GetAutoScrollWrapGap() const;
-
-  /**
-   * @brief Retrieves the text's autoscroll data.
-   *
-   * @return The text's autoscroll data.
-   */
-  const ScrollerData* const GetAutoScrollData();
+  float GetAutoScrollLineAlignment() const;
 
   /**
    * @brief Enables the horizontal scrolling.
@@ -955,13 +910,6 @@ protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
   virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
-
-private: // Inherit from TextScroller
-
-  /**
-   * @copydoc Text::ScrollerInterface::ScrollingFinished()
-   */
-  virtual void ScrollingFinished();
 
 private: // Update.
 

@@ -1081,8 +1081,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   DALI_TEST_CHECK( !value->Get<bool>() );
 
   value = resultMap.Find( TextVisual::Property::ENABLE_AUTO_SCROLL, Property::BOOLEAN );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( !value->Get<bool>() );
+  DALI_TEST_CHECK( !value );
 
   value = resultMap.Find( TextVisual::Property::LINE_SPACING, Property::FLOAT );
   DALI_TEST_CHECK( value );

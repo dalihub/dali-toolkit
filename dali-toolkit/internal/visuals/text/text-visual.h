@@ -26,7 +26,6 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-controller.h>
-#include <dali-toolkit/internal/text/text-scroller.h>
 
 namespace Dali
 {
@@ -79,12 +78,6 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static TextVisualPtr New( VisualFactoryCache& factoryCache );
-
-  /**
-   * @brief Sets the text control interface which is needed to communicate with a control.
-   * @param[in] controlInterface Pointer to the control-interface.
-   */
-  void SetTextControlInterface( Text::ControlInterface* controlInterface );
 
 public: // from Visual::Base
 
@@ -157,22 +150,11 @@ private:
    */
   void RenderText();
 
-  /**
-   * @brief Stops the text auto scroll.
-   */
-  void StopTextAutoScrolling();
-
-  /**
-   * @brief Set up Autoscrolling.
-   */
-  void SetUpAutoScrolling();
-
 private:
   Text::ControllerPtr          mController;               ///< The text's controller.
   WeakHandle<Actor>            mSelf;
 
   Text::RendererPtr            mRenderer;
-  Text::TextScrollerPtr        mTextScroller;
   Actor                        mRenderableActor;
 
   int mRenderingBackend;
