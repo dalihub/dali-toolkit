@@ -71,6 +71,16 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
     }
   }
 
+  Property::Value* transform = propertyMap.Find( Toolkit::Visual::DevelProperty::TRANSFORM, TRANSFORM );
+  if( transform )
+  {
+    Property::Map map;
+    if( transform->Get( map ) )
+    {
+      mImpl->mTransform.SetPropertyMap( map );
+    }
+  }
+
   DoSetProperties( propertyMap );
 }
 
@@ -124,9 +134,12 @@ void Visual::Base::SetOnStage( Actor& actor )
   // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
   DoSetOnStage( actor );
 
-  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-  mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-  mImpl->mFlags |= Impl::IS_ON_STAGE;
+  if( mImpl->mRenderer )
+  {
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+    mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+  }
 }
 
 void Visual::Base::SetOffStage( Actor& actor )
@@ -147,6 +160,10 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   {
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
+
+  Property::Map transform;
+  mImpl->mTransform.GetPropertyMap( transform );
+  map.Insert( Toolkit::Visual::DevelProperty::TRANSFORM, transform );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
@@ -173,8 +190,8 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
 
 void Visual::Base::DoSetOffStage( Actor& actor )
 {
-  actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
+    actor.RemoveRenderer( mImpl->mRenderer );
+    mImpl->mRenderer.Reset();
 }
 
 bool Visual::Base::IsOnStage() const
@@ -195,6 +212,16 @@ void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Propert
 
   if( index < VISUAL_PROPERTY_START_INDEX )
   {
+    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
+    {
+      Property::Map* map = propertyValue.GetMap();
+      if( map )
+      {
+        mImpl->mTransform.SetPropertyMap( *map );
+        OnSetTransform();
+      }
+    }
+
     // TODO set the properties of the visual base.
   }
   else
@@ -213,6 +240,12 @@ Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
 
   if( index < VISUAL_PROPERTY_START_INDEX )
   {
+    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
+    {
+      Property::Map map;
+      mImpl->mTransform.GetPropertyMap( map );
+      return map;
+    }
     // TODO retrieve the properties of the visual base.
   }
   else

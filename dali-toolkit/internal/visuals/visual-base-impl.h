@@ -186,6 +186,11 @@ protected:
    */
   virtual void DoSetProperties( const Property::Map& propertyMap ) = 0;
 
+  /**
+   * @brief Called when transform property changes
+   */
+  virtual void OnSetTransform(){}
+
 protected:
 
   /**

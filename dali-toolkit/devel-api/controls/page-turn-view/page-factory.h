@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -28,7 +28,7 @@ namespace Toolkit
 {
 
 /**
- * @brief PageFactory is an abstract interface for providing images to PageTurnView
+ * @brief PageFactory is an abstract interface for providing textures to PageTurnView
  * Each page is identified by a unique ID, and has a linear order from 0 to GetNumberOfPages()-1
  *
  * @SINCE_1_1.4
@@ -41,7 +41,6 @@ public:
 
   /**
    * @brief Virtual destructor
-   * @SINCE_1_1.4
    */
   virtual ~PageFactory(){};
 
@@ -49,26 +48,24 @@ public:
    * @brief Query the number of pages available from the factory.
    *
    * The maximum available page has an ID of GetNumberOfPages()-1.
-   * @SINCE_1_1.4
    * @return The page count.
    */
   virtual unsigned int GetNumberOfPages() = 0;
 
   /**
-   * @brief Create an actor to represent the page content.
-   * @SINCE_1_1.30
+   * @brief Return the texture for the page
    *
-   * If no valid image provided, a broken image is displayed.
-   * For double-sided page( PageTurnLandscapeView ), the left half of image is used as page front side, and the right half as page back side.
+   * For double-sided page( PageTurnLandscapeView ), the left half of texture is used as page front side, and the right half as page back side.
+   *
+   * @note Must return a valid texture handle!
    *
    * @param[in] pageId The ID of the page to create.
    * @return An actor, or an uninitialized pointer if the ID is out of range.
    */
-  virtual Image NewPage( unsigned int pageId ) = 0;
+  virtual Texture NewPage( unsigned int pageId ) = 0;
 
   /**
    * @brief Retrieve the extension for this factory
-   * @SINCE_1_1.30
    *
    * @return The extension if available, NULL otherwise.
    */

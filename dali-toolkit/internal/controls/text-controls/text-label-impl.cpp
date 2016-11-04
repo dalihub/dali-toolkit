@@ -64,7 +64,7 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextLabel, Toolkit::Control, Create );
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "renderingBackend",     INTEGER, RENDERING_BACKEND      )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "text",                 STRING,  TEXT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontFamily",           STRING,  FONT_FAMILY            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",            STRING,  FONT_STYLE             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",            MAP,     FONT_STYLE             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pointSize",            FLOAT,   POINT_SIZE             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "multiLine",            BOOLEAN, MULTI_LINE             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "horizontalAlignment",  STRING,  HORIZONTAL_ALIGNMENT   )
@@ -81,10 +81,10 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollSpeed",      INTEGER,
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopCount",  INTEGER, AUTO_SCROLL_LOOP_COUNT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollGap",        FLOAT,   AUTO_SCROLL_GAP        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineSpacing",          FLOAT,   LINE_SPACING           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            STRING,  UNDERLINE              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               STRING,  SHADOW                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               STRING,  EMBOSS                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              STRING,  OUTLINE                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            MAP,     UNDERLINE              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               MAP,     SHADOW                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               MAP,     EMBOSS                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              MAP,     OUTLINE                )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -173,11 +173,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool offsetDefined = false;
           Vector2 offset;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    colorDefined,
-                                                    color,
-                                                    offsetDefined,
-                                                    offset );
+          const bool empty = Text::ParseShadowProperties( value.Get<Property::Map>(),
+                                                          colorDefined,
+                                                          color,
+                                                          offsetDefined,
+                                                          offset );
 
           if( !empty )
           {
@@ -191,11 +191,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool offsetDefined = false;
           Vector2 offset;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    colorDefined,
-                                                    color,
-                                                    offsetDefined,
-                                                    offset );
+          const bool empty = Text::ParseShadowProperties( value.Get<Property::Map>(),
+                                                          colorDefined,
+                                                          color,
+                                                          offsetDefined,
+                                                          offset );
 
           if( !empty )
           {
@@ -210,12 +210,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool heightDefined = false;
           float height = 0.f;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    enabled,
-                                                    colorDefined,
-                                                    color,
-                                                    heightDefined,
-                                                    height );
+          const bool empty = Text::ParseUnderlineProperties( value.Get<Property::Map>(),
+                                                             enabled,
+                                                             colorDefined,
+                                                             color,
+                                                             heightDefined,
+                                                             height );
 
           if( !empty )
           {
@@ -230,12 +230,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool heightDefined = false;
           float height = 0.f;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    enabled,
-                                                    colorDefined,
-                                                    color,
-                                                    heightDefined,
-                                                    height );
+          const bool empty = Text::ParseUnderlineProperties( value.Get<Property::Map>(),
+                                                             enabled,
+                                                             colorDefined,
+                                                             color,
+                                                             heightDefined,
+                                                             height );
 
           if( !empty && colorDefined )
           {
@@ -250,12 +250,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           Vector4 color;
           bool heightDefined = false;
           float height = 0.f;
-          const bool empty = Text::ParseProperties( value.Get<std::string>(),
-                                                    enabled,
-                                                    colorDefined,
-                                                    color,
-                                                    heightDefined,
-                                                    height );
+          const bool empty = Text::ParseUnderlineProperties( value.Get<Property::Map>(),
+                                                             enabled,
+                                                             colorDefined,
+                                                             color,
+                                                             heightDefined,
+                                                             height );
 
           if( !empty && heightDefined )
           {
@@ -290,7 +290,7 @@ void TextLabel::OnInitialize()
   visualMap[Toolkit::TextVisual::Property::RENDERING_BACKEND] = static_cast<int>( DEFAULT_RENDERING_BACKEND );
 
   mVisual =  Toolkit::VisualFactory::Get().CreateVisual( visualMap );
-  RegisterVisual( Toolkit::TextLabel::Property::TEXT, self, mVisual );
+  RegisterVisual( Toolkit::TextLabel::Property::TEXT, mVisual );
 
   Internal::Visual::Base& visualBase = Toolkit::GetImplementation( mVisual );
   TextVisual* textVisual = static_cast<TextVisual*>( &visualBase );

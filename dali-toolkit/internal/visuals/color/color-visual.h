@@ -103,6 +103,11 @@ protected:
    */
   virtual void DoSetOnStage( Actor& actor );
 
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
 public:
 
   /**

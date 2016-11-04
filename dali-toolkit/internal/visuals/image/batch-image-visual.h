@@ -45,7 +45,7 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @return A smart-pointer to the newly allocated visual.
    */
-  static BatchImageVisualPtr New( VisualFactoryCache& factoryCache );
+  static BatchImageVisualPtr New( VisualFactoryCache& factoryCache, const std::string& url );
 
 public:  // from Visual
 

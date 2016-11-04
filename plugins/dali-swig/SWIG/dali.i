@@ -62,6 +62,8 @@
 #include <dali/devel-api/images/nine-patch-image.h>
 
 #include <dali-toolkit/devel-api/builder/builder.h>
+
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
@@ -72,6 +74,7 @@
 
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 

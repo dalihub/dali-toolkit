@@ -105,12 +105,24 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
+    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -189,11 +201,6 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 } // unnamed namespace
 
-ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache )
-{
-  return new ImageVisual( factoryCache );
-}
-
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
                                  const std::string& imageUrl,
                                  ImageDimensions size,
@@ -206,21 +213,6 @@ ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, const Image& image )
 {
   return new ImageVisual( factoryCache, image );
-}
-
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
-  mImage(),
-  mPixels(),
-  mPixelArea( FULL_TEXTURE_RECT ),
-  mPlacementActor(),
-  mImageUrl(),
-  mDesiredSize(),
-  mFittingMode( FittingMode::DEFAULT ),
-  mSamplingMode( SamplingMode::DEFAULT ),
-  mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT )
-{
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
@@ -263,69 +255,60 @@ ImageVisual::~ImageVisual()
 
 void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-  if( imageURLValue )
+  // Url is already received in constructor
+  Property::Value* fittingValue = propertyMap.Find( Toolkit::ImageVisual::Property::FITTING_MODE, IMAGE_FITTING_MODE );
+  if( fittingValue )
   {
-    imageURLValue->Get( mImageUrl );
-    if( !mImageUrl.empty() )
-    {
-      mImage.Reset();
-    }
-
-    Property::Value* fittingValue = propertyMap.Find( Toolkit::ImageVisual::Property::FITTING_MODE, IMAGE_FITTING_MODE );
-    if( fittingValue )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, value );
-      mFittingMode = Dali::FittingMode::Type( value );
-    }
-
-    Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
-    if( samplingValue )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, value );
-      mSamplingMode = Dali::SamplingMode::Type( value );
-    }
-
-    int desiredWidth = 0;
-    Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
-    if( desiredWidthValue )
-    {
-      desiredWidthValue->Get( desiredWidth );
-    }
-
-    int desiredHeight = 0;
-    Property::Value* desiredHeightValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, IMAGE_DESIRED_HEIGHT );
-    if( desiredHeightValue )
-    {
-      desiredHeightValue->Get( desiredHeight );
-    }
-
-    Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
-    if( pixelAreaValue )
-    {
-      pixelAreaValue->Get( mPixelArea );
-    }
-
-    Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
-    if( wrapModeValueU )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
-      mWrapModeU = Dali::WrapMode::Type( value );
-    }
-
-    Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
-    if( wrapModeValueV )
-    {
-      int value;
-      Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
-      mWrapModeV = Dali::WrapMode::Type( value );
-    }
-
-    mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+    int value;
+    Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, value );
+    mFittingMode = Dali::FittingMode::Type( value );
   }
+
+  Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
+  if( samplingValue )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, value );
+    mSamplingMode = Dali::SamplingMode::Type( value );
+  }
+
+  int desiredWidth = 0;
+  Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
+  if( desiredWidthValue )
+  {
+    desiredWidthValue->Get( desiredWidth );
+  }
+
+  int desiredHeight = 0;
+  Property::Value* desiredHeightValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, IMAGE_DESIRED_HEIGHT );
+  if( desiredHeightValue )
+  {
+    desiredHeightValue->Get( desiredHeight );
+  }
+
+  Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
+  if( pixelAreaValue )
+  {
+    pixelAreaValue->Get( mPixelArea );
+  }
+
+  Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
+  if( wrapModeValueU )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
+    mWrapModeU = Dali::WrapMode::Type( value );
+  }
+
+  Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
+  if( wrapModeValueV )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
+    mWrapModeV = Dali::WrapMode::Type( value );
+  }
+
+  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 
   Property::Value* syncLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
   if( syncLoading )
@@ -337,7 +320,7 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
       // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
       // ( for on-stage actor with image url unchanged, resource loading is already finished)
-      if( imageURLValue )
+      if( mImageUrl.size() > 0u )
       {
         LoadResourceSynchronously();
       }
@@ -409,6 +392,9 @@ void ImageVisual::CreateRenderer( TextureSet& textures )
   mImpl->mRenderer = Renderer::New( geometry, shader );
   DALI_ASSERT_DEBUG( textures );
   mImpl->mRenderer.SetTextures( textures );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
@@ -457,6 +443,9 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 
@@ -533,13 +522,9 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
 
 void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 {
-  if( imageUrl.empty() )
-  {
-    return;
-  }
+  mImpl->mRenderer.Reset();
 
   mImageUrl = imageUrl;
-  mImpl->mRenderer.Reset();
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
   if( !mImpl->mCustomShader &&
@@ -547,7 +532,14 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
       ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-    bool cacheable =  defaultWrapMode &&  mPixelArea == FULL_TEXTURE_RECT;
+    bool defaultTransform = mImpl->mTransform.mSize == Vector2::ONE &&
+                            mImpl->mTransform.mOffset == Vector2::ZERO &&
+                            mImpl->mTransform.mOffsetSizeMode == Vector4::ZERO &&
+                            mImpl->mTransform.mOrigin == Toolkit::Align::CENTER &&
+                            mImpl->mTransform.mAnchorPoint == Toolkit::Align::CENTER;
+
+    bool cacheable =  defaultWrapMode && defaultTransform &&  mPixelArea == FULL_TEXTURE_RECT;
+
 
     mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
     if( cacheable ) // fetch the renderer from cache if exist
@@ -595,6 +587,7 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 void ImageVisual::InitializeRenderer( const Image& image )
 {
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
+  mImpl->mRenderer.Reset();
 
   // don't reuse CreateTextureSet
   TextureSet textures = TextureSet::New();
@@ -611,11 +604,7 @@ void ImageVisual::InitializeRenderer( const Image& image )
     // reuse existing code for regular images
     CreateRenderer( textures );
   }
-
-  if( image )
-  {
-    ApplyImageToSampler( image );
-  }
+  ApplyImageToSampler( image );
 }
 
 void ImageVisual::UploadCompleted()
@@ -632,16 +621,21 @@ void ImageVisual::UploadCompleted()
 
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
-  mPlacementActor = actor;
-
   if( !mImageUrl.empty() )
   {
     InitializeRenderer( mImageUrl );
   }
-  else
+  else if ( mImage )
   {
     InitializeRenderer( mImage );
   }
+
+  if ( !mImpl->mRenderer)
+  {
+    return;
+  }
+
+  mPlacementActor = actor;
 
   if( mPixelArea != FULL_TEXTURE_RECT )
   {
@@ -657,18 +651,17 @@ void ImageVisual::DoSetOnStage( Actor& actor )
 
 void ImageVisual::DoSetOffStage( Actor& actor )
 {
+  // Visual::Base::SetOffStage only calls DoSetOffStage if mRenderer exists (is on onstage)
+
   //If we own the image then make sure we release it when we go off stage
+  actor.RemoveRenderer( mImpl->mRenderer);
   if( !mImageUrl.empty() )
   {
-    actor.RemoveRenderer( mImpl->mRenderer );
     CleanCache(mImageUrl);
     mImage.Reset();
   }
-  else
-  {
-    actor.RemoveRenderer( mImpl->mRenderer );
-    mImpl->mRenderer.Reset();
-  }
+
+  mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
 
@@ -707,13 +700,35 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void ImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
-  // TODO
+  // This is where specific Properties can be set.
 }
 
 Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
 {
-  // TODO
-  return Dali::Property::Value();
+  Dali::Property::Value value;
+
+  switch( index )
+  {
+    case Toolkit::ImageVisual::Property::URL:
+    {
+      value = mImageUrl;
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return value;
+}
+
+void ImageVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
 }
 
 Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )

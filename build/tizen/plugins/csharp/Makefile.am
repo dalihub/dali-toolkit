@@ -16,8 +16,7 @@ dali_swig_dir = ../../../../plugins/dali-swig
 
 BUILT_SOURCES = \
           $(dali_swig_dir)/automatic/cpp/dali_wrap.cpp \
-          $(dali_swig_dir)/automatic/cpp/dali_wrap.h \
-          $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.cpp
+          $(dali_swig_dir)/automatic/cpp/dali_wrap.h
 
 all-local: 
 gbs-local: libNDalic.so NDali.dll

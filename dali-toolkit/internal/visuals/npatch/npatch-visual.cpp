@@ -24,7 +24,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
 
-// INTERNAL IINCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -55,6 +55,14 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
   uniform mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
   void main()\n
   {\n
     mediump vec2 fixedFactor  = vec2( uNinePatchFactorsX[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uNinePatchFactorsY[ int( ( aPosition.y + 1.0 ) * 0.5 ) ].x );\n
@@ -63,8 +71,13 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );\n
     mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );\n
     \n
-    mediump vec4 vertexPosition = vec4( ( fixedFactor + ( uSize.xy - fixedTotal ) * stretch / stretchTotal ), 0.0, 1.0 );\n
-    vertexPosition.xy -= uSize.xy * vec2( 0.5, 0.5 );\n
+
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+
+    mediump vec4 vertexPosition = vec4( ( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal ) +  anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+    vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );\n
+
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
     vTexCoord = ( fixedFactor + stretch ) / ( fixedTotal + stretchTotal );\n
@@ -82,18 +95,29 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     uniform mediump vec2 uFixed[ 3 ];\n
     uniform mediump vec2 uStretchTotal;\n
     \n
+
+    //Visual size and offset
+    uniform mediump vec2 offset;\n
+    uniform mediump vec2 size;\n
+    uniform mediump vec4 offsetSizeMode;\n
+    uniform mediump vec2 origin;\n
+    uniform mediump vec2 anchorPoint;\n
+
     void main()\n
     {\n
+      vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+      vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+
       mediump vec2 scale        = vec2( length( uModelMatrix[ 0 ].xyz ), length( uModelMatrix[ 1 ].xyz ) );\n
-      mediump vec2 size         = uSize.xy * scale;\n
+      mediump vec2 size         = visualSize.xy * scale;\n
       \n
       mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
       mediump vec2 stretch      = floor( aPosition * 0.5 );\n
       mediump vec2 fixedTotal   = uFixed[ 2 ];\n
       \n
-      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );\n
+      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
       vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
-      vertexPosition.xy =  vertexPosition.xy / scale;\n
+      vertexPosition.xy =  vertexPosition.xy / scale + anchorPoint*size + (visualOffset + origin)*uSize.xy;\
       \n
       vertexPosition = uMvpMatrix * vertexPosition;\n
       \n
@@ -201,14 +225,9 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
 {
-  return new NPatchVisual( factoryCache );
-}
-
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly )
-{
-  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
   nPatchVisual->mImageUrl = imageUrl;
 
   NinePatchImage image = NinePatchImage::New( imageUrl );
@@ -217,9 +236,9 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
   return nPatchVisual;
 }
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
 {
-  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache, borderOnly );
+  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
   nPatchVisual->mImage = image;
 
   nPatchVisual->InitializeFromImage( image );
@@ -227,7 +246,7 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchIm
   return nPatchVisual;
 }
 
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly )
+NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mImage(),
   mCroppedImage(),
@@ -235,7 +254,7 @@ NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly )
   mStretchPixelsX(),
   mStretchPixelsY(),
   mImageSize(),
-  mBorderOnly( borderOnly )
+  mBorderOnly( false )
 {
 }
 
@@ -245,26 +264,12 @@ NPatchVisual::~NPatchVisual()
 
 void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-  if( imageURLValue )
+  // URL is already passed in via constructor
+  //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
+  Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
+  if( borderOnlyValue )
   {
-    //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
-    Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
-    if( borderOnlyValue )
-    {
-      borderOnlyValue->Get( mBorderOnly );
-    }
-
-    if( imageURLValue->Get( mImageUrl ) )
-    {
-      NinePatchImage nPatch = NinePatchImage::New( mImageUrl );
-      InitializeFromImage( nPatch );
-    }
-    else
-    {
-      InitializeFromBrokenImage();
-      DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
-    }
+    borderOnlyValue->Get( mBorderOnly );
   }
 }
 
@@ -387,6 +392,9 @@ void NPatchVisual::InitializeRenderer()
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 
@@ -440,14 +448,42 @@ void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void NPatchVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
-  // TODO
+  // This is where specific Properties can be set.
 }
 
 Dali::Property::Value NPatchVisual::DoGetProperty( Dali::Property::Index index )
 {
-  // TODO
-  return Dali::Property::Value();
+  Dali::Property::Value value;
+
+  switch( index )
+  {
+    case Toolkit::ImageVisual::Property::URL:
+    {
+      value = mImageUrl;
+      break;
+    }
+    case Toolkit::ImageVisual::Property::BORDER_ONLY:
+    {
+      value = mBorderOnly;
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return value;
 }
+
+void NPatchVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 
 void NPatchVisual::ChangeRenderer( bool oldBorderOnly, size_t oldGridX, size_t oldGridY )
 {

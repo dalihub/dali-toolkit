@@ -108,13 +108,27 @@ const char* VERTEX_SHADER[] =
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
     mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
     vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
     \n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
   }\n
 ),
 
@@ -126,11 +140,26 @@ DALI_COMPOSE_SHADER(
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
     mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
     vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
     \n
     vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
   }\n
@@ -226,6 +255,14 @@ void GradientVisual::DoSetProperties( const Property::Map& propertyMap )
   else
   {
     DALI_LOG_ERROR( "Fail to provide valid properties to create a GradientVisual object\n" );
+  }
+}
+
+void GradientVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
   }
 }
 
@@ -326,6 +363,9 @@ void GradientVisual::InitializeRenderer()
   mImpl->mRenderer.SetTextures( textureSet );
 
   mImpl->mRenderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propertyMap)

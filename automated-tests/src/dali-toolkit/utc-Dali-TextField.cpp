@@ -282,7 +282,6 @@ Integration::TapGestureEvent GenerateTap(
   return tap;
 }
 
-
 Integration::LongPressGestureEvent GenerateLongPress(
     Gesture::State state,
     unsigned int numberOfTouches,
@@ -309,6 +308,34 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 keyModifier,
                                 timeStamp,
                                 keyState );
+}
+
+bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
+{
+  if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
+  {
+    for( unsigned int index = 0u; index < fontStyleMapGet.Count(); ++index )
+    {
+      const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
+
+      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      if( NULL != valueSet )
+      {
+        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        {
+          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+      }
+      else
+      {
+        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 } // namespace
@@ -501,18 +528,56 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check font properties.
   field.SetProperty( TextField::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}"), TEST_LOCATION );
+
+  Property::Map fontStyleMapSet;
+  Property::Map fontStyleMapGet;
+  Property::Value* slantValue = NULL;
+
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Reset font style.
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+
+  // Replace 'roman' for 'normal'.
+  slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   // Check that the MAX_LENGTH property can be correctly set
   const int maxNumberOfCharacters = 20;
@@ -598,30 +663,85 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check input font properties.
   field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}", TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Reset input font style.
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string(""), TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+
+  // Replace 'roman' for 'normal'.
+  slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  Property::Map underlineMapSet;
+  Property::Map underlineMapGet;
+
+  underlineMapSet.Insert( "enable", "true" );
+  underlineMapSet.Insert( "color", "red" );
+  underlineMapSet.Insert( "height", "1" );
 
   // Check the underline property
-  field.SetProperty( TextField::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
+  field.SetProperty( TextField::Property::UNDERLINE, underlineMapSet );
+
+  underlineMapGet = field.GetProperty<Property::Map>( TextField::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   // Check the input underline property
   field.SetProperty( TextField::Property::INPUT_UNDERLINE, "Underline input properties" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
 
   // Check the shadow property
-  field.SetProperty( TextField::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
+  Property::Map shadowMapSet;
+  Property::Map shadowMapGet;
+
+  shadowMapSet.Insert( "color", "green" );
+  shadowMapSet.Insert( "offset", "2 2" );
+
+  field.SetProperty( TextField::Property::SHADOW, shadowMapSet );
+
+  shadowMapGet = field.GetProperty<Property::Map>( TextField::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
 
   // Check the input shadow property
   field.SetProperty( TextField::Property::INPUT_SHADOW, "Shadow input properties" );
@@ -940,8 +1060,13 @@ int utcDaliTextFieldInputStyleChanged01(void)
     const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
     DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
 
-    const std::string style = field.GetProperty( TextField::Property::INPUT_FONT_STYLE ).Get<std::string>();
-    DALI_TEST_EQUALS( style, "{\"weight\":\"bold\"}", TEST_LOCATION );
+    const Property::Map fontStyleMapGet = field.GetProperty( TextField::Property::INPUT_FONT_STYLE ).Get<Property::Map>();
+
+    Property::Map fontStyleMapSet;
+    fontStyleMapSet.Insert( "weight", "bold" );
+
+    DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+    DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
   }
   DALI_TEST_CHECK( inputStyleChangedSignal );
 
@@ -1168,7 +1293,12 @@ int utcDaliTextFieldInputStyleChanged02(void)
 
   field.SetProperty( TextField::Property::INPUT_COLOR, Color::YELLOW );
 
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+  Property::Map fontStyleMapSet;
+  fontStyleMapSet.Insert( "weight", "thin" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 20.f );
 
   field.SetProperty( TextField::Property::INPUT_UNDERLINE, "underline" );
@@ -1853,11 +1983,25 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
 
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"slant\":\"italic\"}", TEST_LOCATION );
+  Property::Map fontStyleMapSet;
+  Property::Map fontStyleMapGet;
 
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"width\":\"expanded\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"width\":\"expanded\",\"slant\":\"italic\"}", TEST_LOCATION );
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "width", "expanded" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -1865,11 +2009,24 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   field.SetProperty( TextField::Property::TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::TEXT_COLOR ), Color::RED, TEST_LOCATION );
 
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), "{\"weight\":\"bold\",\"slant\":\"italic\"}", TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "slant", "italic" );
 
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"width\":\"expanded\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), "{\"width\":\"expanded\"}", TEST_LOCATION );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "width", "expanded" );
+
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   END_TEST;
 }

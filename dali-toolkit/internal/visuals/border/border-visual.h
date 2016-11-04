@@ -99,6 +99,11 @@ protected:
    */
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
 public:
 
   /**

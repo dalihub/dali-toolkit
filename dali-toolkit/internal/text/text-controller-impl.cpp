@@ -89,6 +89,7 @@ EventData::EventData( DecoratorPtr decorator )
   mGrabHandleEnabled( true ),
   mGrabHandlePopupEnabled( true ),
   mSelectionEnabled( true ),
+  mUpdateCursorHookPosition( false ),
   mUpdateCursorPosition( false ),
   mUpdateGrabHandlePosition( false ),
   mUpdateLeftSelectionPosition( false ),

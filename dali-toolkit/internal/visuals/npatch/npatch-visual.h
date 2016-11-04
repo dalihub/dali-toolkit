@@ -58,32 +58,22 @@ class NPatchVisual: public Visual::Base
 public:
 
   /**
-   * @brief Create a new n-patch visual.
-   *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @return A smart-pointer to the newly allocated visual.
-   */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache );
-
-  /**
    * @brief Create an N-patch visual using an image URL.
    *
    * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] imageUrl The URL to 9 patch image resource to use
-   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, bool borderOnly = false );
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
 
   /**
    * @brief Create an N-patch visual with a NinePatchImage resource.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] image The NinePatchImage to use
-   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, NinePatchImage image, bool borderOnly = false );
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, NinePatchImage image );
 
 public:  // from Visual
 
@@ -112,10 +102,9 @@ protected:
   /**
    * @brief Constructor.
    *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] borderOnly A Flag to indicate if the image should omit the centre of the n-patch and only render the border
+   * @param[in] factoryCache Reference to the VisualFactoryCache object
    */
-  NPatchVisual( VisualFactoryCache& factoryCache, bool borderOnly = false );
+  NPatchVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -136,6 +125,11 @@ protected:
    * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
+
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
 
 private:
 

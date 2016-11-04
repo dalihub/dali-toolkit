@@ -54,14 +54,6 @@ class SvgVisual: public Visual::Base
 public:
 
   /**
-   * @brief Create a new SVG visual.
-   *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @return A smart-pointer to the newly allocated visual.
-   */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache );
-
-  /**
    * @brief Create the SVG Visual using the image URL.
    *
    * The visual will parse the SVG image once it is set.

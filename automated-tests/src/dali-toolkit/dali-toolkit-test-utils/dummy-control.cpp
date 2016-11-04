@@ -74,14 +74,14 @@ DummyControlImpl::~DummyControlImpl()
 {
 }
 
-void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual )
 {
-  Control::RegisterVisual( index, placementActor, visual );
+  Control::RegisterVisual( index, visual );
 }
 
-void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual, bool enabled )
+void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled )
 {
-  Control::RegisterVisual( index, placementActor, visual, enabled );
+  Control::RegisterVisual( index, visual, enabled );
 }
 
 void DummyControlImpl::UnregisterVisual( Property::Index index )
@@ -102,11 +102,6 @@ void DummyControlImpl::EnableVisual( Property::Index index, bool enabled )
 bool DummyControlImpl::IsVisualEnabled( Property::Index index )
 {
   return Control::IsVisualEnabled( index );
-}
-
-Actor DummyControlImpl::GetPlacementActor( Property::Index index )
-{
-  return Control::GetPlacementActor( index );
 }
 
 Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )

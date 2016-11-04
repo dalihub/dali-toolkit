@@ -30,7 +30,7 @@ const char* DEFAULT_THEME=
   "{\"styles\":{\n"
   "  \"textlabel\":\n"
   "    {\n"
-  "      \"fontStyle\":\"Regular\",\n"
+  "      \"fontStyle\":{\"weight\":\"normal\"},\n"
   "      \"pointSize\":18\n"
   "    }\n"
   "  }\n"

@@ -184,7 +184,8 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
       }
     }
 
-    Image dummyImage; // Dummy image, force creation of an image visual
+    FrameBufferImage dummyImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+
     InitializeVisual( self, mVisualPostFilter, dummyImage );
     Property::Map customShader;
     customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;

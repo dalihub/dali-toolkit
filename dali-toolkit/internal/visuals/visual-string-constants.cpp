@@ -35,6 +35,14 @@ const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
 const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" );
 
+// Transform
+extern const char * const TRANSFORM( "transform" );
+extern const char * const SIZE( "size" );
+extern const char * const OFFSET( "offset" );
+extern const char * const OFFSET_SIZE_MODE( "offsetSizeMode" );
+extern const char * const ORIGIN( "origin" );
+extern const char * const ANCHOR_POINT( "anchorPoint" );
+
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );

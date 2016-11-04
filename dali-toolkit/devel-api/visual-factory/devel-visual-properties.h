@@ -47,10 +47,59 @@ enum Type
    * @details Name "transform", type Property::Map.
 
    * @note Optional.
-   * @see Transform::Property
+   * @see DevelProperty::Transform::Property
    */
   TRANSFORM = SHADER+1//Dali::Toolkit::Visual::Property::SHADER+1
 };
+
+namespace Transform
+{
+
+namespace Property
+{
+
+enum Type
+{
+  /**
+   * @brief Offset of the visual. It can be either relative (percentage of the parent)
+   * or absolute (in world units).
+   * @details Name "offset", type Property::VECTOR2
+   */
+  OFFSET,
+
+  /**
+   * @brief Size of the visual. It can be either relative (percentage of the parent)
+   * or absolute (in world units).
+   * @details Name "size", type Property::VECTOR2
+   */
+  SIZE,
+
+  /**
+   * @brief The origin of the visual within its control area.
+   * @details Name "origin", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @see Toolkit::Align
+   */
+  ORIGIN,
+
+  /**
+   * @brief The anchor-point of the visual
+   * @details Name "anchorPoint", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @see Toolkit::Align
+   */
+  ANCHOR_POINT,
+
+  /**
+   * @brief Indicates which components of the offset and size are relative
+   * (percentage of the parent) or absolute (in world units).
+   * 0 indicates the component is relative, and 1 absolute.
+   * @details Name "offsetSizeMode", type Property::VECTOR4
+   */
+  OFFSET_SIZE_MODE
+};
+
+} //namespace Property
+
+} //namespace Transform
 
 } // namespace DevelProperty
 

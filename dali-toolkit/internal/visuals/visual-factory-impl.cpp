@@ -142,11 +142,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
         UrlType::Type type = ResolveUrlType( imageUrl );
         if( UrlType::N_PATCH == type )
         {
-          visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ) );
+          visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl );
         }
         else if( UrlType::SVG == type )
         {
-          visualPtr = SvgVisual::New( *( mFactoryCache.Get() ) );
+          visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl );
         }
         else // Regular image
         {
@@ -159,12 +159,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
           if( batchingEnabled )
           {
-            visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ) );
+            visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
             break;
           }
           else
           {
-            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ) );
+            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
           }
         }
       }

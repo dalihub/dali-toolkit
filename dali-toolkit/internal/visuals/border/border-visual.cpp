@@ -56,9 +56,24 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   uniform mediump float borderSize;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec2 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy;\n
+  }\n
+
   void main()\n
   {\n
-    vec2 position = aPosition*uSize.xy + aDrift*borderSize;\n
+    vec2 position = ComputeVertexPosition() + aDrift*borderSize;\n
     gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n
   }\n
 );
@@ -177,6 +192,14 @@ Dali::Property::Value BorderVisual::DoGetProperty( Dali::Property::Index index )
   return Dali::Property::Value();
 }
 
+void BorderVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 void BorderVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::BORDER_GEOMETRY );
@@ -189,6 +212,9 @@ void BorderVisual::InitializeRenderer()
 
   Shader shader = GetBorderShader();
   mImpl->mRenderer = Renderer::New( geometry, shader  );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
 }
 

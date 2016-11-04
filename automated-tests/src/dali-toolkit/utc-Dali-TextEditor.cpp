@@ -163,6 +163,34 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 keyState );
 }
 
+bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
+{
+  if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
+  {
+    for( unsigned int index = 0u; index < fontStyleMapGet.Count(); ++index )
+    {
+      const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
+
+      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      if( NULL != valueSet )
+      {
+        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        {
+          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+      }
+      else
+      {
+        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 } // namespace
 
 int UtcDaliToolkitTextEditorConstructorP(void)
@@ -344,18 +372,55 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check font properties.
   editor.SetProperty( TextEditor::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}"), TEST_LOCATION );
+
+  Property::Map fontStyleMapSet;
+  Property::Map fontStyleMapGet;
+  Property::Value* slantValue = NULL;
+
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Reset font style.
-  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::FONT_STYLE, "" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::FONT_STYLE );
+
+  // Replace 'roman' for 'normal'.
+  slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   // Check that the Alignment properties can be correctly set
   editor.SetProperty( TextEditor::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -417,18 +482,54 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check input font properties.
   editor.SetProperty( TextEditor::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}", TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   editor.SetProperty( TextEditor::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Reset input font style.
-  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_FONT_STYLE ), std::string(""), TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::INPUT_FONT_STYLE );
+
+  // Replace 'roman' for 'normal'.
+  slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   // Check the line spacing property
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -441,16 +542,36 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::INPUT_LINE_SPACING ), 20.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-  editor.SetProperty( TextEditor::Property::UNDERLINE, "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), std::string("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}"), TEST_LOCATION );
+
+  Property::Map underlineMapSet;
+  Property::Map underlineMapGet;
+
+  underlineMapSet.Insert( "enable", "true" );
+  underlineMapSet.Insert( "color", "red" );
+  underlineMapSet.Insert( "height", "1" );
+
+  editor.SetProperty( TextEditor::Property::UNDERLINE, underlineMapSet );
+
+  underlineMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   // Check the input underline property
   editor.SetProperty( TextEditor::Property::INPUT_UNDERLINE, "Underline input properties" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
 
   // Check the shadow property
-  editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::SHADOW ), std::string("{\"color\":\"green\",\"offset\":\"2 2\"}"), TEST_LOCATION );
+  Property::Map shadowMapSet;
+  Property::Map shadowMapGet;
+
+  shadowMapSet.Insert( "color", "green" );
+  shadowMapSet.Insert( "offset", "2 2" );
+
+  editor.SetProperty( TextEditor::Property::SHADOW, shadowMapSet );
+
+  shadowMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
 
   // Check the input shadow property
   editor.SetProperty( TextEditor::Property::INPUT_SHADOW, "Shadow input properties" );
@@ -681,8 +802,14 @@ int utcDaliTextEditorInputStyleChanged01(void)
     const Vector4 color = editor.GetProperty( TextEditor::Property::INPUT_COLOR ).Get<Vector4>();
     DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
 
-    const std::string style = editor.GetProperty( TextEditor::Property::INPUT_FONT_STYLE ).Get<std::string>();
-    DALI_TEST_EQUALS( style, "{\"weight\":\"bold\"}", TEST_LOCATION );
+    Property::Map fontStyleMapSet;
+    Property::Map fontStyleMapGet;
+
+    fontStyleMapSet.Insert( "weight", "bold" );
+
+    fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::INPUT_FONT_STYLE );
+    DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+    DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
   }
   DALI_TEST_CHECK( inputStyleChangedSignal );
 
@@ -724,8 +851,12 @@ int utcDaliTextEditorInputStyleChanged01(void)
   {
     DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextEditor::InputStyle::FONT_STYLE ), TEST_LOCATION );
 
-    const std::string style = editor.GetProperty( TextEditor::Property::INPUT_FONT_STYLE ).Get<std::string>();
-    DALI_TEST_CHECK( style.empty() );
+    Property::Map fontStyleMapSet;
+    Property::Map fontStyleMapGet;
+
+    fontStyleMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::INPUT_FONT_STYLE );
+    DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+    DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
   }
   DALI_TEST_CHECK( inputStyleChangedSignal );
 
@@ -909,7 +1040,12 @@ int utcDaliTextEditorInputStyleChanged02(void)
 
   editor.SetProperty( TextEditor::Property::INPUT_COLOR, Color::YELLOW );
 
-  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+  Property::Map fontStyleMapSet;
+  fontStyleMapSet.Insert( "weight", "thin" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  editor.SetProperty( TextEditor::Property::INPUT_FONT_STYLE, fontStyleMapSet );
   editor.SetProperty( TextEditor::Property::INPUT_POINT_SIZE, 20.f );
   editor.SetProperty( TextEditor::Property::INPUT_LINE_SPACING, 5.f );
 
@@ -965,7 +1101,13 @@ int utcDaliTextEditorInputStyleChanged02(void)
   inputStyleChangedSignal = false;
 
   editor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVuSerif" );
-  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"black\",\"width\":\"expanded\",\"slant\":\"oblique\"}" );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "black" );
+  fontStyleMapSet.Insert( "width", "expanded" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, fontStyleMapSet );
 
   // Create a tap event to touch the text editor.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 30.f, 25.f ) ) );

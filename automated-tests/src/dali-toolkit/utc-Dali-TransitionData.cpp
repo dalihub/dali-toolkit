@@ -246,7 +246,7 @@ int UtcDaliTransitionDataMap1P(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( anim );
@@ -309,7 +309,7 @@ int UtcDaliTransitionDataMap2P(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( anim );
@@ -372,7 +372,7 @@ int UtcDaliTransitionDataMap3P(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( anim );
@@ -518,7 +518,7 @@ int UtcDaliTransitionDataMapN3(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( !anim );
@@ -559,7 +559,7 @@ int UtcDaliTransitionDataMapN4(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( !anim );
@@ -610,7 +610,7 @@ int UtcDaliTransitionDataMapN5(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( !anim );
@@ -661,7 +661,7 @@ int UtcDaliTransitionDataMapN6(void)
   visual.SetName( "visual1" );
 
   Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, actor, visual );
+  dummyImpl.RegisterVisual( visualIndex, visual );
 
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( !anim );

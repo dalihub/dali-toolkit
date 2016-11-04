@@ -54,11 +54,6 @@ namespace Toolkit
 namespace Internal
 {
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache )
-{
-  return new SvgVisual( factoryCache );
-}
-
 SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size )
 {
   SvgVisual* svgVisual = new SvgVisual( factoryCache );
@@ -87,19 +82,7 @@ SvgVisual::~SvgVisual()
 
 void SvgVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-  if( imageURLValue )
-  {
-    std::string imageUrl;
-    if( imageURLValue->Get( imageUrl ) )
-    {
-      ParseFromUrl( imageUrl );
-    }
-    else
-    {
-      DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
-    }
-  }
+  // url already passed in from constructor
 }
 
 void SvgVisual::DoSetOnStage( Actor& actor )

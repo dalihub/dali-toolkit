@@ -108,12 +108,17 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
 {
   if( controller )
   {
-    const std::string style = value.Get< std::string >();
-    DALI_LOG_INFO( gLogFilter, Debug::General, "Text Control %p FONT_STYLE %s\n", controller.Get(), style.c_str() );
-
-    // Parses and applies the style.
     Property::Map map;
-    ParsePropertyString( style, map );
+    if( Property::STRING == value.GetType() )
+    {
+      const std::string& fontStyleProperties = value.Get<std::string>();
+
+      ParsePropertyString( fontStyleProperties, map );
+    }
+    else
+    {
+      map = value.Get<Property::Map>();
+    }
 
     if( !map.Empty() )
     {
@@ -289,76 +294,45 @@ void GetFontStyleProperty( ControllerPtr controller, Property::Value& value, Fon
       }
     }
 
-    if( weightDefined || widthDefined || slantDefined )
+    Property::Map map;
+
+    if( weightDefined )
     {
-      std::string styleString("{");
-      if( weightDefined )
+      if( TextAbstraction::FontWeight::NONE != weight )
       {
-        if( TextAbstraction::FontWeight::NONE != weight )
-        {
-          const std::string weightStr( GetEnumerationName( weight,
-                                                           FONT_WEIGHT_STRING_TABLE,
-                                                           FONT_WEIGHT_STRING_TABLE_COUNT ) );
+        const std::string weightStr( GetEnumerationName( weight,
+                                                         FONT_WEIGHT_STRING_TABLE,
+                                                         FONT_WEIGHT_STRING_TABLE_COUNT ) );
 
-          styleString += "\"weight\":\"" + weightStr + "\"";
-        }
-        else
-        {
-          weightDefined = false;
-        }
+        map.Insert( WEIGHT_KEY, weightStr );
       }
-
-      if( widthDefined )
-      {
-        if( TextAbstraction::FontWidth::NONE != width )
-        {
-          const std::string widthStr( GetEnumerationName( width,
-                                                          FONT_WIDTH_STRING_TABLE,
-                                                          FONT_WIDTH_STRING_TABLE_COUNT ) );
-
-          if( weightDefined )
-          {
-            styleString += ",";
-          }
-          styleString += "\"width\":\"" + widthStr + "\"";
-        }
-        else
-        {
-          widthDefined = false;
-        }
-      }
-
-      if( slantDefined )
-      {
-        if( TextAbstraction::FontSlant::NONE != slant )
-        {
-          const std::string slantStr( GetEnumerationName( slant,
-                                                          FONT_SLANT_STRING_TABLE,
-                                                          FONT_SLANT_STRING_TABLE_COUNT ) );
-
-          if( weightDefined || widthDefined )
-          {
-            styleString += ",";
-          }
-          styleString += "\"slant\":\"" + slantStr + "\"";
-        }
-        else
-        {
-          slantDefined = false;
-        }
-      }
-
-      if( weightDefined || widthDefined || slantDefined )
-      {
-        styleString += "}";
-      }
-      else
-      {
-        styleString.clear();
-      }
-
-      value = styleString;
     }
+
+    if( widthDefined )
+    {
+      if( TextAbstraction::FontWidth::NONE != width )
+      {
+        const std::string widthStr( GetEnumerationName( width,
+                                                        FONT_WIDTH_STRING_TABLE,
+                                                        FONT_WIDTH_STRING_TABLE_COUNT ) );
+
+        map.Insert( WIDTH_KEY, widthStr );
+      }
+    }
+
+    if( slantDefined )
+    {
+      if( TextAbstraction::FontSlant::NONE != slant )
+      {
+        const std::string slantStr( GetEnumerationName( slant,
+                                                        FONT_SLANT_STRING_TABLE,
+                                                        FONT_SLANT_STRING_TABLE_COUNT ) );
+
+        map.Insert( SLANT_KEY, slantStr );
+      }
+    }
+
+    value = map;
   }
 }
 
