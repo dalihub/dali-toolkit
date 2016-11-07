@@ -28,7 +28,6 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-data.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -1382,10 +1381,10 @@ Property::Value Popup::GetProperty( BaseObject* object, Property::Index property
       }
       case Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( popupImpl.GetPopupBackgroundImage() );
-        if( image )
+        Toolkit::ImageView imageView = Toolkit::ImageView::DownCast( popupImpl.GetPopupBackgroundImage() );
+        if( imageView )
         {
-          value = image.GetUrl();
+          value = imageView.GetProperty( Toolkit::ImageView::Property::IMAGE );
         }
         break;
       }
