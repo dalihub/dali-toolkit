@@ -37,7 +37,6 @@ namespace Text
 
 class TextScroller;
 class ScrollerInterface;
-struct ScrollerData;
 
 typedef IntrusivePtr<TextScroller> TextScrollerPtr;
 
@@ -47,6 +46,7 @@ typedef IntrusivePtr<TextScroller> TextScrollerPtr;
 class TextScroller : public RefObject, public ConnectionTracker
 {
 public:
+
   /**
    * @brief Text Scrolling helper, used to automatically scroll text, SetParameters should be called before scrolling is needed.
    * CleanUp removes the Scrolling actors from stage whilst keeping the Scroller object alive and preserving Speed, Gap and Loop count.
@@ -56,19 +56,52 @@ public:
   static TextScrollerPtr New( ScrollerInterface& scrollerInterface );
 
   /**
-   * @brief Starts the text scrolling.
+   * @brief Set parameters relating to source required for scrolling
    *
    * @param[in] sourceActor source actor to be scrolled
-   * @param[in] data Parameters needed to set up the text scrolling.
+   * @param[in] controlSize size of the control to scroll within
+   * @param[in] offScreenSize size of the sourceActor
+   * @param[in] direction text direction true for right to left text
+   * @param[in] alignmentOffset alignment of source text
    *
    */
-  void StartScrolling( Actor sourceActor,
-                       const ScrollerData& data );
+  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset );
 
   /**
-   * @brief Stops the text scrolling.
+   * @brief Set the gap distance to elapse before the text wraps around
+   * @param[in] gap distance to elapse
    */
-  void StopScrolling();
+  void SetGap( int gap );
+
+  /**
+   * @brief Get the distance before scrolling wraps
+   * @return gap distance to elapse
+   */
+  int GetGap() const;
+
+  /**
+   * @brief Set speed the text should scroll
+   * @param[in] scrollSpeed pixels per second
+   */
+  void SetSpeed( int scrollSpeed );
+
+  /**
+   * @brief Get the speed of text scrolling
+   * @return speed in pixels per second
+   */
+  int GetSpeed() const;
+
+  /**
+   * @brief Set the number of times the text scrolling should loop, can stop current scrolling by passing in 0;
+   * @param[in] loopCount number of times the scrolled text should loop, 0 to stop scrolling
+   */
+  void SetLoopCount( int loopCount );
+
+  /**
+   * @brief Get the number of loops
+   * @return int number of loops
+   */
+  int GetLoopCount() const;
 
   /**
    * @brief Get the camera used to look at source, should be added to the parent of target actor.
@@ -107,6 +140,14 @@ private: // Implementation
   void AutoScrollAnimationFinished( Dali::Animation& animation );
 
   /**
+   * @brief variables required to set up scrolling animation
+   * @param[in] scrollAmount distance to animate text for the given duration
+   * @param[in] scrollDuration duration of aninmation
+   * @param[in] loopCount number of times to loop the scrolling text
+   */
+  void StartScrolling( float scrollAmount, float scrollDuration, int loopCount );
+
+  /**
    * @brief When scrolling ended, the actors are cleaned up so no longer staged.
    */
   void CleanUp();
@@ -119,6 +160,10 @@ private:
   ScrollerInterface& mScrollerInterface;        // Interface implemented by control that requires scrolling
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
+
+  int   mScrollSpeed;            ///< Speed which text should automatically scroll at
+  int   mLoopCount;              ///< Number of time the text should scroll
+  float mWrapGap;                ///< Gap before text wraps around when scrolling
 
 }; // TextScroller class
 
