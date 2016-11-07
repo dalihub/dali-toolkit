@@ -305,7 +305,7 @@ void Popup::OnInitialize()
   mPopupLayout = Toolkit::TableView::New( 3, 1 );
 
   // Adds the default background image.
-  SetPopupBackgroundImage( Toolkit::ImageView::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
+  SetPopupBackgroundImage( Toolkit::ImageView::New( DEFAULT_BACKGROUND_IMAGE_PATH ) );
 
   mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
@@ -863,8 +863,7 @@ void Popup::LayoutTail()
   if( !image.empty() )
   {
     // Adds the tail actor.
-    Image tail = ResourceImage::New( image );
-    mTailImage = Toolkit::ImageView::New( tail );
+    mTailImage = Toolkit::ImageView::New( image );
     mTailImage.SetName( "tailImage" );
     const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
     mTailImage.SetParentOrigin( position );
@@ -1239,12 +1238,8 @@ void Popup::SetProperty( BaseObject* object, Property::Index propertyIndex, cons
         std::string valueString;
         if( value.Get( valueString ) )
         {
-          Image image = ResourceImage::New( valueString );
-          if( image )
-          {
-            Toolkit::ImageView actor = Toolkit::ImageView::New( image );
-            popupImpl.SetPopupBackgroundImage( actor );
-          }
+          Toolkit::ImageView actor = Toolkit::ImageView::New( valueString );
+          popupImpl.SetPopupBackgroundImage( actor );
         }
         break;
       }
