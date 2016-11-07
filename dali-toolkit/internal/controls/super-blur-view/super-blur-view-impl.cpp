@@ -31,6 +31,7 @@
 
 // INTERNAL_INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace //Unnamed namespace
 {
@@ -170,7 +171,7 @@ void SuperBlurView::SetImage(Image inputImage)
 
   mInputImage = inputImage;
   Actor self( Self() );
-  InitializeVisual( self, mVisuals[0], mInputImage );
+  Internal::InitializeVisual( self, mVisuals[0], mInputImage );
   mVisuals[0].SetDepthIndex(0);
   SetShaderEffect( mVisuals[0] );
   if( self.OnStage() )
@@ -281,7 +282,7 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
       float exponent = static_cast<float>(i);
       mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
-      InitializeVisual( self, mVisuals[i], mBlurredImage[i - 1] );
+      Internal::InitializeVisual( self, mVisuals[i], mBlurredImage[i - 1] );
       mVisuals[ i ].SetDepthIndex( i );
       SetShaderEffect( mVisuals[ i ] );
     }

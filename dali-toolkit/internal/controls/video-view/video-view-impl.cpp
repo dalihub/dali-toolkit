@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -120,7 +121,7 @@ void VideoView::SetPropertyMap( Property::Map map )
   mPropertyMap = map;
 
   Actor self( Self() );
-  InitializeVisual( self, mVisual, mPropertyMap );
+  Internal::InitializeVisual( self, mVisual, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -538,7 +539,7 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
-  InitializeVisual( self, mVisual, mNativeImage );
+  Internal::InitializeVisual( self, mVisual, mNativeImage );
 
   if( mIsPlay )
   {

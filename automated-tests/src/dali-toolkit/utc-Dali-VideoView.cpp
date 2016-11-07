@@ -113,6 +113,36 @@ int UtcDaliVideoViewProperty1(void)
   END_TEST;
 }
 
+// Positive test case for a method
+int UtcDaliVideoViewProperty1b(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliVideoViewProperty1");
+
+  Toolkit::VideoView view = Toolkit::VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  std::string file;
+  Property::Map map;
+
+  view.SetProperty( VideoView::Property::VIDEO, Property::Map()
+                    .Add("rendererType", "IMAGE")
+                    .Add("url", "video.mpg") // Note, videoView doesn't use this url
+                    .Add("RENDERER_TARGET", "windowSurfaceTarget" )
+                    .Add("width", 100)
+                    .Add("height", 100) );
+
+  Property::Value val = view.GetProperty( VideoView::Property::VIDEO );
+  Property::Map* resultMap = val.GetMap();
+
+  DALI_TEST_CHECK( resultMap );
+  Property::Value* value = resultMap->Find("url");
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<std::string>(), "video.mpg", TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliVideoViewProperty2(void)
 {
   ToolkitTestApplication application;

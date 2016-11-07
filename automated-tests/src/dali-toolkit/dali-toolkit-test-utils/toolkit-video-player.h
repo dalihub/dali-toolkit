@@ -49,7 +49,7 @@ public:
 
   VideoPlayer();
 
-  virtual ~VideoPlayer();
+  ~VideoPlayer();
 
   static VideoPlayer New();
 
@@ -102,4 +102,3 @@ private:
 } // namespace Dali;
 
 #endif
-

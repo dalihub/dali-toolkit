@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -89,6 +90,48 @@ private:
   VisualFactoryCachePtr   mFactoryCache;
   bool                    mDebugEnabled;
 };
+
+/**
+ * @brief Template to allow discard old visual, get new one and set it on stage if possible
+ *
+ * @tparam ParameterType0 The type of first argument passed to the CreateVisual()
+ * @tparam ParameterType1 The type of second argument passed to the CreateVisual()
+ * @SINCE_1_0.39
+ * @param[in] actor Actor for which the visual will be replaced
+ * @param[in,out] visual The visual to be replaced
+ * @param[in] param0 First template based argument passed to the visual factory
+ * @param[in] param1 Second template based argument passed to the visual factory
+ */
+template< class ParameterType0, class ParameterType1 >
+void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterType0& param0, ParameterType1& param1 )
+{
+  visual.RemoveAndReset( actor );
+  visual = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
+  if( visual && actor && actor.OnStage() )
+  {
+    Toolkit::GetImplementation(visual).SetOnStage(actor);
+  }
+}
+
+/**
+ * @brief Template to allow discard old visual, get new one and set it on stage if possible
+ *
+ * @tparam ParameterType The type of argument passed to the CreateVisual()
+ * @SINCE_1_0.39
+ * @param[in] actor Actor for which the visual will be replaced
+ * @param[in,out] visual The visual to be replaced
+ * @param[in] param Template based argument passed to the visual factory
+ */
+template< class ParameterType >
+void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterType& param )
+{
+  visual.RemoveAndReset( actor );
+  visual =  Toolkit::VisualFactory::Get().CreateVisual( param );
+  if( visual && actor && actor.OnStage() )
+  {
+    Toolkit::GetImplementation(visual).SetOnStage(actor);
+  }
+}
 
 } // namespace Internal
 

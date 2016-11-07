@@ -37,6 +37,7 @@
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -186,7 +187,7 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
 
     FrameBufferImage dummyImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
 
-    InitializeVisual( self, mVisualPostFilter, dummyImage );
+    Internal::InitializeVisual( self, mVisualPostFilter, dummyImage );
     Property::Map customShader;
     customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
     customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
@@ -438,7 +439,7 @@ void EffectsView::AllocateResources()
     Actor self( Self() );
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-    InitializeVisual( self, mVisualForChildren, mImageForChildren );
+    Internal::InitializeVisual( self, mVisualForChildren, mImageForChildren );
     mVisualForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
