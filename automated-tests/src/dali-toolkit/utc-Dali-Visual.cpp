@@ -147,17 +147,20 @@ int UtcDaliVisualSetGetDepthIndex(void)
 
   visual.SetDepthIndex( 1.f );
 
-  Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  visual.SetOnStage( actor );
+  DummyControl dummyControl = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  int depthIndex = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+
+  int depthIndex = dummyControl.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
   DALI_TEST_EQUALS( depthIndex, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( visual.GetDepthIndex(), 1.f, TEST_LOCATION );
 
   visual.SetDepthIndex( -1.f );
-  depthIndex = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
+  depthIndex = dummyControl.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
   DALI_TEST_EQUALS( depthIndex, -1, TEST_LOCATION );
   DALI_TEST_EQUALS( visual.GetDepthIndex(), -1.f, TEST_LOCATION );
 
@@ -293,20 +296,24 @@ int UtcDaliVisualSetOnOffStage(void)
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base visual = factory.CreateVisual( propertyMap );
 
-  Actor actor = Actor::New();
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+
   actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
-  visual.SetOnStage( actor );
+  Stage::GetCurrent().Add( actor );
+
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
-  visual.SetOffStage( actor );
+  Stage::GetCurrent().Remove( actor );
+
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -321,9 +328,12 @@ int UtcDaliVisualRemoveAndReset(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  Actor actor = Actor::New();
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
   actor.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   Visual::Base imageVisual;
   // test calling RemoveAndReset with an empty handle
@@ -339,11 +349,8 @@ int UtcDaliVisualRemoveAndReset(void)
 
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
   imageVisual = factory.CreateVisual(image);
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, imageVisual );
   DALI_TEST_CHECK( imageVisual );
-
-  imageVisual.SetOnStage( actor );
-  application.SendNotification();
-  application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
   imageVisual.RemoveAndReset( actor );
@@ -378,8 +385,6 @@ int UtcDaliVisualGetPropertyMap1(void)
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLUE );
 
   // change the blend color
-  Actor actor;
-  colorVisual.RemoveAndReset( actor );
   propertyMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
   colorVisual = factory.CreateVisual( propertyMap  );
   colorVisual.CreatePropertyMap( resultMap );
@@ -1080,10 +1085,12 @@ int UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas(void)
 
   DALI_TEST_CHECK( batchImageVisual );
 
-  Actor actor = Actor::New();
-  batchImageVisual.SetOnStage( actor );
+  DummyControl dummyControl = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, batchImageVisual );
+  Stage::GetCurrent().Add( dummyControl );
 
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_CHECK( dummyControl.GetRendererCount() == 1u );
 
   END_TEST;
 }
@@ -1100,11 +1107,12 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   propertyMap.Insert(BorderVisual::Property::SIZE,  5.f);
   Visual::Base borderVisual = factory.CreateVisual( propertyMap );
 
-  Actor actor = Actor::New();
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, borderVisual );
   actor.SetSize(2000, 2000);
   actor.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
-  borderVisual.SetOnStage( actor );
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1146,11 +1154,12 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   propertyMap.Insert(BorderVisual::Property::SIZE,  5.f);
   Visual::Base borderVisual = factory.CreateVisual( propertyMap );
 
-  Actor actor = Actor::New();
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, borderVisual );
   actor.SetSize(2000, 2000);
   actor.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
-  borderVisual.SetOnStage( actor );
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1189,11 +1198,12 @@ int UtcDaliVisualAnimateColorVisual(void)
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
   Visual::Base borderVisual = factory.CreateVisual( propertyMap );
 
-  Actor actor = Actor::New();
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, borderVisual );
   actor.SetSize(2000, 2000);
   actor.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
-  borderVisual.SetOnStage( actor );
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1237,12 +1247,13 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
   Visual::Base borderVisual = factory.CreateVisual( propertyMap );
 
-  Actor actor = Actor::New();
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, borderVisual );
   actor.SetSize(2000, 2000);
   actor.SetParentOrigin(ParentOrigin::CENTER);
   actor.SetColor(Color::BLACK);
   Stage::GetCurrent().Add(actor);
-  borderVisual.SetOnStage( actor );
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1386,10 +1397,13 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   }
 
   //Put the visual on the stage
-  Actor actor = Actor::New();
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  visual.SetOnStage( actor );
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  Stage::GetCurrent().Add(actor);
+
   application.SendNotification();
   application.Render(0);
   Renderer renderer( actor.GetRendererAt(0) );
@@ -1597,9 +1611,14 @@ int UtcDaliNPatchVisualCustomShader(void)
   properties[Dali::Toolkit::ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
 
   Visual::Base visual = factory.CreateVisual( properties );
-  Actor dummy = Actor::New();
+
   // trigger creation through setting on stage
-  visual.SetOnStage( dummy );
+  DummyControl dummy = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummy.SetSize(2000, 2000);
+  dummy.SetParentOrigin(ParentOrigin::CENTER);
+  Stage::GetCurrent().Add(dummy);
 
   Renderer renderer = dummy.GetRendererAt( 0 );
   Shader shader2 = renderer.GetShader();
@@ -1614,11 +1633,9 @@ int UtcDaliNPatchVisualCustomShader(void)
 
   END_TEST;
 }
-
 int UtcDaliGradientVisualBlendMode(void)
 {
   ToolkitTestApplication application;
-
   VisualFactory factory = VisualFactory::Get();
 
   Visual::Base opaqueGradientVisual = factory.CreateVisual(

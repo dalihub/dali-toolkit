@@ -31,6 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 
 namespace Dali
@@ -271,7 +272,7 @@ void Magnifier::SetFrameVisibility(bool visible)
     map[ Toolkit::BorderVisual::Property::COLOR ] = Color::WHITE;
     map[ Toolkit::BorderVisual::Property::SIZE   ] = IMAGE_BORDER_INDENT;
     Toolkit::Visual::Base borderVisual = visualFactory.CreateVisual( map );
-    borderVisual.SetOnStage( mFrame );
+    Toolkit::GetImplementation(borderVisual).SetOnStage( mFrame );
 
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
     constraint.AddSource( ParentSource( Actor::Property::WORLD_POSITION ) );

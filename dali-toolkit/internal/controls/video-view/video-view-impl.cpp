@@ -444,7 +444,7 @@ void VideoView::OnStageConnection( int depth )
   if( mVisual )
   {
     CustomActor self = Self();
-    mVisual.SetOnStage( self );
+    Toolkit::GetImplementation(mVisual).SetOnStage( self );
   }
 }
 
@@ -453,7 +453,7 @@ void VideoView::OnStageDisconnection()
   if( mVisual )
   {
     CustomActor self = Self();
-    mVisual.SetOffStage( self );
+    Toolkit::GetImplementation(mVisual).SetOffStage( self );
   }
 
   Control::OnStageDisconnection();

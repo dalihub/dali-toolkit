@@ -97,10 +97,10 @@ int UtcDaliEffectsViewDownCast(void)
 }
 
 // Positive test case for a method
-int UtcDaliEffectsViewAddRemove(void)
+int UtcDaliEffectsViewAddRemoveDropShadow(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliGaussianBlurViewAddRemove");
+  tet_infoline("UtcDaliEffectsViewAddRemoveDropShadow");
 
   EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
   DALI_TEST_CHECK( view );
@@ -186,6 +186,7 @@ int UtcDaliEffectsViewAddRemoveEmboss(void)
 
   END_TEST;
 }
+
 
 int UtcDaliEffectsViewGetTypeP(void)
 {

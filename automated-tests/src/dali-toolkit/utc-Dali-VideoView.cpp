@@ -121,6 +121,7 @@ int UtcDaliVideoViewProperty1b(void)
 
   Toolkit::VideoView view = Toolkit::VideoView::New();
   DALI_TEST_CHECK( view );
+  Stage stage = Stage::GetCurrent();
 
   std::string file;
   Property::Map map;
@@ -132,6 +133,8 @@ int UtcDaliVideoViewProperty1b(void)
                     .Add("width", 100)
                     .Add("height", 100) );
 
+  stage.Add( view );
+
   Property::Value val = view.GetProperty( VideoView::Property::VIDEO );
   Property::Map* resultMap = val.GetMap();
 
@@ -139,6 +142,8 @@ int UtcDaliVideoViewProperty1b(void)
   Property::Value* value = resultMap->Find("url");
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<std::string>(), "video.mpg", TEST_LOCATION );
+
+  stage.Remove( view );
 
   END_TEST;
 }
@@ -180,6 +185,7 @@ int UtcDaliVideoViewProperty3(void)
   val = view.GetProperty( VideoView::Property::MUTED );
   DALI_TEST_CHECK( val.Get( muted ) );
   DALI_TEST_CHECK( muted );
+
   END_TEST;
 }
 

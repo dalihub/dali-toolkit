@@ -177,25 +177,6 @@ public:
   float GetDepthIndex() const;
 
   /**
-   * @brief Visual needs to know when the control is put on to the stage to add the renderer.
-   *
-   * This function should be called when the control is put on to the stage.
-   *
-   * @param[in] actor The actor using this visual.
-   * @post SetOffStage should be called with the same actor when the control is put off stage otherwise memory will be leaked
-   */
-  void SetOnStage( Actor& actor );
-
-  /**
-   * @brief Visual needs to know when the control is removed from the stage to remove the renderer.
-   *
-   * This function should be called when the control is removed from the stage
-   *
-   * @param[in] actor The actor using this visual.
-   */
-  void SetOffStage( Actor& actor );
-
-  /**
    * @brief Remove the renderer from the actor and reset the visual self.
    *
    * This function can be called with an empty handle. If the visual is empty, this is a no-op.

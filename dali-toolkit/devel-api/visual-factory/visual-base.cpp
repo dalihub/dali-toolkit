@@ -91,21 +91,11 @@ float Visual::Base::GetDepthIndex() const
   return GetImplementation( *this ).GetDepthIndex();
 }
 
-void Visual::Base::SetOnStage( Actor& actor )
-{
-  GetImplementation( *this ).SetOnStage( actor );
-}
-
-void Visual::Base::SetOffStage( Actor& actor )
-{
-  GetImplementation( *this ).SetOffStage( actor );
-}
-
 void Visual::Base::RemoveAndReset( Actor& actor )
 {
   if( actor && *this )
   {
-    SetOffStage( actor );
+    GetImplementation(*this).SetOffStage( actor );
   }
   Reset();
 }

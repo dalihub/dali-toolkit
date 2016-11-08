@@ -163,8 +163,8 @@ void EmbossFilter::Disable()
 
     if( mActorForComposite )
     {
-      mVisualForEmboss1.SetOffStage( mActorForComposite );
-      mVisualForEmboss2.SetOffStage( mActorForComposite );
+      Toolkit::GetImplementation(mVisualForEmboss1).SetOffStage( mActorForComposite );
+      Toolkit::GetImplementation(mVisualForEmboss2).SetOffStage( mActorForComposite );
       mVisualForEmboss1.Reset();
       mVisualForEmboss2.Reset();
       mRootActor.Remove( mActorForComposite );

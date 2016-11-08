@@ -56,6 +56,17 @@ void DummyControlImpl::CustomSlot1( Actor actor )
   mCustomSlot1Called = true;
 }
 
+namespace {
+
+BaseHandle Create()
+{
+  return DummyControlImpl::New();
+}
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::DummyControl, Toolkit::Control, Create );
+DALI_TYPE_REGISTRATION_END()
+}
+
 DummyControl DummyControlImpl::New()
 {
   IntrusivePtr< DummyControlImpl > impl = new DummyControlImpl;
