@@ -181,6 +181,11 @@ void EmbossFilter::Disable()
       taskList.RemoveTask(mRenderTaskForEmboss2);
     }
 
+    if( mRenderTaskForOutput )
+    {
+      taskList.RemoveTask( mRenderTaskForOutput );
+    }
+
     mRootActor.Reset();
   }
 }

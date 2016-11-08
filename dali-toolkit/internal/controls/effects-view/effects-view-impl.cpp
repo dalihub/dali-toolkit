@@ -214,6 +214,7 @@ void EffectsView::Disable()
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
+  mLastSize = Vector2::ZERO; // Ensure resources are reallocated on subsequent enable
   mEnabled = false;
 }
 
