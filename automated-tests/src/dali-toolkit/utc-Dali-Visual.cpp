@@ -1615,4 +1615,41 @@ int UtcDaliNPatchVisualCustomShader(void)
   END_TEST;
 }
 
+int UtcDaliGradientVisualBlendMode(void)
+{
+  ToolkitTestApplication application;
 
+  VisualFactory factory = VisualFactory::Get();
+
+  Visual::Base opaqueGradientVisual = factory.CreateVisual(
+      Property::Map().Add( Visual::Property::TYPE, Visual::GRADIENT )
+                     .Add( GradientVisual::Property::START_POSITION, Vector2( -0.5f, -0.5f ) )
+                     .Add( GradientVisual::Property::END_POSITION, Vector2( 0.5f, 0.5f ) )
+                     .Add( GradientVisual::Property::STOP_COLOR, Property::Array().Add( Color::RED )
+                                                                                  .Add( Color::GREEN ) ) );
+
+  Visual::Base alphaGradientVisual = factory.CreateVisual(
+      Property::Map().Add( Visual::Property::TYPE, Visual::GRADIENT )
+                     .Add( GradientVisual::Property::START_POSITION, Vector2( -0.5f, -0.5f ) )
+                     .Add( GradientVisual::Property::END_POSITION, Vector2( 0.5f, 0.5f ) )
+                     .Add( GradientVisual::Property::STOP_COLOR, Property::Array().Add( Color::RED )
+                                                                                  .Add( Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) ) ) );
+
+  DummyControl control = DummyControl::New();
+  control.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add( control );
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, opaqueGradientVisual );
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 2, alphaGradientVisual );
+
+  application.SendNotification();
+  application.Render();
+
+  // Control should have two renderers, the first one is opaque so our blending mode should be off, the second one has some alpha so should be set to automatic
+  DALI_TEST_EQUALS( 2u, control.GetRendererCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetRendererAt( 0 ).GetProperty( Renderer::Property::BLEND_MODE ).Get<int>(), (int)BlendMode::OFF, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetRendererAt( 1 ).GetProperty( Renderer::Property::BLEND_MODE ).Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+
+  END_TEST;
+}

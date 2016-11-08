@@ -177,6 +177,7 @@ private:
   Matrix3 mGradientTransform;
   IntrusivePtr<Gradient> mGradient;
   Type mGradientType;
+  bool mIsOpaque; ///< Set to false if any of the stop colors are not opaque
 };
 
 } // namespace Internal
