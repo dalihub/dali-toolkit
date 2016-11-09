@@ -143,7 +143,9 @@ public:
       LEFT,   ///< Move keyboard focus towards the left direction @SINCE_1_0.0
       RIGHT,  ///< Move keyboard focus towards the right direction @SINCE_1_0.0
       UP,     ///< Move keyboard focus towards the up direction @SINCE_1_0.0
-      DOWN    ///< Move keyboard focus towards the down direction @SINCE_1_0.0
+      DOWN,    ///< Move keyboard focus towards the down direction @SINCE_1_0.0
+      PAGE_UP,     ///< Move keyboard focus towards the previous page direction @SINCE_1_2.14
+      PAGE_DOWN    ///< Move keyboard focus towards the next page direction @SINCE_1_2.14
     };
   };
 

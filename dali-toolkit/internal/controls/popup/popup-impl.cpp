@@ -1944,6 +1944,11 @@ Actor Popup::GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::
           nextFocusableActor = *( endIterator - 1 );
           break;
         }
+
+        default:
+        {
+          break;
+        }
       }
 
       if( !nextFocusableActor )

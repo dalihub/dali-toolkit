@@ -599,6 +599,10 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
       }
       break;
     }
+    default:
+    {
+      break;
+    }
   }
   return itemID;
 }
