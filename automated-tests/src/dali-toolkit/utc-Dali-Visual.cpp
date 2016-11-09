@@ -321,46 +321,6 @@ int UtcDaliVisualSetOnOffStage(void)
   END_TEST;
 }
 
-int UtcDaliVisualRemoveAndReset(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "intUtcDaliVisualRemoveAndReset" );
-
-  VisualFactory factory = VisualFactory::Get();
-
-  DummyControl actor = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-
-  actor.SetSize(200.f, 200.f);
-  Stage::GetCurrent().Add( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
-
-  Visual::Base imageVisual;
-  // test calling RemoveAndReset with an empty handle
-  try
-  {
-    imageVisual.RemoveAndReset( actor );
-    tet_result(TET_PASS);
-  }
-  catch (DaliException& exception)
-  {
-    tet_result(TET_FAIL);
-  }
-
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  imageVisual = factory.CreateVisual(image);
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, imageVisual );
-  DALI_TEST_CHECK( imageVisual );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  imageVisual.RemoveAndReset( actor );
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u ); // visual is removed from actor
-  DALI_TEST_CHECK( !imageVisual ); // visual is reset
-
-  END_TEST;
-}
 
 int UtcDaliVisualGetPropertyMap1(void)
 {

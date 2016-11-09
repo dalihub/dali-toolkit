@@ -506,7 +506,12 @@ void VideoView::SetWindowSurfaceTarget()
   int curPos = mVideoPlayer.GetPlayPosition();
 
   mSetRenderingTarget = true;
-  mVisual.RemoveAndReset( self );
+
+  if( mVisual )
+  {
+    Toolkit::GetImplementation(mVisual).SetOffStage(self);
+    mVisual.Reset();
+  }
 
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );

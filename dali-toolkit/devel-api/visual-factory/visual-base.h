@@ -177,15 +177,6 @@ public:
   float GetDepthIndex() const;
 
   /**
-   * @brief Remove the renderer from the actor and reset the visual self.
-   *
-   * This function can be called with an empty handle. If the visual is empty, this is a no-op.
-   *
-   * @param[in] actor The actor to be set off stage.
-   */
-  void RemoveAndReset( Actor& actor );
-
-  /**
    * @brief Create the property map representing this visual.
    *
    * @param[out] map The visual property map.

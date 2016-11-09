@@ -105,7 +105,10 @@ private:
 template< class ParameterType0, class ParameterType1 >
 void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterType0& param0, ParameterType1& param1 )
 {
-  visual.RemoveAndReset( actor );
+  if( actor )
+  {
+    Toolkit::GetImplementation(visual).SetOffStage( actor );
+  }
   visual = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
   if( visual && actor && actor.OnStage() )
   {
@@ -125,7 +128,10 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
 template< class ParameterType >
 void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterType& param )
 {
-  visual.RemoveAndReset( actor );
+  if( actor && visual )
+  {
+    Toolkit::GetImplementation(visual).SetOffStage( actor );
+  }
   visual =  Toolkit::VisualFactory::Get().CreateVisual( param );
   if( visual && actor && actor.OnStage() )
   {

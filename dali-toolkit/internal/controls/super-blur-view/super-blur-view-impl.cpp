@@ -172,9 +172,8 @@ void SuperBlurView::SetImage(Image inputImage)
   mInputImage = inputImage;
   Actor self( Self() );
 
-  mVisuals[0].RemoveAndReset( self );
   mVisuals[0] = Toolkit::VisualFactory::Get().CreateVisual( mInputImage );
-  RegisterVisual( 0, mVisuals[0] );
+  RegisterVisual( 0, mVisuals[0] ); // Will clean up previously registered visuals for this index.
   mVisuals[0].SetDepthIndex(0);
   SetShaderEffect( mVisuals[0] );
 
@@ -282,9 +281,8 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
       mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
 
-      mVisuals[i].RemoveAndReset( self );
-      mVisuals[i] =  Toolkit::VisualFactory::Get().CreateVisual( mBlurredImage[i - 1] );
-      RegisterVisual( i, mVisuals[i] );
+      mVisuals[i] = Toolkit::VisualFactory::Get().CreateVisual( mBlurredImage[i - 1] );
+      RegisterVisual( i, mVisuals[i] ); // Will clean up existing visual with same index.
       mVisuals[i].SetDepthIndex( i );
       SetShaderEffect( mVisuals[i] );
     }

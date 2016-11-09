@@ -91,15 +91,6 @@ float Visual::Base::GetDepthIndex() const
   return GetImplementation( *this ).GetDepthIndex();
 }
 
-void Visual::Base::RemoveAndReset( Actor& actor )
-{
-  if( actor && *this )
-  {
-    GetImplementation(*this).SetOffStage( actor );
-  }
-  Reset();
-}
-
 void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 {
   GetImplementation( *this ).CreatePropertyMap( map );

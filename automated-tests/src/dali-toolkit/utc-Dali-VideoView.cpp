@@ -129,7 +129,7 @@ int UtcDaliVideoViewProperty1b(void)
   view.SetProperty( VideoView::Property::VIDEO, Property::Map()
                     .Add("rendererType", "IMAGE")
                     .Add("url", "video.mpg") // Note, videoView doesn't use this url
-                    .Add("RENDERER_TARGET", "windowSurfaceTarget" )
+                    .Add("RENDERING_TARGET", "windowSurfaceTarget" )
                     .Add("width", 100)
                     .Add("height", 100) );
 
