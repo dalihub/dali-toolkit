@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H__
-#define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H__
+#ifndef DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H
+#define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/internal/image-loader/image-load-thread.h>
 
 namespace Dali
@@ -49,10 +49,10 @@ public:
   static IntrusivePtr<AsyncImageLoader> New();
 
   /**
-   * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions,FittingMode::Type, SamplingMode::Type, bool )
+   * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool )
    */
   uint32_t Load( const std::string& url,
-                 ImageDimensions size,
+                 ImageDimensions dimensions,
                  FittingMode::Type fittingMode,
                  SamplingMode::Type samplingMode,
                  bool orientationCorrection );
@@ -97,20 +97,20 @@ private:
 
 } // namespace Internal
 
-inline const Internal::AsyncImageLoader& GetImplementation( const Toolkit::AsyncImageLoader& loader )
+inline const Internal::AsyncImageLoader& GetImplementation( const Toolkit::AsyncImageLoader& handle )
 {
-  DALI_ASSERT_ALWAYS( loader && "AsyncImageLoader handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "AsyncImageLoader handle is empty" );
 
-  const BaseObject& object = loader.GetBaseObject();
+  const BaseObject& object = handle.GetBaseObject();
 
   return static_cast<const Internal::AsyncImageLoader&>( object );
 }
 
-inline Internal::AsyncImageLoader& GetImplementation( Toolkit::AsyncImageLoader& loader )
+inline Internal::AsyncImageLoader& GetImplementation( Toolkit::AsyncImageLoader& handle )
 {
-  DALI_ASSERT_ALWAYS( loader && "AsyncImageLoader handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "AsyncImageLoader handle is empty" );
 
-  BaseObject& object = loader.GetBaseObject();
+  BaseObject& object = handle.GetBaseObject();
 
   return static_cast<Internal::AsyncImageLoader&>( object );
 }
@@ -119,4 +119,4 @@ inline Internal::AsyncImageLoader& GetImplementation( Toolkit::AsyncImageLoader&
 
 } // namespace Dali
 
-#endif /* DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H__ */
+#endif // DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H

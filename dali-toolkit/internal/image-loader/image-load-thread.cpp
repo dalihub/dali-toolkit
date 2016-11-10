@@ -50,7 +50,7 @@ ImageLoadThread::~ImageLoadThread()
 
 void ImageLoadThread::Run()
 {
-  while( LoadingTask* task =  NextTaskToProcess())
+  while( LoadingTask* task = NextTaskToProcess() )
   {
     task->loader.Load();
     AddCompletedTask( task );
@@ -68,7 +68,7 @@ void ImageLoadThread::AddTask( LoadingTask* task )
     mLoadQueue.PushBack( task );
   }
 
-  if( wasEmpty)
+  if( wasEmpty )
   {
     // wake up the image loading thread
     mConditionalWait.Notify();
@@ -97,7 +97,7 @@ bool ImageLoadThread::CancelTask( uint32_t loadingTaskId )
   // Lock while remove task from the queue
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  for( Vector< LoadingTask* >::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); iter++ )
+  for( Vector< LoadingTask* >::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter )
   {
     if( (*iter)->id == loadingTaskId )
     {
@@ -116,9 +116,9 @@ void ImageLoadThread::CancelAll()
   // Lock while remove task from the queue
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  for( Vector< LoadingTask* >::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); iter++ )
+  for( Vector< LoadingTask* >::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter )
   {
-    delete (*iter);
+    delete ( *iter );
   }
   mLoadQueue.Clear();
 }

@@ -111,7 +111,7 @@ develapiprogressbardir =        $(develapicontrolsdir)/progress-bar
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
-develapiimageloaderdir =         $(develapidir)/image-loader
+develapiimageloaderdir =        $(develapidir)/image-loader
 develapiscriptingdir =          $(develapidir)/scripting
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
@@ -146,6 +146,7 @@ develapitextselectionpopup_HEADERS = $(devel_api_text_controls_header_files)
 # public api source
 publicapidir =                     $(topleveldir)/public-api
 publicapicontrolsdir =             $(publicapidir)/controls
+publicapiimageloaderdir =          $(publicapidir)/image-loader
 publicapiaccessibilitymanagerdir = $(publicapidir)/accessibility-manager
 publicapialignmentdir =            $(publicapicontrolsdir)/alignment
 publicapibuttonsdir =              $(publicapicontrolsdir)/buttons
@@ -169,6 +170,7 @@ publicapivisualsdir =              $(publicapidir)/visuals
 # public api headers
 publicapi_HEADERS =                     $(public_api_header_files)
 publicapicontrols_HEADERS =             $(public_api_controls_header_files)
+publicapiimageloader_HEADERS =          $(public_api_image_loader_header_files)
 publicapiaccessibilitymanager_HEADERS = $(public_api_accessibility_manager_header_files)
 publicapialignment_HEADERS =            $(public_api_alignment_header_files)
 publicapibuttons_HEADERS =              $(public_api_buttons_header_files)

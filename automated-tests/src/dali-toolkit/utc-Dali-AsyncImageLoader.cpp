@@ -19,7 +19,7 @@
 #include <dali/dali.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali-toolkit/devel-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -139,6 +139,28 @@ int UtcDaliAsyncImageLoaderAssignmentOperator(void)
   END_TEST;
 }
 
+int UtcDaliAsyncImageLoaderDownCastP(void)
+{
+  AsyncImageLoader asyncImageLoader = AsyncImageLoader::New();
+  BaseHandle object(asyncImageLoader);
+
+  AsyncImageLoader asyncImageLoader2 = AsyncImageLoader::DownCast( object );
+
+  DALI_TEST_CHECK( asyncImageLoader2 );
+
+  END_TEST;
+}
+
+int UtcDaliAsyncImageLoaderDownCastN(void)
+{
+  BaseHandle unInitializedObject;
+  AsyncImageLoader asyncImageLoader = AsyncImageLoader::DownCast( unInitializedObject );
+
+  DALI_TEST_CHECK( !asyncImageLoader );
+
+  END_TEST;
+}
+
 int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
 {
   ToolkitTestApplication application;
@@ -169,6 +191,7 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
   END_TEST;
 }
 
+// Note: This is not an ideal test, but we cannot guarantee we can call Cancel() before the image has finished loading.
 int UtcDaliAsyncImageLoaderCancel(void)
 {
   ToolkitTestApplication application;
@@ -182,31 +205,28 @@ int UtcDaliAsyncImageLoaderCancel(void)
   uint32_t id02 = loader.Load( gImage_50_RGBA, ImageDimensions( 25, 25 ) );
   uint32_t id03 = loader.Load( gImage_128_RGB, ImageDimensions( 100, 100 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
 
-  // cancel the loading of the second image
-  DALI_TEST_CHECK( loader.Cancel( id02 ) );
-
   EventThreadCallback* eventTrigger = EventThreadCallback::Get();
   CallbackBase* callback = eventTrigger->GetCallback();
 
-  eventTrigger->WaitingForTrigger( 2 );// waiting until first and third images are loaded
+  eventTrigger->WaitingForTrigger( 3 ); // waiting until images are loaded
 
   CallbackBase::Execute( *callback );
-
-  DALI_TEST_CHECK( ! loader.Cancel( id03 ) ); // can not cancel a task that is already implemeted
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( loadedSignalVerifier.LoadedImageCount() == 2 );
+  DALI_TEST_CHECK( loadedSignalVerifier.LoadedImageCount() == 3 );
 
-  DALI_TEST_CHECK( loadedSignalVerifier.Verify( id01, 34, 34 ) );  // first image is successfully loaded
-  DALI_TEST_CHECK( !loadedSignalVerifier.Verify( id02, 25, 25 ) ); // second image is not loaded
-  DALI_TEST_CHECK( loadedSignalVerifier.Verify( id03, 100, 100 ) ); // third image is successfully loaded
+  DALI_TEST_CHECK( !loader.Cancel( id03 ) ); // Cannot cancel a task that is already implemeted
+
+  DALI_TEST_CHECK( loadedSignalVerifier.Verify( id01, 34, 34 ) );   // first image is loaded
+  DALI_TEST_CHECK( loadedSignalVerifier.Verify( id02, 25, 25 ) );   // second image is loaded
+  DALI_TEST_CHECK( loadedSignalVerifier.Verify( id03, 100, 100 ) ); // third image is loaded
 
   END_TEST;
 }
 
-int UtcDaliAsncImageLoaderCancelAll01(void)
+int UtcDaliAsyncImageLoaderCancelAll(void)
 {
   ToolkitTestApplication application;
 
@@ -228,39 +248,4 @@ int UtcDaliAsncImageLoaderCancelAll01(void)
 
   END_TEST;
 }
-
-int UtcDaliAsyncImageLoaderCancelAll02(void)
-{
-  ToolkitTestApplication application;
-
-  AsyncImageLoader loader = AsyncImageLoader::New();
-  ImageLoadedSignalVerifier loadedSignalVerifier;
-
-  loader.ImageLoadedSignal().Connect( &loadedSignalVerifier, &ImageLoadedSignalVerifier::ImageLoaded );
-
-  loader.Load( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
-  uint32_t id02 = loader.Load( gImage_50_RGBA, ImageDimensions( 25, 25 ) );
-
-  // try to cancel the loading of the first and second image, however the cancellation of the first image is not guaranteed
-  loader.CancelAll();
-
-  uint32_t id03 = loader.Load( gImage_128_RGB, ImageDimensions( 100, 100 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
-  loader.Load( gImage_128_RGB, ImageDimensions( 128, 128 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
-
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 2 );// waiting until the third images is loaded
-
-  CallbackBase::Execute( *callback );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( !loadedSignalVerifier.Verify( id02, 25, 25 ) ); // second image is not loaded
-  DALI_TEST_CHECK( loadedSignalVerifier.Verify( id03, 100, 100 ) ); // third image is successfully loaded
-
-  END_TEST;
-}
-
 

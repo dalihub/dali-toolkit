@@ -34,7 +34,7 @@ namespace Internal
 AsyncImageLoader::AsyncImageLoader()
 : mLoadedSignal(),
   mLoadThread( new EventThreadCallback( MakeCallback( this, &AsyncImageLoader::ProcessLoadedImage ) ) ),
-  mLoadTaskId( 0 ),
+  mLoadTaskId( 0u ),
   mIsLoadThreadStarted( false )
 {
 }
@@ -51,7 +51,7 @@ IntrusivePtr<AsyncImageLoader> AsyncImageLoader::New()
 }
 
 uint32_t AsyncImageLoader::Load( const std::string& url,
-                                 ImageDimensions size,
+                                 ImageDimensions dimensions,
                                  FittingMode::Type fittingMode,
                                  SamplingMode::Type samplingMode,
                                  bool orientationCorrection )
@@ -62,7 +62,7 @@ uint32_t AsyncImageLoader::Load( const std::string& url,
     mIsLoadThreadStarted = true;
   }
 
-  BitmapLoader loader = BitmapLoader::New( url, size, fittingMode, samplingMode, orientationCorrection );
+  BitmapLoader loader = BitmapLoader::New( url, dimensions, fittingMode, samplingMode, orientationCorrection );
 
   mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, loader ) );
 
