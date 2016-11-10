@@ -44,6 +44,7 @@
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
+#include <dali-toolkit/devel-api/align-enums.h>
 
 namespace Dali
 {
@@ -165,6 +166,16 @@ HandleIndex GetVisualProperty(
   return HandleIndex( handle, Property::INVALID_INDEX );
 }
 
+void SetDefaultTransform( Property::Map& propertyMap )
+{
+  propertyMap.Clear();
+  propertyMap
+    .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::Visual::DevelProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+}
 
 /**
  * Creates control through type registry
@@ -747,22 +758,22 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
   bool visualReplaced ( false );
   Actor self = Self();
 
-  if ( !mImpl->mVisuals.Empty() )
+  if( !mImpl->mVisuals.Empty() )
   {
-      RegisteredVisualContainer::Iterator iter;
-      // Check if visual (index) is already registered.  Replace if so.
-      if ( FindVisual( index, mImpl->mVisuals, iter ) )
+    RegisteredVisualContainer::Iterator iter;
+    // Check if visual (index) is already registered.  Replace if so.
+    if ( FindVisual( index, mImpl->mVisuals, iter ) )
+    {
+      if( (*iter)->visual && self.OnStage() )
       {
-        if( (*iter)->visual && self.OnStage() )
-        {
-          Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
-        }
-        (*iter)->visual = visual;
-        visualReplaced = true;
+        Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
       }
+      (*iter)->visual = visual;
+      visualReplaced = true;
+    }
   }
 
-  if ( !visualReplaced ) // New registration entry
+  if( !visualReplaced ) // New registration entry
   {
     mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
   }
@@ -1142,7 +1153,9 @@ void Control::OnSizeSet(const Vector3& targetSize)
   if( visual )
   {
     Vector2 size( targetSize );
-    visual.SetSize( size );
+    Property::Map transformMap;
+    SetDefaultTransform( transformMap );
+    visual.SetTransformAndSize( transformMap, size );
   }
 }
 
@@ -1176,6 +1189,15 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   for( unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i )
   {
     container.Add( Self().GetChildAt( i ), size );
+  }
+
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
+  {
+    Vector2 controlSize( size );
+    Property::Map transformMap;
+    SetDefaultTransform( transformMap );
+    visual.SetTransformAndSize( transformMap, controlSize );
   }
 }
 

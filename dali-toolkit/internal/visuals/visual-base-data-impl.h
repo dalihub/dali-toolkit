@@ -73,13 +73,14 @@ struct Base::Impl
     void SetPropertyMap( const Property::Map& map );
     void GetPropertyMap( Property::Map& map ) const;
     void RegisterUniforms( Renderer renderer, Toolkit::Direction::Type direction );
+    Vector2 GetVisualSize( const Vector2& controlSize );
   };
 
   Renderer      mRenderer;
   CustomShader* mCustomShader;
   std::string   mName;
   Transform     mTransform;
-  Vector2       mSize;
+  Size          mControlSize;
   float         mDepthIndex;
   int           mFlags;
 

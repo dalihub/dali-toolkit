@@ -90,6 +90,11 @@ protected:
    */
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
 private:
   /**
    * Create the geometry which presents the quad wireframe.

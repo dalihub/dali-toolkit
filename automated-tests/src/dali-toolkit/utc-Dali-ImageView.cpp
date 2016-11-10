@@ -393,6 +393,7 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   callStack.Reset();
   callStack.Enable(true);
 
+  application.GetPlatform().SetClosestImageSize(Vector2(34, 34));
   BitmapLoader::ResetLatestCreated();
   ImageView imageView = ImageView::New( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
 
@@ -411,16 +412,10 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   loader = BitmapLoader::GetLatestCreated();
   DALI_TEST_CHECK( loader );
 
-  // worker thread is created
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  DALI_TEST_CHECK( eventTrigger );
-
   loader.WaitForLoading();// waiting until the image to be loaded
   DALI_TEST_CHECK( loader.IsLoaded() );
 
-  eventTrigger->WaitingForTrigger( 1 );
-  CallbackBase* callback = eventTrigger->GetCallback();
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(16);

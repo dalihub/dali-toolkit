@@ -174,12 +174,7 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
   uint32_t id02 = loader.Load( gImage_50_RGBA, ImageDimensions( 25, 25 ) );
   uint32_t id03 = loader.Load( gImage_128_RGB, ImageDimensions( 100, 100 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 3 );// waiting until all three images are loaded
-
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -205,12 +200,7 @@ int UtcDaliAsyncImageLoaderCancel(void)
   uint32_t id02 = loader.Load( gImage_50_RGBA, ImageDimensions( 25, 25 ) );
   uint32_t id03 = loader.Load( gImage_128_RGB, ImageDimensions( 100, 100 ), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 3 ); // waiting until images are loaded
-
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -248,4 +238,3 @@ int UtcDaliAsyncImageLoaderCancelAll(void)
 
   END_TEST;
 }
-

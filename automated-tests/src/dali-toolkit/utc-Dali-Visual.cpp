@@ -42,6 +42,18 @@ const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
+Property::Map DefaultTransform()
+{
+  Property::Map transformMap;
+  transformMap
+    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::VisualProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::VisualProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::VisualProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+  return transformMap;
+}
+
 bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
 {
   if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
@@ -173,24 +185,25 @@ int UtcDaliVisualSize(void)
   tet_infoline( "UtcDaliVisualGetNaturalSize" );
 
   VisualFactory factory = VisualFactory::Get();
-  Vector2 visualSize( 20.f, 30.f );
+  Vector2 controlSize( 20.f, 30.f );
   Vector2 naturalSize;
 
   // color colorVisual
   Dali::Property::Map map;
   map[ Visual::Property::TYPE ] = Visual::COLOR;
   map[ ColorVisual::Property::MIX_COLOR ] = Color::MAGENTA;
+
   Visual::Base colorVisual = factory.CreateVisual( map );
-  colorVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( colorVisual.GetSize(), visualSize, TEST_LOCATION );
+  colorVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+
   colorVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
 
   // image visual
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
   Visual::Base imageVisual = factory.CreateVisual( image );
-  imageVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( imageVisual.GetSize(), visualSize, TEST_LOCATION );
+  imageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+
   imageVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 200.f), TEST_LOCATION );
 
@@ -203,8 +216,7 @@ int UtcDaliVisualSize(void)
   map[ BorderVisual::Property::COLOR  ] = Color::RED;
   map[ BorderVisual::Property::SIZE   ] = borderSize;
   Visual::Base borderVisual = factory.CreateVisual( map );
-  borderVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( borderVisual.GetSize(), visualSize, TEST_LOCATION );
+  borderVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   borderVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
 
@@ -221,15 +233,13 @@ int UtcDaliVisualSize(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert(GradientVisual::Property::STOP_COLOR,   stopColors);
   Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
-  gradientVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( gradientVisual.GetSize(), visualSize, TEST_LOCATION );
+  gradientVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   gradientVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
 
   // svg visual
   Visual::Base svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
-  svgVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( svgVisual.GetSize(), visualSize, TEST_LOCATION );
+  svgVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   svgVisual.GetNaturalSize(naturalSize);
   // TEST_SVG_FILE:
   //  <svg width="100" height="100">
@@ -239,7 +249,6 @@ int UtcDaliVisualSize(void)
 
   // svg visual with a size
   Visual::Base svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions(200, 200) );
-  DALI_TEST_EQUALS( svgVisual2.GetSize(), Vector2( 200.f, 200.f ), TEST_LOCATION );
   svgVisual2.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION ); // Natural size should still be 100, 100
 
@@ -252,8 +261,7 @@ int UtcDaliVisualSize(void)
   propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
   Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  batchImageVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( batchImageVisual.GetSize(), visualSize, TEST_LOCATION );
+  batchImageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   batchImageVisual.GetNaturalSize( naturalSize );
   DALI_TEST_EQUALS( naturalSize, Vector2( 80.0f, 160.0f ), TEST_LOCATION );
 
@@ -1674,6 +1682,50 @@ int UtcDaliVisualRendererRemovalAndReAddition(void)
   application.Render();
 
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
+int UtcDaliVisualTextVisualRender(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualTextVisualRender" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "text", "Hello world" );
+  propertyMap.Insert( "fontFamily", "TizenSans" );
+
+  Property::Map fontStyleMapSet;
+  fontStyleMapSet.Insert( "weight", "bold" );
+  propertyMap.Insert( "fontStyle", fontStyleMapSet );
+
+  propertyMap.Insert( "pointSize", 12.f );
+  propertyMap.Insert( "multiLine", true );
+  propertyMap.Insert( "horizontalAlignment", "CENTER" );
+  propertyMap.Insert( "verticalAlignment", "CENTER" );
+  propertyMap.Insert( "textColor", Color::RED );
+  propertyMap.Insert( "enableMarkup", false );
+  propertyMap.Insert( "enableAutoScroll", false );
+  propertyMap.Insert( "lineSpacing", 0.f );
+  propertyMap.Insert( "batchingEnabled", false );
+  Visual::Base textVisual = factory.CreateVisual( propertyMap );
+  textVisual.SetDepthIndex( 1.f );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, textVisual );
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+
+  Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

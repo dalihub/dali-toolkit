@@ -61,14 +61,9 @@ const std::string& Visual::Base::GetName()
   return GetImplementation( *this ).GetName();
 }
 
-void Visual::Base::SetSize( const Vector2& size )
+void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
 {
-  GetImplementation( *this ).SetSize( size );
-}
-
-const Vector2& Visual::Base::GetSize() const
-{
-  return GetImplementation( *this ).GetSize();
+  GetImplementation( *this ).SetTransformAndSize( transform, controlSize );
 }
 
 float Visual::Base::GetHeightForWidth( float width ) const

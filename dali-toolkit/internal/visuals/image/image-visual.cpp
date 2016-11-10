@@ -122,7 +122,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
+    mediump vec4 vertexPosition = uMvpMatrix * ComputeVertexPosition();\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -286,6 +286,8 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
     desiredHeightValue->Get( desiredHeight );
   }
 
+  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+
   Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
   if( pixelAreaValue )
   {
@@ -307,8 +309,6 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
     Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
     mWrapModeV = Dali::WrapMode::Type( value );
   }
-
-  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 
   Property::Value* syncLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
   if( syncLoading )

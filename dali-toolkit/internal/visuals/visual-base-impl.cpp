@@ -84,6 +84,13 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
   DoSetProperties( propertyMap );
 }
 
+void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
+{
+  mImpl->mControlSize = controlSize;
+  mImpl->mTransform.SetPropertyMap( transform );
+  OnSetTransform();
+}
+
 void Visual::Base::SetName( const std::string& name )
 {
   mImpl->mName = name;
@@ -92,16 +99,6 @@ void Visual::Base::SetName( const std::string& name )
 const std::string& Visual::Base::GetName()
 {
   return mImpl->mName;
-}
-
-void Visual::Base::SetSize( const Vector2& size )
-{
-  mImpl->mSize = size;
-}
-
-const Vector2& Visual::Base::GetSize() const
-{
-  return mImpl->mSize;
 }
 
 float Visual::Base::GetHeightForWidth( float width ) const
@@ -217,11 +214,10 @@ void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Propert
   {
     if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
     {
-      Property::Map* map = propertyValue.GetMap();
-      if( map )
+      Property::Map* transformMap = propertyValue.GetMap();
+      if( transformMap )
       {
-        mImpl->mTransform.SetPropertyMap( *map );
-        OnSetTransform();
+        SetTransformAndSize( *transformMap, mImpl->mControlSize );
       }
     }
 

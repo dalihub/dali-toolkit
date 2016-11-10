@@ -267,11 +267,6 @@ void GradientVisual::OnSetTransform()
   }
 }
 
-void GradientVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-}
-
 void GradientVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
