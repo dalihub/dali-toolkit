@@ -98,6 +98,9 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
 
+  // Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+
   if( mImpl->mSize != Vector2::ZERO && mParsedImage )
   {
     AddRasterizationTask( mImpl->mSize );
@@ -180,7 +183,6 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
   {
     unsigned int width = static_cast<unsigned int>(size.width);
     unsigned int height = static_cast<unsigned int>( size.height );
-    BufferImage image = BufferImage::New( width, height, Pixel::RGBA8888);
 
     RasterizingTaskPtr newTask = new RasterizingTask( this, mParsedImage, width, height );
     mFactoryCache.GetSVGRasterizationThread()->AddTask( newTask );

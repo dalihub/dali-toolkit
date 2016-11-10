@@ -728,6 +728,7 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
       if( !shader )
       {
         shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
         factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
       }
     }
@@ -737,6 +738,7 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
       if( !shader )
       {
         shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
         factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader );
       }
     }
@@ -747,10 +749,11 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
     if( !shader )
     {
       shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_NO_ATLAS );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
     }
   }
-  shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+
   return shader;
 }
 
