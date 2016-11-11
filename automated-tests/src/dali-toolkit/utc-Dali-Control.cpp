@@ -478,8 +478,9 @@ int UtcDaliControlBackgroundProperties(void)
 
   // Deprecated Properties
   control.SetProperty( Control::Property::BACKGROUND_COLOR, Color::YELLOW );
-  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >() == Color::YELLOW );
-  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >() == control.GetBackgroundColor() );
+  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::YELLOW , TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), control.GetBackgroundColor(), TEST_LOCATION );
+
   control.ClearBackground();
 
   Property::Map deprecatedImageMap;
@@ -487,7 +488,8 @@ int UtcDaliControlBackgroundProperties(void)
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, deprecatedImageMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL )->Get< std::string >() == "TestImage" );
+  DALI_TEST_EQUALS( resultMap->Find( ImageVisual::Property::URL )->Get< std::string >(),  "TestImage" , TEST_LOCATION );
+
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
 

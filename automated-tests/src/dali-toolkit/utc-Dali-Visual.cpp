@@ -1630,3 +1630,50 @@ int UtcDaliGradientVisualBlendMode(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualRendererRemovalAndReAddition(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualRendererRemoval" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  visual.SetDepthIndex( 1.f );
+
+  DummyControl dummyControl = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  tet_infoline( "Add control with visual to stage and check renderer count is 1" );
+
+  Stage::GetCurrent().Add( dummyControl );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
+
+  tet_infoline( "Remove control with visual from stage and check renderer count is 0" );
+  Stage::GetCurrent().Remove( dummyControl );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
+
+  tet_infoline( "Re-add control with visual to stage and check renderer count is still 1" );
+
+  Stage::GetCurrent().Add( dummyControl );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
+
+  END_TEST;
+}
