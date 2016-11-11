@@ -36,7 +36,8 @@ AsyncImageLoader::~AsyncImageLoader()
 
 AsyncImageLoader::AsyncImageLoader( Internal::AsyncImageLoader* impl )
 : BaseHandle( impl )
-{}
+{
+}
 
 AsyncImageLoader::AsyncImageLoader( const AsyncImageLoader& handle )
 : BaseHandle( handle )
@@ -45,8 +46,13 @@ AsyncImageLoader::AsyncImageLoader( const AsyncImageLoader& handle )
 
 AsyncImageLoader& AsyncImageLoader::operator=( const AsyncImageLoader& handle )
 {
-  BaseHandle::operator=(handle);
+  BaseHandle::operator=( handle );
   return *this;
+}
+
+AsyncImageLoader AsyncImageLoader::DownCast( BaseHandle handle )
+{
+  return AsyncImageLoader( dynamic_cast<Dali::Toolkit::Internal::AsyncImageLoader*>( handle.GetObjectPtr() ) );
 }
 
 AsyncImageLoader AsyncImageLoader::New()
@@ -57,36 +63,36 @@ AsyncImageLoader AsyncImageLoader::New()
 
 uint32_t AsyncImageLoader::Load( const std::string& url )
 {
-  return GetImplementation(*this).Load( url, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  return GetImplementation( *this ).Load( url, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
 }
 
-uint32_t AsyncImageLoader::Load( const std::string& url, ImageDimensions size )
+uint32_t AsyncImageLoader::Load( const std::string& url, ImageDimensions dimensions )
 {
-  return GetImplementation(*this).Load( url, size, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  return GetImplementation( *this ).Load( url, dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
 }
 
 uint32_t AsyncImageLoader::Load( const std::string& url,
-                                 ImageDimensions size,
+                                 ImageDimensions dimensions,
                                  FittingMode::Type fittingMode,
                                  SamplingMode::Type samplingMode,
                                  bool orientationCorrection )
 {
-  return GetImplementation(*this).Load( url, size, fittingMode, samplingMode, orientationCorrection );
+  return GetImplementation(*this).Load( url, dimensions, fittingMode, samplingMode, orientationCorrection );
 }
 
-bool AsyncImageLoader::Cancel( uint32_t loadingTaskId)
+bool AsyncImageLoader::Cancel( uint32_t loadingTaskId )
 {
   return GetImplementation(*this).Cancel( loadingTaskId );
 }
 
 void AsyncImageLoader::CancelAll()
 {
-  GetImplementation(*this).CancelAll();
+  GetImplementation( *this ).CancelAll();
 }
 
 AsyncImageLoader::ImageLoadedSignalType& AsyncImageLoader::ImageLoadedSignal()
 {
-  return GetImplementation(*this).ImageLoadedSignal();
+  return GetImplementation( *this ).ImageLoadedSignal();
 }
 } // namespace Toolkit
 

@@ -118,11 +118,6 @@ ControllerPtr Controller::New( ControlInterface* controlInterface,
                                         editableControlInterface ) );
 }
 
-void Controller::SetTextControlInterface( ControlInterface* controlInterface )
-{
-  mImpl->mControlInterface = controlInterface;
-}
-
 // public : Configure the text controller.
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
@@ -170,10 +165,6 @@ void Controller::SetAutoScrollEnabled( bool enable )
                                                                UPDATE_DIRECTION          |
                                                                REORDER );
 
-      if( NULL == mImpl->mAutoScrollData )
-      {
-        mImpl->mAutoScrollData = new ScrollerData();
-      }
     }
     else
     {
@@ -202,87 +193,22 @@ bool Controller::IsAutoScrollEnabled() const
   return mImpl->mIsAutoScrollEnabled;
 }
 
-void Controller::SetAutoscrollSpeed( int scrollSpeed )
+CharacterDirection Controller::GetAutoScrollDirection() const
 {
-  if( NULL == mImpl->mAutoScrollData )
-  {
-    mImpl->mAutoScrollData = new ScrollerData();
-  }
-
-  mImpl->mAutoScrollData->mScrollSpeed = scrollSpeed;
+  return mImpl->mAutoScrollDirectionRTL;
 }
 
-int Controller::GetAutoScrollSpeed() const
+float Controller::GetAutoScrollLineAlignment() const
 {
-  if( NULL != mImpl->mAutoScrollData )
+  float offset = 0.f;
+
+  if( mImpl->mVisualModel &&
+      ( 0u != mImpl->mVisualModel->mLines.Count() ) )
   {
-    return mImpl->mAutoScrollData->mScrollSpeed;
+    offset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
   }
 
-  return 0;
-}
-
-void Controller::SetAutoScrollLoopCount( int loopCount )
-{
-  if( NULL == mImpl->mAutoScrollData )
-  {
-    mImpl->mAutoScrollData = new ScrollerData();
-  }
-
-  mImpl->mAutoScrollData->mLoopCount = loopCount;
-}
-
-int Controller::GetAutoScrollLoopCount() const
-{
-  if( NULL != mImpl->mAutoScrollData )
-  {
-    return mImpl->mAutoScrollData->mLoopCount;
-  }
-
-  return 0;
-}
-
-void Controller::SetAutoScrollWrapGap( float wrapGap )
-{
-  if( NULL == mImpl->mAutoScrollData )
-  {
-    mImpl->mAutoScrollData = new ScrollerData();
-  }
-
-  mImpl->mAutoScrollData->mWrapGap = wrapGap;
-}
-
-float Controller::GetAutoScrollWrapGap() const
-{
-  if( NULL != mImpl->mAutoScrollData )
-  {
-    return mImpl->mAutoScrollData->mWrapGap;
-  }
-
-  return 0.f;
-}
-
-const ScrollerData* const Controller::GetAutoScrollData()
-{
-  if( NULL != mImpl->mAutoScrollData )
-  {
-    // Need to update the data with the latest layout.
-    if( mImpl->mVisualModel )
-    {
-      mImpl->mAutoScrollData->mControlSize = mImpl->mVisualModel->mControlSize;
-      mImpl->mAutoScrollData->mOffscreenSize = GetNaturalSize().GetVectorXY();
-
-      mImpl->mAutoScrollData->mAlignmentOffset = 0.f;
-      if( 0u != mImpl->mVisualModel->mLines.Count() )
-      {
-        mImpl->mAutoScrollData->mAlignmentOffset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
-      }
-    }
-
-    return mImpl->mAutoScrollData;
-  }
-
-  return NULL;
+  return offset;
 }
 
 void Controller::SetHorizontalScrollEnabled( bool enable )
@@ -2202,17 +2128,6 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
   }
 }
 
-// private : Inherit from TextScroller.
-
-void Controller::ScrollingFinished()
-{
-  // Pure Virtual from TextScroller Interface
-  SetAutoScrollEnabled( false );
-  GetLayoutEngine().SetTextEllipsisEnabled( true );
-
-  mImpl->RequestRelayout();
-}
-
 // private : Update.
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
@@ -2678,10 +2593,7 @@ bool Controller::DoRelayout( const Size& size,
 
       if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
-        if( NULL != mImpl->mAutoScrollData )
-        {
-          mImpl->mAutoScrollData->mAutoScrollDirectionRTL = false;
-        }
+        mImpl->mAutoScrollDirectionRTL = false;
       }
 
       // Reorder the lines
@@ -2717,11 +2629,9 @@ bool Controller::DoRelayout( const Size& size,
           if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
           {
             const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
-            if( firstline &&
-                mImpl->mIsAutoScrollEnabled &&
-                ( NULL != mImpl->mAutoScrollData ) )
+            if ( firstline )
             {
-              mImpl->mAutoScrollData->mAutoScrollDirectionRTL = firstline->direction;
+              mImpl->mAutoScrollDirectionRTL = firstline->direction;
             }
           }
         }
@@ -2753,7 +2663,7 @@ bool Controller::DoRelayout( const Size& size,
 #if defined(DEBUG_ENABLED)
   std::string currentText;
   GetText( currentText );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, ( ( NULL != mImpl->mAutoScrollData ) && mImpl->mAutoScrollData->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
 #endif
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;

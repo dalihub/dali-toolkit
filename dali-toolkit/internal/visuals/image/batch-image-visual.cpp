@@ -132,7 +132,7 @@ void BatchImageVisual::SetSize( const Vector2& size )
   Visual::Base::SetSize( size );
 }
 
-void BatchImageVisual::GetNaturalSize( Vector2& naturalSize ) const
+void BatchImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if( mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0 )
   {

@@ -23,6 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <toolkit-environment-variable.h> // for setting environment variable: DALI_DEBUG_RENDERING
+#include "dummy-control.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -45,10 +46,17 @@ bool IsDebugVisual( Visual::Base& visual )
     isDebugVisualType = ( typeValue->Get<int>() == Visual::WIREFRAME ); // Debug Rendering uses the WireframeVisual
   }
 
-  Actor actor = Actor::New();
-  visual.SetOnStage( actor );
-  Geometry geometry = actor.GetRendererAt( 0 ).GetGeometry();
-  isGeometryLineType = ( geometry.GetType() == Geometry::LINES );
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  Stage::GetCurrent().Add( actor );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1, TEST_LOCATION );
+  if( actor.GetRendererCount() > 0 )
+  {
+    Geometry geometry = actor.GetRendererAt( 0 ).GetGeometry();
+    isGeometryLineType = ( geometry.GetType() == Geometry::LINES );
+  }
 
   return isDebugVisualType && isGeometryLineType;
 }

@@ -28,7 +28,6 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-data.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -305,7 +304,7 @@ void Popup::OnInitialize()
   mPopupLayout = Toolkit::TableView::New( 3, 1 );
 
   // Adds the default background image.
-  SetPopupBackgroundImage( Toolkit::ImageView::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
+  SetPopupBackgroundImage( Toolkit::ImageView::New( DEFAULT_BACKGROUND_IMAGE_PATH ) );
 
   mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
@@ -863,8 +862,7 @@ void Popup::LayoutTail()
   if( !image.empty() )
   {
     // Adds the tail actor.
-    Image tail = ResourceImage::New( image );
-    mTailImage = Toolkit::ImageView::New( tail );
+    mTailImage = Toolkit::ImageView::New( image );
     mTailImage.SetName( "tailImage" );
     const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
     mTailImage.SetParentOrigin( position );
@@ -1239,12 +1237,8 @@ void Popup::SetProperty( BaseObject* object, Property::Index propertyIndex, cons
         std::string valueString;
         if( value.Get( valueString ) )
         {
-          Image image = ResourceImage::New( valueString );
-          if( image )
-          {
-            Toolkit::ImageView actor = Toolkit::ImageView::New( image );
-            popupImpl.SetPopupBackgroundImage( actor );
-          }
+          Toolkit::ImageView actor = Toolkit::ImageView::New( valueString );
+          popupImpl.SetPopupBackgroundImage( actor );
         }
         break;
       }
@@ -1387,10 +1381,10 @@ Property::Value Popup::GetProperty( BaseObject* object, Property::Index property
       }
       case Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( popupImpl.GetPopupBackgroundImage() );
-        if( image )
+        Toolkit::ImageView imageView = Toolkit::ImageView::DownCast( popupImpl.GetPopupBackgroundImage() );
+        if( imageView )
         {
-          value = image.GetUrl();
+          value = imageView.GetProperty( Toolkit::ImageView::Property::IMAGE );
         }
         break;
       }

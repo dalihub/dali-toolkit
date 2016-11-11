@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,13 +223,70 @@ int UtcDaliSuperBlurViewSetImage(void)
     Wait(application);
     DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
 
-    application.SendNotification();
-    application.Render();
+    Wait(application);
     Stage::GetCurrent().Remove( blurView );
   }
 
   END_TEST;
 }
+
+int UtcDaliSuperBlurViewSetImage2(void)
+{
+  ToolkitTestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  tet_infoline(" UtcDaliSuperBlurViewSetImage2 - test setting a second image ");
+
+  SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
+  blurView.SetSize( 100.f, 100.f );
+
+  tet_infoline("Call SetImage and add blurview to stage");
+  Image inputImage = CreateSolidColorImage( application, Color::GREEN, 50, 50 );
+  blurView.SetImage( inputImage );
+
+  // start multiple guassian blur call, each guassian blur creates two render tasks
+  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+  {
+    // create image renderers for the original image and each blurred image
+    stage.Add( blurView );
+    Wait(application);
+    DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
+
+    tet_infoline("Wait for a second to allow blur to finish");
+    Wait(application, 1000);
+
+    tet_infoline("Remove from stage");
+    Stage::GetCurrent().Remove( blurView );
+  }
+
+  tet_infoline("Test that there are no render tasks remaining");
+  DALI_TEST_EQUALS(blurView.GetRendererCount(), 0, TEST_LOCATION );
+
+  tet_infoline("Call SetImage a second time and add blurview back to stage");
+  Image inputImage2 = CreateSolidColorImage( application, Color::CYAN, 50, 50 );
+  blurView.SetImage( inputImage2 );
+  // start multiple guassian blur call, each guassian blur creates two render tasks
+  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+
+  {
+    // create image renderers for the original image and each blurred image
+    Stage::GetCurrent().Add( blurView );
+    Wait(application);
+    DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
+
+    tet_infoline("Wait for a second to allow blur to finish");
+    Wait(application, 1000);
+
+    tet_infoline("Remove from stage");
+    Stage::GetCurrent().Remove( blurView );
+  }
+
+  tet_infoline("Test that there are no render tasks remaining");
+  DALI_TEST_EQUALS(blurView.GetRendererCount(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliSuperBlurViewSetProperty(void)
 {

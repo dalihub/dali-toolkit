@@ -6,7 +6,7 @@
 Visuals provide reusable rendering logic which can be used by all controls.
 This means that custom controls do not have to create actors, they can just reuse the existing visuals which increases performance.
  
-Visuals reuse geometry, shaders etc. across controls and manages the renderer and material to exist only when the control is on-stage.
+Visuals reuse geometry, shaders etc. across controls and manages the renderer and texture to exist only when the control is on-stage.
 Additionally, they respond to actor size and color change, while also providing clipping at the renderer level.
  
 DALi provides the following visuals:
@@ -22,11 +22,71 @@ Controls can provide properties that allow users to specify the visual type ( vi
 Setting visual properties are done via a property map.
 The **visualType** field in the property map specifies the visual to use/create.
 This is required to avoid ambiguity as multiple visuals may be capable of rendering the same contents.
+
+Visuals have a **transform** field in the property map to allow layouting within a control. If this field is not set, then the visual defaults to filling the control. The **transform** field has a property map with the following keys:
+
+| Property                                        | String   | Type    | Required | Description               |
+|-------------------------------------------------|----------|:-------:|:--------:|---------------------------|
+| Dali::Toolkit::Visual::Transform::Property::OFFSET | offset | VECTOR2 | No      | The offset of the visual. |
+| Dali::Toolkit::Visual::Transform::Property::SIZE | size | VECTOR2 | No      | The size of the visual. |
+| Dali::Toolkit::Visual::Transform::Property::OFFSET_SIZE_MODE | offsetSizeMode | VECTOR4 | No      | Whether the size or offset components are Relative or Absolute [More info](@ref offset-size-mode)|
+| Dali::Toolkit::Visual::Transform::Property::ORIGIN | origin | INTEGER or STRING | No      | The origin of the visual within the control's area. [More info](@ref align-type)] |
+| Dali::Toolkit::Visual::Transform::Property::ANCHOR_POINT | anchorPoint | INTEGER or STRING | No      | The anchor point of the visual. [More info](@ref align-type)|
+ 
+
+## Offset & size modes  {#offset-size-mode}
+
+The offset and size modes can be either Relative or Absolute. The offset modes are in the x and y components of the offsetSizeMode property, and map to the offset's x and y components respectively. The size modes are in the z and w components of the offsetSizeMode property, and map to the size's x and y components, respectively.
+
+A mode value of 0 represents a Relative mode, in which case the size or offset value represents a ratio of the control's size. A mode value of 1 represents an Absolute mode, in which case the size or offset value represents world units (pixels).
+
+For example, an offsetSizeMode of [0, 0, 1, 1], an offset of (0, 0.25) and a size of (20, 20) means the visual will be 20 pixels by 20 pixels in size, positioned 25% above the center of the control.
+
+
+## Alignment  {#align-type}
+| Enumeration                                          | String  | Description                                                                                          |
+|------------------------------------------------------|---------|------------------------------------------------------------------------------------------------------|
+| Dali::Toolkit::Align::TOP_BEGIN | TOP_BEGIN | Aligns to the top of the vertical axis and the beginning of the horizontal axis (The left or right edge in Left-To-Right or Right-to-Left layouts, respectively) |
+| Dali::Toolkit::Align::TOP_CENTER | TOP_CENTER | Aligns to the top of the vertical axis and the center of the horizontal axis |
+| Dali::Toolkit::Align::TOP_END | TOP_END | Aligns to the top of the vertical axis and end of the horizontal axis (The right or left edge in Left-To-Right or Right-to-Left layouts, respectively) |
+| Dali::Toolkit::Align::CENTER_BEGIN | CENTER_BEGIN | Aligns to the center of the vertical axis and the beginning of the horizontal axis|
+| Dali::Toolkit::Align::CENTER | CENTER | Aligns to the center of the control |
+| Dali::Toolkit::Align::CENTER_END | CENTER_END | Aligns to the center of the vertical axis and end of the horizontal axis |
+| Dali::Toolkit::Align::BOTTOM_BEGIN | BOTTOM_BEGIN | Aligns to the bottom of the vertical axis and the beginning of the horizontal axis|
+| Dali::Toolkit::Align::BOTTOM_CENTER | BOTTOM_CENTER | Aligns to the bottom of the vertical axis and the center of the horizontal axis
+| Dali::Toolkit::Align::BOTTOM_END | BOTTOM_END | Aligns to the bottom of the vertical axis and end of the horizontal axis |
+ 
+Visuals also have a custom **shader** property. Whilst it's possible to change the shader, please note that some visuals rely on the vertex shader to perform certain functions. For example, the NPatch visual uses the vertex shader to perform the stretching. The **shader** property is a Property::Map with the following keys:
+
+
+| Property                                        | String   | Type    | Required | Description               |
+|-------------------------------------------------|----------|:-------:|:--------:|---------------------------|
+| Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER | vertexShader | STRING | No      | The vertex shader code. |
+| Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER | fragmentShader | STRING | No      | The fragment shader code. |
+| Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X | subdivideGridX | INTEGER | No      | How to subdivide the grid along the X-Axis. Defaults to 1 |
+| Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y | subdivideGridY | INTEGER | No      | How to subdivide the grid along the Y-Axis. Defaults to 1 |
+| Dali::Toolkit::Visual::Shader::Property::HINTS | hints | INTEGER or ARRAY of STRING | No      | Shader hints bitmask [More info](@ref shader-hints) |
+
+## Shader hints {#shader-hints}
+
+This is a bitmask giving hints to the renderer about what the shader does, in order to help the rendering system optimise it's rendering.
+
+The bitmask can have the following values:
+
+| Value | Description |
+|-------------------------------------------|----------------------------------------|
+| Dali::Shader::Hint::NONE | No hints |
+| Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT | Might generate transparent alpha from opaque inputs |
+| Dali::Shader::Hint::MODIFIES_GEOMETRY | Might change the position of vertices - this disables culling optimizations |
+
+
+See also Dali::Shader::Hint::Value enumeration.
+
 ___________________________________________________________________________________________________
 
 ## Color Visual {#color-visual}
 
-Renders a solid color to the control's quad.
+Renders a color to the visual's quad geometry.
  
 ![ ](../assets/img/visuals/color-visual.png)
 ![ ](visuals/color-visual.png)
@@ -37,7 +97,7 @@ Renders a solid color to the control's quad.
 
 | Property                                        | String   | Type    | Required | Description               |
 |-------------------------------------------------|----------|:-------:|:--------:|---------------------------|
-| Dali::Toolkit::ColorVisual::Property::MIX_COLOR | mixColor | VECTOR4 | Yes      | The solid color required. |
+| Dali::Toolkit::ColorVisual::Property::MIX_COLOR | mixColor | VECTOR4 | Yes      | The color required. |
 
 ### Usage
 
@@ -66,7 +126,7 @@ ________________________________________________________________________________
 
 ## Gradient Visual {#gradient-visual}
 
-Renders a smooth transition of colors to the control's quad.
+Renders a smooth transition of colors to the visual's quad geometry.
  
 Both Linear and Radial gradients are supported.
 
@@ -108,9 +168,9 @@ Indicates what happens if the gradient starts or ends inside the bounds of the t
 
 | Enumeration                                          | String  | Description                                                                                          |
 |------------------------------------------------------|---------|------------------------------------------------------------------------------------------------------|
-| Dali::Toolkit::GradientVisual::SpreadMethod::PAD     | PAD     | *Default*. Uses the terminal colors of the gradient to fill the remainder of the quad.               |
-| Dali::Toolkit::GradientVisual::SpreadMethod::REFLECT | REFLECT | Reflect the gradient pattern start-to-end, end-to-start, start-to-end etc. until the quad is filled. |
-| Dali::Toolkit::GradientVisual::SpreadMethod::REPEAT  | REPEAT  | Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc. until the quad is filled.  |
+| Dali::Toolkit::GradientVisual::SpreadMethod::PAD     | PAD     | *Default*. Uses the terminal colors of the gradient to fill the remainder of the quad geometry.               |
+| Dali::Toolkit::GradientVisual::SpreadMethod::REFLECT | REFLECT | Reflect the gradient pattern start-to-end, end-to-start, start-to-end etc. until the quad geometry is filled. |
+| Dali::Toolkit::GradientVisual::SpreadMethod::REPEAT  | REPEAT  | Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc. until the quad geometry is filled.  |
 
 ### Usage
 
@@ -215,7 +275,7 @@ ________________________________________________________________________________
 
 ## Image Visual {#image-visuals}
 
-Renders an image into the control's quad.
+Renders an image into the visual's geometry.
  
 Depending on the extension of the image, a different visual is provided to render the image onto the screen.
  
@@ -227,7 +287,7 @@ ___________________________
  
 ### Normal {#image-visual}
  
-Renders a raster image ( jpg, png etc.) into the control's quad.
+Renders a raster image ( jpg, png etc.) into the visual's quad geometry.
  
 ![ ](../assets/img/visuals/image-visual.png)
 ![ ](visuals/image-visual.png)
@@ -271,7 +331,7 @@ ________________________________________________________________________________
 
 ### N-Patch {#n-patch-visual}
 
-Renders an n-patch or a 9-patch image into the control's quad.
+Renders an n-patch or a 9-patch image. Uses non-quad geometry. Both geometry and texture are cached to reduce memory consumption if the same n-patch image is used elsewhere.
  
 ![ ](../assets/img/visuals/n-patch-visual.png)
 ![ ](visuals/n-patch-visual.png)
@@ -314,7 +374,7 @@ ________________________________________________________________________________
 
 ### SVG {#svg-visual}
 
-Renders a svg image into the control's quad.
+Renders a svg image into the visual's quad geometry.
  
 #### Features: SVG Tiny 1.2 specification
 
@@ -384,7 +444,7 @@ ________________________________________________________________________________
 
 ## Border Visual {#border-visual}
 
-Renders a solid color as an internal border to the control's quad.
+Renders a color as an internal border to the visual's geometry.
  
 ![ ](../assets/img/visuals/border-visual.png)
 ![ ](visuals/border-visual.png)
@@ -611,7 +671,7 @@ ________________________________________________________________________________
 
 ## Wireframe Visual {#wireframe-visual}
 
-Renders a wireframe around a control's quad.
+Renders a wireframe around a quad geometry.
 Is mainly used for debugging and is the visual that replaces all other visuals when [Visual Debug Rendering](@ref debugrendering) is turned on.
  
 ![ ](../assets/img/visuals/wireframe-visual.png)

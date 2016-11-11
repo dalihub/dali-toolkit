@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -37,6 +38,7 @@
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -65,6 +67,10 @@ const Pixel::Format EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT = Pixel::RGBA8888;
 const float         ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 1.0f, 1.0f, 1.0f, 0.0 );
 const bool          EFFECTS_VIEW_REFRESH_ON_DEMAND(false);
+
+// Visuals are not stylable or public
+const Property::Index CHILD_VISUAL( Toolkit::EffectsView::ANIMATABLE_PROPERTY_START_INDEX - 1);
+const Property::Index POST_FILTER_VISUAL( CHILD_VISUAL-1 );
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -186,7 +192,9 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
 
     FrameBufferImage dummyImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
 
-    InitializeVisual( self, mVisualPostFilter, dummyImage );
+    Internal::InitializeVisual( self, mVisualPostFilter, dummyImage );
+    RegisterVisual( POST_FILTER_VISUAL, mVisualPostFilter );
+
     Property::Map customShader;
     customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
     customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
@@ -214,6 +222,7 @@ void EffectsView::Disable()
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
+  mLastSize = Vector2::ZERO; // Ensure resources are reallocated on subsequent enable
   mEnabled = false;
 }
 
@@ -302,16 +311,6 @@ void EffectsView::OnStageConnection( int depth )
   Control::OnStageConnection( depth );
 
   Enable();
-
-  Actor self = Self();
-  if( mVisualPostFilter )
-  {
-    mVisualPostFilter.SetOnStage( self );
-  }
-  if( mVisualForChildren )
-  {
-    mVisualForChildren.SetOnStage( self );
-  }
 }
 
 void EffectsView::OnStageDisconnection()
@@ -322,16 +321,6 @@ void EffectsView::OnStageDisconnection()
   for( size_t i = 0; i < numFilters; ++i )
   {
     mFilters[i]->Disable();
-  }
-
-  Actor self = Self();
-  if( mVisualPostFilter )
-  {
-    mVisualPostFilter.SetOffStage( self );
-  }
-  if( mVisualForChildren )
-  {
-    mVisualForChildren.SetOffStage( self );
   }
 
   Control::OnStageDisconnection();
@@ -437,7 +426,8 @@ void EffectsView::AllocateResources()
     Actor self( Self() );
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-    InitializeVisual( self, mVisualForChildren, mImageForChildren );
+    Internal::InitializeVisual( self, mVisualForChildren, mImageForChildren );
+    RegisterVisual( CHILD_VISUAL, mVisualForChildren );
     mVisualForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );

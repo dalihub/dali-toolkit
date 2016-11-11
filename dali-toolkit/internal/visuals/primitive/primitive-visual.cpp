@@ -394,7 +394,7 @@ void PrimitiveVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize ) const
+void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize.x = mObjectDimensions.x;
   naturalSize.y = mObjectDimensions.y;

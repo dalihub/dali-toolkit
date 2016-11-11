@@ -275,4 +275,3 @@ inline const Toolkit::Internal::EffectsView& GetImpl( const Toolkit::EffectsView
 } // namespace Dali
 
 #endif // __DALI_TOOLKIT_INTERNAL_EFFECTS_VIEW_H__
-

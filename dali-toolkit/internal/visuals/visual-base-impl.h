@@ -99,7 +99,7 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize
    */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+  virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
    * @copydoc Toolkit::Visual::Base::SetDepthIndex

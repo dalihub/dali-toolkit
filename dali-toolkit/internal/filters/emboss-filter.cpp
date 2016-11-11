@@ -31,6 +31,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -127,10 +128,10 @@ void EmbossFilter::Enable()
 
   mRootActor.Add( mActorForComposite );
 
-  InitializeVisual( mActorForComposite, mVisualForEmboss1, mImageForEmboss1 );
+  Internal::InitializeVisual( mActorForComposite, mVisualForEmboss1, mImageForEmboss1 );
   Toolkit::GetImplementation( mVisualForEmboss1 ).SetCustomShader( customShader );
   mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
-  InitializeVisual( mActorForComposite, mVisualForEmboss2, mImageForEmboss2 );
+  Internal::InitializeVisual( mActorForComposite, mVisualForEmboss2, mImageForEmboss2 );
   Toolkit::GetImplementation( mVisualForEmboss2 ).SetCustomShader( customShader );
   mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
 
@@ -162,8 +163,8 @@ void EmbossFilter::Disable()
 
     if( mActorForComposite )
     {
-      mVisualForEmboss1.SetOffStage( mActorForComposite );
-      mVisualForEmboss2.SetOffStage( mActorForComposite );
+      Toolkit::GetImplementation(mVisualForEmboss1).SetOffStage( mActorForComposite );
+      Toolkit::GetImplementation(mVisualForEmboss2).SetOffStage( mActorForComposite );
       mVisualForEmboss1.Reset();
       mVisualForEmboss2.Reset();
       mRootActor.Remove( mActorForComposite );
@@ -179,6 +180,11 @@ void EmbossFilter::Disable()
     if( mRenderTaskForEmboss2 )
     {
       taskList.RemoveTask(mRenderTaskForEmboss2);
+    }
+
+    if( mRenderTaskForOutput )
+    {
+      taskList.RemoveTask( mRenderTaskForOutput );
     }
 
     mRootActor.Reset();

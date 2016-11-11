@@ -162,14 +162,6 @@ TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache )
   return new TextVisual( factoryCache );
 }
 
-void TextVisual::SetTextControlInterface( Text::ControlInterface* controlInterface )
-{
-  if( mController )
-  {
-    mController->SetTextControlInterface( controlInterface );
-  }
-}
-
 void TextVisual::SetSize( const Vector2& size )
 {
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
@@ -191,7 +183,7 @@ float TextVisual::GetHeightForWidth( float width ) const
   return mController->GetHeightForWidth( width );
 }
 
-void TextVisual::GetNaturalSize( Vector2& naturalSize ) const
+void TextVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize = mController->GetNaturalSize().GetVectorXY();
 }
@@ -225,14 +217,6 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, mController->GetTextColor() );
 
   map.Insert( Toolkit::TextVisual::Property::ENABLE_MARKUP, mController->IsMarkupProcessorEnabled() );
-
-  map.Insert( Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL, mController->IsAutoScrollEnabled() );
-
-  map.Insert( Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED, mController->GetAutoScrollSpeed() );
-
-  map.Insert( Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT, mController->GetAutoScrollLoopCount() );
-
-  map.Insert( Toolkit::TextVisual::Property::AUTO_SCROLL_GAP, mController->GetAutoScrollWrapGap() );
 
   map.Insert( Toolkit::TextVisual::Property::LINE_SPACING, mController->GetDefaultLineSpacing() );
 
@@ -501,47 +485,22 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     }
     case Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL:
     {
-      const bool enableAutoScroll = propertyValue.Get<bool>();
-
-      // If request to auto scroll is the same as current state then do nothing.
-      if( enableAutoScroll != mController->IsAutoScrollEnabled() )
-      {
-        // If request is disable (false) and auto scrolling is enabled then need to stop it
-        if( !enableAutoScroll )
-        {
-          StopTextAutoScrolling(); // Causes the current animation to finish playing.
-        }
-        // If request is enable (true) then start autoscroll as not already running
-        else
-        {
-          mController->GetLayoutEngine().SetTextEllipsisEnabled( false );
-          mController->SetAutoScrollEnabled( enableAutoScroll );
-          mController->RequestRelayout();
-        }
-      }
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED:
     {
-      mController->SetAutoscrollSpeed( propertyValue.Get<int>() );
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT:
     {
-      const int loopCount = propertyValue.Get<int>();
-      if( loopCount > 0 )
-      {
-        mController->SetAutoScrollLoopCount( loopCount );
-      }
-      else
-      {
-        StopTextAutoScrolling(); // Causes the current animation to finish playing.
-      }
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::AUTO_SCROLL_GAP:
     {
-      mController->SetAutoScrollWrapGap( propertyValue.Get<float>() );
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::LINE_SPACING:
@@ -751,22 +710,22 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
     }
     case Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL:
     {
-      value = mController->IsAutoScrollEnabled();
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED:
     {
-      value = mController->GetAutoScrollSpeed();
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT:
     {
-      value = mController->GetAutoScrollLoopCount();
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::AUTO_SCROLL_GAP:
     {
-      value = mController->GetAutoScrollWrapGap();
+      // nothing to do.
       break;
     }
     case Toolkit::TextVisual::Property::LINE_SPACING:
@@ -837,46 +796,6 @@ void TextVisual::RenderText()
       self.Add( renderableActor );
     }
     mRenderableActor = renderableActor;
-
-    if( mController->IsAutoScrollEnabled() )
-    {
-      SetUpAutoScrolling();
-    }
-  }
-}
-
-void TextVisual::StopTextAutoScrolling()
-{
-  if( mTextScroller )
-  {
-    mTextScroller->StopScrolling();
-  }
-}
-
-void TextVisual::SetUpAutoScrolling()
-{
-  Actor self = mSelf.GetHandle();
-  if( !self )
-  {
-    // Nothing to do if the handle is not initialized.
-    return;
-  }
-
-  const Text::ScrollerData* const data = mController->GetAutoScrollData();
-
-  if( NULL != data )
-  {
-    if( !mTextScroller )
-    {
-      // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
-      mTextScroller = Text::TextScroller::New( *mController );
-    }
-
-    mTextScroller->StartScrolling( mRenderableActor,
-                                   *data );
-
-    self.Add( mTextScroller->GetScrollingText() );
-    self.Add( mTextScroller->GetSourceCamera() );
   }
 }
 

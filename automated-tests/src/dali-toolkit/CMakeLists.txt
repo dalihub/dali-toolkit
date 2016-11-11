@@ -57,6 +57,7 @@ SET(TC_SOURCES
    utc-Dali-ImageAtlas.cpp
    utc-Dali-VideoView.cpp
    utc-Dali-AsyncImageLoader.cpp
+   utc-Dali-SyncImageLoader.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

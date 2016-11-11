@@ -13,6 +13,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/visual-base-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-base-data-impl.cpp \
    $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
+   $(toolkit_src_dir)/visuals/npatch-loader.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-cache.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-string-constants.cpp \
@@ -114,7 +115,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/text-font-style.cpp \
    $(toolkit_src_dir)/text/text-io.cpp \
    $(toolkit_src_dir)/text/text-scroller.cpp \
-   $(toolkit_src_dir)/text/text-scroller-data.cpp \
    $(toolkit_src_dir)/text/text-scroller-interface.cpp \
    $(toolkit_src_dir)/text/text-view.cpp \
    $(toolkit_src_dir)/text/text-view-interface.cpp \

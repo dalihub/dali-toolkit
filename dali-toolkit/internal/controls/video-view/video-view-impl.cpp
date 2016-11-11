@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -120,7 +121,7 @@ void VideoView::SetPropertyMap( Property::Map map )
   mPropertyMap = map;
 
   Actor self( Self() );
-  InitializeVisual( self, mVisual, mPropertyMap );
+  Internal::InitializeVisual( self, mVisual, mPropertyMap );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -443,7 +444,7 @@ void VideoView::OnStageConnection( int depth )
   if( mVisual )
   {
     CustomActor self = Self();
-    mVisual.SetOnStage( self );
+    Toolkit::GetImplementation(mVisual).SetOnStage( self );
   }
 }
 
@@ -452,7 +453,7 @@ void VideoView::OnStageDisconnection()
   if( mVisual )
   {
     CustomActor self = Self();
-    mVisual.SetOffStage( self );
+    Toolkit::GetImplementation(mVisual).SetOffStage( self );
   }
 
   Control::OnStageDisconnection();
@@ -505,7 +506,12 @@ void VideoView::SetWindowSurfaceTarget()
   int curPos = mVideoPlayer.GetPlayPosition();
 
   mSetRenderingTarget = true;
-  mVisual.RemoveAndReset( self );
+
+  if( mVisual )
+  {
+    Toolkit::GetImplementation(mVisual).SetOffStage(self);
+    mVisual.Reset();
+  }
 
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );
@@ -538,7 +544,7 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
-  InitializeVisual( self, mVisual, mNativeImage );
+  Internal::InitializeVisual( self, mVisual, mNativeImage );
 
   if( mIsPlay )
   {

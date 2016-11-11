@@ -75,7 +75,7 @@ public:
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled );
   void UnregisterVisual( Property::Index index );
   void EnableVisual( Property::Index index, bool enabled );
-  bool IsVisualEnabled( Property::Index index );
+  bool IsVisualEnabled( Property::Index indepx );
 
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Animation CreateTransition( const Toolkit::TransitionData& transition );

@@ -332,7 +332,7 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
+void ImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if(mImage)
   {
@@ -700,27 +700,13 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void ImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
-  // This is where specific Properties can be set.
+  // TODO
 }
 
 Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
 {
-  Dali::Property::Value value;
-
-  switch( index )
-  {
-    case Toolkit::ImageVisual::Property::URL:
-    {
-      value = mImageUrl;
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  return value;
+  // TODO
+  return Dali::Property::Value();
 }
 
 void ImageVisual::OnSetTransform()
@@ -742,6 +728,7 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
       if( !shader )
       {
         shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
         factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
       }
     }
@@ -751,6 +738,7 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
       if( !shader )
       {
         shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP );
+        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
         factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader );
       }
     }
@@ -761,10 +749,11 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
     if( !shader )
     {
       shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_NO_ATLAS );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
     }
   }
-  shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+
   return shader;
 }
 

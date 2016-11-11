@@ -222,7 +222,8 @@ GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache )
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
-  mGradientType( LINEAR )
+  mGradientType( LINEAR ),
+  mIsOpaque( true )
 {
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
@@ -362,6 +363,12 @@ void GradientVisual::InitializeRenderer()
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
 
+  // If opaque then no need to have blending
+  if( mIsOpaque )
+  {
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
+  }
+
   mImpl->mRenderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
 
   //Register transform properties
@@ -423,6 +430,10 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
         {
           mGradient->AddStop( offsetArray[i], Vector4(color.r*color.a, color.g*color.a, color.b*color.a, color.a));
           numValidStop++;
+          if( ! Equals( color.a, 1.0f, Math::MACHINE_EPSILON_1 ) )
+          {
+            mIsOpaque = false;
+          }
         }
       }
     }

@@ -76,7 +76,7 @@ float Visual::Base::GetHeightForWidth( float width ) const
   return GetImplementation( *this ).GetHeightForWidth( width );
 }
 
-void Visual::Base::GetNaturalSize(Vector2& naturalSize ) const
+void Visual::Base::GetNaturalSize(Vector2& naturalSize )
 {
   GetImplementation( *this ).GetNaturalSize( naturalSize );
 }
@@ -89,25 +89,6 @@ void Visual::Base::SetDepthIndex( float index )
 float Visual::Base::GetDepthIndex() const
 {
   return GetImplementation( *this ).GetDepthIndex();
-}
-
-void Visual::Base::SetOnStage( Actor& actor )
-{
-  GetImplementation( *this ).SetOnStage( actor );
-}
-
-void Visual::Base::SetOffStage( Actor& actor )
-{
-  GetImplementation( *this ).SetOffStage( actor );
-}
-
-void Visual::Base::RemoveAndReset( Actor& actor )
-{
-  if( actor && *this )
-  {
-    SetOffStage( actor );
-  }
-  Reset();
 }
 
 void Visual::Base::CreatePropertyMap( Property::Map& map ) const

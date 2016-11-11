@@ -27,8 +27,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
-#include <dali-toolkit/devel-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/internal/image-loader/atlas-packer.h>
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 
 namespace Dali
 {

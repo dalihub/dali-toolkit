@@ -17,11 +17,11 @@
 // CLASS HEADER
 #include "visual-factory-cache.h"
 
-// EXTERNAL HEADER
+// EXTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
 #include <dali/public-api/images/resource-image.h>
 
-// INTERNAL HEADER
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
@@ -195,6 +195,11 @@ ImageAtlasManagerPtr VisualFactoryCache::GetAtlasManager()
   }
 
   return mAtlasManager;
+}
+
+NPatchLoader& VisualFactoryCache::GetNPatchLoader()
+{
+  return mNPatchLoader;
 }
 
 SvgRasterizeThread* VisualFactoryCache::GetSVGRasterizationThread()

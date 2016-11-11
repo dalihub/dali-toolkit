@@ -597,8 +597,12 @@ void Control::SetBackgroundImage( Image image )
 
 void Control::ClearBackground()
 {
-  Actor self( Self() );
-  mImpl->mBackgroundVisual.RemoveAndReset( self );
+  if( mImpl->mBackgroundVisual )
+  {
+    Actor self( Self() );
+    Toolkit::GetImplementation( mImpl->mBackgroundVisual ).SetOffStage( self );
+    mImpl->mBackgroundVisual.Reset();
+  }
   mImpl->mBackgroundColor = Color::TRANSPARENT;
 }
 
@@ -759,7 +763,7 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
       {
         if( (*iter)->visual && self.OnStage() )
         {
-          (*iter)->visual.SetOffStage( self );
+          Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
         }
         (*iter)->visual = visual;
         visualReplaced = true;
@@ -773,17 +777,17 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
 
   if( visual && self.OnStage() && enabled )
   {
-    visual.SetOnStage( self );
+    Toolkit::GetImplementation(visual).SetOnStage( self );
   }
 }
 
 void Control::UnregisterVisual( Property::Index index )
 {
-   RegisteredVisualContainer::Iterator iter;
-   if ( FindVisual( index, mImpl->mVisuals, iter ) )
-   {
-     mImpl->mVisuals.Erase( iter );
-   }
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    mImpl->mVisuals.Erase( iter );
+  }
 }
 
 Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
@@ -814,11 +818,11 @@ void Control::EnableVisual( Property::Index index, bool enable )
       if ( enable )
       {
 
-        (*iter)->visual.SetOnStage( parentActor );
+        Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
       }
       else
       {
-        (*iter)->visual.SetOffStage( parentActor );  // No need to call if control not staged.
+        Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
       }
     }
   }
@@ -1091,7 +1095,7 @@ void Control::OnStageConnection( int depth )
     if( (*iter)->visual && (*iter)->enabled )
     {
       Actor self( Self() );
-      (*iter)->visual.SetOnStage( self );
+      Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
     }
   }
 }
@@ -1104,7 +1108,7 @@ void Control::OnStageDisconnection()
     if( (*iter)->visual )
     {
       Actor self( Self() );
-      (*iter)->visual.SetOffStage( self );
+      Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
     }
   }
 }
