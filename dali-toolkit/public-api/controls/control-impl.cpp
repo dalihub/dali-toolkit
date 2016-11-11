@@ -599,8 +599,7 @@ void Control::ClearBackground()
 {
   if( mImpl->mBackgroundVisual )
   {
-    Actor self( Self() );
-    Toolkit::GetImplementation( mImpl->mBackgroundVisual ).SetOffStage( self );
+    UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
     mImpl->mBackgroundVisual.Reset();
   }
   mImpl->mBackgroundColor = Color::TRANSPARENT;
@@ -783,11 +782,14 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
 
 void Control::UnregisterVisual( Property::Index index )
 {
-  RegisteredVisualContainer::Iterator iter;
-  if ( FindVisual( index, mImpl->mVisuals, iter ) )
-  {
-    mImpl->mVisuals.Erase( iter );
-  }
+   RegisteredVisualContainer::Iterator iter;
+   if ( FindVisual( index, mImpl->mVisuals, iter ) )
+   {
+     Actor self( Self() );
+     Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+     (*iter)->visual.Reset();
+     mImpl->mVisuals.Erase( iter );
+   }
 }
 
 Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
