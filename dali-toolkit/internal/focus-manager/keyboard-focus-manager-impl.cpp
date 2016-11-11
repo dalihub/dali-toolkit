@@ -86,6 +86,8 @@ DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboardFocusedActorEn
 
 DALI_TYPE_REGISTRATION_END()
 
+const unsigned int MAX_HISTORY_AMOUNT = 30; ///< Max length of focus history stack
+
 } // unnamed namespace
 
 Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
@@ -165,6 +167,16 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
     // Save the current focused actor
     mCurrentFocusActor = actorID;
 
+    // Push Current Focused Actor to FocusHistory
+    mFocusHistory.PushBack( &actor.GetBaseObject() );
+
+    // Delete first element before add new element when Stack is full.
+    if( mFocusHistory.Count() > MAX_HISTORY_AMOUNT )
+    {
+       FocusStackIterator beginPos = mFocusHistory.Begin();
+       mFocusHistory.Erase( beginPos );
+    }
+
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
     success = true;
   }
@@ -185,6 +197,33 @@ Actor KeyboardFocusManager::GetCurrentFocusActor()
 Actor KeyboardFocusManager::GetCurrentFocusGroup()
 {
   return GetFocusGroup(GetCurrentFocusActor());
+}
+
+void KeyboardFocusManager::MoveFocusBackward()
+{
+  // Find Pre Focused Actor when the list size is more than 1
+  if( mFocusHistory.Count() > 1 )
+  {
+    // Delete current focused actor in history
+    FocusStackIterator endPos = mFocusHistory.End();
+    endPos = mFocusHistory.Erase( --endPos );
+
+    // If pre-focused actors are not on stage, remove them in stack
+    while( !Dali::Actor::DownCast(BaseHandle(mFocusHistory[ mFocusHistory.Count() - 1 ])).OnStage() )
+    {
+      endPos = mFocusHistory.Erase( --endPos );
+    }
+
+    // Get pre focused actor
+    BaseObject* object = mFocusHistory[ mFocusHistory.Count() - 1 ];
+    BaseHandle handle( object );
+    Actor preFocusedActor = Dali::Actor::DownCast( handle );
+
+    // Delete pre focused actor in history because it will pushed again by SetCurrentFocusActor()
+    mFocusHistory.Erase( --endPos );
+
+    SetCurrentFocusActor( preFocusedActor );
+ }
 }
 
 bool KeyboardFocusManager::IsLayoutControl(Actor actor) const
@@ -623,6 +662,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     else if (keyName == "Backspace" && !isAccessibilityEnabled)
     {
       // Emit signal to go back to the previous view???
+    }
+    else if (keyName == "Escape" && !isAccessibilityEnabled)
+    {
     }
   }
   else if(event.state == KeyEvent::Up)

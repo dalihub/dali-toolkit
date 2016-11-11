@@ -107,6 +107,11 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
   return GetImpl(*this).GetFocusIndicatorActor();
 }
 
+void KeyboardFocusManager::MoveFocusBackward()
+{
+  return GetImpl(*this).MoveFocusBackward();
+}
+
 KeyboardFocusManager::PreFocusChangeSignalType& KeyboardFocusManager::PreFocusChangeSignal()
 {
   return GetImpl(*this).PreFocusChangeSignal();
