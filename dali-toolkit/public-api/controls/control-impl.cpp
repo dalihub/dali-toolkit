@@ -292,7 +292,6 @@ public:
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
     mStyleName(""),
-    mBackgroundVisual(),
     mBackgroundColor(Color::TRANSPARENT),
     mStartingPinchScale( NULL ),
     mKeyEventSignal(),
@@ -375,7 +374,7 @@ public:
           }
           else
           {
-            // An empty map means the background is no longer required
+            // An empty image means the background is no longer required
             controlImpl.ClearBackground();
           }
           break;
@@ -397,13 +396,13 @@ public:
         case Toolkit::Control::Property::BACKGROUND:
         {
           const Property::Map* map = value.GetMap();
-          if( map )
+          if( map && !map->Empty() )
           {
             controlImpl.SetBackground( *map );
           }
           else
           {
-            // The background is not a property map, so we should clear the background
+            // The background is an empty property map, so we should clear the background
             controlImpl.ClearBackground();
           }
           break;
@@ -447,9 +446,10 @@ public:
         {
           DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundVisual )
+          Toolkit::Visual::Base visual = controlImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
+          if( visual )
           {
-            controlImpl.mImpl->mBackgroundVisual.CreatePropertyMap( map );
+            visual.CreatePropertyMap( map );
           }
           value = map;
           break;
@@ -464,9 +464,10 @@ public:
         case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundVisual )
+          Toolkit::Visual::Base visual = controlImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
+          if( visual )
           {
-            (controlImpl.mImpl->mBackgroundVisual).CreatePropertyMap( map );
+            visual.CreatePropertyMap( map );
           }
 
           value = map;
@@ -484,7 +485,6 @@ public:
   Control& mControlImpl;
   RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
-  Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background visual
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
@@ -562,12 +562,8 @@ void Control::SetBackgroundColor( const Vector4& color )
   Property::Map map;
   map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
-  if( mImpl->mBackgroundVisual )
-  {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
-  }
+
+  SetBackground( map );
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -577,32 +573,29 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground( const Property::Map& map )
 {
-  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  if( visual )
   {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+    RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+    visual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
-  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
-  if( mImpl->mBackgroundVisual )
+  DALI_LOG_WARNING( "SetBackgroundImage is for the depreciated Property::BACKGROUND_IMAGE use SetBackground( const Property::Map& map )\n" );
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( image );
+  if( visual )
   {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+    RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+    visual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::ClearBackground()
 {
-  if( mImpl->mBackgroundVisual )
-  {
-    UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
-    mImpl->mBackgroundVisual.Reset();
-  }
-  mImpl->mBackgroundColor = Color::TRANSPARENT;
+   UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
+   mImpl->mBackgroundColor = Color::TRANSPARENT;
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -1139,10 +1132,11 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
   {
     Vector2 size( targetSize );
-    mImpl->mBackgroundVisual.SetSize( size );
+    visual.SetSize( size );
   }
 }
 
@@ -1185,11 +1179,12 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
   {
     Vector2 naturalSize;
-    mImpl->mBackgroundVisual.GetNaturalSize(naturalSize);
-    return Vector3(naturalSize);
+    visual.GetNaturalSize( naturalSize );
+    return Vector3( naturalSize );
   }
   return Vector3::ZERO;
 }
