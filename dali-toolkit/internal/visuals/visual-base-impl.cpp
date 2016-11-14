@@ -130,15 +130,18 @@ float Visual::Base::GetDepthIndex() const
 
 void Visual::Base::SetOnStage( Actor& actor )
 {
-  // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
-  // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
-  DoSetOnStage( actor );
-
-  if( mImpl->mRenderer )
+  if( !IsOnStage() )
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-    mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+    // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
+    // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
+    DoSetOnStage( actor );
+
+    if( mImpl->mRenderer )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+      mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+      mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+    }
   }
 }
 

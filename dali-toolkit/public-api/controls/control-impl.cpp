@@ -803,6 +803,7 @@ void Control::EnableVisual( Property::Index index, bool enable )
   {
     if (  (*iter)->enabled == enable )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual Already enabled set (%s) \n", enable?"enabled":"disabled");
       return;
     }
 
@@ -812,11 +813,12 @@ void Control::EnableVisual( Property::Index index, bool enable )
     {
       if ( enable )
       {
-
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting Visual(%d) on stage \n", index );
         Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
       }
       else
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting Visual(%d) off stage \n", index );
         Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
       }
     }
@@ -1084,11 +1086,14 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
+
   for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
     // Check whether the visual is empty and enabled
     if( (*iter)->visual && (*iter)->enabled )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection Setting visual(%d) on stage\n", (*iter)->index );
       Actor self( Self() );
       Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
     }
@@ -1102,6 +1107,7 @@ void Control::OnStageDisconnection()
     // Check whether the visual is empty
     if( (*iter)->visual )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageDisconnection Setting visual(%d) off stage\n", (*iter)->index );
       Actor self( Self() );
       Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
     }
