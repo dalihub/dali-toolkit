@@ -2154,168 +2154,156 @@ void Controller::Impl::ChangeState( EventData::State newState )
   {
     mEventData->mState = newState;
 
-    switch( mEventData->mState )
+    if( EventData::INACTIVE == mEventData->mState )
     {
-      case EventData::INACTIVE:
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetPopupActive( false );
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::INTERRUPTED  == mEventData->mState)
+    {
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetPopupActive( false );
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::SELECTING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
+      }
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      // Grab handle is not shown until a tap is received whilst EDITING
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
         mEventData->mDecorator->SetPopupActive( false );
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
       }
-      case EventData::INTERRUPTED:
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
       {
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      if( mEventData->mSelectionEnabled )
+      {
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      }
+      else
+      {
+        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      }
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
+      }
+      HideClipboard();
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      // Grab handle is not shown until a tap is received whilst EDITING
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
         mEventData->mDecorator->SetPopupActive( false );
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
       }
-      case EventData::SELECTING:
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
+    else if( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive( true );
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
+        mEventData->mDecorator->SetPopupActive( false );
       }
-      case EventData::EDITING:
-      {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
-      }
-      case EventData::EDITING_WITH_POPUP:
-      {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState );
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::GRAB_HANDLE_PANNING == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState );
 
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        if( mEventData->mSelectionEnabled )
-        {
-          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        }
-        else
-        {
-          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        }
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive( true );
-        }
-        HideClipboard();
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::EDITING_WITH_GRAB_HANDLE:
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        HideClipboard();
-        break;
+        mEventData->mDecorator->StartCursorBlink();
       }
-      case EventData::SELECTION_HANDLE_PANNING:
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
+        mEventData->mDecorator->SetPopupActive( false );
       }
-      case EventData::GRAB_HANDLE_PANNING:
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if( EventData::EDITING_WITH_PASTE_POPUP == mEventData->mState )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState );
+
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
+        mEventData->mDecorator->StartCursorBlink();
       }
-      case EventData::EDITING_WITH_PASTE_POPUP:
+
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+
+      if( mEventData->mGrabHandlePopupEnabled )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState );
-
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        if( mEventData->mCursorBlinkEnabled )
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive( true );
-        }
-        HideClipboard();
-        mEventData->mDecoratorUpdated = true;
-        break;
+        SetPopupButtons();
+        mEventData->mDecorator->SetPopupActive( true );
       }
+      HideClipboard();
+      mEventData->mDecoratorUpdated = true;
     }
   }
 }
