@@ -64,7 +64,6 @@ public:
 
   virtual void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) {}
 
-  virtual RenderSurface::Type GetSurfaceType() { return RenderSurface::ECORE_RENDER_SURFACE; }
 };
 
 namespace Internal
