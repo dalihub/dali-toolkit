@@ -56,6 +56,17 @@ void DummyControlImpl::CustomSlot1( Actor actor )
   mCustomSlot1Called = true;
 }
 
+namespace {
+
+BaseHandle Create()
+{
+  return DummyControlImpl::New();
+}
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::DummyControl, Toolkit::Control, Create );
+DALI_TYPE_REGISTRATION_END()
+}
+
 DummyControl DummyControlImpl::New()
 {
   IntrusivePtr< DummyControlImpl > impl = new DummyControlImpl;
@@ -70,19 +81,43 @@ DummyControlImpl::DummyControlImpl()
 {
 }
 
-
 DummyControlImpl::~DummyControlImpl()
 {
 }
 
-void DummyControlImpl::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual )
 {
-  Control::RegisterVisual( index, placementActor, visual );
+  Control::RegisterVisual( index, visual );
+}
+
+void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled )
+{
+  Control::RegisterVisual( index, visual, enabled );
 }
 
 void DummyControlImpl::UnregisterVisual( Property::Index index )
 {
   Control::UnregisterVisual( index );
+}
+
+Toolkit::Visual::Base DummyControlImpl::GetVisual( Property::Index index )
+{
+  return Control::GetVisual( index );
+}
+
+void DummyControlImpl::EnableVisual( Property::Index index, bool enabled )
+{
+  Control::EnableVisual( index, enabled );
+}
+
+bool DummyControlImpl::IsVisualEnabled( Property::Index index )
+{
+  return Control::IsVisualEnabled( index );
+}
+
+Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )
+{
+  return Control::CreateTransition( transition );
 }
 
 DummyControl DummyControlImplOverride::New()

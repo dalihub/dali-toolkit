@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <dali/devel-api/adaptor-framework/style-monitor.h>
 
 #include <iostream>
 #include <stdlib.h>
@@ -161,7 +163,6 @@ void dali_style_manager_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
-
 
 int UtcDaliStyleManagerConstructorP(void)
 {
@@ -573,9 +574,9 @@ int UtcDaliStyleManagerApplyStyle(void)
 }
 
 
-int UtcDaliStyleManagerStyleChangedSignal(void)
+int UtcDaliStyleManagerStyleChangedSignalFontFamily(void)
 {
-  tet_infoline("Test that the StyleChange signal is fired when the font size is altered" );
+  tet_infoline("Test that the StyleChange signal is fired when the font family is altered" );
   Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
                                           defaultTheme );
 
@@ -589,7 +590,7 @@ int UtcDaliStyleManagerStyleChangedSignal(void)
   Stage::GetCurrent().Add( label2 );
 
   StyleChangedSignalChecker styleChangedSignalHandler;
-  StyleMonitor styleMonitor = StyleMonitor::Get();
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
   StyleManager styleManager = StyleManager::Get();
 
   styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
@@ -608,6 +609,254 @@ int UtcDaliStyleManagerStyleChangedSignal(void)
   family.Get( familyStr );
 
   DALI_TEST_EQUALS( familyStr, "Times New Roman", TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliStyleManagerStyleChangedSignalFontSize(void)
+{
+  tet_infoline("Test that the StyleChange signal is fired when the font size is altered" );
+
+  const char* defaultTheme =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"textlabelFontSize0\":\n"
+    "    {\n"
+    "      \"pointSize\":10\n"
+    "    },\n"
+    "    \"textlabelFontSize1\":\n"
+    "    {\n"
+    "      \"pointSize\":10\n"
+    "    },\n"
+    "    \"textlabelFontSize2\":\n"
+    "    {\n"
+    "      \"pointSize\":12\n"
+    "    },\n"
+    "    \"textlabelFontSize3\":\n"
+    "    {\n"
+    "      \"pointSize\":14\n"
+    "    },\n"
+    "    \"textlabelFontSize4\":\n"
+    "    {\n"
+    "      \"pointSize\":16\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json", defaultTheme );
+
+  ToolkitTestApplication application;
+
+  std::string labelStr("Label");
+  Toolkit::TextLabel label = Toolkit::TextLabel::New(labelStr);
+  Stage::GetCurrent().Add( label );
+
+  Toolkit::TextLabel label2 = Toolkit::TextLabel::New(labelStr);
+  Stage::GetCurrent().Add( label2 );
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleMonitor styleMonitor = StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.0f);
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  Test::StyleMonitor::SetDefaultFontSize(2);
+  styleMonitor.StyleChangeSignal().Emit( styleMonitor,  StyleChange::DEFAULT_FONT_SIZE_CHANGE);
+
+  tet_infoline("Test that the StyleChanged signal is received only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  tet_infoline("Test that the label's font size has been altered\n");
+  Property::Value pointSizeValue = label.GetProperty(TextLabel::Property::POINT_SIZE);
+  float pointSize;
+  pointSizeValue.Get( pointSize );
+
+  DALI_TEST_EQUALS( pointSize, 12.0f, 0.001, TEST_LOCATION );
+
+  styleChangedSignalHandler.signalCount = 0;
+
+  Test::StyleMonitor::SetDefaultFontSize(4);
+  styleMonitor.StyleChangeSignal().Emit( styleMonitor, StyleChange::DEFAULT_FONT_SIZE_CHANGE);
+
+  tet_infoline("Test that the StyleChanged signal is received only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  // Check that the label's font style has been altered
+  pointSizeValue = label.GetProperty(TextLabel::Property::POINT_SIZE);
+  pointSizeValue.Get( pointSize );
+
+  DALI_TEST_EQUALS( pointSize, 16.0f, 0.001, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerStyleChangedSignalFontSizeTextField(void)
+{
+  tet_infoline("Test that the StyleChange signal is fired when the font size is altered" );
+
+  const char* defaultTheme =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"textfieldFontSize0\":\n"
+    "    {\n"
+    "      \"pointSize\":8\n"
+    "    },\n"
+    "    \"textfieldFontSize1\":\n"
+    "    {\n"
+    "      \"pointSize\":10\n"
+    "    },\n"
+    "    \"textfieldFontSize2\":\n"
+    "    {\n"
+    "      \"pointSize\":12\n"
+    "    },\n"
+    "    \"textfieldFontSize3\":\n"
+    "    {\n"
+    "      \"pointSize\":14\n"
+    "    },\n"
+    "    \"textfieldFontSize4\":\n"
+    "    {\n"
+    "      \"pointSize\":16\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json", defaultTheme );
+
+  ToolkitTestApplication application;
+
+  std::string fieldStr("Field");
+  Toolkit::TextField field = Toolkit::TextField::New();
+  field.SetProperty( Toolkit::TextField::Property::TEXT, fieldStr );
+  Stage::GetCurrent().Add( field );
+
+  Toolkit::TextField field2 = Toolkit::TextField::New();
+  Stage::GetCurrent().Add( field2 );
+  field2.SetProperty( Toolkit::TextField::Property::TEXT, fieldStr );
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleMonitor styleMonitor = StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  field.SetProperty(TextField::Property::POINT_SIZE, 10.0f);
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  Test::StyleMonitor::SetDefaultFontSize(2);
+  styleMonitor.StyleChangeSignal().Emit( styleMonitor,  StyleChange::DEFAULT_FONT_SIZE_CHANGE);
+
+  tet_infoline("Test that the StyleChanged signal is received only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  tet_infoline("Test that the field's font size has been altered\n");
+  Property::Value pointSizeValue = field.GetProperty(TextField::Property::POINT_SIZE);
+  float pointSize;
+  pointSizeValue.Get( pointSize );
+
+  DALI_TEST_EQUALS( pointSize, 12.0f, 0.001, TEST_LOCATION );
+
+  styleChangedSignalHandler.signalCount = 0;
+
+  Test::StyleMonitor::SetDefaultFontSize(4);
+  styleMonitor.StyleChangeSignal().Emit( styleMonitor, StyleChange::DEFAULT_FONT_SIZE_CHANGE);
+
+  tet_infoline("Test that the StyleChanged signal is received only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  // Check that the field's font style has been altered
+  pointSizeValue = field.GetProperty(TextField::Property::POINT_SIZE);
+  pointSizeValue.Get( pointSize );
+
+  DALI_TEST_EQUALS( pointSize, 16.0f, 0.001, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliStyleManagerStyleChangedSignalFontSizeTextEditor(void)
+{
+  tet_infoline("Test that the StyleChange signal is fired when the font size is altered" );
+
+  const char* defaultTheme =
+    "{\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"texteditorFontSize0\":\n"
+    "    {\n"
+    "      \"pointSize\":10\n"
+    "    },\n"
+    "    \"texteditorFontSize1\":\n"
+    "    {\n"
+    "      \"pointSize\":12\n"
+    "    },\n"
+    "    \"texteditorFontSize2\":\n"
+    "    {\n"
+    "      \"pointSize\":14\n"
+    "    },\n"
+    "    \"texteditorFontSize3\":\n"
+    "    {\n"
+    "      \"pointSize\":18\n"
+    "    },\n"
+    "    \"texteditorFontSize4\":\n"
+    "    {\n"
+    "      \"pointSize\":25\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json", defaultTheme );
+
+  ToolkitTestApplication application;
+
+  std::string editorStr("Editor");
+  Toolkit::TextEditor editor = Toolkit::TextEditor::New();
+  editor.SetProperty( Toolkit::TextEditor::Property::TEXT, editorStr );
+  Stage::GetCurrent().Add( editor );
+
+  Toolkit::TextEditor editor2 = Toolkit::TextEditor::New();
+  Stage::GetCurrent().Add( editor2 );
+  editor2.SetProperty( Toolkit::TextEditor::Property::TEXT, editorStr );
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleMonitor styleMonitor = StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.0f);
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  Test::StyleMonitor::SetDefaultFontSize(2);
+  styleMonitor.StyleChangeSignal().Emit( styleMonitor,  StyleChange::DEFAULT_FONT_SIZE_CHANGE);
+
+  tet_infoline("Test that the StyleChanged signal is received only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  tet_infoline("Test that the editor's font size has been altered\n");
+  Property::Value pointSizeValue = editor.GetProperty(TextEditor::Property::POINT_SIZE);
+  float pointSize;
+  pointSizeValue.Get( pointSize );
+
+  DALI_TEST_EQUALS( pointSize, 14.0f, 0.001, TEST_LOCATION );
+
+  styleChangedSignalHandler.signalCount = 0;
+
+  Test::StyleMonitor::SetDefaultFontSize(4);
+  styleMonitor.StyleChangeSignal().Emit( styleMonitor, StyleChange::DEFAULT_FONT_SIZE_CHANGE);
+
+  tet_infoline("Test that the StyleChanged signal is received only once");
+  DALI_TEST_EQUALS( styleChangedSignalHandler.signalCount, 1, TEST_LOCATION );
+
+  // Check that the editor's font style has been altered
+  pointSizeValue = editor.GetProperty(TextEditor::Property::POINT_SIZE);
+  pointSizeValue.Get( pointSize );
+
+  DALI_TEST_EQUALS( pointSize, 25.0f, 0.001, TEST_LOCATION );
+
 
   END_TEST;
 }

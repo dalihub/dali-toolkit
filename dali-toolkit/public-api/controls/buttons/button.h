@@ -136,12 +136,15 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] button Handle to an object
    */
   Button( const Button& button );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] button Handle to an object
+   * @return A reference to this
    */
   Button& operator=( const Button& button );
 
@@ -520,6 +523,7 @@ public: //Signals
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
@@ -535,6 +539,7 @@ public: // Not intended for application developers
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**

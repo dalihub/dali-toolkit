@@ -30,7 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 
@@ -121,7 +121,7 @@ const char* const RENDER_SHADOW_FRAGMENT_SOURCE =
 } // namespace
 
 ShadowView::ShadowView( float downsampleWidthScale, float downsampleHeightScale )
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mChildrenRoot(Actor::New()),
   mCachedShadowColor(DEFAULT_SHADOW_COLOR),
   mCachedBackgroundColor(DEFAULT_SHADOW_COLOR.r, DEFAULT_SHADOW_COLOR.g, DEFAULT_SHADOW_COLOR.b, 0.0f),
@@ -252,7 +252,7 @@ void ShadowView::OnInitialize()
 
   customShader[ Toolkit::Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
 
-  mShadowVisualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+  mShadowVisualMap[ Toolkit::VisualProperty::SHADER ] = customShader;
 
   // Create render targets needed for rendering from light's point of view
   mSceneFromLightRenderTarget = FrameBufferImage::New( stageSize.width, stageSize.height, Pixel::RGBA8888 );

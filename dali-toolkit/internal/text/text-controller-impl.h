@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
-#define __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
+#define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,6 +116,8 @@ struct EventData
    */
   std::vector<Event> mEventQueue;              ///< The queue of touch events etc.
 
+  Vector<InputStyle::Mask> mInputStyleChangedQueue; ///< Queue of changes in the input style. Used to emit the signal in the iddle callback.
+
   InputStyle         mInputStyle;              ///< The style to be set to the new inputed text.
 
   State              mPreviousState;           ///< Stores the current state before it's updated with the new one.
@@ -166,7 +168,6 @@ struct FontDefaults
 {
   FontDefaults()
   : mFontDescription(),
-    mFontStyle(),
     mDefaultPointSize( 0.f ),
     mFontId( 0u ),
     familyDefined( false ),
@@ -192,7 +193,6 @@ struct FontDefaults
   }
 
   TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
-  std::string                      mFontStyle;        ///< The font's style string set through the property system.
   float                            mDefaultPointSize; ///< The default font's point size.
   FontId                           mFontId;           ///< The font's id of the default font.
   bool familyDefined:1; ///< Whether the default font's family name is defined.
@@ -285,8 +285,10 @@ struct OutlineDefaults
 
 struct Controller::Impl
 {
-  Impl( ControlInterface& controlInterface )
+  Impl( ControlInterface* controlInterface,
+        EditableControlInterface* editableControlInterface )
   : mControlInterface( controlInterface ),
+    mEditableControlInterface( editableControlInterface ),
     mLogicalModel(),
     mVisualModel(),
     mFontDefaults( NULL ),
@@ -302,13 +304,14 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
+    mScrollPosition(),
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
     mRecalculateNaturalSize( true ),
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
-    mAutoScrollEnabled( false ),
+    mIsAutoScrollEnabled( false ),
     mAutoScrollDirectionRTL( false )
   {
     mLogicalModel = LogicalModel::New();
@@ -338,8 +341,10 @@ struct Controller::Impl
     delete mEventData;
   }
 
+  // Text Controller Implementation.
+
   /**
-   * @brief Request a relayout using the ControlInterface.
+   * @copydoc Text::Controller::RequestRelayout()
    */
   void RequestRelayout();
 
@@ -441,6 +446,11 @@ struct Controller::Impl
   void NotifyImfManager();
 
   /**
+   * @brief Helper to notify IMF manager with multi line status.
+   */
+  void NotifyImfMultiLineStatus();
+
+  /**
    * @brief Retrieve the current cursor position.
    *
    * @return The cursor position.
@@ -470,6 +480,12 @@ struct Controller::Impl
   {
     bool result( mClipboard && mClipboard.NumberOfItems() );
     return !result; // If NumberOfItems greater than 0, return false
+  }
+
+  bool IsClipboardVisible()
+  {
+    bool result( mClipboard && mClipboard.IsVisible() );
+    return result;
   }
 
   /**
@@ -579,7 +595,7 @@ struct Controller::Impl
 
   void SendSelectionToClipboard( bool deleteAfterSending );
 
-  void GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString );
+  void RequestGetTextFromClipboard();
 
   void RepositionSelectionHandles();
   void RepositionSelectionHandles( float visualX, float visualY );
@@ -675,7 +691,8 @@ private:
 
 public:
 
-  ControlInterface& mControlInterface;     ///< Reference to the text controller.
+  ControlInterface* mControlInterface;     ///< Reference to the text controller.
+  EditableControlInterface* mEditableControlInterface; ///< Reference to the editable text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
   VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
@@ -703,7 +720,7 @@ public:
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
   bool mClipboardHideEnabled:1;            ///< Whether the ClipboardHide function work or not
-  bool mAutoScrollEnabled:1;               ///< Whether auto text scrolling is enabled.
+  bool mIsAutoScrollEnabled:1;             ///< Whether auto text scrolling is enabled.
   CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
 
 };
@@ -714,4 +731,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

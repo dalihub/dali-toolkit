@@ -24,7 +24,6 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES

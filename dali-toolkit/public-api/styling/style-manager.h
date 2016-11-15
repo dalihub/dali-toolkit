@@ -54,6 +54,11 @@ class StyleManager;
  * If the application wants to customize the theme, RequestThemeChange
  * needs to be called.
  *
+ * To supply resource paths ( in json ) the following constant is available: APPLICATION_RESOURCE_PATH.
+ * It provides the path to the  application resource root folder, from there the filename can an be specified along with
+ * any sub folders, e.g Images, Models etc.
+ * The APPLICATION_RESOURCE_PATH can be retrieved using Application::GetResourcePath()
+ *
  * Signals
  * | %Signal Name            | Method                           |
  * |------------------------------------------------------------|
@@ -106,7 +111,7 @@ public:
    *
    * @SINCE_1_1.32
    * @param[in] themeFile If a relative path is specified, then this is relative
-   * to the directory returned by app_get_resource_path().
+   * to the directory returned by Application::GetResourcePath().
    */
   void ApplyTheme( const std::string& themeFile );
 
@@ -150,7 +155,7 @@ public:
    * @param[in] control The control to which to apply the style.
    * @param[in] jsonFileName The name of the JSON style file to apply. If a
    * relative path is specified, then this is relative to the directory
-   * returned by app_get_resource_path().
+   * returned by Application::GetResourcePath().
    * @param[in] styleName The name of the style within the JSON file to apply.
    */
   void ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName );
@@ -172,6 +177,7 @@ public: // Signals
 
 public:
 
+  /// @cond internal
   /**
    * @brief Allows the creation of a StyleManager handle from an internal pointer.
    *
@@ -180,6 +186,7 @@ public:
    * @param[in] impl A pointer to the object.
    */
   explicit DALI_INTERNAL StyleManager( Internal::StyleManager *impl );
+  /// @endcond
 
 }; // class StyleManager
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 using Dali::Toolkit::Text::LayoutEngine;
-using Dali::Toolkit::Text::Backend;
 
 namespace Dali
 {
@@ -85,7 +84,7 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextLabel, Toolkit::Control, Create );
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "renderingBackend",     INTEGER, RENDERING_BACKEND      )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "text",                 STRING,  TEXT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontFamily",           STRING,  FONT_FAMILY            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",            STRING,  FONT_STYLE             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",            MAP,     FONT_STYLE             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pointSize",            FLOAT,   POINT_SIZE             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "multiLine",            BOOLEAN, MULTI_LINE             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "horizontalAlignment",  STRING,  HORIZONTAL_ALIGNMENT   )
@@ -102,14 +101,12 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollSpeed",      INTEGER,
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopCount",  INTEGER, AUTO_SCROLL_LOOP_COUNT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollGap",        FLOAT,   AUTO_SCROLL_GAP        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineSpacing",          FLOAT,   LINE_SPACING           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            STRING,  UNDERLINE              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               STRING,  SHADOW                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               STRING,  EMBOSS                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              STRING,  OUTLINE                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            MAP,     UNDERLINE              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               MAP,     SHADOW                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               MAP,     EMBOSS                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              MAP,     OUTLINE                )
 
 DALI_TYPE_REGISTRATION_END()
-
-
 
 } // namespace
 
@@ -644,7 +641,7 @@ void TextLabel::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( *this );
+  mController = Text::Controller::New( this );
 
   // When using the vector-based rendering, the size of the GLyphs are different
   TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
@@ -677,16 +674,9 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
       mController->UpdateAfterFontChange( newFont );
       break;
     }
-
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
-
-      if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
-      {
-        // Property system did not set the PointSize so should update it.
-        // todo instruct text-controller to update model
-      }
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
       break;
     }
     case StyleChange::THEME_CHANGE:
@@ -718,7 +708,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
   {
     if( !mRenderer )
     {
-      mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
+      mRenderer = Text::Backend::Get().NewRenderer( mRenderingBackend );
     }
     RenderText();
   }
@@ -797,27 +787,12 @@ void TextLabel::OnStageConnect( Dali::Actor actor )
   }
 }
 
-void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
-{
-  // TextLabel does not show decorations
-}
-
 void TextLabel::OnStageConnection( int depth )
 {
   // Call the Control::OnStageConnection() to set the depth of the background.
   Control::OnStageConnection( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
-}
-
-void TextLabel::TextChanged()
-{
-  // TextLabel does not provide a signal for this
-}
-
-void TextLabel::MaxLengthReached()
-{
-  // Pure Virtual from TextController Interface, only needed when inputting text
 }
 
 void TextLabel::ScrollingFinished()
@@ -830,7 +805,7 @@ void TextLabel::ScrollingFinished()
 }
 
 TextLabel::TextLabel()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false )
 {

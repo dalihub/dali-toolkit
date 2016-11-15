@@ -123,16 +123,6 @@ public:
 private: // From Control
 
   /**
-   * @copydoc Toolkit::Control::OnStageConnect()
-   */
-  virtual void OnStageConnection( int depth );
-
-  /**
-   * @copydoc Toolkit::Control::OnStageDisconnection()
-   */
-  virtual void OnStageDisconnection();
-
-  /**
    * @copydoc Toolkit::Control::OnSizeSet()
    */
   virtual void OnSizeSet( const Vector3& targetSize );

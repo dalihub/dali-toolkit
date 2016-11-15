@@ -11,7 +11,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -47,7 +47,7 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
 {
 }
 
@@ -81,8 +81,8 @@ void ImageView::SetImage( Image image )
 
     mImage = image;
 
-    Actor self( Self() );
-    InitializeVisual( self, mVisual, image );
+    mVisual =  Toolkit::VisualFactory::Get().CreateVisual( image );
+    RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -95,8 +95,8 @@ void ImageView::SetImage( Property::Map map )
   mImage.Reset();
   mPropertyMap = map;
 
-  Actor self( Self() );
-  InitializeVisual( self, mVisual, mPropertyMap );
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
+  RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -137,8 +137,8 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
       mImageSize = size;
     }
 
-    Actor self( Self() );
-    InitializeVisual( self, mVisual, url, size );
+    mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
+    RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
 
     mVisual.SetSize( mSizeSet );
 
@@ -231,28 +231,6 @@ float ImageView::GetWidthForHeight( float height )
 // Private methods
 //
 
-void ImageView::OnStageConnection( int depth )
-{
-  Control::OnStageConnection( depth );
-
-  if( mVisual )
-  {
-    CustomActor self = Self();
-    mVisual.SetOnStage( self );
-  }
-}
-
-void ImageView::OnStageDisconnection()
-{
-  if( mVisual )
-  {
-    CustomActor self = Self();
-    mVisual.SetOffStage( self );
-  }
-
-  Control::OnStageDisconnection();
-}
-
 void ImageView::OnSizeSet( const Vector3& targetSize )
 {
   Control::OnSizeSet( targetSize );
@@ -300,7 +278,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
         // if its not a string then get a Property::Map from the property if possible.
         else if( value.Get( map ) )
         {
-          Property::Value* shaderValue = map.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
+          Property::Value* shaderValue = map.Find( Toolkit::VisualProperty::SHADER, CUSTOM_SHADER );
           // set image only if property map contains image information other than custom shader
           if( map.Count() > 1u ||  !shaderValue )
           {

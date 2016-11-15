@@ -41,6 +41,8 @@ public:
 
 public:
 
+  static std::string GetResourcePath();
+
   //Orientation& GetOrientation();
 
 public: // static methods
@@ -74,6 +76,10 @@ Application::~Application()
   //delete mOrientation;
 }
 
+std::string Application::GetResourcePath()
+{
+  return "";
+}
 //Orientation& Application::GetOrientation()
 //{
 //  return *mOrientation;

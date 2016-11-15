@@ -82,7 +82,7 @@ The JSON format deviates from the formal JSON specification and allows C style c
 
 ## Includes {#includes}
 
-The "includes" section is an array of filenames to be merged in order to
+The "includes" section is an array of file names to be merged in order to
 create a final in memory JSON tree.
 
 The merge process will walk key, value attributes from the root JSON
@@ -255,7 +255,7 @@ Builder.AnimateTo("light-theme", myActor, TimePeriod(0, 10));
 ~~~
 
 When applied to an actor tree the actors are referenced by name. Names
-are not unique in Dali.
+are not unique in DALi.
 
 When a style is applied in code DALi will perform a depth first search
 stopping with the first matching name.
@@ -369,7 +369,7 @@ Shader uniforms can be animated as if they are properties of the actor.
 
 When the animation is created from code (or from a signal) the property
 name search begins on the actor, if it isn't found the search continues
-on the attached shader object.
+on the attached renderer, and then on the attached shader object.
 
 The actor property names and shader uniform names must not clash for the
 uniform to animate correctly. The convention in DALi is to prepend
@@ -418,7 +418,7 @@ uniforms with 'u'.
 The stage section supports the immediate creation of actors at the time
 the JSON is loaded.
 
-The stage is a tree of actors that can be added to Dali's stage object.
+The stage is a tree of actors that can be added to DALi's stage object.
 
 ~~~
 // C++
@@ -461,7 +461,7 @@ builder.addActors( dali.stage.getRootLayer() );
 
 # Actor and Control Properties {#actorprop}
 
-Each control has a set of supported properties documented in the "Dali
+Each control has a set of supported properties documented in the "DALi
 UI Control Specification".
 
 Please refer to the above document for further information about specific

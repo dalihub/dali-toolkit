@@ -40,9 +40,10 @@ class TextEditor;
  * @brief A control which provides a multi-line editable text editor.
  *
  *  * Signals
- * | %Signal Name         | Method                                              |
- * |----------------------|-----------------------------------------------------|
- * | textChanged          | @ref TextChangedSignal()                            |
+ * | %Signal Name         | Method                         |                    |
+ * |----------------------|--------------------------------|--------------------|
+ * | textChanged          | @ref TextChangedSignal()       | @SINCE_1_1.37      |
+ * | inputStyleChanged    | @ref InputStyleChangedSignal() | @SINCE_1_2_2       |
  *
  */
 class DALI_IMPORT_API TextEditor : public Control
@@ -51,6 +52,7 @@ public:
 
   /**
    * @brief The start and end property ranges for this control.
+   * @SINCE_1_1.37
    */
   enum PropertyRange
   {
@@ -60,6 +62,7 @@ public:
 
   /**
    * @brief An enumeration of properties belonging to the TextEditor class.
+   * @SINCE_1_1.37
    */
   struct Property
   {
@@ -69,7 +72,7 @@ public:
       TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                             type STRING @SINCE_1_1.37
       TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                  type VECTOR4 @SINCE_1_1.37
       FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                       type STRING @SINCE_1_1.37
-      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                        type STRING @SINCE_1_1.37
+      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                        type STRING or MAP @SINCE_1_2.13
       POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                      type FLOAT @SINCE_1_1.37
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The text horizontal alignment,                                                   type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_1.37
       SCROLL_THRESHOLD,                         ///< name "scrollThreshold"                      Vertical scrolling will occur if the cursor is this close to the control border, type FLOAT @SINCE_1_1.37
@@ -93,40 +96,76 @@ public:
       ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                       type BOOLEAN @SINCE_1_1.37
       INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                                 type VECTOR4 @SINCE_1_1.37
       INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                         type STRING @SINCE_1_1.37
-      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                          type STRING @SINCE_1_1.37
+      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                          type STRING or MAP @SINCE_1_2.13
       INPUT_POINT_SIZE,                         ///< name "inputPointSize",                      The font's size of the new input text in points,                                 type FLOAT @SINCE_1_1.37
       LINE_SPACING,                             ///< name "lineSpacing",                         The default extra space between lines in points,                                 type FLOAT @SINCE_1_1.37
       INPUT_LINE_SPACING,                       ///< name "inputLineSpacing"                     The extra space between lines in points. It affects the whole paragraph where the new input text is inserted, type FLOAT @SINCE_1_1.37
-      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                type STRING @SINCE_1_1.37
-      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                  type STRING @SINCE_1_1.37
-      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                   type STRING @SINCE_1_1.37
-      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                     type STRING @SINCE_1_1.37
-      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                   type STRING @SINCE_1_1.37
-      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                     type STRING @SINCE_1_1.37
-      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                  type STRING @SINCE_1_1.37
-      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                    type STRING @SINCE_1_1.37
+      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                type STRING or MAP @SINCE_1_2.13
+      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                  type STRING or MAP @SINCE_1_2.13
+      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                   type STRING or MAP @SINCE_1_2.13
+      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                     type STRING or MAP @SINCE_1_2.13
+      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                   type STRING or MAP @SINCE_1_2.13
+      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                     type STRING or MAP @SINCE_1_2.13
+      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                  type STRING or MAP @SINCE_1_2.13
+      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                    type STRING or MAP @SINCE_1_2.13
+    };
+  };
+
+  /**
+   * @brief Mask used by the signal InputStyleChangedSignal(). Notifies which parameters of the input style have changed.
+   *
+   * @SINCE_1_2_2
+   */
+  struct InputStyle
+  {
+    enum Mask
+    {
+      NONE         = 0x0000, ///< @SINCE_1_2_2
+      COLOR        = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
+      LINE_SPACING = 0x0010, ///< @SINCE_1_2_2
+      UNDERLINE    = 0x0020, ///< @SINCE_1_2_2
+      SHADOW       = 0x0040, ///< @SINCE_1_2_2
+      EMBOSS       = 0x0080, ///< @SINCE_1_2_2
+      OUTLINE      = 0x0100  ///< @SINCE_1_2_2
     };
   };
 
   // Type Defs
 
-  /// @brief Text changed signal type.
+  /**
+   * @brief Text changed signal type.
+   * @SINCE_1_1.37
+   */
   typedef Signal<void ( TextEditor ) > TextChangedSignalType;
 
   /**
+   * @brief Input Style changed signal type.
+   * @SINCE_1_2_2
+   */
+  typedef Signal<void ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
+
+  /**
    * @brief Create the TextEditor control.
+   *
+   * @SINCE_1_1.37
    * @return A handle to the TextEditor control.
    */
   static TextEditor New();
 
   /**
    * @brief Creates an empty handle.
+   *
+   * @SINCE_1_1.37
    */
   TextEditor();
 
   /**
    * @brief Copy constructor.
    *
+   * @SINCE_1_1.37
    * @param[in] handle The handle to copy from.
    */
   TextEditor( const TextEditor& handle );
@@ -134,6 +173,7 @@ public:
   /**
    * @brief Assignment operator.
    *
+   * @SINCE_1_1.37
    * @param[in] handle The handle to copy from.
    * @return A reference to this.
    */
@@ -143,6 +183,7 @@ public:
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @SINCE_1_1.37
    */
   ~TextEditor();
 
@@ -152,6 +193,7 @@ public:
    * If the BaseHandle points is a TextEditor the downcast returns a valid handle.
    * If not the returned handle is left empty.
    *
+   * @SINCE_1_1.37
    * @param[in] handle Handle to an object.
    * @return handle to a TextEditor or an empty handle.
    */
@@ -166,15 +208,33 @@ public:
    * @code
    *   void YourCallbackName( TextEditor textEditor );
    * @endcode
+   *
+   * @SINCE_1_1.37
    * @return The signal to connect to.
    */
   TextChangedSignalType& TextChangedSignal();
 
+  /**
+   * @brief This signal is emitted when the input style is updated as a consequence of a change in the cursor position.
+   * i.e. The signal is not emitted when the input style is updated through the property system.
+   *
+   * A callback of the following type may be connected. The @p mask parameter notifies which parts of the style have changed.
+   * @code
+   *   void YourCallbackName( TextEditor textEditor, TextEditor::InputStyle::Mask mask );
+   * @endcode
+   *
+   * @SINCE_1_2_2
+   * @return The signal to connect to.
+   */
+  InputStyleChangedSignalType& InputStyleChangedSignal();
+
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
+   * @SINCE_1_1.37
    * @param[in] implementation The Control implementation.
    */
   DALI_INTERNAL TextEditor( Internal::TextEditor& implementation );
@@ -182,9 +242,11 @@ public: // Not intended for application developers
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
+   * @SINCE_1_1.37
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL TextEditor( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**

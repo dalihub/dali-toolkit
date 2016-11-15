@@ -28,9 +28,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -52,11 +54,19 @@ namespace Toolkit
 namespace Internal
 {
 
-SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size )
+{
+  SvgVisual* svgVisual = new SvgVisual( factoryCache );
+  svgVisual->ParseFromUrl( imageUrl, size );
+  return svgVisual;
+}
+
+SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mAtlasRect( FULL_TEXTURE_RECT ),
-  mAtlasManager( atlasManager ),
-  mParsedImage( NULL )
+  mImageUrl(),
+  mParsedImage( NULL ),
+  mPlacementActor()
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -70,31 +80,14 @@ SvgVisual::~SvgVisual()
   }
 }
 
-bool SvgVisual::IsSvgUrl( const std::string& url )
+void SvgVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  return url.substr( url.find_last_of(".") + 1 ) == "svg";
-}
-
-void SvgVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
-{
-  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-  if( imageURLValue )
-  {
-    std::string imageUrl;
-    if( imageURLValue->Get( imageUrl ) )
-    {
-      SetImage( imageUrl );
-    }
-    else
-    {
-      DALI_LOG_ERROR( "The property '%s' is not a string\n", IMAGE_URL_NAME );
-    }
-  }
+  // url already passed in from constructor
 }
 
 void SvgVisual::DoSetOnStage( Actor& actor )
 {
-  Shader shader = ImageVisual::GetImageShader( mFactoryCache );
+  Shader shader = ImageVisual::GetImageShader( mFactoryCache, true, true );
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   if( !geometry )
   {
@@ -105,10 +98,16 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
 
+  // Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+
   if( mImpl->mSize != Vector2::ZERO && mParsedImage )
   {
     AddRasterizationTask( mImpl->mSize );
   }
+
+  // Hold the weak handle of the placement actor and delay the adding of renderer until the svg rasterization is finished.
+  mPlacementActor = actor;
 }
 
 void SvgVisual::DoSetOffStage( Actor& actor )
@@ -117,9 +116,10 @@ void SvgVisual::DoSetOffStage( Actor& actor )
 
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
+  mPlacementActor.Reset();
 }
 
-void SvgVisual::GetNaturalSize( Vector2& naturalSize ) const
+void SvgVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if( mParsedImage )
   {
@@ -134,7 +134,7 @@ void SvgVisual::GetNaturalSize( Vector2& naturalSize ) const
 
 void SvgVisual::SetSize( const Vector2& size )
 {
-  if(mImpl->mSize != size && mParsedImage && GetIsOnStage() )
+  if(mImpl->mSize != size && mParsedImage && IsOnStage() )
   {
     AddRasterizationTask( size );
   }
@@ -144,37 +144,36 @@ void SvgVisual::SetSize( const Vector2& size )
 void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
   if( !mImageUrl.empty() )
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
   }
 }
 
-void SvgVisual::SetImage( const std::string& imageUrl, ImageDimensions size )
+void SvgVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
-  if( mImageUrl != imageUrl )
+  // TODO
+}
+
+Dali::Property::Value SvgVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
+void SvgVisual::ParseFromUrl( const std::string& imageUrl, ImageDimensions size )
+{
+  mImageUrl = imageUrl;
+
+  Vector2 dpi = Stage::GetCurrent().GetDpi();
+  float meanDpi = (dpi.height + dpi.width) * 0.5f;
+  mParsedImage = nsvgParseFromFile( imageUrl.c_str(), UNITS, meanDpi );
+
+  if( size.GetWidth() != 0u && size.GetHeight() != 0u)
   {
-    mImageUrl = imageUrl;
-
-    NSVGimage* parsedImageOld = mParsedImage;
-
-    Vector2 dpi = Stage::GetCurrent().GetDpi();
-    float meanDpi = (dpi.height + dpi.width) * 0.5f;
-    mParsedImage = nsvgParseFromFile(mImageUrl.c_str(), UNITS, meanDpi);
-
-    if( size.GetWidth() != 0u && size.GetHeight() != 0u)
-    {
-      mImpl->mSize.x = size.GetWidth();
-      mImpl->mSize.y = size.GetHeight();
-    }
-
-    if( mImpl->mSize != Vector2::ZERO && GetIsOnStage() )
-    {
-      AddRasterizationTask( mImpl->mSize );
-    }
-
-    mFactoryCache.GetSVGRasterizationThread()->DeleteImage( parsedImageOld );
+    mImpl->mSize.x = size.GetWidth();
+    mImpl->mSize.y = size.GetHeight();
   }
 }
 
@@ -184,7 +183,6 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
   {
     unsigned int width = static_cast<unsigned int>(size.width);
     unsigned int height = static_cast<unsigned int>( size.height );
-    BufferImage image = BufferImage::New( width, height, Pixel::RGBA8888);
 
     RasterizingTaskPtr newTask = new RasterizingTask( this, mParsedImage, width, height );
     mFactoryCache.GetSVGRasterizationThread()->AddTask( newTask );
@@ -193,16 +191,16 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
 
 void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 {
-  if( GetIsOnStage()  )
+  if( IsOnStage()  )
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if( mAtlasRect != FULL_TEXTURE_RECT )
     {
-      mAtlasManager.Remove( currentTextureSet, mAtlasRect );
+      mFactoryCache.GetAtlasManager()->Remove( currentTextureSet, mAtlasRect );
     }
 
     Vector4 atlasRect;
-    TextureSet textureSet = mAtlasManager.Add(atlasRect, rasterizedPixelData );
+    TextureSet textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData );
     if( textureSet ) // atlasing
     {
       if( textureSet != currentTextureSet )
@@ -211,11 +209,14 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
       }
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       mAtlasRect = atlasRect;
+      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
     }
     else // no atlasing
     {
-      Atlas texture = Atlas::New( rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight() );
-      texture.Upload( rasterizedPixelData, 0, 0 );
+      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888,
+                                      rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight() );
+      texture.Upload( rasterizedPixelData );
+      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
       if( mAtlasRect == FULL_TEXTURE_RECT )
       {
@@ -232,12 +233,20 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 
       if( textureSet )
       {
-        TextureSetImage( textureSet, 0u, texture );
+        textureSet.SetTexture( 0, texture );
       }
+    }
+
+    // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+    Actor actor = mPlacementActor.GetHandle();
+    if( actor )
+    {
+      actor.AddRenderer( mImpl->mRenderer );
+      // reset the weak handle so that the renderer only get added to actor once
+      mPlacementActor.Reset();
     }
   }
 }
-
 
 
 } // namespace Internal

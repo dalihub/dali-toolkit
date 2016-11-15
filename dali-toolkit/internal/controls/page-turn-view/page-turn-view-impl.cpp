@@ -22,14 +22,12 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -39,9 +37,6 @@ using namespace Dali;
 
 namespace //Unnamed namespace
 {
-// broken image is loaded if there is no valid image provided for the page
-const char * const BROKEN_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
-
 // properties set on shader, these properties have the constant value in regardless of the page status
 const char * const PROPERTY_SPINE_SHADOW ( "uSpineShadowParameter" ); // uniform for both spine and turn effect
 
@@ -282,14 +277,13 @@ PageTurnView::Page::Page()
   propertyTurnDirection = actor.RegisterProperty(PROPERTY_TURN_DIRECTION, -1.f);
 }
 
-void PageTurnView::Page::SetImage( Image image  )
+void PageTurnView::Page::SetTexture( Texture texture )
 {
   if( !textureSet )
   {
     textureSet = TextureSet::New();
   }
-
-  TextureSetImage( textureSet, 0u, image );
+  textureSet.SetTexture( 0u, texture );
 }
 
 void PageTurnView::Page::UseEffect(Shader newShader)
@@ -347,7 +341,7 @@ void PageTurnView::Page::SetCurrentCenter( const Vector2& value )
 }
 
 PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mPageFactory( &pageFactory ),
   mPageSize( pageSize ),
   mSpineShadowParameter( DEFAULT_SPINE_SHADOW_PARAMETER ),
@@ -398,7 +392,7 @@ void PageTurnView::OnInitialize()
     Self().Add( mPages[i].actor );
   }
 
-  // create the layer for turning images
+  // create the layer for turning pages
   mTurningPageLayer = Layer::New();
   mTurningPageLayer.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
   mTurningPageLayer.SetBehavior(Layer::LAYER_3D);
@@ -425,7 +419,7 @@ void PageTurnView::OnInitialize()
 Shader PageTurnView::CreateShader( const Property::Map& shaderMap )
 {
   Shader shader;
-  Property::Value* shaderValue = shaderMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
+  Property::Value* shaderValue = shaderMap.Find( Toolkit::VisualProperty::SHADER, CUSTOM_SHADER );
   Property::Map shaderSource;
   if( shaderValue && shaderValue->Get( shaderSource ) )
   {
@@ -584,13 +578,9 @@ void PageTurnView::AddPage( int pageIndex )
   {
     int index = pageIndex % NUMBER_OF_CACHED_PAGES;
 
-    Image newPageImage;
-    newPageImage = mPageFactory->NewPage( pageIndex );
-
-    if( !newPageImage ) // load the broken image
-    {
-      newPageImage = ResourceImage::New( BROKEN_IMAGE_URL );
-    }
+    Texture newPage;
+    newPage = mPageFactory->NewPage( pageIndex );
+    DALI_ASSERT_ALWAYS( newPage && "must pass in valid texture" );
 
     bool isLeftSide = ( pageIndex < mCurrentPageIndex );
     if( mPages[index].isTurnBack != isLeftSide )
@@ -602,11 +592,11 @@ void PageTurnView::AddPage( int pageIndex )
     mPages[index].actor.SetOrientation( Degree( degree ), Vector3::YAXIS );
     mPages[index].actor.SetVisible( false );
     mPages[index].UseEffect( mSpineEffectShader, mGeometry );
-    mPages[index].SetImage( newPageImage );
+    mPages[index].SetTexture( newPage );
 
     // For Portrait, nothing to do
     // For Landscape, set the parent origin to CENTER
-     OnAddPage( mPages[index].actor, isLeftSide );
+    OnAddPage( mPages[index].actor, isLeftSide );
   }
 }
 

@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <fstream>
 #include <string.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
@@ -35,6 +36,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class MeshVisual;
+typedef IntrusivePtr< MeshVisual > MeshVisualPtr;
 
 /**
  * The visual which renders a 3D object to the control's quad
@@ -56,6 +60,38 @@ class MeshVisual: public Visual::Base
 public:
 
   /**
+   * @brief Create a new mesh visual.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static MeshVisualPtr New( VisualFactoryCache& factoryCache );
+
+public:  // from Visual
+
+  /**
+   * @copydoc Visual::Base::SetSize
+   */
+  virtual void SetSize( const Vector2& size );
+
+  /**
+   * @copydoc Visual::Base::CreatePropertyMap
+   */
+  virtual void DoCreatePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::DoSetProperty
+   */
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @copydoc Visual::Base::DoGetProperty
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
+
+protected:
+
+  /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
@@ -67,37 +103,18 @@ public:
    */
   virtual ~MeshVisual();
 
-public:  // from Visual
-
   /**
-   * @copydoc Visual::SetSize
+   * @copydoc Visual::Base::DoSetProperties
    */
-  virtual void SetSize( const Vector2& size );
+  virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::SetClipRect
+   * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void SetClipRect( const Rect<int>& clipRect );
+  virtual void OnSetTransform();
 
   /**
-   * @copydoc Visual::SetOffset
-   */
-  virtual void SetOffset( const Vector2& offset );
-
-  /**
-   * @copydoc Visual::CreatePropertyMap
-   */
-  virtual void DoCreatePropertyMap( Property::Map& map ) const;
-
-protected:
-
-  /**
-   * @copydoc Visual::DoInitialize
-   */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
-
-  /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 

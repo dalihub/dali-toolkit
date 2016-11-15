@@ -10,12 +10,12 @@ This could be from within DALi or externally by an application.
 Properties can be set externally by an application, allowing that application to change the configuration or behaviour of an actor.
 This could include the physical geometry of the actor, or how it is drawn or moves.
 
-Properties can also be read. This feature can be used in conjunction with constraints to allow changes to a property within one actor to cause changes to the property of another actor. For example, an actor following the movement of another separate actor (that it is not a child of). 
+Properties can also be read. This feature can be used in conjunction with constraints to allow changes to a property within one actor to cause changes to the property of another actor. For example, an actor following the movement of another separate actor (that it is not a child of).
 
 Properties can be used to expose any useful information or behaviour of an actor.
 Other actor variables that are used to implement this bevahiour, or do not make useful sense from an application developers point of view should not be exposed.
 
-<h2 class="pg">How to implement a property within Dali-core:</h2>
+<h2 class="pg">How to implement a property within DALi Core:</h2>
 
 <b>There are two stages:</b>
 
@@ -79,7 +79,7 @@ DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 - The parameter to DALI_PROPERTY_TABLE_END should match the start index of the property enumeration.
 
 <br>
-<h2 class="pg">How to implement a property within Dali-toolkit controls and application-side custom controls:</h2>
+<h2 class="pg">How to implement a property within DALi Toolkit controls and application-side custom controls:</h2>
 
 Macros are used to define properties for the following reasons:
 
@@ -189,10 +189,10 @@ shows the index range of the different properties in place.
 |:----------------------|:--------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
 | Default               | Properties defined within DALi Core, e.g. Dali::Actor, Dali::ShaderEffect default properties etc. | \link Dali::DEFAULT_OBJECT_PROPERTY_START_INDEX DEFAULT_OBJECT_PROPERTY_START_INDEX\endlink                | \link Dali::DEFAULT_PROPERTY_MAX_COUNT DEFAULT_PROPERTY_MAX_COUNT\endlink (9999999)                                                |
 | Registered            | Properties registered using Dali::PropertyRegistration                                            | \link Dali::PROPERTY_REGISTRATION_START_INDEX PROPERTY_REGISTRATION_START_INDEX\endlink (10000000)         | \link Dali::PROPERTY_REGISTRATION_MAX_INDEX PROPERTY_REGISTRATION_MAX_INDEX\endlink (19999999)                                     |
-| Registered Animatable | Animatable properties registered using Dali::AnimatablePropertyRegistration                       | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX\endlink (20000000) | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX\endlink (29999999) |
-| Registered Child      | Child properties (which parent supports in its children) registered using Dali::ChildPropertyRegistration   | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX\endlink (20000000) | \link Dali::CHILD_PROPERTY_REGISTRATION_MAX_INDEX CHILD_PROPERTY_REGISTRATION_MAX_INDEX\endlink (49999999) |
 | Control               | Property range reserved by Dali::Toolkit::Control                                                 | \link Dali::Toolkit::Control::CONTROL_PROPERTY_START_INDEX CONTROL_PROPERTY_START_INDEX\endlink (10000000) | \link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX CONTROL_PROPERTY_END_INDEX\endlink (10001000)                             |
 | Derived Control       | Property range for control deriving directly from Dali::Toolkit::Control                          | 10001001                                                                                                   | \link Dali::PROPERTY_REGISTRATION_MAX_INDEX PROPERTY_REGISTRATION_MAX_INDEX\endlink (19999999)                                     |
+| Registered Animatable | Animatable properties registered using Dali::AnimatablePropertyRegistration                       | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX\endlink (20000000) | \link Dali::ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX\endlink (29999999) |
+| Registered Child      | Child properties (which parent supports in its children) registered using Dali::ChildPropertyRegistration   | \link Dali::CHILD_PROPERTY_REGISTRATION_START_INDEX CHILD_PROPERTY_REGISTRATION_START_INDEX\endlink (45000000) | \link Dali::CHILD_PROPERTY_REGISTRATION_MAX_INDEX CHILD_PROPERTY_REGISTRATION_MAX_INDEX\endlink (49999999) |
 | Custom                | Custom properties added to instance using Dali::Handle::RegisterProperty                          | \link Dali::PROPERTY_CUSTOM_START_INDEX PROPERTY_CUSTOM_START_INDEX\endlink (50000000)                     | Onwards...                                                                                                                         |
 
 <br>
@@ -213,8 +213,6 @@ When touched, the property is looked up by index (as this is much faster than a 
 Property lookup via index should always be used unless the indicies cannot be known. If the property reader was completely decoupled from the creation, e.g. A custom control with a custom property being used by external application code, then it may be necessary. In this case the application writer should aim to perform the text lookup once at start-up, and cache the property index locally.
 
 @clip{"properties.cpp", // C++ EXAMPLE, // C++ EXAMPLE END}
-
-Once run, a grid of buttons will appear. When a button is pressed, the unique number stored in the property (in this case the index) is displayed at the bottom of the screen.
 
 <br>
 <hr>

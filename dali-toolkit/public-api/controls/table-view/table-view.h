@@ -175,6 +175,10 @@ public:
     /**
      * @brief Constructor to initialise values to defaults for convenience
      * @SINCE_1_0.0
+     * @param[in] rowIndex The row index initialized
+     * @param[in] columnIndex The column index initialized
+     * @param[in] rowSpan The row span initialized
+     * @param[in] columnSpan The column span initialized
      */
     CellPosition( unsigned int rowIndex = 0, unsigned int columnIndex = 0,
                     unsigned int rowSpan = 1, unsigned int columnSpan = 1 )
@@ -198,13 +202,15 @@ public:
   /**
    * @brief Copy constructor. Creates another handle that points to the same real object
    * @SINCE_1_0.0
-   * @param handle to copy from
+   * @param[in] handle to copy from
    */
   TableView( const TableView& handle );
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object
    * @SINCE_1_0.0
+   * @param[in] handle Handle to an object
+   * @return A reference to this
    */
   TableView& operator=( const TableView& handle );
 
@@ -406,6 +412,7 @@ public:
   /**
    * @brief Gets a row's fixed height.
    * @SINCE_1_0.0
+   * @param[in] rowIndex The row index with fixed height
    * @return height in world coordinate units.
    * @pre The row rowIndex must exist.
    * @note The returned value is valid if it has been set before.
@@ -426,6 +433,7 @@ public:
   /**
    * @brief Gets a row's relative height.
    * @SINCE_1_0.0
+   * @param[in] rowIndex The row index with relative height
    * @return height in percentage units, between 0.0f and 1.0f.
    * @pre The row rowIndex must exist.
    * @note The returned value is valid if it has been set before.
@@ -445,6 +453,7 @@ public:
   /**
    * @brief Gets a column's fixed width.
    * @SINCE_1_0.0
+   * @param[in] columnIndex The column index with fixed width
    * @return width in world coordinate units.
    * @pre The column columnIndex must exist.
    * @note The returned value is valid if it has been set before.
@@ -465,6 +474,7 @@ public:
   /**
    * @brief Gets a column's relative width.
    * @SINCE_1_0.0
+   * @param[in] columnIndex The column index with relative width
    * @return width in percentage units, between 0.0f and 1.0f.
    * @pre The column columnIndex must exist.
    * @note The returned value is valid if it has been set before.
@@ -499,6 +509,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
@@ -512,6 +523,7 @@ public: // Not intended for application developers
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL TableView( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**

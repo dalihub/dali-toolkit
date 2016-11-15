@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/application.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -34,11 +35,13 @@ namespace
 
 const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
-const char* FONT_SIZE_QUALIFIER = "FontSize";
+const char* FONT_SIZE_QUALIFIER = "fontsize";
 
 const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
 const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
+const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
+
 const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
 
 } // namespace
@@ -104,12 +107,12 @@ StyleManager::StyleManager()
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
+  mThemeBuilderConstants[ APPLICATION_RESOURCE_PATH_KEY ] = Application::GetResourcePath();
 
   mStyleMonitor = StyleMonitor::Get();
   if( mStyleMonitor )
   {
     mStyleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
-
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 
@@ -329,9 +332,7 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
 
   if( styleName.empty() )
   {
-    // Convert control name to lower case
     styleName = control.GetTypeName();
-    std::transform( styleName.begin(), styleName.end(), styleName.begin(), ::tolower );
   }
 
   // Apply the style after choosing the correct actual style (e.g. landscape or portrait)

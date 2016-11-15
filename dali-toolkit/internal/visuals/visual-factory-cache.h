@@ -17,9 +17,6 @@
  * limitations under the License.
  */
 
-// INTERNAL INCLUDES
-#include "svg/svg-rasterize-thread.h"
-
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
@@ -29,6 +26,9 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/weak-handle.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 
 namespace Dali
 {
@@ -38,6 +38,11 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class ImageAtlasManager;
+typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
+
+class NPatchLoader;
 
 /**
  * Caches shaders and geometries. Owned by VisualFactory.
@@ -60,6 +65,8 @@ public:
     GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
     IMAGE_SHADER,
     BATCH_IMAGE_SHADER,
+    IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
+    IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
     SVG_SHADER,
     SHADER_TYPE_MAX = SVG_SHADER
@@ -130,6 +137,12 @@ public:
    */
   static Geometry CreateBatchQuadGeometry( Vector4 texCoords );
 
+  /**
+   * @brief Returns an image to be used when a visual has failed to correctly render
+   * @return The broken image handle.
+   */
+  static Image GetBrokenVisualImage();
+
 public:
 
   /**
@@ -160,18 +173,30 @@ public:
   bool CleanRendererCache( const std::string& key );
 
   /**
-   * @brief Cache the debug renderer
+   * @brief Cache the wireframe renderer
    */
-  void CacheDebugRenderer( Renderer& renderer );
+  void CacheWireframeRenderer( Renderer& renderer );
 
   /**
-   * @brief Request the debug renderer;
+   * @brief Request the wireframe renderer;
    */
-  Renderer GetDebugRenderer();
+  Renderer GetWireframeRenderer();
+
+  /**
+   * Get the image atlas manager.
+   * @return A pointer to the atlas manager
+   */
+  ImageAtlasManagerPtr GetAtlasManager();
+
+  /**
+   * Get the N-Patch texture cache.
+   * @return A reference to the N patch loader
+   */
+  NPatchLoader& GetNPatchLoader();
 
   /**
    * Get the SVG rasterization thread.
-   * @return A pointer pointing to the SVG rasterization thread.
+   * @return A raw pointer pointing to the SVG rasterization thread.
    */
   SvgRasterizeThread* GetSVGRasterizationThread();
 
@@ -228,7 +253,10 @@ private:
   HashVector mRendererHashes;
   CachedRenderers mRenderers;
 
-  Renderer mDebugRenderer;
+  Renderer mWireframeRenderer;
+
+  ImageAtlasManagerPtr mAtlasManager;
+  NPatchLoader mNPatchLoader;
 
   SvgRasterizeThread*  mSvgRasterizeThread;
 };

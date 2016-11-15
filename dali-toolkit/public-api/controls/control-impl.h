@@ -32,22 +32,25 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
+
 /**
  * @addtogroup dali_toolkit_controls
  * @{
  */
 
 class StyleManager;
+class TransitionData;
 
 namespace Visual
 {
 class Base;
 }
+
 namespace Internal
 {
+
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -251,6 +254,7 @@ public:
    */
   bool IsKeyboardFocusGroup();
 
+  /// @cond internal
   /**
    * @brief Called by the AccessibilityManager to activate the Control.
    * @SINCE_1_0.0
@@ -262,6 +266,7 @@ public:
    * @SINCE_1_0.0
    */
   DALI_INTERNAL void KeyboardEnter();
+  /// @endcond
 
   // Signals
 
@@ -280,6 +285,7 @@ public:
    */
   Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusLostSignal();
 
+  /// @cond internal
   /**
    * @brief Called by the KeyInputFocusManager to emit key event signals.
    *
@@ -288,29 +294,88 @@ public:
    * @return True if the event was consumed.
    */
   DALI_INTERNAL bool EmitKeyEventSignal( const KeyEvent& event );
+  /// @endcond
 
 protected: // For derived classes to call
 
   /**
-   * @brief Register a visual by Property Index, linking an Actor to controlRenderer when required.
-   * In the case of the visual being an actor or control deeming controlRenderer not required then controlRenderer should be an empty handle.
+   * @brief Register a visual by Property Index, linking an Actor to visual when required.
+   * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
    * No parenting is done during registration, this should be done by derived class.
    *
    * @SINCE_1_2.0
    *
    * @param[in] index The Property index of the visual, used to reference visual
-   * @param[in] placementActor The actor used to by the visual.
    * @param[in] visual The visual to register
+   * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+   *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
    */
-   void RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual );
 
-   /**
-    * @brief Erase the entry matching the given index from the list of registered visuals
-    * @param[in] index The Property index of the visual, used to reference visual
-    *
-    * @SINCE_1_2.0
-    */
-   void UnregisterVisual( Property::Index index );
+  /**
+   * @brief Register a visual by Property Index, linking an Actor to visual when required.
+   * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+   * If enabled is false then the visual is not set on stage until enabled by the derived class.
+   * @see EnableVisual
+   *
+   * @SINCE_1_2.11
+   *
+   * @param[in] index The Property index of the visual, used to reference visual
+   * @param[in] visual The visual to register
+   * @param[in] enabled false if derived class wants to control when visual is set on stage.
+   *
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+  /**
+   * @brief Erase the entry matching the given index from the list of registered visuals
+   * @param[in] index The Property index of the visual, used to reference visual
+   *
+   * @SINCE_1_2.0
+   */
+  void UnregisterVisual( Property::Index index );
+
+  /**
+   * @brief Retrieve the visual associated with the given property index.
+   *
+   * @SINCE_1_2.2
+   *
+   * @param[in] index The Property index of the visual.
+   * @return The registered visual if exist, otherwise empty handle.
+   * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
+   */
+  Toolkit::Visual::Base GetVisual( Property::Index index ) const;
+
+  /**
+   * @brief Sets the given visual to be displayed or not when parent staged.
+   *
+   * @SINCE_1_2.11
+   *
+   * @param[in] index The Property index of the visual
+   * @param[in] enable flag to set enabled or disabled.
+   */
+  void EnableVisual( Property::Index index, bool enable );
+
+  /**
+   * @brief Queries if the given visual is to be displayed when parent staged.
+   *
+   * @SINCE_1_2.11
+   *
+   * @param[in] index The Property index of the visual
+   * @return bool whether visual is enabled or not
+   */
+  bool IsVisualEnabled( Property::Index index ) const;
+
+  /**
+   * @brief Create a transition effect on the control.
+   *
+   * @SINCE_1_2.12
+   *
+   * @param[in] transitionData The transition data describing the effect to create
+   * @return A handle to an animation defined with the given effect, or an empty
+   * handle if no properties match.
+   */
+  Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
 
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
@@ -429,11 +494,17 @@ protected: // Helpers for deriving classes
 
   // Construction
 
-  // Flags for the constructor
+  /**
+   * @brief Flags for the constructor
+   * @SINCE_1_0.0
+   */
   enum ControlBehaviour
   {
-    REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change @SINCE_1_0.0
+    CONTROL_BEHAVIOUR_DEFAULT            = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
+    REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change @SINCE_1_0.0 @DEPRECATED_1_2_10
     REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if needs to support keyboard navigation @SINCE_1_0.0
+
+    DISABLE_STYLE_CHANGE_SIGNALS         = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 2 ),     ///< True if control should not monitor style change signals @SINCE_1_2_10
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
@@ -685,12 +756,14 @@ public: // API for derived classes to override
 
 private:
 
+  /// @cond internal
   // Undefined
   DALI_INTERNAL Control( const Control& );
   DALI_INTERNAL Control& operator=( const Control& );
 
   class Impl;
   Impl* mImpl;
+  /// @endcond
 
 };
 

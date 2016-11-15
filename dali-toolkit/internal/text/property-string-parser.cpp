@@ -79,27 +79,6 @@ void ParsePropertyString( const std::string& property, Property::Map& map )
   }
 }
 
-void StringOffsetToVector2( const std::string& offsetStr,
-                            Vector2& offset )
-{
-  offset = Vector2::ZERO;
-
-  unsigned int wsIndex = 0u;
-  for( std::string::const_iterator it = offsetStr.begin(),
-         endIt = offsetStr.end();
-       it != endIt;
-       ++it, ++wsIndex )
-  {
-    if( *it == ' ' )
-    {
-      break;
-    }
-  }
-
-  offset[0] = StringToFloat( offsetStr.c_str() );
-  offset[1] = StringToFloat( offsetStr.c_str() + wsIndex );
-}
-
 } //namespace Text
 
 } //namespace Toolkit

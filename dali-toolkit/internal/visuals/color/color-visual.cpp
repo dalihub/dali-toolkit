@@ -23,6 +23,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -46,11 +47,24 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
   }\n
 );
 
@@ -65,6 +79,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 );
 }
 
+ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new ColorVisual( factoryCache );
+}
+
 ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mMixColorIndex( Property::INVALID_INDEX )
@@ -75,7 +94,7 @@ ColorVisual::~ColorVisual()
 {
 }
 
-void ColorVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME );
   if( !( color && color->Get(mMixColor) ) )
@@ -91,28 +110,47 @@ void ColorVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void ColorVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void ColorVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mMixColor );
+}
+
+void ColorVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+  /* David Steele comented :
+
+     Some things to bear in mind:
+
+     We currently keep a copy of the mix color in the ColorVisual object, which is then used to instantiate the registered property on the renderer.
+
+     The user can get the renderer and animate the mixColor property (it's registered, so is automatically a scene-graph property).
+
+     The GetProperty method will have to read from the renderer, or from the cached value in the Visual, and the SetProperty will have to write to cache and to the renderer if present.
+  */
+}
+
+Dali::Property::Value ColorVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
+void ColorVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
 }
 
 void ColorVisual::InitializeRenderer()
@@ -133,11 +171,14 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mMixColorIndex = mImpl->mRenderer.RegisterProperty( COLOR_NAME, mMixColor );
+  mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME, mMixColor );
   if( mMixColor.a < 1.f )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 void ColorVisual::SetColor(const Vector4& color)

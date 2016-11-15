@@ -76,7 +76,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
                               Image shapeImage,
                               unsigned int maximumNumberOfBubble,
                               const Vector2& bubbleSizeRange )
-: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mShapeImage( shapeImage ),
   mMovementArea( movementArea ),
   mBubbleSizeRange( bubbleSizeRange ),
@@ -136,7 +136,7 @@ void BubbleEmitter::OnInitialize()
   mBubbleRoot.SetSize(mMovementArea);
 
   // Prepare the frame buffer to store the color adjusted background image
-  mEffectImage = FrameBufferImage::New( mMovementArea.width/4.f, mMovementArea.height/4.f, Pixel::RGBA8888, Dali::Image::UNUSED );
+  mEffectImage = FrameBufferImage::New( mMovementArea.width/4.f, mMovementArea.height/4.f, Pixel::RGBA8888 );
 
   // Generate the geometry, which is used by all bubbleActors
   mMeshGeometry =  CreateGeometry( mNumBubblePerActor*mDensity );

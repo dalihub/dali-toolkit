@@ -26,6 +26,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -83,7 +84,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",            
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "text",                                 STRING,    TEXT                                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "textColor",                            VECTOR4,   TEXT_COLOR                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "fontFamily",                           STRING,    FONT_FAMILY                          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "fontStyle",                            STRING,    FONT_STYLE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "fontStyle",                            MAP,       FONT_STYLE                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pointSize",                            FLOAT,     POINT_SIZE                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "horizontalAlignment",                  STRING,    HORIZONTAL_ALIGNMENT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollThreshold",                      FLOAT,     SCROLL_THRESHOLD                     )
@@ -107,20 +108,21 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "decorationBoundingBox",       
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableMarkup",                         BOOLEAN,   ENABLE_MARKUP                        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputColor",                           VECTOR4,   INPUT_COLOR                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputFontFamily",                      STRING,    INPUT_FONT_FAMILY                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputFontStyle",                       STRING,    INPUT_FONT_STYLE                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputFontStyle",                       MAP,       INPUT_FONT_STYLE                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputPointSize",                       FLOAT,     INPUT_POINT_SIZE                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineSpacing",                          FLOAT,     LINE_SPACING                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputLineSpacing",                     FLOAT,     INPUT_LINE_SPACING                   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "underline",                            STRING,    UNDERLINE                            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputUnderline",                       STRING,    INPUT_UNDERLINE                      )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "shadow",                               STRING,    SHADOW                               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputShadow",                          STRING,    INPUT_SHADOW                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "emboss",                               STRING,    EMBOSS                               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputEmboss",                          STRING,    INPUT_EMBOSS                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                              STRING,    OUTLINE                              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         STRING,    INPUT_OUTLINE                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "underline",                            MAP,       UNDERLINE                            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputUnderline",                       MAP,       INPUT_UNDERLINE                      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "shadow",                               MAP,       SHADOW                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputShadow",                          MAP,       INPUT_SHADOW                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "emboss",                               MAP,       EMBOSS                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                              MAP,       OUTLINE                              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -904,6 +906,10 @@ bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   {
     editor.TextChangedSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED ) )
+  {
+    editor.InputStyleChangedSignal().Connect( tracker, functor );
+  }
   else
   {
     // signalName does not match any signal
@@ -918,11 +924,16 @@ Toolkit::TextEditor::TextChangedSignalType& TextEditor::TextChangedSignal()
   return mTextChangedSignal;
 }
 
+Toolkit::TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedSignal()
+{
+  return mInputStyleChangedSignal;
+}
+
 void TextEditor::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( *this );
+  mController = Text::Controller::New( this, this );
 
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
@@ -938,6 +949,7 @@ void TextEditor::OnInitialize()
   // Disables the horizontal scrolling.
   mController->SetHorizontalScrollEnabled( false );
 
+  // Sets the maximum number of characters.
   mController->SetMaximumNumberOfCharacters( std::numeric_limits<Length>::max() );
 
   // Enable the smooth handle panning.
@@ -988,13 +1000,7 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
-
-      if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
-      {
-        // Property system did not set the PointSize so should update it.
-        // todo instruct text-controller to update model
-      }
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
       break;
     }
     case StyleChange::THEME_CHANGE:
@@ -1037,8 +1043,27 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    EnableClipping( true, size );
+    EnableClipping( size );
     RenderText( updateTextType );
+  }
+
+  // The text-editor emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-editor adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  if( !mController->IsInputStyleChangedSignalsQueueEmpty() )
+  {
+    if( Adaptor::IsAvailable() )
+    {
+      Adaptor& adaptor = Adaptor::Get();
+
+      if( NULL == mIdleCallback )
+      {
+        // @note: The callback manager takes the ownership of the callback object.
+        mIdleCallback = MakeCallback( this, &TextEditor::OnIdleSignal );
+        adaptor.AddIdle( mIdleCallback );
+      }
+    }
   }
 }
 
@@ -1211,21 +1236,6 @@ bool TextEditor::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
-{
-  if( actor )
-  {
-    if( needsClipping )
-    {
-      mClippingDecorationActors.push_back( actor );
-    }
-    else
-    {
-      Self().Add( actor );
-    }
-  }
-}
-
 void TextEditor::RequestTextRelayout()
 {
   RelayoutRequest();
@@ -1240,6 +1250,75 @@ void TextEditor::TextChanged()
 void TextEditor::MaxLengthReached()
 {
   // Nothing to do as TextEditor doesn't emit a max length reached signal.
+}
+
+void TextEditor::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
+{
+  Dali::Toolkit::TextEditor handle( GetOwner() );
+
+  Toolkit::TextEditor::InputStyle::Mask editorInputStyleMask = Toolkit::TextEditor::InputStyle::NONE;
+
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_COLOR ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::COLOR );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_FAMILY ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_FAMILY );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_POINT_SIZE ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::POINT_SIZE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WEIGHT ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WIDTH ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_SLANT ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_LINE_SPACING ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::LINE_SPACING );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_UNDERLINE ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::UNDERLINE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_SHADOW ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::SHADOW );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_EMBOSS ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::EMBOSS );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_OUTLINE ) )
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>( editorInputStyleMask | Toolkit::TextEditor::InputStyle::OUTLINE );
+  }
+
+  mInputStyleChangedSignal.Emit( handle, editorInputStyleMask );
+}
+
+void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
+{
+  if( actor )
+  {
+    if( needsClipping )
+    {
+      mClippingDecorationActors.push_back( actor );
+    }
+    else
+    {
+      Self().Add( actor );
+    }
+  }
 }
 
 void TextEditor::OnStageConnect( Dali::Actor actor )
@@ -1275,31 +1354,23 @@ void TextEditor::GetHandleImagePropertyValue(  Property::Value& value, Text::Han
   }
 }
 
-void TextEditor::EnableClipping( bool clipping, const Vector2& size )
+void TextEditor::EnableClipping( const Vector2& size )
 {
-  if( clipping )
+  // Not worth to created clip actor if width or height is equal to zero.
+  if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
   {
-    // Not worth to created clip actor if width or height is equal to zero.
-    if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
+    if( !mClipper )
     {
-      if( !mClipper )
-      {
-        Actor self = Self();
+      Actor self = Self();
 
-        mClipper = Clipper::New( size );
-        self.Add( mClipper->GetRootActor() );
-        self.Add( mClipper->GetImageView() );
-      }
-      else if ( mClipper )
-      {
-        mClipper->Refresh( size );
-      }
+      mClipper = Clipper::New( size );
+      self.Add( mClipper->GetRootActor() );
+      self.Add( mClipper->GetImageView() );
     }
-  }
-  else
-  {
-    // Note - this will automatically remove the root actor & the image view
-    mClipper.Reset();
+    else if ( mClipper )
+    {
+      mClipper->Refresh( size );
+    }
   }
 }
 
@@ -1339,8 +1410,18 @@ bool TextEditor::OnTouched( Actor actor, const TouchData& touch )
   return true;
 }
 
+void TextEditor::OnIdleSignal()
+{
+  // Emits the change of input style signals.
+  mController->ProcessInputStyleChangedSignals();
+
+  // Set the pointer to null as the callback manager deletes the callback after execute it.
+  mIdleCallback = NULL;
+}
+
 TextEditor::TextEditor()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mIdleCallback( NULL ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false )
 {
@@ -1349,6 +1430,12 @@ TextEditor::TextEditor()
 TextEditor::~TextEditor()
 {
   mClipper.Reset();
+
+  if( ( NULL != mIdleCallback ) && Adaptor::IsAvailable() )
+  {
+    // Removes the callback from the callback manager in case the text-editor is destroyed before the callback is executed.
+    Adaptor::Get().RemoveIdle( mIdleCallback );
+  }
 }
 
 } // namespace Internal

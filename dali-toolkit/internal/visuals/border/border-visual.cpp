@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -55,9 +56,24 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   uniform mediump float borderSize;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec2 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy;\n
+  }\n
+
   void main()\n
   {\n
-    vec2 position = aPosition*uSize.xy + aDrift*borderSize;\n
+    vec2 position = ComputeVertexPosition() + aDrift*borderSize;\n
     gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n
   }\n
 );
@@ -102,6 +118,11 @@ const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
 );
 }
 
+BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new BorderVisual( factoryCache );
+}
+
 BorderVisual::BorderVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mBorderColor( Color::TRANSPARENT ),
@@ -116,7 +137,7 @@ BorderVisual::~BorderVisual()
 {
 }
 
-void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void BorderVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* color = propertyMap.Find( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME );
   if( !( color && color->Get(mBorderColor) ) )
@@ -137,32 +158,46 @@ void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap 
   }
 }
 
-void BorderVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
 void BorderVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
 
-  mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( COLOR_NAME, mBorderColor );
+  mBorderColorIndex = (mImpl->mRenderer).RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
   if( mBorderColor.a < 1.f || mAntiAliasing)
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
-  mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
+  mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize );
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::BORDER );
+  map.Insert( VisualProperty::TYPE, Toolkit::Visual::BORDER );
   map.Insert( Toolkit::BorderVisual::Property::COLOR, mBorderColor );
   map.Insert( Toolkit::BorderVisual::Property::SIZE, mBorderSize );
   map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );
+}
+
+void BorderVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value BorderVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
+void BorderVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
 }
 
 void BorderVisual::InitializeRenderer()
@@ -177,6 +212,9 @@ void BorderVisual::InitializeRenderer()
 
   Shader shader = GetBorderShader();
   mImpl->mRenderer = Renderer::New( geometry, shader  );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
 }
 

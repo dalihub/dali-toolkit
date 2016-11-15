@@ -18,9 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/devel-api/object/weak-handle.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 struct NSVGimage;
 
@@ -32,6 +35,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class SvgVisual;
+typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
 
 /**
  * The visual which renders a svg image
@@ -48,69 +54,74 @@ class SvgVisual: public Visual::Base
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create the SVG Visual using the image URL.
+   *
+   * The visual will parse the SVG image once it is set.
+   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] imageUrl The URL to svg resource to use
+   * @param[in] size The required size for the SVG
    */
-  SvgVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager );
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  ~SvgVisual();
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
 
 public:  // from Visual
 
   /**
-   * @copydoc Visual::GetNaturalSize
+   * @copydoc Visual::Base::GetNaturalSize
    */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
+  virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
-   * @copydoc Visual::SetSize
+   * @copydoc Visual::Base::SetSize
    */
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::CreatePropertyMap
+   * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::DoSetProperty
+   */
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @copydoc Visual::Base::DoGetProperty
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
 
   /**
-   * @copydoc Visual::DoInitialize
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
+  SvgVisual( VisualFactoryCache& factoryCache );
 
   /**
-   * @copydoc Visual::DoSetOnStage
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~SvgVisual();
+
+  /**
+   * @copydoc Visual::Base::DoSetProperties
+   */
+  virtual void DoSetProperties( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::DoSetOffStage
+   * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
 
 public:
-
-  /**
-   * @brief Helper method to determine whether the url indicate that it is a svg image.
-   *
-   * @param [in] url The URL of the image file.
-   * @return true if it is a svg image
-   */
-  static bool IsSvgUrl( const std::string& url );
-
-  /**
-   * @brief Sets the svg image of this visual to the resource at imageUrl
-   * The visual will parse the svg image once it is set.
-   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
-   *
-   * @param[in] imageUrl The URL to svg resource to use
-   */
-  void SetImage( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
 
   /**
    * @bried Apply the rasterized image to the visual.
@@ -120,6 +131,15 @@ public:
   void ApplyRasterizedImage( PixelData rasterizedPixelData );
 
 private:
+
+  /**
+   * @brief Parses the SVG Image from the set URL.
+   *
+   * @param[in] imageUrl The URL of the image to parse the SVG from.
+   * @param[in] size The required size of the SVG
+   */
+  void ParseFromUrl( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
+
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
    *
@@ -136,9 +156,9 @@ private:
 
 private:
   Vector4              mAtlasRect;
-  ImageAtlasManager&   mAtlasManager;
   std::string          mImageUrl;
   NSVGimage*           mParsedImage;
+  WeakHandle<Actor>    mPlacementActor;
 
 };
 

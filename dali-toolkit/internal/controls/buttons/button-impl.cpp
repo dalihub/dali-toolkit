@@ -30,6 +30,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 
@@ -111,7 +112,7 @@ const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 } // unnamed namespace
 
 Button::Button()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mAutoRepeatingTimer(),
   mUnselectedColor( Color::WHITE ), // The natural colors of the specified images will be used by default.
   mSelectedColor( Color::WHITE ),
@@ -570,13 +571,12 @@ void Button::SetColor( const Vector4& color, Button::PaintState selectedState )
       Toolkit::Visual::Base visual;
 
       Property::Map map;
-      map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+      map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
       map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
       visual = visualFactory.CreateVisual( map );
 
-      RegisterVisual( visualIndex, placementActor, visual );
-      visual.SetOnStage( placementActor );
+      RegisterVisual( visualIndex, visual );
 
       SetupContent( *contentActor, placementActor ); //
       contentActor->SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );

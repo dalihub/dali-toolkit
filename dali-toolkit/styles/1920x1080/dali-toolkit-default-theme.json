@@ -1,0 +1,164 @@
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ *
+ * This file is part of Dali Toolkit
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+//******************************************************************************
+//
+// Default Reference style theme for a 1920x1080 resolution, The values determined by UX design specification.
+// This file can be copied to a new folder within the styles/ directory and amended with new default values.
+// Can be overriden if StyleManager applies another style sheet.
+//
+//******************************************************************************
+
+{
+  "styles":
+  {
+    "TextLabel":
+    {
+      "pointSize":108,
+      "enableAutoScroll":false,
+      "autoScrollLoopCount":2,
+      "autoScrollGap":50,
+      "autoScrollSpeed":80
+    },
+
+    "TextLabelFontSize0":
+    {
+      "pointSize":84
+    },
+    "TextLabelFontSize1":
+    {
+      "pointSize":96
+    },
+    "TextLabelFontSize2":
+    {
+      "pointSize":108
+    },
+    "TextLabelFontSize3":
+    {
+      "pointSize":120
+    },
+    "TextLabelFontSize4":
+    {
+      "pointSize":132
+    },
+
+    "TextField":
+    {
+      "pointSize":120,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":6,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+    },
+
+    "TextFieldFontSize0":
+    {
+      "pointSize":120
+    },
+    "TextFieldFontSize1":
+    {
+      "pointSize":120
+    },
+    "TextFieldFontSize2":
+    {
+      "pointSize":120
+    },
+    "TextFieldFontSize3":
+    {
+      "pointSize":120
+    },
+    "TextFieldFontSize4":
+    {
+      "pointSize":120
+    },
+    "TextSelectionPopup":
+    {
+      "popupMaxSize":[1700,100],
+      "optionDividerSize":[2,0],
+      "popupDividerColor":[0.23,0.72,0.8,0.11],
+      "popupIconColor":[1.0,1.0,1.0,1.0],
+      "popupPressedColor":[0.24,0.72,0.8,0.11],
+      "background": {
+        "rendererType": "image",
+        "url": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
+        },
+      "popupFadeInDuration":0.25,
+      "popupFadeOutDuration":0.25
+    },
+    "TextSelectionPopupButton":
+    {
+      "label":
+      {
+        "pointSize":120,
+        "fontStyle":{"weight":"light"}
+      }
+    },
+    "TextSelectionToolbar":
+    {
+      "enableOvershoot":true,
+      "scrollView":
+      {
+        "overshootAnimationSpeed":360.0,
+        "overshootSize":[1920.0,130.0]
+      }
+    },
+    "ScrollView":
+    {
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":960.0,
+      "overshootSize":[1920.0,130.0]
+    },
+    "ItemView":
+    {
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":960.0,
+      "overshootSize":[1920.0,130.0]
+    },
+    "TextEditor":
+    {
+      "pointSize":120,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":6,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+    },
+    "ProgressBar":
+    {
+      "progressValue": 0,
+      "trackVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin.9.png",
+        "size":[24,24]
+      },
+      "progressVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin-progress.9.png",
+        "size":[24,24]
+      }
+    },
+    "ProgressBarValueTextLabel":
+    {
+      "textColor":[0.8,0.8,1,1]
+    }
+  }
+}

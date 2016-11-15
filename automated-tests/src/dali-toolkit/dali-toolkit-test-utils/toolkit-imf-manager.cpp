@@ -267,6 +267,10 @@ const std::string& ImfManager::GetSurroundingText() const
   return Internal::Adaptor::ImfManager::GetImplementation(*this).GetSurroundingText();
 }
 
+void ImfManager::NotifyTextInputMultiLine( bool multiLine )
+{
+}
+
 ImfManager::ImfManagerSignalType& ImfManager::ActivatedSignal()
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).ActivatedSignal();

@@ -25,7 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 
 namespace Dali
 {
@@ -91,7 +91,7 @@ void SpreadFilter::Enable()
   mActorForInput.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 1.0f / mTargetSize.width, 0.0f ) );
 
   // create internal offscreen for result of horizontal pass
-  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
+  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = Toolkit::ImageView::New( mImageForHorz );
   mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
@@ -103,7 +103,7 @@ void SpreadFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SPREAD_FRAGMENT_SOURCE;
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  visualMap.Insert( Toolkit::VisualProperty::SHADER, customShader );
 
   // set SPREAD custom shader
   mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );

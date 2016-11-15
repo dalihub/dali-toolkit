@@ -77,6 +77,12 @@ struct ValidateFontsPerScript
  */
 struct DefaultFonts
 {
+  struct CacheItem
+  {
+    TextAbstraction::FontDescription description;
+    FontId fontId ;
+  };
+
   /**
    * Default constructor.
    */
@@ -94,13 +100,18 @@ struct DefaultFonts
    * @brief Finds a default font for the given @p size.
    *
    * @param[in] fontClient The font client.
+   * @param[in] description The font's description.
    * @param[in] size The given size.
    *
    * @return The font id of a default font for the given @p size. If there isn't any font cached it returns 0.
    */
-  FontId FindFont( TextAbstraction::FontClient& fontClient, PointSize26Dot6 size ) const;
+  FontId FindFont( TextAbstraction::FontClient& fontClient,
+                   const TextAbstraction::FontDescription& description,
+                   PointSize26Dot6 size ) const;
 
-  Vector<FontId> mFonts;
+  void Cache( const TextAbstraction::FontDescription& description, FontId fontId );
+
+  std::vector<CacheItem> mFonts;
 };
 
 /**
@@ -141,7 +152,8 @@ public:
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
                       const Vector<FontDescriptionRun>& fontDescriptions,
-                      FontId defaultFontId,
+                      const TextAbstraction::FontDescription& defaultFontDescription,
+                      TextAbstraction::PointSize26Dot6 defaultFontPointSize,
                       CharacterIndex startIndex,
                       Length numberOfCharacters,
                       Vector<FontRun>& fonts );

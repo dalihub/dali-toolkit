@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/devel-api/align-enums.h>
 
 namespace Dali
 {
@@ -43,8 +44,9 @@ struct Base::Impl
   {
     IS_ON_STAGE = 1,
     IS_FROM_CACHE = 1 << 1,
-    IS_PREMULTIPLIED_ALPHA = 1 << 2,
-    IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 3
+    IS_ATLASING_APPLIED = 1<<2,
+    IS_PREMULTIPLIED_ALPHA = 1 << 3,
+    IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 4
   };
 
   struct CustomShader
@@ -59,14 +61,27 @@ struct Base::Impl
     void CreatePropertyMap( Property::Map& map ) const;
   };
 
-  Renderer mRenderer;
+  struct Transform
+  {
+    Vector2 mOffset;
+    Vector2 mSize;
+    Vector4 mOffsetSizeMode;
+    Toolkit::Align::Type mOrigin;
+    Toolkit::Align::Type mAnchorPoint;
 
+    Transform();
+    void SetPropertyMap( const Property::Map& map );
+    void GetPropertyMap( Property::Map& map ) const;
+    void RegisterUniforms( Renderer renderer, Toolkit::Direction::Type direction );
+  };
+
+  Renderer      mRenderer;
   CustomShader* mCustomShader;
-
-  Vector2   mSize;
-  Vector2   mOffset;
-  float     mDepthIndex;
-  int       mFlags;
+  std::string   mName;
+  Transform     mTransform;
+  Vector2       mSize;
+  float         mDepthIndex;
+  int           mFlags;
 
   Impl();
   ~Impl();

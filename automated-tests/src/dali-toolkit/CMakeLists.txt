@@ -33,6 +33,7 @@ SET(TC_SOURCES
    utc-Dali-TextLabel.cpp
    utc-Dali-TextSelectionPopup.cpp
    utc-Dali-ToolBar.cpp
+   utc-Dali-TransitionData.cpp
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp
    utc-Dali-ControlImpl.cpp
@@ -41,7 +42,9 @@ SET(TC_SOURCES
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
    utc-Dali-Magnifier.cpp
+   utc-Dali-NavigationView.cpp
    utc-Dali-Popup.cpp
+   utc-Dali-ProgressBar.cpp
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp
    utc-Dali-ScrollViewEffect.cpp
@@ -50,13 +53,16 @@ SET(TC_SOURCES
    utc-Dali-Model3dView.cpp
    utc-Dali-Visual.cpp
    utc-Dali-VisualFactory.cpp
-   utc-Dali-DebugVisual.cpp
+   utc-Dali-DebugRendering.cpp
    utc-Dali-ImageAtlas.cpp
    utc-Dali-VideoView.cpp
+   utc-Dali-AsyncImageLoader.cpp
+   utc-Dali-SyncImageLoader.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
+   dali-toolkit-test-utils/toolkit-adaptor.cpp
    dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
    dali-toolkit-test-utils/toolkit-bitmap-loader.cpp

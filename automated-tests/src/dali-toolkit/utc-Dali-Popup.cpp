@@ -1014,11 +1014,11 @@ int UtcDaliPopupPropertyBackgroundImage(void)
   Popup popup = Popup::New();
   Stage::GetCurrent().Add( popup );
 
-  // Check setting an invalid image.
+  // Check setting an image
   popup.SetProperty( Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, "invalid-image.png" );
   std::string resultString;
   popup.GetProperty( Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE ).Get( resultString );
-  DALI_TEST_EQUALS( resultString, std::string(""), TEST_LOCATION );
+  DALI_TEST_EQUALS( resultString, "invalid-image.png", TEST_LOCATION );
 
   END_TEST;
 }

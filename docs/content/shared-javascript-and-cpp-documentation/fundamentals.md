@@ -6,7 +6,7 @@
 ## Actors and the Stage {#actors-and-stage}
 
 Actor is the primary object with which DALi applications interact.
-A DALi application uses a hierachy of Dali::Actor objects to position visible content.
+A DALi application uses a hierarchy of Dali::Actor objects to position visible content.
 An actor inherits a position relative to its parent, and can be moved relative to this point.
 UI controls can be built by combining multiple actors.
 
@@ -38,6 +38,7 @@ downwards**.  This is intended to be convenient when laying-out 2D views.
 ## Positioning Actors {#positioning-actors}
 
 An actor inherits its parent's position.  The relative position between the actor & parent is determined by 3 properties:
+
 1) ParentOrigin.  This Vector3 property defines a point within the parent actor's area.
 
 ![ ](../assets/img/parent-origin.png)
@@ -57,15 +58,15 @@ The default is "center", which can be visualized in 2D as (0.5, 0.5), but is act
 ![ ](../assets/img/actor-position.png)
 ![ ](actor-position.png)
 
-Therefore by default, an actors position is the distance between its center and the top-left corner of its parent.
+The default is (X = 0, Y = 0), so an actor placed directly without modifying the parent origin, anchor point or position would appear centred around the top left corner of its parent.
 
-An actor added directly to the stage with position (X = stageWidth*0.5, Y = stageHeight*0.5), would appear in the center of the screen.  Likewise an actor with position (X = actorWidth*0.5, Y = actorWidth*0.5), would appear at the top-left of the screen.
+An actor added directly to the stage with position (X = stageWidth*0.5, Y = stageHeight*0.5), would appear in the center of the screen.  Likewise an actor with position (X = actorWidth*0.5, Y = actorWidth*0.5), would appear at the top-left of the screen. However, basic positioning like that is normally done via changing the parent origin and/or anchor point instead - use ParentOrigin::CENTER and AnchorPoint::CENTER to place the actor in the center of the screen, and ParentOrigin::TOP_LEFT and AnchorPoint::TOP_LEFT to place it inside the screen on the top left.
 
 Note that since DALi is a 3D toolkit, this behaviour is the result of a default perspective camera setup.
 
 ## Scene Graph {#scene-graph}
 
-From wikipedia...
+From Wikipedia...
   
 A scene graph is a collection of nodes in a graph or tree structure.
 A node may have many children but often only a single parent,

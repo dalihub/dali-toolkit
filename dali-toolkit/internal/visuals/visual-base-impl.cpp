@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -36,21 +36,18 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace Visual
-{
-
-Base::Base( VisualFactoryCache& factoryCache )
+Visual::Base::Base( VisualFactoryCache& factoryCache )
 : mImpl( new Impl() ),
   mFactoryCache( factoryCache )
 {
 }
 
-Base::~Base()
+Visual::Base::~Base()
 {
   delete mImpl;
 }
 
-void Base::SetCustomShader( const Property::Map& shaderMap )
+void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 {
   if( mImpl->mCustomShader )
   {
@@ -58,13 +55,13 @@ void Base::SetCustomShader( const Property::Map& shaderMap )
   }
   else
   {
-   mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
+    mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
   }
 }
 
-void Base::Initialize( Actor& actor, const Property::Map& propertyMap )
+void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
+  Property::Value* customShaderValue = propertyMap.Find( VisualProperty::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
     Property::Map shaderMap;
@@ -74,34 +71,50 @@ void Base::Initialize( Actor& actor, const Property::Map& propertyMap )
     }
   }
 
-  DoInitialize( actor, propertyMap );
+  Property::Value* transform = propertyMap.Find( Toolkit::Visual::DevelProperty::TRANSFORM, TRANSFORM );
+  if( transform )
+  {
+    Property::Map map;
+    if( transform->Get( map ) )
+    {
+      mImpl->mTransform.SetPropertyMap( map );
+    }
+  }
+
+  DoSetProperties( propertyMap );
 }
 
-void Base::SetSize( const Vector2& size )
+void Visual::Base::SetName( const std::string& name )
+{
+  mImpl->mName = name;
+}
+
+const std::string& Visual::Base::GetName()
+{
+  return mImpl->mName;
+}
+
+void Visual::Base::SetSize( const Vector2& size )
 {
   mImpl->mSize = size;
 }
 
-const Vector2& Base::GetSize() const
+const Vector2& Visual::Base::GetSize() const
 {
   return mImpl->mSize;
 }
 
-void Base::GetNaturalSize( Vector2& naturalSize ) const
+float Visual::Base::GetHeightForWidth( float width ) const
+{
+  return 0.f;
+}
+
+void Visual::Base::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize = Vector2::ZERO;
 }
 
-void Base::SetClipRect( const Rect<int>& clipRect )
-{
-}
-
-void Base::SetOffset( const Vector2& offset )
-{
-  mImpl->mOffset = offset;
-}
-
-void Base::SetDepthIndex( float index )
+void Visual::Base::SetDepthIndex( float index )
 {
   mImpl->mDepthIndex = index;
   if( mImpl->mRenderer )
@@ -110,25 +123,28 @@ void Base::SetDepthIndex( float index )
   }
 }
 
-float Base::GetDepthIndex() const
+float Visual::Base::GetDepthIndex() const
 {
   return mImpl->mDepthIndex;
 }
 
-void Base::SetOnStage( Actor& actor )
+void Visual::Base::SetOnStage( Actor& actor )
 {
+  // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
+  // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
   DoSetOnStage( actor );
 
-  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-  mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-  actor.AddRenderer( mImpl->mRenderer );
-
-  mImpl->mFlags |= Impl::IS_ON_STAGE;
+  if( mImpl->mRenderer )
+  {
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+    mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+  }
 }
 
-void Base::SetOffStage( Actor& actor )
+void Visual::Base::SetOffStage( Actor& actor )
 {
-  if( GetIsOnStage() )
+  if( IsOnStage() )
   {
     DoSetOffStage( actor );
 
@@ -136,7 +152,21 @@ void Base::SetOffStage( Actor& actor )
   }
 }
 
-void Base::EnablePreMultipliedAlpha( bool preMultipled )
+void Visual::Base::CreatePropertyMap( Property::Map& map ) const
+{
+  DoCreatePropertyMap( map );
+
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->CreatePropertyMap( map );
+  }
+
+  Property::Map transform;
+  mImpl->mTransform.GetPropertyMap( transform );
+  map.Insert( Toolkit::Visual::DevelProperty::TRANSFORM, transform );
+}
+
+void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
   if(preMultipled)
   {
@@ -153,42 +183,78 @@ void Base::EnablePreMultipliedAlpha( bool preMultipled )
   }
 }
 
-bool Base::IsPreMultipliedAlphaEnabled() const
+bool Visual::Base::IsPreMultipliedAlphaEnabled() const
 {
   return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
-void Base::DoSetOnStage( Actor& actor )
-{
-}
-
-void Base::DoSetOffStage( Actor& actor )
+void Visual::Base::DoSetOffStage( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
 }
 
-void Base::CreatePropertyMap( Property::Map& map ) const
-{
-  DoCreatePropertyMap( map );
-
-  if( mImpl->mCustomShader )
-  {
-    mImpl->mCustomShader->CreatePropertyMap( map );
-  }
-}
-
-bool Base::GetIsOnStage() const
+bool Visual::Base::IsOnStage() const
 {
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
-bool Base::GetIsFromCache() const
+bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }
 
-} // namespace Visual
+void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
+                      ( index > VISUAL_PROPERTY_BASE_START_INDEX ) && // Change the type of visual is not allowed.
+                      "Property index is out of bounds" );
+
+  if( index < VISUAL_PROPERTY_START_INDEX )
+  {
+    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
+    {
+      Property::Map* map = propertyValue.GetMap();
+      if( map )
+      {
+        mImpl->mTransform.SetPropertyMap( *map );
+        OnSetTransform();
+      }
+    }
+
+    // TODO set the properties of the visual base.
+  }
+  else
+  {
+    DoSetProperty( index, propertyValue );
+  }
+}
+
+Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
+{
+  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
+                      ( index >= VISUAL_PROPERTY_BASE_START_INDEX ) &&
+                      "Property index is out of bounds" );
+
+  Dali::Property::Value value;
+
+  if( index < VISUAL_PROPERTY_START_INDEX )
+  {
+    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
+    {
+      Property::Map map;
+      mImpl->mTransform.GetPropertyMap( map );
+      return map;
+    }
+    // TODO retrieve the properties of the visual base.
+  }
+  else
+  {
+    value = DoGetProperty( index );
+  }
+
+  return value;
+}
 
 } // namespace Internal
 

@@ -13,23 +13,26 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/visual-base-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-base-data-impl.cpp \
    $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
+   $(toolkit_src_dir)/visuals/npatch-loader.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-cache.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-string-constants.cpp \
    $(toolkit_src_dir)/visuals/border/border-visual.cpp \
    $(toolkit_src_dir)/visuals/color/color-visual.cpp \
-   $(toolkit_src_dir)/visuals/debug/debug-visual.cpp \
-   $(toolkit_src_dir)/visuals/image/image-visual.cpp \
-   $(toolkit_src_dir)/visuals/npatch/npatch-visual.cpp \
    $(toolkit_src_dir)/visuals/gradient/gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/linear-gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/radial-gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/gradient-visual.cpp \
+   $(toolkit_src_dir)/visuals/image/batch-image-visual.cpp \
+   $(toolkit_src_dir)/visuals/image/image-visual.cpp \
+   $(toolkit_src_dir)/visuals/mesh/mesh-visual.cpp \
+   $(toolkit_src_dir)/visuals/npatch/npatch-visual.cpp \
+   $(toolkit_src_dir)/visuals/primitive/primitive-visual.cpp \
    $(toolkit_src_dir)/visuals/svg/svg-rasterize-thread.cpp \
    $(toolkit_src_dir)/visuals/svg/svg-visual.cpp \
-   $(toolkit_src_dir)/visuals/mesh/mesh-visual.cpp \
-   $(toolkit_src_dir)/visuals/primitive/primitive-visual.cpp \
-   $(toolkit_src_dir)/visuals/image/batch-image-visual.cpp \
+   $(toolkit_src_dir)/visuals/text/text-visual.cpp \
+   $(toolkit_src_dir)/visuals/wireframe/wireframe-visual.cpp \
+   $(toolkit_src_dir)/visuals/transition-data-impl.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
@@ -43,6 +46,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
+   $(toolkit_src_dir)/controls/navigation-view/navigation-view-impl.cpp \
    $(toolkit_src_dir)/controls/popup/confirmation-popup-impl.cpp \
    $(toolkit_src_dir)/controls/model3d-view/model3d-view-impl.cpp \
    $(toolkit_src_dir)/controls/model3d-view/obj-loader.cpp \
@@ -51,6 +55,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
+   $(toolkit_src_dir)/controls/progress-bar/progress-bar-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/bouncing-effect-actor.cpp \
    $(toolkit_src_dir)/controls/scrollable/item-view/depth-layout.cpp \
@@ -84,9 +89,10 @@ toolkit_src_files = \
    $(toolkit_src_dir)/filters/emboss-filter.cpp \
    $(toolkit_src_dir)/filters/image-filter.cpp \
    $(toolkit_src_dir)/filters/spread-filter.cpp \
-   $(toolkit_src_dir)/image-atlas/atlas-packer.cpp \
-   $(toolkit_src_dir)/image-atlas/image-atlas-impl.cpp \
-   $(toolkit_src_dir)/image-atlas/image-load-thread.cpp \
+   $(toolkit_src_dir)/image-loader/async-image-loader-impl.cpp \
+   $(toolkit_src_dir)/image-loader/atlas-packer.cpp \
+   $(toolkit_src_dir)/image-loader/image-atlas-impl.cpp \
+   $(toolkit_src_dir)/image-loader/image-load-thread.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
    $(toolkit_src_dir)/text/bidirectional-support.cpp \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \
@@ -103,7 +109,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/property-string-parser.cpp \
    $(toolkit_src_dir)/text/segmentation.cpp \
    $(toolkit_src_dir)/text/shaper.cpp \
-   $(toolkit_src_dir)/text/text-control-interface.cpp \
    $(toolkit_src_dir)/text/text-controller.cpp \
    $(toolkit_src_dir)/text/text-controller-impl.cpp \
    $(toolkit_src_dir)/text/text-effects-style.cpp \

@@ -31,6 +31,7 @@
 
 // INTERNAL_INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace //Unnamed namespace
 {
@@ -123,7 +124,7 @@ DALI_TYPE_REGISTRATION_END()
 } // unnamed namespace
 
 SuperBlurView::SuperBlurView( unsigned int blurLevels )
-: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),
+: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS ) ),
   mTargetSize( Vector2::ZERO ),
   mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
   mBlurLevels( blurLevels ),
@@ -170,13 +171,11 @@ void SuperBlurView::SetImage(Image inputImage)
 
   mInputImage = inputImage;
   Actor self( Self() );
-  InitializeVisual( self, mVisuals[0], mInputImage );
+
+  mVisuals[0] = Toolkit::VisualFactory::Get().CreateVisual( mInputImage );
+  RegisterVisual( 0, mVisuals[0] ); // Will clean up previously registered visuals for this index.
   mVisuals[0].SetDepthIndex(0);
   SetShaderEffect( mVisuals[0] );
-  if( self.OnStage() )
-  {
-    mVisuals[0].SetOnStage( self );
-  }
 
   BlurImage( 0,  inputImage);
   for(unsigned int i=1; i<mBlurLevels;i++)
@@ -280,29 +279,24 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
     {
       float exponent = static_cast<float>(i);
       mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
-                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
-      InitializeVisual( self, mVisuals[i], mBlurredImage[i - 1] );
-      mVisuals[ i ].SetDepthIndex( i );
-      SetShaderEffect( mVisuals[ i ] );
+                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
+
+      mVisuals[i] = Toolkit::VisualFactory::Get().CreateVisual( mBlurredImage[i - 1] );
+      RegisterVisual( i, mVisuals[i] ); // Will clean up existing visual with same index.
+      mVisuals[i].SetDepthIndex( i );
+      SetShaderEffect( mVisuals[i] );
     }
 
     if( mInputImage )
     {
       SetImage( mInputImage );
     }
-
-    if( self.OnStage() )
-    {
-      for( unsigned int i = 1; i <= mBlurLevels; i++ )
-      {
-        mVisuals[i].SetOnStage( self );
-      }
-    }
   }
 }
 
 void SuperBlurView::OnStageConnection( int depth )
 {
+  // Chaining up first ensures visuals have SetOnStage called to create their renderers
   Control::OnStageConnection( depth );
 
   if( mTargetSize == Vector2::ZERO )
@@ -311,17 +305,8 @@ void SuperBlurView::OnStageConnection( int depth )
   }
 
   Actor self = Self();
-  if( mVisuals[0] )
-  {
-    mVisuals[0].SetOnStage( self );
-  }
   for(unsigned int i=1; i<=mBlurLevels;i++)
   {
-    if( mVisuals[i] )
-    {
-      mVisuals[i].SetOnStage( self );
-    }
-
     Renderer renderer = self.GetRendererAt( i );
     Property::Index index = renderer.RegisterProperty( ALPHA_UNIFORM_NAME, 0.f );
     Constraint constraint = Constraint::New<float>( renderer, index, ActorOpacityConstraint(mBlurLevels, i-1) );
@@ -332,17 +317,6 @@ void SuperBlurView::OnStageConnection( int depth )
 
 void SuperBlurView::OnStageDisconnection( )
 {
-  if( mTargetSize == Vector2::ZERO )
-  {
-    return;
-  }
-
-  Actor self = Self();
-  for(unsigned int i=0; i<mBlurLevels+1;i++)
-  {
-    mVisuals[i].SetOffStage( self );
-  }
-
   Control::OnStageDisconnection();
 }
 

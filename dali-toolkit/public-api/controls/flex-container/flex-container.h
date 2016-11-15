@@ -235,6 +235,8 @@ public:
   /**
    * @brief Assignment operator. Changes this handle to point to another real object
    * @SINCE_1_1.35
+   * @param[in] handle Handle to an object
+   * @return A reference to this
    */
   FlexContainer& operator=( const FlexContainer& handle );
 
@@ -271,6 +273,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_1.35
@@ -286,6 +289,7 @@ public: // Not intended for application developers
    * @param[in] internal A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL FlexContainer( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**

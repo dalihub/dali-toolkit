@@ -125,6 +125,8 @@ public:
   static ImageView New();
 
   /**
+   * @DEPRECATED_1_2.8, use New( const std::string& ) instead.
+   *
    * @brief Create an initialized ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will not display anything.
@@ -200,6 +202,8 @@ public:
   static ImageView DownCast( BaseHandle handle );
 
   /**
+   * @DEPRECATED_1_2.8, use SetImage( const std::string& ) instead.
+   *
    * @brief Sets this ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will display nothing
@@ -242,6 +246,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
@@ -257,6 +262,7 @@ public: // Not intended for application developers
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL ImageView( Dali::Internal::CustomActor* internal );
+  /// @endcond
 
 };
 

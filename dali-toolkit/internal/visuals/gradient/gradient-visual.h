@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GRADIENT_VISUAL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -33,6 +36,8 @@ namespace Internal
 {
 
 class Gradient;
+class GradientVisual;
+typedef IntrusivePtr< GradientVisual > GradientVisualPtr;
 
 /**
  * The visual which renders smooth transition of colors to the control's quad.
@@ -80,6 +85,38 @@ public:
   };
 
   /**
+   * @brief Create a new gradient visual.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static GradientVisualPtr New( VisualFactoryCache& factoryCache );
+
+public:  // from Visual
+
+  /**
+   * @copydoc Visual::Base::SetSize
+   */
+  virtual void SetSize( const Vector2& size );
+
+  /**
+   * @copydoc Visual::Base::CreatePropertyMap
+   */
+  virtual void DoCreatePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::DoSetProperty
+   */
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @copydoc Visual::Base::DoGetProperty
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
+
+protected:
+
+  /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
@@ -89,38 +126,20 @@ public:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
-  ~GradientVisual();
-
-public:  // from Visual
+  virtual ~GradientVisual();
 
   /**
-   * @copydoc Visual::SetSize
+   * @copydoc Visual::Base::DoSetProperties
    */
-  virtual void SetSize( const Vector2& size );
+  virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::SetClipRect
+   * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void SetClipRect( const Rect<int>& clipRect );
+  virtual void OnSetTransform();
 
   /**
-   * @copydoc Visual::SetOffset
-   */
-  virtual void SetOffset( const Vector2& offset );
-
-  /**
-   * @copydoc Visual::CreatePropertyMap
-   */
-  virtual void DoCreatePropertyMap( Property::Map& map ) const;
-
-protected:
-  /**
-   * @copydoc Visual::DoInitialize
-   */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
-
-  /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
@@ -158,6 +177,7 @@ private:
   Matrix3 mGradientTransform;
   IntrusivePtr<Gradient> mGradient;
   Type mGradientType;
+  bool mIsOpaque; ///< Set to false if any of the stop colors are not opaque
 };
 
 } // namespace Internal

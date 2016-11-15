@@ -8,24 +8,35 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
   $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
+  $(devel_api_src_dir)/controls/navigation-view/navigation-view.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
+  $(devel_api_src_dir)/controls/progress-bar/progress-bar.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
-  $(devel_api_src_dir)/image-atlas/image-atlas.cpp \
+  $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
+  $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
+  $(devel_api_src_dir)/visual-factory/transition-data.cpp \
   $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
-  $(devel_api_src_dir)/visual-factory/visual-base.cpp
+  $(devel_api_src_dir)/visual-factory/visual-base.cpp \
+  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp
 
 # Add devel header files here
+
+devel_api_header_files = \
+  $(devel_api_src_dir)/align-enums.h
 
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h
@@ -47,11 +58,25 @@ devel_api_effects_view_header_files = \
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
 
+devel_api_navigation_view_header_files = \
+  $(devel_api_src_dir)/controls/navigation-view/navigation-view.h
+
+devel_api_page_turn_view_header_files = \
+  $(devel_api_src_dir)/controls/page-turn-view/page-factory.h \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.h
+
 devel_api_popup_header_files = \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.h \
   $(devel_api_src_dir)/controls/popup/popup.h
 
+devel_api_progress_bar_header_files = \
+  $(devel_api_src_dir)/controls/progress-bar/progress-bar.h
+
 devel_api_visual_factory_header_files = \
+  $(devel_api_src_dir)/visual-factory/transition-data.h \
+  $(devel_api_src_dir)/visual-factory/devel-visual-properties.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
 
@@ -61,8 +86,9 @@ devel_api_shadow_view_header_files = \
 devel_api_focus_manager_header_files = \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h
 
-devel_api_image_atlas_header_files = \
-  $(devel_api_src_dir)/image-atlas/image-atlas.h
+devel_api_image_loader_header_files = \
+  $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
+  $(devel_api_src_dir)/image-loader/image-atlas.h
 
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
@@ -109,3 +135,6 @@ devel_api_transition_effects_header_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.h \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.h \
   $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.h
+
+devel_api_gaussian_blur_view_header_files = \
+  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h

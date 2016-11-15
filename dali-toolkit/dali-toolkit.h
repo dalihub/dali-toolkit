@@ -27,15 +27,9 @@
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
-#include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
@@ -53,6 +47,9 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
@@ -67,6 +64,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #include <dali-toolkit/public-api/dali-toolkit-version.h>

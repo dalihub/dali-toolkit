@@ -36,12 +36,12 @@ using namespace Text;
 // Tests the following functions with different scripts.
 //
 // void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
-//                             Vector<FontId>& fontIds,
-//                             Vector<bool>& isDefaultFont,
 //                             const TextAbstraction::FontDescription& defaultFontDescription,
 //                             TextAbstraction::PointSize26Dot6 defaultPointSize,
-//                             CharacterIndex startIndex,
-//                             Length numberOfCharacters );
+//                             CharacterIndex characterIndex,
+//                             TextAbstraction::FontDescription& fontDescription,
+//                             TextAbstraction::PointSize26Dot6& fontPointSize,
+//                             bool& isDefaultFont );
 //
 // Script GetScript( Length index,
 //                   Vector<ScriptRun>::ConstIterator& scriptRunIt,
@@ -57,7 +57,8 @@ using namespace Text;
 // void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 //                                           const Vector<ScriptRun>& scripts,
 //                                           const Vector<FontDescriptionRun>& fontDescriptions,
-//                                           FontId defaultFontId,
+//                                           const TextAbstraction::FontDescription& defaultFontDescription,
+//                                           TextAbstraction::PointSize26Dot6 defaultFontPointSize,
 //                                           CharacterIndex startIndex,
 //                                           Length numberOfCharacters,
 //                                           Vector<FontRun>& fonts );
@@ -105,21 +106,50 @@ struct ValidateFontsData
 };
 
 //////////////////////////////////////////////////////////
+void PrintFontDescription( FontId id )
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+
+  TextAbstraction::FontDescription description;
+  fontClient.GetDescription( id, description );
+
+  const TextAbstraction::PointSize26Dot6 pointSize = fontClient.GetPointSize( id );
+
+  std::cout << std::endl << "  font description for font id : " << id << std::endl;
+  std::cout << "  font family : [" << description.family << "]" << std::endl;
+  std::cout << "   font width : [" << TextAbstraction::FontWidth::Name[description.width] << "]" << std::endl;
+  std::cout << "  font weight : [" << TextAbstraction::FontWeight::Name[description.weight] << "]" << std::endl;
+  std::cout << "   font slant : [" << TextAbstraction::FontSlant::Name[description.slant] << "]" << std::endl;
+  std::cout << "    font size : " << pointSize << std::endl;
+}
 
 bool MergeFontDescriptionsTest( const MergeFontDescriptionsData& data )
 {
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+
   Vector<FontId> fontIds;
   fontIds.Resize( data.startIndex + data.numberOfCharacters, 0u );
   Vector<bool> isDefaultFont;
   isDefaultFont.Resize( data.startIndex + data.numberOfCharacters, true );
 
-  MergeFontDescriptions( data.fontDescriptionRuns,
-                         fontIds,
-                         isDefaultFont,
-                         data.defaultFontDescription,
-                         data.defaultPointSize,
-                         data.startIndex,
-                         data.numberOfCharacters );
+  for( unsigned int index = data.startIndex; index < data.startIndex + data.numberOfCharacters; ++index )
+  {
+    TextAbstraction::FontDescription fontDescription;
+    TextAbstraction::PointSize26Dot6 fontPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+
+    MergeFontDescriptions( data.fontDescriptionRuns,
+                           data.defaultFontDescription,
+                           data.defaultPointSize,
+                           index,
+                           fontDescription,
+                           fontPointSize,
+                           isDefaultFont[index] );
+
+    if( !isDefaultFont[index] )
+    {
+      fontIds[index] = fontClient.GetFontId( fontDescription, fontPointSize );
+    }
+  }
 
   if( fontIds.Count() != data.expectedFontIds.Count() )
   {
@@ -197,6 +227,12 @@ bool ScriptsTest( const ScriptsData& data )
   if( scripts.Count() != data.scriptRuns.Count() )
   {
     tet_printf("ScriptsTest FAIL: different number of scripts. %d, should be %d\n", scripts.Count(), data.scriptRuns.Count() );
+    for( Vector<ScriptRun>::ConstIterator it = scripts.Begin(); it != scripts.End(); ++it)
+    {
+      const ScriptRun& run = *it;
+
+      std::cout << "  index : " << run.characterRun.characterIndex << ", num chars : " << run.characterRun.numberOfCharacters << ", script : [" << TextAbstraction::ScriptName[run.script] << "]" << std::endl;
+    }
     return false;
   }
 
@@ -255,6 +291,10 @@ bool ValidateFontTest( const ValidateFontsData& data )
   // Get the default font id.
   const FontId defaultFontId = fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + data.defaultFont,
                                                      data.defaultFontSize );
+  TextAbstraction::FontDescription defaultFontDescription;
+  fontClient.GetDescription( defaultFontId, defaultFontDescription );
+
+  const TextAbstraction::PointSize26Dot6 defaultPointSize = fontClient.GetPointSize( defaultFontId );
 
   Vector<FontRun> fontRuns;
 
@@ -262,7 +302,8 @@ bool ValidateFontTest( const ValidateFontsData& data )
   multilanguageSupport.ValidateFonts( utf32,
                                       scripts,
                                       data.fontDescriptionRuns,
-                                      defaultFontId,
+                                      defaultFontDescription,
+                                      defaultPointSize,
                                       0u,
                                       numberOfCharacters,
                                       fontRuns );
@@ -278,7 +319,8 @@ bool ValidateFontTest( const ValidateFontsData& data )
     multilanguageSupport.ValidateFonts( utf32,
                                         scripts,
                                         data.fontDescriptionRuns,
-                                        defaultFontId,
+                                        defaultFontDescription,
+                                        defaultPointSize,
                                         data.index,
                                         data.numberOfCharacters,
                                         fontRuns );
@@ -447,9 +489,9 @@ int UtcDaliTextMergeFontDescriptions(void)
     },
     const_cast<char*>( "DejaVu Sans" ),
     11u,
-    TextAbstraction::FontWeight::NORMAL,
-    TextAbstraction::FontWidth::NORMAL,
-    TextAbstraction::FontSlant::NORMAL,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
     true,
     false,
@@ -465,8 +507,8 @@ int UtcDaliTextMergeFontDescriptions(void)
     },
     NULL,
     0u,
-    TextAbstraction::FontWeight::NORMAL,
-    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
     TextAbstraction::FontSlant::ITALIC,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
     false,
@@ -484,8 +526,8 @@ int UtcDaliTextMergeFontDescriptions(void)
     NULL,
     0u,
     TextAbstraction::FontWeight::BOLD,
-    TextAbstraction::FontWidth::NORMAL,
-    TextAbstraction::FontSlant::NORMAL,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
     false,
     true,
@@ -501,9 +543,9 @@ int UtcDaliTextMergeFontDescriptions(void)
     },
     NULL,
     0u,
-    TextAbstraction::FontWeight::NORMAL,
-    TextAbstraction::FontWidth::NORMAL,
-    TextAbstraction::FontSlant::NORMAL,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
     NON_DEFAULT_FONT_SIZE,
     false,
     false,
@@ -519,9 +561,9 @@ int UtcDaliTextMergeFontDescriptions(void)
     },
     NULL,
     0u,
-    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWeight::NONE,
     TextAbstraction::FontWidth::EXPANDED,
-    TextAbstraction::FontSlant::NORMAL,
+    TextAbstraction::FontSlant::NONE,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
     false,
     false,
@@ -695,7 +737,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   {
     {
       0u,
-      16u,
+      15u,
     },
     TextAbstraction::LATIN
   };
@@ -707,7 +749,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   {
     {
       0u,
-      16u,
+      15u,
     },
     TextAbstraction::LATIN
   };
@@ -719,7 +761,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   {
     {
       0u,
-      16u,
+      15u,
     },
     TextAbstraction::LATIN
   };
@@ -1120,23 +1162,23 @@ int UtcDaliTextMultiLanguageSetScripts(void)
     },
     {
       "White spaces. At the beginning of the text.",
-      "    Hello world.",
+      "    Hello world",
       0u,
-      16u,
+      15u,
       scriptRuns04,
     },
     {
       "White spaces. At the end of the text.",
-      "Hello world.    ",
+      "Hello world    ",
       0u,
-      16u,
+      15u,
       scriptRuns05,
     },
     {
       "White spaces. At the middle of the text.",
-      "Hello     world.",
+      "Hello     world",
       0u,
-      16u,
+      15u,
       scriptRuns06,
     },
     {

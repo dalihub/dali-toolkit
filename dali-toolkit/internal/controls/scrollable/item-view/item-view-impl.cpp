@@ -262,6 +262,9 @@ DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",    
 
 DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "stopScrolling",       ACTION_STOP_SCROLLING   )
 
+DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "enableRefresh",       ACTION_ENABLE_REFRESH   )
+DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "disableRefresh",      ACTION_DISABLE_REFRESH  )
+
 DALI_TYPE_REGISTRATION_END()
 
 bool FindById( const ItemContainer& items, ItemId id )
@@ -295,7 +298,7 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 }
 
 ItemView::ItemView(ItemFactory& factory)
-: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
+: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
   mItemsParentOrigin(ParentOrigin::CENTER),
   mItemsAnchorPoint(AnchorPoint::CENTER),
@@ -317,6 +320,7 @@ ItemView::ItemView(ItemFactory& factory)
   mIsFlicking(false),
   mAddingItems(false),
   mRefreshEnabled(true),
+  mRefreshNotificationEnabled(true),
   mInAnimation(false)
 {
 }
@@ -474,14 +478,17 @@ void ItemView::DeactivateCurrentLayout()
 
 void ItemView::OnRefreshNotification(PropertyNotification& source)
 {
-  // Cancel scroll animation to prevent any fighting of setting the scroll position property by scroll bar during fast scroll.
-  if(!mRefreshEnabled && mScrollAnimation)
+  if( mRefreshNotificationEnabled )
   {
-    RemoveAnimation(mScrollAnimation);
-  }
+    // Cancel scroll animation to prevent any fighting of setting the scroll position property by scroll bar during fast scroll.
+    if(!mRefreshEnabled && mScrollAnimation)
+    {
+      RemoveAnimation(mScrollAnimation);
+    }
 
-  // Only cache extra items when it is not a fast scroll
-  DoRefresh(GetCurrentLayoutPosition(0), mRefreshEnabled || mScrollAnimation);
+    // Only cache extra items when it is not a fast scroll
+    DoRefresh(GetCurrentLayoutPosition(0), mRefreshEnabled || mScrollAnimation);
+  }
 }
 
 void ItemView::Refresh()
@@ -1783,6 +1790,14 @@ bool ItemView::DoAction( BaseObject* object, const std::string& actionName, cons
   {
     GetImpl( itemView ).DoStopScrolling();
   }
+  else if ( 0 == strcmp( actionName.c_str(), ACTION_ENABLE_REFRESH ) )
+  {
+    GetImpl( itemView ).SetRefreshNotificationEnabled( true );
+  }
+  else if ( 0 == strcmp( actionName.c_str(), ACTION_DISABLE_REFRESH ) )
+  {
+    GetImpl( itemView ).SetRefreshNotificationEnabled( false );
+  }
 
   return true;
 }
@@ -1794,6 +1809,11 @@ void ItemView::DoStopScrolling()
     mScrollAnimation.Stop();
     mScrollAnimation.Reset();
   }
+}
+
+void ItemView::SetRefreshNotificationEnabled( bool enabled )
+{
+  mRefreshNotificationEnabled = enabled;
 }
 
 } // namespace Internal

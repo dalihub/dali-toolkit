@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include "dummy-control.h"
 
 using namespace Dali;
 using namespace Toolkit;
@@ -37,14 +38,15 @@ static void TestCallback(BaseHandle handle)
 
 Actor CreateColorActor( const Vector4& color )
 {
-  Actor solidColorActor = Actor::New();
+  DummyControl solidColorActor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(solidColorActor.GetImplementation());
 
   VisualFactory factory = VisualFactory::Get();
   Dali::Property::Map map;
   map[ Visual::Property::TYPE ] = Visual::COLOR;
   map[ ColorVisual::Property::MIX_COLOR ] = color;
   Visual::Base colorVisual = factory.CreateVisual( map );
-  colorVisual.SetOnStage( solidColorActor );
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, colorVisual );
 
   return solidColorActor;
 }

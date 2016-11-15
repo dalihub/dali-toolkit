@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-data.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -220,7 +219,7 @@ Dali::Toolkit::Popup Popup::New()
 }
 
 Popup::Popup()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mTouchedOutsideSignal(),
   mShowingSignal(),
   mShownSignal(),
@@ -305,7 +304,7 @@ void Popup::OnInitialize()
   mPopupLayout = Toolkit::TableView::New( 3, 1 );
 
   // Adds the default background image.
-  SetPopupBackgroundImage( Toolkit::ImageView::New( ResourceImage::New( DEFAULT_BACKGROUND_IMAGE_PATH ) ) );
+  SetPopupBackgroundImage( Toolkit::ImageView::New( DEFAULT_BACKGROUND_IMAGE_PATH ) );
 
   mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
@@ -703,6 +702,9 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
     // Update the state to indicate the current intent.
     mDisplayState = Toolkit::Popup::SHOWING;
 
+    // We want the popup to have key input focus when it is displayed
+    SetKeyInputFocus();
+
     // We are displaying so bring the popup layer to the front, and set it visible so it is rendered.
     mLayer.RaiseToTop();
     mLayer.SetVisible( true );
@@ -744,7 +746,6 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
 
         if( focusActor )
         {
-          SetKeyInputFocus();
           keyboardFocusManager.SetCurrentFocusActor( focusActor );
         }
       }
@@ -861,8 +862,7 @@ void Popup::LayoutTail()
   if( !image.empty() )
   {
     // Adds the tail actor.
-    Image tail = ResourceImage::New( image );
-    mTailImage = Toolkit::ImageView::New( tail );
+    mTailImage = Toolkit::ImageView::New( image );
     mTailImage.SetName( "tailImage" );
     const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
     mTailImage.SetParentOrigin( position );
@@ -1237,12 +1237,8 @@ void Popup::SetProperty( BaseObject* object, Property::Index propertyIndex, cons
         std::string valueString;
         if( value.Get( valueString ) )
         {
-          Image image = ResourceImage::New( valueString );
-          if( image )
-          {
-            Toolkit::ImageView actor = Toolkit::ImageView::New( image );
-            popupImpl.SetPopupBackgroundImage( actor );
-          }
+          Toolkit::ImageView actor = Toolkit::ImageView::New( valueString );
+          popupImpl.SetPopupBackgroundImage( actor );
         }
         break;
       }
@@ -1385,10 +1381,10 @@ Property::Value Popup::GetProperty( BaseObject* object, Property::Index property
       }
       case Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( popupImpl.GetPopupBackgroundImage() );
-        if( image )
+        Toolkit::ImageView imageView = Toolkit::ImageView::DownCast( popupImpl.GetPopupBackgroundImage() );
+        if( imageView )
         {
-          value = image.GetUrl();
+          value = imageView.GetProperty( Toolkit::ImageView::Property::IMAGE );
         }
         break;
       }

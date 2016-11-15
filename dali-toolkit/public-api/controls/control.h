@@ -130,6 +130,10 @@ public:
    */
   struct KeyboardFocus
   {
+    /**
+     * @brief Keyboard focus direction
+     * @SINCE_1_0.0
+     */
     enum Direction
     {
       LEFT,   ///< Move keyboard focus towards the left direction @SINCE_1_0.0
@@ -325,6 +329,8 @@ public:
   Vector4 GetBackgroundColor() const;
 
   /**
+   * @DEPRECATED_1_2.8, use Property::BACKGROUND instead
+   *
    * @brief Sets an image as the background of the control.
    *
    * @SINCE_1_0.0

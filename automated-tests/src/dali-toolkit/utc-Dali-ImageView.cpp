@@ -351,10 +351,10 @@ int UtcDaliImageViewSetGetProperty03(void)
   int destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
   int srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
   int destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
-  DALI_TEST_CHECK( srcFactorRgb == BlendingFactor::ONE );
-  DALI_TEST_CHECK( destFactorRgb == BlendingFactor::ONE_MINUS_SRC_ALPHA );
-  DALI_TEST_CHECK( srcFactorAlpha == BlendingFactor::ONE );
-  DALI_TEST_CHECK( destFactorAlpha == BlendingFactor::ONE );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE );
 
   value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   DALI_TEST_CHECK( value.Get( enable ) );
@@ -393,6 +393,7 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   callStack.Reset();
   callStack.Enable(true);
 
+  BitmapLoader::ResetLatestCreated();
   ImageView imageView = ImageView::New( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
 
   // By default, Aysnc loading is used
@@ -417,6 +418,7 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   loader.WaitForLoading();// waiting until the image to be loaded
   DALI_TEST_CHECK( loader.IsLoaded() );
 
+  eventTrigger->WaitingForTrigger( 1 );
   CallbackBase* callback = eventTrigger->GetCallback();
   CallbackBase::Execute( *callback );
 

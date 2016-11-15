@@ -18,12 +18,8 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/scripting/scripting.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-controller.h>
-#include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {
@@ -42,6 +38,38 @@ namespace EffectStyle
     INPUT    ///< The input text effect style.
   };
 };
+
+/**
+ * @brief Parses the shadow properties.
+ *
+ * @param[in] shadowProperties The map with the shadow properties.
+ * @param[out] colorDefined Whether the shadow's color is defined.
+ * @param[out] color The shadow's color.
+ * @param[out] offsetDefined Whether the shadow's offset is defined.
+ * @param[out] offset The shadow's offset.
+ */
+bool ParseShadowProperties( const Property::Map& shadowProperties,
+                            bool& colorDefined,
+                            Vector4& color,
+                            bool& offsetDefined,
+                            Vector2& offset );
+
+/**
+ * @brief Parses the underline properties.
+ *
+ * @param[in] underlineProperties The map with the underline properties.
+ * @param[out] enabled Whether the underline is enabled.
+ * @param[out] colorDefined Whether the underline's color is defined.
+ * @param[out] color The underline's color.
+ * @param[out] heightDefined Whether the underline's height is defined.
+ * @param[out] height The underline's height.
+ */
+bool ParseUnderlineProperties( const Property::Map& underlineProperties,
+                               bool& enabled,
+                               bool& colorDefined,
+                               Vector4& color,
+                               bool& heightDefined,
+                               float& height );
 
 /**
  * @brief Sets the underline properties.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -90,7 +91,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                         
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderText",                      STRING,    PLACEHOLDER_TEXT                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextFocused",               STRING,    PLACEHOLDER_TEXT_FOCUSED             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "fontFamily",                           STRING,    FONT_FAMILY                          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "fontStyle",                            STRING,    FONT_STYLE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "fontStyle",                            MAP,       FONT_STYLE                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "pointSize",                            FLOAT,     POINT_SIZE                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "maxLength",                            INTEGER,   MAX_LENGTH                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceedPolicy",                         INTEGER,   EXCEED_POLICY                        )
@@ -122,19 +123,20 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputMethodSettings",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputColor",                           VECTOR4,   INPUT_COLOR                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableMarkup",                         BOOLEAN,   ENABLE_MARKUP                        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontFamily",                      STRING,    INPUT_FONT_FAMILY                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontStyle",                       STRING,    INPUT_FONT_STYLE                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputFontStyle",                       MAP,       INPUT_FONT_STYLE                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputPointSize",                       FLOAT,     INPUT_POINT_SIZE                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "underline",                            STRING,    UNDERLINE                            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputUnderline",                       STRING,    INPUT_UNDERLINE                      )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow",                               STRING,    SHADOW                               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputShadow",                          STRING,    INPUT_SHADOW                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "emboss",                               STRING,    EMBOSS                               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputEmboss",                          STRING,    INPUT_EMBOSS                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                              STRING,    OUTLINE                              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         STRING,    INPUT_OUTLINE                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "underline",                            MAP,       UNDERLINE                            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputUnderline",                       MAP,       INPUT_UNDERLINE                      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow",                               MAP,       SHADOW                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputShadow",                          MAP,       INPUT_SHADOW                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "emboss",                               MAP,       EMBOSS                               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                              MAP,       OUTLINE                              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -211,7 +213,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, text );
+          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
         }
         break;
       }
@@ -222,7 +224,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_FOCUSED %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
+          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
         }
         break;
       }
@@ -736,7 +738,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, text );
+          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
           value = text;
         }
         break;
@@ -746,7 +748,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
+          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
           value = text;
         }
         break;
@@ -1080,6 +1082,10 @@ bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   {
     field.MaxLengthReachedSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED ) )
+  {
+    field.InputStyleChangedSignal().Connect( tracker, functor );
+  }
   else
   {
     // signalName does not match any signal
@@ -1099,11 +1105,16 @@ Toolkit::TextField::MaxLengthReachedSignalType& TextField::MaxLengthReachedSigna
   return mMaxLengthReachedSignal;
 }
 
+Toolkit::TextField::InputStyleChangedSignalType& TextField::InputStyleChangedSignal()
+{
+  return mInputStyleChangedSignal;
+}
+
 void TextField::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( *this );
+  mController = Text::Controller::New( this, this );
 
   // When using the vector-based rendering, the size of the GLyphs are different
   TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
@@ -1168,13 +1179,7 @@ void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
-      DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
-
-      if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
-      {
-        // Property system did not set the PointSize so should update it.
-        // todo instruct text-controller to update model
-      }
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
       break;
     }
     case StyleChange::THEME_CHANGE:
@@ -1217,8 +1222,27 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    EnableClipping( ( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy ), size );
+    EnableClipping( size );
     RenderText( updateTextType );
+  }
+
+  // The text-field emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  if( !mController->IsInputStyleChangedSignalsQueueEmpty() )
+  {
+    if( Adaptor::IsAvailable() )
+    {
+      Adaptor& adaptor = Adaptor::Get();
+
+      if( NULL == mIdleCallback )
+      {
+        // @note: The callback manager takes the ownership of the callback object.
+        mIdleCallback = MakeCallback( this, &TextField::OnIdleSignal );
+        adaptor.AddIdle( mIdleCallback );
+      }
+    }
   }
 }
 
@@ -1392,6 +1416,73 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
+void TextField::RequestTextRelayout()
+{
+  RelayoutRequest();
+}
+
+void TextField::TextChanged()
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+  mTextChangedSignal.Emit( handle );
+}
+
+void TextField::MaxLengthReached()
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+  mMaxLengthReachedSignal.Emit( handle );
+}
+
+void TextField::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+
+  Toolkit::TextField::InputStyle::Mask fieldInputStyleMask = Toolkit::TextField::InputStyle::NONE;
+
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_COLOR ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::COLOR );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_FAMILY ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_FAMILY );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_POINT_SIZE ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::POINT_SIZE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WEIGHT ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_WIDTH ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_FONT_SLANT ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_UNDERLINE ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::UNDERLINE );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_SHADOW ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::SHADOW );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_EMBOSS ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::EMBOSS );
+  }
+  if( InputStyle::NONE != static_cast<InputStyle::Mask>( inputStyleMask & InputStyle::INPUT_OUTLINE ) )
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>( fieldInputStyleMask | Toolkit::TextField::InputStyle::OUTLINE );
+  }
+
+  mInputStyleChangedSignal.Emit( handle, fieldInputStyleMask );
+}
+
 void TextField::AddDecoration( Actor& actor, bool needsClipping )
 {
   if( actor )
@@ -1407,17 +1498,6 @@ void TextField::AddDecoration( Actor& actor, bool needsClipping )
   }
 }
 
-void TextField::RequestTextRelayout()
-{
-  RelayoutRequest();
-}
-
-void TextField::TextChanged()
-{
-  Dali::Toolkit::TextField handle( GetOwner() );
-  mTextChangedSignal.Emit( handle );
-}
-
 void TextField::OnStageConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
@@ -1428,12 +1508,6 @@ void TextField::OnStageConnect( Dali::Actor actor )
   {
     mHasBeenStaged = true;
   }
-}
-
-void TextField::MaxLengthReached()
-{
-  Dali::Toolkit::TextField handle( GetOwner() );
-  mMaxLengthReachedSignal.Emit( handle );
 }
 
 ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
@@ -1457,9 +1531,9 @@ void TextField::GetHandleImagePropertyValue(  Property::Value& value, Text::Hand
   }
 }
 
-void TextField::EnableClipping( bool clipping, const Vector2& size )
+void TextField::EnableClipping( const Vector2& size )
 {
-  if( clipping )
+  if( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy )
   {
     // Not worth to created clip actor if width or height is equal to zero.
     if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
@@ -1521,8 +1595,18 @@ bool TextField::OnTouched( Actor actor, const TouchData& touch )
   return true;
 }
 
+void TextField::OnIdleSignal()
+{
+  // Emits the change of input style signals.
+  mController->ProcessInputStyleChangedSignals();
+
+  // Set the pointer to null as the callback manager deletes the callback after execute it.
+  mIdleCallback = NULL;
+}
+
 TextField::TextField()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mIdleCallback( NULL ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
   mHasBeenStaged( false )
@@ -1532,6 +1616,11 @@ TextField::TextField()
 TextField::~TextField()
 {
   mClipper.Reset();
+
+  if( ( NULL != mIdleCallback ) && Adaptor::IsAvailable() )
+  {
+    Adaptor::Get().RemoveIdle( mIdleCallback );
+  }
 }
 
 } // namespace Internal

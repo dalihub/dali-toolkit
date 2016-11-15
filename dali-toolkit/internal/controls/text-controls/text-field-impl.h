@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,18 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-
-// EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 
 namespace Dali
 {
@@ -42,7 +43,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextField : public Control, public Text::ControlInterface
+class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface
 {
 public:
 
@@ -91,6 +92,11 @@ public:
    * @copydoc TextField::MaxLengthReachedSignal()
    */
   Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
+
+  /**
+   * @copydoc TextField::TextChangedSignal()
+   */
+  Toolkit::TextField::InputStyleChangedSignalType& InputStyleChangedSignal();
 
 private: // From Control
 
@@ -157,14 +163,11 @@ private: // From Control
 // From ControlInterface
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
-   */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
-
-  /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
+
+// From EditableControlInterface
 
   /**
    * @copydoc Text::ControlInterface::TextChanged()
@@ -175,6 +178,16 @@ private: // From Control
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
   virtual void MaxLengthReached();
+
+  /**
+   * @copydoc Text::ControlInterface::InputStyleChanged()
+   */
+  virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
+
+  /**
+   * @copydoc Text::ControlInterface::AddDecoration()
+   */
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
 private: // Implementation
 
@@ -200,10 +213,9 @@ private: // Implementation
   /**
    * @brief Enable or disable clipping.
    *
-   * @param[in] clipping True if clipping should be enabled.
    * @param[in] size The area to clip within.
    */
-  void EnableClipping( bool clipping, const Vector2& size );
+  void EnableClipping( const Vector2& size );
 
   /**
    * @brief Callback when keyboard is shown/hidden.
@@ -219,6 +231,13 @@ private: // Implementation
    * @param[in] touch Touch information
    */
   bool OnTouched( Actor actor, const TouchData& touch );
+
+  /**
+   * @brief Callbacks called on idle.
+   *
+   * If there are notifications of change of input style on the queue, Toolkit::TextField::InputStyleChangedSignal() are emitted.
+   */
+  void OnIdleSignal();
 
   /**
    * Construct a new TextField.
@@ -247,6 +266,7 @@ private: // Data
   // Signals
   Toolkit::TextField::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
+  Toolkit::TextField::InputStyleChangedSignalType mInputStyleChangedSignal;
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
@@ -255,6 +275,7 @@ private: // Data
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
+  CallbackBase* mIdleCallback;
 
   int mRenderingBackend;
   int mExceedPolicy;
@@ -287,4 +308,4 @@ inline const Toolkit::Internal::TextField& GetImpl( const Toolkit::TextField& te
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H

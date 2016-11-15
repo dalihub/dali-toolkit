@@ -43,7 +43,7 @@
 ~~~
  ## Hello World - Javascript
 
- The DALi script application is needed to run the Javascript which provides a Javascript runtime and an interface to Dali.
+ The DALi script application is needed to run the Javascript which provides a Javascript runtime and an interface to DALi.
 
 ~~~
  scripting.example hello-world.js

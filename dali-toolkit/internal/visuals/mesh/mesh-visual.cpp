@@ -28,7 +28,9 @@
 #include <fstream>
 
 //INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
@@ -119,9 +121,26 @@ const char* SIMPLE_VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 lightPosition;\n
   uniform mediump vec2 uStageOffset;\n
 
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    float scaleFactor = min( visualSize.x, visualSize.y );\n
+    vec3 originFlipY =  vec3(origin.x, -origin.y, 0.0);
+    vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
+    vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);\n
+    return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
-    vec4 normalisedVertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
+    vec4 normalisedVertexPosition = ComputeVertexPosition();\n
     vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
@@ -169,9 +188,26 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 lightPosition;\n
   uniform mediump vec2 uStageOffset;\n
 
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    float scaleFactor = min( visualSize.x, visualSize.y );\n
+    vec3 originFlipY =  vec3(origin.x, -origin.y, 0.0);
+    vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
+    vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);\n
+    return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );\n
+  }\n
+
   void main()
   {\n
-    vec4 normalisedVertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
+    vec4 normalisedVertexPosition = ComputeVertexPosition();\n
     vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
@@ -232,9 +268,27 @@ const char* NORMAL_MAP_VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump mat4 uObjectMatrix;\n
   uniform mediump vec3 lightPosition;\n
   uniform mediump vec2 uStageOffset;\n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    float scaleFactor = min( visualSize.x, visualSize.y );\n
+    vec3 originFlipY =  vec3(origin.x, -origin.y, 0.0);
+    vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
+    vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);\n
+    return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );\n
+  }\n
+
   void main()
   {\n
-    vec4 normalisedVertexPosition = vec4( aPosition * min( uSize.x, uSize.y ), 1.0 );\n
+    vec4 normalisedVertexPosition = ComputeVertexPosition();\n
     vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
@@ -288,7 +342,12 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-} // namespace
+} // unnamed namespace
+
+MeshVisualPtr MeshVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new MeshVisual( factoryCache );
+}
 
 MeshVisual::MeshVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
@@ -303,7 +362,7 @@ MeshVisual::~MeshVisual()
 {
 }
 
-void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void MeshVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* objectUrl = propertyMap.Find( Toolkit::MeshVisual::Property::OBJECT_URL, OBJECT_URL_NAME );
   if( !objectUrl || !objectUrl->Get( mObjectUrl ) )
@@ -362,6 +421,14 @@ void MeshVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
   }
 }
 
+void MeshVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 void MeshVisual::SetSize( const Vector2& size )
 {
   Visual::Base::SetSize( size );
@@ -369,27 +436,17 @@ void MeshVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void MeshVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void MeshVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void MeshVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::MESH );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::MESH );
   map.Insert( Toolkit::MeshVisual::Property::OBJECT_URL, mObjectUrl );
   map.Insert( Toolkit::MeshVisual::Property::MATERIAL_URL, mMaterialUrl );
   map.Insert( Toolkit::MeshVisual::Property::TEXTURES_PATH, mTexturesPath );
@@ -397,6 +454,17 @@ void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::MeshVisual::Property::USE_MIPMAPPING, mUseMipmapping );
   map.Insert( Toolkit::MeshVisual::Property::USE_SOFT_NORMALS, mUseSoftNormals );
   map.Insert( Toolkit::MeshVisual::Property::LIGHT_POSITION, mLightPosition );
+}
+
+void MeshVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value MeshVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
 }
 
 void MeshVisual::InitializeRenderer()
@@ -437,6 +505,10 @@ void MeshVisual::InitializeRenderer()
   mImpl->mRenderer = Renderer::New( mGeometry, mShader );
   mImpl->mRenderer.SetTextures( mTextureSet );
   mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
+  mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 void MeshVisual::SupplyEmptyGeometry()

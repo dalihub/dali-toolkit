@@ -25,8 +25,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
 namespace Dali
@@ -57,10 +57,10 @@ protected:
     ~Page(){};
 
     /**
-     * Set the page image content
-     * @param[in] image The content of the page.
+     * Set the page texture content
+     * @param[in] texture The content of the page.
      */
-    void SetImage( Image image );
+    void SetTexture( Texture texture );
 
     /**
      * Apply an effect onto the page actor.

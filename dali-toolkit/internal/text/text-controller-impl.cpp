@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
 namespace
@@ -73,6 +74,7 @@ EventData::EventData( DecoratorPtr decorator )
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
   mEventQueue(),
+  mInputStyleChangedQueue(),
   mState( INACTIVE ),
   mPrimaryCursorPosition( 0u ),
   mLeftSelectionPosition( 0u ),
@@ -87,6 +89,7 @@ EventData::EventData( DecoratorPtr decorator )
   mGrabHandleEnabled( true ),
   mGrabHandlePopupEnabled( true ),
   mSelectionEnabled( true ),
+  mUpdateCursorHookPosition( false ),
   mUpdateCursorPosition( false ),
   mUpdateGrabHandlePosition( false ),
   mUpdateLeftSelectionPosition( false ),
@@ -262,6 +265,10 @@ bool Controller::Impl::ProcessInputEvents()
 
   if( mEventData->mUpdateInputStyle )
   {
+    // Keep a copy of the current input style.
+    InputStyle currentInputStyle;
+    currentInputStyle.Copy( mEventData->mInputStyle );
+
     // Set the default style first.
     RetrieveDefaultInputStyle( mEventData->mInputStyle );
 
@@ -270,6 +277,16 @@ bool Controller::Impl::ProcessInputEvents()
 
     // Retrieve the style from the style runs stored in the logical model.
     mLogicalModel->RetrieveStyle( styleIndex, mEventData->mInputStyle );
+
+    // Compare if the input style has changed.
+    const bool hasInputStyleChanged = !currentInputStyle.Equal( mEventData->mInputStyle );
+
+    if( hasInputStyleChanged )
+    {
+      const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mEventData->mInputStyle );
+      // Queue the input style changed signal.
+      mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
+    }
 
     mEventData->mUpdateInputStyle = false;
   }
@@ -304,6 +321,15 @@ void Controller::Impl::NotifyImfManager()
 
     mEventData->mImfManager.SetCursorPosition( cursorPosition );
     mEventData->mImfManager.NotifyCursorPosition();
+  }
+}
+
+void Controller::Impl::NotifyImfMultiLineStatus()
+{
+  if ( mEventData )
+  {
+    LayoutEngine::Layout layout = mLayoutEngine.GetLayout();
+    mEventData->mImfManager.NotifyTextInputMultiLine( layout == LayoutEngine::MULTI_LINE_BOX );
   }
 }
 
@@ -824,15 +850,22 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // Validate the fonts set through the mark-up string.
       Vector<FontDescriptionRun>& fontDescriptionRuns = mLogicalModel->mFontDescriptionRuns;
 
-      // Get the default font id.
-      const FontId defaultFontId = ( NULL == mFontDefaults ) ? 0u : mFontDefaults->GetFontId( mFontClient );
+      // Get the default font's description.
+      TextAbstraction::FontDescription defaultFontDescription;
+      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+      if( NULL != mFontDefaults )
+      {
+        defaultFontDescription = mFontDefaults->mFontDescription;
+        defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
+      }
 
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
       multilanguageSupport.ValidateFonts( utf32Characters,
                                           scripts,
                                           fontDescriptionRuns,
-                                          defaultFontId,
+                                          defaultFontDescription,
+                                          defaultPointSize,
                                           startIndex,
                                           requestedNumberOfCharacters,
                                           validFonts );
@@ -990,11 +1023,25 @@ void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
   inputStyle.slant = TextAbstraction::FontSlant::NORMAL;
   inputStyle.size = 0.f;
 
-  inputStyle.familyDefined = false;
-  inputStyle.weightDefined = false;
-  inputStyle.widthDefined = false;
-  inputStyle.slantDefined = false;
-  inputStyle.sizeDefined = false;
+  inputStyle.lineSpacing = 0.f;
+
+  inputStyle.underlineProperties.clear();
+  inputStyle.shadowProperties.clear();
+  inputStyle.embossProperties.clear();
+  inputStyle.outlineProperties.clear();
+
+  inputStyle.isFamilyDefined = false;
+  inputStyle.isWeightDefined = false;
+  inputStyle.isWidthDefined = false;
+  inputStyle.isSlantDefined = false;
+  inputStyle.isSizeDefined = false;
+
+  inputStyle.isLineSpacingDefined = false;
+
+  inputStyle.isUnderlineDefined = false;
+  inputStyle.isShadowDefined = false;
+  inputStyle.isEmbossDefined = false;
+  inputStyle.isOutlineDefined = false;
 
   // Sets the default font's family name, weight, width, slant and size.
   if( mFontDefaults )
@@ -1002,31 +1049,31 @@ void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
     if( mFontDefaults->familyDefined )
     {
       inputStyle.familyName = mFontDefaults->mFontDescription.family;
-      inputStyle.familyDefined = true;
+      inputStyle.isFamilyDefined = true;
     }
 
     if( mFontDefaults->weightDefined )
     {
       inputStyle.weight = mFontDefaults->mFontDescription.weight;
-      inputStyle.weightDefined = true;
+      inputStyle.isWeightDefined = true;
     }
 
     if( mFontDefaults->widthDefined )
     {
       inputStyle.width = mFontDefaults->mFontDescription.width;
-      inputStyle.widthDefined = true;
+      inputStyle.isWidthDefined = true;
     }
 
     if( mFontDefaults->slantDefined )
     {
       inputStyle.slant = mFontDefaults->mFontDescription.slant;
-      inputStyle.slantDefined = true;
+      inputStyle.isSlantDefined = true;
     }
 
     if( mFontDefaults->sizeDefined )
     {
       inputStyle.size = mFontDefaults->mDefaultPointSize;
-      inputStyle.sizeDefined = true;
+      inputStyle.isSizeDefined = true;
     }
   }
 }
@@ -1626,8 +1673,22 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
     if( deleteAfterRetrieval ) // Only delete text if copied successfully
     {
+      // Keep a copy of the current input style.
+      InputStyle currentInputStyle;
+      currentInputStyle.Copy( mEventData->mInputStyle );
+
       // Set as input style the style of the first deleted character.
       mLogicalModel->RetrieveStyle( startOfSelectedText, mEventData->mInputStyle );
+
+      // Compare if the input style has changed.
+      const bool hasInputStyleChanged = !currentInputStyle.Equal( mEventData->mInputStyle );
+
+      if( hasInputStyleChanged )
+      {
+        const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mEventData->mInputStyle );
+        // Queue the input style changed signal.
+        mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
+      }
 
       mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
 
@@ -1688,11 +1749,11 @@ void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
   ChangeState( EventData::EDITING );
 }
 
-void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString )
+void Controller::Impl::RequestGetTextFromClipboard()
 {
   if ( mClipboard )
   {
-    retrievedString =  mClipboard.GetItem( itemIndex );
+    mClipboard.RequestItem();
   }
 }
 
@@ -2230,7 +2291,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHighlightActive( false );
         mEventData->mDecorator->SetPopupActive( false );
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::INTERRUPTED:
@@ -2241,7 +2301,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHighlightActive( false );
         mEventData->mDecorator->SetPopupActive( false );
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::SELECTING:
@@ -2277,7 +2336,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetPopupActive( false );
         }
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::EDITING_WITH_POPUP:
@@ -2304,7 +2362,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           SetPopupButtons();
           mEventData->mDecorator->SetPopupActive( true );
         }
-        HideClipboard();
         mEventData->mDecoratorUpdated = true;
         break;
       }
@@ -2327,7 +2384,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetPopupActive( false );
         }
         mEventData->mDecoratorUpdated = true;
-        HideClipboard();
         break;
       }
       case EventData::SELECTION_HANDLE_PANNING:
@@ -2385,7 +2441,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           SetPopupButtons();
           mEventData->mDecorator->SetPopupActive( true );
         }
-        HideClipboard();
         mEventData->mDecoratorUpdated = true;
         break;
       }
@@ -2629,6 +2684,12 @@ void Controller::Impl::ClampHorizontalScroll( const Vector2& layoutSize )
 
 void Controller::Impl::ClampVerticalScroll( const Vector2& layoutSize )
 {
+  if( LayoutEngine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout() )
+  {
+    // Nothing to do if the text is single line.
+    return;
+  }
+
   // Clamp between -space & 0.
   if( layoutSize.height > mVisualModel->mControlSize.height )
   {
@@ -2696,7 +2757,10 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
 
 void Controller::Impl::RequestRelayout()
 {
-  mControlInterface.RequestTextRelayout();
+  if( NULL != mControlInterface )
+  {
+    mControlInterface->RequestTextRelayout();
+  }
 }
 
 } // namespace Text

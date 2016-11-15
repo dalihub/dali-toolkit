@@ -20,7 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/math/vector2.h>
 #include <stdlib.h>
+#include <sstream>
+#include <iomanip>
 
 namespace Dali
 {
@@ -33,9 +36,10 @@ namespace Text
 
 namespace
 {
-const char WHITE_SPACE       = 0x20; // ASCII value of the white space.
-const char LAST_UPPER_CASE   = 0x5b; // ASCII value of the one after the last upper case character (Z).
-const char TO_LOWER_CASE     = 32;   // Value to add to a upper case character to transform it into a lower case.
+const char WHITE_SPACE      = 0x20; // ASCII value of the white space.
+const char FIRST_UPPER_CASE = 0x41; // ASCII value of the one after the first upper case character (A).
+const char LAST_UPPER_CASE  = 0x5b; // ASCII value of the one after the last upper case character (Z).
+const char TO_LOWER_CASE    = 32;   // Value to add to a upper case character to transform it into a lower case.
 
 const char WEB_COLOR_TOKEN( '#' );
 const char* const HEX_COLOR_TOKEN( "0x" );
@@ -65,8 +69,9 @@ bool TokenComparison( const std::string& string1, const char* const stringBuffer
 
   for( std::size_t index = 0; index < stringSize; ++index )
   {
-    char character = *( stringBuffer2 + index );
-    if( *( stringBuffer1 + index ) != ( ( ( character < LAST_UPPER_CASE ) && ( '0' != character ) ) ? character + TO_LOWER_CASE : character ) )
+    const char character = *( stringBuffer2 + index );
+    const bool toLower = ( character < LAST_UPPER_CASE ) && ( character >= FIRST_UPPER_CASE );
+    if( *( stringBuffer1 + index ) != ( toLower ? character + TO_LOWER_CASE : character ) )
     {
       return false;
     }
@@ -75,10 +80,16 @@ bool TokenComparison( const std::string& string1, const char* const stringBuffer
   return true;
 }
 
-void SkipWhiteSpace( const char*& markupStringBuffer,
-                     const char* const markupStringEndBuffer )
+void SkipWhiteSpace( const char*& stringBuffer,
+                     const char* const stringEndBuffer )
 {
-  for( ; ( WHITE_SPACE >= *markupStringBuffer ) && ( markupStringBuffer < markupStringEndBuffer ); ++markupStringBuffer );
+  for( ; ( WHITE_SPACE >= *stringBuffer ) && ( stringBuffer < stringEndBuffer ); ++stringBuffer );
+}
+
+void JumpToWhiteSpace( const char*& stringBuffer,
+                       const char* const stringEndBuffer )
+{
+  for( ; ( WHITE_SPACE != *stringBuffer ) && ( stringBuffer < stringEndBuffer ); ++stringBuffer );
 }
 
 unsigned int StringToHex( const char* const uintStr )
@@ -89,6 +100,13 @@ unsigned int StringToHex( const char* const uintStr )
 float StringToFloat( const char* const floatStr )
 {
   return static_cast<float>( strtod( floatStr, NULL ) );
+}
+
+void FloatToString( float value, std::string& floatStr )
+{
+  std::stringstream ss;
+  ss << value;
+  floatStr = ss.str();
 }
 
 void UintColorToVector4( unsigned int color, Vector4& retColor )
@@ -158,6 +176,112 @@ void ColorStringToVector4( const char* const colorStr, Length length, Vector4& r
   {
     retColor = Color::TRANSPARENT;
   }
+}
+
+void Vector4ToColorString( const Vector4& value, std::string& vector2Str )
+{
+  if( Color::BLACK == value )
+  {
+    vector2Str = BLACK_COLOR;
+    return;
+  }
+
+  if( Color::WHITE == value )
+  {
+    vector2Str = WHITE_COLOR;
+    return;
+  }
+
+  if( Color::RED == value )
+  {
+    vector2Str = RED_COLOR;
+    return;
+  }
+
+  if( Color::GREEN == value )
+  {
+    vector2Str = GREEN_COLOR;
+    return;
+  }
+
+  if( Color::BLUE == value )
+  {
+    vector2Str = BLUE_COLOR;
+    return;
+  }
+
+  if( Color::YELLOW == value )
+  {
+    vector2Str = YELLOW_COLOR;
+    return;
+  }
+
+  if( Color::MAGENTA == value )
+  {
+    vector2Str = MAGENTA_COLOR;
+    return;
+  }
+
+  if( Color::CYAN == value )
+  {
+    vector2Str = CYAN_COLOR;
+    return;
+  }
+
+  if( Color::TRANSPARENT == value )
+  {
+    vector2Str = TRANSPARENT_COLOR;
+    return;
+  }
+
+  const unsigned int alpha = static_cast<unsigned int>( 255.f * value.a );
+  const unsigned int red = static_cast<unsigned int>( 255.f * value.r );
+  const unsigned int green = static_cast<unsigned int>( 255.f * value.g );
+  const unsigned int blue = static_cast<unsigned int>( 255.f * value.b );
+
+  std::stringstream ss;
+  const unsigned int size = 2u * sizeof( unsigned char );
+
+  ss << "0x"
+     << std::setfill('0') << std::setw( size )
+     << std::hex << alpha
+     << std::setfill('0') << std::setw( size )
+     << std::hex << red
+     << std::setfill('0') << std::setw( size )
+     << std::hex << green
+     << std::setfill('0') << std::setw( size )
+     << std::hex << blue;
+  vector2Str = ss.str();
+}
+
+void StringToVector2( const char* const vectorStr, Length length, Vector2& vector2 )
+{
+  // Points to the first character of the string.
+  const char* strBuffer = vectorStr;
+
+  // Points to the first character of the 'x' value.
+  const char* const xBuffer = strBuffer;
+
+  // Jumps to the next white space.
+  JumpToWhiteSpace( strBuffer, strBuffer + length );
+
+  // Points to the first character of the 'y' value.
+  const char* const yBuffer = strBuffer;
+
+  // Converts the shadow's offset to float.
+  vector2.x = StringToFloat( xBuffer );
+  vector2.y = StringToFloat( yBuffer );
+}
+
+void Vector2ToString( const Vector2& value, std::string& vector2Str )
+{
+  FloatToString( value.x, vector2Str );
+  vector2Str += " ";
+
+  std::string yStr;
+  FloatToString( value.y, yStr );
+
+  vector2Str += yStr;
 }
 
 } // namespace Text

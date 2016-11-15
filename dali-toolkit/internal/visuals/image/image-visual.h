@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,16 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
-
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/object/weak-handle.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 
 namespace Dali
 {
@@ -73,97 +75,126 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DEFAULT"
  *
  */
-class ImageVisual: public Visual::Base, public ConnectionTracker
+class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver
 {
 public:
 
   /**
-   * @brief Constructor.
+   * @brief Create a new image visual with a URL.
+   *
+   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] atlasManager The atlasManager object
+   * @param[in] imageUrl The URL of the image resource to use
+   * @param[in] size The width and height to fit the loaded image to.
+   * @param[in] fittingMode The FittingMode of the resource to load
+   * @param[in] samplingMode The SamplingMode of the resource to load
    */
-  ImageVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager );
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
+                             const std::string& imageUrl,
+                             ImageDimensions size = ImageDimensions(),
+                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
 
   /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
+   * @brief Create a new image visual with an Image type.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] image The image to use
    */
-  ~ImageVisual();
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache, const Image& image );
 
 public:  // from Visual
 
   /**
-   * @copydoc Visual::SetSize
+   * @copydoc Visual::Base::GetNaturalSize
    */
-  virtual void SetSize( const Vector2& size );
+  virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
-   * @copydoc Visual::GetNaturalSize
-   */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
-
-  /**
-   * @copydoc Visual::SetClipRect
-   */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
-  /**
-   * @copydoc Visual::SetOffset
-   */
-  virtual void SetOffset( const Vector2& offset );
-
-  /**
-   * @copydoc Visual::CreatePropertyMap
+   * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
-protected:
   /**
-   * @copydoc Visual::DoInitialize
+   * @copydoc Visual::Base::DoSetProperty
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
 
   /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoGetProperty
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
+
+protected:
+
+  /**
+   * @brief Constructor with a URL.
+   *
+   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] imageUrl The URL of the image resource to use
+   * @param[in] size The width and height to fit the loaded image to.
+   * @param[in] fittingMode The FittingMode of the resource to load
+   * @param[in] samplingMode The SamplingMode of the resource to load
+   */
+  ImageVisual( VisualFactoryCache& factoryCache,
+               const std::string& imageUrl,
+               ImageDimensions size,
+               FittingMode::Type fittingMode,
+               Dali::SamplingMode::Type samplingMode );
+
+  /**
+   * @brief Constructor with an Image type.
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] image The image to use
+   */
+  ImageVisual( VisualFactoryCache& factoryCache, const Image& image );
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~ImageVisual();
+
+  /**
+   * @copydoc Visual::Base::DoSetProperties
+   */
+  virtual void DoSetProperties( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::DoSetOffStage
+   * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
+
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
 
 public:
 
   /**
    * Get the standard image rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] atlasing Whether texture atlasing is applied.
+   * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
    */
-  static Shader GetImageShader( VisualFactoryCache& factoryCache );
+  static Shader GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping );
 
   /**
-   * @brief Sets the image of this visual to the resource at imageUrl
-   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   * @copydoc AtlasUploadObserver::UploadCompleted
    *
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
-   * @param[in] imageUrl The URL of the image resource to use
-   * @param[in] size The width and height to fit the loaded image to.
-   * @param[in] fittingMode The FittingMode of the resource to load
-   * @param[in] samplingMode The SamplingMode of the resource to load
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void SetImage( Actor& actor,
-                 const std::string& imageUrl,
-                 ImageDimensions size=ImageDimensions(),
-                 FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                 Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
-
-  /**
-   * @brief Sets the image to be rendered by this visual
-   *
-   * @param[in] actor The Actor the renderer is applied to if, empty if the renderer has not been applied to any Actor
-   * @param[in] image The image to use
-   */
-  void SetImage( Actor& actor, const Image& image );
+  virtual void UploadCompleted();
 
 private:
 
@@ -190,43 +221,36 @@ private:
 
   /**
    * @brief Creates the Dali::Renderer (potentially from the renderer cache), initializing it
-   *
-   * @return Returns the created Dali::Renderer
+   * @param[in] textures to use
    */
-  Renderer CreateRenderer() const;
+  void CreateRenderer( TextureSet& textures );
 
   /**
    * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
-   *
-   * @return Returns the created Dali::Renderer
+   * @param NativeImageRenderer
    */
-  Renderer CreateNativeImageRenderer() const;
+  void CreateNativeImageRenderer( NativeImage& nativeImage );
 
   /**
    * @brief Query whether resources requires to be loaded synchronously.
-   * @return Returns true if synchronoud resource loading is required, false otherwise.
+   * @return Returns true if synchronous resource loading is required, false otherwise.
    */
   bool IsSynchronousResourceLoading() const;
 
   /**
-   * @brief Do the synchronous resource loading
+   * @brief Load the resource synchronously
    */
-  void DoSynchronousResourceLoading();
+  void LoadResourceSynchronously();
 
   /**
-   * Load the image.
+   * Creates the texture set and adds the texture to it
+   * @param[out] textureRect The texture area of the texture in the atlas.
    * @param[in] url The URL of the image resource to use.
    * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
+   * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
+   * @return the texture set to use
    */
-  Image LoadImage( const std::string& url, bool synchronousLoading );
-
-  /**
-   * Load the image and create a texture set to hold the texture, with automatic atlasing applied.
-   * @param [out] textureRect The texture area of the resource image in the atlas.
-   * @param[in] url The URL of the image resource to use.
-   * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
-   */
-  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading );
+  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing );
 
   /**
    * Callback function of image resource loading succeed
@@ -245,23 +269,20 @@ private:
    */
   void CleanCache(const std::string& url);
 
-  /**
-   * Set shader code for nativeimage if it exists
-   */
-  void SetNativeFragmentShaderCode( Dali::NativeImage& nativeImage );
-
 private:
+
   Image mImage;
-  ImageAtlasManager& mAtlasManager;
   PixelData mPixels;
-
+  Vector4 mPixelArea;
+  WeakHandle<Actor> mPlacementActor;
   std::string mImageUrl;
-  Dali::ImageDimensions mDesiredSize;
-  Dali::FittingMode::Type mFittingMode;
-  Dali::SamplingMode::Type mSamplingMode;
 
-  std::string mNativeFragmentShaderCode;
-  bool mNativeImageFlag;
+  Dali::ImageDimensions mDesiredSize;
+  Dali::FittingMode::Type mFittingMode:3;
+  Dali::SamplingMode::Type mSamplingMode:4;
+  Dali::WrapMode::Type mWrapModeU:3;
+  Dali::WrapMode::Type mWrapModeV:3;
+
 };
 
 } // namespace Internal

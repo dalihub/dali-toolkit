@@ -97,10 +97,10 @@ int UtcDaliEffectsViewDownCast(void)
 }
 
 // Positive test case for a method
-int UtcDaliEffectsViewAddRemove(void)
+int UtcDaliEffectsViewAddRemoveDropShadow(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliGaussianBlurViewAddRemove");
+  tet_infoline("UtcDaliEffectsViewAddRemoveDropShadow");
 
   EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
   DALI_TEST_CHECK( view );
@@ -123,6 +123,70 @@ int UtcDaliEffectsViewAddRemove(void)
   DALI_TEST_CHECK( !actor.OnStage() );
   END_TEST;
 }
+
+
+int UtcDaliEffectsViewAddRemoveEmboss(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliEffectsViewAddRemoveEmboss");
+
+  tet_infoline("Checking number of render tasks = 1");
+  application.SendNotification();
+  application.Render();
+  Stage stage = Stage::GetCurrent();
+  DALI_TEST_EQUALS( stage.GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Create effects view");
+
+  EffectsView view = EffectsView::New( EffectsView::EMBOSS );
+  Vector3 offsetSet( 2.f, 3.f, 4.f );
+  Vector4 colorSet( 0.2f, 0.3f, 0.4f, 0.5f );
+  view.SetProperty( EffectsView::Property::EFFECT_OFFSET, offsetSet);
+  view.SetProperty( EffectsView::Property::EFFECT_COLOR, colorSet);
+  Vector3 offsetAnimate( 4.f, 6.f, 8.f );
+  float durationSeconds(0.05f);
+  Animation animation = Animation::New( durationSeconds );
+  animation.AnimateTo( Property(view,EffectsView::Property::EFFECT_OFFSET ), offsetAnimate );
+  animation.Play();
+
+  DALI_TEST_CHECK( view );
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  DALI_TEST_CHECK( !actor.OnStage() );
+
+  view.SetParentOrigin(ParentOrigin::CENTER);
+
+  view.Add(actor);
+  view.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+  stage.Add(view);
+
+  DALI_TEST_CHECK( actor.OnStage() );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Removing view from stage disables view");
+  stage.Remove(view);
+
+  tet_infoline("Checking number of render tasks = 1");
+  DALI_TEST_EQUALS( stage.GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Adding view to stage again re-enables view");
+  stage.Add(view);
+
+  tet_infoline("Removing view from stage disables view");
+  DALI_TEST_GREATER( stage.GetRenderTaskList().GetTaskCount(), 1u, TEST_LOCATION );
+  stage.Remove(view);
+  view.Reset();
+
+  tet_infoline("Checking number of render tasks = 1");
+  DALI_TEST_EQUALS( stage.GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliEffectsViewGetTypeP(void)
 {

@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -37,10 +38,12 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/transition-data-impl.h>
 
 namespace Dali
 {
@@ -51,6 +54,10 @@ namespace Toolkit
 namespace
 {
 
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::General, false, "LOG_CONTROL_VISUALS");
+#endif
+
 /**
  * Struct used to store Visual within the control, index is a unique key for each visual.
  */
@@ -58,25 +65,106 @@ struct RegisteredVisual
 {
   Property::Index index;
   Toolkit::Visual::Base visual;
-  Actor placementActor;
+  bool enabled;
 
-  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor) : index(aIndex), visual(aVisual), placementActor(aPlacementActor) {}
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled) :
+                   index(aIndex), visual(aVisual), enabled(aEnabled) {}
 };
+
+struct HandleIndex
+{
+  Handle handle; ///< a handle to the target object
+  Property::Index index; ///< The index of a property provided by the referenced object
+
+  HandleIndex( )
+  : handle(),
+    index( Property::INVALID_INDEX )
+  {
+  }
+
+  HandleIndex( Handle& handle, Property::Index index )
+  : handle( handle ),
+    index( index )
+  {
+  }
+};
+
+
+typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 
 /**
  *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
  */
-bool FindVisual( Property::Index targetIndex, std::vector<RegisteredVisual>& visuals, std::vector<RegisteredVisual>::iterator& iter )
+bool FindVisual( Property::Index targetIndex, RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter )
 {
-  for ( iter = visuals.begin(); iter != visuals.end(); iter++ )
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
-    if ( (*iter).index ==  targetIndex )
+    if ( (*iter)->index ==  targetIndex )
     {
       return true;
     }
   }
   return false;
 }
+
+HandleIndex GetVisualProperty(
+  Internal::Control& controlImpl,
+  RegisteredVisualContainer& visuals,
+  const std::string& visualName,
+  Property::Key propertyKey )
+{
+#if defined(DEBUG_ENABLED)
+  std::ostringstream oss;
+  oss << "Control::GetHandleIndex(" << visualName << ", " << propertyKey << ")" << std::endl;
+  DALI_LOG_INFO( gLogFilter, Debug::General, oss.str().c_str() );
+#endif
+
+  // Find visualName in the control
+  RegisteredVisualContainer::Iterator iter;
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
+  {
+    if ( (*iter)->visual.GetName() == visualName )
+    {
+      break;
+    }
+  }
+
+  // Does it's renderer have an associated property?
+  if( iter != visuals.End() )
+  {
+    Actor self = controlImpl.Self();
+    Property::Index index = self.GetPropertyIndex( propertyKey );
+    if( index != Property::INVALID_INDEX )
+    {
+      // It's an actor property:
+      return HandleIndex( self, index );
+    }
+    else
+    {
+      // Check if it is a renderer property:
+      if( self.GetRendererCount() > 0 )
+      {
+        // @todo Need to use correct renderer index
+        Renderer renderer = self.GetRendererAt(0);
+        Property::Index index = renderer.GetPropertyIndex( propertyKey );
+        if( index != Property::INVALID_INDEX )
+        {
+          // It's a renderer property:
+          return HandleIndex( renderer, index );
+        }
+      }
+      else
+      {
+        std::ostringstream oss;
+        oss << propertyKey;
+        DALI_LOG_WARNING( "Control::GetHandleIndex(%s, %s) No renderers\n", visualName.c_str(), oss.str().c_str() );
+      }
+    }
+  }
+  Handle handle;
+  return HandleIndex( handle, Property::INVALID_INDEX );
+}
+
 
 /**
  * Creates control through type registry
@@ -202,21 +290,21 @@ public:
 
   // Construction & Destruction
   Impl(Control& controlImpl)
-: mControlImpl( controlImpl ),
-  mStyleName(""),
-  mBackgroundVisual(),
-  mBackgroundColor(Color::TRANSPARENT),
-  mStartingPinchScale( NULL ),
-  mKeyEventSignal(),
-  mPinchGestureDetector(),
-  mPanGestureDetector(),
-  mTapGestureDetector(),
-  mLongPressGestureDetector(),
-  mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
-  mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false )
-{
-}
+  : mControlImpl( controlImpl ),
+    mStyleName(""),
+    mBackgroundVisual(),
+    mBackgroundColor(Color::TRANSPARENT),
+    mStartingPinchScale( NULL ),
+    mKeyEventSignal(),
+    mPinchGestureDetector(),
+    mPanGestureDetector(),
+    mTapGestureDetector(),
+    mLongPressGestureDetector(),
+    mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+    mIsKeyboardNavigationSupported( false ),
+    mIsKeyboardFocusGroup( false )
+  {
+  }
 
   ~Impl()
   {
@@ -394,7 +482,7 @@ public:
   // Data
 
   Control& mControlImpl;
-  std::vector<RegisteredVisual> mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
+  RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -409,7 +497,7 @@ public:
   TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
-  ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
+  ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
@@ -431,7 +519,7 @@ const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "backgro
 Toolkit::Control Control::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) );
+  IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) );
 
   // Pass ownership to handle
   Toolkit::Control handle( *controlImpl );
@@ -470,12 +558,12 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  Actor self( Self() );
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -489,8 +577,8 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground( const Property::Map& map )
 {
-  Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundVisual, map );
+  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -499,8 +587,8 @@ void Control::SetBackground( const Property::Map& map )
 
 void Control::SetBackgroundImage( Image image )
 {
-  Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundVisual, image );
+  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
+  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
   if( mImpl->mBackgroundVisual )
   {
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
@@ -509,8 +597,13 @@ void Control::SetBackgroundImage( Image image )
 
 void Control::ClearBackground()
 {
-  Actor self( Self() );
-  mImpl->mBackgroundVisual.RemoveAndReset( self );
+  if( mImpl->mBackgroundVisual )
+  {
+    Actor self( Self() );
+    Toolkit::GetImplementation( mImpl->mBackgroundVisual ).SetOffStage( self );
+    mImpl->mBackgroundVisual.Reset();
+  }
+  mImpl->mBackgroundColor = Color::TRANSPARENT;
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -652,42 +745,162 @@ void Control::KeyboardEnter()
   OnKeyboardEnter();
 }
 
-void Control::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
+{
+  RegisterVisual( index, visual, true );
+}
+
+void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
   bool visualReplaced ( false );
-  Actor actorToRegister; // Null actor, replaced if placement actor not Self
+  Actor self = Self();
 
-  if ( placementActor != Self() ) // Prevent increasing ref count if actor self
+  if ( !mImpl->mVisuals.Empty() )
   {
-    actorToRegister = placementActor;
-  }
-
-  if ( !mImpl->mVisuals.empty() )
-  {
-      std::vector<RegisteredVisual>::iterator iter;
+      RegisteredVisualContainer::Iterator iter;
       // Check if visual (index) is already registered.  Replace if so.
       if ( FindVisual( index, mImpl->mVisuals, iter ) )
       {
-        (*iter).visual = visual;
-        (*iter).placementActor = actorToRegister;
+        if( (*iter)->visual && self.OnStage() )
+        {
+          Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+        }
+        (*iter)->visual = visual;
         visualReplaced = true;
       }
   }
 
   if ( !visualReplaced ) // New registration entry
   {
-    RegisteredVisual newVisual = RegisteredVisual( index, visual, actorToRegister );
-    mImpl->mVisuals.push_back( newVisual );
+    mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
+  }
+
+  if( visual && self.OnStage() && enabled )
+  {
+    Toolkit::GetImplementation(visual).SetOnStage( self );
   }
 }
 
 void Control::UnregisterVisual( Property::Index index )
 {
-   std::vector< RegisteredVisual >::iterator iter;
-   if ( FindVisual( index, mImpl->mVisuals, iter ) )
-   {
-     mImpl->mVisuals.erase( iter );
-   }
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    mImpl->mVisuals.Erase( iter );
+  }
+}
+
+Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    return (*iter)->visual;
+  }
+
+  return Toolkit::Visual::Base();
+}
+
+void Control::EnableVisual( Property::Index index, bool enable )
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    if (  (*iter)->enabled == enable )
+    {
+      return;
+    }
+
+    (*iter)->enabled = enable;
+    Actor parentActor = Self();
+    if ( Self().OnStage() ) // If control not on Stage then Visual will be added when StageConnection is called.
+    {
+      if ( enable )
+      {
+
+        Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
+      }
+      else
+      {
+        Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
+      }
+    }
+  }
+}
+
+bool Control::IsVisualEnabled( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mImpl->mVisuals, iter ) )
+  {
+    return (*iter)->enabled;
+  }
+  return false;
+}
+
+Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle )
+{
+  Dali::Animation transition;
+  const Internal::TransitionData& transitionData = Toolkit::GetImplementation( handle );
+
+  if( transitionData.Count() > 0 )
+  {
+    // Setup a Transition from TransitionData.
+    TransitionData::Iterator end = transitionData.End();
+    for( TransitionData::Iterator iter = transitionData.Begin() ;
+         iter != end; ++iter )
+    {
+      TransitionData::Animator* animator = (*iter);
+      HandleIndex handleIndex;
+
+      // Attempt to find the object name as a child actor
+      Actor child = Self().FindChildByName( animator->objectName );
+      if( child )
+      {
+        Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
+        handleIndex = HandleIndex( child, propertyIndex );
+      }
+      else
+      {
+        handleIndex = GetVisualProperty( *this, mImpl->mVisuals,
+                                            animator->objectName,
+                                            animator->propertyKey );
+      }
+
+      if( handleIndex.handle && handleIndex.index != Property::INVALID_INDEX )
+      {
+        if( animator->animate == false )
+        {
+          if( animator->targetValue.GetType() != Property::NONE )
+          {
+            handleIndex.handle.SetProperty( handleIndex.index, animator->targetValue );
+          }
+        }
+        else
+        {
+          if( animator->initialValue.GetType() != Property::NONE )
+          {
+            handleIndex.handle.SetProperty( handleIndex.index, animator->initialValue );
+          }
+
+          if( ! transition )
+          {
+            // Create an animation with a default .1 second duration - the animators
+            // will automatically force it to the 'right' duration.
+            transition = Dali::Animation::New( 0.1f );
+          }
+
+          transition.AnimateTo( Property( handleIndex.handle, handleIndex.index ),
+                                animator->targetValue,
+                                animator->alphaFunction,
+                                TimePeriod( animator->timePeriodDelay,
+                                            animator->timePeriodDuration ) );
+        }
+      }
+    }
+  }
+
+  return transition;
 }
 
 bool Control::OnAccessibilityActivated()
@@ -778,7 +991,8 @@ void Control::Initialize()
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();
 
-  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
+  if( (mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS) ||
+      !(mImpl->mFlags & DISABLE_STYLE_CHANGE_SIGNALS) )
   {
     Toolkit::StyleManager styleManager = StyleManager::Get();
 
@@ -820,6 +1034,7 @@ void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Ty
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
+  RelayoutRequest();
 }
 
 void Control::OnPinch(const PinchGesture& pinch)
@@ -874,19 +1089,27 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  if( mImpl->mBackgroundVisual)
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    Actor self( Self() );
-    mImpl->mBackgroundVisual.SetOnStage( self );
+    // Check whether the visual is empty and enabled
+    if( (*iter)->visual && (*iter)->enabled )
+    {
+      Actor self( Self() );
+      Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
+    }
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundVisual )
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    Actor self( Self() );
-    mImpl->mBackgroundVisual.SetOffStage( self );
+    // Check whether the visual is empty
+    if( (*iter)->visual )
+    {
+      Actor self( Self() );
+      Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+    }
   }
 }
 

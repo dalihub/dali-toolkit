@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_CONTROLLER_H__
-#define __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#ifndef DALI_TOOLKIT_TEXT_CONTROLLER_H
+#define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/text-control-interface.h>
 
 namespace Dali
 {
@@ -38,19 +37,11 @@ namespace Text
 {
 
 class Controller;
+class ControlInterface;
+class EditableControlInterface;
 class View;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
-typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
-
-/**
- * @brief Different placeholder-text can be shown when the control is active/inactive.
- */
-enum PlaceholderType
-{
-  PLACEHOLDER_TYPE_ACTIVE,
-  PLACEHOLDER_TYPE_INACTIVE,
-};
 
 /**
  * @brief A Text Controller is used by UI Controls which display text.
@@ -65,7 +56,7 @@ enum PlaceholderType
  */
 class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface
 {
-public:
+public: // Enumerated types.
 
   /**
    * @brief Text related operations to be done in the relayout process.
@@ -108,20 +99,55 @@ public:
     DONT_UPDATE_INPUT_STYLE
   };
 
+  /**
+   * @brief Used to specify what has been updated after the Relayout() method has been called.
+   */
   enum UpdateTextType
   {
-    NONE_UPDATED      = 0x0,
-    MODEL_UPDATED     = 0x1,
-    DECORATOR_UPDATED = 0x2
+    NONE_UPDATED      = 0x0, ///< Nothing has been updated.
+    MODEL_UPDATED     = 0x1, ///< The text's model has been updated.
+    DECORATOR_UPDATED = 0x2  ///< The decoration has been updated.
   };
+
+  /**
+   * @brief Different placeholder-text can be shown when the control is active/inactive.
+   */
+  enum PlaceholderType
+  {
+    PLACEHOLDER_TYPE_ACTIVE,
+    PLACEHOLDER_TYPE_INACTIVE,
+  };
+
+public: // Constructor.
 
   /**
    * @brief Create a new instance of a Controller.
    *
-   * @param[in] controlInterface An interface used to request a text relayout.
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New( ControlInterface& controlInterface );
+  static ControllerPtr New();
+
+  /**
+   * @brief Create a new instance of a Controller.
+   *
+   * @param[in] controlInterface The control's interface.
+   *
+   * @return A pointer to a new Controller.
+   */
+  static ControllerPtr New( ControlInterface* controlInterface );
+
+  /**
+   * @brief Create a new instance of a Controller.
+   *
+   * @param[in] controlInterface The control's interface.
+   * @param[in] editableControlInterface The editable control's interface.
+   *
+   * @return A pointer to a new Controller.
+   */
+  static ControllerPtr New( ControlInterface* controlInterface,
+                            EditableControlInterface* editableControlInterface );
+
+public: // Configure the text controller.
 
   /**
    * @brief Called to enable text input.
@@ -230,6 +256,69 @@ public:
   bool IsSmoothHandlePanEnabled() const;
 
   /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  void SetMaximumNumberOfCharacters( Length maxCharacters );
+
+  /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  int GetMaximumNumberOfCharacters();
+
+  /**
+   * @brief Called to enable/disable cursor blink.
+   *
+   * @note Only editable controls should calls this.
+   * @param[in] enabled Whether the cursor should blink or not.
+   */
+  void SetEnableCursorBlink( bool enable );
+
+  /**
+   * @brief Query whether cursor blink is enabled.
+   *
+   * @return Whether the cursor should blink or not.
+   */
+  bool GetEnableCursorBlink() const;
+
+  /**
+   * @brief Whether to enable the multi-line layout.
+   *
+   * @param[in] enable \e true enables the multi-line (by default)
+   */
+  void SetMultiLineEnabled( bool enable );
+
+  /**
+   * @return Whether the multi-line layout is enabled.
+   */
+  bool IsMultiLineEnabled() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetHorizontalAlignment()
+   */
+  void SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetHorizontalAlignment()
+   */
+  LayoutEngine::HorizontalAlignment GetHorizontalAlignment() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetVerticalAlignment()
+   */
+  void SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetVerticalAlignment()
+   */
+  LayoutEngine::VerticalAlignment GetVerticalAlignment() const;
+
+public: // Update.
+
+  /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.
@@ -243,22 +332,6 @@ public:
    * @param[out] text A string of UTF-8 characters.
    */
   void GetText( std::string& text ) const;
-
-  /**
-   * @brief Remove a given number of characters
-   *
-   * When predictve text is used the pre-edit text is removed and inserted again with the new characters.
-   * The UpdateInputStyleType @type parameter if set to DONT_UPDATE_INPUT_STYLE avoids to update the input
-   * style when pre-edit text is removed.
-   *
-   * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
-   * @param[in] numberOfCharacters The number of characters to delete from the cursorOffset.
-   * @param[in] type Whether to update the input style.
-   * @return True if the remove was successful.
-   */
-  bool RemoveText( int cursorOffset,
-                   int numberOfCharacters,
-                   UpdateInputStyleType type  );
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -277,18 +350,12 @@ public:
   void GetPlaceholderText( PlaceholderType type, std::string& text ) const;
 
   /**
-   * @brief Sets the maximum number of characters that can be inserted into the TextModel
-   *
-   * @param[in] maxCharacters maximum number of characters to be accepted
+   * @ brief Update the text after a font change
+   * @param[in] newDefaultFont The new font to change to
    */
-  void SetMaximumNumberOfCharacters( Length maxCharacters );
+  void UpdateAfterFontChange( const std::string& newDefaultFont );
 
-  /**
-   * @brief Sets the maximum number of characters that can be inserted into the TextModel
-   *
-   * @param[in] maxCharacters maximum number of characters to be accepted
-   */
-  int GetMaximumNumberOfCharacters();
+public: // Default style & Input style
 
   /**
    * @brief Set the default font family.
@@ -305,27 +372,16 @@ public:
   const std::string& GetDefaultFontFamily() const;
 
   /**
-   * @brief Sets the font's style string.
-   *
-   * @note The style set may be changed by the underlying font system. The string is stored to be recovered.
-   *
-   * @param[in] style The font's style string.
-   */
-  void SetDefaultFontStyle( const std::string& style );
-
-  /**
-   * @brief Retrieves the font's style.
-   *
-   * @return The font's style.
-   */
-  const std::string& GetDefaultFontStyle() const;
-
-  /**
    * @brief Sets the default font weight.
    *
    * @param[in] weight The font weight.
    */
   void SetDefaultFontWeight( FontWeight weight );
+
+  /**
+   * @brief Whether the font's weight has been defined.
+   */
+  bool IsDefaultFontWeightDefined() const;
 
   /**
    * @brief Retrieves the default font weight.
@@ -342,6 +398,11 @@ public:
   void SetDefaultFontWidth( FontWidth width );
 
   /**
+   * @brief Whether the font's width has been defined.
+   */
+  bool IsDefaultFontWidthDefined() const;
+
+  /**
    * @brief Retrieves the default font width.
    *
    * @return The default font width.
@@ -354,6 +415,11 @@ public:
    * @param[in] slant The font slant.
    */
   void SetDefaultFontSlant( FontSlant slant );
+
+  /**
+   * @brief Whether the font's slant has been defined.
+   */
+  bool IsDefaultFontSlantDefined() const;
 
   /**
    * @brief Retrieves the default font slant.
@@ -375,12 +441,6 @@ public:
    * @return The default point size.
    */
   float GetDefaultPointSize() const;
-
-  /**
-   * @ brief Update the text after a font change
-   * @param[in] newDefaultFont The new font to change to
-   */
-  void UpdateAfterFontChange( const std::string& newDefaultFont );
 
   /**
    * @brief Set the text color
@@ -439,22 +499,6 @@ public:
   const Vector4& GetShadowColor() const;
 
   /**
-   * @brief Sets the shadow's properties string.
-   *
-   * @note The string is stored to be recovered.
-   *
-   * @param[in] shadowProperties The shadow's properties string.
-   */
-  void SetDefaultShadowProperties( const std::string& shadowProperties );
-
-  /**
-   * @brief Retrieves the shadow's properties string.
-   *
-   * @return The shadow's properties string.
-   */
-  const std::string& GetDefaultShadowProperties() const;
-
-  /**
    * @brief Set the underline color.
    *
    * @param[in] color color of underline.
@@ -495,22 +539,6 @@ public:
    * @return The height of the underline, or 0 if height is not overrided.
    */
   float GetUnderlineHeight() const;
-
-  /**
-   * @brief Sets the underline's properties string.
-   *
-   * @note The string is stored to be recovered.
-   *
-   * @param[in] underlineProperties The underline's properties string.
-   */
-  void SetDefaultUnderlineProperties( const std::string& underlineProperties );
-
-  /**
-   * @brief Retrieves the underline's properties string.
-   *
-   * @return The underline's properties string.
-   */
-  const std::string& GetDefaultUnderlineProperties() const;
 
   /**
    * @brief Sets the emboss's properties string.
@@ -587,25 +615,16 @@ public:
   const std::string& GetInputFontFamily() const;
 
   /**
-   * @brief Sets the input text's font style.
-   *
-   * @param[in] fontStyle The input text's font style.
-   */
-  void SetInputFontStyle( const std::string& fontStyle );
-
-  /**
-   * @brief Retrieves the input text's font style.
-   *
-   * @return The input text's font style.
-   */
-  const std::string& GetInputFontStyle() const;
-
-  /**
    * @brief Sets the input font's weight.
    *
    * @param[in] weight The input font's weight.
    */
   void SetInputFontWeight( FontWeight weight );
+
+  /**
+   * @return Whether the font's weight has been defined.
+   */
+  bool IsInputFontWeightDefined() const;
 
   /**
    * @brief Retrieves the input font's weight.
@@ -622,6 +641,11 @@ public:
   void SetInputFontWidth( FontWidth width );
 
   /**
+   * @return Whether the font's width has been defined.
+   */
+  bool IsInputFontWidthDefined() const;
+
+  /**
    * @brief Retrieves the input font's width.
    *
    * @return The input font's width.
@@ -634,6 +658,11 @@ public:
    * @param[in] slant The input font's slant.
    */
   void SetInputFontSlant( FontSlant slant );
+
+  /**
+   * @return Whether the font's slant has been defined.
+   */
+  bool IsInputFontSlantDefined() const;
 
   /**
    * @brief Retrieves the input font's slant.
@@ -734,20 +763,21 @@ public:
    */
   const std::string& GetInputOutlineProperties() const;
 
-  /**
-   * @brief Called to enable/disable cursor blink.
-   *
-   * @note Only editable controls should calls this.
-   * @param[in] enabled Whether the cursor should blink or not.
-   */
-  void SetEnableCursorBlink( bool enable );
+public: // Queries & retrieves.
 
   /**
-   * @brief Query whether cursor blink is enabled.
+   * @brief Return the layout engine.
    *
-   * @return Whether the cursor should blink or not.
+   * @return A reference to the layout engine.
    */
-  bool GetEnableCursorBlink() const;
+  LayoutEngine& GetLayoutEngine();
+
+  /**
+   * @brief Return a view of the text.
+   *
+   * @return A reference to the view.
+   */
+  View& GetView();
 
   /**
    * @brief Query the current scroll position; the UI control is responsible for moving actors to this position.
@@ -766,6 +796,8 @@ public:
    */
   float GetHeightForWidth( float width );
 
+public: // Relayout.
+
   /**
    * @brief Triggers a relayout which updates View (if necessary).
    *
@@ -777,109 +809,26 @@ public:
   UpdateTextType Relayout( const Size& size );
 
   /**
-   * @brief Process queued events which modify the model.
+   * @brief Request a relayout using the ControlInterface.
    */
-  void ProcessModifyEvents();
+  void RequestRelayout();
+
+public: // Input style change signals.
 
   /**
-   * @brief Used to remove placeholder text.
+   * @return Whether the queue of input style changed signals is empty.
    */
-  void ResetText();
+  bool IsInputStyleChangedSignalsQueueEmpty();
 
   /**
-   * @brief Used to reset the cursor position after setting a new text.
+   * @brief Process all pending input style changed signals.
    *
-   * @param[in] cursorIndex Where to place the cursor.
+   * Calls the Text::ControlInterface::InputStyleChanged() method which is overriden by the
+   * text controls. Text controls may send signals to state the input style has changed.
    */
-  void ResetCursorPosition( CharacterIndex cursorIndex );
+  void ProcessInputStyleChangedSignals();
 
-  /**
-   * @brief Used to reset the scroll position after setting a new text.
-   */
-  void ResetScrollPosition();
-
-  /**
-   * @brief Used to process an event queued from SetText()
-   */
-  void TextReplacedEvent();
-
-  /**
-   * @brief Used to process an event queued from key events etc.
-   */
-  void TextInsertedEvent();
-
-  /**
-   * @brief Used to process an event queued from backspace key etc.
-   */
-  void TextDeletedEvent();
-
-  /**
-   * @brief Lays-out the text.
-   *
-   * GetNaturalSize(), GetHeightForWidth() and Relayout() calls this method.
-   *
-   * @param[in] size A the size of a bounding box to layout text within.
-   * @param[in] operations The layout operations which need to be done.
-   * @param[out] layoutSize The size of the laid-out text.
-   */
-  bool DoRelayout( const Size& size,
-                   OperationsMask operations,
-                   Size& layoutSize );
-
-  /**
-   * @brief Whether to enable the multi-line layout.
-   *
-   * @param[in] enable \e true enables the multi-line (by default)
-   */
-  void SetMultiLineEnabled( bool enable );
-
-  /**
-   * @return Whether the multi-line layout is enabled.
-   */
-  bool IsMultiLineEnabled() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetHorizontalAlignment()
-   */
-  void SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment );
-
-  /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetHorizontalAlignment()
-   */
-  LayoutEngine::HorizontalAlignment GetHorizontalAlignment() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetVerticalAlignment()
-   */
-  void SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment );
-
-  /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetVerticalAlignment()
-   */
-  LayoutEngine::VerticalAlignment GetVerticalAlignment() const;
-
-  /**
-   * @brief Calulates the vertical offset to align the text inside the bounding box.
-   *
-   * @param[in] size The size of the bounding box.
-   */
-  void CalculateVerticalOffset( const Size& size );
-
-  /**
-   * @brief Return the layout engine.
-   *
-   * @return A reference to the layout engine.
-   */
-  LayoutEngine& GetLayoutEngine();
-
-  /**
-   * @brief Return a view of the text.
-   *
-   * @return A reference to the view.
-   */
-  View& GetView();
-
-  // Text-input Event Queuing
+public: // Text-input Event Queuing.
 
   /**
    * @brief Called by editable UI controls when keyboard focus is gained.
@@ -898,20 +847,6 @@ public:
    * @param[in] type Used to distinguish between regular key events and IMF events.
    */
   bool KeyEvent( const Dali::KeyEvent& event );
-
-  /**
-   * @brief Called by editable UI controls when key events are received.
-   *
-   * @param[in] text The text to insert.
-   * @param[in] type Used to distinguish between regular key events and IMF events.
-   */
-  void InsertText( const std::string& text, InsertType type );
-
-  /**
-   * @brief Checks if text is selected and if so removes it.
-   * @return true if text was removed
-   */
-  bool RemoveSelectedText();
 
   /**
    * @brief Called by editable UI controls when a tap gesture occurs.
@@ -939,17 +874,6 @@ public:
   void LongPressEvent( Gesture::State state, float x, float y );
 
   /**
-   * @brief Creates a selection event.
-   *
-   * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.
-   *
-   * @param[in] x The x position relative to the top-left of the parent control.
-   * @param[in] y The y position relative to the top-left of the parent control.
-   * @param[in] selectAll Whether the whole text is selected.
-   */
-  void SelectEvent( float x, float y, bool selectAll );
-
-  /**
    * @brief Event received from IMF manager
    *
    * @param[in] imfManager The IMF manager.
@@ -959,15 +883,11 @@ public:
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
   /**
-   * @brief Paste given string into Text model
-   * @param[in] stringToPaste this string will be inserted into the text model
-   */
-  void PasteText( const std::string& stringToPaste );
-
-  /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting
    */
   void PasteClipboardItemEvent();
+
+protected: // Inherit from Text::Decorator::ControllerInterface.
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::GetTargetSize()
@@ -984,19 +904,105 @@ public:
    */
   virtual void DecorationEvent( HandleType handle, HandleState state, float x, float y );
 
+protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
+
   /**
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
   virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
 
-protected:
+private: // Update.
 
   /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
+   * @brief Called by editable UI controls when key events are received.
+   *
+   * @param[in] text The text to insert.
+   * @param[in] type Used to distinguish between regular key events and IMF events.
    */
-  virtual ~Controller();
+  void InsertText( const std::string& text, InsertType type );
 
-private:
+  /**
+   * @brief Paste given string into Text model
+   * @param[in] stringToPaste this string will be inserted into the text model
+   */
+  void PasteText( const std::string& stringToPaste );
+
+  /**
+   * @brief Remove a given number of characters
+   *
+   * When predictve text is used the pre-edit text is removed and inserted again with the new characters.
+   * The UpdateInputStyleType @type parameter if set to DONT_UPDATE_INPUT_STYLE avoids to update the input
+   * style when pre-edit text is removed.
+   *
+   * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
+   * @param[in] numberOfCharacters The number of characters to delete from the cursorOffset.
+   * @param[in] type Whether to update the input style.
+   * @return True if the remove was successful.
+   */
+  bool RemoveText( int cursorOffset,
+                   int numberOfCharacters,
+                   UpdateInputStyleType type  );
+
+  /**
+   * @brief Checks if text is selected and if so removes it.
+   * @return true if text was removed
+   */
+  bool RemoveSelectedText();
+
+private: // Relayout.
+
+  /**
+   * @brief Lays-out the text.
+   *
+   * GetNaturalSize(), GetHeightForWidth() and Relayout() calls this method.
+   *
+   * @param[in] size A the size of a bounding box to layout text within.
+   * @param[in] operations The layout operations which need to be done.
+   * @param[out] layoutSize The size of the laid-out text.
+   */
+  bool DoRelayout( const Size& size,
+                   OperationsMask operations,
+                   Size& layoutSize );
+
+  /**
+   * @brief Calulates the vertical offset to align the text inside the bounding box.
+   *
+   * @param[in] size The size of the bounding box.
+   */
+  void CalculateVerticalOffset( const Size& size );
+
+private: // Events.
+
+  /**
+   * @brief Process queued events which modify the model.
+   */
+  void ProcessModifyEvents();
+
+  /**
+   * @brief Used to process an event queued from SetText()
+   */
+  void TextReplacedEvent();
+
+  /**
+   * @brief Used to process an event queued from key events etc.
+   */
+  void TextInsertedEvent();
+
+  /**
+   * @brief Used to process an event queued from backspace key etc.
+   */
+  void TextDeletedEvent();
+
+  /**
+   * @brief Creates a selection event.
+   *
+   * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.
+   *
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
+   * @param[in] selectAll Whether the whole text is selected.
+   */
+  void SelectEvent( float x, float y, bool selectAll );
 
   /**
    * @brief Helper to KeyEvent() to handle the backspace case.
@@ -1005,8 +1011,15 @@ private:
    */
   bool BackspaceKeyEvent();
 
+private: // Helpers.
+
   /**
-   * @brief Helper to clear font-specific data.
+   * @brief Used to remove the text included the placeholder text.
+   */
+  void ResetText();
+
+  /**
+   * @brief Helper to show the place holder text..
    */
   void ShowPlaceholderText();
 
@@ -1021,15 +1034,47 @@ private:
   void ClearStyleData();
 
   /**
+   * @brief Used to reset the cursor position after setting a new text.
+   *
+   * @param[in] cursorIndex Where to place the cursor.
+   */
+  void ResetCursorPosition( CharacterIndex cursorIndex );
+
+  /**
+   * @brief Used to reset the scroll position after setting a new text.
+   */
+  void ResetScrollPosition();
+
+private: // Private contructors & copy operator.
+
+  /**
    * @brief Private constructor.
    */
-  Controller( ControlInterface& controlInterface );
+  Controller();
+
+  /**
+   * @brief Private constructor.
+   */
+  Controller( ControlInterface* controlInterface );
+
+  /**
+   * @brief Private constructor.
+   */
+  Controller( ControlInterface* controlInterface,
+              EditableControlInterface* editableControlInterface );
 
   // Undefined
   Controller( const Controller& handle );
 
   // Undefined
   Controller& operator=( const Controller& handle );
+
+protected: // Destructor.
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~Controller();
 
 private:
 
@@ -1043,4 +1088,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_CONTROLLER_H__
+#endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

@@ -167,12 +167,15 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
+   * @param[in] scrollBar Handle to an object
    */
   ScrollBar( const ScrollBar& scrollBar );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
+   * @param[in] scrollBar Handle to an object
+   * @return A reference to this
    */
   ScrollBar& operator=( const ScrollBar& scrollBar );
 
@@ -397,6 +400,7 @@ public: // Signals
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
@@ -410,6 +414,7 @@ public: // Not intended for application developers
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   explicit DALI_INTERNAL ScrollBar( Dali::Internal::CustomActor* internal );
+  /// @endcond
 };
 
 /**

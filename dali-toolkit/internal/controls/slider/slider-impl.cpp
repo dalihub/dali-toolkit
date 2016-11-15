@@ -102,7 +102,6 @@ const Vector4 DEFAULT_DISABLED_COLOR( 0.5f, 0.5f, 0.5f, 1.0f );
 const float VALUE_POPUP_MARGIN = 10.0f;
 const float VALUE_POPUP_HEIGHT = 81.0f;
 const float VALUE_POPUP_MIN_WIDTH = 54.0f;
-const Vector2 VALUE_POPUP_ARROW_SIZE( 18.0f, 18.0f );
 
 const float DEFAULT_LOWER_BOUND = 0.0f;
 const float DEFAULT_UPPER_BOUND = 1.0f;
@@ -135,7 +134,7 @@ Dali::Toolkit::Slider Slider::New()
 }
 
 Slider::Slider()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mState( NORMAL ),
   mPopupVisual(""),
   mPopupArrowVisual(""),
@@ -208,9 +207,14 @@ void Slider::OnInitialize()
 
 void Slider::OnSizeSet( const Vector3& size )
 {
-  // Factor in handle overshoot into size of track
+}
+
+void Slider::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
   SetHitRegion( Vector2( size.x, GetHitRegion().y ) );
+  // Factor in handle overshoot into size of backing
   SetTrackRegion( Vector2( size.x - GetHandleSize().x, GetTrackRegion().y ) );
+  Control::OnRelayout( size, container );
 }
 
 bool Slider::OnTouch(Actor actor, const TouchData& touch)
@@ -313,9 +317,9 @@ Slider::Domain Slider::CalcDomain( const Vector2& currentSize )
 
 void Slider::DisplayValue( float value, bool raiseSignals )
 {
-  float clampledValue = Clamp( value, GetLowerBound(), GetUpperBound() );
+  float clampedValue = Clamp( value, GetLowerBound(), GetUpperBound() );
 
-  float percent = MapValuePercentage( clampledValue );
+  float percent = MapValuePercentage( clampedValue );
 
   float x = mDomain.from.x + percent * ( mDomain.to.x - mDomain.from.x );
 
@@ -331,7 +335,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   if( raiseSignals )
   {
     Toolkit::Slider self = Toolkit::Slider::DownCast( Self() );
-    mValueChangedSignal.Emit( self, clampledValue );
+    mValueChangedSignal.Emit( self, clampedValue );
 
     int markIndex;
     if( MarkReached( percent, markIndex ) )
@@ -344,9 +348,13 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   {
     std::stringstream ss;
     ss.precision( GetValuePrecision() );
-    ss << std::fixed << clampledValue;
+    ss << std::fixed << clampedValue;
 
-    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
+    std::string label = mHandleValueTextLabel.GetProperty<std::string>( Toolkit::TextLabel::Property::TEXT );
+    if( label.compare(ss.str()) )
+    {
+      mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
+    }
   }
 }
 
@@ -383,9 +391,9 @@ Actor Slider::CreateHitRegion()
 Toolkit::ImageView Slider::CreateTrack()
 {
   Toolkit::ImageView track = Toolkit::ImageView::New();
+  track.SetName("SliderTrack");
   track.SetParentOrigin( ParentOrigin::CENTER );
   track.SetAnchorPoint( AnchorPoint::CENTER );
-
   return track;
 }
 
@@ -445,6 +453,7 @@ std::string Slider::GetTrackVisual()
 Toolkit::ImageView Slider::CreateProgress()
 {
   Toolkit::ImageView progress = Toolkit::ImageView::New();
+  progress.SetName("SliderProgress");
   progress.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   progress.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
 
@@ -568,6 +577,7 @@ void Slider::ResizeProgressRegion( const Vector2& region )
 Toolkit::ImageView Slider::CreateHandle()
 {
   Toolkit::ImageView handle = Toolkit::ImageView::New();
+  handle.SetName("SliderHandle");
   handle.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   handle.SetAnchorPoint( AnchorPoint::CENTER );
 
@@ -577,6 +587,8 @@ Toolkit::ImageView Slider::CreateHandle()
 Toolkit::ImageView Slider::CreatePopupArrow()
 {
   Toolkit::ImageView arrow = Toolkit::ImageView::New();
+  arrow.SetStyleName("SliderPopupArrow");
+  arrow.SetName("SliderPopupArrow");
   arrow.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
   arrow.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
 
@@ -586,6 +598,8 @@ Toolkit::ImageView Slider::CreatePopupArrow()
 Toolkit::TextLabel Slider::CreatePopupText()
 {
   Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
+  textLabel.SetName( "SliderPopupTextLabel" );
+  textLabel.SetStyleName( "SliderPopupTextLabel" );
   textLabel.SetParentOrigin( ParentOrigin::CENTER );
   textLabel.SetAnchorPoint( AnchorPoint::CENTER );
   textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
@@ -598,6 +612,7 @@ Toolkit::TextLabel Slider::CreatePopupText()
 Toolkit::ImageView Slider::CreatePopup()
 {
   Toolkit::ImageView popup = Toolkit::ImageView::New();
+  popup.SetName( "SliderPopup" );
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
   popup.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH );
@@ -668,6 +683,8 @@ void Slider::CreateHandleValueDisplay()
   if( mHandle && !mHandleValueTextLabel )
   {
     mHandleValueTextLabel = Toolkit::TextLabel::New();
+    mHandleValueTextLabel.SetName("SliderHandleTextLabel");
+    mHandleValueTextLabel.SetStyleName("SliderHandleTextLabel");
     mHandleValueTextLabel.SetParentOrigin( ParentOrigin::CENTER );
     mHandleValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );

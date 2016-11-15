@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -107,13 +108,27 @@ const char* VERTEX_SHADER[] =
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
     mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
     vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
     \n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
   }\n
 ),
 
@@ -125,11 +140,26 @@ DALI_COMPOSE_SHADER(
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
+
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
   void main()\n
   {\n
     mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
     vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
     \n
     vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
   }\n
@@ -185,10 +215,15 @@ Dali::WrapMode::Type GetWrapMode( Toolkit::GradientVisual::SpreadMethod::Type sp
 
 } // unnamed namespace
 
+GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache )
+{
+  return new GradientVisual( factoryCache );
+}
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
-  mGradientType( LINEAR )
+  mGradientType( LINEAR ),
+  mIsOpaque( true )
 {
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
@@ -197,7 +232,7 @@ GradientVisual::~GradientVisual()
 {
 }
 
-void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
+void GradientVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
 
@@ -224,32 +259,30 @@ void GradientVisual::DoInitialize( Actor& actor, const Property::Map& propertyMa
   }
 }
 
+void GradientVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 void GradientVisual::SetSize( const Vector2& size )
 {
   Visual::Base::SetSize( size );
 }
 
-void GradientVisual::SetClipRect( const Rect<int>& clipRect )
-{
-  Visual::Base::SetClipRect( clipRect );
-
-  //ToDo: renderer responds to the clipRect change
-}
-
-void GradientVisual::SetOffset( const Vector2& offset )
-{
-  //ToDo: renderer applies the offset
-}
-
 void GradientVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
+
+  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::GRADIENT );
+  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::GRADIENT );
   map.Insert( Toolkit::GradientVisual::Property::UNITS, mGradient->GetGradientUnits() );
   map.Insert( Toolkit::GradientVisual::Property::SPREAD_METHOD, mGradient->GetSpreadMethod() );
 
@@ -289,6 +322,17 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
+void GradientVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+{
+  // TODO
+}
+
+Dali::Property::Value GradientVisual::DoGetProperty( Dali::Property::Index index )
+{
+  // TODO
+  return Dali::Property::Value();
+}
+
 void GradientVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
@@ -319,7 +363,16 @@ void GradientVisual::InitializeRenderer()
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
 
+  // If opaque then no need to have blending
+  if( mIsOpaque )
+  {
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
+  }
+
   mImpl->mRenderer.RegisterProperty( UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propertyMap)
@@ -377,6 +430,10 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
         {
           mGradient->AddStop( offsetArray[i], Vector4(color.r*color.a, color.g*color.a, color.b*color.a, color.a));
           numValidStop++;
+          if( ! Equals( color.a, 1.0f, Math::MACHINE_EPSILON_1 ) )
+          {
+            mIsOpaque = false;
+          }
         }
       }
     }

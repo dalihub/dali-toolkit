@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -33,6 +34,9 @@ namespace Toolkit
 namespace Internal
 {
 
+class BorderVisual;
+typedef IntrusivePtr< BorderVisual > BorderVisualPtr;
+
 /**
  * The visual which renders a solid color to the control's quad border fixed to a specified size.
  *
@@ -44,10 +48,19 @@ namespace Internal
  * | borderSize      | FLOAT       |
  * | antiAliasing    | BOOLEAN     |
  */
-
 class BorderVisual : public Visual::Base
 {
 public:
+
+  /**
+   * @brief Create a new border visual.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static BorderVisualPtr New( VisualFactoryCache& factoryCache );
+
+protected:
 
   /**
    * @brief Constructor.
@@ -61,29 +74,35 @@ public:
    */
   virtual ~BorderVisual();
 
-public:  // from Visual
-
   /**
-   * @copydoc Visual::SetClipRect
+   * @copydoc Visual::Base::DoSetProperties
    */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
-protected:
+  virtual void DoSetProperties( const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::DoInitialize
-   */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
-
-  /**
-   * @copydoc Visual::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::CreatePropertyMap
+   * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::DoSetProperty
+   */
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @copydoc Visual::Base::DoGetProperty
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
+
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
 
 public:
 

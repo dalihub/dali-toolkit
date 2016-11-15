@@ -278,7 +278,7 @@ const char* NRMMAP_FRAGMENT_SHADER = MAKE_SHADER(
 using namespace Dali;
 
 Model3dView::Model3dView()
-  : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
 {
   mIlluminationType = Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP;
 
@@ -536,6 +536,7 @@ void Model3dView::CreateGeometry()
     {
       mRenderer.SetGeometry( mMesh );
       mRenderer.SetProperty( Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON );
+      mRenderer.SetProperty( Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON );
     }
   }
 }

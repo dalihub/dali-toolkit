@@ -58,5 +58,15 @@ Each style selector can have resource folders associated with it.
 Images for that style should be in their own folder named images.
 
 Common images not specific for a particular style will be in the images-common folder located in the style folder.
+
+All application resources are stored in a defined path (application resource path), from this path sub directories can be specified.
+
+The application resource path  can be retrieved using Application::GetResourcePath()
+
+Alternatively to supply resource paths in json the following constant is available: APPLICATION_RESOURCE_PATH.
+
+It provides the path to the  application resource root folder, from there the filename can an be specified along with any sub folders, e.g Images, Models etc.
+
+
 *
 */

@@ -66,6 +66,10 @@ public:
   // Signal
   typedef Signal< void (VideoView&) > VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
 
+  /**
+   * @brief The start and end property ranges for this control.
+   * @SINCE_1_0.0
+   */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
@@ -209,6 +213,7 @@ public:
 
 public: // Not intended for application developers
 
+  /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
@@ -224,6 +229,7 @@ public: // Not intended for application developers
    * @param[in] internal A pointer to the internal CustomActor.
    */
   DALI_INTERNAL VideoView( Dali::Internal::CustomActor* internal );
+  /// @endcond
 
 };
 

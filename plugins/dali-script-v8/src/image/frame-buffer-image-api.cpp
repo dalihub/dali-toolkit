@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,6 @@ namespace FrameBufferImageApi
  * @param {Integer} options.height image height
  * @param {Object } [options.nativeImage] ** currently not supported **
  * @param {Integer} [options.pixelFormat] pixel format ( see dali constants, e.g. dali.PIXEL_FORMAT_RGB8888)
- * @param {Integer} [options.releasePolicy] optionally release memory when image is not visible on screen.
  * @return {Object} Image
  */
 Image New( const v8::FunctionCallbackInfo< v8::Value >& args )
@@ -99,14 +98,7 @@ Image New( const v8::FunctionCallbackInfo< v8::Value >& args )
     return FrameBufferImage();
   }
 
-  Image::ReleasePolicy releasePolicy =  Dali::Image::NEVER;
-  v8::Local<v8::Value> releasePolicyValue = obj->Get( v8::String::NewFromUtf8( isolate, "releasePolicy" ) );
-  if( releasePolicyValue->IsUint32() )
-  {
-    releasePolicy = static_cast<Image::ReleasePolicy>( releasePolicyValue->ToUint32()->Value() );
-  }
-
-  return FrameBufferImage::New( width, height, pixelFormat, releasePolicy );
+  return FrameBufferImage::New( width, height, pixelFormat );
 }
 
 } // FrameBufferImageApi

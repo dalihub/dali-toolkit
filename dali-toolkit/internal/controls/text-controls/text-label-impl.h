@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
@@ -95,29 +96,16 @@ private: // From Control
   virtual float GetHeightForWidth( float width );
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
-   */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
-
-  /**
    * @copydoc Control::OnStageConnection()
    */
   virtual void OnStageConnection( int depth );
+
+// From ControlInterface
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
-
-  /**
-   * @copydoc Text::ControlInterface::TextChanged()
-   */
-  virtual void TextChanged();
-
-  /**
-   * @copydoc Text::ControlInterface::MaxLengthReached()
-   */
-  virtual void MaxLengthReached();
 
 private: // from TextScroller
 
@@ -193,4 +181,4 @@ inline const Toolkit::Internal::TextLabel& GetImpl( const Toolkit::TextLabel& te
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H

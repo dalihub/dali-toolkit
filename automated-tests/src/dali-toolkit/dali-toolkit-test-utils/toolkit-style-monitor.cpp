@@ -24,20 +24,13 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
-{
-const std::string Dali::StyleMonitor::DEFAULT_FONT_FAMILY("DefaultFont");
-const std::string Dali::StyleMonitor::DEFAULT_FONT_STYLE("Regular");
-const float       Dali::StyleMonitor::DEFAULT_FONT_SIZE(1.0f);
-}
-
 namespace
 {
 const char* DEFAULT_THEME=
   "{\"styles\":{\n"
   "  \"textlabel\":\n"
   "    {\n"
-  "      \"fontStyle\":\"Regular\",\n"
+  "      \"fontStyle\":{\"weight\":\"normal\"},\n"
   "      \"pointSize\":18\n"
   "    }\n"
   "  }\n"
@@ -57,9 +50,9 @@ typedef std::vector< NamedTheme > NamedThemes;
 NamedThemes gThemes;
 
 std::string gTheme;
-std::string gFontFamily = Dali::StyleMonitor::DEFAULT_FONT_FAMILY;
-std::string gFontStyle  = Dali::StyleMonitor::DEFAULT_FONT_STYLE;
-float       gFontSize   = Dali::StyleMonitor::DEFAULT_FONT_SIZE;
+std::string gFontFamily("LucidaSans");
+std::string gFontStyle("Regular");
+int         gFontSize(1);
 }
 
 namespace Dali
@@ -134,7 +127,6 @@ std::string StyleMonitor::GetDefaultFontStyle() const
 float StyleMonitor::GetDefaultFontSize() const
 {
   return gFontSize;
-
 }
 
 const std::string& StyleMonitor::GetTheme() const
@@ -220,7 +212,7 @@ std::string StyleMonitor::GetDefaultFontStyle() const
   return GetImplementation(*this).GetDefaultFontStyle();
 }
 
-float StyleMonitor::GetDefaultFontSize() const
+int StyleMonitor::GetDefaultFontSize() const
 {
   return GetImplementation(*this).GetDefaultFontSize();
 }
@@ -230,7 +222,7 @@ const std::string& StyleMonitor::GetTheme() const
   return GetImplementation(*this).GetTheme();
 }
 
-void StyleMonitor::SetTheme(std::string themeFilePath)
+void StyleMonitor::SetTheme(const std::string& themeFilePath)
 {
   GetImplementation(*this).SetTheme(themeFilePath);
 }
@@ -238,11 +230,6 @@ void StyleMonitor::SetTheme(std::string themeFilePath)
 StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
 {
   return GetImplementation(*this).StyleChangeSignal();
-}
-
-void StyleMonitor::EmitStyleChangeSignal(StyleChange::Type styleChange)
-{
-  GetImplementation(*this).EmitStyleChangeSignal(styleChange);
 }
 
 bool StyleMonitor::LoadThemeFile( const std::string& filename, std::string& output )

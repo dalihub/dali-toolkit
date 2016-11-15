@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/shader.h>
@@ -65,14 +66,20 @@ class Base : public BaseObject
 public:
 
   /**
-   *  Initialisation of the visual, this API should only called by the VisualFactory:
-   *  request the geometry and shader from the cache, if not available, create and save to the cache for sharing;
-   *  record the property values.
-   *
-   * @param[in] actor The Actor the visual is applied to if, empty if the visual has not been applied to any Actor
+   * Setting the properties of the visual, this API should only called by the VisualFactory
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  void Initialize( Actor& actor, const Property::Map& propertyMap );
+  void SetProperties( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::SetName
+   */
+  void SetName( const std::string& name );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::GetName
+   */
+  const std::string& GetName();
 
   /**
    * @copydoc Toolkit::Visual::Base::SetSize
@@ -85,28 +92,14 @@ public:
   const Vector2& GetSize() const;
 
   /**
+   * @copydoc Toolkit::Visual::Base::GetHeightForWidth
+   */
+  virtual float GetHeightForWidth( float width ) const;
+
+  /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize
    */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
-
-  /**
-   * ToDo: Add this function to Toolkit::Visual when it is fully implemented.
-   *
-   * Set the clip rectangular of this visual.
-   * The contents of the visual will not be visible outside this rectangular.
-   *
-   * @param [in] clipRect The clipping rectangular.
-   */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
-  /**
-   *ToDo: Add this function to Toolkit::Visual when it is fully implemented.
-   *
-   * Reposition this visual with a 2D offset.
-   *
-   * @param[in] offset The offset to reposition the visual.
-   */
-  virtual void SetOffset( const Vector2& offset );
+  virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
    * @copydoc Toolkit::Visual::Base::SetDepthIndex
@@ -139,7 +132,7 @@ public:
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha(  bool preMultipled );
+  void EnablePreMultipliedAlpha( bool preMultipled );
 
   /**
    * @brief Query whether alpha is pre-multiplied.
@@ -153,6 +146,16 @@ public:
    * @param[in] propertyMap Property map containing the custom shader data
    */
   void SetCustomShader( const Property::Map& propertyMap );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::SetProperty
+   */
+  void SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::GetProperty
+   */
+  Dali::Property::Value GetProperty( Dali::Property::Index index );
 
 protected:
 
@@ -177,21 +180,27 @@ protected:
   virtual void DoCreatePropertyMap( Property::Map& map ) const = 0;
 
   /**
-   * @brief Called by Initialize() allowing sub classes to respond to the Initialize event
+   * @brief Called by SetProperties() allowing sub classes to set their properties
    *
-   * @param[in] actor The Actor the visual is applied to if, empty if the visual has not been applied to any Actor
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap ) {}
+  virtual void DoSetProperties( const Property::Map& propertyMap ) = 0;
+
+  /**
+   * @brief Called when transform property changes
+   */
+  virtual void OnSetTransform(){}
 
 protected:
 
   /**
    * @brief Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
    *
+   * @note The derived class is required to create the renderer, and add it to the actor when all the resources are in place.
+   *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOnStage( Actor& actor );
+  virtual void DoSetOnStage( Actor& actor )=0;
 
   /**
    * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
@@ -201,19 +210,38 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
 protected:
+
   /**
    * @brief Gets the on stage state for this Visual
    *
    * @return Returns true if this Visual is on stage, false if it is off the stage
    */
-  bool GetIsOnStage() const;
+  bool IsOnStage() const;
 
   /**
    * @brief Gets whether the Dali::Renderer is from a shared cache (and therefore any modifications will affect other users of that renderer)
    *
    * @return Returns true if the renderer is from shared cache, false otherwise
    */
-  bool GetIsFromCache() const;
+  bool IsFromCache() const;
+
+protected:
+  /**
+   * @brief Called by SetProperty(). To be overriden by derived clases in order to set properties.
+   *
+   * @param [in] index The index of the property.
+   * @param [in] propertyValue The new value of the property.
+   */
+  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue ) = 0;
+
+  /**
+   * @brief Called by GetProperty(). To be overriden by derived classes in order to retrieve properties.
+   *
+   * @param [in] index The index of the property.
+   *
+   * @return The property value.
+   */
+  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index ) = 0;
 
 private:
 
@@ -228,6 +256,8 @@ protected:
   Impl* mImpl;
   VisualFactoryCache& mFactoryCache;
 };
+
+typedef IntrusivePtr<Base> BasePtr;
 
 } // namspace Visual
 

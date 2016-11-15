@@ -624,7 +624,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS ) ),   // Enable size negotiation
+: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS | DISABLE_STYLE_CHANGE_SIGNALS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
@@ -1693,6 +1693,7 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
   // Position Delta ///////////////////////////////////////////////////////
   if(positionChanged)
   {
+    UpdateMainInternalConstraint();
     if(mWrapMode && findShortcuts)
     {
       // In Wrap Mode, the shortest distance is a little less intuitive...

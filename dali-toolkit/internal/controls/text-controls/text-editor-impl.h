@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -18,17 +18,18 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 #include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-
-// EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 
 namespace Dali
 {
@@ -42,7 +43,7 @@ namespace Internal
 /**
  * @brief A control which renders a long text string with styles.
  */
-class TextEditor : public Control, public Text::ControlInterface
+class TextEditor : public Control, public Text::ControlInterface, public Text::EditableControlInterface
 {
 public:
 
@@ -86,6 +87,11 @@ public:
    * @copydoc TextEditor::TextChangedSignal()
    */
   Toolkit::TextEditor::TextChangedSignalType&  TextChangedSignal();
+
+  /**
+   * @copydoc TextEditor::TextChangedSignal()
+   */
+  Toolkit::TextEditor::InputStyleChangedSignalType& InputStyleChangedSignal();
 
 private: // From Control
 
@@ -152,14 +158,11 @@ private: // From Control
 // From ControlInterface
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
-   */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
-
-  /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
+
+// From EditableControlInterface
 
   /**
    * @copydoc Text::ControlInterface::TextChanged()
@@ -170,6 +173,16 @@ private: // From Control
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
   virtual void MaxLengthReached();
+
+  /**
+   * @copydoc Text::ControlInterface::InputStyleChanged()
+   */
+  virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
+
+  /**
+   * @copydoc Text::ControlInterface::AddDecoration()
+   */
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
 private: // Implementation
 
@@ -195,10 +208,9 @@ private: // Implementation
   /**
    * @brief Enable or disable clipping.
    *
-   * @param[in] clipping True if clipping should be enabled.
    * @param[in] size The area to clip within.
    */
-  void EnableClipping( bool clipping, const Vector2& size );
+  void EnableClipping( const Vector2& size );
 
   /**
    * @brief Callback when keyboard is shown/hidden.
@@ -214,6 +226,13 @@ private: // Implementation
    * @param[in] touch Touch information
    */
   bool OnTouched( Actor actor, const TouchData& touch );
+
+  /**
+   * @brief Callbacks called on idle.
+   *
+   * If there are notifications of change of input style on the queue, Toolkit::TextEditor::InputStyleChangedSignal() are emitted.
+   */
+  void OnIdleSignal();
 
   /**
    * Construct a new TextEditor.
@@ -241,6 +260,7 @@ private: // Data
 
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
+  Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
@@ -249,6 +269,7 @@ private: // Data
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
+  CallbackBase* mIdleCallback;
 
   int mRenderingBackend;
   bool mHasBeenStaged:1;
@@ -280,4 +301,4 @@ inline const Toolkit::Internal::TextEditor& GetImpl( const Toolkit::TextEditor& 
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H

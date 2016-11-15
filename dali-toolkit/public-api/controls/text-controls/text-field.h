@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_FIELD_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,11 @@ class TextField;
  * @brief A control which provides a single-line editable text field.
  *
  *  * Signals
- * | %Signal Name         | Method                                              |
- * |----------------------|-----------------------------------------------------|
- * | textChanged          | @ref TextChangedSignal()                            |
- * | maxLengthReached     | @ref MaxLengthReachedSignal()                       |
- *
- * @SINCE_1_0.0
+ * | %Signal Name         | Method                         |                    |
+ * |----------------------|--------------------------------|--------------------|
+ * | textChanged          | @ref TextChangedSignal()       | @SINCE_1_0.0       |
+ * | maxLengthReached     | @ref MaxLengthReachedSignal()  | @SINCE_1_0.0       |
+ * | inputStyleChanged    | @ref InputStyleChangedSignal() | @SINCE_1_2_2       |
  */
 class DALI_IMPORT_API TextField : public Control
 {
@@ -74,7 +73,7 @@ public:
       PLACEHOLDER_TEXT,                         ///< name "placeholderText",                     The text to display when the TextField is empty and inactive,                      type STRING @SINCE_1_0.0
       PLACEHOLDER_TEXT_FOCUSED,                 ///< name "placeholderTextFocused",              The text to display when the TextField is empty with key-input focus,              type STRING @SINCE_1_0.0
       FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                         type STRING @SINCE_1_0.0
-      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                          type STRING @SINCE_1_0.0
+      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                          type STRING or MAP @SINCE_1_2.13
       POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                        type FLOAT @SINCE_1_0.0
       MAX_LENGTH,                               ///< name "maxLength"                            The maximum number of characters that can be inserted,                             type INTEGER @SINCE_1_0.0
       EXCEED_POLICY,                            ///< name "exceedPolicy"                         Specifies how the text is truncated when it does not fit,                          type INTEGER @SINCE_1_0.0
@@ -106,16 +105,16 @@ public:
       INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                                   type VECTOR4 @SINCE_1_0.0
       ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                         type BOOLEAN @SINCE_1_0.0
       INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                           type STRING @SINCE_1_0.0
-      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                            type STRING @SINCE_1_0.0
+      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                            type STRING or MAP @SINCE_1_2.13
       INPUT_POINT_SIZE,                         ///< name "inputPointSize",                      The font's size of the new input text in points,                                   type FLOAT @SINCE_1_0.0
-      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                  type STRING @SINCE_1_1.37
-      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                    type STRING @SINCE_1_1.37
-      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                     type STRING @SINCE_1_1.37
-      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                       type STRING @SINCE_1_1.37
-      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                     type STRING @SINCE_1_1.37
-      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                       type STRING @SINCE_1_1.37
-      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                    type STRING @SINCE_1_1.37
-      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                      type STRING @SINCE_1_1.37
+      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                  type STRING or MAP @SINCE_1_2.13
+      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                    type STRING or MAP @SINCE_1_2.13
+      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                     type STRING or MAP @SINCE_1_2.13
+      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                       type STRING or MAP @SINCE_1_2.13
+      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                     type STRING or MAP @SINCE_1_2.13
+      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                       type STRING or MAP @SINCE_1_2.13
+      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                    type STRING or MAP @SINCE_1_2.13
+      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                      type STRING or MAP @SINCE_1_2.13
     };
   };
 
@@ -131,12 +130,46 @@ public:
     EXCEED_POLICY_CLIP             ///< The end of text will be clipped to fit within the TextField. @SINCE_1_0.0
   };
 
+  /**
+   * @brief Mask used by the signal InputStyleChangedSignal(). Notifies which parameters of the input style have changed.
+   *
+   * @SINCE_1_2_2
+   */
+  struct InputStyle
+  {
+    enum Mask
+    {
+      NONE         = 0x0000, ///< @SINCE_1_2_2
+      COLOR        = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
+      UNDERLINE    = 0x0010, ///< @SINCE_1_2_2
+      SHADOW       = 0x0020, ///< @SINCE_1_2_2
+      EMBOSS       = 0x0040, ///< @SINCE_1_2_2
+      OUTLINE      = 0x0080  ///< @SINCE_1_2_2
+    };
+  };
+
   // Type Defs
 
-  /// @brief Text changed signal type.
+  /**
+   * @brief Text changed signal type.
+   * @SINCE_1_0.0
+   */
   typedef Signal<void ( TextField ) > TextChangedSignalType;
-  /// @brief Max Characters Exceed signal type.
+
+  /**
+   * @brief Max Characters Exceed signal type.
+   * @SINCE_1_0.0
+   */
   typedef Signal<void ( TextField ) > MaxLengthReachedSignalType;
+
+  /**
+   * @brief Input Style changed signal type.
+   * @SINCE_1_2_2
+   */
+  typedef Signal<void ( TextField, InputStyle::Mask ) > InputStyleChangedSignalType;
 
   /**
    * @brief Create the TextField control.
@@ -213,6 +246,20 @@ public:
    * @return The signal to connect to.
    */
   MaxLengthReachedSignalType& MaxLengthReachedSignal();
+
+  /**
+   * @brief This signal is emitted when the input style is updated as a consequence of a change in the cursor position.
+   * i.e. The signal is not emitted when the input style is updated through the property system.
+   *
+   * A callback of the following type may be connected. The @p mask parameter notifies which parts of the style have changed.
+   * @code
+   *   void YourCallbackName( TextField textField, TextField::InputStyle::Mask mask );
+   * @endcode
+   *
+   * @SINCE_1_2_2
+   * @return The signal to connect to.
+   */
+  InputStyleChangedSignalType& InputStyleChangedSignal();
 
 public: // Not intended for application developers
 

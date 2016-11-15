@@ -17,6 +17,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
@@ -25,6 +27,7 @@
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include "toolkit-clipboard.h"
 
 using namespace Dali;
 using namespace Toolkit;
@@ -105,8 +108,13 @@ const float TO_SECONDS = 1.f / TO_MILLISECONDS;
 const float SCROLL_THRESHOLD = 10.f;
 const float SCROLL_SPEED = 300.f;
 
+const unsigned int DEFAULT_FONT_SIZE = 1152u;
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+
 static bool gTextChangedCallBackCalled;
 static bool gMaxCharactersCallBackCalled;
+static bool gInputStyleChangedCallbackCalled;
+static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
 static void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
 {
@@ -206,6 +214,35 @@ static int Wait(ToolkitTestApplication& application, int duration = 0)
   return time;
 }
 
+Dali::Integration::Point GetPointDownInside( Vector2& pos )
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( pos );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpInside( Vector2& pos )
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( pos );
+  return point;
+}
+
+struct CallbackFunctor
+{
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag( callbackFlag )
+  {
+  }
+
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
 
 static void TestTextChangedCallback( TextField control )
 {
@@ -219,6 +256,14 @@ static void TestMaxLengthReachedCallback( TextField control )
   tet_infoline(" TestMaxLengthReachedCallback");
 
   gMaxCharactersCallBackCalled = true;
+}
+
+static void TestInputStyleChangedCallback( TextField control, TextField::InputStyle::Mask mask )
+{
+  tet_infoline(" TestInputStyleChangedCallback");
+
+  gInputStyleChangedCallbackCalled = true;
+  gInputStyleMask = mask;
 }
 
 // Generate a TapGestureEvent to send to Core.
@@ -236,7 +281,6 @@ Integration::TapGestureEvent GenerateTap(
 
   return tap;
 }
-
 
 Integration::LongPressGestureEvent GenerateLongPress(
     Gesture::State state,
@@ -264,6 +308,34 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 keyModifier,
                                 timeStamp,
                                 keyState );
+}
+
+bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
+{
+  if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
+  {
+    for( unsigned int index = 0u; index < fontStyleMapGet.Count(); ++index )
+    {
+      const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
+
+      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      if( NULL != valueSet )
+      {
+        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        {
+          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+      }
+      else
+      {
+        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 } // namespace
@@ -456,10 +528,56 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check font properties.
   field.SetProperty( TextField::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "Setting font style" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("Setting font style"), TEST_LOCATION );
+
+  Property::Map fontStyleMapSet;
+  Property::Map fontStyleMapGet;
+  Property::Value* slantValue = NULL;
+
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Reset font style.
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+
+  // Replace 'roman' for 'normal'.
+  slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   // Check that the MAX_LENGTH property can be correctly set
   const int maxNumberOfCharacters = 20;
@@ -545,22 +663,85 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check input font properties.
   field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "Setting input font style" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "Setting input font style", TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
+  // Reset input font style.
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "normal" );
+  fontStyleMapSet.Insert( "slant", "oblique" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "slant", "roman" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+
+  // Replace 'roman' for 'normal'.
+  slantValue = fontStyleMapGet.Find( "slant" );
+  if( NULL != slantValue )
+  {
+    if( "normal" == slantValue->Get<std::string>() )
+    {
+      fontStyleMapGet["slant"] = "roman";
+    }
+  }
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  Property::Map underlineMapSet;
+  Property::Map underlineMapGet;
+
+  underlineMapSet.Insert( "enable", "true" );
+  underlineMapSet.Insert( "color", "red" );
+  underlineMapSet.Insert( "height", "1" );
+
   // Check the underline property
-  field.SetProperty( TextField::Property::UNDERLINE, "Underline properties" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::UNDERLINE ), std::string("Underline properties"), TEST_LOCATION );
+  field.SetProperty( TextField::Property::UNDERLINE, underlineMapSet );
+
+  underlineMapGet = field.GetProperty<Property::Map>( TextField::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   // Check the input underline property
   field.SetProperty( TextField::Property::INPUT_UNDERLINE, "Underline input properties" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_UNDERLINE ), std::string("Underline input properties"), TEST_LOCATION );
 
   // Check the shadow property
-  field.SetProperty( TextField::Property::SHADOW, "Shadow properties" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SHADOW ), std::string("Shadow properties"), TEST_LOCATION );
+  Property::Map shadowMapSet;
+  Property::Map shadowMapGet;
+
+  shadowMapSet.Insert( "color", "green" );
+  shadowMapSet.Insert( "offset", "2 2" );
+
+  field.SetProperty( TextField::Property::SHADOW, shadowMapSet );
+
+  shadowMapGet = field.GetProperty<Property::Map>( TextField::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
 
   // Check the input shadow property
   field.SetProperty( TextField::Property::INPUT_SHADOW, "Shadow input properties" );
@@ -625,11 +806,16 @@ int utcDaliTextFieldTextChangedP(void)
 
   Stage::GetCurrent().Add( field );
 
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
+  bool textChangedSignal = false;
+  field.ConnectSignal( testTracker, "textChanged",   CallbackFunctor(&textChangedSignal) );
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::TEXT, "ABC" );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_CHECK( textChangedSignal );
 
   application.SendNotification();
 
@@ -652,11 +838,16 @@ int utcDaliTextFieldTextChangedN(void)
 
   Stage::GetCurrent().Add( field );
 
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
+  bool textChangedSignal = false;
+  field.ConnectSignal( testTracker, "textChanged",   CallbackFunctor(&textChangedSignal) );
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "ABC" ); // Setting placeholder, not TEXT
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+  DALI_TEST_CHECK( !textChangedSignal );
 
   END_TEST;
 }
@@ -676,13 +867,19 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
 
   field.SetKeyInputFocus();
 
-  gMaxCharactersCallBackCalled = false;
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
+  bool maxLengthReachedSignal = false;
+  field.ConnectSignal( testTracker, "maxLengthReached",   CallbackFunctor(&maxLengthReachedSignal) );
+
+  gMaxCharactersCallBackCalled = false;
 
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( maxLengthReachedSignal );
 
   END_TEST;
 }
@@ -702,13 +899,451 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   field.SetKeyInputFocus();
 
-  gMaxCharactersCallBackCalled = false;
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
+  bool maxLengthReachedSignal = false;
+  field.ConnectSignal( testTracker, "maxLengthReached",   CallbackFunctor(&maxLengthReachedSignal) );
+
+  gMaxCharactersCallBackCalled = false;
 
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( !maxLengthReachedSignal );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldInputStyleChanged01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged01");
+
+  // The text-field emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
+  application.CreateAdaptor();
+
+  // Load some fonts.
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE );
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>" );
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  field.InputStyleChangedSignal().Connect( &TestInputStyleChangedCallback );
+  bool inputStyleChangedSignal = false;
+  field.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
+
+  Stage::GetCurrent().Add( field );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 18.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 18.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::FONT_FAMILY | TextField::InputStyle::POINT_SIZE ), TEST_LOCATION );
+
+    const std::string fontFamily = field.GetProperty( TextField::Property::INPUT_FONT_FAMILY ).Get<std::string>();
+    DALI_TEST_EQUALS( fontFamily, "DejaVuSerif", TEST_LOCATION );
+
+    const float pointSize = field.GetProperty( TextField::Property::INPUT_POINT_SIZE ).Get<float>();
+    DALI_TEST_EQUALS( pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 43.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 43.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::COLOR ), TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::GREEN, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 88.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 88.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::COLOR | TextField::InputStyle::FONT_STYLE ), TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+
+    const Property::Map fontStyleMapGet = field.GetProperty( TextField::Property::INPUT_FONT_STYLE ).Get<Property::Map>();
+
+    Property::Map fontStyleMapSet;
+    fontStyleMapSet.Insert( "weight", "bold" );
+
+    DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+    DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 115.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 115.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 164.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 164.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ), static_cast<unsigned int>( TextField::InputStyle::FONT_STYLE ), TEST_LOCATION );
+
+    const std::string style = field.GetProperty( TextField::Property::INPUT_FONT_STYLE ).Get<std::string>();
+    DALI_TEST_CHECK( style.empty() );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 191.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 191.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldInputStyleChanged02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged02");
+
+  // The text-field emits signals when the input style changes. These changes of style are
+  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
+  // can't be emitted during the size negotiation as the callbacks may update the UI.
+  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
+  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
+  application.CreateAdaptor();
+
+  // Load some fonts.
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE );
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>" );
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  field.InputStyleChangedSignal().Connect( &TestInputStyleChangedCallback );
+  bool inputStyleChangedSignal = false;
+  field.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
+
+  Stage::GetCurrent().Add( field );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 53.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 53.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 53.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 53.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::FONT_FAMILY |
+                                                 TextField::InputStyle::POINT_SIZE  |
+                                                 TextField::InputStyle::COLOR ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::GREEN, TEST_LOCATION );
+
+    const std::string fontFamily = field.GetProperty( TextField::Property::INPUT_FONT_FAMILY ).Get<std::string>();
+    DALI_TEST_EQUALS( fontFamily, "DejaVuSerif", TEST_LOCATION );
+
+    const float pointSize = field.GetProperty( TextField::Property::INPUT_POINT_SIZE ).Get<float>();
+    DALI_TEST_EQUALS( pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::COLOR ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLUE, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::COLOR ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
+
+  gInputStyleChangedCallbackCalled = false;
+  gInputStyleMask = TextField::InputStyle::NONE;
+  inputStyleChangedSignal = false;
+
+  field.SetProperty( TextField::Property::INPUT_COLOR, Color::YELLOW );
+
+  Property::Map fontStyleMapSet;
+  fontStyleMapSet.Insert( "weight", "thin" );
+  fontStyleMapSet.Insert( "width", "condensed" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+  field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 20.f );
+
+  field.SetProperty( TextField::Property::INPUT_UNDERLINE, "underline" );
+  field.SetProperty( TextField::Property::INPUT_SHADOW, "shadow" );
+  field.SetProperty( TextField::Property::INPUT_EMBOSS, "emboss" );
+  field.SetProperty( TextField::Property::INPUT_OUTLINE, "outline" );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( !gInputStyleChangedCallbackCalled );
+  DALI_TEST_CHECK( !inputStyleChangedSignal );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 63.f, 25.f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 63.f, 25.f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Executes the idle callbacks added by the text control on the change of input style.
+  application.RunIdles();
+
+  DALI_TEST_CHECK( gInputStyleChangedCallbackCalled );
+  if( gInputStyleChangedCallbackCalled )
+  {
+    DALI_TEST_EQUALS( static_cast<unsigned int>( gInputStyleMask ),
+                      static_cast<unsigned int>( TextField::InputStyle::COLOR |
+                                                 TextField::InputStyle::POINT_SIZE |
+                                                 TextField::InputStyle::FONT_STYLE |
+                                                 TextField::InputStyle::UNDERLINE |
+                                                 TextField::InputStyle::SHADOW |
+                                                 TextField::InputStyle::EMBOSS |
+                                                 TextField::InputStyle::OUTLINE ),
+                      TEST_LOCATION );
+
+    const Vector4 color = field.GetProperty( TextField::Property::INPUT_COLOR ).Get<Vector4>();
+    DALI_TEST_EQUALS( color, Color::BLACK, TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( inputStyleChangedSignal );
 
   END_TEST;
 }
@@ -1236,6 +1871,9 @@ int utcDaliTextFieldEvent08(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent08");
 
+  Dali::Clipboard clipboard = Clipboard::Get();
+  clipboard.SetItem("testTextFieldEvent");
+
   // Checks Longpress when only place holder text
 
   TextField field = TextField::New();
@@ -1266,13 +1904,35 @@ int utcDaliTextFieldEvent08(void)
   application.SendNotification();
   application.Render();
 
+  Wait(application, 500);
+
+  Stage stage = Stage::GetCurrent();
+  Layer layer = stage.GetRootLayer();
+  Actor actor = layer.FindChildByName("optionPaste");
+
+  if (actor)
+  {
+    Vector3 worldPosition = actor.GetCurrentWorldPosition();
+    Vector2 halfStageSize = stage.GetSize() / 2.0f;
+    Vector2 position(worldPosition.x + halfStageSize.width, worldPosition.y + halfStageSize.height);
+
+    Dali::Integration::TouchEvent event;
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint( GetPointDownInside( position ) );
+    application.ProcessEvent( event );
+
+    event = Dali::Integration::TouchEvent();
+    event.AddPoint( GetPointUpInside( position ) );
+    application.ProcessEvent( event );
+  }
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("testTextFieldEvent"), TEST_LOCATION );
   END_TEST;
 }
 
-int utcDaliTextFieldStyleWhilstSelected09(void)
+int utcDaliTextFieldStyleWhilstSelected(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldEvent09");
+  tet_infoline(" utcDaliTextFieldStyleWhilstSelected");
 
   // Change font and styles whilst text is selected whilst word selected
 
@@ -1323,11 +1983,25 @@ int utcDaliTextFieldStyleWhilstSelected09(void)
   field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
 
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"slant\":\"italic\"}", TEST_LOCATION );
+  Property::Map fontStyleMapSet;
+  Property::Map fontStyleMapGet;
 
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"width\":\"expanded\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"width\":\"expanded\",\"slant\":\"italic\"}", TEST_LOCATION );
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "width", "expanded" );
+  fontStyleMapSet.Insert( "slant", "italic" );
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -1335,11 +2009,24 @@ int utcDaliTextFieldStyleWhilstSelected09(void)
   field.SetProperty( TextField::Property::TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::TEXT_COLOR ), Color::RED, TEST_LOCATION );
 
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), "{\"weight\":\"bold\",\"slant\":\"italic\"}", TEST_LOCATION );
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "weight", "bold" );
+  fontStyleMapSet.Insert( "slant", "italic" );
 
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"width\":\"expanded\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), "{\"width\":\"expanded\"}", TEST_LOCATION );
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  fontStyleMapSet.Clear();
+  fontStyleMapSet.Insert( "width", "expanded" );
+
+  field.SetProperty( TextField::Property::FONT_STYLE, fontStyleMapSet );
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   END_TEST;
 }

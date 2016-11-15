@@ -175,7 +175,7 @@ const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
 }
 
 ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIndicatorShowAlpha(1.0f),
   mDirection(direction),
   mScrollableObject(WeakHandleBase()),
@@ -243,11 +243,16 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
   // Don't allow empty handle
   if( indicator )
   {
+    // Remove current Indicator
+    if( mIndicator )
+    {
+      Self().Remove( mIndicator );
+    }
     mIndicator = indicator;
     mIndicatorFirstShow = true;
-    Self().Add(mIndicator);
+    Self().Add( mIndicator );
 
-    EnableGestureDetection(Gesture::Type(Gesture::Pan));
+    EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
 
     PanGestureDetector detector( GetPanGestureDetector() );
     detector.DetachAll();
