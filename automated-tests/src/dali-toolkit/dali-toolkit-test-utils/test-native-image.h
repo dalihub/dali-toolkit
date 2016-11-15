@@ -19,11 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-
-// EXTERNAL INCLUDES
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/devel-api/images/native-image-interface-extension.h>
-#include <dali/integration-api/gl-defines.h>
 
 namespace Dali
 {
@@ -35,8 +32,6 @@ class DALI_IMPORT_API TestNativeImageExtension: public Dali::NativeImageInterfac
 public:
   inline const char* GetCustomFragmentPreFix(){return "#extension GL_OES_EGL_image_external:require\n";}
   inline const char* GetCustomSamplerTypename(){return "samplerExternalOES";}
-
-  inline int GetEglImageTextureTarget(){return GL_TEXTURE_2D;}
 
 };
 
