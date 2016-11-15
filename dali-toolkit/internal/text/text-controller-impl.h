@@ -477,12 +477,6 @@ struct Controller::Impl
     return !result; // If NumberOfItems greater than 0, return false
   }
 
-  bool IsClipboardVisible()
-  {
-    bool result( mClipboard && mClipboard.IsVisible() );
-    return result;
-  }
-
   /**
    * @brief Calculates the start character index of the first paragraph to be updated and
    * the end character index of the last paragraph to be updated.
@@ -590,7 +584,7 @@ struct Controller::Impl
 
   void SendSelectionToClipboard( bool deleteAfterSending );
 
-  void RequestGetTextFromClipboard();
+  void GetTextFromClipboard( unsigned int itemIndex, std::string& retrievedString );
 
   void RepositionSelectionHandles();
   void RepositionSelectionHandles( float visualX, float visualY );

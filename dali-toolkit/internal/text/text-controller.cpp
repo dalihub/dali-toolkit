@@ -2418,27 +2418,31 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
   if( NULL != mImpl->mEventData )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Concise, "TapEvent state:%d \n", mImpl->mEventData->mState );
-    EventData::State state( mImpl->mEventData->mState );
-    bool relayoutNeeded( false );   // to avoid unnecessary relayouts when tapping an empty text-field
 
-    if( mImpl->IsClipboardVisible() )
+    if( 1u == tapCount )
     {
-      if( EventData::INACTIVE == state || EventData::EDITING == state)
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
-      }
-      relayoutNeeded = true;
-    }
-    else if( 1u == tapCount )
-    {
-      if( EventData::EDITING_WITH_POPUP == state || EventData::EDITING_WITH_PASTE_POPUP == state )
+      // This is to avoid unnecessary relayouts when tapping an empty text-field
+      bool relayoutNeeded( false );
+
+      if( ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) ||
+          ( EventData::EDITING_WITH_PASTE_POPUP == mImpl->mEventData->mState ) )
       {
         mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );  // If Popup shown hide it here so can be shown again if required.
       }
 
-      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != state ) )
+      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != mImpl->mEventData->mState ) )
       {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        // Already in an active state so show a popup
+        if( !mImpl->IsClipboardEmpty() )
+        {
+          // Shows Paste popup but could show full popup with Selection options. ( EDITING_WITH_POPUP )
+          mImpl->ChangeState( EventData::EDITING_WITH_PASTE_POPUP );
+        }
+        else
+        {
+          // Show cursor and grabhandle on first tap, this matches the behaviour of tapping when already editing
+          mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
+        }
         relayoutNeeded = true;
       }
       else
@@ -2449,7 +2453,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
           ResetText();
         }
 
-        if( EventData::INACTIVE == state )
+        if( EventData::INACTIVE == mImpl->mEventData->mState )
         {
           mImpl->ChangeState( EventData::EDITING );
         }
@@ -2459,6 +2463,18 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
         }
         relayoutNeeded = true;
       }
+
+      // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+      if( relayoutNeeded )
+      {
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = tapCount;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
+
+        mImpl->RequestRelayout();
+      }
     }
     else if( 2u == tapCount )
     {
@@ -2467,17 +2483,6 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       {
         SelectEvent( x, y, false );
       }
-    }
-    // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
-    if( relayoutNeeded )
-    {
-      Event event( Event::TAP_EVENT );
-      event.p1.mUint = tapCount;
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-
-      mImpl->RequestRelayout();
     }
   }
 
@@ -2530,7 +2535,7 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 
         mImpl->RequestRelayout();
       }
-      else if( !mImpl->IsClipboardVisible() )
+      else
       {
         // Reset the imf manger to commit the pre-edit before selecting the text.
         mImpl->ResetImfManager();
@@ -2698,7 +2703,9 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     }
     case Toolkit::TextSelectionPopup::PASTE:
     {
-      mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
+      std::string stringToPaste("");
+      mImpl->GetTextFromClipboard( 0, stringToPaste ); // Paste latest item from system clipboard
+      PasteText( stringToPaste );
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT:

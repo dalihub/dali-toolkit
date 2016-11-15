@@ -74,9 +74,11 @@ public:
   bool SetItem( const std::string& itemData );
 
   /**
-   * Request clipboard service to retrieve an item
+   * Retreive the string at the given index in the clip board.
+   * @param[in] index item in clipboard list to retrieve
+   * @return string the text item at the current index.
    */
-  void RequestItem();
+  std::string GetItem( unsigned int index );
 
   /**
    * Returns the number of item currently in the clipboard
@@ -93,12 +95,6 @@ public:
    * Hide the clipboard window
    */
   void HideClipboard();
-
-  /**
-  * @brief Retrieves the clipboard's visibility
-  * @return bool true if the clipboard is visible.
-  */
-  bool IsVisible() const;
 
 };
 } // namespace Dali
