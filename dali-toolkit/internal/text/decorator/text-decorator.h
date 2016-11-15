@@ -476,20 +476,6 @@ public:
   const Vector4& GetHighlightColor() const;
 
   /**
-   * @brief Sets whether the highlight is active.
-   *
-   * @param[in] active Whether the highlight is active.
-   */
-  void SetHighlightActive( bool active );
-
-  /**
-   * @brief Retrieves whether the highlight is active.
-   *
-   * @return @e true if the highlight is active, @e false otherwise.
-   */
-  bool IsHighlightActive() const;
-
-  /**
    * @brief Sets into the decorator the depth used to render the text.
    *
    * @param[in] depth The text's depth.

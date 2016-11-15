@@ -91,7 +91,6 @@ EventData::EventData( DecoratorPtr decorator )
   mUpdateGrabHandlePosition( false ),
   mUpdateLeftSelectionPosition( false ),
   mUpdateRightSelectionPosition( false ),
-  mIsLeftHandleSelected( false ),
   mUpdateHighlightBox( false ),
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
@@ -219,12 +218,16 @@ bool Controller::Impl::ProcessInputEvents()
       GetCursorPosition( mEventData->mRightSelectionPosition,
                          rightHandleInfo );
 
-      if( mEventData->mScrollAfterUpdatePosition && ( mEventData->mIsLeftHandleSelected ? mEventData->mUpdateLeftSelectionPosition : mEventData->mUpdateRightSelectionPosition ) )
+      if( mEventData->mScrollAfterUpdatePosition && mEventData->mUpdateLeftSelectionPosition )
       {
-        CursorInfo& info = mEventData->mIsLeftHandleSelected ? leftHandleInfo : rightHandleInfo;
+        const Vector2 currentCursorPosition( leftHandleInfo.primaryPosition.x, leftHandleInfo.lineOffset );
+        ScrollToMakePositionVisible( currentCursorPosition, leftHandleInfo.lineHeight );
+       }
 
-        const Vector2 currentCursorPosition( info.primaryPosition.x, info.lineOffset );
-        ScrollToMakePositionVisible( currentCursorPosition, info.lineHeight );
+      if( mEventData->mScrollAfterUpdatePosition && mEventData->mUpdateRightSelectionPosition )
+      {
+        const Vector2 currentCursorPosition( rightHandleInfo.primaryPosition.x, rightHandleInfo.lineOffset );
+        ScrollToMakePositionVisible( currentCursorPosition, rightHandleInfo.lineHeight );
       }
     }
 
@@ -1200,31 +1203,17 @@ void Controller::Impl::OnPanEvent( const Event& event )
     return;
   }
 
-  const bool isHorizontalScrollEnabled = mEventData->mDecorator->IsHorizontalScrollEnabled();
-  const bool isVerticalScrollEnabled = mEventData->mDecorator->IsVerticalScrollEnabled();
+  int state = event.p1.mInt;
 
-  if( !isHorizontalScrollEnabled && !isVerticalScrollEnabled )
+  if( ( Gesture::Started == state ) ||
+      ( Gesture::Continuing == state ) )
   {
-    // Nothing to do if scrolling is not enabled.
-    return;
-  }
-
-  const int state = event.p1.mInt;
-
-  switch( state )
-  {
-    case Gesture::Started:
-    {
-      // Will remove the cursor, handles or text's popup, ...
-      ChangeState( EventData::TEXT_PANNING );
-      break;
-    }
-    case Gesture::Continuing:
+    if( mEventData->mDecorator )
     {
       const Vector2& layoutSize = mVisualModel->GetLayoutSize();
       const Vector2 currentScroll = mScrollPosition;
 
-      if( isHorizontalScrollEnabled )
+      if( mEventData->mDecorator->IsHorizontalScrollEnabled() )
       {
         const float displacementX = event.p2.mFloat;
         mScrollPosition.x += displacementX;
@@ -1232,7 +1221,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
         ClampHorizontalScroll( layoutSize );
       }
 
-      if( isVerticalScrollEnabled )
+      if( mEventData->mDecorator->IsVerticalScrollEnabled() )
       {
         const float displacementY = event.p3.mFloat;
         mScrollPosition.y += displacementY;
@@ -1241,17 +1230,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
       }
 
       mEventData->mDecorator->UpdatePositions( mScrollPosition - currentScroll );
-      break;
     }
-    case Gesture::Finished:
-    case Gesture::Cancelled: // FALLTHROUGH
-    {
-      // Will go back to the previous state to show the cursor, handles, the text's popup, ...
-      ChangeState( mEventData->mPreviousState );
-      break;
-    }
-    default:
-      break;
   }
 }
 
@@ -1323,9 +1302,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
       mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-
-      // Will define the order to scroll the text to match the handle position.
-      mEventData->mIsLeftHandleSelected = true;
     }
     else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
     {
@@ -1343,9 +1319,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
       mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-
-      // Will define the order to scroll the text to match the handle position.
-      mEventData->mIsLeftHandleSelected = false;
     }
   } // end ( HANDLE_PRESSED == state )
   else if( ( HANDLE_RELEASED == state ) ||
@@ -1388,7 +1361,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       mEventData->mUpdateHighlightBox = true;
       mEventData->mUpdateLeftSelectionPosition = true;
-      mEventData->mUpdateRightSelectionPosition = true;
 
       if( handleStopScrolling || isSmoothHandlePanEnabled )
       {
@@ -1407,7 +1379,6 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       mEventData->mUpdateHighlightBox = true;
       mEventData->mUpdateRightSelectionPosition = true;
-      mEventData->mUpdateLeftSelectionPosition = true;
 
       if( handleStopScrolling || isSmoothHandlePanEnabled )
       {
@@ -2181,7 +2152,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
 
   if( mEventData->mState != newState )
   {
-    mEventData->mPreviousState = mEventData->mState;
     mEventData->mState = newState;
 
     switch( mEventData->mState )
@@ -2193,7 +2163,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
         mEventData->mDecorator->SetPopupActive( false );
         mEventData->mDecoratorUpdated = true;
         HideClipboard();
@@ -2204,7 +2173,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
         mEventData->mDecorator->SetPopupActive( false );
         mEventData->mDecoratorUpdated = true;
         HideClipboard();
@@ -2217,7 +2185,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHighlightActive( true );
         if( mEventData->mGrabHandlePopupEnabled )
         {
           SetPopupButtons();
@@ -2237,7 +2204,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
         if( mEventData->mGrabHandlePopupEnabled )
         {
           mEventData->mDecorator->SetPopupActive( false );
@@ -2259,7 +2225,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         {
           mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
           mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHighlightActive( false );
         }
         else
         {
@@ -2287,7 +2252,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
         if( mEventData->mGrabHandlePopupEnabled )
         {
           mEventData->mDecorator->SetPopupActive( false );
@@ -2303,7 +2267,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHighlightActive( true );
         if( mEventData->mGrabHandlePopupEnabled )
         {
           mEventData->mDecorator->SetPopupActive( false );
@@ -2323,7 +2286,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
         if( mEventData->mGrabHandlePopupEnabled )
         {
           mEventData->mDecorator->SetPopupActive( false );
@@ -2344,7 +2306,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-        mEventData->mDecorator->SetHighlightActive( false );
 
         if( mEventData->mGrabHandlePopupEnabled )
         {
@@ -2352,27 +2313,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetPopupActive( true );
         }
         HideClipboard();
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::TEXT_PANNING:
-      {
-        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        if( mEventData->mDecorator->IsHandleActive( LEFT_SELECTION_HANDLE ) ||
-            mEventData->mDecorator->IsHandleActive( RIGHT_SELECTION_HANDLE ) )
-        {
-          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-          mEventData->mDecorator->SetHighlightActive( true );
-        }
-
-        if( mEventData->mGrabHandlePopupEnabled )
-        {
-          mEventData->mDecorator->SetPopupActive( false );
-        }
-
         mEventData->mDecoratorUpdated = true;
         break;
       }
