@@ -35,23 +35,23 @@ namespace Text
 {
 
 /**
- * @brief Merges font's descriptions to retrieve the combined font's description for a given character.
+ * @brief Merges the font descriptions to retrieve the font Id for each character.
  *
- * @param[in] fontDescriptions The font's descriptions for the whole text.
- * @param[in] defaultFontDescription The default font's description.
- * @param[in] defaultPointSize The default font's point size.
- * @param[in] characterIndex Index to the character to retrieve its font's description.
- * @param[out] fontDescription The font's description for the character.
- * @param[out] fontPointSize The font's point size for the character.
+ * @param[in] fontDescriptions The font descriptions.
+ * @param[out] fontIds The font id for each character.
  * @param[out] isDefaultFont Whether the font is a default one.
+ * @param[in] defaultFontDescription The default font description.
+ * @param[in] defaultPointSize The default font size.
+ * @param[in] startIndex The character from where the fonts are merged.
+ * @param[in] numberOfCharacters The number of characters to set the font.
  */
 void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
+                            Vector<FontId>& fontIds,
+                            Vector<bool>& isDefaultFont,
                             const TextAbstraction::FontDescription& defaultFontDescription,
                             TextAbstraction::PointSize26Dot6 defaultPointSize,
-                            CharacterIndex characterIndex,
-                            TextAbstraction::FontDescription& fontDescription,
-                            TextAbstraction::PointSize26Dot6& fontPointSize,
-                            bool& isDefaultFont );
+                            CharacterIndex startIndex,
+                            Length numberOfCharacters );
 
 /**
  * @brief Retrieves the script Id from the script run for a given character's @p index.

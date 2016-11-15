@@ -112,9 +112,8 @@ public:
    *
    * @param[in] text Vector of UTF-32 characters.
    * @param[in] scripts Vector containing the script runs for the whole text.
-   * @param[in] fontDescriptions The fonts set through the mark-up string or the input style set through the property system.
-   * @param[in] defaultFontDescription The default font's description set through the property system.
-   * @param[in] defaultFontPointSize The default font's point size set through the property system.
+   * @param[in] fontDescriptions The fonts set by the application developers.
+   * @param[in] defaultFontId The default font's id.
    * @param[in] startIndex The character from where the font info is set.
    * @param[in] numberOfCharacters The number of characters to set the font.
    * @param[out] fonts The validated fonts.
@@ -122,8 +121,7 @@ public:
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
                       const Vector<FontDescriptionRun>& fontDescriptions,
-                      const TextAbstraction::FontDescription& defaultFontDescription,
-                      TextAbstraction::PointSize26Dot6 defaultFontPointSize,
+                      FontId defaultFontId,
                       CharacterIndex startIndex,
                       Length numberOfCharacters,
                       Vector<FontRun>& fonts );

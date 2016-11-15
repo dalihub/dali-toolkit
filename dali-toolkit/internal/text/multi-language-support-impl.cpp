@@ -63,9 +63,7 @@ bool ValidateFontsPerScript::IsValidFont( FontId fontId ) const
   return false;
 }
 
-FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient,
-                               const TextAbstraction::FontDescription& description,
-                               PointSize26Dot6 size ) const
+FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient, PointSize26Dot6 size ) const
 {
   for( Vector<FontId>::ConstIterator it = mFonts.Begin(),
          endIt = mFonts.End();
@@ -73,13 +71,7 @@ FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient,
        ++it )
   {
     const FontId fontId = *it;
-    TextAbstraction::FontDescription fontDescription;
-    fontClient.GetDescription( fontId, fontDescription );
-
-    if( ( size == fontClient.GetPointSize( fontId ) ) &&
-        ( description.weight == fontDescription.weight ) &&
-        ( description.width == fontDescription.width ) &&
-        ( description.slant == fontDescription.slant ) )
+    if( size == fontClient.GetPointSize( fontId ) )
     {
       return fontId;
     }
@@ -382,8 +374,7 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           const Vector<FontDescriptionRun>& fontDescriptions,
-                                          const TextAbstraction::FontDescription& defaultFontDescription,
-                                          TextAbstraction::PointSize26Dot6 defaultFontPointSize,
+                                          FontId defaultFontId,
                                           CharacterIndex startIndex,
                                           Length numberOfCharacters,
                                           Vector<FontRun>& fonts )
@@ -433,13 +424,36 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   // Get the font client.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
-  const Character* const textBuffer = text.Begin();
+  // Get the default font description and default size.
+  TextAbstraction::FontDescription defaultFontDescription;
+  TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+  if( defaultFontId > 0u )
+  {
+    fontClient.GetDescription( defaultFontId, defaultFontDescription );
+    defaultPointSize = fontClient.GetPointSize( defaultFontId );
+  }
 
-  // Iterators of the script runs.
+  // Merge font descriptions
+  Vector<FontId> fontIds;
+  fontIds.Resize( numberOfCharacters, defaultFontId );
+  Vector<bool> isDefaultFont;
+  isDefaultFont.Resize( numberOfCharacters, true );
+  MergeFontDescriptions( fontDescriptions,
+                         fontIds,
+                         isDefaultFont,
+                         defaultFontDescription,
+                         defaultPointSize,
+                         startIndex,
+                         numberOfCharacters );
+
+  const Character* const textBuffer = text.Begin();
+  const FontId* const fontIdsBuffer = fontIds.Begin();
+  const bool* const isDefaultFontBuffer = isDefaultFont.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
   bool isNewParagraphCharacter = false;
 
+  PointSize26Dot6 currentPointSize = defaultPointSize;
   FontId currentFontId = 0u;
   FontId previousFontId = 0u;
   bool isPreviousEmojiScript = false;
@@ -454,25 +468,23 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // Get the current character.
     const Character character = *( textBuffer + index );
 
-    TextAbstraction::FontDescription currentFontDescription;
-    TextAbstraction::PointSize26Dot6 currentFontPointSize = defaultFontPointSize;
-    bool isDefaultFont = true;
-    MergeFontDescriptions( fontDescriptions,
-                           defaultFontDescription,
-                           defaultFontPointSize,
-                           index,
-                           currentFontDescription,
-                           currentFontPointSize,
-                           isDefaultFont );
-
     // Get the font for the current character.
-    FontId fontId = fontClient.GetFontId( currentFontDescription, currentFontPointSize );
-    currentFontId = fontId;
+    FontId fontId = *( fontIdsBuffer + index - startIndex );
+
+    // Whether the font being validated for the current character is a default one not set by the user.
+    const bool isDefault = *( isDefaultFontBuffer + index - startIndex );
 
     // Get the script for the current character.
     const Script script = GetScript( index,
                                      scriptRunIt,
                                      scriptRunEndIt );
+
+    // Get the current point size.
+    if( currentFontId != fontId )
+    {
+      currentPointSize = fontClient.GetPointSize( fontId );
+      currentFontId = fontId;
+    }
 
 #ifdef DEBUG_ENABLED
     {
@@ -497,9 +509,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     FontId cachedDefaultFontId = 0u;
     if( NULL != defaultFonts )
     {
-      cachedDefaultFontId = defaultFonts->FindFont( fontClient,
-                                                    currentFontDescription,
-                                                    currentFontPointSize );
+      cachedDefaultFontId = defaultFonts->FindFont( fontClient, currentPointSize );
     }
 
     // Whether the cached default font is valid.
@@ -552,7 +562,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       if( isCommonScript )
       {
         if( isValidCachedDefaultFont &&
-            ( isDefaultFont || ( currentFontId == previousFontId ) ) &&
+            ( isDefault || ( currentFontId == previousFontId ) ) &&
             !isEmojiScript )
         {
           // At this point the character common for all scripts has no font assigned.
@@ -621,10 +631,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
               const bool preferColor = ( TextAbstraction::EMOJI == script );
 
               // Find a fallback-font.
-              fontId = fontClient.FindFallbackFont( character,
-                                                    currentFontDescription,
-                                                    currentFontPointSize,
-                                                    preferColor );
+              fontId = fontClient.FindFallbackFont( currentFontId, character, currentPointSize, preferColor );
 
               if( 0u == fontId )
               {
@@ -632,15 +639,13 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                 defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + TextAbstraction::LATIN );
                 if( NULL != defaultFontsPerScript )
                 {
-                  fontId = defaultFontsPerScript->FindFont( fontClient,
-                                                            currentFontDescription,
-                                                            currentFontPointSize );
+                  fontId = defaultFontsPerScript->FindFont( fontClient, currentPointSize );
                 }
               }
 
               if( 0u == fontId )
               {
-                fontId = fontClient.FindDefaultFont( UTF32_A, currentFontPointSize );
+                fontId = fontClient.FindDefaultFont( UTF32_A, currentPointSize );
               }
 
               // Cache the font.

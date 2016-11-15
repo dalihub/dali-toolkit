@@ -150,19 +150,24 @@ void CreateTextModel( const std::string& text,
   fontDescriptionRuns = fontDescriptions;
   Vector<FontRun>& validFonts = logicalModel->mFontRuns;
 
-  // The default font description.
-  TextAbstraction::FontDescription fontDescription;
+  // The default font id.
+  FontDefaults fontDefaults;
+  fontDefaults.mFontDescription.family = "";
+  fontDefaults.familyDefined = true;
+  fontDefaults.mDefaultPointSize = 12.f;
+  fontDefaults.sizeDefined = true;
 
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
   fontClient.SetDpi( 96u, 96u );
+
+  const FontId defaultFontId = fontDefaults.GetFontId( fontClient );
 
   // Validates the fonts. If there is a character with no assigned font it sets a default one.
   // After this call, fonts are validated.
   multilanguageSupport.ValidateFonts( utf32Characters,
                                       scripts,
                                       fontDescriptionRuns,
-                                      fontDescription,
-                                      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+                                      defaultFontId,
                                       0u,
                                       numberOfCharacters,
                                       validFonts );

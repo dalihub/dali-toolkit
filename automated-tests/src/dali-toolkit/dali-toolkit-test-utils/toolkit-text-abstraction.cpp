@@ -142,7 +142,7 @@ public:
   void GetDescription( FontId id, FontDescription& fontDescription ){}
   PointSize26Dot6 GetPointSize( FontId id ){return 9;}
   FontId FindDefaultFont( Character charcode, PointSize26Dot6 pointSize, bool preferColor ){return 0;}
-  FontId FindFallbackFont( Character charcode, const FontDescription& fontDescription, PointSize26Dot6 pointSize, bool preferColor ){return 0;}
+  FontId FindFallbackFont( FontId preferredFont, Character charcode, PointSize26Dot6 pointSize, bool preferColor ){return 0;}
   FontId GetFontId( const FontPath& path, PointSize26Dot6 pointSize, FaceIndex faceIndex ){return 0;}
   FontId GetFontId( const FontDescription& fontDescription,PointSize26Dot6 pointSize, FaceIndex faceIndex ){return 0;}
   bool IsScalable( const FontPath& path ){return true;}
@@ -407,9 +407,9 @@ FontId FontClient::FindDefaultFont( Character charcode, PointSize26Dot6 pointSiz
   return GetImplementation(*this).FindDefaultFont( charcode, pointSize, preferColor );
 }
 
-FontId FontClient::FindFallbackFont( Character charcode, const FontDescription& fontDescription, PointSize26Dot6 pointSize, bool preferColor )
+FontId FontClient::FindFallbackFont( FontId preferredFont, Character charcode, PointSize26Dot6 pointSize, bool preferColor )
 {
-  return GetImplementation(*this).FindFallbackFont( charcode, fontDescription, pointSize, preferColor );
+  return GetImplementation(*this).FindFallbackFont( preferredFont, charcode, pointSize, preferColor );
 }
 
 FontId FontClient::GetFontId( const FontPath& path, PointSize26Dot6 pointSize, FaceIndex faceIndex )
