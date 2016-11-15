@@ -57,13 +57,6 @@
     {
       "pointSize":25
     },
-    "radiobutton":
-    {
-      "unselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected.png",
-      "selectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected.png",
-      "disabledUnselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected-disabled.png",
-      "disabledSelectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
-    },
 
     "textfield":
     {
@@ -150,44 +143,6 @@
       "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
       "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
-    },
-    "popup":
-    {
-      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
-    },
-    "confirmationpopup":
-    {
-      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
-    },
-    "slider":
-    {
-      "showPopup": true,
-      "showValue": true,
-      "valuePrecision": 0,
-      "trackVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin.9.png",
-        "size":[27,27]
-      },
-      "progressVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin-progress.9.png",
-        "size":[27,27]
-      },
-      "handleVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin-handle.png",
-        "size":[72,72]
-      },
-      "popupVisual":"{DALI_IMAGE_DIR}slider-popup.9.png",
-      "popupArrowVisual":"{DALI_IMAGE_DIR}slider-popup-arrow.9.png",
-      "disableColor":[0.5, 0.5, 0.5, 1.0],
-      "popupTextColor":[0.5,0.5,0.5,1.0],
-      "hitRegion":[0, 72],
-      "marks":[],
-      "snapToMarks":false,
-      "markTolerance":0.05
-    },
-    "SliderHandleTextLabel":
-    {
-      "textColor":[0.8,0.8,1,1]
     }
   }
 }

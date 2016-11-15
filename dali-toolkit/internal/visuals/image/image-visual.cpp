@@ -501,6 +501,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer( mImage );
   }
+
 }
 
 void ImageVisual::DoSetOffStage( Actor& actor )

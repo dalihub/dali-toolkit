@@ -755,7 +755,6 @@ void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Ty
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
-  RelayoutRequest();
 }
 
 void Control::OnPinch(const PinchGesture& pinch)
