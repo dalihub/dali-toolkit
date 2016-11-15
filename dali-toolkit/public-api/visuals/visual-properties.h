@@ -42,7 +42,7 @@ enum Type
   IMAGE, ///< Renders an image into the control's quad. @SINCE_1_1.45
   MESH, ///< Renders a mesh using an "obj" file, optionally with textures provided by an "mtl" file. @SINCE_1_1.45
   PRIMITIVE, ///< Renders a simple 3D shape, such as a cube or sphere. @SINCE_1_1.45
-  WIREFRAME, ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
+  WIREFRAME, ///< Renders a simple wire-frame outlining a quad. @SINCE_1_1.45
 };
 
 namespace Property
@@ -67,7 +67,7 @@ enum
    * @note Will override the existing shaders.
    * @see Shader::Property
    */
-  SHADER,
+  SHADER
 };
 
 } // namespace Property
