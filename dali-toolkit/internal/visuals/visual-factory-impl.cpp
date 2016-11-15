@@ -31,21 +31,22 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/debug/debug-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
-#include <dali-toolkit/internal/visuals/image/image-visual.h>
-#include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
-#include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
+#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
-#include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
+#include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
+#include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 namespace
 {
 const char * const BROKEN_VISUAL_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
 }
- 
+
 namespace Dali
 {
 
@@ -65,7 +66,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, DEBUG )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 const char * const VISUAL_TYPE( "visualType" );
@@ -99,10 +100,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     mFactoryCache = new VisualFactoryCache();
   }
 
-  // Return a new WireframeVisual if we have debug enabled
+  // Return a new DebugVisual if we have debug enabled
   if( mDebugEnabled )
   {
-    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
   }
 
   Visual::Base* visualPtr = NULL;
@@ -173,9 +174,9 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::Visual::WIREFRAME:
+    case Toolkit::Visual::DEBUG:
     {
-      visualPtr = new WireframeVisual( *( mFactoryCache.Get() ) );
+      visualPtr = new DebugVisual( *( mFactoryCache.Get() ) );
       break;
     }
   }
@@ -202,7 +203,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 
   if( mDebugEnabled )
   {
-    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
   }
 
   NinePatchImage npatchImage = NinePatchImage::DownCast( image );
@@ -233,7 +234,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
 
   if( mDebugEnabled )
   {
-    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
+    return Toolkit::Visual::Base( new DebugVisual( *( mFactoryCache.Get() ) ) );
   }
 
   if( NinePatchImage::IsNinePatchUrl( url ) )

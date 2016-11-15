@@ -152,14 +152,14 @@ public:
   bool CleanRendererCache( const std::string& key );
 
   /**
-   * @brief Cache the wireframe renderer
+   * @brief Cache the debug renderer
    */
-  void CacheWireframeRenderer( Renderer& renderer );
+  void CacheDebugRenderer( Renderer& renderer );
 
   /**
-   * @brief Request the wireframe renderer;
+   * @brief Request the debug renderer;
    */
-  Renderer GetWireframeRenderer();
+  Renderer GetDebugRenderer();
 
   /**
    * Get the SVG rasterization thread.
@@ -220,7 +220,7 @@ private:
   HashVector mRendererHashes;
   CachedRenderers mRenderers;
 
-  Renderer mWireframeRenderer;
+  Renderer mDebugRenderer;
 
   SvgRasterizeThread*  mSvgRasterizeThread;
 };

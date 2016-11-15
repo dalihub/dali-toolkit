@@ -17,7 +17,7 @@
 
 
 // CLASS HEADER
-#include "wireframe-visual.h"
+#include "debug-visual.h"
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -65,39 +65,39 @@ void main()\n
 }
 
 
-WireframeVisual::WireframeVisual( VisualFactoryCache& factoryCache )
+DebugVisual::DebugVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache )
 {
 }
 
-WireframeVisual::~WireframeVisual()
+DebugVisual::~DebugVisual()
 {}
 
-void WireframeVisual::DoSetOnStage( Actor& actor )
+void DebugVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
 }
 
-void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
+void DebugVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::WIREFRAME );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::DEBUG );
 }
 
-void WireframeVisual::InitializeRenderer()
+void DebugVisual::InitializeRenderer()
 {
-  mImpl->mRenderer = mFactoryCache.GetWireframeRenderer();
+  mImpl->mRenderer = mFactoryCache.GetDebugRenderer();
   if( !mImpl->mRenderer )
   {
     Geometry geometry = CreateQuadWireframeGeometry();
     Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
     mImpl->mRenderer = Renderer::New( geometry, shader);
-    mFactoryCache.CacheWireframeRenderer( mImpl->mRenderer );
+    mFactoryCache.CacheDebugRenderer( mImpl->mRenderer );
   }
 }
 
-Geometry WireframeVisual::CreateQuadWireframeGeometry()
+Geometry DebugVisual::CreateQuadWireframeGeometry()
 {
   const float halfWidth = 0.5f;
   const float halfHeight = 0.5f;

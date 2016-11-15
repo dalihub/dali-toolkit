@@ -77,7 +77,7 @@
  + Environment Variables
  + [Resource Tracking](@ref resourcetracking)
  + Logging
- + [Visual Debug Rendering](@ref debugrendering)
+ + [Debug Visual](@ref debugvisual)
  + [Stagehand - DALi Visual Debugger](@ref stagehand)
 
 ### Viewing Modes
