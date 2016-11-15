@@ -213,7 +213,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+          impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, text );
         }
         break;
       }
@@ -224,7 +224,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_FOCUSED %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
+          impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
         }
         break;
       }
@@ -738,7 +738,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+          impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, text );
           value = text;
         }
         break;
@@ -748,7 +748,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
+          impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
           value = text;
         }
         break;
