@@ -25,8 +25,7 @@ field.enableMarkup = true;
 dali.stage.add( field );
 ~~~
 
-Note the mark-up processor doesn't check the correctness of the mark-up string. This may
-cause the text to be badly rendered.
+Note the mark-up processor doesn't check the correctness of the mark-up string. This may cause the text to be badly rendered.
 
 The table below describes the priorities when styles are applied while rendering text.
 |  |  |  |  |
@@ -34,20 +33,6 @@ The table below describes the priorities when styles are applied while rendering
 | Priority 1 | Style set by markup string. | Will override the style set through the control properties. | i.e The \<color\> tag will override the *TEXT_COLOR* property. |
 | Priority 2 | Style set through the control properties. | Will override the default platform style. |  |
 | Priority 3 | Default platform style. |  |  |
-
-Font size has slightly different priorities - the size provided by the platform is a logical
-size, and can be mapped to physical point sizes using style sheets. There is a default set of
-sizes defined for DALi, and these can be overridden by application specific stylesheets. Thus
-the priorities are:
-
-|  |  |  |
-|--|--|--|
-| Priority 1 | Size set by markup string. | Will override the style set through the stylesheets. |
-| Priority 2 | Physical Size set by application style sheet | |
-| Priority 2 | Logical Size set by application style sheet | Mapping from platform logical to physical |
-| Priority 3 | Logical Size set by DALi style sheet | Mapping from platform logical to physical |
-
-See [Font Selection](@ref font-selection) for more details.
 
 Current supported tags are:
 

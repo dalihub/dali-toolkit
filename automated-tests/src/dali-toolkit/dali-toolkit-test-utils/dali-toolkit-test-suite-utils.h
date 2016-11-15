@@ -20,7 +20,16 @@
 
 // INTERNAL INCLUDES
 
+// dali-test-suite-utils.h needed first, but want to prevent certain headers
+// from being read, as we want to override as much of their behaviour as possible.
+#define __DALI_STYLE_MONITOR_H__
+#define __DALI_ACCESSIBILITY_MANAGER_H__
+#define __DALI_TIMER_H__
+#define __DALI_CLIPBOARD_H__
+#define __DALI_IMF_MANAGER_H__
+
 #include <dali-test-suite-utils.h>
+
 #include "toolkit-test-application.h"
 #include "toolkit-application.h"
 
