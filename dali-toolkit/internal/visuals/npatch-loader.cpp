@@ -59,12 +59,12 @@ std::size_t NPatchLoader::Load( const std::string& url )
   NinePatchImage ninePatch = NinePatchImage::New( url );
   if( ninePatch )
   {
-    Data* data = new Data();
-    data->hash = hash;
-    data->url = url;
     BufferImage croppedImage = ninePatch.CreateCroppedBufferImage();
     if( croppedImage )
     {
+      Data* data = new Data();
+      data->hash = hash;
+      data->url = url;
       data->textureSet = TextureSet::New();
       TextureSetImage( data->textureSet, 0u, croppedImage );
       data->croppedWidth = croppedImage.GetWidth();

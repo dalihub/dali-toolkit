@@ -449,7 +449,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   if( spread )
   {
     Toolkit::GradientVisual::SpreadMethod::Type spreadMethod = Toolkit::GradientVisual::SpreadMethod::PAD;
-    if( Scripting::GetEnumerationProperty( *spread, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod ) );
+    if( Scripting::GetEnumerationProperty( *spread, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod ) )
     {
       mGradient->SetSpreadMethod( spreadMethod );
     }

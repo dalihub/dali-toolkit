@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,9 @@ void CreateQuad( SizeType imageWidth,
   Vector2 topLeft = Vector2( position.x - 0.5f, position.y - 0.5f );
 
   float fBlockX = texelBlockWidth * static_cast< float >( block % atlasWidthInBlocks );
+
+  // In the next expression, we have purposely made ( block / atlasWidthInBlocks ) yield an integer value and then convert to float as
+  // we do not want the remainder in that expression to affect the value of fBlockY
   float fBlockY = texelBlockHeight * static_cast< float >( block / atlasWidthInBlocks );
 
   // Add on texture filtering compensation ( half a texel plus compensation for filled pixel in top left corner )
