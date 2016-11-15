@@ -8,7 +8,7 @@
   - Try to reduce actor count ( less actors == less processing)
   - Delete any actors that are not visible, or move them off stage
   - Use TextureAtlases ( reduces OpenGL driver calls to glBindTexture
-  - Optimize / reduce any constraints used
+  - Optimise / reduce any constraints used
 
 ## High GPU occupancy
 
@@ -17,7 +17,7 @@
 
 ~~~{.cpp}
 // C++
-// In this mode depth testing is turned off and order is determined by the hierarchy (depth-first search order).
+// In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
 // Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
 
 Actor::SetDrawMode( DrawMode::OVERLAY_2D ); // C++
@@ -25,7 +25,7 @@ Actor::SetDrawMode( DrawMode::OVERLAY_2D ); // C++
 
 ~~~{.js}
 // JavaScript
-// In this mode depth testing is turned off and order is determined by the hierarchy (depth-first search order).
+// In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
 // Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
 
 actor.drawMode = dali.DRAW_MODE_OVERLAY_2D;
@@ -36,7 +36,7 @@ actor.drawMode = dali.DRAW_MODE_OVERLAY_2D;
   - Use Dali::NinePatchImage  where possible.
   - Avoid using too many textures which contain alpha and require blending
   - Avoid using too many Dali::Layer with depth testing enabled. Otherwise the layer has to clear the depth buffer.
-  - Optimize any shaders used. Pixel shaders should be kept as lean as possible.
+  - Optimise any shaders used. Pixel shaders should be kept as lean as possible.
 
 
 @class _Guide_Performance_Tips

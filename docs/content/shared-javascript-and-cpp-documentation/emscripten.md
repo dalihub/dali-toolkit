@@ -16,9 +16,9 @@ This can then be run within a web browser at near native speed (without plugins)
 Dali-Core can be built using with Emscripten producing a Javascript version of DALi.
 A web page can then be made with HTML, and by embedding Javascript can reference and control the DALi Javascript canvas.
   
-This allows you to have a DALi canvas within a web page that can either:
+This allows you to have a DALi canvas within a webpage that can either:
 - Run autonomously
-- Be controlled by HTML / Javascript controls elsewhere on the web page
+- Be controlled by HTML / Javascript controls elsewhere on the webpage
   
 The necessary scripts for building are included within each DALi repository.
   
@@ -33,9 +33,9 @@ In summary, this process involves:
 - Building dali-adaptor Emscripten replacement with a separate build script found in dali-adaptor
 - Installing the examples within the dali-demo repository
   
-## Build Artifacts {#emscripten-artifacts}
+## Build Artefacts {#emscripten-artefacts}
   
-Each step in the build process will produce artifacts that will be written to the DALi environment directory.
+Each step in the build process will produce artefacts that will be written to the DALi environment directory.
   
 - dali-core: Produces a dali-core.so in bytecode.
 - dali-adaptor: Produces:
@@ -94,14 +94,14 @@ chromium-browser ./dali-doc-demo.html
 # Running The Live Unit Tests {#emscripten-tests}
   
 Included are some live unit tests.
-These run as a web page within a browser, a DALi canvas is created and used to run each test.
+These run as a webpage within a browser, a DALi canvas is created and used to run each test.
 The QUnit test suite is used (included within the repository for compatibility).
   
 ![ ](../assets/img/emscripten/emscripten-tests.png) ![ ](./emscripten-tests.png)
   
 <br>
 
-For the tests to work correctly, the web page should be run through a web server, rather than directly with a browser.
+For the tests to work correctly, the webpage should be run through a webserver, rather than directly with a browser.
 This can be achieved simply using npms's zero configuration command line server: "http-server".
   
 To install "http-server":

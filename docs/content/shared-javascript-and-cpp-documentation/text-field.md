@@ -11,7 +11,7 @@ The Dali::Toolkit::TextField is a control which provides a single-line editable 
 
 Before any text has been entered, the TextField can display some placeholder text.
 An alternative placeholder can be displayed when the TextField has keyboard focus.
-For example a TextField used to enter a user name could initially show "Unknown Name", and then show "Enter Name." when the cursor is shown.
+For example a TextField used to enter a username could initially show "Unknown Name", and then show "Enter Name." when the cursor is shown.
 
 Note *CR+LF* new line characters are replaced by a *LF* one.
 

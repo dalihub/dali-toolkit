@@ -34,7 +34,7 @@ For JavaScript use actor.connect( "touch", myCallback ) and actor.connect("hover
 
  - Actors
    - The final part of hit testing is performed by walking through the actor tree within a layer.
-   - The following pseudo-code shows the algorithm used:
+   - The following pseudocode shows the algorithm used:
 
 
 ~~~
@@ -107,7 +107,7 @@ Hit Priority of above Actor tree (all overlays): 1 - Lowest. 6 - Highest.
      actor (and its parents).  There will be NO touch signal delivery for the hit actors of the
      other touch points.
    - The local coordinates are from the top-left (0.0f, 0.0f, 0.5f) of the hit actor.
-   - The following pseudo-code shows the delivery mechanism:
+   - The following pseudocode shows the delivery mechanism:
 
 ~~~
   EMIT-TOUCH-SIGNAL( ACTOR )

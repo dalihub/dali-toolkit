@@ -93,7 +93,7 @@ Click screen shot to get overlay current screen
 ![ ](../assets/img/stage-hand/stagehand-screenshot.png)
 ![ ](stagehand-screenshot.png)
 
-To cycle through the actor hierarchy, keep clicking the same spot. Alternatively, select using the actor tree.
+To cycle through the actor hierachy, keep clicking the same spot. Alternatively, select using the actor tree.
 
   
 ![ ](../assets/img/stage-hand/stagehand-mainscreen.png)

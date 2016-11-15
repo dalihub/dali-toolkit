@@ -28,7 +28,7 @@ The current file / folder structure is as follows:
 
 ### New property has been added
 - No code change required.
-- It will be automatically available using the dot notation. E.g. actor.my_new_property = true;
+- It will be automatically avalable using the dot notation. E.g. actor.my_new_property = true;
 
 ### New property type has been added
 - modify property-value-wrapper.h / .cpp to support the new type
@@ -36,7 +36,7 @@ The current file / folder structure is as follows:
 ### New function added to an object
 - Add the function name to function table in my-object-wrapper.cpp
 - Add the forwarding function to my-object-api.cpp/.h
-- Ensure you have created YUIDOC documentation above the function
+- Ensure you have created YUIDOC documention above the function
   
 ![ ](../assets/img/javascript-wrapping-guide/adding-function.png)
 ![ ](adding-function.png)
@@ -68,7 +68,7 @@ var light = new dali.Light();
 If Light inherits from Handle then use path-wrapper and path-api as a template to create light-wrapper and light-api
 ( inherits from HandleWrapper)
   
-Otherwise use animation-wrapper and animation-api as a template ( inherits from BaseWrappedObject)
+Otherwise use animation-wrapper and animation-api as a template ( inherts from BaseWrappedObject)
 
 
 

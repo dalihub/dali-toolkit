@@ -10,12 +10,12 @@ This could be from within DALi or externally by an application.
 Properties can be set externally by an application, allowing that application to change the configuration or behaviour of an actor.
 This could include the physical geometry of the actor, or how it is drawn or moves.
 
-Properties can also be read. This feature can be used in conjunction with constraints to allow changes to a property within one actor to cause changes to the property of another actor. For example, an actor following the movement of another separate actor (that it is not a child of).
+Properties can also be read. This feature can be used in conjunction with constraints to allow changes to a property within one actor to cause changes to the property of another actor. For example, an actor following the movement of another separate actor (that it is not a child of). 
 
 Properties can be used to expose any useful information or behaviour of an actor.
 Other actor variables that are used to implement this bevahiour, or do not make useful sense from an application developers point of view should not be exposed.
 
-<h2 class="pg">How to implement a property within DALi Core:</h2>
+<h2 class="pg">How to implement a property within Dali-core:</h2>
 
 <b>There are two stages:</b>
 
@@ -79,7 +79,7 @@ DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 - The parameter to DALI_PROPERTY_TABLE_END should match the start index of the property enumeration.
 
 <br>
-<h2 class="pg">How to implement a property within DALi Toolkit controls and application-side custom controls:</h2>
+<h2 class="pg">How to implement a property within Dali-toolkit controls and application-side custom controls:</h2>
 
 Macros are used to define properties for the following reasons:
 

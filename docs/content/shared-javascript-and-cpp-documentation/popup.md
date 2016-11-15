@@ -86,7 +86,7 @@ The default to fading in and out.
   
 The Popup can be configured to a preset type by using named types within the type-registry.
   
-These types are modifications / specializations of a Popup. They provide the library user with a shortcut way of creating a specific type of Popup.
+These types are modifications / specialisations of a Popup. They provide the library user with a shortcut way of creating a specific type of Popup.
   
 
 The Popup control features a "Toast" popup type. This is a Popup that appears at the bottom of the screen, typically with some text. They are normally for informational purposes only.
@@ -180,7 +180,7 @@ The ConfirmationPopup control provides a simple interface for providing automati
   
 ConfirmationPopup will automatically provide signals for 1 or 2 controls.
 Note: The controls do not need to be PushButtons.
-These signals are dynamically created. The controls (typically PushButtons) must be specifically named so the ConfirmationPopup can locate them.
+These signals are dynamically created. The controls (typically PushButtons) must be specifially named so the ConfirmationPopup can locate them.
   
 ## Step 1 {#popupconfirmationstep1}
 Name your controls.
@@ -204,8 +204,8 @@ Connect to the following respective signals within ConfirmationPopup:
   
 The ConfirmationPopup will dynamically make the connection between the signalling control, and your signal handler.
   
-This allows connection of signals within both C++, JSON and JavaScript APIs.
-If more manual control or customizable layout is needed, then it is recommended to use the Popup widget directly for full control.
+This allows connection of signals within both C++, JSON and Javascript APIs.
+If more manual control or customisable layout is needed, then it is recommended to use the Popup widget directly for full control.
   
 The JSON code example at the bottom of this document uses the ConfirmationPopup to allow signal connection from within the JSON description.
   

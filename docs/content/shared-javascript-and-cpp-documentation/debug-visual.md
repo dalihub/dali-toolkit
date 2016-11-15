@@ -5,7 +5,7 @@
 
 ## Enable debug rendering
 
-Setting DALI_DEBUG_RENDERING environment variable will enable the visual debugging.
+Setting DALI_DEBUG_RENDERING environment variable will enable the visual debuging.
 
 Then, every concrete visual ( ColorVisual, BorderVisual, ImageVisual, GradientVisual, etc. ) is replaced with a DebugVisual object.
 Debug visual renders a simple quad wireframe, so that the control layout and scene structure is clearly displayed.

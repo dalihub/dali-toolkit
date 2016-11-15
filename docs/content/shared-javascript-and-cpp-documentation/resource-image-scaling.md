@@ -12,7 +12,7 @@ This operation is performed at load time.
   
 ### Developer options:
 * A target size of the image - this could be the full screen size for example.
-* A Fitting mode - This determines how the image is fitted to the target dimensions. If necessary the image will be cropped, or have borders added automatically.
+* A Fitting mMde - This determines how the image is fitted to the target dimensions. If necessary the image will be cropped, or have borders added automatically.
 * A Sampling Mode - This determines the quality of the scaling (by specifying the type of filtering to use).
   
 ### Benefits of Resource Image Scaling:
@@ -25,14 +25,14 @@ While common uses of images in DALi applications involve fixed sized images unde
 
 There are more code examples later in this document under [API usage](#resourceimagescaling-apidetails). For now we will just give one full code example to show how this feature is used..
   
-Let's say we are writing a home-screen application for a smart phone.
+Let's say we are writing a home-screen application for a smartphone.
 Here we have a large, square image that we want to set as the wallpaper on a tall and narrow phone screen.
 We want to fill the screen without distorting the image or having black borders, and wasting as few pixels from the source image as possible.
   
 ![ ](../assets/img/image-scaling/example-scale-to-fill-problem.jpg)
 ![ ](example-scale-to-fill-problem.jpg)
   
-DALi provides the concept of a `FittingMode` to specify how a source image is mapped into a target rectangle, and the one we need here is `FittingMode::SCALE_TO_FILL` as it guarantees to cover all of the pixels of the target dimensions specified.
+DALi provides the concept of a `FittingMode` to specify how a source image is mapped into a target rectangle, and the one we need here is `FittingMode::SCALE_TO_FILL` as it guarrentees to cover all of the pixels of the target dimensions specified.
 A second concept of a `SamplingMode` controls how source image pixels are combined during the scaling and allows the developer to trade speed for quality.
 Since our image is to be loaded once and reused, we use `SamplingMode::BOX_THEN_LINEAR` which is the highest quality option.
   
@@ -72,7 +72,7 @@ The workflow for achieving the final scaled image is (in order):
 - Target Size: Determine target size (from source image size and any user specified target dimensions).
 - Target Image Dimensions: Determine the size the image should be scaled to (taking Fitting Mode into account)
 - Scaling: Perform a scale to target image dimensions using the specified Sampling mode.
-- Crop or Add Borders: Automatically performed as necessary to maintain final target aspect (actual stored data size could be smaller).
+- Crop or Add Borders: Automatically perfomed as necessary to maintain final target aspect (actual stored data size could be smaller).
   
 
 
@@ -110,8 +110,8 @@ The operation of each of these modes is as follows:
   
 | `FittingMode` | **Operation** |
 | ------------- | ------------- |
-| `SCALE_TO_FILL` | Centers the image on the target box and uniformly scales it so that it matches the target in one dimension and extends outside the target in the other. Chooses the dimension to match that results in the fewest pixels outside the target. Trims away the parts of the image outside the target box so as to match it exactly. This guarantees all of the target area is filled. |
-| `SHRINK_TO_FIT` | Centers the image on the target box and uniformly scales it so that it matches the target in one dimension and fits inside it in the other. This guarantees that all of the source image area is visible. |
+| `SCALE_TO_FILL` | Centers the image on the target box and uniformly scales it so that it matches the target in one dimension and extends outside the target in the other. Chooses the dimension to match that results in the fewest pixels outside the target. Trims away the parts of the image outside the target box so as to match it exactly. This guarentees all of the target area is filled. |
+| `SHRINK_TO_FIT` | Centers the image on the target box and uniformly scales it so that it matches the target in one dimension and fits inside it in the other. This guarentees that all of the source image area is visible. |
 | `FIT_WIDTH` | Centers the image on the target box and uniformly scales it so that it matches the target width without regard for the target height. |
 | `FIT_HEIGHT` | Centers the image on the target box and uniformly scales it so that it matches the target in height without regard for the target width. |
   

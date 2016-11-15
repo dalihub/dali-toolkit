@@ -23,7 +23,7 @@ the OpenGL API from developers and provides a clean cross-platform C++ & JavaScr
  + Provides Layers to aid in 2D UI layout
  + Easy to use Animation framework
  + Automatic background loading of resources ( images / text / meshes )
- + Runs all animations in a separate thread. This helps maintain 60 FPS even if JavaScript is performing a long operation ( e.g. Garbage Collection ).
+ + Runs all animations in a seperate thread. This helps maintain 60 FPS even if JavaScript is performing a long operation ( e.g. Garbage Collection ).
  + Provides keyboard / touch / mouse handling
 
 ![ ](screen-shot.png)

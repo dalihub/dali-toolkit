@@ -4,7 +4,7 @@
 # Performance Profiling  {#performanceprofiling}
 
 
-DALi has many mechanisms for analyzing performance including kernel, system and network logging.
+DALi has many mechanisms for analysing performance including kernel, system and network logging.
 
 
 ## Background
@@ -52,7 +52,7 @@ This type of logging is used for recording individual time stamped events.
   
 Setting DALI_PERFORMANCE_TIMESTAMP_OUTPUT environment variable will enable time stamps.
 
-Tools such as Tizen dynamic analyzer and StageHand can be used to provide a GUI display of
+Tools such as Tizen dynamic analyser and StageHand can be used to provide a GUI display of
 the output.
 
 
@@ -62,7 +62,7 @@ The log options are:
 |------|--------------------------|--------------|
 |   0  |  log markers to DALi log (dlog on Tizen) | DALI_PERFORMANCE_TIMESTAMP_OUTPUT=1 dali-demo |
 |   1  |  log markers to kernel trace ( logs to ftrace )| DALI_PERFORMANCE_TIMESTAMP_OUTPUT=2 dali-demo |
-|   2  |  log markers to system trace ( ttrace on Tizen for Tizen analyzer) | DALI_PERFORMANCE_TIMESTAMP_OUTPUT=4 dali-demo |
+|   2  |  log markers to system trace ( ttrace on Tizen for Tizen analyser) | DALI_PERFORMANCE_TIMESTAMP_OUTPUT=4 dali-demo |
 |   3  |  log markers to network client (tcp port 3001+) | DALI_PERFORMANCE_TIMESTAMP_OUTPUT=8 dali-demo |
 
   
@@ -193,11 +193,11 @@ DALI_PERFORMANCE_TIMESTAMP_OUTPUT=2 dali-demo
 ~~~
 
 Ftrace is a kernel tracer designed to help developers find out what is going on inside the kernel.
-It can be used for analyzing how long DALi takes to perform different tasks and
+It can be used for analysing how long DALi takes to perform different tasks and
 what DALi is doing in relation to other system processes / interrupts.
   
 On Tizen if the kernel has been built with ftrace enabled, then DALi can log out to ftrace.
-This gives exact time stamps of the main events in DALi.
+This gives exact time stamps of the main events in Dali.
 Current markers that are logged:
 
 

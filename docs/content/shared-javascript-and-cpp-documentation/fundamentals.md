@@ -6,7 +6,7 @@
 ## Actors and the Stage {#actors-and-stage}
 
 Actor is the primary object with which DALi applications interact.
-A DALi application uses a hierarchy of Dali::Actor objects to position visible content.
+A DALi application uses a hierachy of Dali::Actor objects to position visible content.
 An actor inherits a position relative to its parent, and can be moved relative to this point.
 UI controls can be built by combining multiple actors.
 
@@ -65,7 +65,7 @@ Note that since DALi is a 3D toolkit, this behaviour is the result of a default 
 
 ## Scene Graph {#scene-graph}
 
-From Wikipedia...
+From wikipedia...
   
 A scene graph is a collection of nodes in a graph or tree structure.
 A node may have many children but often only a single parent,
