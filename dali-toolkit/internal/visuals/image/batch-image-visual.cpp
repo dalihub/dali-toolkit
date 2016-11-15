@@ -24,6 +24,7 @@
 #include <dali/public-api/images/native-image.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -191,7 +192,7 @@ void BatchImageVisual::InitializeRenderer( const std::string& imageUrl )
       mImpl->mRenderer.SetTextures( textureSet );
 
       // Turn batching on, to send message it must be on stage.
-      mImpl->mRenderer.SetProperty( Dali::Renderer::Property::BATCHING_ENABLED, true );
+      mImpl->mRenderer.SetProperty( Dali::DevelRenderer::Property::BATCHING_ENABLED, true );
     }
     mImpl->mFlags |= Impl::IS_FROM_CACHE;
   }
@@ -204,7 +205,7 @@ void BatchImageVisual::DoSetOnStage( Actor& actor )
     InitializeRenderer( mImageUrl );
   }
   // Turn batching on, to send message it must be on stage
-  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::BATCHING_ENABLED, true );
+  mImpl->mRenderer.SetProperty( Dali::DevelRenderer::Property::BATCHING_ENABLED, true );
 
   actor.AddRenderer( mImpl->mRenderer );
 }
