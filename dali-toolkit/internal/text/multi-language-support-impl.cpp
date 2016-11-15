@@ -67,32 +67,25 @@ FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient,
                                const TextAbstraction::FontDescription& description,
                                PointSize26Dot6 size ) const
 {
-  for( std::vector<CacheItem>::const_iterator it = mFonts.begin(),
-         endIt = mFonts.end();
+  for( Vector<FontId>::ConstIterator it = mFonts.Begin(),
+         endIt = mFonts.End();
        it != endIt;
        ++it )
   {
-    const CacheItem& item = *it;
+    const FontId fontId = *it;
+    TextAbstraction::FontDescription fontDescription;
+    fontClient.GetDescription( fontId, fontDescription );
 
-    if( ( ( TextAbstraction::FontWeight::NONE == description.weight ) || ( description.weight == item.description.weight ) ) &&
-        ( ( TextAbstraction::FontWidth::NONE == description.width )   || ( description.width == item.description.width ) ) &&
-        ( ( TextAbstraction::FontSlant::NONE == description.slant )   || ( description.slant == item.description.slant ) ) &&
-        ( size == fontClient.GetPointSize( item.fontId ) ) &&
-        ( description.family.empty() || ( description.family == item.description.family ) ) )
+    if( ( size == fontClient.GetPointSize( fontId ) ) &&
+        ( description.weight == fontDescription.weight ) &&
+        ( description.width == fontDescription.width ) &&
+        ( description.slant == fontDescription.slant ) )
     {
-      return item.fontId;
+      return fontId;
     }
   }
 
   return 0u;
-}
-
-void DefaultFonts::Cache( const TextAbstraction::FontDescription& description, FontId fontId )
-{
-  CacheItem item;
-  item.description = description;
-  item.fontId = fontId;
-  mFonts.push_back( item );
 }
 
 MultilanguageSupport::MultilanguageSupport()
@@ -661,7 +654,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                   *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
                 }
               }
-              defaultFontsPerScript->Cache( currentFontDescription, fontId );
+              defaultFontsPerScript->mFonts.PushBack( fontId );
             }
           } // !isValidFont (3)
         } // !isValidFont (2)
