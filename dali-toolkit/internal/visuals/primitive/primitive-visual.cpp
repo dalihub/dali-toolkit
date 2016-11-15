@@ -361,12 +361,6 @@ void PrimitiveVisual::SetSize( const Vector2& size )
   // ToDo: renderer responds to the size change
 }
 
-void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize ) const
-{
-  naturalSize.x = mObjectDimensions.x;
-  naturalSize.y = mObjectDimensions.y;
-}
-
 void PrimitiveVisual::SetClipRect( const Rect<int>& clipRect )
 {
   Visual::Base::SetClipRect( clipRect );

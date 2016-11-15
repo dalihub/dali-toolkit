@@ -116,11 +116,6 @@ public:  // from Visual
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::GetNaturalSize
-   */
-  virtual void GetNaturalSize( Vector2& naturalSize ) const;
-
-  /**
    * @copydoc Visual::SetClipRect
    */
   virtual void SetClipRect( const Rect<int>& clipRect );
