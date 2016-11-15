@@ -118,6 +118,74 @@ public static ClassName Get ## ClassName ## FromPtr(global::System.IntPtr cPtr) 
     return ret;
   }
 
+/* Properties earlier added by Ruby Script */
+
+  public Dali.CSharp.Size ScreenPosition
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PanGestureDetector.Property.SCREEN_POSITION).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+}  public Dali.CSharp.Size ScreenDisplacement
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PanGestureDetector.Property.SCREEN_DISPLACEMENT).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+}  public Dali.CSharp.Size ScreenVelocity
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PanGestureDetector.Property.SCREEN_VELOCITY).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+}  public Dali.CSharp.Size LocalPosition
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PanGestureDetector.Property.LOCAL_POSITION).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+}  public Dali.CSharp.Size LocalDisplacement
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PanGestureDetector.Property.LOCAL_DISPLACEMENT).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+}  public Dali.CSharp.Size LocalVelocity
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PanGestureDetector.Property.LOCAL_VELOCITY).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+}  public bool Panning
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( PanGestureDetector.Property.PANNING).Get( ref temp );
+      return temp;
+    }
+}
+
+/* Properties ends */
+
 %}
 
 %enddef

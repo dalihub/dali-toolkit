@@ -230,6 +230,146 @@ public class CompletedEventArgs : EventArgs
 
   }
 
+/* Properties earlier added by Ruby Script */
+
+  public Dali.CSharp.Color OvershootEffectColor
+  {
+    get
+    {
+      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
+      GetProperty( Scrollable.Property.OVERSHOOT_EFFECT_COLOR).Get(  temp );
+      Dali.CSharp.Color ret = new Dali.CSharp.Color(temp.r, temp.g, temp.b, temp.a);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.OVERSHOOT_EFFECT_COLOR, new Dali.Property.Value( value ) );
+    }
+  }
+  public float OvershootAnimationSpeed
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( Scrollable.Property.OVERSHOOT_ANIMATION_SPEED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.OVERSHOOT_ANIMATION_SPEED, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool OvershootEnabled
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Scrollable.Property.OVERSHOOT_ENABLED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.OVERSHOOT_ENABLED, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size OvershootSize
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( Scrollable.Property.OVERSHOOT_SIZE).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.OVERSHOOT_SIZE, new Dali.Property.Value( value ) );
+    }
+  }
+  public int ScrollToAlphaFunction
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( Scrollable.Property.SCROLL_TO_ALPHA_FUNCTION).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.SCROLL_TO_ALPHA_FUNCTION, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollRelativePosition
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( Scrollable.Property.SCROLL_RELATIVE_POSITION).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.SCROLL_RELATIVE_POSITION, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollPositionMin
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( Scrollable.Property.SCROLL_POSITION_MIN).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.SCROLL_POSITION_MIN, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollPositionMax
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( Scrollable.Property.SCROLL_POSITION_MAX).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.SCROLL_POSITION_MAX, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool CanScrollVertical
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Scrollable.Property.CAN_SCROLL_VERTICAL).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.CAN_SCROLL_VERTICAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool CanScrollHorizontal
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Scrollable.Property.CAN_SCROLL_HORIZONTAL).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Scrollable.Property.CAN_SCROLL_HORIZONTAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+/* Properties ends */
+
 %}
 
 %enddef

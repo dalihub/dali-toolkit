@@ -109,6 +109,242 @@ public class SnapStartedEventArgs : EventArgs
      }
   }
 
+/* Properties earlier added by Ruby Script */
+
+  public bool WrapEnabled
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( ScrollView.Property.WRAP_ENABLED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.WRAP_ENABLED, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool PanningEnabled
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( ScrollView.Property.PANNING_ENABLED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.PANNING_ENABLED, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool AxisAutoLockEnabled
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( ScrollView.Property.AXIS_AUTO_LOCK_ENABLED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.AXIS_AUTO_LOCK_ENABLED, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size WheelScrollDistanceStep
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.WHEEL_SCROLL_DISTANCE_STEP).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.WHEEL_SCROLL_DISTANCE_STEP, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollPosition
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_POSITION).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_POSITION, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollPrePosition
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_PRE_POSITION).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_PRE_POSITION, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollPrePositionMax
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_PRE_POSITION_MAX).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_PRE_POSITION_MAX, new Dali.Property.Value( value ) );
+    }
+  }
+  public float OvershootX
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollView.Property.OVERSHOOT_X).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.OVERSHOOT_X, new Dali.Property.Value( value ) );
+    }
+  }
+  public float OvershootY
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollView.Property.OVERSHOOT_Y).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.OVERSHOOT_Y, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollFinal
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_FINAL).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_FINAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool Wrap
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( ScrollView.Property.WRAP).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.WRAP, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool Panning
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( ScrollView.Property.PANNING).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.PANNING, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool Scrolling
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( ScrollView.Property.SCROLLING).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLLING, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollDomainSize
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_DOMAIN_SIZE).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_DOMAIN_SIZE, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollDomainOffset
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_DOMAIN_OFFSET).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_DOMAIN_OFFSET, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Size ScrollPositionDelta
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( ScrollView.Property.SCROLL_POSITION_DELTA).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.SCROLL_POSITION_DELTA, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Position StartPagePosition
+  {
+    get
+    {
+      Vector3 temp = new Vector3(0.0f,0.0f,0.0f);
+      GetProperty( ScrollView.Property.START_PAGE_POSITION).Get(  temp );
+      Dali.CSharp.Position ret = new Dali.CSharp.Position(temp.x, temp.y, temp.z);
+      return ret;
+    }
+    set
+    {
+      SetProperty( ScrollView.Property.START_PAGE_POSITION, new Dali.Property.Value( value ) );
+    }
+  }
+
+
+/* Properties ends */
+
 %}
 
 %enddef

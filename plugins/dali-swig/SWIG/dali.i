@@ -163,6 +163,7 @@
 
 #endif
 
+
 %ignore operator<<;
 %ignore *::GetImplementation();
 %ignore *::GetImplementation(Dali::BaseHandle&);
@@ -216,8 +217,27 @@ using namespace Dali::Toolkit;
 %include events/textfield-event.i
 %include events/timer-event.i
 %include events/videoview-event.i
+%include events/rendertask-event.i
 
 %include alphafunction.i
+%include cameraActor.i
+%include flexContainer.i
+%include imageView.i
+%include layer.i
+%include linearConstrainer.i
+%include model3DView.i
+%include path.i
+%include pathConstrainer.i
+%include progressBar.i
+%include pushButton.i
+%include renderer.i
+%include shader.i
+%include tableView.i
+%include textLabel.i
+
+%include propertyValue.i
+%include pageTurnLandscapeView.i
+%include pageTurnPortraitView.i
 
 %include dali-operator.i
 %include dali-core.i

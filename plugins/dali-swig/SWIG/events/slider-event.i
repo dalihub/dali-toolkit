@@ -282,6 +282,207 @@ public class MarkReachedEventArgs : EventArgs
     return ret;
   }
 
+/* Properties earlier added by Ruby Script */
+
+  public float LowerBound
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( Slider.Property.LOWER_BOUND).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.LOWER_BOUND, new Dali.Property.Value( value ) );
+    }
+  }
+  public float UpperBound
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( Slider.Property.UPPER_BOUND).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.UPPER_BOUND, new Dali.Property.Value( value ) );
+    }
+  }
+  public float Value
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( Slider.Property.VALUE).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.VALUE, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map TrackVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Slider.Property.TRACK_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.TRACK_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map HandleVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Slider.Property.HANDLE_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.HANDLE_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map ProgressVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Slider.Property.PROGRESS_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.PROGRESS_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map PopupVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Slider.Property.POPUP_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.POPUP_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map PopupArrowVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Slider.Property.POPUP_ARROW_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.POPUP_ARROW_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Color DisabledColor
+  {
+    get
+    {
+      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
+      GetProperty( Slider.Property.DISABLED_COLOR).Get(  temp );
+      Dali.CSharp.Color ret = new Dali.CSharp.Color(temp.r, temp.g, temp.b, temp.a);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Slider.Property.DISABLED_COLOR, new Dali.Property.Value( value ) );
+    }
+  }
+  public int ValuePrecision
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( Slider.Property.VALUE_PRECISION).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.VALUE_PRECISION, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool ShowPopup
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Slider.Property.SHOW_POPUP).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.SHOW_POPUP, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool ShowValue
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Slider.Property.SHOW_VALUE).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.SHOW_VALUE, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Array Marks
+  {
+    get
+    {
+      Dali.Property.Array temp = new Dali.Property.Array();
+      GetProperty( Slider.Property.MARKS).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.MARKS, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool SnapToMarks
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Slider.Property.SNAP_TO_MARKS).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.SNAP_TO_MARKS, new Dali.Property.Value( value ) );
+    }
+  }
+  public float MarkTolerance
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( Slider.Property.MARK_TOLERANCE).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Slider.Property.MARK_TOLERANCE, new Dali.Property.Value( value ) );
+    }
+  }
+
+/* Properties ends */
+
 %}
 
 %enddef

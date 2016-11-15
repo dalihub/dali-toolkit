@@ -296,3 +296,18 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %template(TapGestureDetectedSignal) Dali::Signal<void (Dali::Actor, const Dali::TapGesture&)>;
 %template(AnimationSignal) Dali::Signal<void(Dali::Animation&)>;
 %template(ResourceImageSignal) Dali::Signal<void(Dali::ResourceImage)>;
+
+%define QUATERNION_TYPEMAP_HELPER(NameSpace, ClassName)
+%typemap(cscode) NameSpace::ClassName %{
+  public Quaternion(Radian angle, Dali.CSharp.Position pos) : this(angle, new Vector3(pos.X, pos.Y, pos.Z) {
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+%}
+%enddef
+
+namespace Dali
+{
+  QUATERNION_TYPEMAP_HELPER( Dali, Quaternion);
+}
+

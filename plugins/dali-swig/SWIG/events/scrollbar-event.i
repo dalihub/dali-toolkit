@@ -54,7 +54,7 @@ public class ScrollPositionIntervalReachedEventArgs : EventArgs
   private delegate void PanFinishedEventCallbackDelegate();
   private DaliEventHandler<object,PanFinishedEventArgs> _scrollBarPanFinishedEventHandler;
   private PanFinishedEventCallbackDelegate _scrollBarPanFinishedEventCallbackDelegate;
-  
+
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void ScrollPositionIntervalReachedEventCallbackDelegate();
   private DaliEventHandler<object,ScrollPositionIntervalReachedEventArgs> _scrollBarScrollPositionIntervalReachedEventHandler;
@@ -146,6 +146,127 @@ public class ScrollPositionIntervalReachedEventArgs : EventArgs
         _scrollBarScrollPositionIntervalReachedEventHandler(this, e);
      }
   }
+
+/* Properties earlier added by Ruby Script */
+
+  public string ScrollDirection
+  {
+    get
+    {
+      string temp;
+      GetProperty( ScrollBar.Property.SCROLL_DIRECTION).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.SCROLL_DIRECTION, new Dali.Property.Value( value ) );
+    }
+  }
+  public string IndicatorHeightPolicy
+  {
+    get
+    {
+      string temp;
+      GetProperty( ScrollBar.Property.INDICATOR_HEIGHT_POLICY).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_HEIGHT_POLICY, new Dali.Property.Value( value ) );
+    }
+  }
+  public float IndicatorFixedHeight
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollBar.Property.INDICATOR_FIXED_HEIGHT).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_FIXED_HEIGHT, new Dali.Property.Value( value ) );
+    }
+  }
+  public float IndicatorShowDuration
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollBar.Property.INDICATOR_SHOW_DURATION).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_SHOW_DURATION, new Dali.Property.Value( value ) );
+    }
+  }
+  public float IndicatorHideDuration
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollBar.Property.INDICATOR_HIDE_DURATION).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_HIDE_DURATION, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Array ScrollPositionIntervals
+  {
+    get
+    {
+      Dali.Property.Array temp = new Dali.Property.Array();
+      GetProperty( ScrollBar.Property.SCROLL_POSITION_INTERVALS).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.SCROLL_POSITION_INTERVALS, new Dali.Property.Value( value ) );
+    }
+  }
+  public float IndicatorMinimumHeight
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollBar.Property.INDICATOR_MINIMUM_HEIGHT).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_MINIMUM_HEIGHT, new Dali.Property.Value( value ) );
+    }
+  }
+  public float IndicatorStartPadding
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollBar.Property.INDICATOR_START_PADDING).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_START_PADDING, new Dali.Property.Value( value ) );
+    }
+  }
+  public float IndicatorEndPadding
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( ScrollBar.Property.INDICATOR_END_PADDING).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( ScrollBar.Property.INDICATOR_END_PADDING, new Dali.Property.Value( value ) );
+    }
+  }
+/* Properties ends */
 
 %}
 %enddef
