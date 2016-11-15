@@ -52,30 +52,6 @@ class CheckBoxButton;
  *
  * When the button is disabled, \e background image and \e selected image are replaced by \e disabled images.
  *
- * Usage example: -
- *
- * @code
- * // in Creating a DALi Application
- * void HelloWorldExample::Create( Application& application )
- * {
- *   CheckBoxButton button = CheckBoxButton::New();
- *   button.SetParentOrigin( ParentOrigin::CENTER );
- *   button.SetLabelText( "Check" );
- *   button.SetSize( 200, 40 );
- *   button.SetBackgroundColor( Color::WHITE );
- *   Stage::GetCurrent().Add( button );
- *
- *   // Connect to a button signal emitted by the button
- *   button.StateChangedSignal().Connect( this, &HelloWorldExample::OnButtonStateChanged );
- * }
- *
- * bool HelloWorldExample::OnButtonStateChanged( Button button )
- * {
- *   // Do something when the button state is changed
- *   // You can get the state using button.IsSelected() call
- *   return true;
- * }
- * @endcode
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API CheckBoxButton : public Button

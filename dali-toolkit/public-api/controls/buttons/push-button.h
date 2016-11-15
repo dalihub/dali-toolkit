@@ -46,42 +46,6 @@ class PushButton;
  * By default a PushButton emits a Button::PressedSignal() signal when the button is pressed, a Button::ClickedSignal() signal when it's clicked
  * and a Button::ReleasedSignal() signal when it's released or having pressed it, the touch point leaves the boundary of the button.
  *
- * Usage example: -
- *
- * @code
- * // in Creating a DALi Application
- * void HelloWorldExample::Create( Application& application )
- * {
- *   PushButton button = PushButton::New();
- *   button.SetParentOrigin( ParentOrigin::CENTER );
- *   button.SetLabelText( "Press" );
- *   Stage::GetCurrent().Add( button );
- *
- *   // Connect to button signals emitted by the button
- *   button.ClickedSignal().Connect( this, &HelloWorldExample::OnButtonClicked );
- *   button.PressedSignal().Connect( this, &HelloWorldExample::OnButtonPressed );
- *   button.ReleasedSignal().Connect( this, &HelloWorldExample::OnButtonReleased );
- * }
- *
- * bool HelloWorldExample::OnButtonClicked( Button button )
- * {
- *   // Do something when the button is clicked
- *   return true;
- * }
- *
- * bool HelloWorldExample::OnButtonPressed( Button button )
- * {
- *   // Do something when the button is pressed
- *   return true;
- * }
- *
- * bool HelloWorldExample::OnButtonReleased( Button button )
- * {
- *   // Do something when the button is released
- *   return true;
- * }
- * @endcode
- *
  * See Button for more detail on signals and modifying appearance via properties.
  * @SINCE_1_0.0
  */

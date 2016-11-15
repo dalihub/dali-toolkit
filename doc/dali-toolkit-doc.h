@@ -90,11 +90,11 @@
  * </tr>
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_scroll_bar</td>
- *    <td>ScrollBar is a component that can be linked to the scrollable objects.</td>
+ *    <td>ScrollBar control.</td>
  * </tr>
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_scrollable</td>
- *    <td>Scrollable contains scrolled controls.</td>
+ *    <td>Scrollable container controls.</td>
  * </tr>
  * <tr>
  *    <td style="padding-left:2em">@ref dali_toolkit_controls_item_view</td>
@@ -165,10 +165,10 @@
  *     @brief ImageView is a control displying an image.
 
  *     @defgroup dali_toolkit_controls_scroll_bar Scroll Bar
- *     @brief ScrollBar is a component that can be linked to the scrollable objects.
+ *     @brief ScrollBar control.
 
  *     @defgroup dali_toolkit_controls_scrollable Scrollable
- *     @brief Scrollable contains scrolled controls.
+ *     @brief Scrollable container controls.
 
  *     @{
  *       @defgroup dali_toolkit_controls_item_view Item View
