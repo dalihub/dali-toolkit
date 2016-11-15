@@ -36,7 +36,6 @@
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -162,6 +161,8 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     RemoveFilters();
 
     Actor self = Self();
+    Property::Map visualMap;
+    visualMap.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
     switch( type )
     {
@@ -184,12 +185,11 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
       }
     }
 
-    Image dummyImage; // Dummy image, force creation of an image visual
-    InitializeVisual( self, mVisualPostFilter, dummyImage );
     Property::Map customShader;
     customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
     customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
-    Toolkit::GetImplementation( mVisualPostFilter ).SetCustomShader( customShader );
+    visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
+    InitializeVisual( self, mVisualPostFilter, visualMap );
 
     mEffectType = type;
   }

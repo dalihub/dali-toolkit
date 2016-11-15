@@ -880,13 +880,13 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   //This should still load but display an error image
 
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid URL" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::TYPE,  111 );
   propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -907,26 +907,6 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
                              Integration::ResourcePointer(bitmap) );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliVisualFactoryGetNPatchVisualN3(void)
-{
-  // Passing in an invalid visual type so we should not get a visual
-
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid visual type" );
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  111 );
-  propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
-
-  Visual::Base visual = factory.CreateVisual( propertyMap );
-  DALI_TEST_CHECK( !visual );
 
   END_TEST;
 }
