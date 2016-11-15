@@ -116,8 +116,6 @@ Dali::AccessibilityAdaptor AccessibilityAdaptor::Get()
 
 AccessibilityAdaptor::AccessibilityAdaptor()
 : mIsEnabled(false),
-  mActionHandler(NULL),
-  mGestureHandler(NULL),
   mReadPosition( 0.0f, 0.0f )
 {
 }

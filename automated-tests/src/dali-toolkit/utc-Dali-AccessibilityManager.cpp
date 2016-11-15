@@ -1944,7 +1944,6 @@ int UtcDaliAccessibilityManagerActionMoveToFirstSignalP(void)
   END_TEST;
 }
 
-
 int UtcDaliAccessibilityManagerActionMoveToFirstSignalN(void)
 {
   ToolkitTestApplication application;
