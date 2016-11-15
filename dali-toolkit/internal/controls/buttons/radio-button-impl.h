@@ -74,10 +74,9 @@ private: // From Button
   virtual void OnStateChange( State newState );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonUp
+   * @copydoc Toolkit::Internal::Button::OnToggleReleased
    */
-  virtual void OnButtonUp();
-
+  virtual bool OnToggleReleased();
 
 private:
 

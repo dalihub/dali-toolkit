@@ -316,8 +316,7 @@ protected:
 
   /**
    * Button press state which is not the same as the actual button's state.
-   * A button can be DEPRESSED but the until released the button state may have not changed,
-   * For example DEPRESSING a toggle button that is already in the SELECTED state will not change the button state untill released.
+   * For example An UNSELECTED button can be DEPRESSED, but until released, the actual button state doesn't change to SELECTED
    */
   enum PressState
   {
@@ -360,57 +359,11 @@ private:
   bool DoClickAction( const Property::Map& attributes );
 
   /**
-   * This method is called when the label is set.
-   * @param[in] noPadding Used to bypass padding if the label is to be treated generically.
-   */
-  virtual void OnLabelSet( bool noPadding ) {}
-
-  /**
-   * This method is called when the unselected button image is set
-   */
-  virtual void OnUnselectedImageSet() {}
-
-  /**
-   * This method is called when the selected image is set
-   */
-  virtual void OnSelectedImageSet() {}
-
-  /**
-   * This method is called when the background image is set
-   */
-  virtual void OnBackgroundImageSet() {}
-
-  /**
-   * This method is called when the selected background image is set
-   */
-  virtual void OnSelectedBackgroundImageSet() {}
-
-  /**
-   * This method is called when the disabled button image is set
-   */
-  virtual void OnDisabledImageSet() {}
-
-  /**
-   * This method is called when the disabled selected image is set
-   */
-  virtual void OnDisabledSelectedImageSet() {}
-
-  /**
-   * This method is called when the disabled background image is set
-   */
-  virtual void OnDisabledBackgroundImageSet() {}
-
-  /**
-   * This method is called the button is down.
+   * This method is called when the button is a Toggle button and released
    * Could be reimplemented in subclasses to provide specific behaviour.
+   * @return bool returns true if state changed.
    */
-  virtual void OnButtonDown();
-
-  /**
-   * This method is called when the button is up.
-   * Could be reimplemented in subclasses to provide specific behaviour.
-   */
-  virtual void OnButtonUp();
+  virtual bool OnToggleReleased();
 
   /**
    * This method is called when touch leaves the boundary of the button or several touch points are received.
@@ -571,6 +524,16 @@ private:
   void Pressed();
 
   /**
+   * This method is called the button is down.
+   */
+  void ButtonDown();
+
+  /**
+   * This method is called when the button is up.
+   */
+  void ButtonUp();
+
+  /**
    * Slot called when Dali::Timer::SignalTick signal. Resets the autorepeating timer.
    */
   bool AutoRepeatingSlot();
@@ -589,12 +552,6 @@ private:
    * @param[in] state Visuals in this state will be the target
    */
   void PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state  );
-
-  /**
-   * Transition the visual in or out using the set animation
-   * @param[in] state State to transition in or out
-   */
-  void SetVisualsForTransition( State state );
 
   /**
    * Changes the button state when an action occurs on it
@@ -654,18 +611,6 @@ protected:
   Padding GetForegroundPadding();
 
   /**
-   * @brief Get the pressed state of the button
-   * @return ButtonPressedState the state the button is in
-   */
-  PressState GetPressedState();
-
-  /**
-   * @brief Get the state of the button
-   * @return PaintState the state the button is in
-   */
-  State GetButtonState();
-
-  /**
    * @brief Setup the button components for example foregrounds and background
    * @param[in] index the index of the visual to set
    * @param[in] value the value to set on the component
@@ -680,56 +625,16 @@ protected:
   Dali::Animation GetTransitionAnimation();
 
   /**
-   * @brief Set distance between label and foreground/icon, if both present
-   * @param[in] length length of strut
-   */
-  void SetLabelStrutLength( unsigned int length );
-
-  /**
    * @brief Set the position of the label relative to foreground/icon, if both present
    * @param[in] labelAlignment given alignment setting
    */
   void SetLabelAlignment( Align labelAlignment);
 
   /**
-   * @brief Get set distance between label and foreground/icon visual
-   * @return length of strut
-   */
-  float GetLabelStrutLength();
-
-  /**
    * @brief Get set alignment of label in relation to foreground/icon
    * @return Set alignment value
    */
   Align GetLabelAlignment();
-
-  /**
-   * Prepares the actor to be transitioned in.
-   * @param[in]  actor  The actor that will be transitioned in.
-   */
-  virtual void PrepareForTransitionIn( Actor actor ) {}
-
-  /**
-   * Prepares the actor to be transitioned in.
-   * @param[in]  actor  The actor that will be transitioned out.
-   */
-  virtual void PrepareForTransitionOut( Actor actor ) {}
-
-  /**
-   * Transitions the actor in, allowing derived classes to configure
-   * the GetTransitionAnimation() animation ready.
-   * Button is in charge of calling Dali::Animation::Play and so derived classes
-   * only need to add the animation.
-   */
-  virtual void OnTransitionIn( Actor actor );
-
-  /**
-   * Transitions the actor out, allowing derived classes to configure
-   * the GetTransitionAnimation() animation ready.
-   * Button is in charge of calling Dali::Animation::Play and so derived classes
-   * only need to add the animation.
-   */
-  virtual void OnTransitionOut( Actor actor ) {}
 
   /**
    * Removes the visual from the button (un-staged)
@@ -741,32 +646,6 @@ protected:
 
 
 private:
-
-  /**
-   * Starts the transition animation.
-   * Button::TransitionFinished is called when the animation finishes.
-   */
-  void StartTransitionAnimation();
-
-  /**
-   * This method stops and clears animations
-   */
-  void ClearTransitionAnimation();
-
-  /**
-   * Called when the transition animation finishes.
-   */
-  void TransitionAnimationFinished( Dali::Animation& source );
-
-  /**
-   * Transition button visual using an animation before removal from Stage
-   */
-  void TransitionButtonVisualOut( Property::Index visualIndex );
-
-  /**
-   * Transition button visual using an animation before adding to Stage
-   */
-  void TransitionButtonVisualIn( Property::Index visualIndex );
 
   /**
    * Removes the visual from the button and prepares it to be transitioned out
@@ -800,10 +679,7 @@ private:
   Padding          mLabelPadding;               ///< The padding around the label (if present).
   Padding          mForegroundPadding;          ///< The padding around the foreground/icon visual (if present).
 
-  unsigned int     mForeGroundToLabelStrutLength; ///< Distance between foreground/icon and label.
   Align            mTextLabelAlignment;           ///< Position of text label in relation to foreground/icon when both are present.
-
-  Animation        mTransitionAnimation;        ///< Used in the state transitions.
 
   TapGestureDetector mTapDetector;
 

@@ -70,31 +70,6 @@ private: // From Button
    */
   virtual void OnInitialize();
 
-  /**
-   * @copydoc Toolkit::Internal::Button::PrepareForTranstionIn( Actor actor )
-   */
-  virtual void PrepareForTransitionIn( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::PrepareForTranstionOut( Actor actor )
-   */
-  virtual void PrepareForTransitionOut( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnTransitionInImage( Actor actor )
-   */
-  virtual void OnTransitionIn( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnTransitionOut( Actor actor )
-   */
-  virtual void OnTransitionOut( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnButtonVisualRemoval( Property::Index visualIndex )
-   */
- // virtual void OnButtonVisualRemoval( Property::Index visualIndex );
-
 private:
 
   // Undefined

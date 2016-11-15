@@ -78,15 +78,16 @@ void RadioButton::OnInitialize()
   Button::OnInitialize();
 }
 
-void RadioButton::OnButtonUp()
+bool RadioButton::OnToggleReleased()
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RadioButton::OnStateChange selecting:%s\n", ( (!IsSelected())?"true":"false" ) );
-
-  // Don't allow un-selection on an already selected radio button, can only un-select by selecting a sibling radio button
+  // Radio button overrides toggle release (button up) as doesn't allow un-selection to be performed on it directly.
+  bool stateChanged = false;
   if( !IsSelected() )
   {
-    SetSelected( !IsSelected() );
+    Button::SetSelected( true ); // Set button to selected as previously unselected
+    stateChanged = true;
   }
+  return stateChanged;
 }
 
 void RadioButton::OnStateChange( State newState )

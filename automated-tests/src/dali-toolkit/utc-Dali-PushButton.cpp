@@ -1077,7 +1077,6 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   const int BROKEN_VISUAL_TYPE = 999999999;
 
   colorMap.Insert(Visual::Property::TYPE,  BROKEN_VISUAL_TYPE);
-  //colorMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
   colorMap.Insert(BorderVisual::Property::COLOR,  Color::BLUE);
   colorMap.Insert(BorderVisual::Property::SIZE,  5.f);
   pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, colorMap );

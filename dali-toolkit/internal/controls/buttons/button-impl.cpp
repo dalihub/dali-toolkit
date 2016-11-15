@@ -87,7 +87,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedBackgroundVisual",      
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedBackgroundVisual",           MAP,     SELECTED_BACKGROUND_VISUAL            )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedBackgroundVisual", MAP,     DISABLED_UNSELECTED_BACKGROUND_VISUAL )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedBackgroundVisual",   MAP,     DISABLED_SELECTED_BACKGROUND_VISUAL   )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelStrutLength",                   INTEGER, LABEL_STRUT_LENGTH                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelRelativeAlignment",             STRING,  LABEL_RELATIVE_ALIGNMENT              )
 
 // Signals:
@@ -131,7 +130,6 @@ const Property::Index GET_VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
 Button::Button()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mAutoRepeatingTimer(),
-  mForeGroundToLabelStrutLength( 0.0f ),
   mTextLabelAlignment( END ),
   mAutoRepeating( false ),
   mTogglableButton( false ),
@@ -280,8 +278,10 @@ bool Button::ValidateState( State requestedState )
 
 void Button::PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state )
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState BACKROUND visual(%d) for state (%d)\n", GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND], state );
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState FOREGROUND visuals(%d)  for state (%d)\n", GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND], state );
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState BACKROUND visual(%d) for state (%d)\n",
+                 GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND], state );
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState FOREGROUND visuals(%d)  for state (%d)\n",
+                 GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND], state );
 
   (this->*functionPtr)( GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
   (this->*functionPtr)( GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
@@ -306,13 +306,9 @@ void Button::ChangeState( State requestedState )
 
   if ( Self().OnStage() )
   {
-    // Clear existing animation and remove visual being transitioned out before starting a new transition of visuals. ClearTransitionAnimation();
     OnStateChange( mButtonState ); // Notify derived buttons
-    //// When animations enabled PerformFunctionOnVisualsInState( &Button::TransitionButtonVisualOut, mPreviousButtonState );
     PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
-    // When animations enabled then call PerformFunctionOnVisualsInState( &Button::TransitionButtonVisualIn, mButtonState );
-    // then StartTransitionAnimation();
-    // and ClearTransitionAnimation();
+    // If animation supported then visual removal should be performed after any transition animation has completed.
     PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
   }
 
@@ -325,16 +321,6 @@ bool Button::IsSelected() const
 {
   bool selected = ( mButtonState == SELECTED_STATE ) || ( mButtonState == DISABLED_SELECTED_STATE );
   return mTogglableButton && selected;
-}
-
-void Button::SetAnimationTime( float animationTime )
-{
-  mAnimationTime = animationTime;
-}
-
-float Button::GetAnimationTime() const
-{
-  return mAnimationTime;
 }
 
 void Button::SetLabelText( const std::string& label )
@@ -403,26 +389,13 @@ void Button::SetupLabel( const Property::Map& properties )
     }
   }
 
-  // Notify derived button classes of the change.
-  OnLabelSet( false );
-
   RelayoutRequest();
-}
-
-void Button::SetLabelStrutLength( unsigned int length )
-{
-  mForeGroundToLabelStrutLength = length;
 }
 
 void Button::SetLabelAlignment( Button::Align labelAlignment)
 {
   mTextLabelAlignment = labelAlignment;
   RelayoutRequest();
-}
-
-float Button::GetLabelStrutLength()
-{
-  return mForeGroundToLabelStrutLength;
 }
 
 Button::Align Button::GetLabelAlignment()
@@ -470,35 +443,6 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
   }
 }
 
-const Vector4 Button::GetUnselectedColor() const
-{
-  return mUnselectedColor;
-}
-
-const Vector4 Button::GetSelectedColor() const
-{
-  return mSelectedColor;
-}
-
-// Legacy code whilst Color can be set by direct Property setting ( deprecated ) instead of setting a Visual
-void Button::SetColor( const Vector4& color, Property::Index visualIndex )
-{
-  if ( visualIndex == Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL )
-  {
-    mSelectedColor = color;
-  }
-  else
-  {
-    mUnselectedColor = color;
-  }
-
-  Property::Map map;
-  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
-  map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-
-  CreateVisualsForComponent( visualIndex, map, DepthIndex::BACKGROUND );
-}
-
 bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
@@ -524,12 +468,12 @@ bool Button::DoClickAction( const Property::Map& attributes )
   if( !mClickActionPerforming )
   {
     mClickActionPerforming = true;
-    OnButtonDown();
+    ButtonDown();
     if ( !mTogglableButton )
     {
       mButtonPressedState = DEPRESSED;
     }
-    OnButtonUp();
+    ButtonUp();
     mClickActionPerforming = false;
 
     return true;
@@ -538,7 +482,7 @@ bool Button::DoClickAction( const Property::Map& attributes )
   return false;
 }
 
-void Button::OnButtonDown()
+void Button::ButtonDown()
 {
   if( mTogglableButton )
   {
@@ -567,33 +511,43 @@ void Button::OnButtonDown()
   mPressedSignal.Emit( handle );
 }
 
-void Button::OnButtonUp()
+void Button::ButtonUp()
 {
   if( DEPRESSED == mButtonPressedState )
   {
-    if( mTogglableButton )
+    bool validButtonAction = false;
+
+    if( mTogglableButton ) // Button up will change state
     {
-      if ( TOGGLE_DEPRESSED != mButtonPressedState )
-      {
-        SetSelected( !IsSelected() );
-        mButtonPressedState = UNPRESSED;
-      }
+      OnToggleReleased(); // Derived toggle buttons can override this to provide custom behaviour
     }
     else
     {
-      Released();
+      Released(); // Button up will result in unselected state
       if( mAutoRepeating )
       {
         mAutoRepeatingTimer.Reset();
       }
+      validButtonAction = true;
     }
 
-    // The clicked and released signals should be emitted regardless of toggle mode.
-    Toolkit::Button handle( GetOwner() );
-    mReleasedSignal.Emit( handle );
-    mClickedSignal.Emit( handle );
+    if ( validButtonAction )
+    {
+      // The clicked and released signals should be emitted regardless of toggle mode.
+      Toolkit::Button handle( GetOwner() );
+      mReleasedSignal.Emit( handle );
+      mClickedSignal.Emit( handle );
+    }
   }
 }
+
+bool Button::OnToggleReleased()
+{
+  SetSelected( !IsSelected() );
+  mButtonPressedState = UNPRESSED;
+  return true;
+}
+
 
 void Button::OnTouchPointLeave()
 {
@@ -706,12 +660,12 @@ bool Button::OnTouch( Actor actor, const TouchData& touch )
     {
       case PointState::DOWN:
       {
-        OnButtonDown();
+        ButtonDown();
         break;
       }
       case PointState::UP:
       {
-        OnButtonUp();
+        ButtonUp();
         break;
       }
       case PointState::INTERRUPTED:
@@ -871,13 +825,6 @@ void Button::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimen
 void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout targetSize(%f,%f) ptr(%p) state[%d]\n", size.width, size.height, this, mButtonState );
-
-  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
-
-  ResizePolicy::Type widthResizePolicy = Self().GetResizePolicy(  Dimension::WIDTH );
-  ResizePolicy::Type heightResizePolicy = Self().GetResizePolicy(  Dimension::HEIGHT );
-
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout resize policy: width:%d height:%d\n", heightResizePolicy, widthResizePolicy);
 
   Toolkit::Visual::Base currentVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
 
@@ -1050,7 +997,6 @@ void Button::Pressed()
 
   if( mButtonState == UNSELECTED_STATE )
   {
-    ClearTransitionAnimation();
     ChangeState( SELECTED_STATE );
     OnPressed();  // Notifies the derived class the button has been pressed.
   }
@@ -1062,21 +1008,10 @@ void Button::Released()
 
   if( mButtonState == SELECTED_STATE && !mTogglableButton )
   {
-    ClearTransitionAnimation();
     ChangeState( UNSELECTED_STATE );
     OnReleased(); //    // Notifies the derived class the button has been released.
   }
   mButtonPressedState = UNPRESSED;
-}
-
-Button::PressState Button::GetPressedState()
-{
-  return mButtonPressedState;
-}
-
-Button::State Button::GetButtonState()
-{
-  return mButtonState;
 }
 
 void Button::SelectRequiredVisual( Property::Index visualIndex )
@@ -1084,23 +1019,6 @@ void Button::SelectRequiredVisual( Property::Index visualIndex )
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SelectRequiredVisual index(%d) state(%d)\n", visualIndex, mButtonState );
 
   EnableVisual( visualIndex, true );
-}
-
-void Button::TransitionButtonVisualOut( Property::Index visualIndex )
-{
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::TransitionButtonVisualOut index(%d)\n", visualIndex);
-
-  // PrepareForTranstionOut and OnTransitionOut needs to be called on visual instead of Actor once animating is possible
-}
-
-void Button::TransitionButtonVisualIn( Property::Index visualIndex )
-{
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::TransitionButtonVisualIn index(%d)\n", visualIndex );
-}
-
-void Button::OnTransitionIn( Actor actor )
-{
-  PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
 }
 
 void Button::RemoveVisual( Property::Index visualIndex )
@@ -1121,47 +1039,6 @@ void Button::OnButtonVisualRemoval( Property::Index visualIndex )
   // Derived Buttons can over ride this to prevent default removal.
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnButtonVisualRemoval index(%d)\n", visualIndex );
   RemoveVisual( visualIndex );
-}
-
-void Button::StartTransitionAnimation()
-{
-  if( mTransitionAnimation )
-  {
-    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::StartTransitionAnimation progress(%f) duration(%f) state(%d) \n",
-                   mTransitionAnimation.GetCurrentProgress(), mTransitionAnimation.GetDuration(),
-                   mTransitionAnimation.GetState());
-    mTransitionAnimation.Play();
-  }
-}
-
-void Button::ClearTransitionAnimation()
-{
-  if( mTransitionAnimation )
-  {
-    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::ClearTransitionAnimation progress(%f) duration(%f) state(%d) \n",
-                   mTransitionAnimation.GetCurrentProgress(), mTransitionAnimation.GetDuration(),
-                   mTransitionAnimation.GetState());
-    mTransitionAnimation.Clear();
-    mTransitionAnimation.Reset();
-  }
-}
-
-Dali::Animation Button::GetTransitionAnimation()
-{
-  if( !mTransitionAnimation )
-  {
-    mTransitionAnimation = Dali::Animation::New( GetAnimationTime() );
-    mTransitionAnimation.FinishedSignal().Connect( this, &Button::TransitionAnimationFinished );
-  }
-
-  return mTransitionAnimation;
-}
-
-void Button::TransitionAnimationFinished( Dali::Animation& source )
-{
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::TransitionAnimationFinished\n" );
-  ClearTransitionAnimation();
-  PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
 }
 
 void Button::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
@@ -1274,12 +1151,6 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         {
           GetImplementation( button ).SetupLabel( setPropertyMap );
         }
-        break;
-      }
-
-      case Toolkit::Button::Property::LABEL_STRUT_LENGTH:
-      {
-        GetImplementation( button ).SetLabelStrutLength( value.Get< int >() );
         break;
       }
 
@@ -1436,6 +1307,47 @@ Padding Button::GetForegroundPadding()
 
 ////////////////////////////////////////////////////////////////////////
 // Legacy functions from Tizen 2.4 and 3.0
+
+// Legacy code needed whilst Color can be set by direct Property setting ( deprecated ) instead of setting a Visual
+void Button::SetColor( const Vector4& color, Property::Index visualIndex )
+{
+  if ( visualIndex == Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL )
+  {
+    mSelectedColor = color;
+  }
+  else
+  {
+    mUnselectedColor = color;
+  }
+
+  Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
+
+  CreateVisualsForComponent( visualIndex, map, DepthIndex::BACKGROUND );
+}
+
+const Vector4 Button::GetUnselectedColor() const
+{
+  return mUnselectedColor;
+}
+
+const Vector4 Button::GetSelectedColor() const
+{
+  return mSelectedColor;
+}
+
+void Button::SetAnimationTime( float animationTime )
+{
+  // Used by depreciated API
+  mAnimationTime = animationTime;
+}
+
+float Button::GetAnimationTime() const
+{
+  // Used by depreciated API
+  return mAnimationTime;
+}
 
 void Button::SetLabel( Actor label )
 {

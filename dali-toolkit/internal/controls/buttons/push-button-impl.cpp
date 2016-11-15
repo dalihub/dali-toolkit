@@ -47,8 +47,6 @@ namespace Internal
 namespace
 {
 
-const float   ANIMATION_TIME( 0.2f );
-
 BaseHandle Create()
 {
   return Toolkit::PushButton::New();
@@ -102,7 +100,6 @@ PushButton::PushButton()
 : Button(),
   mIconAlignment( RIGHT )
 {
-  SetAnimationTime( ANIMATION_TIME );
 }
 
 PushButton::~PushButton()
@@ -243,46 +240,6 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
   }
 
   return value;
-}
-
-void PushButton::PrepareForTranstionIn( Actor actor )
-{
-  // Set Toolkit::Button::Property::SELECTED_VISUAL and Toolkit::Button::Property::UNSELECTED_VISUAL to opacity 0
-  // Then get and start animation
-}
-
-void PushButton::PrepareForTranstionOut( Actor actor )
-{
-  // Set Toolkit::Button::Property::SELECTED_VISUAL and Toolkit::Button::Property::UNSELECTED_VISUAL to opacity 1
-  // Then get and start animation
-}
-
-void PushButton::OnTransitionIn( Actor actor )
-{
-  // Only transition selected and unselected visual, background doesn't change.
-  // Start Fade animation to 1
-}
-
-void PushButton::OnTransitionOut( Actor actor )
-{
-  // Only transition selected and unselected visual, background doesn't change.
-  // Start Fade animation to 0
-}
-
-void PushButton::FadeImageTo( Actor actor , float opacity )
-{
-  if( actor )
-  {
-    Dali::Animation transitionAnimation = GetTransitionAnimation();
-    DALI_ASSERT_DEBUG( transitionAnimation );
-
-    if( transitionAnimation )
-    {
-      DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "PushButton::FadeImageTo(%f)\n", opacity );
-
-      transitionAnimation.AnimateTo( Property( actor, Actor::Property::COLOR_ALPHA ), opacity );
-    }
-  }
 }
 
 } // namespace Internal

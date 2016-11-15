@@ -100,27 +100,6 @@ private: // From Button
    */
   virtual void OnInitialize();
 
-  /**
-   * @copydoc Toolkit::Internal::Button::PrepareForTranstionIn( Actor actor )
-   */
-  virtual void PrepareForTranstionIn( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::PrepareForTranstionOut( Actor actor )
-   */
-  virtual void PrepareForTranstionOut( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnTransitionIn( Toolkit::Visual::Base& visual )
-   */
-  virtual void OnTransitionIn( Actor actor );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnTransitionOut( Toolkit::Visual::Base& visual )
-   */
-  virtual void OnTransitionOut( Actor actor );
-
-
 private:
 
   /**

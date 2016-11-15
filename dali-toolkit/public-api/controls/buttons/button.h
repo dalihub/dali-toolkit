@@ -95,7 +95,6 @@ class Button;
  * | Property::SELECTED_BACKGROUND_VISUAL                  | selectedBackgroundVisual               |  MAP         | Y      | N        |
  * | Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL       | disabledUnselectedBackgroundVisual     |  MAP         | Y      | N        |
  * | Property::DISABLED_SELECTED_BACKGROUND_VISUAL         | disabledSelectedBackgroundVisual       |  MAP         | Y      | N        |
- * | Property::LABEL_STRUT_LENGTH                          | labelStrutLength                       |  INTEGER     | Y      | N        |
  * | Property::LABEL_RELATIVE_ALIGNMENT                    | labelRelativeAlignment                 |  STRING      | Y      | N        |
  * -------------------------------------------------------------------------------------------------------------------------------------
  *
@@ -289,13 +288,6 @@ public:
        * @SINCE_1_2.XX
        */
       DISABLED_SELECTED_BACKGROUND_VISUAL,
-
-      /**
-       * @brief name "labelStrutLength", type INTEGER
-       * @details Sets the distance between the label and foreground/icon visual if both present
-       * @SINCE_1_2.XX
-       */
-      LABEL_STRUT_LENGTH,  // todo ????? remove
 
       /**
        * @brief name "labelRelativeAlignment", type STRING

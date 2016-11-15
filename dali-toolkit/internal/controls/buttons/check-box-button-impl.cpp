@@ -45,8 +45,6 @@ namespace Internal
 namespace
 {
 
-const float ANIMATION_TIME( 0.26f );  // EFL checkbox tick time - Will be replaced by stylable tranisitions
-
 BaseHandle Create()
 {
   return Toolkit::CheckBoxButton::New();
@@ -77,25 +75,10 @@ CheckBoxButton::CheckBoxButton()
 : Button()
 {
   SetTogglableButton( true );
-
-  SetAnimationTime( ANIMATION_TIME );
 }
 
 CheckBoxButton::~CheckBoxButton()
 {
-}
-
-void CheckBoxButton::FadeImageTo( Actor actor , float opacity )
-{
-  if( actor )
-  {
-    Dali::Animation transitionAnimation = GetTransitionAnimation();
-
-    if( transitionAnimation )
-    {
-      transitionAnimation.AnimateTo( Property( actor, Actor::Property::COLOR_ALPHA ), opacity );
-    }
-  }
 }
 
 void CheckBoxButton::OnInitialize()
@@ -103,29 +86,6 @@ void CheckBoxButton::OnInitialize()
   Button::OnInitialize();
 }
 
-void CheckBoxButton::PrepareForTransitionIn( Actor actor )
-{
-  // Set Toolkit::Button::Property::SELECTED_VISUAL and Toolkit::Button::Property::UNSELECTED_VISUAL to opacity 0
-  // Then get and start animation
-}
-
-void CheckBoxButton::PrepareForTransitionOut( Actor actor )
-{
-  // Set Toolkit::Button::Property::SELECTED_VISUAL and Toolkit::Button::Property::UNSELECTED_VISUAL to opacity 1
-  // Then get and start animation
-}
-
-void CheckBoxButton::OnTransitionIn( Actor actor )
-{
-  // Only transition selected and unselected visual, background doesn't change.
-  // Start Fade animation to 1
-}
-
-void CheckBoxButton::OnTransitionOut( Actor actor )
-{
-  // Only transition selected and unselected visual, background doesn't change.
-  // Start Fade animation to 0
-}
 
 } // namespace Internal
 
