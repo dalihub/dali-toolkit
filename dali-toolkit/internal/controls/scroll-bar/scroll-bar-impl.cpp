@@ -243,11 +243,6 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
   // Don't allow empty handle
   if( indicator )
   {
-    // Remove current Indicator
-    if( mIndicator )
-    {
-      Self().Remove( mIndicator );
-    }
     mIndicator = indicator;
     mIndicatorFirstShow = true;
     Self().Add(mIndicator);
