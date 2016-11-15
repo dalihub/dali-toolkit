@@ -62,7 +62,7 @@ namespace MyCSharpExample
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor =  new Color("white") ;
+      stage.BackgroundColor =  new Color(Colors.White) ;
 
       Size stageSize = stage.Size;
       Console.WriteLine("Stage size: " + stageSize.x + ", " + stageSize.y);
