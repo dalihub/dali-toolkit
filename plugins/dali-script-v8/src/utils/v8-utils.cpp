@@ -87,7 +87,7 @@ void LogError(const v8::FunctionCallbackInfo< v8::Value >& args)
     output += *utf8_value;
     output +="\n";
   }
-  DALI_LOG_ERROR_NOFN( "JavaScript: %s\n",output.c_str() );
+  DALI_LOG_ERROR_NOFN( "JavaScript: %s",output.c_str() );
 }
 
 void GetFileContents(const std::string &fileName, std::string& contents)

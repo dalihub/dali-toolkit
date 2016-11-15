@@ -164,7 +164,7 @@ void Controller::SetAutoScrollEnabled( bool enable )
   }
   else
   {
-    DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n" );
+    DALI_LOG_WARNING( "Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored" );
     mImpl->mAutoScrollEnabled = false;
   }
 }
@@ -572,7 +572,7 @@ float Controller::GetDefaultPointSize() const
 
 void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange");
 
   if( !mImpl->mFontDefaults->familyDefined ) // If user defined font then should not update when system font changes
   {
@@ -2172,7 +2172,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     {
       if( !mImpl->mEventData->mPreEditFlag )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state" );
 
         // Record the start of the pre-edit text
         mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;

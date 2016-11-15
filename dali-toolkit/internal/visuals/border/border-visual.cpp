@@ -121,13 +121,13 @@ void BorderVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap 
   Property::Value* color = propertyMap.Find( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME );
   if( !( color && color->Get(mBorderColor) ) )
   {
-    DALI_LOG_ERROR( "Fail to provide a border color to the BorderVisual object\n" );
+    DALI_LOG_ERROR( "Fail to provide a border color to the BorderVisual object" );
   }
 
   Property::Value* size = propertyMap.Find( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME );
   if( !( size && size->Get(mBorderSize) ) )
   {
-    DALI_LOG_ERROR( "Fail to provide a border size to the BorderVisual object\n" );
+    DALI_LOG_ERROR( "Fail to provide a border size to the BorderVisual object" );
   }
 
   Property::Value* antiAliasing = propertyMap.Find( Toolkit::BorderVisual::Property::ANTI_ALIASING, ANTI_ALIASING );
