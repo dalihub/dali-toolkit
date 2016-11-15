@@ -98,6 +98,14 @@ enum
    * @note For N-Patch images only.
    */
   BORDER_ONLY,
+
+  /**
+   * @brief This enables Image visuals to automatically be converted to Batch-Image visuals.
+   * @details Name "batchingEnabled", type Property::BOOLEAN.
+   * @SINCE_1_2.0
+   * @note Optional. For Image visuals only. Not to be used with NPatch or SVG images.
+   */
+  BATCHING_ENABLED,
 };
 
 } // namespace Property

@@ -41,6 +41,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/image/batch-image-visual.h>
 
 namespace
 {
@@ -70,7 +71,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, DEBUG )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 const char * const VISUAL_TYPE( "visualType" );
-
+const char * const BATCHING_ENABLED( "batchingEnabled" );
 BaseHandle Create()
 {
   BaseHandle handle = Toolkit::VisualFactory::Get();
@@ -109,7 +110,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   Visual::Base* visualPtr = NULL;
 
   Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
-  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type
+  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
@@ -142,7 +143,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
+        Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
+        if( batchingEnabledValue  )
+        {
+          bool batchingEnabled( false );
+          batchingEnabledValue->Get( batchingEnabled );
+          if( batchingEnabled )
+          {
+            CreateAtlasManager();
+            visualPtr = new BatchImageVisual( *( mFactoryCache.Get() ), *( mAtlasManager.Get() ) );
+            break;
+          }
+        }
+        else if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
         {
           visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
         }
@@ -187,6 +200,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       visualPtr = new DebugVisual( *( mFactoryCache.Get() ) );
       break;
     }
+
   }
 
   if( visualPtr )
@@ -196,7 +210,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   }
   else
   {
-    DALI_LOG_ERROR( "Renderer type unknown" );
+    DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
 
   return Toolkit::Visual::Base( visualPtr );

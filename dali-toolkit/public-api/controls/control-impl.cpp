@@ -52,6 +52,33 @@ namespace
 {
 
 /**
+ * Struct used to store Visual within the control, index is a unique key for each visual.
+ */
+struct RegisteredVisual
+{
+  Property::Index index;
+  Toolkit::Visual::Base visual;
+  Actor placementActor;
+
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, Actor &aPlacementActor) : index(aIndex), visual(aVisual), placementActor(aPlacementActor) {}
+};
+
+/**
+ *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
+ */
+bool FindVisual( Property::Index targetIndex, std::vector<RegisteredVisual>& visuals, std::vector<RegisteredVisual>::iterator& iter )
+{
+  for ( iter = visuals.begin(); iter != visuals.end(); iter++ )
+  {
+    if ( (*iter).index ==  targetIndex )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Creates control through type registry
  */
 BaseHandle Create()
@@ -367,6 +394,7 @@ public:
   // Data
 
   Control& mControlImpl;
+  std::vector<RegisteredVisual> mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -623,6 +651,44 @@ void Control::KeyboardEnter()
 {
   // Inform deriving classes
   OnKeyboardEnter();
+}
+
+void Control::RegisterVisual( Property::Index index, Actor placementActor, Toolkit::Visual::Base visual )
+{
+  bool visualReplaced ( false );
+  Actor actorToRegister; // Null actor, replaced if placement actor not Self
+
+  if ( placementActor != Self() ) // Prevent increasing ref count if actor self
+  {
+    actorToRegister = placementActor;
+  }
+
+  if ( !mImpl->mVisuals.empty() )
+  {
+      std::vector<RegisteredVisual>::iterator iter;
+      // Check if visual (index) is already registered.  Replace if so.
+      if ( FindVisual( index, mImpl->mVisuals, iter ) )
+      {
+        (*iter).visual = visual;
+        (*iter).placementActor = actorToRegister;
+        visualReplaced = true;
+      }
+  }
+
+  if ( !visualReplaced ) // New registration entry
+  {
+    RegisteredVisual newVisual = RegisteredVisual( index, visual, actorToRegister );
+    mImpl->mVisuals.push_back( newVisual );
+  }
+}
+
+void Control::UnregisterVisual( Property::Index index )
+{
+   std::vector< RegisteredVisual >::iterator iter;
+   if ( FindVisual( index, mImpl->mVisuals, iter ) )
+   {
+     mImpl->mVisuals.erase( iter );
+   }
 }
 
 bool Control::OnAccessibilityActivated()
