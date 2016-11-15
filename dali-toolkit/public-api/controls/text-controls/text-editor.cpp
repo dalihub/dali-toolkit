@@ -64,11 +64,6 @@ TextEditor::TextChangedSignalType& TextEditor::TextChangedSignal()
   return Dali::Toolkit::GetImpl( *this ).TextChangedSignal();
 }
 
-TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedSignal()
-{
-  return Dali::Toolkit::GetImpl( *this ).InputStyleChangedSignal();
-}
-
 TextEditor::TextEditor( Internal::TextEditor& implementation )
 : Control( implementation )
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,74 @@
 #include <dali/integration-api/adaptors/adaptor.h>
 
 #include <dali/public-api/object/base-object.h>
-
-#include <toolkit-adaptor-impl.h>
+#include <dali/devel-api/adaptor-framework/render-surface.h>
 
 namespace Dali
 {
+
+class EglInterface;
+class DisplayConnection;
+class ThreadSynchronizationInterface;
+
+namespace Integration
+{
+
+class GlAbstraction;
+
+} // namespace Integration
+
+class TestRenderSurface : public RenderSurface
+{
+public:
+  virtual PositionSize GetPositionSize() const { PositionSize size; return size; }
+
+  virtual void InitializeEgl( EglInterface& egl ) {}
+
+  virtual void CreateEglSurface( EglInterface& egl ) {}
+
+  virtual void DestroyEglSurface( EglInterface& egl ) {}
+
+  virtual bool ReplaceEGLSurface( EglInterface& egl ) { return false; }
+
+  virtual void MoveResize( Dali::PositionSize positionSize ) {}
+
+  virtual void SetViewMode( ViewMode viewMode ) {}
+
+  virtual void StartRender() {}
+
+  virtual bool PreRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction ) { return false; }
+
+  virtual void PostRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction, DisplayConnection* displayConnection, bool replacingSurface ) {}
+
+  virtual void StopRender() {}
+
+  virtual void ReleaseLock() {}
+
+  virtual void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) {}
+
+  virtual RenderSurface::Type GetSurfaceType() { return RenderSurface::ECORE_RENDER_SURFACE; }
+};
 
 namespace Internal
 {
 namespace Adaptor
 {
 
-bool Adaptor::mAvailable = false;
-Vector<CallbackBase*> Adaptor::mCallbacks = Vector<CallbackBase*>();
+class Adaptor: public BaseObject
+{
+public:
+  static Dali::Adaptor& Get();
+  Adaptor();
+  ~Adaptor();
+
+public:
+  static Dali::RenderSurface& GetSurface();
+  static Dali::Adaptor::AdaptorSignalType& AdaptorSignal();
+};
 
 Dali::Adaptor& Adaptor::Get()
 {
   Dali::Adaptor* adaptor = new Dali::Adaptor;
-  Adaptor::mAvailable = true;
   return *adaptor;
 }
 
@@ -52,8 +102,12 @@ Dali::Adaptor::AdaptorSignalType& Adaptor::AdaptorSignal()
   return *signal;
 }
 
-} // namespace Adaptor
-} // namespace Internal
+}
+}
+}
+
+namespace Dali
+{
 
 Adaptor& Adaptor::New( Window window )
 {
@@ -97,34 +151,7 @@ void Adaptor::Stop()
 
 bool Adaptor::AddIdle( CallbackBase* callback )
 {
-  const bool isAvailable = IsAvailable();
-
-  if( isAvailable )
-  {
-    Internal::Adaptor::Adaptor::mCallbacks.PushBack( callback );
-  }
-
-  return isAvailable;
-}
-
-void Adaptor::RemoveIdle( CallbackBase* callback )
-{
-  const bool isAvailable = IsAvailable();
-
-  if( isAvailable )
-  {
-    for( Vector<CallbackBase*>::Iterator it = Internal::Adaptor::Adaptor::mCallbacks.Begin(),
-           endIt = Internal::Adaptor::Adaptor::mCallbacks.End();
-         it != endIt;
-         ++it )
-    {
-      if( callback == *it )
-      {
-        Internal::Adaptor::Adaptor::mCallbacks.Remove( it );
-        return;
-      }
-    }
-  }
+  return false;
 }
 
 void Adaptor::ReplaceSurface( Any nativeWindow, Dali::RenderSurface& surface )
@@ -171,7 +198,7 @@ Adaptor& Adaptor::Get()
 
 bool Adaptor::IsAvailable()
 {
-  return Internal::Adaptor::Adaptor::mAvailable;
+  return false;
 }
 
 void Adaptor::NotifySceneCreated()

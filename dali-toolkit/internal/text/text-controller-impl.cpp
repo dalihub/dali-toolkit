@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,6 @@ EventData::EventData( DecoratorPtr decorator )
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
   mEventQueue(),
-  mInputStyleChangedQueue(),
   mState( INACTIVE ),
   mPrimaryCursorPosition( 0u ),
   mLeftSelectionPosition( 0u ),
@@ -263,10 +262,6 @@ bool Controller::Impl::ProcessInputEvents()
 
   if( mEventData->mUpdateInputStyle )
   {
-    // Keep a copy of the current input style.
-    InputStyle currentInputStyle;
-    currentInputStyle.Copy( mEventData->mInputStyle );
-
     // Set the default style first.
     RetrieveDefaultInputStyle( mEventData->mInputStyle );
 
@@ -275,16 +270,6 @@ bool Controller::Impl::ProcessInputEvents()
 
     // Retrieve the style from the style runs stored in the logical model.
     mLogicalModel->RetrieveStyle( styleIndex, mEventData->mInputStyle );
-
-    // Compare if the input style has changed.
-    const bool hasInputStyleChanged = !currentInputStyle.Equal( mEventData->mInputStyle );
-
-    if( hasInputStyleChanged )
-    {
-      const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mEventData->mInputStyle );
-      // Queue the input style changed signal.
-      mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
-    }
 
     mEventData->mUpdateInputStyle = false;
   }
@@ -1021,25 +1006,11 @@ void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
   inputStyle.slant = TextAbstraction::FontSlant::NORMAL;
   inputStyle.size = 0.f;
 
-  inputStyle.lineSpacing = 0.f;
-
-  inputStyle.underlineProperties.clear();
-  inputStyle.shadowProperties.clear();
-  inputStyle.embossProperties.clear();
-  inputStyle.outlineProperties.clear();
-
-  inputStyle.isFamilyDefined = false;
-  inputStyle.isWeightDefined = false;
-  inputStyle.isWidthDefined = false;
-  inputStyle.isSlantDefined = false;
-  inputStyle.isSizeDefined = false;
-
-  inputStyle.isLineSpacingDefined = false;
-
-  inputStyle.isUnderlineDefined = false;
-  inputStyle.isShadowDefined = false;
-  inputStyle.isEmbossDefined = false;
-  inputStyle.isOutlineDefined = false;
+  inputStyle.familyDefined = false;
+  inputStyle.weightDefined = false;
+  inputStyle.widthDefined = false;
+  inputStyle.slantDefined = false;
+  inputStyle.sizeDefined = false;
 
   // Sets the default font's family name, weight, width, slant and size.
   if( mFontDefaults )
@@ -1047,31 +1018,31 @@ void Controller::Impl::RetrieveDefaultInputStyle( InputStyle& inputStyle )
     if( mFontDefaults->familyDefined )
     {
       inputStyle.familyName = mFontDefaults->mFontDescription.family;
-      inputStyle.isFamilyDefined = true;
+      inputStyle.familyDefined = true;
     }
 
     if( mFontDefaults->weightDefined )
     {
       inputStyle.weight = mFontDefaults->mFontDescription.weight;
-      inputStyle.isWeightDefined = true;
+      inputStyle.weightDefined = true;
     }
 
     if( mFontDefaults->widthDefined )
     {
       inputStyle.width = mFontDefaults->mFontDescription.width;
-      inputStyle.isWidthDefined = true;
+      inputStyle.widthDefined = true;
     }
 
     if( mFontDefaults->slantDefined )
     {
       inputStyle.slant = mFontDefaults->mFontDescription.slant;
-      inputStyle.isSlantDefined = true;
+      inputStyle.slantDefined = true;
     }
 
     if( mFontDefaults->sizeDefined )
     {
       inputStyle.size = mFontDefaults->mDefaultPointSize;
-      inputStyle.isSizeDefined = true;
+      inputStyle.sizeDefined = true;
     }
   }
 }
@@ -1671,22 +1642,8 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
 
     if( deleteAfterRetrieval ) // Only delete text if copied successfully
     {
-      // Keep a copy of the current input style.
-      InputStyle currentInputStyle;
-      currentInputStyle.Copy( mEventData->mInputStyle );
-
       // Set as input style the style of the first deleted character.
       mLogicalModel->RetrieveStyle( startOfSelectedText, mEventData->mInputStyle );
-
-      // Compare if the input style has changed.
-      const bool hasInputStyleChanged = !currentInputStyle.Equal( mEventData->mInputStyle );
-
-      if( hasInputStyleChanged )
-      {
-        const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mEventData->mInputStyle );
-        // Queue the input style changed signal.
-        mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
-      }
 
       mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
 

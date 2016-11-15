@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_CONTROL_INTERFACE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
  * limitations under the License.
  *
  */
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/input-style.h>
 
 namespace Dali
 {
@@ -71,13 +68,6 @@ public:
    * @brief Called when the number of characters to be inserted exceeds the maximum limit
    */
   virtual void MaxLengthReached() = 0;
-
-  /**
-   * @brief Called to signal that input style has been changed.
-   *
-   * @param[in] inputStyleMask Mask with the bits of the input style that has changed.
-   */
-  virtual void InputStyleChanged( InputStyle::Mask inputStyleMask ) = 0;
 };
 
 } // namespace Text

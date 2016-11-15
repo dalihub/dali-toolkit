@@ -640,25 +640,11 @@ bool Controller::RemoveText( int cursorOffset,
 
       if( UPDATE_INPUT_STYLE == type )
       {
-        // Keep a copy of the current input style.
-        InputStyle currentInputStyle;
-        currentInputStyle.Copy( mImpl->mEventData->mInputStyle );
-
         // Set first the default input style.
         mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
 
         // Update the input style.
         mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
-
-        // Compare if the input style has changed.
-        const bool hasInputStyleChanged = !currentInputStyle.Equal( mImpl->mEventData->mInputStyle );
-
-        if( hasInputStyleChanged )
-        {
-          const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( mImpl->mEventData->mInputStyle );
-          // Queue the input style changed signal.
-          mImpl->mEventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
-        }
       }
 
       // Updates the text style runs by removing characters. Runs with no characters are removed.
@@ -910,7 +896,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.familyName = fontFamily;
-    mImpl->mEventData->mInputStyle.isFamilyDefined = true;
+    mImpl->mEventData->mInputStyle.familyDefined = true;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -969,7 +955,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.weight = weight;
-    mImpl->mEventData->mInputStyle.isWeightDefined = true;
+    mImpl->mEventData->mInputStyle.weightDefined = true;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -1014,7 +1000,7 @@ bool Controller::IsInputFontWeightDefined() const
 
   if( NULL != mImpl->mEventData )
   {
-    defined = mImpl->mEventData->mInputStyle.isWeightDefined;
+    defined = mImpl->mEventData->mInputStyle.weightDefined;
   }
 
   return defined;
@@ -1035,7 +1021,7 @@ void Controller::SetInputFontWidth( FontWidth width )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.width = width;
-    mImpl->mEventData->mInputStyle.isWidthDefined = true;
+    mImpl->mEventData->mInputStyle.widthDefined = true;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -1080,7 +1066,7 @@ bool Controller::IsInputFontWidthDefined() const
 
   if( NULL != mImpl->mEventData )
   {
-    defined = mImpl->mEventData->mInputStyle.isWidthDefined;
+    defined = mImpl->mEventData->mInputStyle.widthDefined;
   }
 
   return defined;
@@ -1101,7 +1087,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.slant = slant;
-    mImpl->mEventData->mInputStyle.isSlantDefined = true;
+    mImpl->mEventData->mInputStyle.slantDefined = true;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -1146,7 +1132,7 @@ bool Controller::IsInputFontSlantDefined() const
 
   if( NULL != mImpl->mEventData )
   {
-    defined = mImpl->mEventData->mInputStyle.isSlantDefined;
+    defined = mImpl->mEventData->mInputStyle.slantDefined;
   }
 
   return defined;
@@ -1167,7 +1153,6 @@ void Controller::SetInputFontPointSize( float size )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.size = size;
-    mImpl->mEventData->mInputStyle.isSizeDefined = true;
 
     if( EventData::SELECTING == mImpl->mEventData->mState )
     {
@@ -1222,7 +1207,6 @@ void Controller::SetInputLineSpacing( float lineSpacing )
   if( NULL != mImpl->mEventData )
   {
     mImpl->mEventData->mInputStyle.lineSpacing = lineSpacing;
-    mImpl->mEventData->mInputStyle.isLineSpacingDefined = true;
   }
 }
 
@@ -1630,33 +1614,6 @@ void Controller::ProcessModifyEvents()
 
   // Discard temporary text
   events.Clear();
-}
-
-bool Controller::IsInputStyleChangedSignalsQueueEmpty()
-{
-  return ( NULL == mImpl->mEventData ) || ( 0u == mImpl->mEventData->mInputStyleChangedQueue.Count() );
-}
-
-void Controller::ProcessInputStyleChangedSignals()
-{
-  if( NULL == mImpl->mEventData )
-  {
-    // Nothing to do.
-    return;
-  }
-
-  for( Vector<InputStyle::Mask>::ConstIterator it = mImpl->mEventData->mInputStyleChangedQueue.Begin(),
-         endIt = mImpl->mEventData->mInputStyleChangedQueue.End();
-       it != endIt;
-       ++it )
-  {
-    const InputStyle::Mask mask = *it;
-
-    // Emit the input style changed signal.
-    mImpl->mControlInterface.InputStyleChanged( mask );
-  }
-
-  mImpl->mEventData->mInputStyleChangedQueue.Clear();
 }
 
 void Controller::ResetText()
@@ -2804,6 +2761,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
   {
     mImpl->mOperationsPending = ALL_OPERATIONS;
     mImpl->RequestRelayout();
+
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.TextChanged();
   }
 
   std::string text;
@@ -2832,12 +2792,6 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
   }
 
   ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
-
-  if( requestRelayout )
-  {
-    // Do this last since it provides callbacks into application code
-    mImpl->mControlInterface.TextChanged();
-  }
 
   return callbackData;
 }
