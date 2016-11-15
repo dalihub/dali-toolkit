@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,13 +109,15 @@ Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
 
 KeyboardFocusManager::KeyboardFocusManager()
 : mCurrentFocusActor(0),
-  mFocusIndicatorActor(),
+  mFocusIndicatorActor(Actor()),
   mFocusGroupLoopEnabled(false),
   mIsKeyboardFocusEnabled(false),
   mIsFocusIndicatorEnabled(false),
   mIsWaitingKeyboardFocusChangeCommit(false),
   mSlotDelegate(this)
 {
+  CreateDefaultFocusIndicatorActor();
+
   OnPhysicalKeyboardStatusChanged(PhysicalKeyboard::Get());
 
   Toolkit::KeyInputFocusManager::Get().UnhandledKeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
@@ -150,7 +152,10 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
   {
     mIsFocusIndicatorEnabled = true;
     // Draw the focus indicator upon the focused actor
-    actor.Add( GetFocusIndicatorActor() );
+    if( mFocusIndicatorActor )
+    {
+      actor.Add( mFocusIndicatorActor );
+    }
 
     // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
@@ -448,17 +453,19 @@ void KeyboardFocusManager::SetFocusIndicatorActor(Actor indicator)
 
 Actor KeyboardFocusManager::GetFocusIndicatorActor()
 {
-  if( ! mFocusIndicatorActor )
-  {
-    // Create the default if it hasn't been set and one that's shared by all the keyboard focusable actors
-    mFocusIndicatorActor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
-    mFocusIndicatorActor.SetParentOrigin( ParentOrigin::CENTER );
-
-    // Apply size constraint to the focus indicator
-    mFocusIndicatorActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  }
-
   return mFocusIndicatorActor;
+}
+
+void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
+{
+  // Create a focus indicator actor shared by all the keyboard focusable actors
+  Toolkit::ImageView focusIndicator = Toolkit::ImageView::New(FOCUS_BORDER_IMAGE_PATH);
+  focusIndicator.SetParentOrigin( ParentOrigin::CENTER );
+
+  // Apply size constraint to the focus indicator
+  focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+  SetFocusIndicatorActor(focusIndicator);
 }
 
 void KeyboardFocusManager::OnPhysicalKeyboardStatusChanged(PhysicalKeyboard keyboard)
@@ -471,7 +478,10 @@ void KeyboardFocusManager::OnPhysicalKeyboardStatusChanged(PhysicalKeyboard keyb
     Actor actor = GetCurrentFocusActor();
     if(actor)
     {
-      actor.Add( GetFocusIndicatorActor() );
+      if(mFocusIndicatorActor)
+      {
+        actor.Add(mFocusIndicatorActor);
+      }
     }
     mIsFocusIndicatorEnabled = true;
   }
@@ -479,9 +489,9 @@ void KeyboardFocusManager::OnPhysicalKeyboardStatusChanged(PhysicalKeyboard keyb
   {
     // Hide indicator when keyboard focus turned off
     Actor actor = GetCurrentFocusActor();
-    if( actor && mFocusIndicatorActor )
+    if(actor)
     {
-      actor.Remove( mFocusIndicatorActor );
+      actor.Remove(mFocusIndicatorActor);
     }
     mIsFocusIndicatorEnabled = false;
   }
@@ -658,16 +668,16 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   if(isFocusStartableKey && mIsFocusIndicatorEnabled && !isAccessibilityEnabled)
   {
     Actor actor = GetCurrentFocusActor();
-    if( actor )
-    {
-      // Make sure the focused actor is highlighted
-      actor.Add( GetFocusIndicatorActor() );
-    }
-    else
+    if( !actor )
     {
       // No actor is focused but keyboard focus is activated by the key press
       // Let's try to move the initial focus
       MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
+    }
+    else if(mFocusIndicatorActor)
+    {
+      // Make sure the focused actor is highlighted
+      actor.Add(mFocusIndicatorActor);
     }
   }
 }

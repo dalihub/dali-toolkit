@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,13 @@ void utc_dali_toolkit_accessibility_manager_cleanup(void)
 
 namespace
 {
+
+static bool gObjectCreatedCallBackCalled;
+
+static void TestCallback(BaseHandle handle)
+{
+  gObjectCreatedCallBackCalled = true;
+}
 
 // Functors to test whether focus changed signal is emitted when the focus is changed
 class FocusChangedCallback : public Dali::ConnectionTracker
@@ -130,8 +137,19 @@ int UtcDaliAccessibilityManagerGet(void)
 
   tet_infoline(" UtcDaliAccessibilityManagerGet");
 
-  AccessibilityManager manager = AccessibilityManager::Get();
-  DALI_TEST_CHECK(manager);
+  AccessibilityManager manager;
+
+  //Ensure object is created by checking if it's registered
+  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  DALI_TEST_CHECK(registry);
+
+  gObjectCreatedCallBackCalled = false;
+  registry.ObjectCreatedSignal().Connect( &TestCallback );
+  {
+    manager = AccessibilityManager::Get();
+    DALI_TEST_CHECK(manager);
+  }
+  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
 
   AccessibilityManager newManager = AccessibilityManager::Get();
   DALI_TEST_CHECK(newManager);
@@ -970,51 +988,6 @@ int UtcDaliAccessibilityManagerSetAndGetFocusIndicator(void)
   Actor newFocusIndicatorActor = Actor::New();
   manager.SetFocusIndicatorActor(newFocusIndicatorActor);
   DALI_TEST_CHECK(manager.GetFocusIndicatorActor() == newFocusIndicatorActor);
-  END_TEST;
-}
-
-int UtcDaliAccessibilityManagerSetAndGetFocusIndicatorWithFocusedActor(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline(" UtcDaliAccessibilityManagerSetAndGetFocusIndicatorWithFocusedActor");
-
-  AccessibilityManager manager = AccessibilityManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
-  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
-  accAdaptor.HandleActionEnableEvent();
-
-  Actor defaultFocusIndicatorActor = manager.GetFocusIndicatorActor();
-  DALI_TEST_CHECK(defaultFocusIndicatorActor);
-
-  Actor focusedActor = Actor::New();
-  Stage::GetCurrent().Add( focusedActor );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( focusedActor.GetChildCount(), 0u, TEST_LOCATION );
-
-  manager.SetFocusOrder( focusedActor, 1 );
-  manager.SetCurrentFocusActor( focusedActor );
-
-  DALI_TEST_EQUALS( focusedActor.GetChildCount(), 1u, TEST_LOCATION );
-  DALI_TEST_CHECK( focusedActor.GetChildAt(0) == defaultFocusIndicatorActor );
-
-  Actor newFocusIndicatorActor = Actor::New();
-  manager.SetFocusIndicatorActor( newFocusIndicatorActor );
-  DALI_TEST_CHECK(manager.GetFocusIndicatorActor() == newFocusIndicatorActor);
-  DALI_TEST_EQUALS( focusedActor.GetChildCount(), 1u, TEST_LOCATION );
-  DALI_TEST_CHECK( focusedActor.GetChildAt(0) == newFocusIndicatorActor );
-
-  // Disable Accessibility
-  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, false );
-  accAdaptor.HandleActionEnableEvent();
-
-  DALI_TEST_EQUALS( focusedActor.GetChildCount(), 0u, TEST_LOCATION );
-
   END_TEST;
 }
 

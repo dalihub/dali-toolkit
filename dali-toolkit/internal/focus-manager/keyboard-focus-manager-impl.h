@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +188,11 @@ private:
    * @param actor The actor to notify
    */
   void DoKeyboardEnter( Actor actor );
+
+  /**
+   * Create the default indicator actor to highlight the focused actor.
+   */
+  void CreateDefaultFocusIndicatorActor();
 
   /**
    * Check whether the actor is a layout control that supports two dimensional keyboard navigation.

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -484,6 +484,11 @@ private:
    * @param actor The actor to activate
    */
   void DoActivate(Actor actor);
+
+  /**
+   * Create the default indicator actor to highlight the focused actor.
+   */
+  void CreateDefaultFocusIndicatorActor();
 
   /**
    * Set whether the actor is focusable or not. A focusable property will be registered for
