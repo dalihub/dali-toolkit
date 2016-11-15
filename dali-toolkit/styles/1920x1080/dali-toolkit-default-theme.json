@@ -28,7 +28,7 @@
 {
   "styles":
   {
-    "TextLabel":
+    "textlabel":
     {
       "pointSize":108,
       "enableAutoScroll":false,
@@ -37,28 +37,28 @@
       "autoScrollSpeed":80
     },
 
-    "TextLabelFontSize0":
+    "textlabelFontSize0":
     {
       "pointSize":84
     },
-    "TextLabelFontSize1":
+    "textlabelFontSize1":
     {
       "pointSize":96
     },
-    "TextLabelFontSize2":
+    "textlabelFontSize2":
     {
       "pointSize":108
     },
-    "TextLabelFontSize3":
+    "textlabelFontSize3":
     {
       "pointSize":120
     },
-    "TextLabelFontSize4":
+    "textlabelFontSize4":
     {
       "pointSize":132
     },
 
-    "TextField":
+    "textfield":
     {
       "pointSize":120,
       "primaryCursorColor":[0.0,0.72,0.9,1.0],
@@ -70,27 +70,27 @@
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
     },
 
-    "TextFieldFontSize0":
+    "textfieldFontSize0":
     {
       "pointSize":120
     },
-    "TextFieldFontSize1":
+    "textfieldFontSize1":
     {
       "pointSize":120
     },
-    "TextFieldFontSize2":
+    "textfieldFontSize2":
     {
       "pointSize":120
     },
-    "TextFieldFontSize3":
+    "textfieldFontSize3":
     {
       "pointSize":120
     },
-    "TextFieldFontSize4":
+    "textfieldFontSize4":
     {
       "pointSize":120
     },
-    "TextSelectionPopup":
+    "textselectionpopup":
     {
       "popupMaxSize":[1700,100],
       "optionDividerSize":[2,0],
@@ -104,7 +104,7 @@
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
     },
-    "TextSelectionPopupButton":
+    "textselectionpopupbutton":
     {
       "label":
       {
@@ -112,7 +112,7 @@
         "fontStyle":"{\"weight\":\"light\"}"
       }
     },
-    "TextSelectionToolbar":
+    "textselectiontoolbar":
     {
       "enableOvershoot":true,
       "scrollView":
@@ -121,19 +121,19 @@
         "overshootSize":[1920.0,130.0]
       }
     },
-    "ScrollView":
+    "scrollview":
     {
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":960.0,
       "overshootSize":[1920.0,130.0]
     },
-    "ItemView":
+    "itemview":
     {
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":960.0,
       "overshootSize":[1920.0,130.0]
     },
-    "TextEditor":
+    "texteditor":
     {
       "pointSize":120,
       "primaryCursorColor":[0.0,0.72,0.9,1.0],
