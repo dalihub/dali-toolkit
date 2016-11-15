@@ -1788,14 +1788,6 @@ void Controller::Impl::RepositionSelectionHandles()
   const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
   bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
 
-  // The number of quads of the selection box.
-  const unsigned int numberOfQuads = 1u + ( glyphEnd - glyphStart ) + ( ( numberOfLines > 1u ) ? 2u * numberOfLines : 0u );
-  mEventData->mDecorator->ResizeHighlightQuads( numberOfQuads );
-
-  // Count the actual number of quads.
-  unsigned int actualNumberOfQuads = 0u;
-  Vector4 quad;
-
   // Traverse the glyphs.
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
   {
@@ -1819,17 +1811,18 @@ void Controller::Impl::RepositionSelectionHandles()
       // Calculate the number of characters selected.
       const Length numberOfCharacters = ( glyphStart == glyphEnd ) ? ( selectionEnd - selectionStart ) : ( numberOfCharactersStart - interGlyphIndex );
 
-      quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
-      quad.y = selectionBoxInfo->lineOffset;
-      quad.z = quad.x + static_cast<float>( numberOfCharacters ) * glyphAdvance;
-      quad.w = selectionBoxInfo->lineOffset + selectionBoxInfo->lineHeight;
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+      const float xPositionAdvance = xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset;
 
       // Store the min and max 'x' for each line.
-      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, quad.x );
-      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, quad.z );
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads, quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitStartGlyph = false;
       continue;
@@ -1850,35 +1843,35 @@ void Controller::Impl::RepositionSelectionHandles()
 
       const Length numberOfCharacters = numberOfCharactersEnd - interGlyphIndex;
 
-      quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
-      quad.y = selectionBoxInfo->lineOffset;
-      quad.z = quad.x + static_cast<float>( interGlyphIndex ) * glyphAdvance;
-      quad.w = quad.y + selectionBoxInfo->lineHeight;
+      const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      const float xPositionAdvance = xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance;
+      const float yPosition = selectionBoxInfo->lineOffset;
 
       // Store the min and max 'x' for each line.
-      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, quad.x );
-      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, quad.z );
+      selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+      selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            yPosition,
+                                            xPositionAdvance,
+                                            yPosition + selectionBoxInfo->lineHeight );
 
       splitEndGlyph = false;
       continue;
     }
 
-    quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
-    quad.y = selectionBoxInfo->lineOffset;
-    quad.z = quad.x + glyph.advance;
-    quad.w = quad.y + selectionBoxInfo->lineHeight;
+    const float xPosition = lineRun->alignmentOffset + position.x - glyph.xBearing + mScrollPosition.x;
+    const float xPositionAdvance = xPosition + glyph.advance;
+    const float yPosition = selectionBoxInfo->lineOffset;
 
     // Store the min and max 'x' for each line.
-    selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, quad.x );
-    selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, quad.z );
+    selectionBoxInfo->minX = std::min( selectionBoxInfo->minX, xPosition );
+    selectionBoxInfo->maxX = std::max( selectionBoxInfo->maxX, xPositionAdvance );
 
-    mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                          quad );
-    ++actualNumberOfQuads;
+    mEventData->mDecorator->AddHighlight( xPosition,
+                                          yPosition,
+                                          xPositionAdvance,
+                                          yPosition + selectionBoxInfo->lineHeight );
 
     // Whether to retrieve the next line.
     if( index == lastGlyphOfLine )
@@ -1922,7 +1915,7 @@ void Controller::Impl::RepositionSelectionHandles()
     const SelectionBoxInfo& info = *it;
 
     // Update the size of the highlighted text.
-    highLightSize.height += info.lineHeight;
+    highLightSize.height += selectionBoxInfo->lineHeight;
     minHighlightX = std::min( minHighlightX, info.minX );
     maxHighlightX = std::max( maxHighlightX, info.maxX );
   }
@@ -1940,15 +1933,11 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyBegin )
     {
-      quad.x = 0.f;
-      quad.y = firstSelectionBoxLineInfo.lineOffset;
-      quad.z = firstSelectionBoxLineInfo.minX;
-      quad.w = firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the beginning of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            firstSelectionBoxLineInfo.minX,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       minHighlightX = 0.f;
@@ -1956,15 +1945,11 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyEnd )
     {
-      quad.x = firstSelectionBoxLineInfo.maxX;
-      quad.y = firstSelectionBoxLineInfo.lineOffset;
-      quad.z = mVisualModel->mControlSize.width;
-      quad.w = firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the end of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( firstSelectionBoxLineInfo.maxX,
+                                            firstSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            firstSelectionBoxLineInfo.lineOffset + firstSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       maxHighlightX = mVisualModel->mControlSize.width;
@@ -1980,23 +1965,15 @@ void Controller::Impl::RepositionSelectionHandles()
       {
         const SelectionBoxInfo& info = *it;
 
-        quad.x = 0.f;
-        quad.y = info.lineOffset;
-        quad.z = info.minX;
-        quad.w = info.lineOffset + info.lineHeight;
+        mEventData->mDecorator->AddHighlight( 0.f,
+                                              info.lineOffset,
+                                              info.minX,
+                                              info.lineOffset + info.lineHeight );
 
-        mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                              quad );
-        ++actualNumberOfQuads;
-
-        quad.x = info.maxX;
-        quad.y = info.lineOffset;
-        quad.z = mVisualModel->mControlSize.width;
-        quad.w = info.lineOffset + info.lineHeight;
-
-        mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                              quad );
-        ++actualNumberOfQuads;
+        mEventData->mDecorator->AddHighlight( info.maxX,
+                                              info.lineOffset,
+                                              mVisualModel->mControlSize.width,
+                                              info.lineOffset + info.lineHeight );
       }
 
       // Update the size of the highlighted text.
@@ -2013,15 +1990,11 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyBegin )
     {
-      quad.x = 0.f;
-      quad.y = lastSelectionBoxLineInfo.lineOffset;
-      quad.z = lastSelectionBoxLineInfo.minX;
-      quad.w = lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the beginning of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( 0.f,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            lastSelectionBoxLineInfo.minX,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       minHighlightX = 0.f;
@@ -2029,23 +2002,16 @@ void Controller::Impl::RepositionSelectionHandles()
 
     if( boxifyEnd )
     {
-      quad.x = lastSelectionBoxLineInfo.maxX;
-      quad.y = lastSelectionBoxLineInfo.lineOffset;
-      quad.z = mVisualModel->mControlSize.width;
-      quad.w = lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight;
-
       // Boxify at the end of the line.
-      mEventData->mDecorator->AddHighlight( actualNumberOfQuads,
-                                            quad );
-      ++actualNumberOfQuads;
+      mEventData->mDecorator->AddHighlight( lastSelectionBoxLineInfo.maxX,
+                                            lastSelectionBoxLineInfo.lineOffset,
+                                            mVisualModel->mControlSize.width,
+                                            lastSelectionBoxLineInfo.lineOffset + lastSelectionBoxLineInfo.lineHeight );
 
       // Update the size of the highlighted text.
       maxHighlightX = mVisualModel->mControlSize.width;
     }
   }
-
-  // Set the actual number of quads.
-  mEventData->mDecorator->ResizeHighlightQuads( actualNumberOfQuads );
 
   // Sets the highlight's size and position. In decorator's coords.
   // The highlight's height has been calculated above (before 'boxifying' the highlight).
