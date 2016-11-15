@@ -456,18 +456,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check font properties.
   field.SetProperty( TextField::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}"), TEST_LOCATION );
+  field.SetProperty( TextField::Property::FONT_STYLE, "Setting font style" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("Setting font style"), TEST_LOCATION );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Reset font style.
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::FONT_STYLE, "" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
 
   // Check that the MAX_LENGTH property can be correctly set
   const int maxNumberOfCharacters = 20;
@@ -553,18 +545,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check input font properties.
   field.SetProperty( TextField::Property::INPUT_FONT_FAMILY, "Setting input font family" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_FAMILY ), "Setting input font family", TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}", TEST_LOCATION );
+  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "Setting input font style" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), "Setting input font style", TEST_LOCATION );
   field.SetProperty( TextField::Property::INPUT_POINT_SIZE, 12.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::INPUT_POINT_SIZE ), 12.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Reset input font style.
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  field.SetProperty( TextField::Property::INPUT_FONT_STYLE, "" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_FONT_STYLE ), std::string(""), TEST_LOCATION );
 
   // Check the underline property
   field.SetProperty( TextField::Property::UNDERLINE, "Underline properties" );
@@ -1285,10 +1269,10 @@ int utcDaliTextFieldEvent08(void)
   END_TEST;
 }
 
-int utcDaliTextFieldStyleWhilstSelected(void)
+int utcDaliTextFieldStyleWhilstSelected09(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldStyleWhilstSelected");
+  tet_infoline(" utcDaliTextFieldEvent09");
 
   // Change font and styles whilst text is selected whilst word selected
 

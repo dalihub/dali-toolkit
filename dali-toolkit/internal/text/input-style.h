@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_INPUT_STYLE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ struct InputStyle
 {
   InputStyle()
   : textColor( Color::BLACK ),
+    fontStyle(),
     familyName(),
     weight( TextAbstraction::FontWeight::NORMAL ),
     width( TextAbstraction::FontWidth::NORMAL ),
@@ -63,6 +64,7 @@ struct InputStyle
   {};
 
   Vector4     textColor;           ///< The text's color.
+  std::string fontStyle;           ///< The font's style string.
   std::string familyName;          ///< The font's family name.
   FontWeight  weight;              ///< The font's weight.
   FontWidth   width;               ///< The font's width.

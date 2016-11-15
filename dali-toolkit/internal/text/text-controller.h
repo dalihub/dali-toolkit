@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_CONTROLLER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,16 +305,27 @@ public:
   const std::string& GetDefaultFontFamily() const;
 
   /**
+   * @brief Sets the font's style string.
+   *
+   * @note The style set may be changed by the underlying font system. The string is stored to be recovered.
+   *
+   * @param[in] style The font's style string.
+   */
+  void SetDefaultFontStyle( const std::string& style );
+
+  /**
+   * @brief Retrieves the font's style.
+   *
+   * @return The font's style.
+   */
+  const std::string& GetDefaultFontStyle() const;
+
+  /**
    * @brief Sets the default font weight.
    *
    * @param[in] weight The font weight.
    */
   void SetDefaultFontWeight( FontWeight weight );
-
-  /**
-   * @brief Whether the font's weight has been defined.
-   */
-  bool IsDefaultFontWeightDefined() const;
 
   /**
    * @brief Retrieves the default font weight.
@@ -331,11 +342,6 @@ public:
   void SetDefaultFontWidth( FontWidth width );
 
   /**
-   * @brief Whether the font's width has been defined.
-   */
-  bool IsDefaultFontWidthDefined() const;
-
-  /**
    * @brief Retrieves the default font width.
    *
    * @return The default font width.
@@ -348,11 +354,6 @@ public:
    * @param[in] slant The font slant.
    */
   void SetDefaultFontSlant( FontSlant slant );
-
-  /**
-   * @brief Whether the font's slant has been defined.
-   */
-  bool IsDefaultFontSlantDefined() const;
 
   /**
    * @brief Retrieves the default font slant.
@@ -586,16 +587,25 @@ public:
   const std::string& GetInputFontFamily() const;
 
   /**
+   * @brief Sets the input text's font style.
+   *
+   * @param[in] fontStyle The input text's font style.
+   */
+  void SetInputFontStyle( const std::string& fontStyle );
+
+  /**
+   * @brief Retrieves the input text's font style.
+   *
+   * @return The input text's font style.
+   */
+  const std::string& GetInputFontStyle() const;
+
+  /**
    * @brief Sets the input font's weight.
    *
    * @param[in] weight The input font's weight.
    */
   void SetInputFontWeight( FontWeight weight );
-
-  /**
-   * @return Whether the font's weight has been defined.
-   */
-  bool IsInputFontWeightDefined() const;
 
   /**
    * @brief Retrieves the input font's weight.
@@ -612,11 +622,6 @@ public:
   void SetInputFontWidth( FontWidth width );
 
   /**
-   * @return Whether the font's width has been defined.
-   */
-  bool IsInputFontWidthDefined() const;
-
-  /**
    * @brief Retrieves the input font's width.
    *
    * @return The input font's width.
@@ -629,11 +634,6 @@ public:
    * @param[in] slant The input font's slant.
    */
   void SetInputFontSlant( FontSlant slant );
-
-  /**
-   * @return Whether the font's slant has been defined.
-   */
-  bool IsInputFontSlantDefined() const;
 
   /**
    * @brief Retrieves the input font's slant.

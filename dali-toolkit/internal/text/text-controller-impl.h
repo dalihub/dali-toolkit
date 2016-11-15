@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,6 +166,7 @@ struct FontDefaults
 {
   FontDefaults()
   : mFontDescription(),
+    mFontStyle(),
     mDefaultPointSize( 0.f ),
     mFontId( 0u ),
     familyDefined( false ),
@@ -191,6 +192,7 @@ struct FontDefaults
   }
 
   TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
+  std::string                      mFontStyle;        ///< The font's style string set through the property system.
   float                            mDefaultPointSize; ///< The default font's point size.
   FontId                           mFontId;           ///< The font's id of the default font.
   bool familyDefined:1; ///< Whether the default font's family name is defined.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,18 +193,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check font properties.
   label.SetProperty( TextLabel::Property::FONT_FAMILY, "Setting font family" );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::FONT_STYLE, "Setting font style" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("Setting font style"), TEST_LOCATION );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Reset font style.
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"normal\",\"slant\":\"oblique\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("{\"weight\":\"normal\",\"slant\":\"oblique\"}"), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"slant\":\"roman\"}" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("{\"slant\":\"normal\"}"), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::FONT_STYLE, "" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
 
   // Toggle multi-line
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
