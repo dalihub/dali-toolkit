@@ -210,7 +210,6 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_1.38
@@ -219,7 +218,6 @@ public: // Not intended for application developers
   DALI_INTERNAL VideoView( Internal::VideoView& implementation );
 
   /**
-   * @internal
    * @brief Allows the creation of this VideoView from an Internal::CustomActor pointer.
    *
    * @SINCE_1_1.38

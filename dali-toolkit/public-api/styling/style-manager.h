@@ -173,7 +173,6 @@ public: // Signals
 public:
 
   /**
-   * @internal
    * @brief Allows the creation of a StyleManager handle from an internal pointer.
    *
    * @note Not intended for application developers

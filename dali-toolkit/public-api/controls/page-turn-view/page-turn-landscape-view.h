@@ -88,7 +88,6 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
    * @param[in]  implementation  The Control implementation.
@@ -96,7 +95,6 @@ public: // Not intended for application developers
   DALI_INTERNAL PageTurnLandscapeView( Internal::PageTurnLandscapeView& implementation );
 
   /**
-   * @internal
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.

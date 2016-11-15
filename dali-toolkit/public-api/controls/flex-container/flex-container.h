@@ -272,7 +272,6 @@ public:
 public: // Not intended for application developers
 
   /**
-   * @internal
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_1.35
    *
@@ -281,7 +280,6 @@ public: // Not intended for application developers
   DALI_INTERNAL FlexContainer( Internal::FlexContainer& implementation );
 
   /**
-   * @internal
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_1.35
    *
