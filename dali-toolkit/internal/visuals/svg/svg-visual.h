@@ -18,9 +18,6 @@
  *
  */
 
-//EXTERNAL INCLUDES
-#include <dali/devel-api/object/weak-handle.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
@@ -65,34 +62,34 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::Base::GetNaturalSize
+   * @copydoc Visual::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
-   * @copydoc Visual::Base::SetSize
+   * @copydoc Visual::SetSize
    */
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::Base::CreatePropertyMap
+   * @copydoc Visual::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
 
   /**
-   * @copydoc Visual::Base::DoInitialize
+   * @copydoc Visual::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::Base::DoSetOnStage
+   * @copydoc Visual::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::Base::DoSetOffStage
+   * @copydoc Visual::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
 
@@ -142,7 +139,6 @@ private:
   ImageAtlasManager&   mAtlasManager;
   std::string          mImageUrl;
   NSVGimage*           mParsedImage;
-  WeakHandle<Actor>    mPlacementActor;
 
 };
 

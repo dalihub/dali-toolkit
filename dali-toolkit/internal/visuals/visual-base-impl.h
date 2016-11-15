@@ -189,10 +189,9 @@ protected:
   /**
    * @brief Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
    *
-   * @note The derived class is required to create the renderer, and add it to the actor when all the resources are in place.
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOnStage( Actor& actor ) = 0;
+  virtual void DoSetOnStage( Actor& actor );
 
   /**
    * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event

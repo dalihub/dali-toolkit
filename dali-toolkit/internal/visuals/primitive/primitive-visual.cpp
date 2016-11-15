@@ -395,8 +395,6 @@ void PrimitiveVisual::SetOffset( const Vector2& offset )
 void PrimitiveVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
-
-  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const

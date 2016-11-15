@@ -53,12 +53,12 @@ public:
 protected:
 
   /**
-   * @copydoc Visual::Base::DoSetOnStage
+   * @copydoc Visual::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::Base::CreatePropertyMap
+   * @copydoc Visual::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 

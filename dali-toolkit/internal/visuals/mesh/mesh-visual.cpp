@@ -384,8 +384,6 @@ void MeshVisual::SetOffset( const Vector2& offset )
 void MeshVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
-
-  actor.AddRenderer( mImpl->mRenderer );
 }
 
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const

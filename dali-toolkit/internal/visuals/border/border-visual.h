@@ -64,24 +64,24 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::Base::SetClipRect
+   * @copydoc Visual::SetClipRect
    */
   virtual void SetClipRect( const Rect<int>& clipRect );
 
 protected:
 
   /**
-   * @copydoc Visual::Base::DoInitialize
+   * @copydoc Visual::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::Base::DoSetOnStage
+   * @copydoc Visual::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
   /**
-   * @copydoc Visual::Base::CreatePropertyMap
+   * @copydoc Visual::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 

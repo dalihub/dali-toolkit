@@ -70,34 +70,34 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::Base::SetSize
+   * @copydoc Visual::SetSize
    */
   virtual void SetSize( const Vector2& size );
 
   /**
-   * @copydoc Visual::Base::SetClipRect
+   * @copydoc Visual::SetClipRect
    */
   virtual void SetClipRect( const Rect<int>& clipRect );
 
   /**
-   * @copydoc Visual::Base::SetOffset
+   * @copydoc Visual::SetOffset
    */
   virtual void SetOffset( const Vector2& offset );
 
   /**
-   * @copydoc Visual::Base::CreatePropertyMap
+   * @copydoc Visual::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
 
   /**
-   * @copydoc Visual::Base::DoInitialize
+   * @copydoc Visual::DoInitialize
    */
   virtual void DoInitialize( Actor& actor, const Property::Map& propertyMap );
 
   /**
-   * @copydoc Visual::Base::DoSetOnStage
+   * @copydoc Visual::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
 
