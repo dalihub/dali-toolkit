@@ -23,7 +23,6 @@ public_api_src_dir  = ../../../dali-toolkit/public-api
 devel_api_src_dir   = ../../../dali-toolkit/devel-api
 third_party_src_dir = ../../../dali-toolkit/third-party
 
-toolkit_styles_base_dir = ${STYLE_BASE_DIR}
 toolkit_styles_dir = $(STYLE_DIR)
 toolkit_style_images_dir = $(STYLE_DIR)/images
 
