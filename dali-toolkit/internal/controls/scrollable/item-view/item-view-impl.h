@@ -335,12 +335,6 @@ public:
    */
   void DoStopScrolling();
 
-  /**
-   * Helper for DoAction( ACTION_ENABLE/DISABLE_REFRESH_NOTIFICATIONS ).
-   * @param[in] enabled Whether to disable refresh notifications or not.
-   */
-  void SetRefreshNotificationEnabled( bool enabled );
-
 private:
 
   /**
@@ -625,7 +619,6 @@ private:
   bool mIsFlicking                      : 1;
   bool mAddingItems                     : 1;
   bool mRefreshEnabled                  : 1;        ///< Whether to refresh the cache automatically
-  bool mRefreshNotificationEnabled      : 1;        ///< Whether to disable refresh notifications or not.
   bool mInAnimation                     : 1;        ///< Keeps track of whether an animation is controlling the overshoot property.
 };
 

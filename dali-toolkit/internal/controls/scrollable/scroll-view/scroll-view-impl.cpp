@@ -1693,7 +1693,6 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
   // Position Delta ///////////////////////////////////////////////////////
   if(positionChanged)
   {
-    UpdateMainInternalConstraint();
     if(mWrapMode && findShortcuts)
     {
       // In Wrap Mode, the shortest distance is a little less intuitive...

@@ -262,9 +262,6 @@ DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layoutActivated",    
 
 DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "stopScrolling",       ACTION_STOP_SCROLLING   )
 
-DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "enableRefresh",       ACTION_ENABLE_REFRESH   )
-DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "disableRefresh",      ACTION_DISABLE_REFRESH  )
-
 DALI_TYPE_REGISTRATION_END()
 
 bool FindById( const ItemContainer& items, ItemId id )
@@ -320,7 +317,6 @@ ItemView::ItemView(ItemFactory& factory)
   mIsFlicking(false),
   mAddingItems(false),
   mRefreshEnabled(true),
-  mRefreshNotificationEnabled(true),
   mInAnimation(false)
 {
 }
@@ -478,17 +474,14 @@ void ItemView::DeactivateCurrentLayout()
 
 void ItemView::OnRefreshNotification(PropertyNotification& source)
 {
-  if( mRefreshNotificationEnabled )
+  // Cancel scroll animation to prevent any fighting of setting the scroll position property by scroll bar during fast scroll.
+  if(!mRefreshEnabled && mScrollAnimation)
   {
-    // Cancel scroll animation to prevent any fighting of setting the scroll position property by scroll bar during fast scroll.
-    if(!mRefreshEnabled && mScrollAnimation)
-    {
-      RemoveAnimation(mScrollAnimation);
-    }
-
-    // Only cache extra items when it is not a fast scroll
-    DoRefresh(GetCurrentLayoutPosition(0), mRefreshEnabled || mScrollAnimation);
+    RemoveAnimation(mScrollAnimation);
   }
+
+  // Only cache extra items when it is not a fast scroll
+  DoRefresh(GetCurrentLayoutPosition(0), mRefreshEnabled || mScrollAnimation);
 }
 
 void ItemView::Refresh()
@@ -1790,14 +1783,6 @@ bool ItemView::DoAction( BaseObject* object, const std::string& actionName, cons
   {
     GetImpl( itemView ).DoStopScrolling();
   }
-  else if ( 0 == strcmp( actionName.c_str(), ACTION_ENABLE_REFRESH ) )
-  {
-    GetImpl( itemView ).SetRefreshNotificationEnabled( true );
-  }
-  else if ( 0 == strcmp( actionName.c_str(), ACTION_DISABLE_REFRESH ) )
-  {
-    GetImpl( itemView ).SetRefreshNotificationEnabled( false );
-  }
 
   return true;
 }
@@ -1809,11 +1794,6 @@ void ItemView::DoStopScrolling()
     mScrollAnimation.Stop();
     mScrollAnimation.Reset();
   }
-}
-
-void ItemView::SetRefreshNotificationEnabled( bool enabled )
-{
-  mRefreshNotificationEnabled = enabled;
 }
 
 } // namespace Internal

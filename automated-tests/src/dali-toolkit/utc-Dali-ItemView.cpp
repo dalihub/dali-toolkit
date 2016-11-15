@@ -50,7 +50,6 @@ const int RENDER_FRAME_INTERVAL = 16;                     ///< Duration of each 
 
 static bool gObjectCreatedCallBackCalled;
 static bool gOnLayoutActivatedCalled;                     ///< Whether the LayoutActivated signal was invoked.
-static bool gOnScrollUpdateCalled;
 
 static void TestCallback(BaseHandle handle)
 {
@@ -60,11 +59,6 @@ static void TestCallback(BaseHandle handle)
 static void OnLayoutActivated()
 {
   gOnLayoutActivatedCalled = true;
-}
-
-static void OnScrollUpdate( const Vector2& position )
-{
-  gOnScrollUpdateCalled = true;
 }
 
 // Generate a PanGestureEvent to send to Core
@@ -1105,47 +1099,6 @@ int UtcDaliItemViewOvershootHorizontal(void)
 
   SendPan(application, Gesture::Finished, pos);
   Wait(application, 100);
-
-  END_TEST;
-}
-
-int UtcDaliItemEnableDisableRefresh(void)
-{
-  ToolkitTestApplication application;
-  Dali::Stage stage = Dali::Stage::GetCurrent();
-
-  // Create the ItemView actor
-  TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
-
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout(*gridLayout);
-  stage.Add(view);
-
-  // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(stage.GetSize());
-  view.ActivateLayout(0, stageSize, 0.5f);
-
-  //Connect to signal scroll updated
-  view.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
-
-  Property::Map attributes;
-  view.DoAction("enableRefresh", attributes );
-  gOnScrollUpdateCalled = true;
-  view.SetProperty( ItemView::Property::LAYOUT_POSITION, 100.0f );
-  application.SendNotification();
-  application.Render(1000);
-  DALI_TEST_EQUALS( gOnScrollUpdateCalled, true, TEST_LOCATION );
-
-
-  view.DoAction("disableRefresh", attributes );
-  gOnScrollUpdateCalled = false;
-  view.SetProperty( ItemView::Property::LAYOUT_POSITION, 100.0f );
-  application.SendNotification();
-  application.Render(1000);
-
-  DALI_TEST_EQUALS( gOnScrollUpdateCalled, false, TEST_LOCATION );
 
   END_TEST;
 }
