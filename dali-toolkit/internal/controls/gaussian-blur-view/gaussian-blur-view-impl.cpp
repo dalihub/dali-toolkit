@@ -30,6 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 // TODO:

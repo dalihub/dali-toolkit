@@ -435,11 +435,11 @@ void EffectsView::AllocateResources()
 
     Actor self( Self() );
 
-    mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+    mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
     InitializeVisual( self, mVisualForChildren, mImageForChildren );
     mVisualForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
-    mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+    mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
     TextureSet textureSet = TextureSet::New();
     TextureSetImage( textureSet, 0u,  mImagePostFilter );
     self.GetRendererAt( 0 ).SetTextures( textureSet );

@@ -32,7 +32,7 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
@@ -363,10 +363,10 @@ void BloomView::AllocateResources()
     // Create render targets
 
     // create off screen buffer of new size to render our child actors to
-    mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-    mBloomExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
-    FrameBufferImage mBlurExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
-    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+    mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
+    mBloomExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::UNUSED );
+    FrameBufferImage mBlurExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::UNUSED );
+    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED);
 
 
     //////////////////////////////////////////////////////

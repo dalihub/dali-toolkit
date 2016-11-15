@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
-#include <dali/devel-api/images/nine-patch-image.h>
+#include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>

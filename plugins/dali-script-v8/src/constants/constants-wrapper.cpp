@@ -27,6 +27,8 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/blending.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/render-tasks/render-task.h>

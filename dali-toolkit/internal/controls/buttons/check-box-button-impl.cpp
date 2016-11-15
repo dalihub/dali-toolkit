@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 namespace Dali

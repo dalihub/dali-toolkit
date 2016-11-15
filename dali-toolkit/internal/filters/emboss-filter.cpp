@@ -90,8 +90,8 @@ EmbossFilter::~EmbossFilter()
 
 void EmbossFilter::Enable()
 {
-  mImageForEmboss1 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-  mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+  mImageForEmboss1 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
+  mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
 
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EMBOSS_FRAGMENT_SOURCE;

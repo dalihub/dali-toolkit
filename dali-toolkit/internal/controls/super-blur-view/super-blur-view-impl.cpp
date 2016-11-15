@@ -280,7 +280,7 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
     {
       float exponent = static_cast<float>(i);
       mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
-                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
+                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
       InitializeVisual( self, mVisuals[i], mBlurredImage[i - 1] );
       mVisuals[ i ].SetDepthIndex( i );
       SetShaderEffect( mVisuals[ i ] );
