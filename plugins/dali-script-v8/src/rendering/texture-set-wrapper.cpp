@@ -45,6 +45,7 @@ const ApiFunction TextureSetFunctionTable[]=
     * TextureSet API (in order of texture-set.h)
     **************************************/
 
+   { "SetImage"                        , TextureSetApi::SetImage },
    { "SetSampler"                      , TextureSetApi::SetSampler },
 };
 

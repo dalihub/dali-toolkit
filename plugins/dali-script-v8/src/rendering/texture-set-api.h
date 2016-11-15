@@ -57,6 +57,7 @@ namespace TextureSetApi
    /**
     * TextureSet API see texture-set.h for a description
     */
+   void SetImage( const v8::FunctionCallbackInfo< v8::Value >& args );
    void SetSampler( const v8::FunctionCallbackInfo< v8::Value >& args );
 
 }; // namespace TextureSetApi
