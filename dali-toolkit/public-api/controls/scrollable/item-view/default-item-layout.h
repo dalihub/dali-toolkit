@@ -38,10 +38,6 @@ namespace Toolkit
 namespace DefaultItemLayout
 {
 
-/**
- * @brief The type of DefaultItemLayout
- * @SINCE_1_0.0
- */
 enum Type
 {
   DEPTH,     ///< Items arranged in a grid, scrolling along the Z-Axis. @SINCE_1_0.0

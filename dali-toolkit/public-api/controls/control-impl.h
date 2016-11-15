@@ -407,10 +407,7 @@ protected: // Helpers for deriving classes
 
   // Construction
 
-  /**
-   * @brief Flags for the constructor
-   * @SINCE_1_0.0
-   */
+  // Flags for the constructor
   enum ControlBehaviour
   {
     REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change @SINCE_1_0.0

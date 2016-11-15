@@ -92,15 +92,12 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param[in] checkBox Handle to an object
    */
   CheckBoxButton( const CheckBoxButton& checkBox );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
-   * @param[in] checkBox Handle to an object
-   * @return A reference to this
    */
   CheckBoxButton& operator=( const CheckBoxButton& checkBox );
 

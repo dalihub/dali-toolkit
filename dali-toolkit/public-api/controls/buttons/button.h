@@ -136,15 +136,12 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param[in] button Handle to an object
    */
   Button( const Button& button );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
-   * @param[in] button Handle to an object
-   * @return A reference to this
    */
   Button& operator=( const Button& button );
 

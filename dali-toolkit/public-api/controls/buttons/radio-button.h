@@ -98,15 +98,12 @@ class DALI_IMPORT_API RadioButton: public Button
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param[in] radioButton Handle to an object
    */
   RadioButton( const RadioButton& radioButton );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
-   * @param[in] radioButton Handle to an object
-   * @return A reference to this
    */
   RadioButton& operator=( const RadioButton& radioButton );
 

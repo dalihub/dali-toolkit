@@ -184,7 +184,6 @@ public:
    *
    * Creates another handle that points to the same real object.
    * @SINCE_1_1.39
-   * @param[in] handle Handle to an object
    */
   Slider( const Slider& handle );
 
@@ -193,8 +192,6 @@ public:
    *
    * Changes this handle to point to another real object.
    * @SINCE_1_1.39
-   * @param[in] handle Handle to an object
-   * @return A reference to this
    */
   Slider& operator=( const Slider& handle );
 

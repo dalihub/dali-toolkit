@@ -66,10 +66,6 @@ public:
   // Signal
   typedef Signal< void (VideoView&) > VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
 
-  /**
-   * @brief The start and end property ranges for this control.
-   * @SINCE_1_0.0
-   */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0

@@ -95,9 +95,6 @@ public:
    * @brief Create a new instance of a Model3dView control.
    *
    * @SINCE_1_1.4
-   * @param[in] objUrl The path to the geometry file
-   * @param[in] mtlUrl The path to the material file
-   * @param[in] imagesUrl The path to the images directory
    * @return A handle to the new Model3dView control.
    */
   static Model3dView New( const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl );
@@ -123,15 +120,12 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_1.4
-   * @param[in] model3dView Handle to an object
    */
   Model3dView( const Model3dView& model3dView );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_1.4
-   * @param[in] model3dView Handle to an object
-   * @return reference to this
    */
   Model3dView& operator=( const Model3dView& model3dView );
 

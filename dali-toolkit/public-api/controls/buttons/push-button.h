@@ -128,15 +128,12 @@ public:
   /**
    * @brief Copy constructor.
    * @SINCE_1_0.0
-   * @param[in] pushButton Handle to an object
    */
   PushButton( const PushButton& pushButton );
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
-   * @param[in] pushButton Handle to an object
-   * @return A reference to this
    */
   PushButton& operator=( const PushButton& pushButton );
 
