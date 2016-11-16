@@ -175,7 +175,7 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonClickedEventHandler != null)
      {
         //here we send all data to user event handlers
-        return _buttonClickedEventHandler(this, e,true);
+        return _buttonClickedEventHandler(this, e);
      }
      return false;
   }
@@ -222,7 +222,7 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonPressedEventHandler != null)
      {
         //here we send all data to user event handlers
-       return _buttonPressedEventHandler(this, e,true);
+       return _buttonPressedEventHandler(this, e);
      }
      return false;
   }
@@ -269,7 +269,7 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonReleasedEventHandler != null)
      {
         //here we send all data to user event handlers
-       return _buttonReleasedEventHandler(this, e, true);
+       return _buttonReleasedEventHandler(this, e);
      }
      return false;
   }
@@ -316,7 +316,7 @@ public class StateChangedEventArgs : EventArgs
      if (_buttonStateChangedEventHandler != null)
      {
         //here we send all data to user event handlers
-       return _buttonStateChangedEventHandler(this, e, true);
+       return _buttonStateChangedEventHandler(this, e);
      }
      return false;
   }

@@ -449,12 +449,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.FONT_FAMILY, new Dali.Property.Value( value ) );
     }
   }
-  public string FontStyle 
+  public Dali.Property.Map FontStyle 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.FONT_STYLE).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.FONT_STYLE).Get(  temp );
       return temp;
     }
     set 
@@ -865,12 +865,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.INPUT_FONT_FAMILY, new Dali.Property.Value( value ) );
     }
   }
-  public string InputFontStyle 
+  public Dali.Property.Map InputFontStyle 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.INPUT_FONT_STYLE).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.INPUT_FONT_STYLE).Get(  temp );
       return temp;
     }
     set 
@@ -891,12 +891,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.INPUT_POINT_SIZE, new Dali.Property.Value( value ) );
     }
   }
-  public string Underline 
+  public Dali.Property.Map Underline 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.UNDERLINE).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.UNDERLINE).Get(  temp );
       return temp;
     }
     set 
@@ -904,12 +904,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.UNDERLINE, new Dali.Property.Value( value ) );
     }
   }
-  public string InputUnderline 
+  public Dali.Property.Map InputUnderline 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.INPUT_UNDERLINE).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.INPUT_UNDERLINE).Get(  temp );
       return temp;
     }
     set 
@@ -917,12 +917,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.INPUT_UNDERLINE, new Dali.Property.Value( value ) );
     }
   }
-  public string Shadow 
+  public Dali.Property.Map Shadow 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.SHADOW).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.SHADOW).Get(  temp );
       return temp;
     }
     set 
@@ -930,12 +930,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.SHADOW, new Dali.Property.Value( value ) );
     }
   }
-  public string InputShadow 
+  public Dali.Property.Map InputShadow 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.INPUT_SHADOW).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.INPUT_SHADOW).Get(  temp );
       return temp;
     }
     set 
@@ -943,12 +943,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.INPUT_SHADOW, new Dali.Property.Value( value ) );
     }
   }
-  public string Emboss 
+  public Dali.Property.Map Emboss 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.EMBOSS).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.EMBOSS).Get(  temp );
       return temp;
     }
     set 
@@ -956,12 +956,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.EMBOSS, new Dali.Property.Value( value ) );
     }
   }
-  public string InputEmboss 
+  public Dali.Property.Map InputEmboss 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.INPUT_EMBOSS).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.INPUT_EMBOSS).Get(  temp );
       return temp;
     }
     set 
@@ -969,12 +969,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.INPUT_EMBOSS, new Dali.Property.Value( value ) );
     }
   }
-  public string Outline 
+  public Dali.Property.Map Outline 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.OUTLINE).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.OUTLINE).Get(  temp );
       return temp;
     }
     set 
@@ -982,12 +982,12 @@ public class MaxLengthReachedEventArgs : EventArgs
       SetProperty( TextField.Property.OUTLINE, new Dali.Property.Value( value ) );
     }
   }
-  public string InputOutline 
+  public Dali.Property.Map InputOutline 
   { 
     get 
     {
-      string temp;
-      GetProperty( TextField.Property.INPUT_OUTLINE).Get( out temp );
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( TextField.Property.INPUT_OUTLINE).Get(  temp );
       return temp;
     }
     set 

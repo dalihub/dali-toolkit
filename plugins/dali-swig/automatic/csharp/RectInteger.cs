@@ -40,6 +40,56 @@ public class RectInteger : global::System.IDisposable {
     }
   }
 
+
+  public int X {
+    set {
+      NDalicPINVOKE.RectInteger_x_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      int ret = NDalicPINVOKE.RectInteger_x_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public int Y {
+    set {
+      NDalicPINVOKE.RectInteger_y_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      int ret = NDalicPINVOKE.RectInteger_y_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public int W {
+    set {
+      NDalicPINVOKE.RectInteger_width_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      int ret = NDalicPINVOKE.RectInteger_width_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public int H {
+    set {
+      NDalicPINVOKE.RectInteger_height_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      int ret = NDalicPINVOKE.RectInteger_height_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+
   public RectInteger() : this(NDalicPINVOKE.new_RectInteger__SWIG_0(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }

@@ -46,8 +46,8 @@ public class PageFactory : global::System.IDisposable {
     return ret;
   }
 
-  public virtual Image NewPage(uint pageId) {
-    Image ret = new Image(NDalicPINVOKE.PageFactory_NewPage(swigCPtr, pageId), true);
+  public virtual Texture NewPage(uint pageId) {
+    Texture ret = new Texture(NDalicPINVOKE.PageFactory_NewPage(swigCPtr, pageId), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

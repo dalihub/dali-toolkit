@@ -53,6 +53,17 @@ public class VisualBase : BaseHandle {
     return ret;
   }
 
+  public void SetName(string name) {
+    NDalicPINVOKE.VisualBase_SetName(swigCPtr, name);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public string GetName() {
+    string ret = NDalicPINVOKE.VisualBase_GetName(swigCPtr);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public void SetSize(Vector2 size) {
     NDalicPINVOKE.VisualBase_SetSize(swigCPtr, Vector2.getCPtr(size));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -60,6 +71,12 @@ public class VisualBase : BaseHandle {
 
   public Vector2 GetSize() {
     Vector2 ret = new Vector2(NDalicPINVOKE.VisualBase_GetSize(swigCPtr), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public float GetHeightForWidth(float width) {
+    float ret = NDalicPINVOKE.VisualBase_GetHeightForWidth(swigCPtr, width);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -80,24 +97,20 @@ public class VisualBase : BaseHandle {
     return ret;
   }
 
-  public void SetOnStage(Actor actor) {
-    NDalicPINVOKE.VisualBase_SetOnStage(swigCPtr, Actor.getCPtr(actor));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public void SetOffStage(Actor actor) {
-    NDalicPINVOKE.VisualBase_SetOffStage(swigCPtr, Actor.getCPtr(actor));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public void RemoveAndReset(Actor actor) {
-    NDalicPINVOKE.VisualBase_RemoveAndReset(swigCPtr, Actor.getCPtr(actor));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
   public void CreatePropertyMap(Property.Map map) {
     NDalicPINVOKE.VisualBase_CreatePropertyMap(swigCPtr, Property.Map.getCPtr(map));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public void SetProperty(int index, Property.Value propertyValue) {
+    NDalicPINVOKE.VisualBase_SetProperty(swigCPtr, index, Property.Value.getCPtr(propertyValue));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public Property.Value GetProperty(int index) {
+    Property.Value ret = new Property.Value(NDalicPINVOKE.VisualBase_GetProperty(swigCPtr, index), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
   }
 
   public VisualBase(SWIGTYPE_p_Dali__Toolkit__Internal__Visual__Base impl) : this(NDalicPINVOKE.new_VisualBase__SWIG_2(SWIGTYPE_p_Dali__Toolkit__Internal__Visual__Base.getCPtr(impl)), true) {

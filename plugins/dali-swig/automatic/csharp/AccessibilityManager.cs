@@ -907,7 +907,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerStatusChangedEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerStatusChangedEventHandler(this, e, true);
+        return _accessibilityManagerStatusChangedEventHandler(this, e);
       }
       return false;
     }
@@ -954,7 +954,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionNextEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionNextEventHandler(this, e, true);
+        return _accessibilityManagerActionNextEventHandler(this, e);
       }
       return false;
     }
@@ -1001,7 +1001,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionPreviousEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionPreviousEventHandler(this, e, true);
+        return _accessibilityManagerActionPreviousEventHandler(this, e);
       }
       return false;
     }
@@ -1048,7 +1048,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionActivateEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionActivateEventHandler(this, e, true);
+        return _accessibilityManagerActionActivateEventHandler(this, e);
       }
       return false;
     }
@@ -1095,7 +1095,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadEventHandler(this, e, true);
+        return _accessibilityManagerActionReadEventHandler(this, e);
       }
       return false;
     }
@@ -1142,7 +1142,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionOverEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionOverEventHandler(this, e, true);
+        return _accessibilityManagerActionOverEventHandler(this, e);
       }
       return false;
     }
@@ -1189,7 +1189,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadNextEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadNextEventHandler(this, e, true);
+        return _accessibilityManagerActionReadNextEventHandler(this, e);
       }
       return false;
     }
@@ -1237,7 +1237,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadPreviousEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadPreviousEventHandler(this, e, true);
+        return _accessibilityManagerActionReadPreviousEventHandler(this, e);
       }
       return false;
     }
@@ -1284,7 +1284,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionUpEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionUpEventHandler(this, e, true);
+        return _accessibilityManagerActionUpEventHandler(this, e);
       }
       return false;
     }
@@ -1331,7 +1331,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionDownEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionDownEventHandler(this, e, true);
+        return _accessibilityManagerActionDownEventHandler(this, e);
       }
       return false;
     }
@@ -1378,7 +1378,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionClearFocusEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionClearFocusEventHandler(this, e, true);
+        return _accessibilityManagerActionClearFocusEventHandler(this, e);
       }
       return false;
     }
@@ -1425,7 +1425,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionBackEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionBackEventHandler(this, e, true);
+        return _accessibilityManagerActionBackEventHandler(this, e);
       }
       return false;
     }
@@ -1472,7 +1472,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionScrollUpEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionScrollUpEventHandler(this, e, true);
+        return _accessibilityManagerActionScrollUpEventHandler(this, e);
       }
       return false;
     }
@@ -1519,7 +1519,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionScrollDownEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionScrollDownEventHandler(this, e, true);
+        return _accessibilityManagerActionScrollDownEventHandler(this, e);
       }
       return false;
     }
@@ -1567,7 +1567,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionPageLeftEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionPageLeftEventHandler(this, e, true);
+        return _accessibilityManagerActionPageLeftEventHandler(this, e);
       }
       return false;
     }
@@ -1614,7 +1614,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionPageRightEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionPageRightEventHandler(this, e, true);
+        return _accessibilityManagerActionPageRightEventHandler(this, e);
       }
       return false;
     }
@@ -1661,7 +1661,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionPageUpEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionPageUpEventHandler(this, e, true);
+        return _accessibilityManagerActionPageUpEventHandler(this, e);
       }
       return false;
     }
@@ -1709,7 +1709,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionPageDownEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionPageDownEventHandler(this, e, true);
+        return _accessibilityManagerActionPageDownEventHandler(this, e);
       }
       return false;
     }
@@ -1757,7 +1757,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionMoveToFirstEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionMoveToFirstEventHandler(this, e, true);
+        return _accessibilityManagerActionMoveToFirstEventHandler(this, e);
       }
       return false;
     }
@@ -1804,7 +1804,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionMoveToLastEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionMoveToLastEventHandler(this, e, true);
+        return _accessibilityManagerActionMoveToLastEventHandler(this, e);
       }
       return false;
     }
@@ -1851,7 +1851,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadFromTopEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadFromTopEventHandler(this, e, true);
+        return _accessibilityManagerActionReadFromTopEventHandler(this, e);
       }
       return false;
     }
@@ -1898,7 +1898,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadFromNextEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadFromNextEventHandler(this, e, true);
+        return _accessibilityManagerActionReadFromNextEventHandler(this, e);
       }
       return false;
     }
@@ -1945,7 +1945,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionZoomEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionZoomEventHandler(this, e, true);
+        return _accessibilityManagerActionZoomEventHandler(this, e);
       }
       return false;
     }
@@ -1992,7 +1992,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadIndicatorInformationEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadIndicatorInformationEventHandler(this, e, true);
+        return _accessibilityManagerActionReadIndicatorInformationEventHandler(this, e);
       }
       return false;
     }
@@ -2039,7 +2039,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionReadPauseResumeEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionReadPauseResumeEventHandler(this, e, true);
+        return _accessibilityManagerActionReadPauseResumeEventHandler(this, e);
       }
       return false;
     }
@@ -2086,7 +2086,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionStartStopEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionStartStopEventHandler(this, e, true);
+        return _accessibilityManagerActionStartStopEventHandler(this, e);
       }
       return false;
     }
@@ -2134,7 +2134,7 @@ public class AccessibilityManager : BaseHandle {
       if (_accessibilityManagerActionScrollEventHandler != null)
       {
         //here we send all data to user event handlers
-        return _accessibilityManagerActionScrollEventHandler(this, e, true);
+        return _accessibilityManagerActionScrollEventHandler(this, e);
       }
       return false;
     }

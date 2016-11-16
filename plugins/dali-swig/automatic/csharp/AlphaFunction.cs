@@ -40,6 +40,10 @@ public class AlphaFunction : global::System.IDisposable {
     }
   }
 
+  public AlphaFunction(Dali.Constants.AlphaFunction.BuiltinFunction function) : this(NDalicPINVOKE.new_AlphaFunction__SWIG_1((int)function), true){
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
   public AlphaFunction() : this(NDalicPINVOKE.new_AlphaFunction__SWIG_0(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }

@@ -206,6 +206,12 @@ public class Property : global::System.IDisposable {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   
+    public Property.Array Add(Property.Value value) {
+      Property.Array ret = new Property.Array(NDalicPINVOKE.Property_Array_Add(swigCPtr, Property.Value.getCPtr(value)), false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  
     public Property.Value GetElementAt(uint index) {
       Property.Value ret = new Property.Value(NDalicPINVOKE.Property_Array_GetElementAt__SWIG_0(swigCPtr, index), false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
