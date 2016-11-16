@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ITEM_LAYOUT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,8 +79,11 @@ struct ItemRange
    */
   ItemRange& operator=(const ItemRange& range)
   {
-    begin = range.begin;
-    end = range.end;
+    if( this != &range )
+    {
+      begin = range.begin;
+      end = range.end;
+    }
     return *this;
   }
 
