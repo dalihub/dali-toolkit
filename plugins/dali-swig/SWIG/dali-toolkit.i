@@ -24,6 +24,8 @@
 %ignore *::CheckBoxButton(Internal::CheckBoxButton&);
 %ignore *::CheckBoxButton(Dali::Internal::CustomActor*);
 %ignore *::Control(Dali::Internal::CustomActor*);
+%ignore *::ControlWrapper( Internal::ControlWrapper& );
+%ignore *::ControlWrapper( Dali::Internal::CustomActor* );
 %ignore *::FlexContainer(Internal::FlexContainer&);
 %ignore *::FlexContainer(Dali::Internal::CustomActor*);
 %ignore *::GaussianBlurView(Internal::GaussianBlurView&);
@@ -158,8 +160,15 @@
 %csconstvalue("PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX") ANIMATABLE_PROPERTY_START_INDEX;
 %csconstvalue("PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX+1000") ANIMATABLE_PROPERTY_END_INDEX;
 %csconstvalue("PropertyRanges.CORE_PROPERTY_MAX_INDEX+1") VISUAL_PROPERTY_BASE_START_INDEX;
-%csconstvalue("1 << 5") REQUIRES_STYLE_CHANGE_SIGNALS;
-%csconstvalue("1 << 6") REQUIRES_KEYBOARD_NAVIGATION_SUPPORT;
+%csconstvalue("0") CONTROL_BEHAVIOUR_NONE;
+%csconstvalue("0") CONTROL_BEHAVIOUR_DEFAULT;
+%csconstvalue("1 << 0") DISABLE_SIZE_NEGOTIATION;
+%csconstvalue("1 << 1") REQUIRES_TOUCH_EVENTS;
+%csconstvalue("1 << 2") REQUIRES_HOVER_EVENTS;
+%csconstvalue("1 << 3") REQUIRES_WHEEL_EVENTS;
+%csconstvalue("1 << 4") REQUIRES_STYLE_CHANGE_SIGNALS;
+%csconstvalue("1 << 5") REQUIRES_KEYBOARD_NAVIGATION_SUPPORT;
+%csconstvalue("1 << 6") DISABLE_STYLE_CHANGE_SIGNALS;
 
 typedef unsigned int ItemId;
 typedef std::vector<ItemId> ItemIdContainer;
