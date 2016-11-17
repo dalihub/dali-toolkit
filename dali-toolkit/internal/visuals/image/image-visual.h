@@ -20,12 +20,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/object/weak-handle.h>
 
 namespace Dali
 {
@@ -73,7 +74,7 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DEFAULT"
  *
  */
-class ImageVisual: public Visual::Base, public ConnectionTracker
+class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver
 {
 public:
 
@@ -81,9 +82,8 @@ public:
    * @brief Constructor.
    *
    * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] atlasManager The atlasManager object
    */
-  ImageVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager );
+  ImageVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -93,27 +93,12 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::Base::SetSize
-   */
-  virtual void SetSize( const Vector2& size );
-
-  /**
-   * @copydoc Visual::Base::GetNaturalSize
+   * @copydoc Visual::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize ) const;
 
   /**
-   * @copydoc Visual::Base::SetClipRect
-   */
-  virtual void SetClipRect( const Rect<int>& clipRect );
-
-  /**
-   * @copydoc Visual::Base::SetOffset
-   */
-  virtual void SetOffset( const Vector2& offset );
-
-  /**
-   * @copydoc Visual::Base::CreatePropertyMap
+   * @copydoc Visual::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
@@ -138,8 +123,10 @@ public:
   /**
    * Get the standard image rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] atlasing Whether texture atlasing is applied.
+   * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
    */
-  static Shader GetImageShader( VisualFactoryCache& factoryCache );
+  static Shader GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping );
 
   /**
    * @brief Sets the image of this visual to the resource at imageUrl
@@ -164,6 +151,14 @@ public:
    * @param[in] image The image to use
    */
   void SetImage( Actor& actor, const Image& image );
+
+  /**
+   * @copydoc AtlasUploadObserver::UploadCompleted
+   *
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the loading is finished.
+   */
+  virtual void UploadCompleted();
 
 private:
 
@@ -252,13 +247,16 @@ private:
 
 private:
   Image mImage;
-  ImageAtlasManager& mAtlasManager;
   PixelData mPixels;
+  Vector4 mPixelArea;
+  WeakHandle<Actor> mPlacementActor;
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;
   Dali::FittingMode::Type mFittingMode;
   Dali::SamplingMode::Type mSamplingMode;
+  Dali::WrapMode::Type mWrapModeU;
+  Dali::WrapMode::Type mWrapModeV;
 
   std::string mNativeFragmentShaderCode;
   bool mNativeImageFlag;

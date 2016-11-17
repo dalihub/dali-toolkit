@@ -19,10 +19,17 @@
 
 // EXTERNAL HEADER
 #include <dali/devel-api/common/hash.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL HEADER
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+
+namespace
+{
+const char * const BROKEN_VISUAL_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
+}
 
 namespace Dali
 {
@@ -179,6 +186,17 @@ Geometry VisualFactoryCache::CreateQuadGeometry()
   return geometry;
 }
 
+ImageAtlasManagerPtr VisualFactoryCache::GetAtlasManager()
+{
+  if( !mAtlasManager )
+  {
+    mAtlasManager = new ImageAtlasManager();
+    mAtlasManager->SetBrokenImage( BROKEN_VISUAL_IMAGE_URL );
+  }
+
+  return mAtlasManager;
+}
+
 SvgRasterizeThread* VisualFactoryCache::GetSVGRasterizationThread()
 {
   if( !mSvgRasterizeThread )
@@ -264,6 +282,11 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
   geometry.SetType( Geometry::TRIANGLE_STRIP );
 
   return geometry;
+}
+
+Image VisualFactoryCache::GetBrokenVisualImage()
+{
+  return ResourceImage::New( BROKEN_VISUAL_IMAGE_URL );
 }
 
 } // namespace Internal

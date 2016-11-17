@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 struct NSVGimage;
 
@@ -55,7 +54,7 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  SvgVisual( VisualFactoryCache& factoryCache, ImageAtlasManager& atlasManager );
+  SvgVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -139,7 +138,6 @@ private:
 
 private:
   Vector4              mAtlasRect;
-  ImageAtlasManager&   mAtlasManager;
   std::string          mImageUrl;
   NSVGimage*           mParsedImage;
   WeakHandle<Actor>    mPlacementActor;

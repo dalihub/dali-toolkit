@@ -98,6 +98,37 @@ enum
    * @note For N-Patch images only.
    */
   BORDER_ONLY,
+
+  /**
+   * @brief The image area to be displayed.
+   * @details Name "pixelArea", type Property::VECTOR4.
+   *          It is a rectangular area.
+   *          The first two elements indicate the top-left position of the area, and the last two elements are the area width and height respectively.
+   * @SINCE_1_2.1
+   * @note Optional. If not specified, the default value is [0.0, 0.0, 1.0, 1.0], i.e. the entire area of the image.
+   * @note For Normal Quad images only.
+   */
+  PIXEL_AREA,
+
+  /**
+   * @brief The wrap mode for u coordinate.
+   * @details Name "wrapModeU", type Dali::WrapMode::Type (Property::INTEGER) or Property::STRING
+   *          It decides how the texture should be sampled when the u coordinate exceeds the range of 0.0 to 1.0.
+   * @SINCE_1_2.1
+   * @note Optional. If not specified, the default is CLAMP.
+   * @note For Normal QUAD image only.
+   */
+  WRAP_MODE_U,
+
+  /**
+   * @brief The wrap mode for v coordinate.
+   * @details Name "wrapModeV", type Dali::WrapMode::Type (Property::INTEGER) or Property::STRING
+   *          it decides how the texture should be sampled when the v coordinate exceeds the range of 0.0 to 1.0.
+   * @SINCE_1_2.1
+   * @note Optional. If not specified, the default is CLAMP.
+   * @note For Normal QUAD image only.
+   */
+  WRAP_MODE_V,
 };
 
 } // namespace Property

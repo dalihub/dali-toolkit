@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <string.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -34,43 +35,50 @@ namespace Internal
 {
 
 ImageAtlas::ImageAtlas( SizeType width, SizeType height, Pixel::Format pixelFormat )
-: mPacker( width, height ),
-  mLoadQueue(),
-  mCompleteQueue( new EventThreadCallback( MakeCallback( this, &ImageAtlas::UploadToAtlas ) ) ),
-  mLoadingThread( mLoadQueue, mCompleteQueue ),
+: mAtlas( Texture::New( Dali::TextureType::TEXTURE_2D, pixelFormat, width, height ) ),
+  mPacker( width, height ),
+  mAsyncLoader( Toolkit::AsyncImageLoader::New() ),
   mBrokenImageUrl(""),
   mBrokenImageSize(),
-  mPixelFormat( pixelFormat ),
-  mLoadingThreadStarted( false )
+  mWidth( static_cast<float>(width) ),
+  mHeight( static_cast<float>( height ) ),
+  mPixelFormat( pixelFormat )
 {
-  mAtlas = Atlas::New( width, height, pixelFormat );
-  mWidth = static_cast<float>(width);
-  mHeight = static_cast<float>( height );
+  mAsyncLoader.ImageLoadedSignal().Connect( this, &ImageAtlas::UploadToAtlas );
 }
 
 ImageAtlas::~ImageAtlas()
 {
-  if( mLoadingThreadStarted )
+  const std::size_t count = mLoadingTaskInfoContainer.Count();
+  for( std::size_t i=0; i < count; ++i )
   {
-    // add an empty task would stop the loading thread from contional wait.
-    mLoadQueue.AddTask( NULL );
-    // stop the loading thread
-    mLoadingThread.Join();
-    // The atlas can still be used as texture after ImageAtlas has been thrown away,
-    // so make sure all the loaded bitmap been uploaded to atlas
-    UploadToAtlas();
+    // Call unregister to every observer in the list.
+    // Note that, the Atlas can be registered to same observer multiple times, and the Unregister method only remove one item each time.
+    // In this way, the atlas is actually detached from a observer either every upload call invoked by this observer is completed or atlas is destroyed.
+    if( mLoadingTaskInfoContainer[i]->observer )
+    {
+      mLoadingTaskInfoContainer[i]->observer->Unregister( *this );
+    }
   }
+
+  mLoadingTaskInfoContainer.Clear();
 }
 
 IntrusivePtr<ImageAtlas> ImageAtlas::New( SizeType width, SizeType height, Pixel::Format pixelFormat )
 {
   IntrusivePtr<ImageAtlas> internal = new ImageAtlas( width, height, pixelFormat );
+
   return internal;
 }
 
-Image ImageAtlas::GetAtlas()
+Texture ImageAtlas::GetAtlas()
 {
   return mAtlas;
+}
+
+float ImageAtlas::GetOccupancyRate() const
+{
+  return 1.f - static_cast<float>( mPacker.GetAvailableArea() ) / ( mWidth*mHeight );
 }
 
 void ImageAtlas::SetBrokenImage( const std::string& brokenImageUrl )
@@ -86,7 +94,8 @@ bool ImageAtlas::Upload( Vector4& textureRect,
                          const std::string& url,
                          ImageDimensions size,
                          FittingMode::Type fittingMode,
-                         bool orientationCorrection )
+                         bool orientationCorrection,
+                         AtlasUploadObserver* atlasUploadObserver )
 {
   ImageDimensions dimensions = size;
   ImageDimensions zero;
@@ -97,7 +106,7 @@ bool ImageAtlas::Upload( Vector4& textureRect,
     {
       if( !mBrokenImageUrl.empty() )
       {
-        return Upload( textureRect, mBrokenImageUrl, mBrokenImageSize, FittingMode::DEFAULT, true );
+        return Upload( textureRect, mBrokenImageUrl, mBrokenImageSize, FittingMode::DEFAULT, true, atlasUploadObserver );
       }
       else
       {
@@ -107,30 +116,24 @@ bool ImageAtlas::Upload( Vector4& textureRect,
     }
   }
 
-  if( static_cast<unsigned int>(dimensions.GetWidth() * dimensions.GetHeight()) > mPacker.GetAvailableArea() )
-  {
-    return false;
-  }
-
   unsigned int packPositionX = 0;
   unsigned int packPositionY = 0;
   if( mPacker.Pack( dimensions.GetWidth(), dimensions.GetHeight(), packPositionX, packPositionY ) )
   {
-    if( !mLoadingThreadStarted )
-    {
-      mLoadingThread.Start();
-      mLoadingThreadStarted = true;
-    }
-
-    LoadingTask* newTask = new LoadingTask(BitmapLoader::New(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection ),
-                                           packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight());
-    mLoadQueue.AddTask( newTask );
-
+    unsigned short loadId = mAsyncLoader.Load( url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection );
+    mLoadingTaskInfoContainer.PushBack( new LoadingTaskInfo( loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight(), atlasUploadObserver ) );
     // apply the half pixel correction
     textureRect.x = ( static_cast<float>( packPositionX ) +0.5f ) / mWidth; // left
     textureRect.y = ( static_cast<float>( packPositionY ) +0.5f ) / mHeight; // right
     textureRect.z = ( static_cast<float>( packPositionX + dimensions.GetX() )-0.5f ) / mWidth; // right
     textureRect.w = ( static_cast<float>( packPositionY + dimensions.GetY() )-0.5f ) / mHeight;// bottom
+
+    if( atlasUploadObserver )
+    {
+      // register to the observer,
+      // Not that a matching unregister call should be invoked in UploadToAtlas if the observer is still alive by then.
+      atlasUploadObserver->Register( *this );
+    }
 
     return true;
   }
@@ -144,7 +147,7 @@ bool ImageAtlas::Upload( Vector4& textureRect, PixelData pixelData )
   unsigned int packPositionY = 0;
   if( mPacker.Pack( pixelData.GetWidth(), pixelData.GetHeight(), packPositionX, packPositionY ) )
   {
-    mAtlas.Upload( pixelData, packPositionX, packPositionY );
+    mAtlas.Upload( pixelData, 0u, 0u, packPositionX, packPositionY, pixelData.GetWidth(), pixelData.GetHeight() );
 
     // apply the half pixel correction
     textureRect.x = ( static_cast<float>( packPositionX ) +0.5f ) / mWidth; // left
@@ -166,38 +169,54 @@ void ImageAtlas::Remove( const Vector4& textureRect )
                        static_cast<SizeType>((textureRect.w-textureRect.y)*mHeight+1.f) );
 }
 
-void ImageAtlas::UploadToAtlas()
+void ImageAtlas::ObserverDestroyed( AtlasUploadObserver* observer )
 {
-  while( LoadingTask* next = mCompleteQueue.NextTask() )
+  const std::size_t count = mLoadingTaskInfoContainer.Count();
+  for( std::size_t i=0; i < count; ++i )
   {
-    if( ! next->loader.IsLoaded() )
+    if( mLoadingTaskInfoContainer[i]->observer == observer )
     {
-      if(!mBrokenImageUrl.empty()) // replace with the broken image
-      {
-        UploadBrokenImage( next->packRect );
-      }
-
-      DALI_LOG_ERROR( "Failed to load the image: %s\n", (next->loader.GetUrl()).c_str());
+      // the observer is destructing, so its member function should not be called anymore
+      mLoadingTaskInfoContainer[i]->observer = NULL;
     }
-    else
-    {
-      if( next->loader.GetPixelData().GetWidth() < next->packRect.width || next->loader.GetPixelData().GetHeight() < next->packRect.height  )
-      {
-        DALI_LOG_ERROR( "Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
-                        next->loader.GetPixelData().GetWidth(),
-                        next->loader.GetPixelData().GetHeight(),
-                        next->packRect.width,
-                        next->packRect.height );
-      }
-
-      mAtlas.Upload( next->loader.GetPixelData(), next->packRect.x, next->packRect.y );
-    }
-
-    delete next;
   }
 }
 
-void ImageAtlas::UploadBrokenImage( const Rect<SizeType>& area )
+void ImageAtlas::UploadToAtlas( uint32_t id, PixelData pixelData )
+{
+  if(  mLoadingTaskInfoContainer[0]->loadTaskId == id)
+  {
+    Rect<unsigned int> packRect( mLoadingTaskInfoContainer[0]->packRect  );
+    if( !pixelData || ( pixelData.GetWidth() ==0 && pixelData.GetHeight() == 0 ))
+    {
+      if(!mBrokenImageUrl.empty()) // replace with the broken image
+      {
+        UploadBrokenImage( packRect );
+      }
+    }
+    else
+    {
+      if( pixelData.GetWidth() < packRect.width || pixelData.GetHeight() < packRect.height  )
+      {
+        DALI_LOG_ERROR( "Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
+            pixelData.GetWidth(), pixelData.GetHeight(),
+            packRect.width, packRect.height );
+      }
+
+      mAtlas.Upload( pixelData, 0u, 0u, packRect.x, packRect.y, packRect.width, packRect.height );
+    }
+
+    if( mLoadingTaskInfoContainer[0]->observer )
+    {
+      mLoadingTaskInfoContainer[0]->observer->UploadCompleted();
+      mLoadingTaskInfoContainer[0]->observer->Unregister( *this );
+    }
+
+    mLoadingTaskInfoContainer.Erase( mLoadingTaskInfoContainer.Begin() );
+  }
+}
+
+void ImageAtlas::UploadBrokenImage( const Rect<unsigned int>& area )
 {
   BitmapLoader loader = BitmapLoader::New(mBrokenImageUrl, ImageDimensions( area.width, area.height ) );
   loader.Load();
@@ -228,10 +247,10 @@ void ImageAtlas::UploadBrokenImage( const Rect<SizeType>& area )
     {
       buffer[idx] = 0x00;
     }
-    mAtlas.Upload( background, area.x, area.y );
+    mAtlas.Upload( background, 0u, 0u, area.x, area.y, area.width, area.height );
   }
 
-  mAtlas.Upload( loader.GetPixelData(), packX, packY );
+  mAtlas.Upload( loader.GetPixelData(), 0u, 0u, packX, packY, loadedWidth, loadedHeight );
 }
 
 } // namespace Internal

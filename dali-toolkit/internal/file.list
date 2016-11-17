@@ -83,9 +83,10 @@ toolkit_src_files = \
    $(toolkit_src_dir)/filters/emboss-filter.cpp \
    $(toolkit_src_dir)/filters/image-filter.cpp \
    $(toolkit_src_dir)/filters/spread-filter.cpp \
-   $(toolkit_src_dir)/image-atlas/atlas-packer.cpp \
-   $(toolkit_src_dir)/image-atlas/image-atlas-impl.cpp \
-   $(toolkit_src_dir)/image-atlas/image-load-thread.cpp \
+   $(toolkit_src_dir)/image-loader/async-image-loader-impl.cpp \
+   $(toolkit_src_dir)/image-loader/atlas-packer.cpp \
+   $(toolkit_src_dir)/image-loader/image-atlas-impl.cpp \
+   $(toolkit_src_dir)/image-loader/image-load-thread.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
    $(toolkit_src_dir)/text/bidirectional-support.cpp \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \

@@ -47,6 +47,9 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>

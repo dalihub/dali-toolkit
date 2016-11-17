@@ -19,7 +19,7 @@
 #include "image-atlas.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/image-atlas/image-atlas-impl.h>
+#include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 
 namespace Dali
 {
@@ -58,10 +58,16 @@ ImageAtlas ImageAtlas::New(SizeType width, SizeType height,
   return ImageAtlas( internal.Get() );
 }
 
-Image ImageAtlas::GetAtlas()
+Texture ImageAtlas::GetAtlas()
 {
   return GetImplementation( *this ).GetAtlas();
 }
+
+float ImageAtlas::GetOccupancyRate() const
+{
+  return GetImplementation( *this ).GetOccupancyRate();
+}
+
 
 void ImageAtlas::SetBrokenImage( const std::string& brokenImageUrl )
 {
@@ -74,7 +80,17 @@ bool ImageAtlas::Upload( Vector4& textureRect,
                          FittingMode::Type fittingMode,
                          bool orientationCorrection )
 {
-  return GetImplementation(*this).Upload( textureRect, url, size, fittingMode, orientationCorrection );
+  return Upload( textureRect, url, size, fittingMode, orientationCorrection, NULL );
+}
+
+bool ImageAtlas::Upload( Vector4& textureRect,
+                         const std::string& url,
+                         ImageDimensions size,
+                         FittingMode::Type fittingMode,
+                         bool orientationCorrection,
+                         AtlasUploadObserver* atlasUploadObserver )
+{
+  return GetImplementation(*this).Upload( textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver );
 }
 
 bool ImageAtlas::Upload( Vector4& textureRect, PixelData pixelData )
