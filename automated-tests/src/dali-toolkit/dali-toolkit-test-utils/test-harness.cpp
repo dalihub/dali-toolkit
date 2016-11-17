@@ -329,8 +329,9 @@ void Usage(const char* program)
   printf("Usage: \n"
          "   %s <testcase name>\t\t Execute a test case\n"
          "   %s \t\t Execute all test cases in parallel\n"
-         "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n",
-         program, program, program);
+         "   %s -r\t\t Execute all test cases in parallel, rerunning failed test cases\n"
+         "   %s -s\t\t Execute all test cases serially\n",
+         program, program, program, program);
 }
 
 } // namespace

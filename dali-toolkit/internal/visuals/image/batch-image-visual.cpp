@@ -127,11 +127,6 @@ void BatchImageVisual::DoSetProperties( const Property::Map& propertyMap )
   mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 }
 
-void BatchImageVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-}
-
 void BatchImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if( mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0 )
@@ -275,6 +270,14 @@ void BatchImageVisual::CleanCache(const std::string& url)
   }
 }
 
+void BatchImageVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    //Register transform properties
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
 
 } // namespace Internal
 

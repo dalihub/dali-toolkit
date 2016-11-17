@@ -103,13 +103,6 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void ColorVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-
-  // ToDo: renderer responds to the size change
-}
-
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

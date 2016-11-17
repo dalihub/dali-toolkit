@@ -429,13 +429,6 @@ void MeshVisual::OnSetTransform()
   }
 }
 
-void MeshVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-
-  // ToDo: renderer responds to the size change
-}
-
 void MeshVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();

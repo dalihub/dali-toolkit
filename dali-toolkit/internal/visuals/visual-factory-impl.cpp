@@ -258,7 +258,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   }
   else if( UrlType::SVG == type )
   {
-    visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url, size );
+    visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url );
   }
   else // Regular image
   {

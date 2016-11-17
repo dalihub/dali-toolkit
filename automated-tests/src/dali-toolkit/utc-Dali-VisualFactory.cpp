@@ -23,6 +23,8 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/images/nine-patch-image.h>
+#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
@@ -46,6 +48,18 @@ const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simpl
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
 static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
+
+Property::Map DefaultTransform()
+{
+  Property::Map transformMap;
+  transformMap
+    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::VisualProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::VisualProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::VisualProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+  return transformMap;
+}
 
 Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
 {
@@ -372,7 +386,7 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( actor );
-  visual.SetSize(Vector2(200.f, 200.f));
+  visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   int blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
@@ -420,7 +434,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( actor );
-  visual.SetSize(Vector2(200.f, 200.f));
+  visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
@@ -971,9 +985,8 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
 
   ResourceImage image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
   Visual::Base nPatchVisual = factory.CreateVisual( image );
-  Vector2 visualSize( 20.f, 30.f ), naturalSize(0,0);
-  nPatchVisual.SetSize( visualSize );
-  DALI_TEST_EQUALS( nPatchVisual.GetSize(), visualSize, TEST_LOCATION );
+  Vector2 controlSize( 20.f, 30.f ), naturalSize(0,0);
+  nPatchVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   nPatchVisual.GetNaturalSize( naturalSize );
   DALI_TEST_EQUALS( naturalSize, Vector2( ninePatchImageWidth-2, ninePatchImageHeight-2 ), TEST_LOCATION );
 
@@ -1124,7 +1137,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
-  visual.SetSize( Vector2(200.f, 200.f) );
+  visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
   application.SendNotification();
   application.Render();
@@ -1132,11 +1145,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   // renderer is not added to actor until the rasterization is completed.
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
@@ -1163,8 +1172,9 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS ); // Only rasterizes when it knows control size.
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   Stage::GetCurrent().Add( actor );
 
@@ -1174,11 +1184,7 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   // renderer is not added to actor until the rasterization is completed.
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 1 );// waiting until the svg image is rasterized.
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
@@ -1209,7 +1215,7 @@ void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplic
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
-  visual.SetSize( Vector2( 200.f, 200.f ) );
+  visual.SetTransformAndSize(DefaultTransform(), Vector2( 200.f, 200.f ) );
 
   //Ensure set on stage.
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
@@ -1256,7 +1262,7 @@ void MeshVisualDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTest
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
-  visual.SetSize( Vector2( 200.f, 200.f ) );
+  visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
 
   //Ensure set on stage.
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
@@ -1538,7 +1544,7 @@ void TestPrimitiveVisualWithProperties( Property::Map& propertyMap, ToolkitTestA
 
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
-  visual.SetSize( Vector2( 200.f, 200.f ) );
+  visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
 
   //Ensure set on stage.
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
@@ -1959,7 +1965,7 @@ int UtcDaliVisualFactoryGetBatchImageVisual1(void)
 
   actor.SetSize( 200.0f, 200.0f );
   Stage::GetCurrent().Add( actor );
-  visual.SetSize( Vector2( 200.0f, 200.0f ) );
+  visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.0f, 200.0f ) );
 
   // Test SetOnStage().
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
@@ -2008,7 +2014,7 @@ int UtcDaliVisualFactoryGetBatchImageVisual2(void)
 
   actor.SetSize( 200.0f, 200.0f );
   Stage::GetCurrent().Add( actor );
-  visual.SetSize( Vector2( 200.0f, 200.0f ) );
+  visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.0f, 200.0f ) );
 
   // Test SetOnStage().
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );

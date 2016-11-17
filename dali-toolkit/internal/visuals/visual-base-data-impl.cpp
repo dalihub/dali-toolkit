@@ -82,8 +82,9 @@ Dali::Vector2 PointToVector2( Toolkit::Align::Type point, Toolkit::Direction::Ty
 } // unnamed namespace
 
 Internal::Visual::Base::Impl::Impl()
-: mCustomShader(NULL),
+: mCustomShader( NULL ),
   mTransform(),
+  mControlSize( Vector2::ZERO ),
   mDepthIndex( 0.0f ),
   mFlags( 0 )
 {
@@ -266,6 +267,13 @@ void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer r
   renderer.RegisterProperty( ORIGIN, PointToVector2( mOrigin, direction ) - Vector2(0.5,0.5) );
   renderer.RegisterProperty( ANCHOR_POINT, Vector2(0.5,0.5) - PointToVector2( mAnchorPoint, direction ) );
 }
+
+Vector2 Internal::Visual::Base::Impl::Transform::GetVisualSize( const Vector2& controlSize )
+{
+  return Vector2( Lerp( mOffsetSizeMode.x, mSize.x * controlSize.x, mSize.x ),
+                  Lerp( mOffsetSizeMode.y, mSize.y * controlSize.y, mSize.y ) );
+}
+
 
 } // namespace Internal
 

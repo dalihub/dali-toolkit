@@ -387,13 +387,6 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void PrimitiveVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-
-  // ToDo: renderer responds to the size change
-}
-
 void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize.x = mObjectDimensions.x;

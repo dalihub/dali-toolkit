@@ -128,18 +128,12 @@ public:
   const std::string& GetName();
 
   /**
-   * @brief Set the size of the painting area.
+   * @brief Sets the transform and the control size
    *
-   * @param[in] size The size of the painting area.
+   * @param[in] transform A property map describing the transform
+   * @param[in] controlSize The size of the parent control for visuals that need to scale internally.
    */
-  void SetSize( const Vector2& size );
-
-  /**
-   * @brief Get the size of the painting area.
-   *
-   * @return The size of the visual's painting area.
-   */
-  const Vector2& GetSize() const;
+  void SetTransformAndSize( const Dali::Property::Map& transform, Size controlSize );
 
   /**
    * @brief Returns the height for a given width.
@@ -153,7 +147,11 @@ public:
   /**
    * @brief Return the natural size of the visual.
    *
-   * Deriving classes stipulate the natural size and by default a visual has a ZERO natural size.
+   * Deriving classes stipulate the natural size and by default a
+   * visual has a ZERO natural size.
+   *
+   * @note A visual may not actually have a natural size until it has
+   * been placed on stage and acquired all it's resources.
    *
    * @param[out] naturalSize The visual's natural size
    */

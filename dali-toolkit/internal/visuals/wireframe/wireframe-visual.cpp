@@ -150,6 +150,15 @@ Geometry WireframeVisual::CreateQuadWireframeGeometry()
   return geometry;
 }
 
+void WireframeVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    //Register transform properties
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
 } // namespace Internal
 
 } // namespace Toolkit
