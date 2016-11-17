@@ -1310,6 +1310,7 @@ void Controller::Impl::OnLongPressEvent( const Event& event )
   {
     ChangeState ( EventData::EDITING_WITH_POPUP );
     mEventData->mDecoratorUpdated = true;
+    mEventData->mUpdateInputStyle = true;
   }
 }
 
