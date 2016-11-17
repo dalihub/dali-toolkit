@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/button-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 namespace Dali
 {

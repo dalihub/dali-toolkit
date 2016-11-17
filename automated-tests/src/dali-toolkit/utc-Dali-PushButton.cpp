@@ -26,6 +26,9 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -396,6 +399,11 @@ int UtcDaliPushButtonSetLabelText(void)
   const std::string STR( "Hola!" );
 
   PushButton pushButton = PushButton::New();
+
+  pushButton.SetProperty( Toolkit::Button::Property::LABEL,
+                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                                         .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                        );
 
   application.SendNotification();
   application.Render();

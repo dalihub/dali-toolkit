@@ -794,6 +794,8 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
   {
     Toolkit::GetImplementation(visual).SetOnStage( self );
   }
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
+
 }
 
 void Control::UnregisterVisual( Property::Index index )

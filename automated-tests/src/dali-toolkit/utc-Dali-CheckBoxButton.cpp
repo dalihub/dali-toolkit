@@ -20,6 +20,10 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -155,11 +159,14 @@ int UtcDaliCheckBoxSetLabelP(void)
   CheckBoxButton checkBox = CheckBoxButton::New();
 
   Property::Map propertyMap;
-  propertyMap.Insert("text",  "activate");
+
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+             .Add( Toolkit::TextVisual::Property::TEXT, "activate" )
+             .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
+
   checkBox.SetProperty( checkBox.GetPropertyIndex("label"), propertyMap );
 
   DALI_TEST_EQUALS( checkBox.GetLabelText(), "activate", TEST_LOCATION ); // Change to use GerProperty once that code is implemented
-
   END_TEST;
 }
 
@@ -177,13 +184,16 @@ int UtcDaliCheckBoxSetLabelDisabledP(void)
   application.Render();
 
   Property::Map propertyMap;
-  propertyMap.Insert("text",  "activate");
-  checkBox.SetProperty(checkBox.GetPropertyIndex("disabled"), true);
 
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+             .Add( Toolkit::TextVisual::Property::TEXT, "activate" )
+             .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
+
+  checkBox.SetProperty(checkBox.GetPropertyIndex("disabled"), true);
   checkBox.SetProperty( checkBox.GetPropertyIndex("label"), propertyMap );
 
   DALI_TEST_CHECK(  checkBox.GetProperty<bool>(checkBox.GetPropertyIndex("disabled")) );
-  DALI_TEST_EQUALS( checkBox.GetLabelText(), "activate", TEST_LOCATION ); // Change to use GerProperty once that code is implemented
+  DALI_TEST_EQUALS( checkBox.GetLabelText(), "activate", TEST_LOCATION ); // Change to use GetProperty once that code is implemented
 
   END_TEST;
 }

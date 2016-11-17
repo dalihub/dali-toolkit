@@ -219,7 +219,13 @@
     {
       "initialAutoRepeatingDelay":2.0,
       "nextAutoRepeatingDelay":0.9,
-      "labelStrutLength":12
+       "label":
+       {
+         "visualType": "TEXT",
+         "horizontalAlignment": "CENTER",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       }
       // Note: Visuals added to Button will be used in all derived buttons unless overridden.
     },
     "PushButton":
@@ -252,22 +258,22 @@
     "CheckBoxButton":
     {
       "styles":["Button"],
-      "unselectedBackgroundVisual":
+      "unselectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}checkbox-unselected.png"
       },
-      "selectedBackgroundVisual":
+      "selectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}checkbox-selected.png"
       },
-      "disabledUnselectedBackgroundVisual":
+      "disabledUnselectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}checkbox-unselected-disabled.png"
       },
-      "disabledSelectedBackgroundVisual":
+      "disabledSelectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}checkbox-selected-disabled.png"
@@ -276,22 +282,22 @@
     "RadioButton":
     {
       "styles":["Button"],
-      "unselectedBackgroundVisual":
+      "unselectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}radio-button-unselected.png"
       },
-      "selectedBackgroundVisual":
+      "selectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}radio-button-selected.png"
       },
-      "disabledUnselectedBackgroundVisual":
+      "disabledUnselectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}radio-button-unselected-disabled.png"
       },
-      "disabledSelectedBackgroundVisual":
+      "disabledSelectedVisual":
       {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}radio-button-selected-disabled.png"

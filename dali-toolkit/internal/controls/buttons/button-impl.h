@@ -149,12 +149,13 @@ public:
   std::string GetLabelText() const;
 
   /**
-   * @brief Sets the specified properties on the button label.
+   * @brief Produces a Property::Map of Text properties to create a Text Visual
    * If the label does not exist yet, it is created.
    * The derived buttons are notified if any properties are changed.
    * @param[in] properties A Property::Map of key-value pairs of properties to set.
+   * @param[out] properties A Property::Map of text visual  properties to set.
    */
-  void SetupLabel( const Property::Map& properties );
+  void MergeLabelProperties( const Property::Map& inMap, Property::Map& outMap );
 
   /**
    * Performs actions as requested using the action name.
@@ -590,6 +591,13 @@ protected:
   void CreateVisualsForComponent( Property::Index index ,const Property::Value& value, const float visualDepth );
 
   /**
+   * @brief Get the Property map for the given Visual
+   * @param[in] visualIndex visual index of the required visual
+   * @param[out] retreivedMap the property map used to construct the required visual
+   * @return bool success flag, true if visual found
+   */
+  bool GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const;
+  /**
    * Returns the animation to be used for transition, creating the animation if needed.
    * @return The initialised transition animation.
    */
@@ -659,6 +667,8 @@ private:
 
   bool             mAutoRepeating;              ///< Stores the autorepeating property.
   bool             mTogglableButton;            ///< Stores the togglable property as a flag.
+  bool             mTextStringSetFlag;          ///< Stores if text has been set. Required in relayout but don't want to calculate there.
+
   float            mInitialAutoRepeatingDelay;  ///< Stores the initial autorepeating delay in seconds.
   float            mNextAutoRepeatingDelay;     ///< Stores the next autorepeating delay in seconds.
 

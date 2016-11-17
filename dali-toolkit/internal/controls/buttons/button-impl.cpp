@@ -37,9 +37,9 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #if defined(DEBUG_ENABLED)
     Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_BUTTON_CONTROL");
@@ -125,6 +125,25 @@ const Property::Index GET_VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
   { Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_SELECTED_VISUAL }
 };
 
+/**
+ * Checks if given map contains a text string
+ */
+bool MapContainsTextString( Property::Map& map )
+{
+  bool result = false;
+  Property::Value* value = map.Find( Toolkit::TextVisual::Property::TEXT );
+  if ( value )
+  {
+    std::string textString;
+    value->Get( textString );
+    if ( !textString.empty() )
+    {
+      result = true;
+    }
+  }
+  return result;
+}
+
 } // unnamed namespace
 
 Button::Button()
@@ -133,6 +152,7 @@ Button::Button()
   mTextLabelAlignment( END ),
   mAutoRepeating( false ),
   mTogglableButton( false ),
+  mTextStringSetFlag( false ),
   mInitialAutoRepeatingDelay( 0.0f ),
   mNextAutoRepeatingDelay( 0.0f ),
   mAnimationTime( 0.0f ),
@@ -151,15 +171,14 @@ void Button::SetAutoRepeating( bool autoRepeating )
 {
   mAutoRepeating = autoRepeating;
 
-  // An autorepeating button can't be a togglable button.
+  // An autorepeating button can't be a toggle button.
   if( autoRepeating )
   {
-    mTogglableButton = false;
-
     if( IsSelected() )
     {
-      SetSelected( false );
+      SetSelected( false ); // UnSelect before switching off Toggle feature.
     }
+    mTogglableButton = false;
   }
 }
 
@@ -300,7 +319,7 @@ void Button::ChangeState( State requestedState )
     return;
   }
 
-  // If not on stage the button could have still been set to selected so update state/
+  // If not on stage the button could have still been set to selected so update state
   mPreviousButtonState = mButtonState; // Store previous state for visual removal (used when animations ended)
   mButtonState = requestedState; // Update current state
 
@@ -309,6 +328,7 @@ void Button::ChangeState( State requestedState )
     OnStateChange( mButtonState ); // Notify derived buttons
     PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
     // If animation supported then visual removal should be performed after any transition animation has completed.
+    // If Required Visual is not loaded before current visual is removed then a flickering will be evident.
     PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
   }
 
@@ -326,70 +346,57 @@ bool Button::IsSelected() const
 void Button::SetLabelText( const std::string& label )
 {
   Property::Map labelProperty;
-  labelProperty.Insert( "text", label );
-  SetupLabel( labelProperty );
+  labelProperty.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT)
+               .Add( Toolkit::TextVisual::Property::TEXT, label );
+
+  Self().SetProperty( Toolkit::Button::Property::LABEL, labelProperty );
 }
 
 std::string Button::GetLabelText() const
 {
-  Toolkit::TextLabel label = Dali::Toolkit::TextLabel::DownCast( mLabel );
-  if( label )
+  Property::Value value = Self().GetProperty( Toolkit::Button::Property::LABEL );
+
+  Property::Map *labelProperty = value.GetMap();
+
+  std::string textLabel;
+
+  if ( labelProperty )
   {
-    return label.GetProperty<std::string>( Dali::Toolkit::TextLabel::Property::TEXT );
+    Property::Value* value = labelProperty->Find( Toolkit::TextVisual::Property::TEXT );
+    value->Get( textLabel );
   }
-  return std::string();
+
+  return textLabel;
 }
 
-void Button::SetupLabel( const Property::Map& properties )
+void Button::MergeLabelProperties( const Property::Map& inMap, Property::Map& outMap )
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "SetupLabel\n");
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "MergeLabelProperties with %d properties\n", inMap.Count() );
 
-  // If we don't have a label yet, create one.
-  if( !mLabel )
+  /**
+   * Properties for the Label visual could be from a style sheet but after being set the "TEXT" property could be set.
+   * Hence would need to create the Text Visual with the complete merged set of properties.
+   *
+   * 1) Find Label Visual
+   * 2) Retrieve current properties ( settings )
+   * 3) Merge with new properties ( settings )
+   * 4) Return new merged map
+   */
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Button::Property::LABEL );
+  if ( visual )
   {
-    // If we don't have a label, create one and set it up.
-    // Note: The label text is set from the passed in property map after creation.
-    mLabel = Toolkit::TextLabel::New();
-    mLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
-    mLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-    mLabel.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mLabel.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-
-    // todo DEBUG
-    mLabel.SetProperty( Toolkit::Control::Property::BACKGROUND, Dali::Property::Map()
-                        .Add( Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR )
-                        .Add( Toolkit::ColorVisual::Property::MIX_COLOR, Color::RED )
-                      );
-
-    ResizePolicy::Type policy = Self().GetResizePolicy(  Dimension::ALL_DIMENSIONS );
-    if ( policy == ResizePolicy::USE_NATURAL_SIZE || policy == ResizePolicy::FIT_TO_CHILDREN  )
-    {
-      mLabel.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-    }
-    else
-    {
-      // todo Can't set Text Label to USE_ASSIGNED_SIZE as causes a relayout in it whilst doing a relayout = error
-     //mLabel.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
-    }
-    Self().Add( mLabel );
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "MergeLabelProperties Visual already exists, retrieving existing map\n");
+    visual.CreatePropertyMap( outMap );
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "MergeLabelProperties retrieved %d properties\n", outMap.Count() );
   }
 
-  // Set any properties specified for the label by iterating through all property key-value pairs.
-  for( unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i )
-  {
-    const StringValuePair& propertyPair( properties.GetPair( i ) );
+  outMap.Merge( inMap );
 
-    // Convert the property string to a property index.
-    Property::Index setPropertyIndex = mLabel.GetPropertyIndex( propertyPair.first );
-    if( setPropertyIndex != Property::INVALID_INDEX )
-    {
-      // If the conversion worked, we have a valid property index,
-      // Set the property to the new value.
-      mLabel.SetProperty( setPropertyIndex, propertyPair.second );
-    }
-  }
+  // Store if a text string has been supplied.
 
-  RelayoutRequest();
+  mTextStringSetFlag = MapContainsTextString( outMap );
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "MergeLabelProperties now has %d properties\n", outMap.Count() );
 }
 
 void Button::SetLabelAlignment( Button::Align labelAlignment)
@@ -403,6 +410,14 @@ Button::Align Button::GetLabelAlignment()
   return mTextLabelAlignment;
 }
 
+/**
+ * Create Visual for given index from a property map or url.
+ * 1) Check if value passed in is a url and create visual
+ * 2) Create visual from map if step (1) is false
+ * 3) Register visual with control with false for enable flag. Button will later enable visual when needed ( Button::SelectRequiredVisual )
+ * 4) Unregister visual if empty map was provided. This is the method to remove a visual
+ */
+
 void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent index(%d)\n", index );
@@ -415,6 +430,7 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
     DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent Using image URL(%d)\n", index );
     if ( !imageUrl.empty() )
     {
+      DALI_ASSERT_DEBUG( index != Toolkit::Button::Property::LABEL && "Creating a Image Visual instead of Text Visual " );
       buttonVisual = visualFactory.CreateVisual(  imageUrl, ImageDimensions()  );
     }
   }
@@ -431,16 +447,31 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
 
   if ( buttonVisual )
   {
-    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RegisterVisual index(%d)\n", index );
+    DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent RegisterVisual index(%d) enabled(%s)\n",
+                   index, IsVisualEnabled( index )?"true":"false" );
     buttonVisual.SetDepthIndex( visualDepth );
-    // Background Visuals take full size of control
-    RegisterVisual( index, buttonVisual, false );
+    RegisterVisual( index, buttonVisual, IsVisualEnabled( index ) );
   }
   else
   {
     UnregisterVisual( index );
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "Button visual not created or empty map provided (clearing visual).(%d)\n", index);
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "CreateVisualsForComponent Visual not created or empty map (clearing visual).(%d)\n", index);
   }
+  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+}
+
+bool Button::GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const
+{
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetPropertyMapForVisual visual(%d)\n", visualIndex);
+  bool success = false;
+  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+  if ( visual )
+  {
+    visual.CreatePropertyMap( retreivedMap );
+    success = true;
+  }
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetPropertyMapForVisual %s\n", success?"Success":"Failure");
+  return success;
 }
 
 bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
@@ -729,9 +760,10 @@ void Button::OnStageDisconnection()
 void Button::OnStageConnection( int depth )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnStageConnection ptr(%p) \n", this );
+  PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState );
+  SelectRequiredVisual( Toolkit::Button::Property::LABEL );
   PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
   Control::OnStageConnection( depth ); // Enabled visuals will be put on stage
-
 }
 
 Vector3 Button::GetNaturalSize()
@@ -742,7 +774,7 @@ Vector3 Button::GetNaturalSize()
 
   // Get natural size of foreground ( largest of the possible visuals )
   Size largestForegroundVisual;
-  Size labelSize;
+  Size labelSize = Size::ZERO;
 
   for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++)
   {
@@ -770,27 +802,32 @@ Vector3 Button::GetNaturalSize()
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize visual Size(%f,%f)\n",
                  largestForegroundVisual.width, largestForegroundVisual.height );
 
-  // Get natural size of label
-  if ( mLabel )
+  // Get natural size of label if text has been set
+  if ( mTextStringSetFlag )
   {
-    labelSize = Vector2( mLabel.GetNaturalSize());
+    Toolkit::Visual::Base visual = GetVisual( Toolkit::Button::Property::LABEL );
 
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize labelSize(%f,%f) padding(%f,%f)\n",
-                   labelSize.width, labelSize.height, mLabelPadding.left + mLabelPadding.right, mLabelPadding.top + mLabelPadding.bottom);
-
-    labelSize.width += mLabelPadding.left + mLabelPadding.right;
-    labelSize.height += mLabelPadding.top + mLabelPadding.bottom;
-
-    // Add label size to height or width depending on alignment position
-    if ( horizontalAlignment )
+    if ( visual )
     {
-      size.width += labelSize.width;
-      size.height = std::max(size.height, labelSize.height );
-    }
-    else
-    {
-      size.height += labelSize.height;
-      size.width = std::max(size.width, labelSize.width );
+      visual.GetNaturalSize( labelSize );
+
+      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize labelSize(%f,%f) padding(%f,%f)\n",
+                     labelSize.width, labelSize.height, mLabelPadding.left + mLabelPadding.right, mLabelPadding.top + mLabelPadding.bottom);
+
+      labelSize.width += mLabelPadding.left + mLabelPadding.right;
+      labelSize.height += mLabelPadding.top + mLabelPadding.bottom;
+
+      // Add label size to height or width depending on alignment position
+      if ( horizontalAlignment )
+      {
+        size.width += labelSize.width;
+        size.height = std::max(size.height, labelSize.height );
+      }
+      else
+      {
+        size.height += labelSize.height;
+        size.width = std::max(size.width, labelSize.width );
+      }
     }
   }
 
@@ -809,24 +846,17 @@ Vector3 Button::GetNaturalSize()
 void Button::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnSetResizePolicy\n");
-
-  if ( policy != ResizePolicy::USE_NATURAL_SIZE || policy != ResizePolicy::FIT_TO_CHILDREN  )
-  {
-    if ( mLabel )
-    {
-      // todo Can't set Text Label to USE_ASSIGNED_SIZE as causes a relayout in it whilst doing a relayout = error
-      //mLabel.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
-    }
-  }
-
   RelayoutRequest();
 }
+
+/**
+ * Visuals are sized and positioned in this function.
+ * Whilst the control has it's size negotiated it has to size it's visuals explicitly here.
+ */
 
 void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout targetSize(%f,%f) ptr(%p) state[%d]\n", size.width, size.height, this, mButtonState );
-
-  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
 
   Toolkit::Visual::Base currentVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
 
@@ -839,7 +869,7 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Padding foregroundVisualPadding = Padding(0.0f, 0.0f, 0.0f, 0.0f );
   Padding labelVisualPadding = Padding(0.0f, 0.0f, 0.0f, 0.0f );
 
-  if ( mLabel )
+  if ( mTextStringSetFlag )
   {
     DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Label padding setting padding:%f,%f,%f,%f\n", mLabelPadding.y, mLabelPadding.x, mLabelPadding.width,mLabelPadding.height );
     labelVisualPadding = mLabelPadding;
@@ -859,6 +889,10 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout visualAndPaddingSize(%f,%f)\n", visualAndPaddingSize.width, visualAndPaddingSize.height);
 
+  // Text Visual should take all space available after foreground visual size and all padding is considered.
+  // Remaining Space priority, Foreground padding, foreground visual, Text padding then Text visual.
+  Size remainingSpaceForText = Size::ZERO;
+
   switch ( mTextLabelAlignment )
   {
     case BEGIN :
@@ -869,6 +903,9 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       labelPosition.x = labelVisualPadding.x;
       labelPosition.y = labelVisualPadding.top;
+
+      remainingSpaceForText.width = size.width - visualAndPaddingSize.width - labelVisualPadding.x - labelVisualPadding.y;
+      remainingSpaceForText.height = size.height - labelVisualPadding.top - labelVisualPadding.bottom;
       break;
     }
     case END :
@@ -879,6 +916,9 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       labelPosition.x = visualAndPaddingSize.width + labelVisualPadding.x;
       labelPosition.y = labelVisualPadding.top;
+
+      remainingSpaceForText.width = size.width - visualAndPaddingSize.width - labelVisualPadding.x - labelVisualPadding.y;
+      remainingSpaceForText.height = size.height - labelVisualPadding.top - labelVisualPadding.bottom;
       break;
     }
     case TOP :
@@ -889,6 +929,10 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       labelPosition.x = labelVisualPadding.left;
       labelPosition.y = labelVisualPadding.top;
+
+      remainingSpaceForText.width = size.width - labelVisualPadding.x - labelVisualPadding.y;
+      remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.top - labelVisualPadding.bottom;
+
       break;
     }
     case BOTTOM :
@@ -899,6 +943,10 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       labelPosition.x = labelVisualPadding.left;
       labelPosition.y = visualAndPaddingSize.height + labelVisualPadding.top;
+
+      remainingSpaceForText.width = size.width - labelVisualPadding.x - labelVisualPadding.y;
+      remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.top - labelVisualPadding.bottom;
+
       break;
     }
   }
@@ -917,44 +965,43 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if ( currentVisual )
   {
-      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Setting visual size to(%f,%f)\n", visualSize.width, visualSize.height);
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Setting visual size to(%f,%f)\n", visualSize.width, visualSize.height);
 
-      currentVisual.SetProperty( Toolkit::Visual::DevelProperty::TRANSFORM,
-                                 Dali::Property::Map()
-                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::SIZE, visualSize )
-                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET, visualPosition )
-                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4(1.0f, 1.0f, 1.0f,1.0f) )
-                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                                 .Add( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT, visualAnchorPoint )
-                                );
+    Property::Map visualTransform;
+
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, visualSize )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, visualPosition )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f) )  // Use absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                   .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
+
+    currentVisual.SetTransformAndSize( visualTransform, size );
   }
 
-  if ( mLabel )
+  if ( mTextStringSetFlag )
   {
-    // When Text visual size can be set, determine the size here.
-    // Text Visual should take all space available after foreground visual size and all padding is considered.
-    // Remaining Space priority, Foreground padding, foreground visual, Text padding then Text visual.
+    Toolkit::Visual::Base textVisual = GetVisual( Toolkit::Button::Property::LABEL ); // No need to search for Label visual if no text set.
 
-    Size remainingSpaceForText = Size::ZERO;
-    remainingSpaceForText.width = size.width - visualAndPaddingSize.width - labelVisualPadding.x - labelVisualPadding.y;
-    remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.width - labelVisualPadding.height;
-
-    if ( !currentVisual )
+    if ( textVisual )
     {
-      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Only Text\n");
+      if ( !currentVisual )
+      {
+        DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Only Text\n");
+        labelPosition.x = labelVisualPadding.left;
+        labelPosition.y = labelVisualPadding.height;
+      }
 
-      // Center Text if no foreground visual
-      Size labelNaturalSize = Vector2( mLabel.GetNaturalSize() );
+      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout text Size(%f,%f) text Position(%f,%f) \n", remainingSpaceForText.width, remainingSpaceForText.height, labelPosition.x, labelPosition.y);
 
-      // A Text visual will take up all the remainingSpaceForText, for now TextLabel natural size needed for positioning.
-      labelPosition.x = labelVisualPadding.left + remainingSpaceForText.width*0.5 - labelNaturalSize.width *0.5;
-      labelPosition.y = labelVisualPadding.height + remainingSpaceForText.height*0.5 - labelNaturalSize.height *0.5;
+      Property::Map textVisualTransform;
+      textVisualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, remainingSpaceForText)
+                         .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, labelPosition )
+                         .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f,1.0f ) ) // Use absolute size
+                         .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                         .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
+
+      textVisual.SetTransformAndSize( textVisualTransform, size );
     }
-
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout text Size(%f,%f) text Position(%f,%f) \n", remainingSpaceForText.width, remainingSpaceForText.height, labelPosition.x, labelPosition.y);
-
-    mLabel.SetPosition( labelPosition.x, labelPosition.y );
-    container.Add( mLabel, remainingSpaceForText ); // Currently a TextLabel is used and size can not be set here.
   }
 
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout << \n");
@@ -962,7 +1009,7 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void Button::OnTap(Actor actor, const TapGesture& tap)
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnTap\n" );
+  // Prevents Parent getting a tap event
 }
 
 void Button::SetUpTimer( float delay )
@@ -1139,19 +1186,20 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
       case Toolkit::Button::Property::LABEL_TEXT:
       {
         DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::LABEL_TEXT instead use Button::Property::LABEL\n", __FUNCTION__);
-        Property::Map labelTextProperty;
-        labelTextProperty.Insert( "text", value.Get< std::string >() );
-        GetImplementation( button ).SetupLabel( labelTextProperty );
+        GetImplementation( button ).SetLabelText(value.Get< std::string >() );
         break;
       }
 
       case Toolkit::Button::Property::LABEL:
       {
         // Get a Property::Map from the property if possible.
-        Property::Map setPropertyMap;
-        if( value.Get( setPropertyMap ) )
+        Property::Map* setPropertyMap = value.GetMap();
+        if( setPropertyMap )
         {
-          GetImplementation( button ).SetupLabel( setPropertyMap );
+          Property::Map textVisualProperties;
+          GetImplementation( button ).MergeLabelProperties( *setPropertyMap, textVisualProperties );
+          GetImplementation( button ).CreateVisualsForComponent( index, textVisualProperties, DepthIndex::CONTENT );
+          GetImplementation( button ).RelayoutRequest();
         }
         break;
       }
@@ -1234,6 +1282,24 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
+      case Toolkit::Button::Property::UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::LABEL:
+      {
+        Property::Map visualProperty;
+        if ( GetImplementation( button ).GetPropertyMapForVisual( propertyIndex, visualProperty ) )
+        {
+          value = visualProperty;
+        }
+        break;
+      }
+
       case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
         value = GetImplementation( button ).GetUnselectedColor();
@@ -1249,19 +1315,6 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
       case Toolkit::Button::Property::LABEL_TEXT:
       {
         value = GetImplementation( button ).GetLabelText();
-        break;
-      }
-
-      case Toolkit::Button::Property::LABEL:
-      {
-        Property::Map emptyMap;
-        value = emptyMap;
-        break;
-      }
-
-      case Toolkit::Button::Property::LABEL_STRUT_LENGTH:
-      {
-        value = GetImplementation( button ).GetLabelStrutLength();
         break;
       }
 
@@ -1418,6 +1471,7 @@ void Button::SetDisabledSelectedImage( const std::string& filename )
   }
 }
 
+// Used by Deprecated Properties which don't use the Visual Property maps for setting and getting
 std::string Button::GetUrlForImageVisual( const Property::Index index ) const
 {
   Toolkit::Visual::Base visual = GetVisual( index );

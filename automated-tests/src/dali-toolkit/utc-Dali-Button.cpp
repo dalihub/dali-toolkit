@@ -27,6 +27,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -473,6 +476,10 @@ int UtcDaliButtonSetLabelStringP(void)
   ToolkitTestApplication application;
 
   Button button = PushButton::New();
+  button.SetProperty( Toolkit::Button::Property::LABEL,
+                      Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                                     .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                     );
 
   button.SetLabelText( "Button Label" );
 
@@ -489,6 +496,11 @@ int UtcDaliButtonSetLabelPropertyP(void)
 
   Button button = PushButton::New();
 
+  button.SetProperty( Toolkit::Button::Property::LABEL,
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                                       .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                     );
+
   button.SetProperty( Button::Property::LABEL_TEXT, TEST_LABEL1 );
 
   std::string labelText = button.GetProperty<std::string>( Button::Property::LABEL_TEXT );
@@ -496,8 +508,10 @@ int UtcDaliButtonSetLabelPropertyP(void)
   DALI_TEST_EQUALS( labelText, TEST_LABEL1,  TEST_LOCATION );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Toolkit::TextLabel::Property::TEXT,  TEST_LABEL2 );
-  propertyMap.Insert( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE);
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::DevelVisual::TEXT );
+  propertyMap.Insert( Toolkit::TextVisual::Property::TEXT,  TEST_LABEL2 );
+  propertyMap.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, Color::BLUE );
+  propertyMap.Insert( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
   button.SetProperty( Button::Property::LABEL, propertyMap );
 
   labelText = button.GetProperty<std::string>( Button::Property::LABEL_TEXT );
@@ -1174,6 +1188,7 @@ int UtcDaliButtonSetImagesWithDeprecatedProperties(void)
   tet_infoline(" UtcDaliButtonSetImagesWithDeprecatedProperties");
 
   PushButton pushButton = PushButton::New();
+
   Stage::GetCurrent().Add( pushButton );
 
   Property::Map propertyMap;

@@ -211,7 +211,13 @@
     {
       "initialAutoRepeatingDelay":2.0,
       "nextAutoRepeatingDelay":0.9,
-      "labelStrutLength":12
+      "label":
+       {
+         "visualType": "TEXT",
+         "horizontalAlignment": "CENTER",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       }
       // Note: Visuals added to Button will be used in all derived buttons unless overridden.
     },
     "PushButton":

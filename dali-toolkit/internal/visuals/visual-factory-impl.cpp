@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -63,6 +64,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, TEXT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
