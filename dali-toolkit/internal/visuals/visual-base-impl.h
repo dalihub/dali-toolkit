@@ -221,24 +221,6 @@ protected:
    */
   bool IsFromCache() const;
 
-protected:
-  /**
-   * @brief Called by SetProperty(). To be overriden by derived clases in order to set properties.
-   *
-   * @param [in] index The index of the property.
-   * @param [in] propertyValue The new value of the property.
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue ) = 0;
-
-  /**
-   * @brief Called by GetProperty(). To be overriden by derived classes in order to retrieve properties.
-   *
-   * @param [in] index The index of the property.
-   *
-   * @return The property value.
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index ) = 0;
-
 private:
 
   // Undefined

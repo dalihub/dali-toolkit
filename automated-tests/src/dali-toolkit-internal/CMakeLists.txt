@@ -19,7 +19,6 @@ SET(TC_SOURCES
  utc-Dali-Text-Layout.cpp
  utc-Dali-Text-Controller.cpp
  utc-Dali-VisualFactoryResolveUrl.cpp
- utc-Dali-Visuals.cpp
  utc-Dali-Text-Markup.cpp
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp

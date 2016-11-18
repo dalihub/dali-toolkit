@@ -124,21 +124,19 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
   /**
-   *@copydoc Visual::Base::DoSetProperty
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @copydoc Visual::Base::DoGetProperty
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
-
-  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   virtual void OnSetTransform();
 
 private:
+
+  /**
+   * Set the individual property to the given value
+   * @param[in] index The index key used to reference this value within the initial
+   * property map.
+   * @param[in] propertyValue The value to set
+   */
+  void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
 
   /**
    * @brief Creates the text's renderer.
