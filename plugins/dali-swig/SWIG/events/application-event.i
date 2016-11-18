@@ -927,7 +927,7 @@
       }
     }
 
-    private static  Application instance; // singleton
+    private static Application _instance; // singleton
 
     public delegate void InitDelegate();
 
@@ -984,6 +984,14 @@
       //	instance.InitDelegate();
     }
 
+    public static Application Instance
+    {
+       get
+       {
+            return _instance;
+       }
+    }
+
     public static Application GetApplicationFromPtr(global::System.IntPtr cPtr) {
       Application ret = new Application(cPtr, false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -999,11 +1007,13 @@
     }
 
     public static Application NewApplication() {
-      return NewApplication("",Application.WINDOW_MODE.OPAQUE);
+     _instance = NewApplication("", Application.WINDOW_MODE.OPAQUE);
+     return _instance;
     }
 
     public static Application NewApplication(string stylesheet) {
-      return NewApplication(stylesheet, Application.WINDOW_MODE.OPAQUE);
+      _instance = NewApplication(stylesheet, Application.WINDOW_MODE.OPAQUE);
+      return _instance;
     }
 
     public static Application NewApplication(string stylesheet, Application.WINDOW_MODE windowMode) {
@@ -1014,10 +1024,19 @@
       // we've got an application now connect the signals
       ret.SetupDelegates();
       // set the singleton
-
+      _instance = ret;
       return ret;
     }
 
+    public bool AddIdle(System.Delegate func) {
+      System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func);
+      System.IntPtr ip2 = NDalicManualPINVOKE.MakeCallback(new System.Runtime.InteropServices.HandleRef(this, ip));
+
+      bool ret = NDalicPINVOKE.Application_AddIdle(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip2));
+
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
 
     %}
     %enddef
