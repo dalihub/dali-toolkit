@@ -14,4 +14,3 @@ namespace FirstScreen
         void FocusAnimation(View parentItem, Vector3 itemSize, float duration, FocusEffectDirection direction);
     }
 }
-
