@@ -987,16 +987,25 @@ int UtcDaliButtonSetButtonImageP(void)
 
   try
   {
-    ResourceImage image1 = ResourceImage::New( "TestImage.jpg");
+    ResourceImage image1 = ResourceImage::New( TEST_IMAGE_ONE );
     button.SetButtonImage( image1 );
 
     Property::Value value = button.GetProperty(Button::Property::UNSELECTED_STATE_IMAGE );
-    DALI_TEST_CHECK( value.Get<std::string>() == "TestImage.jpg" );
+    DALI_TEST_CHECK( value.Get<std::string>() == TEST_IMAGE_ONE );
   }
   catch(...)
   {
     DALI_TEST_CHECK( false );
   }
+
+  std::string imageUrl;
+
+  Dali::Actor actor = button.GetButtonImage();
+
+  Toolkit::ImageView imageView = Toolkit::ImageView ::DownCast( actor );
+
+  tet_infoline(" UtcDaliButtonSetButtonImageP Ensure an ImageView is returned\n");
+  DALI_TEST_CHECK ( imageView )
 
   END_TEST;
 }
@@ -1009,7 +1018,7 @@ int UtcDaliButtonSetButtonImageN(void)
 
   try
   {
-    ResourceImage image1 = ResourceImage::New( "TestImage.jpg");
+    ResourceImage image1 = ResourceImage::New( TEST_IMAGE_ONE );
     button.SetButtonImage( image1 );
 
     DALI_TEST_CHECK( false );
@@ -1033,13 +1042,21 @@ int UtcDaliButtonSetSelectedImageWithImageP(void)
   try
   {
     button.SetSelectedImage( image1 );
-    Property::Value value = button.GetProperty(Button::Property::SELECTED_STATE_IMAGE );
+    Property::Value value = button.GetProperty( Button::Property::SELECTED_STATE_IMAGE );
     DALI_TEST_CHECK( value.Get<std::string>() == TEST_IMAGE_ONE );
   }
   catch(...)
   {
     DALI_TEST_CHECK( false );
   }
+
+  std::string imageUrl;
+
+  Dali::Actor actor = button.GetSelectedImage();
+
+  Toolkit::ImageView imageView = Toolkit::ImageView::DownCast( actor );
+
+  tet_infoline(" UtcDaliButtonSetSelectedImageWithImageP Ensure an ImageView is returned\n");
 
   END_TEST;
 }

@@ -253,32 +253,14 @@ void Button::SetButtonImage( Image image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetButtonImage() is deprecated and will be removed from next release. Use Styling file instead.\n" );
 
-  Dali::ResourceImage resourceImage = Dali::ResourceImage::DownCast( image );
-
-  std::string imageUrl;
-
-  if ( resourceImage )
-  {
-    imageUrl = resourceImage.GetUrl();
-  }
-
-  Dali::Toolkit::GetImplementation( *this ).SetUnselectedImage( imageUrl );
+  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( image );
 }
 
 void Button::SetSelectedImage( Image image )
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetSelectedImage() is deprecated and will be removed from next release. Use Styling file instead.\n" );
 
-  Dali::ResourceImage resourceImage = Dali::ResourceImage::DownCast( image );
-
-  std::string imageUrl;
-
-  if ( resourceImage )
-  {
-    imageUrl = resourceImage.GetUrl();
-  }
-
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageUrl );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
 }
 
 Actor Button::GetButtonImage() const

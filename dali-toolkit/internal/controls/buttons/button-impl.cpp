@@ -519,7 +519,7 @@ void Button::ButtonUp()
 
     if( mTogglableButton ) // Button up will change state
     {
-      OnToggleReleased(); // Derived toggle buttons can override this to provide custom behaviour
+      validButtonAction = OnToggleReleased(); // Derived toggle buttons can override this to provide custom behaviour
     }
     else
     {
@@ -825,6 +825,8 @@ void Button::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimen
 void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout targetSize(%f,%f) ptr(%p) state[%d]\n", size.width, size.height, this, mButtonState );
+
+  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
 
   Toolkit::Visual::Base currentVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
 
@@ -1339,13 +1341,13 @@ const Vector4 Button::GetSelectedColor() const
 
 void Button::SetAnimationTime( float animationTime )
 {
-  // Used by depreciated API
+  // Used by deprecated API
   mAnimationTime = animationTime;
 }
 
 float Button::GetAnimationTime() const
 {
-  // Used by depreciated API
+  // Used by deprecated API
   return mAnimationTime;
 }
 
@@ -1416,7 +1418,7 @@ void Button::SetDisabledSelectedImage( const std::string& filename )
   }
 }
 
-std::string Button::GetUrlForImageVisual( Property::Index index )
+std::string Button::GetUrlForImageVisual( const Property::Index index ) const
 {
   Toolkit::Visual::Base visual = GetVisual( index );
   std::string result;
@@ -1437,16 +1439,50 @@ std::string Button::GetUrlForImageVisual( Property::Index index )
 
 // Below functions DEPRECATED_1_0.50 - Return empty Actors
 
+namespace
+{
+std::string GetUrlFromImage( Image& image )
+{
+  ResourceImage resourceImage = ResourceImage::DownCast( image );
+
+  std::string imageUrl;
+
+  if ( resourceImage )
+  {
+    imageUrl = resourceImage.GetUrl();
+  }
+  return imageUrl;
+}
+
+} // namespace
+
+
+void Button::SetButtonImage( Image image )
+{
+  DALI_LOG_WARNING("Button::SetButtonImage @DEPRECATED_1_0.50\n");
+  SetUnselectedImage( GetUrlFromImage( image ) );
+}
+
+void Button::SetSelectedImage( Image image )
+{
+  DALI_LOG_WARNING("Button::SetSelectedImage @DEPRECATED_1_0.50\n");
+  SetSelectedImage( GetUrlFromImage( image ) );
+}
+
 Actor Button::GetButtonImage() const
 {
-  DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50 Returning empty Actor \n");
-  return Actor();;
+  DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50\n");
+  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::Button::Property::UNSELECTED_VISUAL ) );
+
+  return imageView;
 }
 
 Actor Button::GetSelectedImage() const
 {
-  DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50 Returning empty Actor \n");
-  return Actor();
+  DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50\n");
+  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::Button::Property::SELECTED_VISUAL ) );
+
+  return imageView;
 }
 
 } // namespace Internal

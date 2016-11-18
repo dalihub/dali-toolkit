@@ -107,8 +107,8 @@
     {
       "label":
       {
-        "pointSize":8,
-        "fontStyle":{"weight":"light"}
+        "visualType":"TEXT",
+        "pointSize":8
       }
     },
     "TextSelectionToolbar":

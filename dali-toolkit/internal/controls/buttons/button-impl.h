@@ -27,10 +27,6 @@
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-//#if defined(DEBUG_ENABLED)
-//  Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_BUTTON_CONTROL");
-//#endif
-
 namespace Dali
 {
 
@@ -220,47 +216,22 @@ public: // Deprecated API
 
   /**
    * @deprecated Sets the unselected image with an Actor.
-   * @param[in] image The Actor to use.
+   * @param[in] image The Image to use.
    */
-  void SetUnselectedImage( Actor image );
+  void SetButtonImage( Image image );
 
   /**
    * @deprecated Sets the selected image with an Actor.
-   * @param[in] image The Actor to use.
+   * @param[in] image The Image to use.
    */
-  void SetSelectedImage( Actor image );
-
-  /**
-   * @deprecated Sets the selected background image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetSelectedBackgroundImage( Actor image );
-
-  /**
-   * @deprecated Sets the disabled image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetDisabledImage( Actor image );
-
-  /**
-   * @deprecated Sets the disabled selected image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetDisabledSelectedImage( Actor image );
-
-  /**
-   * @deprecated Sets the disabled background image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetDisabledBackgroundImage( Actor image );
+  void SetSelectedImage( Image image );
 
   /**
    * @Gets url of a image visual, used by GetProperty but for deprecated Properties
    * @param[in] index Visual index of url required
    * @return filename for the corresponding visual
    */
-  std::string GetUrlForImageVisual( Property::Index index );
-
+  std::string GetUrlForImageVisual( const Property::Index index ) const;
 
   /**
    * @copydoc Dali::Toolkit::Button::GetButtonImage
