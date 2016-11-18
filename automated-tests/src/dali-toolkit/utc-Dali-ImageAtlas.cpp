@@ -207,12 +207,7 @@ int UtcDaliImageAtlasUploadP(void)
   Vector4 textureRect3;
   atlas.Upload( textureRect3, gImage_128_RGB, ImageDimensions(128, 128) );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 3 );// waiting until all three images are loaded
-
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -262,8 +257,6 @@ int UtcDaliImageAtlasUploadWithObserver01(void)
   TestApplication application;
   ImageAtlas atlas = ImageAtlas::New( 200, 200 );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
 
   gCountOfTestFuncCall = 0;
   TestUploadObserver uploadObserver;
@@ -276,8 +269,7 @@ int UtcDaliImageAtlasUploadWithObserver01(void)
   atlas.Upload( textureRect3, gImage_128_RGB, ImageDimensions(128, 128), FittingMode::DEFAULT, true, &uploadObserver );
 
   // waiting until all three images are loaded and uploaded to atlas
-  eventTrigger->WaitingForTrigger( 3 );
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
@@ -291,9 +283,6 @@ int UtcDaliImageAtlasUploadWithObserver02(void)
 {
   TestApplication application;
   ImageAtlas atlas = ImageAtlas::New( 200, 200 );
-
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  CallbackBase* callback = eventTrigger->GetCallback();
 
   gCountOfTestFuncCall = 0;
   TestUploadObserver* uploadObserver = new TestUploadObserver;
@@ -309,8 +298,8 @@ int UtcDaliImageAtlasUploadWithObserver02(void)
   delete uploadObserver;
 
  // waiting until all three images are loaded and uploaded to atlas
-  eventTrigger->WaitingForTrigger( 3 );
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
+
   application.Render(RENDER_FRAME_INTERVAL);
   application.SendNotification();
 
@@ -382,20 +371,19 @@ int UtcDaliImageAtlasImageView(void)
 
   ImageView imageView1 = ImageView::New( gImage_34_RGBA, ImageDimensions(34, 34) );
   ImageView imageView2 = ImageView::New( gImage_50_RGBA, ImageDimensions(50, 50) );
+
+  // ImageView doesn't do size negotiation properly: it only listens to OnSizeSet:
+  imageView1.SetSize( 100, 100 );
+  imageView2.SetSize( 100, 100 );
+  imageView1.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  imageView2.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+  application.GetPlatform().SetClosestImageSize(  Vector2(34, 34) );
   Stage::GetCurrent().Add( imageView1 );
+  application.GetPlatform().SetClosestImageSize(  Vector2(50, 50) );
   Stage::GetCurrent().Add( imageView2 );
 
-  EventThreadCallback* eventTrigger = EventThreadCallback::Get();
-  while( eventTrigger == NULL) // waiting uintil the ImageAtlas is created by ImageAtlasManager
-  {
-    usleep(10);
-    eventTrigger = EventThreadCallback::Get();
-  }
-  CallbackBase* callback = eventTrigger->GetCallback();
-
-  eventTrigger->WaitingForTrigger( 2 );// waiting until both images are loaded
-
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -426,10 +414,10 @@ int UtcDaliImageAtlasImageView(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
   ImageView imageView3 = ImageView::New( gImage_128_RGB, ImageDimensions(100, 100) );
+  application.GetPlatform().SetClosestImageSize(  Vector2(100, 100) );
   Stage::GetCurrent().Add( imageView3 );
 
-  eventTrigger->WaitingForTrigger( 3 ); // waiting for the third image loaded
-  CallbackBase::Execute( *callback );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);

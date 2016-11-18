@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,21 @@ bool TraceCallStack::FindMethod(std::string method) const
     if( 0 == mCallStack[i].method.compare(method) )
     {
       found = true;
+      break;
+    }
+  }
+  return found;
+}
+
+bool TraceCallStack::FindMethodAndGetParameters(std::string method, std::string& params ) const
+{
+  bool found = false;
+  for( size_t i=0; i < mCallStack.size(); i++ )
+  {
+    if( 0 == mCallStack[i].method.compare(method) )
+    {
+      found = true;
+      params = mCallStack[i].paramList;
       break;
     }
   }

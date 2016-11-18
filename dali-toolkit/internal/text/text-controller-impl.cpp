@@ -75,6 +75,7 @@ EventData::EventData( DecoratorPtr decorator )
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
   mEventQueue(),
   mInputStyleChangedQueue(),
+  mPreviousState( INACTIVE ),
   mState( INACTIVE ),
   mPrimaryCursorPosition( 0u ),
   mLeftSelectionPosition( 0u ),
@@ -1310,6 +1311,7 @@ void Controller::Impl::OnLongPressEvent( const Event& event )
   {
     ChangeState ( EventData::EDITING_WITH_POPUP );
     mEventData->mDecoratorUpdated = true;
+    mEventData->mUpdateInputStyle = true;
   }
 }
 

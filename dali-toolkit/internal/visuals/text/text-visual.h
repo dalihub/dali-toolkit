@@ -84,12 +84,7 @@ public: // from Visual::Base
   /**
    * @copydoc Visual::Base::GetHeightForWidth()
    */
-  float GetHeightForWidth( float width ) const;
-
-  /**
-   * @copydoc Visual::Base::GetNaturalSize()
-   */
-  virtual void SetSize( const Vector2& size );
+  virtual float GetHeightForWidth( float width ) const;
 
   /**
    * @copydoc Visual::Base::GetNaturalSize()
@@ -141,6 +136,11 @@ protected:
    * @copydoc Visual::Base::DoGetProperty
    */
   virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
+
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
 
 private:
 

@@ -16,19 +16,24 @@ dali_swig_dir = ../../../../plugins/dali-swig
 
 BUILT_SOURCES = \
           $(dali_swig_dir)/automatic/cpp/dali_wrap.cpp \
-          $(dali_swig_dir)/automatic/cpp/dali_wrap.h
+          $(dali_swig_dir)/automatic/cpp/dali_wrap.h \
+          $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.cpp \
+          $(dali_swig_dir)/manual/cpp/view-wrapper-impl-wrap.cpp
 
-all-local: 
+all-local:
 gbs-local: libNDalic.so NDali.dll
 
-libNDalic.so: $(dali_swig_dir)/automatic/cpp/dali_wrap.o $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o
-	$(CXX) -shared $(dali_swig_dir)/automatic/cpp/dali_wrap.o $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o -o $(dali_swig_dir)/libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
+libNDalic.so: $(dali_swig_dir)/automatic/cpp/dali_wrap.o $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.o $(dali_swig_dir)/manual/cpp/view-wrapper-impl-wrap.o
+	$(CXX) -shared $(dali_swig_dir)/automatic/cpp/dali_wrap.o $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.o $(dali_swig_dir)/manual/cpp/view-wrapper-impl-wrap.o -o $(dali_swig_dir)/libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
 
 $(dali_swig_dir)/automatic/cpp/dali_wrap.o: $(BUILT_SOURCES)
 	$(CXX) -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) $(dali_swig_dir)/automatic/cpp/dali_wrap.cpp -o $(dali_swig_dir)/automatic/cpp/dali_wrap.o
 
-$(dali_swig_dir)/manual/cpp/dali_wrap_manual.o: $(BUILT_SOURCES)
-	$(CXX) -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.cpp -o $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o
+$(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.o: $(BUILT_SOURCES)
+	$(CXX) -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.cpp -o $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.o
+
+$(dali_swig_dir)/manual/cpp/view-wrapper-impl-wrap.o: $(BUILT_SOURCES)
+	$(CXX) -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) $(dali_swig_dir)/manual/cpp/view-wrapper-impl-wrap.cpp -o $(dali_swig_dir)/manual/cpp/view-wrapper-impl-wrap.o
 
 NDali.dll: $(BUILT_SOURCES)
 #	mcs -nologo -target:library -out:$(dali_swig_dir)/NDali.dll $(dali_swig_dir)/automatic/csharp/*.cs $(dali_swig_dir)/manual/csharp/*.cs

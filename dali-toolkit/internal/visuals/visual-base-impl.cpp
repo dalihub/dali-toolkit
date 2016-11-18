@@ -84,6 +84,13 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
   DoSetProperties( propertyMap );
 }
 
+void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
+{
+  mImpl->mControlSize = controlSize;
+  mImpl->mTransform.SetPropertyMap( transform );
+  OnSetTransform();
+}
+
 void Visual::Base::SetName( const std::string& name )
 {
   mImpl->mName = name;
@@ -92,16 +99,6 @@ void Visual::Base::SetName( const std::string& name )
 const std::string& Visual::Base::GetName()
 {
   return mImpl->mName;
-}
-
-void Visual::Base::SetSize( const Vector2& size )
-{
-  mImpl->mSize = size;
-}
-
-const Vector2& Visual::Base::GetSize() const
-{
-  return mImpl->mSize;
 }
 
 float Visual::Base::GetHeightForWidth( float width ) const
@@ -130,15 +127,18 @@ float Visual::Base::GetDepthIndex() const
 
 void Visual::Base::SetOnStage( Actor& actor )
 {
-  // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
-  // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
-  DoSetOnStage( actor );
-
-  if( mImpl->mRenderer )
+  if( !IsOnStage() )
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-    mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+    // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
+    // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
+    DoSetOnStage( actor );
+
+    if( mImpl->mRenderer )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+      mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+      mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+    }
   }
 }
 
@@ -214,11 +214,10 @@ void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Propert
   {
     if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
     {
-      Property::Map* map = propertyValue.GetMap();
-      if( map )
+      Property::Map* transformMap = propertyValue.GetMap();
+      if( transformMap )
       {
-        mImpl->mTransform.SetPropertyMap( *map );
-        OnSetTransform();
+        SetTransformAndSize( *transformMap, mImpl->mControlSize );
       }
     }
 

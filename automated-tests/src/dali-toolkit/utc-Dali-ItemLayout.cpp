@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -290,6 +290,9 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
   float flickSpeedFactor = layout->GetFlickSpeedFactor();
 
   DALI_TEST_CHECK(flickSpeedFactor != 0.0f);
+
+  // White box test here: -( itemId / NoOfItemsPerRow(default 4) ) * NoOfItemsPerRow
+  DALI_TEST_EQUALS( -1.0f, gridLayout->GetItemScrollToPosition( 1 ), TEST_LOCATION );
 
   ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);

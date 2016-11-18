@@ -69,7 +69,8 @@ public:
     IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
     SVG_SHADER,
-    SHADER_TYPE_MAX = SVG_SHADER
+    WIREFRAME_SHADER,
+    SHADER_TYPE_MAX = WIREFRAME_SHADER
   };
 
   /**
@@ -81,7 +82,8 @@ public:
     BORDER_GEOMETRY,
     NINE_PATCH_GEOMETRY,
     NINE_PATCH_BORDER_GEOMETRY,
-    GEOMETRY_TYPE_MAX = NINE_PATCH_BORDER_GEOMETRY
+    WIREFRAME_GEOMETRY,
+    GEOMETRY_TYPE_MAX = WIREFRAME_GEOMETRY
   };
 
 public:
@@ -171,16 +173,6 @@ public:
    * @return True if the renderer is no longer used anywhere, false otherwise
    */
   bool CleanRendererCache( const std::string& key );
-
-  /**
-   * @brief Cache the wireframe renderer
-   */
-  void CacheWireframeRenderer( Renderer& renderer );
-
-  /**
-   * @brief Request the wireframe renderer;
-   */
-  Renderer GetWireframeRenderer();
 
   /**
    * Get the image atlas manager.

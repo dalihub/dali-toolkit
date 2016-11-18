@@ -84,6 +84,8 @@ public:
   void CustomSlot1( Actor actor );
 
   bool mCustomSlot1Called;
+  typedef std::vector<Property::Index> VisualIndices;
+  VisualIndices mRegisteredVisualIndices;
 
 protected:
 
@@ -135,6 +137,7 @@ private: // From CustomActorImpl
   virtual bool OnKeyEvent(const KeyEvent& event);
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
 public:
 

@@ -64,6 +64,7 @@
 #include <dali-toolkit/devel-api/builder/builder.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
@@ -172,10 +173,7 @@ using namespace Dali;
 using namespace Dali::Toolkit;
 %}
 
-//%feature("director") Dali::Internal::CustomActorImpl;
-//%feature("notabstract") Dali::Internal::CustomActorImpl;
-//%feature("director") Dali::Toolkit::Internal::Control;
-//%feature("notabstract") Dali::Toolkit::Internal::Control;
+%feature("director") Dali::Toolkit::Internal::Control;
 %feature("notabstract") Dali::Toolkit::FixedRuler;
 %feature("notabstract") Dali::Toolkit::DefaultRuler;
 

@@ -162,22 +162,6 @@ TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache )
   return new TextVisual( factoryCache );
 }
 
-void TextVisual::SetSize( const Vector2& size )
-{
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
-
-  if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) ) ||
-      !mRenderer )
-  {
-    if( !mRenderer )
-    {
-      mRenderer = Text::Backend::Get().NewRenderer( mRenderingBackend );
-    }
-
-    RenderText();
-  }
-}
-
 float TextVisual::GetHeightForWidth( float width ) const
 {
   return mController->GetHeightForWidth( width );
@@ -766,6 +750,26 @@ Dali::Property::Value TextVisual::DoGetProperty( Dali::Property::Index index )
   }
 
   return value;
+}
+
+void TextVisual::OnSetTransform()
+{
+  Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
+
+  // Note, the direction should come from the layout of the parent control
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( visualSize );
+
+  if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) ) ||
+      !mRenderer )
+  {
+    if( !mRenderer )
+    {
+      mRenderer = Text::Backend::Get().NewRenderer( mRenderingBackend );
+    }
+    RenderText();
+  }
 }
 
 void TextVisual::RenderText()

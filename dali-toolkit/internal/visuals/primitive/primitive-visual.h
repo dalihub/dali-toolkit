@@ -112,11 +112,6 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::Base::SetSize
-   */
-  virtual void SetSize( const Vector2& size );
-
-  /**
    * @copydoc Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize );

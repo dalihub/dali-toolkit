@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_IMAGE_LOAD_THREAD_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,8 @@ public:
    * Add a task in to the loading queue
    *
    * @param[in] task The task added to the queue.
+   *
+   * @note This class takes ownership of the task object
    */
   void AddTask( LoadingTask* task );
 
