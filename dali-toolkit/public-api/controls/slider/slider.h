@@ -69,6 +69,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Slider class.
+     * @SINCE_1_1.39
+     */
     enum
     {
 
