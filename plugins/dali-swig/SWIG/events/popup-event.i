@@ -288,6 +288,274 @@ using System.Runtime.InteropServices;
         _popUpHiddenEventHandler(this, e);
      }
   }
+
+/* Properties earlier added by Ruby Script */
+
+  public Dali.Property.Map Title
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Popup.Property.TITLE).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TITLE, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map Content
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Popup.Property.CONTENT).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.CONTENT, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map Footer
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Popup.Property.FOOTER).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.FOOTER, new Dali.Property.Value( value ) );
+    }
+  }
+  public string DisplayState
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.DISPLAY_STATE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.DISPLAY_STATE, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool TouchTransparent
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Popup.Property.TOUCH_TRANSPARENT).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TOUCH_TRANSPARENT, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool TailVisibility
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Popup.Property.TAIL_VISIBILITY).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TAIL_VISIBILITY, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Position TailPosition
+  {
+    get
+    {
+      Vector3 temp = new Vector3(0.0f,0.0f,0.0f);
+      GetProperty( Popup.Property.TAIL_POSITION).Get(  temp );
+      Dali.CSharp.Position ret = new Dali.CSharp.Position(temp.x, temp.y, temp.z);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TAIL_POSITION, new Dali.Property.Value( value ) );
+    }
+  }
+  public string ContextualMode
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.CONTEXTUAL_MODE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.CONTEXTUAL_MODE, new Dali.Property.Value( value ) );
+    }
+  }
+  public float AnimationDuration
+  {
+    get
+    {
+      float temp = 0.0f;
+      GetProperty( Popup.Property.ANIMATION_DURATION).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.ANIMATION_DURATION, new Dali.Property.Value( value ) );
+    }
+  }
+  public string AnimationMode
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.ANIMATION_MODE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.ANIMATION_MODE, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map EntryAnimation
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Popup.Property.ENTRY_ANIMATION).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.ENTRY_ANIMATION, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map ExitAnimation
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Popup.Property.EXIT_ANIMATION).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.EXIT_ANIMATION, new Dali.Property.Value( value ) );
+    }
+  }
+  public int AutoHideDelay
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( Popup.Property.AUTO_HIDE_DELAY).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.AUTO_HIDE_DELAY, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool BackingEnabled
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( Popup.Property.BACKING_ENABLED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.BACKING_ENABLED, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.CSharp.Color BackingColor
+  {
+    get
+    {
+      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
+      GetProperty( Popup.Property.BACKING_COLOR).Get(  temp );
+      Dali.CSharp.Color ret = new Dali.CSharp.Color(temp.r, temp.g, temp.b, temp.a);
+      return ret;
+    }
+    set
+    {
+      SetProperty( Popup.Property.BACKING_COLOR, new Dali.Property.Value( value ) );
+    }
+  }
+  public string PopupBackgroundImage
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.POPUP_BACKGROUND_IMAGE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.POPUP_BACKGROUND_IMAGE, new Dali.Property.Value( value ) );
+    }
+  }
+  public string TailUpImage
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.TAIL_UP_IMAGE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TAIL_UP_IMAGE, new Dali.Property.Value( value ) );
+    }
+  }
+  public string TailDownImage
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.TAIL_DOWN_IMAGE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TAIL_DOWN_IMAGE, new Dali.Property.Value( value ) );
+    }
+  }
+  public string TailLeftImage
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.TAIL_LEFT_IMAGE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TAIL_LEFT_IMAGE, new Dali.Property.Value( value ) );
+    }
+  }
+  public string TailRightImage
+  {
+    get
+    {
+      string temp;
+      GetProperty( Popup.Property.TAIL_RIGHT_IMAGE).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Popup.Property.TAIL_RIGHT_IMAGE, new Dali.Property.Value( value ) );
+    }
+  }
+
+/* Properties ends */
+
 %}
 %enddef
 

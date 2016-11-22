@@ -366,6 +366,51 @@ public class PageTurnFinishedEventArgs : EventArgs
     return ret;
   }
 
+/* Properties earlier added by Ruby Script */
+
+  public Dali.CSharp.Size PageSize
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PageTurnView.Property.PAGE_SIZE).Get(  temp );
+      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
+      return ret;
+    }
+    set
+    {
+      SetProperty( PageTurnView.Property.PAGE_SIZE, new Dali.Property.Value( value ) );
+    }
+  }
+  public int CurrentPageId
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( PageTurnView.Property.CURRENT_PAGE_ID).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( PageTurnView.Property.CURRENT_PAGE_ID, new Dali.Property.Value( value ) );
+    }
+  }
+  public Vector2 SpineShadow
+  {
+    get
+    {
+      Vector2 temp = new Vector2(0.0f,0.0f);
+      GetProperty( PageTurnView.Property.SPINE_SHADOW).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( PageTurnView.Property.SPINE_SHADOW, new Dali.Property.Value( value ) );
+    }
+  }
+
+/* Properties ends */
+
 %}
 
 %enddef

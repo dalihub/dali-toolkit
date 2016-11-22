@@ -316,7 +316,8 @@ DALI_SIGNAL_1_PARAM( Dali::BaseHandle );
 DALI_SIGNAL_1_PARAM( const Dali::RefObject* );
 
 // Signal< void (const Dali::RenderTask&) >
-DALI_SIGNAL_1_PARAM( const Dali::RenderTask& );
+//DALI_SIGNAL_1_PARAM( const Dali::RenderTask& );
+DALI_SIGNAL_1_PARAM( Dali::RenderTask& );
 
 // Signal< bool ( const Dali::Toolkit::AccessibilityManager& ) >
 DALI_SIGNAL_1_PARAM_RETURN( bool, Dali::Toolkit::AccessibilityManager& );

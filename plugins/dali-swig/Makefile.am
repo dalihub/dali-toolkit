@@ -66,7 +66,6 @@ $(BUILT_SOURCES): SWIG/*.i
 	rm -f automatic/csharp/*.cs
 	$(SWIG) -csharp -c++ -outdir automatic/csharp \
             $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o automatic/cpp/dali_wrap.cpp SWIG/dali.i
-	./property-wrapper.rb
 	./constructor-generator.rb
 
 dist-hook: $(BUILT_SOURCES)

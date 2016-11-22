@@ -114,6 +114,63 @@ public class FinishedEventArgs : EventArgs
     return ret;
   }
 
+/* Properties earlier added by Ruby Script */
+
+  public Dali.Property.Map Video
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( VideoView.Property.VIDEO).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( VideoView.Property.VIDEO, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool Looping
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( VideoView.Property.LOOPING).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( VideoView.Property.LOOPING, new Dali.Property.Value( value ) );
+    }
+  }
+  public bool Muted
+  {
+    get
+    {
+      bool temp = false;
+      GetProperty( VideoView.Property.MUTED).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( VideoView.Property.MUTED, new Dali.Property.Value( value ) );
+    }
+  }
+  public Dali.Property.Map Volume
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( VideoView.Property.VOLUME).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( VideoView.Property.VOLUME, new Dali.Property.Value( value ) );
+    }
+  }
+
+/* Properties ends */
+
 %}
 
 %enddef

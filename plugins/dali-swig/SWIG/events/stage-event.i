@@ -20,6 +20,7 @@
 using System;
 using System.Runtime.InteropServices;
 
+
 %}
 %enddef
 
@@ -524,21 +525,21 @@ public class SceneCreatedEventArgs : EventArgs
      }
   }
 
-  ///< name "Size", type Dali.Size (Stage Size value)
+  ///< name "Size", type Dali.CSharp.Size (Stage Size value)
   //@since 1.0.0
-  public Dali.Size Size
+  public Dali.CSharp.Size Size
   {
      get
      {
         Vector2 ret1 = GetSize();
-        Dali.Size ret= new Size(ret1);
+        Dali.CSharp.Size ret= new Dali.CSharp.Size(ret1.width, ret1.height);
         return ret;
      }
   }
 
-  ///< name "BackgroundColor", type Dali.Color (Stage background color value)
+  ///< name "BackgroundColor", type Dali.CSharp.Color (Stage background color value)
   //@since 1.0.0
-  public Dali.Color BackgroundColor
+  public Dali.CSharp.Color BackgroundColor
   {
      set
      {
@@ -547,7 +548,7 @@ public class SceneCreatedEventArgs : EventArgs
      get
      {
         Vector4 ret1 = GetBackgroundColor();
-        Dali.Color ret = new Color(ret1);
+        Dali.CSharp.Color ret = new Dali.CSharp.Color(ret1.r, ret1.g, ret1.b, ret1.a);
         return ret;
      }
    }
@@ -564,7 +565,37 @@ public class SceneCreatedEventArgs : EventArgs
 
 %enddef
 
+%define DALI_VECTOR4_TO_COLOR_CONVERSION
+%typemap(cstype) (Vector4 color) "Dali.CSharp.Color"
+%typemap(csin,
+         pre=" Vector4 temp$csinput = new Vector4($csinput.R, $csinput.G, $csinput.B, $csinput.A);",
+         cshin="ref $csinput"
+        ) (Vector4 color) "$csclassname.getCPtr(temp$csinput)"
+
+%enddef
+
+%define DALI_CONST_VECTOR3_REF_TO_POSITION_CONVERSION
+%typemap(cstype) (const Vector3& position) "Dali.CSharp.Position"
+%typemap(csin,
+         pre=" Vector3 temp$csinput = new Vector3($csinput.X, $csinput.Y, $csinput.Z);",
+         cshin="ref $csinput"
+        ) (const Vector3& position) "$csclassname.getCPtr(temp$csinput)"
+
+%enddef
+
+%define DALI_CONST_VECTOR3_TO_POSITION_CONVERSION
+%typemap(cstype) (const Vector3) "Dali.CSharp.Position"
+%typemap(csin,
+         pre=" Vector3 temp$csinput = new Vector3($csinput.X, $csinput.Y, $csinput.Z);",
+         cshin="ref $csinput"
+        ) (const Vector3) "$csclassname.getCPtr(temp$csinput)"
+
+%enddef
+
 namespace Dali
 {
   DALI_STAGE_EVENTHANDLER_PARAM( Dali, Stage);
+  DALI_VECTOR4_TO_COLOR_CONVERSION;
+  DALI_CONST_VECTOR3_REF_TO_POSITION_CONVERSION;
+  DALI_CONST_VECTOR3_TO_POSITION_CONVERSION;
 }
