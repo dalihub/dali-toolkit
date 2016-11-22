@@ -293,33 +293,37 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
-        Property::Map map;
+        Property::Map* map;
         if( value.Get( imageUrl ) )
         {
           impl.SetImage( imageUrl, ImageDimensions() );
         }
         // if its not a string then get a Property::Map from the property if possible.
-        else if( value.Get( map ) )
+        else
         {
-          Property::Value* shaderValue = map.Find( Toolkit::VisualProperty::SHADER, CUSTOM_SHADER );
-          // set image only if property map contains image information other than custom shader
-          if( map.Count() > 1u ||  !shaderValue )
+          map = value.GetMap();
+          if( map )
           {
-            impl.SetImage( map );
-          }
-          // the property map contains only the custom shader
-          else if(  impl.mVisual && map.Count() == 1u &&  shaderValue )
-          {
-            Property::Map shaderMap;
-            if( shaderValue->Get( shaderMap ) )
+            Property::Value* shaderValue = map->Find( Toolkit::VisualProperty::SHADER, CUSTOM_SHADER );
+            // set image only if property map contains image information other than custom shader
+            if( map->Count() > 1u ||  !shaderValue )
             {
-              Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
-              visual.SetCustomShader( shaderMap );
-              if( imageView.OnStage() )
+              impl.SetImage( *map );
+            }
+            // the property map contains only the custom shader
+            else if( ( impl.mVisual )&&( map->Count() == 1u )&&( shaderValue ) )
+            {
+              Property::Map* shaderMap = shaderValue->GetMap();
+              if( shaderMap )
               {
-                // force to create new core renderer to use the newly set shader
-                visual.SetOffStage( imageView );
-                visual.SetOnStage( imageView );
+                Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
+                visual.SetCustomShader( *shaderMap );
+                if( imageView.OnStage() )
+                {
+                  // force to create new core renderer to use the newly set shader
+                  visual.SetOffStage( imageView );
+                  visual.SetOnStage( imageView );
+                }
               }
             }
           }
