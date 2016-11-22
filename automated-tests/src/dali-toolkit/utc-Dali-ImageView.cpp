@@ -384,7 +384,7 @@ int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
   END_TEST;
 }
 
-int UtcDaliImageViewAsyncLoadingWithAltasing(void)
+int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
 {
   ToolkitTestApplication application;
 
@@ -393,14 +393,10 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   callStack.Reset();
   callStack.Enable(true);
 
-  application.GetPlatform().SetClosestImageSize(Vector2(34, 34));
-  BitmapLoader::ResetLatestCreated();
   ImageView imageView = ImageView::New( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
 
   // By default, Aysnc loading is used
   // loading is not started if the actor is offStage
-  BitmapLoader loader = BitmapLoader::GetLatestCreated();
-  DALI_TEST_CHECK( !loader );
 
   Stage::GetCurrent().Add( imageView );
   application.SendNotification();
@@ -408,13 +404,7 @@ int UtcDaliImageViewAsyncLoadingWithAltasing(void)
   application.Render(16);
   application.SendNotification();
 
-  // loading started
-  loader = BitmapLoader::GetLatestCreated();
-  DALI_TEST_CHECK( loader );
-
-  loader.WaitForLoading();// waiting until the image to be loaded
-  DALI_TEST_CHECK( loader.IsLoaded() );
-
+  // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   application.SendNotification();
