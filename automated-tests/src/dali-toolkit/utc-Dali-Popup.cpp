@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1430,6 +1430,29 @@ int UtcDaliPopupOnKeyEvent(void)
   application.Render();
 
   DALI_TEST_EQUALS( popup.GetDisplayState(), Popup::HIDDEN, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupSetPopupBackgroundBorderProperty(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Set the background border property of a popup & retrieve it" );
+  Popup popup = Popup::New();
+
+  Rect< int > rect( 40, 30, 20, 10 );
+  tet_infoline( "Ensure value we want to set is different from what is already set" );
+  DALI_TEST_CHECK( rect != popup.GetProperty( Popup::Property::POPUP_BACKGROUND_BORDER ).Get< Rect< int > >() );
+
+  tet_infoline( "Set the property and retrieve it to make sure it's the value we set" );
+  popup.SetProperty( Popup::Property::POPUP_BACKGROUND_BORDER, rect );
+  DALI_TEST_EQUALS( rect, popup.GetProperty( Popup::Property::POPUP_BACKGROUND_BORDER ).Get< Rect< int > >(), TEST_LOCATION );
+
+  tet_infoline( "Set a vector4 as well which should also work" );
+  Vector4 vectorValue( 10.0f, 20.0f, 30.0f, 40.0f );
+  popup.SetProperty( Popup::Property::POPUP_BACKGROUND_BORDER, vectorValue );
+  DALI_TEST_EQUALS( Rect< int >( 10, 20, 30, 40 ), popup.GetProperty( Popup::Property::POPUP_BACKGROUND_BORDER ).Get< Rect< int > >(), TEST_LOCATION );
 
   END_TEST;
 }
