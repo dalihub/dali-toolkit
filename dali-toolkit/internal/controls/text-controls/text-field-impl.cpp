@@ -63,17 +63,17 @@ namespace
 
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_END    },
+  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
+  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
 const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "TOP",    Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_TOP    },
-  { "CENTER", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_CENTER },
-  { "BOTTOM", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_BOTTOM },
+  { "TOP",    Toolkit::Text::Layout::VERTICAL_ALIGN_TOP    },
+  { "CENTER", Toolkit::Text::Layout::VERTICAL_ALIGN_CENTER },
+  { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
 };
 const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
@@ -199,7 +199,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string text = value.Get< std::string >();
+          const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p TEXT %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetText( text );
@@ -210,7 +210,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string text = value.Get< std::string >();
+          const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
@@ -221,7 +221,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string text = value.Get< std::string >();
+          const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_FOCUSED %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
@@ -232,7 +232,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string fontFamily = value.Get< std::string >();
+          const std::string& fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
           impl.mController->SetDefaultFontFamily( fontFamily );
         }
@@ -277,14 +277,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string alignStr = value.Get< std::string >();
+          const std::string& alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
-          LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
-                                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                              alignment ) )
+          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
+          if( Scripting::GetEnumeration< Layout::HorizontalAlignment >( alignStr.c_str(),
+                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                        alignment ) )
           {
             impl.mController->SetHorizontalAlignment( alignment );
           }
@@ -295,14 +295,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string alignStr = value.Get< std::string >();
+          const std::string& alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
-          LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
-          if( Scripting::GetEnumeration< LayoutEngine::VerticalAlignment >( alignStr.c_str(),
-                                                                            VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                            VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                            alignment ) )
+          Layout::VerticalAlignment alignment( Layout::VERTICAL_ALIGN_BOTTOM );
+          if( Scripting::GetEnumeration< Layout::VerticalAlignment >( alignStr.c_str(),
+                                                                      VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                      VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                      alignment ) )
           {
             impl.mController->SetVerticalAlignment( alignment );
           }
@@ -313,12 +313,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector4 textColor = value.Get< Vector4 >();
+          const Vector4& textColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
-          if( impl.mController->GetTextColor() != textColor )
+          if( impl.mController->GetDefaultColor() != textColor )
           {
-            impl.mController->SetTextColor( textColor );
+            impl.mController->SetDefaultColor( textColor );
             impl.mController->SetInputColor( textColor );
             impl.mRenderer.Reset();
           }
@@ -329,7 +329,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector4 textColor = value.Get< Vector4 >();
+          const Vector4& textColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
           if( impl.mController->GetPlaceholderTextColor() != textColor )
@@ -344,7 +344,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector2 shadowOffset = value.Get< Vector2 >();
+          const Vector2& shadowOffset = value.Get< Vector2 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SHADOW_OFFSET %f,%f\n", impl.mController.Get(), shadowOffset.x, shadowOffset.y );
 
           if ( impl.mController->GetShadowOffset() != shadowOffset )
@@ -359,7 +359,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const Vector4 shadowColor = value.Get< Vector4 >();
+          const Vector4& shadowColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SHADOW_COLOR %f,%f,%f,%f\n", impl.mController.Get(), shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a );
 
           if ( impl.mController->GetShadowColor() != shadowColor )
@@ -374,7 +374,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          const Vector4 color = value.Get< Vector4 >();
+          const Vector4& color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
@@ -386,7 +386,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          const Vector4 color = value.Get< Vector4 >();
+          const Vector4& color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
@@ -608,7 +608,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string fontFamily = value.Get< std::string >();
+          const std::string& fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
           impl.mController->SetInputFontFamily( fontFamily );
         }
@@ -791,9 +791,9 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
-                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
+                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
           if( name )
           {
             value = std::string( name );
@@ -803,11 +803,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
       {
-        if( impl.mController )
+        if( impl.mController ) 
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
-                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
+                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
           if( name )
           {
             value = std::string( name );
@@ -819,7 +819,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if ( impl.mController )
         {
-          value = impl.mController->GetTextColor();
+          value = impl.mController->GetDefaultColor();
         }
         break;
       }
@@ -1123,7 +1123,7 @@ void TextField::OnInitialize()
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
-  mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
+  mController->GetLayoutEngine().SetLayout( Layout::Engine::SINGLE_LINE_BOX );
 
   // Enables the text input.
   mController->EnableTextInput( mDecorator );
@@ -1267,7 +1267,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 
   if( mRenderableActor )
   {
-    const Vector2& scrollOffset = mController->GetScrollPosition();
+    const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
 
     mRenderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 

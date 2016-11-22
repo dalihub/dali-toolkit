@@ -17,6 +17,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -63,6 +65,8 @@ const char* const PROPERTY_NAME_EMBOSS = "emboss";
 const char* const PROPERTY_NAME_OUTLINE = "outline";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+const unsigned int EMOJI_FONT_SIZE = 3968u;
 
 bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
 {
@@ -471,45 +475,20 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
   application.SendNotification();
   application.Render();
 
-  END_TEST;
-}
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
-int UtcDaliToolkitTextLabelVectorBasedP(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextLabelVectorBasedP");
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
 
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-  glAbstraction.EnableTextureCallTrace( true );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenColorEmoji.ttf", EMOJI_FONT_SIZE );
 
-  TextLabel label = TextLabel::New();
-  label.SetParentOrigin( ParentOrigin::CENTER );
-  label.SetSize( Stage::GetCurrent().GetSize() );
-  label.SetProperty( TextLabel::Property::TEXT, "Hello World" );
-  label.SetProperty( TextLabel::Property::POINT_SIZE, 10.0f );
-  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Toolkit::Text::RENDERING_VECTOR_BASED );
-  Stage::GetCurrent().Add( label );
+  const std::string emojis = "<font family='TizenColorEmoji'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  label.SetProperty( TextLabel::Property::TEXT, emojis );
 
   application.SendNotification();
   application.Render();
-
-  // Test that the vector data is uploaded to atlas
-  DALI_TEST_CHECK( glAbstraction.GetTextureTrace().FindMethod("TexSubImage2D") );
-  glAbstraction.GetTextureTrace().Reset();
-
-  // Add another label with the same text in a different point-size
-  TextLabel label2 = TextLabel::New();
-  label2.SetProperty( TextLabel::Property::TEXT, "Hello World" );
-  label2.SetProperty( TextLabel::Property::POINT_SIZE, 13.0f );
-  label2.SetProperty( TextLabel::Property::RENDERING_BACKEND, Toolkit::Text::RENDERING_VECTOR_BASED );
-  Stage::GetCurrent().Add( label2 );
-
-  application.SendNotification();
-  application.Render();
-
-  // Test that no additional vector data was uploaded to atlas
-  // i.e. the same vector data can be used to render any point-size
-  DALI_TEST_CHECK( ! glAbstraction.GetTextureTrace().FindMethod("TexSubImage2D") );
 
   END_TEST;
 }

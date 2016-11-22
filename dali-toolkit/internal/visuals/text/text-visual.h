@@ -18,13 +18,9 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/object/weak-handle.h>
-#include <dali/public-api/common/intrusive-ptr.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 
 namespace Dali
@@ -145,20 +141,19 @@ protected:
 private:
 
   /**
-   * @brief Render view, create and attach actor(s) to this TextView.
-   * @todo In a next patch a new text render back-end won't add extra actors.
+   * @brief Creates the text's renderer.
    */
-  void RenderText();
+  void CreateRenderer();
+
+  /**
+   * @brief Destroys the text's renderer.
+   */
+  void DestroyRenderer();
 
 private:
-  Text::ControllerPtr          mController;               ///< The text's controller.
-  WeakHandle<Actor>            mSelf;
-
-  Text::RendererPtr            mRenderer;
-  Actor                        mRenderableActor;
-
-  int mRenderingBackend;
-  bool mHasBeenStaged           : 1;
+  Text::ControllerPtr mController; ///< The text's controller.
+  Text::TypesetterPtr mTypesetter; ///< The text's typesetter.
+  WeakHandle<Actor>   mControl;    ///< The control where the renderer is added.
 };
 
 } // namespace Internal

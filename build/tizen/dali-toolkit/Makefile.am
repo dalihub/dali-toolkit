@@ -118,6 +118,7 @@ develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 develapivisualfactorydir =      $(develapidir)/visual-factory
+develapivisualsdir =            $(develapidir)/visuals
 
 # devel headers
 develapi_HEADERS =                  $(devel_api_header_files)
@@ -135,6 +136,7 @@ develapipageturnview_HEADERS =      $(devel_api_page_turn_view_header_files)
 develapipopup_HEADERS =             $(devel_api_popup_header_files)
 develapiprogressbar_HEADERS =       $(devel_api_progress_bar_header_files)
 develapivisualfactory_HEADERS =     $(devel_api_visual_factory_header_files)
+develapivisuals_HEADERS =           $(devel_api_visuals_header_files)
 develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
 develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)

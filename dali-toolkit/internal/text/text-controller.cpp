@@ -122,6 +122,15 @@ ControllerPtr Controller::New( ControlInterface* controlInterface,
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
 {
+  if( !decorator )
+  {
+    delete mImpl->mEventData;
+    mImpl->mEventData = NULL;
+
+    // Nothing else to do.
+    return;
+  }
+
   if( NULL == mImpl->mEventData )
   {
     mImpl->mEventData = new EventData( decorator );
@@ -151,9 +160,9 @@ bool Controller::IsMarkupProcessorEnabled() const
 
 void Controller::SetAutoScrollEnabled( bool enable )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable)?"true":"false", ( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX)?"true":"false", this );
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable)?"true":"false", ( mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)?"true":"false", this );
 
-  if( mImpl->mLayoutEngine.GetLayout() == LayoutEngine::SINGLE_LINE_BOX )
+  if( mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX )
   {
     if( enable )
     {
@@ -202,10 +211,10 @@ float Controller::GetAutoScrollLineAlignment() const
 {
   float offset = 0.f;
 
-  if( mImpl->mVisualModel &&
-      ( 0u != mImpl->mVisualModel->mLines.Count() ) )
+  if( mImpl->mModel->mVisualModel &&
+      ( 0u != mImpl->mModel->mVisualModel->mLines.Count() ) )
   {
-    offset = ( *mImpl->mVisualModel->mLines.Begin() ).alignmentOffset;
+    offset = ( *mImpl->mModel->mVisualModel->mLines.Begin() ).alignmentOffset;
   }
 
   return offset;
@@ -219,7 +228,6 @@ void Controller::SetHorizontalScrollEnabled( bool enable )
     mImpl->mEventData->mDecorator->SetHorizontalScrollEnabled( enable );
   }
 }
-
 bool Controller::IsHorizontalScrollEnabled() const
 {
   if( ( NULL != mImpl->mEventData ) &&
@@ -312,7 +320,7 @@ bool Controller::GetEnableCursorBlink() const
 
 void Controller::SetMultiLineEnabled( bool enable )
 {
-  const LayoutEngine::Layout layout = enable ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
+  const Layout::Engine::Type layout = enable ? Layout::Engine::MULTI_LINE_BOX : Layout::Engine::SINGLE_LINE_BOX;
 
   if( layout != mImpl->mLayoutEngine.GetLayout() )
   {
@@ -333,15 +341,15 @@ void Controller::SetMultiLineEnabled( bool enable )
 
 bool Controller::IsMultiLineEnabled() const
 {
-  return LayoutEngine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
+  return Layout::Engine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
 }
 
-void Controller::SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment )
+void Controller::SetHorizontalAlignment( Layout::HorizontalAlignment alignment )
 {
-  if( alignment != mImpl->mLayoutEngine.GetHorizontalAlignment() )
+  if( alignment != mImpl->mModel->mHorizontalAlignment )
   {
     // Set the alignment.
-    mImpl->mLayoutEngine.SetHorizontalAlignment( alignment );
+    mImpl->mModel->mHorizontalAlignment = alignment;
 
     // Set the flag to redo the alignment operation.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
@@ -350,17 +358,17 @@ void Controller::SetHorizontalAlignment( LayoutEngine::HorizontalAlignment align
   }
 }
 
-LayoutEngine::HorizontalAlignment Controller::GetHorizontalAlignment() const
+Layout::HorizontalAlignment Controller::GetHorizontalAlignment() const
 {
-  return mImpl->mLayoutEngine.GetHorizontalAlignment();
+  return mImpl->mModel->mHorizontalAlignment;
 }
 
-void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment )
+void Controller::SetVerticalAlignment( Layout::VerticalAlignment alignment )
 {
-  if( alignment != mImpl->mLayoutEngine.GetVerticalAlignment() )
+  if( alignment != mImpl->mModel->mVerticalAlignment )
   {
     // Set the alignment.
-    mImpl->mLayoutEngine.SetVerticalAlignment( alignment );
+    mImpl->mModel->mVerticalAlignment = alignment;
 
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
 
@@ -368,9 +376,19 @@ void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment
   }
 }
 
-LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
+Layout::VerticalAlignment Controller::GetVerticalAlignment() const
 {
-  return mImpl->mLayoutEngine.GetVerticalAlignment();
+  return mImpl->mModel->mVerticalAlignment;
+}
+
+void Controller::SetTextElideEnabled( bool enabled )
+{
+  mImpl->mModel->mElideEnabled = enabled;
+}
+
+bool Controller::IsTextElideEnabled() const
+{
+  return mImpl->mModel->mElideEnabled;
 }
 
 // public : Update
@@ -404,10 +422,10 @@ void Controller::SetText( const std::string& text )
 
   if( !text.empty() )
   {
-    mImpl->mVisualModel->SetTextColor( mImpl->mTextColor );
+    mImpl->mModel->mVisualModel->SetTextColor( mImpl->mTextColor );
 
-    MarkupProcessData markupProcessData( mImpl->mLogicalModel->mColorRuns,
-                                         mImpl->mLogicalModel->mFontDescriptionRuns );
+    MarkupProcessData markupProcessData( mImpl->mModel->mLogicalModel->mColorRuns,
+                                         mImpl->mModel->mLogicalModel->mFontDescriptionRuns );
 
     Length textSize = 0u;
     const uint8_t* utf8 = NULL;
@@ -428,7 +446,7 @@ void Controller::SetText( const std::string& text )
     }
 
     //  Convert text into UTF-32
-    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
+    Vector<Character>& utf32Characters = mImpl->mModel->mLogicalModel->mText;
     utf32Characters.Resize( textSize );
 
     // Transform a text array encoded in utf8 into an array encoded in utf32.
@@ -437,10 +455,10 @@ void Controller::SetText( const std::string& text )
     utf32Characters.Resize( characterCount );
 
     DALI_ASSERT_DEBUG( textSize >= characterCount && "Invalid UTF32 conversion length" );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, textSize, mImpl->mLogicalModel->mText.Count() );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, textSize, mImpl->mModel->mLogicalModel->mText.Count() );
 
     // The characters to be added.
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mLogicalModel->mText.Count();
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
 
     // To reset the cursor position
     lastCursorIndex = characterCount;
@@ -508,7 +526,7 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
 
     // Update placeholder if there is no text
     if( mImpl->IsShowingPlaceholderText() ||
-        ( 0u == mImpl->mLogicalModel->mText.Count() ) )
+        ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
     {
       ShowPlaceholderText();
     }
@@ -693,19 +711,19 @@ float Controller::GetDefaultPointSize() const
   return 0.0f;
 }
 
-void Controller::SetTextColor( const Vector4& textColor )
+void Controller::SetDefaultColor( const Vector4& color )
 {
-  mImpl->mTextColor = textColor;
+  mImpl->mTextColor = color;
 
   if( !mImpl->IsShowingPlaceholderText() )
   {
-    mImpl->mVisualModel->SetTextColor( textColor );
+    mImpl->mModel->mVisualModel->SetTextColor( color );
 
     mImpl->RequestRelayout();
   }
 }
 
-const Vector4& Controller::GetTextColor() const
+const Vector4& Controller::GetDefaultColor() const
 {
   return mImpl->mTextColor;
 }
@@ -719,7 +737,7 @@ void Controller::SetPlaceholderTextColor( const Vector4& textColor )
 
   if( mImpl->IsShowingPlaceholderText() )
   {
-    mImpl->mVisualModel->SetTextColor( textColor );
+    mImpl->mModel->mVisualModel->SetTextColor( textColor );
     mImpl->RequestRelayout();
   }
 }
@@ -736,62 +754,62 @@ const Vector4& Controller::GetPlaceholderTextColor() const
 
 void Controller::SetShadowOffset( const Vector2& shadowOffset )
 {
-  mImpl->mVisualModel->SetShadowOffset( shadowOffset );
+  mImpl->mModel->mVisualModel->SetShadowOffset( shadowOffset );
 
   mImpl->RequestRelayout();
 }
 
 const Vector2& Controller::GetShadowOffset() const
 {
-  return mImpl->mVisualModel->GetShadowOffset();
+  return mImpl->mModel->mVisualModel->GetShadowOffset();
 }
 
 void Controller::SetShadowColor( const Vector4& shadowColor )
 {
-  mImpl->mVisualModel->SetShadowColor( shadowColor );
+  mImpl->mModel->mVisualModel->SetShadowColor( shadowColor );
 
   mImpl->RequestRelayout();
 }
 
 const Vector4& Controller::GetShadowColor() const
 {
-  return mImpl->mVisualModel->GetShadowColor();
+  return mImpl->mModel->mVisualModel->GetShadowColor();
 }
 
 void Controller::SetUnderlineColor( const Vector4& color )
 {
-  mImpl->mVisualModel->SetUnderlineColor( color );
+  mImpl->mModel->mVisualModel->SetUnderlineColor( color );
 
   mImpl->RequestRelayout();
 }
 
 const Vector4& Controller::GetUnderlineColor() const
 {
-  return mImpl->mVisualModel->GetUnderlineColor();
+  return mImpl->mModel->mVisualModel->GetUnderlineColor();
 }
 
 void Controller::SetUnderlineEnabled( bool enabled )
 {
-  mImpl->mVisualModel->SetUnderlineEnabled( enabled );
+  mImpl->mModel->mVisualModel->SetUnderlineEnabled( enabled );
 
   mImpl->RequestRelayout();
 }
 
 bool Controller::IsUnderlineEnabled() const
 {
-  return mImpl->mVisualModel->IsUnderlineEnabled();
+  return mImpl->mModel->mVisualModel->IsUnderlineEnabled();
 }
 
 void Controller::SetUnderlineHeight( float height )
 {
-  mImpl->mVisualModel->SetUnderlineHeight( height );
+  mImpl->mModel->mVisualModel->SetUnderlineHeight( height );
 
   mImpl->RequestRelayout();
 }
 
 float Controller::GetUnderlineHeight() const
 {
-  return mImpl->mVisualModel->GetUnderlineHeight();
+  return mImpl->mModel->mVisualModel->GetUnderlineHeight();
 }
 
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
@@ -861,10 +879,10 @@ void Controller::SetInputColor( const Vector4& color )
       const Length lengthOfSelectedText = ( handlesCrossed ? mImpl->mEventData->mLeftSelectionPosition : mImpl->mEventData->mRightSelectionPosition ) - startOfSelectedText;
 
       // Add the color run.
-      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mColorRuns.Count();
-      mImpl->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
+      const VectorBase::SizeType numberOfRuns = mImpl->mModel->mLogicalModel->mColorRuns.Count();
+      mImpl->mModel->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
 
-      ColorRun& colorRun = *( mImpl->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
+      ColorRun& colorRun = *( mImpl->mModel->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
       colorRun.color = color;
       colorRun.characterRun.characterIndex = startOfSelectedText;
       colorRun.characterRun.numberOfCharacters = lengthOfSelectedText;
@@ -904,7 +922,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel,
+                                                                            mImpl->mModel->mLogicalModel,
                                                                             startOfSelectedText,
                                                                             lengthOfSelectedText );
 
@@ -963,7 +981,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel,
+                                                                            mImpl->mModel->mLogicalModel,
                                                                             startOfSelectedText,
                                                                             lengthOfSelectedText );
 
@@ -1029,7 +1047,7 @@ void Controller::SetInputFontWidth( FontWidth width )
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel,
+                                                                            mImpl->mModel->mLogicalModel,
                                                                             startOfSelectedText,
                                                                             lengthOfSelectedText );
 
@@ -1095,7 +1113,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel,
+                                                                            mImpl->mModel->mLogicalModel,
                                                                             startOfSelectedText,
                                                                             lengthOfSelectedText );
 
@@ -1161,7 +1179,7 @@ void Controller::SetInputFontPointSize( float size )
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
       FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mLogicalModel,
+                                                                            mImpl->mModel->mLogicalModel,
                                                                             startOfSelectedText,
                                                                             lengthOfSelectedText );
 
@@ -1297,7 +1315,7 @@ const std::string& Controller::GetInputOutlineProperties() const
 
 // public : Queries & retrieves.
 
-LayoutEngine& Controller::GetLayoutEngine()
+Layout::Engine& Controller::GetLayoutEngine()
 {
   return mImpl->mLayoutEngine;
 }
@@ -1305,11 +1323,6 @@ LayoutEngine& Controller::GetLayoutEngine()
 View& Controller::GetView()
 {
   return mImpl->mView;
-}
-
-const Vector2& Controller::GetScrollPosition() const
-{
-  return mImpl->mScrollPosition;
 }
 
 Vector3 Controller::GetNaturalSize()
@@ -1339,10 +1352,10 @@ Vector3 Controller::GetNaturalSize()
 
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
 
     // Store the actual control's size to restore later.
-    const Size actualControlSize = mImpl->mVisualModel->mControlSize;
+    const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
@@ -1360,7 +1373,7 @@ Vector3 Controller::GetNaturalSize()
 
     // Stores the natural size to avoid recalculate it again
     // unless the text/style changes.
-    mImpl->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
+    mImpl->mModel->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
 
     mImpl->mRecalculateNaturalSize = false;
 
@@ -1368,13 +1381,13 @@ Vector3 Controller::GetNaturalSize()
     mImpl->mTextUpdateInfo.Clear();
 
     // Restore the actual control's size.
-    mImpl->mVisualModel->mControlSize = actualControlSize;
+    mImpl->mModel->mVisualModel->mControlSize = actualControlSize;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
   else
   {
-    naturalSize = mImpl->mVisualModel->GetNaturalSize();
+    naturalSize = mImpl->mModel->mVisualModel->GetNaturalSize();
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
@@ -1392,7 +1405,7 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( fabsf( width - mImpl->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 )
+  if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
@@ -1412,10 +1425,10 @@ float Controller::GetHeightForWidth( float width )
 
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
 
     // Store the actual control's width.
-    const float actualControlWidth = mImpl->mVisualModel->mControlSize.width;
+    const float actualControlWidth = mImpl->mModel->mVisualModel->mControlSize.width;
 
     DoRelayout( Size( width, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
@@ -1436,17 +1449,22 @@ float Controller::GetHeightForWidth( float width )
     mImpl->mTextUpdateInfo.Clear();
 
     // Restore the actual control's width.
-    mImpl->mVisualModel->mControlSize.width = actualControlWidth;
+    mImpl->mModel->mVisualModel->mControlSize.width = actualControlWidth;
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height );
   }
   else
   {
-    layoutSize = mImpl->mVisualModel->GetLayoutSize();
+    layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height );
   }
 
   return layoutSize.height;
+}
+
+const ModelInterface* const Controller::GetTextModel() const
+{
+  return mImpl->mModel.Get();
 }
 
 // public : Relayout.
@@ -1459,9 +1477,9 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
 
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
-    if( 0u != mImpl->mVisualModel->mGlyphPositions.Count() )
+    if( 0u != mImpl->mModel->mVisualModel->mGlyphPositions.Count() )
     {
-      mImpl->mVisualModel->mGlyphPositions.Clear();
+      mImpl->mModel->mVisualModel->mGlyphPositions.Clear();
       updateTextType = MODEL_UPDATED;
     }
 
@@ -1475,11 +1493,11 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   }
 
   // Whether a new size has been set.
-  const bool newSize = ( size != mImpl->mVisualModel->mControlSize );
+  const bool newSize = ( size != mImpl->mModel->mVisualModel->mControlSize );
 
   if( newSize )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mVisualModel->mControlSize.width, mImpl->mVisualModel->mControlSize.height );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mModel->mVisualModel->mControlSize.width, mImpl->mModel->mVisualModel->mControlSize.height );
 
     // Layout operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -1525,7 +1543,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   Vector2 offset;
   if( newSize && isEditable )
   {
-    offset = mImpl->mScrollPosition;
+    offset = mImpl->mModel->mScrollPosition;
   }
 
   if( !isEditable || !IsMultiLineEnabled() )
@@ -1542,7 +1560,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
       mImpl->ClampHorizontalScroll( layoutSize );
 
       // Update the decorator's positions is needed if there is a new size.
-      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mScrollPosition - offset );
+      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mModel->mScrollPosition - offset );
     }
 
     // Move the cursor, grab handle etc.
@@ -1889,7 +1907,7 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
       if( textDeleted )
       {
-        if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
+        if( ( 0u != mImpl->mModel->mLogicalModel->mText.Count() ) ||
             !mImpl->IsPlaceholderAvailable() )
         {
           mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
@@ -1983,7 +2001,7 @@ void Controller::PasteClipboardItemEvent()
 
 void Controller::GetTargetSize( Vector2& targetSize )
 {
-  targetSize = mImpl->mVisualModel->mControlSize;
+  targetSize = mImpl->mModel->mVisualModel->mControlSize;
 }
 
 void Controller::AddDecoration( Actor& actor, bool needsClipping )
@@ -2064,7 +2082,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
       mImpl->mOperationsPending = ALL_OPERATIONS;
 
-      if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
+      if( ( 0u != mImpl->mModel->mLogicalModel->mText.Count() ) ||
           !mImpl->IsPlaceholderAvailable() )
       {
         mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
@@ -2148,10 +2166,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
                  mImpl->mEventData->mPrimaryCursorPosition, mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
 
   // TODO: At the moment the underline runs are only for pre-edit.
-  mImpl->mVisualModel->mUnderlineRuns.Clear();
+  mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
 
   // Keep the current number of characters.
-  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mLogicalModel->mText.Count() : 0u;
+  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
 
   // Remove the previous IMF pre-edit.
   if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
@@ -2221,7 +2239,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
     }
 
-    const Length numberOfCharactersInModel = mImpl->mLogicalModel->mText.Count();
+    const Length numberOfCharactersInModel = mImpl->mModel->mLogicalModel->mText.Count();
 
     // Restrict new text to fit within Maximum characters setting.
     Length maxSizeOfNewText = std::min( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
@@ -2233,7 +2251,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Update the text's style.
 
     // Updates the text style runs by adding characters.
-    mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, maxSizeOfNewText );
+    mImpl->mModel->mLogicalModel->UpdateTextStyleRuns( cursorIndex, maxSizeOfNewText );
 
     // Get the character index from the cursor index.
     const CharacterIndex styleIndex = ( cursorIndex > 0u ) ? cursorIndex - 1u : 0u;
@@ -2241,7 +2259,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Retrieve the text's style for the given index.
     InputStyle style;
     mImpl->RetrieveDefaultInputStyle( style );
-    mImpl->mLogicalModel->RetrieveStyle( styleIndex, style );
+    mImpl->mModel->mLogicalModel->RetrieveStyle( styleIndex, style );
 
     // Whether to add a new text color run.
     const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor );
@@ -2256,10 +2274,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Add style runs.
     if( addColorRun )
     {
-      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mColorRuns.Count();
-      mImpl->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
+      const VectorBase::SizeType numberOfRuns = mImpl->mModel->mLogicalModel->mColorRuns.Count();
+      mImpl->mModel->mLogicalModel->mColorRuns.Resize( numberOfRuns + 1u );
 
-      ColorRun& colorRun = *( mImpl->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
+      ColorRun& colorRun = *( mImpl->mModel->mLogicalModel->mColorRuns.Begin() + numberOfRuns );
       colorRun.color = mImpl->mEventData->mInputStyle.textColor;
       colorRun.characterRun.characterIndex = cursorIndex;
       colorRun.characterRun.numberOfCharacters = maxSizeOfNewText;
@@ -2271,10 +2289,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
         addFontSlantRun  ||
         addFontSizeRun )
     {
-      const VectorBase::SizeType numberOfRuns = mImpl->mLogicalModel->mFontDescriptionRuns.Count();
-      mImpl->mLogicalModel->mFontDescriptionRuns.Resize( numberOfRuns + 1u );
+      const VectorBase::SizeType numberOfRuns = mImpl->mModel->mLogicalModel->mFontDescriptionRuns.Count();
+      mImpl->mModel->mLogicalModel->mFontDescriptionRuns.Resize( numberOfRuns + 1u );
 
-      FontDescriptionRun& fontDescriptionRun = *( mImpl->mLogicalModel->mFontDescriptionRuns.Begin() + numberOfRuns );
+      FontDescriptionRun& fontDescriptionRun = *( mImpl->mModel->mLogicalModel->mFontDescriptionRuns.Begin() + numberOfRuns );
 
       if( addFontNameRun )
       {
@@ -2315,7 +2333,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     }
 
     // Insert at current cursor position.
-    Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
+    Vector<Character>& modifyText = mImpl->mModel->mLogicalModel->mText;
 
     if( cursorIndex < numberOfCharactersInModel )
     {
@@ -2333,12 +2351,12 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Update the cursor index.
     cursorIndex += maxSizeOfNewText;
 
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mModel->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mLogicalModel->mText.Count() : 0u;
+  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
 
-  if( ( 0u == mImpl->mLogicalModel->mText.Count() ) &&
+  if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
     // Show place-holder if empty after removing the pre-edit text
@@ -2365,7 +2383,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
   if( maxLengthReached )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", mImpl->mLogicalModel->mText.Count() );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", mImpl->mModel->mLogicalModel->mText.Count() );
 
     mImpl->ResetImfManager();
 
@@ -2402,12 +2420,12 @@ bool Controller::RemoveText( int cursorOffset,
   }
 
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfCharacters %d\n",
-                 this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfCharacters );
+                 this, mImpl->mModel->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfCharacters );
 
   if( !mImpl->IsShowingPlaceholderText() )
   {
     // Delete at current cursor position
-    Vector<Character>& currentText = mImpl->mLogicalModel->mText;
+    Vector<Character>& currentText = mImpl->mModel->mLogicalModel->mText;
     CharacterIndex& oldCursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
     CharacterIndex cursorIndex = oldCursorIndex;
@@ -2441,7 +2459,7 @@ bool Controller::RemoveText( int cursorOffset,
         mImpl->RetrieveDefaultInputStyle( mImpl->mEventData->mInputStyle );
 
         // Update the input style.
-        mImpl->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
+        mImpl->mModel->mLogicalModel->RetrieveStyle( cursorIndex, mImpl->mEventData->mInputStyle );
 
         // Compare if the input style has changed.
         const bool hasInputStyleChanged = !currentInputStyle.Equal( mImpl->mEventData->mInputStyle );
@@ -2455,7 +2473,7 @@ bool Controller::RemoveText( int cursorOffset,
       }
 
       // Updates the text style runs by removing characters. Runs with no characters are removed.
-      mImpl->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
+      mImpl->mModel->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
 
       // Remove the characters.
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
@@ -2511,7 +2529,7 @@ bool Controller::DoRelayout( const Size& size,
   const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
 
   // Get the current layout size.
-  layoutSize = mImpl->mVisualModel->GetLayoutSize();
+  layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
 
   if( NO_OPERATION != ( LAYOUT & operations ) )
   {
@@ -2522,21 +2540,21 @@ bool Controller::DoRelayout( const Size& size,
     // Fill the vectors again.
 
     // Calculate the number of glyphs to layout.
-    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mVisualModel->mCharactersToGlyph;
-    const Vector<Length>& glyphsPerCharacter = mImpl->mVisualModel->mGlyphsPerCharacter;
+    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mModel->mVisualModel->mCharactersToGlyph;
+    const Vector<Length>& glyphsPerCharacter = mImpl->mModel->mVisualModel->mGlyphsPerCharacter;
     const GlyphIndex* const charactersToGlyphBuffer = charactersToGlyph.Begin();
     const Length* const glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
 
     const CharacterIndex lastIndex = startIndex + ( ( requestedNumberOfCharacters > 0u ) ? requestedNumberOfCharacters - 1u : 0u );
     const GlyphIndex startGlyphIndex = mImpl->mTextUpdateInfo.mStartGlyphIndex;
     const Length numberOfGlyphs = ( requestedNumberOfCharacters > 0u ) ? *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex : 0u;
-    const Length totalNumberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
+    const Length totalNumberOfGlyphs = mImpl->mModel->mVisualModel->mGlyphs.Count();
 
     if( 0u == totalNumberOfGlyphs )
     {
       if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
       {
-        mImpl->mVisualModel->SetLayoutSize( Size::ZERO );
+        mImpl->mModel->mVisualModel->SetLayoutSize( Size::ZERO );
       }
 
       // Nothing else to do if there is no glyphs.
@@ -2544,33 +2562,34 @@ bool Controller::DoRelayout( const Size& size,
       return true;
     }
 
-    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
-    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
-    const Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
-    const Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
-    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
-    const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
-    const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
+    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mModel->mLogicalModel->mLineBreakInfo;
+    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mModel->mLogicalModel->mWordBreakInfo;
+    const Vector<CharacterDirection>& characterDirection = mImpl->mModel->mLogicalModel->mCharacterDirections;
+    const Vector<GlyphInfo>& glyphs = mImpl->mModel->mVisualModel->mGlyphs;
+    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mModel->mVisualModel->mGlyphsToCharacters;
+    const Vector<Length>& charactersPerGlyph = mImpl->mModel->mVisualModel->mCharactersPerGlyph;
+    const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
 
     // Set the layout parameters.
-    LayoutParameters layoutParameters( size,
-                                       textBuffer,
-                                       lineBreakInfo.Begin(),
-                                       wordBreakInfo.Begin(),
-                                       ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
-                                       glyphs.Begin(),
-                                       glyphsToCharactersMap.Begin(),
-                                       charactersPerGlyph.Begin(),
-                                       charactersToGlyphBuffer,
-                                       glyphsPerCharacterBuffer,
-                                       totalNumberOfGlyphs );
+    Layout::Parameters layoutParameters( size,
+                                         textBuffer,
+                                         lineBreakInfo.Begin(),
+                                         wordBreakInfo.Begin(),
+                                         ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
+                                         glyphs.Begin(),
+                                         glyphsToCharactersMap.Begin(),
+                                         charactersPerGlyph.Begin(),
+                                         charactersToGlyphBuffer,
+                                         glyphsPerCharacterBuffer,
+                                         totalNumberOfGlyphs,
+                                         mImpl->mModel->mHorizontalAlignment );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
-    Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
+    Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;
     glyphPositions.Resize( totalNumberOfGlyphs );
 
     // Whether the last character is a new paragraph character.
-    mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
+    mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mModel->mLogicalModel->mText.Count() - 1u ) ) );
     layoutParameters.isLastNewParagraph = mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph;
 
     // The initial glyph and the number of glyphs to layout.
@@ -2583,8 +2602,9 @@ bool Controller::DoRelayout( const Size& size,
     Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
-                                                   mImpl->mVisualModel->mLines,
-                                                   newLayoutSize );
+                                                   mImpl->mModel->mVisualModel->mLines,
+                                                   newLayoutSize,
+                                                   mImpl->mModel->mElideEnabled );
 
     viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 
@@ -2592,7 +2612,7 @@ bool Controller::DoRelayout( const Size& size,
     {
       layoutSize = newLayoutSize;
 
-      if ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
+      if( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
         mImpl->mAutoScrollDirectionRTL = false;
       }
@@ -2600,21 +2620,21 @@ bool Controller::DoRelayout( const Size& size,
       // Reorder the lines
       if( NO_OPERATION != ( REORDER & operations ) )
       {
-        Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mLogicalModel->mBidirectionalParagraphInfo;
-        Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mLogicalModel->mBidirectionalLineInfo;
+        Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mModel->mLogicalModel->mBidirectionalParagraphInfo;
+        Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mModel->mLogicalModel->mBidirectionalLineInfo;
 
         // Check first if there are paragraphs with bidirectional info.
         if( 0u != bidirectionalInfo.Count() )
         {
           // Get the lines
-          const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
+          const Length numberOfLines = mImpl->mModel->mVisualModel->mLines.Count();
 
           // Reorder the lines.
           bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
           ReorderLines( bidirectionalInfo,
                         startIndex,
                         requestedNumberOfCharacters,
-                        mImpl->mVisualModel->mLines,
+                        mImpl->mModel->mVisualModel->mLines,
                         bidirectionalLineInfo );
 
           // Set the bidirectional info per line into the layout parameters.
@@ -2629,7 +2649,7 @@ bool Controller::DoRelayout( const Size& size,
 
           if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
           {
-            const LineRun* const firstline = mImpl->mVisualModel->mLines.Begin();
+            const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
             if ( firstline )
             {
               mImpl->mAutoScrollDirectionRTL = firstline->direction;
@@ -2641,22 +2661,23 @@ bool Controller::DoRelayout( const Size& size,
       // Sets the layout size.
       if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
       {
-        mImpl->mVisualModel->SetLayoutSize( layoutSize );
+        mImpl->mModel->mVisualModel->SetLayoutSize( layoutSize );
       }
     } // view updated
 
     // Store the size used to layout the text.
-    mImpl->mVisualModel->mControlSize = size;
+    mImpl->mModel->mVisualModel->mControlSize = size;
   }
 
   if( NO_OPERATION != ( ALIGN & operations ) )
   {
     // The laid-out lines.
-    Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
+    Vector<LineRun>& lines = mImpl->mModel->mVisualModel->mLines;
 
     mImpl->mLayoutEngine.Align( size,
                                 startIndex,
                                 requestedNumberOfCharacters,
+                                mImpl->mModel->mHorizontalAlignment,
                                 lines );
 
     viewUpdated = true;
@@ -2672,7 +2693,7 @@ bool Controller::DoRelayout( const Size& size,
 
 void Controller::CalculateVerticalOffset( const Size& controlSize )
 {
-  Size layoutSize = mImpl->mVisualModel->GetLayoutSize();
+  Size layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
 
   if( fabsf( layoutSize.height ) < Math::MACHINE_EPSILON_1000 )
   {
@@ -2680,21 +2701,21 @@ void Controller::CalculateVerticalOffset( const Size& controlSize )
     layoutSize.height = mImpl->GetDefaultFontLineHeight();
   }
 
-  switch( mImpl->mLayoutEngine.GetVerticalAlignment() )
+  switch( mImpl->mModel->mVerticalAlignment )
   {
-    case LayoutEngine::VERTICAL_ALIGN_TOP:
+    case Layout::VERTICAL_ALIGN_TOP:
     {
-      mImpl->mScrollPosition.y = 0.f;
+      mImpl->mModel->mScrollPosition.y = 0.f;
       break;
     }
-    case LayoutEngine::VERTICAL_ALIGN_CENTER:
+    case Layout::VERTICAL_ALIGN_CENTER:
     {
-      mImpl->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
+      mImpl->mModel->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
       break;
     }
-    case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
+    case Layout::VERTICAL_ALIGN_BOTTOM:
     {
-      mImpl->mScrollPosition.y = controlSize.height - layoutSize.height;
+      mImpl->mModel->mScrollPosition.y = controlSize.height - layoutSize.height;
       break;
     }
   }
@@ -2842,7 +2863,7 @@ bool Controller::BackspaceKeyEvent()
 
   if( removed )
   {
-    if( ( 0u != mImpl->mLogicalModel->mText.Count() ) ||
+    if( ( 0u != mImpl->mModel->mLogicalModel->mText.Count() ) ||
         !mImpl->IsPlaceholderAvailable() )
     {
       mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
@@ -2863,7 +2884,7 @@ bool Controller::BackspaceKeyEvent()
 void Controller::ResetText()
 {
   // Reset buffers.
-  mImpl->mLogicalModel->mText.Clear();
+  mImpl->mModel->mLogicalModel->mText.Clear();
 
   // We have cleared everything including the placeholder-text
   mImpl->PlaceholderCleared();
@@ -2920,11 +2941,11 @@ void Controller::ShowPlaceholderText()
     mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
 
     // Reset model for showing placeholder.
-    mImpl->mLogicalModel->mText.Clear();
-    mImpl->mVisualModel->SetTextColor( mImpl->mEventData->mPlaceholderTextColor );
+    mImpl->mModel->mLogicalModel->mText.Clear();
+    mImpl->mModel->mVisualModel->SetTextColor( mImpl->mEventData->mPlaceholderTextColor );
 
     // Convert text into UTF-32
-    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
+    Vector<Character>& utf32Characters = mImpl->mModel->mLogicalModel->mText;
     utf32Characters.Resize( size );
 
     // This is a bit horrible but std::string returns a (signed) char*
@@ -2962,7 +2983,7 @@ void Controller::ClearFontData()
   // Set flags to update the model.
   mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
   mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mLogicalModel->mText.Count();
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
 
   mImpl->mTextUpdateInfo.mClearAll = true;
   mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
@@ -2980,8 +3001,8 @@ void Controller::ClearFontData()
 
 void Controller::ClearStyleData()
 {
-  mImpl->mLogicalModel->mColorRuns.Clear();
-  mImpl->mLogicalModel->ClearFontDescriptionRuns();
+  mImpl->mModel->mLogicalModel->mColorRuns.Clear();
+  mImpl->mModel->mLogicalModel->ClearFontDescriptionRuns();
 }
 
 void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
@@ -3004,7 +3025,7 @@ void Controller::ResetScrollPosition()
   if( NULL != mImpl->mEventData )
   {
     // Reset the scroll position.
-    mImpl->mScrollPosition = Vector2::ZERO;
+    mImpl->mModel->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
 }

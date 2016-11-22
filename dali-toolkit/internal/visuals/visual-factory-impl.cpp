@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
@@ -107,7 +108,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   else
   {
     Property::Value* typeValue = propertyMap.Find( Toolkit::VisualProperty::TYPE, VISUAL_TYPE );
-    Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
+    Toolkit::DevelVisual::Type visualType = Toolkit::DevelVisual::IMAGE; // Default to IMAGE type.
     if( typeValue )
     {
       Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
@@ -191,7 +192,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
         break;
       }
 
-      case Toolkit::Visual::TEXT:
+      case Toolkit::DevelVisual::TEXT:
       {
         visualPtr = TextVisual::New( *( mFactoryCache.Get() ) );
         break;

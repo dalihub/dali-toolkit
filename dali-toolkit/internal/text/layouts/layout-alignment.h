@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_SCROLLER_INTERFACE_H__
-#define __DALI_TOOLKIT_TEXT_SCROLLER_INTERFACE_H__
+#ifndef DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H
+#define DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -21,32 +21,39 @@
 namespace Dali
 {
 
-class Actor;
-
 namespace Toolkit
 {
 
 namespace Text
 {
 
-/**
- * @brief An interface used by the text-controls which implement auto-scrolling
- */
-class ScrollerInterface
+namespace Layout
 {
-public:
 
-  /**
-   * @brief Virtual destructor.
-   */
-  virtual ~ScrollerInterface()
-  {}
-
-  /**
-   * @brief Called when the scrolling finishes
-   */
-  virtual void ScrollingFinished() = 0;
+/**
+ * @brief Speficies the horizontal alignment.
+ *
+ * BEGIN is on the left for Left To Right languages whereas is right for Right To Left.
+ * Similarly, END is on the right for Left To Right languages and left for Right To Left.
+ */
+enum HorizontalAlignment
+{
+  HORIZONTAL_ALIGN_BEGIN,
+  HORIZONTAL_ALIGN_CENTER,
+  HORIZONTAL_ALIGN_END
 };
+
+/**
+ * @brief Speficies the vertical alignment.
+ */
+enum VerticalAlignment
+{
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_CENTER,
+  VERTICAL_ALIGN_BOTTOM
+};
+
+} // namespace Layout
 
 } // namespace Text
 
@@ -54,4 +61,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_SCROLLER_INTERFACE_H__
+#endif // DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H

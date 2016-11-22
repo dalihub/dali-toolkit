@@ -21,7 +21,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <toolkit-text-model.h>
+#include <toolkit-text-utils.h>
 
 
 using namespace Dali;
