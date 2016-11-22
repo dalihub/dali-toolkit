@@ -56,6 +56,8 @@ namespace SyncImageLoader
  * orientationCorrection = true
  *
  * @SINCE_1_2_14
+ * @REMARK_INTERNET
+ * @REMARK_STORAGE
  *
  * @param[in] url The URL of the image file to load.
  * @return A PixelData object containing the image, or an invalid object on failure.
@@ -70,6 +72,8 @@ DALI_IMPORT_API PixelData Load( const std::string& url );
  * orientationCorrection = true
  *
  * @SINCE_1_2_14
+ * @REMARK_INTERNET
+ * @REMARK_STORAGE
  *
  * @param[in] url The URL of the image file to load.
  * @param[in] dimensions The width and height to fit the loaded image to.
@@ -80,6 +84,8 @@ DALI_IMPORT_API PixelData Load( const std::string& url, ImageDimensions dimensio
 /**
  * @brief Load an image synchronously by specifying the target dimensions and options.
  * @SINCE_1_2_14
+ * @REMARK_INTERNET
+ * @REMARK_STORAGE
  *
  * @param[in] url The URL of the image file to load.
  * @param[in] dimensions The width and height to fit the loaded image to.

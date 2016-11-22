@@ -362,6 +362,7 @@ ALIASES += PRIVLEVEL_PUBLIC=""
 ALIASES += PRIVILEGE_KEYGRAB=""
 ALIASES += PRIVILEGE_DISPLAY=""
 ALIASES += REMARK_INTERNET=""
+ALIASES += REMARK_STORAGE=""
 
 ############################################
 ## For Tizen Native API Reference
@@ -389,7 +390,7 @@ ALIASES += REMARK_INTERNET=""
 #ALIASES += PRIVILEGE_KEYGRAB="\par Privilege:\n http://tizen.org/privilege/keygrab"
 #ALIASES += PRIVILEGE_DISPLAY="\par Privilege:\n http://tizen.org/privilege/display"
 #ALIASES += REMARK_INTERNET="@remarks %http://tizen.org/privilege/internet is needed if @a url is a http or https address."
-
+#ALIASES += REMARK_STORAGE="@remarks %http://tizen.org/privilege/mediastorage is needed if @a url is relevant to media storage. @remarks %http://tizen.org/privilege/externalstorage is needed if @a url is relevant to external storage."
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"

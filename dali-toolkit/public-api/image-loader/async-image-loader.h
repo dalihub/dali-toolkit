@@ -156,6 +156,8 @@ public:
    * orientationCorrection = true
    *
    * @SINCE_1_2_14
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    *
    * @param[in] url The URL of the image file to load.
    * @return The loading task id.
@@ -170,6 +172,8 @@ public:
    * orientationCorrection = true
    *
    * @SINCE_1_2_14
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    *
    * @param[in] url The URL of the image file to load.
    * @param[in] dimensions The width and height to fit the loaded image to.
@@ -180,6 +184,8 @@ public:
   /**
    * @brief Start an image loading task.
    * @SINCE_1_2_14
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    *
    * @param[in] url The URL of the image file to load.
    * @param[in] dimensions The width and height to fit the loaded image to.
