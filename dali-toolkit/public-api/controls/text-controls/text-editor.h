@@ -66,6 +66,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the TextEditor class.
+     * @SINCE_1_1.37
+     */
     enum
     {
       RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",                    The type or rendering e.g. bitmap-based,                                         type INT @SINCE_1_1.37
@@ -118,6 +122,11 @@ public:
    */
   struct InputStyle
   {
+  /**
+   * @brief Mask used by the signal InputStyleChangedSignal().
+   *
+   * @SINCE_1_2_2
+   */
     enum Mask
     {
       NONE         = 0x0000, ///< @SINCE_1_2_2

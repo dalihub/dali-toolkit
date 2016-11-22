@@ -66,6 +66,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the TextField class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",                    The type or rendering e.g. bitmap-based,                                           type INT @SINCE_1_0.0
@@ -137,6 +141,11 @@ public:
    */
   struct InputStyle
   {
+  /**
+   * @brief Mask used by the signal InputStyleChangedSignal().
+   *
+   * @SINCE_1_2_2
+   */
     enum Mask
     {
       NONE         = 0x0000, ///< @SINCE_1_2_2

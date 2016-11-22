@@ -105,6 +105,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the PushButton class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string @SINCE_1_0.0

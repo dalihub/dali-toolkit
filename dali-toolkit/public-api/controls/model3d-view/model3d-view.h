@@ -62,6 +62,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the TextLabel class.
+     * @SINCE_1_1.4
+     */
     enum
     {
       GEOMETRY_URL = PROPERTY_START_INDEX,  ///< name "geometryUrl",       The path to the geometry file,    type STRING @SINCE_1_1.4

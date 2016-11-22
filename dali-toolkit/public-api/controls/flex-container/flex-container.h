@@ -190,6 +190,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the FlexContainer class.
+     * @SINCE_1_1.35
+     */
     enum
     {
       // Event side properties
@@ -208,6 +212,10 @@ public:
    */
   struct ChildProperty
   {
+    /**
+     * @brief An enumeration of child properties belonging to the FlexContainer class.
+     * @SINCE_1_1.35
+     */
     enum
     {
       // Event side child properties

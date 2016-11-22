@@ -70,6 +70,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the ImageView class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       // Event side properties

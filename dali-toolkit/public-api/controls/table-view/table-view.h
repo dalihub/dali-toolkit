@@ -128,6 +128,11 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the TableView class.
+     *
+     * @SINCE_1_0.0
+     */
     enum
     {
       ROWS = PROPERTY_START_INDEX, ///< name "rows",           type unsigned int @SINCE_1_0.0
@@ -144,6 +149,10 @@ public:
    */
   struct ChildProperty
   {
+    /**
+     * @brief An enumeration of child properties belonging to the TableView class.
+     * @SINCE_1_1.36
+     */
     enum
     {
       CELL_INDEX = CHILD_PROPERTY_START_INDEX,  ///< name "cellIndex",                The top-left cell this child occupies, if not set, the first available cell is used,           type VECTOR2 @SINCE_1_1.36
