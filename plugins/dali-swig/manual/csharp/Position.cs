@@ -1,159 +1,188 @@
-namespace Dali {
+namespace Dali
+{
+  using System;
 
-using System;
+  public class Position
+  {
 
-public class Position : Vector3
-       {
+    private float x;
+    private float y;
+    private float z;
 
-  /**
-   * @brief constructor
-   *
-   * @since 1.0.0
-   */
-           public Position()
-               : base()
-           {
-           }
+    /**
+     * @brief constructor
+     *
+     * @since 1.0.0
+     */
+    public Position()
+    {
+      x = 0.0f;
+      y = 0.0f;
+      z = 0.0f;
+    }
 
-  /**
-   * @brief constructor
-   *
-   * @since 1.0.0
-   * @param [in] a The Position X.
-   * @param [in] b The Position Y.
-   * @param [in] c The Position Z.
-   */
-           public Position(float a, float b, float c)
-               : base(a, b, c)
-           {
-           }
-           
-  /**
-   * @brief constructor
-   *
-   * @since 1.0.0
-   * @param [in] o The Vector Position X, Y, Z.
-   */
-           public Position(Vector3 o)
-               : base(o.x, o.y, o.z)
-           {      
-           }
+    /**
+     * @brief constructor
+     *
+     * @since 1.0.0
+     * @param [in] a The Position X.
+     * @param [in] b The Position Y.
+     * @param [in] c The Position Z.
+     */
+    public Position(float a, float b, float c)
+    {
+      x = a;
+      y = b;
+      z = c;
+    }
 
-  ///< name "X", type float (Position X value)
-  //@since 1.0.0
-           public float X
-           {
-               get { return width; }
-               set { width = value; }
-           }
+    /**
+     * @brief constructor
+     *
+     * @since 1.0.0
+     * @param [in] o The Vector Position X, Y, Z.
+     */
+    public Position(Vector3 o)
+    {
+      x = o.x;
+      y = o.y;
+      z = o.z;
+    }
 
-  ///< name "Y", type float (Position Y value)
-  //@since 1.0.0
-           public float Y
-           {
-               get { return height; }
-               set { height = value; }
-           }
+    ///< name "X", type float (Position X value)
+    //@since 1.0.0
+    public float X
+    {
+      get { return x; }
+      set { x = value; }
+    }
 
-  ///< name "Z", type float (Position Z value)
-  //@since 1.0.0
-           public float Z
-           {
-               get { return depth; }
-               set { depth = value; }
-           }
-   
-  /**
-   * @brief operator+
-   *
-   * @since 1.0.0
-   * @param [in] l The Position to add.
-   * @param [in] r The Position to add
-   * @return A reference to this
-   */ 
-           public static Position operator +(Position l, Position r)
-           {
-               return new Position(l.X + r.X, l.Y + r.Y, l.Z + r.Z);
-           }
+    ///< name "Y", type float (Position Y value)
+    //@since 1.0.0
+    public float Y
+    {
+      get { return y; }
+      set { y = value; }
+    }
 
-  /**
-   * @brief operator-
-   *
-   * @since 1.0.0
-   * @param [in] l The Position to substract.
-   * @param [in] r The Position to substract
-   * @return A reference to this
-   */ 
-           public static Position operator -(Position l, Position r)
-           {
-               return new Position(l.X - r.X, l.Y - r.Y, l.Z - r.Z);
-           }
+    ///< name "Z", type float (Position Z value)
+    //@since 1.0.0
+    public float Z
+    {
+      get { return z; }
+      set { z = value; }
+    }
 
-  /**
-   * @brief operator*
-   *
-   * @since 1.0.0
-   * @param [in] a The Position to multiply.
-   * @param [in] b The Position to multiply
-   * @return A reference to this
-   */ 
-           public static Position operator *(Position a, double b)
-           {
-               return new Position((int)(a.X * b), (int)(a.Y * b), (int)(a.Z * b));
-           }
+    /**
+     * @brief operator+
+     *
+     * @since 1.0.0
+     * @param [in] l The Position to add.
+     * @param [in] r The Position to add
+     * @return A reference to this
+     */
+    public static Position operator +(Position l, Position r)
+    {
+      return new Position(l.X + r.X, l.Y + r.Y, l.Z + r.Z);
+    }
 
-  /**
-   * @brief operator/
-   *
-   * @since 1.0.0
-   * @param [in] a The Position to divide.
-   * @param [in] b The Position to divide
-   * @return float value of division operation
-   */ 
-           public static float operator /(Position a, Position b)
-           {
-               return (float)System.Math.Sqrt((a.X / b.X) * (a.Y / b.Y) * (a.Z / b.Z));
-           }
+    /**
+     * @brief operator-
+     *
+     * @since 1.0.0
+     * @param [in] l The Position to substract.
+     * @param [in] r The Position to substract
+     * @return A reference to this
+     */
+    public static Position operator -(Position l, Position r)
+    {
+      return new Position(l.X - r.X, l.Y - r.Y, l.Z - r.Z);
+    }
 
-  /**
-   * @brief Equals
-   *
-   * @since 1.0.0
-   * @param [in] o The Position object to compare.
-   * @return bool, whether object equal or not
-   */
-           public override bool Equals(object obj)
-           {
-               Position r = obj as Position;
-               if (r == null)
-               {
-                   return false;
-               }
-               return this.X == r.X && this.Y == r.Y && this.Z == r.Z;
-           }
+    /**
+     * @brief operator*
+     *
+     * @since 1.0.0
+     * @param [in] a The Position to multiply.
+     * @param [in] b The constant to multiply of type double.
+     * @return A reference to this
+     */
+    public static Position operator *(Position a, double b)
+    {
+      return new Position((int)(a.X * b), (int)(a.Y * b), (int)(a.Z * b));
+    }
 
-  /**
-   * @brief GetHashCode
-   *
-   * @since 1.0.0
-   * @return int, hascode of position
-   */
-           public override int GetHashCode()
-           {
-               return base.GetHashCode();
-           }
+    /**
+     * @brief operator/
+     *
+     * @since 1.0.0
+     * @param [in] a The Position to divide.
+     * @param [in] b The Position to divide
+     * @return float value of division operation
+     */
+    public static float operator /(Position a, Position b)
+    {
+      return (float)System.Math.Sqrt((a.X / b.X) * (a.Y / b.Y) * (a.Z / b.Z));
+    }
 
-  /**
-   * @brief Clone
-   *
-   * @since 1.0.0
-   * @return Position object
-   */
-           public Position Clone()
-           {
-               Position copy = new Position(X, Y, Z);
-               return copy;
-           }
-      }
+    /**
+     * @brief Operator ==
+     *
+     * @since 1.0.0
+     * @param [in] a The Position object to compare.
+     * @param [in] b The Position object to compare.
+     * @return bool, whether Position are equal or not
+     */
+    public static bool operator == (Position a, Position b)
+    {
+      return a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+    }
 
+    /**
+     * @brief Operator !=
+     *
+     * @since 1.0.0
+     * @param [in] a The Position object to compare.
+     * @param [in] b The Position object to compare.
+     * @return bool, whether Position are equal or not
+     */
+    public static bool operator != (Position a, Position b)
+    {
+      return a.X != b.X || a.Y != b.Y || a.Z == b.Z;
+    }
+
+    /**
+     * @brief GetHashCode
+     *
+     * @since 1.0.0
+     * @return int, hascode of position
+     */
+    public override int GetHashCode()
+    {
+      return base.GetHashCode();
+    }
+
+    /**
+     * @brief Clone
+     *
+     * @since 1.0.0
+     * @return Position object
+     */
+    public Position Clone()
+    {
+      Position copy = new Position(X, Y, Z);
+      return copy;
+    }
+
+    // User-defined conversion from Position to Vector3
+    public static implicit operator Vector3(Position pos)
+    {
+      return new Vector3(pos.x, pos.y, pos.z);
+    }
+
+    public static implicit operator Position(Vector3 vec)
+    {
+      return new Position(vec.x, vec.y, vec.z);
+    }
+  }
 }

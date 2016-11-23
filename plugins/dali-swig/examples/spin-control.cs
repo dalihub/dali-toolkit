@@ -36,8 +36,8 @@ namespace MyCSharpExample
         private string _fontFamily;
         private string _fontStyle;
         private int _pointSize;
-        private Vector4 _textColor;
-        private Vector4 _textBackgroundColor;
+        private Color _textColor;
+        private Color _textBackgroundColor;
         private int _maxTextLength;
 
         public Spin() : base(ViewWrapperImpl.CustomViewBehaviour.REQUIRES_KEYBOARD_NAVIGATION_SUPPORT | ViewWrapperImpl.CustomViewBehaviour.DISABLE_STYLE_CHANGE_SIGNALS)
@@ -48,7 +48,7 @@ namespace MyCSharpExample
         {
             // Initialize the properties
             _arrowImage = "./images/arrow.png";
-            _textBackgroundColor = new Vector4(0.6f, 0.6f, 0.6f, 1.0f);
+            _textBackgroundColor = new Color(0.6f, 0.6f, 0.6f, 1.0f);
             _currentValue = 0;
             _minValue = 0;
             _maxValue = 0;
@@ -229,8 +229,8 @@ namespace MyCSharpExample
             }
         }
 
-        // TextColor property of type Vector4:
-        public Vector4 TextColor
+        // TextColor property of type Color:
+        public Color TextColor
         {
             get
             {
@@ -305,7 +305,7 @@ namespace MyCSharpExample
         public void Initialize(object source, AUIApplicationInitEventArgs e)
         {
             Stage stage = Stage.GetCurrent();
-            stage.SetBackgroundColor( NDalic.WHITE );
+            stage.BackgroundColor = Color.White;
 
             // Create a container for the spins
             _container = new FlexContainer();
@@ -331,7 +331,7 @@ namespace MyCSharpExample
             _spinYear.Step = 1;
             _spinYear.MaxTextLength = 4;
             _spinYear.TextPointSize = 26;
-            _spinYear.TextColor = NDalic.WHITE;
+            _spinYear.TextColor = Color.White;
             _spinYear.SetKeyboardFocusable(true);
             _spinYear.Name = "_spinYear";
 
@@ -349,7 +349,7 @@ namespace MyCSharpExample
             _spinMonth.Step = 1;
             _spinMonth.MaxTextLength = 2;
             _spinMonth.TextPointSize = 26;
-            _spinMonth.TextColor = NDalic.WHITE;
+            _spinMonth.TextColor = Color.White;
             _spinMonth.SetKeyboardFocusable(true);
             _spinMonth.Name = "_spinMonth";
 
@@ -367,7 +367,7 @@ namespace MyCSharpExample
             _spinDay.Step = 1;
             _spinDay.MaxTextLength = 2;
             _spinDay.TextPointSize = 26;
-            _spinDay.TextColor = NDalic.WHITE;
+            _spinDay.TextColor = Color.White;
             _spinDay.SetKeyboardFocusable(true);
             _spinDay.Name = "_spinDay";
 
