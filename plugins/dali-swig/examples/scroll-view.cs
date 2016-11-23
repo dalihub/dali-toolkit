@@ -18,7 +18,6 @@
 using System;
 using System.Runtime.InteropServices;
 using Dali;
-using Dali.CSharp;
 
 namespace MyCSharpExample
 {
@@ -51,14 +50,14 @@ namespace MyCSharpExample
     private void CreateScrollView()
     {
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor = new Dali.CSharp.Color(Dali.CSharp.Colors.Green);
+      stage.BackgroundColor = new Color("white");
 
       // Create a scroll view
       _scrollView = new ScrollView();
       Size stageSize = stage.Size;
-      _scrollView.Size = new Position(stageSize.W, stageSize.H, 0.0f);
-      _scrollView.ParentOrigin = new Position(NDalic.ParentOriginCenter);
-      _scrollView.AnchorPoint = new Position(NDalic.AnchorPointCenter);
+      _scrollView.Size = new Position(stageSize.x, stageSize.y, 0.0f);
+      _scrollView.ParentOrigin = NDalic.ParentOriginCenter;
+      _scrollView.AnchorPoint = NDalic.AnchorPointCenter;
       stage.Add(_scrollView);
 
       // Add actors to a scroll view with 3 pages
@@ -70,15 +69,15 @@ namespace MyCSharpExample
         {
           View pageActor = new View();
           pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
-          pageActor.ParentOrigin = new Position(NDalic.ParentOriginCenter);
-          pageActor.AnchorPoint = new Position(NDalic.AnchorPointCenter);
-          pageActor.Position = new Position(pageColumn * stageSize.W, pageRow * stageSize.H, 0.0f);
+          pageActor.ParentOrigin = NDalic.ParentOriginCenter;
+          pageActor.AnchorPoint = NDalic.AnchorPointCenter;
+          pageActor.Position = new Position(pageColumn * stageSize.x, pageRow * stageSize.y, 0.0f);
 
           // Add images in a 3x4 grid layout for each page
           int imageRows = 4;
           int imageColumns = 3;
           float margin = 10.0f;
-          Position imageSize = new Position((stageSize.W / imageColumns) - margin, (stageSize.H / imageRows) - margin, 0.0f);
+          Position imageSize = new Position((stageSize.x / imageColumns) - margin, (stageSize.y / imageRows) - margin, 0.0f);
 
           for(int row = 0; row < imageRows; row++)
           {
@@ -86,11 +85,11 @@ namespace MyCSharpExample
             {
               int imageId = (row * imageColumns + column) % 2 + 1;
               ImageView imageView = new ImageView("images/image-" + imageId + ".jpg");
-              imageView.ParentOrigin = new Position(NDalic.ParentOriginCenter);
-              imageView.AnchorPoint = new Position(NDalic.AnchorPointCenter);
+              imageView.ParentOrigin = NDalic.ParentOriginCenter;
+              imageView.AnchorPoint = NDalic.AnchorPointCenter;
               imageView.Size = imageSize;
-              imageView.Position = new Position( margin * 0.5f + (imageSize.X + margin) * column - stageSize.W * 0.5f + imageSize.X * 0.5f,
-                  margin * 0.5f + (imageSize.Y + margin) * row - stageSize.H * 0.5f + imageSize.Y * 0.5f, 0.0f );
+              imageView.Position = new Position( margin * 0.5f + (imageSize.x + margin) * column - stageSize.x * 0.5f + imageSize.x * 0.5f,
+                  margin * 0.5f + (imageSize.y + margin) * row - stageSize.y * 0.5f + imageSize.y * 0.5f, 0.0f );
               pageActor.Add(imageView);
             }
           }
@@ -103,20 +102,20 @@ namespace MyCSharpExample
 
       // Set scroll view to have 3 pages in X axis and allow page snapping,
       // and also disable scrolling in Y axis.
-      RulerPtr scrollRulerX = new RulerPtr(new FixedRuler(stageSize.W));
+      RulerPtr scrollRulerX = new RulerPtr(new FixedRuler(stageSize.width));
       RulerPtr scrollRulerY = new RulerPtr(new DefaultRuler());
-      scrollRulerX.SetDomain(new RulerDomain(0.0f, stageSize.W * pageColumns, true));
+      scrollRulerX.SetDomain(new RulerDomain(0.0f, stageSize.width * pageColumns, true));
       scrollRulerY.Disable();
       _scrollView.SetRulerX(scrollRulerX);
       _scrollView.SetRulerY(scrollRulerY);
 
       // Create a horizontal scroll bar in the bottom of scroll view (which is optional)
       _scrollBar = new ScrollBar();
-      _scrollBar.ParentOrigin = new Position(NDalic.ParentOriginBottomLeft);
-      _scrollBar.AnchorPoint = new Position(NDalic.AnchorPointTopLeft);
+      _scrollBar.ParentOrigin = NDalic.ParentOriginBottomLeft;
+      _scrollBar.AnchorPoint = NDalic.AnchorPointTopLeft;
       _scrollBar.SetResizePolicy(ResizePolicyType.FIT_TO_CHILDREN, DimensionType.WIDTH);
       _scrollBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
-      _scrollBar.Orientation = new Quaternion( new Radian( new Degree( 270.0f ) ), Vector3.ZAXIS);
+      _scrollBar.Orientation = new Quaternion( new Radian( new Degree( 270.0f ) ), Position.ZAXIS );
       _scrollBar.SetScrollDirection(ScrollBar.Direction.Horizontal);
       _scrollView.Add(_scrollBar);
 
@@ -126,8 +125,8 @@ namespace MyCSharpExample
       _scrollView.WheelMoved += Onwheel;
       _scrollView.KeyInputFocusGained += OnKey;
       _text = new TextLabel("View Touch Event Handler Test");
-      _text.ParentOrigin = new Position(NDalic.ParentOriginCenter);
-      _text.AnchorPoint = new Position(NDalic.AnchorPointCenter);
+      _text.ParentOrigin = NDalic.ParentOriginCenter;
+      _text.AnchorPoint = NDalic.AnchorPointCenter;
       _text.HorizontalAlignment = "CENTER";
       _text.PointSize = 48.0f;
 
@@ -167,8 +166,8 @@ namespace MyCSharpExample
 
         _animation = new Animation(1.0f); // 1 second of duration
 
-        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, 0.5f));
-        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
+        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Position.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, 0.5f));
+        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Position.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
 
         // Connect the signal callback for animaiton finished signal
         _animation.Finished += AnimationFinished;

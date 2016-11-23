@@ -18,7 +18,6 @@
 using System;
 using System.Runtime.InteropServices;
 using Dali;
-using Dali.CSharp;
 
 namespace MyCSharpExample
 {
@@ -39,14 +38,14 @@ namespace MyCSharpExample
         {
             Console.WriteLine("Customized Application Initialize event handler");
             Stage stage = Stage.GetCurrent();
-            stage.BackgroundColor = new Dali.CSharp.Color(Dali.CSharp.Colors.Red);
+            stage.BackgroundColor = new Color("white");
 
-            stage.Touched += OnStageTouched;
+	    stage.Touched += OnStageTouched;
 
             // Add a _text label to the stage
             _text = new TextLabel("Hello Mono World");
-            _text.ParentOrigin = new Position(NDalic.ParentOriginCenter);
-            _text.AnchorPoint = new Position(NDalic.AnchorPointCenter);
+            _text.ParentOrigin = NDalic.ParentOriginCenter;
+            _text.AnchorPoint = NDalic.AnchorPointCenter;
             _text.HorizontalAlignment = "CENTER";
             _text.PointSize = 32.0f;
 

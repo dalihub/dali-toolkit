@@ -18,7 +18,6 @@
 using System;
 using System.Runtime.InteropServices;
 using Dali;
-using Dali.CSharp;
 
 namespace MyCSharpExample
 {
@@ -31,7 +30,6 @@ namespace MyCSharpExample
 
     public Example(Dali.Application application)
     {
-      Console.WriteLine( "DBG : Example Constructor.... " );
       _application = application;
       Console.WriteLine( "InitSignal connection count = " + _application.InitSignal().GetConnectionCount() );
 
@@ -42,43 +40,37 @@ namespace MyCSharpExample
     public void Initialize(object source, AUIApplicationInitEventArgs e)
     {
 
-      Console.WriteLine( "DBG : Initializing.... " );
       OperatorTests();
 
       Handle handle = new Handle();
-      Console.WriteLine( "DBG : Initializing.... "+ handle );
       int myPropertyIndex = handle.RegisterProperty("myProperty", new Property.Value(10.0f), Property.AccessMode.READ_WRITE);
       float myProperty = 0.0f;
       handle.GetProperty(myPropertyIndex).Get(ref myProperty);
       Console.WriteLine( "myProperty value: " + myProperty );
 
-      Size s = new Size(5.0f, 5.0f);
-      Property.Value val = new Property.Value(s);
-      int myPropertyIndex2 = handle.RegisterProperty("myProperty2", val, Property.AccessMode.READ_WRITE);
+      int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Size(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
       Size myProperty2 = new Size(0.0f, 0.0f);
       handle.GetProperty(myPropertyIndex2).Get(myProperty2);
-      Console.WriteLine( "myProperty2 value: " + myProperty2.W + ", " + myProperty2.H );
+      Console.WriteLine( "myProperty2 value: " + myProperty2.x + ", " + myProperty2.y );
 
       Actor actor = new Actor();
       actor.Size = new Position(200.0f, 200.0f, 0.0f);
       actor.Name = "MyActor";
-      actor.Color = new Color(Colors.Green);
+      actor.Color = new Color(1.0f, 0.0f, 1.0f, 0.8f);
       Console.WriteLine("Actor id: {0}", actor.GetId());
-      Console.WriteLine( "DBG : Initializing.... "+ actor.Size.X );
-
-      Console.WriteLine("Actor size: " + actor.Size.X + ", " + actor.Size.Y);
+      Console.WriteLine("Actor size: " + actor.Size.x + ", " + actor.Size.y);
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor =  new Dali.CSharp.Color(Dali.CSharp.Colors.Blue) ;
+      stage.BackgroundColor =  new Color(Colors.White) ;
 
       Size stageSize = stage.Size;
-      Console.WriteLine("Stage size: " + stageSize.W + ", " + stageSize.H);
+      Console.WriteLine("Stage size: " + stageSize.x + ", " + stageSize.y);
       stage.Add(actor);
 
       TextLabel text = new TextLabel("Hello Mono World");
-      text.ParentOrigin = new Position(NDalic.ParentOriginCenter);
-      text.AnchorPoint = new Position(NDalic.AnchorPointCenter);
+      text.ParentOrigin = NDalic.ParentOriginCenter;
+      text.AnchorPoint = NDalic.AnchorPointCenter;
       text.HorizontalAlignment = "CENTER";
       stage.Add(text);
 
@@ -136,41 +128,41 @@ namespace MyCSharpExample
       Console.WriteLine( "    Area  = " + rd2.Area() );
 
       Console.WriteLine( " *************************" );
-      Size size = new Size(100, 50);
-      Console.WriteLine( "    Created " + size );
-      Console.WriteLine( "    Size width =  " + size.W + ", height = " + size.H );
-      size += new Size(20, 20);
-      Console.WriteLine( "    Size W =  " + size.W + ", H = " + size.H );
-      size.W += 10;
-      size.H += 10;
-      Console.WriteLine( "    Size width =  " + size.W + ", height = " + size.H );
-      size += new Size(15, 15);
-      Console.WriteLine( "    Size width =  " + size.W + ", height = " + size.H );
+      Size Size = new Size(100, 50);
+      Console.WriteLine( "    Created " + Size );
+      Console.WriteLine( "    Size x =  " + Size.x + ", y = " + Size.y );
+      Size += new Size(20, 20);
+      Console.WriteLine( "    Size x =  " + Size[0] + ", y = " + Size[1] );
+      Size.x += 10;
+      Size.y += 10;
+      Console.WriteLine( "    Size width =  " + Size.width + ", height = " + Size.height );
+      Size += new Size(15, 15);
+      Console.WriteLine( "    Size width =  " + Size[0] + ", height = " + Size[1] );
 
       Console.WriteLine( " *************************" );
-      Dali.CSharp.Position position = new Dali.CSharp.Position(20, 100, 50);
-      Console.WriteLine( "    Created " + position );
-      Console.WriteLine( "    Position x =  " + position.X + ", y = " + position.Y + ", z = " + position.Z );
-      position += new Dali.CSharp.Position(20, 20, 20);
-      Console.WriteLine( "    Position x =  " + position.X + ", y = " + position.Y + ", z = " + position.Y );
-      position.X += 10;
-      position.Y += 10;
-      position.Z += 10;
-      Console.WriteLine( "    Position width =  " + position.X + ", height = " + position.Y + ", depth = " + position.Z );
-      Dali.CSharp.Position parentOrigin = new Dali.CSharp.Position(NDalic.ParentOriginBottomRight);
-      Console.WriteLine( "    parentOrigin x =  " + parentOrigin.X + ", y = " + parentOrigin.Y + ", z = " + parentOrigin.Z );
+      Position Position = new Position(20, 100, 50);
+      Console.WriteLine( "    Created " + Position );
+      Console.WriteLine( "    Position x =  " + Position.x + ", y = " + Position.y + ", z = " + Position.z );
+      Position += new Position(20, 20, 20);
+      Console.WriteLine( "    Position x =  " + Position[0] + ", y = " + Position[1] + ", z = " + Position[2] );
+      Position.x += 10;
+      Position.y += 10;
+      Position.z += 10;
+      Console.WriteLine( "    Position width =  " + Position.width + ", height = " + Position.height + ", depth = " + Position.depth );
+      Position parentOrigin = new Dali.Position(NDalic.ParentOriginBottomRight);
+      Console.WriteLine( "    parentOrigin x =  " + parentOrigin.x + ", y = " + parentOrigin.y + ", z = " + parentOrigin.z );
 
       Console.WriteLine( " *************************" );
-      Dali.CSharp.Color color = new Dali.CSharp.Color(20, 100, 50, 200);
-      Console.WriteLine( "    Created " + color );
-      Console.WriteLine( "    Color x =  " + color.R + ", y = " + color.G + ", z = " + color.B + ", w = " + color.A );
-      color += new Dali.CSharp.Color(20, 20, 20, 20);
-      Console.WriteLine( "    Color x =  " + color.R + ", y = " + color.G + ", z = " + color.B + ", w = " + color.A );
-      color.R += 10;
-      color.G += 10;
-      color.B += 10;
-      color.A += 10;
-      Console.WriteLine( "    Color x =  " + color.R + ", y = " + color.G + ", z = " + color.B + ", w = " + color.A );
+      Color Color = new Color(20, 100, 50, 200);
+      Console.WriteLine( "    Created " + Color );
+      Console.WriteLine( "    Color x =  " + Color.x + ", y = " + Color.y + ", z = " + Color.z + ", w = " + Color.w );
+      Color += new Color(20, 20, 20, 20);
+      Console.WriteLine( "    Color x =  " + Color[0] + ", y = " + Color[1] + ", z = " + Color[2] + ", w = " + Color[3] );
+      Color.x += 10;
+      Color.y += 10;
+      Color.z += 10;
+      Color.w += 10;
+      Console.WriteLine( "    Color r =  " + Color.r + ", g = " + Color.g + ", b = " + Color.b + ", a = " + Color.a );
     }
 
 

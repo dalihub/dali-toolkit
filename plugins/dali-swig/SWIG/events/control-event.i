@@ -370,7 +370,7 @@
 
     /**
      * @brief Event for KeyInputFocusGained signal which can be used to subscribe/unsubscribe the event handler
-     * (in the type of KeyInputFocusGainedEventHandler-DaliEventHandler<object,KeyInputFocusGainedEventArgs>)
+     * (in the type of KeyInputFocusGainedEventHandler-DaliEventHandler<object,KeyInputFocusGainedEventArgs>) 
      * provided by the user. KeyInputFocusGained signal is emitted when the control gets Key Input Focus.
      */
     public event DaliEventHandler<object,KeyInputFocusGainedEventArgs> KeyInputFocusGained
@@ -421,7 +421,7 @@
 
     /**
      * @brief Event for KeyInputFocusLost signal which can be used to subscribe/unsubscribe the event handler
-     * (in the type of KeyInputFocusLostEventHandler-DaliEventHandler<object,KeyInputFocusLostEventArgs>)
+     * (in the type of KeyInputFocusLostEventHandler-DaliEventHandler<object,KeyInputFocusLostEventArgs>) 
      * provided by the user. KeyInputFocusLost signal is emitted when the control loses Key Input Focus.
      */
     public event DaliEventHandler<object,KeyInputFocusLostEventArgs> KeyInputFocusLost
@@ -471,7 +471,7 @@
 
     /**
      * @brief Event for KeyPressed signal which can be used to subscribe/unsubscribe the event handler
-     * (in the type of KeyEventEventHandler-DaliEventHandlerWithReturnType<object,KeyEventArgs,bool>)
+     * (in the type of KeyEventEventHandler-DaliEventHandlerWithReturnType<object,KeyEventArgs,bool>) 
      * provided by the user. KeyPressed signal is emitted when key event is received.
      */
     public event DaliEventHandlerWithReturnType<object,KeyEventArgs,bool> KeyPressed
@@ -842,184 +842,6 @@
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     }
-
-/* Properties earlier added by Ruby Script */
-
-  public Dali.CSharp.Size CellIndex
-  {
-    get
-    {
-      Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( TableView.ChildProperty.CELL_INDEX).Get(  temp );
-      Dali.CSharp.Size ret = new Dali.CSharp.Size(temp.x, temp.y);
-      return ret;
-    }
-    set
-    {
-      SetProperty( TableView.ChildProperty.CELL_INDEX, new Dali.Property.Value( value ) );
-    }
-  }
-  public float RowSpan
-  {
-    get
-    {
-      float temp = 0.0f;
-      GetProperty( TableView.ChildProperty.ROW_SPAN).Get( ref temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( TableView.ChildProperty.ROW_SPAN, new Dali.Property.Value( value ) );
-    }
-  }
-  public float ColumnSpan
-  {
-    get
-    {
-      float temp = 0.0f;
-      GetProperty( TableView.ChildProperty.COLUMN_SPAN).Get( ref temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( TableView.ChildProperty.COLUMN_SPAN, new Dali.Property.Value( value ) );
-    }
-  }
-  public string CellHorizontalAlignment
-  {
-    get
-    {
-      string temp;
-      GetProperty( TableView.ChildProperty.CELL_HORIZONTAL_ALIGNMENT).Get( out temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( TableView.ChildProperty.CELL_HORIZONTAL_ALIGNMENT, new Dali.Property.Value( value ) );
-    }
-  }
-  public string CellVerticalAlignment
-  {
-    get
-    {
-      string temp;
-      GetProperty( TableView.ChildProperty.CELL_VERTICAL_ALIGNMENT).Get( out temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( TableView.ChildProperty.CELL_VERTICAL_ALIGNMENT, new Dali.Property.Value( value ) );
-    }
-  }
-
-  public float Flex
-  {
-    get
-    {
-      float temp = 0.0f;
-      GetProperty( FlexContainer.ChildProperty.FLEX).Get( ref temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( FlexContainer.ChildProperty.FLEX, new Dali.Property.Value( value ) );
-    }
-  }
-  public int AlignSelf
-  {
-    get
-    {
-      int temp = 0;
-      GetProperty( FlexContainer.ChildProperty.ALIGN_SELF).Get( ref temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( FlexContainer.ChildProperty.ALIGN_SELF, new Dali.Property.Value( value ) );
-    }
-  }
-  public Vector4 FlexMargin
-  {
-    get
-    {
-      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
-      GetProperty( FlexContainer.ChildProperty.FLEX_MARGIN).Get(  temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( FlexContainer.ChildProperty.FLEX_MARGIN, new Dali.Property.Value( value ) );
-    }
-  }
-
-  public string StyleName
-  {
-    get
-    {
-      string temp;
-      GetProperty( View.Property.STYLE_NAME).Get( out temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( View.Property.STYLE_NAME, new Dali.Property.Value( value ) );
-    }
-  }
-  public Dali.CSharp.Color BackgroundColor
-  {
-    get
-    {
-      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
-      GetProperty( View.Property.BACKGROUND_COLOR).Get(  temp );
-      Dali.CSharp.Color ret = new Dali.CSharp.Color(temp.r, temp.g, temp.b, temp.a);
-      return ret;
-    }
-    set
-    {
-      SetProperty( View.Property.BACKGROUND_COLOR, new Dali.Property.Value( value ) );
-    }
-  }
-  public Dali.Property.Map BackgroundImage
-  {
-    get
-    {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( View.Property.BACKGROUND_IMAGE).Get(  temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( View.Property.BACKGROUND_IMAGE, new Dali.Property.Value( value ) );
-    }
-  }
-  public bool KeyInputFocus
-  {
-    get
-    {
-      bool temp = false;
-      GetProperty( View.Property.KEY_INPUT_FOCUS).Get( ref temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( View.Property.KEY_INPUT_FOCUS, new Dali.Property.Value( value ) );
-    }
-  }
-  public Dali.Property.Map Background
-  {
-    get
-    {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( View.Property.BACKGROUND).Get(  temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( View.Property.BACKGROUND, new Dali.Property.Value( value ) );
-    }
-  }
-
-/* Properties ends */
 
     %}
 
