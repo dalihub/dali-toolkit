@@ -238,17 +238,6 @@ void BatchImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
-void BatchImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value BatchImageVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
 Shader BatchImageVisual::GetBatchShader( VisualFactoryCache& factoryCache )
 {
   Shader shader = factoryCache.GetShader( VisualFactoryCache::BATCH_IMAGE_SHADER );

@@ -317,17 +317,6 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
-void GradientVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value GradientVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
 void GradientVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );

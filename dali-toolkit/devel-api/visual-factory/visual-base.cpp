@@ -91,16 +91,6 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   GetImplementation( *this ).CreatePropertyMap( map );
 }
 
-void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  GetImplementation( *this ).SetProperty( index, propertyValue );
-}
-
-Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
-{
-  return GetImplementation( *this ).GetProperty( index );
-}
-
 } // namespace Toolkit
 
 } // namespace Dali

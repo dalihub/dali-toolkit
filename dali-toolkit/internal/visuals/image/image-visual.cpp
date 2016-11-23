@@ -699,17 +699,6 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 }
 
-void ImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
 void ImageVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )

@@ -418,17 +418,6 @@ void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::PrimitiveVisual::Property::LIGHT_POSITION, mLightPosition );
 }
 
-void PrimitiveVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value PrimitiveVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
 void PrimitiveVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )

@@ -204,57 +204,6 @@ bool Visual::Base::IsFromCache() const
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }
 
-void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
-                      ( index > VISUAL_PROPERTY_BASE_START_INDEX ) && // Change the type of visual is not allowed.
-                      "Property index is out of bounds" );
-
-  if( index < VISUAL_PROPERTY_START_INDEX )
-  {
-    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
-    {
-      Property::Map* transformMap = propertyValue.GetMap();
-      if( transformMap )
-      {
-        SetTransformAndSize( *transformMap, mImpl->mControlSize );
-      }
-    }
-
-    // TODO set the properties of the visual base.
-  }
-  else
-  {
-    DoSetProperty( index, propertyValue );
-  }
-}
-
-Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
-{
-  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
-                      ( index >= VISUAL_PROPERTY_BASE_START_INDEX ) &&
-                      "Property index is out of bounds" );
-
-  Dali::Property::Value value;
-
-  if( index < VISUAL_PROPERTY_START_INDEX )
-  {
-    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
-    {
-      Property::Map map;
-      mImpl->mTransform.GetPropertyMap( map );
-      return map;
-    }
-    // TODO retrieve the properties of the visual base.
-  }
-  else
-  {
-    value = DoGetProperty( index );
-  }
-
-  return value;
-}
-
 } // namespace Internal
 
 } // namespace Toolkit

@@ -109,17 +109,6 @@ void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::WIREFRAME );
 }
 
-void WireframeVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value WireframeVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
 void WireframeVisual::InitializeRenderer()
 {
   Shader shader = mFactoryCache.GetShader( VisualFactoryCache::WIREFRAME_SHADER );
