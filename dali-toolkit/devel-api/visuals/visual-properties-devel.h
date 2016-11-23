@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_VISUAL_PROPERTIES_DEVEL_H
-#define DALI_TOOLKIT_VISUAL_PROPERTIES_DEVEL_H
+#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
+#define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -35,15 +35,85 @@ namespace DevelVisual
  */
 enum Type
 {
-  BORDER = Dali::Toolkit::Visual::BORDER,
-  COLOR = Dali::Toolkit::Visual::COLOR,
-  GRADIENT = Dali::Toolkit::Visual::GRADIENT,
-  IMAGE = Dali::Toolkit::Visual::IMAGE,
-  MESH = Dali::Toolkit::Visual::MESH,
+  BORDER    = Dali::Toolkit::Visual::BORDER,
+  COLOR     = Dali::Toolkit::Visual::COLOR,
+  GRADIENT  = Dali::Toolkit::Visual::GRADIENT,
+  IMAGE     = Dali::Toolkit::Visual::IMAGE,
+  MESH      = Dali::Toolkit::Visual::MESH,
   PRIMITIVE = Dali::Toolkit::Visual::PRIMITIVE,
   WIREFRAME = Dali::Toolkit::Visual::WIREFRAME,
-  TEXT = Dali::Toolkit::Visual::WIREFRAME + 1, ///< Renders text.
+
+  TEXT      = WIREFRAME + 1, ///< Renders text.
 };
+
+namespace Property
+{
+
+enum Type
+{
+  TYPE   = Dali::Toolkit::Visual::Property::TYPE,
+  SHADER = Dali::Toolkit::Visual::Property::SHADER,
+
+  /**
+   * @brief The transform used by the visual.
+   * @details Name "transform", type Property::Map.
+
+   * @note Optional.
+   * @see DevelVisual::Transform::Property
+   */
+  TRANSFORM = SHADER+1//Dali::Toolkit::Visual::Property::SHADER+1
+};
+
+} //namespace Property
+
+namespace Transform
+{
+
+namespace Property
+{
+
+enum Type
+{
+  /**
+   * @brief Offset of the visual. It can be either relative (percentage of the parent)
+   * or absolute (in world units).
+   * @details Name "offset", type Property::VECTOR2
+   */
+  OFFSET,
+
+  /**
+   * @brief Size of the visual. It can be either relative (percentage of the parent)
+   * or absolute (in world units).
+   * @details Name "size", type Property::VECTOR2
+   */
+  SIZE,
+
+  /**
+   * @brief The origin of the visual within its control area.
+   * @details Name "origin", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @see Toolkit::Align
+   */
+  ORIGIN,
+
+  /**
+   * @brief The anchor-point of the visual
+   * @details Name "anchorPoint", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @see Toolkit::Align
+   */
+  ANCHOR_POINT,
+
+  /**
+   * @brief Indicates which components of the offset and size are relative
+   * (percentage of the parent) or absolute (in world units).
+   * 0 indicates the component is relative, and 1 absolute.
+   * @details Name "offsetSizeMode", type Property::VECTOR4
+   */
+  OFFSET_SIZE_MODE
+};
+
+} //namespace Property
+
+} // namespace Transform
 
 } // namespace DevelVisual
 
@@ -51,4 +121,4 @@ enum Type
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_VISUAL_PROPERTIES_DEVEL_H
+#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H

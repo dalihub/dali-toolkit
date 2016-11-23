@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 
 // INTERNAL HEADER
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -155,7 +154,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   Property::Value value;
 
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::DevelVisual::TEXT );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::TEXT );
 
   std::string text;
   mController->GetText( text );
@@ -200,7 +199,7 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
     {
       case Property::Key::INDEX:
       {
-        if( Toolkit::VisualProperty::TYPE != keyValue.first.indexKey ) // Toolkit::VisualProperty::TYPE is not a TextVisual's property.
+        if( Toolkit::DevelVisual::Property::TYPE != keyValue.first.indexKey ) // Toolkit::DevelVisual::Property::TYPE is not a TextVisual's property.
         {
           SetProperty( keyValue.first.indexKey, keyValue.second );
         }

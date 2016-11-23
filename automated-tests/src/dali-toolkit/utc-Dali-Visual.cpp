@@ -23,7 +23,6 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
@@ -48,11 +47,11 @@ Property::Map DefaultTransform()
 {
   Property::Map transformMap;
   transformMap
-    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::VisualProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::VisualProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::VisualProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
   return transformMap;
 }
 
@@ -1245,33 +1244,33 @@ int UtcDaliVisualGetTransform(void)
 
   Dali::Property::Map visualMap;
   colorVisual.CreatePropertyMap( visualMap );
-  Property::Value* value = visualMap.Find( Dali::Toolkit::Visual::DevelProperty::TRANSFORM );
+  Property::Value* value = visualMap.Find( Dali::Toolkit::DevelVisual::Property::TRANSFORM );
   Dali::Property::Map* map = value->GetMap();
   DALI_TEST_CHECK( map );
 
   //Test default values
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( typeValue->Get<Vector2>() == Vector2(0.0f,0.0f) );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::SIZE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::SIZE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( typeValue->Get<Vector2>() == Vector2(1.0f,1.0f) );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( typeValue->Get<Vector4>() == Vector4(0.0f,0.0f,0.0f,0.0f) );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
   }
@@ -1282,42 +1281,42 @@ int UtcDaliVisualGetTransform(void)
 static void TestTransform( ToolkitTestApplication& application, Visual::Base visual )
 {
   Property::Map transform;
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET, Vector2(10.0f, 10.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::SIZE, Vector2(0.2f, 0.2f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4(1.0f, 1.0f, 0.0f,0.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::ORIGIN, "TOP_BEGIN" );
-  transform.Insert( Visual::DevelProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(10.0f, 10.0f) );
+  transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(0.2f, 0.2f) );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4(1.0f, 1.0f, 0.0f,0.0f) );
+  transform.Insert( DevelVisual::Transform::Property::ORIGIN, "TOP_BEGIN" );
+  transform.Insert( DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
 
   visual.SetTransformAndSize( transform, Vector2(100, 100) );
 
   Dali::Property::Map visualMap;
   visual.CreatePropertyMap( visualMap );
-  Property::Value* value = visualMap.Find( Dali::Toolkit::Visual::DevelProperty::TRANSFORM );
+  Property::Value* value = visualMap.Find( Dali::Toolkit::DevelVisual::Property::TRANSFORM );
   Dali::Property::Map* map = value->GetMap();
   DALI_TEST_CHECK( map );
 
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( typeValue->Get<Vector2>(),Vector2(10.0f,10.0f), TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::SIZE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::SIZE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( typeValue->Get<Vector2>(), Vector2(0.2f,0.2f), TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( typeValue->Get<Vector4>(), Vector4(1.0f,1.0f,0.0f,0.0f), TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::TOP_BEGIN, TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map->Find( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::BOTTOM_END, TEST_LOCATION );
   }
@@ -1352,9 +1351,9 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
 
   //Set a new transform
   transform.Clear();
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4(0.0f, 0.0f, 1.0f,1.0f) );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
+  transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4(0.0f, 0.0f, 1.0f,1.0f) );
   visual.SetTransformAndSize( transform, Vector2(100, 100) );
   application.SendNotification();
   application.Render(0);

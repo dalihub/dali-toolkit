@@ -28,7 +28,7 @@
 #include <fstream>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -439,7 +439,7 @@ void MeshVisual::DoSetOnStage( Actor& actor )
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::MESH );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::MESH );
   map.Insert( Toolkit::MeshVisual::Property::OBJECT_URL, mObjectUrl );
   map.Insert( Toolkit::MeshVisual::Property::MATERIAL_URL, mMaterialUrl );
   map.Insert( Toolkit::MeshVisual::Property::TEXTURES_PATH, mTexturesPath );

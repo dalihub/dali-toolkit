@@ -23,7 +23,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -97,7 +97,7 @@ inline Property::Map CreateColorAdjuster()
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentShader;
 
   Property::Map map;
-  map[ Toolkit::VisualProperty::SHADER ] = customShader;
+  map[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
 
   return map;
 }

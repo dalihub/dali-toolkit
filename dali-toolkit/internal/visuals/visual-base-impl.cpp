@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -61,7 +61,7 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( VisualProperty::SHADER, CUSTOM_SHADER );
+  Property::Value* customShaderValue = propertyMap.Find( DevelVisual::Property::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
     Property::Map shaderMap;
@@ -71,7 +71,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
     }
   }
 
-  Property::Value* transform = propertyMap.Find( Toolkit::Visual::DevelProperty::TRANSFORM, TRANSFORM );
+  Property::Value* transform = propertyMap.Find( DevelVisual::Property::TRANSFORM, TRANSFORM );
   if( transform )
   {
     Property::Map map;
@@ -163,7 +163,7 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 
   Property::Map transform;
   mImpl->mTransform.GetPropertyMap( transform );
-  map.Insert( Toolkit::Visual::DevelProperty::TRANSFORM, transform );
+  map.Insert( DevelVisual::Property::TRANSFORM, transform );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )

@@ -38,7 +38,7 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -170,11 +170,11 @@ void SetDefaultTransform( Property::Map& propertyMap )
 {
   propertyMap.Clear();
   propertyMap
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
 }
 
 /**
@@ -571,7 +571,7 @@ void Control::SetBackgroundColor( const Vector4& color )
 {
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::DevelVisual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
   SetBackground( map );
