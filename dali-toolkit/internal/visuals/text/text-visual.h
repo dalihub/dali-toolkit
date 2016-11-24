@@ -136,7 +136,7 @@ private:
    * property map.
    * @param[in] propertyValue The value to set
    */
-  void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+  void SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
 
   /**
    * @brief Creates the text's renderer.
