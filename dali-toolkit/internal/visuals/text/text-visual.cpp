@@ -202,7 +202,7 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         if( Toolkit::VisualProperty::TYPE != keyValue.first.indexKey ) // Toolkit::VisualProperty::TYPE is not a TextVisual's property.
         {
-          DoSetProperty( keyValue.first.indexKey, keyValue.second );
+          SetProperty( keyValue.first.indexKey, keyValue.second );
         }
         break;
       }
@@ -210,39 +210,39 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         if( keyValue.first.stringKey == TEXT_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
         }
         else if( keyValue.first.stringKey == FONT_FAMILY_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::FONT_FAMILY, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::FONT_FAMILY, keyValue.second );
         }
         else if( keyValue.first.stringKey == FONT_STYLE_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::FONT_STYLE, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::FONT_STYLE, keyValue.second );
         }
         else if( keyValue.first.stringKey == POINT_SIZE_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::POINT_SIZE, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::POINT_SIZE, keyValue.second );
         }
         else if( keyValue.first.stringKey == MULTI_LINE_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::MULTI_LINE, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::MULTI_LINE, keyValue.second );
         }
         else if( keyValue.first.stringKey == HORIZONTAL_ALIGNMENT_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, keyValue.second );
         }
         else if( keyValue.first.stringKey == VERTICAL_ALIGNMENT_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, keyValue.second );
         }
         else if( keyValue.first.stringKey == TEXT_COLOR_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::TEXT_COLOR, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::TEXT_COLOR, keyValue.second );
         }
         else if( keyValue.first.stringKey == ENABLE_MARKUP_PROPERTY )
         {
-          DoSetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
+          SetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
         }
         break;
       }
@@ -280,7 +280,7 @@ void TextVisual::DoSetOffStage( Actor& actor )
   mControl.Reset();
 }
 
-void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+void TextVisual::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
   switch( index )
   {
