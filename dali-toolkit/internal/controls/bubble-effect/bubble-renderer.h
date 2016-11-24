@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H
-#define DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H
+#ifndef DALI_TOOLKIT_INTERNAL_BUBBLE_RENDERER_H
+#define DALI_TOOLKIT_INTERNAL_BUBBLE_RENDERER_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -34,56 +34,49 @@ namespace Internal
 {
 
 /**
- * BubbleActor is a group of bubbles.Each bubble can be moved separately.
+ * BubbleRenderer renders a group of bubbles.Each bubble can be moved separately.
  * Its custom shader achieves similar effect of particle system by applying on a specially created mesh
  * Each bubble is rendered on a patch with two triangles; and each mesh can contain multiple such patches, thus a group.
  */
-class BubbleActor : public RefObject
+class BubbleRenderer
 {
 public:
 
   /**
-   * Constructor
+   * Constructor   *
+   * @return A newly allocated object.
+   */
+  BubbleRenderer();
+
+  /**
+   * @brief Destructor
+   */
+  ~BubbleRenderer(){}
+
+  /**
+   * Prepare for the rendering: create the renderer, and register properties
    * @param[in] numberOfBubble How many groups of uniforms are used to control the bubble movement.
    * Note: Limited by the maximum available uniforms, this parameter cannot be bigger than 100.
    * Ideally use one group of uniform to control one bubble.
    * If the num of patches in the MeshActor is more than groups of uniforms,
    * the uniform values will be shared by multiple bubbles. Allow up to 9 times.
    * @param[in] movementArea The size of the bubble moving area, usually the same size as the background.
-   * @return A newly allocated object.
-   */
-  BubbleActor( unsigned int numberOfBubble,
-               const Vector2& movementArea);
-
-  /**
-   * @brief Destructor
-   */
-  ~BubbleActor(){}
-
-  /**
-   * Prepare for the rendering: create and add renderer, and register properties
    * @param[in] geometry The geometry to be used by the renderer
    * @param[in] textureSet The texture set to be used by the renderer
-   * @param[in] textureSet The shader set to be used by the renderer
+   * @param[in] shader The shader set to be used by the renderer
    */
-  void MakeRenderable( Geometry geometry, TextureSet textureSet, Shader shader  );
+  void Initialize( unsigned int numberOfBubble, const Vector2& movementArea, Geometry geometry, TextureSet textureSet, Shader shader  );
 
   /**
    * Return the mesh actor which is used to display the bubbles
    */
-  Actor GetMeshActor();
+  Renderer& GetRenderer();
 
   /**
    * Sets the geometry to be used by the renderer
    * @param[in] geometry The geometry to be used by the renderer
    */
   void SetGeometry( Geometry geometry );
-
-  /**
-   * Set the bubble movement area for the BubbleEffect
-   * @param[in] movementArea The size of bubble movement area; by default, it is the stage size
-   */
-  void SetMovementArea( const Vector2& movementArea );
 
   /**
    * Set the start and end positions of the index-th bubble's movement.
@@ -128,10 +121,7 @@ public:
 
 private:
 
-  Actor        mActor;
   Renderer     mRenderer;
-
-  Vector2      mMovementArea;      ///< The size of the bubble moving area, usually the same size as the background.
 
   //properties mapped as uniforms
   std::vector<Property::Index> mIndicesOffset;             ///< Indices of the properties mapping to uniform array 'uOffset'
@@ -140,9 +130,6 @@ private:
   Property::Index              mIndexGravity;              ///< Index of the property mapping to uniform 'uGravity'
   Property::Index              mIndexDynamicScale;         ///< Index of the property mapping to uniform 'uDynamicScale'
   Property::Index              mIndexInvertedMovementArea; ///< Index of the property mapping to uniform 'uInvertedMovementArea'
-
-  unsigned int mNumBubble;  ///< How many groups of uniforms are used to control the bubble movement.
-  unsigned int mRandomSeed; ///< Seed to generate random number.
 };
 
 } // namespace Internal
@@ -151,4 +138,4 @@ private:
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_BUBBLE_ACTOR_H
+#endif // DALI_TOOLKIT_INTERNAL_BUBBLE_RENDERER_H

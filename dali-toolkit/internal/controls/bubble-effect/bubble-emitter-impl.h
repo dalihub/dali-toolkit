@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/property-buffer.h>
@@ -42,8 +42,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class BubbleActor;
-typedef IntrusivePtr<BubbleActor> BubbleActorPtr;
+class BubbleRenderer;
 
 /**
  * BubbleEmitter implementation class.
@@ -61,7 +60,7 @@ public:
    * @copydoc Toolkit::BubbleEmitter::New
    */
   static Toolkit::BubbleEmitter New( const Vector2& winSize,
-                                     Image shapeImage,
+                                     Texture shapeTexture,
                                      unsigned int maximumNumberOfBubble,
                                      const Vector2& bubbleSizeRange );
 
@@ -73,12 +72,12 @@ public:
   /**
    * @copydoc Toolkit::BubbleEmitter::SetBackground
    */
-  void SetBackground( Image bgImage, const Vector3& hsvDelta );
+  void SetBackground( Texture bgTexture, const Vector3& hsvDelta );
 
   /**
-   * @copydoc Toolkit::BubbleEmitter::SetShapeImage
+   * @copydoc Toolkit::BubbleEmitter::SetShape
    */
-  void SetShapeImage( Image shapeImage );
+  void SetBubbleShape( Texture shapeTexture );
 
   /**
    * @copydoc Toolkit::BubbleEmiter::SetBubbleScale
@@ -105,12 +104,12 @@ private:
   /**
    * Construct a new BubbleEmitter object.
    * @param[in] movementArea The size of the bubble moving area
-   * @param[in] shapeImage The alpha channnel of this texture defines the bubble shape.
+   * @param[in] shapeTexture The alpha channnel of this texture defines the bubble shape.
    * @param[in] maximumNumberOfBubble The maximum number of bubble needed.
    * @param[in] bubbleSizeRange The size range of the bubbles; x component is the minimal size, and y component is the maximum size.
    */
   BubbleEmitter( const Vector2& movementArea,
-                 Image shapeImage,
+                 Texture shapeTexture,
                  unsigned int maximumNumberOfBubble,
                  const Vector2& bubbleSizeRange );
 
@@ -129,7 +128,7 @@ private:
 
   /**
    * Callback function of the finished signal of off-screen render task.
-   * @param[in] source The render task used to create the color adjusted background image.
+   * @param[in] source The render task used to create the color adjusted background texture.
    */
   void OnRenderFinished(RenderTask& source);
 
@@ -140,33 +139,34 @@ private:
 
   /**
    * Set the uniform values to the shader effect to emit a bubble
-   * @param[in] bubbleActor The BubbleActor to render the current bubble
+   * @param[in] bubbleRenderer The BubbleRenderer
    * @param[in] curUniform The index of the uniform array in the shader
    * @param[in] emitPosition The start position of the bubble movement.
    * @param[in] direction The direction used to constrain the bubble to move in an adjacent direction around it.
    * @param[in] displacement The displacement used to bound the moving distance of the bubble.
    */
-  void SetBubbleParameter( BubbleActorPtr bubbleActor, unsigned int curUniform,
+  void SetBubbleParameter( BubbleRenderer& bubbleRenderer, unsigned int curUniform,
                            const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
 
 private:
 
   Actor                       mBubbleRoot;          ///<The bubble root actor. Need to add it to stage to get the bubbles rendered.
-  Image                       mShapeImage;          ///< The alpha channnel of this texture defines the bubble shape.
-  Image                       mBackgroundImage;     ///< The original background image
-  FrameBufferImage            mEffectImage;         ///< The image stores the adjusted color of the background image.The bubbles pick color from this image.
+  Texture                     mShapeTexture;        ///< The alpha channnel of this texture defines the bubble shape.
+  Texture                     mBackgroundTexture;   ///< The original background texture
+  Texture                     mEffectTexture;       ///< Texture which stores the adjusted color of the background image.The bubbles pick color from this image.
+  FrameBuffer                 mFrameBuffer;         ///< FrameBuffer used for offscreen rendering
   CameraActor                 mCameraActor;         ///< The render task views the scene from the perspective of this actor.
 
   Geometry                    mMeshGeometry;         ///< The mesh geometry which contains the vertices and indices data
   TextureSet                  mTextureSet;           ///< The texture set which controls the bubble display
-  std::vector<BubbleActorPtr> mBubbleActors;         ///< The meshActor vector, its size is mNumShader.
+  std::vector<BubbleRenderer> mBubbleRenderers;      ///< The BubbleRenderer vector, its size is mNumShader.
 
   Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background.
   Vector2                     mBubbleSizeRange;     ///< The size range of the bubbles; x component is the low bound, and y component is the up bound.
   Vector3                     mHSVDelta;            ///< The HSV difference used to adjust the background image color.
 
-  unsigned int                mNumBubblePerActor;   ///< How many bubbles for each BubbleActor.
-  unsigned int                mNumActor;            ///< How many BubbleActors are used.
+  unsigned int                mNumBubblePerRenderer;   ///< How many bubbles for each BubbleRenderer.
+  unsigned int                mNumRenderer;            ///< How many BubbleRenderers are used.
   unsigned int                mDensity;             ///< How many bubbles will emit at each time, they are controlled by same uniforms in the shader.
   unsigned int                mTotalNumOfBubble;    ///< mNumBubblePerShader*mNumShader.
   unsigned int                mCurrentBubble;       ///< Keep track of the index for the newly emitted bubble

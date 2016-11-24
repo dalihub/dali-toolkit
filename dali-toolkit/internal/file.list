@@ -36,7 +36,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
-   $(toolkit_src_dir)/controls/bubble-effect/bubble-actor.cpp \
+   $(toolkit_src_dir)/controls/bubble-effect/bubble-renderer.cpp \
    $(toolkit_src_dir)/controls/buttons/button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
