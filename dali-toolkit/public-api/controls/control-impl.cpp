@@ -415,11 +415,6 @@ Toolkit::Control Control::New()
   return handle;
 }
 
-Control::~Control()
-{
-  delete mImpl;
-}
-
 void Control::SetStyleName( const std::string& styleName )
 {
   if( styleName != mImpl->mStyleName )
@@ -706,6 +701,11 @@ Control::Control( ControlBehaviour behaviourFlags )
   mImpl(new Impl(*this))
 {
   mImpl->mFlags = behaviourFlags;
+}
+
+Control::~Control()
+{
+  delete mImpl;
 }
 
 void Control::Initialize()
