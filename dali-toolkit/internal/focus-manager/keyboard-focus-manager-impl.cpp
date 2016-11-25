@@ -149,9 +149,11 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
   if( actor && actor.IsKeyboardFocusable() )
   {
     mIsFocusIndicatorEnabled = true;
-    // Draw the focus indicator upon the focused actor
-    actor.Add( GetFocusIndicatorActor() );
-
+    // Draw the focus indicator upon the focused actor when PhysicalKeyboard is attached
+    if( mIsKeyboardFocusEnabled )
+    {
+      actor.Add( GetFocusIndicatorActor() );
+    }
     // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
     {
