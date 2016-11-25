@@ -19,7 +19,7 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 
 namespace Dali
@@ -208,11 +208,11 @@ void DummyControlImplOverride::OnRelayout( const Vector2& size, RelayoutContaine
 {
   Property::Map transformMap;
   transformMap
-    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::VisualProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::VisualProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::VisualProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
 
   for( VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end() ; ++iter )
   {

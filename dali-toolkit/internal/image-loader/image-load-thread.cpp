@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include "image-load-thread.h"
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/image-loading.h>
+
 namespace Dali
 {
 
@@ -27,11 +30,23 @@ namespace Toolkit
 namespace Internal
 {
 
-LoadingTask::LoadingTask(uint32_t id, BitmapLoader loader )
-: loader( loader ),
-  id( id )
+LoadingTask::LoadingTask( uint32_t id, const std::string& url, ImageDimensions dimensions,
+                          FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection )
+: pixelData(),
+  url( url ),
+  id( id ),
+  dimensions( dimensions ),
+  fittingMode( fittingMode ),
+  samplingMode( samplingMode ),
+  orientationCorrection( orientationCorrection )
 {
 }
+
+void LoadingTask::Load()
+{
+  pixelData = Dali::LoadImageFromFile( url, dimensions, fittingMode, samplingMode, orientationCorrection );
+}
+
 
 ImageLoadThread::ImageLoadThread( EventThreadCallback* trigger )
 : mTrigger( trigger )
@@ -52,7 +67,7 @@ void ImageLoadThread::Run()
 {
   while( LoadingTask* task = NextTaskToProcess() )
   {
-    task->loader.Load();
+    task->Load();
     AddCompletedTask( task );
   }
 }
@@ -149,8 +164,6 @@ void ImageLoadThread::AddCompletedTask( LoadingTask* task )
   // wake up the main thread
   mTrigger->Trigger();
 }
-
-
 
 } // namespace Internal
 

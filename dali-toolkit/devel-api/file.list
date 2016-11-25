@@ -80,9 +80,12 @@ devel_api_progress_bar_header_files = \
 
 devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.h \
-  $(devel_api_src_dir)/visual-factory/devel-visual-properties.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
+
+devel_api_visuals_header_files = \
+  $(devel_api_src_dir)/visuals/text-visual-properties.h \
+  $(devel_api_src_dir)/visuals/visual-properties-devel.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h

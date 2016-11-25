@@ -97,6 +97,7 @@
 %rename(View) Dali::Toolkit::Control;
 %rename(ViewImpl) Dali::Toolkit::Internal::Control;
 %rename(VisualBase) Dali::Toolkit::Visual::Base;
+%rename(LoadImageSynchronously) Dali::Toolkit::SyncImageLoader::Load;
 %rename(ControlOrientationType) Dali::Toolkit::ControlOrientation::Type;
 %rename(DefaultItemLayoutType) Dali::Toolkit::DefaultItemLayout::Type;
 %rename(NewItemLayout) Dali::Toolkit::DefaultItemLayout::New;
@@ -185,7 +186,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
-%include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+%include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 %include <dali-toolkit/devel-api/builder/builder.h>
 
@@ -236,6 +237,10 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 
 %include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 %include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+
+%include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+%include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+%include <dali-toolkit/public-api/text/rendering-backend.h>
 
 %template(ItemIdContainer) std::vector<unsigned int>;
 %template(Item) std::pair<unsigned int, Dali::Actor>;

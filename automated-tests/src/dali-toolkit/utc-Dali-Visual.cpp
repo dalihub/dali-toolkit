@@ -23,7 +23,8 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
@@ -46,11 +47,11 @@ Property::Map DefaultTransform()
 {
   Property::Map transformMap;
   transformMap
-    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::VisualProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::VisualProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::VisualProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::VisualProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
   return transformMap;
 }
 
@@ -278,7 +279,7 @@ int UtcDaliVisualSize(void)
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
 
   propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
   propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
   propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
@@ -361,10 +362,6 @@ int UtcDaliVisualGetPropertyMap1(void)
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
 
-  // Test the properties. TODO: to be completed.
-  colorVisual.SetProperty( ColorVisual::Property::MIX_COLOR, Color::RED );
-  Property::Value value = colorVisual.GetProperty( ColorVisual::Property::MIX_COLOR );
-
   END_TEST;
 }
 
@@ -415,9 +412,6 @@ int UtcDaliVisualGetPropertyMap2(void)
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<float>() == 10.f );
 
-  // Test the properties. TODO: to be completed.
-  borderVisual.SetProperty( BorderVisual::Property::COLOR, Color::RED );
-  Property::Value value = borderVisual.GetProperty( BorderVisual::Property::COLOR );
 
   END_TEST;
 }
@@ -485,10 +479,6 @@ int UtcDaliVisualGetPropertyMap3(void)
   DALI_TEST_CHECK( colorArray->Count() == 2 );
   DALI_TEST_EQUALS( colorArray->GetElementAt(0).Get<Vector4>(), Color::RED , Math::MACHINE_EPSILON_100, TEST_LOCATION );
   DALI_TEST_EQUALS( colorArray->GetElementAt(1).Get<Vector4>(), Color::GREEN , Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  // Test the properties. TODO: to be completed.
-  gradientVisual.SetProperty( GradientVisual::Property::STOP_COLOR, Color::RED );
-  Property::Value gradientValue = gradientVisual.GetProperty( GradientVisual::Property::STOP_COLOR );
 
   END_TEST;
 }
@@ -745,10 +735,6 @@ int UtcDaliVisualGetPropertyMap7(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
 
-  // Test the properties. TODO: to be completed.
-  svgVisual.SetProperty( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
-  Property::Value svgValue = svgVisual.GetProperty( ImageVisual::Property::URL );
-
   END_TEST;
 }
 
@@ -797,11 +783,7 @@ int UtcDaliVisualGetPropertyMap8(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  // Test the properties. TODO: to be completed.
-  meshVisual.SetProperty( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
-  Property::Value meshValue = meshVisual.GetProperty( MeshVisual::Property::OBJECT_URL );
-
-  END_TEST;
+ END_TEST;
 }
 
 //Primitive shape visual
@@ -888,10 +870,6 @@ int UtcDaliVisualGetPropertyMap9(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector3>(), Vector3( 5.0f, 10.0f, 15.0f), Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
-  // Test the properties. TODO: to be completed.
-  primitiveVisual.SetProperty( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
-  Property::Value primitiveValue = primitiveVisual.GetProperty( PrimitiveVisual::Property::SHAPE );
-
   END_TEST;
 }
 
@@ -931,10 +909,6 @@ int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 30 );
 
-  // Test the properties. TODO: to be completed.
-  batchImageVisual.SetProperty( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  Property::Value primitiveValue = batchImageVisual.GetProperty( ImageVisual::Property::URL );
-
   END_TEST;
 }
 
@@ -948,7 +922,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   VisualFactory factory = VisualFactory::Get();
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
@@ -963,9 +937,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
   propertyMap.Insert( "enableMarkup", false );
-  propertyMap.Insert( "enableAutoScroll", false );
-  propertyMap.Insert( "lineSpacing", 0.f );
-  propertyMap.Insert( "batchingEnabled", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -974,11 +945,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   //Check values in the result map are identical to the initial map's values.
   Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<int>(), (int)Visual::TEXT, TEST_LOCATION );
-
-  value = resultMap.Find( TextVisual::Property::RENDERING_BACKEND, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<int>(), Toolkit::Text::DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)DevelVisual::TEXT, TEST_LOCATION );
 
   value = resultMap.Find( TextVisual::Property::TEXT, Property::STRING );
   DALI_TEST_CHECK( value );
@@ -1016,17 +983,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   DALI_TEST_EQUALS( value->Get<Vector4>(), Color::RED, TEST_LOCATION );
 
   value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( !value->Get<bool>() );
-
-  value = resultMap.Find( TextVisual::Property::ENABLE_AUTO_SCROLL, Property::BOOLEAN );
-  DALI_TEST_CHECK( !value );
-
-  value = resultMap.Find( TextVisual::Property::LINE_SPACING, Property::FLOAT );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<float>(), 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  value = resultMap.Find( TextVisual::Property::BATCHING_ENABLED, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( !value->Get<bool>() );
 
@@ -1272,9 +1228,6 @@ int UtcDaliVisualWireframeVisual(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == Visual::WIREFRAME );
 
-  // Test the properties. TODO: to be completed.
-  Property::Value primitiveValue = visual.GetProperty( Visual::Property::TYPE );
-
   END_TEST;
 }
 
@@ -1289,33 +1242,35 @@ int UtcDaliVisualGetTransform(void)
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base colorVisual = factory.CreateVisual( propertyMap );
 
-  Dali::Property::Map map;
-  Dali::Property::Value transformProperty = colorVisual.GetProperty( Dali::Toolkit::Visual::DevelProperty::TRANSFORM );
-  transformProperty.Get(map);
+  Dali::Property::Map visualMap;
+  colorVisual.CreatePropertyMap( visualMap );
+  Property::Value* value = visualMap.Find( Dali::Toolkit::DevelVisual::Property::TRANSFORM );
+  Dali::Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
 
   //Test default values
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( typeValue->Get<Vector2>() == Vector2(0.0f,0.0f) );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::SIZE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::SIZE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( typeValue->Get<Vector2>() == Vector2(1.0f,1.0f) );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( typeValue->Get<Vector4>() == Vector4(0.0f,0.0f,0.0f,0.0f) );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
   }
@@ -1326,40 +1281,42 @@ int UtcDaliVisualGetTransform(void)
 static void TestTransform( ToolkitTestApplication& application, Visual::Base visual )
 {
   Property::Map transform;
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET, Vector2(10.0f, 10.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::SIZE, Vector2(0.2f, 0.2f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4(1.0f, 1.0f, 0.0f,0.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::ORIGIN, "TOP_BEGIN" );
-  transform.Insert( Visual::DevelProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(10.0f, 10.0f) );
+  transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(0.2f, 0.2f) );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4(1.0f, 1.0f, 0.0f,0.0f) );
+  transform.Insert( DevelVisual::Transform::Property::ORIGIN, "TOP_BEGIN" );
+  transform.Insert( DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
 
-  visual.SetProperty( Dali::Toolkit::Visual::DevelProperty::TRANSFORM, transform );
+  visual.SetTransformAndSize( transform, Vector2(100, 100) );
 
-  Dali::Property::Map map;
-  Dali::Property::Value transformProperty = visual.GetProperty( Dali::Toolkit::Visual::DevelProperty::TRANSFORM );
-  transformProperty.Get(map);
+  Dali::Property::Map visualMap;
+  visual.CreatePropertyMap( visualMap );
+  Property::Value* value = visualMap.Find( Dali::Toolkit::DevelVisual::Property::TRANSFORM );
+  Dali::Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
 
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( typeValue->Get<Vector2>(),Vector2(10.0f,10.0f), TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::SIZE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::SIZE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( typeValue->Get<Vector2>(), Vector2(0.2f,0.2f), TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( typeValue->Get<Vector4>(), Vector4(1.0f,1.0f,0.0f,0.0f), TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::TOP_BEGIN, TEST_LOCATION );
   }
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT );
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::BOTTOM_END, TEST_LOCATION );
   }
@@ -1394,10 +1351,10 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
 
   //Set a new transform
   transform.Clear();
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
-  transform.Insert( Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4(0.0f, 0.0f, 1.0f,1.0f) );
-  visual.SetProperty( Dali::Toolkit::Visual::DevelProperty::TRANSFORM, transform );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
+  transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
+  transform.Insert( DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4(0.0f, 0.0f, 1.0f,1.0f) );
+  visual.SetTransformAndSize( transform, Vector2(100, 100) );
   application.SendNotification();
   application.Render(0);
 
@@ -1695,7 +1652,7 @@ int UtcDaliVisualTextVisualRender(void)
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::TEXT );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
@@ -1710,9 +1667,6 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
   propertyMap.Insert( "enableMarkup", false );
-  propertyMap.Insert( "enableAutoScroll", false );
-  propertyMap.Insert( "lineSpacing", 0.f );
-  propertyMap.Insert( "batchingEnabled", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
   textVisual.SetDepthIndex( 1.f );
 

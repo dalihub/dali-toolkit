@@ -11,7 +11,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -48,11 +48,11 @@ void SetDefaultTransformMap( Property::Map& transformMap )
 {
   transformMap.Clear();
   transformMap
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::Visual::DevelProperty::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
 
 }
 
@@ -293,33 +293,37 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
-        Property::Map map;
+        Property::Map* map;
         if( value.Get( imageUrl ) )
         {
           impl.SetImage( imageUrl, ImageDimensions() );
         }
         // if its not a string then get a Property::Map from the property if possible.
-        else if( value.Get( map ) )
+        else
         {
-          Property::Value* shaderValue = map.Find( Toolkit::VisualProperty::SHADER, CUSTOM_SHADER );
-          // set image only if property map contains image information other than custom shader
-          if( map.Count() > 1u ||  !shaderValue )
+          map = value.GetMap();
+          if( map )
           {
-            impl.SetImage( map );
-          }
-          // the property map contains only the custom shader
-          else if(  impl.mVisual && map.Count() == 1u &&  shaderValue )
-          {
-            Property::Map shaderMap;
-            if( shaderValue->Get( shaderMap ) )
+            Property::Value* shaderValue = map->Find( Toolkit::DevelVisual::Property::SHADER, CUSTOM_SHADER );
+            // set image only if property map contains image information other than custom shader
+            if( map->Count() > 1u ||  !shaderValue )
             {
-              Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
-              visual.SetCustomShader( shaderMap );
-              if( imageView.OnStage() )
+              impl.SetImage( *map );
+            }
+            // the property map contains only the custom shader
+            else if( ( impl.mVisual )&&( map->Count() == 1u )&&( shaderValue ) )
+            {
+              Property::Map* shaderMap = shaderValue->GetMap();
+              if( shaderMap )
               {
-                // force to create new core renderer to use the newly set shader
-                visual.SetOffStage( imageView );
-                visual.SetOnStage( imageView );
+                Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
+                visual.SetCustomShader( *shaderMap );
+                if( imageView.OnStage() )
+                {
+                  // force to create new core renderer to use the newly set shader
+                  visual.SetOffStage( imageView );
+                  visual.SetOnStage( imageView );
+                }
               }
             }
           }

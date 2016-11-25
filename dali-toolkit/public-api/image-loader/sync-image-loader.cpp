@@ -16,7 +16,7 @@
 
 // CLASS HEADER
 #include "sync-image-loader.h"
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 
 namespace Dali
@@ -45,12 +45,8 @@ PixelData Load( const std::string& url,
                 SamplingMode::Type samplingMode,
                 bool orientationCorrection )
 {
-  BitmapLoader loader = BitmapLoader::New( url, dimensions, fittingMode, samplingMode, orientationCorrection );
-
   // Load the image synchronously (block the thread here).
-  loader.Load();
-
-  return loader.GetPixelData();
+  return Dali::LoadImageFromFile( url, dimensions, fittingMode, samplingMode, orientationCorrection );
 }
 
 

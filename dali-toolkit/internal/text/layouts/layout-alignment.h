@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H
+#define DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H
+
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
@@ -15,9 +18,6 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/internal/text/text-scroller-interface.h>
-
 namespace Dali
 {
 
@@ -27,16 +27,38 @@ namespace Toolkit
 namespace Text
 {
 
-ScrollerInterface::ScrollerInterface()
+namespace Layout
 {
-}
 
-ScrollerInterface::~ScrollerInterface()
+/**
+ * @brief Speficies the horizontal alignment.
+ *
+ * BEGIN is on the left for Left To Right languages whereas is right for Right To Left.
+ * Similarly, END is on the right for Left To Right languages and left for Right To Left.
+ */
+enum HorizontalAlignment
 {
-}
+  HORIZONTAL_ALIGN_BEGIN,
+  HORIZONTAL_ALIGN_CENTER,
+  HORIZONTAL_ALIGN_END
+};
+
+/**
+ * @brief Speficies the vertical alignment.
+ */
+enum VerticalAlignment
+{
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_CENTER,
+  VERTICAL_ALIGN_BOTTOM
+};
+
+} // namespace Layout
 
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H

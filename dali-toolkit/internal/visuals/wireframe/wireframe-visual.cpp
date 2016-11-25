@@ -20,7 +20,7 @@
 #include "wireframe-visual.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -106,18 +106,7 @@ void WireframeVisual::DoSetOnStage( Actor& actor )
 void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::WIREFRAME );
-}
-
-void WireframeVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value WireframeVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::WIREFRAME );
 }
 
 void WireframeVisual::InitializeRenderer()

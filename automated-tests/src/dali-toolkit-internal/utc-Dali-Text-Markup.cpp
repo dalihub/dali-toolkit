@@ -22,7 +22,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <toolkit-text-model.h>
+#include <toolkit-text-utils.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/color-run.h>

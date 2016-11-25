@@ -99,16 +99,6 @@ public:  // from Visual
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
-  /**
-   * @copydoc Visual::Base::DoSetProperty
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @copydoc Visual::Base::DoGetProperty
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
-
 protected:
 
   /**

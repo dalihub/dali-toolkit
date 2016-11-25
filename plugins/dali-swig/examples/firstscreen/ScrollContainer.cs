@@ -6,88 +6,37 @@ using System.Collections.Generic;
 
 namespace FirstScreen
 {
-    public class ScrollContainer
+    public class ScrollContainer : CustomView
     {
-        private View _container;
-        private Actor _itemRoot;
-        private Vector3 _itemSize;
-        private List<View> _itemList;
-        private int _itemCount;
-        private int _focusedItem;
-        private PanGestureDetector _panGestureDetector;
-        private float _scrollDisplacement;
-        private float _currentScrollPosition;
-        private float _padding;
-        private float _width;
-        private float _height;
-        private bool _isFocused;
-        private float _marginX;
-        private float _marginY;
-        private float _offsetY;
-        private float _offsetX;
-        private Stage _stage;
-        private Vector2 _stageSize;
-        private ImageView _shadowBorder;
-        private ImageView _spotLight;
-        private Animation _spotLightAnimation;
-        private Animation _showAnimation;
-        private Animation _hideAnimation;
-        private Animation _focusAnimation;
-        private Animation _scrollAnimation;
-        private Animation _focusTransitionAnimation;
-        private Path _circularPath;
-        private bool _shouldHide;
+        private View _container;                      // View Container will be the first item added to ScrollContainer and parent to all the items added to the ScrollContainer.
+        private Vector3 _itemSize;                    // Size of the item / images added to the ScrollContainer.
+        private List<View> _itemList;                 // List collection of View items/images  added to the ScrollContainer.
+        private int _itemCount;                       // Number of items / images  added to the ScrollContainer.
+        private int _focusedItem;                     // Index of currently focused View item / image  on the ScrollContainer.
+        private float _scrollDisplacement;            // Used for horizontal pan displacement.
+        private float _currentScrollPosition;         // Used for horizontal scroll position.
+        private float _gap;                           // Used for gap / padding between items / images on the ScrollContainer.
+        private float _width;                         // Width of the ScrollContainer.
+        private float _height;                        // Height of the ScrollContainer.
+        private bool _isFocused;                      // Flag to check if ScrollContainer is enabled or not.
+        private float _marginX;                       // Extra horizontal margin is used to add an extra gap between items / images after a focused and scaled item / image.
+        private float _marginY;                       // Extra vertical margin (not used at the moment).
+        private float _offsetYFactor;                 // Vertical Position offset Factor of item height.
+        private float _offsetX;                       // Horizontal Position offset of ScrollContainer.
+        private Stage _stage;                         // Reference to Dali stage.
+        private Vector2 _stageSize;                   // Reference to Dali stage size.
+        private ImageView _shadowBorder;              // Reference to Shadow border ImageView applied to the focused item on ScrollContainer.
+        private ImageView _spotLight;                 // Reference to SpotLight ImageView applied to the focused item on ScrollContainer.
+        private Animation _spotLightAnimation;        // SpotLight Animation applied to the focused item on ScrollContainer.
+        private Animation _focusAnimation;            // Focused position animation on ScrollContainer.
+        private Animation _scrollAnimation;           // Scroll animation on items of ScrollContainer.
+        private Animation _focusTransitionAnimation;  // Focus Transition (scaling /unscaling) animation on items of ScrollContainer.
+        private Path _circularPath;                   // Circular path used for SpotLight Animation applied to the focused item on ScrollContainer.
 
-        public ScrollContainer()
+        public ScrollContainer() : base(ViewWrapperImpl.CustomViewBehaviour.DISABLE_STYLE_CHANGE_SIGNALS |
+                                        ViewWrapperImpl.CustomViewBehaviour.REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)
         {
-            _itemSize = new Vector3(0.0f, 0.0f, 0.0f);
-            _padding = 0.0f;
-            _width = 0.0f;
-            _height = 0.0f;
-            _currentScrollPosition = 0.0f;
-            _itemCount = 0;
-            _focusedItem = -1;
-            _isFocused = false;
-            _marginX = 50.0f;
-            _marginY = 0.0f;
-            _offsetY = 0.0f;
-            _offsetX = 0.0f;
 
-            _shouldHide = true;
-
-            _container = new View();
-            _itemRoot = new Actor();
-            _container.Add(_itemRoot);
-
-            _itemList = new List<View>();
-
-            if (_panGestureDetector == null)
-            {
-                _panGestureDetector = new PanGestureDetector();
-                _panGestureDetector.Attach(_container);
-
-                _panGestureDetector.Detected += OnPan;
-            }
-
-            _container.ParentOrigin = NDalic.ParentOriginTopLeft;
-            _container.AnchorPoint = NDalic.AnchorPointTopLeft;
-            _itemRoot.ParentOrigin = NDalic.ParentOriginTopLeft;
-            _itemRoot.AnchorPoint = NDalic.AnchorPointTopLeft;
-
-            _container.WidthResizePolicy = "FILL_TO_PARENT";
-            _container.HeightResizePolicy = "FILL_TO_PARENT";
-            _itemRoot.WidthResizePolicy = "FILL_TO_PARENT";
-            _itemRoot.HeightResizePolicy = "FILL_TO_PARENT";
-
-            _stage = Stage.GetCurrent();
-            _stageSize = _stage.GetSize();
-
-            _spotLightAnimation = new Animation(5.0f);
-            _focusTransitionAnimation = new Animation (0.35f);
-            _focusAnimation = new Animation (0.35f);
-            _focusAnimation.SetEndAction(Animation.EndAction.BakeFinal);
-            _scrollAnimation = new Animation (0.35f);
-            _scrollAnimation.SetEndAction(Animation.EndAction.BakeFinal);
         }
 
         public bool IsFocused
@@ -111,14 +60,6 @@ namespace FirstScreen
             get
             {
                 return _itemCount;
-            }
-        }
-
-        public Actor ItemRoot
-        {
-            get
-            {
-                return _itemRoot;
             }
         }
 
@@ -148,16 +89,16 @@ namespace FirstScreen
             }
         }
 
-        public float Padding
+        public float Gap
         {
             get
             {
-                return _padding;
+                return _gap;
             }
 
             set
             {
-                _padding = value;
+                _gap = value;
             }
         }
 
@@ -174,16 +115,16 @@ namespace FirstScreen
             }
         }
 
-        public float OffsetY
+        public float OffsetYFator
         {
             get
             {
-                return _offsetY;
+                return _offsetYFactor;
             }
 
             set
             {
-                _offsetY = value;
+                _offsetYFactor = value;
             }
         }
 
@@ -278,7 +219,159 @@ namespace FirstScreen
             }
         }
 
-        public Actor GetCurrentFocusedActor()
+        // This override method is called automatically after the Control has been initialized.
+        // Any second phase initialization is done here.
+        public override void OnInitialize()
+        {
+            _itemSize = new Vector3(0.0f, 0.0f, 0.0f);
+            _gap = 0.0f;
+            _width = 0.0f;
+            _height = 0.0f;
+            _currentScrollPosition = 0.0f;
+            _itemCount = 0;
+            _focusedItem = -1;
+            _isFocused = false;
+            _marginX = 50.0f;
+            _marginY = 0.0f;
+            _offsetYFactor = 0.0f;
+            _offsetX = 0.0f;
+
+            _container = new View();
+            this.Add(_container);
+
+            _itemList = new List<View>();
+
+            this.ParentOrigin = NDalic.ParentOriginTopLeft;
+            this.AnchorPoint = NDalic.AnchorPointTopLeft;
+            this.WidthResizePolicy = "FILL_TO_PARENT";
+            this.HeightResizePolicy = "FILL_TO_PARENT";
+            this.SetKeyboardFocusable(true);
+
+            _container.ParentOrigin = NDalic.ParentOriginTopLeft;
+            _container.AnchorPoint = NDalic.AnchorPointTopLeft;
+            _container.WidthResizePolicy = "FILL_TO_PARENT";
+            _container.HeightResizePolicy = "FILL_TO_PARENT";
+
+            _stage = Stage.GetCurrent();
+            _stageSize = _stage.GetSize();
+
+            _spotLightAnimation = new Animation(Constants.SpotLightDuration);
+            _focusTransitionAnimation = new Animation(Constants.FocusTransitionDuration);
+            _focusAnimation = new Animation(Constants.FocusDuration);
+            _focusAnimation.SetEndAction(Animation.EndAction.BakeFinal);
+            _scrollAnimation = new Animation(Constants.ScrollDuration);
+            _scrollAnimation.SetEndAction(Animation.EndAction.BakeFinal);
+
+            EnableGestureDetection(Gesture.Type.Pan);
+        }
+
+        // This will be invoked automatically if an item/image is added to the ScrollContainer
+        public override void OnChildAdd(Actor actor)
+        {
+            View item = View.DownCast(actor);
+
+            if (item is View && item != _container)
+            {
+                item.AnchorPoint = NDalic.AnchorPointBottomCenter;
+                item.ParentOrigin = NDalic.ParentOriginBottomCenter;
+
+                item.Size = _itemSize;
+                item.SetKeyboardFocusable(true);
+                item.Position = GetItemPosition(_itemCount, _currentScrollPosition);
+
+                item.Name = _itemCount.ToString();
+
+                //item.ClippingMode = "CLIP_CHILDREN";
+
+                _container.Add(item);
+                _itemList.Add(item);
+
+                _itemCount++;
+                item.SetKeyboardFocusable(true);
+            }
+        }
+
+        // This will be invoked automatically if an item/image is removed from the ScrollContainer
+        public override void OnChildRemove(Actor actor)
+        {
+            View item = View.DownCast(actor);
+
+            if (item is View && item != _container)
+            {
+                _container.Remove(item);
+
+                _itemCount--;
+                _itemList.Remove(item);
+            }
+        }
+
+        // This override function supports two dimensional keyboard navigation.
+        // This function returns the next keyboard focusable actor in ScrollContainer control towards the given direction.
+        public override Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, View.KeyboardFocus.Direction direction, bool loopEnabled)
+        {
+            if (direction == View.KeyboardFocus.Direction.LEFT)
+            {
+                return FocusPrevious(loopEnabled);
+            }
+            else if (direction == View.KeyboardFocus.Direction.RIGHT)
+            {
+                return FocusNext(loopEnabled);
+            }
+            else
+            {
+                return currentFocusedActor;
+            }
+        }
+
+        // This override function is invoked before chosen focusable actor will be focused.
+        // This allows the application to preform any actions (i.e. Scroll and SpotLight animations) before the focus is actually moved to the chosen actor.
+        public override void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
+        {
+            Focus(_focusedItem);
+        }
+
+        // This override function is invoked whenever a pan gesture is detected on this control.
+        // Perform Scroll Animation based upon pan gesture velocity / speed.
+        public override void OnPan(PanGesture pan)
+        {
+            switch (pan.state)
+            {
+            case Gesture.State.Started:
+                _scrollDisplacement = 0.0f;
+                break;
+
+            case Gesture.State.Continuing:
+                _scrollDisplacement = pan.displacement.x;
+                break;
+
+            case Gesture.State.Finished:
+            case Gesture.State.Cancelled:
+                float absScrollDistance = _scrollDisplacement;
+                if (absScrollDistance < 0.0f)
+                    absScrollDistance = 0.0f - absScrollDistance;
+
+                float scrollSpeed = pan.velocity.x * pan.velocity.x + pan.velocity.y * pan.velocity.y;
+                float maxScrollSpeed = 40.0f;  // TBD
+                if (scrollSpeed > maxScrollSpeed)
+                    scrollSpeed = maxScrollSpeed;
+
+                if (absScrollDistance > 1.0f && scrollSpeed > 0.05f) // Threshold TBD
+                {
+                    if (_scrollDisplacement > 0.0f) // scroll constant distance in constant speed.
+                    {
+                        Scroll((_itemSize.x + _gap) * 2, GetFirstVisibleItemId());
+                    }
+                    else
+                    {
+                        Scroll(-(_itemSize.x + _gap) * 2, GetFirstVisibleItemId());
+                    }
+                }
+                break;
+            }
+        }
+
+        // This function returns current focused actor
+        public View GetCurrentFocusedActor()
         {
             if (_focusedItem < 0)
             {
@@ -288,65 +381,186 @@ namespace FirstScreen
             return _itemList[_focusedItem];
         }
 
-        public void AddItem(View item)
+        public void SetFocused(bool focused)
         {
-            item.AnchorPoint = NDalic.AnchorPointBottomCenter;
-            item.ParentOrigin = NDalic.ParentOriginBottomCenter;
+            _isFocused = focused;
 
-            item.Size = _itemSize;
-            item.SetKeyboardFocusable(true);
-            item.Position = GetItemPosition(_itemCount, _currentScrollPosition);
-
-            item.Name = _itemCount.ToString();
-
-//          item.ClippingMode = "CLIP_CHILDREN";
-
-            _itemRoot.Add(item);
-            _itemList.Add(item);
-            _panGestureDetector.Attach(item);
-            _itemCount++;
-        }
-
-        // Perform Show animation on ScrollContainer (used only for Poster Container)
-        public void Show()
-        {
-            Container.Add(ItemRoot);
-
-            _shouldHide = false;
-            _showAnimation = new Animation (0.35f);
-
-            _showAnimation.AnimateTo(new Property(_container, Actor.Property.COLOR_ALPHA), new Property.Value(1.0f));
-
-            _container.PositionY = _container.Position.y + 200.0f;
-            float targetPositionY = _container.Position.y - 200.0f;
-            _showAnimation.AnimateTo(new Property(_container, Actor.Property.POSITION_Y), new Property.Value(targetPositionY),
-                                     new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR));
-
-            _showAnimation.Play();
-        }
-
-        // Perform Hide animation on ScrollContainer (used only for Poster Container)
-        public void Hide()
-        {
-            if (_hideAnimation)
+            // Perform Focus animation if the ScrollContainer is not focused already
+            if (!_isFocused)
             {
-                _hideAnimation.Clear();
-                _hideAnimation.Reset();
+                Actor parent = _shadowBorder.GetParent();
+                if (parent)
+                {
+                    parent.Remove(_shadowBorder);
+                }
+
+                parent = _spotLight.GetParent();
+                if (parent)
+                {
+                    parent.Remove(_spotLight);
+                }
+
+                _focusTransitionAnimation.Clear();
+
+                for (int i = 0; i < _itemList.Count; ++i)
+                {
+                    SetupItemRenderer(_itemList[i], false);
+
+                    Vector3 targetPosition = GetItemPosition(i, _currentScrollPosition);
+                    _focusTransitionAnimation.AnimateTo(new Dali.Property(_itemList[i], Actor.Property.POSITION),
+                                                        new Dali.Property.Value(targetPosition),
+                                                        new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
+
+                    _focusTransitionAnimation.AnimateTo(new Dali.Property(_itemList[i], Actor.Property.SCALE),
+                                                        new Dali.Property.Value(new Vector3(1.0f, 1.0f, 1.0f)),
+                                                        new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
+                }
+
+                _focusTransitionAnimation.Play();
+            }
+            else
+            {
+                Focus(_focusedItem);
+            }
+        }
+
+        // Obtain ID of first visible item/image on the screen of the ScrollContainer
+        private int GetFirstVisibleItemId()
+        {
+            int firstItemId = -1;
+
+            if (_isFocused)
+            {
+                firstItemId = (int)Math.Floor((-1.0 * _currentScrollPosition + _marginX * 2.0f) / (_itemSize.x + _gap));
+            }
+            else
+            {
+                firstItemId = (int)Math.Floor(-1.0 * _currentScrollPosition / (_itemSize.x + _gap));
             }
 
-            float duration = 0.35f;
-            _hideAnimation = new Animation(duration);
+            if (firstItemId < 0)
+            {
+                firstItemId = 0;
+            }
 
-            _hideAnimation.AnimateTo(new Property(_container, Actor.Property.COLOR_ALPHA), new Property.Value(0.0f),
-                                     new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, duration * 0.75f));
-
-            _hideAnimation.Finished += OnHideAnimationFinished;
-
-            _shouldHide = true;
-            _hideAnimation.Play();
+            return firstItemId;
         }
 
-        public View Focus(int itemId)
+        // Obtain ID of last visible item/image on the screen of the ScrollContainer
+        private int GetLastVisibleItemId()
+        {
+            int lastItemId = -1;
+
+            if (_isFocused)
+            {
+                lastItemId = (int)Math.Ceiling(((_width - _currentScrollPosition - _marginX * 2.0f) / _itemSize.x) - 1);
+            }
+            else
+            {
+                lastItemId = (int)Math.Ceiling(((_width - _currentScrollPosition) / _itemSize.x) - 1);
+            }
+
+            if (lastItemId >= _itemList.Count)
+            {
+
+                lastItemId = _itemList.Count - 1;
+            }
+
+            return lastItemId;
+        }
+
+        // Obtain Next item/image (Right of the currently focused item) of the ScrollContainer
+        private Actor FocusNext(bool loopEnabled)
+        {
+            int nextItem = -1;
+
+            if (_focusedItem < GetFirstVisibleItemId() || _focusedItem > GetLastVisibleItemId())
+            {
+                nextItem = GetFirstVisibleItemId();
+            }
+            else
+            {
+                nextItem = _focusedItem + 1;
+            }
+
+            if (nextItem >= _itemList.Count)
+            {
+                if (loopEnabled)
+                {
+                    nextItem = 0;
+                }
+                else
+                {
+                    nextItem = _itemList.Count - 1;
+                }
+            }
+
+            _focusedItem = nextItem;
+            return _itemList[_focusedItem];
+        }
+
+        // Obtain Previous item/image (left of the currently focused item) of the ScrollContainer
+        private Actor FocusPrevious(bool loopEnabled)
+        {
+            int previousItem = -1;
+
+            if (_focusedItem < GetFirstVisibleItemId() || _focusedItem > GetLastVisibleItemId())
+            {
+                previousItem = GetFirstVisibleItemId();
+            }
+            else
+            {
+                previousItem = _focusedItem - 1;
+            }
+
+            if (previousItem < 0)
+            {
+                if (loopEnabled)
+                {
+                    previousItem = _itemList.Count - 1;
+                }
+                else
+                {
+                    previousItem = 0;
+                }
+            }
+
+            _focusedItem = previousItem;
+            return _itemList[_focusedItem];
+        }
+
+        // Perform ScrollAnimation on each item
+        private void Scroll(float amount, int baseItem)
+        {
+            float tagetScrollPosition = _currentScrollPosition + amount;
+            float totalItemSize = _itemList.Count * (_itemSize.width + _gap) + _gap + (_marginX * 2.0f);
+
+            float maxScrollPosition = _width - totalItemSize;
+
+            if (tagetScrollPosition < maxScrollPosition)
+            {
+                tagetScrollPosition = maxScrollPosition;
+            }
+            if (tagetScrollPosition > 0.0f)
+            {
+                tagetScrollPosition = 0.0f;
+            }
+            _scrollAnimation.Clear();
+
+            for (int i = 0; i < _itemList.Count; ++i)
+            {
+                Vector3 targetPosition = GetItemPosition(i, tagetScrollPosition);
+                _scrollAnimation.AnimateTo(new Dali.Property(_itemList[i], Actor.Property.POSITION),
+                                           new Dali.Property.Value(targetPosition),
+                                           new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
+            }
+
+            _currentScrollPosition = tagetScrollPosition;
+            _scrollAnimation.Play();
+        }
+
+        // This function uses ItemId as next FocusedItem and preforms Scroll and SpotLight animations on that item.
+        private void Focus(int itemId)
         {
             if (itemId < 0)
             {
@@ -376,23 +590,24 @@ namespace FirstScreen
             _focusAnimation.Clear();
 
             float relativeItemPositionX = itemPosition.x - _itemSize.width * 0.5f + (_stageSize.width * 0.5f) + _offsetX;
-            if (relativeItemPositionX < _marginX + _offsetX + _padding)
+            if (relativeItemPositionX < _marginX + _offsetX + _gap)
             {
-                float amount = _marginX + _offsetX + _padding - relativeItemPositionX;
+                float amount = _marginX + _offsetX + _gap - relativeItemPositionX;
                 Scroll(amount, itemId + 1); // Perform Scroll animation
             }
-            else if (relativeItemPositionX + _itemSize.width + _padding + _marginX > _stageSize.width)
+            else if (relativeItemPositionX + _itemSize.width + _gap + _marginX > _stageSize.width)
             {
-                float amount = relativeItemPositionX + _marginX + _padding + _itemSize.width - _stageSize.width;
+                float amount = relativeItemPositionX + _marginX + _gap + _itemSize.width - _stageSize.width;
                 Scroll(-amount, itemId - 1); // Perform Scroll animation
             }
             else
             {
+                // Perform animation when item is focused
                 for (int i = 0; i < _itemList.Count; ++i)
                 {
                     Vector3 targetPosition = GetItemPosition(i, _currentScrollPosition);
-                    _focusAnimation.AnimateTo(new Property(_itemList[i], Actor.Property.POSITION),
-                                              new Property.Value(targetPosition),
+                    _focusAnimation.AnimateTo(new Dali.Property(_itemList[i], Actor.Property.POSITION),
+                                              new Dali.Property.Value(targetPosition),
                                               new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
                 }
             }
@@ -401,17 +616,17 @@ namespace FirstScreen
             {
                 SetupItemRenderer(_itemList[i], false);
 
-                // Perform Focus animation
+                // Perform scale animation on Focused item
                 if (i == _focusedItem)
                 {
-                    _focusAnimation.AnimateTo(new Property(_itemList[i], Actor.Property.SCALE),
-                                              new Property.Value(new Vector3(1.2f, 1.2f, 1.2f)),
+                    _focusAnimation.AnimateTo(new Dali.Property(_itemList[i], Actor.Property.SCALE),
+                                              new Dali.Property.Value(new Vector3(1.2f, 1.2f, 1.2f)),
                                               new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
                 }
                 else
                 {
-                    _focusAnimation.AnimateTo(new Property(_itemList[i], Actor.Property.SCALE),
-                                              new Property.Value(new Vector3(1.0f, 1.0f, 1.0f)),
+                    _focusAnimation.AnimateTo(new Dali.Property(_itemList[i], Actor.Property.SCALE),
+                                              new Dali.Property.Value(new Vector3(1.0f, 1.0f, 1.0f)),
                                               new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
                 }
             }
@@ -423,214 +638,6 @@ namespace FirstScreen
                 SetupItemRenderer(_itemList[_focusedItem], true);
                 SetupSpotLightRenderer();
             }
-
-            return _itemList[_focusedItem];
-        }
-
-        // Perform EddenEffect animation on Focused Item specified
-        public void FocusAnimation(FocusEffect focusEffect, FocusEffectDirection direction)
-        {
-            focusEffect.FocusAnimation(_itemList[_focusedItem], _itemSize, 1.0f, direction);
-        }
-
-        public void SetFocused(bool focused)
-        {
-            _isFocused = focused;
-
-            // Perform Focus animation if the ScrollContainer is not focused already
-            if (!_isFocused)
-            {
-                Actor parent = _shadowBorder.GetParent();
-                if (parent)
-                {
-                    parent.Remove(_shadowBorder);
-                }
-
-                parent = _spotLight.GetParent();
-                if (parent)
-                {
-                    parent.Remove(_spotLight);
-                }
-
-                _focusTransitionAnimation.Clear();
-
-                for (int i = 0; i < _itemList.Count; ++i)
-                {
-                    SetupItemRenderer(_itemList[i], false);
-
-                    Vector3 targetPosition = GetItemPosition(i, _currentScrollPosition);
-                    _focusTransitionAnimation.AnimateTo(new Property(_itemList[i], Actor.Property.POSITION),
-                                                        new Property.Value(targetPosition),
-                                                        new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
-
-                    _focusTransitionAnimation.AnimateTo(new Property(_itemList[i], Actor.Property.SCALE),
-                                                        new Property.Value(new Vector3(1.0f, 1.0f, 1.0f)),
-                                                        new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
-                }
-
-                _focusTransitionAnimation.Play();
-            }
-            else
-            {
-                Focus(_focusedItem);
-            }
-        }
-
-        // Obtain ID of first visible item/image on the screen of the ScrollContainer
-        public int GetFirstVisibleItemId()
-        {
-            int firstItemId = -1;
-
-            if (_isFocused)
-            {
-                firstItemId = (int)Math.Floor((-1.0 * _currentScrollPosition + _marginX * 2.0f) / (_itemSize.x + _padding));
-            }
-            else
-            {
-                firstItemId = (int)Math.Floor(-1.0 * _currentScrollPosition / (_itemSize.x + _padding));
-            }
-
-            if (firstItemId < 0)
-            {
-                firstItemId = 0;
-            }
-
-            return firstItemId;
-        }
-
-        // Obtain ID of last visible item/image on the screen of the ScrollContainer
-        public int GetLastVisibleItemId()
-        {
-            int lastItemId = -1;
-
-            if (_isFocused)
-            {
-                lastItemId = (int)Math.Ceiling(((_width - _currentScrollPosition - _marginX * 2.0f) / _itemSize.x) - 1);
-            }
-            else
-            {
-                lastItemId = (int)Math.Ceiling(((_width - _currentScrollPosition) / _itemSize.x) - 1);
-            }
-
-            if (lastItemId >= _itemList.Count)
-            {
-
-                lastItemId = _itemList.Count - 1;
-            }
-
-            return lastItemId;
-        }
-
-        // Obtain Next item/image (Right of the currently focused item) of the ScrollContainer
-        public Actor FocusNext()
-        {
-            int nextItem = -1;
-
-            if (_focusedItem < GetFirstVisibleItemId() || _focusedItem > GetLastVisibleItemId())
-            {
-                nextItem = GetFirstVisibleItemId();
-            }
-            else
-            {
-                nextItem = _focusedItem + 1;
-            }
-
-            return Focus(nextItem);
-        }
-
-        // Obtain Previous item/image (left of the currently focused item) of the ScrollContainer
-        public Actor FocusPrevious()
-        {
-            int previousItem = -1;
-
-            if (_focusedItem < GetFirstVisibleItemId() || _focusedItem > GetLastVisibleItemId())
-            {
-                previousItem = GetFirstVisibleItemId();
-            }
-            else
-            {
-                previousItem = _focusedItem - 1;
-            }
-
-            return Focus(previousItem);
-        }
-
-        private void OnHideAnimationFinished(object source, Animation.FinishedEventArgs e)
-        {
-            var currentParent =  ItemRoot.GetParent();
-            if (_shouldHide && currentParent != null)
-            {
-                Container.Remove(ItemRoot);
-            }
-        }
-
-        private void OnPan(object source, PanGestureDetector.DetectedEventArgs e)
-        {
-            switch (e.PanGesture.state)
-            {
-            case Gesture.State.Started:
-                _scrollDisplacement = 0.0f;
-                break;
-
-            case Gesture.State.Continuing:
-                _scrollDisplacement = e.PanGesture.displacement.x;
-                break;
-
-            case Gesture.State.Finished:
-            case Gesture.State.Cancelled:
-                float absScrollDistance = _scrollDisplacement;
-                if (absScrollDistance < 0.0f)
-                    absScrollDistance = 0.0f - absScrollDistance;
-
-                float scrollSpeed = e.PanGesture.velocity.x * e.PanGesture.velocity.x + e.PanGesture.velocity.y * e.PanGesture.velocity.y;
-                float maxScrollSpeed = 40.0f;  // TBD
-                if (scrollSpeed > maxScrollSpeed)
-                    scrollSpeed = maxScrollSpeed;
-
-                if (absScrollDistance > 1.0f && scrollSpeed > 0.05f) // Threshold TBD
-                {
-                    if (_scrollDisplacement > 0.0f) // scroll constant distance in constant speed.
-                    {
-                        Scroll((_itemSize.x + _padding) * 2, GetFirstVisibleItemId());
-                    }
-                    else
-                    {
-                        Scroll(-(_itemSize.x + _padding) * 2, GetFirstVisibleItemId());
-                    }
-                }
-                break;
-            }
-        }
-
-        // Perform ScrollAnimation on each item
-        private void Scroll(float amount, int baseItem)
-        {
-            float tagetScrollPosition = _currentScrollPosition + amount;
-            float totalItemSize = _itemList.Count * (_itemSize.width + _padding) + _padding + (_marginX * 2.0f);
-
-            float maxScrollPosition = _width - totalItemSize;
-
-            if (tagetScrollPosition < maxScrollPosition)
-            {
-                tagetScrollPosition = maxScrollPosition;
-            }
-            if (tagetScrollPosition > 0.0f)
-            {
-                tagetScrollPosition = 0.0f;
-            }
-
-            _scrollAnimation.Clear();
-
-            for (int i = 0; i < _itemList.Count; ++i)
-            {
-                Vector3 targetPosition = GetItemPosition(i, tagetScrollPosition);
-                _scrollAnimation.AnimateTo(new Property(_itemList[i], Actor.Property.POSITION),
-                                           new Property.Value(targetPosition),
-                                           new AlphaFunction(AlphaFunction.BuiltinFunction.EASE_OUT_SINE));
-            }
-
-            _currentScrollPosition = tagetScrollPosition;
-            _scrollAnimation.Play();
         }
 
         // Calculate Position of any item/image of ScrollContainer
@@ -642,24 +649,24 @@ namespace FirstScreen
                 // used (_stageSize.width * 0.5f) because of ParentOriginCenter
                 if (_focusedItem > itemId)
                 {
-                    float positionX = (_itemSize.width * itemId) + (_padding * (itemId + 1)) + scrollPosition + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
-                    return new Vector3(positionX, -_itemSize.height * _offsetY, 0.0f);
+                    float positionX = (_itemSize.width * itemId) + (_gap * (itemId + 1)) + scrollPosition + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
+                    return new Vector3(positionX, -_itemSize.height * _offsetYFactor, 0.0f);
                 }
                 else if (_focusedItem == itemId)
                 {
-                    float positionX = (_itemSize.width * itemId) + (_padding * (itemId + 1)) + scrollPosition + _marginX + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
-                    return new Vector3(positionX, -_itemSize.height * _offsetY, 0.0f);
+                    float positionX = (_itemSize.width * itemId) + (_gap * (itemId + 1)) + scrollPosition + _marginX + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
+                    return new Vector3(positionX, -_itemSize.height * _offsetYFactor, 0.0f);
                 }
                 else
                 {
-                    float positionX = (_itemSize.width * itemId) + (_padding * (itemId + 1)) + scrollPosition + _marginX * 2.0f + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
-                    return new Vector3(positionX, -_itemSize.height * _offsetY, 0.0f);
+                    float positionX = (_itemSize.width * itemId) + (_gap * (itemId + 1)) + scrollPosition + _marginX * 2.0f + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
+                    return new Vector3(positionX, -_itemSize.height * _offsetYFactor, 0.0f);
                 }
             }
             else
             {
-                float positionX = (_itemSize.width * itemId) + (_padding * (itemId + 1)) + scrollPosition + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
-                return new Vector3(positionX, -_itemSize.height * _offsetY, 0.0f);
+                float positionX = (_itemSize.width * itemId) + (_gap * (itemId + 1)) + scrollPosition + (_itemSize.width * 0.5f) - (_stageSize.width * 0.5f);
+                return new Vector3(positionX, -_itemSize.height * _offsetYFactor, 0.0f);
             }
         }
 

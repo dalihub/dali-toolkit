@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_DEVEL_VISUAL_PROPERTIES_H
-#define DALI_TOOLKIT_DEVEL_VISUAL_PROPERTIES_H
+#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
+#define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
@@ -28,13 +27,26 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace Visual
+namespace DevelVisual
 {
 
-// Mirror of public API Property namespace with addition of enums that are not yet
-// public. A namespace alias is used below to reduce implementation cruft.
+/**
+ * @brief All the visual types.
+ */
+enum Type
+{
+  BORDER    = Dali::Toolkit::Visual::BORDER,
+  COLOR     = Dali::Toolkit::Visual::COLOR,
+  GRADIENT  = Dali::Toolkit::Visual::GRADIENT,
+  IMAGE     = Dali::Toolkit::Visual::IMAGE,
+  MESH      = Dali::Toolkit::Visual::MESH,
+  PRIMITIVE = Dali::Toolkit::Visual::PRIMITIVE,
+  WIREFRAME = Dali::Toolkit::Visual::WIREFRAME,
 
-namespace DevelProperty
+  TEXT      = WIREFRAME + 1, ///< Renders text.
+};
+
+namespace Property
 {
 
 enum Type
@@ -47,10 +59,12 @@ enum Type
    * @details Name "transform", type Property::Map.
 
    * @note Optional.
-   * @see DevelProperty::Transform::Property
+   * @see DevelVisual::Transform::Property
    */
   TRANSFORM = SHADER+1//Dali::Toolkit::Visual::Property::SHADER+1
 };
+
+} //namespace Property
 
 namespace Transform
 {
@@ -99,17 +113,12 @@ enum Type
 
 } //namespace Property
 
-} //namespace Transform
+} // namespace Transform
 
-} // namespace DevelProperty
-
-} // namespace Visual
-
-namespace VisualProperty = Visual::DevelProperty;
+} // namespace DevelVisual
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-
-#endif // DALI_TOOLKIT_DEVEL_VISUAL_PROPERTIES_H
+#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H

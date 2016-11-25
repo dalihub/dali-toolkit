@@ -22,14 +22,14 @@ namespace FirstScreen
         public const float BottomClipLayerHeightFactor = 0.84f;       // Height Factor of stage height used for Bottom Clip layer height
         public const float MenuContainerPadding = 10.0f;              // Padding size used between items / images in Menu ScrollContainer
         public const float MenuContainerMargin = 25.0f;               // Extra margin Padding size used between items / images in Menu ScrollContainer when item / image is focused
-        public const float MenuContainerOffsetYFactor = 0.35f;        // Position Factor of Poster item height used for Menu items / images position
+        public const float MenuContainerOffsetYFactor = 0.35f;        // Position Factor of Menu item height used for Menu items / images position
 
         public const float MenuItemWidthFactor = 0.125f;              // Width Factor (1/8) of stage Width used for Menu items / images Width
         public const float MenuItemHeightFactor = 0.10f;              // Height Factor of stage height used for Menu items / images Height
         public const float MenuItemsCount = 14;                       // Number of Menu items / images used in a Menu ScrollContainer
 
         public const float Poster0ItemWidthFactor = 0.25f;            // Width Factor (1/4) of stage Width used for Poster items / images Width in a Poster ScrollContainer 0
-        public const float Poster1ItemWidthFactor = 0.24f;            // Width Factor of stage Width used for Poster items / images Width in a Poster ScrollContainer 1
+        public const float Poster1ItemWidthFactor = 0.20f;            // Width Factor of stage Width used for Poster items / images Width in a Poster ScrollContainer 1
         public const float PostersItemHeightFactor = 0.24f;           // Height Factor of stage height used for Poster items / images Height
         public const float PostersItemsCount = 24;                    // Number of Menu items / images used in a Poster ScrollContainer
 
@@ -38,6 +38,10 @@ namespace FirstScreen
         public const float LauncherSeparatorWidth = 20.0f;            // Extra area / space to the left of Menu ScrollContainer used for a speration shadow image
         public const float LauncherItemsCount = 3.0f;                 // Total number of Launcher items / images
         public const float LauncherIconWidth = (LauncherWidth - LauncherLeftMargin - LauncherSeparatorWidth) / LauncherItemsCount; // Width of each Launcher item / image
+
+        public const float SpotLightDuration = 5.0f;                  // Duration of Spot Light Animation. 
+        public const float FocusTransitionDuration = 0.35f;           // Duration of Focus Transition Animation. 
+        public const float FocusDuration = 0.35f;                     // Duration of Focus Animation.
+        public const float ScrollDuration = 0.35f;                    // Duration of Scroll Animation.
     }
 }
-

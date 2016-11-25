@@ -31,7 +31,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -669,7 +669,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
 
   bool sync = IsSynchronousResourceLoading();
   map.Insert( SYNCHRONOUS_LOADING, sync );
@@ -697,17 +697,6 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
-}
-
-void ImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
 }
 
 void ImageVisual::OnSetTransform()

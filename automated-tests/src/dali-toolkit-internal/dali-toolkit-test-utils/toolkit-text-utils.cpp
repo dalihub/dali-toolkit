@@ -15,9 +15,11 @@
  *
  */
 
-#include "toolkit-text-model.h"
+// FILE HEADER
+#include "toolkit-text-utils.h"
 
 // EXTERNAL INCLUDES
+#include <limits>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
@@ -260,25 +262,26 @@ void CreateTextModel( const std::string& text,
   }
 
   // 9) Layout the text
-  LayoutEngine layoutEngine;
+  Layout::Engine layoutEngine;
   layoutEngine.SetMetrics( metrics );
-  layoutEngine.SetLayout( LayoutEngine::MULTI_LINE_BOX );
+  layoutEngine.SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
   // Set the layout parameters.
   const Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   const Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
 
-  LayoutParameters layoutParameters( textArea,
-                                     utf32Characters.Begin(),
-                                     lineBreakInfo.Begin(),
-                                     wordBreakInfo.Begin(),
-                                     ( 0u != characterDirections.Count() ) ? characterDirections.Begin() : NULL,
-                                     glyphs.Begin(),
-                                     glyphsToCharactersMap.Begin(),
-                                     charactersPerGlyph.Begin(),
-                                     charactersToGlyph.Begin(),
-                                     glyphsPerCharacter.Begin(),
-                                     numberOfGlyphs );
+  Layout::Parameters layoutParameters( textArea,
+                                       utf32Characters.Begin(),
+                                       lineBreakInfo.Begin(),
+                                       wordBreakInfo.Begin(),
+                                       ( 0u != characterDirections.Count() ) ? characterDirections.Begin() : NULL,
+                                       glyphs.Begin(),
+                                       glyphsToCharactersMap.Begin(),
+                                       charactersPerGlyph.Begin(),
+                                       charactersToGlyph.Begin(),
+                                       glyphsPerCharacter.Begin(),
+                                       numberOfGlyphs,
+                                       Layout::HORIZONTAL_ALIGN_BEGIN );
 
   Vector<LineRun>& lines = visualModel->mLines;
 
@@ -296,7 +299,8 @@ void CreateTextModel( const std::string& text,
   layoutEngine.LayoutText( layoutParameters,
                            glyphPositions,
                            lines,
-                           layoutSize );
+                           layoutSize,
+                           false );
 
   // 10) Reorder the lines
   if( 0u != bidirectionalInfo.Count() )
@@ -333,8 +337,89 @@ void CreateTextModel( const std::string& text,
     layoutEngine.Align( textArea,
                         0u,
                         numberOfCharacters,
+                        Layout::HORIZONTAL_ALIGN_BEGIN,
                         lines );
   }
+}
+
+void ConfigureTextLabel( ControllerPtr controller )
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  // Set the text layout as multi-line.
+  controller->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
+
+  // Set cursor's width to zero.
+  controller->GetLayoutEngine().SetCursorWidth( 0 );
+
+  // Disables the text input.
+  controller->EnableTextInput( NULL );
+
+  // Disables the vertical scrolling.
+  controller->SetVerticalScrollEnabled( false );
+
+  // Disables the horizontal scrolling.
+  controller->SetHorizontalScrollEnabled( false );
+
+  // Enable the text elide.
+  controller->SetTextElideEnabled( true );
+}
+
+void ConfigureTextField( ControllerPtr controller )
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+
+  // Set the text layout as multi-line.
+  controller->GetLayoutEngine().SetLayout( Layout::Engine::SINGLE_LINE_BOX );
+
+  // Enables the text input.
+  controller->EnableTextInput( decorator );
+
+  // Enables the vertical scrolling after the text input has been enabled.
+  controller->SetVerticalScrollEnabled( false );
+
+  // Disables the horizontal scrolling.
+  controller->SetHorizontalScrollEnabled( true );
+
+  // No maximum number of characters.
+  controller->SetMaximumNumberOfCharacters( 50u );
+
+  // Disable the text elide.
+  controller->SetTextElideEnabled( false );
+}
+
+void ConfigureTextEditor( ControllerPtr controller )
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+
+  // Set the text layout as multi-line.
+  controller->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
+
+  // Enables the text input.
+  controller->EnableTextInput( decorator );
+
+  // Enables the vertical scrolling after the text input has been enabled.
+  controller->SetVerticalScrollEnabled( true );
+
+  // Disables the horizontal scrolling.
+  controller->SetHorizontalScrollEnabled( false );
+
+  // No maximum number of characters.
+  controller->SetMaximumNumberOfCharacters( std::numeric_limits<Length>::max() );
+
+  // Disable the text elide.
+  controller->SetTextElideEnabled( false );
 }
 
 } // namespace Text

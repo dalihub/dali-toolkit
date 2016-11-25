@@ -18,13 +18,9 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/object/weak-handle.h>
-#include <dali/public-api/common/intrusive-ptr.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 
 namespace Dali
@@ -128,16 +124,6 @@ protected:
   virtual void DoSetOffStage( Actor& actor );
 
   /**
-   *@copydoc Visual::Base::DoSetProperty
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @copydoc Visual::Base::DoGetProperty
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
-
-  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   virtual void OnSetTransform();
@@ -145,20 +131,27 @@ protected:
 private:
 
   /**
-   * @brief Render view, create and attach actor(s) to this TextView.
-   * @todo In a next patch a new text render back-end won't add extra actors.
+   * Set the individual property to the given value
+   * @param[in] index The index key used to reference this value within the initial
+   * property map.
+   * @param[in] propertyValue The value to set
    */
-  void RenderText();
+  void SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+
+  /**
+   * @brief Creates the text's renderer.
+   */
+  void CreateRenderer();
+
+  /**
+   * @brief Destroys the text's renderer.
+   */
+  void DestroyRenderer();
 
 private:
-  Text::ControllerPtr          mController;               ///< The text's controller.
-  WeakHandle<Actor>            mSelf;
-
-  Text::RendererPtr            mRenderer;
-  Actor                        mRenderableActor;
-
-  int mRenderingBackend;
-  bool mHasBeenStaged           : 1;
+  Text::ControllerPtr mController; ///< The text's controller.
+  Text::TypesetterPtr mTypesetter; ///< The text's typesetter.
+  WeakHandle<Actor>   mControl;    ///< The control where the renderer is added.
 };
 
 } // namespace Internal

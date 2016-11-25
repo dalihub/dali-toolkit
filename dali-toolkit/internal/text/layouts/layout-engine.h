@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H__
-#define __DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H__
+#ifndef DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H
+#define DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDE
+#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/metrics.h>
 
@@ -35,44 +36,33 @@ namespace Toolkit
 namespace Text
 {
 
-struct LayoutParameters;
+namespace Layout
+{
+
+struct Parameters;
 
 /**
  * @brief LayoutEngine is responsible for calculating the visual position of glyphs in layout.
  */
-class LayoutEngine
+class Engine
 {
 public:
 
-  enum Layout
+  enum Type
   {
     SINGLE_LINE_BOX,
     MULTI_LINE_BOX
   };
 
-  enum HorizontalAlignment
-  {
-    HORIZONTAL_ALIGN_BEGIN,
-    HORIZONTAL_ALIGN_CENTER,
-    HORIZONTAL_ALIGN_END
-  };
-
-  enum VerticalAlignment
-  {
-    VERTICAL_ALIGN_TOP,
-    VERTICAL_ALIGN_CENTER,
-    VERTICAL_ALIGN_BOTTOM
-  };
-
   /**
    * @brief Create a new instance of a LayoutEngine.
    */
-  LayoutEngine();
+  Engine();
 
   /**
    * @brief Virtual destructor.
    */
-  ~LayoutEngine();
+  ~Engine();
 
   /**
    * @brief Provide the wrapper around FontClient used to get metrics
@@ -86,54 +76,14 @@ public:
    *
    * @param[in] layout The required layout.
    */
-  void SetLayout( Layout layout );
+  void SetLayout( Type layout );
 
   /**
    * @brief Query the required layout.
    *
    * @return The required layout.
    */
-  Layout GetLayout() const;
-
-  /**
-   * @brief Enable or disable the text ellipsis.
-   *
-   * @param[in] enabled Whether to enable the text ellipsis.
-   */
-  void SetTextEllipsisEnabled( bool enabled );
-
-  /**
-   * @return Whether the text ellipsis is enabled.
-   */
-  bool GetTextEllipsisEnabled() const;
-
-  /**
-   * @brief Choose the required text horizontal alignment.
-   *
-   * @param[in] alignment The required alignment.
-   */
-  void SetHorizontalAlignment( HorizontalAlignment alignment );
-
-  /**
-   * @brief Query the required text horizontal alignment.
-   *
-   * @return The required alignment.
-   */
-  HorizontalAlignment GetHorizontalAlignment() const;
-
-  /**
-   * @brief Choose the required text vertical alignment.
-   *
-   * @param[in] alignment The required alignment.
-   */
-  void SetVerticalAlignment( VerticalAlignment alignment );
-
-  /**
-   * @brief Query the required text vertical alignment.
-   *
-   * @return The required alignment.
-   */
-  VerticalAlignment GetVerticalAlignment() const;
+  Type GetLayout() const;
 
   /**
    * @brief Sets the width of the cursor.
@@ -156,13 +106,15 @@ public:
    * @param[out] glyphPositions The positions of all the glyphs.
    * @param[out] lines The laid-out lines.
    * @param[out] layoutSize The size of the text after it has been laid-out.
+   * @param[in] elideTextEnabled Whether the text elide is enabled.
    *
    * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
    */
-  bool LayoutText( const LayoutParameters& layoutParameters,
+  bool LayoutText( const Parameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
-                   Size& layoutSize );
+                   Size& layoutSize,
+                   bool elideTextEnabled );
 
   /**
    * @brief Re-lays out those lines with right to left characters.
@@ -174,7 +126,7 @@ public:
    * @param[in] numberOfCharacters The number of characters.
    * @param[in,out] glyphPositions The positions of all the glyphs.
    */
-  void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+  void ReLayoutRightToLeftLines( const Parameters& layoutParameters,
                                  CharacterIndex startIndex,
                                  Length numberOfCharacters,
                                  Vector<Vector2>& glyphPositions );
@@ -185,11 +137,13 @@ public:
    * @param[in] size The size of the container where the text is laid-out.
    * @param[in] startIndex Character index of the line from where the lines are aligned.
    * @param[in] numberOfCharacters The number of characters.
+   * @param[in] horizontalAlignment The horizontal alignment.
    * @param[in,out] lines The laid-out lines.
    */
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
+              Layout::HorizontalAlignment horizontalAlignment,
               Vector<LineRun>& lines );
 
   /**
@@ -209,20 +163,23 @@ public:
 private:
 
   // Undefined
-  LayoutEngine( const LayoutEngine& handle );
+  Engine( const Engine& handle );
 
   // Undefined
-  LayoutEngine& operator=( const LayoutEngine& handle );
+  Engine& operator=( const Engine& handle );
 
 private:
 
   struct Impl;
   Impl* mImpl;
 };
+
+} // namespace Layout
+
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H__
+#endif // DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H

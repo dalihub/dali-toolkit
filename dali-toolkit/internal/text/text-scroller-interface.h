@@ -37,14 +37,10 @@ class ScrollerInterface
 public:
 
   /**
-   * @brief Constructor.
-   */
-  ScrollerInterface();
-
-  /**
    * @brief Virtual destructor.
    */
-  virtual ~ScrollerInterface();
+  virtual ~ScrollerInterface()
+  {}
 
   /**
    * @brief Called when the scrolling finishes

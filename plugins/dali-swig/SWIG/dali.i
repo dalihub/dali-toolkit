@@ -25,6 +25,7 @@
 #endif
 
 %include exception.i
+%include dali-gc.i
 
 %exception {
     try {
@@ -76,6 +77,8 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 

@@ -181,23 +181,6 @@ public:
    */
   void CreatePropertyMap( Dali::Property::Map& map ) const;
 
-  /**
-   * @brief Sets the value of an existing property.
-   *
-   * @param [in] index The index of the property.
-   * @param [in] propertyValue The new value of the property.
-   */
-  void SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @brief Retrieves a property value.
-   *
-   * @param [in] index The index of the property.
-   *
-   * @return The property value.
-   */
-  Dali::Property::Value GetProperty( Dali::Property::Index index );
-
 public: // Not intended for application developers
 
   explicit DALI_INTERNAL Base(Internal::Visual::Base *impl);

@@ -183,5 +183,9 @@ namespace Dali
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ViewWrapperImpl_ApplyThemeStyle")]
         public static extern void ViewWrapperImpl_ApplyThemeStyle(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_MakeCallback")]
+        public static extern global::System.IntPtr MakeCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
+
     }
 }

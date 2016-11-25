@@ -64,7 +64,6 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
-#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #include <dali-toolkit/public-api/dali-toolkit-version.h>

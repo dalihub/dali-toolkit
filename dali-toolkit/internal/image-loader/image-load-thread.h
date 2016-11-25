@@ -20,11 +20,13 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
+
 
 namespace Dali
 {
@@ -42,8 +44,20 @@ struct LoadingTask
 {
   /**
    * Constructor.
+   * @param [in] id of the task
+   * @param [in] url The URL of the image file to load.
+   * @param [in] size The width and height to fit the loaded image to, 0.0 means whole image
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    */
-  LoadingTask( uint32_t id, BitmapLoader loader );
+  LoadingTask( uint32_t id, const std::string& url, ImageDimensions dimensions,
+               FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection );
+
+  /**
+   * Load the image
+   */
+  void Load();
 
 private:
 
@@ -55,8 +69,14 @@ private:
 
 public:
 
-  BitmapLoader loader;    ///< The loader used to load the bitmap from URL
-  uint32_t     id;        ///< The id associated with this task.
+  PixelData pixelData;             ///< pixelData handle after successfull load
+  std::string url;                 ///< url of the image to load
+  uint32_t     id;                 ///< The unique id associated with this task.
+  ImageDimensions dimensions;      ///< dimensions to load
+  FittingMode::Type fittingMode;   ///< fitting options
+  SamplingMode::Type samplingMode; ///< sampling options
+  bool orientationCorrection:1;    ///< if orientation correction is needed
+
 };
 
 

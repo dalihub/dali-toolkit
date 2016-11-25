@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -61,7 +61,7 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( VisualProperty::SHADER, CUSTOM_SHADER );
+  Property::Value* customShaderValue = propertyMap.Find( DevelVisual::Property::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
     Property::Map shaderMap;
@@ -71,7 +71,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
     }
   }
 
-  Property::Value* transform = propertyMap.Find( Toolkit::Visual::DevelProperty::TRANSFORM, TRANSFORM );
+  Property::Value* transform = propertyMap.Find( DevelVisual::Property::TRANSFORM, TRANSFORM );
   if( transform )
   {
     Property::Map map;
@@ -163,7 +163,7 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 
   Property::Map transform;
   mImpl->mTransform.GetPropertyMap( transform );
-  map.Insert( Toolkit::Visual::DevelProperty::TRANSFORM, transform );
+  map.Insert( DevelVisual::Property::TRANSFORM, transform );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
@@ -202,57 +202,6 @@ bool Visual::Base::IsOnStage() const
 bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
-}
-
-void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
-                      ( index > VISUAL_PROPERTY_BASE_START_INDEX ) && // Change the type of visual is not allowed.
-                      "Property index is out of bounds" );
-
-  if( index < VISUAL_PROPERTY_START_INDEX )
-  {
-    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
-    {
-      Property::Map* transformMap = propertyValue.GetMap();
-      if( transformMap )
-      {
-        SetTransformAndSize( *transformMap, mImpl->mControlSize );
-      }
-    }
-
-    // TODO set the properties of the visual base.
-  }
-  else
-  {
-    DoSetProperty( index, propertyValue );
-  }
-}
-
-Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
-{
-  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
-                      ( index >= VISUAL_PROPERTY_BASE_START_INDEX ) &&
-                      "Property index is out of bounds" );
-
-  Dali::Property::Value value;
-
-  if( index < VISUAL_PROPERTY_START_INDEX )
-  {
-    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
-    {
-      Property::Map map;
-      mImpl->mTransform.GetPropertyMap( map );
-      return map;
-    }
-    // TODO retrieve the properties of the visual base.
-  }
-  else
-  {
-    value = DoGetProperty( index );
-  }
-
-  return value;
 }
 
 } // namespace Internal

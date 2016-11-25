@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_POPUP_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,6 +347,11 @@ private:
    */
   void SetExitAnimationData( const Property::Map& map );
 
+  /**
+   * @briefs Updates the popup background's position and size.
+   */
+  void UpdateBackgroundPositionAndSize();
+
 public: // Signals
 
   /**
@@ -542,7 +547,7 @@ private:
   bool mBackingEnabled;                              ///< True if a dimmed backing will be used.
   Vector4 mBackingColor;                             ///< The color of the backing.
   Actor mPopupBackgroundImage;                       ///< Stores the background image.
-  Vector4 mBackgroundOuterBorder;                    ///< Background external border margin size
+  Rect<int> mBackgroundBorder;                       ///< Background border.
   float mMargin;                                     ///< Internal margin for popup contents.
   std::string mTailUpImage;                          ///< Image used for the tail for the up direction.
   std::string mTailDownImage;                        ///< Image used for the tail for the down direction.

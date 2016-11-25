@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/text/text-model-interface.h>
 
 namespace Dali
 {
@@ -40,6 +41,7 @@ class Controller;
 class ControlInterface;
 class EditableControlInterface;
 class View;
+class RenderingController;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
 
@@ -297,24 +299,40 @@ public: // Configure the text controller.
   bool IsMultiLineEnabled() const;
 
   /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetHorizontalAlignment()
+   * @brief Sets the text's horizontal alignment.
+   *
+   * @param[in] alignment The horizontal alignment.
    */
-  void SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment );
+  void SetHorizontalAlignment( Layout::HorizontalAlignment alignment );
 
   /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetHorizontalAlignment()
+   * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  LayoutEngine::HorizontalAlignment GetHorizontalAlignment() const;
+  Layout::HorizontalAlignment GetHorizontalAlignment() const;
 
   /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetVerticalAlignment()
+   * @brief Sets the text's vertical alignment.
+   *
+   * @param[in] alignment The vertical alignment.
    */
-  void SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment );
+  void SetVerticalAlignment( Layout::VerticalAlignment alignment );
 
   /**
-   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetVerticalAlignment()
+   * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  LayoutEngine::VerticalAlignment GetVerticalAlignment() const;
+  Layout::VerticalAlignment GetVerticalAlignment() const;
+
+  /**
+   * @brief Enable or disable the text elide.
+   *
+   * @param[in] enabled Whether to enable the text elide.
+   */
+  void SetTextElideEnabled( bool enabled );
+
+  /**
+   * @copydoc ModelInterface::IsTextElideEnabled()
+   */
+  bool IsTextElideEnabled() const;
 
 public: // Update.
 
@@ -443,18 +461,18 @@ public: // Default style & Input style
   float GetDefaultPointSize() const;
 
   /**
-   * @brief Set the text color
+   * @brief Sets the text's default color.
    *
-   * @param textColor The text color
+   * @param color The default color.
    */
-  void SetTextColor( const Vector4& textColor );
+  void SetDefaultColor( const Vector4& color );
 
   /**
-   * @brief Retrieve the text color
+   * @brief Retrieves the text's default color.
    *
-   * @return The text color
+   * @return The default color.
    */
-  const Vector4& GetTextColor() const;
+  const Vector4& GetDefaultColor() const;
 
   /**
    * @brief Set the text color
@@ -770,7 +788,7 @@ public: // Queries & retrieves.
    *
    * @return A reference to the layout engine.
    */
-  LayoutEngine& GetLayoutEngine();
+  Layout::Engine& GetLayoutEngine();
 
   /**
    * @brief Return a view of the text.
@@ -778,13 +796,6 @@ public: // Queries & retrieves.
    * @return A reference to the view.
    */
   View& GetView();
-
-  /**
-   * @brief Query the current scroll position; the UI control is responsible for moving actors to this position.
-   *
-   * @return The scroll position.
-   */
-  const Vector2& GetScrollPosition() const;
 
   /**
    * @copydoc Control::GetNaturalSize()
@@ -795,6 +806,13 @@ public: // Queries & retrieves.
    * @copydoc Control::GetHeightForWidth()
    */
   float GetHeightForWidth( float width );
+
+  /**
+   * @brief Retrieves the text's model.
+   *
+   * @return A pointer to the text's model.
+   */
+  const ModelInterface* const GetTextModel() const;
 
 public: // Relayout.
 
