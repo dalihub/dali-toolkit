@@ -584,6 +584,9 @@ void Control::SetBackground( const Property::Map& map )
   {
     RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
     visual.SetDepthIndex( DepthIndex::BACKGROUND );
+
+    // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
+    RelayoutRequest();
   }
 }
 
@@ -602,6 +605,9 @@ void Control::ClearBackground()
 {
    UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
    mImpl->mBackgroundColor = Color::TRANSPARENT;
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   RelayoutRequest();
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
