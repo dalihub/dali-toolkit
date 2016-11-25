@@ -129,24 +129,24 @@ protected:
   virtual void OnSetTransform();
 
 private:
+  /**
+   * @brief Set the individual property to the given value.
+   *
+   * @param[in] index The index key used to reference this value within the initial property map.
+   *
+   * @param[in] propertyValue The value to set.
+   */
+  void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
 
   /**
-   * Set the individual property to the given value
-   * @param[in] index The index key used to reference this value within the initial
-   * property map.
-   * @param[in] propertyValue The value to set
+   * @brief Updates the text's renderer.
    */
-  void SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+  void UpdateRenderer();
 
   /**
-   * @brief Creates the text's renderer.
+   * @brief Removes the texture set from the renderer.
    */
-  void CreateRenderer();
-
-  /**
-   * @brief Destroys the text's renderer.
-   */
-  void DestroyRenderer();
+  void RemoveTextureSet();
 
 private:
   Text::ControllerPtr mController; ///< The text's controller.

@@ -924,6 +924,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
 
@@ -936,7 +937,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
-  propertyMap.Insert( "enableMarkup", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -1654,6 +1654,7 @@ int UtcDaliVisualTextVisualRender(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
 
@@ -1666,7 +1667,6 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
-  propertyMap.Insert( "enableMarkup", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
   textVisual.SetDepthIndex( 1.f );
 
@@ -1678,6 +1678,27 @@ int UtcDaliVisualTextVisualRender(void)
   dummyControl.SetSize(200.f, 200.f);
 
   Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render();
+
+
+  // Create a texture bigger than the maximum allowed by the image atlas. Used to increase coverage.
+  propertyMap.Clear();
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
+  propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
+  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
+  propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
+
+  Property::Map transformMap;
+  transformMap.Insert( DevelVisual::Transform::Property::SIZE, Vector2( 720.f, 640.f ) );
+  propertyMap.Insert( DevelVisual::Property::TRANSFORM, transformMap );
+
+  textVisual = factory.CreateVisual( propertyMap );
+  textVisual.SetDepthIndex( 1.f );
+
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, textVisual );
+  dummyControl.SetSize( 720.f, 640.f );
+
   application.SendNotification();
   application.Render();
 
