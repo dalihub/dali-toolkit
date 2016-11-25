@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/object/property-key.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
@@ -163,6 +165,33 @@ public:
    * @return the orientation of the layout.
    */
   DALI_IMPORT_API ControlOrientation::Type GetOrientation() const;
+
+  /**
+   * @brief Apply the layout Properties.
+   * @SINCE_1_2.20
+   * @param[in] properties The properties the layout.
+   */
+  void SetLayoutProperties(const Property::Map& properties);
+
+  /**
+   * @brief Get the layout Properties.
+   * @SINCE_1_2.20
+   * @return the property of the layout.
+   */
+  Property::Map GetLayoutProperties();
+
+  /**
+   * @brief Check if the Property has been changed.
+   * @SINCE_1_2.20
+   * @return whether the layout has been changed or not.if changed, return true.
+   */
+  bool HasLayoutChanged();
+
+  /**
+   * @brief Set the layout changed flag to false.
+   * @SINCE_1_2.20
+   */
+  void ResetLayoutChangedFlag();
 
   /**
    * @brief Retrieve the target size of an item in the layout.

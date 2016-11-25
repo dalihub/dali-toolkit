@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -424,6 +425,11 @@ Degree SpiralLayout::GetScrollDirection() const
 
 void SpiralLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
 {
+
+  if(HasLayoutChanged())
+  {
+    SetSpiralLayoutProperties(GetLayoutProperties());
+  }
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
@@ -498,6 +504,53 @@ void SpiralLayout::ApplyConstraints( Actor& actor, const int itemId, const Vecto
   }
 }
 
+void SpiralLayout::SetSpiralLayoutProperties(const Property::Map& properties)
+{
+  // Set any properties specified for SpiralLayout.
+  for( unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx )
+  {
+    KeyValuePair propertyPair = properties.GetKeyValue( idx );
+    switch(DefaultItemLayoutProperty::Property(propertyPair.first.indexKey))
+    {
+      case DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING:
+      {
+        SetItemSpacing(Radian(propertyPair.second.Get<float>()));
+        break;
+      }
+      case DefaultItemLayoutProperty::SPIRAL_MAXIMUM_SWIPE_SPEED:
+      {
+        SetMaximumSwipeSpeed(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT:
+      {
+        SetTopItemAlignment(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::SPIRAL_SCROLL_SPEED_FACTOR:
+      {
+        SetScrollSpeedFactor(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::SPIRAL_REVOLUTION_DISTANCE:
+      {
+        SetRevolutionDistance(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::SPIRAL_ITEM_FLICK_ANIMATION_DURATION:
+      {
+        SetItemFlickAnimationDuration(propertyPair.second.Get<float>());
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+  }
+  ResetLayoutChangedFlag();
+}
+
 Vector3 SpiralLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
 {
   Vector3 itemPosition = Vector3::ZERO;
@@ -517,7 +570,7 @@ Vector3 SpiralLayout::GetItemPosition(int itemID, float currentLayoutPosition, c
   {
     positionConstraint.OrientationDown( itemPosition, currentLayoutPosition + itemID, layoutSize );
   }
-  else // orientation == ControlOrientation::Right
+  else //orientation == ControlOrientation::Right
   {
     positionConstraint.OrientationRight( itemPosition, currentLayoutPosition + itemID, layoutSize );
   }

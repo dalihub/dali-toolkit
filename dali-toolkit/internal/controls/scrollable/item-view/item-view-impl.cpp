@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <algorithm>
+#include <dali/public-api/actors/layer.h>
+
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/set-wrapper.h>
@@ -29,10 +31,17 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/item-view-devel.h>
+#include <dali-toolkit/internal/controls/scrollable/item-view/grid-layout.h>
+#include <dali-toolkit/internal/controls/scrollable/item-view/depth-layout.h>
+#include <dali-toolkit/internal/controls/scrollable/item-view/spiral-layout.h>
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 using std::string;
@@ -250,6 +259,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "minimumSwipeDistance",       FLO
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "wheelScrollDistanceStep",    FLOAT,     WHEEL_SCROLL_DISTANCE_STEP   )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "snapToItemEnabled",          BOOLEAN,   SNAP_TO_ITEM_ENABLED         )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "refreshInterval",            FLOAT,     REFRESH_INTERVAL             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout",               ARRAY,     LAYOUT                       )
+
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scrollSpeed",         FLOAT,    SCROLL_SPEED)
@@ -407,11 +418,11 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     // Remove constraints from previous layout
     actor.RemoveConstraints();
 
+    mActiveLayout->ApplyConstraints(actor, itemId, targetSize, Self() );
+
     Vector3 size;
     mActiveLayout->GetItemSize( itemId, targetSize, size );
     actor.SetSize( size.GetVectorXY() );
-
-    mActiveLayout->ApplyConstraints(actor, itemId, targetSize, Self() );
   }
 
   // Refresh the new layout
@@ -1732,6 +1743,89 @@ void ItemView::SetProperty( BaseObject* object, Property::Index index, const Pro
         itemViewImpl.SetRefreshInterval( value.Get<float>() );
         break;
       }
+      case Toolkit::DevelItemView::Property::LAYOUT:
+      {
+        // Get a Property::Array from the property if possible.
+        Property::Array layoutArray;
+        if( value.Get( layoutArray ) )
+        {
+          itemViewImpl.SetLayoutArray( layoutArray );
+        }
+        break;
+      }
+    }
+  }
+}
+
+Property::Array ItemView::GetLayoutArray()
+{
+  return mlayoutArray;
+}
+
+void ItemView::SetLayoutArray( const Property::Array& layouts )
+{
+  mlayoutArray = layouts;
+  if(GetLayoutCount() > 0)
+  {
+    for(unsigned int index = GetLayoutCount() - 1; index >= 0; --index)
+    {
+      RemoveLayout(index);
+      if(index == 0) break;
+    }
+  }
+
+  for( unsigned int arrayIdx = 0, arrayCount = layouts.Count(); arrayIdx < arrayCount; ++arrayIdx )
+  {
+    const Property::Value& element = layouts.GetElementAt( arrayIdx );
+
+    Property::Map* layout = element.GetMap();
+    if( layout != NULL )
+    {
+      for( unsigned int mapIdx = 0, mapCount = (*layout).Count(); mapIdx < mapCount; ++mapIdx )
+      {
+        KeyValuePair propertyPair( (*layout).GetKeyValue( mapIdx ) );
+
+        if(propertyPair.first == DefaultItemLayoutProperty::TYPE)
+        {
+          int layoutType = propertyPair.second.Get<int>();
+          if(layoutType <= DefaultItemLayout::SPIRAL && layoutType >= DefaultItemLayout::DEPTH)
+          {
+            //DEPTH, GRID, LIST, SPIRAL
+            switch(DefaultItemLayout::Type(layoutType))
+            {
+              case DefaultItemLayout::DEPTH:
+              {
+                Internal::DepthLayoutPtr depthLayout = Internal::DepthLayout::New();
+                (*depthLayout).SetLayoutProperties(*layout);
+                AddLayout(*depthLayout);
+                break;
+              }
+              case DefaultItemLayout::GRID:
+              {
+                Internal::GridLayoutPtr gridLayout = Internal::GridLayout::New();
+                (*gridLayout).SetLayoutProperties(*layout);
+                AddLayout(*gridLayout);
+                break;
+              }
+              case DefaultItemLayout::LIST:
+              {
+                Internal::GridLayoutPtr listLayout = Internal::GridLayout::New();
+                listLayout->SetNumberOfColumns( 1 );
+                (*listLayout).SetLayoutProperties(*layout);
+                AddLayout(*listLayout);
+                break;
+              }
+              case DefaultItemLayout::SPIRAL:
+              {
+                Internal::SpiralLayoutPtr spiralLayout = Internal::SpiralLayout::New();
+                (*spiralLayout).SetLayoutProperties(*layout);
+                AddLayout(*spiralLayout);
+                break;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -1772,6 +1866,13 @@ Property::Value ItemView::GetProperty( BaseObject* object, Property::Index index
         value = itemViewImpl.GetRefreshInterval();
         break;
       }
+      case Toolkit::DevelItemView::Property::LAYOUT:
+      {
+        Property::Array layouts= itemViewImpl.GetLayoutArray();
+        value = layouts;
+        break;
+      }
+
     }
   }
 

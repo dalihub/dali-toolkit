@@ -100,6 +100,7 @@
 %rename(LoadImageSynchronously) Dali::Toolkit::SyncImageLoader::Load;
 %rename(ControlOrientationType) Dali::Toolkit::ControlOrientation::Type;
 %rename(DefaultItemLayoutType) Dali::Toolkit::DefaultItemLayout::Type;
+%rename(DefaultItemLayoutProperty) Dali::Toolkit::DefaultItemLayoutProperty::Property;
 %rename(NewItemLayout) Dali::Toolkit::DefaultItemLayout::New;
 %rename(ContentDirectionType) Dali::Toolkit::FlexContainer::ContentDirection;
 %rename(FlexDirectionType) Dali::Toolkit::FlexContainer::FlexDirection;
@@ -210,6 +211,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/enums.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
+%include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 %include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>

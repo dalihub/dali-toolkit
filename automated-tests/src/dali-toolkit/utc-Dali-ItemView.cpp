@@ -25,6 +25,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/item-view-devel.h>
 
 
 using namespace Dali;
@@ -937,6 +939,71 @@ int UtcDaliItemViewSetGetProperty(void)
   DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), view.GetRefreshInterval(), TEST_LOCATION );
   view.SetProperty( ItemView::Property::REFRESH_INTERVAL, 11.0f );
   DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), 11.0f, TEST_LOCATION );
+
+  // Test "layout" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("layout") == DevelItemView::Property::LAYOUT  );
+  Property::Map gridLayoutProperty;
+  gridLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::GRID) );
+  gridLayoutProperty.Insert( DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(200, 200,50)) );
+  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_ROW_SPACING, Dali::Property::Value(50.0f) );
+  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_COLUMN_NUMBER, Dali::Property::Value(4) );
+
+  Property::Map depthLayoutProperty;
+  depthLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::DEPTH) );
+  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER, Dali::Property::Value(3) );
+  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_ROW_NUMBER, Dali::Property::Value(26.0f) );
+
+  Property::Map spiralLayoutPrperty;
+  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::SPIRAL) );
+  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING, Dali::Property::Value((Math::PI*2.0f)/9.5f) );
+  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT, Dali::Property::Value(-0.125f) );
+
+  Property::Map listLayoutPrperty;
+  listLayoutPrperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::LIST) );
+  listLayoutPrperty.Insert( DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(100, 100,50)) );
+
+
+  Property::Array layoutArray;
+  layoutArray.PushBack(gridLayoutProperty);
+  layoutArray.PushBack(depthLayoutProperty);
+  layoutArray.PushBack(spiralLayoutPrperty);
+  layoutArray.PushBack(listLayoutPrperty);
+
+  view.SetProperty( DevelItemView::Property::LAYOUT, layoutArray);
+
+  Property::Array getLayoutArray;
+  DALI_TEST_CHECK( view.GetProperty(DevelItemView::Property::LAYOUT ).Get( getLayoutArray ) );
+
+  //Check that the result is the same as
+  DALI_TEST_EQUALS( layoutArray.Count(), getLayoutArray.Count(), TEST_LOCATION );
+  Property::Map firstLayout = *((getLayoutArray.GetElementAt( 0 )).GetMap());
+
+  for( unsigned int mapIdx = 0, mapCount = firstLayout.Count(); mapIdx < mapCount; ++mapIdx )
+  {
+    KeyValuePair propertyPair( firstLayout.GetKeyValue( mapIdx ) );
+    if(propertyPair.first == DefaultItemLayoutProperty::TYPE)
+    {
+      int layoutType = propertyPair.second.Get<int>();
+      DALI_TEST_EQUALS( layoutType, (int)DefaultItemLayout::GRID, TEST_LOCATION );
+    }
+    else if(propertyPair.first == DefaultItemLayoutProperty::ITEM_SIZE)
+    {
+      Vector3 size = propertyPair.second.Get<Vector3>();
+      DALI_TEST_EQUALS( size, Vector3(200, 200,50), TEST_LOCATION );
+    }
+    else if(propertyPair.first == DefaultItemLayoutProperty::GRID_ROW_SPACING)
+    {
+      float spacing = propertyPair.second.Get<float>();
+      DALI_TEST_EQUALS( spacing, 50.0f, TEST_LOCATION );
+    }
+    else if(propertyPair.first == DefaultItemLayoutProperty::GRID_COLUMN_NUMBER)
+    {
+      int number = propertyPair.second.Get<int>();
+      DALI_TEST_EQUALS(number, 4, TEST_LOCATION );
+    }
+  }
+  view.SetProperty( DevelItemView::Property::LAYOUT, layoutArray);
+
 
   // Test "overshootEnabled" property
   DALI_TEST_CHECK( view.GetPropertyIndex("overshootEnabled") == Scrollable::Property::OVERSHOOT_ENABLED  );

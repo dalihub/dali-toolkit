@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -445,6 +446,11 @@ Degree DepthLayout::GetScrollDirection() const
 
 void DepthLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
 {
+
+  if(HasLayoutChanged())
+  {
+    SetDepthLayoutProperties(GetLayoutProperties());
+  }
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
   if( itemView )
   {
@@ -497,6 +503,63 @@ void DepthLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector
     constraint.SetRemoveAction( Dali::Constraint::Discard );
     constraint.Apply();
   }
+}
+
+void DepthLayout::SetDepthLayoutProperties(const Property::Map& properties)
+{
+  // Set any properties specified for DepthLayout.
+  for( unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx )
+  {
+    KeyValuePair propertyPair = properties.GetKeyValue( idx );
+    switch(DefaultItemLayoutProperty::Property(propertyPair.first.indexKey))
+    {
+      case DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER:
+      {
+        SetNumberOfColumns(propertyPair.second.Get<int>());
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_ROW_NUMBER:
+      {
+        SetNumberOfRows(propertyPair.second.Get<int>());
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_ROW_SPACING:
+      {
+        SetRowSpacing(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_MAXIMUM_SWIPE_SPEED:
+      {
+        SetMaximumSwipeSpeed(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_SCROLL_SPEED_FACTOR:
+      {
+        SetScrollSpeedFactor(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_TILT_ANGLE:
+      {
+        SetTiltAngle(Degree(Radian(propertyPair.second.Get<float>())));
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_ITEM_TILT_ANGLE:
+      {
+        SetItemTiltAngle(Degree(Radian(propertyPair.second.Get<float>())));
+        break;
+      }
+      case DefaultItemLayoutProperty::DEPTH_ITEM_FLICK_ANIMATION_DURATION:
+      {
+        SetItemFlickAnimationDuration(propertyPair.second.Get<float>());
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+  }
+  ResetLayoutChangedFlag();
 }
 
 Vector3 DepthLayout::GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const

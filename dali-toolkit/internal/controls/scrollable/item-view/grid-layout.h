@@ -22,6 +22,9 @@
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
+#include <dali/public-api/common/dali-common.h>
+
+
 namespace Dali
 {
 
@@ -51,6 +54,12 @@ public:
    * @brief Virtual destructor.
    */
   virtual ~GridLayout();
+
+  /**
+   * Apply grid layout Properties.
+   * @param[in] properties The properties of the layout.
+   */
+  void SetGridLayoutProperties(const Property::Map& properties);
 
   /**
    * @brief Set the number of columns in the layout.

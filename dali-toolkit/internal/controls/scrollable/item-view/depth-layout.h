@@ -21,6 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
+
+
 namespace Dali
 {
 
@@ -50,6 +52,12 @@ public:
    * Virtual destructor.
    */
   virtual ~DepthLayout();
+
+  /**
+   * Apply depth layout Properties.
+   * @param[in] properties The properties of the layout.
+   */
+  void SetDepthLayoutProperties(const Property::Map& properties);
 
   /**
    * Set the number of columns in the layout.

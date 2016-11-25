@@ -62,6 +62,10 @@ devel_api_builder_header_files = \
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
 
+devel_api_item_view_header_files = \
+  $(devel_api_src_dir)/controls/scrollable/item-view/default-item-layout-property.h \
+  $(devel_api_src_dir)/controls/scrollable/item-view/item-view-devel.h
+
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
 
