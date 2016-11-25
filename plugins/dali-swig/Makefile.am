@@ -64,6 +64,7 @@ endif
 # then call our property-wrapper to inject DALi property getters / setters
 $(BUILT_SOURCES): SWIG/*.i
 	rm -f automatic/csharp/*.cs
+	mkdir -p automatic/csharp
 	$(SWIG) -csharp -c++ -outdir automatic/csharp \
             $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o automatic/cpp/dali_wrap.cpp SWIG/dali.i
 	./property-wrapper.rb
