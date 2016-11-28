@@ -134,9 +134,11 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
 
 } // unnamed namespace
 
-TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache )
+TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new TextVisual( factoryCache );
+  TextVisualPtr TextVisualPtr( new TextVisual( factoryCache ) );
+  TextVisualPtr->SetProperties( properties );
+  return TextVisualPtr;
 }
 
 float TextVisual::GetHeightForWidth( float width )

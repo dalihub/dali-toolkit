@@ -61,6 +61,20 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] imageUrl The URL to svg resource to use
+   * @param[in] properties A Property::Map containing settings for this visual
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties );
+
+  /**
+   * @brief Create the SVG Visual using the image URL.
+   *
+   * The visual will parse the SVG image once it is set.
+   * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] imageUrl The URL to svg resource to use
+   * @return A smart-pointer to the newly allocated visual.
    */
   static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
 

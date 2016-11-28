@@ -54,10 +54,20 @@ namespace Toolkit
 namespace Internal
 {
 
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+{
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  svgVisual->ParseFromUrl( imageUrl );
+  svgVisual->SetProperties( properties );
+
+  return svgVisual;
+}
+
 SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
 {
-  SvgVisual* svgVisual = new SvgVisual( factoryCache );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
   svgVisual->ParseFromUrl( imageUrl );
+
   return svgVisual;
 }
 

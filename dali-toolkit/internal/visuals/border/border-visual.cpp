@@ -119,9 +119,11 @@ const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
 );
 }
 
-BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache )
+BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new BorderVisual( factoryCache );
+  BorderVisualPtr borderVisualPtr( new BorderVisual( factoryCache ) );
+  borderVisualPtr->SetProperties( properties );
+  return borderVisualPtr;
 }
 
 BorderVisual::BorderVisual( VisualFactoryCache& factoryCache )

@@ -203,6 +203,18 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
                                  const std::string& imageUrl,
+                                 const Property::Map& properties,
+                                 ImageDimensions size,
+                                 FittingMode::Type fittingMode,
+                                 Dali::SamplingMode::Type samplingMode )
+{
+  ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode ) );
+  imageVisualPtr->SetProperties( properties );
+  return imageVisualPtr;
+}
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 const std::string& imageUrl,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
                                  Dali::SamplingMode::Type samplingMode )
@@ -272,11 +284,14 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
     mSamplingMode = Dali::SamplingMode::Type( value );
   }
 
+  // Use a variable to detect if the width or height have been modified by the property map.
+  bool desiredSizeSpecified = false;
   int desiredWidth = 0;
   Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
   if( desiredWidthValue )
   {
     desiredWidthValue->Get( desiredWidth );
+    desiredSizeSpecified = true;
   }
 
   int desiredHeight = 0;
@@ -284,9 +299,14 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
   if( desiredHeightValue )
   {
     desiredHeightValue->Get( desiredHeight );
+    desiredSizeSpecified = true;
   }
 
-  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+  // Only update the desired size if specified in the property map.
+  if( desiredSizeSpecified )
+  {
+    mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+  }
 
   Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
   if( pixelAreaValue )

@@ -86,9 +86,30 @@ public:
    *
    * @param[in] factoryCache The VisualFactoryCache object
    * @param[in] imageUrl The URL of the image resource to use
+   * @param[in] properties A Property::Map containing settings for this visual
    * @param[in] size The width and height to fit the loaded image to.
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
+                             const std::string& imageUrl,
+                             const Property::Map& properties,
+                             ImageDimensions size = ImageDimensions(),
+                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
+
+  /**
+   * @brief Create a new image visual with a URL.
+   *
+   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   *
+   * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] imageUrl The URL of the image resource to use
+   * @param[in] size The width and height to fit the loaded image to.
+   * @param[in] fittingMode The FittingMode of the resource to load
+   * @param[in] samplingMode The SamplingMode of the resource to load
+   * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
                              const std::string& imageUrl,

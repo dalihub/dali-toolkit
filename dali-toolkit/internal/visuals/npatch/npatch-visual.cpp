@@ -226,9 +226,18 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+{
+  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
+  nPatchVisual->mImageUrl = imageUrl;
+  nPatchVisual->SetProperties( properties );
+
+  return nPatchVisual;
+}
+
 NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
 {
-  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
+  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
   nPatchVisual->mImageUrl = imageUrl;
 
   return nPatchVisual;
@@ -236,7 +245,7 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
 
 NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
 {
-  NPatchVisual* nPatchVisual = new NPatchVisual( factoryCache );
+  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
   nPatchVisual->mImageUrl = image.GetUrl();
 
   return nPatchVisual;
