@@ -407,10 +407,21 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND:
         {
+          std::string url;
           const Property::Map* map = value.GetMap();
           if( map && !map->Empty() )
           {
             controlImpl.SetBackground( *map );
+          }
+          else if( value.Get( url ) )
+          {
+            // don't know the size to load
+            Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
+            if( visual )
+            {
+              controlImpl.RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+              visual.SetDepthIndex( DepthIndex::BACKGROUND );
+            }
           }
           else
           {

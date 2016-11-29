@@ -117,7 +117,7 @@ public:
        */
       KEY_INPUT_FOCUS,
       /**
-       * @brief name "background",       mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE,                   type Map
+       * @brief name "background", mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map or std::string for URL
        * @SINCE_1_1.3
        */
       BACKGROUND,
