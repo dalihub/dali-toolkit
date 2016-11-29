@@ -166,7 +166,7 @@ namespace MyCSharpExample
         public void Initialize(object source, AUIApplicationInitEventArgs e)
         {
             Stage stage = Stage.GetCurrent();
-            stage.SetBackgroundColor( NDalic.WHITE );
+            stage.BackgroundColor = Color.White;
 
             // Create a container to layout the rows of image and rating vertically
             FlexContainer container = new FlexContainer();
