@@ -29,6 +29,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -134,7 +135,7 @@ HandleIndex GetVisualProperty(
   if( iter != visuals.End() )
   {
     Actor self = controlImpl.Self();
-    Property::Index index = self.GetPropertyIndex( propertyKey );
+    Property::Index index = DevelHandle::GetPropertyIndex( self, propertyKey );
     if( index != Property::INVALID_INDEX )
     {
       // It's an actor property:
@@ -147,7 +148,7 @@ HandleIndex GetVisualProperty(
       {
         // @todo Need to use correct renderer index
         Renderer renderer = self.GetRendererAt(0);
-        Property::Index index = renderer.GetPropertyIndex( propertyKey );
+        Property::Index index = DevelHandle::GetPropertyIndex( renderer, propertyKey );
         if( index != Property::INVALID_INDEX )
         {
           // It's a renderer property:
@@ -866,7 +867,7 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
       Actor child = Self().FindChildByName( animator->objectName );
       if( child )
       {
-        Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
+        Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
         handleIndex = HandleIndex( child, propertyIndex );
       }
       else

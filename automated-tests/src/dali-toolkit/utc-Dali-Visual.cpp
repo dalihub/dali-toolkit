@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -1041,7 +1042,7 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, BorderVisual::Property::COLOR );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), Color::WHITE );
@@ -1088,7 +1089,7 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::SIZE );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, BorderVisual::Property::SIZE );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), 9.0f );
@@ -1132,7 +1133,7 @@ int UtcDaliVisualAnimateColorVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), Color::WHITE );
@@ -1182,7 +1183,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( PrimitiveVisual::Property::MIX_COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, PrimitiveVisual::Property::MIX_COLOR );
 
   // The property isn't registered on the renderer, it's instead registered on the shader.
   DALI_TEST_EQUALS( index, Property::INVALID_INDEX, TEST_LOCATION );
