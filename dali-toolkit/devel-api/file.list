@@ -103,29 +103,11 @@ devel_api_scripting_header_files = \
 
 devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
-  $(devel_api_src_dir)/shader-effects/bendy-effect.h \
-  $(devel_api_src_dir)/shader-effects/blind-effect.h \
-  $(devel_api_src_dir)/shader-effects/bouncing-effect.h \
-  $(devel_api_src_dir)/shader-effects/carousel-effect.h \
-  $(devel_api_src_dir)/shader-effects/displacement-effect.h \
   $(devel_api_src_dir)/shader-effects/dissolve-effect.h \
-  $(devel_api_src_dir)/shader-effects/dissolve-local-effect.h \
   $(devel_api_src_dir)/shader-effects/distance-field-effect.h \
   $(devel_api_src_dir)/shader-effects/image-region-effect.h \
-  $(devel_api_src_dir)/shader-effects/iris-effect.h \
-  $(devel_api_src_dir)/shader-effects/mask-effect.h \
-  $(devel_api_src_dir)/shader-effects/mirror-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
-  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h \
-  $(devel_api_src_dir)/shader-effects/overlay-effect.h \
-  $(devel_api_src_dir)/shader-effects/quadratic-bezier.h \
-  $(devel_api_src_dir)/shader-effects/ripple-effect.h \
-  $(devel_api_src_dir)/shader-effects/ripple2d-effect.h \
-  $(devel_api_src_dir)/shader-effects/shear-effect.h \
-  $(devel_api_src_dir)/shader-effects/soft-button-effect.h \
-  $(devel_api_src_dir)/shader-effects/spot-effect.h \
-  $(devel_api_src_dir)/shader-effects/square-dissolve-effect.h \
-  $(devel_api_src_dir)/shader-effects/swirl-effect.h
+  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h
 
 devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
