@@ -330,7 +330,7 @@ public:
    * @SINCE_1_0.0
    * @return The background color of the control.
    */
-  Vector4 GetBackgroundColor() const;
+  Vector4 GetBackgroundColor() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_2_8, use Property::BACKGROUND instead
@@ -340,7 +340,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The image to set as the background.
    */
-  void SetBackgroundImage( Image image );
+  void SetBackgroundImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Clears the background.

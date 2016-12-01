@@ -460,7 +460,7 @@ public: // API for derived classes to override
    * @SINCE_1_0.0
    * @param[in] child The added actor.
    */
-  virtual void OnControlChildAdd( Actor& child );
+  virtual void OnControlChildAdd( Actor& child ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.30. Override OnChildRemove instead.
@@ -472,7 +472,7 @@ public: // API for derived classes to override
    * @SINCE_1_0.0
    * @param[in] child The removed actor.
    */
-  virtual void OnControlChildRemove( Actor& child );
+  virtual void OnControlChildRemove( Actor& child ) DALI_DEPRECATED_API;
 
   // Styling
 

@@ -139,7 +139,7 @@ public:
    * @param[in] image The Image instance to display.
    * @return A handle to a newly allocated ImageView.
    */
-  static ImageView New( Image image );
+  static ImageView New( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Create an initialized ImageView from an URL to an image resource.
@@ -218,7 +218,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Image instance to display.
    */
-  void SetImage( Image image );
+  void SetImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Sets this ImageView from the given URL.
@@ -254,7 +254,7 @@ public:
    * @SINCE_1_0.0
    * @return The Image instance currently used by the ImageView.
    */
-  Image GetImage() const;
+  Image GetImage() const DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 
