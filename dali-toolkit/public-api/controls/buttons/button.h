@@ -184,7 +184,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] disabled property.
    */
-  void SetDisabled( bool disabled );
+  void SetDisabled( bool disabled ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use GetProperty DISABLED
@@ -193,7 +193,7 @@ public:
    * @SINCE_1_0.0
    * @return \e true if the button is \e disabled.
    */
-  bool IsDisabled() const;
+  bool IsDisabled() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 SetProperty AUTO_REPEATING or Styling file
@@ -206,7 +206,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] autoRepeating \e autorepeating property.
    */
-  void SetAutoRepeating( bool autoRepeating );
+  void SetAutoRepeating( bool autoRepeating ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 GetProperty AUTO_REPEATING
@@ -215,7 +215,7 @@ public:
    * @SINCE_1_0.0
    * @return \e true if the \e autorepeating property is set.
    */
-  bool IsAutoRepeating() const;
+  bool IsAutoRepeating() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 SetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file
@@ -228,7 +228,7 @@ public:
    * @param[in] initialAutoRepeatingDelay in seconds.
    * @pre initialAutoRepeatingDelay must be greater than zero.
    */
-  void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
+  void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 GetProperty INITIAL_AUTO_REPEATING_DELAY
@@ -237,7 +237,7 @@ public:
    * @SINCE_1_0.0
    * @return the initial autorepeating delay in seconds.
    */
-  float GetInitialAutoRepeatingDelay() const;
+  float GetInitialAutoRepeatingDelay() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 SetProperty NEXT_AUTO_REPEATING_DELAY or Styling file
@@ -250,7 +250,7 @@ public:
    * @param[in] nextAutoRepeatingDelay in seconds.
    * @pre nextAutoRepeatingDelay must be greater than zero.
    */
-  void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
+  void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 GetProperty NEXT_AUTO_REPEATING_DELAY
@@ -259,7 +259,7 @@ public:
    * @SINCE_1_0.0
    * @return the next autorepeating delay in seconds.
    */
-  float GetNextAutoRepeatingDelay() const;
+  float GetNextAutoRepeatingDelay() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 SetProperty TOGGLABLE or Styling file
@@ -271,7 +271,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] togglable property.
    */
-  void SetTogglableButton( bool togglable );
+  void SetTogglableButton( bool togglable ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 GetProperty TOGGLABLE
@@ -280,7 +280,7 @@ public:
    * @SINCE_1_0.0
    * @return \e true if the \e togglable property is set.
    */
-  bool IsTogglableButton() const;
+  bool IsTogglableButton() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 SetProperty SELECTED
@@ -294,16 +294,16 @@ public:
    * @SINCE_1_0.0
    * @param[in] selected property.
    */
-  void SetSelected( bool selected );
+  void SetSelected( bool selected ) DALI_DEPRECATED_API;
 
   /**
-   * DEPRECATED_1_1.32  SetProperty SELECTED
+   * DEPRECATED_1_1.32  GetProperty SELECTED
    *
    * @brief Returns if the selected property is set and the button is togglable.
    * @SINCE_1_0.0
    * @return \e true if the button is \e selected.
    */
-  bool IsSelected() const;
+  bool IsSelected() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use Styling file to set animation
@@ -313,7 +313,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] animationTime The animation time in seconds.
    */
-  void SetAnimationTime( float animationTime );
+  void SetAnimationTime( float animationTime ) DALI_DEPRECATED_API;
 
   /**
    * DEPRECATED_1_1.32 Use Styling file to set animation
@@ -323,7 +323,7 @@ public:
    * @SINCE_1_0.0
    * @return The animation time in seconds.
    */
-  float GetAnimationTime() const;
+  float GetAnimationTime() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 SetProperty LABEL or Styling file
@@ -333,7 +333,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] label The label text.
    */
-  void SetLabelText( const std::string& label );
+  void SetLabelText( const std::string& label ) DALI_DEPRECATED_API;
 
   /**
    * DEPRECATED_1_1.32 GetProperty LABEL
@@ -343,7 +343,7 @@ public:
    * @SINCE_1_0.0
    * @return The label text.
    */
-  std::string GetLabelText() const;
+  std::string GetLabelText() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use Styling file
@@ -353,7 +353,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The button image.
    */
-  void SetUnselectedImage( const std::string& filename );
+  void SetUnselectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use styling
@@ -363,7 +363,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The background image.
    */
-  void SetBackgroundImage( const std::string& filename );
+  void SetBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
@@ -373,7 +373,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The selected image.
    */
-  void SetSelectedImage( const std::string& filename );
+  void SetSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
@@ -383,7 +383,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The selected background image.
    */
-  void SetSelectedBackgroundImage( const std::string& filename );
+  void SetSelectedBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
@@ -393,7 +393,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The disabled background image.
    */
-  void SetDisabledBackgroundImage( const std::string& filename );
+  void SetDisabledBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
@@ -403,7 +403,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The disabled button image.
    */
-  void SetDisabledImage( const std::string& filename );
+  void SetDisabledImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_1.32 Use styling file
@@ -413,7 +413,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] filename The disabled selected button image.
    */
-  void SetDisabledSelectedImage( const std::string& filename );
+  void SetDisabledSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_0.50. Instead, use SetLabelText.
@@ -423,7 +423,7 @@ public:
    * @SINCE_1_0.0
    * @param[in]  label The actor to use as a label
    */
-  void SetLabel( Actor label );
+  void SetLabel( Actor label ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_0.50. Instead, use SetUnselectedImage.
@@ -433,7 +433,7 @@ public:
    * @SINCE_1_0.0
    * @param[in]  image The button image.
    */
-  void SetButtonImage( Image image );
+  void SetButtonImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_0.50. Instead, use SetSelectedImage( const std::string& filename ).
@@ -443,7 +443,7 @@ public:
    * @SINCE_1_0.0
    * @param[in]  image The selected image.
    */
-  void SetSelectedImage( Image image );
+  void SetSelectedImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_0.50
@@ -454,7 +454,7 @@ public:
    * @remarks Avoid using this method as it's a legacy code.
    * @return     An actor with the button image.
    */
-  Actor GetButtonImage() const;
+  Actor GetButtonImage() const DALI_DEPRECATED_API;
 
   /**
    * @DEPRECATED_1_0.50
@@ -465,7 +465,7 @@ public:
    * @remarks Avoid using this method as it's a legacy code.
    * @return     An actor with the selected image.
    */
-  Actor GetSelectedImage() const;
+  Actor GetSelectedImage() const DALI_DEPRECATED_API;
 
 public: //Signals
 

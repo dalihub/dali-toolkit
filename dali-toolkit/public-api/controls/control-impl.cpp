@@ -604,7 +604,6 @@ void Control::SetBackground( const Property::Map& map )
 
 void Control::SetBackgroundImage( Image image )
 {
-  DALI_LOG_WARNING( "SetBackgroundImage is for the depreciated Property::BACKGROUND_IMAGE use SetBackground( const Property::Map& map )\n" );
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( image );
   if( visual )
   {
@@ -1047,10 +1046,12 @@ void Control::OnInitialize()
 
 void Control::OnControlChildAdd( Actor& child )
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: OnControlChildAdd() is deprecated and will be removed from next release. Override OnChildAdd instead.\n" );
 }
 
 void Control::OnControlChildRemove( Actor& child )
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: OnControlChildRemove() is deprecated and will be removed from next release. Override OnChildRemove instead.\n" );
 }
 
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
