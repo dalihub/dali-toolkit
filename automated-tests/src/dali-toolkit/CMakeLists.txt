@@ -48,6 +48,7 @@ SET(TC_SOURCES
    utc-Dali-ProgressBar.cpp
    utc-Dali-PushButton.cpp
    utc-Dali-RadioButton.cpp
+   utc-Dali-ToggleButton.cpp
    utc-Dali-ScrollViewEffect.cpp
    utc-Dali-SuperBlurView.cpp
    utc-Dali-Toolkit.cpp
