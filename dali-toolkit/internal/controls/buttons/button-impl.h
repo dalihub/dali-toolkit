@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/public-api/controls/buttons/button.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali

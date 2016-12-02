@@ -163,14 +163,7 @@
     "Button":
     {
       "initialAutoRepeatingDelay":2.0,
-      "nextAutoRepeatingDelay":0.9,
-       "label":
-       {
-         "visualType": "TEXT",
-         "horizontalAlignment": "CENTER",
-         "pointSize" : 15.0, // Point size must always be provided to Text Visual
-         "verticalAlignment": "CENTER"
-       }
+      "nextAutoRepeatingDelay":0.9
       // Note: Visuals added to Button will be used in all derived buttons unless overridden.
     },
     "PushButton":
@@ -179,6 +172,13 @@
       "autoRepeating":false,
       "togglable":false,
       "labelPadding":[ 12.0, 12.0, 12.0, 12.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "horizontalAlignment": "CENTER",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
       "unselectedBackgroundVisual":
        {
          "visualType": "IMAGE",
@@ -203,6 +203,13 @@
     "CheckBoxButton":
     {
       "styles":["Button"],
+      "labelPadding":[ 12.0, 12.0, 0.0, 0.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
       "unselectedBackgroundVisual":
       {
         "visualType": "IMAGE",
@@ -227,6 +234,13 @@
     "RadioButton":
     {
       "styles":["Button"],
+      "labelPadding":[ 12.0, 12.0, 0.0, 0.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
       "unselectedBackgroundVisual":
       {
         "visualType": "IMAGE",

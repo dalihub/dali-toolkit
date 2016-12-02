@@ -30,6 +30,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 
 #if defined(DEBUG_ENABLED)
   extern Debug::Filter* gLogButtonFilter;
@@ -164,12 +165,12 @@ void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex,
     {
       case Toolkit::PushButton::Property::UNSELECTED_ICON:
       {
-        pushButtonImpl.CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        pushButtonImpl.CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
       case Toolkit::PushButton::Property::SELECTED_ICON:
       {
-        pushButtonImpl.CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
+        pushButtonImpl.CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
       case Toolkit::PushButton::Property::ICON_ALIGNMENT:

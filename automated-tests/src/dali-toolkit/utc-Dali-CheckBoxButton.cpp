@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
@@ -36,6 +37,10 @@ bool CheckBoxButtonClicked( Button button )
   gCheckBoxButtonState = button.IsSelected();
   return true;
 }
+
+static const char* TEST_IMAGE_ONE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+const Vector2 TEST_IMAGE_SIZE = Vector2( 66.0f, 66.0f );
+
 
 } // namespace
 
@@ -210,6 +215,103 @@ int UtcDaliCheckBoxSettingDisabled(void)
   checkBox.SetProperty(checkBox.GetPropertyIndex("disabled"), false);
 
   DALI_TEST_CHECK(  !checkBox.GetProperty<bool>(checkBox.GetPropertyIndex("disabled")) );
+
+  END_TEST;
+}
+
+int UtcDaliCheckBoxSetLabelPadding(void)
+{
+  tet_infoline("UtcDaliCheckBoxSetLabelPadding\n");
+
+  ToolkitTestApplication application;
+
+  CheckBoxButton checkBox = CheckBoxButton::New();
+
+  Property::Map propertyMap;
+
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+             .Add( Toolkit::TextVisual::Property::TEXT, "activate" )
+             .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
+
+  checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL, propertyMap );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 orginalSize = checkBox.GetNaturalSize();
+
+  checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 paddingAddedSize = checkBox.GetNaturalSize();
+
+  DALI_TEST_EQUALS( checkBox.GetProperty<Vector4>( Toolkit::DevelButton::Property::LABEL_PADDING ), Vector4( 10.0f, 10.0f, 10.0f, 10.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  tet_infoline("Comparing original size of button with just text and button size with text and padding\n");
+
+  DALI_TEST_EQUALS( orginalSize.width +10.0f + 10.0f , paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( orginalSize.height +10.0f + 10.0f , paddingAddedSize.height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliCheckBoxSetForegroundPadding(void)
+{
+  tet_infoline("UtcDaliCheckBoxSetForegroundPadding\n");
+
+  ToolkitTestApplication application;
+
+  CheckBoxButton checkBox = CheckBoxButton::New();
+
+  Property::Map propertyMap;
+
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+             .Add( Toolkit::TextVisual::Property::TEXT, "activate" )
+             .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
+
+  checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL, propertyMap );
+  checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL_PADDING, Vector4( 5.0f, 5.0f, 5.0f, 5.0f ) );
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Button RelayoutSize with text(%f,%f)\n", checkBox.GetNaturalSize().width, checkBox.GetNaturalSize().height );
+
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  platform.SetClosestImageSize( TEST_IMAGE_SIZE );
+
+  checkBox.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, TEST_IMAGE_ONE );
+  checkBox.SetProperty( Toolkit::DevelButton::Property::SELECTED_VISUAL, TEST_IMAGE_ONE );
+
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 preVisualPaddingSize = checkBox.GetNaturalSize();
+
+  tet_printf( "Button RelayoutSize with text and icon (%f,%f)\n", checkBox.GetNaturalSize().width, checkBox.GetNaturalSize().height );
+
+  checkBox.SetProperty( Toolkit::DevelButton::Property::VISUAL_PADDING, Vector4( 25.0f, 25.0f, 25.0f, 25.0f ) );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 paddingAddedSize = checkBox.GetNaturalSize();
+
+  tet_printf( "Button RelayoutSize with text, icon and padding (%f,%f)\n", checkBox.GetNaturalSize().width, checkBox.GetNaturalSize().height );
+
+  DALI_TEST_EQUALS( checkBox.GetProperty<Vector4>( Toolkit::DevelButton::Property::VISUAL_PADDING ), Vector4( 25.0f, 25.0f, 25.0f, 25.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  tet_infoline("Comparing original size of button before adding padding to visual foreground\n");
+
+  DALI_TEST_GREATER( paddingAddedSize.width, preVisualPaddingSize.width , TEST_LOCATION );
+
+  tet_infoline("Text and Visual are side by side, visual height and padding must be greater than text height and padding for this test\n");
+
+  DALI_TEST_GREATER( paddingAddedSize.height, preVisualPaddingSize.height , TEST_LOCATION );
 
   END_TEST;
 }

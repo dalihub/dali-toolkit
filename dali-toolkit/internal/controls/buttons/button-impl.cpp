@@ -27,16 +27,17 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -79,15 +80,17 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedColor",                 
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedColor",                      VECTOR4, SELECTED_COLOR                        ) // Deprecated property
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                              MAP,     LABEL                                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelText",                          STRING,  LABEL_TEXT                            ) // Deprecated property
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedVisual",                   MAP,     UNSELECTED_VISUAL                     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedVisual",                     MAP,     SELECTED_VISUAL                       )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedVisual",             MAP,     DISABLED_SELECTED_VISUAL              )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedVisual",           MAP,     DISABLED_UNSELECTED_VISUAL            )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedBackgroundVisual",         MAP,     UNSELECTED_BACKGROUND_VISUAL          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedBackgroundVisual",           MAP,     SELECTED_BACKGROUND_VISUAL            )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedBackgroundVisual", MAP,     DISABLED_UNSELECTED_BACKGROUND_VISUAL )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedBackgroundVisual",   MAP,     DISABLED_SELECTED_BACKGROUND_VISUAL   )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelRelativeAlignment",             STRING,  LABEL_RELATIVE_ALIGNMENT              )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedVisual",                   MAP,     UNSELECTED_VISUAL                     )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "selectedVisual",                     MAP,     SELECTED_VISUAL                       )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedVisual",             MAP,     DISABLED_SELECTED_VISUAL              )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedVisual",           MAP,     DISABLED_UNSELECTED_VISUAL            )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedBackgroundVisual",         MAP,     UNSELECTED_BACKGROUND_VISUAL          )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "selectedBackgroundVisual",           MAP,     SELECTED_BACKGROUND_VISUAL            )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedBackgroundVisual", MAP,     DISABLED_UNSELECTED_BACKGROUND_VISUAL )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedBackgroundVisual",   MAP,     DISABLED_SELECTED_BACKGROUND_VISUAL   )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "labelRelativeAlignment",             STRING,  LABEL_RELATIVE_ALIGNMENT              )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "labelPadding",                       VECTOR4, LABEL_PADDING                         )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "visualPadding",                      VECTOR4, VISUAL_PADDING                        )
 
 // Signals:
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
@@ -119,10 +122,10 @@ const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE
 
 const Property::Index GET_VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
 {
-  { Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::UNSELECTED_VISUAL },
-  { Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::SELECTED_VISUAL  },
-  { Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL },
-  { Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_SELECTED_VISUAL }
+  { Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::UNSELECTED_VISUAL },
+  { Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::SELECTED_VISUAL  },
+  { Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL },
+  { Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL }
 };
 
 /**
@@ -1138,32 +1141,32 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
 
       case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE: // Legacy Tizen 3.0
       {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
       case Toolkit::Button::Property::DISABLED_STATE_IMAGE:  // Legacy Tizen 3.0
       {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
       case Toolkit::Button::Property::SELECTED_STATE_IMAGE:  // Legacy Tizen 3.0
       {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
-      case Toolkit::Button::Property::UNSELECTED_VISUAL:
-      case Toolkit::Button::Property::SELECTED_VISUAL:
-      case Toolkit::Button::Property::DISABLED_SELECTED_VISUAL:
-      case Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::UNSELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::SELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL:
       {
         GetImplementation( button ).CreateVisualsForComponent( index, value, DepthIndex::CONTENT );
         break;
       }
 
-      case Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL:
-      case Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
       {
         GetImplementation( button ).CreateVisualsForComponent( index , value, DepthIndex::BACKGROUND);
         break;
@@ -1172,14 +1175,14 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
       case Toolkit::Button::Property::UNSELECTED_COLOR:
       {
         DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::UNSELECTED_COLOR instead use Button::Property::UNSELECTED_BACKGROUND_VISUAL\n", __FUNCTION__);
-        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL );
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_COLOR:
       {
         DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::SELECTED_COLOR instead use Button::Property::SELECTED_BACKGROUND_VISUAL\n", __FUNCTION__);
-        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL );
+        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL );
         break;
       }
 
@@ -1204,7 +1207,7 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         break;
       }
 
-      case Toolkit::Button::Property::LABEL_RELATIVE_ALIGNMENT:
+      case Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT:
       {
         Button::Align labelAlignment(END);
         Scripting::GetEnumeration< Button::Align> ( value.Get< std::string >().c_str(),
@@ -1212,6 +1215,22 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
                                                     labelAlignment );
 
         GetImplementation( button ).SetLabelAlignment( labelAlignment );
+        GetImplementation( button ).RelayoutRequest();
+        break;
+      }
+
+      case Toolkit::DevelButton::Property::LABEL_PADDING:
+      {
+        Vector4 padding ( value.Get< Vector4 >() );
+        GetImplementation( button ).SetLabelPadding( Padding( padding.x, padding.y, padding.z, padding.w ) );
+        break;
+      }
+
+      case Toolkit::DevelButton::Property::VISUAL_PADDING:
+      {
+        Vector4 padding ( value.Get< Vector4 >() );
+        GetImplementation( button ).SetForegroundPadding( Padding( padding.x, padding.y, padding.z, padding.w ) );
+        GetImplementation( button ).RelayoutRequest();
         break;
       }
     }
@@ -1266,30 +1285,30 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
 
       case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::Button::Property::UNSELECTED_VISUAL );
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::Button::Property::SELECTED_VISUAL );
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL );
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL );
         break;
       }
 
-      case Toolkit::Button::Property::UNSELECTED_VISUAL:
-      case Toolkit::Button::Property::SELECTED_VISUAL:
-      case Toolkit::Button::Property::DISABLED_SELECTED_VISUAL:
-      case Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL:
-      case Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL:
-      case Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::UNSELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::SELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL:
+      case Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
       case Toolkit::Button::Property::LABEL:
       {
         Property::Map visualProperty;
@@ -1318,7 +1337,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Button::Property::LABEL_RELATIVE_ALIGNMENT:
+      case Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT:
       {
         const char* alignment = Scripting::GetEnumerationName< Button::Align >( GetImplementation( button ).GetLabelAlignment(),
                                                                                 ALIGNMENT_STRING_TABLE,
@@ -1329,6 +1348,19 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         }
 
         break;
+      }
+
+      case Toolkit::DevelButton::Property::LABEL_PADDING:
+      {
+        Padding padding = GetImplementation( button ).GetLabelPadding();
+        value = Vector4( padding.x, padding.y, padding.top, padding.bottom);
+        break;
+      }
+
+      case Toolkit::DevelButton::Property::VISUAL_PADDING:
+      {
+        Padding padding = GetImplementation( button ).GetForegroundPadding();
+        value = Vector4( padding.x, padding.y, padding.top, padding.bottom);
       }
     }
   }
@@ -1366,7 +1398,7 @@ Padding Button::GetForegroundPadding()
 // Legacy code needed whilst Color can be set by direct Property setting ( deprecated ) instead of setting a Visual
 void Button::SetColor( const Vector4& color, Property::Index visualIndex )
 {
-  if ( visualIndex == Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL )
+  if ( visualIndex == Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL )
   {
     mSelectedColor = color;
   }
@@ -1419,7 +1451,7 @@ void Button::SetUnselectedImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
   }
 }
 
@@ -1427,7 +1459,7 @@ void Button::SetBackgroundImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
   }
 }
 
@@ -1435,7 +1467,7 @@ void Button::SetSelectedImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, filename, DepthIndex::CONTENT );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_VISUAL, filename, DepthIndex::CONTENT );
   }
 }
 
@@ -1443,7 +1475,7 @@ void Button::SetSelectedBackgroundImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
   }
 }
 
@@ -1451,7 +1483,7 @@ void Button::SetDisabledBackgroundImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
   }
 }
 
@@ -1459,7 +1491,7 @@ void Button::SetDisabledImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
   }
 }
 
@@ -1467,7 +1499,7 @@ void Button::SetDisabledSelectedImage( const std::string& filename )
 {
   if( !filename.empty() )
   {
-    CreateVisualsForComponent( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, filename, DepthIndex::CONTENT );
+    CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL, filename, DepthIndex::CONTENT );
   }
 }
 
@@ -1526,7 +1558,7 @@ void Button::SetSelectedImage( Image image )
 Actor Button::GetButtonImage() const
 {
   DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50\n");
-  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::Button::Property::UNSELECTED_VISUAL ) );
+  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL ) );
 
   return imageView;
 }
@@ -1534,7 +1566,7 @@ Actor Button::GetButtonImage() const
 Actor Button::GetSelectedImage() const
 {
   DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50\n");
-  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::Button::Property::SELECTED_VISUAL ) );
+  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL ) );
 
   return imageView;
 }
