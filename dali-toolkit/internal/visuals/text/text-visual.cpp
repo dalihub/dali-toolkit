@@ -199,49 +199,46 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
     {
       case Property::Key::INDEX:
       {
-        if( Toolkit::DevelVisual::Property::TYPE != keyValue.first.indexKey ) // Toolkit::DevelVisual::Property::TYPE is not a TextVisual's property.
-        {
-          SetProperty( keyValue.first.indexKey, keyValue.second );
-        }
+        DoSetProperty( keyValue.first.indexKey, keyValue.second );
         break;
       }
       case Property::Key::STRING:
       {
         if( keyValue.first.stringKey == TEXT_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
         }
         else if( keyValue.first.stringKey == FONT_FAMILY_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::FONT_FAMILY, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::FONT_FAMILY, keyValue.second );
         }
         else if( keyValue.first.stringKey == FONT_STYLE_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::FONT_STYLE, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::FONT_STYLE, keyValue.second );
         }
         else if( keyValue.first.stringKey == POINT_SIZE_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::POINT_SIZE, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::POINT_SIZE, keyValue.second );
         }
         else if( keyValue.first.stringKey == MULTI_LINE_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::MULTI_LINE, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::MULTI_LINE, keyValue.second );
         }
         else if( keyValue.first.stringKey == HORIZONTAL_ALIGNMENT_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, keyValue.second );
         }
         else if( keyValue.first.stringKey == VERTICAL_ALIGNMENT_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, keyValue.second );
         }
         else if( keyValue.first.stringKey == TEXT_COLOR_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::TEXT_COLOR, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::TEXT_COLOR, keyValue.second );
         }
         else if( keyValue.first.stringKey == ENABLE_MARKUP_PROPERTY )
         {
-          SetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
+          DoSetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
         }
         break;
       }
@@ -262,7 +259,25 @@ void TextVisual::DoSetOnStage( Actor& actor )
 {
   mControl = actor;
 
-  CreateRenderer();
+  Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
+  if( !geometry )
+  {
+    geometry =  VisualFactoryCache::CreateQuadGeometry();
+    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY , geometry );
+  }
+
+  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
+  if( !shader )
+  {
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+    mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+  }
+  shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+
+  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
+
+  UpdateRenderer();
 }
 
 void TextVisual::DoSetOffStage( Actor& actor )
@@ -272,17 +287,31 @@ void TextVisual::DoSetOffStage( Actor& actor )
     // Removes the renderer from the actor.
     actor.RemoveRenderer( mImpl->mRenderer );
 
-    DestroyRenderer();
+    RemoveTextureSet();
+
+    // Resets the renderer.
+    mImpl->mRenderer.Reset();
   }
 
   // Resets the control handle.
   mControl.Reset();
 }
 
-void TextVisual::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
+void TextVisual::OnSetTransform()
+{
+  UpdateRenderer();
+}
+
+void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
 {
   switch( index )
   {
+    case Toolkit::TextVisual::Property::ENABLE_MARKUP:
+    {
+      const bool enableMarkup = propertyValue.Get<bool>();
+      mController->SetMarkupProcessorEnabled( enableMarkup );
+      break;
+    }
     case Toolkit::TextVisual::Property::TEXT:
     {
       mController->SetText( propertyValue.Get<std::string>() );
@@ -301,7 +330,6 @@ void TextVisual::SetProperty( Dali::Property::Index index, const Dali::Property:
     case Toolkit::TextVisual::Property::POINT_SIZE:
     {
       const float pointSize = propertyValue.Get<float>();
-
       if( !Equals( mController->GetDefaultPointSize(), pointSize ) )
       {
         mController->SetDefaultPointSize( pointSize );
@@ -346,26 +374,10 @@ void TextVisual::SetProperty( Dali::Property::Index index, const Dali::Property:
       }
       break;
     }
-    case Toolkit::TextVisual::Property::ENABLE_MARKUP:
-    {
-      const bool enableMarkup = propertyValue.Get<bool>();
-      mController->SetMarkupProcessorEnabled( enableMarkup );
-      break;
-    }
-    default:
-    {
-      // Should not arrive here.
-      DALI_ASSERT_DEBUG( false );
-    }
   }
 }
 
-void TextVisual::OnSetTransform()
-{
-  CreateRenderer();
-}
-
-void TextVisual::CreateRenderer()
+void TextVisual::UpdateRenderer()
 {
   Actor control = mControl.GetHandle();
   if( !control )
@@ -386,12 +398,13 @@ void TextVisual::CreateRenderer()
 
   if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) )
   {
+    // Removes the texture set.
+    RemoveTextureSet();
+
     // Remove any renderer previously set.
     if( mImpl->mRenderer )
     {
       control.RemoveRenderer( mImpl->mRenderer );
-
-      DestroyRenderer();
     }
 
     // Nothing else to do if the relayout size is zero.
@@ -402,12 +415,13 @@ void TextVisual::CreateRenderer()
 
   if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
   {
+    // Removes the texture set.
+    RemoveTextureSet();
+
     // Remove any renderer previously set.
     if( mImpl->mRenderer )
     {
       control.RemoveRenderer( mImpl->mRenderer );
-
-      DestroyRenderer();
     }
 
     if( ( relayoutSize.width > Math::MACHINE_EPSILON_1000 ) &&
@@ -415,68 +429,65 @@ void TextVisual::CreateRenderer()
     {
       PixelData data = mTypesetter->Render( relayoutSize );
 
-      Geometry geometry;
-      Shader shader;
-      TextureSet textureSet;
+      Vector4 atlasRect = FULL_TEXTURE_RECT;
+      TextureSet textureSet = mFactoryCache.GetAtlasManager()->Add( atlasRect, data );
 
-      Vector4 atlasRect;
+      if( textureSet )
+      {
+        mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+      }
+      else
+      {
+        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
+        // In that case, create a texture. TODO: should tile the text.
 
-      textureSet = mFactoryCache.GetAtlasManager()->Add( atlasRect, data );
-      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                        data.GetPixelFormat(),
+                                        data.GetWidth(),
+                                        data.GetHeight() );
+
+        texture.Upload( data );
+
+        textureSet = TextureSet::New();
+        textureSet.SetTexture( 0u, texture );
+
+        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+      }
+
+      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
+
+      //Register transform properties
+      mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
       // Filter mode needs to be set to nearest to avoid blurry text.
       Sampler sampler = Sampler::New();
       sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
       textureSet.SetSampler( 0u, sampler );
 
-      geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-      if( !geometry )
-      {
-        geometry =  VisualFactoryCache::CreateQuadGeometry();
-        mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY , geometry );
-      }
-
-      shader = mFactoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-      if( !shader )
-      {
-        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-        mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
-      }
-      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-
-      mImpl->mRenderer = Renderer::New( geometry, shader );
-      mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
-      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
-
       mImpl->mRenderer.SetTextures( textureSet );
 
       control.AddRenderer( mImpl->mRenderer );
-
-      //Register transform properties
-      mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-
-      mImpl->mFlags |= Impl::IS_FROM_CACHE;
     }
   }
 }
 
-void TextVisual::DestroyRenderer()
+void TextVisual::RemoveTextureSet()
 {
-  // Removes the text's image from the texture atlas.
-  Vector4 atlasRect;
-
-  const Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
-  if( index != Property::INVALID_INDEX )
+  if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED )
   {
-    const Property::Value& atlasRectValue = mImpl->mRenderer.GetProperty( index );
-    atlasRectValue.Get( atlasRect );
+    // Removes the text's image from the texture atlas.
+    Vector4 atlasRect;
 
-    const TextureSet& textureSet = mImpl->mRenderer.GetTextures();
-    mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    const Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+    if( index != Property::INVALID_INDEX )
+    {
+      const Property::Value& atlasRectValue = mImpl->mRenderer.GetProperty( index );
+      atlasRectValue.Get( atlasRect );
+
+      const TextureSet& textureSet = mImpl->mRenderer.GetTextures();
+      mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    }
   }
-
-  // Resets the renderer.
-  mImpl->mRenderer.Reset();
 }
 
 } // namespace Internal

@@ -38,7 +38,7 @@ typedef IntrusivePtr< ControlWrapper > ControlWrapperPtr;
 /**
  * @copydoc Toolkit::ControlWrapper
  */
-class ControlWrapper : public Control
+class DALI_IMPORT_API ControlWrapper : public Control
 {
 public:
 
@@ -157,12 +157,13 @@ protected:
 
 private:
 
-  // Undefined.
-  ControlWrapper( const ControlWrapper& );
+  /// @cond internal
+  /// Undefined.
+  DALI_INTERNAL ControlWrapper( const ControlWrapper& );
 
-  // Undefined.
-  ControlWrapper& operator=( const ControlWrapper& rhs );
-
+  /// Undefined.
+  DALI_INTERNAL ControlWrapper& operator=( const ControlWrapper& rhs );
+  /// @endcond
 };
 
 } // namespace Internal

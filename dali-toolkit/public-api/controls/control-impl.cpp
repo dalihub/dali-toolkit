@@ -29,6 +29,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -134,7 +135,7 @@ HandleIndex GetVisualProperty(
   if( iter != visuals.End() )
   {
     Actor self = controlImpl.Self();
-    Property::Index index = self.GetPropertyIndex( propertyKey );
+    Property::Index index = DevelHandle::GetPropertyIndex( self, propertyKey );
     if( index != Property::INVALID_INDEX )
     {
       // It's an actor property:
@@ -147,7 +148,7 @@ HandleIndex GetVisualProperty(
       {
         // @todo Need to use correct renderer index
         Renderer renderer = self.GetRendererAt(0);
-        Property::Index index = renderer.GetPropertyIndex( propertyKey );
+        Property::Index index = DevelHandle::GetPropertyIndex( renderer, propertyKey );
         if( index != Property::INVALID_INDEX )
         {
           // It's a renderer property:
@@ -406,10 +407,21 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND:
         {
+          std::string url;
           const Property::Map* map = value.GetMap();
           if( map && !map->Empty() )
           {
             controlImpl.SetBackground( *map );
+          }
+          else if( value.Get( url ) )
+          {
+            // don't know the size to load
+            Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
+            if( visual )
+            {
+              controlImpl.RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+              visual.SetDepthIndex( DepthIndex::BACKGROUND );
+            }
           }
           else
           {
@@ -542,11 +554,6 @@ Toolkit::Control Control::New()
   return handle;
 }
 
-Control::~Control()
-{
-  delete mImpl;
-}
-
 void Control::SetStyleName( const std::string& styleName )
 {
   if( styleName != mImpl->mStyleName )
@@ -589,6 +596,9 @@ void Control::SetBackground( const Property::Map& map )
   {
     RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
     visual.SetDepthIndex( DepthIndex::BACKGROUND );
+
+    // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
+    RelayoutRequest();
   }
 }
 
@@ -607,6 +617,9 @@ void Control::ClearBackground()
 {
    UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
    mImpl->mBackgroundColor = Color::TRANSPARENT;
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   RelayoutRequest();
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -865,7 +878,7 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
       Actor child = Self().FindChildByName( animator->objectName );
       if( child )
       {
-        Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
+        Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
         handleIndex = HandleIndex( child, propertyIndex );
       }
       else
@@ -992,6 +1005,11 @@ Control::Control( ControlBehaviour behaviourFlags )
   mImpl(new Impl(*this))
 {
   mImpl->mFlags = behaviourFlags;
+}
+
+Control::~Control()
+{
+  delete mImpl;
 }
 
 void Control::Initialize()

@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
@@ -458,7 +459,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
   mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
   mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
-  mShader.RegisterProperty( Toolkit::PrimitiveVisual::Property::MIX_COLOR, COLOR_UNIFORM_NAME, mColor );
+  DevelHandle::RegisterProperty( mShader, Toolkit::PrimitiveVisual::Property::MIX_COLOR, COLOR_UNIFORM_NAME, mColor );
   mShader.RegisterProperty( OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions );
 }
 

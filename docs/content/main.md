@@ -38,7 +38,6 @@
    + [Equal To Constraint](@ref constraints-equal-to)
    + [Relative To Constraint](@ref constraints-relative-to)
   + [Multi-threading Notes](@ref animation-multi-threading-notes)
-  + [Shader Animation](@ref animation-shader)
  + [Styling](@ref styling)
 
 ### Resources

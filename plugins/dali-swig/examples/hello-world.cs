@@ -38,7 +38,7 @@ namespace MyCSharpExample
         {
             Console.WriteLine("Customized Application Initialize event handler");
             Stage stage = Stage.GetCurrent();
-            stage.BackgroundColor = new Color("white");
+            stage.BackgroundColor = Color.Green;
 
 	    stage.Touched += OnStageTouched;
 

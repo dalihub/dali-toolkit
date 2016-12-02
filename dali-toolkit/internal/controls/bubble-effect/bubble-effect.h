@@ -92,7 +92,7 @@ inline Shader CreateBubbleShader( unsigned int numBubble )
     vTexCoord = aTexCoord;\n
     vPercentage = percentage;\n
     // Use the emit position color for the bubble
-    vEffectTexCoord = startAndEnd.xy * uInvertedMovementArea;\n
+    vEffectTexCoord = startAndEnd.xy * uInvertedMovementArea + vec2(0.5);\n
   }\n
   );
 

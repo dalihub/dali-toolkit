@@ -59,7 +59,7 @@
  *
  * @brief DALi Toolkit provides UI components and various effects on top of the DALi Core.
  *
- * @section dali_core_overview Overview
+ * @section dali_toolkit_overview Overview
  *
  * DALi Toolkit consists of the following groups of API:
  *

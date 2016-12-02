@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -924,6 +925,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
 
@@ -936,7 +938,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
-  propertyMap.Insert( "enableMarkup", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -1041,7 +1042,7 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, BorderVisual::Property::COLOR );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), Color::WHITE );
@@ -1088,7 +1089,7 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::SIZE );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, BorderVisual::Property::SIZE );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), 9.0f );
@@ -1132,7 +1133,7 @@ int UtcDaliVisualAnimateColorVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), Color::WHITE );
@@ -1182,7 +1183,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = renderer.GetPropertyIndex( PrimitiveVisual::Property::MIX_COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, PrimitiveVisual::Property::MIX_COLOR );
 
   // The property isn't registered on the renderer, it's instead registered on the shader.
   DALI_TEST_EQUALS( index, Property::INVALID_INDEX, TEST_LOCATION );
@@ -1654,6 +1655,7 @@ int UtcDaliVisualTextVisualRender(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
   propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
 
@@ -1666,7 +1668,6 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
-  propertyMap.Insert( "enableMarkup", false );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
   textVisual.SetDepthIndex( 1.f );
 
@@ -1678,6 +1679,27 @@ int UtcDaliVisualTextVisualRender(void)
   dummyControl.SetSize(200.f, 200.f);
 
   Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render();
+
+
+  // Create a texture bigger than the maximum allowed by the image atlas. Used to increase coverage.
+  propertyMap.Clear();
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
+  propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
+  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
+  propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
+
+  Property::Map transformMap;
+  transformMap.Insert( DevelVisual::Transform::Property::SIZE, Vector2( 720.f, 640.f ) );
+  propertyMap.Insert( DevelVisual::Property::TRANSFORM, transformMap );
+
+  textVisual = factory.CreateVisual( propertyMap );
+  textVisual.SetDepthIndex( 1.f );
+
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, textVisual );
+  dummyControl.SetSize( 720.f, 640.f );
+
   application.SendNotification();
   application.Render();
 

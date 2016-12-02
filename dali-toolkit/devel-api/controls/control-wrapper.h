@@ -95,14 +95,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL ControlWrapper( Internal::ControlWrapper& implementation );
+  ControlWrapper( Internal::ControlWrapper& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL ControlWrapper( Dali::Internal::CustomActor* internal );
+  explicit ControlWrapper( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

@@ -41,7 +41,7 @@ namespace Toolkit
  *  "uBottomRight"  - The bottom-right corner of the image region. The coordinates are in percentage,
  *                    (0,0) being the top-left and (1,1) the bottom right of the original image
  *
- * @return A handle to a newly allocated ShaderEffect
+ * @return A property map of the required shader
  */
 inline Property::Map CreateImageRegionEffect()
 {

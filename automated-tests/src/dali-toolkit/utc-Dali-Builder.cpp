@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016-2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1301,22 +1301,6 @@ int UtcDaliBuilderFrameBufferP(void)
     "        }\n"
     "      ]\n"
     "    }\n"
-    "  },\n"
-    "  \"shaderEffects\": {\n"
-    "    \"Ripple2D\": {\n"
-    "      \"program\": {\n"
-    "        \"vertexPrefix\": \"\",\n"
-    "        \"vertex\": \"void main(void)\\n{\\n  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\\n  vTexCoord = aTexCoord;\\n}\\n\\n\",\n"
-    "        \"fragmentPrefix\": \"\",\n"
-    "        \"fragment\": \"precision mediump float;\\nuniform float uAmplitude; // 0.02; (< 1)\\nuniform float uTime;\\nvoid main()\\n{\\n  highp vec2 textureSize = sTextureRect.zw - sTextureRect.xy;\\n  highp vec2 pos = -1.0 + 2.0 * vTexCoord.st/textureSize;\\n  highp float len = length(pos);\\n  highp vec2 texCoord = vTexCoord.st/textureSize + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude; \\n  gl_FragColor = texture2D(sTexture, texCoord) * uColor;\\n}\\n\\n\\n\",\n"
-    "        \"geometryType\": \"GEOMETRY_TYPE_IMAGE\"\n"
-    "      },\n"
-    "      \"geometryHints\": \"HINT_NONE\",\n"
-    "      \"gridDensity\": 0,\n"
-    "      \"loop\": true,\n"
-    "      \"uAmplitude\": 0.02,\n"
-    "      \"uTime\": 0.0\n"
-    "    }\n"
     "  }\n"
     "}\n");
 
@@ -1497,22 +1481,6 @@ int UtcDaliBuilderPathConstraintsP(void)
     "          \"gui-builder-timeline-color\": \"#8dc0da\"\n"
     "        }\n"
     "      ]\n"
-    "    }\n"
-    "  },\n"
-    "  \"shaderEffects\": {\n"
-    "    \"Ripple2D\": {\n"
-    "      \"program\": {\n"
-    "        \"vertexPrefix\": \"\",\n"
-    "        \"vertex\": \"void main(void)\\n{\\n  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\\n  vTexCoord = aTexCoord;\\n}\\n\\n\",\n"
-    "        \"fragmentPrefix\": \"\",\n"
-    "        \"fragment\": \"precision mediump float;\\nuniform float uAmplitude; // 0.02; (< 1)\\nuniform float uTime;\\nvoid main()\\n{\\n  highp vec2 textureSize = sTextureRect.zw - sTextureRect.xy;\\n  highp vec2 pos = -1.0 + 2.0 * vTexCoord.st/textureSize;\\n  highp float len = length(pos);\\n  highp vec2 texCoord = vTexCoord.st/textureSize + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude; \\n  gl_FragColor = texture2D(sTexture, texCoord) * uColor;\\n}\\n\\n\\n\",\n"
-    "        \"geometryType\": \"GEOMETRY_TYPE_IMAGE\"\n"
-    "      },\n"
-    "      \"geometryHints\": \"HINT_NONE\",\n"
-    "      \"gridDensity\": 0,\n"
-    "      \"loop\": true,\n"
-    "      \"uAmplitude\": 0.02,\n"
-    "      \"uTime\": 0.0\n"
     "    }\n"
     "  }\n"
     "}\n");

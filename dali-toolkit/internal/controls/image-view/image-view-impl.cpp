@@ -43,19 +43,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, P
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, ImageView, "pixelArea", Vector4(0.f, 0.f, 1.f, 1.f), PIXEL_AREA )
 DALI_TYPE_REGISTRATION_END()
 
-
-void SetDefaultTransformMap( Property::Map& transformMap )
-{
-  transformMap.Clear();
-  transformMap
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
-
-}
-
 } // anonymous namespace
 
 using namespace Dali;
@@ -154,12 +141,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
     RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual );
 
-    // This transform fills the control
-    // Should provide a transform that handles aspect ratio according to image size
-    Property::Map transformMap;
-    SetDefaultTransformMap( transformMap );
-    mVisual.SetTransformAndSize( transformMap, mSizeSet );
-
     RelayoutRequest();
   }
 }
@@ -243,26 +224,15 @@ float ImageView::GetWidthForHeight( float height )
   }
 }
 
-
-///////////////////////////////////////////////////////////
-//
-// Private methods
-//
-
-void ImageView::OnSizeSet( const Vector3& targetSize )
+void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  Control::OnSizeSet( targetSize );
-  mSizeSet = targetSize;
+  Control::OnRelayout( size, container );
 
   if( mVisual )
   {
-    Vector2 size( targetSize );
-
-    // This transform fills the control
+    // Pass in an empty map which uses default transform values meaning our visual fills the control
     // Should provide a transform that handles aspect ratio according to image size
-    Property::Map transformMap;
-    SetDefaultTransformMap( transformMap );
-    mVisual.SetTransformAndSize( transformMap, size );
+    mVisual.SetTransformAndSize( Property::Map(), size );
   }
 }
 

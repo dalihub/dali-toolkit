@@ -51,7 +51,7 @@ namespace MyCSharpExample
       int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Size(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
       Size myProperty2 = new Size(0.0f, 0.0f);
       handle.GetProperty(myPropertyIndex2).Get(myProperty2);
-      Console.WriteLine( "myProperty2 value: " + myProperty2.x + ", " + myProperty2.y );
+      Console.WriteLine( "myProperty2 value: " + myProperty2.W + ", " + myProperty2.H );
 
       Actor actor = new Actor();
       actor.Size = new Position(200.0f, 200.0f, 0.0f);
@@ -62,10 +62,10 @@ namespace MyCSharpExample
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor =  new Color(Colors.White) ;
+      stage.BackgroundColor = Color.White;
 
       Size stageSize = stage.Size;
-      Console.WriteLine("Stage size: " + stageSize.x + ", " + stageSize.y);
+      Console.WriteLine("Stage size: " + stageSize.W + ", " + stageSize.H);
       stage.Add(actor);
 
       TextLabel text = new TextLabel("Hello Mono World");
@@ -130,39 +130,37 @@ namespace MyCSharpExample
       Console.WriteLine( " *************************" );
       Size Size = new Size(100, 50);
       Console.WriteLine( "    Created " + Size );
-      Console.WriteLine( "    Size x =  " + Size.x + ", y = " + Size.y );
+      Console.WriteLine( "    Size x =  " + Size.W + ", y = " + Size.H );
       Size += new Size(20, 20);
-      Console.WriteLine( "    Size x =  " + Size[0] + ", y = " + Size[1] );
-      Size.x += 10;
-      Size.y += 10;
-      Console.WriteLine( "    Size width =  " + Size.width + ", height = " + Size.height );
-      Size += new Size(15, 15);
-      Console.WriteLine( "    Size width =  " + Size[0] + ", height = " + Size[1] );
+      Console.WriteLine( "    Size x =  " + Size.W + ", y = " + Size.H );
+      Size.W += 10;
+      Size.H += 10;
+      Console.WriteLine( "    Size width =  " + Size.W + ", height = " + Size.H );
 
       Console.WriteLine( " *************************" );
       Position Position = new Position(20, 100, 50);
       Console.WriteLine( "    Created " + Position );
-      Console.WriteLine( "    Position x =  " + Position.x + ", y = " + Position.y + ", z = " + Position.z );
+      Console.WriteLine( "    Position x =  " + Position.X + ", y = " + Position.Y + ", z = " + Position.Z );
       Position += new Position(20, 20, 20);
-      Console.WriteLine( "    Position x =  " + Position[0] + ", y = " + Position[1] + ", z = " + Position[2] );
-      Position.x += 10;
-      Position.y += 10;
-      Position.z += 10;
-      Console.WriteLine( "    Position width =  " + Position.width + ", height = " + Position.height + ", depth = " + Position.depth );
+      Console.WriteLine( "    Position x =  " + Position.X + ", y = " + Position.Y + ", z = " + Position.Z );
+      Position.X += 10;
+      Position.Y += 10;
+      Position.Z += 10;
+      Console.WriteLine( "    Position width =  " + Position.X + ", height = " + Position.Y + ", depth = " + Position.Z );
       Position parentOrigin = new Dali.Position(NDalic.ParentOriginBottomRight);
-      Console.WriteLine( "    parentOrigin x =  " + parentOrigin.x + ", y = " + parentOrigin.y + ", z = " + parentOrigin.z );
+      Console.WriteLine( "    parentOrigin x =  " + parentOrigin.X + ", y = " + parentOrigin.Y + ", z = " + parentOrigin.Z );
 
       Console.WriteLine( " *************************" );
-      Color Color = new Color(20, 100, 50, 200);
-      Console.WriteLine( "    Created " + Color );
-      Console.WriteLine( "    Color x =  " + Color.x + ", y = " + Color.y + ", z = " + Color.z + ", w = " + Color.w );
-      Color += new Color(20, 20, 20, 20);
-      Console.WriteLine( "    Color x =  " + Color[0] + ", y = " + Color[1] + ", z = " + Color[2] + ", w = " + Color[3] );
-      Color.x += 10;
-      Color.y += 10;
-      Color.z += 10;
-      Color.w += 10;
-      Console.WriteLine( "    Color r =  " + Color.r + ", g = " + Color.g + ", b = " + Color.b + ", a = " + Color.a );
+      Color color = new Color(20, 100, 50, 200);
+      Console.WriteLine( "    Created " + color );
+      Console.WriteLine( "    Color R =  " + color.R + ", G = " + color.G + ", B = " + color.B + ", A = " + color.A );
+      color += new Color(20, 20, 20, 20);
+      Console.WriteLine( "    Color R =  " + color.R + ", G = " + color.G + ", B = " + color.B + ", A = " + color.A );
+      color.R += 10;
+      color.G += 10;
+      color.B += 10;
+      color.A += 10;
+      Console.WriteLine( "    Color r =  " + color.R + ", g = " + color.G + ", b = " + color.B + ", a = " + color.A );
     }
 
 
