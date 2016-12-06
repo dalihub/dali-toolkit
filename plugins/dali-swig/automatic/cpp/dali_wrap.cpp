@@ -432,13 +432,10 @@ SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/devel-api/adaptor-framework/drag-and-drop-detector.h>
-#include <dali/devel-api/adaptor-framework/application-extensions.h>
 
 #include <dali/devel-api/images/nine-patch-image.h>
 
 #include <dali-toolkit/devel-api/builder/builder.h>
-
-#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
@@ -449,7 +446,6 @@ SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
 
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
@@ -602,26 +598,8 @@ unsigned int int_to_uint(int x) {
 using namespace Dali;
 using namespace Dali::Toolkit;
 
-SWIGINTERN bool Dali_BaseHandle_HasBody(Dali::BaseHandle const *self){
-
-     // C++ code. DALi uses Handle <-> Body design pattern.
-     // This function checks the Handle to see if it has a body attached ( possible to have empty handles).
-     // Handles in DALi can be converted into a boolean type
-     // to check if the handle has a valid body attached to it.
-     // Internally checking *self will  checks IntrusivePtr<Dali::RefObject> mObjectHandle in BaseHandle;
+SWIGINTERN bool Dali_BaseHandle_IsHandleEmpty(Dali::BaseHandle const *self){
      if( *self )
-     {
-       return true;
-     }
-     else
-     {
-       return false;
-     }
-    }
-SWIGINTERN bool Dali_BaseHandle_IsEqual(Dali::BaseHandle const *self,Dali::BaseHandle const &rhs){
-
-     // C++ code. Check if two handles reference the same implemtion
-     if( *self == rhs)
      {
        return true;
      }
@@ -12752,40 +12730,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Dali_Property_Array_PushBack(void * jarg1, vo
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_Property_Array_Add(void * jarg1, void * jarg2) {
-  void * jresult ;
-  Dali::Property::Array *arg1 = (Dali::Property::Array *) 0 ;
-  Dali::Property::Value *arg2 = 0 ;
-  Dali::Property::Array *result = 0 ;
-  
-  arg1 = (Dali::Property::Array *)jarg1; 
-  arg2 = (Dali::Property::Value *)jarg2;
-  if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Property::Value const & type is null", 0);
-    return 0;
-  } 
-  {
-    try {
-      result = (Dali::Property::Array *) &(arg1)->Add((Dali::Property::Value const &)*arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_Property_Array_GetElementAt__SWIG_0(void * jarg1, unsigned long jarg2) {
   void * jresult ;
   Dali::Property::Array *arg1 = (Dali::Property::Array *) 0 ;
@@ -15711,7 +15655,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_BaseHandle_GetObjectPtr(void * jarg1) 
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Dali_BaseHandle_HasBody(void * jarg1) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Dali_BaseHandle_IsHandleEmpty(void * jarg1) {
   unsigned int jresult ;
   Dali::BaseHandle *arg1 = (Dali::BaseHandle *) 0 ;
   bool result;
@@ -15719,41 +15663,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Dali_BaseHandle_HasBody(void * jarg1)
   arg1 = (Dali::BaseHandle *)jarg1; 
   {
     try {
-      result = (bool)Dali_BaseHandle_HasBody((Dali::BaseHandle const *)arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Dali_BaseHandle_IsEqual(void * jarg1, void * jarg2) {
-  unsigned int jresult ;
-  Dali::BaseHandle *arg1 = (Dali::BaseHandle *) 0 ;
-  Dali::BaseHandle *arg2 = 0 ;
-  bool result;
-  
-  arg1 = (Dali::BaseHandle *)jarg1; 
-  arg2 = (Dali::BaseHandle *)jarg2;
-  if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::BaseHandle const & type is null", 0);
-    return 0;
-  } 
-  {
-    try {
-      result = (bool)Dali_BaseHandle_IsEqual((Dali::BaseHandle const *)arg1,(Dali::BaseHandle const &)*arg2);
+      result = (bool)Dali_BaseHandle_IsHandleEmpty((Dali::BaseHandle const *)arg1);
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
@@ -52971,204 +52881,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_DragAndDropDetector_DroppedSignal(void
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_ApplicationExtensions__SWIG_0() {
-  void * jresult ;
-  Dali::ApplicationExtensions *result = 0 ;
-  
-  {
-    try {
-      result = (Dali::ApplicationExtensions *)new Dali::ApplicationExtensions();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_ApplicationExtensions__SWIG_1(void * jarg1) {
-  void * jresult ;
-  Dali::Application *arg1 = (Dali::Application *) 0 ;
-  Dali::ApplicationExtensions *result = 0 ;
-  
-  arg1 = (Dali::Application *)jarg1; 
-  {
-    try {
-      result = (Dali::ApplicationExtensions *)new Dali::ApplicationExtensions(arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_delete_ApplicationExtensions(void * jarg1) {
-  Dali::ApplicationExtensions *arg1 = (Dali::ApplicationExtensions *) 0 ;
-  
-  arg1 = (Dali::ApplicationExtensions *)jarg1; 
-  {
-    try {
-      delete arg1;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_ApplicationExtensions_Init(void * jarg1) {
-  Dali::ApplicationExtensions *arg1 = (Dali::ApplicationExtensions *) 0 ;
-  
-  arg1 = (Dali::ApplicationExtensions *)jarg1; 
-  {
-    try {
-      (arg1)->Init();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_ApplicationExtensions_Terminate(void * jarg1) {
-  Dali::ApplicationExtensions *arg1 = (Dali::ApplicationExtensions *) 0 ;
-  
-  arg1 = (Dali::ApplicationExtensions *)jarg1; 
-  {
-    try {
-      (arg1)->Terminate();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_ApplicationExtensions_Pause(void * jarg1) {
-  Dali::ApplicationExtensions *arg1 = (Dali::ApplicationExtensions *) 0 ;
-  
-  arg1 = (Dali::ApplicationExtensions *)jarg1; 
-  {
-    try {
-      (arg1)->Pause();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_ApplicationExtensions_Resume(void * jarg1) {
-  Dali::ApplicationExtensions *arg1 = (Dali::ApplicationExtensions *) 0 ;
-  
-  arg1 = (Dali::ApplicationExtensions *)jarg1; 
-  {
-    try {
-      (arg1)->Resume();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_ApplicationExtensions_LanguageChange(void * jarg1) {
-  Dali::ApplicationExtensions *arg1 = (Dali::ApplicationExtensions *) 0 ;
-  
-  arg1 = (Dali::ApplicationExtensions *)jarg1; 
-  {
-    try {
-      (arg1)->LanguageChange();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_Window_New__SWIG_0(void * jarg1, char * jarg2, unsigned int jarg3) {
   void * jresult ;
   Dali::PositionSize arg1 ;
@@ -56083,7 +55795,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_BORDER_ONLY_get() {
 }
 
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_BATCHING_ENABLED_get() {
+SWIGEXPORT int SWIGSTDCALL CSharp_Dali_BATCHING_ENABLED_get() {
   int jresult ;
   int result;
   
@@ -56109,7 +55821,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_BATCHING_ENABLED_get() {
 }
 
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_PIXEL_AREA_get() {
+SWIGEXPORT int SWIGSTDCALL CSharp_Dali_PIXEL_AREA_get() {
   int jresult ;
   int result;
   
@@ -56135,7 +55847,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_PIXEL_AREA_get() {
 }
 
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_WRAP_MODE_U_get() {
+SWIGEXPORT int SWIGSTDCALL CSharp_Dali_WRAP_MODE_U_get() {
   int jresult ;
   int result;
   
@@ -56161,7 +55873,7 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_WRAP_MODE_U_get() {
 }
 
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_IMAGE_VISUAL_WRAP_MODE_V_get() {
+SWIGEXPORT int SWIGSTDCALL CSharp_Dali_WRAP_MODE_V_get() {
   int jresult ;
   int result;
   
@@ -56662,526 +56374,6 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Dali_PRIMITIVE_VISUAL_LIGHT_POSITION_get() {
   {
     try {
       result = (int)Dali::Toolkit::PrimitiveVisual::Property::LIGHT_POSITION;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_RENDERING_BACKEND_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::RENDERING_BACKEND;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_TEXT_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::TEXT;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_FONT_FAMILY_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::FONT_FAMILY;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_FONT_STYLE_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::FONT_STYLE;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_POINT_SIZE_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::POINT_SIZE;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_MULTI_LINE_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::MULTI_LINE;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_HORIZONTAL_ALIGNMENT_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_VERTICAL_ALIGNMENT_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_TEXT_COLOR_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::TEXT_COLOR;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_ENABLE_MARKUP_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::ENABLE_MARKUP;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_ENABLE_AUTO_SCROLL_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::ENABLE_AUTO_SCROLL;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_AUTO_SCROLL_SPEED_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::AUTO_SCROLL_SPEED;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_AUTO_SCROLL_LOOP_COUNT_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::AUTO_SCROLL_LOOP_COUNT;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_AUTO_SCROLL_GAP_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::AUTO_SCROLL_GAP;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_LINE_SPACING_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::LINE_SPACING;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_UNDERLINE_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::UNDERLINE;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_SHADOW_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::SHADOW;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_EMBOSS_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::EMBOSS;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_OUTLINE_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::OUTLINE;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (int)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Dali_BATCHING_ENABLED_get() {
-  int jresult ;
-  int result;
-  
-  {
-    try {
-      result = (int)Dali::Toolkit::TextVisual::Property::BATCHING_ENABLED;
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
@@ -58140,306 +57332,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_Builder_QuitSignal(void * jarg1) {
   {
     try {
       result = (Dali::Toolkit::Builder::BuilderSignalType *) &(arg1)->QuitSignal();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_TransitionData__SWIG_0() {
-  void * jresult ;
-  Dali::Toolkit::TransitionData *result = 0 ;
-  
-  {
-    try {
-      result = (Dali::Toolkit::TransitionData *)new Dali::Toolkit::TransitionData();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_delete_TransitionData(void * jarg1) {
-  Dali::Toolkit::TransitionData *arg1 = (Dali::Toolkit::TransitionData *) 0 ;
-  
-  arg1 = (Dali::Toolkit::TransitionData *)jarg1; 
-  {
-    try {
-      delete arg1;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_TransitionData_New__SWIG_0(void * jarg1) {
-  void * jresult ;
-  Dali::Property::Map *arg1 = 0 ;
-  Dali::Toolkit::TransitionData result;
-  
-  arg1 = (Dali::Property::Map *)jarg1;
-  if (!arg1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Property::Map const & type is null", 0);
-    return 0;
-  } 
-  {
-    try {
-      result = Dali::Toolkit::TransitionData::New((Dali::Property::Map const &)*arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Toolkit::TransitionData((const Dali::Toolkit::TransitionData &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_TransitionData_New__SWIG_1(void * jarg1) {
-  void * jresult ;
-  Dali::Property::Array *arg1 = 0 ;
-  Dali::Toolkit::TransitionData result;
-  
-  arg1 = (Dali::Property::Array *)jarg1;
-  if (!arg1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Property::Array const & type is null", 0);
-    return 0;
-  } 
-  {
-    try {
-      result = Dali::Toolkit::TransitionData::New((Dali::Property::Array const &)*arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Toolkit::TransitionData((const Dali::Toolkit::TransitionData &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_TransitionData_DownCast(void * jarg1) {
-  void * jresult ;
-  Dali::BaseHandle arg1 ;
-  Dali::BaseHandle *argp1 ;
-  Dali::Toolkit::TransitionData result;
-  
-  argp1 = (Dali::BaseHandle *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null Dali::BaseHandle", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  {
-    try {
-      result = Dali::Toolkit::TransitionData::DownCast(arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Toolkit::TransitionData((const Dali::Toolkit::TransitionData &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_TransitionData__SWIG_1(void * jarg1) {
-  void * jresult ;
-  Dali::Toolkit::TransitionData *arg1 = 0 ;
-  Dali::Toolkit::TransitionData *result = 0 ;
-  
-  arg1 = (Dali::Toolkit::TransitionData *)jarg1;
-  if (!arg1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Toolkit::TransitionData const & type is null", 0);
-    return 0;
-  } 
-  {
-    try {
-      result = (Dali::Toolkit::TransitionData *)new Dali::Toolkit::TransitionData((Dali::Toolkit::TransitionData const &)*arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_TransitionData_Assign(void * jarg1, void * jarg2) {
-  void * jresult ;
-  Dali::Toolkit::TransitionData *arg1 = (Dali::Toolkit::TransitionData *) 0 ;
-  Dali::Toolkit::TransitionData *arg2 = 0 ;
-  Dali::Toolkit::TransitionData *result = 0 ;
-  
-  arg1 = (Dali::Toolkit::TransitionData *)jarg1; 
-  arg2 = (Dali::Toolkit::TransitionData *)jarg2;
-  if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Toolkit::TransitionData const & type is null", 0);
-    return 0;
-  } 
-  {
-    try {
-      result = (Dali::Toolkit::TransitionData *) &(arg1)->operator =((Dali::Toolkit::TransitionData const &)*arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT unsigned long SWIGSTDCALL CSharp_Dali_TransitionData_Count(void * jarg1) {
-  unsigned long jresult ;
-  Dali::Toolkit::TransitionData *arg1 = (Dali::Toolkit::TransitionData *) 0 ;
-  size_t result;
-  
-  arg1 = (Dali::Toolkit::TransitionData *)jarg1; 
-  {
-    try {
-      result = ((Dali::Toolkit::TransitionData const *)arg1)->Count();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (unsigned long)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_TransitionData_GetAnimatorAt(void * jarg1, unsigned long jarg2) {
-  void * jresult ;
-  Dali::Toolkit::TransitionData *arg1 = (Dali::Toolkit::TransitionData *) 0 ;
-  size_t arg2 ;
-  Dali::Property::Map result;
-  
-  arg1 = (Dali::Toolkit::TransitionData *)jarg1; 
-  arg2 = (size_t)jarg2; 
-  {
-    try {
-      result = (arg1)->GetAnimatorAt(arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Property::Map((const Dali::Property::Map &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_TransitionData__SWIG_2(void * jarg1) {
-  void * jresult ;
-  Dali::Toolkit::Internal::TransitionData *arg1 = (Dali::Toolkit::Internal::TransitionData *) 0 ;
-  Dali::Toolkit::TransitionData *result = 0 ;
-  
-  arg1 = (Dali::Toolkit::Internal::TransitionData *)jarg1; 
-  {
-    try {
-      result = (Dali::Toolkit::TransitionData *)new Dali::Toolkit::TransitionData(arg1);
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
@@ -60646,266 +59538,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_View__SWIG_2(void * jarg1) {
   {
     try {
       result = (Dali::Toolkit::Control *)new Dali::Toolkit::Control(*arg1);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_KeyInputFocusManager() {
-  void * jresult ;
-  Dali::Toolkit::KeyInputFocusManager *result = 0 ;
-  
-  {
-    try {
-      result = (Dali::Toolkit::KeyInputFocusManager *)new Dali::Toolkit::KeyInputFocusManager();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_delete_KeyInputFocusManager(void * jarg1) {
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  {
-    try {
-      delete arg1;
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_Get() {
-  void * jresult ;
-  Dali::Toolkit::KeyInputFocusManager result;
-  
-  {
-    try {
-      result = Dali::Toolkit::KeyInputFocusManager::Get();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Toolkit::KeyInputFocusManager((const Dali::Toolkit::KeyInputFocusManager &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_SetFocus(void * jarg1, void * jarg2) {
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  Dali::Toolkit::Control arg2 ;
-  Dali::Toolkit::Control *argp2 ;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  argp2 = (Dali::Toolkit::Control *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null Dali::Toolkit::Control", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  {
-    try {
-      (arg1)->SetFocus(arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_GetCurrentFocusControl(void * jarg1) {
-  void * jresult ;
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  Dali::Toolkit::Control result;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  {
-    try {
-      result = ((Dali::Toolkit::KeyInputFocusManager const *)arg1)->GetCurrentFocusControl();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Toolkit::Control((const Dali::Toolkit::Control &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_RemoveFocus(void * jarg1, void * jarg2) {
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  Dali::Toolkit::Control arg2 ;
-  Dali::Toolkit::Control *argp2 ;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  argp2 = (Dali::Toolkit::Control *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null Dali::Toolkit::Control", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  {
-    try {
-      (arg1)->RemoveFocus(arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_IsKeyboardListener(void * jarg1, void * jarg2) {
-  unsigned int jresult ;
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  Dali::Toolkit::Control arg2 ;
-  Dali::Toolkit::Control *argp2 ;
-  bool result;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  argp2 = (Dali::Toolkit::Control *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null Dali::Toolkit::Control", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  {
-    try {
-      result = (bool)(arg1)->IsKeyboardListener(arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_KeyInputFocusChangedSignal(void * jarg1) {
-  void * jresult ;
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  Dali::Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType *result = 0 ;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  {
-    try {
-      result = (Dali::Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType *) &(arg1)->KeyInputFocusChangedSignal();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_UnhandledKeyEventSignal(void * jarg1) {
-  void * jresult ;
-  Dali::Toolkit::KeyInputFocusManager *arg1 = (Dali::Toolkit::KeyInputFocusManager *) 0 ;
-  Dali::Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType *result = 0 ;
-  
-  arg1 = (Dali::Toolkit::KeyInputFocusManager *)jarg1; 
-  {
-    try {
-      result = (Dali::Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType *) &(arg1)->UnhandledKeyEventSignal();
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
@@ -80753,7 +79385,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_PageFactory_NewPage(void * jarg1, unsi
   void * jresult ;
   Dali::Toolkit::PageFactory *arg1 = (Dali::Toolkit::PageFactory *) 0 ;
   unsigned int arg2 ;
-  Dali::Texture result;
+  Dali::Image result;
   
   arg1 = (Dali::Toolkit::PageFactory *)jarg1; 
   arg2 = (unsigned int)jarg2; 
@@ -80774,7 +79406,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_PageFactory_NewPage(void * jarg1, unsi
       };
     }
   }
-  jresult = new Dali::Texture((const Dali::Texture &)result); 
+  jresult = new Dali::Image((const Dali::Image &)result); 
   return jresult;
 }
 
@@ -81613,68 +80245,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_VisualBase_Assign(void * jarg1, void *
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_SetName(void * jarg1, char * jarg2) {
-  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
-  std::string *arg2 = 0 ;
-  
-  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
-  if (!jarg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
-    return ;
-  }
-  std::string arg2_str(jarg2);
-  arg2 = &arg2_str; 
-  {
-    try {
-      (arg1)->SetName((std::string const &)*arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-  
-  //argout typemap for const std::string&
-  
-}
-
-
-SWIGEXPORT char * SWIGSTDCALL CSharp_Dali_VisualBase_GetName(void * jarg1) {
-  char * jresult ;
-  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
-  std::string *result = 0 ;
-  
-  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
-  {
-    try {
-      result = (std::string *) &(arg1)->GetName();
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = SWIG_csharp_string_callback(result->c_str()); 
-  return jresult;
-}
-
-
 SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_SetSize(void * jarg1, void * jarg2) {
   Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
   Dali::Vector2 *arg2 = 0 ;
@@ -81733,36 +80303,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_VisualBase_GetSize(void * jarg1) {
 }
 
 
-SWIGEXPORT float SWIGSTDCALL CSharp_Dali_VisualBase_GetHeightForWidth(void * jarg1, float jarg2) {
-  float jresult ;
-  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
-  float arg2 ;
-  float result;
-  
-  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
-  arg2 = (float)jarg2; 
-  {
-    try {
-      result = (float)((Dali::Toolkit::Visual::Base const *)arg1)->GetHeightForWidth(arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_GetNaturalSize(void * jarg1, void * jarg2) {
   Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
   Dali::Vector2 *arg2 = 0 ;
@@ -81775,7 +80315,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_GetNaturalSize(void * jarg1, 
   } 
   {
     try {
-      (arg1)->GetNaturalSize(*arg2);
+      ((Dali::Toolkit::Visual::Base const *)arg1)->GetNaturalSize(*arg2);
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
@@ -81847,6 +80387,96 @@ SWIGEXPORT float SWIGSTDCALL CSharp_Dali_VisualBase_GetDepthIndex(void * jarg1) 
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_SetOnStage(void * jarg1, void * jarg2) {
+  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
+  Dali::Actor *arg2 = 0 ;
+  
+  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
+  arg2 = (Dali::Actor *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Actor & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->SetOnStage(*arg2);
+    } catch (std::out_of_range& e) {
+      {
+        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
+      };
+    } catch (std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
+      };
+    } catch (...) {
+      {
+        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_SetOffStage(void * jarg1, void * jarg2) {
+  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
+  Dali::Actor *arg2 = 0 ;
+  
+  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
+  arg2 = (Dali::Actor *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Actor & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->SetOffStage(*arg2);
+    } catch (std::out_of_range& e) {
+      {
+        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
+      };
+    } catch (std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
+      };
+    } catch (...) {
+      {
+        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
+      };
+    }
+  }
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_RemoveAndReset(void * jarg1, void * jarg2) {
+  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
+  Dali::Actor *arg2 = 0 ;
+  
+  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
+  arg2 = (Dali::Actor *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Actor & type is null", 0);
+    return ;
+  } 
+  {
+    try {
+      (arg1)->RemoveAndReset(*arg2);
+    } catch (std::out_of_range& e) {
+      {
+        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
+      };
+    } catch (std::exception& e) {
+      {
+        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
+      };
+    } catch (...) {
+      {
+        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
+      };
+    }
+  }
+}
+
+
 SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_CreatePropertyMap(void * jarg1, void * jarg2) {
   Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
   Dali::Property::Map *arg2 = 0 ;
@@ -81874,68 +80504,6 @@ SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_CreatePropertyMap(void * jarg
       };
     }
   }
-}
-
-
-SWIGEXPORT void SWIGSTDCALL CSharp_Dali_VisualBase_SetProperty(void * jarg1, int jarg2, void * jarg3) {
-  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
-  Dali::Property::Index arg2 ;
-  Dali::Property::Value *arg3 = 0 ;
-  
-  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
-  arg2 = (Dali::Property::Index)jarg2; 
-  arg3 = (Dali::Property::Value *)jarg3;
-  if (!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Property::Value const & type is null", 0);
-    return ;
-  } 
-  {
-    try {
-      (arg1)->SetProperty(arg2,(Dali::Property::Value const &)*arg3);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return ; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return ; 
-      };
-    }
-  }
-}
-
-
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_VisualBase_GetProperty(void * jarg1, int jarg2) {
-  void * jresult ;
-  Dali::Toolkit::Visual::Base *arg1 = (Dali::Toolkit::Visual::Base *) 0 ;
-  Dali::Property::Index arg2 ;
-  Dali::Property::Value result;
-  
-  arg1 = (Dali::Toolkit::Visual::Base *)jarg1; 
-  arg2 = (Dali::Property::Index)jarg2; 
-  {
-    try {
-      result = (arg1)->GetProperty(arg2);
-    } catch (std::out_of_range& e) {
-      {
-        SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (std::exception& e) {
-      {
-        SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0; 
-      };
-    } catch (...) {
-      {
-        SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0; 
-      };
-    }
-  }
-  jresult = new Dali::Property::Value((const Dali::Property::Value &)result); 
-  return jresult;
 }
 
 
@@ -89637,20 +88205,12 @@ SWIGEXPORT Dali::BaseHandle * SWIGSTDCALL CSharp_Dali_Builder_SWIGUpcast(Dali::T
     return (Dali::BaseHandle *)jarg1;
 }
 
-SWIGEXPORT Dali::BaseHandle * SWIGSTDCALL CSharp_Dali_TransitionData_SWIGUpcast(Dali::Toolkit::TransitionData *jarg1) {
-    return (Dali::BaseHandle *)jarg1;
-}
-
 SWIGEXPORT Dali::CustomActorImpl * SWIGSTDCALL CSharp_Dali_ViewImpl_SWIGUpcast(Dali::Toolkit::Internal::Control *jarg1) {
     return (Dali::CustomActorImpl *)jarg1;
 }
 
 SWIGEXPORT Dali::CustomActor * SWIGSTDCALL CSharp_Dali_View_SWIGUpcast(Dali::Toolkit::Control *jarg1) {
     return (Dali::CustomActor *)jarg1;
-}
-
-SWIGEXPORT Dali::BaseHandle * SWIGSTDCALL CSharp_Dali_KeyInputFocusManager_SWIGUpcast(Dali::Toolkit::KeyInputFocusManager *jarg1) {
-    return (Dali::BaseHandle *)jarg1;
 }
 
 SWIGEXPORT Dali::Toolkit::Control * SWIGSTDCALL CSharp_Dali_Alignment_SWIGUpcast(Dali::Toolkit::Alignment *jarg1) {

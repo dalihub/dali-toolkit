@@ -542,21 +542,16 @@ public class SceneCreatedEventArgs : EventArgs
      }
   }
 
-  ///< name "Size", type Dali.Size (Stage Size value)
-  //@since 1.0.0
-  public Dali.Size Size
+  public Vector2 Size
   {
      get
      {
-        Vector2 ret1 = GetSize();
-        Dali.Size ret= new Size(ret1);
+        Vector2 ret = GetSize();
         return ret;
      }
   }
 
-  ///< name "BackgroundColor", type Dali.Color (Stage background color value)
-  //@since 1.0.0
-  public Dali.Color BackgroundColor
+  public Vector4 BackgroundColor
   {
      set
      {
@@ -564,8 +559,7 @@ public class SceneCreatedEventArgs : EventArgs
      }
      get
      {
-        Vector4 ret1 = GetBackgroundColor();
-        Dali.Color ret = new Color(ret1);
+        Vector4 ret = GetBackgroundColor();
         return ret;
      }
    }

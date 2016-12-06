@@ -19,10 +19,7 @@ BUILT_SOURCES = \
           $(dali_swig_dir)/automatic/cpp/dali_wrap.h
 
 all-local: 
-gbs-local: libNDalic.so NDali.dll hello-world.exe
-
-hello-world.exe: $(dali_swig_dir)/NDali.dll
-	mcs -nologo -target:exe -out:$(dali_swig_dir)/hello-world.exe -reference:$(dali_swig_dir)/NDali.dll $(dali_swig_dir)/examples/hello-world.cs
+gbs-local: libNDalic.so NDali.dll
 
 libNDalic.so: $(dali_swig_dir)/automatic/cpp/dali_wrap.o $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o
 	$(CXX) -shared $(dali_swig_dir)/automatic/cpp/dali_wrap.o $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o -o $(dali_swig_dir)/libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
@@ -34,11 +31,11 @@ $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o: $(BUILT_SOURCES)
 	$(CXX) -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) $(dali_swig_dir)/manual/cpp/keyboard_focus_manager_wrap.cpp -o $(dali_swig_dir)/manual/cpp/dali_wrap_manual.o
 
 NDali.dll: $(BUILT_SOURCES)
-	mcs -nologo -target:library -out:$(dali_swig_dir)/NDali.dll $(dali_swig_dir)/automatic/csharp/*.cs $(dali_swig_dir)/manual/csharp/*.cs
+#	mcs -nologo -target:library -out:$(dali_swig_dir)/NDali.dll $(dali_swig_dir)/automatic/csharp/*.cs $(dali_swig_dir)/manual/csharp/*.cs
 
 $(BUILT_SOURCES): $(dali_swig_dir)/SWIG/*.i
-#	rm -f $(dali_swig_dir)/automatic/csharp/*.cs
-#	rm -f $(dali_swig_dir)/automatic/cpp/*.cpp
+	rm -f $(dali_swig_dir)/automatic/csharp/*.cs
+	rm -f $(dali_swig_dir)/automatic/cpp/*.cpp
 	$(SWIG) -version
 	$(SWIG) -csharp -c++ -outdir $(dali_swig_dir)/automatic/csharp \
             $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o $(dali_swig_dir)/automatic/cpp/dali_wrap.cpp $(dali_swig_dir)/SWIG/dali.i
@@ -47,7 +44,6 @@ gbs-install: gbs-local
 	-$(INSTALL) -d $(DESTDIR)
 	-$(INSTALL) $(dali_swig_dir)/libNDalic.so $(DESTDIR)
 	-$(INSTALL) $(dali_swig_dir)/NDali.dll $(DESTDIR)
-	-$(INSTALL) $(dali_swig_dir)/hello-world.exe $(DESTDIR)
 
 EXTRA_DIST = \
     swig.cmd

@@ -184,12 +184,12 @@ public class TextLabel : View {
       SetProperty( TextLabel.Property.FONT_FAMILY, new Dali.Property.Value( value ) );
     }
   }
-  public Dali.Property.Map FontStyle 
+  public string FontStyle 
   { 
     get 
     {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( TextLabel.Property.FONT_STYLE).Get(  temp );
+      string temp;
+      GetProperty( TextLabel.Property.FONT_STYLE).Get( out temp );
       return temp;
     }
     set 
@@ -405,12 +405,12 @@ public class TextLabel : View {
       SetProperty( TextLabel.Property.LINE_SPACING, new Dali.Property.Value( value ) );
     }
   }
-  public Dali.Property.Map Underline 
+  public string Underline 
   { 
     get 
     {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( TextLabel.Property.UNDERLINE).Get(  temp );
+      string temp;
+      GetProperty( TextLabel.Property.UNDERLINE).Get( out temp );
       return temp;
     }
     set 
@@ -418,12 +418,12 @@ public class TextLabel : View {
       SetProperty( TextLabel.Property.UNDERLINE, new Dali.Property.Value( value ) );
     }
   }
-  public Dali.Property.Map Shadow 
+  public string Shadow 
   { 
     get 
     {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( TextLabel.Property.SHADOW).Get(  temp );
+      string temp;
+      GetProperty( TextLabel.Property.SHADOW).Get( out temp );
       return temp;
     }
     set 
@@ -431,12 +431,12 @@ public class TextLabel : View {
       SetProperty( TextLabel.Property.SHADOW, new Dali.Property.Value( value ) );
     }
   }
-  public Dali.Property.Map Emboss 
+  public string Emboss 
   { 
     get 
     {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( TextLabel.Property.EMBOSS).Get(  temp );
+      string temp;
+      GetProperty( TextLabel.Property.EMBOSS).Get( out temp );
       return temp;
     }
     set 
@@ -444,12 +444,12 @@ public class TextLabel : View {
       SetProperty( TextLabel.Property.EMBOSS, new Dali.Property.Value( value ) );
     }
   }
-  public Dali.Property.Map Outline 
+  public string Outline 
   { 
     get 
     {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( TextLabel.Property.OUTLINE).Get(  temp );
+      string temp;
+      GetProperty( TextLabel.Property.OUTLINE).Get( out temp );
       return temp;
     }
     set 

@@ -41,116 +41,21 @@ public class BaseHandle : global::System.IDisposable {
   }
 
 
-  // Returns the bool value true to indicate that an operand is true and returns false otherwise.
-  public static bool operator true(BaseHandle handle)
-  {
-    // if the C# object is null, return false
-    if( BaseHandle.ReferenceEquals( handle, null ) )
-    {
-      return false;
-    }
-    // returns true if the handle has a body, false otherwise
-    return handle.HasBody();
-  }
-
-  // Returns the bool false  to indicate that an operand is false and returns true otherwise.
-  public static bool operator false(BaseHandle  handle)
-  {
-    // if the C# object is null, return true
-    if( BaseHandle.ReferenceEquals( handle, null ) )
-    {
-      return true;
-    }
-    return !handle.HasBody();
-  }
-
-  // Explicit conversion from Handle to bool.
-  public static explicit operator bool(BaseHandle handle)
-  {
-     // if the C# object is null, return false
-    if( BaseHandle.ReferenceEquals( handle, null ) )
-    {
-      return false;
-    }
-    // returns true if the handle has a body, false otherwise
-    return handle.HasBody();
-  }
-
-  // Equality operator
-  public static bool operator == (BaseHandle x, BaseHandle y)
-  {
-    // if the C# objects are the same return true
-    if(  BaseHandle.ReferenceEquals( x, y ) )
-    {
-      return true;
-    }
-    if ( !BaseHandle.ReferenceEquals( x, null ) && !BaseHandle.ReferenceEquals( y, null ) )
-    {
-      // drop into native code to see if both handles point to the same body
-      return x.IsEqual( y) ;
-    }
-    return false;
-
-  }
-
-  // Inequality operator. Returns Null if either operand is Null
-  public static bool operator !=(BaseHandle x, BaseHandle y)
-  {
-    return !(x==y);
-  }
-
-  // Logical AND operator for &&
-  // It's possible when doing a && this function (opBitwiseAnd) is never called due
-  // to short circuiting. E.g.
-  // If you perform x && y What actually is called is
-  // BaseHandle.op_False( x ) ? BaseHandle.op_True( x ) : BaseHandle.opTrue( BaseHandle.opBitwiseAnd(x,y) )
-  //
-  public static BaseHandle operator &(BaseHandle x, BaseHandle y)
-  {
-    if( x == y )
-    {
-      return x;
-    }
-    return null;
-  }
-
-  // Logical OR operator for ||
-  // It's possible when doing a || this function (opBitwiseOr) is never called due
-  // to short circuiting. E.g.
-  // If you perform x || y What actually is called is
-  // BaseHandle.op_True( x ) ? BaseHandle.op_True( x ) : BaseHandle.opTrue( BaseHandle.opBitwiseOr(x,y) )
-  public static BaseHandle operator |(BaseHandle x, BaseHandle y)
-  {
-    if ( !BaseHandle.ReferenceEquals( x, null ) || !BaseHandle.ReferenceEquals( y, null ) )
-    {
-       if( x.HasBody() )
-       {
-         return x;
-       }
-       if( y.HasBody() )
-       {
-         return y;
-       }
-       return null;
-    }
-    return null;
-  }
-
-  // Logical ! operator
-  public static bool operator !(BaseHandle x)
-  {
-    // if the C# object is null, return true
-    if( BaseHandle.ReferenceEquals( x, null ) )
-    {
-      return true;
-    }
-    if( x.HasBody() )
-    {
-      return false;
-    }
-    return true;
-  }
-
+ public static bool operator true(BaseHandle  handle)
+ {
+   if( handle!= null  )
+   {
+     return  handle.IsHandleEmpty();
+   }
+   else
+   {
+     return false;
+   }
+ }
+ public static bool operator false(BaseHandle  handle)
+ {
+   return  handle.IsHandleEmpty();
+ }
 
   public BaseHandle(BaseObject handle) : this(NDalicPINVOKE.new_BaseHandle__SWIG_0(BaseObject.getCPtr(handle)), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -218,14 +123,8 @@ public class BaseHandle : global::System.IDisposable {
     return ret;
   }
 
-  public bool HasBody() {
-    bool ret = NDalicPINVOKE.BaseHandle_HasBody(swigCPtr);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public bool IsEqual(BaseHandle rhs) {
-    bool ret = NDalicPINVOKE.BaseHandle_IsEqual(swigCPtr, BaseHandle.getCPtr(rhs));
+  public bool IsHandleEmpty() {
+    bool ret = NDalicPINVOKE.BaseHandle_IsHandleEmpty(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

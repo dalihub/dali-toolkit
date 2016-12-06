@@ -973,10 +973,10 @@ public class NDalic {
   public static readonly int IMAGE_VISUAL_DESIRED_HEIGHT = NDalicPINVOKE.IMAGE_VISUAL_DESIRED_HEIGHT_get();
   public static readonly int IMAGE_VISUAL_SYNCHRONOUS_LOADING = NDalicPINVOKE.IMAGE_VISUAL_SYNCHRONOUS_LOADING_get();
   public static readonly int IMAGE_VISUAL_BORDER_ONLY = NDalicPINVOKE.IMAGE_VISUAL_BORDER_ONLY_get();
-  public static readonly int IMAGE_VISUAL_BATCHING_ENABLED = NDalicPINVOKE.IMAGE_VISUAL_BATCHING_ENABLED_get();
-  public static readonly int IMAGE_VISUAL_PIXEL_AREA = NDalicPINVOKE.IMAGE_VISUAL_PIXEL_AREA_get();
-  public static readonly int IMAGE_VISUAL_WRAP_MODE_U = NDalicPINVOKE.IMAGE_VISUAL_WRAP_MODE_U_get();
-  public static readonly int IMAGE_VISUAL_WRAP_MODE_V = NDalicPINVOKE.IMAGE_VISUAL_WRAP_MODE_V_get();
+  public static readonly int BATCHING_ENABLED = NDalicPINVOKE.BATCHING_ENABLED_get();
+  public static readonly int PIXEL_AREA = NDalicPINVOKE.PIXEL_AREA_get();
+  public static readonly int WRAP_MODE_U = NDalicPINVOKE.WRAP_MODE_U_get();
+  public static readonly int WRAP_MODE_V = NDalicPINVOKE.WRAP_MODE_V_get();
 
   public static readonly int OBJECT_URL = NDalicPINVOKE.OBJECT_URL_get();
   public static readonly int MATERIAL_URL = NDalicPINVOKE.MATERIAL_URL_get();
@@ -998,27 +998,6 @@ public class NDalic {
   public static readonly int BEVEL_PERCENTAGE = NDalicPINVOKE.BEVEL_PERCENTAGE_get();
   public static readonly int BEVEL_SMOOTHNESS = NDalicPINVOKE.BEVEL_SMOOTHNESS_get();
   public static readonly int PRIMITIVE_VISUAL_LIGHT_POSITION = NDalicPINVOKE.PRIMITIVE_VISUAL_LIGHT_POSITION_get();
-
-  public static readonly int RENDERING_BACKEND = NDalicPINVOKE.RENDERING_BACKEND_get();
-  public static readonly int TEXT = NDalicPINVOKE.TEXT_get();
-  public static readonly int FONT_FAMILY = NDalicPINVOKE.FONT_FAMILY_get();
-  public static readonly int FONT_STYLE = NDalicPINVOKE.FONT_STYLE_get();
-  public static readonly int POINT_SIZE = NDalicPINVOKE.POINT_SIZE_get();
-  public static readonly int MULTI_LINE = NDalicPINVOKE.MULTI_LINE_get();
-  public static readonly int HORIZONTAL_ALIGNMENT = NDalicPINVOKE.HORIZONTAL_ALIGNMENT_get();
-  public static readonly int VERTICAL_ALIGNMENT = NDalicPINVOKE.VERTICAL_ALIGNMENT_get();
-  public static readonly int TEXT_COLOR = NDalicPINVOKE.TEXT_COLOR_get();
-  public static readonly int ENABLE_MARKUP = NDalicPINVOKE.ENABLE_MARKUP_get();
-  public static readonly int ENABLE_AUTO_SCROLL = NDalicPINVOKE.ENABLE_AUTO_SCROLL_get();
-  public static readonly int AUTO_SCROLL_SPEED = NDalicPINVOKE.AUTO_SCROLL_SPEED_get();
-  public static readonly int AUTO_SCROLL_LOOP_COUNT = NDalicPINVOKE.AUTO_SCROLL_LOOP_COUNT_get();
-  public static readonly int AUTO_SCROLL_GAP = NDalicPINVOKE.AUTO_SCROLL_GAP_get();
-  public static readonly int LINE_SPACING = NDalicPINVOKE.LINE_SPACING_get();
-  public static readonly int UNDERLINE = NDalicPINVOKE.UNDERLINE_get();
-  public static readonly int SHADOW = NDalicPINVOKE.SHADOW_get();
-  public static readonly int EMBOSS = NDalicPINVOKE.EMBOSS_get();
-  public static readonly int OUTLINE = NDalicPINVOKE.OUTLINE_get();
-  public static readonly int BATCHING_ENABLED = NDalicPINVOKE.BATCHING_ENABLED_get();
 
 }
 
