@@ -61,7 +61,18 @@ enum Type
    * @note Optional.
    * @see DevelVisual::Transform::Property
    */
-  TRANSFORM = SHADER+1//Dali::Toolkit::Visual::Property::SHADER+1
+  TRANSFORM = SHADER + 1, // Dali::Toolkit::Visual::Property::SHADER + 1
+
+  /**
+   * @brief Enables/disables premultiplied alpha.
+   * The premultiplied alpha is false by default unless this behaviour is modified
+   * by the derived Visual type.
+
+   * @details Name "premultipliedAlpha", type Property::Boolean.
+
+   * @note Optional.
+   */
+  PREMULTIPLIED_ALPHA = SHADER + 2, // Dali::Toolkit::Visual::Property::SHADER + 2
 };
 
 } //namespace Property
