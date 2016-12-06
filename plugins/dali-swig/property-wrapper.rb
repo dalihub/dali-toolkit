@@ -55,7 +55,7 @@ end
 
 
 # Property struct stores the information about a property after parsing the C++ DALI_PROPERTY macro
-$propertyStruct = Struct.new("Property", :name, :type, :writable, :animatable,:constrainInput, :enum, :shortenum,  :csharpGetter, :csharpSetter, :childProperty,)
+$propertyStruct = Struct.new("Property", :name, :type, :writable, :animatable,:constrainInput, :enum, :shortenum, :develAPI, :csharpGetter, :csharpSetter, :childProperty,)
 
 # daliClass struct stores a class name and an array of properties
 $daliClassStruct = Struct.new("DaliClass", :name, :properties )
@@ -90,6 +90,16 @@ def extractPropertyInfo( propertyMacro )
     # extract the property enum name Dali::Path::Property::POINTS -> POINTS
     shortenum =  data[6].split(":").last
 
+    develAPI = false;
+    # Check if the property uses devel API
+    # Currently we ignore devel properties for now
+    if data[6].include? "Devel"
+      develAPI = true;
+      puts("Ignoring DEVEL API property: " + shortenum);
+    end
+
+
+
     # store the :name, :type, :writable, :animatable, :constrainInput, :enum
     property = $propertyStruct.new;
 
@@ -99,7 +109,7 @@ def extractPropertyInfo( propertyMacro )
     property.animatable = (data[4] == "true")
     property.constrainInput = (data[5]=="true")
     property.enum = shortenum
-
+    property.develAPI = develAPI;
     return property;
 end
 
@@ -221,7 +231,7 @@ def writePropertiesToCSharpFile( daliClass )
 
   for property in daliClass.properties
 
-    if (!property.childProperty)
+    if( (!property.childProperty) && (!property.develAPI))
       file.write( property.csharpGetter );
       file.write( property.csharpSetter );
     end
