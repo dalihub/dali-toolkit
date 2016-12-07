@@ -1530,6 +1530,9 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+
+    // Store the size used to layout the text.
+    mImpl->mVisualModel->mControlSize = size;
   }
 
   // Whether there are modify events.
@@ -2679,9 +2682,6 @@ bool Controller::DoRelayout( const Size& size,
         mImpl->mVisualModel->SetLayoutSize( layoutSize );
       }
     } // view updated
-
-    // Store the size used to layout the text.
-    mImpl->mVisualModel->mControlSize = size;
   }
 
   if( NO_OPERATION != ( ALIGN & operations ) )
