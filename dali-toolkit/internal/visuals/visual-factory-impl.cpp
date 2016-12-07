@@ -23,7 +23,6 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
@@ -58,18 +57,6 @@ namespace Internal
 namespace
 {
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_TYPE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BORDER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, TEXT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
-DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
-
-const char * const VISUAL_TYPE( "visualType" );
 const char * const BATCHING_ENABLED( "batchingEnabled" );
 BaseHandle Create()
 {
