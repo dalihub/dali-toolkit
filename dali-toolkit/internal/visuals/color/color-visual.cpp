@@ -131,11 +131,6 @@ void ColorVisual::OnSetTransform()
 void ColorVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  if( !geometry )
-  {
-    geometry =  VisualFactoryCache::CreateQuadGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-  }
 
   Shader shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER );
   if( !shader )

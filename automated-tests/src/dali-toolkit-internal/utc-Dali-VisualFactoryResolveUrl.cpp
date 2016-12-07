@@ -30,8 +30,6 @@ int UtcDaliResolveUrlRegularImage(void)
 
   DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("foobar.jpeg"), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("foobar.gif"), TEST_LOCATION );
-
   DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("foobar.PNG"), TEST_LOCATION );
 
   DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("foobar.Png123"), TEST_LOCATION );
@@ -78,8 +76,6 @@ int UtcDaliResolveUrlNPatch(void)
 {
   tet_infoline( "UtcDaliResolveUrl N_PATCH" );
 
-  DALI_TEST_EQUALS( UrlType::N_PATCH, ResolveUrlType("foobar.9.gif"), TEST_LOCATION );
-
   DALI_TEST_EQUALS( UrlType::N_PATCH, ResolveUrlType("foobar.#.png"), TEST_LOCATION );
 
   DALI_TEST_EQUALS( UrlType::N_PATCH, ResolveUrlType("foobar.9.9.bmp"), TEST_LOCATION );
@@ -91,6 +87,29 @@ int UtcDaliResolveUrlNPatch(void)
   DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("svg.##.png"), TEST_LOCATION );
 
   DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("svg.99.jpeg"), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliResolveUrlGif(void)
+{
+  tet_infoline( "UtcDaliResolveUrl GIF" );
+
+  DALI_TEST_EQUALS( UrlType::GIF, ResolveUrlType("foobar.gif"), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( UrlType::GIF, ResolveUrlType("foobar.gif.gif"), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( UrlType::GIF, ResolveUrlType("foobar.giF"), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( UrlType::GIF, ResolveUrlType("foobar.GIF"), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( UrlType::GIF, ResolveUrlType(".GiF"), TEST_LOCATION );
+
+  // GIFs aren't N-patch
+  DALI_TEST_EQUALS( UrlType::GIF, ResolveUrlType("foobar.9.gif"), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("gif.png"), TEST_LOCATION );
+  DALI_TEST_EQUALS( UrlType::REGULAR_IMAGE, ResolveUrlType("gif.gif1"), TEST_LOCATION );
 
   END_TEST;
 }

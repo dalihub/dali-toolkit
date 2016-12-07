@@ -185,11 +185,6 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
   if( gridSize == ImageDimensions( 1, 1 ) )
   {
     geometry = factoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-    if( !geometry )
-    {
-      geometry =  VisualFactoryCache::CreateQuadGeometry();
-      factoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-    }
   }
   else
   {

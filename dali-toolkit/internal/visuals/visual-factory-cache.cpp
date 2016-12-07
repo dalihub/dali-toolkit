@@ -52,6 +52,11 @@ VisualFactoryCache::~VisualFactoryCache()
 
 Geometry VisualFactoryCache::GetGeometry( GeometryType type )
 {
+  if( !mGeometry[type] && type == QUAD_GEOMETRY )
+  {
+    mGeometry[type] = CreateQuadGeometry();
+  }
+
   return mGeometry[type];
 }
 

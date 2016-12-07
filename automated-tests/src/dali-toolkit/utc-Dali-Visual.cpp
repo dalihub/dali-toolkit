@@ -38,6 +38,7 @@ namespace
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
@@ -291,6 +292,14 @@ int UtcDaliVisualSize(void)
 
   const float height = textVisual.GetHeightForWidth( 40.f );
   DALI_TEST_EQUALS( height, 40.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  //AnimatedImageVisual
+  Visual::Base animatedImageVisual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  animatedImageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+  animatedImageVisual.GetNaturalSize(naturalSize);
+  // TEST_GIF_FILE: anim.gif
+  // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
+  DALI_TEST_EQUALS( naturalSize, Vector2(50.f, 50.f), TEST_LOCATION );
 
   END_TEST;
 }
@@ -986,6 +995,45 @@ int UtcDaliVisualGetPropertyMap10(void)
   value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( !value->Get<bool>() );
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetPropertyMap11(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetPropertyMap7: AnimatedImageVisual" );
+
+  // request SvgVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  Visual::Base svgVisual = factory.CreateVisual( Property::Map()
+                                                 .Add( Visual::Property::TYPE,  Visual::IMAGE )
+                                                 .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME ) );
+
+  Property::Map resultMap;
+  svgVisual.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
+
+  // request SvgVisual with an URL
+  Visual::Base svgVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  resultMap.Clear();
+  svgVisual2.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from a visual
+  value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
 
   END_TEST;
 }
