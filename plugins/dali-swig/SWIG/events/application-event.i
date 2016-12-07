@@ -1018,6 +1018,9 @@
 
     public static Application NewApplication(string stylesheet, Application.WINDOW_MODE windowMode) {
 
+      // register all Views with the type registry, so that can be created / styled via JSON
+      ViewRegistryHelper.Initialize();
+
       Application ret = New(1, stylesheet, windowMode);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
 

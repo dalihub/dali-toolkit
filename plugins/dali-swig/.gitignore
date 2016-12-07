@@ -4,6 +4,5 @@ autom4te.cache/
 aclocal.m4
 config/
 config.*
-cpp/dali_wrap.cpp
-cpp/dali_wrap.h
+automatic/*
 configure
