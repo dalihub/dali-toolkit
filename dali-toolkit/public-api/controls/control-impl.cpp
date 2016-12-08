@@ -39,8 +39,11 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -457,10 +460,24 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundVisual, map );
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base backgroundVisual;
+  InitializeVisual( self, backgroundVisual, map );
+
+  // if new visual created, replace existing one
+  if( backgroundVisual )
   {
+    mImpl->mBackgroundVisual = backgroundVisual;
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+  }
+  // ...otherwise process map and apply it to the existing visual
+  else if( mImpl->mBackgroundVisual )
+  {
+    Property::Value* premultipliedAlpha = map.Find( Toolkit::DevelVisual::Property::PREMULTIPLIED_ALPHA, Toolkit::Internal::PREMULTIPLIED_ALPHA );
+    if( premultipliedAlpha )
+    {
+      bool value( premultipliedAlpha->Get<bool>() );
+      Toolkit::GetImplementation( mImpl->mBackgroundVisual ).EnablePreMultipliedAlpha( value );
+    }
   }
 }
 

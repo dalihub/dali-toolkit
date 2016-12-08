@@ -1012,3 +1012,61 @@ int UtcDaliVisualWireframeVisual(void)
   END_TEST;
 }
 
+int UtcDaliVisualPremultipliedAlpha(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualPremultipliedAlpha" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  // image visual, test default value ( false )
+  {
+    Visual::Base imageVisual = factory.CreateVisual(
+          Property::Map()
+          .Add( Visual::Property::TYPE, Visual::IMAGE )
+          .Add( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME ) );
+
+    Dali::Property::Map visualMap;
+    imageVisual.CreatePropertyMap( visualMap );
+    Property::Value* value = visualMap.Find( DevelVisual::Property::PREMULTIPLIED_ALPHA );
+
+    // test values
+    DALI_TEST_CHECK( value );
+    DALI_TEST_EQUALS( value->Get<bool>(), false, TEST_LOCATION );
+  }
+
+  // image visual, override premultiplied
+  {
+    Visual::Base imageVisual = factory.CreateVisual(
+          Property::Map()
+          .Add( Visual::Property::TYPE, Visual::IMAGE )
+          .Add( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME )
+          .Add( DevelVisual::Property::PREMULTIPLIED_ALPHA, true ) );
+
+    Dali::Property::Map visualMap;
+    imageVisual.CreatePropertyMap( visualMap );
+    Property::Value* value = visualMap.Find( DevelVisual::Property::PREMULTIPLIED_ALPHA );
+
+    // test values
+    DALI_TEST_CHECK( value );
+    DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION);
+  }
+
+  // svg visual ( premultiplied alpha by default is true )
+  {
+    Visual::Base imageVisual = factory.CreateVisual(
+          Property::Map()
+          .Add( Visual::Property::TYPE, Visual::IMAGE )
+          .Add( ImageVisual::Property::URL, TEST_SVG_FILE_NAME ) );
+
+    Dali::Property::Map visualMap;
+    imageVisual.CreatePropertyMap( visualMap );
+    Property::Value* value = visualMap.Find( DevelVisual::Property::PREMULTIPLIED_ALPHA );
+
+    // test values
+    DALI_TEST_CHECK( value );
+    DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION );
+  }
+
+  END_TEST;
+}

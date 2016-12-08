@@ -35,6 +35,9 @@ extern const char * const CUSTOM_SUBDIVIDE_GRID_X;
 extern const char * const CUSTOM_SUBDIVIDE_GRID_Y;
 extern const char * const CUSTOM_SHADER_HINTS;
 
+// Premultiplied alpha
+extern const char * const PREMULTIPLIED_ALPHA;
+
 // Image visual
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;

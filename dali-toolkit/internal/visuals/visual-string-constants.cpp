@@ -35,6 +35,9 @@ const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
 const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" );
 
+// Premultipled alpha
+extern const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
+
 // Image visual
 const char * const IMAGE_URL_NAME("url");
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );

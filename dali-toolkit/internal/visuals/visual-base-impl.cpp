@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -64,6 +65,7 @@ void Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Base::Initialize( Actor& actor, const Property::Map& propertyMap )
 {
+
   Property::Value* customShaderValue = propertyMap.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
   if( customShaderValue )
   {
@@ -71,6 +73,16 @@ void Base::Initialize( Actor& actor, const Property::Map& propertyMap )
     if( customShaderValue->Get( shaderMap ) )
     {
       SetCustomShader( shaderMap );
+    }
+  }
+
+  Property::Value* premultipliedAlphaValue = propertyMap.Find( Toolkit::DevelVisual::Property::PREMULTIPLIED_ALPHA, PREMULTIPLIED_ALPHA );
+  if( premultipliedAlphaValue )
+  {
+    bool premultipliedAlpha( false );
+    if( premultipliedAlphaValue->Get( premultipliedAlpha ) )
+    {
+      EnablePreMultipliedAlpha( premultipliedAlpha );
     }
   }
 
@@ -138,7 +150,7 @@ void Base::SetOffStage( Actor& actor )
 
 void Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  if(preMultipled)
+  if( preMultipled )
   {
     mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
   }
@@ -172,6 +184,9 @@ void Base::CreatePropertyMap( Property::Map& map ) const
   {
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
+
+  bool premultipliedAlpha( IsPreMultipliedAlphaEnabled() );
+  map.Insert( DevelVisual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha );
 }
 
 bool Base::GetIsOnStage() const
