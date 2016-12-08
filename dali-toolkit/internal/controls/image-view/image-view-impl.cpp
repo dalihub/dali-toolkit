@@ -73,76 +73,41 @@ Toolkit::ImageView ImageView::New()
 
 void ImageView::SetImage( Image image )
 {
-  if( ( mImage != image ) ||
-      ! mUrl.empty()      ||   // If we're changing from a URL type to an Image type
-      ! mPropertyMap.Empty() ) // If we're changing from a property map type to an Image type
-  {
-    mUrl.clear();
-    mPropertyMap.Clear();
+  // Don't bother comparing if we had a visual previously, just drop old visual and create new one
+  mImage = image;
+  mUrl.clear();
+  mPropertyMap.Clear();
 
-    mImage = image;
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( image );
+  RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
 
-    mVisual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-    RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
-    mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
-
-    RelayoutRequest();
-  }
+  RelayoutRequest();
 }
 
 void ImageView::SetImage( const Property::Map& map )
 {
+  // Comparing a property map is too expensive so just creating a new visual
+  mPropertyMap = map;
   mUrl.clear();
   mImage.Reset();
-  mPropertyMap = map;
 
   mVisual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
   RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual  );
-
-  Property::Value* widthValue = mPropertyMap.Find( "width" );
-  if( widthValue )
-  {
-    int width;
-    if( widthValue->Get( width ) )
-    {
-      mImageSize = ImageDimensions( width, mImageSize.GetHeight() );
-    }
-  }
-
-  Property::Value* heightValue = mPropertyMap.Find( "height" );
-  if( heightValue )
-  {
-    int height;
-    if( heightValue->Get( height ) )
-    {
-      mImageSize = ImageDimensions( mImageSize.GetWidth(), height );
-    }
-  }
 
   RelayoutRequest();
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
-  if( ( mUrl != url ) ||
-        mImage        ||       // If we're changing from an Image type to a URL type
-      ! mPropertyMap.Empty() ) // If we're changing from a property map type to a URL type
-  {
-    mImage.Reset();
-    mPropertyMap.Clear();
+  // Don't bother comparing if we had a visual previously, just drop old visual and create new one
+  mUrl = url;
+  mImage.Reset();
+  mPropertyMap.Clear();
 
-    mUrl = url;
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
+  RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual );
 
-    if( size.GetWidth() != 0u && size.GetHeight() != 0u )
-    {
-      mImageSize = size;
-    }
-
-    mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
-    RegisterVisual( Toolkit::ImageView::Property::IMAGE, mVisual );
-
-    RelayoutRequest();
-  }
+  RelayoutRequest();
 }
 
 Image ImageView::GetImage() const
@@ -184,27 +149,15 @@ Vector3 ImageView::GetNaturalSize()
     return Vector3( rendererNaturalSize );
   }
 
-  Vector3 size;
-  size.x = mImageSize.GetWidth();
-  size.y = mImageSize.GetHeight();
-
-  if( size.x > 0 && size.y > 0 )
-  {
-    size.z = std::min(size.x, size.y);
-    return size;
-  }
-  else
-  {
-    // if no image then use Control's natural size
-    return Control::GetNaturalSize();
-  }
+  // if no visual then use Control's natural size
+  return Control::GetNaturalSize();
 }
 
 float ImageView::GetHeightForWidth( float width )
 {
-  if( mImageSize.GetWidth() > 0 && mImageSize.GetHeight() > 0 )
+  if( mVisual )
   {
-    return GetHeightForWidthBase( width );
+    return mVisual.GetHeightForWidth( width );
   }
   else
   {
@@ -214,9 +167,9 @@ float ImageView::GetHeightForWidth( float width )
 
 float ImageView::GetWidthForHeight( float height )
 {
-  if( mImageSize.GetWidth() > 0 && mImageSize.GetHeight() > 0 )
+  if( mVisual )
   {
-    return GetWidthForHeightBase( height );
+    return mVisual.GetWidthForHeight( height );
   }
   else
   {

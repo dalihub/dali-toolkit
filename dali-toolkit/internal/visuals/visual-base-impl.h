@@ -89,7 +89,12 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
    */
-  virtual float GetHeightForWidth( float width ) const;
+  virtual float GetHeightForWidth( float width );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::GetWidthForHeight
+   */
+  virtual float GetWidthForHeight( float height );
 
   /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize

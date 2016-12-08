@@ -149,7 +149,6 @@ private:
 
 private:
   Toolkit::Visual::Base  mVisual;
-  ImageDimensions        mImageSize;
 
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise

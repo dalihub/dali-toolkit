@@ -66,9 +66,14 @@ void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size con
   GetImplementation( *this ).SetTransformAndSize( transform, controlSize );
 }
 
-float Visual::Base::GetHeightForWidth( float width ) const
+float Visual::Base::GetHeightForWidth( float width )
 {
   return GetImplementation( *this ).GetHeightForWidth( width );
+}
+
+float Visual::Base::GetWidthForHeight( float height )
+{
+  return GetImplementation( *this ).GetWidthForHeight( height );
 }
 
 void Visual::Base::GetNaturalSize(Vector2& naturalSize )

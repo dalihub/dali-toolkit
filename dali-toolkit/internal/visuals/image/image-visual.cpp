@@ -522,13 +522,11 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
 
 void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 {
-  DALI_ASSERT_DEBUG( !mImpl->mRenderer && "Renderer should have been removed from stage and already reset before initialization" );
-
   mImageUrl = imageUrl;
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
   if( !mImpl->mCustomShader &&
-      ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // ignore remote images
+      ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // dont atlas remote images
       ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
@@ -586,7 +584,6 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 
 void ImageVisual::InitializeRenderer( const Image& image )
 {
-  DALI_ASSERT_DEBUG( !mImpl->mRenderer && "Renderer should have been removed from stage and already reset before initialization" );
 
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
 

@@ -120,9 +120,28 @@ const std::string& Visual::Base::GetName()
   return mImpl->mName;
 }
 
-float Visual::Base::GetHeightForWidth( float width ) const
+float Visual::Base::GetHeightForWidth( float width )
 {
-  return 0.f;
+  float aspectCorrectedHeight = 0.f;
+  Vector2 naturalSize;
+  GetNaturalSize( naturalSize );
+  if( naturalSize.width )
+  {
+    aspectCorrectedHeight = naturalSize.height * width / naturalSize.width;
+  }
+  return aspectCorrectedHeight;
+}
+
+float Visual::Base::GetWidthForHeight( float height )
+{
+  float aspectCorrectedWidth = 0.f;
+  Vector2 naturalSize;
+  GetNaturalSize( naturalSize );
+  if( naturalSize.height > 0.0f )
+  {
+    aspectCorrectedWidth = naturalSize.width * height / naturalSize.height;
+  }
+  return aspectCorrectedWidth;
 }
 
 void Visual::Base::GetNaturalSize( Vector2& naturalSize )

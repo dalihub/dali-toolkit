@@ -80,7 +80,7 @@ public: // from Visual::Base
   /**
    * @copydoc Visual::Base::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width ) const;
+  virtual float GetHeightForWidth( float width );
 
   /**
    * @copydoc Visual::Base::GetNaturalSize()

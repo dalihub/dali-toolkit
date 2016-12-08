@@ -139,7 +139,7 @@ TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache )
   return new TextVisual( factoryCache );
 }
 
-float TextVisual::GetHeightForWidth( float width ) const
+float TextVisual::GetHeightForWidth( float width )
 {
   return mController->GetHeightForWidth( width );
 }
