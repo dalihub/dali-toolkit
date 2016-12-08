@@ -57,14 +57,6 @@
     {
       "pointSize":25
     },
-    "RadioButton":
-    {
-      "unselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected.png",
-      "selectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected.png",
-      "disabledUnselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected-disabled.png",
-      "disabledSelectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
-    },
-
     "TextField":
     {
       "pointSize":18,
@@ -115,8 +107,18 @@
     {
       "label":
       {
-        "visualType": "TEXT",
+        "visualType":"TEXT",
         "pointSize":8
+      },
+      "unselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
+      },
+      "selectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
       }
     },
     "TextSelectionToolbar":

@@ -974,7 +974,7 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if ( currentBackGroundVisual )
   {
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Setting visual bakcground size to(%f,%f)\n", size.width, size.height);
+    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout Setting visual background size to(%f,%f)\n", size.width, size.height);
 
     Property::Map visualTransform;
 

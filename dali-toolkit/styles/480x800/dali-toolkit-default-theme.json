@@ -109,6 +109,16 @@
       {
         "visualType":"TEXT",
         "pointSize":8
+      },
+      "unselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
+      },
+      "selectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
       }
     },
     "TextSelectionToolbar":
