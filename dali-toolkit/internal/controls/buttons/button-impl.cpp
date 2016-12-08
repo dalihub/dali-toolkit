@@ -776,34 +776,52 @@ Vector3 Button::GetNaturalSize()
   bool horizontalAlignment = mTextLabelAlignment == BEGIN || mTextLabelAlignment == END; // label and visual side by side
 
   // Get natural size of foreground ( largest of the possible visuals )
-  Size largestForegroundVisual;
+  Size largestProvidedVisual;
   Size labelSize = Size::ZERO;
 
-  for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++)
+  bool foreGroundVisualUsed = false;
+
+  for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++ )
   {
     Toolkit::Visual::Base visual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
     Size visualSize;
     if ( visual )
     {
       visual.GetNaturalSize( visualSize );
-      largestForegroundVisual.width = std::max(largestForegroundVisual.width, visualSize.width );
-      largestForegroundVisual.height = std::max(largestForegroundVisual.height, visualSize.height );
+      largestProvidedVisual.width = std::max(largestProvidedVisual.width, visualSize.width );
+      largestProvidedVisual.height = std::max(largestProvidedVisual.height, visualSize.height );
+      foreGroundVisualUsed = true;
+    }
+  }
+
+  if ( !foreGroundVisualUsed ) // If foreground visual not supplied then use the background visual to calculate Natural size
+  {
+    for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++ )
+    {
+      Toolkit::Visual::Base visual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
+      Size visualSize;
+      if ( visual )
+      {
+        visual.GetNaturalSize( visualSize );
+        largestProvidedVisual.width = std::max(largestProvidedVisual.width, visualSize.width );
+        largestProvidedVisual.height = std::max(largestProvidedVisual.height, visualSize.height );
+      }
     }
   }
 
   // Get horizontal padding total
-  if ( largestForegroundVisual.width > 0 )  // if visual exists
+  if ( largestProvidedVisual.width > 0 )  // if visual exists
   {
-    size.width += largestForegroundVisual.width + mForegroundPadding.left + mForegroundPadding.right;
+    size.width += largestProvidedVisual.width + mForegroundPadding.left + mForegroundPadding.right;
   }
   // Get vertical padding total
-  if ( largestForegroundVisual.height > 0 )
+  if ( largestProvidedVisual.height > 0 )
   {
-    size.height += largestForegroundVisual.height + mForegroundPadding.top + mForegroundPadding.bottom;
+    size.height += largestProvidedVisual.height + mForegroundPadding.top + mForegroundPadding.bottom;
   }
 
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetNaturalSize visual Size(%f,%f)\n",
-                 largestForegroundVisual.width, largestForegroundVisual.height );
+                 largestProvidedVisual.width, largestProvidedVisual.height );
 
   // Get natural size of label if text has been set
   if ( mTextStringSetFlag )
@@ -1141,17 +1159,17 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
 
       case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE: // Legacy Tizen 3.0
       {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, value, DepthIndex::BACKGROUND );
         break;
       }
       case Toolkit::Button::Property::DISABLED_STATE_IMAGE:  // Legacy Tizen 3.0
       {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, value, DepthIndex::BACKGROUND );
         break;
       }
       case Toolkit::Button::Property::SELECTED_STATE_IMAGE:  // Legacy Tizen 3.0
       {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
+        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, value, DepthIndex::BACKGROUND );
         break;
       }
       case Toolkit::DevelButton::Property::UNSELECTED_VISUAL:
@@ -1285,19 +1303,19 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
 
       case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL );
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL );
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL );
         break;
       }
 
       case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
       {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL );
+        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL );
         break;
       }
 
@@ -1449,10 +1467,7 @@ void Button::SetLabel( Actor label )
 
 void Button::SetUnselectedImage( const std::string& filename )
 {
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
-  }
+  SetBackgroundImage( filename );
 }
 
 void Button::SetBackgroundImage( const std::string& filename )
@@ -1461,14 +1476,15 @@ void Button::SetBackgroundImage( const std::string& filename )
   {
     CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
   }
+  else
+  {
+    UnregisterVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
+  }
 }
 
 void Button::SetSelectedImage( const std::string& filename )
 {
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_VISUAL, filename, DepthIndex::CONTENT );
-  }
+    SetSelectedBackgroundImage( filename );
 }
 
 void Button::SetSelectedBackgroundImage( const std::string& filename )
@@ -1476,6 +1492,10 @@ void Button::SetSelectedBackgroundImage( const std::string& filename )
   if( !filename.empty() )
   {
     CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
+  }
+  else
+  {
+    UnregisterVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
   }
 }
 
@@ -1558,7 +1578,7 @@ void Button::SetSelectedImage( Image image )
 Actor Button::GetButtonImage() const
 {
   DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50\n");
-  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL ) );
+  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL ) );
 
   return imageView;
 }
@@ -1566,7 +1586,7 @@ Actor Button::GetButtonImage() const
 Actor Button::GetSelectedImage() const
 {
   DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50\n");
-  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL ) );
+  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL ) );
 
   return imageView;
 }

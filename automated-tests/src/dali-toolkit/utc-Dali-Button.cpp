@@ -27,6 +27,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
@@ -271,8 +272,8 @@ int UtcDaliButtonPropertyGetLabelAlignment(void)
   tet_infoline(" UtcDaliPushButtonPropertyGetLabelAlignment\n");
 
   Button button = PushButton::New();
-  button.SetProperty( Toolkit::Button::Property::LABEL_RELATIVE_ALIGNMENT, "END"  );
-  DALI_TEST_EQUALS( button.GetProperty<std::string>( Toolkit::Button::Property::LABEL_RELATIVE_ALIGNMENT ), "END", TEST_LOCATION );
+  button.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "END"  );
+  DALI_TEST_EQUALS( button.GetProperty<std::string>( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT ), "END", TEST_LOCATION );
 
   END_TEST;
 }

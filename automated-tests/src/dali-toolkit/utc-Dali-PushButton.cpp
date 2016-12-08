@@ -26,6 +26,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
@@ -1018,7 +1019,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
 
-  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, propertyMap );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, propertyMap );
 
   tet_infoline(" UNSELECTED_VISUAL Added to button\n");
 
@@ -1044,7 +1045,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   Property::Map propertyMap2;
   propertyMap2.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap2.Insert(ColorVisual::Property::MIX_COLOR, Color::RED);
-  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, propertyMap2 );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, propertyMap2 );
 
   tet_printf("Added UNSELECTED_VISUAL and add button back to Stage\n");
 
@@ -1087,7 +1088,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   colorMap.Insert(Visual::Property::TYPE,  BROKEN_VISUAL_TYPE);
   colorMap.Insert(BorderVisual::Property::COLOR,  Color::BLUE);
   colorMap.Insert(BorderVisual::Property::SIZE,  5.f);
-  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, colorMap );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, colorMap );
 
   Stage::GetCurrent().Add( pushButton );
   application.SendNotification();
