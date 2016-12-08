@@ -68,7 +68,7 @@ public:
    * If the handle is empty, ImageView will display nothing
    * @param[in] map The Dali::Property::Map to use for to display.
    */
-  void SetImage( Dali::Property::Map map );
+  void SetImage( const Dali::Property::Map& map );
 
   /**
    * @copydoc Dali::Toolkit::SetImage

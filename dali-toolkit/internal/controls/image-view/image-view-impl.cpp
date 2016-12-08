@@ -90,7 +90,7 @@ void ImageView::SetImage( Image image )
   }
 }
 
-void ImageView::SetImage( Property::Map map )
+void ImageView::SetImage( const Property::Map& map )
 {
   mUrl.clear();
   mImage.Reset();
