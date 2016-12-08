@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
-#include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -212,10 +211,8 @@ private: // Implementation
 
   /**
    * @brief Enable or disable clipping.
-   *
-   * @param[in] size The area to clip within.
    */
-  void EnableClipping( const Vector2& size );
+  void EnableClipping();
 
   /**
    * @brief Callback when keyboard is shown/hidden.
@@ -271,7 +268,7 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
-  Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
+  Toolkit::Control mStencil; ///< For EXCEED_POLICY_CLIP
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;

@@ -1106,15 +1106,10 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( offscreen root actor, and the offscreen image view
-  DALI_TEST_EQUALS( editor.GetChildCount(), 2u, TEST_LOCATION );
+  // Check there are the expected number of children (the stencil).
+  DALI_TEST_EQUALS( editor.GetChildCount(), 1u, TEST_LOCATION );
 
-  Actor offscreenRoot = editor.GetChildAt( 0u );
-  DALI_TEST_CHECK( offscreenRoot.IsLayer() );
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
-
-  Actor offscreenImage = editor.GetChildAt( 1u );
-  DALI_TEST_CHECK( offscreenImage );
+  Actor stencil = editor.GetChildAt( 0u );
 
   // Create a tap event to touch the text editor.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
@@ -1124,11 +1119,11 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = editor.GetChildAt( 2u );
+  Actor layer = editor.GetChildAt( 1u );
   DALI_TEST_CHECK( layer.IsLayer() );
 
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text editor has the focus, so it can handle the key events.
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
@@ -1140,16 +1135,13 @@ int utcDaliTextEditorEvent02(void)
 
   // Checks the cursor and the renderer have been created.
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 2u, TEST_LOCATION ); // The camera actor and the renderer
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 1u, TEST_LOCATION ); // The renderer
 
   Control cursor = Control::DownCast( layer.GetChildAt( 0u ) );
   DALI_TEST_CHECK( cursor );
 
-  CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
-  DALI_TEST_CHECK( camera );
-
-  // The offscreen root actor has a container with all the actors which contain the text renderers.
-  Actor container = offscreenRoot.GetChildAt( 1u );
+  // The stencil actor has a container with all the actors which contain the text renderers.
+  Actor container = stencil.GetChildAt( 0u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
@@ -1223,7 +1215,7 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
 
   // Should not be a renderer.
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1280,22 +1272,18 @@ int utcDaliTextEditorEvent03(void)
   application.SendNotification();
   application.Render();
 
-  // The offscreen root actor should have three actors: the camera, a renderer and the highlight actor.
-  Actor offscreenRoot = editor.GetChildAt( 0u );
-  DALI_TEST_CHECK( offscreenRoot.IsLayer() );
+  // The stencil actor should have two actors: the renderer and the highlight actor.
+  Actor stencil = editor.GetChildAt( 0u );
 
-  CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
-  DALI_TEST_CHECK( camera );
-
-  // The offscreen root actor has a container with all the actors which contain the text renderers.
-  Actor container = offscreenRoot.GetChildAt( 1u );
+  // The stencil actor has a container with all the actors which contain the text renderers.
+  Actor container = stencil.GetChildAt( 0u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
     DALI_TEST_CHECK( renderer );
   }
 
-  Renderer highlight = offscreenRoot.GetChildAt( 2u ).GetRendererAt( 0u );
+  Renderer highlight = stencil.GetChildAt( 1u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );
 
   END_TEST;
