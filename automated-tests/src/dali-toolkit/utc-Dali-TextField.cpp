@@ -585,7 +585,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::MAX_LENGTH ), maxNumberOfCharacters, TEST_LOCATION );
 
   // Check exceed policy
-  // Set a different exceed policy is not implemented.
+  field.SetProperty( TextField::Property::EXCEED_POLICY, Dali::Toolkit::TextField::EXCEED_POLICY_CLIP );
+  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::EXCEED_POLICY ), static_cast<int>( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ), TEST_LOCATION );
+  field.SetProperty( TextField::Property::EXCEED_POLICY, Dali::Toolkit::TextField::EXCEED_POLICY_ORIGINAL );
+  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::EXCEED_POLICY ), static_cast<int>( Dali::Toolkit::TextField::EXCEED_POLICY_ORIGINAL ), TEST_LOCATION );
 
   // Check that the Alignment properties can be correctly set
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -1460,15 +1463,11 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( offscreen root actor, and the offscreen image view
-  DALI_TEST_EQUALS( field.GetChildCount(), 2u, TEST_LOCATION );
+  // Check there are the expected number of children ( stencil ).
+  DALI_TEST_EQUALS( field.GetChildCount(), 1u, TEST_LOCATION );
 
-  Actor offscreenRoot = field.GetChildAt( 0u );
-  DALI_TEST_CHECK( offscreenRoot.IsLayer() );
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
-
-  Actor offscreenImage = field.GetChildAt( 1u );
-  DALI_TEST_CHECK( offscreenImage );
+  Actor stencil = field.GetChildAt( 0u );
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Create a tap event to touch the text field.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
@@ -1478,11 +1477,11 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = field.GetChildAt( 2u );
+  Actor layer = field.GetChildAt( 1u );
   DALI_TEST_CHECK( layer.IsLayer() );
 
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text field has the focus, so it can handle the key events.
   application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
@@ -1494,16 +1493,13 @@ int utcDaliTextFieldEvent02(void)
 
   // Checks the cursor and the renderer have been created.
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 2u, TEST_LOCATION ); // The camera actor and the renderer
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 1u, TEST_LOCATION ); // The renderer
 
   Control cursor = Control::DownCast( layer.GetChildAt( 0u ) );
   DALI_TEST_CHECK( cursor );
 
-  CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
-  DALI_TEST_CHECK( camera );
-
   // The offscreen root actor has a container with all the actors which contain the text renderers.
-  Actor container = offscreenRoot.GetChildAt( 1u );
+  Actor container = stencil.GetChildAt( 0u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
@@ -1577,7 +1573,7 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
 
   // Should not be a renderer.
-  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1624,22 +1620,18 @@ int utcDaliTextFieldEvent03(void)
   application.SendNotification();
   application.Render();
 
-  // The offscreen root actor should have three actors: the camera, a renderer and the highlight actor.
-  Actor offscreenRoot = field.GetChildAt( 1u );
-  DALI_TEST_CHECK( offscreenRoot.IsLayer() );
-
-  CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
-  DALI_TEST_CHECK( camera );
+  // The offscreen root actor should have two actors: the renderer and the highlight actor.
+  Actor stencil = field.GetChildAt( 0u );
 
   // The offscreen root actor has a container with all the actors which contain the text renderers.
-  Actor container = offscreenRoot.GetChildAt( 1u );
+  Actor container = stencil.GetChildAt( 0u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
     DALI_TEST_CHECK( renderer );
   }
 
-  Renderer highlight = offscreenRoot.GetChildAt( 2u ).GetRendererAt( 0u );
+  Renderer highlight = stencil.GetChildAt( 1u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );
 
   END_TEST;
@@ -1770,7 +1762,7 @@ int utcDaliTextFieldEvent05(void)
   SendPan(application, Gesture::Finished, pos);
   Wait(application, RENDER_FRAME_INTERVAL);
 
-  Actor offscreenRoot = field.GetChildAt( 1u );
+  Actor stencil = field.GetChildAt( 1u );
   END_TEST;
 }
 
