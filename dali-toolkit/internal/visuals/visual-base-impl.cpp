@@ -90,7 +90,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
 
       case DevelVisual::Property::PREMULTIPLIED_ALPHA:
       {
-        bool premultipliedAlpha( premultipliedAlpha );
+        bool premultipliedAlpha = false;
         if( value.Get( premultipliedAlpha ) )
         {
           EnablePreMultipliedAlpha( premultipliedAlpha );
