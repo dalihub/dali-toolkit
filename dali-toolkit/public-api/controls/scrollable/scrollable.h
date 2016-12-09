@@ -73,6 +73,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Scrollable class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       // Event side properties

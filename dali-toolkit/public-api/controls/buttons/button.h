@@ -102,6 +102,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Button class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool @SINCE_1_0.0
