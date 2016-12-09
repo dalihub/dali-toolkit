@@ -68,7 +68,7 @@ public:
    * If the handle is empty, ImageView will display nothing
    * @param[in] map The Dali::Property::Map to use for to display.
    */
-  void SetImage( Dali::Property::Map map );
+  void SetImage( const Dali::Property::Map& map );
 
   /**
    * @copydoc Dali::Toolkit::SetImage
@@ -149,7 +149,6 @@ private:
 
 private:
   Toolkit::Visual::Base  mVisual;
-  ImageDimensions        mImageSize;
 
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise
