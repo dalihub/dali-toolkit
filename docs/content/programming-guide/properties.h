@@ -89,15 +89,16 @@ Macros are used to define properties for the following reasons:
 
 Two different macros are provided depending on whether the property is to be an event-side only property or an animatable property.
 
-<b>There are two stages:</b>
+<b>There are three stages:</b>
 
-- Define the properties as an enum in the public-api header file, along with a definition of the property ranges.
+- Define the property ranges as an enum in the public-api header file. There are two ranges, one for event-side only properties, and one for animatable properties. Each range should follow on from the range defined in the parent class.
+- Define the properties as an enum in the public-api header file
 - Define the property details using the pre-defined macros to perform the type-registering of the properties. This is done for signals and actions also.
 
 <b>Example: ImageView</b>
 
 Source file: <b>image-view.h</b>:
-Note that the “PropertyRange” contents “PROPERTY_START_INDEX” & "ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX" are also used by the macro for order checking.
+  Note that the “PropertyRange” contents “PROPERTY_START_INDEX” & "ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX" are also used by the macro for order checking, so should always have these names.
 
 @code
   /**

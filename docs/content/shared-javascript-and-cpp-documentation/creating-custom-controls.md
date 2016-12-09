@@ -89,6 +89,8 @@ The TypeRegistry is used to register your custom control.
 This allows the creation of the control via a JSON file, as well as registering properties, signals and actions.
  
 To ensure your control is stylable, the process described in [Type Registration](@ref type-registration) should be followed.
+
+#### Properties
 To aid development, some macros are provided for registering properties which are described in the [Property](@ref properties) section.
  
 Control properties can be one of three types:
