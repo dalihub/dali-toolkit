@@ -527,13 +527,18 @@ void FlexContainer::OnRelayout( const Vector2& size, RelayoutContainer& containe
     Actor child = mChildrenNodes[i].actor.GetHandle();
     if( child )
     {
-      if( child.GetResizePolicy( Dimension::WIDTH ) != ResizePolicy::USE_ASSIGNED_SIZE )
+      if( child.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX ) != Property::NONE )
       {
-        child.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH );
-      }
-      if( child.GetResizePolicy( Dimension::HEIGHT ) != ResizePolicy::USE_ASSIGNED_SIZE )
-      {
-        child.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT );
+        // Only Set to USE_ASSIGNED_SIZE if the child actor is flexible.
+
+        if( child.GetResizePolicy( Dimension::WIDTH ) != ResizePolicy::USE_ASSIGNED_SIZE )
+        {
+          child.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH );
+        }
+        if( child.GetResizePolicy( Dimension::HEIGHT ) != ResizePolicy::USE_ASSIGNED_SIZE )
+        {
+          child.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT );
+        }
       }
 
       container.Add( child, Vector2(mChildrenNodes[i].node->layout.dimensions[CSS_WIDTH], mChildrenNodes[i].node->layout.dimensions[CSS_HEIGHT] ) );
