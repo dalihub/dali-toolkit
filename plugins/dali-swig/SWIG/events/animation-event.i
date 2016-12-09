@@ -80,8 +80,6 @@ using System.Runtime.InteropServices;
     public static readonly int MaximumSize = NDalicPINVOKE.Actor_Property_MAXIMUM_SIZE_get();
     public static readonly int InheritPosition = NDalicPINVOKE.Actor_Property_INHERIT_POSITION_get();
     public static readonly int ClippingMode = NDalicPINVOKE.Actor_Property_CLIPPING_MODE_get();
-    public static readonly int BatchParent = NDalicPINVOKE.Actor_Property_BATCH_PARENT_get();
-
 
     /**
       * @brief Event arguments that passed via Finished signal

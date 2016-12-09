@@ -43,6 +43,9 @@ extern const char * const OFFSET_SIZE_MODE( "offsetSizeMode" );
 extern const char * const ORIGIN( "origin" );
 extern const char * const ANCHOR_POINT( "anchorPoint" );
 
+// Premultipled alpha
+extern const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
+
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );

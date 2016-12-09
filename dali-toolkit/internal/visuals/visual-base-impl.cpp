@@ -61,23 +61,42 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( DevelVisual::Property::SHADER, CUSTOM_SHADER );
-  if( customShaderValue )
+  for( size_t i = 0; i < propertyMap.Count(); ++i )
   {
-    Property::Map shaderMap;
-    if( customShaderValue->Get( shaderMap ) )
+    const KeyValuePair& pair = propertyMap.GetKeyValue( i );
+    const Property::Key& key = pair.first;
+    const Property::Value& value = pair.second;
+    switch( key.indexKey )
     {
-      SetCustomShader( shaderMap );
-    }
-  }
+      case DevelVisual::Property::SHADER:
+      {
+        Property::Map shaderMap;
+        if( value.Get( shaderMap ) )
+        {
+          SetCustomShader( shaderMap );
+        }
+        break;
+      }
 
-  Property::Value* transform = propertyMap.Find( DevelVisual::Property::TRANSFORM, TRANSFORM );
-  if( transform )
-  {
-    Property::Map map;
-    if( transform->Get( map ) )
-    {
-      mImpl->mTransform.SetPropertyMap( map );
+      case DevelVisual::Property::TRANSFORM:
+      {
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          mImpl->mTransform.SetPropertyMap( map );
+        }
+        break;
+      }
+
+      case DevelVisual::Property::PREMULTIPLIED_ALPHA:
+      {
+        bool premultipliedAlpha( premultipliedAlpha );
+        if( value.Get( premultipliedAlpha ) )
+        {
+          EnablePreMultipliedAlpha( premultipliedAlpha );
+        }
+        break;
+      }
     }
   }
 
@@ -164,11 +183,14 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   Property::Map transform;
   mImpl->mTransform.GetPropertyMap( transform );
   map.Insert( DevelVisual::Property::TRANSFORM, transform );
+
+  bool premultipliedAlpha( IsPreMultipliedAlphaEnabled() );
+  map.Insert( DevelVisual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  if(preMultipled)
+  if( preMultipled )
   {
     mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
   }

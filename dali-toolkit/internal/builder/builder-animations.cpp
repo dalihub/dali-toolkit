@@ -231,12 +231,6 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
             DALI_SCRIPT_WARNING( "Cannot find property on object\n" );
             continue;
         }
-
-        if( propIndex == Property::INVALID_INDEX)
-        {
-          DALI_ASSERT_ALWAYS( propIndex != Property::INVALID_INDEX && "Animation must specify a valid property" );
-          continue;
-        }
       }
 
       // these are the defaults
