@@ -198,20 +198,20 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Ma
 }
 
 Internal::Visual::Base::Impl::Transform::Transform()
-: mOffset(0.0f,0.0f),
-  mSize(1.0f,1.0f),
-  mOffsetSizeMode(0.0f,0.0f,0.0f,0.0f),
-  mOrigin(Toolkit::Align::CENTER),
-  mAnchorPoint(Toolkit::Align::CENTER)
+: mOffset( 0.0f,0.0f ),
+  mSize( 1.0f,1.0f ),
+  mOffsetSizeMode( 0.0f,0.0f,0.0f,0.0f ),
+  mOrigin( Toolkit::Align::CENTER ),
+  mAnchorPoint( Toolkit::Align::CENTER )
 {
 }
 
 void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Map& map )
 {
   //Set default values
-  mOffset = Vector2(0.0f,0.0f);
-  mSize = Vector2(1.0f,1.0f);
-  mOffsetSizeMode = Vector4(0.0f,0.0f,0.0f,0.0f);
+  mOffset = Vector2( 0.0f,0.0f );
+  mSize = Vector2( 1.0f,1.0f );
+  mOffsetSizeMode = Vector4( 0.0f,0.0f,0.0f,0.0f );
   mOrigin = Toolkit::Align::CENTER;
   mAnchorPoint = Toolkit::Align::CENTER;
 
