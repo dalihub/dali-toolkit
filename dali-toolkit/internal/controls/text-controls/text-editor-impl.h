@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
-#include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -206,13 +205,6 @@ private: // Implementation
   void GetHandleImagePropertyValue(  Property::Value& value, Text::HandleType handleType, Text::HandleImageType handleImageType );
 
   /**
-   * @brief Enable or disable clipping.
-   *
-   * @param[in] size The area to clip within.
-   */
-  void EnableClipping( const Vector2& size );
-
-  /**
    * @brief Callback when keyboard is shown/hidden.
    *
    * @param[in] keyboardShown True if keyboard is shown.
@@ -265,7 +257,7 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
-  Text::ClipperPtr mClipper;
+  Toolkit::Control mStencil;
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
