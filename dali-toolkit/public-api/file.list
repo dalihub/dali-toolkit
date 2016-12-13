@@ -119,5 +119,4 @@ public_api_visuals_header_files = \
   $(public_api_src_dir)/visuals/image-visual-properties.h \
   $(public_api_src_dir)/visuals/mesh-visual-properties.h \
   $(public_api_src_dir)/visuals/primitive-visual-properties.h \
-  $(public_api_src_dir)/visuals/text-visual-properties.h \
   $(public_api_src_dir)/visuals/visual-properties.h

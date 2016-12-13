@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -565,7 +565,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
           // At this point the character common for all scripts has no font assigned.
           // If there is a valid previously cached default font for it, use that one.
           fontId = cachedDefaultFontId;
-          isValidFont = true;
         }
       }
       else
@@ -590,10 +589,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
           if( isValidFont &&
               isEmojiScript )
           {
-            const PixelData bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
-
-            // For color emojis, the font is valid if the bitmap is RGBA.
-            isValidFont = bitmap && ( Pixel::BGRA8888 == bitmap.GetPixelFormat() );
+            // For color emojis, the font is valid if the glyph is a color glyph (the bitmap is RGBA).
+            isValidFont = fontClient.IsColorGlyph( fontId, glyphIndex );
           }
 
           // If there is a valid font, cache it.

@@ -150,16 +150,6 @@ bool VisualFactoryCache::CleanRendererCache( const std::string& key )
   return false;
 }
 
-void VisualFactoryCache::CacheWireframeRenderer( Renderer& renderer )
-{
-  mWireframeRenderer = renderer;
-}
-
-Renderer VisualFactoryCache::GetWireframeRenderer()
-{
-  return mWireframeRenderer;
-}
-
 Geometry VisualFactoryCache::CreateQuadGeometry()
 {
   const float halfWidth = 0.5f;

@@ -143,6 +143,8 @@ public:
    * If the string is empty, ImageView will not display anything.
    *
    * @SINCE_1_0.0
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param[in] url The url of the image resource to display.
    * @return A handle to a newly allocated ImageView.
    */
@@ -154,6 +156,8 @@ public:
    * If the string is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.10
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param[in] url The url of the image resource to display.
    * @param [in] size The width and height to which to fit the loaded image.
    * @return A handle to a newly allocated ImageView.
@@ -218,6 +222,8 @@ public:
    * If the URL is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.4
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param[in] url The URL to the image resource to display.
    */
   void SetImage( const std::string& url );
@@ -228,6 +234,8 @@ public:
    * If the URL is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.10
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param[in] url The URL to the image resource to display.
    * @param [in] size The width and height to fit the loaded image to.
    */

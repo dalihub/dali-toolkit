@@ -107,39 +107,40 @@ BaseHandle CreateToast()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Popup, Toolkit::Control, Create )
 
 // Main content related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "title",                             MAP,              TITLE                  )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "content",                           MAP,              CONTENT                )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "footer",                            MAP,              FOOTER                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "displayState",                      STRING,           DISPLAY_STATE          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "touchTransparent",                  BOOLEAN,          TOUCH_TRANSPARENT      )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "title",                             MAP,              TITLE                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "content",                           MAP,              CONTENT                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "footer",                            MAP,              FOOTER                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "displayState",                      STRING,           DISPLAY_STATE           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "touchTransparent",                  BOOLEAN,          TOUCH_TRANSPARENT       )
 
 // Contextual related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailVisibility",                    BOOLEAN,          TAIL_VISIBILITY        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailPosition",                      VECTOR3,          TAIL_POSITION          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "contextualMode",                    STRING,           CONTEXTUAL_MODE        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailVisibility",                    BOOLEAN,          TAIL_VISIBILITY         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailPosition",                      VECTOR3,          TAIL_POSITION           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "contextualMode",                    STRING,           CONTEXTUAL_MODE         )
 
 // Animation related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationDuration",                 FLOAT,            ANIMATION_DURATION     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationMode",                     STRING,           ANIMATION_MODE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "entryAnimation",                    MAP,              ENTRY_ANIMATION        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "exitAnimation",                     MAP,              EXIT_ANIMATION         )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "autoHideDelay",                     INTEGER,          AUTO_HIDE_DELAY        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationDuration",                 FLOAT,            ANIMATION_DURATION      )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "animationMode",                     STRING,           ANIMATION_MODE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "entryAnimation",                    MAP,              ENTRY_ANIMATION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "exitAnimation",                     MAP,              EXIT_ANIMATION          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "autoHideDelay",                     INTEGER,          AUTO_HIDE_DELAY         )
 
 // Style related properties.
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingEnabled",                    BOOLEAN,          BACKING_ENABLED        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingColor",                      VECTOR4,          BACKING_COLOR          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popupBackgroundImage",              STRING,           POPUP_BACKGROUND_IMAGE )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailUpImage",                       STRING,           TAIL_UP_IMAGE          )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailDownImage",                     STRING,           TAIL_DOWN_IMAGE        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailLeftImage",                     STRING,           TAIL_LEFT_IMAGE        )
-DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailRightImage",                    STRING,           TAIL_RIGHT_IMAGE       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingEnabled",                    BOOLEAN,          BACKING_ENABLED         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "backingColor",                      VECTOR4,          BACKING_COLOR           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popupBackgroundImage",              STRING,           POPUP_BACKGROUND_IMAGE  )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "popupBackgroundBorder",             RECTANGLE,        POPUP_BACKGROUND_BORDER )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailUpImage",                       STRING,           TAIL_UP_IMAGE           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailDownImage",                     STRING,           TAIL_DOWN_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailLeftImage",                     STRING,           TAIL_LEFT_IMAGE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Popup, "tailRightImage",                    STRING,           TAIL_RIGHT_IMAGE        )
 
 // Signals.
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "touchedOutside",                                      SIGNAL_TOUCHED_OUTSIDE )
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "showing",                                             SIGNAL_SHOWING         )
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "shown",                                               SIGNAL_SHOWN           )
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "hiding",                                              SIGNAL_HIDING          )
-DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "hidden",                                              SIGNAL_HIDDEN          )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "touchedOutside",                                      SIGNAL_TOUCHED_OUTSIDE  )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "showing",                                             SIGNAL_SHOWING          )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "shown",                                               SIGNAL_SHOWN            )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "hiding",                                              SIGNAL_HIDING           )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Popup, "hidden",                                              SIGNAL_HIDDEN           )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -191,7 +192,7 @@ const char*   DEFAULT_TAIL_LEFT_IMAGE_PATH =      DALI_IMAGE_DIR "popup_tail_lef
 const char*   DEFAULT_TAIL_RIGHT_IMAGE_PATH =     DALI_IMAGE_DIR "popup_tail_right.png";    ///< Tail right image.
 
 const Vector4 DEFAULT_BACKING_COLOR( 0.0f, 0.0f, 0.0f, 0.5f );                              ///< Color of the dimmed backing.
-const Vector3 BACKGROUND_OUTER_BORDER( 40.0f, 30.0f, 0.0f );                                ///< External border.
+const Rect<int> DEFAULT_BACKGROUND_BORDER( 17, 17, 13, 13 );                                ///< Default border of the background.
 const Rect<float>  DEFAULT_TITLE_PADDING( 20.0f, 20.0f, 20.0f, 20.0f );                     ///< Title padding used on popups with content and/or controls (from Tizen GUI UX).
 const Rect<float>  DEFAULT_TITLE_ONLY_PADDING( 8.0f, 8.0f, 8.0f, 8.0f );                    ///< Title padding used on popups with a title only (like toast popups).
 const Vector3 FOOTER_SIZE( 620.0f, 96.0f,0.0f );                                            ///< Default size of the bottom control area.
@@ -251,7 +252,7 @@ Popup::Popup()
   mBackingEnabled( true ),
   mBackingColor( DEFAULT_BACKING_COLOR ),
   mPopupBackgroundImage(),
-  mBackgroundOuterBorder(),
+  mBackgroundBorder( DEFAULT_BACKGROUND_BORDER ),
   mMargin(),
   mTailUpImage( DEFAULT_TAIL_UP_IMAGE_PATH ),
   mTailDownImage( DEFAULT_TAIL_DOWN_IMAGE_PATH ),
@@ -567,7 +568,11 @@ void Popup::SetPopupBackgroundImage( Actor image )
   // Removes any previous background.
   if( mPopupBackgroundImage )
   {
-    mPopupContainer.Remove( mPopupBackgroundImage );
+    mPopupBackgroundImage.Unparent();
+    if( mTailImage )
+    {
+      mTailImage.Unparent();
+    }
   }
 
   // Adds new background to the dialog.
@@ -580,13 +585,17 @@ void Popup::SetPopupBackgroundImage( Actor image )
   mPopupBackgroundImage.TouchSignal().Connect( this, &Popup::OnDialogTouched );
 
   // Set the popup border to be slightly larger than the layout contents.
-  mPopupBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
-  mPopupBackgroundImage.SetSizeModeFactor( BACKGROUND_OUTER_BORDER );
+  UpdateBackgroundPositionAndSize();
 
   const bool prevAlter = mAlterAddedChild;
   mAlterAddedChild = false;
   mPopupContainer.Add( mPopupBackgroundImage );
   mAlterAddedChild = prevAlter;
+
+  if( mTailImage )
+  {
+    mPopupBackgroundImage.Add( mTailImage );
+  }
 
   mLayoutDirty = true;
 }
@@ -838,25 +847,35 @@ void Popup::LayoutTail()
     return;
   }
 
-  const Vector3& position = GetTailPosition();
+  const Vector3& parentOrigin = GetTailPosition();
+  Vector3 position;
   std::string image;
+  Vector3 anchorPoint;
 
   // depending on position of tail around ParentOrigin, a different tail image is used...
-  if( position.y < Math::MACHINE_EPSILON_1 )
+  if( parentOrigin.y < Math::MACHINE_EPSILON_1 )
   {
     image = mTailUpImage;
+    anchorPoint = AnchorPoint::BOTTOM_CENTER;
+    position.y = mBackgroundBorder.top;
   }
-  else if( position.y > 1.0f - Math::MACHINE_EPSILON_1 )
+  else if( parentOrigin.y > ( 1.0f - Math::MACHINE_EPSILON_1 ) )
   {
     image = mTailDownImage;
+    anchorPoint = AnchorPoint::TOP_CENTER;
+    position.y = - mBackgroundBorder.bottom;
   }
-  else if( position.x < Math::MACHINE_EPSILON_1 )
+  else if( parentOrigin.x < Math::MACHINE_EPSILON_1 )
   {
     image = mTailLeftImage;
+    anchorPoint = AnchorPoint::CENTER_RIGHT;
+    position.x = mBackgroundBorder.left;
   }
-  else if( position.x > 1.0f - Math::MACHINE_EPSILON_1 )
+  else if( parentOrigin.x > ( 1.0f - Math::MACHINE_EPSILON_1 ) )
   {
     image = mTailRightImage;
+    anchorPoint = AnchorPoint::CENTER_LEFT;
+    position.x = - mBackgroundBorder.right;
   }
 
   if( !image.empty() )
@@ -864,11 +883,14 @@ void Popup::LayoutTail()
     // Adds the tail actor.
     mTailImage = Toolkit::ImageView::New( image );
     mTailImage.SetName( "tailImage" );
-    const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
-    mTailImage.SetParentOrigin( position );
+    mTailImage.SetParentOrigin( parentOrigin );
     mTailImage.SetAnchorPoint( anchorPoint );
+    mTailImage.SetPosition( position );
 
-    mPopupContainer.Add( mTailImage );
+    if( mPopupBackgroundImage )
+    {
+      mPopupBackgroundImage.Add( mTailImage );
+    }
   }
 }
 
@@ -988,6 +1010,18 @@ void Popup::SetExitAnimationData( const Property::Map& map )
   Scripting::NewAnimation( map, mExitAnimationData );
 }
 
+void Popup::UpdateBackgroundPositionAndSize()
+{
+  if( mPopupBackgroundImage )
+  {
+    mPopupBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
+    mPopupBackgroundImage.SetSizeModeFactor( Vector3( mBackgroundBorder.left + mBackgroundBorder.right, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f ) );
+
+    // Adjust the position of the background so the transparent areas are set appropriately
+    mPopupBackgroundImage.SetPosition( ( mBackgroundBorder.right - mBackgroundBorder.left ) * 0.5f, ( mBackgroundBorder.bottom - mBackgroundBorder.top ) * 0.5f );
+  }
+}
+
 void Popup::SetAutoHideDelay( int delay )
 {
   mAutoHideDelay = delay;
@@ -1025,6 +1059,7 @@ void Popup::SetTailUpImage( std::string image )
 {
   mTailUpImage = image;
   mLayoutDirty = true;
+  LayoutTail();
 }
 
 const std::string& Popup::GetTailUpImage() const
@@ -1036,6 +1071,7 @@ void Popup::SetTailDownImage( std::string image )
 {
   mTailDownImage = image;
   mLayoutDirty = true;
+  LayoutTail();
 }
 
 const std::string& Popup::GetTailDownImage() const
@@ -1047,6 +1083,7 @@ void Popup::SetTailLeftImage( std::string image )
 {
   mTailLeftImage = image;
   mLayoutDirty = true;
+  LayoutTail();
 }
 
 const std::string& Popup::GetTailLeftImage() const
@@ -1058,6 +1095,7 @@ void Popup::SetTailRightImage( std::string image )
 {
   mTailRightImage = image;
   mLayoutDirty = true;
+  LayoutTail();
 }
 
 const std::string& Popup::GetTailRightImage() const
@@ -1242,6 +1280,31 @@ void Popup::SetProperty( BaseObject* object, Property::Index propertyIndex, cons
         }
         break;
       }
+      case Toolkit::Popup::Property::POPUP_BACKGROUND_BORDER:
+      {
+        bool valueUpdated = false;
+
+        Vector4 valueVector4;
+        if( value.Get( popupImpl.mBackgroundBorder ) )
+        {
+          valueUpdated = true;
+        }
+        else if( value.Get( valueVector4 ) )
+        {
+          popupImpl.mBackgroundBorder.left   = valueVector4.x;
+          popupImpl.mBackgroundBorder.right  = valueVector4.y;
+          popupImpl.mBackgroundBorder.bottom = valueVector4.z;
+          popupImpl.mBackgroundBorder.top    = valueVector4.w;
+          valueUpdated = true;
+        }
+
+        if( valueUpdated )
+        {
+          popupImpl.LayoutTail(); // Update the tail if required
+          popupImpl.UpdateBackgroundPositionAndSize(); // Update the background's size and position
+        }
+        break;
+      }
       case Toolkit::Popup::Property::TAIL_UP_IMAGE:
       {
         std::string valueString;
@@ -1386,6 +1449,11 @@ Property::Value Popup::GetProperty( BaseObject* object, Property::Index property
         {
           value = imageView.GetProperty( Toolkit::ImageView::Property::IMAGE );
         }
+        break;
+      }
+      case Toolkit::Popup::Property::POPUP_BACKGROUND_BORDER:
+      {
+        value = popupImpl.mBackgroundBorder;
         break;
       }
       case Toolkit::Popup::Property::TAIL_UP_IMAGE:

@@ -61,9 +61,8 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] imageUrl The URL to svg resource to use
-   * @param[in] size The required size for the SVG
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
 
 public:  // from Visual
 
@@ -73,24 +72,9 @@ public:  // from Visual
   virtual void GetNaturalSize( Vector2& naturalSize );
 
   /**
-   * @copydoc Visual::Base::SetSize
-   */
-  virtual void SetSize( const Vector2& size );
-
-  /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
-
-  /**
-   * @copydoc Visual::Base::DoSetProperty
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @copydoc Visual::Base::DoGetProperty
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
 
@@ -121,6 +105,11 @@ protected:
    */
   virtual void DoSetOffStage( Actor& actor );
 
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
+
 public:
 
   /**
@@ -136,9 +125,8 @@ private:
    * @brief Parses the SVG Image from the set URL.
    *
    * @param[in] imageUrl The URL of the image to parse the SVG from.
-   * @param[in] size The required size of the SVG
    */
-  void ParseFromUrl( const std::string& imageUrl, ImageDimensions size = ImageDimensions() );
+  void ParseFromUrl( const std::string& imageUrl );
 
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
@@ -159,7 +147,7 @@ private:
   std::string          mImageUrl;
   NSVGimage*           mParsedImage;
   WeakHandle<Actor>    mPlacementActor;
-
+  Vector2              mVisualSize;
 };
 
 } // namespace Internal

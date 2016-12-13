@@ -50,11 +50,6 @@ public:
 public:  // from Visual
 
   /**
-   * @copydoc Visual::Base::SetSize
-   */
-  virtual void SetSize( const Vector2& size );
-
-  /**
    * @copydoc Visual::Base::GetNaturalSize
    */
   virtual void GetNaturalSize( Vector2& naturalSize );
@@ -63,16 +58,6 @@ public:  // from Visual
    * @copydoc Visual::Base::CreatePropertyMap
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
-
-  /**
-   * @copydoc Visual::Base::DoSetProperty
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @copydoc Visual::Base::DoGetProperty
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
 
 protected:
 
@@ -102,6 +87,11 @@ protected:
    * @copydoc Visual::Base::DoSetOffStage
    */
   virtual void DoSetOffStage( Actor& actor );
+
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  virtual void OnSetTransform();
 
 private:
 

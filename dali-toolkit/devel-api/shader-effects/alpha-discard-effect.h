@@ -42,7 +42,7 @@ namespace Toolkit
  *   Property::Map alphaDiscardEffect = CreateAlphaDiscardEffect();
  *   actor.SetProperty( ImageView::Property::IMAGE, alphaDiscardEffect );
  *
- * @return A handle to a newly allocated ShaderEffect.
+ * @return A property map of the required shaders.
  */
 inline Property::Map CreateAlphaDiscardEffect()
 {

@@ -4,6 +4,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/builder/builder.cpp \
   $(devel_api_src_dir)/builder/json-parser.cpp \
   $(devel_api_src_dir)/builder/tree-node.cpp \
+  $(devel_api_src_dir)/controls/control-wrapper.cpp \
+  $(devel_api_src_dir)/controls/control-wrapper-impl.cpp \
   $(devel_api_src_dir)/controls/bloom-view/bloom-view.cpp \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
@@ -39,7 +41,9 @@ devel_api_header_files = \
   $(devel_api_src_dir)/align-enums.h
 
 devel_api_controls_header_files = \
-  $(devel_api_src_dir)/controls/control-depth-index-ranges.h
+  $(devel_api_src_dir)/controls/control-depth-index-ranges.h \
+  $(devel_api_src_dir)/controls/control-wrapper.h \
+  $(devel_api_src_dir)/controls/control-wrapper-impl.h
 
 devel_api_bloom_view_header_files = \
   $(devel_api_src_dir)/controls/bloom-view/bloom-view.h
@@ -76,9 +80,12 @@ devel_api_progress_bar_header_files = \
 
 devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.h \
-  $(devel_api_src_dir)/visual-factory/devel-visual-properties.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
+
+devel_api_visuals_header_files = \
+  $(devel_api_src_dir)/visuals/text-visual-properties.h \
+  $(devel_api_src_dir)/visuals/visual-properties-devel.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
@@ -96,29 +103,11 @@ devel_api_scripting_header_files = \
 
 devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
-  $(devel_api_src_dir)/shader-effects/bendy-effect.h \
-  $(devel_api_src_dir)/shader-effects/blind-effect.h \
-  $(devel_api_src_dir)/shader-effects/bouncing-effect.h \
-  $(devel_api_src_dir)/shader-effects/carousel-effect.h \
-  $(devel_api_src_dir)/shader-effects/displacement-effect.h \
   $(devel_api_src_dir)/shader-effects/dissolve-effect.h \
-  $(devel_api_src_dir)/shader-effects/dissolve-local-effect.h \
   $(devel_api_src_dir)/shader-effects/distance-field-effect.h \
   $(devel_api_src_dir)/shader-effects/image-region-effect.h \
-  $(devel_api_src_dir)/shader-effects/iris-effect.h \
-  $(devel_api_src_dir)/shader-effects/mask-effect.h \
-  $(devel_api_src_dir)/shader-effects/mirror-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
-  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h \
-  $(devel_api_src_dir)/shader-effects/overlay-effect.h \
-  $(devel_api_src_dir)/shader-effects/quadratic-bezier.h \
-  $(devel_api_src_dir)/shader-effects/ripple-effect.h \
-  $(devel_api_src_dir)/shader-effects/ripple2d-effect.h \
-  $(devel_api_src_dir)/shader-effects/shear-effect.h \
-  $(devel_api_src_dir)/shader-effects/soft-button-effect.h \
-  $(devel_api_src_dir)/shader-effects/spot-effect.h \
-  $(devel_api_src_dir)/shader-effects/square-dissolve-effect.h \
-  $(devel_api_src_dir)/shader-effects/swirl-effect.h
+  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h
 
 devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h

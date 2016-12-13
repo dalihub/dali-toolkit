@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -61,27 +61,53 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 
 void Visual::Base::SetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* customShaderValue = propertyMap.Find( VisualProperty::SHADER, CUSTOM_SHADER );
-  if( customShaderValue )
+  for( size_t i = 0; i < propertyMap.Count(); ++i )
   {
-    Property::Map shaderMap;
-    if( customShaderValue->Get( shaderMap ) )
+    const KeyValuePair& pair = propertyMap.GetKeyValue( i );
+    const Property::Key& key = pair.first;
+    const Property::Value& value = pair.second;
+    switch( key.indexKey )
     {
-      SetCustomShader( shaderMap );
-    }
-  }
+      case DevelVisual::Property::SHADER:
+      {
+        Property::Map shaderMap;
+        if( value.Get( shaderMap ) )
+        {
+          SetCustomShader( shaderMap );
+        }
+        break;
+      }
 
-  Property::Value* transform = propertyMap.Find( Toolkit::Visual::DevelProperty::TRANSFORM, TRANSFORM );
-  if( transform )
-  {
-    Property::Map map;
-    if( transform->Get( map ) )
-    {
-      mImpl->mTransform.SetPropertyMap( map );
+      case DevelVisual::Property::TRANSFORM:
+      {
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          mImpl->mTransform.SetPropertyMap( map );
+        }
+        break;
+      }
+
+      case DevelVisual::Property::PREMULTIPLIED_ALPHA:
+      {
+        bool premultipliedAlpha( premultipliedAlpha );
+        if( value.Get( premultipliedAlpha ) )
+        {
+          EnablePreMultipliedAlpha( premultipliedAlpha );
+        }
+        break;
+      }
     }
   }
 
   DoSetProperties( propertyMap );
+}
+
+void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
+{
+  mImpl->mControlSize = controlSize;
+  mImpl->mTransform.SetPropertyMap( transform );
+  OnSetTransform();
 }
 
 void Visual::Base::SetName( const std::string& name )
@@ -92,16 +118,6 @@ void Visual::Base::SetName( const std::string& name )
 const std::string& Visual::Base::GetName()
 {
   return mImpl->mName;
-}
-
-void Visual::Base::SetSize( const Vector2& size )
-{
-  mImpl->mSize = size;
-}
-
-const Vector2& Visual::Base::GetSize() const
-{
-  return mImpl->mSize;
 }
 
 float Visual::Base::GetHeightForWidth( float width ) const
@@ -130,15 +146,18 @@ float Visual::Base::GetDepthIndex() const
 
 void Visual::Base::SetOnStage( Actor& actor )
 {
-  // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
-  // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
-  DoSetOnStage( actor );
-
-  if( mImpl->mRenderer )
+  if( !IsOnStage() )
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-    mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-    mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+    // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
+    // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
+    DoSetOnStage( actor );
+
+    if( mImpl->mRenderer )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+      mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+      mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+    }
   }
 }
 
@@ -163,12 +182,15 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 
   Property::Map transform;
   mImpl->mTransform.GetPropertyMap( transform );
-  map.Insert( Toolkit::Visual::DevelProperty::TRANSFORM, transform );
+  map.Insert( DevelVisual::Property::TRANSFORM, transform );
+
+  bool premultipliedAlpha( IsPreMultipliedAlphaEnabled() );
+  map.Insert( DevelVisual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  if(preMultipled)
+  if( preMultipled )
   {
     mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
   }
@@ -202,58 +224,6 @@ bool Visual::Base::IsOnStage() const
 bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
-}
-
-void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
-                      ( index > VISUAL_PROPERTY_BASE_START_INDEX ) && // Change the type of visual is not allowed.
-                      "Property index is out of bounds" );
-
-  if( index < VISUAL_PROPERTY_START_INDEX )
-  {
-    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
-    {
-      Property::Map* map = propertyValue.GetMap();
-      if( map )
-      {
-        mImpl->mTransform.SetPropertyMap( *map );
-        OnSetTransform();
-      }
-    }
-
-    // TODO set the properties of the visual base.
-  }
-  else
-  {
-    DoSetProperty( index, propertyValue );
-  }
-}
-
-Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
-{
-  DALI_ASSERT_ALWAYS( ( index > Property::INVALID_INDEX ) &&
-                      ( index >= VISUAL_PROPERTY_BASE_START_INDEX ) &&
-                      "Property index is out of bounds" );
-
-  Dali::Property::Value value;
-
-  if( index < VISUAL_PROPERTY_START_INDEX )
-  {
-    if( index == Dali::Toolkit::Visual::DevelProperty::TRANSFORM )
-    {
-      Property::Map map;
-      mImpl->mTransform.GetPropertyMap( map );
-      return map;
-    }
-    // TODO retrieve the properties of the visual base.
-  }
-  else
-  {
-    value = DoGetProperty( index );
-  }
-
-  return value;
 }
 
 } // namespace Internal

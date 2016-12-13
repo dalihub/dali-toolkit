@@ -31,7 +31,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -122,7 +122,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
+    mediump vec4 vertexPosition = uMvpMatrix * ComputeVertexPosition();\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -286,6 +286,8 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
     desiredHeightValue->Get( desiredHeight );
   }
 
+  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
+
   Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
   if( pixelAreaValue )
   {
@@ -307,8 +309,6 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
     Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
     mWrapModeV = Dali::WrapMode::Type( value );
   }
-
-  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 
   Property::Value* syncLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
   if( syncLoading )
@@ -522,7 +522,7 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
 
 void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 {
-  mImpl->mRenderer.Reset();
+  DALI_ASSERT_DEBUG( !mImpl->mRenderer && "Renderer should have been removed from stage and already reset before initialization" );
 
   mImageUrl = imageUrl;
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
@@ -586,8 +586,9 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 
 void ImageVisual::InitializeRenderer( const Image& image )
 {
+  DALI_ASSERT_DEBUG( !mImpl->mRenderer && "Renderer should have been removed from stage and already reset before initialization" );
+
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
-  mImpl->mRenderer.Reset();
 
   // don't reuse CreateTextureSet
   TextureSet textures = TextureSet::New();
@@ -668,7 +669,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
 
   bool sync = IsSynchronousResourceLoading();
   map.Insert( SYNCHRONOUS_LOADING, sync );
@@ -696,17 +697,6 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
-}
-
-void ImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value ImageVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
 }
 
 void ImageVisual::OnSetTransform()

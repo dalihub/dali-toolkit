@@ -81,14 +81,9 @@ protected:
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
   /**
-   * @copydoc Visual::Base::DoSetProperty
+   * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
-
-  /**
-   * @copydoc Visual::Base::DoGetProperty
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index );
+  virtual void OnSetTransform();
 
 private:
   /**

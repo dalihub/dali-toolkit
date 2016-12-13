@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/devel-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>

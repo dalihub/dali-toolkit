@@ -174,7 +174,7 @@ TransitionData::Animator* TransitionData::ConvertMap( const Property::Map& map)
             bool valid = true;
             Vector4 controlPoints;
             Property::Array *array = value.GetArray();
-            if( array->Count() >= 4 )
+            if( array && array->Count() >= 4 )
             {
               for( size_t vecIdx = 0; vecIdx < 4; ++vecIdx )
               {

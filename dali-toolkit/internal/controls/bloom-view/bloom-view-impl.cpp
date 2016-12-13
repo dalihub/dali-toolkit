@@ -34,7 +34,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 
 namespace Dali
@@ -378,7 +378,7 @@ void BloomView::AllocateResources()
     Property::Map customShader;
     customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
     Property::Map visualMap;
-    visualMap.Insert( Toolkit::VisualProperty::SHADER, customShader );
+    visualMap.Insert( Toolkit::DevelVisual::Property::SHADER, customShader );
     mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
     // set GaussianBlurView to blur our extracted bloom
@@ -388,7 +388,7 @@ void BloomView::AllocateResources()
     mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
     // Create shader used to composite bloom and original image to output render target
     customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = COMPOSITE_FRAGMENT_SOURCE;
-    visualMap[ Toolkit::VisualProperty::SHADER ] = customShader;
+    visualMap[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
     mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
     TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
     TextureSetImage( textureSet, 1u, mBlurExtractTarget );

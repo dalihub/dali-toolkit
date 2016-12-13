@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,11 +123,6 @@ public:
 private: // From Control
 
   /**
-   * @copydoc Toolkit::Control::OnSizeSet()
-   */
-  virtual void OnSizeSet( const Vector3& targetSize );
-
-  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   virtual Vector3 GetNaturalSize();
@@ -142,6 +137,11 @@ private: // From Control
    */
   virtual float GetWidthForHeight( float height );
 
+  /**
+   * @copydoc Toolkit::Control::OnRelayout()
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
 private:
   // Undefined
   ImageView( const ImageView& );
@@ -150,7 +150,6 @@ private:
 private:
   Toolkit::Visual::Base  mVisual;
   ImageDimensions        mImageSize;
-  Vector2                mSizeSet;
 
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise

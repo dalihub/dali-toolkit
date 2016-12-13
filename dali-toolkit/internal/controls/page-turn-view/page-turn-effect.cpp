@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 
 using namespace Dali;
@@ -337,7 +337,7 @@ Property::Map Dali::Toolkit::Internal::CreatePageTurnEffect()
   customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
   customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
 
-  map[ Toolkit::VisualProperty::SHADER ] = customShader;
+  map[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
   return map;
 
 }

@@ -29,6 +29,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -38,12 +39,13 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
+#include <dali-toolkit/devel-api/align-enums.h>
 
 namespace Dali
 {
@@ -133,7 +135,7 @@ HandleIndex GetVisualProperty(
   if( iter != visuals.End() )
   {
     Actor self = controlImpl.Self();
-    Property::Index index = self.GetPropertyIndex( propertyKey );
+    Property::Index index = DevelHandle::GetPropertyIndex( self, propertyKey );
     if( index != Property::INVALID_INDEX )
     {
       // It's an actor property:
@@ -146,7 +148,7 @@ HandleIndex GetVisualProperty(
       {
         // @todo Need to use correct renderer index
         Renderer renderer = self.GetRendererAt(0);
-        Property::Index index = renderer.GetPropertyIndex( propertyKey );
+        Property::Index index = DevelHandle::GetPropertyIndex( renderer, propertyKey );
         if( index != Property::INVALID_INDEX )
         {
           // It's a renderer property:
@@ -165,6 +167,16 @@ HandleIndex GetVisualProperty(
   return HandleIndex( handle, Property::INVALID_INDEX );
 }
 
+void SetDefaultTransform( Property::Map& propertyMap )
+{
+  propertyMap.Clear();
+  propertyMap
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+}
 
 /**
  * Creates control through type registry
@@ -292,7 +304,6 @@ public:
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
     mStyleName(""),
-    mBackgroundVisual(),
     mBackgroundColor(Color::TRANSPARENT),
     mStartingPinchScale( NULL ),
     mKeyEventSignal(),
@@ -375,7 +386,7 @@ public:
           }
           else
           {
-            // An empty map means the background is no longer required
+            // An empty image means the background is no longer required
             controlImpl.ClearBackground();
           }
           break;
@@ -396,14 +407,25 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND:
         {
+          std::string url;
           const Property::Map* map = value.GetMap();
-          if( map )
+          if( map && !map->Empty() )
           {
             controlImpl.SetBackground( *map );
           }
+          else if( value.Get( url ) )
+          {
+            // don't know the size to load
+            Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
+            if( visual )
+            {
+              controlImpl.RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+              visual.SetDepthIndex( DepthIndex::BACKGROUND );
+            }
+          }
           else
           {
-            // The background is not a property map, so we should clear the background
+            // The background is an empty property map, so we should clear the background
             controlImpl.ClearBackground();
           }
           break;
@@ -447,9 +469,10 @@ public:
         {
           DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundVisual )
+          Toolkit::Visual::Base visual = controlImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
+          if( visual )
           {
-            controlImpl.mImpl->mBackgroundVisual.CreatePropertyMap( map );
+            visual.CreatePropertyMap( map );
           }
           value = map;
           break;
@@ -464,9 +487,10 @@ public:
         case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
-          if( controlImpl.mImpl->mBackgroundVisual )
+          Toolkit::Visual::Base visual = controlImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
+          if( visual )
           {
-            (controlImpl.mImpl->mBackgroundVisual).CreatePropertyMap( map );
+            visual.CreatePropertyMap( map );
           }
 
           value = map;
@@ -484,7 +508,6 @@ public:
   Control& mControlImpl;
   RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
-  Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
   Vector4 mBackgroundColor;                       ///< The color of the background visual
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
@@ -531,11 +554,6 @@ Toolkit::Control Control::New()
   return handle;
 }
 
-Control::~Control()
-{
-  delete mImpl;
-}
-
 void Control::SetStyleName( const std::string& styleName )
 {
   if( styleName != mImpl->mStyleName )
@@ -560,14 +578,10 @@ void Control::SetBackgroundColor( const Vector4& color )
 {
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ Toolkit::VisualProperty::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::DevelVisual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
-  if( mImpl->mBackgroundVisual )
-  {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
-  }
+
+  SetBackground( map );
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -577,33 +591,35 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground( const Property::Map& map )
 {
-  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  if( visual )
   {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+    RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+    visual.SetDepthIndex( DepthIndex::BACKGROUND );
+
+    // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
+    RelayoutRequest();
   }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
-  mImpl->mBackgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
-  RegisterVisual( Toolkit::Control::Property::BACKGROUND, mImpl->mBackgroundVisual );
-  if( mImpl->mBackgroundVisual )
+  DALI_LOG_WARNING( "SetBackgroundImage is for the depreciated Property::BACKGROUND_IMAGE use SetBackground( const Property::Map& map )\n" );
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( image );
+  if( visual )
   {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+    RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+    visual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::ClearBackground()
 {
-  if( mImpl->mBackgroundVisual )
-  {
-    Actor self( Self() );
-    Toolkit::GetImplementation( mImpl->mBackgroundVisual ).SetOffStage( self );
-    mImpl->mBackgroundVisual.Reset();
-  }
-  mImpl->mBackgroundColor = Color::TRANSPARENT;
+   UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
+   mImpl->mBackgroundColor = Color::TRANSPARENT;
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   RelayoutRequest();
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -755,22 +771,22 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
   bool visualReplaced ( false );
   Actor self = Self();
 
-  if ( !mImpl->mVisuals.Empty() )
+  if( !mImpl->mVisuals.Empty() )
   {
-      RegisteredVisualContainer::Iterator iter;
-      // Check if visual (index) is already registered.  Replace if so.
-      if ( FindVisual( index, mImpl->mVisuals, iter ) )
+    RegisteredVisualContainer::Iterator iter;
+    // Check if visual (index) is already registered.  Replace if so.
+    if ( FindVisual( index, mImpl->mVisuals, iter ) )
+    {
+      if( (*iter)->visual && self.OnStage() )
       {
-        if( (*iter)->visual && self.OnStage() )
-        {
-          Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
-        }
-        (*iter)->visual = visual;
-        visualReplaced = true;
+        Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
       }
+      (*iter)->visual = visual;
+      visualReplaced = true;
+    }
   }
 
-  if ( !visualReplaced ) // New registration entry
+  if( !visualReplaced ) // New registration entry
   {
     mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
   }
@@ -783,11 +799,14 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
 
 void Control::UnregisterVisual( Property::Index index )
 {
-  RegisteredVisualContainer::Iterator iter;
-  if ( FindVisual( index, mImpl->mVisuals, iter ) )
-  {
-    mImpl->mVisuals.Erase( iter );
-  }
+   RegisteredVisualContainer::Iterator iter;
+   if ( FindVisual( index, mImpl->mVisuals, iter ) )
+   {
+     Actor self( Self() );
+     Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+     (*iter)->visual.Reset();
+     mImpl->mVisuals.Erase( iter );
+   }
 }
 
 Toolkit::Visual::Base Control::GetVisual( Property::Index index ) const
@@ -808,6 +827,7 @@ void Control::EnableVisual( Property::Index index, bool enable )
   {
     if (  (*iter)->enabled == enable )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual Already enabled set (%s) \n", enable?"enabled":"disabled");
       return;
     }
 
@@ -817,11 +837,12 @@ void Control::EnableVisual( Property::Index index, bool enable )
     {
       if ( enable )
       {
-
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting Visual(%d) on stage \n", index );
         Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
       }
       else
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting Visual(%d) off stage \n", index );
         Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
       }
     }
@@ -857,7 +878,7 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
       Actor child = Self().FindChildByName( animator->objectName );
       if( child )
       {
-        Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
+        Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
         handleIndex = HandleIndex( child, propertyIndex );
       }
       else
@@ -986,6 +1007,11 @@ Control::Control( ControlBehaviour behaviourFlags )
   mImpl->mFlags = behaviourFlags;
 }
 
+Control::~Control()
+{
+  delete mImpl;
+}
+
 void Control::Initialize()
 {
   // Call deriving classes so initialised before styling is applied to them.
@@ -1089,11 +1115,14 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
+
   for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
     // Check whether the visual is empty and enabled
     if( (*iter)->visual && (*iter)->enabled )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection Setting visual(%d) on stage\n", (*iter)->index );
       Actor self( Self() );
       Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
     }
@@ -1107,6 +1136,7 @@ void Control::OnStageDisconnection()
     // Check whether the visual is empty
     if( (*iter)->visual )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageDisconnection Setting visual(%d) off stage\n", (*iter)->index );
       Actor self( Self() );
       Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
     }
@@ -1137,10 +1167,13 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
   {
     Vector2 size( targetSize );
-    mImpl->mBackgroundVisual.SetSize( size );
+    Property::Map transformMap;
+    SetDefaultTransform( transformMap );
+    visual.SetTransformAndSize( transformMap, size );
   }
 }
 
@@ -1175,6 +1208,15 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   {
     container.Add( Self().GetChildAt( i ), size );
   }
+
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
+  {
+    Vector2 controlSize( size );
+    Property::Map transformMap;
+    SetDefaultTransform( transformMap );
+    visual.SetTransformAndSize( transformMap, controlSize );
+  }
 }
 
 void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
@@ -1183,11 +1225,12 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
   {
     Vector2 naturalSize;
-    mImpl->mBackgroundVisual.GetNaturalSize(naturalSize);
-    return Vector3(naturalSize);
+    visual.GetNaturalSize( naturalSize );
+    return Vector3( naturalSize );
   }
   return Vector3::ZERO;
 }

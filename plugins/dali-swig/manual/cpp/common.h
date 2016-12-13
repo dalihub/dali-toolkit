@@ -1,8 +1,50 @@
-#ifndef CSHARP_COMMON
-#define CSHARP_COMMON
-#endif
+#ifndef CSHARP_COMMON_H
+#define CSHARP_COMMON_H
+
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #define SWIG_DIRECTORS
+
+#ifdef __cplusplus
+/* SwigValueWrapper is described in swig.swg */
+template<typename T> class SwigValueWrapper
+{
+  struct SwigMovePointer
+  {
+    T *ptr;
+    SwigMovePointer(T *p) : ptr(p) { }
+    ~SwigMovePointer() { delete ptr; }
+    SwigMovePointer& operator=(SwigMovePointer& rhs) { T* oldptr = ptr; ptr = 0; delete oldptr; ptr = rhs.ptr; rhs.ptr = 0; return *this; }
+  } pointer;
+  SwigValueWrapper& operator=(const SwigValueWrapper<T>& rhs);
+  SwigValueWrapper(const SwigValueWrapper<T>& rhs);
+public:
+  SwigValueWrapper() : pointer(0) { }
+  SwigValueWrapper& operator=(const T& t) { SwigMovePointer tmp(new T(t)); pointer = tmp; return *this; }
+  operator T&() const { return *pointer.ptr; }
+  T *operator&() { return pointer.ptr; }
+};
+
+template <typename T> T SwigValueInit()
+{
+  return T();
+}
+#endif
 
 #include <stdexcept>
 
@@ -65,7 +107,8 @@
 
 /* Support for throwing C# exceptions from C/C++. There are two types:
  * Exceptions that take a message and ArgumentExceptions that take a message and a parameter name. */
-typedef enum {
+typedef enum
+{
   SWIG_CSharpApplicationException,
   SWIG_CSharpArithmeticException,
   SWIG_CSharpDivideByZeroException,
@@ -79,7 +122,8 @@ typedef enum {
   SWIG_CSharpSystemException
 } SWIG_CSharpExceptionCodes;
 
-typedef enum {
+typedef enum
+{
   SWIG_CSharpArgumentException,
   SWIG_CSharpArgumentNullException,
   SWIG_CSharpArgumentOutOfRangeException
@@ -88,17 +132,20 @@ typedef enum {
 typedef void (SWIGSTDCALL* SWIG_CSharpExceptionCallback_t)(const char *);
 typedef void (SWIGSTDCALL* SWIG_CSharpExceptionArgumentCallback_t)(const char *, const char *);
 
-typedef struct {
+typedef struct
+{
   SWIG_CSharpExceptionCodes code;
   SWIG_CSharpExceptionCallback_t callback;
 } SWIG_CSharpException_t;
 
-typedef struct {
+typedef struct
+{
   SWIG_CSharpExceptionArgumentCodes code;
   SWIG_CSharpExceptionArgumentCallback_t callback;
 } SWIG_CSharpExceptionArgument_t;
 
-static SWIG_CSharpException_t SWIG_csharp_exceptions[] = {
+static SWIG_CSharpException_t SWIG_csharp_exceptions[] =
+{
   { SWIG_CSharpApplicationException, NULL },
   { SWIG_CSharpArithmeticException, NULL },
   { SWIG_CSharpDivideByZeroException, NULL },
@@ -112,15 +159,18 @@ static SWIG_CSharpException_t SWIG_csharp_exceptions[] = {
   { SWIG_CSharpSystemException, NULL }
 };
 
-static SWIG_CSharpExceptionArgument_t SWIG_csharp_exceptions_argument[] = {
+static SWIG_CSharpExceptionArgument_t SWIG_csharp_exceptions_argument[] =
+{
   { SWIG_CSharpArgumentException, NULL },
   { SWIG_CSharpArgumentNullException, NULL },
   { SWIG_CSharpArgumentOutOfRangeException, NULL }
 };
 
-static void SWIGUNUSED SWIG_CSharpSetPendingException(SWIG_CSharpExceptionCodes code, const char *msg) {
+static void SWIGUNUSED SWIG_CSharpSetPendingException(SWIG_CSharpExceptionCodes code, const char *msg)
+{
   SWIG_CSharpExceptionCallback_t callback = SWIG_csharp_exceptions[SWIG_CSharpApplicationException].callback;
-  if ((size_t)code < sizeof(SWIG_csharp_exceptions)/sizeof(SWIG_CSharpException_t)) {
+  if ((size_t)code < sizeof(SWIG_csharp_exceptions)/sizeof(SWIG_CSharpException_t))
+  {
     callback = SWIG_csharp_exceptions[code].callback;
   }
   callback(msg);
@@ -134,52 +184,54 @@ static void SWIGUNUSED SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpExcepti
   callback(msg, param_name);
 }
 
-SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
-  if (code == SWIG_ValueError) {
+SWIGINTERN void SWIG_CSharpException(int code, const char *msg)
+{
+  if (code == SWIG_ValueError)
+  {
     SWIG_CSharpExceptionArgumentCodes exception_code = SWIG_CSharpArgumentOutOfRangeException;
     SWIG_CSharpSetPendingExceptionArgument(exception_code, msg, 0);
-  } else {
+  }
+  else
+  {
     SWIG_CSharpExceptionCodes exception_code = SWIG_CSharpApplicationException;
-    switch(code) {
-    case SWIG_MemoryError:
-      exception_code = SWIG_CSharpOutOfMemoryException;
-      break;
-    case SWIG_IndexError:
-      exception_code = SWIG_CSharpIndexOutOfRangeException;
-      break;
-    case SWIG_DivisionByZero:
-      exception_code = SWIG_CSharpDivideByZeroException;
-      break;
-    case SWIG_IOError:
-      exception_code = SWIG_CSharpIOException;
-      break;
-    case SWIG_OverflowError:
-      exception_code = SWIG_CSharpOverflowException;
-      break;
-    case SWIG_RuntimeError:
-    case SWIG_TypeError:
-    case SWIG_SyntaxError:
-    case SWIG_SystemError:
-    case SWIG_UnknownError:
-    default:
-      exception_code = SWIG_CSharpApplicationException;
-      break;
+    switch(code)
+    {
+      case SWIG_MemoryError:
+        exception_code = SWIG_CSharpOutOfMemoryException;
+        break;
+      case SWIG_IndexError:
+        exception_code = SWIG_CSharpIndexOutOfRangeException;
+        break;
+      case SWIG_DivisionByZero:
+        exception_code = SWIG_CSharpDivideByZeroException;
+        break;
+      case SWIG_IOError:
+        exception_code = SWIG_CSharpIOException;
+        break;
+      case SWIG_OverflowError:
+        exception_code = SWIG_CSharpOverflowException;
+        break;
+      case SWIG_RuntimeError:
+      case SWIG_TypeError:
+      case SWIG_SyntaxError:
+      case SWIG_SystemError:
+      case SWIG_UnknownError:
+      default:
+        exception_code = SWIG_CSharpApplicationException;
+        break;
     }
     SWIG_CSharpSetPendingException(exception_code, msg);
   }
 }
 
-
 #include <stdexcept>
 
-
 #define SWIGSTDCALL
-
 
 #include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 
-using namespace Dali;
-using namespace Dali::Toolkit;
+#include <dali-toolkit/devel-api/controls/control-wrapper.h>
+#include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 
-
+#endif // CSHARP_COMMON_H

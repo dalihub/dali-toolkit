@@ -28,7 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
@@ -97,103 +97,105 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     mFactoryCache = new VisualFactoryCache();
   }
 
-  // Return a new WireframeVisual if we have debug enabled
-  if( mDebugEnabled )
-  {
-    return Toolkit::Visual::Base( WireframeVisual::New( *( mFactoryCache.Get() ) ).Get() );
-  }
-
   Visual::BasePtr visualPtr;
 
-  Property::Value* typeValue = propertyMap.Find( Toolkit::VisualProperty::TYPE, VISUAL_TYPE );
-  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
-  if( typeValue )
+  if( mDebugEnabled )
   {
-    Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
+    //Create a WireframeVisual if we have debug enabled
+    visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ) );
   }
-
-  switch( visualType )
+  else
   {
-    case Toolkit::Visual::BORDER:
+    Property::Value* typeValue = propertyMap.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE );
+    Toolkit::DevelVisual::Type visualType = Toolkit::DevelVisual::IMAGE; // Default to IMAGE type.
+    if( typeValue )
     {
-      visualPtr = BorderVisual::New( *( mFactoryCache.Get() ) );
-      break;
+      Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
     }
 
-    case Toolkit::Visual::COLOR:
+    switch( visualType )
     {
-      visualPtr = ColorVisual::New( *( mFactoryCache.Get() ) );
-      break;
-    }
-
-    case Toolkit::Visual::GRADIENT:
-    {
-      visualPtr = GradientVisual::New( *( mFactoryCache.Get() ) );
-      break;
-    }
-
-    case Toolkit::Visual::IMAGE:
-    {
-      Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-      std::string imageUrl;
-      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      case Toolkit::Visual::BORDER:
       {
-        // first resolve url type to know which visual to create
-        UrlType::Type type = ResolveUrlType( imageUrl );
-        if( UrlType::N_PATCH == type )
-        {
-          visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl );
-        }
-        else if( UrlType::SVG == type )
-        {
-          visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl );
-        }
-        else // Regular image
-        {
-          bool batchingEnabled( false );
-          Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
-          if( batchingEnabledValue  )
-          {
-            batchingEnabledValue->Get( batchingEnabled );
-          }
-
-          if( batchingEnabled )
-          {
-            visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
-            break;
-          }
-          else
-          {
-            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
-          }
-        }
+        visualPtr = BorderVisual::New( *( mFactoryCache.Get() ) );
+        break;
       }
 
-      break;
-    }
+      case Toolkit::Visual::COLOR:
+      {
+        visualPtr = ColorVisual::New( *( mFactoryCache.Get() ) );
+        break;
+      }
 
-    case Toolkit::Visual::MESH:
-    {
-      visualPtr = MeshVisual::New( *( mFactoryCache.Get() ) );
-      break;
-    }
+      case Toolkit::Visual::GRADIENT:
+      {
+        visualPtr = GradientVisual::New( *( mFactoryCache.Get() ) );
+        break;
+      }
 
-    case Toolkit::Visual::PRIMITIVE:
-    {
-      visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ) );
-      break;
-    }
+      case Toolkit::Visual::IMAGE:
+      {
+        Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+        std::string imageUrl;
+        if( imageURLValue && imageURLValue->Get( imageUrl ) )
+        {
+          // first resolve url type to know which visual to create
+          UrlType::Type type = ResolveUrlType( imageUrl );
+          if( UrlType::N_PATCH == type )
+          {
+            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl );
+          }
+          else if( UrlType::SVG == type )
+          {
+            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl );
+          }
+          else // Regular image
+          {
+            bool batchingEnabled( false );
+            Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
+            if( batchingEnabledValue  )
+            {
+              batchingEnabledValue->Get( batchingEnabled );
+            }
 
-    case Toolkit::Visual::WIREFRAME:
-    {
-      visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ) );
-      break;
-    }
+            if( batchingEnabled )
+            {
+              visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
+              break;
+            }
+            else
+            {
+              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
+            }
+          }
+        }
 
-    case Toolkit::Visual::TEXT:
-    {
-      visualPtr = TextVisual::New( *( mFactoryCache.Get() ) );
-      break;
+        break;
+      }
+
+      case Toolkit::Visual::MESH:
+      {
+        visualPtr = MeshVisual::New( *( mFactoryCache.Get() ) );
+        break;
+      }
+
+      case Toolkit::Visual::PRIMITIVE:
+      {
+        visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ) );
+        break;
+      }
+
+      case Toolkit::Visual::WIREFRAME:
+      {
+        visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ) );
+        break;
+      }
+
+      case Toolkit::DevelVisual::TEXT:
+      {
+        visualPtr = TextVisual::New( *( mFactoryCache.Get() ) );
+        break;
+      }
     }
   }
 
@@ -258,7 +260,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   }
   else if( UrlType::SVG == type )
   {
-    visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url, size );
+    visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url );
   }
   else // Regular image
   {

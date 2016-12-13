@@ -153,11 +153,21 @@
     },
     "Popup":
     {
-      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png",
+      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.png",
+      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.png",
+      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.png",
+      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.png",
+      "popupBackgroundBorder":[17,17,13,13]
     },
     "ConfirmationPopup":
     {
-      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png"
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png",
+      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.png",
+      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.png",
+      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.png",
+      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.png",
+      "popupBackgroundBorder":[17,17,13,13]
     },
     "Slider":
     {

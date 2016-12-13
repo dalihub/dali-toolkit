@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -104,7 +104,7 @@ inline Property::Map CreatePageTurnBookSpineEffect()
   customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = vertexSource;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource;
 
-  map[ Toolkit::VisualProperty::SHADER ] = customShader;
+  map[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
   return map;
 }
 

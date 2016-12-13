@@ -61,14 +61,9 @@ const std::string& Visual::Base::GetName()
   return GetImplementation( *this ).GetName();
 }
 
-void Visual::Base::SetSize( const Vector2& size )
+void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
 {
-  GetImplementation( *this ).SetSize( size );
-}
-
-const Vector2& Visual::Base::GetSize() const
-{
-  return GetImplementation( *this ).GetSize();
+  GetImplementation( *this ).SetTransformAndSize( transform, controlSize );
 }
 
 float Visual::Base::GetHeightForWidth( float width ) const
@@ -94,16 +89,6 @@ float Visual::Base::GetDepthIndex() const
 void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 {
   GetImplementation( *this ).CreatePropertyMap( map );
-}
-
-void Visual::Base::SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  GetImplementation( *this ).SetProperty( index, propertyValue );
-}
-
-Dali::Property::Value Visual::Base::GetProperty( Dali::Property::Index index )
-{
-  return GetImplementation( *this ).GetProperty( index );
 }
 
 } // namespace Toolkit

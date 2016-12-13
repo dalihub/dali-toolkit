@@ -187,7 +187,7 @@ shows the index range of the different properties in place.
 
 | Kind                  | Description                                                                                       | Start Index                                                                                                | End Index                                                                                                                          |
 |:----------------------|:--------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
-| Default               | Properties defined within DALi Core, e.g. Dali::Actor, Dali::ShaderEffect default properties etc. | \link Dali::DEFAULT_OBJECT_PROPERTY_START_INDEX DEFAULT_OBJECT_PROPERTY_START_INDEX\endlink                | \link Dali::DEFAULT_PROPERTY_MAX_COUNT DEFAULT_PROPERTY_MAX_COUNT\endlink (9999999)                                                |
+| Default               | Properties defined within DALi Core, e.g. Dali::Actor default properties etc.                     | \link Dali::DEFAULT_OBJECT_PROPERTY_START_INDEX DEFAULT_OBJECT_PROPERTY_START_INDEX\endlink                | \link Dali::DEFAULT_PROPERTY_MAX_COUNT DEFAULT_PROPERTY_MAX_COUNT\endlink (9999999)                                                |
 | Registered            | Properties registered using Dali::PropertyRegistration                                            | \link Dali::PROPERTY_REGISTRATION_START_INDEX PROPERTY_REGISTRATION_START_INDEX\endlink (10000000)         | \link Dali::PROPERTY_REGISTRATION_MAX_INDEX PROPERTY_REGISTRATION_MAX_INDEX\endlink (19999999)                                     |
 | Control               | Property range reserved by Dali::Toolkit::Control                                                 | \link Dali::Toolkit::Control::CONTROL_PROPERTY_START_INDEX CONTROL_PROPERTY_START_INDEX\endlink (10000000) | \link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX CONTROL_PROPERTY_END_INDEX\endlink (10001000)                             |
 | Derived Control       | Property range for control deriving directly from Dali::Toolkit::Control                          | 10001001                                                                                                   | \link Dali::PROPERTY_REGISTRATION_MAX_INDEX PROPERTY_REGISTRATION_MAX_INDEX\endlink (19999999)                                     |
@@ -238,8 +238,6 @@ imageView.image = {
 // add to the stage
 dali.stage.add( imageView );
 @endcode
-
-For a more detailed example see the ShaderEffect example in the JavaScript documentation.
 
 <br>
 <hr>

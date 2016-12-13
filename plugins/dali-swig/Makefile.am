@@ -23,8 +23,8 @@ if BUILD_MCS
 
 all-local: libNDalic.so NDali.dll
 
-libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o
-	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
+libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o
+	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
 
 automatic/cpp/dali_wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) automatic/cpp/dali_wrap.cpp -o automatic/cpp/dali_wrap.o
@@ -32,12 +32,20 @@ automatic/cpp/dali_wrap.o: $(BUILT_SOURCES)
 manual/cpp/keyboard_focus_manager_wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/keyboard_focus_manager_wrap.cpp -o manual/cpp/keyboard_focus_manager_wrap.o
 
+manual/cpp/view-wrapper-impl-wrap.o: $(BUILT_SOURCES)
+	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/view-wrapper-impl-wrap.cpp -o manual/cpp/view-wrapper-impl-wrap.o
+
+manual/cpp/callbackbase_wrap.o: $(BUILT_SOURCES)
+	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/callbackbase_wrap.cpp -o manual/cpp/callbackbase_wrap.o
+
 NDali.dll: $(BUILT_SOURCES)
 	$(MCS) -nologo -target:library -out:NDali.dll automatic/csharp/*.cs manual/csharp/*.cs
 
 check-local: examples/dali-test.exe \
              examples/hello-world.exe \
              examples/scroll-view.exe \
+             examples/custom-control.exe \
+             examples/spin-control.exe \
              examples/libNDalic.so examples/NDali.dll
 
 examples/%.exe: examples/%.cs
@@ -56,6 +64,7 @@ endif
 # then call our property-wrapper to inject DALi property getters / setters
 $(BUILT_SOURCES): SWIG/*.i
 	rm -f automatic/csharp/*.cs
+	mkdir -p automatic/csharp
 	$(SWIG) -csharp -c++ -outdir automatic/csharp \
             $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o automatic/cpp/dali_wrap.cpp SWIG/dali.i
 	./property-wrapper.rb

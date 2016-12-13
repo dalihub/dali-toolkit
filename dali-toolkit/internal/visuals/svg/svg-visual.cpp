@@ -28,7 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
@@ -54,10 +54,10 @@ namespace Toolkit
 namespace Internal
 {
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, ImageDimensions size )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
 {
   SvgVisual* svgVisual = new SvgVisual( factoryCache );
-  svgVisual->ParseFromUrl( imageUrl, size );
+  svgVisual->ParseFromUrl( imageUrl );
   return svgVisual;
 }
 
@@ -66,7 +66,8 @@ SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
   mAtlasRect( FULL_TEXTURE_RECT ),
   mImageUrl(),
   mParsedImage( NULL ),
-  mPlacementActor()
+  mPlacementActor(),
+  mVisualSize(Vector2::ZERO)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -101,10 +102,7 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
-  if( mImpl->mSize != Vector2::ZERO && mParsedImage )
-  {
-    AddRasterizationTask( mImpl->mSize );
-  }
+  // Defer the rasterisation task until we get given a size (by Size Negotiation algorithm)
 
   // Hold the weak handle of the placement actor and delay the adding of renderer until the svg rasterization is finished.
   mPlacementActor = actor;
@@ -132,49 +130,23 @@ void SvgVisual::GetNaturalSize( Vector2& naturalSize )
   }
 }
 
-void SvgVisual::SetSize( const Vector2& size )
-{
-  if(mImpl->mSize != size && mParsedImage && IsOnStage() )
-  {
-    AddRasterizationTask( size );
-  }
-  mImpl->mSize = size;
-}
-
 void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
   if( !mImageUrl.empty() )
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
   }
 }
 
-void SvgVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value SvgVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
-}
-
-void SvgVisual::ParseFromUrl( const std::string& imageUrl, ImageDimensions size )
+void SvgVisual::ParseFromUrl( const std::string& imageUrl )
 {
   mImageUrl = imageUrl;
 
   Vector2 dpi = Stage::GetCurrent().GetDpi();
   float meanDpi = (dpi.height + dpi.width) * 0.5f;
   mParsedImage = nsvgParseFromFile( imageUrl.c_str(), UNITS, meanDpi );
-
-  if( size.GetWidth() != 0u && size.GetHeight() != 0u)
-  {
-    mImpl->mSize.x = size.GetWidth();
-    mImpl->mSize.y = size.GetHeight();
-  }
 }
 
 void SvgVisual::AddRasterizationTask( const Vector2& size )
@@ -248,6 +220,19 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
   }
 }
 
+void SvgVisual::OnSetTransform()
+{
+  Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
+
+  if( mParsedImage && IsOnStage() )
+  {
+    if( visualSize != mVisualSize )
+    {
+      AddRasterizationTask( visualSize );
+      mVisualSize = visualSize;
+    }
+  }
+}
 
 } // namespace Internal
 

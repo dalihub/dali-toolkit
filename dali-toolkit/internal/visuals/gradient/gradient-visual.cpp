@@ -29,7 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -267,11 +267,6 @@ void GradientVisual::OnSetTransform()
   }
 }
 
-void GradientVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-}
-
 void GradientVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
@@ -282,7 +277,7 @@ void GradientVisual::DoSetOnStage( Actor& actor )
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::GRADIENT );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::GRADIENT );
   map.Insert( Toolkit::GradientVisual::Property::UNITS, mGradient->GetGradientUnits() );
   map.Insert( Toolkit::GradientVisual::Property::SPREAD_METHOD, mGradient->GetSpreadMethod() );
 
@@ -320,17 +315,6 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter() );
     map.Insert( Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius() );
   }
-}
-
-void GradientVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value GradientVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
 }
 
 void GradientVisual::InitializeRenderer()
@@ -449,7 +433,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   if( spread )
   {
     Toolkit::GradientVisual::SpreadMethod::Type spreadMethod = Toolkit::GradientVisual::SpreadMethod::PAD;
-    if( Scripting::GetEnumerationProperty( *spread, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod ) );
+    if( Scripting::GetEnumerationProperty( *spread, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod ) )
     {
       mGradient->SetSpreadMethod( spreadMethod );
     }

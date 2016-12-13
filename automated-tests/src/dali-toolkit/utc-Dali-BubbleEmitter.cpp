@@ -75,30 +75,10 @@ static int Wait(ToolkitTestApplication& application, int duration = 0)
   return time;
 }
 
-static Image CreateSolidColorImage( ToolkitTestApplication& application, const Vector4& color, unsigned int width, unsigned int height )
+static Texture CreateSolidColorTexture( ToolkitTestApplication& application, const Vector4& color, unsigned int width, unsigned int height )
 {
-  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
-
-  // Create the image
-  PixelBuffer* pixbuf = imageData.GetBuffer();
-  unsigned int size = width * height;
-
-  for( size_t i = 0; i < size; i++ )
-    {
-      pixbuf[i*4+0] = 0xFF * color.r;
-      pixbuf[i*4+1] = 0xFF * color.g;
-      pixbuf[i*4+2] = 0xFF * color.b;
-      pixbuf[i*4+3] = 0xFF * color.a;
-    }
-  imageData.Update();
-
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  application.SendNotification();
-  application.Render(RENDER_FRAME_INTERVAL);
-  application.Render(RENDER_FRAME_INTERVAL);
-  application.SendNotification();
-
-  return imageData;
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
+  return texture;
 }
 }//namespace
 
@@ -114,7 +94,7 @@ int UtcDaliBubbleEmitterNew(void)
   DALI_TEST_CHECK( !emitter );
 
   // Test object creation
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 200, Vector2( 5.f, 10.f ));
   DALI_TEST_CHECK( emitter );
 
@@ -146,7 +126,7 @@ int UtcDaliBubbleEmitterDownCast01(void)
 
   tet_infoline(" UtcDaliBubbleEmitterDownCast01 ");
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 200, Vector2( 5.f, 10.f ));
 
   BaseHandle handle(emitter);
@@ -172,12 +152,12 @@ int UtcDaliBubbleEmitterGetRootActor(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterGetRootActor " );
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 270, Vector2( 5.f, 10.f ));
 
   Actor root = emitter.GetRootActor();
   DALI_TEST_CHECK( root );
-  DALI_TEST_CHECK( root.GetChildCount() == 3 );
+  DALI_TEST_CHECK( root.GetChildCount() == 0 );
   END_TEST;
 }
 
@@ -186,13 +166,13 @@ int UtcDaliBubbleEmitterSetBackground(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterSetBackground " );
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 200, Vector2( 5.f, 10.f ));
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   unsigned int taskCount = taskList.GetTaskCount();
 
-  Image bgImage = CreateSolidColorImage( application, Color::RED, 50, 50 );
+  Texture bgImage = CreateSolidColorTexture( application, Color::RED, 50, 50 );
   emitter.SetBackground( bgImage, Vector3(0.f, 0.f, 0.5f) );
 
   DALI_TEST_CHECK( taskList.GetTaskCount() == taskCount+1 );
@@ -213,7 +193,7 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterSetBubbleScale " );
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 150, Vector2( 5.f, 10.f ));
   DALI_TEST_CHECK(emitter);
   Actor root = emitter.GetRootActor();
@@ -248,7 +228,7 @@ int UtcDaliBubbleEmitterSetBubbleDensity01(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterSetBubbleDensity " );
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 200, Vector2( 5.f, 10.f ));
 
   try
@@ -269,7 +249,7 @@ int UtcDaliBubbleEmitterSetBubbleDensity02(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterSetBubbleDensity " );
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 200, Vector2( 5.f, 10.f ));
 
   try
@@ -289,39 +269,39 @@ int UtcDaliBubbleEmitterEmitBubble(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterEmitBubble " );
 
-  Image shapeImage1 = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
+  Texture shapeImage1 = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage1, 200, Vector2( 5.f, 10.f ));
 
   Actor root = emitter.GetRootActor();
-  Actor bubbleMesh = root.GetChildAt( 0 );
+  Renderer bubbleRenderer = root.GetRendererAt( 0 );
   Stage::GetCurrent().Add( root );
-  DALI_TEST_CHECK( bubbleMesh );
+  DALI_TEST_CHECK( bubbleRenderer );
 
-  Property::Index propertyIndex0 = bubbleMesh.GetPropertyIndex( "uPercentage[0]" );
-  Property::Index propertyIndex1 = bubbleMesh.GetPropertyIndex( "uPercentage[1]" );
+  Property::Index propertyIndex0 = bubbleRenderer.GetPropertyIndex( "uPercentage[0]" );
+  Property::Index propertyIndex1 = bubbleRenderer.GetPropertyIndex( "uPercentage[1]" );
   float value0, value1;
 
   Animation animation = Animation::New( 0.5f );
   emitter.EmitBubble( animation, Vector2(40.f,40.f), Vector2(-5.f,-5.f), Vector2(30.f,30.f) );
   emitter.EmitBubble( animation, Vector2(10.f,10.f), Vector2(5.f,5.f), Vector2(30.f,30.f) );
-  (bubbleMesh.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleMesh.GetProperty(propertyIndex1)).Get( value1 );
+  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
+  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
   DALI_TEST_EQUALS(value0, 0.f, TEST_LOCATION );
   DALI_TEST_EQUALS(value1, 0.f, TEST_LOCATION );
 
   animation.Play();
 
   Wait(application, 300);
-  propertyIndex0 = bubbleMesh.GetPropertyIndex( "uPercentage[0]" );
-  propertyIndex1 = bubbleMesh.GetPropertyIndex( "uPercentage[1]" );
-  (bubbleMesh.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleMesh.GetProperty(propertyIndex1)).Get( value1 );
+  propertyIndex0 = bubbleRenderer.GetPropertyIndex( "uPercentage[0]" );
+  propertyIndex1 = bubbleRenderer.GetPropertyIndex( "uPercentage[1]" );
+  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
+  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
   DALI_TEST_CHECK( value0 >= 0.6f );
   DALI_TEST_CHECK( value1 >= 0.6f );
 
   Wait(application,500);
-  (bubbleMesh.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleMesh.GetProperty(propertyIndex1)).Get( value1 );
+  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
+  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
   DALI_TEST_EQUALS(value0, 1.f, TEST_LOCATION );
   DALI_TEST_EQUALS(value1, 1.f, TEST_LOCATION );
   END_TEST;
@@ -332,16 +312,16 @@ int UtcDaliBubbleEmitterRestore(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterRestore " );
 
-  Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
-  BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 90, Vector2( 5.f, 10.f ));
+  Vector2 movementArea(50.f,50.f);
+  Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
+  BubbleEmitter emitter = BubbleEmitter::New( movementArea,shapeImage, 90, Vector2( 5.f, 10.f ));
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
   root.SetPosition( Vector3::ZERO );
   root.SetParentOrigin( ParentOrigin::CENTER );
   root.SetAnchorPoint( AnchorPoint::CENTER );
 
-  Actor bubbleMesh = root.GetChildAt( 0 );
-  Renderer renderer = bubbleMesh.GetRendererAt( 0 );
+  Renderer renderer = root.GetRendererAt( 0 );
   DALI_TEST_CHECK( renderer );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -358,8 +338,8 @@ int UtcDaliBubbleEmitterRestore(void)
   DALI_TEST_EQUALS( percentageValue, 0.f, TEST_LOCATION );
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
-  DALI_TEST_EQUALS( startEndPosValue.x, 40.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( startEndPosValue.y, 40.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( startEndPosValue.x, 40.f - movementArea.x*0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( startEndPosValue.y, 40.f- movementArea.x*0.5f, TEST_LOCATION );
 
   animation.Play();
   Wait(application, 200);
@@ -369,8 +349,8 @@ int UtcDaliBubbleEmitterRestore(void)
   DALI_TEST_CHECK( percentageValue < 0.5f && percentageValue >= 0.4);
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
-  DALI_TEST_EQUALS( startEndPosValue.x, 40.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( startEndPosValue.y, 40.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( startEndPosValue.x, 40.f- movementArea.x*0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( startEndPosValue.y, 40.f- movementArea.x*0.5f, TEST_LOCATION );
 
   emitter.Restore();
   application.SendNotification();

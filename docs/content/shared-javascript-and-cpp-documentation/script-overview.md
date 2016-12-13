@@ -38,7 +38,7 @@ JSON file contains different sections:
 - **Templates** actor & control tree creation
 - **Styles** used to style actor & control trees
 - **Animations**
-- **Instances** of objects for path, shaderEffects, renderTasks, frameBuffers
+- **Instances** of objects for path, renderTasks, frameBuffers
 - **Stage**. A list of actors / controls that can be added to the stage
 - **Constants**  (e.g. positions / colors, that can be references by other parts of the JSON file);
 - **Actions**
