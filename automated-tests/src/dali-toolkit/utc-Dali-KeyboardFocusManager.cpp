@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,19 +175,8 @@ public:
   Actor mActivatedActor;
 };
 
-// Used to connect to signals via the ConnectSignal Handle method
-struct CallbackFunctor
-{
-  CallbackFunctor()
-  {
-  }
-
-  void operator()()
-  {
-  }
-};
-
 } // namespace
+
 
 int UtcDaliKeyboardFocusManagerGet(void)
 {
@@ -677,21 +666,5 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
   DALI_TEST_CHECK(focusGroupChangedCallback.mCurrentFocusedActor == Actor());
   DALI_TEST_CHECK(focusGroupChangedCallback.mForward == false);
   focusGroupChangedCallback.Reset();
-  END_TEST;
-}
-
-int UtcDaliKeyboardFocusManagerSignals(void)
-{
-  ToolkitTestApplication application;
-
-  KeyboardFocusManager manager = KeyboardFocusManager::Get();
-  DALI_TEST_CHECK( manager );
-
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  DALI_TEST_EQUALS( true, manager.ConnectSignal( testTracker, "keyboardPreFocusChange", CallbackFunctor() ), TEST_LOCATION );
-  DALI_TEST_EQUALS( true, manager.ConnectSignal( testTracker, "keyboardFocusChanged", CallbackFunctor() ), TEST_LOCATION );
-  DALI_TEST_EQUALS( true, manager.ConnectSignal( testTracker, "keyboardFocusGroupChanged", CallbackFunctor() ), TEST_LOCATION );
-  DALI_TEST_EQUALS( true, manager.ConnectSignal( testTracker, "keyboardFocusedActorEnterKey", CallbackFunctor() ), TEST_LOCATION );
-
   END_TEST;
 }

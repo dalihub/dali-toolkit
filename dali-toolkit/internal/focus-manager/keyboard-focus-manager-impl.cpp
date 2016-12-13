@@ -707,17 +707,17 @@ bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  KeyboardFocusManager* manager = static_cast< KeyboardFocusManager* >( object ); // TypeRegistry guarantees that this is the correct type.
+  KeyboardFocusManager* manager = dynamic_cast<KeyboardFocusManager*>( object );
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_PRE_FOCUS_CHANGE ) )
   {
     manager->PreFocusChangeSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {
     manager->FocusChangedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_GROUP_CHANGED ) )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_GROUP_CHANGED ) )
   {
     manager->FocusGroupChangedSignal().Connect( tracker, functor );
   }
