@@ -436,29 +436,23 @@ void TextVisual::UpdateRenderer()
       PixelData data = mTypesetter->Render( relayoutSize );
 
       Vector4 atlasRect = FULL_TEXTURE_RECT;
-      TextureSet textureSet = mFactoryCache.GetAtlasManager()->Add( atlasRect, data );
 
-      if( textureSet )
-      {
-        mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-      }
-      else
-      {
-        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
-        // In that case, create a texture. TODO: should tile the text.
+      // Texture set not retrieved from Atlas Manager whilst pixel offset visible.
 
-        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                        data.GetPixelFormat(),
-                                        data.GetWidth(),
-                                        data.GetHeight() );
+      // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
+      // In that case, create a texture. TODO: should tile the text.
 
-        texture.Upload( data );
+      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                      data.GetPixelFormat(),
+                                      data.GetWidth(),
+                                      data.GetHeight() );
 
-        textureSet = TextureSet::New();
-        textureSet.SetTexture( 0u, texture );
+      texture.Upload( data );
 
-        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-      }
+      TextureSet textureSet = TextureSet::New();
+      textureSet.SetTexture( 0u, texture );
+
+      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
 
