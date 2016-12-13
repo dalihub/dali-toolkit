@@ -94,9 +94,13 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;
+
+  uniform mediump mat4 uModelMatrix;\n
+  uniform mediump mat4 uViewMatrix;\n
+  uniform mediump mat4 uProjection;\n
+
   varying mediump vec2 vTexCoord;\n
   \n
-
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
@@ -113,7 +117,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
+    mediump vec4 nonAlignedVertex = uViewMatrix*uModelMatrix*ComputeVertexPosition();\n
+    mediump vec4 pixelAlignedVertex = vec4 ( floor(nonAlignedVertex.xyz), 1.0 );\n
+    mediump vec4 vertexPosition = uProjection*pixelAlignedVertex;\n
+
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -268,12 +275,9 @@ void TextVisual::DoSetOnStage( Actor& actor )
     mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY , geometry );
   }
 
-  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-  if( !shader )
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-    mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
-  }
+  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+  mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+
   shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
 
   mImpl->mRenderer = Renderer::New( geometry, shader );

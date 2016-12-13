@@ -1012,10 +1012,15 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
         labelPosition.y = labelVisualPadding.height;
       }
 
+      Vector2 preSize = Vector2( static_cast< int >( remainingSpaceForText.x ), static_cast< int >( remainingSpaceForText.y ));
+
       DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout text Size(%f,%f) text Position(%f,%f) \n", remainingSpaceForText.width, remainingSpaceForText.height, labelPosition.x, labelPosition.y);
 
+      DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout text Size -- (%f,%f) text Position(%f,%f) \n", preSize.width, preSize.height, labelPosition.x, labelPosition.y);
+
+
       Property::Map textVisualTransform;
-      textVisualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, remainingSpaceForText)
+      textVisualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, preSize )
                          .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, labelPosition )
                          .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f,1.0f ) ) // Use absolute size
                          .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
