@@ -24,6 +24,8 @@
 %ignore *::CheckBoxButton(Internal::CheckBoxButton&);
 %ignore *::CheckBoxButton(Dali::Internal::CustomActor*);
 %ignore *::Control(Dali::Internal::CustomActor*);
+%ignore *::ControlWrapper( Internal::ControlWrapper& );
+%ignore *::ControlWrapper( Dali::Internal::CustomActor* );
 %ignore *::FlexContainer(Internal::FlexContainer&);
 %ignore *::FlexContainer(Dali::Internal::CustomActor*);
 %ignore *::GaussianBlurView(Internal::GaussianBlurView&);
@@ -95,6 +97,7 @@
 %rename(View) Dali::Toolkit::Control;
 %rename(ViewImpl) Dali::Toolkit::Internal::Control;
 %rename(VisualBase) Dali::Toolkit::Visual::Base;
+%rename(LoadImageSynchronously) Dali::Toolkit::SyncImageLoader::Load;
 %rename(ControlOrientationType) Dali::Toolkit::ControlOrientation::Type;
 %rename(DefaultItemLayoutType) Dali::Toolkit::DefaultItemLayout::Type;
 %rename(NewItemLayout) Dali::Toolkit::DefaultItemLayout::New;
@@ -158,8 +161,15 @@
 %csconstvalue("PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX") ANIMATABLE_PROPERTY_START_INDEX;
 %csconstvalue("PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX+1000") ANIMATABLE_PROPERTY_END_INDEX;
 %csconstvalue("PropertyRanges.CORE_PROPERTY_MAX_INDEX+1") VISUAL_PROPERTY_BASE_START_INDEX;
-%csconstvalue("1 << 5") REQUIRES_STYLE_CHANGE_SIGNALS;
-%csconstvalue("1 << 6") REQUIRES_KEYBOARD_NAVIGATION_SUPPORT;
+%csconstvalue("0") CONTROL_BEHAVIOUR_NONE;
+%csconstvalue("0") CONTROL_BEHAVIOUR_DEFAULT;
+%csconstvalue("1 << 0") DISABLE_SIZE_NEGOTIATION;
+%csconstvalue("1 << 1") REQUIRES_TOUCH_EVENTS;
+%csconstvalue("1 << 2") REQUIRES_HOVER_EVENTS;
+%csconstvalue("1 << 3") REQUIRES_WHEEL_EVENTS;
+%csconstvalue("1 << 4") REQUIRES_STYLE_CHANGE_SIGNALS;
+%csconstvalue("1 << 5") REQUIRES_KEYBOARD_NAVIGATION_SUPPORT;
+%csconstvalue("1 << 6") DISABLE_STYLE_CHANGE_SIGNALS;
 
 typedef unsigned int ItemId;
 typedef std::vector<ItemId> ItemIdContainer;
@@ -176,7 +186,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
-%include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+%include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 %include <dali-toolkit/devel-api/builder/builder.h>
 
@@ -227,6 +237,10 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 
 %include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 %include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+
+%include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+%include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+%include <dali-toolkit/public-api/text/rendering-backend.h>
 
 %template(ItemIdContainer) std::vector<unsigned int>;
 %template(Item) std::pair<unsigned int, Dali::Actor>;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -390,7 +390,7 @@ float DepthLayout::GetClosestAnchorPosition(float layoutPosition) const
 
 float DepthLayout::GetItemScrollToPosition(unsigned int itemId) const
 {
-  float rowIndex = static_cast<float>(itemId / mImpl->mNumberOfColumns);
+  float rowIndex = static_cast< float >( itemId ) / mImpl->mNumberOfColumns;
   return -rowIndex * static_cast<float>(mImpl->mNumberOfColumns);
 }
 

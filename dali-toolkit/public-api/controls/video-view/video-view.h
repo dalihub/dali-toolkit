@@ -121,6 +121,8 @@ public:
    * If the string is empty, VideoView will not display anything
    *
    * @SINCE_1_1.38
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
    * @param[in] url The url of the video resource to display
    * @return A handle to a newly allocated Dali VideoView
    */

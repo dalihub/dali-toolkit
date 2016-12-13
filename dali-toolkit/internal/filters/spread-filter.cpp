@@ -25,7 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -103,7 +103,7 @@ void SpreadFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SPREAD_FRAGMENT_SOURCE;
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::VisualProperty::SHADER, customShader );
+  visualMap.Insert( Toolkit::DevelVisual::Property::SHADER, customShader );
 
   // set SPREAD custom shader
   mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );

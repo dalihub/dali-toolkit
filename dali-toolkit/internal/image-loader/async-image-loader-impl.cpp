@@ -19,7 +19,6 @@
 #include "async-image-loader-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 
 namespace Dali
@@ -62,9 +61,7 @@ uint32_t AsyncImageLoader::Load( const std::string& url,
     mIsLoadThreadStarted = true;
   }
 
-  BitmapLoader loader = BitmapLoader::New( url, dimensions, fittingMode, samplingMode, orientationCorrection );
-
-  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, loader ) );
+  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection ) );
 
   return mLoadTaskId;
 }
@@ -88,7 +85,7 @@ void AsyncImageLoader::ProcessLoadedImage()
 {
   while( LoadingTask *next =  mLoadThread.NextCompletedTask() )
   {
-    mLoadedSignal.Emit( next->id, next->loader.GetPixelData() );
+    mLoadedSignal.Emit( next->id, next->pixelData );
     delete next;
   }
 }

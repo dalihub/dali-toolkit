@@ -149,9 +149,11 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
   if( actor && actor.IsKeyboardFocusable() )
   {
     mIsFocusIndicatorEnabled = true;
-    // Draw the focus indicator upon the focused actor
-    actor.Add( GetFocusIndicatorActor() );
-
+    // Draw the focus indicator upon the focused actor when PhysicalKeyboard is attached
+    if( mIsKeyboardFocusEnabled )
+    {
+      actor.Add( GetFocusIndicatorActor() );
+    }
     // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
     {
@@ -707,17 +709,17 @@ bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  KeyboardFocusManager* manager = dynamic_cast<KeyboardFocusManager*>( object );
+  KeyboardFocusManager* manager = static_cast< KeyboardFocusManager* >( object ); // TypeRegistry guarantees that this is the correct type.
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_PRE_FOCUS_CHANGE ) )
   {
     manager->PreFocusChangeSignal().Connect( tracker, functor );
   }
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {
     manager->FocusChangedSignal().Connect( tracker, functor );
   }
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_GROUP_CHANGED ) )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_GROUP_CHANGED ) )
   {
     manager->FocusGroupChangedSignal().Connect( tracker, functor );
   }

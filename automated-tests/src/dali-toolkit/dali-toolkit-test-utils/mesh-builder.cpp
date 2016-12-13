@@ -72,4 +72,6 @@ Geometry CreateQuadGeometry(void)
   return geometry;
 }
 
+
+
 } // namespace Dali

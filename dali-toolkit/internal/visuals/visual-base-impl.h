@@ -84,12 +84,7 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::SetSize
    */
-  virtual void SetSize( const Vector2& size );
-
-  /**
-   * @copydoc Toolkit::Visual::Base::GetSize
-   */
-  const Vector2& GetSize() const;
+  void SetTransformAndSize( const Property::Map& transform, Size controlSize );
 
   /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
@@ -187,9 +182,10 @@ protected:
   virtual void DoSetProperties( const Property::Map& propertyMap ) = 0;
 
   /**
-   * @brief Called when transform property changes
+   * @brief Called when transform or control size changes
+   * ( Of use to SVG and Text visuals )
    */
-  virtual void OnSetTransform(){}
+  virtual void OnSetTransform() = 0;
 
 protected:
 
@@ -224,24 +220,6 @@ protected:
    * @return Returns true if the renderer is from shared cache, false otherwise
    */
   bool IsFromCache() const;
-
-protected:
-  /**
-   * @brief Called by SetProperty(). To be overriden by derived clases in order to set properties.
-   *
-   * @param [in] index The index of the property.
-   * @param [in] propertyValue The new value of the property.
-   */
-  virtual void DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue ) = 0;
-
-  /**
-   * @brief Called by GetProperty(). To be overriden by derived classes in order to retrieve properties.
-   *
-   * @param [in] index The index of the property.
-   *
-   * @return The property value.
-   */
-  virtual Dali::Property::Value DoGetProperty( Dali::Property::Index index ) = 0;
 
 private:
 

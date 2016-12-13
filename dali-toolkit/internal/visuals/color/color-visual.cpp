@@ -20,10 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/object/handle-devel.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -103,13 +104,6 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void ColorVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-
-  // ToDo: renderer responds to the size change
-}
-
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
@@ -120,29 +114,8 @@ void ColorVisual::DoSetOnStage( Actor& actor )
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::COLOR );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mMixColor );
-}
-
-void ColorVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-  /* David Steele comented :
-
-     Some things to bear in mind:
-
-     We currently keep a copy of the mix color in the ColorVisual object, which is then used to instantiate the registered property on the renderer.
-
-     The user can get the renderer and animate the mixColor property (it's registered, so is automatically a scene-graph property).
-
-     The GetProperty method will have to read from the renderer, or from the cached value in the Visual, and the SetProperty will have to write to cache and to the renderer if present.
-  */
-}
-
-Dali::Property::Value ColorVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
 }
 
 void ColorVisual::OnSetTransform()
@@ -171,7 +144,7 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME, mMixColor );
+  mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME, mMixColor );
   if( mMixColor.a < 1.f )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );

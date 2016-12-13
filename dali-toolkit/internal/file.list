@@ -36,7 +36,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
-   $(toolkit_src_dir)/controls/bubble-effect/bubble-actor.cpp \
+   $(toolkit_src_dir)/controls/bubble-effect/bubble-renderer.cpp \
    $(toolkit_src_dir)/controls/buttons/button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
@@ -114,8 +114,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/text-effects-style.cpp \
    $(toolkit_src_dir)/text/text-font-style.cpp \
    $(toolkit_src_dir)/text/text-io.cpp \
+   $(toolkit_src_dir)/text/text-model.cpp \
    $(toolkit_src_dir)/text/text-scroller.cpp \
-   $(toolkit_src_dir)/text/text-scroller-interface.cpp \
    $(toolkit_src_dir)/text/text-view.cpp \
    $(toolkit_src_dir)/text/text-view-interface.cpp \
    $(toolkit_src_dir)/text/visual-model-impl.cpp \
@@ -132,6 +132,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-manager-impl.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-mesh-factory.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/text-typesetter.cpp \
+   $(toolkit_src_dir)/text/rendering/view-model.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-fold-effect-impl.cpp \

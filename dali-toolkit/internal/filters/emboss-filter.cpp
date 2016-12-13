@@ -29,7 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
@@ -97,7 +97,7 @@ void EmbossFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EMBOSS_FRAGMENT_SOURCE;
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::VisualProperty::SHADER, customShader );
+  visualMap.Insert( Toolkit::DevelVisual::Property::SHADER, customShader );
 
   // create actor to render input with applied emboss effect
   mActorForInput1 = Toolkit::ImageView::New(mInputImage);

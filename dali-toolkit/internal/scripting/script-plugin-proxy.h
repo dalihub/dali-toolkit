@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCRIPT_PLUGIN_PROXY_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,10 @@ public:
   bool IsInitialized() const;
 
 private:
+
+  ScriptPluginProxy( const ScriptPluginProxy& ); ///< Undefined
+  ScriptPluginProxy& operator=( const ScriptPluginProxy& ); ///< Undefined
+
   /**
    * @brief Dynamically loads the script plugin.
    */

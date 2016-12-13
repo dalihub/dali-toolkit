@@ -21,29 +21,11 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali-toolkit/devel-api/shader-effects/alpha-discard-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/bendy-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/blind-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/bouncing-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/carousel-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/displacement-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/dissolve-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/dissolve-local-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/distance-field-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/iris-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/mask-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/mirror-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/motion-blur-effect.h>
 #include <dali-toolkit/devel-api/shader-effects/motion-stretch-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/overlay-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/quadratic-bezier.h>
-#include <dali-toolkit/devel-api/shader-effects/ripple-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/ripple2d-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/shear-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/soft-button-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/spot-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/square-dissolve-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/swirl-effect.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -79,71 +61,6 @@ int UtcDaliCreateAlphaDiscardEffect(void)
 
   Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( !hintsValue );
-
-  END_TEST;
-}
-
-int UtcDaliCreateBendyEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateBendyEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateBlindEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateBlindEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateBouncingEffect(void)
-{
-  ToolkitTestApplication application;
-
-  Vector4 color(1.0f,1.0f,1.0f,1.0f);
-
-  ShaderEffect effect = Toolkit::CreateBouncingEffect(color);
-  DALI_TEST_CHECK( effect );
-
-  Property::Value value = effect.GetProperty( effect.GetPropertyIndex("uAssignedColor"));
-  DALI_TEST_EQUALS( value.Get<Vector4>(), color, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliCreateCarouselEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateCarouselEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateDisplacementEffectDisplaced(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateDisplacementEffect(Toolkit::DISPLACEMENT_EFFECT_DISPLACED);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateDisplacementEffectFixed(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateDisplacementEffect(Toolkit::DISPLACEMENT_EFFECT_FIXED);
-  DALI_TEST_CHECK( effect );
 
   END_TEST;
 }
@@ -213,16 +130,6 @@ int UtcDaliCreateDissolveEffectMediumPrecision(void)
   return UtcDaliCreateDissolveEffect(false);
 }
 
-int UtcDaliCreateDissolveLocalEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateDissolveLocalEffect(0);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
 int UtcDaliCreateDissolveEffect(void)
 {
   ToolkitTestApplication application;
@@ -290,38 +197,6 @@ int UtcDaliCreateImageRegionEffect(void)
 
   Property::Value* hintsValue = customShader.Find( Visual::Shader::Property::HINTS );
   DALI_TEST_CHECK( !hintsValue );
-
-  END_TEST;
-}
-
-int UtcDaliCreateIrisEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateIrisEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateMaskEffect(void)
-{
-  ToolkitTestApplication application;
-
-  BufferImage image = CreateBufferImage();
-  ShaderEffect effect = Toolkit::CreateMaskEffect(image);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateMirrorEffect(void)
-{
-  ToolkitTestApplication application;
-
-  BufferImage image = CreateBufferImage();
-  ShaderEffect effect = Toolkit::CreateMirrorEffect();
-  DALI_TEST_CHECK( effect );
 
   END_TEST;
 }
@@ -445,137 +320,6 @@ int UtcDaliCreateMotionStretchEffect(void)
   DALI_TEST_CHECK( actor.GetPropertyIndex( "uObjectFadeEnd" ) != Property::INVALID_INDEX );
   DALI_TEST_CHECK( actor.GetPropertyIndex( "uAlphaScale" ) != Property::INVALID_INDEX );
   DALI_TEST_CHECK( actor.GetPropertyIndex( "uModelLastFrame" ) != Property::INVALID_INDEX );
-
-  END_TEST;
-}
-
-int UtcDaliCreateOverlayEffect(void)
-{
-  ToolkitTestApplication application;
-
-  BufferImage image = CreateBufferImage();
-  ShaderEffect effect = Toolkit::CreateOverlayEffect(image);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateQuadraticBezier(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateQuadraticBezier(3,false);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateQuadraticBezierFilled(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateQuadraticBezier(3,true);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateRipple2DEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateRipple2DEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateRippleEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateRippleEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateShearEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateShearEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliSoftButtonEffectElliptical(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSoftButtonEffect(Toolkit::SOFT_BUTTON_ELLIPTICAL);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliSoftButtonEffectRectangular(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSoftButtonEffect(Toolkit::SOFT_BUTTON_RECTANGULAR);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliSoftButtonEffectFixed(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSoftButtonEffect(Toolkit::SOFT_BUTTON_FIXED);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateSpotEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSpotEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliCreateSquareDissolveEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSquareDissolveEffect();
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliSwirlEffect(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSwirlEffect(false);
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
-int UtcDaliSwirlEffectWrap(void)
-{
-  ToolkitTestApplication application;
-
-  ShaderEffect effect = Toolkit::CreateSwirlEffect(true);
-  DALI_TEST_CHECK( effect );
 
   END_TEST;
 }

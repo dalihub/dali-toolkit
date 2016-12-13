@@ -35,7 +35,7 @@ extern const char * const CUSTOM_SUBDIVIDE_GRID_X;
 extern const char * const CUSTOM_SUBDIVIDE_GRID_Y;
 extern const char * const CUSTOM_SHADER_HINTS;
 
-//Transform
+// Transform
 extern const char * const TRANSFORM;
 extern const char * const SIZE;
 extern const char * const OFFSET;
@@ -43,6 +43,8 @@ extern const char * const OFFSET_SIZE_MODE;
 extern const char * const ORIGIN;
 extern const char * const ANCHOR_POINT;
 
+// Premultiplied alpha
+extern const char * const PREMULTIPLIED_ALPHA;
 
 // Image visual
 extern const char * const IMAGE_URL_NAME;

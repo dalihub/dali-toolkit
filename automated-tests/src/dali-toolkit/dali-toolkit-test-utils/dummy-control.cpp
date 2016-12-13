@@ -19,6 +19,8 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/align-enums.h>
 
 namespace Dali
 {
@@ -88,11 +90,23 @@ DummyControlImpl::~DummyControlImpl()
 void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual )
 {
   Control::RegisterVisual( index, visual );
+
+  VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
+  if( iter == mRegisteredVisualIndices.end() )
+  {
+    mRegisteredVisualIndices.push_back(index);
+  }
 }
 
 void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled )
 {
   Control::RegisterVisual( index, visual, enabled );
+
+  VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
+  if( iter == mRegisteredVisualIndices.end() )
+  {
+    mRegisteredVisualIndices.push_back(index);
+  }
 }
 
 void DummyControlImpl::UnregisterVisual( Property::Index index )
@@ -114,6 +128,7 @@ bool DummyControlImpl::IsVisualEnabled( Property::Index index )
 {
   return Control::IsVisualEnabled( index );
 }
+
 
 Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )
 {
@@ -188,6 +203,24 @@ bool DummyControlImplOverride::OnWheelEvent(const WheelEvent& event) { wheelEven
 bool DummyControlImplOverride::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
 void DummyControlImplOverride::OnKeyInputFocusGained() { keyInputFocusGained = true; }
 void DummyControlImplOverride::OnKeyInputFocusLost() { keyInputFocusLost = true; }
+
+void DummyControlImplOverride::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  Property::Map transformMap;
+  transformMap
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+
+  for( VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end() ; ++iter )
+  {
+    Visual::Base visual = GetVisual(*iter);
+    visual.SetTransformAndSize( transformMap, size );
+  }
+}
+
 
 DummyControl DummyControl::New( bool override )
 {

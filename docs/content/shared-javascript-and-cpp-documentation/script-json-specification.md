@@ -372,45 +372,52 @@ name search begins on the actor, if it isn't found the search continues
 on the attached renderer, and then on the attached shader object.
 
 The actor property names and shader uniform names must not clash for the
-uniform to animate correctly. The convention in DALi is to prepend
-uniforms with 'u'.
+uniform to animate correctly.
+
+The actor needs to register the uniform properties as custom animatable
+properties.
 
 ~~~
-    {                                    \\
-    "animations":                        \\ Animation library
-    {                                    \\
-     "rotate":                           \\ An Animation named rotate
-     {                                   \\
-     "duration": 10,                     \\
-     "properties":                       \\ Properties changed in this animation
-     [                                   \\
-     {
-     "actor":"image",                    \\ Actor found by name from the stage
-     "property":"uTranslate",            \\ Uniform name specified as if it is a
-                                         \\ property of the object.
-     "value":[10, 20],
-     ...
-     },
-     ...
-     ]
-     },
-     "shaderEffects":
-     {
-     "myshader1":
-     {
-                                        \\ Shader program with uniform
-     "program": {...}                   \\ "uTranslate"
-     }
-     },
-     "actors":
-     [
-     {
-     "name": "image",
-     "effect": "myshader1"              \\ Actor using shader effect instance
-                                        \\ "myshader1"
-     }
-     ]
+{
+  "animations":
+  {
+    "rotate":                          \\ An Animation named rotate
+    {
+      "properties":                    \\ Properties changed in this animation
+      [
+        {
+          "actor": "image",            \\ Actor found by name from the stage
+          "property": "uTranslate",    \\ Uniform name specified as if it is a property of the object
+          "value": [10, 20],           \\ Target value of uniform
+          ...
+        }
+      ]
     },
+    ...
+  },
+  "stage":
+  [
+    {
+      "type": "ImageView",
+      "name": "image",                 \\ Name of the actor
+      ...
+      "image":
+      {
+        ...
+        "shader":                      \\ ImageView has a shader property where we can set a custom shader
+        {
+          "vertexShader": "..."        \\ Vertex shader with uniform "uTranslate"
+        }
+      },
+      "animatableProperties":          \\ Custom properties that the actor needs to register
+      {
+        "uTranslate": [0, 0]           \\ The name should match the uniform we want to animate
+      },
+      ...
+    },
+    ...
+  ]
+}
 ~~~
 
 ## Stage {#stage}

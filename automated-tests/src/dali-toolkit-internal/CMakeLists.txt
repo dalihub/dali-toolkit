@@ -19,8 +19,9 @@ SET(TC_SOURCES
  utc-Dali-Text-Layout.cpp
  utc-Dali-Text-Controller.cpp
  utc-Dali-VisualFactoryResolveUrl.cpp
- utc-Dali-Visuals.cpp
  utc-Dali-Text-Markup.cpp
+ utc-Dali-Text-Typesetter.cpp
+ utc-Dali-Text-ViewModel.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
@@ -53,7 +54,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-render-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
-   dali-toolkit-test-utils/toolkit-text-model.cpp
+   dali-toolkit-test-utils/toolkit-text-utils.cpp
 )
 
 

@@ -20,7 +20,7 @@
 #include "wireframe-visual.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -45,11 +45,24 @@ attribute mediump vec2  aPosition;\n
 uniform   mediump mat4  uMvpMatrix;\n
 uniform   mediump vec3  uSize;\n
 \n
+
+//Visual size and offset
+uniform mediump vec2 offset;\n
+uniform mediump vec2 size;\n
+uniform mediump vec4 offsetSizeMode;\n
+uniform mediump vec2 origin;\n
+uniform mediump vec2 anchorPoint;\n
+
+vec4 ComputeVertexPosition()\n
+{\n
+  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+  return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+}\n
+
 void main()\n
 {\n
-  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-  vertexPosition.xyz *= uSize;\n
-  gl_Position = uMvpMatrix * vertexPosition;\n
+  gl_Position = uMvpMatrix * ComputeVertexPosition();\n
 }\n
 );
 
@@ -93,31 +106,30 @@ void WireframeVisual::DoSetOnStage( Actor& actor )
 void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::WIREFRAME );
-}
-
-void WireframeVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value WireframeVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::WIREFRAME );
 }
 
 void WireframeVisual::InitializeRenderer()
 {
-  mImpl->mRenderer = mFactoryCache.GetWireframeRenderer();
-  if( !mImpl->mRenderer )
+  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::WIREFRAME_SHADER );
+  if( !shader )
   {
-    Geometry geometry = CreateQuadWireframeGeometry();
-    Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-
-    mImpl->mRenderer = Renderer::New( geometry, shader);
-    mFactoryCache.CacheWireframeRenderer( mImpl->mRenderer );
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mFactoryCache.SaveShader( VisualFactoryCache::WIREFRAME_SHADER, shader );
   }
+
+  Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::WIREFRAME_GEOMETRY );
+  if( !geometry )
+  {
+    geometry = CreateQuadWireframeGeometry();
+    mFactoryCache.SaveGeometry( VisualFactoryCache::WIREFRAME_GEOMETRY, geometry );
+  }
+
+  //Create the renderer
+  mImpl->mRenderer = Renderer::New( geometry, shader);
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 Geometry WireframeVisual::CreateQuadWireframeGeometry()
@@ -148,6 +160,15 @@ Geometry WireframeVisual::CreateQuadWireframeGeometry()
   geometry.SetType( Geometry::LINES );
 
   return geometry;
+}
+
+void WireframeVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    //Register transform properties
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
 }
 
 } // namespace Internal

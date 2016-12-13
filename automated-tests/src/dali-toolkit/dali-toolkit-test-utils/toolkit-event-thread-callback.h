@@ -36,7 +36,7 @@ public:
 
   void Trigger();
 
-  void WaitingForTrigger(unsigned int count);
+  bool WaitingForTrigger(unsigned int count, unsigned int seconds );
 
   CallbackBase* GetCallback();
 
@@ -57,5 +57,20 @@ private:
 };
 
 }
+
+namespace Test
+{
+
+/**
+ * Wait for the tested code to create an event trigger, then
+ * wait for triggerCount Trigger calls to occur, and execute the trigger
+ * callback afterwards.
+ *
+ * Will wait for a maximum of 30s before failing the test and returning.
+ */
+bool WaitForEventThreadTrigger( int triggerCount );
+
+}
+
 
 #endif /* __DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H__ */

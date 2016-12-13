@@ -25,6 +25,7 @@
 #endif
 
 %include exception.i
+%include dali-gc.i
 
 %exception {
     try {
@@ -64,6 +65,7 @@
 #include <dali-toolkit/devel-api/builder/builder.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
@@ -75,6 +77,8 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
@@ -172,10 +176,7 @@ using namespace Dali;
 using namespace Dali::Toolkit;
 %}
 
-//%feature("director") Dali::Internal::CustomActorImpl;
-//%feature("notabstract") Dali::Internal::CustomActorImpl;
-//%feature("director") Dali::Toolkit::Internal::Control;
-//%feature("notabstract") Dali::Toolkit::Internal::Control;
+%feature("director") Dali::Toolkit::Internal::Control;
 %feature("notabstract") Dali::Toolkit::FixedRuler;
 %feature("notabstract") Dali::Toolkit::DefaultRuler;
 

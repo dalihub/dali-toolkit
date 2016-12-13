@@ -48,11 +48,11 @@ BubbleEmitter::BubbleEmitter(Dali::Internal::CustomActor* internal)
 }
 
 BubbleEmitter BubbleEmitter::New( const Vector2& winSize,
-                                  Image shapeImage,
+                                  Dali::Texture shapeTexture,
                                   unsigned int maximumNumberOfBubble,
                                   const Vector2& bubbleSizeRange )
 {
-  return Internal::BubbleEmitter::New( winSize, shapeImage, maximumNumberOfBubble, bubbleSizeRange );
+  return Internal::BubbleEmitter::New( winSize, shapeTexture, maximumNumberOfBubble, bubbleSizeRange );
 }
 
 BubbleEmitter::BubbleEmitter( const BubbleEmitter& handle )
@@ -79,14 +79,14 @@ Actor BubbleEmitter::GetRootActor()
   return GetImpl(*this).GetRootActor();
 }
 
-void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
+void BubbleEmitter::SetBackground( Dali::Texture bgTexture, const Vector3& hsvDelta )
 {
-  GetImpl(*this).SetBackground( bgImage, hsvDelta );
+  GetImpl(*this).SetBackground( bgTexture, hsvDelta );
 }
 
-void BubbleEmitter::SetShapeImage( Image shapeImage )
+void BubbleEmitter::SetBubbleShape( Dali::Texture shapeTexture )
 {
-  GetImpl(*this).SetShapeImage( shapeImage );
+  GetImpl(*this).SetBubbleShape( shapeTexture );
 }
 
 void BubbleEmitter::SetBubbleScale( float scale )

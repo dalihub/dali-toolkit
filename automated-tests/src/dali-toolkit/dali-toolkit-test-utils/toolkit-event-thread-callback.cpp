@@ -21,7 +21,10 @@
 #include <cstddef>
 #include <semaphore.h>
 #include <math.h>
+#include <ctime>
 #include <climits>
+#include <cstdio>
+#include <unistd.h>
 
 namespace Dali
 {
@@ -63,14 +66,18 @@ void EventThreadCallback::Trigger()
   }
 }
 
-void EventThreadCallback::WaitingForTrigger(unsigned int count)
+bool EventThreadCallback::WaitingForTrigger(unsigned int count, unsigned int seconds)
 {
   if(  mImpl->triggeredCount >= count )
   {
-    return;
+    return true;
   }
+  struct timespec now;
+  clock_gettime( CLOCK_REALTIME, &now );
+  now.tv_sec += seconds;
   mImpl->expectedCount = count;
-  sem_wait( &(mImpl->mySemaphore) );
+  int error = sem_timedwait( &(mImpl->mySemaphore), &now );
+  return error != 0;
 }
 
 CallbackBase* EventThreadCallback::GetCallback()
@@ -81,6 +88,49 @@ CallbackBase* EventThreadCallback::GetCallback()
 EventThreadCallback* EventThreadCallback::Get()
 {
   return gEventThreadCallback;
+}
+
+}
+
+namespace Test
+{
+
+bool WaitForEventThreadTrigger( int triggerCount )
+{
+  bool success = true;
+  const int TEST_TIMEOUT(30);
+
+  struct timespec startTime;
+  struct timespec now;
+  clock_gettime( CLOCK_REALTIME, &startTime );
+  now.tv_sec = startTime.tv_sec;
+  now.tv_nsec = startTime.tv_nsec;
+
+  Dali::EventThreadCallback* eventTrigger = NULL;
+  while( eventTrigger == NULL )
+  {
+    eventTrigger = Dali::EventThreadCallback::Get();
+    clock_gettime( CLOCK_REALTIME, &now );
+    if( now.tv_sec - startTime.tv_sec > TEST_TIMEOUT )
+    {
+      success = false;
+      break;
+    }
+    usleep(10);
+  }
+  if( eventTrigger != NULL )
+  {
+    Dali::CallbackBase* callback = eventTrigger->GetCallback();
+    eventTrigger->WaitingForTrigger( triggerCount, TEST_TIMEOUT - (now.tv_sec - startTime.tv_sec) );
+    Dali::CallbackBase::Execute( *callback );
+  }
+
+  clock_gettime( CLOCK_REALTIME, &now );
+  if( now.tv_sec > startTime.tv_sec + 1 )
+  {
+    fprintf(stderr, "WaitForEventThreadTrigger took %ld seconds\n", now.tv_sec - startTime.tv_sec );
+  }
+  return success;
 }
 
 }

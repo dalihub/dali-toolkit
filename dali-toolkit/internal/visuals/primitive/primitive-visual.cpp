@@ -22,11 +22,12 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -387,13 +388,6 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void PrimitiveVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-
-  // ToDo: renderer responds to the size change
-}
-
 void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize.x = mObjectDimensions.x;
@@ -410,7 +404,7 @@ void PrimitiveVisual::DoSetOnStage( Actor& actor )
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::PRIMITIVE );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
   map.Insert( Toolkit::PrimitiveVisual::Property::SHAPE, mPrimitiveType );
   map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SLICES, mSlices );
@@ -423,17 +417,6 @@ void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::PrimitiveVisual::Property::BEVEL_PERCENTAGE, mBevelPercentage );
   map.Insert( Toolkit::PrimitiveVisual::Property::BEVEL_SMOOTHNESS, mBevelSmoothness );
   map.Insert( Toolkit::PrimitiveVisual::Property::LIGHT_POSITION, mLightPosition );
-}
-
-void PrimitiveVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value PrimitiveVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
 }
 
 void PrimitiveVisual::OnSetTransform()
@@ -476,7 +459,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
   mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
   mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
-  mShader.RegisterProperty( Toolkit::PrimitiveVisual::Property::MIX_COLOR, COLOR_UNIFORM_NAME, mColor );
+  DevelHandle::RegisterProperty( mShader, Toolkit::PrimitiveVisual::Property::MIX_COLOR, COLOR_UNIFORM_NAME, mColor );
   mShader.RegisterProperty( OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions );
 }
 

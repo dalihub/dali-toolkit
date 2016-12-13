@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -58,13 +59,13 @@ public:
    * @brief Create an initialized BubbleEmitter.
    *
    * @param[in] winSize The size of the bubble moving area, usually the same size as the background.
-   * @param[in] shapeImage The alpha channnel of this texture defines the bubble shape.
+   * @param[in] shapeTexture The alpha channnel of this texture defines the bubble shape.
    * @param[in] maximumNumberOfBubble The maximum number of bubble needed.
    * @param[in] bubbleSizeRange The size range of the bubbles; x component is the low bound, and y component is the up bound.
    * @return The initialized BubbleEmitter object.
    */
   static BubbleEmitter New( const Vector2& winSize,
-                            Image shapeImage,
+                            Dali::Texture shapeTexture,
                             unsigned int maximumNumberOfBubble,
                             const Vector2& bubbleSizeRange );
 
@@ -107,19 +108,19 @@ public:
    * @brief Set Background image.
    *
    * The bubbles pick color from this image with HSV values adjusted.
-   * @param[in] bgImage The background image which provide color to bubbles.
+   * @param[in] bgTexture The background texture which provide color to bubbles.
    * @param[in] hsvDelta The hsv channel difference used to adjust the background image color.
    *            If set these vector as Vector3::Zero, original colors are used.
    */
-  void SetBackground( Image bgImage, const Vector3& hsvDelta );
+  void SetBackground( Dali::Texture bgTexture, const Vector3& hsvDelta );
 
   /**
    * @brief Set bubble shape.
    *
-   * The bubble mesh is a rectangular patch, but its displayed shape is decided by the alpha channel of the shape image.
-   * @param[in] shapeImage The image whose alpha channel defines the bubble shape.
+   * The bubble mesh is a rectangular patch, but its displayed shape is decided by the alpha channel of the shape texture.
+   * @param[in] shapeTexture The texture whose alpha channel defines the bubble shape.
    */
-  void SetShapeImage( Image shapeImage );
+  void SetBubbleShape( Dali::Texture shapeTexture );
 
   /**
    * @brief Set the scale factor applied to all the bubbles.

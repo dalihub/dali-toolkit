@@ -1118,11 +1118,23 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
   // Register index with a color visual
   dummyImpl.RegisterVisual( index, visual );
 
+  tet_infoline( "Add control with visual to stage and check renderer count is 1" );
+  Stage::GetCurrent().Add( dummy );
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_CHECK( dummyImpl.GetVisual( index ) == visual );
+  DALI_TEST_EQUALS( dummy.GetRendererCount(), 1, TEST_LOCATION );
 
   // Unregister visual
   dummyImpl.UnregisterVisual( index );
 
+  tet_infoline( "Remove control with visual from stage and check renderer count is 0" );
+  Stage::GetCurrent().Remove( dummy );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( dummy.GetRendererCount(), 0, TEST_LOCATION );
   DALI_TEST_CHECK( !dummyImpl.GetVisual( index ) );
 
   END_TEST;

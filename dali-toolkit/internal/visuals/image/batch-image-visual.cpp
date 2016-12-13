@@ -24,6 +24,7 @@
 #include <dali/public-api/images/native-image.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -31,7 +32,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/devel-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -127,11 +128,6 @@ void BatchImageVisual::DoSetProperties( const Property::Map& propertyMap )
   mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 }
 
-void BatchImageVisual::SetSize( const Vector2& size )
-{
-  Visual::Base::SetSize( size );
-}
-
 void BatchImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if( mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0 )
@@ -196,7 +192,7 @@ void BatchImageVisual::InitializeRenderer( const std::string& imageUrl )
       mImpl->mRenderer.SetTextures( textureSet );
 
       // Turn batching on, to send message it must be on stage.
-      mImpl->mRenderer.SetProperty( Dali::Renderer::Property::BATCHING_ENABLED, true );
+      mImpl->mRenderer.SetProperty( Dali::DevelRenderer::Property::BATCHING_ENABLED, true );
     }
     mImpl->mFlags |= Impl::IS_FROM_CACHE;
   }
@@ -209,7 +205,7 @@ void BatchImageVisual::DoSetOnStage( Actor& actor )
     InitializeRenderer( mImageUrl );
   }
   // Turn batching on, to send message it must be on stage
-  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::BATCHING_ENABLED, true );
+  mImpl->mRenderer.SetProperty( Dali::DevelRenderer::Property::BATCHING_ENABLED, true );
 
   actor.AddRenderer( mImpl->mRenderer );
 }
@@ -232,7 +228,7 @@ void BatchImageVisual::DoSetOffStage( Actor& actor )
 void BatchImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::VisualProperty::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
 
   if( !mImageUrl.empty() )
   {
@@ -241,17 +237,6 @@ void BatchImageVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
   }
-}
-
-void BatchImageVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
-{
-  // TODO
-}
-
-Dali::Property::Value BatchImageVisual::DoGetProperty( Dali::Property::Index index )
-{
-  // TODO
-  return Dali::Property::Value();
 }
 
 Shader BatchImageVisual::GetBatchShader( VisualFactoryCache& factoryCache )
@@ -275,6 +260,14 @@ void BatchImageVisual::CleanCache(const std::string& url)
   }
 }
 
+void BatchImageVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    //Register transform properties
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
 
 } // namespace Internal
 

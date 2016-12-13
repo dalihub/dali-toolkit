@@ -65,9 +65,9 @@ namespace
 
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_END    },
+  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
+  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
@@ -173,7 +173,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const std::string text = value.Get< std::string >();
+          const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p TEXT %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetText( text );
@@ -184,12 +184,12 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const Vector4 textColor = value.Get< Vector4 >();
+          const Vector4& textColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
-          if( impl.mController->GetTextColor() != textColor )
+          if( impl.mController->GetDefaultColor() != textColor )
           {
-            impl.mController->SetTextColor( textColor );
+            impl.mController->SetDefaultColor( textColor );
             impl.mController->SetInputColor( textColor );
             impl.mRenderer.Reset();
           }
@@ -200,7 +200,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const std::string fontFamily = value.Get< std::string >();
+          const std::string& fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
           impl.mController->SetDefaultFontFamily( fontFamily );
         }
@@ -229,14 +229,14 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const std::string alignStr = value.Get< std::string >();
+          const std::string& alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
-          LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
-                                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                              alignment ) )
+          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
+          if( Scripting::GetEnumeration< Layout::HorizontalAlignment >( alignStr.c_str(),
+                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                        alignment ) )
           {
             impl.mController->SetHorizontalAlignment( alignment );
           }
@@ -269,7 +269,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mDecorator )
         {
-          const Vector4 color = value.Get< Vector4 >();
+          const Vector4& color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PRIMARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
@@ -281,7 +281,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mDecorator )
         {
-          const Vector4 color = value.Get< Vector4 >();
+          const Vector4& color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SECONDARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
@@ -441,7 +441,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mDecorator )
         {
-          const Rect<int> box = value.Get< Rect<int> >();
+          const Rect<int>& box = value.Get< Rect<int> >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p DECORATION_BOUNDING_BOX %d,%d %dx%d\n", impl.mController.Get(), box.x, box.y, box.width, box.height );
 
           impl.mDecorator->SetBoundingBox( box );
@@ -464,7 +464,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const Vector4 inputColor = value.Get< Vector4 >();
+          const Vector4& inputColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), inputColor.r, inputColor.g, inputColor.b, inputColor.a );
 
           impl.mController->SetInputColor( inputColor );
@@ -475,7 +475,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const std::string fontFamily = value.Get< std::string >();
+          const std::string& fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
           impl.mController->SetInputFontFamily( fontFamily );
         }
@@ -624,7 +624,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if ( impl.mController )
         {
-          value = impl.mController->GetTextColor();
+          value = impl.mController->GetDefaultColor();
         }
         break;
       }
@@ -653,9 +653,9 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
-                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
+                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
           if( name )
           {
             value = std::string( name );
@@ -938,7 +938,7 @@ void TextEditor::OnInitialize()
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
-  mController->GetLayoutEngine().SetLayout( LayoutEngine::MULTI_LINE_BOX );
+  mController->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
   // Enables the text input.
   mController->EnableTextInput( mDecorator );
@@ -1088,7 +1088,7 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
 
   if( mRenderableActor )
   {
-    const Vector2& scrollOffset = mController->GetScrollPosition();
+    const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
 
     mRenderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
 
