@@ -17,8 +17,7 @@ public enum VisualType {
   IMAGE,
   MESH,
   PRIMITIVE,
-  WIREFRAME,
-  TEXT
+  WIREFRAME
 }
 
 }

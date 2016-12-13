@@ -1463,9 +1463,6 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Array_PushBack")]
   public static extern void Property_Array_PushBack(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Array_Add")]
-  public static extern global::System.IntPtr Property_Array_Add(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Array_GetElementAt__SWIG_0")]
   public static extern global::System.IntPtr Property_Array_GetElementAt__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1, uint jarg2);
 
@@ -1754,11 +1751,8 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_BaseHandle_GetObjectPtr")]
   public static extern global::System.IntPtr BaseHandle_GetObjectPtr(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_BaseHandle_HasBody")]
-  public static extern bool BaseHandle_HasBody(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_BaseHandle_IsEqual")]
-  public static extern bool BaseHandle_IsEqual(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_BaseHandle_IsHandleEmpty")]
+  public static extern bool BaseHandle_IsHandleEmpty(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_LessThan__SWIG_3")]
   public static extern bool LessThan__SWIG_3(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -6233,30 +6227,6 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_DragAndDropDetector_DroppedSignal")]
   public static extern global::System.IntPtr DragAndDropDetector_DroppedSignal(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_ApplicationExtensions__SWIG_0")]
-  public static extern global::System.IntPtr new_ApplicationExtensions__SWIG_0();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_ApplicationExtensions__SWIG_1")]
-  public static extern global::System.IntPtr new_ApplicationExtensions__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_delete_ApplicationExtensions")]
-  public static extern void delete_ApplicationExtensions(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ApplicationExtensions_Init")]
-  public static extern void ApplicationExtensions_Init(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ApplicationExtensions_Terminate")]
-  public static extern void ApplicationExtensions_Terminate(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ApplicationExtensions_Pause")]
-  public static extern void ApplicationExtensions_Pause(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ApplicationExtensions_Resume")]
-  public static extern void ApplicationExtensions_Resume(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ApplicationExtensions_LanguageChange")]
-  public static extern void ApplicationExtensions_LanguageChange(global::System.Runtime.InteropServices.HandleRef jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Window_New__SWIG_0")]
   public static extern global::System.IntPtr Window_New__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2, bool jarg3);
 
@@ -6560,17 +6530,17 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_IMAGE_VISUAL_BORDER_ONLY_get")]
   public static extern int IMAGE_VISUAL_BORDER_ONLY_get();
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_IMAGE_VISUAL_BATCHING_ENABLED_get")]
-  public static extern int IMAGE_VISUAL_BATCHING_ENABLED_get();
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_BATCHING_ENABLED_get")]
+  public static extern int BATCHING_ENABLED_get();
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_IMAGE_VISUAL_PIXEL_AREA_get")]
-  public static extern int IMAGE_VISUAL_PIXEL_AREA_get();
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_PIXEL_AREA_get")]
+  public static extern int PIXEL_AREA_get();
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_IMAGE_VISUAL_WRAP_MODE_U_get")]
-  public static extern int IMAGE_VISUAL_WRAP_MODE_U_get();
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_WRAP_MODE_U_get")]
+  public static extern int WRAP_MODE_U_get();
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_IMAGE_VISUAL_WRAP_MODE_V_get")]
-  public static extern int IMAGE_VISUAL_WRAP_MODE_V_get();
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_WRAP_MODE_V_get")]
+  public static extern int WRAP_MODE_V_get();
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_OBJECT_URL_get")]
   public static extern int OBJECT_URL_get();
@@ -6628,66 +6598,6 @@ class NDalicPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_PRIMITIVE_VISUAL_LIGHT_POSITION_get")]
   public static extern int PRIMITIVE_VISUAL_LIGHT_POSITION_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_RENDERING_BACKEND_get")]
-  public static extern int RENDERING_BACKEND_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TEXT_get")]
-  public static extern int TEXT_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_FONT_FAMILY_get")]
-  public static extern int FONT_FAMILY_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_FONT_STYLE_get")]
-  public static extern int FONT_STYLE_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_POINT_SIZE_get")]
-  public static extern int POINT_SIZE_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_MULTI_LINE_get")]
-  public static extern int MULTI_LINE_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_HORIZONTAL_ALIGNMENT_get")]
-  public static extern int HORIZONTAL_ALIGNMENT_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VERTICAL_ALIGNMENT_get")]
-  public static extern int VERTICAL_ALIGNMENT_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TEXT_COLOR_get")]
-  public static extern int TEXT_COLOR_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ENABLE_MARKUP_get")]
-  public static extern int ENABLE_MARKUP_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ENABLE_AUTO_SCROLL_get")]
-  public static extern int ENABLE_AUTO_SCROLL_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_AUTO_SCROLL_SPEED_get")]
-  public static extern int AUTO_SCROLL_SPEED_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_AUTO_SCROLL_LOOP_COUNT_get")]
-  public static extern int AUTO_SCROLL_LOOP_COUNT_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_AUTO_SCROLL_GAP_get")]
-  public static extern int AUTO_SCROLL_GAP_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_LINE_SPACING_get")]
-  public static extern int LINE_SPACING_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_UNDERLINE_get")]
-  public static extern int UNDERLINE_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_SHADOW_get")]
-  public static extern int SHADOW_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_EMBOSS_get")]
-  public static extern int EMBOSS_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_OUTLINE_get")]
-  public static extern int OUTLINE_get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_BATCHING_ENABLED_get")]
-  public static extern int BATCHING_ENABLED_get();
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_Builder")]
   public static extern global::System.IntPtr new_Builder();
@@ -6766,36 +6676,6 @@ class NDalicPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Builder_QuitSignal")]
   public static extern global::System.IntPtr Builder_QuitSignal(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_TransitionData__SWIG_0")]
-  public static extern global::System.IntPtr new_TransitionData__SWIG_0();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_delete_TransitionData")]
-  public static extern void delete_TransitionData(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_New__SWIG_0")]
-  public static extern global::System.IntPtr TransitionData_New__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_New__SWIG_1")]
-  public static extern global::System.IntPtr TransitionData_New__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_DownCast")]
-  public static extern global::System.IntPtr TransitionData_DownCast(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_TransitionData__SWIG_1")]
-  public static extern global::System.IntPtr new_TransitionData__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_Assign")]
-  public static extern global::System.IntPtr TransitionData_Assign(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_Count")]
-  public static extern uint TransitionData_Count(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_GetAnimatorAt")]
-  public static extern global::System.IntPtr TransitionData_GetAnimatorAt(global::System.Runtime.InteropServices.HandleRef jarg1, uint jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_TransitionData__SWIG_2")]
-  public static extern global::System.IntPtr new_TransitionData__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ViewImpl_New")]
   public static extern global::System.IntPtr ViewImpl_New();
@@ -7039,33 +6919,6 @@ class NDalicPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_View__SWIG_2")]
   public static extern global::System.IntPtr new_View__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_KeyInputFocusManager")]
-  public static extern global::System.IntPtr new_KeyInputFocusManager();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_delete_KeyInputFocusManager")]
-  public static extern void delete_KeyInputFocusManager(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_Get")]
-  public static extern global::System.IntPtr KeyInputFocusManager_Get();
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_SetFocus")]
-  public static extern void KeyInputFocusManager_SetFocus(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_GetCurrentFocusControl")]
-  public static extern global::System.IntPtr KeyInputFocusManager_GetCurrentFocusControl(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_RemoveFocus")]
-  public static extern void KeyInputFocusManager_RemoveFocus(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_IsKeyboardListener")]
-  public static extern bool KeyInputFocusManager_IsKeyboardListener(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_KeyInputFocusChangedSignal")]
-  public static extern global::System.IntPtr KeyInputFocusManager_KeyInputFocusChangedSignal(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_UnhandledKeyEventSignal")]
-  public static extern global::System.IntPtr KeyInputFocusManager_UnhandledKeyEventSignal(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_Alignment_Padding__SWIG_0")]
   public static extern global::System.IntPtr new_Alignment_Padding__SWIG_0();
@@ -9785,20 +9638,11 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_Assign")]
   public static extern global::System.IntPtr VisualBase_Assign(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_SetName")]
-  public static extern void VisualBase_SetName(global::System.Runtime.InteropServices.HandleRef jarg1, string jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_GetName")]
-  public static extern string VisualBase_GetName(global::System.Runtime.InteropServices.HandleRef jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_SetSize")]
   public static extern void VisualBase_SetSize(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_GetSize")]
   public static extern global::System.IntPtr VisualBase_GetSize(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_GetHeightForWidth")]
-  public static extern float VisualBase_GetHeightForWidth(global::System.Runtime.InteropServices.HandleRef jarg1, float jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_GetNaturalSize")]
   public static extern void VisualBase_GetNaturalSize(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -9809,14 +9653,17 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_GetDepthIndex")]
   public static extern float VisualBase_GetDepthIndex(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_SetOnStage")]
+  public static extern void VisualBase_SetOnStage(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_SetOffStage")]
+  public static extern void VisualBase_SetOffStage(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_RemoveAndReset")]
+  public static extern void VisualBase_RemoveAndReset(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_CreatePropertyMap")]
   public static extern void VisualBase_CreatePropertyMap(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_SetProperty")]
-  public static extern void VisualBase_SetProperty(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_VisualBase_GetProperty")]
-  public static extern global::System.IntPtr VisualBase_GetProperty(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_VisualBase__SWIG_2")]
   public static extern global::System.IntPtr new_VisualBase__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -10745,17 +10592,11 @@ class NDalicPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Builder_SWIGUpcast")]
   public static extern global::System.IntPtr Builder_SWIGUpcast(global::System.IntPtr jarg1);
 
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_TransitionData_SWIGUpcast")]
-  public static extern global::System.IntPtr TransitionData_SWIGUpcast(global::System.IntPtr jarg1);
-
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ViewImpl_SWIGUpcast")]
   public static extern global::System.IntPtr ViewImpl_SWIGUpcast(global::System.IntPtr jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_View_SWIGUpcast")]
   public static extern global::System.IntPtr View_SWIGUpcast(global::System.IntPtr jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_KeyInputFocusManager_SWIGUpcast")]
-  public static extern global::System.IntPtr KeyInputFocusManager_SWIGUpcast(global::System.IntPtr jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Alignment_SWIGUpcast")]
   public static extern global::System.IntPtr Alignment_SWIGUpcast(global::System.IntPtr jarg1);

@@ -209,7 +209,7 @@ public class MarkReachedEventArgs : EventArgs
      if (_sliderValueChangedEventHandler != null)
      {
         //here we send all page to user event handlers
-      return _sliderValueChangedEventHandler(this, e);
+      return _sliderValueChangedEventHandler(this, e, true);
      }
      return false;
   }
@@ -257,7 +257,7 @@ public class MarkReachedEventArgs : EventArgs
      if (_sliderSlidingFinishedEventHandler != null)
      {
         //here we send all page to user event handlers
-      return _sliderSlidingFinishedEventHandler(this, e);
+      return _sliderSlidingFinishedEventHandler(this, e, true);
      }
      return false;
   }
@@ -305,7 +305,7 @@ public class MarkReachedEventArgs : EventArgs
      if (_sliderMarkReachedEventHandler != null)
      {
         //here we send all page to user event handlers
-      return _sliderMarkReachedEventHandler(this, e);
+      return _sliderMarkReachedEventHandler(this, e, true);
      }
      return false;
   }

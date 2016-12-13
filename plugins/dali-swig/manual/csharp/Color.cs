@@ -2,22 +2,6 @@ namespace Dali {
 
 using System;
 
-
-public enum Colors
-{
-  Red,
-  White,
-  Blue,
-  Green,
-  Black,
-  Grey,
-  Yellow,
-  Azure,
-  Rose
-}
-
-
-
 public class Color : Vector4
        {
   /**
@@ -93,49 +77,6 @@ public class Color : Vector4
                        break;
                }
            }
-
-
-  /**
-   * @brief constructor
-   *
-   * @since 1.0.0
-   * @param [in] color as enum Colors.
-   */
-           public Color(Colors color)
-               : base(0, 0, 0, 0)
-           {
-               switch (color)
-               {
-                   case Colors.Red:
-                       SetColor(255, 0, 0, 255);
-                       break;
-                   case Colors.White:
-                       SetColor(255, 255, 255, 255);
-                       break;
-                   case Colors.Blue:
-                       SetColor(0, 0, 255, 255);
-                       break;
-                   case Colors.Green:
-                       SetColor(0, 255, 0, 255);
-                       break;
-                   case Colors.Black:
-                       SetColor(0, 0, 0, 255);
-                       break;
-                   case Colors.Grey:
-                       SetColor(128, 128, 128, 255);
-                       break;
-                   case Colors.Yellow:
-                       SetColor(255, 255, 0, 255);
-                       break;
-                   case Colors.Azure:
-                       SetColor(0, 255, 255, 255);
-                       break;
-                   case Colors.Rose:
-                       SetColor(255, 0, 255, 255);
-                       break;
-               }
-           }
-
    
   /**
    * @brief SetColor
