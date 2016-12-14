@@ -483,10 +483,12 @@ bool AlignTest( const AlignData& data )
   engine.SetHorizontalAlignment( data.horizontalAlignment );
   engine.SetVerticalAlignment( data.verticalAlignment );
 
+  float alignmentOffset = 0.f;
   engine.Align( data.textArea,
                 data.startIndex,
                 data.numberOfCharacters,
-                visualModel->mLines );
+                visualModel->mLines,
+                alignmentOffset );
 
   // Compare results.
   if( data.numberOfLines != visualModel->mLines.Count() )

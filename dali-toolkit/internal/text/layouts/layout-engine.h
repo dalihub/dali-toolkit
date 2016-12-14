@@ -186,11 +186,13 @@ public:
    * @param[in] startIndex Character index of the line from where the lines are aligned.
    * @param[in] numberOfCharacters The number of characters.
    * @param[in,out] lines The laid-out lines.
+   * @param[out] alignmentOffset The alignment offset.
    */
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
-              Vector<LineRun>& lines );
+              Vector<LineRun>& lines,
+              float& alignmentOffset );
 
   /**
    * @brief Sets the default line spacing.

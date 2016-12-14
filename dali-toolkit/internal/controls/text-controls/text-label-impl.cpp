@@ -730,9 +730,12 @@ void TextLabel::RenderText()
   Actor self = Self();
   Actor renderableActor;
 
+  float alignmentOffset = 0.f;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
+    renderableActor = mRenderer->Render( mController->GetView(),
+                                         alignmentOffset,
+                                         DepthIndex::TEXT );
   }
 
   if( renderableActor != mRenderableActor )
@@ -742,7 +745,7 @@ void TextLabel::RenderText()
     if( renderableActor )
     {
       const Vector2& scrollOffset = mController->GetScrollPosition();
-      renderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
+      renderableActor.SetPosition( scrollOffset.x + alignmentOffset, scrollOffset.y );
 
       self.Add( renderableActor );
     }

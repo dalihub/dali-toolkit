@@ -263,6 +263,7 @@ private: // Data
   Actor mRenderableActor;
   CallbackBase* mIdleCallback;
 
+  float mAlignmentOffset;
   int mRenderingBackend;
   bool mHasBeenStaged:1;
 };

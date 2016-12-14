@@ -274,6 +274,7 @@ private: // Data
   Actor mRenderableActor;
   CallbackBase* mIdleCallback;
 
+  float mAlignmentOffset;
   int mRenderingBackend;
   int mExceedPolicy;
   bool mHasBeenStaged:1;

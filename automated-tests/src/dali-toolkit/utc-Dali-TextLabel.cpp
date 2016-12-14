@@ -316,6 +316,17 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
     tet_result(TET_FAIL);
   }
 
+  try
+  {
+    // Render some text with the shared atlas backend
+    label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_VECTOR_BASED );
+    application.SendNotification();
+    application.Render();
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
   END_TEST;
 }
 
