@@ -95,29 +95,21 @@ void RadioButton::OnStateChange( State newState )
   // Radio button can be part of a group, if a button in the group is selected then all others should be unselected
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RadioButton::OnStateChange state(%d)\n", newState );
 
-   switch( newState )
-   {
-     case SELECTED_STATE:
-     {
-       Actor parent = Self().GetParent();
-       if( parent )
-       {
-         for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
-         {
-           Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
-           if( radioButtonChild && radioButtonChild != Self() )
-           {
-             radioButtonChild.SetSelected( false );
-           }
-         }
-       }
-     }
-
-     default:
-     {
-       break;
-     }
-   }
+  if ( SELECTED_STATE ==  newState )
+  {
+    Actor parent = Self().GetParent();
+    if( parent )
+    {
+      for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
+      {
+        Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
+        if( radioButtonChild && radioButtonChild != Self() )
+        {
+          radioButtonChild.SetSelected( false );
+        }
+      }
+    }
+  }
 }
 
 } // namespace Internal

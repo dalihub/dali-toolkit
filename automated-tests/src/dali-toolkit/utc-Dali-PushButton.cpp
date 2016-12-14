@@ -47,6 +47,10 @@ namespace
 {
 static const char* TEST_IMAGE_ONE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
+static const Vector2 INSIDE_TOUCH_POINT_POSITON  = Vector2( 240, 400 );
+static const Vector3 BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS  = Vector3( 200, 360, 0 );
+static const Size BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS  = Size( 100, 100 );
+
 static bool gPushButtonSelectedState = false;
 bool PushButtonSelected( Button button )
 {
@@ -70,11 +74,19 @@ static bool PushButtonReleased( Button button )
   return true;
 }
 
+static bool gPushButtonClicked = false;
+
+static bool PushButtonClicked( Button button )
+{
+  gPushButtonClicked = true;
+  return gPushButtonClicked;
+}
+
 Dali::Integration::Point GetPointDownInside()
 {
   Dali::Integration::Point point;
   point.SetState( PointState::DOWN );
-  point.SetScreenPosition( Vector2( 240, 400 ) );
+  point.SetScreenPosition( INSIDE_TOUCH_POINT_POSITON );
   return point;
 }
 
@@ -82,7 +94,7 @@ Dali::Integration::Point GetPointUpInside()
 {
   Dali::Integration::Point point;
   point.SetState( PointState::UP );
-  point.SetScreenPosition( Vector2( 240, 400 ) );
+  point.SetScreenPosition( INSIDE_TOUCH_POINT_POSITON );
   return point;
 }
 
@@ -90,7 +102,7 @@ Dali::Integration::Point GetPointLeave()
 {
   Dali::Integration::Point point;
   point.SetState( PointState::LEAVE );
-  point.SetScreenPosition( Vector2( 240, 400 ) );
+  point.SetScreenPosition( INSIDE_TOUCH_POINT_POSITON );
   return point;
 }
 
@@ -98,7 +110,7 @@ Dali::Integration::Point GetPointEnter()
 {
   Dali::Integration::Point point;
   point.SetState( PointState::MOTION );
-  point.SetScreenPosition( Vector2( 240, 400 ) );
+  point.SetScreenPosition( INSIDE_TOUCH_POINT_POSITON );
   return point;
 }
 
@@ -116,6 +128,22 @@ Dali::Integration::Point GetPointUpOutside()
   point.SetState( PointState::UP );
   point.SetScreenPosition( Vector2( 10, 10 ) );
   return point;
+}
+
+// Set up the position of the button for the default test events
+void SetupButtonForTestTouchEvents( ToolkitTestApplication& application, Button& button, bool useDefaultImages )
+{
+  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  if ( useDefaultImages )
+  {
+    const Vector2 TEST_IMAGE_SIZE = Vector2( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
+    TestPlatformAbstraction& platform = application.GetPlatform();
+    platform.SetClosestImageSize( TEST_IMAGE_SIZE );
+    button.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
+    button.SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
+  }
 }
 
 } //namespace
@@ -424,8 +452,8 @@ int UtcDaliPushButtonPressed(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 240, 400 );
-  pushButton.SetSize( 100, 100 );
+  pushButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -457,8 +485,8 @@ int UtcDaliPushButtonReleased(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 240, 400 );
-  pushButton.SetSize( 100, 100 );
+  pushButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -540,8 +568,8 @@ int UtcDaliPushButtonSelected(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 240, 400 );
-  pushButton.SetSize( 100, 100 );
+  pushButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -1011,7 +1039,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   ToolkitTestApplication application;
 
   PushButton pushButton = PushButton::New();
-  pushButton.SetSize(100.0f, 100.0f);
+  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -1238,6 +1266,40 @@ int UtcDaliPushButtonSetDisabledSelectedImageP(void)
   {
     DALI_TEST_CHECK( false );
   }
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonToggleSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonToggleSignalP Ensure Signals emitted");
+
+  PushButton button = PushButton::New();
+  button.SetProperty( Button::Property::TOGGLABLE, true);
+
+  SetupButtonForTestTouchEvents( application, button, true );
+
+  Stage::GetCurrent().Add( button );
+
+  application.SendNotification();
+  application.Render();
+
+  // connect to its signal
+  button.ClickedSignal().Connect( &PushButtonClicked );
+  gPushButtonClicked = false;
+
+  tet_infoline(" Touch down and up within button");
+  Dali::Integration::TouchEvent event;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( GetPointDownInside() );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( GetPointUpInside() );
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gPushButtonClicked, true, TEST_LOCATION );
 
   END_TEST;
 }

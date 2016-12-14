@@ -547,13 +547,13 @@ void Button::ButtonDown()
 
 void Button::ButtonUp()
 {
+  bool emitSignalsForPressAndReleaseAction = false;
+
   if( DEPRESSED == mButtonPressedState )
   {
-    bool validButtonAction = false;
-
     if( mTogglableButton ) // Button up will change state
     {
-      validButtonAction = OnToggleReleased(); // Derived toggle buttons can override this to provide custom behaviour
+      emitSignalsForPressAndReleaseAction = OnToggleReleased(); // Derived toggle buttons can override this to provide custom behaviour
     }
     else
     {
@@ -562,16 +562,20 @@ void Button::ButtonUp()
       {
         mAutoRepeatingTimer.Reset();
       }
-      validButtonAction = true;
+      emitSignalsForPressAndReleaseAction = true;
     }
+  }
+  else if ( TOGGLE_DEPRESSED == mButtonPressedState )
+  {
+    emitSignalsForPressAndReleaseAction = true; // toggle released after being pressed, a click
+  }
 
-    if ( validButtonAction )
-    {
-      // The clicked and released signals should be emitted regardless of toggle mode.
-      Toolkit::Button handle( GetOwner() );
-      mReleasedSignal.Emit( handle );
-      mClickedSignal.Emit( handle );
-    }
+  if ( emitSignalsForPressAndReleaseAction )
+  {
+    // The clicked and released signals should be emitted regardless of toggle mode.
+    Toolkit::Button handle( GetOwner() );
+    mReleasedSignal.Emit( handle );
+    mClickedSignal.Emit( handle );
   }
 }
 
@@ -1029,6 +1033,8 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
       textVisual.SetTransformAndSize( textVisualTransform, size );
     }
   }
+
+  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout selected (%s) \n", IsSelected()?"yes":"no" );
 
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout << \n");
 }
