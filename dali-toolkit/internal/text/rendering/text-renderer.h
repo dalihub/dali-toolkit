@@ -51,10 +51,13 @@ public:
    * @brief Render the glyphs from a ViewInterface.
    *
    * @param[in] view The interface to a view.
+   * @param[out] alignmentOffset Offset used to internally align the placement actor.
    * @param[in] depth The depth in the tree of the parent.
    * @return The Renderable actor used to position the text.
    */
-  virtual Actor Render( ViewInterface& view, int depth ) = 0;
+  virtual Actor Render( ViewInterface& view,
+                        float& alignmentOffset,
+                        int depth ) = 0;
 
 protected:
 

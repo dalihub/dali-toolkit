@@ -1078,10 +1078,12 @@ struct Engine::Impl
               CharacterIndex startIndex,
               Length numberOfCharacters,
               HorizontalAlignment horizontalAlignment,
-              Vector<LineRun>& lines )
+              Vector<LineRun>& lines,
+              float& alignmentOffset )
   {
     const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
 
+    alignmentOffset = MAX_FLOAT;
     // Traverse all lines and align the glyphs.
     for( Vector<LineRun>::Iterator it = lines.Begin(), endIt = lines.End();
          it != endIt;
@@ -1106,6 +1108,9 @@ struct Engine::Impl
       CalculateHorizontalAlignment( size.width,
                                     horizontalAlignment,
                                     line );
+
+      // Updates the alignment offset.
+      alignmentOffset = std::min( alignmentOffset, line.alignmentOffset );
     }
   }
 
@@ -1267,13 +1272,15 @@ void Engine::Align( const Size& size,
                     CharacterIndex startIndex,
                     Length numberOfCharacters,
                     Layout::HorizontalAlignment horizontalAlignment,
-                    Vector<LineRun>& lines )
+                    Vector<LineRun>& lines,
+                    float& alignmentOffset )
 {
   mImpl->Align( size,
                 startIndex,
                 numberOfCharacters,
                 horizontalAlignment,
-                lines );
+                lines,
+                alignmentOffset );
 }
 
 void Engine::SetDefaultLineSpacing( float lineSpacing )

@@ -94,6 +94,7 @@ Length View::GetNumberOfGlyphs() const
 
 Length View::GetGlyphs( GlyphInfo* glyphs,
                         Vector2* glyphPositions,
+                        float& minLineOffset,
                         GlyphIndex glyphIndex,
                         Length numberOfGlyphs ) const
 {
@@ -157,6 +158,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
 
         // Add the alignment offset to the glyph's position.
 
+        minLineOffset = line->alignmentOffset;
         float penY = line->ascender;
         for( Length index = 0u; index < numberOfLaidOutGlyphs; ++index )
         {
@@ -174,6 +176,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
             if( lineIndex < numberOfLines )
             {
               line = lineBuffer + lineIndex;
+              minLineOffset = std::min( minLineOffset, line->alignmentOffset );
 
               lastGlyphIndexOfLine = line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs - 1u;
 
