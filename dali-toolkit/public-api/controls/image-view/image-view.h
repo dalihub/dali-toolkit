@@ -125,7 +125,7 @@ public:
   static ImageView New();
 
   /**
-   * @DEPRECATED_1_2.8, use New( const std::string& ) instead.
+   * @DEPRECATED_1_2_8, use New( const std::string& ) instead.
    *
    * @brief Create an initialized ImageView from an Image instance.
    *
@@ -206,7 +206,7 @@ public:
   static ImageView DownCast( BaseHandle handle );
 
   /**
-   * @DEPRECATED_1_2.8, use SetImage( const std::string& ) instead.
+   * @DEPRECATED_1_2_8, use SetImage( const std::string& ) instead.
    *
    * @brief Sets this ImageView from an Image instance.
    *
