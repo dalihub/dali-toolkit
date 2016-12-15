@@ -94,14 +94,6 @@ protected:
    */
   virtual void OnSetTransform();
 
-public:
-
-  /**
-   * Set the color for rendering.
-   * @param[in] color The color to be rendered.
-   */
-  void SetColor( const Vector4& color );
-
 private:
   /**
    * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
@@ -115,12 +107,6 @@ private:
 
   // Undefined
   ColorVisual& operator=( const ColorVisual& colorRenderer );
-
-private:
-
-  Vector4 mMixColor;
-  Property::Index mMixColorIndex;
-
 };
 
 } // namespace Internal

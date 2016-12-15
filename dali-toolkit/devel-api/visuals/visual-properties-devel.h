@@ -57,22 +57,30 @@ enum Type
   /**
    * @brief The transform used by the visual.
    * @details Name "transform", type Property::Map.
-
+   *
    * @note Optional.
    * @see DevelVisual::Transform::Property
    */
-  TRANSFORM = SHADER + 1, // Dali::Toolkit::Visual::Property::SHADER + 1
+  TRANSFORM = SHADER + 1,
 
   /**
    * @brief Enables/disables premultiplied alpha.
    * The premultiplied alpha is false by default unless this behaviour is modified
    * by the derived Visual type.
-
+   *
    * @details Name "premultipliedAlpha", type Property::Boolean.
-
+   *
    * @note Optional.
    */
-  PREMULTIPLIED_ALPHA = SHADER + 2, // Dali::Toolkit::Visual::Property::SHADER + 2
+  PREMULTIPLIED_ALPHA = SHADER + 2,
+
+  /**
+   * @brief Mix color is a blend color for any visual.
+   * @details Name "mixColor", type Property::VECTOR4
+   *
+   * @note Optional
+   */
+  MIX_COLOR = SHADER + 3,
 };
 
 } //namespace Property

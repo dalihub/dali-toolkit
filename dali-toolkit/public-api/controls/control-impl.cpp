@@ -48,6 +48,7 @@
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 
@@ -82,25 +83,6 @@ struct RegisteredVisual
                    index(aIndex), visual(aVisual), enabled(aEnabled) {}
 };
 
-struct HandleIndex
-{
-  Handle handle; ///< a handle to the target object
-  Property::Index index; ///< The index of a property provided by the referenced object
-
-  HandleIndex( )
-  : handle(),
-    index( Property::INVALID_INDEX )
-  {
-  }
-
-  HandleIndex( Handle& handle, Property::Index index )
-  : handle( handle ),
-    index( index )
-  {
-  }
-};
-
-
 typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 
 /**
@@ -118,43 +100,23 @@ bool FindVisual( Property::Index targetIndex, RegisteredVisualContainer& visuals
   return false;
 }
 
-HandleIndex GetVisualProperty(
-  Internal::Control& controlImpl,
+Toolkit::Visual::Base GetVisualByName(
   RegisteredVisualContainer& visuals,
-  const std::string& visualName,
-  Property::Key propertyKey )
+  const std::string& visualName )
 {
-#if defined(DEBUG_ENABLED)
-  std::ostringstream oss;
-  oss << "Control::GetVisualProperty(" << visualName << ", " << propertyKey << ")" << std::endl;
-  DALI_LOG_INFO( gLogFilter, Debug::General, oss.str().c_str() );
-#endif
+  Toolkit::Visual::Base visualHandle;
 
-  // Find visualName in the control
   RegisteredVisualContainer::Iterator iter;
   for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
     Toolkit::Visual::Base visual = (*iter)->visual;
     if( visual && visual.GetName() == visualName )
     {
-      Internal::Visual::Base& visualImpl = GetImplementation(visual);
-      Renderer renderer = visualImpl.GetRenderer();
-      if( renderer )
-      {
-        Property::Index index = DevelHandle::GetPropertyIndex( renderer, propertyKey );
-        if( index != Property::INVALID_INDEX )
-        {
-          return HandleIndex( renderer, index );
-        }
-      }
+      visualHandle = visual;
+      break;
     }
   }
-
-  std::ostringstream noRenderers;
-  noRenderers << propertyKey;
-  DALI_LOG_WARNING( "Control::GetVisualProperty(%s, %s) No renderers\n", visualName.c_str(), noRenderers.str().c_str() );
-  Handle handle;
-  return HandleIndex( handle, Property::INVALID_INDEX );
+  return visualHandle;
 }
 
 void SetDefaultTransform( Property::Map& propertyMap )
@@ -910,50 +872,49 @@ Dali::Animation Control::CreateTransition( const Toolkit::TransitionData& handle
          iter != end; ++iter )
     {
       TransitionData::Animator* animator = (*iter);
-      HandleIndex handleIndex;
 
-      // Attempt to find the object name as a child actor
-      Actor child = Self().FindChildByName( animator->objectName );
-      if( child )
+      Toolkit::Visual::Base visual = GetVisualByName( mImpl->mVisuals, animator->objectName );
+
+      if( visual )
       {
-        Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
-        handleIndex = HandleIndex( child, propertyIndex );
+        Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+        visualImpl.AnimateProperty( transition, *animator );
       }
       else
       {
-        handleIndex = GetVisualProperty( *this, mImpl->mVisuals,
-                                            animator->objectName,
-                                            animator->propertyKey );
-      }
-
-      if( handleIndex.handle && handleIndex.index != Property::INVALID_INDEX )
-      {
-        if( animator->animate == false )
+        // Otherwise, try any actor children of control (Including the control)
+        Actor child = Self().FindChildByName( animator->objectName );
+        if( child )
         {
-          if( animator->targetValue.GetType() != Property::NONE )
+          Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
+          if( propertyIndex != Property::INVALID_INDEX )
           {
-            handleIndex.handle.SetProperty( handleIndex.index, animator->targetValue );
-          }
-        }
-        else
-        {
-          if( animator->initialValue.GetType() != Property::NONE )
-          {
-            handleIndex.handle.SetProperty( handleIndex.index, animator->initialValue );
-          }
+            if( animator->animate == false )
+            {
+              if( animator->targetValue.GetType() != Property::NONE )
+              {
+                child.SetProperty( propertyIndex, animator->targetValue );
+              }
+            }
+            else // animate the property
+            {
+              if( animator->initialValue.GetType() != Property::NONE )
+              {
+                child.SetProperty( propertyIndex, animator->initialValue );
+              }
 
-          if( ! transition )
-          {
-            // Create an animation with a default .1 second duration - the animators
-            // will automatically force it to the 'right' duration.
-            transition = Dali::Animation::New( 0.1f );
-          }
+              if( ! transition )
+              {
+                transition = Dali::Animation::New( 0.1f );
+              }
 
-          transition.AnimateTo( Property( handleIndex.handle, handleIndex.index ),
-                                animator->targetValue,
-                                animator->alphaFunction,
-                                TimePeriod( animator->timePeriodDelay,
-                                            animator->timePeriodDuration ) );
+              transition.AnimateTo( Property( child, propertyIndex ),
+                                    animator->targetValue,
+                                    animator->alphaFunction,
+                                    TimePeriod( animator->timePeriodDelay,
+                                                animator->timePeriodDuration ) );
+            }
+          }
         }
       }
     }

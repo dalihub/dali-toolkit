@@ -165,6 +165,13 @@ private:
    */
   bool LoadTextures();
 
+  /**
+   * Helper method to set individual values by index key.
+   * @param[in] index The index key of the value
+   * @param[in] value The value
+   */
+  void DoSetProperty( Property::Index index, const Property::Value& value );
+
 private:
 
   // Undefined

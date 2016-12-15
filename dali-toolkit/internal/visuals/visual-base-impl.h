@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-object.h>
@@ -27,8 +28,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/internal/visuals/transition-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 namespace Dali
 {
@@ -163,6 +165,33 @@ public:
    */
   Renderer GetRenderer();
 
+  /**
+   * Sets the mix color of the visual.
+   * @param[in] mixColor The new mix color
+   */
+  void SetMixColor( const Vector4& color );
+
+  /**
+   * Gets the mix color of the visual.
+   * @return The mix color
+   */
+  const Vector4& GetMixColor() const;
+
+  /**
+   * Animate the property if it exists in the visual or renderer.
+   *
+   * If it's a visual property such as mix color or a transform property,
+   * saves the target value to the local data.
+   *
+   * If the visual isn't staged (i.e. it doesn't have a renderer),
+   * then this will not add an animation.
+   *
+   * @param[in] transition The animation to create or attach to
+   * @param[in] animator The animation parameters of the property.
+   */
+  void AnimateProperty( Dali::Animation& transition,
+                        Internal::TransitionData::Animator& animator );
+
 protected:
 
   /**
@@ -232,6 +261,19 @@ protected:
   bool IsFromCache() const;
 
 private:
+
+  /**
+   * Register the mix color uniform on the Renderer and store the property index.
+   * Note, this is not used by Color or Primitive Visuals, which will use their
+   * own property index.
+   */
+  void RegisterMixColor();
+
+  /**
+   * When a mix color animation has finished, ensure the blend mode is set back
+   * to the right value for the target opacity.
+   */
+  void OnMixColorFinished( Animation& animation );
 
   // Undefined
   Base( const Visual::Base& visual );

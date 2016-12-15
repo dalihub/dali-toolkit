@@ -54,6 +54,9 @@ extern const char * const ANCHOR_POINT;
 // Premultiplied alpha
 extern const char * const PREMULTIPLIED_ALPHA;
 
+// Mix color
+extern const char * const MIX_COLOR;
+
 // Image visual
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;

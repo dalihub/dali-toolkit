@@ -79,11 +79,16 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
-  uniform lowp float uAlphaBlending; // Set to 1.0 for conventional alpha blending; if pre-multiplied alpha blending, set to 0.0
+  uniform lowp vec4 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+  }\n
   \n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * vec4( uColor.rgb*max( uAlphaBlending, uColor.a ), uColor.a );\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * visualMixColor();
   }\n
 );
 
@@ -113,21 +118,58 @@ void BatchImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   // url already passed in constructor
 
-  int desiredWidth = 0;
-  Property::Value* desiredWidthValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH, DESIRED_WIDTH );
-  if( desiredWidthValue )
+  for( Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter )
   {
-    desiredWidthValue->Get( desiredWidth );
+    KeyValuePair keyValue = propertyMap.GetKeyValue( iter );
+    if( keyValue.first.type == Property::Key::INDEX )
+    {
+      DoSetProperty( keyValue.first.indexKey, keyValue.second );
+    }
+    else
+    {
+      if( keyValue.first == DESIRED_WIDTH )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second );
+      }
+      else if( keyValue.first == DESIRED_HEIGHT )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second );
+      }
+    }
   }
+}
 
-  int desiredHeight = 0;
-  Property::Value* desiredHeightValue = propertyMap.Find( Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT, DESIRED_HEIGHT );
-  if( desiredHeightValue )
+void BatchImageVisual::DoSetProperty( Property::Index index, const Property::Value& value )
+{
+  switch( index )
   {
-    desiredHeightValue->Get( desiredHeight );
+    case Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH:
+    {
+      int width;
+      if( value.Get( width ) )
+      {
+        mDesiredSize.SetWidth( width );
+      }
+      else
+      {
+        DALI_LOG_ERROR("BatchImageVisual: width property has incorrect type\n");
+      }
+      break;
+    }
+    case Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
+    {
+      int height;
+      if( value.Get( height ) )
+      {
+        mDesiredSize.SetHeight( height );
+      }
+      else
+      {
+        DALI_LOG_ERROR("BatchImageVisual: height property has incorrect type\n");
+      }
+      break;
+    }
   }
-
-  mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
 }
 
 void BatchImageVisual::GetNaturalSize( Vector2& naturalSize )

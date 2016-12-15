@@ -420,12 +420,54 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   END_TEST;
 }
 
+int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
+{
+  ToolkitTestApplication application;
+
+  //Async loading, automatic atlasing for small size image
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+  callStack.Reset();
+  callStack.Enable(true);
+
+  Property::Map asyncLoadingMap;
+  asyncLoadingMap[ "url" ] = gImage_34_RGBA;
+  asyncLoadingMap[ "desiredHeight" ] = 34;
+  asyncLoadingMap[ "desiredWidth" ] = 34;
+  asyncLoadingMap[ "synchronousLoading" ] = false;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty( ImageView::Property::IMAGE, asyncLoadingMap );
+
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+  application.Render(16);
+  application.SendNotification();
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  callStack.Enable(false);
+
+  TraceCallStack::NamedParams params;
+  params["width"] = ToString(34);
+  params["height"] = ToString(34);
+  DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliImageViewSyncLoading(void)
 {
   ToolkitTestApplication application;
 
+  tet_infoline("ImageView Testing sync loading and size using index key property map");
+
   Property::Map syncLoadingMap;
-  syncLoadingMap[ "synchronousLoading" ] = true;
+  syncLoadingMap[ ImageVisual::Property::SYNCHRONOUS_LOADING ] = true;
 
   // Sync loading, no atlasing for big size image
   {
@@ -452,6 +494,51 @@ int UtcDaliImageViewSyncLoading(void)
     syncLoadingMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
     syncLoadingMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
     syncLoadingMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    // loading is started even if the actor is offStage
+    BitmapLoader loader = BitmapLoader::GetLatestCreated();
+    DALI_TEST_CHECK( loader );
+
+    loader.WaitForLoading();
+
+    DALI_TEST_CHECK( loader.IsLoaded() );
+
+    Stage::GetCurrent().Add( imageView );
+    application.SendNotification();
+    application.Render(16);
+
+    TraceCallStack::NamedParams params;
+    params["width"] = ToString(34);
+    params["height"] = ToString(34);
+    DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
+                      true, TEST_LOCATION );
+  }
+  END_TEST;
+}
+
+
+int UtcDaliImageViewSyncLoading02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing sync loading and size using string key property map");
+
+  // Sync loading, automatic atlasing for small size image
+  {
+    BitmapLoader::ResetLatestCreated();
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+    callStack.Reset();
+    callStack.Enable(true);
+
+    ImageView imageView = ImageView::New( );
+
+    // Sync loading is used
+    Property::Map syncLoadingMap;
+    syncLoadingMap[ "url" ] = gImage_34_RGBA;
+    syncLoadingMap[ "desiredHeight" ] = 34;
+    syncLoadingMap[ "desiredWidth" ] = 34;
+    syncLoadingMap[ "synchronousLoading" ] = true;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // loading is started even if the actor is offStage

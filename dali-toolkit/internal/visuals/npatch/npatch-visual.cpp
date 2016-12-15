@@ -132,10 +132,15 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
-  \n
+  uniform lowp vec4 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+  }\n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * visualMixColor();\n
   }\n
 );
 

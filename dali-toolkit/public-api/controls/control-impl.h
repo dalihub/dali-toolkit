@@ -371,6 +371,11 @@ protected: // For derived classes to call
   /**
    * @brief Create a transition effect on the control.
    *
+   * Only generates an animation if the properties described in the transition
+   * data are staged (e.g. the visual is Enabled and the control is on stage).
+   * Otherwise the target values are stored, and will get set onto the properties
+   * when the visual is next staged.
+   *
    * @SINCE_1_2.12
    *
    * @param[in] transitionData The transition data describing the effect to create

@@ -45,7 +45,8 @@ public:
   {
     enum Type
     {
-      TEST_VISUAL = PROPERTY_START_INDEX
+      TEST_VISUAL = PROPERTY_START_INDEX,
+      TEST_VISUAL2
     };
   };
 
@@ -70,7 +71,7 @@ public: // Not intended for application developers
  * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
  * This class does not override any of Internal::Control's behaviour.
  */
-class DummyControlImpl : public Internal::Control
+class DummyControlImpl : public Toolkit::Internal::Control
 {
 public:
 
@@ -111,21 +112,26 @@ protected:
   virtual ~DummyControlImpl();
 };
 
+namespace Impl
+{
+
 /**
  * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
  * This class DOES override Internal::Control's behaviour.
  */
-class DummyControlImplOverride : public DummyControlImpl
+class DummyControl : public Toolkit::DummyControlImpl
 {
 public:
 
-  static DummyControl New();
+  static Toolkit::DummyControl New();
+
+  void SetLayout( Property::Index visualIndex, Property::Map& map );
 
 private:
 
-  DummyControlImplOverride();
+  DummyControl();
 
-  virtual ~DummyControlImplOverride();
+  virtual ~DummyControl();
 
 private: // From Internal::Control
 
@@ -156,6 +162,9 @@ private: // From CustomActorImpl
   virtual void OnKeyInputFocusLost();
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
+  DALI_INTERNAL DummyControl( const DummyControl& );
+  DALI_INTERNAL DummyControl& operator=( const DummyControl& );
+
 public:
 
   bool initializeCalled;
@@ -180,7 +189,11 @@ public:
   bool keyEventCalled;
   bool keyInputFocusGained;
   bool keyInputFocusLost;
+
+  Property::Map mLayouts;
 };
+
+} // namespace Impl
 
 } // namespace Toolkit
 
