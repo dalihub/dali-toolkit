@@ -208,7 +208,7 @@ Internal::Visual::Base::Impl::Transform::Transform()
 
 void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Map& map )
 {
-  //Set default values
+  // Set default values
   mOffset = Vector2( 0.0f,0.0f );
   mSize = Vector2( 1.0f,1.0f );
   mOffsetSizeMode = Vector4( 0.0f,0.0f,0.0f,0.0f );
@@ -218,33 +218,67 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Ma
   for( Property::Map::SizeType i(0); i<map.Count(); ++i )
   {
     KeyValuePair keyValue = map.GetKeyValue( i );
-    if( keyValue.first == Toolkit::DevelVisual::Transform::Property::OFFSET )
+    if( keyValue.first.type == Property::Key::INDEX )
     {
-      keyValue.second.Get( mOffset );
-    }
-    else if( keyValue.first == Toolkit::DevelVisual::Transform::Property::SIZE )
-    {
-      keyValue.second.Get( mSize );
-    }
-    else if( keyValue.first == Toolkit::DevelVisual::Transform::Property::ORIGIN )
-    {
-      Toolkit::Align::Type align(Toolkit::Align::CENTER);
-      if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+      switch( keyValue.first.indexKey )
       {
-        mOrigin = align;
+        case Toolkit::DevelVisual::Transform::Property::OFFSET:
+        {
+          keyValue.second.Get( mOffset );
+          break;
+        }
+        case Toolkit::DevelVisual::Transform::Property::SIZE:
+        {
+          keyValue.second.Get( mSize );
+          break;
+        }
+        case Toolkit::DevelVisual::Transform::Property::ORIGIN:
+        {
+          Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mOrigin );
+          break;
+        }
+        case Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT:
+        {
+          Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint );
+          break;
+        }
+        case Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE:
+        {
+          keyValue.second.Get( mOffsetSizeMode );
+          break;
+        }
       }
     }
-    else if( keyValue.first == Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT )
+    else  // Key type is STRING
     {
-      Toolkit::Align::Type align(Toolkit::Align::CENTER);
-      if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+      if( keyValue.first == "offset" )
       {
-        mAnchorPoint = align;
+        keyValue.second.Get( mOffset );
       }
-    }
-    else if( keyValue.first == Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE )
-    {
-      keyValue.second.Get( mOffsetSizeMode );
+      else if( keyValue.first == "size" )
+      {
+        keyValue.second.Get( mSize );
+      }
+      else if( keyValue.first == "origin" )
+      {
+        Toolkit::Align::Type align(Toolkit::Align::CENTER);
+        if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+        {
+          mOrigin = align;
+        }
+      }
+      else if( keyValue.first == "anchorPoint" )
+      {
+        Toolkit::Align::Type align(Toolkit::Align::CENTER);
+        if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+        {
+          mAnchorPoint = align;
+        }
+      }
+      else if( keyValue.first == "offsetSizeMode" )
+      {
+        keyValue.second.Get( mOffsetSizeMode );
+      }
     }
   }
 }

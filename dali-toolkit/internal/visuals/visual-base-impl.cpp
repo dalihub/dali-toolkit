@@ -27,6 +27,13 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVisualBaseLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VISUAL_BASE" );
+#endif
+}
+
 namespace Dali
 {
 
@@ -107,6 +114,14 @@ void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size con
 {
   mImpl->mControlSize = controlSize;
   mImpl->mTransform.SetPropertyMap( transform );
+
+#if defined(DEBUG_ENABLED)
+  std::ostringstream oss;
+  oss << transform;
+  DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "Visual::Base::SetTransformAndSize(%s) - [\e[1;32mtransform: %s  controlSize: (%3.1f, %3.1f)]\e[0m\n",
+                 GetName().c_str(), oss.str().c_str(), controlSize.x, controlSize.y );
+#endif
+
   OnSetTransform();
 }
 
@@ -243,6 +258,11 @@ bool Visual::Base::IsOnStage() const
 bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
+}
+
+Renderer Visual::Base::GetRenderer()
+{
+  return mImpl->mRenderer;
 }
 
 } // namespace Internal

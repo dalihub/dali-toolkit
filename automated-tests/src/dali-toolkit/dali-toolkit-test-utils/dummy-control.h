@@ -28,13 +28,26 @@ namespace Toolkit
 {
 
 class DummyControlImpl;
-class ControlRenderer;
+
 /**
  * Control does not have a New method so use this dummy class for the handle.
  */
 class DummyControl : public Control
 {
 public:
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property index
+  };
+
+  struct Property
+  {
+    enum Type
+    {
+      TEST_VISUAL = PROPERTY_START_INDEX
+    };
+  };
 
   DummyControl();
   DummyControl(const DummyControl& control);
@@ -79,6 +92,10 @@ public:
 
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Animation CreateTransition( const Toolkit::TransitionData& transition );
+
+  static void SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value );
+
+  static Property::Value GetProperty( BaseObject* object, Dali::Property::Index propertyIndex );
 
   // Used to test signal connections
   void CustomSlot1( Actor actor );

@@ -96,6 +96,9 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   GetImplementation( *this ).CreatePropertyMap( map );
 }
 
+
+
+
 } // namespace Toolkit
 
 } // namespace Dali

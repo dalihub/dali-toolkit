@@ -338,71 +338,11 @@ int UtcDaliTransitionDataMap2P(void)
   END_TEST;
 }
 
-
 int UtcDaliTransitionDataMap3P(void)
 {
   TestApplication application;
 
-  tet_printf("Testing animation of a visual's placement actor property\n");
-
-  Property::Map map;
-  map["target"] = "visual1";
-  map["property"] = "color";
-  map["initialValue"] = Color::MAGENTA;
-  map["targetValue"] = Color::RED;
-  map["animator"] = Property::Map()
-    .Add("alphaFunction", "EASE_IN_OUT")
-    .Add("timePeriod", Property::Map()
-         .Add("delay", 0.5f)
-         .Add("duration", 1.0f));
-
-  Dali::Toolkit::TransitionData transition = TransitionData::New( map );
-
-  DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  actor.SetName("Actor1");
-  actor.SetColor(Color::CYAN);
-  Stage::GetCurrent().Add(actor);
-
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-
-  Property::Map visualMap;
-  visualMap[Visual::Property::TYPE] = Visual::COLOR;
-  visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
-  Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
-  visual.SetName( "visual1" );
-
-  Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, visual );
-
-  Animation anim = dummyImpl.CreateTransition( transition );
-  DALI_TEST_CHECK( anim );
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::MAGENTA, TEST_LOCATION);
-
-  anim.Play();
-
-  application.SendNotification();
-  application.Render(0);
-  application.Render(500);
-  application.Render(500); // Halfway thru map1 anim
-  application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), (Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
-
-  application.Render(500); // End of map1 anim
-  application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::RED, TEST_LOCATION );
-  END_TEST;
-}
-
-
-int UtcDaliTransitionDataMap4P(void)
-{
-  TestApplication application;
-
-  tet_printf("Testing animation of a visual's placement actor property using bezier curve\n");
+  tet_printf("Testing animation of an actor's position property using bezier curve\n");
 
   Property::Map map;
   map["target"] = "Actor1";
@@ -452,6 +392,79 @@ int UtcDaliTransitionDataMap4P(void)
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(100,100,0), TEST_LOCATION );
   END_TEST;
 }
+
+
+int UtcDaliTransitionDataMap4P(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing animation of a visual's transform property using programmatic maps\n");
+
+  Property::Map map1;
+  map1["target"] = "testVisual";
+  map1["property"] = "offset";
+  map1["initialValue"] = Vector2(0.0f, 0.0f);
+  map1["targetValue"] = Vector2(100.0f, 100.0f);
+  map1["animator"] = Property::Map()
+    .Add("alphaFunction", "LINEAR")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.5f)
+         .Add("duration", 1.0f));
+
+  Property::Map map2;
+  map2["target"] = "testVisual";
+  map2["property"] = "size";
+  map2["initialValue"] = Vector2(10.0f, 10.0f);
+  map2["targetValue"] = Vector2(110.0f, 110.0f);
+  map2["animator"] = Property::Map()
+    .Add("alphaFunction", "LINEAR")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.5f)
+         .Add("duration", 1.0f));
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New( Property::Array().Add(map1).Add(map2) );
+
+  DummyControl actor = DummyControl::New();
+  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  actor.SetName("Actor1");
+  Stage::GetCurrent().Add(actor);
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
+  Property::Map visualMap;
+  visualMap[Visual::Property::TYPE] = Visual::COLOR;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+  Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
+
+  visual.SetName( "testVisual" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  Animation anim = dummyImpl.CreateTransition( transition );
+  DALI_TEST_CHECK( anim );
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index sizeIndex = renderer.GetPropertyIndex( "size" );
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(sizeIndex), Vector2(10.0f, 10.0f), TEST_LOCATION);
+
+  anim.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(500); // Start animation
+  application.Render(500); // Halfway thru anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(sizeIndex), Vector2(60.0f, 60.0f), TEST_LOCATION);
+
+  application.Render(500); // End of anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(sizeIndex), Vector2(110.0f, 110.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliTransitionDataMap1N(void)
 {
