@@ -45,9 +45,6 @@
 %}
 #endif
 
-// This define is needed to fix SWIG compilation error when compiling / parsing DALi deprecated APIs.
-#define DALI_DEPRECATED_API
-
 %{
 #include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
