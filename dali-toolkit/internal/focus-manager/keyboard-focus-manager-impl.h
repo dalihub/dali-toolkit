@@ -107,6 +107,11 @@ public:
    */
   Actor GetFocusIndicatorActor();
 
+  /**
+   * Move current focus to backward
+   */
+  void MoveFocusBackward();
+
 public:
 
   /**
@@ -148,6 +153,9 @@ protected:
   virtual ~KeyboardFocusManager();
 
 private:
+
+  typedef Dali::Vector< Dali::BaseObject* > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
+  typedef FocusStack::Iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
 
   /**
    * Get the focus group of current focused actor.
@@ -252,7 +260,12 @@ private:
 
   bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
 
+  FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
+
+  FocusStackIterator mFocusHistoryIter; ///< Iterator for mFocusHistory
+
   SlotDelegate< KeyboardFocusManager > mSlotDelegate;
+
 };
 
 } // namespace Internal
