@@ -2112,10 +2112,10 @@ int UtcDaliVisualFactoryGetBatchImageVisual4N(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
+int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual: Request animated image visual with a gif url" );
+  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual1: Request animated image visual with a gif url" );
 
   VisualFactory factory = VisualFactory::Get();
   Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
@@ -2128,6 +2128,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  actor.SetSize( 200.0f, 200.0f );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -2186,6 +2187,72 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
 
   // Test SetOffStage().
   actor.Unparent();
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area" );
+
+  const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
+  Property::Map propertyMap;
+  propertyMap.Add( Visual::Property::TYPE,  Visual::IMAGE  )
+             .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME  )
+             .Add( ImageVisual::Property::PIXEL_AREA, pixelArea )
+             .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT )
+             .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Enable( true );
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  actor.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  // For animated image visual, the wrapping is handled manually in shader, so the following gl function should not be called
+  std::stringstream out;
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
+  DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+
+  // test the uniforms which used to handle the wrap mode
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Value pixelAreaValue = renderer.GetProperty( renderer.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelArea, TEST_LOCATION );
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelArea, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  Property::Value wrapModeValue = renderer.GetProperty( renderer.GetPropertyIndex( "wrapMode" ) );
+  Vector2 wrapMode( WrapMode::MIRRORED_REPEAT-1, WrapMode::REPEAT-1 );
+  DALI_TEST_EQUALS( wrapModeValue.Get<Vector2>(), wrapMode, TEST_LOCATION );
+  Vector2 wrapModeUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector2>( "wrapMode", wrapModeUniform ) );
+  DALI_TEST_EQUALS( wrapMode, wrapModeUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;

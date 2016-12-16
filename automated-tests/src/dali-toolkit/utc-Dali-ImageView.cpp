@@ -80,6 +80,9 @@ static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
 static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 
+// resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
+
 void TestImage( ImageView imageView, BufferImage image )
 {
   Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
@@ -359,6 +362,62 @@ int UtcDaliImageViewSetGetProperty03(void)
   value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   DALI_TEST_CHECK( value.Get( enable ) );
   DALI_TEST_CHECK( enable );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPixelArea(void)
+{
+  // Test pixel area property
+  ToolkitTestApplication application;
+
+  // Gif image, use AnimatedImageVisual internally
+  // Atlasing is applied to pack multiple frames, use custom wrap mode
+  ImageView gifView = ImageView::New();
+  const Vector4 pixelAreaVisual( 0.f, 0.f, 2.f, 2.f );
+  gifView.SetProperty( ImageView::Property::IMAGE,
+                       Property::Map().Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+                                      .Add( ImageVisual::Property::PIXEL_AREA, pixelAreaVisual ) );
+
+  // Add to stage
+  Stage stage = Stage::GetCurrent();
+  stage.Add( gifView );
+
+  // loading started
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK( gifView.GetRendererCount() == 1u );
+
+  const Vector4 fullTextureRect( 0.f, 0.f, 1.f, 1.f );
+  // test that the pixel area value defined in the visual property map is registered on renderer
+  Renderer renderer = gifView.GetRendererAt(0);
+  Property::Value pixelAreaValue = renderer.GetProperty( renderer.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelAreaVisual, TEST_LOCATION );
+
+  // test that the shader has the default pixel area value registered.
+  Shader shader = renderer.GetShader();
+  pixelAreaValue = shader.GetProperty( shader.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), fullTextureRect, TEST_LOCATION );
+
+  // test that the uniform uses the pixelArea property on the renderer.
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelAreaVisual, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // set the pixelArea property on the control
+  const Vector4 pixelAreaControl( -1.f, -1.f, 3.f, 3.f );
+  gifView.SetProperty( ImageView::Property::PIXEL_AREA, pixelAreaControl );
+  application.SendNotification();
+  application.Render(16);
+
+  // check the pixelArea property on the control
+  pixelAreaValue = gifView.GetProperty( gifView.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelAreaControl, TEST_LOCATION );
+  // test that the uniform uses the pixelArea property on the control.
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelAreaControl, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
 
   END_TEST;
 }

@@ -50,8 +50,6 @@ const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
 const char * const TEXT_COLOR_PROPERTY( "textColor" );
 const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 
-const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
-
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
