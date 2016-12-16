@@ -27,6 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_visuals
+ * @{
+ */
+
 namespace BorderVisual
 {
 
@@ -63,6 +68,10 @@ enum
 } // namespace Property
 
 } // namespace BorderVisual
+
+/**
+ * @}
+ */
 
 } // namespace Toolkit
 
