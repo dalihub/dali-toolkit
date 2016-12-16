@@ -44,13 +44,11 @@ public:
   static RendererPtr New();
 
   /**
-   * @brief Render the glyphs from a ViewInterface.
-   *
-   * @param[in] view The interface to a view.
-   * @param[in] depth The depth in the tree of the parent.
-   * @return The Renderable actor used to position the text.
+   * @copydoc Renderer::Render()
    */
-  virtual Actor Render( ViewInterface& view, int depth );
+  virtual Actor Render( ViewInterface& view,
+                        float& alignmentOffset,
+                        int depth );
 
 protected:
 

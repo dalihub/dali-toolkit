@@ -2689,10 +2689,13 @@ bool Controller::DoRelayout( const Size& size,
     // The laid-out lines.
     Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
 
+    // Need to align with the control's size as the text may contain lines
+    // starting either with left to right text or right to left.
     mImpl->mLayoutEngine.Align( size,
                                 startIndex,
                                 requestedNumberOfCharacters,
-                                lines );
+                                lines,
+                                mImpl->mAlignmentOffset );
 
     viewUpdated = true;
   }

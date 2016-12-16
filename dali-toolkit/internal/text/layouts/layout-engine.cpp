@@ -1076,10 +1076,12 @@ struct LayoutEngine::Impl
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
-              Vector<LineRun>& lines )
+              Vector<LineRun>& lines,
+              float& alignmentOffset )
   {
     const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
 
+    alignmentOffset = MAX_FLOAT;
     // Traverse all lines and align the glyphs.
     for( Vector<LineRun>::Iterator it = lines.Begin(), endIt = lines.End();
          it != endIt;
@@ -1103,6 +1105,9 @@ struct LayoutEngine::Impl
       // the box width, line length, and the paragraph's direction.
       CalculateHorizontalAlignment( size.width,
                                     line );
+
+      // Updates the alignment offset.
+      alignmentOffset = std::min( alignmentOffset, line.alignmentOffset );
     }
   }
 
@@ -1295,12 +1300,14 @@ void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParam
 void LayoutEngine::Align( const Size& size,
                           CharacterIndex startIndex,
                           Length numberOfCharacters,
-                          Vector<LineRun>& lines )
+                          Vector<LineRun>& lines,
+                          float& alignmentOffset )
 {
   mImpl->Align( size,
                 startIndex,
                 numberOfCharacters,
-                lines );
+                lines,
+                alignmentOffset );
 }
 
 void LayoutEngine::SetDefaultLineSpacing( float lineSpacing )

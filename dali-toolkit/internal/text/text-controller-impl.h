@@ -304,9 +304,11 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mTextColor( Color::BLACK ),
+    mScrollPosition(),
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
+    mAlignmentOffset( 0.f ),
     mRecalculateNaturalSize( true ),
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
@@ -713,6 +715,7 @@ public:
   TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
+  float mAlignmentOffset;                  ///< The alignment offset.
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.

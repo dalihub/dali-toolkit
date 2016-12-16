@@ -1093,7 +1093,9 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
   {
     if( mRenderer )
     {
-      renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
+      renderableActor = mRenderer->Render( mController->GetView(),
+                                           mAlignmentOffset,
+                                           DepthIndex::TEXT );
     }
 
     if( renderableActor != mRenderableActor )
@@ -1107,7 +1109,7 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
   {
     const Vector2& scrollOffset = mController->GetScrollPosition();
 
-    mRenderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
+    mRenderableActor.SetPosition( scrollOffset.x + mAlignmentOffset, scrollOffset.y );
 
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
@@ -1399,6 +1401,7 @@ void TextEditor::OnIdleSignal()
 TextEditor::TextEditor()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIdleCallback( NULL ),
+  mAlignmentOffset( 0.f ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false )
 {
