@@ -40,6 +40,7 @@
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
+#include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-resolve-url.h>
@@ -151,6 +152,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
           {
             visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
           }
+          else if( UrlType::GIF == type )
+          {
+            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+          }
           else // Regular image
           {
             bool batchingEnabled( false );
@@ -258,6 +263,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   else if( UrlType::SVG == type )
   {
     visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url );
+  }
+  else if( UrlType::GIF == type )
+  {
+    visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), url );
   }
   else // Regular image
   {

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-timer.h>
 #include <toolkit-bitmap-loader.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -43,6 +44,9 @@ const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_SIMPLE_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube-Points-Only.obj";
 const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simple.mtl";
+
+// resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
@@ -2048,6 +2052,85 @@ int UtcDaliVisualFactoryGetBatchImageVisual3(void)
 
   imageView.SetSize( 200.0f, 200.0f );
   Stage::GetCurrent().Add( imageView );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual: Request animated image visual with a gif url" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  DALI_TEST_CHECK( visual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  // renderer is added to actor
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  // test the uniforms which used to handle the atlas rect
+  // the four frames should be located inside atlas as follows: atlas size 100*100
+  // -------------
+  // |     |     |
+  // |  0  |  1  |
+  // -------------
+  // |     |     |
+  // |  2  |  3  |
+  // -------------
+
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Value atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
+  // take into consideration the half pixel correction
+  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(0.5f, 0.5f, 49.5f, 49.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // waiting for the resource uploading
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  // Force the timer used by the animatedImageVisual to tick,
+  Dali::Timer timer = Timer::New( 0 );
+  timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
+  // take into consideration the half pixel correction
+  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(50.5f, 0.5f, 99.5f, 49.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // Force the timer used by the animatedImageVisual to tick,
+  timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
+  // take into consideration the half pixel correction
+  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(0.5f, 50.5f, 49.5f, 99.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // Force the timer used by the animatedImageVisual to tick,
+  timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
+  // take into consideration the half pixel correction
+  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(50.5f, 50.5f, 99.5f, 99.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // Test SetOffStage().
+  actor.Unparent();
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
