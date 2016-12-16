@@ -87,6 +87,7 @@ public:
    *
    * @param[out] glyphs Pointer to a buffer where the glyphs are copied.
    * @param[out] glyphPositions Pointer to a buffer where the glyph's positions are copied.
+   * @param[out] minLineOffset The minimum line offset.
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs Number of glyphs to be copied.
    *
@@ -94,6 +95,7 @@ public:
    */
   virtual Length GetGlyphs( GlyphInfo* glyphs,
                             Vector2* glyphPositions,
+                            float& minLineOffset,
                             GlyphIndex glyphIndex,
                             Length numberOfGlyphs ) const = 0;
 

@@ -181,7 +181,9 @@ Text::RendererPtr VectorBasedRenderer::New()
   return Text::RendererPtr( new VectorBasedRenderer() );
 }
 
-Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
+Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
+                                   float& alignmentOffset,
+                                   int /*depth*/ )
 {
   UnparentAndReset( mImpl->mActor );
 
@@ -205,8 +207,10 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
 
     numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
                                      positions.Begin(),
+                                     alignmentOffset,
                                      0u,
                                      numberOfGlyphs );
+
     glyphs.Resize( numberOfGlyphs );
     positions.Resize( numberOfGlyphs );
 
@@ -218,7 +222,7 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view, int /*depth*/ )
     Vector< unsigned short > indices;
 
     const Vector2& controlSize = view.GetControlSize();
-    float xOffset = controlSize.width  * -0.5f;
+    float xOffset = -alignmentOffset + controlSize.width * -0.5f;
     float yOffset = controlSize.height * -0.5f;
 
     if( ! mImpl->mAtlas ||

@@ -482,11 +482,13 @@ bool AlignTest( const AlignData& data )
   Layout::Engine engine;
   engine.SetMetrics( metrics );
 
+  float alignmentOffset = 0.f;
   engine.Align( data.textArea,
                 data.startIndex,
                 data.numberOfCharacters,
                 data.horizontalAlignment,
-                visualModel->mLines );
+                visualModel->mLines,
+                alignmentOffset );
 
   // Compare results.
   if( data.numberOfLines != visualModel->mLines.Count() )
