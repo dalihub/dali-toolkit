@@ -69,19 +69,14 @@ private: // From Button
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonUp
+   * @copydoc Toolkit::Internal::Button::OnStateChange
    */
-  virtual void OnButtonUp();
+  virtual void OnStateChange( State newState );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelected
+   * @copydoc Toolkit::Internal::Button::OnToggleReleased
    */
-  virtual void OnSelected();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::OnLabelSet
-   */
-  virtual void OnLabelSet( bool noPadding );
+  virtual bool OnToggleReleased();
 
 private:
 

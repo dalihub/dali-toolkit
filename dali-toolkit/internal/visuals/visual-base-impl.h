@@ -22,6 +22,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
@@ -89,7 +90,12 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
    */
-  virtual float GetHeightForWidth( float width ) const;
+  virtual float GetHeightForWidth( float width );
+
+  /**
+   * @copydoc Toolkit::Visual::Base::GetWidthForHeight
+   */
+  virtual float GetWidthForHeight( float height );
 
   /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize
@@ -151,6 +157,11 @@ public:
    * @copydoc Toolkit::Visual::Base::GetProperty
    */
   Dali::Property::Value GetProperty( Dali::Property::Index index );
+
+  /**
+   * Gets currently staged renderer, or an empty handle if not staged
+   */
+  Renderer GetRenderer();
 
 protected:
 

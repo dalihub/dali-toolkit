@@ -105,11 +105,15 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the PushButton class.
+     * @SINCE_1_0.0
+     */
     enum
     {
-      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string @SINCE_1_0.0
-      SELECTED_ICON,                          ///< Property, name "selectedIcon",    type std::string @SINCE_1_0.0
-      ICON_ALIGNMENT,                         ///< Property, name "iconAlignment",   type std::string @SINCE_1_0.0
+      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Button::Property::UNSELECTED_VISUAL
+      SELECTED_ICON,                          ///< Property, name "selectedIcon",    type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Button::Property::SELECTED_VISUAL
+      ICON_ALIGNMENT,                         ///< Property, name "iconAlignment",   type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Use Button::Property::LABEL_RELATIVE_ALIGNMENT
       LABEL_PADDING,                          ///< Property, name "labelPadding",    type Vector4 @SINCE_1_0.0
       ICON_PADDING,                           ///< Property, name "iconPadding",     type Vector4 @SINCE_1_0.0
     };
@@ -168,7 +172,7 @@ public:
    */
   static PushButton DownCast( BaseHandle handle );
 
-
+  ///////////////////////////////////////////////////////////////////////////
   // Deprecated API
 
   using Button::SetButtonImage;
@@ -181,7 +185,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetButtonImage( Actor image );
+  void SetButtonImage( Actor image ) DALI_DEPRECATED_API;
 
   using Button::SetBackgroundImage;
 
@@ -193,7 +197,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetBackgroundImage( Actor image );
+  void SetBackgroundImage( Actor image ) DALI_DEPRECATED_API;
 
   using Button::SetSelectedImage;
 
@@ -205,7 +209,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetSelectedImage( Actor image );
+  void SetSelectedImage( Actor image ) DALI_DEPRECATED_API;
 
   using Button::SetSelectedBackgroundImage;
 
@@ -217,7 +221,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetSelectedBackgroundImage( Actor image );
+  void SetSelectedBackgroundImage( Actor image ) DALI_DEPRECATED_API;
 
   using Button::SetDisabledBackgroundImage;
 
@@ -229,7 +233,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetDisabledBackgroundImage( Actor image );
+  void SetDisabledBackgroundImage( Actor image ) DALI_DEPRECATED_API;
 
   using Button::SetDisabledImage;
 
@@ -241,7 +245,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetDisabledImage( Actor image );
+  void SetDisabledImage( Actor image ) DALI_DEPRECATED_API;
 
   using Button::SetDisabledSelectedImage;
 
@@ -253,7 +257,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] image The Actor to use.
    */
-  void SetDisabledSelectedImage( Actor image );
+  void SetDisabledSelectedImage( Actor image ) DALI_DEPRECATED_API;
 
 
 public: // Not intended for application developers

@@ -40,6 +40,16 @@ namespace Visual
 
 struct Base::Impl
 {
+  /**
+   * Constructor
+   */
+  Impl();
+
+  /**
+   * Destructor
+   */
+  ~Impl();
+
   enum Flags
   {
     IS_ON_STAGE = 1,
@@ -51,29 +61,29 @@ struct Base::Impl
 
   struct CustomShader
   {
+    CustomShader( const Property::Map& map );
+    void SetPropertyMap( const Property::Map& map );
+    void CreatePropertyMap( Property::Map& map ) const;
+
     std::string mVertexShader;
     std::string mFragmentShader;
     Dali::ImageDimensions mGridSize;
     Dali::Shader::Hint::Value mHints; //(bitfield) values from enum Shader::Hint
-
-    CustomShader( const Property::Map& map );
-    void SetPropertyMap( const Property::Map& map );
-    void CreatePropertyMap( Property::Map& map ) const;
   };
 
   struct Transform
   {
-    Vector2 mOffset;
-    Vector2 mSize;
-    Vector4 mOffsetSizeMode;
-    Toolkit::Align::Type mOrigin;
-    Toolkit::Align::Type mAnchorPoint;
-
     Transform();
     void SetPropertyMap( const Property::Map& map );
     void GetPropertyMap( Property::Map& map ) const;
     void RegisterUniforms( Renderer renderer, Toolkit::Direction::Type direction );
     Vector2 GetVisualSize( const Vector2& controlSize );
+
+    Vector2 mOffset;
+    Vector2 mSize;
+    Vector4 mOffsetSizeMode;
+    Toolkit::Align::Type mOrigin;
+    Toolkit::Align::Type mAnchorPoint;
   };
 
   Renderer      mRenderer;
@@ -83,9 +93,6 @@ struct Base::Impl
   Size          mControlSize;
   float         mDepthIndex;
   int           mFlags;
-
-  Impl();
-  ~Impl();
 };
 
 } // namespace Visual

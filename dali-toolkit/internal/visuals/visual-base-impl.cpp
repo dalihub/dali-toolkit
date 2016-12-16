@@ -27,6 +27,13 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVisualBaseLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VISUAL_BASE" );
+#endif
+}
+
 namespace Dali
 {
 
@@ -90,7 +97,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
 
       case DevelVisual::Property::PREMULTIPLIED_ALPHA:
       {
-        bool premultipliedAlpha( premultipliedAlpha );
+        bool premultipliedAlpha = false;
         if( value.Get( premultipliedAlpha ) )
         {
           EnablePreMultipliedAlpha( premultipliedAlpha );
@@ -107,6 +114,14 @@ void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size con
 {
   mImpl->mControlSize = controlSize;
   mImpl->mTransform.SetPropertyMap( transform );
+
+#if defined(DEBUG_ENABLED)
+  std::ostringstream oss;
+  oss << transform;
+  DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "Visual::Base::SetTransformAndSize(%s) - [\e[1;32mtransform: %s  controlSize: (%3.1f, %3.1f)]\e[0m\n",
+                 GetName().c_str(), oss.str().c_str(), controlSize.x, controlSize.y );
+#endif
+
   OnSetTransform();
 }
 
@@ -120,9 +135,28 @@ const std::string& Visual::Base::GetName()
   return mImpl->mName;
 }
 
-float Visual::Base::GetHeightForWidth( float width ) const
+float Visual::Base::GetHeightForWidth( float width )
 {
-  return 0.f;
+  float aspectCorrectedHeight = 0.f;
+  Vector2 naturalSize;
+  GetNaturalSize( naturalSize );
+  if( naturalSize.width )
+  {
+    aspectCorrectedHeight = naturalSize.height * width / naturalSize.width;
+  }
+  return aspectCorrectedHeight;
+}
+
+float Visual::Base::GetWidthForHeight( float height )
+{
+  float aspectCorrectedWidth = 0.f;
+  Vector2 naturalSize;
+  GetNaturalSize( naturalSize );
+  if( naturalSize.height > 0.0f )
+  {
+    aspectCorrectedWidth = naturalSize.width * height / naturalSize.height;
+  }
+  return aspectCorrectedWidth;
 }
 
 void Visual::Base::GetNaturalSize( Vector2& naturalSize )
@@ -224,6 +258,11 @@ bool Visual::Base::IsOnStage() const
 bool Visual::Base::IsFromCache() const
 {
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
+}
+
+Renderer Visual::Base::GetRenderer()
+{
+  return mImpl->mRenderer;
 }
 
 } // namespace Internal

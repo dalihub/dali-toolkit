@@ -89,6 +89,10 @@ public:
    */
   struct Property
   {
+    /**
+     * @brief An enumeration of properties belonging to the Control class.
+     * @SINCE_1_0.0
+     */
     enum
     {
       /**
@@ -326,17 +330,17 @@ public:
    * @SINCE_1_0.0
    * @return The background color of the control.
    */
-  Vector4 GetBackgroundColor() const;
+  Vector4 GetBackgroundColor() const DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_2.8, use Property::BACKGROUND instead
+   * @DEPRECATED_1_2_8, use Property::BACKGROUND instead
    *
    * @brief Sets an image as the background of the control.
    *
    * @SINCE_1_0.0
    * @param[in] image The image to set as the background.
    */
-  void SetBackgroundImage( Image image );
+  void SetBackgroundImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Clears the background.

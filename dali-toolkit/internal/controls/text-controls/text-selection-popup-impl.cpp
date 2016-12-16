@@ -34,6 +34,8 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -709,7 +711,7 @@ std::string TextSelectionPopup::GetPressedImage() const
 
      // Label properties.
      Property::Map buttonLabelProperties;
-     buttonLabelProperties.Insert( "text", button.caption );
+     buttonLabelProperties.Insert( Toolkit::TextVisual::Property::TEXT, button.caption );
      option.SetProperty( Toolkit::Button::Property::LABEL, buttonLabelProperties );
    }
    if( showIcons )

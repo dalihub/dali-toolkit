@@ -142,7 +142,16 @@ public:
    *
    * @return The height based on the width.
    */
-  float GetHeightForWidth( float width ) const;
+  float GetHeightForWidth( float width );
+
+  /**
+   * @brief Returns the width for a given height.
+   *
+   * @param[in] height Height to use.
+   *
+   * @return The width based on the height.
+   */
+  float GetWidthForHeight( float height );
 
   /**
    * @brief Return the natural size of the visual.

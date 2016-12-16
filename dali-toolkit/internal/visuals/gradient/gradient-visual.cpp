@@ -215,9 +215,11 @@ Dali::WrapMode::Type GetWrapMode( Toolkit::GradientVisual::SpreadMethod::Type sp
 
 } // unnamed namespace
 
-GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache )
+GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new GradientVisual( factoryCache );
+  GradientVisualPtr gradientVisualPtr( new GradientVisual( factoryCache ) );
+  gradientVisualPtr->SetProperties( properties );
+  return gradientVisualPtr;
 }
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )

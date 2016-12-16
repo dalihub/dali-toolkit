@@ -80,9 +80,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 );
 }
 
-ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache )
+ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new ColorVisual( factoryCache );
+  ColorVisualPtr colorVisualPtr( new ColorVisual( factoryCache ) );
+  colorVisualPtr->SetProperties( properties );
+  return colorVisualPtr;
 }
 
 ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )

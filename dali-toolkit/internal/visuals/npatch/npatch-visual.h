@@ -64,6 +64,19 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] imageUrl The URL to 9 patch image resource to use
+   * @param[in] properties A Property::Map containing settings for this visual
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties );
+
+  /**
+   * @brief Create an N-patch visual using an image URL.
+   *
+   * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] imageUrl The URL to 9 patch image resource to use
+   * @return A smart-pointer to the newly allocated visual.
    */
   static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
 

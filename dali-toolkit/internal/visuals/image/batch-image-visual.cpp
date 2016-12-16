@@ -89,10 +89,12 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 } // unnamed namespace
 
-BatchImageVisualPtr BatchImageVisual::New( VisualFactoryCache& factoryCache, const std::string& url )
+BatchImageVisualPtr BatchImageVisual::New( VisualFactoryCache& factoryCache, const std::string& url, const Property::Map& properties )
 {
   BatchImageVisualPtr visual = new BatchImageVisual( factoryCache );
   visual->mImageUrl = url;
+  visual->SetProperties( properties );
+
   return visual;
 }
 

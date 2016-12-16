@@ -155,6 +155,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/object/ref-object.h>
 %include <dali/public-api/object/any.h>
 
+%include <dali/public-api/common/dali-common.h>
 %include <dali/public-api/common/intrusive-ptr.h>
 
 %include <dali/public-api/math/vector2.h>

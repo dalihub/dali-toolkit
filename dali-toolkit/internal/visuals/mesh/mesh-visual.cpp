@@ -344,9 +344,11 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 
 } // unnamed namespace
 
-MeshVisualPtr MeshVisual::New( VisualFactoryCache& factoryCache )
+MeshVisualPtr MeshVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new MeshVisual( factoryCache );
+  MeshVisualPtr meshVisualPtr( new MeshVisual( factoryCache ) );
+  meshVisualPtr->SetProperties( properties );
+  return meshVisualPtr;
 }
 
 MeshVisual::MeshVisual( VisualFactoryCache& factoryCache )

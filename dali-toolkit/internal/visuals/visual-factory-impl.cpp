@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -63,6 +64,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, TEXT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
@@ -117,19 +119,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     {
       case Toolkit::Visual::BORDER:
       {
-        visualPtr = BorderVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = BorderVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
       case Toolkit::Visual::COLOR:
       {
-        visualPtr = ColorVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = ColorVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
       case Toolkit::Visual::GRADIENT:
       {
-        visualPtr = GradientVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = GradientVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
@@ -143,11 +145,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
           UrlType::Type type = ResolveUrlType( imageUrl );
           if( UrlType::N_PATCH == type )
           {
-            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl );
+            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
           }
           else if( UrlType::SVG == type )
           {
-            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl );
+            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
           }
           else // Regular image
           {
@@ -160,12 +162,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
             if( batchingEnabled )
             {
-              visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
-              break;
+              visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
             }
             else
             {
-              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
+              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
             }
           }
         }
@@ -175,13 +176,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
       case Toolkit::Visual::MESH:
       {
-        visualPtr = MeshVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = MeshVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
       case Toolkit::Visual::PRIMITIVE:
       {
-        visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
@@ -193,17 +194,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
       case Toolkit::DevelVisual::TEXT:
       {
-        visualPtr = TextVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = TextVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
     }
   }
 
-  if( visualPtr )
-  {
-    visualPtr->SetProperties( propertyMap );
-  }
-  else
+  if( !visualPtr )
   {
     DALI_LOG_ERROR( "Renderer type unknown\n" );
   }

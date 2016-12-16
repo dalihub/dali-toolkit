@@ -51,6 +51,9 @@ devel_api_bloom_view_header_files = \
 devel_api_bubble_emitter_header_files = \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.h
 
+devel_api_buttons_header_files = \
+  $(devel_api_src_dir)/controls/buttons/button-devel.h
+
 devel_api_builder_header_files = \
   $(devel_api_src_dir)/builder/builder.h \
   $(devel_api_src_dir)/builder/json-parser.h \
