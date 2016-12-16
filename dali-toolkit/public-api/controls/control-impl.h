@@ -54,6 +54,13 @@ namespace Internal
  */
 class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
 {
+protected:
+  /**
+   * @brief Virtual destructor.
+   * @SINCE_1_0.0
+   */
+  virtual ~Control();
+
 public:
 
   class Extension; ///< Forward declare future extension interface
@@ -425,12 +432,6 @@ protected: // Helpers for deriving classes
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
    */
   Control( ControlBehaviour behaviourFlags );
-
-  /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
-   */
-  virtual ~Control();
 
   /**
    * @brief Second phase initialization.
