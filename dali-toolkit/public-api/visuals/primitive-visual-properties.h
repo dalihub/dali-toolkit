@@ -27,6 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_visuals
+ * @{
+ */
+
 namespace PrimitiveVisual
 {
 
@@ -196,6 +201,10 @@ enum Type
 }
 
 } // namespace PrimitiveVisual
+
+/**
+ * @}
+ */
 
 } // namespace Toolkit
 

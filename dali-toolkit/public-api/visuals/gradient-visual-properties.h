@@ -27,6 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_visuals
+ * @{
+ */
+
 namespace GradientVisual
 {
 
@@ -138,6 +143,10 @@ enum Type
 } // namespace SpreadMethod
 
 } // namespace GradientVisual
+
+/**
+ * @}
+ */
 
 } // namespace Toolkit
 

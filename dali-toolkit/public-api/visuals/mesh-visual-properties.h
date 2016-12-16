@@ -27,6 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_visuals
+ * @{
+ */
+
 namespace MeshVisual
 {
 
@@ -111,6 +116,10 @@ enum Value
 } // namespace ShadingMode
 
 } // namespace MeshVisual
+
+/**
+ * @}
+ */
 
 } // namespace Toolkit
 
