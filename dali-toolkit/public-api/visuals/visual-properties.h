@@ -27,6 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_visuals
+ * @{
+ */
+
 namespace Visual
 {
 
@@ -133,6 +138,10 @@ enum
 } // namespace Shader
 
 } // namespace Visual
+
+/**
+ * @}
+ */
 
 } // namespace Toolkit
 
