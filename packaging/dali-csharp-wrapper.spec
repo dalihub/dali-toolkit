@@ -1,6 +1,6 @@
 Name:       NDalic
 Summary:    dali wrapper
-Version:    1.2.18
+Version:    1.2.19
 Release:    1
 Group:      uifw/graphic
 License:    TO_BE_FILLED_IN
