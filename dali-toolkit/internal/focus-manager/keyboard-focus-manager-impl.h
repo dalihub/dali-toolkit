@@ -262,8 +262,6 @@ private:
 
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 
-  FocusStackIterator mFocusHistoryIter; ///< Iterator for mFocusHistory
-
   SlotDelegate< KeyboardFocusManager > mSlotDelegate;
 
 };

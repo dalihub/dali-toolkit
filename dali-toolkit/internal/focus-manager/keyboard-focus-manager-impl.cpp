@@ -110,13 +110,18 @@ Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
 }
 
 KeyboardFocusManager::KeyboardFocusManager()
-: mCurrentFocusActor(0),
+: mPreFocusChangeSignal(),
+  mFocusChangedSignal(),
+  mFocusGroupChangedSignal(),
+  mFocusedActorEnterKeySignal(),
+  mCurrentFocusActor( 0 ),
   mFocusIndicatorActor(),
-  mFocusGroupLoopEnabled(false),
-  mIsKeyboardFocusEnabled(false),
-  mIsFocusIndicatorEnabled(false),
-  mIsWaitingKeyboardFocusChangeCommit(false),
-  mSlotDelegate(this)
+  mFocusGroupLoopEnabled( false ),
+  mIsKeyboardFocusEnabled( false ),
+  mIsFocusIndicatorEnabled( false ),
+  mIsWaitingKeyboardFocusChangeCommit( false ),
+  mFocusHistory(),
+  mSlotDelegate( this )
 {
   OnPhysicalKeyboardStatusChanged(PhysicalKeyboard::Get());
 
