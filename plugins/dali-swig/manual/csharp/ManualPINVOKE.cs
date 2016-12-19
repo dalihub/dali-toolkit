@@ -80,7 +80,7 @@ namespace Dali
         public static extern uint KeyboardPreFocusChangeSignal_GetConnectionCount(global::System.Runtime.InteropServices.HandleRef jarg1);
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_KeyboardPreFocusChangeSignal_Connect")]
-        public static extern void KeyboardPreFocusChangeSignal_Connect(global::System.Runtime.InteropServices.HandleRef jarg1, KeyboardFocusManager.PreFocusChangeEventCallbackDelegate delegate1);
+        public static extern void KeyboardPreFocusChangeSignal_Connect(global::System.Runtime.InteropServices.HandleRef jarg1, FocusManager.PreFocusChangeEventCallbackDelegate delegate1);
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_KeyboardPreFocusChangeSignal_Disconnect")]
         public static extern void KeyboardPreFocusChangeSignal_Disconnect(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);

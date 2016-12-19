@@ -779,6 +779,8 @@
       // Populate all members of "e" (OnStageEventArgs) with real data
       e.View = View.GetViewFromPtr(data);
 
+      //Console.WriteLine("############# OnStage()! e.View.Name=" + e.View.Name);
+
       if (_viewOnStageEventHandler != null)
       {
         //here we send all data to user event handlers

@@ -96,11 +96,11 @@ namespace MyCSharpExample
 
             CreateContent();
 
-            KeyboardFocusManager.Get().PreFocusChange += OnPreFocusChange;
+            FocusManager.Instance.PreFocusChange += OnPreFocusChange;
         }
 
         // Callback for KeyboardFocusManager
-        private Actor OnPreFocusChange(object source, KeyboardFocusManager.PreFocusChangeEventArgs e)
+        private Actor OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
         {
             if (!e.Proposed && !e.Current)
             {

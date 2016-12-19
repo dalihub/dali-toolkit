@@ -89,7 +89,7 @@ namespace MyCSharpExample
         {
             // Make sure when the current spin that takes input focus also takes the keyboard focus
             // For example, when you tap the spin directly
-            KeyboardFocusManager.Get().SetCurrentFocusActor(_textField);
+            FocusManager.Instance.SetCurrentFocusActor(_textField);
         }
 
         public void TextFieldKeyInputFocusLost(object source, KeyInputFocusLostEventArgs e)
@@ -371,13 +371,13 @@ namespace MyCSharpExample
             _spinDay.SetKeyboardFocusable(true);
             _spinDay.Name = "_spinDay";
 
-            KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.Get();
+            FocusManager keyboardFocusManager = FocusManager.Instance;
             keyboardFocusManager.PreFocusChange += OnKeyboardPreFocusChange;
             keyboardFocusManager.FocusedActorEnterKeyPressed += OnFocusedActorEnterKeyPressed;
 
         }
 
-        private Actor OnKeyboardPreFocusChange(object source, KeyboardFocusManager.PreFocusChangeEventArgs e)
+        private Actor OnKeyboardPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
         {
             Actor nextFocusActor = e.Proposed;
 
@@ -414,7 +414,7 @@ namespace MyCSharpExample
             return nextFocusActor;
         }
 
-        private void OnFocusedActorEnterKeyPressed(object source, KeyboardFocusManager.FocusedActorEnterKeyEventArgs e)
+        private void OnFocusedActorEnterKeyPressed(object source, FocusManager.FocusedActorEnterKeyEventArgs e)
         {
             // Make the text field in the current focused spin to take the key input
             KeyInputFocusManager manager = KeyInputFocusManager.Get();

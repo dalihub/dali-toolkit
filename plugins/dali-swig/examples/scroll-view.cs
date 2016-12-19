@@ -134,10 +134,9 @@ namespace MyCSharpExample
     }
 
     // Callback for _animation finished signal handling
-    public void AnimationFinished(object source, Animation.FinishedEventArgs e)
+    public void AnimationFinished(object sender, EventArgs e)
     {
       Console.WriteLine("Customized Animation Finished Event handler");
-      Console.WriteLine("Animation finished: duration = " + e.Animation.Duration);
     }
     private void OnKey(object source, View.KeyInputFocusGainedEventArgs e)
     {

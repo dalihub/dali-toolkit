@@ -26,113 +26,25 @@ using System.Runtime.InteropServices;
 %define Animation_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
   %typemap(cscode) NameSpace::ClassName %{
 
-    public static readonly int ParentOrigin = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_get();
-    public static readonly int ParentOriginX = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_X_get();
-    public static readonly int ParentOriginY = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Y_get();
-    public static readonly int ParentOriginZ = NDalicPINVOKE.Actor_Property_PARENT_ORIGIN_Z_get();
-    public static readonly int AnchorPoint = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_get();
-    public static readonly int AnchorPointX = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_X_get();
-    public static readonly int AnchorPointY = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Y_get();
-    public static readonly int AnchorPointZ = NDalicPINVOKE.Actor_Property_ANCHOR_POINT_Z_get();
-    public static readonly int Size = NDalicPINVOKE.Actor_Property_SIZE_get();
-    public static readonly int SizeWidth = NDalicPINVOKE.Actor_Property_SIZE_WIDTH_get();
-    public static readonly int SizeHeight = NDalicPINVOKE.Actor_Property_SIZE_HEIGHT_get();
-    public static readonly int SizeDepth = NDalicPINVOKE.Actor_Property_SIZE_DEPTH_get();
-    public static readonly int Position = NDalicPINVOKE.Actor_Property_POSITION_get();
-    public static readonly int PositionX = NDalicPINVOKE.Actor_Property_POSITION_X_get();
-    public static readonly int PositionY = NDalicPINVOKE.Actor_Property_POSITION_Y_get();
-    public static readonly int PositionZ = NDalicPINVOKE.Actor_Property_POSITION_Z_get();
-    public static readonly int WorldPosition = NDalicPINVOKE.Actor_Property_WORLD_POSITION_get();
-    public static readonly int WorldPositionX = NDalicPINVOKE.Actor_Property_WORLD_POSITION_X_get();
-    public static readonly int WorldPositionY = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Y_get();
-    public static readonly int WorldPositionZ = NDalicPINVOKE.Actor_Property_WORLD_POSITION_Z_get();
-    public static readonly int Orientation = NDalicPINVOKE.Actor_Property_ORIENTATION_get();
-    public static readonly int WorldOrientation = NDalicPINVOKE.Actor_Property_WORLD_ORIENTATION_get();
-    public static readonly int Scale = NDalicPINVOKE.Actor_Property_SCALE_get();
-    public static readonly int ScaleX = NDalicPINVOKE.Actor_Property_SCALE_X_get();
-    public static readonly int ScaleY = NDalicPINVOKE.Actor_Property_SCALE_Y_get();
-    public static readonly int ScaleZ = NDalicPINVOKE.Actor_Property_SCALE_Z_get();
-    public static readonly int WorldScale = NDalicPINVOKE.Actor_Property_WORLD_SCALE_get();
-    public static readonly int Visibile = NDalicPINVOKE.Actor_Property_VISIBLE_get();
-    public static readonly int Color = NDalicPINVOKE.Actor_Property_COLOR_get();
-    public static readonly int ColorRed = NDalicPINVOKE.Actor_Property_COLOR_RED_get();
-    public static readonly int ColorGreeb = NDalicPINVOKE.Actor_Property_COLOR_GREEN_get();
-    public static readonly int ColorBlue = NDalicPINVOKE.Actor_Property_COLOR_BLUE_get();
-    public static readonly int ColorAlpha = NDalicPINVOKE.Actor_Property_COLOR_ALPHA_get();
-    public static readonly int WorldColor = NDalicPINVOKE.Actor_Property_WORLD_COLOR_get();
-    public static readonly int WorldMatrix = NDalicPINVOKE.Actor_Property_WORLD_MATRIX_get();
-    public static readonly int Name = NDalicPINVOKE.Actor_Property_NAME_get();
-    public static readonly int Sensitive = NDalicPINVOKE.Actor_Property_SENSITIVE_get();
-    public static readonly int LeaveRequired = NDalicPINVOKE.Actor_Property_LEAVE_REQUIRED_get();
-    public static readonly int InheritOrientation = NDalicPINVOKE.Actor_Property_INHERIT_ORIENTATION_get();
-    public static readonly int InheritScale = NDalicPINVOKE.Actor_Property_INHERIT_SCALE_get();
-    public static readonly int ColorMode = NDalicPINVOKE.Actor_Property_COLOR_MODE_get();
-    public static readonly int PositionInheritance = NDalicPINVOKE.Actor_Property_POSITION_INHERITANCE_get();
-    public static readonly int DrawMode = NDalicPINVOKE.Actor_Property_DRAW_MODE_get();
-    public static readonly int SizeModeFactor = NDalicPINVOKE.Actor_Property_SIZE_MODE_FACTOR_get();
-    public static readonly int WidthResizePolicy = NDalicPINVOKE.Actor_Property_WIDTH_RESIZE_POLICY_get();
-    public static readonly int HeightResizePolicy = NDalicPINVOKE.Actor_Property_HEIGHT_RESIZE_POLICY_get();
-    public static readonly int SizeScalePolicy = NDalicPINVOKE.Actor_Property_SIZE_SCALE_POLICY_get();
-    public static readonly int WidthForHeight = NDalicPINVOKE.Actor_Property_WIDTH_FOR_HEIGHT_get();
-    public static readonly int HeightForWidth = NDalicPINVOKE.Actor_Property_HEIGHT_FOR_WIDTH_get();
-    public static readonly int Padding = NDalicPINVOKE.Actor_Property_PADDING_get();
-    public static readonly int MinimumSize = NDalicPINVOKE.Actor_Property_MINIMUM_SIZE_get();
-    public static readonly int MaximumSize = NDalicPINVOKE.Actor_Property_MAXIMUM_SIZE_get();
-    public static readonly int InheritPosition = NDalicPINVOKE.Actor_Property_INHERIT_POSITION_get();
-    public static readonly int ClippingMode = NDalicPINVOKE.Actor_Property_CLIPPING_MODE_get();
 
-    /**
-      * @brief Event arguments that passed via Finished signal
-      *
-      */
-    public class FinishedEventArgs : EventArgs
-    {
-      private Animation _animation;
-
-      /**
-        * @brief Animation - is the Animation which has finished with the animation.
-        *
-        */
-      public Animation Animation
-      {
-        get
-        {
-          return _animation;
-        }
-        set
-        {
-          _animation = value;
-        }
-      }
-    }
-
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void FinishedEventCallbackDelegate(IntPtr Animation);
-    private DaliEventHandler<object,FinishedEventArgs> _animationFinishedEventHandler;
-    private FinishedEventCallbackDelegate _animationFinishedEventCallbackDelegate;
+    private EventCallbackDelegateType1<IntPtr> _animationFinishedEventCallbackDelegate;
+    private event EventHandler _animationFinishedEventHandler;
 
     /**
       * @brief Event for Finished signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of FinishedEventHandler - DaliEventHandler<object,FinishedEventArgs>) provided by the user.
       * Finished signal is emitted when an Animation's animations have finished.
       */
-    public event DaliEventHandler<object,FinishedEventArgs> Finished
+    public event EventHandler Finished
     {
       add
       {
         lock(this)
         {
-          // Restricted to only one listener
-          if (_animationFinishedEventHandler == null)
-          {
-            _animationFinishedEventHandler += value;
-
-            _animationFinishedEventCallbackDelegate = new FinishedEventCallbackDelegate(OnFinished);
-            this.FinishedSignal().Connect(_animationFinishedEventCallbackDelegate);
-          }
+          _animationFinishedEventHandler += value;
+          _animationFinishedEventCallbackDelegate = OnFinished;
+          this.FinishedSignal().Connect(_animationFinishedEventCallbackDelegate);
         }
       }
-
       remove
       {
         lock(this)
@@ -141,7 +53,6 @@ using System.Runtime.InteropServices;
           {
             this.FinishedSignal().Disconnect(_animationFinishedEventCallbackDelegate);
           }
-
           _animationFinishedEventHandler -= value;
         }
       }
@@ -150,18 +61,12 @@ using System.Runtime.InteropServices;
     // Callback for Animation FinishedSignal
     private void OnFinished(IntPtr data)
     {
-      FinishedEventArgs e = new FinishedEventArgs();
-
-      // Populate all members of "e" (FinishedEventArgs) with real data
-      e.Animation = Animation.GetAnimationFromPtr(data);
-
       if (_animationFinishedEventHandler != null)
       {
         //here we send all data to user event handlers
-        _animationFinishedEventHandler(this, e);
+        _animationFinishedEventHandler(this, null);
       }
     }
-
 
   public static ClassName Get ## ClassName ## FromPtr(global::System.IntPtr cPtr) {
     ClassName ret = new ClassName(cPtr, false);
@@ -169,30 +74,25 @@ using System.Runtime.InteropServices;
     return ret;
   }
 
-
-  public float Duration
+  private float MilliSecondsToSeconds( int millisec )
   {
-    set
-    {
-       SetDuration(value);
-    }
-    get
-    {
-       float ret = GetDuration();
-       return ret;
-    }
+    return (float)millisec / 1000.0f;
   }
 
-  public int DurationMilliSecs
+  private int SecondsToMilliSeconds( float sec )
+  {
+    return (int)( sec * 1000 );
+  }
+
+  public int Duration
   {
     set
     {
-      SetDuration(value/1000);
+      SetDuration( MilliSecondsToSeconds( value ) );
     }
     get
     {
-      int ret = (int) GetDuration() * 1000;
-      return ret;
+      return SecondsToMilliSeconds( GetDuration() );
     }
   }
 
@@ -209,12 +109,11 @@ using System.Runtime.InteropServices;
     }
   }
 
-  public Animation.State Status
+  public Dali.Constants.Animation.State Status
   {
     get
     {
-       Animation.State ret = GetState();
-       return ret;
+       return (Dali.Constants.Animation.State)GetState();
     }
   }
 
@@ -244,114 +143,272 @@ using System.Runtime.InteropServices;
     }
   }
 
-  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue)
+  public Dali.Constants.Animation.EndAction EndAction
   {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(relativeValue);
-	AnimateBy(new Property(target, var), new Property.Value(obj));
+    set
+    {
+        switch(value)
+        {
+          case Dali.Constants.Animation.EndAction.Cancel :
+            SetEndAction(Dali.Animation.DaliEndAction.Bake);
+            break;
+          case Dali.Constants.Animation.EndAction.Discard :
+            SetEndAction(Dali.Animation.DaliEndAction.Discard);
+            break;
+          case Dali.Constants.Animation.EndAction.Stop :
+            SetEndAction(Dali.Animation.DaliEndAction.BakeFinal);
+            break;
+          default :
+            SetEndAction(Dali.Animation.DaliEndAction.Bake);
+            break;
+        }
+    }
+    get
+    {
+        Dali.Animation.DaliEndAction temp = GetEndAction();
+        switch(temp)
+        {
+          case Dali.Animation.DaliEndAction.Bake :
+            return Dali.Constants.Animation.EndAction.Cancel;
+          case Dali.Animation.DaliEndAction.Discard :
+            return Dali.Constants.Animation.EndAction.Discard;
+          case Dali.Animation.DaliEndAction.BakeFinal :
+            return Dali.Constants.Animation.EndAction.Stop;
+          default :
+            return Dali.Constants.Animation.EndAction.Cancel;
+        }
+    }
   }
 
-  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue, AlphaFunction alpha)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(relativeValue);
-	AnimateBy(new Property(target, var), new Property.Value(obj),  alpha);
-  }
-
-  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue, TimePeriod period)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(relativeValue);
-	AnimateBy(new Property(target, var), new Property.Value(obj), period);
-  }
-
-  public void AnimateBy<T,U>(Actor target, T propertyIndex, U relativeValue, AlphaFunction alpha, TimePeriod period)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(relativeValue);
-	AnimateBy(new Property(target, var), new Property.Value(obj), alpha, period);
-  }
-
-  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(destinationValue);
-	AnimateTo(new Property(target, var), new Property.Value(obj));
-  }
-
-  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue, AlphaFunction alpha)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(destinationValue);
-	AnimateTo(new Property(target, var), new Property.Value(obj), alpha);
-  }
-
-  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue, TimePeriod period)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(destinationValue);
-	AnimateTo(new Property(target, var), new Property.Value(obj), period);
-  }
-
-  public void AnimateTo<T,U>(Actor target, T propertyIndex, U destinationValue, AlphaFunction alpha, TimePeriod period)
-  {
-	dynamic var = (object)(propertyIndex);
-	dynamic obj = (object)(destinationValue);
-	AnimateTo(new Property(target, var), new Property.Value(obj), alpha, period);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, Animation.Interpolation interpolation)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames, interpolation);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames, alpha);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha, Animation.Interpolation interpolation)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames, alpha, interpolation);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, TimePeriod period)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames, period);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, TimePeriod period, Animation.Interpolation interpolation)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames,  period, interpolation);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames, alpha, period);
-  }
-
-  public void AnimateBetween<U>(Actor target, U propertyIndex, KeyFrames keyFrames, AlphaFunction alpha, TimePeriod period, Animation.Interpolation interpolation)
-  {
-	dynamic var = (object)(propertyIndex);
-	AnimateBetween(new Property(target, var), keyFrames, alpha, period, interpolation);
-  }
-
-  public void Stop(Animation.EndAction action) {
-    SetEndAction(action);
+  public void Stop(Dali.Constants.Animation.EndAction action) {
+    switch( action )
+    {
+      case Dali.Constants.Animation.EndAction.Cancel :
+        SetEndAction(Dali.Animation.DaliEndAction.Bake);
+        break;
+      case Dali.Constants.Animation.EndAction.Discard :
+        SetEndAction(Dali.Animation.DaliEndAction.Discard);
+        break;
+      case Dali.Constants.Animation.EndAction.Stop :
+        SetEndAction(Dali.Animation.DaliEndAction.BakeFinal);
+        break;
+      default :
+        SetEndAction(Dali.Animation.DaliEndAction.Bake);
+        break;
+    }
     NDalicPINVOKE.Animation_Stop(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public int StartTime { set; get; }
+  public int EndTime { set; get; }
+  public string TargetPoperty { set; get; }
+  public object Destination { set; get; }
+  public Dali.AlphaFunction AlphaFunction { set; get; }
+
+
+  public void AnimateBy(Actor target)
+  {
+    string _str1 = TargetPoperty.Substring(0, 1);
+    string _str2 = TargetPoperty.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+    dynamic obj = (object)Destination;
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBy(new Property(target, _str), new Property.Value(obj) );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateBy(new Property(target, _str), new Property.Value(obj), time );
+      }
+    }
+  }
+
+  public void AnimateBy(Actor target, string propertyIndex)
+  {
+    string _str1 = propertyIndex.Substring(0, 1);
+    string _str2 = propertyIndex.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+    dynamic obj = (object)Destination;
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBy(new Property(target, _str), new Property.Value(obj) );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateBy(new Property(target, _str), new Property.Value(obj), time );
+      }
+    }
+  }
+
+  public void AnimateBy(Actor target, string propertyIndex, object relativeValue)
+  {
+    string _str1 = propertyIndex.Substring(0, 1);
+    string _str2 = propertyIndex.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+    dynamic obj = (object)relativeValue;
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBy(new Property(target, _str), new Property.Value(obj) );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateBy(new Property(target, _str), new Property.Value(obj), time );
+      }
+    }
+  }
+
+  public void AnimateTo(Actor target)
+  {
+    string _str1 = TargetPoperty.Substring(0, 1);
+    string _str2 = TargetPoperty.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+    dynamic obj = (object)Destination;
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateTo(new Property(target, _str), new Property.Value(obj) );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateTo(new Property(target, _str), new Property.Value(obj), time );
+      }
+    }
+  }
+
+  public void AnimateTo(Actor target, string propertyIndex)
+  {
+    string _str1 = propertyIndex.Substring(0, 1);
+    string _str2 = propertyIndex.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+    dynamic obj = (object)Destination;
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateTo(new Property(target, _str), new Property.Value(obj) );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateTo(new Property(target, _str), new Property.Value(obj), time );
+      }
+    }
+  }
+
+  public void AnimateTo(Actor target, string propertyIndex, object destinationValue)
+  {
+    string _str1 = propertyIndex.Substring(0, 1);
+    string _str2 = propertyIndex.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+    dynamic obj = (object)destinationValue;
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateTo(new Property(target, _str), new Property.Value(obj) );
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        AnimateTo(new Property(target, _str), new Property.Value(obj), time );
+      }
+    }
   }
 
   /**
@@ -368,6 +425,11 @@ using System.Runtime.InteropServices;
   public Animation (int durationmSeconds) : this (NDalicPINVOKE.Animation_New((float)durationmSeconds/1000.0f), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
+
+  public Animation () : this (NDalicPINVOKE.Animation_New( 0.0f ), true ) {
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+  
 %}
 
 %enddef
