@@ -44,7 +44,7 @@ namespace MyCSharpExample
 
         // List of items
         private Item[] mViewList = {
-            new Item("PushButton", false),  new Item("DropDown", false),    new Item("Toggle", false),
+            new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", false),
             new Item("InputField", false),  new Item("AnimateGif", false),  new Item("Loading", false),
             new Item("ProgressBar", false), new Item("CheckBox", false),    new Item("RadioButton", true),
             new Item("Tooltip", false),     new Item("Popup", false),       new Item("Toast", false),
@@ -132,7 +132,20 @@ namespace MyCSharpExample
             {
                 if (item.name.CompareTo("PushButton") == 0)
                 {
+                    PushButton pushButton = new PushButton();
+                    pushButton.LabelText = "Push Button";
+                    pushButton.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
+                    pushButton.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
+                    pushButton.UnselectedColor = new Vector4(1.0f,0.0f,0.0f,1.0f);
+                    pushButton.SelectedColor = new Vector4(0.0f,1.0f,0.0f,1.0f);
+                    pushButton.Clicked += (obj, e) =>
+                    {
+                        e.Button.LabelText = "Click Me";
+                        e.Button.UnselectedColor = new Vector4(0.0f,0.0f,1.0f,1.0f);
+                        return true;
+                    };
 
+                    _contentContainer.AddChild(pushButton, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
                 }
                 if (item.name.CompareTo("DropDown") == 0)
                 {
