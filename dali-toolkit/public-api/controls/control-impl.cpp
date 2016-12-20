@@ -1051,12 +1051,10 @@ void Control::OnInitialize()
 
 void Control::OnControlChildAdd( Actor& child )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: OnControlChildAdd() is deprecated and will be removed from next release. Override OnChildAdd instead.\n" );
 }
 
 void Control::OnControlChildRemove( Actor& child )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: OnControlChildRemove() is deprecated and will be removed from next release. Override OnChildRemove instead.\n" );
 }
 
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
