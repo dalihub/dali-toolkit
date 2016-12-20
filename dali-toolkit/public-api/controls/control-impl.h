@@ -54,13 +54,6 @@ namespace Internal
  */
 class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
 {
-protected:
-  /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
-   */
-  virtual ~Control();
-
 public:
 
   class Extension; ///< Forward declare future extension interface
@@ -76,6 +69,14 @@ public:
    */
   static Toolkit::Control New();
 
+protected:
+  /**
+   * @brief Virtual destructor.
+   * @SINCE_1_0.0
+   */
+  virtual ~Control();
+
+public:
   // Styling
 
   /**
