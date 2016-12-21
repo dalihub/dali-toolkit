@@ -41,13 +41,14 @@ namespace MyCSharpExample
         private Dali.Application _application;
         private TableView _contentContainer;
         private Stage _stage;
+        private Popup _popup;
 
         // List of items
         private Item[] mViewList = {
             new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", false),
             new Item("InputField", false),  new Item("AnimateGif", false),  new Item("Loading", false),
             new Item("ProgressBar", false), new Item("CheckBox", false),    new Item("RadioButton", true),
-            new Item("Tooltip", false),     new Item("Popup", false),       new Item("Toast", false),
+            new Item("Tooltip", false),     new Item("Popup", true),       new Item("Toast", true),
             new Item("ItemView", false),    new Item("CheckBox", true)
         };
 
@@ -206,11 +207,60 @@ namespace MyCSharpExample
                 }
                 if (item.name.CompareTo("Popup") == 0)
                 {
+                    PushButton button = new PushButton();
+                    button.LabelText = "Popup";
+                    button.ParentOrigin = NDalic.ParentOriginCenter;
+                    button.AnchorPoint = NDalic.AnchorPointCenter;
+                    button.MaximumSize = new Vector2(90.0f,50.0f);
+                    _popup = CreatePopup();
+                    _popup.SetTitle(CreateTitle("Popup"));
 
+                    TextLabel text = new TextLabel("This will erase the file permanently. Are you sure?");
+                    text.BackgroundColor = Color.White;
+                    text.MultiLine = true;
+                    text.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
+                    text.SetResizePolicy(ResizePolicyType.DIMENSION_DEPENDENCY, DimensionType.HEIGHT);
+                    text.SetPadding(new RectFloat(10.0f, 10.0f, 20.0f, 0.0f));
+                    _popup.SetContent(text);
+                    _popup.SetKeyboardFocusable(true);
+                    _popup.SetDisplayState(Popup.DisplayStateType.HIDDEN);
+
+                    button.Clicked += (obj, ee) =>
+                    {
+                        _stage.Add(_popup);
+                        _popup.SetDisplayState(Popup.DisplayStateType.SHOWN);
+                        FocusManager.Instance.SetCurrentFocusActor((_popup.FindChildByName( "Footer" )).FindChildByName("OKButton"));
+                        return true;
+                    };
+                    _contentContainer.AddChild(button, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
                 }
                 if (item.name.CompareTo("Toast") == 0)
                 {
-
+                    PushButton button = new PushButton();
+                    button.LabelText = "Toast";
+                    button.ParentOrigin = NDalic.ParentOriginCenter;
+                    button.AnchorPoint = NDalic.AnchorPointCenter;
+                    button.Clicked += (obj, ee) =>
+                    {
+                        TypeInfo typeInfo = new TypeInfo(TypeRegistry.Get().GetTypeInfo( "PopupToast" ));
+                        if( typeInfo )
+                        {
+                            BaseHandle baseHandle = typeInfo.CreateInstance();
+                            if( baseHandle )
+                            {
+                                Popup toast = Popup.DownCast( baseHandle );
+                                TextLabel text = new TextLabel("This is a Toast.\nIt will auto-hide itself");
+                                text.TextColor = Color.White;
+                                text.MultiLine = true;
+                                text.HorizontalAlignment = "center";
+                                toast.SetTitle( text);
+                                _stage.Add(toast);
+                                toast.SetDisplayState( Popup.DisplayStateType.SHOWN);
+                            }
+                        }
+                        return true;
+                    };
+                    _contentContainer.AddChild(button, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
                 }
                 if (item.name.CompareTo("ItemView") == 0)
                 {
@@ -224,6 +274,81 @@ namespace MyCSharpExample
                 notSupportView.SetKeyboardFocusable(true);
                 _contentContainer.AddChild(notSupportView, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
             }
+        }
+        Popup CreatePopup()
+        {
+            Popup confirmationPopup = new Popup();
+
+            Actor footer = new Actor();
+            footer.SetName("Footer");
+            footer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
+            footer.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.HEIGHT);
+            footer.SetSize(0.0f, 80.0f);
+            footer.ParentOrigin = NDalic.ParentOriginCenter;
+            footer.AnchorPoint = NDalic.AnchorPointCenter;
+
+            PushButton okButton = CreateOKButton();
+            okButton.ParentOrigin = NDalic.ParentOriginCenter;
+            okButton.AnchorPoint = NDalic.AnchorPointCenter;
+            okButton.SetResizePolicy(ResizePolicyType.SIZE_FIXED_OFFSET_FROM_PARENT, DimensionType.ALL_DIMENSIONS);
+            okButton.SetSizeModeFactor(new Vector3(-20.0f, -20.0f, 0.0f));
+
+            PushButton cancelButton = CreateCancelButton();
+            cancelButton.ParentOrigin = NDalic.ParentOriginCenter;
+            cancelButton.AnchorPoint = NDalic.AnchorPointCenter;
+            cancelButton.SetResizePolicy(ResizePolicyType.SIZE_FIXED_OFFSET_FROM_PARENT, DimensionType.ALL_DIMENSIONS);
+            cancelButton.SetSizeModeFactor(new Vector3(-20.0f, -20.0f, 0.0f));
+
+            TableView controlLayout = new TableView(1, 2);
+            controlLayout.ParentOrigin = NDalic.ParentOriginCenter;
+            controlLayout.AnchorPoint = NDalic.AnchorPointCenter;
+            controlLayout.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
+            controlLayout.SetCellPadding(new Size(10.0f, 10.0f));
+            controlLayout.SetRelativeWidth(0, 0.5f);
+            controlLayout.SetRelativeWidth(1, 0.5f);
+            controlLayout.SetCellAlignment(new TableView.CellPosition(0, 0), HorizontalAlignmentType.CENTER, VerticalAlignmentType.CENTER);
+            controlLayout.SetCellAlignment(new TableView.CellPosition(0, 1), HorizontalAlignmentType.CENTER, VerticalAlignmentType.CENTER);
+            controlLayout.AddChild(okButton, new TableView.CellPosition(0, 0));
+            controlLayout.AddChild(cancelButton, new TableView.CellPosition(0, 1));
+
+            footer.Add(controlLayout);
+
+            confirmationPopup.SetFooter(footer);
+            return confirmationPopup;
+        }
+        Actor CreateTitle(string title)
+        {
+            TextLabel titleActor = new TextLabel(title);
+            titleActor.TextColor = Color.White;
+            titleActor.MultiLine = true;
+            titleActor.HorizontalAlignment = "center";
+            return titleActor;
+        }
+
+        PushButton CreateOKButton()
+        {
+            PushButton okayButton = new PushButton();
+            okayButton.SetName("OKButton");
+            okayButton.LabelText = "OK";
+            okayButton.SetKeyboardFocusable(true);
+            okayButton.Clicked += (obj, ee) =>
+            {
+                _popup.SetDisplayState(Popup.DisplayStateType.HIDDEN);
+                return true;
+            };
+            return okayButton;
+        }
+        PushButton CreateCancelButton()
+        {
+            PushButton cancelButton = new PushButton();
+            cancelButton.LabelText = "Cancel";
+            cancelButton.SetKeyboardFocusable(true);
+            cancelButton.Clicked += (obj, ee) =>
+            {
+                _popup.SetDisplayState(Popup.DisplayStateType.HIDDEN);
+                return true;
+            };
+            return cancelButton;
         }
 
         public void MainLoop()

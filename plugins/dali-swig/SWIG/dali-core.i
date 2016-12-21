@@ -194,6 +194,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/object/property-notification.h>
 %include <dali/public-api/object/handle.h>
 %include <dali/public-api/object/type-info.h>
+%include <dali/public-api/object/type-registry.h>
 
 %include <dali/public-api/common/constants.h>
 %include <dali/public-api/actors/actor-enumerations.h>
