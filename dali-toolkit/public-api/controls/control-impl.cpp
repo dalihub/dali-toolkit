@@ -460,12 +460,16 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackground( const Property::Map& map )
 {
   Actor self( Self() );
-  Toolkit::Visual::Base backgroundVisual;
-  InitializeVisual( self, backgroundVisual, map );
+  Toolkit::Visual::Base backgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
 
   // if new visual created, replace existing one
   if( backgroundVisual )
   {
+    if( self.OnStage() )
+    {
+      mImpl->mBackgroundVisual.RemoveAndReset( self );
+      backgroundVisual.SetOnStage( self );
+    }
     mImpl->mBackgroundVisual = backgroundVisual;
     mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
