@@ -32,12 +32,24 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief BorderVisual is to render a solid color as an internal border to the control's quad.
+ * @SINCE_1_1.45
+ */
 namespace BorderVisual
 {
 
+/**
+ * @brief BorderVisual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief BorderVisual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
