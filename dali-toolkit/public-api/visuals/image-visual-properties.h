@@ -32,12 +32,24 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief ImageVisual is to render an image into the control's quad.
+ * @SINCE_1_1.45
+ */
 namespace ImageVisual
 {
 
+/**
+ * @brief ImageVisual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief ImageVisual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
