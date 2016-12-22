@@ -162,20 +162,20 @@ void SuperBlurView::OnInitialize()
 
 void SuperBlurView::SetImage(Image inputImage)
 {
-  if( mTargetSize == Vector2::ZERO || mInputImage == inputImage)
+  mInputImage = inputImage;
+  if( mTargetSize == Vector2::ZERO )
   {
     return;
   }
 
   ClearBlurResource();
 
-  mInputImage = inputImage;
   Actor self( Self() );
 
   mVisuals[0] = Toolkit::VisualFactory::Get().CreateVisual( mInputImage );
   RegisterVisual( 0, mVisuals[0] ); // Will clean up previously registered visuals for this index.
   mVisuals[0].SetDepthIndex(0);
-  SetShaderEffect( mVisuals[0] );
+  // custom shader is not applied on the original image.
 
   BlurImage( 0,  inputImage);
   for(unsigned int i=1; i<mBlurLevels;i++)
@@ -264,8 +264,8 @@ void SuperBlurView::SetShaderEffect( Toolkit::Visual::Base& visual )
   std::stringstream verterShaderString;
   shaderMap[ "fragmentShader" ] = FRAGMENT_SHADER;
 
-  Internal::Visual::Base& rendererImpl = Toolkit::GetImplementation( visual );
-  rendererImpl.SetCustomShader( shaderMap );
+  Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+  visualImpl.SetCustomShader( shaderMap );
 }
 
 void SuperBlurView::OnSizeSet( const Vector3& targetSize )
@@ -296,22 +296,29 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 
 void SuperBlurView::OnStageConnection( int depth )
 {
-  // Chaining up first ensures visuals have SetOnStage called to create their renderers
-  Control::OnStageConnection( depth );
-
   if( mTargetSize == Vector2::ZERO )
   {
     return;
   }
 
+  // Chaining up first ensures visuals have SetOnStage called to create their renderers
+  Control::OnStageConnection( depth );
+
   Actor self = Self();
-  for(unsigned int i=1; i<=mBlurLevels;i++)
+  for(unsigned int i=0; i<=mBlurLevels;i++)
   {
+    // Note that the renderer indices are depending on the order they been added to the actor
+    // which might be different from the blur level of its texture.
+    // We can check the depth index of the renderer to know which blurred image it renders.
     Renderer renderer = self.GetRendererAt( i );
-    Property::Index index = renderer.RegisterProperty( ALPHA_UNIFORM_NAME, 0.f );
-    Constraint constraint = Constraint::New<float>( renderer, index, ActorOpacityConstraint(mBlurLevels, i-1) );
-    constraint.AddSource( Source( self, mBlurStrengthPropertyIndex ) );
-    constraint.Apply();
+    int depthIndex = renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX);
+    if( depthIndex > 0 )
+    {
+      Property::Index index = renderer.RegisterProperty( ALPHA_UNIFORM_NAME, 0.f );
+      Constraint constraint = Constraint::New<float>( renderer, index, ActorOpacityConstraint(mBlurLevels, depthIndex-1) );
+      constraint.AddSource( Source( self, mBlurStrengthPropertyIndex ) );
+      constraint.Apply();
+    }
   }
 }
 
