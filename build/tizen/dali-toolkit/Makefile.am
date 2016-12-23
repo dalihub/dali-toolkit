@@ -118,6 +118,7 @@ develapiscriptingdir =          $(develapidir)/scripting
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
+develapitooltipdir =            $(develapicontrolsdir)/tooltip
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 develapivisualfactorydir =      $(develapidir)/visual-factory
 develapivisualsdir =            $(develapidir)/visuals
@@ -146,6 +147,7 @@ develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
+develapitooltip_HEADERS =           $(devel_api_tooltip_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
 develapitextselectionpopup_HEADERS = $(devel_api_text_controls_header_files)
 

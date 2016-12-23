@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ class Timer;
 typedef IntrusivePtr<Timer> TimerPtr;
 
 Dali::Timer::TimerSignalType gTickSignal;
+int gTimerCount = 0;
 
 /**
  * Implementation of the timer
@@ -98,10 +99,12 @@ TimerPtr Timer::New( unsigned int milliSec )
 Timer::Timer( unsigned int milliSec )
 : mInterval( milliSec )
 {
+  ++gTimerCount;
 }
 
 Timer::~Timer()
 {
+  --gTimerCount;
 }
 
 void Timer::Start()
@@ -141,7 +144,11 @@ Dali::Timer::TimerSignalType& Timer::TickSignal()
 
 void Timer::MockEmitSignal()
 {
-  gTickSignal.Emit();
+  if( gTimerCount > 1 )
+  {
+    // Only emit the signal if we have more than just the timer created in the test function
+    gTickSignal.Emit();
+  }
 }
 
 

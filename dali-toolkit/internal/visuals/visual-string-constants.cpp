@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include "visual-string-constants.h"
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+
 namespace Dali
 {
 
@@ -26,6 +30,20 @@ namespace Toolkit
 
 namespace Internal
 {
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_TYPE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BORDER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, COLOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, TEXT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
+DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
+
+// Visual Type
+const char * const VISUAL_TYPE( "visualType" );
 
 // Custom shader
 const char * const CUSTOM_SHADER( "shader" );
@@ -49,6 +67,9 @@ extern const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );
 const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
+
+// Text visual
+const char * const TEXT_PROPERTY( "text" );
 
 } // namespace Internal
 

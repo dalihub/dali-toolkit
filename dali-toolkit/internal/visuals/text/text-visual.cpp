@@ -40,8 +40,7 @@ namespace Internal
 namespace
 {
 
-// Property names.
-const char * const TEXT_PROPERTY( "text" );
+// Property names - common properties defined in visual-string-constants.h/cpp
 const char * const FONT_FAMILY_PROPERTY( "fontFamily" );
 const char * const FONT_STYLE_PROPERTY( "fontStyle" );
 const char * const POINT_SIZE_PROPERTY( "pointSize" );
