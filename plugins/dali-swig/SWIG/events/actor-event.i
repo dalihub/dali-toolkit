@@ -41,8 +41,7 @@
     {
       get
       {
-        Actor parent = GetParent();
-        return parent;
+        return GetParent();
       }
     }
 
@@ -50,8 +49,7 @@
    {
       get
       {
-        bool visibility = IsVisible();
-        return visibility;
+        return IsVisible();
       }
     }
 
@@ -63,8 +61,7 @@
       }
       get
       {
-        float ret = GetCurrentOpacity();
-        return ret;
+        return GetCurrentOpacity();
       }
    }
 
@@ -76,8 +73,15 @@
       }
       get
       {
-        bool focusable = IsKeyboardFocusable();
-        return focusable;
+        return IsKeyboardFocusable();
+      }
+    }
+
+    public bool IsOnStage
+    {
+      get
+      {
+        return OnStage();
       }
     }
 

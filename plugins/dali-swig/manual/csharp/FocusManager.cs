@@ -20,18 +20,18 @@ namespace Dali {
 using System;
 using System.Runtime.InteropServices;
 
-public class KeyboardFocusManager : BaseHandle {
+public class FocusManager : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
-  internal KeyboardFocusManager(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicManualPINVOKE.KeyboardFocusManager_SWIGUpcast(cPtr), cMemoryOwn) {
+  internal FocusManager(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicManualPINVOKE.KeyboardFocusManager_SWIGUpcast(cPtr), cMemoryOwn) {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(KeyboardFocusManager obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(FocusManager obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~KeyboardFocusManager() {
+  ~FocusManager() {
     DisposeQueue.Instance.Add(this);
   }
 
@@ -461,12 +461,12 @@ public class PreFocusChangeEventArgs : EventArgs
      }
   }
 
-  public KeyboardFocusManager() : this(NDalicManualPINVOKE.new_KeyboardFocusManager(), true) {
+  public FocusManager() : this(NDalicManualPINVOKE.new_KeyboardFocusManager(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static KeyboardFocusManager Get() {
-    KeyboardFocusManager ret = new KeyboardFocusManager(NDalicManualPINVOKE.KeyboardFocusManager_Get(), true);
+  public static FocusManager Get() {
+    FocusManager ret = new FocusManager(NDalicManualPINVOKE.KeyboardFocusManager_Get(), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -556,6 +556,17 @@ public class PreFocusChangeEventArgs : EventArgs
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
+
+  private static readonly FocusManager instance = FocusManager.Get();
+
+  public static FocusManager Instance
+  {
+      get
+      {
+          return instance;
+      }
+  }
+
 
 }
 
