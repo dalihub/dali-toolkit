@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,7 +275,7 @@ void AtlasPacker::GrowNode( SizeType blockWidth, SizeType blockHeight )
   bool shouldGrowRight = canGrowRight && mRoot->rectArea.height >= mRoot->rectArea.width+blockWidth;
   bool shouldGrowDown = canGrowDown && mRoot->rectArea.width >= mRoot->rectArea.height+blockHeight;
 
-  if( canGrowRight && canGrowRight )
+  if( canGrowRight && canGrowDown )
   {
     shouldGrowRight = mRoot->rectArea.width+blockWidth <= mRoot->rectArea.height+blockHeight;
     shouldGrowDown = !shouldGrowRight;

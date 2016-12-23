@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1765,9 +1765,10 @@ Property::Array ItemView::GetLayoutArray()
 void ItemView::SetLayoutArray( const Property::Array& layouts )
 {
   mlayoutArray = layouts;
-  if(GetLayoutCount() > 0)
+  const int layoutCount = GetLayoutCount();
+  if( layoutCount > 0 )
   {
-    for(unsigned int index = GetLayoutCount() - 1; index >= 0; --index)
+    for(int index = layoutCount - 1; index >= 0; --index)
     {
       RemoveLayout(index);
       if(index == 0) break;
