@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Баарын тандоо"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Көчүрүү"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Тандоо"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Кесүү"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Коюу"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Буфер"
+

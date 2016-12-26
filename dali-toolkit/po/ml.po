@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "എല്ലാം തിരഞ്ഞെടുക്കുക"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "പകര്‍ത്തുക"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "തിരഞ്ഞെ."
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "മുറിക്കുക"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ഒട്ടിക്കുക"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ക്ലിപ്ബോര്‍ഡ്"
+

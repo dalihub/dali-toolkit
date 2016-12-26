@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "เลือก​ทั้ง​หมด"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "คัด​ลอก"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "เลือก"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "ตัด"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "วาง"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "คลิ​ป​บอร์ด"
+
