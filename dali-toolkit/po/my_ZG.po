@@ -1,0 +1,19 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "အားလုံးကုိ ေရြးပါ"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "ကူးပါ"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "ေရြးခ်ယ္"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "ျဖတ္ေတာက္ပါ"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ကူးထည့္ပါ"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ကလစ္ဘုတ္"
+
+

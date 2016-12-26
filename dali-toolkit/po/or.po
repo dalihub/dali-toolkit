@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "ସମସ୍ତ ଚୟନ"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "କପି"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "ଚୟନ"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "କଟ୍"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ଲେପନ"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "କ୍ଲିପବୋର୍ଡ"
+

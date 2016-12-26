@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Вылучыць усё"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Скапіраваць"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Выразаць"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Буфер абмену"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Выбраць"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Уставіць"
+

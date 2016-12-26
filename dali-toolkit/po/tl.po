@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Piliin lahat"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Kopyahin"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Piliin"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "I-cut"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "I-paste"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Clipboard"
+
