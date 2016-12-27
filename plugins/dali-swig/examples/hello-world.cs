@@ -34,15 +34,12 @@ namespace MyCSharpExample
       _application.Initialized += Initialize;
     }
 
-    public void Initialize(object source, AUIApplicationInitEventArgs e)
+    public void Initialize(object source, NUIApplicationInitEventArgs e)
     {
       Console.WriteLine("Customized Application Initialize event handler");
-      Stage stage = Stage.GetCurrent();
-      stage.BackgroundColor = Color.Cyan;
+      Stage stage = Stage.Instance;
+      stage.BackgroundColor = Color.White;
       stage.TouchEvent += OnStageTouched;
-      stage.WheelEvent += OnStageWheelMoved;
-      stage.KeyEvent += OnStageKeyPressed;
-      stage.EventProcessingFinished += OnStageEventProcessingFinished;
 
       // Add a _text label to the stage
       _text = new TextLabel("Hello Mono World");
@@ -57,41 +54,12 @@ namespace MyCSharpExample
     // Callback for _animation finished signal handling
     public void AnimationFinished(object sender, EventArgs e)
     {
-        Console.WriteLine("AnimationFinished()!");
-    }
-
-    // Callback for _animation finished signal handling
-    public void AnimationFinished2(object sender, EventArgs e)
-    {
-      Console.WriteLine("AnimationFinished2()!");
+      Console.WriteLine("AnimationFinished()!");
       if(_animation)
       {
         Console.WriteLine("Duration= " + _animation.Duration);
         Console.WriteLine("EndAction= " + _animation.EndAction);
       }
-    }
-
-    public void OnStageEventProcessingFinished(object sender, EventArgs e)
-    {
-      Console.WriteLine("OnStageEventProcessingFinished()!");
-      if( e != null)
-      {
-        Console.WriteLine("e != null !");
-      }
-    }
-
-    public void OnStageKeyPressed(object sender, Stage.KeyEventArgs e)
-    {
-      Console.WriteLine("OnStageKeyEventOccured()!");
-      Console.WriteLine("keyPressedName=" + e.KeyEvent.keyPressedName);
-      Console.WriteLine("state=" + e.KeyEvent.state);
-    }
-
-    public void OnStageWheelMoved(object sender, Stage.WheelEventArgs e)
-    {
-      Console.WriteLine("OnStageWheelEventOccured()!");
-      Console.WriteLine("direction=" + e.WheelEvent.direction);
-      Console.WriteLine("type=" + e.WheelEvent.type);
     }
 
     // Callback for stage touched signal handling
@@ -112,34 +80,33 @@ namespace MyCSharpExample
           Duration = 2000,
           StartTime = 0,
           EndTime = 500,
-          TargetPoperty = "Orientation",
+          TargetProperty = "Orientation",
           Destination = new Quaternion( new Radian( new Degree( 180.0f ) ), Vect3.Xaxis)
         };
         _animation.AnimateTo(_text);
 
         _animation.StartTime = 500;
         _animation.EndTime = 1000;
-        _animation.TargetPoperty = "Orientation";
+        _animation.TargetProperty = "Orientation";
         _animation.Destination = new Quaternion( new Radian( new Degree( 0.0f ) ), Vect3.Xaxis );
         _animation.AnimateTo(_text);
 
         _animation.StartTime = 1000;
         _animation.EndTime = 1500;
-        _animation.TargetPoperty = "ScaleX";
+        _animation.TargetProperty = "ScaleX";
         _animation.Destination = 3.0f;
         _animation.AnimateBy(_text);
 
         _animation.StartTime = 1500;
         _animation.EndTime = 2000;
-        _animation.TargetPoperty = "ScaleY";
+        _animation.TargetProperty = "ScaleY";
         _animation.Destination = 4.0f;
         _animation.AnimateBy(_text);
 
-        _animation.EndAction = Dali.Constants.Animation.EndAction.Discard;
+        _animation.EndAction = Animation.EndActions.Discard;
 
         // Connect the signal callback for animaiton finished signal
         _animation.Finished += AnimationFinished;
-        _animation.Finished += AnimationFinished2;
 
         // Play the _animation
         _animation.Play();

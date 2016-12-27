@@ -48,6 +48,7 @@ check-local: examples/dali-test.exe \
              examples/spin-control.exe \
              examples/control-dashboard.exe \
              examples/user-alphafunction.exe \
+             examples/image-view.exe \
              examples/libNDalic.so examples/NDali.dll
 
 examples/%.exe: examples/%.cs

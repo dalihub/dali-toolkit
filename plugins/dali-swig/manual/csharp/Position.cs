@@ -44,9 +44,9 @@ namespace Dali
      */
     public Position(Vector3 o)
     {
-      x = o.x;
-      y = o.y;
-      z = o.z;
+      x = o.X;
+      y = o.Y;
+      z = o.Z;
     }
 
     ///< name "X", type float (Position X value)
@@ -182,7 +182,7 @@ namespace Dali
 
     public static implicit operator Position(Vector3 vec)
     {
-      return new Position(vec.x, vec.y, vec.z);
+      return new Position(vec.X, vec.Y, vec.Z);
     }
   }
 }

@@ -46,7 +46,7 @@ namespace MyCSharpExample
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     delegate float UserAlphaFunctionDelegate(float progress);
 
-    public void Initialize(object source, AUIApplicationInitEventArgs e)
+    public void Initialize(object source, NUIApplicationInitEventArgs e)
     {
       Log("Initialize() is called!");
       Stage stage = Stage.GetCurrent();
@@ -127,13 +127,13 @@ namespace MyCSharpExample
       _animation = new Animation(10000); // 10000 milli-second of duration
       _animation.StartTime = 5000;
       _animation.EndTime = 10000;
-      _animation.TargetPoperty = "Position";
+      _animation.TargetProperty = "Position";
       _animation.AlphaFunction = new AlphaFunction(_user_alpha_func);
       _animation.Destination = new Vector3(150.0f, 150.0f, 0.0f);
       _animation.AnimateTo(_view2);
       // Connect the signal callback for animaiton finished signal
       _animation.Finished += AnimationFinished;
-      _animation.EndAction = Dali.Constants.Animation.EndAction.Discard;
+      _animation.EndAction = Animation.EndActions.Discard;
       // Play the _animation
       _animation.Play();
     }
