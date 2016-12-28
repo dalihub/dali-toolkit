@@ -37,6 +37,8 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
 using namespace Dali;
@@ -908,7 +910,9 @@ Toolkit::Popup::ContextualMode Popup::GetContextualMode() const
 Toolkit::Control Popup::CreateBacking()
 {
   Toolkit::Control backing = Control::New();
-  backing.SetBackgroundColor( Vector4( mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f ) );
+  backing.SetProperty( Toolkit::Control::Property::BACKGROUND,
+                       Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR )
+                                      .Add( Toolkit::ColorVisual::Property::MIX_COLOR, Vector4( mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f ) ) );
   backing.SetName( "popupBacking" );
 
   // Must always be positioned top-left of stage, regardless of parent.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundImage() is deprecated and will be removed from next release. use Property::BACKGROUND instead.\n" );
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundColor() is deprecated and will be removed from next release. use Property::BACKGROUND instead.\n" );
 
   Internal::GetImplementation(*this).SetBackgroundColor( color );
 }
