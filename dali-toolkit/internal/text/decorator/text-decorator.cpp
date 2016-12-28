@@ -1162,7 +1162,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       // Sets the position of the highlight actor inside the decorator.
       mHighlightActor.SetPosition( mHighlightPosition.x,
-                                   mHighlightPosition.y );
+                                   mHighlightPosition.y, -0.0001f );
 
       const unsigned int numberOfQuads = mHighlightQuadList.Count();
       if( 0u != numberOfQuads )
