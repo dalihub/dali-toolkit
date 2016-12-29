@@ -32,12 +32,24 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief ColorVisual is to render a solid color to the control's quad.
+ * @SINCE_1_1.45
+ */
 namespace ColorVisual
 {
 
+/**
+ * @brief ColorVisual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief ColorVisual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
