@@ -322,11 +322,6 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 void GradientVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  if( !geometry )
-  {
-    geometry =  VisualFactoryCache::CreateQuadGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-  }
 
   Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
   VisualFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, gradientUnits );

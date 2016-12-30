@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "انتخاب همه"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "کپی"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "انتخاب"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "برش"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "الحاق"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "کلیپ بورد"
+

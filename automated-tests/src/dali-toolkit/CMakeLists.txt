@@ -33,6 +33,7 @@ SET(TC_SOURCES
    utc-Dali-TextLabel.cpp
    utc-Dali-TextSelectionPopup.cpp
    utc-Dali-ToolBar.cpp
+   utc-Dali-Tooltip.cpp
    utc-Dali-TransitionData.cpp
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp

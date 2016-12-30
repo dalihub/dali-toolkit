@@ -119,6 +119,14 @@ def extractToolkitPropertyInfo( propertyMacro )
     # Extract the property name, type
     property = $propertyStruct.new;
 
+    #First strip out any comments at the end of the macro, some have text like // deprecated
+    commentIndex = propertyMacro.index("//");
+
+    if( commentIndex )
+        propertyMacro = propertyMacro.slice(0..commentIndex-1)
+    end
+
+
     # Split the macro definition by comma and quotes, close bracket and delete any empty segments
     data = propertyMacro.split(/[\s,")]/).reject { |s| s.empty? }
 
@@ -177,6 +185,7 @@ def extractToolkitPropertyInfo( propertyMacro )
         property.type = data[4]
       end
 
+      # last item should be property enum, e.g. INPUT_POINT_SIZE
       property.enum = data[data.length-1]
 
     end

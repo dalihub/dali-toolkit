@@ -75,6 +75,7 @@ public:
    */
   virtual Length GetGlyphs( GlyphInfo* glyphs,
                             Vector2* glyphPositions,
+                            float& minLineOffset,
                             GlyphIndex glyphIndex,
                             Length numberOfGlyphs ) const;
 

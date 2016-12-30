@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
 
 namespace Dali
 {
@@ -36,6 +37,8 @@ struct ItemLayout::Impl
 {
   Vector3 mItemSize;                              ///< The size of an item in the layout
   ControlOrientation::Type mOrientation;          ///< the orientation of the layout.
+  Property::Map mProperties;
+  bool mHasLayoutChanged;
 };
 
 ItemLayout::ItemLayout()
@@ -119,6 +122,10 @@ int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       }
       break;
     }
+    default:
+    {
+      break;
+    }
   }
   return itemID;
 }
@@ -127,6 +134,45 @@ float ItemLayout::GetFlickSpeedFactor() const
 {
   // By default, the speed factor while dragging and swiping is the same.
   return GetScrollSpeedFactor();
+}
+
+void ItemLayout::SetLayoutProperties(const Property::Map& properties)
+{
+  for( unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx )
+  {
+    KeyValuePair propertyPair( properties.GetKeyValue( idx ) );
+
+    if(propertyPair.first == DefaultItemLayoutProperty::ITEM_SIZE)
+    {
+      SetItemSize(propertyPair.second.Get<Vector3>());
+    }
+    else if(propertyPair.first == DefaultItemLayoutProperty::ORIENTATION)
+    {
+      //Up, Left, Down, Right
+      int orientationType = propertyPair.second.Get<int>();
+      if(orientationType <= ControlOrientation::Right && orientationType >= ControlOrientation::Up)
+      {
+        SetOrientation(ControlOrientation::Type(orientationType));
+      }
+    }
+  }
+  mImpl->mHasLayoutChanged = true;
+  mImpl->mProperties = properties;
+}
+
+Property::Map ItemLayout::GetLayoutProperties()
+{
+  return mImpl->mProperties;
+}
+
+bool ItemLayout::HasLayoutChanged()
+{
+  return mImpl->mHasLayoutChanged;
+}
+
+void ItemLayout::ResetLayoutChangedFlag()
+{
+  mImpl->mHasLayoutChanged = false;
 }
 
 } // namespace Toolkit

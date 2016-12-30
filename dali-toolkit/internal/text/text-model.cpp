@@ -108,6 +108,7 @@ Model::Model()
   mScrollPosition(),
   mHorizontalAlignment( Layout::HORIZONTAL_ALIGN_BEGIN ),
   mVerticalAlignment( Layout::VERTICAL_ALIGN_TOP ),
+  mAlignmentOffset( 0.0f ),
   mElideEnabled( false )
 {
   mLogicalModel = LogicalModel::New();

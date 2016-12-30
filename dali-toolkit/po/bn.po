@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "সমস্ত নির্বাচন করুন"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "অনুলিপি করুন"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "নির্বাচন"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "কাট"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "প্রতিলেপন"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ক্লিপবোর্ড"
+

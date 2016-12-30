@@ -68,7 +68,7 @@ public class KeyboardPreFocusChangeSignal : global::System.IDisposable {
     return ret;
   }
 
-  public void Connect(KeyboardFocusManager.PreFocusChangeEventCallbackDelegate func) {
+  public void Connect(FocusManager.PreFocusChangeEventCallbackDelegate func) {
      NDalicManualPINVOKE.KeyboardPreFocusChangeSignal_Connect(swigCPtr, func);
      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
  }

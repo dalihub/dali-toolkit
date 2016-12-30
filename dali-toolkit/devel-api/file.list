@@ -42,6 +42,7 @@ devel_api_header_files = \
 
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h \
+  $(devel_api_src_dir)/controls/control-devel.h \
   $(devel_api_src_dir)/controls/control-wrapper.h \
   $(devel_api_src_dir)/controls/control-wrapper-impl.h
 
@@ -61,6 +62,10 @@ devel_api_builder_header_files = \
 
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
+
+devel_api_item_view_header_files = \
+  $(devel_api_src_dir)/controls/scrollable/item-view/default-item-layout-property.h \
+  $(devel_api_src_dir)/controls/scrollable/item-view/item-view-devel.h
 
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
@@ -121,6 +126,9 @@ devel_api_text_controls_header_files = \
 
 devel_api_tool_bar_header_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.h
+
+devel_api_tooltip_header_files = \
+  $(devel_api_src_dir)/controls/tooltip/tooltip-properties.h
 
 devel_api_transition_effects_header_files = \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.h \

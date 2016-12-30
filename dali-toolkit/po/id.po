@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Pilih semua"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Salin"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Pilih"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Memotong"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Kutip"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Papan klip"
+

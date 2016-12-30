@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "ເລືອກທັງໝົດ"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "ອັດສຳເນົາ"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "ເລືອກ"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "ຕັດ"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ວາງໃສ່"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ກະດານເກັບຄວາມຈໍາ"
+

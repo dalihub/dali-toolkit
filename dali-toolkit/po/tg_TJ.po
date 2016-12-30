@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Ҳамаро интихоб кардан"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Нусха"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Интихоб кардан"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Бурида гирифтан"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Гузоштан"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Планшет"
+

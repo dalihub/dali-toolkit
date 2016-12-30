@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/scripting/enum-helper.h>
+
 namespace Dali
 {
 
@@ -26,6 +29,11 @@ namespace Toolkit
 
 namespace Internal
 {
+
+// Visual type
+extern const char * const VISUAL_TYPE;
+extern const Dali::Scripting::StringEnum VISUAL_TYPE_TABLE[];
+extern const unsigned int VISUAL_TYPE_TABLE_COUNT;
 
 // Custom shader
 extern const char * const CUSTOM_SHADER;
@@ -49,6 +57,9 @@ extern const char * const PREMULTIPLIED_ALPHA;
 // Image visual
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;
+
+// Text visual
+extern const char * const TEXT_PROPERTY;
 
 } // namespace Internal
 

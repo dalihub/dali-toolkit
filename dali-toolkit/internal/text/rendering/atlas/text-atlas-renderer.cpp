@@ -168,7 +168,8 @@ struct AtlasRenderer::Impl
                   const Vector4& defaultColor,
                   const Vector4* const colorsBuffer,
                   const ColorIndex* const colorIndicesBuffer,
-                  int depth )
+                  int depth,
+                  float minLineOffset )
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
@@ -214,11 +215,11 @@ struct AtlasRenderer::Impl
     Vector< TextCacheEntry > newTextCache;
     const GlyphInfo* const glyphsBuffer = glyphs.Begin();
     const Vector2* const positionsBuffer = positions.Begin();
+    const Vector2 lineOffsetPosition( minLineOffset, 0.f );
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
       const GlyphInfo& glyph = *( glyphsBuffer + i );
-
       const bool underlineGlyph = underlineEnabled || IsGlyphUnderlined( i, underlineRuns );
       thereAreUnderlinedGlyphs = thereAreUnderlinedGlyphs || underlineGlyph;
 
@@ -325,7 +326,7 @@ struct AtlasRenderer::Impl
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor
-        const Vector2 position = *( positionsBuffer + i ) - halfTextSize;
+        const Vector2 position = *( positionsBuffer + i ) - halfTextSize - lineOffsetPosition;
 
         // Generate mesh data for this quad, plugging in our supplied position
         AtlasManager::Mesh2D newMesh;
@@ -735,7 +736,9 @@ Text::RendererPtr AtlasRenderer::New()
   return Text::RendererPtr( new AtlasRenderer() );
 }
 
-Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
+Actor AtlasRenderer::Render( Text::ViewInterface& view,
+                             float& alignmentOffset,
+                             int depth )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Text::AtlasRenderer::Render()\n" );
 
@@ -753,6 +756,7 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
 
     numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
                                      positions.Begin(),
+                                     alignmentOffset,
                                      0u,
                                      numberOfGlyphs );
 
@@ -769,7 +773,8 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
                       defaultColor,
                       colorsBuffer,
                       colorIndicesBuffer,
-                      depth );
+                      depth,
+                      alignmentOffset );
 
     /* In the case where AddGlyphs does not create a renderable Actor for example when glyphs are all whitespace create a new Actor. */
     /* This renderable actor is used to position the text, other "decorations" can rely on there always being an Actor regardless of it is whitespace or regular text. */

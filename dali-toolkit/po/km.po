@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "ជ្រើស​ទាំង​អស់"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "ចម្លង"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "ជ្រើស"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "កាត់"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "បិទ​ភ្ជាប់"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ក្ដារ​តម្បៀតខ្ទាស់"
+

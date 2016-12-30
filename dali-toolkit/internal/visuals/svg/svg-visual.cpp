@@ -100,11 +100,6 @@ void SvgVisual::DoSetOnStage( Actor& actor )
 {
   Shader shader = ImageVisual::GetImageShader( mFactoryCache, true, true );
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  if( !geometry )
-  {
-    geometry =  mFactoryCache.CreateQuadGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-  }
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );

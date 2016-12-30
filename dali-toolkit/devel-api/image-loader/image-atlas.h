@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <stdint.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/pixel.h>
@@ -34,6 +35,7 @@ namespace Dali
 
 namespace Toolkit
 {
+
 namespace Internal DALI_INTERNAL
 {
 class ImageAtlas;
@@ -52,6 +54,14 @@ public:
   typedef uint32_t SizeType;
 
 public:
+
+  /**
+   * @brief Pack a group of  pixel data into atlas.
+   * @param[in] pixelData The group of the pixel data to be packed into the atlas.
+   * @param[out] textureRects The list of texture areas where each frame is located inside the atlas.
+   * @return The atlas texture.
+   */
+  static Texture PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  );
 
   /**
    * @brief Create a new ImageAtlas.

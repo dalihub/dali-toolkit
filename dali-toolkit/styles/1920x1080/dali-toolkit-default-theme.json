@@ -28,6 +28,32 @@
 {
   "styles":
   {
+    "Tooltip":
+    {
+      "tooltip":
+      {
+        "content":
+        {
+          "pointSize":84
+        },
+        "waitTime":0.5,
+        "background":
+        {
+          "visual":"{DALI_IMAGE_DIR}tooltip.9.png",
+          "border":[1,5,5,1]
+        },
+        "tail":
+        {
+          "visibility":false,
+          "aboveVisual":"{DALI_IMAGE_DIR}tooltip-tail-above.png",
+          "belowVisual":"{DALI_IMAGE_DIR}tooltip-tail-below.png"
+        },
+        "position":"BELOW",
+        "hoverPointOffset":[10,10],
+        "movementThreshold":5,
+        "disappearOnMovement":false
+      }
+    },
     "TextLabel":
     {
       "pointSize":108,
@@ -172,6 +198,7 @@
     },
     "Button":
     {
+      "styles":["Tooltip"],
       "initialAutoRepeatingDelay":2.0,
       "nextAutoRepeatingDelay":0.9
       // Note: Visuals added to Button will be used in all derived buttons unless overridden.

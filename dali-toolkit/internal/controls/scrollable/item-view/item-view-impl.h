@@ -23,11 +23,14 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property-array.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
@@ -344,6 +347,18 @@ public:
 private:
 
   /**
+   * Get all the layouts used in the ItemView.
+   * @return The layout array
+   */
+  Property::Array GetLayoutArray();
+
+  /**
+   * Set all the layouts. that will be used in the ItemView.
+   * @param[in] layouts The layouts used in the itemView.
+   */
+  void SetLayoutArray( const Property::Array& layouts );
+
+  /**
    * Remove an Actor if found in the ItemPool.
    * @param[in] itemId The item to remove.
    * @return True if the remaining actors were reordered.
@@ -591,6 +606,8 @@ private:
   typedef std::map<unsigned int, Actor> ItemPool;
   typedef ItemPool::iterator            ItemPoolIter;
   typedef ItemPool::const_iterator      ConstItemPoolIter;
+
+  Property::Array mlayoutArray;
 
   ItemPool mItemPool;
   ItemFactory& mItemFactory;

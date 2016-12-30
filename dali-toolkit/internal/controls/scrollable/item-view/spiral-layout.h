@@ -22,6 +22,7 @@
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
+
 namespace Dali
 {
 
@@ -51,6 +52,12 @@ public:
    * Virtual destructor.
    */
   virtual ~SpiralLayout();
+
+  /**
+   * Apply spiral layout Properties.
+   * @param[in] properties The properties of the layout.
+   */
+  void SetSpiralLayoutProperties(const Property::Map& properties);
 
   /**
    * Set spacing angle between items.

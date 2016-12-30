@@ -76,6 +76,14 @@ public:
    */
   static Toolkit::Control New();
 
+protected:
+  /**
+   * @brief Virtual destructor.
+   * @SINCE_1_0.0
+   */
+  virtual ~Control();
+
+public:
   // Styling
 
   /**
@@ -512,12 +520,6 @@ protected: // Helpers for deriving classes
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
    */
   Control( ControlBehaviour behaviourFlags );
-
-  /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
-   */
-  virtual ~Control();
 
   /**
    * @brief Second phase initialization.

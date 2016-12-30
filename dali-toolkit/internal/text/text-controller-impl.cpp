@@ -2668,13 +2668,13 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType,
 
 void Controller::Impl::ClampHorizontalScroll( const Vector2& layoutSize )
 {
-  // Clamp between -space & 0.
+  // Clamp between -space & -alignment offset.
 
   if( layoutSize.width > mModel->mVisualModel->mControlSize.width )
   {
-    const float space = ( layoutSize.width - mModel->mVisualModel->mControlSize.width );
+    const float space = ( layoutSize.width - mModel->mVisualModel->mControlSize.width ) + mModel->mAlignmentOffset;
     mModel->mScrollPosition.x = ( mModel->mScrollPosition.x < -space ) ? -space : mModel->mScrollPosition.x;
-    mModel->mScrollPosition.x = ( mModel->mScrollPosition.x > 0.f ) ? 0.f : mModel->mScrollPosition.x;
+    mModel->mScrollPosition.x = ( mModel->mScrollPosition.x > -mModel->mAlignmentOffset ) ? -mModel->mAlignmentOffset : mModel->mScrollPosition.x;
 
     mEventData->mDecoratorUpdated = true;
   }

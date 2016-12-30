@@ -133,6 +133,16 @@ std::string KeyboardFocusManagerWrapper::GetDirectionName(  Toolkit::Control::Ke
       return "down";
       break;
     }
+    case Dali::Toolkit::Control::KeyboardFocus::PAGE_UP:
+    {
+      return "pageUp";
+      break;
+    }
+    case Dali::Toolkit::Control::KeyboardFocus::PAGE_DOWN:
+    {
+      return "pageDown";
+      break;
+    }
   }
   return "unknown direction";
 }

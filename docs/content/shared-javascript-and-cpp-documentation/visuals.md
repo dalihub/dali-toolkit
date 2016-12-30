@@ -30,7 +30,7 @@ Visuals have a **transform** field in the property map to allow layouting within
 | Dali::Toolkit::Visual::Transform::Property::OFFSET | offset | VECTOR2 | No      | The offset of the visual. |
 | Dali::Toolkit::Visual::Transform::Property::SIZE | size | VECTOR2 | No      | The size of the visual. |
 | Dali::Toolkit::Visual::Transform::Property::OFFSET_SIZE_MODE | offsetSizeMode | VECTOR4 | No      | Whether the size or offset components are Relative or Absolute [More info](@ref offset-size-mode)|
-| Dali::Toolkit::Visual::Transform::Property::ORIGIN | origin | INTEGER or STRING | No      | The origin of the visual within the control's area. [More info](@ref align-type)] |
+| Dali::Toolkit::Visual::Transform::Property::ORIGIN | origin | INTEGER or STRING | No      | The origin of the visual within the control's area. [More info](@ref align-type) |
 | Dali::Toolkit::Visual::Transform::Property::ANCHOR_POINT | anchorPoint | INTEGER or STRING | No      | The anchor point of the visual. [More info](@ref align-type)|
  
 
@@ -282,6 +282,7 @@ Depending on the extension of the image, a different visual is provided to rende
  + [Normal (Quad)](@ref image-visual)
  + [N-Patch](@ref n-patch-visual)
  + [SVG](@ref svg-visual)
+ + [Animated Image]( @ref animated-image-visual )
  
 ___________________________
  
@@ -438,6 +439,45 @@ control.background =
 {
   visualType : "IMAGE",
   url : "path-to-image.svg"
+};
+~~~
+
+___________________________________________________________________________________________________
+
+## Animated Image Visual {#animated-image-visual}
+
+Renders an animated image into the visual's quad geometry. Currently, only the GIF format is supported.
+
+![ ](../assets/img/visuals/animated-image-visual.gif)
+![ ](animated-image-visual.gif)
+
+#### Properties Supported
+
+**VisualType:** Dali::Toolkit::Visual::IMAGE, "IMAGE"
+
+| Property                                  | String | Type    | Required | Description                      |
+|-------------------------------------------|--------|:-------:|:--------:|----------------------------------|
+| Dali::Toolkit::ImageVisual::Property::URL | url    | STRING  | Yes      | The URL of the animated image.    |
+
+#### Usage
+
+~~~{.cpp}
+// C++
+Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+
+control.SetProperty( Control::Property::BACKGROUND,
+                     Property::Map().Add( Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE )
+                                    .Add( Dali::Toolkit::ImageVisual::Property::URL, "path-to-image.gif" ) );
+~~~
+
+~~~{.js}
+// JavaScript
+var control = new dali.Control( "Control" );
+
+control.background =
+{
+  visualType : "IMAGE",
+  url : "path-to-image.gif"
 };
 ~~~
 ___________________________________________________________________________________________________

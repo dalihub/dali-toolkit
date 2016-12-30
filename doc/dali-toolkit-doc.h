@@ -128,6 +128,10 @@
  *    <td>@ref dali_toolkit_managers</td>
  *    <td>Singleton classes for managing application-wide functionalities.</td>
  * </tr>
+ * <tr>
+ *    <td>@ref dali_toolkit_visuals</td>
+ *    <td>Visuals can control rendering the contents as using Property.</td>
+ * </tr>
  * </table>
  *
  * \ifnot show_tizen_feature
@@ -197,6 +201,9 @@
 
  *   @defgroup dali_toolkit_managers Managers
  *   @brief Singleton classes for managing application-wide functionalities.
+
+ *   @defgroup dali_toolkit_visuals Visuals
+ *   @brief Visuals can control rendering the contents as using Property.
 
  * @}
  */

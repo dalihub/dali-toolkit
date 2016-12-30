@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "બધું પસંદ કરો"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "કૉપિ કરો"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "પસંદ કરો"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "કટ કરો"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ચોંટાડો"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ક્લિપબોર્ડ"
+

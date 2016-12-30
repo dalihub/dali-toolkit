@@ -47,6 +47,11 @@ public:
   typedef Toolkit::ImageAtlas::SizeType SizeType;
 
   /**
+   * @copydoc ImageAtlas::PackToAtlas( const std::vector<PixelData>&, Dali::Vector<Vector4>& )
+   */
+  static Texture PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  );
+
+  /**
    * Constructor
    * @param [in] width          The atlas width in pixels.
    * @param [in] height         The atlas height in pixels.

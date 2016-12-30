@@ -735,6 +735,10 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
             } while ( !mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().IsKeyboardFocusable() );
             break;
           }
+          default:
+          {
+            break;
+          }
         }
 
         if( nextFocusedActorIndex != currentFocusedActorIndex )

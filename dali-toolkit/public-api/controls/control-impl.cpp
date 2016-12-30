@@ -40,6 +40,7 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
@@ -47,6 +48,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 
 namespace Dali
 {
@@ -412,6 +414,16 @@ public:
           }
           break;
         }
+
+        case Toolkit::DevelControl::Property::TOOLTIP:
+        {
+          TooltipPtr& tooltipPtr = controlImpl.mImpl->mTooltip;
+          if( ! tooltipPtr )
+          {
+            tooltipPtr = Tooltip::New( control );
+          }
+          tooltipPtr->SetProperties( value );
+        }
       }
     }
   }
@@ -479,6 +491,17 @@ public:
           break;
         }
 
+        case Toolkit::DevelControl::Property::TOOLTIP:
+        {
+          Property::Map map;
+          if( controlImpl.mImpl->mTooltip )
+          {
+            controlImpl.mImpl->mTooltip->CreatePropertyMap( map );
+          }
+          value = map;
+          break;
+        }
+
       }
     }
 
@@ -502,16 +525,20 @@ public:
   TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
+  // Tooltip
+  TooltipPtr mTooltip;
+
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
-  // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
+  // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;
   static const PropertyRegistration PROPERTY_2;
   static const PropertyRegistration PROPERTY_3;
   static const PropertyRegistration PROPERTY_4;
   static const PropertyRegistration PROPERTY_5;
+  static const PropertyRegistration PROPERTY_6;
 };
 
 // Properties registered without macro to use specific member variables.
@@ -520,6 +547,7 @@ const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",         Toolkit::DevelControl::Property::TOOLTIP,     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -1051,12 +1079,10 @@ void Control::OnInitialize()
 
 void Control::OnControlChildAdd( Actor& child )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: OnControlChildAdd() is deprecated and will be removed from next release. Override OnChildAdd instead.\n" );
 }
 
 void Control::OnControlChildRemove( Actor& child )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: OnControlChildRemove() is deprecated and will be removed from next release. Override OnChildRemove instead.\n" );
 }
 
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )

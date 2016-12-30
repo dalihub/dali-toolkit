@@ -34,6 +34,49 @@ namespace Toolkit
 namespace Internal
 {
 
+Texture ImageAtlas::PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  )
+{
+  // Record each block size
+  Dali::Vector<Uint16Pair> blockSizes;
+  SizeType count = pixelData.size();
+  for( SizeType index = 0; index < count; index++ )
+  {
+    blockSizes.PushBack( ImageDimensions( pixelData[index].GetWidth(), pixelData[index].GetHeight() ) );
+  }
+
+  // Ask atlasPacker for packing position of each block
+  Dali::Vector<Uint16Pair> packPositions;
+  ImageDimensions atlasSize = AtlasPacker::GroupPack( blockSizes, packPositions );
+
+  // Prepare for outout texture rect array
+  textureRects.Clear();
+  textureRects.Resize( count );
+
+  // create the texture for uploading the multiple pixel data
+  Texture atlasTexture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, atlasSize.GetWidth(), atlasSize.GetHeight() );
+
+  float atlasWidth = static_cast<float>( atlasTexture.GetWidth() );
+  float atlasHeight = static_cast<float>( atlasTexture.GetHeight() );
+  int packPositionX, packPositionY;
+  // Upload the pixel data one by one to its packing position, and record the texture rects
+  for( SizeType index = 0; index < count; index++ )
+  {
+    packPositionX = packPositions[index].GetX();
+    packPositionY = packPositions[index].GetY();
+    atlasTexture.Upload( pixelData[index], 0u, 0u,
+                         packPositionX, packPositionY,
+                         pixelData[index].GetWidth(), pixelData[index].GetHeight() );
+
+    // Apply the half pixel correction to avoid the color bleeding between neighbour blocks
+    textureRects[index].x = ( static_cast<float>( packPositionX ) +0.5f ) / atlasWidth; // left
+    textureRects[index].y = ( static_cast<float>( packPositionY ) +0.5f ) / atlasHeight; // right
+    textureRects[index].z = ( static_cast<float>( packPositionX + pixelData[index].GetWidth() )-0.5f ) / atlasWidth; // right
+    textureRects[index].w = ( static_cast<float>( packPositionY + pixelData[index].GetHeight() )-0.5f ) / atlasHeight;// bottom
+  }
+
+  return atlasTexture;
+}
+
 ImageAtlas::ImageAtlas( SizeType width, SizeType height, Pixel::Format pixelFormat )
 : mAtlas( Texture::New( Dali::TextureType::TEXTURE_2D, pixelFormat, width, height ) ),
   mPacker( width, height ),

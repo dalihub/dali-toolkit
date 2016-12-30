@@ -1,0 +1,17 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "সকলো চয়ন কৰক"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "প্ৰতিলিপি"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "চয়ন কৰক"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "কাটক"
+msgid "IDS_COM_BODY_PASTE"
+msgstr "লেপন কৰক"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ক্লিপব'ৰ্ড"
+

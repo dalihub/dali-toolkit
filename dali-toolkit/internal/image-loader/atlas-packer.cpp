@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADER
 #include <stdlib.h> // For abs()
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -36,6 +37,18 @@ namespace
 bool ApproximatelyEqual( uint32_t a, uint32_t b  )
 {
   return abs( a-b ) <= 1;
+}
+
+uint16_t MaxDimension( const Uint16Pair& dimensions )
+{
+  return dimensions.GetWidth() >= dimensions.GetHeight() ? dimensions.GetWidth() : dimensions.GetHeight();
+}
+
+void Swap( Uint16Pair& first, Uint16Pair& second )
+{
+  Uint16Pair temp = first;
+  first = second;
+  second = temp;
 }
 
 }
@@ -192,6 +205,103 @@ void AtlasPacker::DeleteNode( Node *node )
     DeleteNode( node->child[0] );
     DeleteNode( node->child[1] );
     delete node;
+  }
+}
+
+Uint16Pair AtlasPacker::GroupPack( const Dali::Vector<Uint16Pair>& blockSizes, Dali::Vector<Uint16Pair>& packPositions )
+{
+  uint16_t count = blockSizes.Count();
+  packPositions.Resize( count );
+
+  // Sort the blocks according to its maximum dimension. The bigger blocks are packed first.
+  Dali::Vector<Uint16Pair> packOrder;
+  packOrder.Resize( count );
+  for( uint16_t i = 0; i < count; i++ )
+  {
+    packOrder[i].SetX( MaxDimension( blockSizes[i] ) );
+    packOrder[i].SetY( i );
+  }
+  for( uint16_t i = 0; i < count-1; i++ )
+    for( uint16_t j = 0; j < count-i-1; j++ )
+    {
+      if( packOrder[j].GetX() < packOrder[j+1].GetX() )
+      {
+        Swap( packOrder[j], packOrder[j+1] );
+      }
+    }
+
+  int index = packOrder[0].GetY();
+  AtlasPacker packer( blockSizes[index].GetWidth(), blockSizes[index].GetHeight() );
+
+  SizeType packPositionX, packPositionY;
+  // pack the blocks one by one with descending size, grows as necessary to accommodate each subsequent block.
+  for( uint16_t i = 0; i < count; i++ )
+  {
+    index = packOrder[i].GetY();
+    packer.GrowPack( blockSizes[index].GetWidth(), blockSizes[index].GetHeight(),
+                     packPositionX, packPositionY );
+    packPositions[index].SetX( packPositionX );
+    packPositions[index].SetY( packPositionY );
+  }
+
+  return Uint16Pair( packer.mRoot->rectArea.width, packer.mRoot->rectArea.height );
+}
+
+void AtlasPacker::GrowPack( SizeType blockWidth, SizeType blockHeight,
+                            SizeType& packPositionX, SizeType& packPositionY )
+{
+  Node* firstFit = InsertNode( mRoot, blockWidth, blockHeight );
+  if( firstFit == NULL )
+  {
+    // Could fit in the current left space, grow the partition tree to get more space.
+    GrowNode( blockWidth, blockHeight );
+    firstFit = InsertNode( mRoot->child[1], blockWidth, blockHeight );
+  }
+
+  if( firstFit != NULL )
+  {
+    firstFit->occupied = true;
+    packPositionX = firstFit->rectArea.x;
+    packPositionY = firstFit->rectArea.y;
+  }
+}
+
+void AtlasPacker::GrowNode( SizeType blockWidth, SizeType blockHeight )
+{
+  // Attempts to maintain a roughly square ratio when choosing the growing direction: right or down
+  bool canGrowRight = blockWidth <= mRoot->rectArea.width;
+  bool canGrowDown = blockHeight <= mRoot->rectArea.height;
+
+  bool shouldGrowRight = canGrowRight && mRoot->rectArea.height >= mRoot->rectArea.width+blockWidth;
+  bool shouldGrowDown = canGrowDown && mRoot->rectArea.width >= mRoot->rectArea.height+blockHeight;
+
+  if( canGrowRight && canGrowDown )
+  {
+    shouldGrowRight = mRoot->rectArea.width+blockWidth <= mRoot->rectArea.height+blockHeight;
+    shouldGrowDown = !shouldGrowRight;
+  }
+
+  if( shouldGrowRight || ( canGrowRight && !shouldGrowDown ) )
+  {
+    Node* newRoot = new Node( NULL, 0u, 0u, mRoot->rectArea.width+blockWidth, mRoot->rectArea.height );
+    newRoot->occupied = true;
+    newRoot->child[0] = mRoot;
+    newRoot->child[1] = new Node( newRoot, mRoot->rectArea.width, 0u, blockWidth, mRoot->rectArea.height );
+
+    mRoot = newRoot;
+  }
+  else if( shouldGrowDown || ( canGrowDown && !shouldGrowRight ) )
+  {
+    Node* newRoot = new Node( NULL, 0u, 0u, mRoot->rectArea.width, mRoot->rectArea.height+blockHeight );
+    newRoot->occupied = true;
+    newRoot->child[0] = mRoot;
+    newRoot->child[1] = new Node( newRoot, 0u, mRoot->rectArea.height, mRoot->rectArea.width, blockHeight );
+
+    mRoot = newRoot;
+  }
+  else
+  {
+    DALI_LOG_ERROR( " Atlas Packer failed to grow: make sure the packing order is sorted with the block size to avoid this happening");
   }
 }
 
