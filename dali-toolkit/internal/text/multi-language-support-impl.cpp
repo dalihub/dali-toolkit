@@ -477,7 +477,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     currentFontId = fontId;
 
     // Get the script for the current character.
-    const Script script = GetScript( index,
+    Script script = GetScript( index,
                                      scriptRunIt,
                                      scriptRunEndIt );
 
@@ -494,6 +494,10 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                      description.path.c_str() );
     }
 #endif
+    if (script == TextAbstraction::UNKNOWN)
+    {
+      script = TextAbstraction::LATIN;
+    }
 
     // Validate whether the current character is supported by the given font.
     bool isValidFont = false;
