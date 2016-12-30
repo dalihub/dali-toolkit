@@ -416,6 +416,12 @@ protected: // From CustomActorImpl, not to be used by application developers
   virtual void OnChildRemove( Actor& child );
 
   /**
+   * @copydoc CustomActorImpl::OnPropertySet()
+   * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
+   */
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
+
+  /**
    * @copydoc CustomActorImpl::OnSizeSet()
    * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the end.
    */

@@ -449,6 +449,18 @@ More information on size negotiation can be found [here](@ref size-negotiation-c
  
 ___________________________________________________________________________________________________
 
+### Clipping Support {#creating-controls-clipping}
+
+When an Actor is set to clip its children, the renderers have to be added manually in order to specify what its children need to clip to.
+The Control base class automates the creation of the renderers/visuals when it is set to clip its children.
+ 
+This is only done if the application or custom control writer has not added any renderers to the Control or registered any visuals
+(regardless of whether these visuals are enabled or not).
+ 
+If custom control writers want to define the clipping visuals themselves, then they should register all required visuals before the control is staged.
+ 
+___________________________________________________________________________________________________
+
 ### Other Features {#creating-controls-other}
 
  + [Background](@ref background)
