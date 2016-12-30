@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -795,6 +795,8 @@ void TableView::OnSizeSet( const Vector3& size )
   // rows and columns must be recalculated or the new size will not take effect.
   mRowDirty = mColumnDirty = true;
   RelayoutRequest();
+
+  Control::OnSizeSet( size );
 }
 
 void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
@@ -961,98 +963,101 @@ Property::Value TableView::GetProperty( BaseObject* object, Property::Index inde
 
 void TableView::OnChildAdd( Actor& child )
 {
-  Control::OnChildAdd( child );
-
-  if( mLayoutingChild )
+  if( ! mLayoutingChild )
   {
-    // we're in the middle of laying out children so no point doing anything here
-    return;
-  }
+    // Ensure we're not in the middle of laying out children
 
-  // Check child properties on actor to decide its position inside the table
-  HorizontalAlignment::Type horizontalAlignment = HorizontalAlignment::LEFT;
-  VerticalAlignment::Type verticalAlignment = VerticalAlignment::TOP;
+    // Check child properties on actor to decide its position inside the table
+    HorizontalAlignment::Type horizontalAlignment = HorizontalAlignment::LEFT;
+    VerticalAlignment::Type verticalAlignment = VerticalAlignment::TOP;
 
-  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT ) != Property::NONE )
-  {
-    std::string value = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT ).Get<std::string >();
-    Scripting::GetEnumeration< HorizontalAlignment::Type >( value.c_str(),
-                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                            horizontalAlignment );
-  }
-
-  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT ) != Property::NONE )
-  {
-    std::string value = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT ).Get<std::string >();
-    Scripting::GetEnumeration< VerticalAlignment::Type >( value.c_str(),
-                                                          VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                          VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                          verticalAlignment );
-  }
-
-  Toolkit::TableView::CellPosition cellPosition;
-  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::ROW_SPAN ) != Property::NONE )
-  {
-    cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::ROW_SPAN ).Get<float>() );
-  }
-
-  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::COLUMN_SPAN ) != Property::NONE )
-  {
-    cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::COLUMN_SPAN ).Get<float>() );
-  }
-
-  if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_INDEX ) != Property::NONE )
-  {
-    Vector2 indices = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_INDEX ).Get<Vector2 >();
-    cellPosition.rowIndex = static_cast<unsigned int>( indices.x );
-    cellPosition.columnIndex = static_cast<unsigned int>( indices.y );
-
-    AddChild( child, cellPosition );
-    SetCellAlignment(cellPosition, horizontalAlignment, verticalAlignment);
-
-    // Do not continue
-    return;
-  }
-
-  // Find the first available cell to store the actor in
-  const unsigned int rowCount = mCellData.GetRows();
-  const unsigned int columnCount = mCellData.GetColumns();
-  for( unsigned int row = 0; row < rowCount; ++row )
-  {
-    for( unsigned int column = 0; column < columnCount; ++column )
+    if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT ) != Property::NONE )
     {
-      if( !(mCellData[ row ][ column ].actor) )
+      std::string value = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT ).Get<std::string >();
+      Scripting::GetEnumeration< HorizontalAlignment::Type >( value.c_str(),
+                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                              horizontalAlignment );
+    }
+
+    if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT ) != Property::NONE )
+    {
+      std::string value = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT ).Get<std::string >();
+      Scripting::GetEnumeration< VerticalAlignment::Type >( value.c_str(),
+                                                            VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                            VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                            verticalAlignment );
+    }
+
+    Toolkit::TableView::CellPosition cellPosition;
+    if( child.GetPropertyType( Toolkit::TableView::ChildProperty::ROW_SPAN ) != Property::NONE )
+    {
+      cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::ROW_SPAN ).Get<float>() );
+    }
+
+    if( child.GetPropertyType( Toolkit::TableView::ChildProperty::COLUMN_SPAN ) != Property::NONE )
+    {
+      cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::COLUMN_SPAN ).Get<float>() );
+    }
+
+    if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_INDEX ) != Property::NONE )
+    {
+      Vector2 indices = child.GetProperty( Toolkit::TableView::ChildProperty::CELL_INDEX ).Get<Vector2 >();
+      cellPosition.rowIndex = static_cast<unsigned int>( indices.x );
+      cellPosition.columnIndex = static_cast<unsigned int>( indices.y );
+
+      AddChild( child, cellPosition );
+      SetCellAlignment(cellPosition, horizontalAlignment, verticalAlignment);
+    }
+    else
+    {
+      bool availableCellFound = false;
+
+      // Find the first available cell to store the actor in
+      const unsigned int rowCount = mCellData.GetRows();
+      const unsigned int columnCount = mCellData.GetColumns();
+      for( unsigned int row = 0; row < rowCount && !availableCellFound; ++row )
       {
-        // Put the actor in the cell
+        for( unsigned int column = 0; column < columnCount && !availableCellFound; ++column )
+        {
+          if( !(mCellData[ row ][ column ].actor) )
+          {
+            // Put the actor in the cell
+            CellData data;
+            data.actor = child;
+            data.position.columnIndex = column;
+            data.position.rowIndex = row;
+            data.horizontalAlignment = horizontalAlignment;
+            data.verticalAlignment = verticalAlignment;
+            mCellData[ row ][ column ] = data;
+
+            availableCellFound = true;
+            break;
+          }
+        }
+      }
+
+      if( ! availableCellFound )
+      {
+        // No empty cells, so increase size of the table
+        unsigned int newColumnCount = ( columnCount > 0 ) ? columnCount : 1;
+        ResizeContainers( rowCount + 1, newColumnCount );
+
+        // Put the actor in the first cell of the new row
         CellData data;
         data.actor = child;
-        data.position.columnIndex = column;
-        data.position.rowIndex = row;
+        data.position.rowIndex = rowCount;
+        data.position.columnIndex = 0;
         data.horizontalAlignment = horizontalAlignment;
         data.verticalAlignment = verticalAlignment;
-        mCellData[ row ][ column ] = data;
-
-        // Don't continue
-        RelayoutRequest();
-        return;
+        mCellData[ rowCount ][ 0 ] = data;
       }
+
+      RelayoutRequest();
     }
   }
 
-  // No empty cells, so increase size of the table
-  unsigned int newColumnCount = ( columnCount > 0 ) ? columnCount : 1;
-  ResizeContainers( rowCount + 1, newColumnCount );
-
-  // Put the actor in the first cell of the new row
-  CellData data;
-  data.actor = child;
-  data.position.rowIndex = rowCount;
-  data.position.columnIndex = 0;
-  data.horizontalAlignment = horizontalAlignment;
-  data.verticalAlignment = verticalAlignment;
-  mCellData[ rowCount ][ 0 ] = data;
-  RelayoutRequest();
+  Control::OnChildAdd( child );
 }
 
 void TableView::OnChildRemove( Actor& child )

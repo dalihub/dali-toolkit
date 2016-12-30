@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_FLEX_CONTAINER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,11 +204,6 @@ private: // From Control
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
   virtual void OnSizeSet( const Vector3& size );
-
-  /**
-   * @copydoc CustomActorImpl::OnSizeAnimation(Animation&, const Vector3&)
-   */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
 
 private: // Implementation
 

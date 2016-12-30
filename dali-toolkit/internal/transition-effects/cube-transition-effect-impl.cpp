@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -246,8 +246,6 @@ void CubeTransitionEffect::Initialize()
 
 void CubeTransitionEffect::OnStageConnection( int depth )
 {
-  Control::OnStageConnection( depth );
-
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
 
@@ -262,6 +260,8 @@ void CubeTransitionEffect::OnStageConnection( int depth )
 
   mCurrentRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, depth );
   Self().AddRenderer( mCurrentRenderer );
+
+  Control::OnStageConnection( depth );
 }
 
 void CubeTransitionEffect::OnStageDisconnection()

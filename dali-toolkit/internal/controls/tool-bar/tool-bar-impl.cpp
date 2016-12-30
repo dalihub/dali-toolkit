@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,8 +317,6 @@ void ToolBar::OnInitialize()
 
 void ToolBar::OnChildAdd(Actor& child)
 {
-  Control::OnChildAdd( child );
-
   if( !mInitializing )
   {
     // An actor is being added through the Actor's API.
@@ -335,6 +333,8 @@ void ToolBar::OnChildAdd(Actor& child)
   // No OnChildRemove method required because Actors are added to the mLayout table view, so if an
   // actor is removed using the Actor::RemoveChild method it will not remove anything because the
   // actor is in mLayout not in Self().
+
+  Control::OnChildAdd( child );
 }
 
 } // namespace Internal

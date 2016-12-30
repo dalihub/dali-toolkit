@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,8 +288,6 @@ void Magnifier::SetFrameVisibility(bool visible)
 
 void Magnifier::OnSizeSet(const Vector3& targetSize)
 {
-  Control::OnSizeSet( targetSize );
-
   // TODO: Once Camera/CameraActor properties function as proper animatable properties
   // this code can disappear.
   // whenever the size of the magnifier changes, the field of view needs to change
@@ -297,6 +295,8 @@ void Magnifier::OnSizeSet(const Vector3& targetSize)
   // a constraint yet as Camera/CameraActor properties are not animatable/constrainable.
   mActorSize = targetSize;
   Update();
+
+  Control::OnSizeSet( targetSize );
 }
 
 float Magnifier::GetMagnificationFactor() const

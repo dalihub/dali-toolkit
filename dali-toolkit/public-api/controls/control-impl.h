@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -393,7 +393,7 @@ protected: // From CustomActorImpl, not to be used by application developers
 
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
-   * @note If overridden, then an up-call to Control::OnStageConnection MUST be made at the start.
+   * @note If overridden, then an up-call to Control::OnStageConnection MUST be made at the end.
    */
   virtual void OnStageConnection( int depth );
 
@@ -405,7 +405,7 @@ protected: // From CustomActorImpl, not to be used by application developers
 
   /**
    * @copydoc CustomActorImpl::OnChildAdd()
-   * @note If overridden, then an up-call to Control::OnChildAdd MUST be made at the start.
+   * @note If overridden, then an up-call to Control::OnChildAdd MUST be made at the end.
    */
   virtual void OnChildAdd( Actor& child );
 
@@ -417,13 +417,13 @@ protected: // From CustomActorImpl, not to be used by application developers
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
-   * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the start.
+   * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the end.
    */
   virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
    * @copydoc CustomActorImpl::OnSizeAnimation()
-   * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the start.
+   * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the end.
    */
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize );
 

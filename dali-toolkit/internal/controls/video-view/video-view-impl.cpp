@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -439,13 +439,13 @@ void VideoView::SetDepthIndex( int depthIndex )
 
 void VideoView::OnStageConnection( int depth )
 {
-  Control::OnStageConnection( depth );
-
   if( mVisual )
   {
     CustomActor self = Self();
     Toolkit::GetImplementation(mVisual).SetOnStage( self );
   }
+
+  Control::OnStageConnection( depth );
 }
 
 void VideoView::OnStageDisconnection()
