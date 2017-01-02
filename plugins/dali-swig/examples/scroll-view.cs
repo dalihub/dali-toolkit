@@ -42,7 +42,7 @@ namespace MyCSharpExample
     }
 
 
-    public void Initialize(object source, AUIApplicationInitEventArgs e)
+    public void Initialize(object source, NUIApplicationInitEventArgs e)
     {
       CreateScrollView();
     }
@@ -165,8 +165,8 @@ namespace MyCSharpExample
 
         _animation = new Animation(1.0f); // 1 second of duration
 
-        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.0f, 0.5f));
-        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.LINEAR), new TimePeriod(0.5f, 0.5f));
+        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 180.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.Linear), new TimePeriod(0.0f, 0.5f));
+        _animation.AnimateTo(new Property(_text, Actor.Property.ORIENTATION), new Property.Value(new Quaternion( new Radian( new Degree( 0.0f ) ), Vector3.XAXIS )), new AlphaFunction(AlphaFunction.BuiltinFunction.Linear), new TimePeriod(0.5f, 0.5f));
 
         // Connect the signal callback for animaiton finished signal
         _animation.Finished += AnimationFinished;

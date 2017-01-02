@@ -302,7 +302,7 @@ namespace MyCSharpExample
             _application.Initialized += Initialize;
         }
 
-        public void Initialize(object source, AUIApplicationInitEventArgs e)
+        public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
             Stage stage = Stage.GetCurrent();
             stage.BackgroundColor = Color.White;

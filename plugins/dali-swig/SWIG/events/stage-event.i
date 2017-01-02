@@ -442,6 +442,32 @@ using System.Runtime.InteropServices;
      }
    }
 
+  private static readonly Stage instance = Stage.GetCurrent();
+
+  public static Stage Instance
+  {
+      get
+      {
+          return instance;
+      }
+  }
+
+  public Layer GetDefaultLayer()
+  {
+    return this.GetRootLayer();
+  }
+
+  public void AddLayer(Layer layer)
+  {
+    this.Add( (Actor)layer );
+  }
+
+  public void RemoveLayer(Layer layer)
+  {
+    this.Remove( (Actor)layer );
+  }
+
+
 %}
 
 %enddef

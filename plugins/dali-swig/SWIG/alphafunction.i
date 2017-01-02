@@ -16,11 +16,6 @@
  */
 
 %typemap(cscode) Dali::AlphaFunction %{
-  public AlphaFunction(Dali.Constants.AlphaFunction.BuiltinFunction function) : this(NDalicPINVOKE.new_AlphaFunction__SWIG_1((int)function), true)
-  {
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
   public AlphaFunction(System.Delegate func) : this(NDalicPINVOKE.new_AlphaFunction__SWIG_2(SWIGTYPE_p_f_float__float.getCPtr(new SWIGTYPE_p_f_float__float(System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func), true))), true)
   {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
