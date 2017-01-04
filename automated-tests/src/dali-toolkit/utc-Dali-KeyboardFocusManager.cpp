@@ -695,3 +695,70 @@ int UtcDaliKeyboardFocusManagerSignals(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyboardFocusManagerMoveFocusBackward(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerMoveFocusBackward");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  // Make history stack full
+  for(int i = 0 ; i < 31 ; i ++)
+  {
+    Actor actor = Actor::New();
+    actor.SetKeyboardFocusable(true);
+    Stage::GetCurrent().Add(actor);
+    manager.SetCurrentFocusActor(actor);
+  }
+
+  // Create the first actor and add it to the stage
+  Actor first = Actor::New();
+  first.SetKeyboardFocusable(true);
+  Stage::GetCurrent().Add(first);
+
+  // Create the second actor and add it to the stage
+  Actor second = Actor::New();
+  second.SetKeyboardFocusable(true);
+  Stage::GetCurrent().Add(second);
+
+  // Create the second actor and add it to the stage
+  Actor third = Actor::New();
+  third.SetKeyboardFocusable(true);
+  Stage::GetCurrent().Add(third);
+
+  // Check that the focus is set on the second actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  // Check that the focus is set on the second actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  // Check that the focus is set on the third  actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
+
+  // Move the focus backward
+  manager.MoveFocusBackward();
+
+  // Check that it current focused actor is second actor
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  // Check that the focus is set on the third actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
+
+  // Remove the second actor on stage
+  second.Unparent();
+
+  // Move the focus backward
+  manager.MoveFocusBackward();
+
+  // Check that it current focused actor is first actor
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  END_TEST;
+}

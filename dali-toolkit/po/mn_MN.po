@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Бүгдийг сонгох"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Хуулах"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Сонгох"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Хайчлах"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Буулгах"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Түр санах ой"
+

@@ -54,10 +54,20 @@ namespace Toolkit
 namespace Internal
 {
 
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+{
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  svgVisual->ParseFromUrl( imageUrl );
+  svgVisual->SetProperties( properties );
+
+  return svgVisual;
+}
+
 SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
 {
-  SvgVisual* svgVisual = new SvgVisual( factoryCache );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
   svgVisual->ParseFromUrl( imageUrl );
+
   return svgVisual;
 }
 
@@ -90,11 +100,6 @@ void SvgVisual::DoSetOnStage( Actor& actor )
 {
   Shader shader = ImageVisual::GetImageShader( mFactoryCache, true, true );
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  if( !geometry )
-  {
-    geometry =  mFactoryCache.CreateQuadGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-  }
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );

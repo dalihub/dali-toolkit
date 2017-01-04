@@ -40,14 +40,35 @@ static const char* gImageNonExist = "non-exist.jpg";
 
 const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
 
+PixelData CreatePixelData( unsigned int width, unsigned int height )
+{
+  unsigned int bufferSize = width*height*Pixel::GetBytesPerPixel( Pixel::RGBA8888 );
+
+  unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
+  PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE );
+
+  return pixelData;
+}
+
 Rect<int> TextureCoordinateToPixelArea( const Vector4& textureCoordinate, float size )
 {
   Vector4 temp = textureCoordinate * size;
   Rect<int> pixelArea;
   pixelArea.x = static_cast<int>( temp.x );
   pixelArea.y = static_cast<int>( temp.y );
-  pixelArea.width = static_cast<int>( temp.z-temp.x+1.f );
-  pixelArea.height = static_cast<int>( temp.w-temp.y+1.f );
+  pixelArea.width = static_cast<int>( temp.z-temp.x+1.01f );
+  pixelArea.height = static_cast<int>( temp.w-temp.y+1.01f );
+
+  return pixelArea;
+}
+
+Rect<int> TextureCoordinateToPixelArea( const Vector4& textureCoordinate, float width, float height )
+{
+  Rect<int> pixelArea;
+  pixelArea.x = static_cast<int>( textureCoordinate.x*width );
+  pixelArea.y = static_cast<int>( textureCoordinate.y*height);
+  pixelArea.width = static_cast<int>( (textureCoordinate.z-textureCoordinate.x)*width+1.01f );
+  pixelArea.height = static_cast<int>( (textureCoordinate.w-textureCoordinate.y)*height+1.01f );
 
   return pixelArea;
 }
@@ -431,6 +452,59 @@ int UtcDaliImageAtlasImageView(void)
   params3["yoffset"] = "34";
 
   DALI_TEST_EQUALS(  callStack.FindMethodAndParams("TexSubImage2D", params3 ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageAtlasPackToAtlas(void)
+{
+  ToolkitTestApplication application;
+
+  std::vector<PixelData> pixelDataContainer;
+  pixelDataContainer.push_back( CreatePixelData( 20, 30 ) );
+  pixelDataContainer.push_back( CreatePixelData( 10, 10 ) );
+  pixelDataContainer.push_back( CreatePixelData( 45, 30 ) );
+  pixelDataContainer.push_back( CreatePixelData( 20, 20 ) );
+
+  Dali::Vector<Vector4> textureRects;
+  Texture texture = ImageAtlas::PackToAtlas( pixelDataContainer, textureRects  );
+
+ // --------------
+ // |            |
+ // |    45*30   |
+//  |            |
+//  --------------
+//  | 20 |    | 20*20
+//  |  * |____|
+//  | 30 |  |  10*10
+//  --------
+
+  DALI_TEST_EQUALS( texture.GetWidth(), 45, TEST_LOCATION );
+  DALI_TEST_EQUALS( texture.GetHeight(), 60, TEST_LOCATION );
+
+  Rect<int> pixelArea = TextureCoordinateToPixelArea(textureRects[0], texture.GetWidth(), texture.GetHeight());
+  DALI_TEST_EQUALS( pixelArea.x, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.y, 30, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 30, TEST_LOCATION );
+
+  pixelArea = TextureCoordinateToPixelArea(textureRects[1], texture.GetWidth(), texture.GetHeight());
+  DALI_TEST_EQUALS( pixelArea.x, 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.y, 50, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 10, TEST_LOCATION );
+
+  pixelArea = TextureCoordinateToPixelArea(textureRects[2], texture.GetWidth(), texture.GetHeight());
+  DALI_TEST_EQUALS( pixelArea.x, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.y, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 45, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 30, TEST_LOCATION );
+
+  pixelArea = TextureCoordinateToPixelArea(textureRects[3], texture.GetWidth(), texture.GetHeight());
+  DALI_TEST_EQUALS( pixelArea.x, 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.y, 30, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 20, TEST_LOCATION );
 
   END_TEST;
 }

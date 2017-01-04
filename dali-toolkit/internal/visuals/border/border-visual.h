@@ -56,9 +56,10 @@ public:
    * @brief Create a new border visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static BorderVisualPtr New( VisualFactoryCache& factoryCache );
+  static BorderVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
 
 protected:
 

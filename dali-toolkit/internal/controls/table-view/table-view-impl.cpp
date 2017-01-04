@@ -1319,51 +1319,78 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
       int numberOfColumns = GetColumns();
       int numberOfRows = GetRows();
 
+      bool lastCell = false;
+      Actor nextValidActor;
+
       switch ( direction )
       {
         case Toolkit::Control::KeyboardFocus::LEFT:
         {
-          if(--currentColumn < 0)
+          do
           {
-            currentColumn = numberOfColumns - 1;
-            if(--currentRow < 0)
+            if(--currentColumn < 0)
             {
-              currentRow = loopEnabled ? numberOfRows - 1 : 0;
-              focusLost = (currentRow == 0);
+              currentColumn = numberOfColumns - 1;
+              if(--currentRow < 0)
+              {
+                lastCell = true;
+                currentRow = loopEnabled ? numberOfRows - 1 : 0;
+                focusLost = (currentRow == 0);
+              }
             }
-          }
+            nextValidActor = GetChildAt(Toolkit::TableView::CellPosition(currentRow, currentColumn));
+          } while ( !nextValidActor && !lastCell );
           break;
         }
         case Toolkit::Control::KeyboardFocus::RIGHT:
         {
-          if(++currentColumn > numberOfColumns - 1)
+          do
           {
-            currentColumn = 0;
-            if(++currentRow > numberOfRows - 1)
+            if(++currentColumn > numberOfColumns - 1)
             {
-              currentRow = loopEnabled ? 0 : numberOfRows - 1;
-              focusLost = (currentRow == numberOfRows - 1);
+              currentColumn = 0;
+              if(++currentRow > numberOfRows - 1)
+              {
+                lastCell = true;
+                currentRow = loopEnabled ? 0 : numberOfRows - 1;
+                focusLost = (currentRow == numberOfRows - 1);
+              }
             }
-          }
+            nextValidActor = GetChildAt(Toolkit::TableView::CellPosition(currentRow, currentColumn));
+          } while ( !nextValidActor && !lastCell );
           break;
         }
         case Toolkit::Control::KeyboardFocus::UP:
         {
-          if(--currentRow < 0)
+          do
           {
-            currentRow = loopEnabled ? numberOfRows - 1 : 0;
-            focusLost = (currentRow == 0);
-          }
+            if(--currentRow < 0)
+            {
+              lastCell = true;
+              currentRow = loopEnabled ? numberOfRows - 1 : 0;
+              focusLost = (currentRow == 0);
+            }
+            nextValidActor = GetChildAt(Toolkit::TableView::CellPosition(currentRow, currentColumn));
+          } while ( !nextValidActor && !lastCell );
           break;
         }
         case Toolkit::Control::KeyboardFocus::DOWN:
 
         {
-          if(++currentRow > numberOfRows - 1)
+          do
           {
-            currentRow = loopEnabled ? 0 : numberOfRows - 1;
-            focusLost = (currentRow == numberOfRows - 1);
-          }
+            if(++currentRow > numberOfRows - 1)
+            {
+              lastCell = true;
+              currentRow = loopEnabled ? 0 : numberOfRows - 1;
+              focusLost = (currentRow == numberOfRows - 1);
+            }
+            nextValidActor = GetChildAt(Toolkit::TableView::CellPosition(currentRow, currentColumn));
+          } while ( !nextValidActor && !lastCell );
+          break;
+        }
+        default:
+        {
           break;
         }
       }

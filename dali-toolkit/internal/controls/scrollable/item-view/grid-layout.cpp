@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -533,6 +534,10 @@ Degree GridLayout::GetScrollDirection() const
 
 void GridLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
 {
+  if(HasLayoutChanged())
+  {
+    SetGridLayoutProperties(GetLayoutProperties());
+  }
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
@@ -621,6 +626,68 @@ void GridLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3
   }
 }
 
+void GridLayout::SetGridLayoutProperties(const Property::Map& properties)
+{
+  // Set any properties specified for gridLayout.
+  for( unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx )
+  {
+    KeyValuePair propertyPair = properties.GetKeyValue( idx );
+    switch(DefaultItemLayoutProperty::Property(propertyPair.first.indexKey))
+    {
+      case DefaultItemLayoutProperty::GRID_COLUMN_NUMBER:
+      {
+        SetNumberOfColumns(propertyPair.second.Get<int>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_ROW_SPACING:
+      {
+        SetRowSpacing(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_COLUMN_SPACING:
+      {
+        SetColumnSpacing(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_TOP_MARGIN:
+      {
+        SetTopMargin(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_BOTTOM_MARGIN:
+      {
+        SetBottomMargin(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_SIDE_MARGIN:
+      {
+        SetSideMargin(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_SCROLL_SPEED_FACTOR:
+      {
+        SetScrollSpeedFactor(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_MAXIMUM_SWIPE_SPEED:
+      {
+        SetMaximumSwipeSpeed(propertyPair.second.Get<float>());
+        break;
+      }
+      case DefaultItemLayoutProperty::GRID_ITEM_FLICK_ANIMATION_DURATION:
+      {
+        SetItemFlickAnimationDuration(propertyPair.second.Get<float>());
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+  }
+  ResetLayoutChangedFlag();
+}
+
 Vector3 GridLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
 {
   Vector3 itemPosition = Vector3::ZERO;
@@ -697,6 +764,10 @@ int GridLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       {
         itemID = loopEnabled ? 0 : itemID - mImpl->mNumberOfColumns;
       }
+      break;
+    }
+    default:
+    {
       break;
     }
   }

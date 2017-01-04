@@ -20,9 +20,21 @@ namespace Dali {
     using System.Runtime.InteropServices;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate void DaliEventHandler<T,U>(T source, U e);
+    public delegate R DaliEventHandlerWithReturnType<T,U,R>(T source, U e);
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    public delegate R DaliEventHandlerWithReturnType<T,U,R>(T source, U e);
+    public delegate void EventCallbackDelegateType0();
+
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    public delegate void EventCallbackDelegateType1<T>(T arg1);
+
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    public delegate void EventCallbackDelegateType2<T,U>(T arg1, U arg2);
+
+
+    //this should be removed with EventHandler from .NET
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    public delegate void DaliEventHandler<T,U>(T source, U e);
+
 
 }

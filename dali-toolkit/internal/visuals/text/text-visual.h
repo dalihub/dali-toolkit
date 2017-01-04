@@ -71,16 +71,17 @@ public:
    * @brief Create a new text visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static TextVisualPtr New( VisualFactoryCache& factoryCache );
+  static TextVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
 
 public: // from Visual::Base
 
   /**
    * @copydoc Visual::Base::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width ) const;
+  virtual float GetHeightForWidth( float width );
 
   /**
    * @copydoc Visual::Base::GetNaturalSize()

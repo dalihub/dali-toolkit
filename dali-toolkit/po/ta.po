@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "எல்லாம் தேர்வு"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "நகல்"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "தேர்வு"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "வெட்டு"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "ஒட்டு"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "கிளிப்போர்டு"
+

@@ -18,7 +18,9 @@
  */
 
 #include <stdint.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/uint-16-pair.h>
 
 namespace Dali
 {
@@ -99,6 +101,14 @@ public:
    */
   unsigned int GetAvailableArea() const;
 
+  /**
+   * Pack a group of blocks with different sizes, calculate the required packing size and the position of each block.
+   * @param[in] blockSizes The size list of the blocks .
+   * @param[out] packPositions The packing position of each block.
+   * @return The required size to accommodate all the blocks.
+   */
+  static Uint16Pair GroupPack( const Dali::Vector<Uint16Pair>& blockSizes, Dali::Vector<Uint16Pair>& packPositions );
+
 private:
 
   /*
@@ -146,11 +156,30 @@ private:
    */
   void DeleteNode( Node* node );
 
-  // Undefined
-  AtlasPacker( const AtlasPacker& imageAtlas);
+  /**
+   * Pack a block into the atlas. If there is no enough room, grow the partition tree.
+   *
+   * @param[in] blockWidth The width of the block to pack.
+   * @param[in] blockHeight The height of the block to pack.
+   * @param[out] packPositionX The x coordinate of the position to pack the block.
+   * @param[out] packPositionY The y coordinate of the position to pack the block.
+   */
+  void GrowPack( SizeType blockWidth, SizeType blockHeight,
+                 SizeType& packPositionX, SizeType& packPositionY );
+
+  /**
+   * Add extra node into the partition tree to accommodate the given block.
+   *
+   * @param[in] blockWidth The width of the block to pack.
+   * @param[in] blockHeight The height of the block to pack.
+   */
+  void GrowNode( SizeType blockWidth, SizeType blockHeight );
 
   // Undefined
-  AtlasPacker& operator=( const AtlasPacker& imageAtlas );
+  AtlasPacker( const AtlasPacker& atlasPacker);
+
+  // Undefined
+  AtlasPacker& operator=( const AtlasPacker& atlasPacker );
 
 private:
 

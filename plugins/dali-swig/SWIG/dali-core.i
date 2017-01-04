@@ -147,6 +147,7 @@
 %rename(BlendingEquationType) Dali::BlendingEquation::Type;
 %rename(CameraType) Dali::Camera::Type;
 %rename(LayerBehavior) Dali::Layer::Behavior;
+%rename(DaliEndAction) Dali::Animation::EndAction;
 
 typedef std::pair<std::string, Dali::Property::Value> StringValuePair;
 typedef std::vector<Dali::TouchPoint> TouchPointContainer;
@@ -155,6 +156,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/object/ref-object.h>
 %include <dali/public-api/object/any.h>
 
+%include <dali/public-api/common/dali-common.h>
 %include <dali/public-api/common/intrusive-ptr.h>
 
 %include <dali/public-api/math/vector2.h>
@@ -192,6 +194,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/object/property-notification.h>
 %include <dali/public-api/object/handle.h>
 %include <dali/public-api/object/type-info.h>
+%include <dali/public-api/object/type-registry.h>
 
 %include <dali/public-api/common/constants.h>
 %include <dali/public-api/actors/actor-enumerations.h>
@@ -281,13 +284,13 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %template(ImageSignal) Dali::Signal<void(Dali::Image)>;
 %template(RenderTaskSignal) Dali::Signal<void(Dali::RenderTask&)>;
 %template(LongPressGestureDetectedSignal) Dali::Signal<void (Dali::Actor, const Dali::LongPressGesture&)>;
-%template(ActorTouchEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchEvent&)>;
+//%template(ActorTouchEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchEvent&)>;
 %template(ActorTouchDataSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchData&)>;
 %template(ActorHoverEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::HoverEvent&)>;
 %template(ActorWheelEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::WheelEvent&)>;
 %template(ActorSignal) Dali::Signal<void (Dali::Actor)>;
 %template(KeyEventSignal) Dali::Signal<void (const Dali::KeyEvent&)>;
-%template(TouchEventSignal) Dali::Signal<void (const Dali::TouchEvent&)>;
+//%template(TouchEventSignal) Dali::Signal<void (const Dali::TouchEvent&)>;
 %template(TouchSignal) Dali::Signal<void (const Dali::TouchData&)>;
 %template(StageWheelEventSignal) Dali::Signal<void (const Dali::WheelEvent&)>;
 %template(AngleThresholdPair) std::pair<Dali::Radian, Dali::Radian>;

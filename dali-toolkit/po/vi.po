@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Chọn tất cả"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Chép"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Chọn"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Cắt"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Dán"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Bộ nhớ tạm"
+

@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "Ählisini saýla"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "Nusga"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "Saýla"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "Kes"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "Goýmak"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "Alyş-çalyş buferi"
+

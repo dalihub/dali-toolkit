@@ -67,6 +67,10 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::DummyControl, Toolkit::Control, Create );
 DALI_TYPE_REGISTRATION_END()
+
+Dali::PropertyRegistration dummyControlVisualProperty(
+  typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+
 }
 
 DummyControl DummyControlImpl::New()
@@ -134,6 +138,18 @@ Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& tra
 {
   return Control::CreateTransition( transition );
 }
+
+void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value )
+{
+}
+
+Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Property::Index propertyIndex )
+{
+  Dali::Property::Value value;
+  return value;
+}
+
+
 
 DummyControl DummyControlImplOverride::New()
 {

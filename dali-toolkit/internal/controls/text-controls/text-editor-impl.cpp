@@ -31,7 +31,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
@@ -981,6 +983,22 @@ void TextEditor::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
   self.OnStageSignal().Connect( this, &TextEditor::OnStageConnect );
+
+  // Creates an extra control to be used as stencil buffer.
+  mStencil = Control::New();
+  mStencil.SetAnchorPoint( AnchorPoint::CENTER );
+  mStencil.SetParentOrigin( ParentOrigin::CENTER );
+
+  // Creates a background visual. Even if the color is transparent it updates the stencil.
+  mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, DevelVisual::COLOR ).
+                        Add( ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT ) );
+
+  // Enable the clipping property.
+  mStencil.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  mStencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+  self.Add( mStencil );
 }
 
 void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -1043,7 +1061,6 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    EnableClipping( size );
     RenderText( updateTextType );
   }
 
@@ -1069,14 +1086,15 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
 {
-  Actor self = Self();
   Actor renderableActor;
 
   if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
   {
     if( mRenderer )
     {
-      renderableActor = mRenderer->Render( mController->GetView(), DepthIndex::TEXT );
+      renderableActor = mRenderer->Render( mController->GetView(),
+                                           mAlignmentOffset,
+                                           DepthIndex::TEXT );
     }
 
     if( renderableActor != mRenderableActor )
@@ -1090,41 +1108,21 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
   {
     const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
 
-    mRenderableActor.SetPosition( scrollOffset.x, scrollOffset.y );
+    mRenderableActor.SetPosition( scrollOffset.x + mAlignmentOffset, scrollOffset.y );
 
-    Actor clipRootActor;
-    if( mClipper )
-    {
-      clipRootActor = mClipper->GetRootActor();
-    }
+    // Make sure the actors are parented correctly with/without clipping
+    Actor self = mStencil ? mStencil : Self();
 
     for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
            endIt = mClippingDecorationActors.end();
          it != endIt;
          ++it )
     {
-      Actor actor = *it;
-
-      if( clipRootActor )
-      {
-        clipRootActor.Add( actor );
-      }
-      else
-      {
-        self.Add( actor );
-      }
+      self.Add( *it );
     }
     mClippingDecorationActors.clear();
 
-    // Make sure the actor is parented correctly with/without clipping
-    if( clipRootActor )
-    {
-      clipRootActor.Add( mRenderableActor );
-    }
-    else
-    {
-      self.Add( mRenderableActor );
-    }
+    self.Add( mRenderableActor );
   }
 }
 
@@ -1354,26 +1352,6 @@ void TextEditor::GetHandleImagePropertyValue(  Property::Value& value, Text::Han
   }
 }
 
-void TextEditor::EnableClipping( const Vector2& size )
-{
-  // Not worth to created clip actor if width or height is equal to zero.
-  if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
-  {
-    if( !mClipper )
-    {
-      Actor self = Self();
-
-      mClipper = Clipper::New( size );
-      self.Add( mClipper->GetRootActor() );
-      self.Add( mClipper->GetImageView() );
-    }
-    else if ( mClipper )
-    {
-      mClipper->Refresh( size );
-    }
-  }
-}
-
 void TextEditor::OnClipboardTextSelected( ClipboardEventNotifier& clipboard )
 {
   mController->PasteClipboardItemEvent();
@@ -1422,6 +1400,7 @@ void TextEditor::OnIdleSignal()
 TextEditor::TextEditor()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIdleCallback( NULL ),
+  mAlignmentOffset( 0.f ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false )
 {
@@ -1429,7 +1408,7 @@ TextEditor::TextEditor()
 
 TextEditor::~TextEditor()
 {
-  mClipper.Reset();
+  UnparentAndReset( mStencil );
 
   if( ( NULL != mIdleCallback ) && Adaptor::IsAvailable() )
   {

@@ -139,12 +139,14 @@ public:
    * @param[in] numberOfCharacters The number of characters.
    * @param[in] horizontalAlignment The horizontal alignment.
    * @param[in,out] lines The laid-out lines.
+   * @param[out] alignmentOffset The alignment offset.
    */
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
               Layout::HorizontalAlignment horizontalAlignment,
-              Vector<LineRun>& lines );
+              Vector<LineRun>& lines,
+              float& alignmentOffset );
 
   /**
    * @brief Sets the default line spacing.

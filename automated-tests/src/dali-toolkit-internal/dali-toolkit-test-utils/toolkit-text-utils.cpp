@@ -334,11 +334,13 @@ void CreateTextModel( const std::string& text,
 
   if( options.align )
   {
+    float alignmentOffset = 0.f;
     layoutEngine.Align( textArea,
                         0u,
                         numberOfCharacters,
                         Layout::HORIZONTAL_ALIGN_BEGIN,
-                        lines );
+                        lines,
+                        alignmentOffset );
   }
 }
 

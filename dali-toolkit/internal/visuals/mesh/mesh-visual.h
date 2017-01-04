@@ -63,9 +63,10 @@ public:
    * @brief Create a new mesh visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static MeshVisualPtr New( VisualFactoryCache& factoryCache );
+  static MeshVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
 
 public:  // from Visual
 

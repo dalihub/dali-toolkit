@@ -1,0 +1,18 @@
+msgid "IDS_COM_BODY_SELECT_ALL"
+msgstr "සියල්ල තෝරන්න"
+
+msgid "IDS_COM_BODY_COPY"
+msgstr "පිටපත් කරන්න"
+
+msgid "IDS_COM_SK_SELECT"
+msgstr "තෝරන්න"
+
+msgid "IDS_COM_BODY_CUT"
+msgstr "කපන්න"
+
+msgid "IDS_COM_BODY_PASTE"
+msgstr "අලවන්න"
+
+msgid "IDS_COM_BODY_CLIPBOARD"
+msgstr "ක්ලිප් පුවරුව"
+

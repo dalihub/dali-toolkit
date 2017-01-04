@@ -40,8 +40,7 @@ namespace Internal
 namespace
 {
 
-// Property names.
-const char * const TEXT_PROPERTY( "text" );
+// Property names - common properties defined in visual-string-constants.h/cpp
 const char * const FONT_FAMILY_PROPERTY( "fontFamily" );
 const char * const FONT_STYLE_PROPERTY( "fontStyle" );
 const char * const POINT_SIZE_PROPERTY( "pointSize" );
@@ -94,9 +93,13 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;
+
+  uniform mediump mat4 uModelMatrix;\n
+  uniform mediump mat4 uViewMatrix;\n
+  uniform mediump mat4 uProjection;\n
+
   varying mediump vec2 vTexCoord;\n
   \n
-
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
@@ -113,7 +116,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uMvpMatrix *ComputeVertexPosition();\n
+    mediump vec4 nonAlignedVertex = uViewMatrix*uModelMatrix*ComputeVertexPosition();\n
+    mediump vec4 pixelAlignedVertex = vec4 ( floor(nonAlignedVertex.xyz), 1.0 );\n
+    mediump vec4 vertexPosition = uProjection*pixelAlignedVertex;\n
+
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -134,12 +140,14 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
 
 } // unnamed namespace
 
-TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache )
+TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new TextVisual( factoryCache );
+  TextVisualPtr TextVisualPtr( new TextVisual( factoryCache ) );
+  TextVisualPtr->SetProperties( properties );
+  return TextVisualPtr;
 }
 
-float TextVisual::GetHeightForWidth( float width ) const
+float TextVisual::GetHeightForWidth( float width )
 {
   return mController->GetHeightForWidth( width );
 }
@@ -260,18 +268,10 @@ void TextVisual::DoSetOnStage( Actor& actor )
   mControl = actor;
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  if( !geometry )
-  {
-    geometry =  VisualFactoryCache::CreateQuadGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY , geometry );
-  }
 
-  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-  if( !shader )
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-    mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
-  }
+  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+  mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+
   shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
@@ -430,29 +430,23 @@ void TextVisual::UpdateRenderer()
       PixelData data = mTypesetter->Render( relayoutSize );
 
       Vector4 atlasRect = FULL_TEXTURE_RECT;
-      TextureSet textureSet = mFactoryCache.GetAtlasManager()->Add( atlasRect, data );
 
-      if( textureSet )
-      {
-        mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-      }
-      else
-      {
-        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
-        // In that case, create a texture. TODO: should tile the text.
+      // Texture set not retrieved from Atlas Manager whilst pixel offset visible.
 
-        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                        data.GetPixelFormat(),
-                                        data.GetWidth(),
-                                        data.GetHeight() );
+      // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
+      // In that case, create a texture. TODO: should tile the text.
 
-        texture.Upload( data );
+      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                      data.GetPixelFormat(),
+                                      data.GetWidth(),
+                                      data.GetHeight() );
 
-        textureSet = TextureSet::New();
-        textureSet.SetTexture( 0u, texture );
+      texture.Upload( data );
 
-        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-      }
+      TextureSet textureSet = TextureSet::New();
+      textureSet.SetTexture( 0u, texture );
+
+      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
 

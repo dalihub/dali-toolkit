@@ -37,7 +37,8 @@ namespace UrlType
   {
     REGULAR_IMAGE,
     N_PATCH,
-    SVG
+    SVG,
+    GIF
   };
 }
 
@@ -55,7 +56,9 @@ inline UrlType::Type ResolveUrlType( const std::string& url )
     // parsing from the end for better chance of early outs
     enum { SUFFIX, HASH, HASH_DOT } state = SUFFIX;
     char SVG[ 4 ] = { 'g', 'v', 's', '.' };
+    char GIF[ 4 ] = { 'f', 'i', 'g', '.' };
     unsigned int svgScore = 0;
+    unsigned int gifScore = 0;
     int index = count;
     while( --index >= 0 )
     {
@@ -67,6 +70,14 @@ inline UrlType::Type ResolveUrlType( const std::string& url )
         if( ++svgScore == sizeof(SVG) )
         {
           return UrlType::SVG;
+        }
+      }
+      if( ( offsetFromEnd < sizeof(GIF) )&&( tolower( currentChar ) == GIF[ offsetFromEnd ] ) )
+      {
+        // early out if GIF
+        if( ++gifScore == sizeof(GIF) )
+        {
+          return UrlType::GIF;
         }
       }
       switch( state )

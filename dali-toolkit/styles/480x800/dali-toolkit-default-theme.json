@@ -28,6 +28,32 @@
 {
   "styles":
   {
+    "Tooltip":
+    {
+      "tooltip":
+      {
+        "content":
+        {
+          "pointSize":12
+        },
+        "waitTime":0.5,
+        "background":
+        {
+          "visual":"{DALI_IMAGE_DIR}tooltip.9.png",
+          "border":[1,5,5,1]
+        },
+        "tail":
+        {
+          "visibility":false,
+          "aboveVisual":"{DALI_IMAGE_DIR}tooltip-tail-above.png",
+          "belowVisual":"{DALI_IMAGE_DIR}tooltip-tail-below.png"
+        },
+        "position":"BELOW",
+        "hoverPointOffset":[10,10],
+        "movementThreshold":5,
+        "disappearOnMovement":false
+      }
+    },
     "TextLabel":
     {
       "pointSize":18,
@@ -57,14 +83,6 @@
     {
       "pointSize":25
     },
-    "RadioButton":
-    {
-      "unselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected.png",
-      "selectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected.png",
-      "disabledUnselectedStateImage":"{DALI_IMAGE_DIR}radio-button-unselected-disabled.png",
-      "disabledSelectedStateImage":"{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
-    },
-
     "TextField":
     {
       "pointSize":18,
@@ -115,8 +133,18 @@
     {
       "label":
       {
-        "pointSize":8,
-        "fontStyle":{"weight":"light"}
+        "visualType":"TEXT",
+        "pointSize":8
+      },
+      "unselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
+      },
+      "selectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
       }
     },
     "TextSelectionToolbar":
@@ -214,6 +242,109 @@
     "ProgressBarValueTextLabel":
     {
       "textColor":[0.8,0.8,1,1]
+    },
+    "Button":
+    {
+      "styles":["Tooltip"],
+      "initialAutoRepeatingDelay":2.0,
+      "nextAutoRepeatingDelay":0.9
+      // Note: Visuals added to Button will be used in all derived buttons unless overridden.
+    },
+    "PushButton":
+    {
+      "styles":["Button"],
+      "autoRepeating":false,
+      "togglable":false,
+      "labelPadding":[ 12.0, 12.0, 12.0, 12.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "horizontalAlignment": "CENTER",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
+      "unselectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-up.9.png"
+       },
+       "selectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-down.9.png"
+       },
+       "disabledSelectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-down-disabled.9.png"
+       },
+       "disabledUnselectedBackgroundVisual":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_IMAGE_DIR}button-disabled.9.png"
+       }
+    },
+    "CheckBoxButton":
+    {
+      "styles":["Button"],
+      "labelPadding":[ 12.0, 12.0, 0.0, 0.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
+      "unselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected.png"
+      },
+      "selectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-selected.png"
+      },
+      "disabledUnselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected-disabled.png"
+      },
+      "disabledSelectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-selected-disabled.png"
+      }
+    },
+    "RadioButton":
+    {
+      "styles":["Button"],
+      "labelPadding":[ 12.0, 12.0, 0.0, 0.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "pointSize" : 15.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
+      "unselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected.png"
+      },
+      "selectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-selected.png"
+      },
+      "disabledUnselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected-disabled.png"
+      },
+      "disabledSelectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
+      }
     }
   }
 }

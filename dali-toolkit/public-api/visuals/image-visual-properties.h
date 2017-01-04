@@ -27,6 +27,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_visuals
+ * @{
+ */
+
 namespace ImageVisual
 {
 
@@ -143,6 +148,10 @@ enum
 } // namespace Property
 
 } // namespace ImageVisual
+
+/**
+ * @}
+ */
 
 } // namespace Toolkit
 

@@ -88,9 +88,10 @@ public:
    * @brief Create a new gradient visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static GradientVisualPtr New( VisualFactoryCache& factoryCache );
+  static GradientVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
 
 public:  // from Visual
 

@@ -23,11 +23,11 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -39,6 +39,7 @@
 #include <dali-toolkit/internal/visuals/primitive/primitive-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
+#include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-resolve-url.h>
@@ -56,17 +57,6 @@ namespace Internal
 namespace
 {
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_TYPE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BORDER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
-DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
-
-const char * const VISUAL_TYPE( "visualType" );
 const char * const BATCHING_ENABLED( "batchingEnabled" );
 BaseHandle Create()
 {
@@ -117,19 +107,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     {
       case Toolkit::Visual::BORDER:
       {
-        visualPtr = BorderVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = BorderVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
       case Toolkit::Visual::COLOR:
       {
-        visualPtr = ColorVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = ColorVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
       case Toolkit::Visual::GRADIENT:
       {
-        visualPtr = GradientVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = GradientVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
@@ -143,11 +133,15 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
           UrlType::Type type = ResolveUrlType( imageUrl );
           if( UrlType::N_PATCH == type )
           {
-            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl );
+            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
           }
           else if( UrlType::SVG == type )
           {
-            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl );
+            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+          }
+          else if( UrlType::GIF == type )
+          {
+            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
           }
           else // Regular image
           {
@@ -160,12 +154,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
             if( batchingEnabled )
             {
-              visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
-              break;
+              visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
             }
             else
             {
-              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl );
+              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
             }
           }
         }
@@ -175,13 +168,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
       case Toolkit::Visual::MESH:
       {
-        visualPtr = MeshVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = MeshVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
       case Toolkit::Visual::PRIMITIVE:
       {
-        visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
 
@@ -193,17 +186,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
       case Toolkit::DevelVisual::TEXT:
       {
-        visualPtr = TextVisual::New( *( mFactoryCache.Get() ) );
+        visualPtr = TextVisual::New( *( mFactoryCache.Get() ), propertyMap );
         break;
       }
     }
   }
 
-  if( visualPtr )
-  {
-    visualPtr->SetProperties( propertyMap );
-  }
-  else
+  if( !visualPtr )
   {
     DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
@@ -261,6 +250,10 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   else if( UrlType::SVG == type )
   {
     visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), url );
+  }
+  else if( UrlType::GIF == type )
+  {
+    visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), url );
   }
   else // Regular image
   {

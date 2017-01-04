@@ -215,9 +215,11 @@ Dali::WrapMode::Type GetWrapMode( Toolkit::GradientVisual::SpreadMethod::Type sp
 
 } // unnamed namespace
 
-GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache )
+GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new GradientVisual( factoryCache );
+  GradientVisualPtr gradientVisualPtr( new GradientVisual( factoryCache ) );
+  gradientVisualPtr->SetProperties( properties );
+  return gradientVisualPtr;
 }
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
@@ -320,11 +322,6 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 void GradientVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  if( !geometry )
-  {
-    geometry =  VisualFactoryCache::CreateQuadGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::QUAD_GEOMETRY, geometry );
-  }
 
   Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
   VisualFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, gradientUnits );

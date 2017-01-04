@@ -217,6 +217,13 @@ public:
    */
   Actor GetFocusIndicatorActor();
 
+  /**
+   * @brief Move the focus to prev focused actor
+   *
+   * @SINCE_1_2.17
+   */
+  void MoveFocusBackward();
+
 public: // Signals
 
   /**

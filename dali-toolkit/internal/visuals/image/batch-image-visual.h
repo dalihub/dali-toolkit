@@ -43,9 +43,11 @@ public:
    * @brief Create a new batch-image visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] url The URL of the image to use
+   * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static BatchImageVisualPtr New( VisualFactoryCache& factoryCache, const std::string& url );
+  static BatchImageVisualPtr New( VisualFactoryCache& factoryCache, const std::string& url, const Property::Map& properties = Property::Map() );
 
 public:  // from Visual
 

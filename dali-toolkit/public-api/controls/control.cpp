@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/control.h>
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -106,11 +109,15 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundColor() is deprecated and will be removed from next release. use Property::BACKGROUND instead.\n" );
+
   Internal::GetImplementation(*this).SetBackgroundColor( color );
 }
 
 Vector4 Control::GetBackgroundColor() const
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetBackgroundColor() is deprecated and will be removed from next release. use Property::BACKGROUND instead.\n" );
+
   return Internal::GetImplementation(*this).GetBackgroundColor();
 }
 

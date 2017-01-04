@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUTTON_H__
-#define __DALI_TOOLKIT_INTERNAL_BUTTON_H__
+#ifndef DALI_TOOLKIT_INTERNAL_BUTTON_H
+#define DALI_TOOLKIT_INTERNAL_BUTTON_H
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -23,7 +23,8 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/buttons/button.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
@@ -38,10 +39,32 @@ namespace Internal
 {
 
 /**
+ * @copydoc Toolkit::Button
+ *
  * Button is the base class implementation for all buttons.
+ *
+ * @note
+ *
+ * All Foreground/Icon visuals expected to be the same size.
+ * Background visuals will take the size of the control.
+ * Padding and struts take size precedence over visuals when available space is limited.
+ * Icon/Foreground visuals take size precedence over Labels when available space is limited.
  */
 class Button : public Control
 {
+
+public:
+
+  /**
+   * Enum describing the position the text label can be in relation to the control (and foreground/icon)
+   */
+  enum Align
+  {
+    BEGIN,  // At the start of the control before the foreground/icon
+    END,    // At the end of the control after the foreground/icon
+    TOP,    // At the top of the control above the foreground/icon
+    BOTTOM  // At the bottom of the control below the foreground/icon
+  };
 
 public:
 
@@ -126,82 +149,13 @@ public:
   std::string GetLabelText() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetUnselectedImage
-   */
-  void SetUnselectedImage( const std::string& filename );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage
-   */
-  void SetSelectedImage( const std::string& filename );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage
-   */
-  void SetBackgroundImage( const std::string& filename );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedBackgroundImage
-   */
-  void SetSelectedBackgroundImage( const std::string& filename );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage
-   */
-  void SetDisabledImage( const std::string& filename );
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage
-   */
-  void SetDisabledSelectedImage( const std::string& filename );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage
-   */
-  void SetDisabledBackgroundImage( const std::string& filename );
-
-  /**
-   * @return The filename used for the button image.
-   */
-  std::string GetUnselectedImageFilename() const;
-
-  /**
-   * @return The filename used for the selected image.
-   */
-  std::string GetSelectedImageFilename() const;
-
-  /**
-   * @return The filename used for the background image.
-   */
-  std::string GetBackgroundImageFilename() const;
-
-  /**
-   * @return The filename used for the selected background image.
-   */
-  std::string GetSelectedBackgroundImageFilename() const;
-
-  /**
-   * @return The filename used for the disabled button image.
-   */
-  std::string GetDisabledImageFilename() const;
-
-  /**
-   * @return The filename used for the disabled selected image.
-   */
-  std::string GetDisabledSelectedImageFilename() const;
-
-  /**
-   * @return The filename used for the disabled background image.
-   */
-  std::string GetDisabledBackgroundImageFilename() const;
-
-  /**
-   * @brief Sets the specified properties on the button label.
+   * @brief Produces a Property::Map of Text properties to create a Text Visual
    * If the label does not exist yet, it is created.
    * The derived buttons are notified if any properties are changed.
    * @param[in] properties A Property::Map of key-value pairs of properties to set.
+   * @param[out] properties A Property::Map of text visual  properties to set.
    */
-  void ModifyLabel( const Property::Map& properties );
+  void MergeLabelProperties( const Property::Map& inMap, Property::Map& outMap );
 
   /**
    * Performs actions as requested using the action name.
@@ -220,46 +174,65 @@ public: // Deprecated API
   void SetLabel( Actor label );
 
   /**
-   * @deprecated Sets the unselected image with an Actor.
+   * @deprecated Sets the unselected image with an url.
    * @param[in] image The Actor to use.
    */
-  void SetButtonImage( Actor image );
+  void SetUnselectedImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the selected image with an url.
+   * @param[in] filename The url of the image to use to use.
+   */
+  void SetSelectedImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the selected background image with an url.
+   * @param[in] filename The url of the image to use to use.
+   */
+  void SetSelectedBackgroundImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the background image with an url.
+   * @param[in] filename The url of the image to use to use.
+   */
+  void SetBackgroundImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the disabled unselected background image with an url.
+   * @param[in] filename The url of the image to use to use.
+   */
+  void SetDisabledBackgroundImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the disabled unselected image with an url.
+   * @param[in] filename The url of the image to use to use.
+   */
+  void SetDisabledImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the disabled selected image with an url.
+   * @param[in] filename The url of the image to use to use.
+   */
+  void SetDisabledSelectedImage( const std::string& filename );
+
+  /**
+   * @deprecated Sets the unselected image with an Actor.
+   * @param[in] image The Image to use.
+   */
+  void SetButtonImage( Image image );
 
   /**
    * @deprecated Sets the selected image with an Actor.
-   * @param[in] image The Actor to use.
+   * @param[in] image The Image to use.
    */
-  void SetSelectedImage( Actor image );
+  void SetSelectedImage( Image image );
 
   /**
-   * @deprecated Sets the background image with an Actor.
-   * @param[in] image The Actor to use.
+   * @Gets url of a image visual, used by GetProperty but for deprecated Properties
+   * @param[in] index Visual index of url required
+   * @return filename for the corresponding visual
    */
-  void SetBackgroundImage( Actor image );
-
-  /**
-   * @deprecated Sets the selected background image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetSelectedBackgroundImage( Actor image );
-
-  /**
-   * @deprecated Sets the disabled image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetDisabledImage( Actor image );
-
-  /**
-   * @deprecated Sets the disabled selected image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetDisabledSelectedImage( Actor image );
-
-  /**
-   * @deprecated Sets the disabled background image with an Actor.
-   * @param[in] image The Actor to use.
-   */
-  void SetDisabledBackgroundImage( Actor image );
+  std::string GetUrlForImageVisual( const Property::Index index ) const;
 
   /**
    * @copydoc Dali::Toolkit::Button::GetButtonImage
@@ -271,33 +244,57 @@ public: // Deprecated API
    */
   Actor GetSelectedImage() const;
 
+public:
+
+  /**
+   * Button's state
+   */
+  enum State
+  {
+    UNSELECTED_STATE,              ///< The button is unselected.
+    SELECTED_STATE,                ///< The button is selected.
+    DISABLED_UNSELECTED_STATE,     ///< The button is disabled and unselected.
+    DISABLED_SELECTED_STATE,       ///< The button is disabled and selected.
+    STATE_COUNT,                   ///< Number of States
+  };
+
+  /**
+   * Enum to distinguish the different style-able components of the button
+   */
+  enum Visuals
+  {
+    UNSELECTED_FOREGROUND = 0,
+    SELECTED_FOREGROUND,
+    DISABLED_SELECTED_FOREGROUND,
+    DISABLED_UNSELECTED_FOREGROUND,
+    UNSELECTED_BACKGROUND,
+    SELECTED_BACKGROUND,
+    DISABLED_UNSELECTED_BACKGROUND,
+    DISABLED_SELECTED_BACKGROUND,
+    VISUALS_COUNT
+  };
+
+  /**
+   * Enum to list types of visual a state can have.
+   */
+  enum VisualState
+  {
+    BACKGROUND = 0,
+    FOREGROUND,
+    VISUAL_STATE_COUNT
+  };
+
 protected:
 
-  enum ButtonState
-  {
-    ButtonUp,                                  ///< The button is up.
-    ButtonDown,                                ///< The button is down.
-  };
-
   /**
-   * Button paint states.
+   * Button press state which is not the same as the actual button's state.
+   * For example An UNSELECTED button can be DEPRESSED, but until released, the actual button state doesn't change to SELECTED
    */
-  enum PaintState
+  enum PressState
   {
-    UnselectedState,              ///< The button is unselected.
-    SelectedState,                ///< The button is selected.
-    DisabledUnselectedState,      ///< The button is disabled and unselected.
-    DisabledSelectedState,        ///< The button is disabled and selected.
-  };
-
-  /**
-   * Enum to specify which decoration when getting and setting decorations.
-   */
-  enum DecorationState
-  {
-    UNSELECTED_DECORATION = 0,
-    SELECTED_DECORATION,
-    DECORATION_STATES
+    DEPRESSED,                           ///< The button is up.
+    UNPRESSED,                           ///< The button is down.
+    TOGGLE_DEPRESSED,                    ///< The button has been pressed down and will stay depressed when released.
   };
 
   /**
@@ -317,37 +314,12 @@ protected:
   /**
    * @return A reference to the unselected button image.
    */
-  Actor& GetUnselectedImage();
+  Actor GetUnselectedImage();
 
   /**
    * @return A reference to the selected image.
    */
-  Actor& GetSelectedImage();
-
-  /**
-   * @return A reference to the background image.
-   */
-  Actor& GetBackgroundImage();
-
-  /**
-   * @return A reference to the selected background image.
-   */
-  Actor& GetSelectedBackgroundImage();
-
-  /**
-   * @return A reference to the disabled button image.
-   */
-  Actor& GetDisabledImage();
-
-  /**
-   * @return A reference to the disabled selected image.
-   */
-  Actor& GetDisabledSelectedImage();
-
-  /**
-   * @return A reference to the disabled background image.
-   */
-  Actor& GetDisabledBackgroundImage();
+  Actor GetSelectedImage();
 
 private:
 
@@ -359,57 +331,11 @@ private:
   bool DoClickAction( const Property::Map& attributes );
 
   /**
-   * This method is called when the label is set.
-   * @param[in] noPadding Used to bypass padding if the label is to be treated generically.
-   */
-  virtual void OnLabelSet( bool noPadding ) {}
-
-  /**
-   * This method is called when the unselected button image is set
-   */
-  virtual void OnUnselectedImageSet() {}
-
-  /**
-   * This method is called when the selected image is set
-   */
-  virtual void OnSelectedImageSet() {}
-
-  /**
-   * This method is called when the background image is set
-   */
-  virtual void OnBackgroundImageSet() {}
-
-  /**
-   * This method is called when the selected background image is set
-   */
-  virtual void OnSelectedBackgroundImageSet() {}
-
-  /**
-   * This method is called when the disabled button image is set
-   */
-  virtual void OnDisabledImageSet() {}
-
-  /**
-   * This method is called when the disabled selected image is set
-   */
-  virtual void OnDisabledSelectedImageSet() {}
-
-  /**
-   * This method is called when the disabled background image is set
-   */
-  virtual void OnDisabledBackgroundImageSet() {}
-
-  /**
-   * This method is called the button is down.
+   * This method is called when the button is a Toggle button and released
    * Could be reimplemented in subclasses to provide specific behaviour.
+   * @return bool returns true if state changed.
    */
-  virtual void OnButtonDown();
-
-  /**
-   * This method is called when the button is up.
-   * Could be reimplemented in subclasses to provide specific behaviour.
-   */
-  virtual void OnButtonUp();
+  virtual bool OnToggleReleased();
 
   /**
    * This method is called when touch leaves the boundary of the button or several touch points are received.
@@ -426,7 +352,7 @@ private:
   /**
    * This method is called when the \e selected property is changed.
    */
-  virtual void OnSelected() {}
+  virtual void OnStateChange( State newState ){}
 
   /**
    * This method is called when the \e disabled property is changed.
@@ -516,8 +442,27 @@ protected: // From Control
    * @copydoc Toolkit::Control::OnStageDisconnection()
    * @note If overridden by deriving button classes, then an up-call to Button::OnStageDisconnection MUST be made at the end.
    */
-  void OnStageDisconnection();
+  virtual void OnStageDisconnection();
 
+  /**
+   * @copydoc Toolkit::Control::OnStageConnnection()
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
+   * @copydoc Toolkit::Control::GetNaturalSize
+   */
+  virtual Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Toolkit::Control::OnSetResizePolicy
+   */
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
+
+  /**
+   * @copydoc Toolkit::Control::OnRelayout
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
 private:
 
@@ -546,160 +491,152 @@ private:
   void SetUpTimer( float delay );
 
   /**
+   * Button has been pressed
+   */
+  void Pressed();
+
+  /**
+   * This method is called the button is down.
+   */
+  void ButtonDown();
+
+  /**
+   * This method is called when the button is up.
+   */
+  void ButtonUp();
+
+  /**
    * Slot called when Dali::Timer::SignalTick signal. Resets the autorepeating timer.
    */
   bool AutoRepeatingSlot();
 
   /**
-   * Sets the button as selected or unselected.
-   * @param[in] selected \e selected property value.
-   * @param[in] emitSignal Emit a signal if this value is \e true.
+   *  Check the requested state is an allowed transition.
+   *  Some states can not be transitioned to from certain states.
+   *  @param[in] requestedState check if can transition to this state
+   *  @return bool true if state change valid
    */
-  void SetSelected( bool selected, bool emitSignal );
+  bool ValidateState( State requestedState );
 
   /**
-   * This method is called when the button is pressed.
+   * Perform the given function on the visuals in the given state. Can be used to add and remove visuals.
+   * @param[in] functionPtr pointer to the function to perform an action on a visual
+   * @param[in] state Visuals in this state will be the target
    */
-  void Pressed();
+  void PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state  );
+
+  /**
+   * Changes the button state when an action occurs on it
+   * @param[in] requestedState the state to change to
+   */
+  void ChangeState( State requestedState );
+
+  /**
+   * @brief Get unselected button color
+   * @return color as vector4
+   */
+  const Vector4 GetUnselectedColor() const;
+
+  /**
+   * @brief Get selected button color
+   * @return color as vector4
+   */
+  const Vector4 GetSelectedColor() const;
+
+  /**
+   * Sets the color of button in selected or unselected state, if image also supplied this color will be appplied to it.
+   * If no visual exists, it is created.
+   * @param[in]  color The color to use.
+   * @param[in]  visualIndex The Visual to apply the color
+   */
+  void SetColor( const Vector4& color, Property::Index visualIndex );
 
   /**
    * This method is called when the button is released.
    */
   void Released();
 
-  /**
-   * Used to perform common setup applied to images within button.
-   * This will replace the current image with the specifed one.
-   * @param[in]  actorToModify The image to replace.
-   * @param[out] newActor The new image to use.
-   */
-  void SetupContent( Actor& actorToModify, Actor newActor );
-
-  /**
-   * Gets the unselected content color.
-   * @return     The currently used unselected color.
-   */
-  const Vector4 GetUnselectedColor() const;
-
-  /**
-   * Sets the color of button in selected or unselected state, if image also supplied this color will be appplied to it.
-   * If no visual exists, it is created.
-   * @param[in]  color The color to use.
-   * @param[in]  selectedState The state to apply the color to, SelectedState or DisabledUnselectedState.
-   */
-  void SetColor( const Vector4& color, PaintState selectedState );
-
-  /**
-   * Gets the selected content color.
-   * @return     The currently used selected color.
-   */
-  const Vector4 GetSelectedColor() const;
-
 protected:
 
-  ButtonState GetState();
-  PaintState GetPaintState();
-  void SetDecoration( DecorationState state, Actor actor );
-  Actor& GetDecoration( DecorationState state );
-
+  /**
+   * Set Text Label Padding
+   * @param[in] padding BEGIN END BOTTOM TOP
+   */
+  void SetLabelPadding( const Padding& padding );
 
   /**
-   * Returns the animation to be used for transitioning creating the animation if needed.
+   * Get Text Label padding
+   * @return Padding
+   */
+  Padding GetLabelPadding();
+
+  /**
+   * Set Foreground/icon Padding
+   * @param[in] padding BEGIN END BOTTOM TOP
+   */
+  void SetForegroundPadding( const Padding& padding);
+
+  /**
+   * Get Foreground padding
+   * @ return Padding
+   */
+  Padding GetForegroundPadding();
+
+  /**
+   * @brief Setup the button components for example foregrounds and background
+   * @param[in] index the index of the visual to set
+   * @param[in] value the value to set on the component
+   * @param[in] visualDepth the depth of the visual if overlapping another
+   */
+  void CreateVisualsForComponent( Property::Index index ,const Property::Value& value, const float visualDepth );
+
+  /**
+   * @brief Get the Property map for the given Visual
+   * @param[in] visualIndex visual index of the required visual
+   * @param[out] retreivedMap the property map used to construct the required visual
+   * @return bool success flag, true if visual found
+   */
+  bool GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const;
+  /**
+   * Returns the animation to be used for transition, creating the animation if needed.
    * @return The initialised transition animation.
    */
   Dali::Animation GetTransitionAnimation();
 
   /**
-   * Prepares the actor to be transitioned in.
-   * @param[in]  actor  The actor that will be transitioned in.
+   * @brief Set the position of the label relative to foreground/icon, if both present
+   * @param[in] labelAlignment given alignment setting
    */
-  virtual void PrepareForTranstionIn( Actor actor ) {}
+  void SetLabelAlignment( Align labelAlignment);
 
   /**
-   * Prepares the actor to be transitioned in.
-   * @param[in]  actor  The actor that will be transitioned out.
+   * @brief Get set alignment of label in relation to foreground/icon
+   * @return Set alignment value
    */
-  virtual void PrepareForTranstionOut( Actor actor ) {}
+  Align GetLabelAlignment();
 
   /**
-   * Transitions the actor in, allowing derived classes to configure
-   * the GetTransitionAnimation() animation ready.
-   * Button is in charge of calling Dali::Animation::Play and so derived classes
-   * only need to add the animation.
+   * Removes the visual from the button (un-staged)
+   * If the derived button does not want the visual removed then use this virtual function to
+   * define the required behaviour.
+   * Can decide to only remove specified visuals via index
    */
-  virtual void OnTransitionIn( Actor actor ) {}
+  virtual void OnButtonVisualRemoval( Property::Index visualIndex );
 
-  /**
-   * Transitions the actor out, allowing derived classes to configure
-   * the GetTransitionAnimation() animation ready.
-   * Button is in charge of calling Dali::Animation::Play and so derived classes
-   * only need to add the animation.
-   */
-  virtual void OnTransitionOut( Actor actor ) {}
 
 private:
 
   /**
-   * Starts the transition animation.
-   * Button::TransitionFinished is called when the animation finishes.
+   * Removes the visual from the button and prepares it to be transitioned out
+   * @param[in] visualIndex the visual to remove
    */
-  void StartTransitionAnimation();
+  void RemoveVisual( Property::Index visualIndex );
 
   /**
-   * This method stops all transition animations
+   * Adds the required visual to the button.
+   * @param[in] visualIndex The Property index of the visual required
    */
-  void StopTransitionAnimation();
-
-  /**
-   * Called when the transition animation finishes.
-   */
-  void TransitionAnimationFinished( Dali::Animation& source );
-
-  /**
-   * Resets the Button to the base state for the current paint state.
-   * Any additionally inserted images needed for transitions that are
-   * no longer needed and the removed.
-   */
-  void ResetImageLayers();
-
-  /**
-   * Transitions out the actor
-   */
-  void TransitionOut( Actor actor );
-
-  /**
-   * Removes the actor from the button and prepares it to be transitioned out
-   */
-  void RemoveButtonImage( Actor& actor );
-
-  /**
-   * Finds the index of the actor.
-   * If the actor doesn't exist, return the last index + 1.
-   */
-  unsigned int FindChildIndex( Actor& actor );
-
-  /**
-   * Adds an actor to the hierarchy and prepares it to be transitioned.
-   * @param[in] actor The actor to add
-   */
-  void PrepareAddButtonImage( Actor& actor );
-
-  /**
-   * Adds an actor to the hierarchy and marks it to be transitioned.
-   * @param[in] actor The actor to add
-   */
-  void TransitionButtonImage( Actor& actor );
-
-  /**
-   * Adds an actor to the hierarchy.
-   * @param[in] actor The actor to add
-   */
-  void AddButtonImage( Actor& actor );
-
-  /**
-   * (Re)Adds the label (if exists) to the hierarchy (so it is always on top).
-   */
-  void ReAddLabel();
+  void SelectRequiredVisual( Property::Index visualIndex );
 
   // Undefined
   Button( const Button& );
@@ -715,41 +652,34 @@ private:
   Toolkit::Button::ButtonSignalType mClickedSignal;           ///< Signal emitted when the button is clicked.
   Toolkit::Button::ButtonSignalType mStateChangedSignal;      ///< Signal emitted when the button's state is changed.
 
-  Timer mAutoRepeatingTimer;                   ///< Timer used to implement the autorepeating property.
+  Timer            mAutoRepeatingTimer;
 
-  Actor mLabel;                                ///< Stores the button label.
+  Actor            mLabel;                      ///< Stores the button text label.
+  Padding          mLabelPadding;               ///< The padding around the label (if present).
+  Padding          mForegroundPadding;          ///< The padding around the foreground/icon visual (if present).
 
-  Actor mDecoration[ DECORATION_STATES ];      ///< Stores the decorations for both selected and unselected states.
-
-  Actor mUnselectedContent;                    ///< Stores the unselected content.
-  Actor mSelectedContent;                      ///< Stores the selected content.
-  Actor mBackgroundContent;                    ///< Stores the background content.
-  Actor mSelectedBackgroundContent;            ///< Stores the selected background content.
-  Actor mDisabledContent;                      ///< Stores the disabled content.
-  Actor mDisabledSelectedContent;              ///< Stores the disabled selected content.
-  Actor mDisabledBackgroundContent;            ///< Stores the disabled background content.
-
-  Animation        mTransitionAnimation;       ///< Animation used in the state transitions.
+  Align            mTextLabelAlignment;           ///< Position of text label in relation to foreground/icon when both are present.
 
   TapGestureDetector mTapDetector;
 
-  Vector4          mUnselectedColor;           ///< Color to use for unselected content.
-  Vector4          mSelectedColor;             ///< Color to use for selected content.
+  Vector4          mUnselectedColor;
+  Vector4          mSelectedColor;
 
-  bool             mDisabled;                  ///< Stores the disabled property.
-  bool             mAutoRepeating;             ///< Stores the autorepeating property.
-  bool             mTogglableButton;           ///< Stores the togglable property.
-  bool             mSelected;                  ///< Stores the selected state.
-  float            mInitialAutoRepeatingDelay; ///< Stores the initial autorepeating delay in seconds.
-  float            mNextAutoRepeatingDelay;    ///< Stores the next autorepeating delay in seconds.
+  bool             mAutoRepeating;              ///< Stores the autorepeating property.
+  bool             mTogglableButton;            ///< Stores the togglable property as a flag.
+  bool             mTextStringSetFlag;          ///< Stores if text has been set. Required in relayout but don't want to calculate there.
 
-  float            mAnimationTime;             ///< The animation time.
+  float            mInitialAutoRepeatingDelay;  ///< Stores the initial autorepeating delay in seconds.
+  float            mNextAutoRepeatingDelay;     ///< Stores the next autorepeating delay in seconds.
+
+  float            mAnimationTime;
+
+  PressState       mButtonPressedState;         ///< In relation to the button being pressed/released
+  State            mButtonState;
+  State            mPreviousButtonState;        ///< During a transition between two states, this stores the previous state so Visuals can be removed.
 
   // Actions
-  bool             mClickActionPerforming;
-
-  ButtonState      mState;                     ///< Stores the button state.
-  PaintState       mPaintState;                ///< Stores the paint state.
+  bool             mClickActionPerforming;      ///< Used to manage signal emissions during action
 };
 
 } // namespace Internal
@@ -778,4 +708,4 @@ inline const Toolkit::Internal::Button& GetImplementation( const Toolkit::Button
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_BUTTON_H__
+#endif // DALI_TOOLKIT_INTERNAL_BUTTON_H

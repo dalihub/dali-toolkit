@@ -35,6 +35,11 @@ ImageAtlas::~ImageAtlas()
 {
 }
 
+Texture ImageAtlas::PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  )
+{
+  return Internal::ImageAtlas::PackToAtlas( pixelData, textureRects );
+}
+
 ImageAtlas::ImageAtlas(Internal::ImageAtlas* internal)
 : BaseHandle( internal )
 {

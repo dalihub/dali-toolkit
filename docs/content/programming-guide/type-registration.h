@@ -6,23 +6,22 @@ DALi has a \link Dali::TypeRegistry type registration \endlink system which can 
 a derived actor/control type along with specifying a method which is used to create this type. This
 type registration normally takes place at library load time.
 
-Once a type is registered, signals, actions and properties can also be registered for all instances
+Once a type is registered, properties, signals and actions can also be registered for all instances
 of this type.
 
-This then allows the application writer to create instances using just the type name; connect to
-signals using only the signal name; activate an action by just using the action name; and finally,
-getting and setting properties using a property name or index.
+This then allows the application writer to create instances using just the type name; getting and setting properties using a property name or index; connect to
+signals using only the signal name; and activate an action by just using the action name.
 
 This topic covers:
 
  - @ref register-type
+ - @ref register-property
  - @ref register-signal
  - @ref register-action
- - @ref register-property
  - @ref using-type
+ - @ref using-property
  - @ref using-signal
  - @ref using-action
- - @ref using-property
 
 @section register-type Registering a Type
 
@@ -37,22 +36,252 @@ within the source file of the deriving control as shown in the code below.
 namespace
 {
 
-Dali::BaseHandle Create()
+Dali::BaseHandle CreateMyControl()
 {
   // Create an instance of MyControl and return the handle.
   return MyControlImpl::New();
 }
 
-Dali::TypeRegistration type(
-    typeid( MyControl ),              // Type ID of our Control
-    typeid( Dali::Toolkit::Control ), // Type ID of what our Control derives from
-    Create                            // Function which creates our Control, signature shown above
-);
+DALI_TYPE_REGISTRATION_BEGIN( MyControl, Toolkit::Control, CreateMyControl );
+DALI_TYPE_REGISTRATION_END()
 
 } // unnamed namespace
 @endcode
 
-This registration informs DALi of the existence of MyControl type.
+This registration macro informs DALi of the existence of MyControl type, which class it derives from, and a method for creating an instance of MyControl.
+
+
+@section register-property Registering a Property
+
+DALi has a property system which can be extended by registering more properties through the type
+registry. The property index is <b><i>very important</i></b> when registering these properties and
+all property indices should be between Dali::PROPERTY_REGISTRATION_START_INDEX and
+Dali::PROPERTY_REGISTRATION_MAX_INDEX.
+
+Furthermore, if deriving from a \link Dali::Toolkit::Control Control\endlink, the control
+writer needs to be aware of their parent class's property range to avoid overlapping indices, so should start their property indices after their parent's range.
+Control reserves a property range between
+\link Dali::Toolkit::Control::CONTROL_PROPERTY_START_INDEX Control::CONTROL_PROPERTY_START_INDEX\endlink
+and \link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX Control::CONTROL_PROPERTY_END_INDEX\endlink.
+
+Any control deriving from \link Dali::Toolkit::Control Control\endlink
+should start at
+\link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX Control::CONTROL_PROPERTY_END_INDEX\endlink + 1.
+Controls deriving from an existing control such as \link Dali::Toolkit::Button Button\endlink should start at
+\link Dali::Toolkit::Button::PROPERTY_END_INDEX Button::PROPERTY_END_INDEX\endlink + 1.
+
+Please have a look at \ref property-indices for more information.
+
+The following code shows how a property can be added to a type.
+
+@code
+// Define the indices we will use for the properties:
+
+class MyControl : public Control
+{
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,
+
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
+    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000
+  };
+
+  struct Property
+  {
+    enum
+    {
+      // Event side properties
+
+      /**
+       * @brief name "propertyOne", type bool
+       * @details Enables the feature.
+       * @SINCE_1_0.0
+       */
+      PROPERTY_ONE = PROPERTY_START_INDEX,
+
+      /**
+       * @brief name "propertyTwo", type float
+       * @details Controls the level of the feature
+       * @SINCE_1_0.0
+       */
+      PROPERTY_TWO,
+
+      /**
+       * @brief name "propertyThree", type Vector4
+       * @details The foreground color
+       * @SINCE_1_0.0
+       */
+      PROPERTY_THREE,
+
+      // Animatable properties
+
+      /**
+       * @brief name "propertyFour", type Vector4
+       * @details Animatable parameters of the feature
+       * @SINCE_1_0.0
+       */
+      PROPERTY_FOUR = ANIMATABLE_PROPERTY_START_INDEX,
+    };
+  };
+
+  /// ...
+};
+@endcode
+
+The control and properties are registered with the TypeRegistry using the following macros:
+
+@code
+DALI_TYPE_REGISTRATION_BEGIN( MyControl, Toolkit::Control, CreateMyControl );
+DALI_PROPERTY_REGISTRATION( AppNamespace, MyControl, "property1", BOOLEAN, PROPERTY_ONE )
+DALI_PROPERTY_REGISTRATION( AppNamespace, MyControl, "property2", FLOAT, PROPERTY_TWO )
+DALI_PROPERTY_REGISTRATION( AppNamespace, MyControl, "property3", VECTOR4, PROPERTY_THREE )
+
+DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( AppNamespace, MyControl, "property4", Vector4(0.f, 0.f, 1.f, 1.f), PROPERTY_FOUR )
+
+DALI_TYPE_REGISTRATION_END()
+@endcode
+
+The DALI_PROPERTY_REGISTRATION macro requires that you define the class methods SetProperty() and GetProperty().
+
+The DALI_ANIMATABLE_PROPERTY_REGISTRATION macros automatically create and handle scene-graph values, and do not need any code in your derived class. Just use the property index in animation or constraint methods.
+
+The SetProperty class method has to be static, and follows the format:
+
+@code
+void MyControl::SetProperty(
+    Dali::BaseObject* object,          // A pointer to an instance of MyControl
+    Dali::Property::Index index,       // The index of the property to set
+    const Dali::Property::Value& value // The value to set the property to
+)
+{
+  // DownCast to MyControl so that we can do the specific behaviour
+  MyControl control = MyControl::DownCast( Dali::BaseHandle ( object ) );
+
+  if ( control )
+  {
+    MyControlImpl& controlImpl( GetImplementation( control ) );
+
+    switch ( index )
+    {
+      case PROPERTY_ONE:
+      {
+        // Assume we already have a method in MyControl which sets the appropriate value and takes in a boolean
+        bool property;
+        if( value.Get( property ) )
+        {
+          controlImpl.SetPropertyOne( property );
+        }
+        break;
+      }
+
+      case PROPERTY_TWO
+      {
+        // Assume we already have a method in MyControl which sets the appropriate value and takes in a float
+        float property;
+        if( value.Get( property ) )
+        {
+          controlImpl.SetPropertyTwo( property );
+        }
+        break;
+      }
+
+      case PROPERTY_THREE
+      {
+        // Assume we already have a method in MyControl which sets the appropriate value and takes in a Vector4
+        Vector4 property;
+        if( value.Get( property ) )
+        {
+          controlImpl.SetPropertyThree( property );
+        }
+        break;
+      }
+    }
+  }
+}
+@endcode
+
+And the GetProperty method also has to be static and takes the form:
+
+@code
+Property::Value MyControl::GetProperty(
+    BaseObject* object,     // A pointer to an instance of MyControl
+    Property::Index index ) // The index of the property to retrieve
+{
+  Property::Value value;
+
+  // DownCast to MyControl so that we can do the specific behaviour
+  MyControl control = MyControl::DownCast( Dali::BaseHandle ( object ) );
+
+  if ( control )
+  {
+    MyControlImpl& controlImpl( GetImplementation( control ) );
+
+    switch ( index )
+    {
+      case PROPERTY_ONE:
+      {
+        // Assume we have a member variable that stores the value of this property
+        value = controlImpl.mPropertyOne;
+        break;
+      }
+
+      case PROPERTY_TWO:
+      {
+        // Assume we have a member variable that stores the value of this property
+        value = controlImpl.mPropertyTwo;
+        break;
+      }
+
+      case PROPERTY_THREE:
+      {
+        // Assume we have a member variable that stores the value of this property
+        value = controlImpl.mPropertyThree;
+        break;
+      }
+    }
+  }
+}
+@endcode
+
+@section using-property Setting & Getting Registered Properties
+
+Like other properties, type registered properties can also be set and their values can be retrieved
+in a similar manner. The code below shows how this can be done.
+
+@code
+Dali::TypeInfo type = Dali::TypeRegistry::Get().GetTypeInfo( "MyControl" );
+
+if ( type )
+{
+  Dali::BaseHandle baseHandle = type.CreateInstance();
+
+  if ( baseHandle )
+  {
+    // Handle deals with properties, so DownCast
+    Dali::Handle handle = Dali::Handle::DownCast( baseHandle );
+
+    if ( handle )
+    {
+      // Setting a property
+      handle.SetProperty( MyControl::Property::PROPERTY_ONE, 11.0f );
+
+      // Get the property name
+      std::cout << "Property1 name is: " << handle.GetPropertyName( MyControl::Property::PROPERTY_ONE ) << std::endl;
+
+      // Get the property
+      bool propertyOne = handle.GetProperty< bool >( MyControl::Property::PROPERTY_ONE );
+
+      // Set the second property
+      handle.SetProperty( MyControl::Property::PROPERTY_TWO, 4.0f );
+    }
+  }
+}
+@endcode
 
 @section register-signal Registering a Signal
 
@@ -188,133 +417,6 @@ If the action is not performed by the derived class, it will be propagated to th
 For example, in the above case, MyControl can perform "action1" so should return true, but it
 cannot perform "action4" so should return false and propagate the action to Control.
 
-@section register-property Registering a Property
-
-DALi has a property system which can be extended by registering more properties through the type
-registry. The property index is <b><i>very important</i></b> when registering these properties and
-all property indices should be between Dali::PROPERTY_REGISTRATION_START_INDEX and
-Dali::PROPERTY_REGISTRATION_MAX_INDEX.
-
-Furthermore, if deriving from \link Dali::Toolkit::Control Control\endlink, the control writer
-needs to be aware of their parent class's property range. Control reserves a property range between
-\link Dali::Toolkit::Control::CONTROL_PROPERTY_START_INDEX ControlImpl::CONTROL_PROPERTY_START_INDEX\endlink
-and \link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX Control::CONTROL_PROPERTY_END_INDEX\endlink.
-Any deriving control should start their property indices from
-\link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX Control::CONTROL_PROPERTY_END_INDEX\endlink + 1.
-
-Please have a look at \ref property-indices for more information.
-
-The following code shows how a property can be added to a type.
-
-@code
-// Define the indices we will use for the properties
-static const int PROPERTY_ONE( Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 1 );
-static const int PROPERTY_TWO( Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 2 );
-static const int PROPERTY_THREE( Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 3 );
-
-Dali::PropertyRegistration property1(
-    type,                    // Reference to type registration object (see above)
-    "property1",             // Name of the property
-    PROPERTY_ONE,            // Index of this property
-    Dali::Property::BOOLEAN, // The property type
-    &MyControl::SetProperty, // Method called when property is set
-    &MyControl::GetProperty  // Method called when retrieving the value of the property
-);
-
-// Register more properties
-Dali::PropertyRegistration property2(
-    type, "property2", PROPERTY_TWO, Dali::Property::FLOAT,
-    NULL, // SetProperty is NULL, means that this property is a read-only property
-    &MyControl::GetProperty
-);
-Dali::PropertyRegistration property3( type, "property3", PROPERTY_THREE, Dali::Property::FLOAT, &MyControl::SetProperty, &MyControl::GetProperty);
-@endcode
-
-It is recommended to use static members (of MyControl class) for the property indices. That way
-applications can also use the static member as well. If they require the property name, they can
-just call the Dali::Handle::GetPropertyName().
-
-The method that deals with setting the property has to be static, and follows the format:
-
-@code
-void MyControl::SetProperty(
-    Dali::BaseObject* object,          // A pointer to an instance of MyControl
-    Dali::Property::Index index,       // The index of the property to set
-    const Dali::Property::Value& value // The value to set the property to
-)
-{
-  // DownCast to MyControl so that we can do the specific behaviour
-  MyControl control = MyControl::DownCast( Dali::BaseHandle ( object ) );
-
-  if ( control )
-  {
-    MyControlImpl& controlImpl( GetImplementation( control ) );
-
-    switch ( index )
-    {
-      case PROPERTY_ONE:
-      {
-        // Assume we already have a method in MyControl which sets the appropriate value and takes in a boolean
-        controlImpl.SetPropertyOne( value.Get< bool >() );
-        break;
-      }
-
-      // PROPERTY_TWO is read-only so does not need to be handled
-
-      case PROPERTY_THREE
-      {
-        // Assume we already have a method in MyControl which sets the appropriate value and takes in a float
-        controlImpl.SetPropertyThree( value.Get< float >() );
-        break;
-      }
-    }
-  }
-}
-@endcode
-
-And the function to retrieve the property value also has to be static and takes the form:
-
-@code
-Property::Value MyControl::GetProperty(
-    BaseObject* object,   // A pointer to an instance of MyControl
-    Property::Index index // The index of the property to retrieve
-)
-{
-  Property::Value value;
-
-  // DownCast to MyControl so that we can do the specific behaviour
-  MyControl control = MyControl::DownCast( Dali::BaseHandle ( object ) );
-
-  if ( control )
-  {
-    MyControlImpl& controlImpl( GetImplementation( control ) );
-
-    switch ( index )
-    {
-      case PROPERTY_ONE:
-      {
-        // Assume we have a member variable that stores the value of this property
-        value = controlImpl.mPropertyOne;
-        break;
-      }
-
-      case PROPERTY_TWO:
-      {
-        // Assume we have a member variable that stores the value of this property
-        value = controlImpl.mPropertyTwo;
-        break;
-      }
-
-      case PROPERTY_THREE:
-      {
-        // Assume we have a member variable that stores the value of this property
-        value = controlImpl.mPropertyThree;
-        break;
-      }
-    }
-  }
-}
-@endcode
 
 @section using-type Creating an instance of a Registered Type
 
@@ -407,39 +509,5 @@ if ( type )
 }
 @endcode
 
-@section using-property Setting & Getting Registered Properties
-
-Like other properties, type registered properties can also be set and their values can be retrieved
-in a similar manner. The code below shows how this can be done.
-
-@code
-Dali::TypeInfo type = Dali::TypeRegistry::Get().GetTypeInfo( "MyControl" );
-
-if ( type )
-{
-  Dali::BaseHandle baseHandle = type.CreateInstance();
-
-  if ( baseHandle )
-  {
-    // Handle deals with properties, so DownCast
-    Dali::Handle handle = Dali::Handle::DownCast( baseHandle );
-
-    if ( handle )
-    {
-      // Setting a property
-      handle.SetProperty( PROPERTY_ONE, true ); // Assume Property indices are publicly accessible
-
-      // Get the property name
-      std::cout << "Property1 name is: " << handle.GetPropertyName( PROPERTY_ONE ) << std::endl;
-
-      // Get the property
-      bool propertyOne = handle.GetProperty< bool >( PROPERTY_ONE );
-
-      // Attempt to write a read-only property...
-      handle.SetProperty( PROPERTY_TWO, 4.0f ); // !!! Will assert as PROPERTY_TWO is read-only !!!
-    }
-  }
-}
-@endcode
 *
 */

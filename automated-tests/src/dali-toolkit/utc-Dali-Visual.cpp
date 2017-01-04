@@ -38,6 +38,7 @@ namespace
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
@@ -291,6 +292,14 @@ int UtcDaliVisualSize(void)
 
   const float height = textVisual.GetHeightForWidth( 40.f );
   DALI_TEST_EQUALS( height, 40.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  //AnimatedImageVisual
+  Visual::Base animatedImageVisual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  animatedImageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+  animatedImageVisual.GetNaturalSize(naturalSize);
+  // TEST_GIF_FILE: anim.gif
+  // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
+  DALI_TEST_EQUALS( naturalSize, Vector2(50.f, 50.f), TEST_LOCATION );
 
   END_TEST;
 }
@@ -990,6 +999,45 @@ int UtcDaliVisualGetPropertyMap10(void)
   END_TEST;
 }
 
+int UtcDaliVisualGetPropertyMap11(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetPropertyMap7: AnimatedImageVisual" );
+
+  // request SvgVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  Visual::Base svgVisual = factory.CreateVisual( Property::Map()
+                                                 .Add( Visual::Property::TYPE,  Visual::IMAGE )
+                                                 .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME ) );
+
+  Property::Map resultMap;
+  svgVisual.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
+
+  // request SvgVisual with an URL
+  Visual::Base svgVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  resultMap.Clear();
+  svgVisual2.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from a visual
+  value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
+
+  END_TEST;
+}
+
 int UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas(void)
 {
   ToolkitTestApplication application;
@@ -1532,6 +1580,15 @@ int UtcDaliNPatchVisualCustomShader(void)
   Property::Map shader;
   const std::string fragmentShader = "Foobar";
   shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+
+  Property::Map transformMap;
+  transformMap["size"] = Vector2( 0.5f, 0.5f ) ;
+  transformMap["offset"] = Vector2( 20.0f, 0.0f ) ;
+  transformMap["offsetSizeMode"] = Vector4( 1.0f, 1.0f, 0.0f, 0.0f );
+  transformMap["anchorPoint"] = Align::CENTER;
+  transformMap["origin"] = Align::CENTER;
+  properties[DevelVisual::Property::TRANSFORM] = transformMap;
+
   properties[Dali::Toolkit::Visual::Property::TYPE] = Dali::Toolkit::Visual::IMAGE;
   properties[Dali::Toolkit::Visual::Property::SHADER]=shader;
   properties[Dali::Toolkit::ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
@@ -1545,12 +1602,16 @@ int UtcDaliNPatchVisualCustomShader(void)
   dummy.SetSize(2000, 2000);
   dummy.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add(dummy);
+  application.SendNotification();
 
   Renderer renderer = dummy.GetRendererAt( 0 );
   Shader shader2 = renderer.GetShader();
   Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
   Property::Map* map = value.GetMap();
   DALI_TEST_CHECK( map );
+
+  Property::Index index = renderer.GetPropertyIndex("size");
+  DALI_TEST_EQUALS( renderer.GetProperty( index ), Property::Value(Vector2(0.5, 0.5)), 0.001, TEST_LOCATION );
 
   Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
   // *map["vertex"]; is default here so not verifying it
@@ -1677,6 +1738,7 @@ int UtcDaliVisualTextVisualRender(void)
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
 
   dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetParentOrigin( ParentOrigin::CENTER );
 
   Stage::GetCurrent().Add( dummyControl );
   application.SendNotification();
@@ -1691,7 +1753,7 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
 
   Property::Map transformMap;
-  transformMap.Insert( DevelVisual::Transform::Property::SIZE, Vector2( 720.f, 640.f ) );
+  transformMap.Insert( "size", Vector2( 0.5f, 0.5f ) );
   propertyMap.Insert( DevelVisual::Property::TRANSFORM, transformMap );
 
   textVisual = factory.CreateVisual( propertyMap );
@@ -1700,8 +1762,15 @@ int UtcDaliVisualTextVisualRender(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, textVisual );
   dummyControl.SetSize( 720.f, 640.f );
 
-  application.SendNotification();
+  application.SendNotification(); // force process events to ensure text visual
+  // adds renderer to the dummy control in OnRelayout
   application.Render();
+
+  Renderer renderer = dummyControl.GetRendererAt(0u);
+  Property::Index index = renderer.GetPropertyIndex("size");
+
+  tet_infoline( "Test that the TextVisual overrides anything set by developer" );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(index), Vector2( 1.0, 1.0 ), 0.001f, TEST_LOCATION );
 
   END_TEST;
 }

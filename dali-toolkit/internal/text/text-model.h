@@ -158,6 +158,7 @@ public:
   Vector2                     mScrollPosition;      ///< The text is offset by this position when scrolling.
   Layout::HorizontalAlignment mHorizontalAlignment; ///< The layout's horizontal alignment.
   Layout::VerticalAlignment   mVerticalAlignment;   ///< The layout's vertical alignment.
+  float                       mAlignmentOffset;     ///< The alignment offset.
   bool                        mElideEnabled:1;      ///< Whether the text's elide is enabled.
 };
 

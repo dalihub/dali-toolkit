@@ -196,7 +196,6 @@ using namespace Dali::Toolkit;
 %include events/gaussian-blur-view-event.i
 %include events/image-event.i
 %include events/itemview-event.i
-%include events/keyboardFocusManager-event.i
 %include events/objectregistry-event.i
 %include events/popup-event.i
 %include events/pinchgesture-event.i

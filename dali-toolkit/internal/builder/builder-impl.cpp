@@ -193,7 +193,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
       }
       else
       {
-        DALI_SCRIPT_VERBOSE("SetProperty INVALID '%s' Index=:%d\n", key.c_str(), index);
+        DALI_LOG_ERROR("Key '%s' not found.\n", key.c_str());
       }
 
       // Add custom properties

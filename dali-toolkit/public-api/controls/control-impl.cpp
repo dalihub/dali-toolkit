@@ -22,6 +22,7 @@
 #include <cstring> // for strcmp
 #include <limits>
 #include <stack>
+#include <typeinfo>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
@@ -39,6 +40,7 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
@@ -46,6 +48,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 
 namespace Dali
 {
@@ -57,7 +60,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New( Debug::General, false, "LOG_CONTROL_VISUALS");
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
 #endif
 
 /**
@@ -117,7 +120,7 @@ HandleIndex GetVisualProperty(
 {
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
-  oss << "Control::GetHandleIndex(" << visualName << ", " << propertyKey << ")" << std::endl;
+  oss << "Control::GetVisualProperty(" << visualName << ", " << propertyKey << ")" << std::endl;
   DALI_LOG_INFO( gLogFilter, Debug::General, oss.str().c_str() );
 #endif
 
@@ -125,44 +128,25 @@ HandleIndex GetVisualProperty(
   RegisteredVisualContainer::Iterator iter;
   for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
-    if ( (*iter)->visual.GetName() == visualName )
+    Toolkit::Visual::Base visual = (*iter)->visual;
+    if( visual && visual.GetName() == visualName )
     {
-      break;
-    }
-  }
-
-  // Does it's renderer have an associated property?
-  if( iter != visuals.End() )
-  {
-    Actor self = controlImpl.Self();
-    Property::Index index = DevelHandle::GetPropertyIndex( self, propertyKey );
-    if( index != Property::INVALID_INDEX )
-    {
-      // It's an actor property:
-      return HandleIndex( self, index );
-    }
-    else
-    {
-      // Check if it is a renderer property:
-      if( self.GetRendererCount() > 0 )
+      Internal::Visual::Base& visualImpl = GetImplementation(visual);
+      Renderer renderer = visualImpl.GetRenderer();
+      if( renderer )
       {
-        // @todo Need to use correct renderer index
-        Renderer renderer = self.GetRendererAt(0);
         Property::Index index = DevelHandle::GetPropertyIndex( renderer, propertyKey );
         if( index != Property::INVALID_INDEX )
         {
-          // It's a renderer property:
           return HandleIndex( renderer, index );
         }
       }
-      else
-      {
-        std::ostringstream oss;
-        oss << propertyKey;
-        DALI_LOG_WARNING( "Control::GetHandleIndex(%s, %s) No renderers\n", visualName.c_str(), oss.str().c_str() );
-      }
     }
   }
+
+  std::ostringstream noRenderers;
+  noRenderers << propertyKey;
+  DALI_LOG_WARNING( "Control::GetVisualProperty(%s, %s) No renderers\n", visualName.c_str(), noRenderers.str().c_str() );
   Handle handle;
   return HandleIndex( handle, Property::INVALID_INDEX );
 }
@@ -430,6 +414,16 @@ public:
           }
           break;
         }
+
+        case Toolkit::DevelControl::Property::TOOLTIP:
+        {
+          TooltipPtr& tooltipPtr = controlImpl.mImpl->mTooltip;
+          if( ! tooltipPtr )
+          {
+            tooltipPtr = Tooltip::New( control );
+          }
+          tooltipPtr->SetProperties( value );
+        }
       }
     }
   }
@@ -497,6 +491,17 @@ public:
           break;
         }
 
+        case Toolkit::DevelControl::Property::TOOLTIP:
+        {
+          Property::Map map;
+          if( controlImpl.mImpl->mTooltip )
+          {
+            controlImpl.mImpl->mTooltip->CreatePropertyMap( map );
+          }
+          value = map;
+          break;
+        }
+
       }
     }
 
@@ -520,16 +525,20 @@ public:
   TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
+  // Tooltip
+  TooltipPtr mTooltip;
+
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
-  // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
+  // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;
   static const PropertyRegistration PROPERTY_2;
   static const PropertyRegistration PROPERTY_3;
   static const PropertyRegistration PROPERTY_4;
   static const PropertyRegistration PROPERTY_5;
+  static const PropertyRegistration PROPERTY_6;
 };
 
 // Properties registered without macro to use specific member variables.
@@ -538,6 +547,7 @@ const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",         Toolkit::DevelControl::Property::TOOLTIP,     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -604,7 +614,6 @@ void Control::SetBackground( const Property::Map& map )
 
 void Control::SetBackgroundImage( Image image )
 {
-  DALI_LOG_WARNING( "SetBackgroundImage is for the depreciated Property::BACKGROUND_IMAGE use SetBackground( const Property::Map& map )\n" );
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( image );
   if( visual )
   {
@@ -786,6 +795,27 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
     }
   }
 
+  // If not set, set the name of the visual to the same name as the control's property.
+  // ( If the control has been type registered )
+  if( visual.GetName().empty() )
+  {
+    // Check if the control has been type registered:
+    TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(*this) );
+    if( typeInfo )
+    {
+      // Check if the property index has been registered:
+      Property::IndexContainer indices;
+      typeInfo.GetPropertyIndices( indices );
+      Property::IndexContainer::Iterator iter = std::find( indices.Begin(), indices.End(), index );
+      if( iter != indices.End() )
+      {
+        // If it has, then get it's name and use that for the visual
+        std::string visualName = typeInfo.GetPropertyName( index );
+        visual.SetName( visualName );
+      }
+    }
+  }
+
   if( !visualReplaced ) // New registration entry
   {
     mImpl->mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
@@ -795,6 +825,8 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
   {
     Toolkit::GetImplementation(visual).SetOnStage( self );
   }
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
+
 }
 
 void Control::UnregisterVisual( Property::Index index )
