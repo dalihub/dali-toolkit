@@ -392,6 +392,11 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
 
 void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
 {
+  if( !mGeometry )
+  {
+    CreateGeometry();
+  }
+
   naturalSize.x = mObjectDimensions.x;
   naturalSize.y = mObjectDimensions.y;
 }

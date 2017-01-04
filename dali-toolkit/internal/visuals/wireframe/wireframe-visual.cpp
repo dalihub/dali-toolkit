@@ -77,18 +77,78 @@ void main()\n
 
 }
 
-WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache )
+WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  return new WireframeVisual( factoryCache );
+  Visual::BasePtr emtptyVisual;
+
+  return New(factoryCache, emtptyVisual, properties);
 }
 
-WireframeVisual::WireframeVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache )
+WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual )
+{
+  return new WireframeVisual( factoryCache, actualVisual );
+}
+
+WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual, const Property::Map& properties )
+{
+  WireframeVisualPtr wireframeVisual( new WireframeVisual( factoryCache, actualVisual ) );
+
+  // Instead of calling SetProperties, looking for the only valid property 'transform'
+  Property::Value* transformValue = properties.Find( DevelVisual::Property::TRANSFORM, TRANSFORM );
+  Property::Map transformMap;
+  if( transformValue && transformValue->Get( transformMap ) )
+  {
+    wireframeVisual->SetTransformAndSize( transformMap, Vector2::ZERO );
+  }
+
+  return wireframeVisual;
+}
+
+WireframeVisual::WireframeVisual( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual )
+: Visual::Base( factoryCache ),
+  mActualVisual( actualVisual )
 {
 }
 
 WireframeVisual::~WireframeVisual()
 {
+}
+
+float WireframeVisual::GetHeightForWidth( float width )
+{
+  if( mActualVisual )
+  {
+    return mActualVisual->GetHeightForWidth( width );
+  }
+  else
+  {
+    return Visual::Base::GetHeightForWidth( width );
+  }
+}
+
+void WireframeVisual::GetNaturalSize( Vector2& naturalSize )
+{
+  if( mActualVisual )
+  {
+    mActualVisual->GetNaturalSize( naturalSize );
+  }
+  else
+  {
+    Visual::Base::GetNaturalSize( naturalSize );
+  }
+}
+
+void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
+{
+  if( mActualVisual )
+  {
+    mActualVisual->CreatePropertyMap( map );
+  }
+  else
+  {
+    map.Clear();
+    map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::WIREFRAME );
+  }
 }
 
 void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
@@ -101,12 +161,6 @@ void WireframeVisual::DoSetOnStage( Actor& actor )
   InitializeRenderer();
 
   actor.AddRenderer( mImpl->mRenderer );
-}
-
-void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
-{
-  map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::WIREFRAME );
 }
 
 void WireframeVisual::InitializeRenderer()
