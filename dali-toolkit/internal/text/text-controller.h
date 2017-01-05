@@ -814,6 +814,13 @@ public: // Queries & retrieves.
    */
   const ModelInterface* const GetTextModel() const;
 
+  /**
+   * @brief Used to get scrolled distance by user input
+   *
+   * @return Distance from last scroll offset to new scroll offset
+   */
+  float GetScrollAmountByUserInput();
+
 public: // Relayout.
 
   /**

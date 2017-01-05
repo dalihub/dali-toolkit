@@ -156,6 +156,7 @@ public:
    * Typically this will have a negative value with scrolling occurs.
    */
   Vector2                     mScrollPosition;      ///< The text is offset by this position when scrolling.
+  Vector2                     mScrollPositionLast;  ///< The last offset value of mScrollPosition
   Layout::HorizontalAlignment mHorizontalAlignment; ///< The layout's horizontal alignment.
   Layout::VerticalAlignment   mVerticalAlignment;   ///< The layout's vertical alignment.
   float                       mAlignmentOffset;     ///< The alignment offset.

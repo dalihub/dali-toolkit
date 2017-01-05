@@ -25,6 +25,7 @@
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -83,6 +84,9 @@ const char* const PROPERTY_NAME_EMBOSS                               = "emboss";
 const char* const PROPERTY_NAME_INPUT_EMBOSS                         = "inputEmboss";
 const char* const PROPERTY_NAME_OUTLINE                              = "outline";
 const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
+
+const char* const PROPERTY_NAME_SMOOTH_SCROLL                        = "smoothScroll";
+const char* const PROPERTY_NAME_SMOOTH_SCROLL_DURATION               = "smoothScrollDuration";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -324,6 +328,8 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextEditor::Property::INPUT_EMBOSS );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextEditor::Property::OUTLINE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextEditor::Property::INPUT_OUTLINE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL ) == DevelTextEditor::Property::SMOOTH_SCROLL );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL_DURATION ) == DevelTextEditor::Property::SMOOTH_SCROLL_DURATION );
 
   END_TEST;
 }
@@ -592,6 +598,15 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check the input outline property
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "Outline input properties" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_OUTLINE ), std::string("Outline input properties"), TEST_LOCATION );
+
+  // Check the smooth scroll property
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), false, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
+
+  // Check the smooth scroll duration property
+  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1517,6 +1532,76 @@ int utcDaliTextEditorEvent04(void)
   application.Render();
 
   DALI_TEST_EQUALS( " Hello\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorEvent05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorEvent05");
+
+  // Checks if the highlight actor is created.
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetSize( 50.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
+  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move at the end of the text.
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  for( unsigned int index = 0u; index < 10u; ++index )
+  {
+    // Add a character
+    application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+
+    // Render and notify
+    application.SendNotification();
+    application.Render();
+  }
+  // Modify duration after scroll is enabled
+  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.1f );
+
+  // Continuous scroll left to increase coverage
+  for( unsigned int index = 0u; index < 10u; ++index )
+  {
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
+
+    // Render and notify
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
 
   END_TEST;
 }

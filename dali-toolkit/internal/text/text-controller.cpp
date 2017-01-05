@@ -1467,6 +1467,18 @@ const ModelInterface* const Controller::GetTextModel() const
   return mImpl->mModel.Get();
 }
 
+float Controller::GetScrollAmountByUserInput()
+{
+  float scrollAmount = 0.0f;
+
+  if (NULL != mImpl->mEventData && mImpl->mEventData->mCheckScrollAmount)
+  {
+    scrollAmount = mImpl->mModel->mScrollPosition.y -  mImpl->mModel->mScrollPositionLast.y;
+    mImpl->mEventData->mCheckScrollAmount = false;
+  }
+  return scrollAmount;
+}
+
 // public : Relayout.
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
@@ -1538,6 +1550,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
 
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
+  mImpl->mModel->mScrollPositionLast = mImpl->mModel->mScrollPosition;
 
   // Whether the text control is editable
   const bool isEditable = NULL != mImpl->mEventData;
@@ -1686,6 +1699,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
              ( Dali::DALI_KEY_CURSOR_UP    == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_DOWN  == keyCode ) )
     {
+      mImpl->mEventData->mCheckScrollAmount = true;
+
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
       mImpl->mEventData->mEventQueue.push_back( event );
@@ -2792,6 +2807,8 @@ void Controller::TextInsertedEvent()
     return;
   }
 
+  mImpl->mEventData->mCheckScrollAmount = true;
+
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
@@ -2807,6 +2824,8 @@ void Controller::TextDeletedEvent()
   {
     return;
   }
+
+  mImpl->mEventData->mCheckScrollAmount = true;
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -2834,6 +2853,7 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
       mImpl->mEventData->mEventQueue.push_back( event );
     }
 
+    mImpl->mEventData->mCheckScrollAmount = true;
     mImpl->RequestRelayout();
   }
 }
