@@ -13,6 +13,7 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali-core)
+BuildRequires:  pkgconfig(dali-adaptor)
 BuildRequires: gettext
 
 # dali-toolkit only need to know the interfaces(APIs) of dali-adaptor(the devel package).

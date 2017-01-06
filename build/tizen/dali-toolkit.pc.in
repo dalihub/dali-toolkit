@@ -4,9 +4,9 @@ apiversion=@DALI_TOOLKIT_VERSION@
 libdir=@libdir@
 includedir=@devincludepath@
 
-Name: Samsung OpenGLES Toolkit (including Toolkit)
+Name: dali-toolkit
 Description: 3D Canvas Toolkit using OpenGLES (with the toolkit)
 Version: ${apiversion}
-Requires: dali-core
+Requires: dali-core dali-adaptor
 Libs: -L${libdir} -ldali-toolkit
-Cflags: -I${includedir}
+Cflags: -I${includedir}/dali-toolkit
