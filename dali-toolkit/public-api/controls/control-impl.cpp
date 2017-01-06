@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -62,6 +63,11 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
 #endif
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( CLIPPING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, DISABLED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, CLIP_CHILDREN )
+DALI_ENUM_TO_STRING_TABLE_END( CLIPPING_MODE )
 
 /**
  * Struct used to store Visual within the control, index is a unique key for each visual.
@@ -1149,14 +1155,31 @@ void Control::OnStageConnection( int depth )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
 
+  Actor self( Self() );
+
   for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
     // Check whether the visual is empty and enabled
     if( (*iter)->visual && (*iter)->enabled )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection Setting visual(%d) on stage\n", (*iter)->index );
-      Actor self( Self() );
       Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
+    }
+  }
+
+  if( mImpl->mVisuals.Empty() && ! self.GetRendererCount() )
+  {
+    Property::Value clippingValue = self.GetProperty( Actor::Property::CLIPPING_MODE );
+    int clippingMode = ClippingMode::DISABLED;
+    if( clippingValue.Get( clippingMode ) )
+    {
+      // Add a transparent background if we do not have any renderers or visuals so we clip our children
+
+      if( clippingMode == ClippingMode::CLIP_CHILDREN )
+      {
+        // Create a transparent background visual which will also get staged.
+        SetBackgroundColor( Color::TRANSPARENT );
+      }
     }
   }
 }
@@ -1195,6 +1218,29 @@ void Control::OnChildRemove(Actor& child)
 {
   // Notify derived classes.
   OnControlChildRemove( child );
+}
+
+void Control::OnPropertySet( Property::Index index, Property::Value propertyValue )
+{
+  Actor self( Self() );
+  if( index == Actor::Property::CLIPPING_MODE )
+  {
+    // Only set the background if we're already on the stage and have no renderers or visuals
+
+    if( mImpl->mVisuals.Empty() && ! self.GetRendererCount() && self.OnStage() )
+    {
+      ClippingMode::Type clippingMode = ClippingMode::DISABLED;
+      if( Scripting::GetEnumerationProperty< ClippingMode::Type >( propertyValue, CLIPPING_MODE_TABLE, CLIPPING_MODE_TABLE_COUNT, clippingMode ) )
+      {
+        // Add a transparent background if we do not have one so we clip children
+
+        if( clippingMode == ClippingMode::CLIP_CHILDREN )
+        {
+          SetBackgroundColor( Color::TRANSPARENT );
+        }
+      }
+    }
+  }
 }
 
 void Control::OnSizeSet(const Vector3& targetSize)
