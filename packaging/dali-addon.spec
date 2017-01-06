@@ -1,6 +1,6 @@
 Name:       dali-addon
 Summary:    DALi module for Node.JS
-Version:    1.2.20
+Version:    1.2.21
 Release:    1
 Group:      Development/Libraries
 License:    Apache License, Version 2.0
