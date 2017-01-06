@@ -497,6 +497,8 @@ private: // Data
   Size mFixedTotals;             ///< Accumulated totals for fixed width and height
 
   Size mPadding;                 ///< Padding to apply to each cell
+  unsigned int mCurrentRow;      ///< Last / current focused row
+  unsigned int mCurrentColumn;   ///< Last / current focused column
   bool mLayoutingChild;          ///< Can't be a bitfield due to Relayouting lock
   bool mRowDirty : 1;            ///< Flag to indicate the row data is dirty
   bool mColumnDirty : 1;         ///< Flag to indicate the column data is dirty

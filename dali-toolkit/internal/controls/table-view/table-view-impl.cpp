@@ -1082,6 +1082,8 @@ TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
   mRowDirty( true ),     // Force recalculation first time
   mColumnDirty( true )
 {
+  mCurrentColumn = 0;
+  mCurrentRow = 0;
   SetKeyboardNavigationSupport( true );
   ResizeContainers( initialRows, initialColumns );
 }
@@ -1403,13 +1405,42 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
       // Move the focus if we haven't lost it.
       if(!focusLost)
       {
+        // Save the new focus cell positions of TableView.
+        mCurrentColumn = currentColumn;
+        mCurrentRow = currentRow;
+
         nextFocusableActor = GetChildAt(Toolkit::TableView::CellPosition(currentRow, currentColumn));
       }
     }
     else
     {
-      // The current focused actor is not within table view, so the child in the first cell should be focused.
-      nextFocusableActor = GetChildAt(Toolkit::TableView::CellPosition(0, 0));
+      // The current focused actor is not within TableView.
+      // This means that the TableView has gained the Focus again.
+
+      unsigned int numberOfColumns = GetColumns();
+      unsigned int numberOfRows = GetRows();
+
+      if( (mCurrentRow != 0 && mCurrentColumn != 0) && // Last saved cell was not the first cell
+          (mCurrentRow != numberOfRows - 1 && mCurrentColumn != numberOfColumns - 1) ) // Last saved cell was not the last cell
+      {
+        // This condition handles the cases when parent TableView gained the focus again after the child layout
+        // container (i.e. TableView) has no more items (i.e. actors) to be focused on in a given direction.
+
+        // Move the focus to next cell towards the given direction in a TableView if the last saved cell was not the first or last cell.
+        nextFocusableActor = GetNextKeyboardFocusableActor(GetChildAt(Toolkit::TableView::CellPosition(mCurrentRow, mCurrentColumn)), direction, loopEnabled);
+      }
+      else
+      {
+        // Otherwise, move the focus to either the first or the last cell according to the given direction.
+        if(direction == Toolkit::Control::KeyboardFocus::LEFT || direction == Toolkit::Control::KeyboardFocus::UP)
+        {
+          nextFocusableActor = GetChildAt(Toolkit::TableView::CellPosition(numberOfRows - 1, numberOfColumns - 1));
+        }
+        else
+        {
+          nextFocusableActor = GetChildAt(Toolkit::TableView::CellPosition(0, 0));
+        }
+      }
     }
   }
 
