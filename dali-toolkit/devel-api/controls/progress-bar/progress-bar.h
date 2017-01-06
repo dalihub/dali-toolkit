@@ -34,6 +34,25 @@ class ProgressBar;
 
 /**
  * @brief ProgressBar is a control to give the user an indication of the progress of an operation.
+ * *
+ *     Determinate Progress State
+ *
+ *      #  : Progress visual
+ *      *  : Secondary Progress visual
+ *      =  : Track visual
+ *     40% : Label visual
+ *
+ *     =============================================
+ *     = ###############**** 40%                   =
+ *     =============================================
+ *
+ *     Indeterminate Progress State
+ *
+ *      /  : Indeterminate visual
+ *
+ *     =============================================
+ *     = ///////////////////////////////////////// =
+ *     =============================================
  *
  * Also progress value percentage is shown as text inside the progress bar.
  *
@@ -42,6 +61,7 @@ class ProgressBar;
  * |-------------------|-------------------------------|
  * | valueChanged      | @ref ValueChangedSignal()     |
  */
+
 class DALI_IMPORT_API ProgressBar : public Control
 {
 public:
@@ -77,6 +97,23 @@ public:
       PROGRESS_VALUE = PROPERTY_START_INDEX,
 
       /**
+       * @brief The secondary progress value of progress bar, secondary progress runs form 0 to 1.
+       * @details Name "secondaryProgressValue", type Property::FLOAT.
+       * @note Optional. If not supplied, the default is 0.
+       * @note Value should be between 0 to 1.
+       * @note If Value is set to 0, progress bar will be set secondary progress to beginning.
+       * @note If Value is set to 1, progress bar will be set secondary progress to end.
+       * @note Any Value outside of the range is ignored.
+       */
+      SECONDARY_PROGRESS_VALUE,
+
+      /**
+       * @brief Sets the progress-bar as \e indeterminate state.
+       * @details name "indeterminate", type bool
+       */
+      INDETERMINATE,
+
+      /**
        * @brief The track Visual value of progress bar, it's a full progress area and it's shown behind PROGRESS_VISUAL.
        * @details Name "trackVisual", type Property::STRING if it is a url, map otherwise.
        * @note Optional. If not supplied, the default track visual will be shown.
@@ -89,6 +126,33 @@ public:
        * @note Optional. If not supplied, the default progress visual will be shown.
        */
       PROGRESS_VISUAL,
+
+      /**
+       * @brief The secondary progress visual of progress bar, size of the secondary progress visual is changed based on SECONDARY_PROGRESS_VALUE.
+       * @details Name "secondaryProgressVisual", type Property::STRING if it is a url, map otherwise.
+       * @note Optional. If not supplied, the secondary progress visual will not be shown.
+       */
+      SECONDARY_PROGRESS_VISUAL,
+
+      /**
+       * @brief The indeterminate visual of progress bar.
+       * @details Name "inditerminateVisual", type Property::STRING if it is a url, map otherwise.
+       * @note Optional. If not supplied, the default inditerminate visual will be shown.
+       */
+      INDETERMINATE_VISUAL,
+
+      /**
+       * @brief The transition data for indeterminate visual animation.
+       * @details Name "indeterminateVisualAnimation", type Property::STRING.
+       * @note Optional. If not supplied, default animation will be played.
+       */
+      INDETERMINATE_VISUAL_ANIMATION,
+
+      /**
+       * @brief The Label visual of progress bar.
+       * @details Name "labelVisual", type Property::MAP.
+       */
+      LABEL_VISUAL,
     };
   };
 
@@ -141,18 +205,19 @@ public:  // Signals
   /**
    * @brief Value changed signal type.
    */
-  typedef Signal< void ( ProgressBar, float ) > ValueChangedSignalType;
+  typedef Signal< void ( ProgressBar, float, float ) > ValueChangedSignalType;
 
   /**
    * @brief Signal emitted when the ProgressBar value changes.
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( ProgressBar progressBar, float value );
+   *   void YourCallbackName( ProgressBar progressBar, float progressValue, float secondaryProgressValue );
    * @endcode
    * @return The signal to connect to
    */
   ValueChangedSignalType& ValueChangedSignal();
+
 
 public: // Not intended for application developers
 
