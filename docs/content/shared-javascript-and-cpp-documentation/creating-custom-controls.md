@@ -341,10 +341,10 @@ An up call to the Control class is necessary if these methods are overridden.
 // C++
 void MyUIControlImpl::OnChildAdd( Actor& child );
 {
-  // Up call to Control first
-  Control::OnChildAdd( child );
-
   // Do any other operations required upon child addition
+
+  // Up call to Control at the end
+  Control::OnChildAdd( child );
 }
 ~~~
 ~~~{.cpp}
@@ -371,10 +371,10 @@ An up call to the Control class is necessary if these methods are overridden.
 // C++
 void MyUIControlImpl::OnStageConnection( int depth )
 {
-  // Up call to Control first
-  Control::OnStageConnection( depth );
-
   // Do any other operations required upon stage connection
+
+  // Up call to Control at the end
+  Control::OnStageConnection( depth );
 }
 ~~~
 ~~~{.cpp}

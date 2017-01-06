@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -465,8 +465,6 @@ Property::Value FlexContainer::GetProperty( BaseObject* object, Property::Index 
 
 void FlexContainer::OnChildAdd( Actor& child )
 {
-  Control::OnChildAdd( child );
-
   // Anchor actor to top left of the container
   child.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   child.SetParentOrigin( ParentOrigin::TOP_LEFT );
@@ -478,6 +476,8 @@ void FlexContainer::OnChildAdd( Actor& child )
   childNode.node->get_child = GetChildNodeAtIndex;
   childNode.node->is_dirty = IsNodeDirty;
   mChildrenNodes.push_back(childNode);
+
+  Control::OnChildAdd( child );
 }
 
 void FlexContainer::OnChildRemove( Actor& child )
@@ -562,11 +562,8 @@ void FlexContainer::OnSizeSet( const Vector3& size )
 
     RelayoutRequest();
   }
-}
 
-void FlexContainer::OnSizeAnimation( Animation& animation, const Vector3& targetSize )
-{
-  // @todo Animate the children to their target size and position
+  Control::OnSizeSet( size );
 }
 
 void FlexContainer::ComputeLayout()

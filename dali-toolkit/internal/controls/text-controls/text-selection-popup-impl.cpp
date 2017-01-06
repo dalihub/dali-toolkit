@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -392,15 +392,6 @@ void TextSelectionPopup::OnInitialize()
   // The Popup Control background is a nine-patch image. We clip against this so the
   // contents are correctly clipped against the edges of the nine-patch.
   self.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
-}
-
-void TextSelectionPopup::OnStageConnection( int depth )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::OnStageConnection\n" );
-  // Call the Control::OnStageConnection() to set the depth of the background.
-  Control::OnStageConnection( depth );
-
-  // TextSelectionToolbar::OnStageConnection() will set the depths of all the popup's components.
 }
 
 void TextSelectionPopup::HideAnimationFinished( Animation& animation )

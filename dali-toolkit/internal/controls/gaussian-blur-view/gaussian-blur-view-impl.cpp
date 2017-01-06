@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -330,8 +330,6 @@ void GaussianBlurView::OnInitialize()
 
 void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
 {
-  Control::OnSizeSet( targetSize );
-
   mTargetSize = Vector2(targetSize);
 
   mChildrenRoot.SetSize(targetSize);
@@ -356,16 +354,18 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
     Deactivate();
     Activate();
   }
+
+  Control::OnSizeSet( targetSize );
 }
 
 void GaussianBlurView::OnChildAdd( Actor& child )
 {
-  Control::OnChildAdd( child );
-
   if( child != mChildrenRoot && child != mInternalRoot)
   {
     mChildrenRoot.Add( child );
   }
+
+  Control::OnChildAdd( child );
 }
 
 void GaussianBlurView::OnChildRemove( Actor& child )

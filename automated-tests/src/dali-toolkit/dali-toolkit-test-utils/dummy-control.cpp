@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,12 +207,12 @@ void DummyControlImplOverride::OnPinch(const PinchGesture& pinch) { pinchCalled 
 void DummyControlImplOverride::OnPan(const PanGesture& pan) { panCalled = true; }
 void DummyControlImplOverride::OnTap(const TapGesture& tap) { tapCalled = true; }
 void DummyControlImplOverride::OnLongPress(const LongPressGesture& longPress) { longPressCalled = true; }
-void DummyControlImplOverride::OnStageConnection( int depth ) { Control::OnStageConnection( depth ); stageConnectionCalled = true; }
+void DummyControlImplOverride::OnStageConnection( int depth ) { stageConnectionCalled = true; Control::OnStageConnection( depth ); }
 void DummyControlImplOverride::OnStageDisconnection() { stageDisconnectionCalled = true; Control::OnStageDisconnection(); }
-void DummyControlImplOverride::OnChildAdd(Actor& child) { childAddCalled = true; }
-void DummyControlImplOverride::OnChildRemove(Actor& child) { childRemoveCalled = true; }
-void DummyControlImplOverride::OnSizeSet(const Vector3& targetSize) { Control::OnSizeSet( targetSize ); sizeSetCalled = true; }
-void DummyControlImplOverride::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { Control::OnSizeAnimation( animation, targetSize ); sizeAnimationCalled = true; }
+void DummyControlImplOverride::OnChildAdd(Actor& child) { childAddCalled = true; Control::OnChildAdd( child ); }
+void DummyControlImplOverride::OnChildRemove(Actor& child) { childRemoveCalled = true; Control::OnChildRemove( child ); }
+void DummyControlImplOverride::OnSizeSet(const Vector3& targetSize) { sizeSetCalled = true; Control::OnSizeSet( targetSize ); }
+void DummyControlImplOverride::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { sizeAnimationCalled = true; Control::OnSizeAnimation( animation, targetSize ); }
 bool DummyControlImplOverride::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
 bool DummyControlImplOverride::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
 bool DummyControlImplOverride::OnWheelEvent(const WheelEvent& event) { wheelEventCalled = true; return false; }
