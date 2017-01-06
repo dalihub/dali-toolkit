@@ -37,7 +37,7 @@ namespace MyCSharpExample
       Console.WriteLine( "InitSignal connection count = " + _application.InitSignal().GetConnectionCount() );
     }
 
-    public void Initialize(object source, AUIApplicationInitEventArgs e)
+    public void Initialize(object source, NUIApplicationInitEventArgs e)
     {
 
       OperatorTests();
@@ -58,7 +58,7 @@ namespace MyCSharpExample
       actor.Name = "MyActor";
       actor.Color = new Color(1.0f, 0.0f, 1.0f, 0.8f);
       Console.WriteLine("Actor id: {0}", actor.GetId());
-      Console.WriteLine("Actor size: " + actor.Size.x + ", " + actor.Size.y);
+      Console.WriteLine("Actor size: " + actor.Size.X + ", " + actor.Size.Y);
       Console.WriteLine("Actor name: " + actor.Name);
 
       Stage stage = Stage.GetCurrent();

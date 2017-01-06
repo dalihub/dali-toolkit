@@ -187,7 +187,10 @@ void BlurTwoPassFilter::Enable()
 
   // Add effect texture to blend-two-image custom shader
   TextureSet textureSet = mActorForBlending.GetRendererAt(0).GetTextures();
-  TextureSetImage( textureSet, 1u, mInputImage );
+  if( textureSet )
+  {
+    TextureSetImage( textureSet, 1u, mInputImage );
+  }
 
   SetupCamera();
   CreateRenderTasks();

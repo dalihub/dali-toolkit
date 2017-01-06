@@ -21,6 +21,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Markup.cpp
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp
+ utc-Dali-DebugRendering.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
@@ -64,6 +65,8 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
 )
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror")
+
+ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")

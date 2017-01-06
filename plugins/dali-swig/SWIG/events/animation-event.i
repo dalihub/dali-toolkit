@@ -109,11 +109,11 @@ using System.Runtime.InteropServices;
     }
   }
 
-  public Dali.Constants.Animation.State Status
+  public Animation.State Status
   {
     get
     {
-       return (Dali.Constants.Animation.State)GetState();
+       return GetState();
     }
   }
 
@@ -143,74 +143,36 @@ using System.Runtime.InteropServices;
     }
   }
 
-  public Dali.Constants.Animation.EndAction EndAction
+  public Animation.EndActions EndAction
   {
     set
     {
-        switch(value)
-        {
-          case Dali.Constants.Animation.EndAction.Cancel :
-            SetEndAction(Dali.Animation.DaliEndAction.Bake);
-            break;
-          case Dali.Constants.Animation.EndAction.Discard :
-            SetEndAction(Dali.Animation.DaliEndAction.Discard);
-            break;
-          case Dali.Constants.Animation.EndAction.Stop :
-            SetEndAction(Dali.Animation.DaliEndAction.BakeFinal);
-            break;
-          default :
-            SetEndAction(Dali.Animation.DaliEndAction.Bake);
-            break;
-        }
+      SetEndAction(value);
     }
     get
     {
-        Dali.Animation.DaliEndAction temp = GetEndAction();
-        switch(temp)
-        {
-          case Dali.Animation.DaliEndAction.Bake :
-            return Dali.Constants.Animation.EndAction.Cancel;
-          case Dali.Animation.DaliEndAction.Discard :
-            return Dali.Constants.Animation.EndAction.Discard;
-          case Dali.Animation.DaliEndAction.BakeFinal :
-            return Dali.Constants.Animation.EndAction.Stop;
-          default :
-            return Dali.Constants.Animation.EndAction.Cancel;
-        }
+      return GetEndAction();
     }
   }
 
-  public void Stop(Dali.Constants.Animation.EndAction action) {
-    switch( action )
-    {
-      case Dali.Constants.Animation.EndAction.Cancel :
-        SetEndAction(Dali.Animation.DaliEndAction.Bake);
-        break;
-      case Dali.Constants.Animation.EndAction.Discard :
-        SetEndAction(Dali.Animation.DaliEndAction.Discard);
-        break;
-      case Dali.Constants.Animation.EndAction.Stop :
-        SetEndAction(Dali.Animation.DaliEndAction.BakeFinal);
-        break;
-      default :
-        SetEndAction(Dali.Animation.DaliEndAction.Bake);
-        break;
-    }
+  public void Stop(Animation.EndActions action) 
+  {
+    SetEndAction(action);
     NDalicPINVOKE.Animation_Stop(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public int StartTime { set; get; }
   public int EndTime { set; get; }
-  public string TargetPoperty { set; get; }
+  public string TargetProperty { set; get; }
   public object Destination { set; get; }
   public Dali.AlphaFunction AlphaFunction { set; get; }
 
 
   public void AnimateBy(Actor target)
   {
-    string _str1 = TargetPoperty.Substring(0, 1);
-    string _str2 = TargetPoperty.Substring(1);
+    string _str1 = TargetProperty.Substring(0, 1);
+    string _str2 = TargetProperty.Substring(1);
     string _str = _str1.ToLower() + _str2;
 
     dynamic obj = (object)Destination;
@@ -223,7 +185,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
       }
     }
@@ -235,7 +197,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateBy(new Property(target, _str), new Property.Value(obj), time );
       }
     }
@@ -257,7 +219,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
       }
     }
@@ -269,7 +231,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateBy(new Property(target, _str), new Property.Value(obj), time );
       }
     }
@@ -291,7 +253,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateBy(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
       }
     }
@@ -303,7 +265,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateBy(new Property(target, _str), new Property.Value(obj), time );
       }
     }
@@ -311,8 +273,8 @@ using System.Runtime.InteropServices;
 
   public void AnimateTo(Actor target)
   {
-    string _str1 = TargetPoperty.Substring(0, 1);
-    string _str2 = TargetPoperty.Substring(1);
+    string _str1 = TargetProperty.Substring(0, 1);
+    string _str2 = TargetProperty.Substring(1);
     string _str = _str1.ToLower() + _str2;
 
     dynamic obj = (object)Destination;
@@ -325,7 +287,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
       }
     }
@@ -337,7 +299,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateTo(new Property(target, _str), new Property.Value(obj), time );
       }
     }
@@ -359,7 +321,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
       }
     }
@@ -371,7 +333,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateTo(new Property(target, _str), new Property.Value(obj), time );
       }
     }
@@ -393,7 +355,7 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateTo(new Property(target, _str), new Property.Value(obj), this.AlphaFunction, time );
       }
     }
@@ -405,11 +367,78 @@ using System.Runtime.InteropServices;
       }
       else
       {
-        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime ) );
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
         AnimateTo(new Property(target, _str), new Property.Value(obj), time );
       }
     }
   }
+
+  public void AnimateBetween(Actor target, KeyFrames keyFrames)
+  {
+    string _str1 = TargetProperty.Substring(0, 1);
+    string _str2 = TargetProperty.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBetween(new Property(target, _str), keyFrames, this.AlphaFunction);
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
+        AnimateBetween(new Property(target, _str), keyFrames, this.AlphaFunction, time);
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBetween(new Property(target, _str), keyFrames);
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
+        AnimateBetween(new Property(target, _str), keyFrames, time);
+      }
+    }
+  }
+
+  public void AnimateBetween(Actor target, KeyFrames keyFrames, Animation.Interpolation interpolation)
+  {
+    string _str1 = TargetProperty.Substring(0, 1);
+    string _str2 = TargetProperty.Substring(1);
+    string _str = _str1.ToLower() + _str2;
+
+
+    if( this.AlphaFunction != null )
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBetween(new Property(target, _str), keyFrames, this.AlphaFunction, interpolation);
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
+        AnimateBetween(new Property(target, _str), keyFrames, this.AlphaFunction, time, interpolation);
+      }
+    }
+    else
+    {
+      if( this.StartTime == 0 && this.EndTime == 0 )
+      {
+        AnimateBetween(new Property(target, _str), keyFrames, interpolation);
+      }
+      else
+      {
+        Dali.TimePeriod time = new Dali.TimePeriod( MilliSecondsToSeconds( this.StartTime ), MilliSecondsToSeconds( this.EndTime - this.StartTime ) );
+        AnimateBetween(new Property(target, _str), keyFrames, time, interpolation);
+      }
+    }
+  }
+
 
   /**
    * @brief Create an initialized Animation.
@@ -443,4 +472,21 @@ using System.Runtime.InteropServices;
   namespace Dali
 {
   DALI_animation_EVENTHANDLER_PARAM( Dali, Animation);
+
+%typemap(cscode) Dali::KeyFrames %{
+
+  public void Add(float progress, object value)
+  {
+    dynamic obj = value;
+    Add(progress, new Property.Value(obj));
+  }
+
+  public void Add(float progress, object value, AlphaFunction alpha)
+  {
+    dynamic obj = value;
+    Add(progress, new Property.Value(obj), alpha);
+  }
+
+%}
+
 }

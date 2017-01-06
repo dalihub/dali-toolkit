@@ -47,9 +47,34 @@ public:
    * @brief Create a new wireframe visual.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static WireframeVisualPtr New( VisualFactoryCache& factoryCache );
+  static WireframeVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+
+  /**
+   * @brief Create a new wireframe visual with an encapsulated actual visual.
+   *
+   * For debugging purpose, the rendering of the encapsulated visual is replaced with wireframe
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] actualVisual The encapsulated actual visual.
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static WireframeVisualPtr New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual );
+
+  /**
+   * @brief Create a new wireframe visual with an encapsulated actual visual.
+   *
+   * For debugging purpose, the rendering of the encapsulated visual is replaced with wireframe
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] actualVisual The encapsulated actual visual.
+   * @param[in] properties A Property::Map containing settings for this visual
+   * @return A smart-pointer to the newly allocated visual.
+   */
+  static WireframeVisualPtr New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual, const Property::Map& properties );
+
 
 protected:
 
@@ -57,13 +82,31 @@ protected:
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] actualVisual The encapsulated actual visual.
    */
-  WireframeVisual( VisualFactoryCache& factoryCache );
+  WireframeVisual( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~WireframeVisual();
+
+protected: // from Visual::Base
+
+  /**
+   * @copydoc Visual::Base::GetHeightForWidth()
+   */
+  virtual float GetHeightForWidth( float width );
+
+  /**
+   * @copydoc Visual::Base::GetNaturalSize()
+   */
+  virtual void GetNaturalSize( Vector2& naturalSize );
+
+  /**
+   * @copydoc Visual::Base::CreatePropertyMap()
+   */
+  virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
   /**
    * @copydoc Visual::Base::DoSetProperties()
@@ -74,11 +117,6 @@ protected:
    * @copydoc Visual::Base::DoSetOnStage
    */
   virtual void DoSetOnStage( Actor& actor );
-
-  /**
-   * @copydoc Visual::Base::CreatePropertyMap
-   */
-  virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -97,13 +135,15 @@ private:
    */
   void InitializeRenderer();
 
-private:
-
   // Undefined
   WireframeVisual( const WireframeVisual& visual);
 
   // Undefined
   WireframeVisual& operator=( const WireframeVisual& visual );
+
+private:
+
+  Visual::BasePtr mActualVisual;
 
 };
 

@@ -83,8 +83,8 @@ namespace MyCSharpExample
                     case Gesture.State.Continuing:
                     {
                         // Calculate the rating according to pan desture displacement
-                        _gestureDisplacement.x += gesture.displacement.x;
-                        int delta = (int)Math.Ceiling(_gestureDisplacement.x / 40.0f);
+                        _gestureDisplacement.X += gesture.displacement.X;
+                        int delta = (int)Math.Ceiling(_gestureDisplacement.X / 40.0f);
                         _currentValue = _myRating + delta;
 
                         // Clamp the rating
@@ -163,7 +163,7 @@ namespace MyCSharpExample
             _application.Initialized += Initialize;
         }
 
-        public void Initialize(object source, AUIApplicationInitEventArgs e)
+        public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
             Stage stage = Stage.GetCurrent();
             stage.BackgroundColor = Color.White;

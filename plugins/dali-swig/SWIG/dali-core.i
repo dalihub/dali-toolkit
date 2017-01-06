@@ -147,7 +147,21 @@
 %rename(BlendingEquationType) Dali::BlendingEquation::Type;
 %rename(CameraType) Dali::Camera::Type;
 %rename(LayerBehavior) Dali::Layer::Behavior;
-%rename(DaliEndAction) Dali::Animation::EndAction;
+%rename(X) Dali::Vector2::x;
+%rename(Y) Dali::Vector2::y;
+%rename(Width) Dali::Vector2::width;
+%rename(Height) Dali::Vector2::height;
+%rename(X) Dali::Vector3::x;
+%rename(Y) Dali::Vector3::y;
+%rename(Z) Dali::Vector3::z;
+%rename(Width) Dali::Vector3::width;
+%rename(Height) Dali::Vector3::height;
+%rename(Depth) Dali::Vector3::depth;
+%rename(X) Dali::Vector4::x;
+%rename(Y) Dali::Vector4::y;
+%rename(Z) Dali::Vector4::z;
+%rename(W) Dali::Vector4::w;
+
 
 typedef std::pair<std::string, Dali::Property::Value> StringValuePair;
 typedef std::vector<Dali::TouchPoint> TouchPointContainer;

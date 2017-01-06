@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 public class FocusManager : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
-  internal FocusManager(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicManualPINVOKE.KeyboardFocusManager_SWIGUpcast(cPtr), cMemoryOwn) {
+  internal FocusManager(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicManualPINVOKE.FocusManager_SWIGUpcast(cPtr), cMemoryOwn) {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
@@ -45,7 +45,7 @@ public class FocusManager : BaseHandle {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicManualPINVOKE.delete_KeyboardFocusManager(swigCPtr);
+          NDalicManualPINVOKE.delete_FocusManager(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -237,23 +237,23 @@ public class PreFocusChangeEventArgs : EventArgs
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   public delegate IntPtr PreFocusChangeEventCallbackDelegate(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction);
-  private PreFocusChangeEventHandler _keyboardFocusManagerPreFocusChangeEventHandler;
-  private PreFocusChangeEventCallbackDelegate _keyboardFocusManagerPreFocusChangeEventCallbackDelegate;
+  private PreFocusChangeEventHandler _FocusManagerPreFocusChangeEventHandler;
+  private PreFocusChangeEventCallbackDelegate _FocusManagerPreFocusChangeEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FocusChangedEventCallbackDelegate(IntPtr actorCurrent, IntPtr actorNext);
-  private FocusChangedEventHandler _keyboardFocusManagerFocusChangedEventHandler;
-  private FocusChangedEventCallbackDelegate _keyboardFocusManagerFocusChangedEventCallbackDelegate;
+  private FocusChangedEventHandler _FocusManagerFocusChangedEventHandler;
+  private FocusChangedEventCallbackDelegate _FocusManagerFocusChangedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FocusGroupChangedEventCallbackDelegate(IntPtr currentFocusedActor, bool forwardDirection);
-  private FocusGroupChangedEventHandler _keyboardFocusManagerFocusGroupChangedEventHandler;
-  private FocusGroupChangedEventCallbackDelegate _keyboardFocusManagerFocusGroupChangedEventCallbackDelegate;
+  private FocusGroupChangedEventHandler _FocusManagerFocusGroupChangedEventHandler;
+  private FocusGroupChangedEventCallbackDelegate _FocusManagerFocusGroupChangedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   private delegate void FocusedActorEnterKeyEventCallbackDelegate(IntPtr actor);
-  private FocusedActorEnterKeyEventHandler _keyboardFocusManagerFocusedActorEnterKeyEventHandler;
-  private FocusedActorEnterKeyEventCallbackDelegate _keyboardFocusManagerFocusedActorEnterKeyEventCallbackDelegate;
+  private FocusedActorEnterKeyEventHandler _FocusManagerFocusedActorEnterKeyEventHandler;
+  private FocusedActorEnterKeyEventCallbackDelegate _FocusManagerFocusedActorEnterKeyEventCallbackDelegate;
 
   public event PreFocusChangeEventHandler PreFocusChange
   {
@@ -262,12 +262,12 @@ public class PreFocusChangeEventArgs : EventArgs
         lock(this)
         {
            // Restricted to only one listener
-           if (_keyboardFocusManagerPreFocusChangeEventHandler == null)
+           if (_FocusManagerPreFocusChangeEventHandler == null)
            {
-               _keyboardFocusManagerPreFocusChangeEventHandler += value;
+               _FocusManagerPreFocusChangeEventHandler += value;
 
-               _keyboardFocusManagerPreFocusChangeEventCallbackDelegate = new PreFocusChangeEventCallbackDelegate(OnPreFocusChange);
-              this.PreFocusChangeSignal().Connect(_keyboardFocusManagerPreFocusChangeEventCallbackDelegate);
+               _FocusManagerPreFocusChangeEventCallbackDelegate = new PreFocusChangeEventCallbackDelegate(OnPreFocusChange);
+              this.PreFocusChangeSignal().Connect(_FocusManagerPreFocusChangeEventCallbackDelegate);
            }
         }
      }
@@ -276,17 +276,17 @@ public class PreFocusChangeEventArgs : EventArgs
      {
         lock(this)
         {
-           if (_keyboardFocusManagerPreFocusChangeEventHandler != null)
+           if (_FocusManagerPreFocusChangeEventHandler != null)
            {
-              this.PreFocusChangeSignal().Disconnect(_keyboardFocusManagerPreFocusChangeEventCallbackDelegate);
+              this.PreFocusChangeSignal().Disconnect(_FocusManagerPreFocusChangeEventCallbackDelegate);
            }
 
-           _keyboardFocusManagerPreFocusChangeEventHandler -= value;
+           _FocusManagerPreFocusChangeEventHandler -= value;
         }
      }
   }
 
-  // Callback for KeyboardFocusManager PreFocusChangeSignal
+  // Callback for FocusManager PreFocusChangeSignal
   private IntPtr OnPreFocusChange(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction)
   {
       Actor actor = null;
@@ -297,10 +297,10 @@ public class PreFocusChangeEventArgs : EventArgs
       e.Proposed = Actor.GetActorFromPtr(proposed);
       e.Direction = direction;
 
-      if (_keyboardFocusManagerPreFocusChangeEventHandler != null)
+      if (_FocusManagerPreFocusChangeEventHandler != null)
       {
         //here we send all data to user event handlers
-          actor = _keyboardFocusManagerPreFocusChangeEventHandler(this, e);
+          actor = _FocusManagerPreFocusChangeEventHandler(this, e);
       }
 
       return actor.GetPtrfromActor();
@@ -318,12 +318,12 @@ public class PreFocusChangeEventArgs : EventArgs
         lock(this)
         {
            // Restricted to only one listener
-           if (_keyboardFocusManagerFocusChangedEventHandler == null)
+           if (_FocusManagerFocusChangedEventHandler == null)
            {
-              _keyboardFocusManagerFocusChangedEventHandler += value;
+              _FocusManagerFocusChangedEventHandler += value;
 
-              _keyboardFocusManagerFocusChangedEventCallbackDelegate = new FocusChangedEventCallbackDelegate(OnFocusChanged);
-              this.FocusChangedSignal().Connect(_keyboardFocusManagerFocusChangedEventCallbackDelegate);
+              _FocusManagerFocusChangedEventCallbackDelegate = new FocusChangedEventCallbackDelegate(OnFocusChanged);
+              this.FocusChangedSignal().Connect(_FocusManagerFocusChangedEventCallbackDelegate);
            }
         }
      }
@@ -332,17 +332,17 @@ public class PreFocusChangeEventArgs : EventArgs
      {
         lock(this)
         {
-           if (_keyboardFocusManagerFocusChangedEventHandler != null)
+           if (_FocusManagerFocusChangedEventHandler != null)
            {
-              this.FocusChangedSignal().Disconnect(_keyboardFocusManagerFocusChangedEventCallbackDelegate);
+              this.FocusChangedSignal().Disconnect(_FocusManagerFocusChangedEventCallbackDelegate);
            }
 
-           _keyboardFocusManagerFocusChangedEventHandler -= value;
+           _FocusManagerFocusChangedEventHandler -= value;
         }
      }
   }
 
-  // Callback for KeyboardFocusManager FocusChangedSignal
+  // Callback for FocusManager FocusChangedSignal
   private void OnFocusChanged(IntPtr actorCurrent, IntPtr actorNext)
   {
      FocusChangedEventArgs e = new FocusChangedEventArgs();
@@ -351,10 +351,10 @@ public class PreFocusChangeEventArgs : EventArgs
      e.ActorCurrent = Actor.GetActorFromPtr(actorCurrent);
      e.ActorNext = Actor.GetActorFromPtr(actorNext);
 
-     if (_keyboardFocusManagerFocusChangedEventHandler != null)
+     if (_FocusManagerFocusChangedEventHandler != null)
      {
         //here we send all data to user event handlers
-        _keyboardFocusManagerFocusChangedEventHandler(this, e);
+        _FocusManagerFocusChangedEventHandler(this, e);
      }
   }
 
@@ -370,12 +370,12 @@ public class PreFocusChangeEventArgs : EventArgs
         lock(this)
         {
            // Restricted to only one listener
-           if (_keyboardFocusManagerFocusGroupChangedEventHandler == null)
+           if (_FocusManagerFocusGroupChangedEventHandler == null)
            {
-              _keyboardFocusManagerFocusGroupChangedEventHandler += value;
+              _FocusManagerFocusGroupChangedEventHandler += value;
 
-              _keyboardFocusManagerFocusGroupChangedEventCallbackDelegate = new FocusGroupChangedEventCallbackDelegate(OnFocusGroupChanged);
-              this.FocusGroupChangedSignal().Connect(_keyboardFocusManagerFocusGroupChangedEventCallbackDelegate);
+              _FocusManagerFocusGroupChangedEventCallbackDelegate = new FocusGroupChangedEventCallbackDelegate(OnFocusGroupChanged);
+              this.FocusGroupChangedSignal().Connect(_FocusManagerFocusGroupChangedEventCallbackDelegate);
            }
         }
      }
@@ -384,17 +384,17 @@ public class PreFocusChangeEventArgs : EventArgs
      {
         lock(this)
         {
-           if (_keyboardFocusManagerFocusGroupChangedEventHandler != null)
+           if (_FocusManagerFocusGroupChangedEventHandler != null)
            {
-              this.FocusGroupChangedSignal().Disconnect(_keyboardFocusManagerFocusGroupChangedEventCallbackDelegate);
+              this.FocusGroupChangedSignal().Disconnect(_FocusManagerFocusGroupChangedEventCallbackDelegate);
            }
 
-           _keyboardFocusManagerFocusGroupChangedEventHandler -= value;
+           _FocusManagerFocusGroupChangedEventHandler -= value;
         }
      }
   }
 
-  // Callback for KeyboardFocusManager FocusGroupChangedSignal
+  // Callback for FocusManager FocusGroupChangedSignal
   private void OnFocusGroupChanged(IntPtr currentFocusedActor, bool forwardDirection)
   {
      FocusGroupChangedEventArgs e = new FocusGroupChangedEventArgs();
@@ -403,10 +403,10 @@ public class PreFocusChangeEventArgs : EventArgs
      e.CurrentFocusedActor = Actor.GetActorFromPtr(currentFocusedActor);
      e.ForwardDirection = forwardDirection;
 
-     if (_keyboardFocusManagerFocusGroupChangedEventHandler != null)
+     if (_FocusManagerFocusGroupChangedEventHandler != null)
      {
         //here we send all data to user event handlers
-        _keyboardFocusManagerFocusGroupChangedEventHandler(this, e);
+        _FocusManagerFocusGroupChangedEventHandler(this, e);
      }
   }
 
@@ -422,12 +422,12 @@ public class PreFocusChangeEventArgs : EventArgs
         lock(this)
         {
            // Restricted to only one listener
-           if (_keyboardFocusManagerFocusedActorEnterKeyEventHandler == null)
+           if (_FocusManagerFocusedActorEnterKeyEventHandler == null)
            {
-              _keyboardFocusManagerFocusedActorEnterKeyEventHandler += value;
+              _FocusManagerFocusedActorEnterKeyEventHandler += value;
 
-              _keyboardFocusManagerFocusedActorEnterKeyEventCallbackDelegate = new FocusedActorEnterKeyEventCallbackDelegate(OnFocusedActorEnterKey);
-              this.FocusedActorEnterKeySignal().Connect(_keyboardFocusManagerFocusedActorEnterKeyEventCallbackDelegate);
+              _FocusManagerFocusedActorEnterKeyEventCallbackDelegate = new FocusedActorEnterKeyEventCallbackDelegate(OnFocusedActorEnterKey);
+              this.FocusedActorEnterKeySignal().Connect(_FocusManagerFocusedActorEnterKeyEventCallbackDelegate);
            }
         }
      }
@@ -436,17 +436,17 @@ public class PreFocusChangeEventArgs : EventArgs
      {
         lock(this)
         {
-           if (_keyboardFocusManagerFocusedActorEnterKeyEventHandler != null)
+           if (_FocusManagerFocusedActorEnterKeyEventHandler != null)
            {
-              this.FocusedActorEnterKeySignal().Disconnect(_keyboardFocusManagerFocusedActorEnterKeyEventCallbackDelegate);
+              this.FocusedActorEnterKeySignal().Disconnect(_FocusManagerFocusedActorEnterKeyEventCallbackDelegate);
            }
 
-           _keyboardFocusManagerFocusedActorEnterKeyEventHandler -= value;
+           _FocusManagerFocusedActorEnterKeyEventHandler -= value;
         }
      }
   }
 
-  // Callback for KeyboardFocusManager FocusedActorEnterKeySignal
+  // Callback for FocusManager FocusedActorEnterKeySignal
   private void OnFocusedActorEnterKey(IntPtr actor)
   {
      FocusedActorEnterKeyEventArgs e = new FocusedActorEnterKeyEventArgs();
@@ -454,105 +454,105 @@ public class PreFocusChangeEventArgs : EventArgs
      // Populate all members of "e" (FocusedActorEnterKeyEventArgs) with real data
      e.Actor = Actor.GetActorFromPtr(actor);
 
-     if (_keyboardFocusManagerFocusedActorEnterKeyEventHandler != null)
+     if (_FocusManagerFocusedActorEnterKeyEventHandler != null)
      {
         //here we send all data to user event handlers
-        _keyboardFocusManagerFocusedActorEnterKeyEventHandler(this, e);
+        _FocusManagerFocusedActorEnterKeyEventHandler(this, e);
      }
   }
 
-  public FocusManager() : this(NDalicManualPINVOKE.new_KeyboardFocusManager(), true) {
+  public FocusManager() : this(NDalicManualPINVOKE.new_FocusManager(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static FocusManager Get() {
-    FocusManager ret = new FocusManager(NDalicManualPINVOKE.KeyboardFocusManager_Get(), true);
+    FocusManager ret = new FocusManager(NDalicManualPINVOKE.FocusManager_Get(), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public bool SetCurrentFocusActor(Actor actor) {
-    bool ret = NDalicManualPINVOKE.KeyboardFocusManager_SetCurrentFocusActor(swigCPtr, Actor.getCPtr(actor));
+    bool ret = NDalicManualPINVOKE.FocusManager_SetCurrentFocusActor(swigCPtr, Actor.getCPtr(actor));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public Actor GetCurrentFocusActor() {
-    Actor ret = new Actor(NDalicManualPINVOKE.KeyboardFocusManager_GetCurrentFocusActor(swigCPtr), true);
+    Actor ret = new Actor(NDalicManualPINVOKE.FocusManager_GetCurrentFocusActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public bool MoveFocus(View.KeyboardFocus.Direction direction) {
-    bool ret = NDalicManualPINVOKE.KeyboardFocusManager_MoveFocus(swigCPtr, (int)direction);
+    bool ret = NDalicManualPINVOKE.FocusManager_MoveFocus(swigCPtr, (int)direction);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void ClearFocus() {
-    NDalicManualPINVOKE.KeyboardFocusManager_ClearFocus(swigCPtr);
+    NDalicManualPINVOKE.FocusManager_ClearFocus(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void SetFocusGroupLoop(bool enabled) {
-    NDalicManualPINVOKE.KeyboardFocusManager_SetFocusGroupLoop(swigCPtr, enabled);
+    NDalicManualPINVOKE.FocusManager_SetFocusGroupLoop(swigCPtr, enabled);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public bool GetFocusGroupLoop() {
-    bool ret = NDalicManualPINVOKE.KeyboardFocusManager_GetFocusGroupLoop(swigCPtr);
+    bool ret = NDalicManualPINVOKE.FocusManager_GetFocusGroupLoop(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void SetAsFocusGroup(Actor actor, bool isFocusGroup) {
-    NDalicManualPINVOKE.KeyboardFocusManager_SetAsFocusGroup(swigCPtr, Actor.getCPtr(actor), isFocusGroup);
+    NDalicManualPINVOKE.FocusManager_SetAsFocusGroup(swigCPtr, Actor.getCPtr(actor), isFocusGroup);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public bool IsFocusGroup(Actor actor) {
-    bool ret = NDalicManualPINVOKE.KeyboardFocusManager_IsFocusGroup(swigCPtr, Actor.getCPtr(actor));
+    bool ret = NDalicManualPINVOKE.FocusManager_IsFocusGroup(swigCPtr, Actor.getCPtr(actor));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public Actor GetFocusGroup(Actor actor) {
-    Actor ret = new Actor(NDalicManualPINVOKE.KeyboardFocusManager_GetFocusGroup(swigCPtr, Actor.getCPtr(actor)), true);
+    Actor ret = new Actor(NDalicManualPINVOKE.FocusManager_GetFocusGroup(swigCPtr, Actor.getCPtr(actor)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public void SetFocusIndicatorActor(Actor indicator) {
-    NDalicManualPINVOKE.KeyboardFocusManager_SetFocusIndicatorActor(swigCPtr, Actor.getCPtr(indicator));
+    NDalicManualPINVOKE.FocusManager_SetFocusIndicatorActor(swigCPtr, Actor.getCPtr(indicator));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public Actor GetFocusIndicatorActor() {
-    Actor ret = new Actor(NDalicManualPINVOKE.KeyboardFocusManager_GetFocusIndicatorActor(swigCPtr), true);
+    Actor ret = new Actor(NDalicManualPINVOKE.FocusManager_GetFocusIndicatorActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public KeyboardPreFocusChangeSignal PreFocusChangeSignal() {
-    KeyboardPreFocusChangeSignal ret = new KeyboardPreFocusChangeSignal(NDalicManualPINVOKE.KeyboardFocusManager_PreFocusChangeSignal(swigCPtr), false);
+  public PreFocusChangeSignal PreFocusChangeSignal() {
+    PreFocusChangeSignal ret = new PreFocusChangeSignal(NDalicManualPINVOKE.FocusManager_PreFocusChangeSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public FocusChangedSignal FocusChangedSignal() {
-    FocusChangedSignal ret = new FocusChangedSignal(NDalicManualPINVOKE.KeyboardFocusManager_FocusChangedSignal(swigCPtr), false);
+    FocusChangedSignal ret = new FocusChangedSignal(NDalicManualPINVOKE.FocusManager_FocusChangedSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public FocusGroupChangedSignal FocusGroupChangedSignal() {
-    FocusGroupChangedSignal ret = new FocusGroupChangedSignal(NDalicManualPINVOKE.KeyboardFocusManager_FocusGroupChangedSignal(swigCPtr), false);
+    FocusGroupChangedSignal ret = new FocusGroupChangedSignal(NDalicManualPINVOKE.FocusManager_FocusGroupChangedSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public ActorSignal FocusedActorEnterKeySignal() {
-    ActorSignal ret = new ActorSignal(NDalicManualPINVOKE.KeyboardFocusManager_FocusedActorEnterKeySignal(swigCPtr), false);
+    ActorSignal ret = new ActorSignal(NDalicManualPINVOKE.FocusManager_FocusedActorEnterKeySignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

@@ -178,6 +178,7 @@ protected:
   virtual ~Base();
 
 protected:
+
   /**
    * @brief Called by CreatePropertyMap() allowing sub classes to respond to the CreatePropertyMap event
    *
@@ -197,8 +198,6 @@ protected:
    * ( Of use to SVG and Text visuals )
    */
   virtual void OnSetTransform() = 0;
-
-protected:
 
   /**
    * @brief Called by SetOnStage() allowing sub classes to respond to the SetOnStage event

@@ -58,7 +58,7 @@ namespace MyCSharpExample
             _application.Initialized += OnInitialize;
         }
 
-        public void OnInitialize(object source, AUIApplicationInitEventArgs e)
+        public void OnInitialize(object source, NUIApplicationInitEventArgs e)
         {
             Console.WriteLine("Customized Application Initialize event handler");
             _stage = Stage.GetCurrent();
@@ -122,7 +122,7 @@ namespace MyCSharpExample
         {
             // Make label for item
             TextLabel itemLabel = new TextLabel("    " + item.name);
-            itemLabel.Size = new Vector3(_stage.GetSize().width * 0.2f, _stage.GetSize().height * 0.05f, 0.0f);
+            itemLabel.Size = new Vector3(_stage.GetSize().Width * 0.2f, _stage.GetSize().Height * 0.05f, 0.0f);
             itemLabel.HorizontalAlignment = "BEGIN";
             itemLabel.VerticalAlignment = "BOTTOM";
             itemLabel.PointSize = 18.0f;
@@ -270,7 +270,7 @@ namespace MyCSharpExample
             else
             {
                 ImageView notSupportView = new ImageView("images/not_yet_sign.png");
-                notSupportView.Size = new Vector3(_stage.GetSize().width * 0.2f, _stage.GetSize().height * 0.25f, 0.0f);
+                notSupportView.Size = new Vector3(_stage.GetSize().Width * 0.2f, _stage.GetSize().Height * 0.25f, 0.0f);
                 notSupportView.SetKeyboardFocusable(true);
                 _contentContainer.AddChild(notSupportView, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
             }
