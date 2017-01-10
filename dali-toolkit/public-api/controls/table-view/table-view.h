@@ -383,7 +383,7 @@ public:
   void SetFitHeight( unsigned int rowIndex );
 
   /**
-   * @brief Is the row a fit row
+   * @brief Check if the row is a fit row.
    *
    * @SINCE_1_0.0
    * @param[in] rowIndex The row to check
@@ -400,7 +400,7 @@ public:
   void SetFitWidth( unsigned int columnIndex );
 
   /**
-   * @brief Is the column a fit column
+   * @brief Check if the column is a fit column.
    *
    * @SINCE_1_0.0
    * @param[in] columnIndex The column to check
