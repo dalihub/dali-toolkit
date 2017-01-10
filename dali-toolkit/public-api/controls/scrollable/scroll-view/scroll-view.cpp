@@ -248,7 +248,7 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
     {
       position = WrapInDomain(position, mDomain.min, mDomain.max);
     }
-    page = std::max(static_cast<double>(0.0f), floor((position - mDomain.min) / mSpacing + 0.5f));
+    page = std::max(static_cast<double>(0.0f), static_cast<double>(floor((position - mDomain.min) / mSpacing + 0.5f)));
 
     if(wrap)
     {
