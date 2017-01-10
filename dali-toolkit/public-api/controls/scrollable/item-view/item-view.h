@@ -82,13 +82,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the ScrollView class.
+   * @brief Enumeration for the instance of properties belonging to the ScrollView class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the ScrollView class.
+     * @brief Enumeration for the instance of properties belonging to the ScrollView class.
      * @SINCE_1_0.0
      */
     enum
@@ -422,11 +422,12 @@ public:
    *
    * A relayout will occur for the remaining actors; for example if RemoveItem(Item(2, ActorZ), 0) is called,
    * the items with ID 3 or greater will be moved:
-   *   Initial actors:     After remove:
-   *     ID 1 - ActorA       ID 1 - ActorA
-   *     ID 2 - ActorB       ID 2 - ActorC (previously ID 3)
-   *     ID 3 - ActorC       ID 3 - ActorB (previously ID 4)
-   *     ID 4 - ActorD
+   *  | Initial actors:    | After remove:  |
+   *  |:------------------ |:-------------- |
+   *  |  ID 1 - ActorA     |  ID 1 - ActorA |
+   *  |  ID 2 - ActorB     |  ID 2 - ActorC (previously ID 3) |
+   *  |  ID 3 - ActorC     |  ID 3 - ActorB (previously ID 4) |
+   *  |  ID 4 - ActorD     |                |
    * @SINCE_1_0.0
    * @param[in] itemId The Item ID of the item to remove.
    * @param[in] durationSeconds How long the relayout takes in seconds.
