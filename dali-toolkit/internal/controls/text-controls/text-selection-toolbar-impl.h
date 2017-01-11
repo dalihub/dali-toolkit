@@ -84,6 +84,11 @@ public:
    */
   void RaiseAbove( Layer target );
 
+  /**
+   * @copydoc Toolkit::TextSelectionToolbar::ScrollTo()
+   */
+  void ScrollTo( const Vector2& position );
+
 private: // From Control
 
   /**

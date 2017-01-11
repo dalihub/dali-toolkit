@@ -76,6 +76,11 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
   GetImpl(*this).RaiseAbove( target );
 }
 
+void TextSelectionToolbar::ScrollTo( const Vector2& position )
+{
+  GetImpl(*this).ScrollTo( position );
+}
+
 TextSelectionToolbar TextSelectionToolbar::DownCast( BaseHandle handle )
 {
   return Control::DownCast<TextSelectionToolbar, Internal::TextSelectionToolbar>(handle);

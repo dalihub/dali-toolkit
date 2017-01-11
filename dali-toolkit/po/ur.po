@@ -1,3 +1,7 @@
+#: Used to know if the language is using a right to left script
+msgid "IDS_LTR"
+msgstr "RTL"
+
 msgid "IDS_COM_BODY_SELECT_ALL"
 msgstr "تمام منتخب کریں"
 

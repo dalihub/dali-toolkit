@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <libintl.h>
+#include <string.h>
 #include <cfloat>
 #include <dali/public-api/animation/animation.h>
 #include <dali/devel-api/images/nine-patch-image.h>
@@ -82,6 +83,9 @@ const char* const OPTION_CUT("optionCut");                                      
 const char* const OPTION_COPY("optionCopy");                                      // "Copy" popup option.
 const char* const OPTION_PASTE("optionPaste");                                    // "Paste" popup option.
 const char* const OPTION_CLIPBOARD("optionClipboard");                            // "Clipboard" popup option.
+
+const std::string IDS_LTR( "IDS_LTR" );
+const std::string RTL_DIRECTION( "RTL" );
 
 BaseHandle Create()
 {
@@ -789,6 +793,19 @@ std::string TextSelectionPopup::GetPressedImage() const
      self.Add( mToolbar );
    }
 
+   // Whether to mirror the list of buttons (for right to left languages)
+   bool mirror = false;
+   char* idsLtr = GET_LOCALE_TEXT( IDS_LTR.c_str() );
+   if( NULL != idsLtr )
+   {
+     mirror = ( 0 == strcmp( idsLtr, RTL_DIRECTION.c_str() ) );
+
+     if( mirror )
+     {
+       std::reverse( mOrderListOfButtons.begin(), mOrderListOfButtons.end() );
+     }
+   }
+
    // Iterate list of buttons and add active ones to Toolbar
    std::size_t numberOfOptionsRequired =  GetNumberOfEnabledOptions();
    std::size_t numberOfOptionsAdded = 0u;
@@ -800,6 +817,11 @@ std::string TextSelectionPopup::GetPressedImage() const
        numberOfOptionsAdded++;
        AddOption(  button, ( numberOfOptionsAdded < numberOfOptionsRequired ) , showIcons, showCaptions );
      }
+   }
+
+   if( mirror )
+   {
+     mToolbar.ScrollTo( Vector2( mPopupMaxSize.x, 0.f ) );
    }
  }
 

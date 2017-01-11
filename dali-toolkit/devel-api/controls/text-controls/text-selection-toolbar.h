@@ -128,6 +128,11 @@ public:
   void RaiseAbove( Layer target );
 
   /**
+   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2&)
+   */
+  void ScrollTo( const Vector2& position );
+
+  /**
    * @brief Downcast a handle to TextSelectionToolbar.
    *
    * If the BaseHandle points is a TextSelectionToolbar the downcast returns a valid handle.

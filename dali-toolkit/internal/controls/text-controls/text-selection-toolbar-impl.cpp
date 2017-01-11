@@ -263,6 +263,11 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
   mToolbarLayer.RaiseAbove( target );
 }
 
+void TextSelectionToolbar::ScrollTo( const Vector2& position )
+{
+  mScrollView.ScrollTo( position, 0.f );
+}
+
 void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )
 {
   // Set any properties specified for the label by iterating through all property key-value pairs.
