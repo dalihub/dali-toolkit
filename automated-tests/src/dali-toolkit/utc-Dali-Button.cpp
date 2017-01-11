@@ -59,6 +59,23 @@ static bool ButtonCallback( Button button )
   return false;
 }
 
+static std::string GetButtonText( Button button )
+{
+  Property::Value value = button.GetProperty( Toolkit::Button::Property::LABEL );
+
+  Property::Map *labelProperty = value.GetMap();
+
+  std::string textLabel;
+
+  if ( labelProperty )
+  {
+    Property::Value* value = labelProperty->Find( Toolkit::TextVisual::Property::TEXT );
+    value->Get( textLabel );
+  }
+
+  return textLabel;
+}
+
 struct CallbackFunctor
 {
   CallbackFunctor(bool* callbackFlag)
@@ -472,7 +489,7 @@ int UtcDaliButtonSetAnimationTimeP(void)
   END_TEST;
 }
 
-int UtcDaliButtonSetLabelStringP(void)
+int UtcDaliButtonSetLabelStringWithPropertyMapP(void)
 {
   ToolkitTestApplication application;
 
@@ -480,17 +497,37 @@ int UtcDaliButtonSetLabelStringP(void)
   button.SetProperty( Toolkit::Button::Property::LABEL,
                       Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
                                      .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                                     .Add( Toolkit::TextVisual::Property::TEXT, "Button Label")
                      );
 
-  button.SetLabelText( "Button Label" );
+  DALI_TEST_EQUALS( GetButtonText( button ), "Button Label", TEST_LOCATION );
+  END_TEST;
+}
 
-  DALI_TEST_EQUALS( button.GetLabelText(), "Button Label", TEST_LOCATION );
+int UtcDaliButtonSetLabelWithStringP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  // Set default point size for text visual as style sheet not available.
+  button.SetProperty( Toolkit::Button::Property::LABEL,
+                      Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                                     .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                                     );
+
+  button.SetProperty( Toolkit::Button::Property::LABEL, "Button Label" );
+
+  DALI_TEST_EQUALS( GetButtonText( button ), "Button Label", TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliButtonSetLabelPropertyP(void)
 {
   ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliButtonSetLabelPropertyP Set text label and then set again with new text");
+
 
   const std::string TEST_LABEL1 = "test label one";
   const std::string TEST_LABEL2 = "test label two";
@@ -500,13 +537,10 @@ int UtcDaliButtonSetLabelPropertyP(void)
   button.SetProperty( Toolkit::Button::Property::LABEL,
                         Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
                                        .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                                       .Add( Toolkit::TextVisual::Property::TEXT, TEST_LABEL1 )
                      );
 
-  button.SetProperty( Button::Property::LABEL_TEXT, TEST_LABEL1 );
-
-  std::string labelText = button.GetProperty<std::string>( Button::Property::LABEL_TEXT );
-
-  DALI_TEST_EQUALS( labelText, TEST_LABEL1,  TEST_LOCATION );
+  DALI_TEST_EQUALS( GetButtonText( button ), TEST_LABEL1,  TEST_LOCATION );
 
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::DevelVisual::TEXT );
@@ -515,9 +549,7 @@ int UtcDaliButtonSetLabelPropertyP(void)
   propertyMap.Insert( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
   button.SetProperty( Button::Property::LABEL, propertyMap );
 
-  labelText = button.GetProperty<std::string>( Button::Property::LABEL_TEXT );
-
-  DALI_TEST_EQUALS( labelText, TEST_LABEL2,  TEST_LOCATION );
+  DALI_TEST_EQUALS( GetButtonText( button ), TEST_LABEL2,  TEST_LOCATION );
 
   END_TEST;
 }
@@ -1237,4 +1269,39 @@ int UtcDaliButtonSetGetDepreciatedPropertiesWithURL(void)
   DALI_TEST_EQUALS( value.Get<std::string>(),  TEST_IMAGE_ONE, TEST_LOCATION );
 
 END_TEST;
+}
+
+int UtcDaliButtonSetLabelTextDeprecatedPropertyP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetLabelTextDeprecatedPropertyP");
+
+  const std::string TEST_LABEL1 = "test label one";
+  const std::string TEST_LABEL2 = "test label two";
+
+  Button button = PushButton::New();
+
+  button.SetProperty( Toolkit::Button::Property::LABEL,
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                                       .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                     );
+
+  button.SetProperty( Button::Property::LABEL_TEXT, TEST_LABEL1 );
+
+  std::string labelText = button.GetProperty<std::string>( Button::Property::LABEL_TEXT );
+
+  DALI_TEST_EQUALS( labelText, TEST_LABEL1,  TEST_LOCATION );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::DevelVisual::TEXT );
+  propertyMap.Insert( Toolkit::TextVisual::Property::TEXT,  TEST_LABEL2 );
+  propertyMap.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, Color::BLUE );
+  propertyMap.Insert( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
+  button.SetProperty( Button::Property::LABEL, propertyMap );
+
+  labelText = button.GetProperty<std::string>( Button::Property::LABEL_TEXT );
+
+  DALI_TEST_EQUALS( labelText, TEST_LABEL2,  TEST_LOCATION );
+
+  END_TEST;
 }
