@@ -141,8 +141,9 @@ private:
 
   /**
    * @brief Updates the text's renderer.
+   * @param[in] initializeRendererAndTexture Set flag to true to initialize textures and add renderer to control.
    */
-  void UpdateRenderer();
+  void UpdateRenderer( bool initializeRendererAndTexture );
 
   /**
    * @brief Removes the texture set from the renderer.
