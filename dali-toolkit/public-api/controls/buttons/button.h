@@ -192,7 +192,7 @@ public:
       SELECTED_COLOR,
 
       /**
-       * @brief name "label", type Property::Map
+       * @brief name "label", type Property::Map or std::string
        * @SINCE_1_0.0
        */
       LABEL,

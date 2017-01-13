@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -473,9 +473,9 @@ void PageTurnView::SetupShadowView()
 
 void PageTurnView::OnStageConnection( int depth )
 {
-  Control::OnStageConnection( depth );
-
   SetupShadowView();
+
+  Control::OnStageConnection( depth );
 }
 
 void PageTurnView::OnStageDisconnection()

@@ -341,10 +341,10 @@ An up call to the Control class is necessary if these methods are overridden.
 // C++
 void MyUIControlImpl::OnChildAdd( Actor& child );
 {
-  // Up call to Control first
-  Control::OnChildAdd( child );
-
   // Do any other operations required upon child addition
+
+  // Up call to Control at the end
+  Control::OnChildAdd( child );
 }
 ~~~
 ~~~{.cpp}
@@ -371,10 +371,10 @@ An up call to the Control class is necessary if these methods are overridden.
 // C++
 void MyUIControlImpl::OnStageConnection( int depth )
 {
-  // Up call to Control first
-  Control::OnStageConnection( depth );
-
   // Do any other operations required upon stage connection
+
+  // Up call to Control at the end
+  Control::OnStageConnection( depth );
 }
 ~~~
 ~~~{.cpp}
@@ -446,6 +446,18 @@ void MyUIControlImpl::OnRelayout( const Vector2& size, RelayoutContainer& contai
 }
 ~~~
 More information on size negotiation can be found [here](@ref size-negotiation-controls).
+ 
+___________________________________________________________________________________________________
+
+### Clipping Support {#creating-controls-clipping}
+
+When an Actor is set to clip its children, the renderers have to be added manually in order to specify what its children need to clip to.
+The Control base class automates the creation of the renderers/visuals when it is set to clip its children.
+ 
+This is only done if the application or custom control writer has not added any renderers to the Control or registered any visuals
+(regardless of whether these visuals are enabled or not).
+ 
+If custom control writers want to define the clipping visuals themselves, then they should register all required visuals before the control is staged.
  
 ___________________________________________________________________________________________________
 

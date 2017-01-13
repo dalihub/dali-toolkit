@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1351,3 +1351,69 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
   END_TEST;
 }
 
+int UtcDaliControlImplAutoClippingWithVisuals(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Test to ensure a renderer does NOT get added when we've already registered a visual which we haven't enabled" );
+
+  DummyControl control = DummyControl::New();
+  DummyControlImpl& controlImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+  controlImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual, false );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplAutoClippingWithVisualsAlreadyOnStage(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Test to ensure a renderer does NOT get added when we've already registered a visual which we haven't enabled and we're already on the stage" );
+
+  DummyControl control = DummyControl::New();
+  DummyControlImpl& controlImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+  controlImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual, false );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  END_TEST;
+}

@@ -84,6 +84,7 @@
 %ignore *::AnchorPoint::DEFAULT;
 %ignore *::SetPositionInheritanceMode(PositionInheritanceMode);
 %ignore *::GetKeyValue(SizeType) const;
+%ignore *::TypeInfo::GetCreator() const;
 
 %rename(ParentOriginTop) Dali::ParentOrigin::TOP;
 %rename(ParentOriginBottom) Dali::ParentOrigin::BOTTOM;
@@ -209,6 +210,8 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/object/handle.h>
 %include <dali/public-api/object/type-info.h>
 %include <dali/public-api/object/type-registry.h>
+%include <dali/devel-api/object/csharp-type-info.h>
+%include <dali/devel-api/object/csharp-type-registry.h>
 
 %include <dali/public-api/common/constants.h>
 %include <dali/public-api/actors/actor-enumerations.h>

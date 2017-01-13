@@ -348,11 +348,7 @@ bool Button::IsSelected() const
 
 void Button::SetLabelText( const std::string& label )
 {
-  Property::Map labelProperty;
-  labelProperty.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT)
-               .Add( Toolkit::TextVisual::Property::TEXT, label );
-
-  Self().SetProperty( Toolkit::Button::Property::LABEL, labelProperty );
+  Self().SetProperty( Toolkit::Button::Property::LABEL, label );
 }
 
 std::string Button::GetLabelText() const
@@ -372,7 +368,7 @@ std::string Button::GetLabelText() const
   return textLabel;
 }
 
-void Button::MergeLabelProperties( const Property::Map& inMap, Property::Map& outMap )
+void Button::MergeWithExistingLabelProperties( const Property::Map& inMap, Property::Map& outMap )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "MergeLabelProperties with %d properties\n", inMap.Count() );
 
@@ -1224,13 +1220,32 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
 
       case Toolkit::Button::Property::LABEL:
       {
-        // Get a Property::Map from the property if possible.
-        Property::Map* setPropertyMap = value.GetMap();
-        if( setPropertyMap )
+        Property::Map outTextVisualProperties;
+        std::string textString;
+
+        if ( value.Get( textString ) )
         {
-          Property::Map textVisualProperties;
-          GetImplementation( button ).MergeLabelProperties( *setPropertyMap, textVisualProperties );
-          GetImplementation( button ).CreateVisualsForComponent( index, textVisualProperties, DepthIndex::CONTENT );
+          DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetProperty Setting TextVisual with string[%s]\n", textString.c_str() );
+
+          Property::Map setPropertyMap;
+          setPropertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT)
+                        .Add( Toolkit::TextVisual::Property::TEXT, textString );
+
+          GetImplementation( button ).MergeWithExistingLabelProperties( setPropertyMap, outTextVisualProperties );
+        }
+        else
+        {
+          // Get a Property::Map from the property if possible.
+          Property::Map* setPropertyMap = value.GetMap();
+          if( setPropertyMap )
+          {
+            GetImplementation( button ).MergeWithExistingLabelProperties( *setPropertyMap, outTextVisualProperties );
+          }
+        }
+
+        if( !outTextVisualProperties.Empty() )
+        {
+          GetImplementation( button ).CreateVisualsForComponent( index, outTextVisualProperties, DepthIndex::CONTENT );
           GetImplementation( button ).RelayoutRequest();
         }
         break;

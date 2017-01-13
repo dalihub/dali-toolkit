@@ -335,9 +335,9 @@ def writeCSharpData
               hasChildProperties = true
             end
 
-            property.csharpGetter ="  public #{propertyType} #{property.name} \n"\
-                     "  { \n"\
-                     "    get \n" \
+            property.csharpGetter ="  public #{propertyType} #{property.name}\n"\
+                     "  {\n"\
+                     "    get\n" \
                      "    {\n"\
                      "      #{tempDeclaration}\n"\
                      "      GetProperty( #{propertyName}).Get( #{propertyArg} temp );\n"\
@@ -346,8 +346,8 @@ def writeCSharpData
 
             if property.writable
                   #text.SetProperty(TextLabel.Property.HORIZONTAL_ALIGNMENT, new Property.Value("CENTER"));
-                  property.csharpSetter = "    set \n" \
-                         "    { \n"\
+                  property.csharpSetter = "    set\n" \
+                         "    {\n"\
                          "      SetProperty( #{propertyName}, new Dali.Property.Value( value ) );\n" \
                          "    }\n"\
                          "  }\n"

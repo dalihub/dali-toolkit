@@ -233,7 +233,7 @@
        {
          "visualType": "TEXT",
          "horizontalAlignment": "CENTER",
-         "pointSize" : 12.0, // Point size must always be provided to Text Visual
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
          "verticalAlignment": "CENTER"
        },
       "unselectedBackgroundVisual":
@@ -264,7 +264,7 @@
       "label":
        {
          "visualType": "TEXT",
-         "pointSize" : 12.0, // Point size must always be provided to Text Visual
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
          "verticalAlignment": "CENTER"
        },
       "unselectedVisual":
@@ -295,7 +295,7 @@
       "label":
        {
          "visualType": "TEXT",
-         "pointSize" : 12.0, // Point size must always be provided to Text Visual
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
          "verticalAlignment": "CENTER"
        },
       "unselectedVisual":

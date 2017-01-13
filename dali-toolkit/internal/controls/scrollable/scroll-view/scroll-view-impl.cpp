@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -701,8 +701,6 @@ void ScrollView::OnInitialize()
 
 void ScrollView::OnStageConnection( int depth )
 {
-  ScrollBase::OnStageConnection( depth );
-
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
   if ( mSensitive )
@@ -710,11 +708,14 @@ void ScrollView::OnStageConnection( int depth )
     SetScrollSensitive( false );
     SetScrollSensitive( true );
   }
+
   if(IsOvershootEnabled())
   {
     // try and make sure property notifications are set
     EnableScrollOvershoot(true);
   }
+
+  ScrollBase::OnStageConnection( depth );
 }
 
 void ScrollView::OnStageDisconnection()
@@ -1941,6 +1942,8 @@ void ScrollView::OnSizeSet( const Vector3& size )
   {
     mOvershootIndicator->Reset();
   }
+
+  ScrollBase::OnSizeSet( size );
 }
 
 void ScrollView::OnChildAdd(Actor& child)

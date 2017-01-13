@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_SUPER_BLUR_VIEW_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,11 +130,6 @@ private: // from Control
    * @copydoc CustomActorImpl::OnStageConnection()
    */
   virtual void OnStageConnection( int depth );
-
-  /**
-   * @copydoc CustomActorImpl::OnStageDisconnection()
-   */
-  virtual void OnStageDisconnection();
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()

@@ -80,6 +80,29 @@
       }
     }
 
+    ///
+  public void LoadFromFile( string fileName )
+  {
+    try
+    {
+      string json = System.IO.File.ReadAllText( fileName );
+      if( json.Length > 0 )
+      {
+        LoadFromString( json );
+      }
+      else
+      {
+        throw new global::System.InvalidOperationException("Failed to load file " +fileName);
+
+      }
+    }
+    catch ( System.Exception e)
+    {
+      throw new global::System.InvalidOperationException("Failed to parse " +fileName);
+    }
+  }
+
+
     %}
     %enddef
 
