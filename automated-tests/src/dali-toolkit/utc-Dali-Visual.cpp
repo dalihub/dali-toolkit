@@ -1459,6 +1459,69 @@ int UtcDaliVisualAnimateImageVisualMixColor(void)
   END_TEST;
 }
 
+int UtcDaliVisualAnimateImageVisualPixelArea(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimateImageVisual pixel area" );
+
+  application.GetPlatform().SetClosestImageSize( Vector2(100, 100) );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert("mixColor", Color::BLUE);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetColor(Color::BLACK);
+  Stage::GetCurrent().Add(actor);
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::MIX_COLOR );
+
+  tet_infoline("Test that the renderer has the mixColor property");
+  DALI_TEST_CHECK( index != Property::INVALID_INDEX );
+
+  // TransitionData only takes string keys
+  Property::Map map;
+  map["target"] = "testVisual";
+  map["property"] = "pixelArea";
+  map["initialValue"] = Vector4( 0,0,0,1 );
+  map["targetValue"] = Vector4( 0,0,1,1 ); // Animate width from zero to full
+  map["animator"] = Property::Map()
+    .Add("alphaFunction", "LINEAR")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.0f)
+         .Add("duration", 4.0f));
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New( map );
+
+  Animation animation = dummyImpl.CreateTransition( transition );
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR), Color::WHITE );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(2000u); // halfway point
+
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4(0.0f, 0.0f, 0.5f, 1.0f )), true, TEST_LOCATION );
+
+  application.Render(2000u);
+
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", Vector4( 0.0f, 0.0f, 1.0f, 1.0f )), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliVisualWireframeVisual(void)
 {

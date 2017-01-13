@@ -349,7 +349,77 @@ Renderer Visual::Base::GetRenderer()
   return mImpl->mRenderer;
 }
 
-void Visual::Base::AnimateProperty( Dali::Animation& transition, Internal::TransitionData::Animator& animator )
+
+Property::Index Visual::Base::GetPropertyIndex( Property::Key key )
+{
+  Property::Index index = DevelHandle::GetPropertyIndex( mImpl->mRenderer, key );
+
+  if( index == Property::INVALID_INDEX )
+  {
+    // Is it a shader property?
+    Shader shader = mImpl->mRenderer.GetShader();
+    index = DevelHandle::GetPropertyIndex( shader, key );
+    if( index != Property::INVALID_INDEX )
+    {
+      // Yes - we should register it in the Renderer so it can be set / animated
+      // independently, as shaders are shared across multiple renderers.
+      std::string keyName;
+      Property::Index keyIndex( Property::INVALID_KEY );
+      if( key.type == Property::Key::INDEX )
+      {
+        keyName = shader.GetPropertyName( index );
+        keyIndex = key.indexKey;
+      }
+      else
+      {
+        keyName = key.stringKey;
+        // Leave keyIndex as INVALID_KEY - it can still be registered against the string key.
+      }
+      Property::Value value = shader.GetProperty( index );
+      index = DevelHandle::RegisterProperty( mImpl->mRenderer, keyIndex, keyName, value );
+    }
+  }
+  return index;
+}
+
+void Visual::Base::SetupTransition(
+  Dali::Animation& transition,
+  Internal::TransitionData::Animator& animator,
+  Property::Index index )
+{
+  if( index != Property::INVALID_INDEX )
+  {
+    if( mImpl->mRenderer )
+    {
+      if( animator.animate == false )
+      {
+        mImpl->mRenderer.SetProperty( index, animator.targetValue );
+      }
+      else
+      {
+        if( animator.initialValue.GetType() != Property::NONE )
+        {
+          mImpl->mRenderer.SetProperty( index, animator.initialValue );
+        }
+
+        if( ! transition )
+        {
+          transition = Dali::Animation::New( 0.1f );
+        }
+
+        transition.AnimateTo( Property( mImpl->mRenderer, index ),
+                              animator.targetValue,
+                              animator.alphaFunction,
+                              TimePeriod( animator.timePeriodDelay,
+                                          animator.timePeriodDuration ) );
+      }
+    }
+  }
+}
+
+void Visual::Base::AnimateProperty(
+  Dali::Animation& transition,
+  Internal::TransitionData::Animator& animator )
 {
 #if defined(DEBUG_ENABLED)
   {
@@ -361,20 +431,30 @@ void Visual::Base::AnimateProperty( Dali::Animation& transition, Internal::Trans
 
   Property::Index index = Property::INVALID_INDEX;
 
-  // Get the property index
   bool isMixColor = false;
+  bool isMixColorOpaque = true;
+
+  // Get the property index
   if( animator.propertyKey == Toolkit::DevelVisual::Property::MIX_COLOR ||
       animator.propertyKey == MIX_COLOR )
   {
     isMixColor = true;
     index = mImpl->mMixColorIndex;
+
+    Vector4 initialColor;
+    if( animator.initialValue.Get(initialColor) ) // if there is an initial color, test it
+    {
+      isMixColorOpaque = initialColor.a >= 1.0f;
+    }
+    else
+    {
+      isMixColorOpaque = mImpl->mMixColor.a >= 1.0f; // otherwise, test the current color
+    }
   }
   else if( mImpl->mRenderer )
   {
-    index = DevelHandle::GetPropertyIndex( mImpl->mRenderer, animator.propertyKey );
+    index = GetPropertyIndex( animator.propertyKey );
   }
-
-  Vector4 currentMixColor( mImpl->mMixColor );
 
   // Set target value into data store
   if( animator.targetValue.GetType() != Property::NONE )
@@ -385,7 +465,8 @@ void Visual::Base::AnimateProperty( Dali::Animation& transition, Internal::Trans
     }
     else
     {
-      // Note: there may be several of these calls if more than one transform property is animated.
+      // Note: there may be several of these calls if more than one
+      // transform property is animated.
       Property::Map map;
       if( animator.propertyKey.type == Property::Key::INDEX )
       {
@@ -402,69 +483,23 @@ void Visual::Base::AnimateProperty( Dali::Animation& transition, Internal::Trans
 
   if( index != Property::INVALID_INDEX )
   {
-    if( mImpl->mRenderer )
+    SetupTransition( transition, animator, index );
+
+    // For mix color, ensure the blend mode is on if the initial or final values are not opaque,
+    // and that it is turned off after the animation ends if the final value is opaque
+    if( isMixColor && (!isMixColorOpaque || mImpl->mMixColor.a < 1.0f) )
     {
-      if( animator.animate == false )
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+
+      if( animator.animate == true && mImpl->mMixColor.a >= 1.0f )
       {
-        mImpl->mRenderer.SetProperty( index, animator.targetValue );
-        if( isMixColor )
+        // When it becomes opaque, set the blend mode back to automatically
+        if( ! mImpl->mBlendSlotDelegate )
         {
-          mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, mImpl->mMixColor.a < 1.0 ? BlendMode::ON : BlendMode::AUTO );
+          mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
         }
-      }
-      else
-      {
-        if( animator.initialValue.GetType() != Property::NONE )
-        {
-          if( isMixColor )
-          {
-            animator.initialValue.Get( currentMixColor );
-          }
-
-#if defined(DEBUG_ENABLED)
-          {
-            std::ostringstream oss;
-            oss << animator.initialValue;
-            DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "  Setting Initial Value - %s\n", oss.str().c_str() );
-          }
-#endif
-          mImpl->mRenderer.SetProperty( index, animator.initialValue );
-        }
-
-        if( isMixColor )
-        {
-          mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE,
-                                        ( currentMixColor.a < 1.0 || mImpl->mMixColor.a < 1.0 ) ? BlendMode::ON : BlendMode::AUTO );
-        }
-
-        if( ! transition )
-        {
-          transition = Dali::Animation::New( 0.1f );
-        }
-
-#if defined(DEBUG_ENABLED)
-        {
-          std::ostringstream oss;
-          oss << animator.targetValue;
-          DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "  Animating to Value - %s\n", oss.str().c_str() );
-        }
-#endif
-
-        transition.AnimateTo( Property( mImpl->mRenderer, index ),
-                              animator.targetValue,
-                              animator.alphaFunction,
-                              TimePeriod( animator.timePeriodDelay,
-                                          animator.timePeriodDuration ) );
-
-        if( isMixColor && currentMixColor.a < 1.0f && mImpl->mMixColor.a >= 1.0f )
-        {
-          // When it becomes opaque, set the blend mode back to automatically
-          if( ! mImpl->mBlendSlotDelegate )
-          {
-            mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
-          }
-          transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate), &Visual::Base::OnMixColorFinished );
-        }
+        transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
+                                             &Visual::Base::OnMixColorFinished );
       }
     }
   }

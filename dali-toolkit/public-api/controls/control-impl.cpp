@@ -79,8 +79,10 @@ struct RegisteredVisual
   Toolkit::Visual::Base visual;
   bool enabled;
 
-  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled) :
-                   index(aIndex), visual(aVisual), enabled(aEnabled) {}
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled)
+  : index(aIndex), visual(aVisual), enabled(aEnabled)
+  {
+  }
 };
 
 typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
@@ -793,8 +795,8 @@ void Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visu
   {
     Toolkit::GetImplementation(visual).SetOnStage( self );
   }
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"T":"F" );
 }
 
 void Control::UnregisterVisual( Property::Index index )
@@ -827,7 +829,7 @@ void Control::EnableVisual( Property::Index index, bool enable )
   {
     if (  (*iter)->enabled == enable )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual Already enabled set (%s) \n", enable?"enabled":"disabled");
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual %s(%d) already %s\n", (*iter)->visual.GetName().c_str(), index, enable?"enabled":"disabled");
       return;
     }
 
@@ -837,12 +839,12 @@ void Control::EnableVisual( Property::Index index, bool enable )
     {
       if ( enable )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting Visual(%d) on stage \n", index );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting %s(%d) on stage \n", (*iter)->visual.GetName().c_str(), index );
         Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
       }
       else
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting Visual(%d) off stage \n", index );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting %s(%d) off stage \n", (*iter)->visual.GetName().c_str(), index );
         Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
       }
     }

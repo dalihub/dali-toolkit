@@ -270,6 +270,27 @@ private:
   void RegisterMixColor();
 
   /**
+   * Find the matching property on the renderer or shader. If it's a shader
+   * property, register it on the renderer in order to animate it for this
+   * visual independently.
+   * @param[in] key The key to match.
+   * @return the matching index, or INVALID_INDEX if it's not found
+   */
+  Property::Index GetPropertyIndex( Property::Key key );
+
+  /**
+   * Set up the transition. If no animation is required, then
+   * transition will be untouched.
+   *
+   * @param[in] transition The transition to use or set up.
+   * @param[in] animator The animation data to use
+   * @param[in] index The property index on the renderer to animate
+   */
+  void SetupTransition( Dali::Animation& transition,
+                        Internal::TransitionData::Animator& animator,
+                        Property::Index index );
+
+  /**
    * When a mix color animation has finished, ensure the blend mode is set back
    * to the right value for the target opacity.
    */
