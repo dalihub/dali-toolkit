@@ -68,10 +68,11 @@ void main()\n
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(\n
 uniform lowp vec4 uColor;\n
+uniform lowp vec4 mixColor;\n
 \n
 void main()\n
 {\n
-  gl_FragColor = uColor;\n
+  gl_FragColor = uColor*mixColor;\n
 }\n
 );
 
@@ -153,7 +154,13 @@ void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
 
 void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  // no properties supported at the moment
+  Property::Value* mixValue = propertyMap.Find( Toolkit::DevelVisual::Property::MIX_COLOR, MIX_COLOR );
+  if( mixValue )
+  {
+    Vector4 mixColor;
+    mixValue->Get( mixColor );
+    SetMixColor( mixColor );
+  }
 }
 
 void WireframeVisual::DoSetOnStage( Actor& actor )

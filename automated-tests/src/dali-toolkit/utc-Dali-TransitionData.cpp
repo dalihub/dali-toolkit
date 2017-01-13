@@ -262,7 +262,6 @@ int UtcDaliTransitionDataMap1P(void)
   anim.Play();
 
   application.SendNotification();
-  application.Render(0);
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();

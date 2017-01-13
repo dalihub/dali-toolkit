@@ -2338,7 +2338,7 @@ int UtcDaliAccessibilityManagerActionTouch(void)
   Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
 
   DummyControl dummyControl = DummyControl::New(true);
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummyControl.GetImplementation());
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
   dummyControl.SetSize(480, 800);
   manager.SetFocusOrder( dummyControl, 1 );
   Stage::GetCurrent().Add( dummyControl );

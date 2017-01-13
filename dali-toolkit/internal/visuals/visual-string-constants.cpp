@@ -54,15 +54,18 @@ const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
 const char * const CUSTOM_SHADER_HINTS( "hints" );
 
 // Transform
-extern const char * const TRANSFORM( "transform" );
-extern const char * const SIZE( "size" );
-extern const char * const OFFSET( "offset" );
-extern const char * const OFFSET_SIZE_MODE( "offsetSizeMode" );
-extern const char * const ORIGIN( "origin" );
-extern const char * const ANCHOR_POINT( "anchorPoint" );
+const char * const TRANSFORM( "transform" );
+const char * const SIZE( "size" );
+const char * const OFFSET( "offset" );
+const char * const OFFSET_SIZE_MODE( "offsetSizeMode" );
+const char * const ORIGIN( "origin" );
+const char * const ANCHOR_POINT( "anchorPoint" );
 
 // Premultipled alpha
-extern const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
+const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
+
+// Mix color
+const char * const MIX_COLOR( "mixColor" );
 
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );

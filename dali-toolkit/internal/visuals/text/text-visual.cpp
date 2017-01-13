@@ -130,11 +130,12 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform sampler2D sTexture;\n
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
+    uniform lowp vec4 mixColor;\n
     \n
     void main()\n
     {\n
       mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
+      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * mixColor;\n
     }\n
 );
 
@@ -269,10 +270,14 @@ void TextVisual::DoSetOnStage( Actor& actor )
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
-  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-  mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::TEXT_SHADER );
+  if( ! shader )
+  {
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
 
-  shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    mFactoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER, shader );
+  }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );

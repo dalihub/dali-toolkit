@@ -82,10 +82,11 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec4 borderColor;\n
+  uniform lowp vec4 mixColor;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = borderColor*uColor;\n
+    gl_FragColor = mixColor*borderColor*uColor;\n
   }\n
 );
 
@@ -108,12 +109,13 @@ const char* VERTEX_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec4 borderColor;\n
+  uniform lowp vec4 mixColor;\n
   uniform mediump float borderSize;\n
   varying mediump float vAlpha;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = borderColor*uColor;\n
+    gl_FragColor = mixColor*borderColor*uColor;\n
     gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha)*smoothstep( borderSize+1.5, borderSize, vAlpha );\n
   }\n
 );
@@ -142,22 +144,60 @@ BorderVisual::~BorderVisual()
 
 void BorderVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* color = propertyMap.Find( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME );
-  if( !( color && color->Get(mBorderColor) ) )
+  for( Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter )
   {
-    DALI_LOG_ERROR( "Fail to provide a border color to the BorderVisual object\n" );
+    KeyValuePair keyValue = propertyMap.GetKeyValue( iter );
+    if( keyValue.first.type == Property::Key::INDEX )
+    {
+      DoSetProperty( keyValue.first.indexKey, keyValue.second );
+    }
+    else
+    {
+      if( keyValue.first == COLOR_NAME )
+      {
+        DoSetProperty( Toolkit::BorderVisual::Property::COLOR, keyValue.second );
+      }
+      else if( keyValue.first == SIZE_NAME )
+      {
+        DoSetProperty( Toolkit::BorderVisual::Property::SIZE, keyValue.second );
+      }
+      else if( keyValue.first == ANTI_ALIASING )
+      {
+        DoSetProperty( Toolkit::BorderVisual::Property::ANTI_ALIASING, keyValue.second );
+      }
+    }
   }
+}
 
-  Property::Value* size = propertyMap.Find( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME );
-  if( !( size && size->Get(mBorderSize) ) )
+void BorderVisual::DoSetProperty( Dali::Property::Index index,
+                                  const Dali::Property::Value& value )
+{
+  switch( index )
   {
-    DALI_LOG_ERROR( "Fail to provide a border size to the BorderVisual object\n" );
-  }
-
-  Property::Value* antiAliasing = propertyMap.Find( Toolkit::BorderVisual::Property::ANTI_ALIASING, ANTI_ALIASING );
-  if( antiAliasing )
-  {
-    antiAliasing->Get( mAntiAliasing );
+    case Toolkit::BorderVisual::Property::COLOR:
+    {
+      if( !value.Get( mBorderColor ) )
+      {
+        DALI_LOG_ERROR("BorderVisual: borderColor property has incorrect type\n");
+      }
+      break;
+    }
+    case Toolkit::BorderVisual::Property::SIZE:
+    {
+      if( !value.Get( mBorderSize ) )
+      {
+        DALI_LOG_ERROR("BorderVisual: borderSize property has incorrect type\n");
+      }
+      break;
+    }
+    case Toolkit::BorderVisual::Property::ANTI_ALIASING:
+    {
+      if( !value.Get( mAntiAliasing ) )
+      {
+        DALI_LOG_ERROR("BorderVisual: antiAliasing property has incorrect type\n");
+      }
+      break;
+    }
   }
 }
 
@@ -178,7 +218,7 @@ void BorderVisual::DoSetOnStage( Actor& actor )
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( DevelVisual::Property::TYPE, Toolkit::Visual::BORDER );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::BORDER );
   map.Insert( Toolkit::BorderVisual::Property::COLOR, mBorderColor );
   map.Insert( Toolkit::BorderVisual::Property::SIZE, mBorderSize );
   map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );
@@ -201,13 +241,11 @@ void BorderVisual::InitializeRenderer()
     mFactoryCache.SaveGeometry( VisualFactoryCache::BORDER_GEOMETRY, geometry );
   }
 
-
   Shader shader = GetBorderShader();
   mImpl->mRenderer = Renderer::New( geometry, shader  );
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-
 }
 
 void BorderVisual::SetBorderColor(const Vector4& color)
