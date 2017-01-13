@@ -312,6 +312,159 @@ public class StateChangedEventArgs : EventArgs
     return ret;
   }
 
+  public Dali.Property.Map UnselectedVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.UNSELECTED_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.UNSELECTED_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map SelectedVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.SELECTED_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.SELECTED_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map DisabledSelectedVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.DISABLED_SELECTED_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.DISABLED_SELECTED_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map DisabledUnselectedVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.DISABLED_UNSELECTED_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.DISABLED_UNSELECTED_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map UnselectedBackgroundVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.UNSELECTED_BACKGROUND_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.UNSELECTED_BACKGROUND_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map SelectedBackgroundVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.SELECTED_BACKGROUND_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.SELECTED_BACKGROUND_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map DisabledUnselectedBackgroundVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.DISABLED_UNSELECTED_BACKGROUND_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.DISABLED_UNSELECTED_BACKGROUND_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Dali.Property.Map DisabledSelectedBackgroundVisual
+  {
+    get
+    {
+      Dali.Property.Map temp = new Dali.Property.Map();
+      GetProperty( Button.Property.DISABLED_SELECTED_BACKGROUND_VISUAL).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.DISABLED_SELECTED_BACKGROUND_VISUAL, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public string LabelRelativeAlignment
+  {
+    get
+    {
+      string temp;
+      GetProperty( Button.Property.LABEL_RELATIVE_ALIGNMENT).Get( out temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.LABEL_RELATIVE_ALIGNMENT, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Vector4 LabelPadding
+  {
+    get
+    {
+      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
+      GetProperty( Button.Property.LABEL_PADDING).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.LABEL_PADDING, new Dali.Property.Value( value ) );
+    }
+  }
+
+  public Vector4 VisualPadding
+  {
+    get
+    {
+      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
+      GetProperty( Button.Property.VISUAL_PADDING).Get(  temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( Button.Property.VISUAL_PADDING, new Dali.Property.Value( value ) );
+    }
+  }
 %}
 %enddef
 

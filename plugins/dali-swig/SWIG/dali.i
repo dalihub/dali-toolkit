@@ -282,6 +282,8 @@ using namespace Dali::Toolkit;
 %include name-changed.i
 %include property-value.i
 %include dali-operator.i
+%include devel-properties.i
+
 %include dali-core.i
 %include dali-adaptor.i
 %include dali-toolkit.i
