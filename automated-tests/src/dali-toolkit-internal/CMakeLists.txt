@@ -22,6 +22,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp
  utc-Dali-DebugRendering.cpp
+ utc-Dali-ItemView-internal.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

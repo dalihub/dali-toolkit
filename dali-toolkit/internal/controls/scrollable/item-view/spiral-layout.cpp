@@ -426,10 +426,6 @@ Degree SpiralLayout::GetScrollDirection() const
 void SpiralLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
 {
 
-  if(HasLayoutChanged())
-  {
-    SetSpiralLayoutProperties(GetLayoutProperties());
-  }
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
@@ -548,7 +544,6 @@ void SpiralLayout::SetSpiralLayoutProperties(const Property::Map& properties)
       }
     }
   }
-  ResetLayoutChangedFlag();
 }
 
 Vector3 SpiralLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const

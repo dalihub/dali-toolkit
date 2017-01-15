@@ -1800,6 +1800,7 @@ void ItemView::SetLayoutArray( const Property::Array& layouts )
               {
                 Internal::DepthLayoutPtr depthLayout = Internal::DepthLayout::New();
                 (*depthLayout).SetLayoutProperties(*layout);
+                (*depthLayout).SetDepthLayoutProperties(*layout);
                 AddLayout(*depthLayout);
                 break;
               }
@@ -1807,6 +1808,7 @@ void ItemView::SetLayoutArray( const Property::Array& layouts )
               {
                 Internal::GridLayoutPtr gridLayout = Internal::GridLayout::New();
                 (*gridLayout).SetLayoutProperties(*layout);
+                (*gridLayout).SetGridLayoutProperties(*layout);
                 AddLayout(*gridLayout);
                 break;
               }
@@ -1815,6 +1817,7 @@ void ItemView::SetLayoutArray( const Property::Array& layouts )
                 Internal::GridLayoutPtr listLayout = Internal::GridLayout::New();
                 listLayout->SetNumberOfColumns( 1 );
                 (*listLayout).SetLayoutProperties(*layout);
+                (*listLayout).SetGridLayoutProperties(*layout);
                 AddLayout(*listLayout);
                 break;
               }
@@ -1822,6 +1825,7 @@ void ItemView::SetLayoutArray( const Property::Array& layouts )
               {
                 Internal::SpiralLayoutPtr spiralLayout = Internal::SpiralLayout::New();
                 (*spiralLayout).SetLayoutProperties(*layout);
+                (*spiralLayout).SetSpiralLayoutProperties(*layout);
                 AddLayout(*spiralLayout);
                 break;
               }
