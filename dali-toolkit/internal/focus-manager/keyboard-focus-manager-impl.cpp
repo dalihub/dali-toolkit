@@ -627,6 +627,36 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
+    else if (keyName == "Prior" && !isAccessibilityEnabled)
+    {
+      if(!mIsFocusIndicatorEnabled)
+      {
+        // Show focus indicator
+        mIsFocusIndicatorEnabled = true;
+      }
+      else
+      {
+        // Move the focus towards the previous page
+        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_UP);
+      }
+
+      isFocusStartableKey = true;
+    }
+    else if (keyName == "Next" && !isAccessibilityEnabled)
+    {
+      if(!mIsFocusIndicatorEnabled)
+      {
+        // Show focus indicator
+        mIsFocusIndicatorEnabled = true;
+      }
+      else
+      {
+        // Move the focus towards the next page
+        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_DOWN);
+      }
+
+      isFocusStartableKey = true;
+    }
     else if (keyName == "Tab" && !isAccessibilityEnabled)
     {
       if(!mIsFocusIndicatorEnabled)
