@@ -69,7 +69,11 @@ const char * const MIX_COLOR( "mixColor" );
 
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );
-const char * const ATLAS_RECT_UNIFORM_NAME ( "uAtlasRect" );
+const char * const ATLAS_RECT_UNIFORM_NAME( "uAtlasRect" );
+const char * const PIXEL_AREA_UNIFORM_NAME( "pixelArea" );
+const char * const WRAP_MODE_UNIFORM_NAME( "wrapMode" );
+const char * const IMAGE_WRAP_MODE_U("wrapModeU");
+const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

@@ -60,6 +60,10 @@ extern const char * const MIX_COLOR;
 // Image visual
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;
+extern const char * const PIXEL_AREA_UNIFORM_NAME;
+extern const char * const WRAP_MODE_UNIFORM_NAME;
+extern const char * const IMAGE_WRAP_MODE_U;
+extern const char * const IMAGE_WRAP_MODE_V;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;
