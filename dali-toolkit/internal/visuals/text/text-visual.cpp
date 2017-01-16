@@ -282,7 +282,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
 
-  UpdateRenderer();
+  UpdateRenderer( true ); // Renderer needs textures and to be added to control
 }
 
 void TextVisual::DoSetOffStage( Actor& actor )
@@ -304,7 +304,7 @@ void TextVisual::DoSetOffStage( Actor& actor )
 
 void TextVisual::OnSetTransform()
 {
-  UpdateRenderer();
+  UpdateRenderer( false );
 }
 
 void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
@@ -382,7 +382,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
   }
 }
 
-void TextVisual::UpdateRenderer()
+void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
 {
   Actor control = mControl.GetHandle();
   if( !control )
@@ -418,7 +418,7 @@ void TextVisual::UpdateRenderer()
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( relayoutSize );
 
-  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
+  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) || initializeRendererAndTexture )
   {
     // Removes the texture set.
     RemoveTextureSet();

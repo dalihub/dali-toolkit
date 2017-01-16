@@ -2073,6 +2073,57 @@ int UtcDaliVisualTextVisualRender(void)
   END_TEST;
 }
 
+int UtcDaliVisualTextVisualDisableEnable(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualTextVisualDisableEnable Ensure Text visible can be re-enabled" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
+  propertyMap.Insert( "mixColor", Color::WHITE );
+  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "enableMarkup", false );
+  propertyMap.Insert( "text", "Hello world" );
+  propertyMap.Insert( "fontFamily", "TizenSans" );
+
+  Property::Map fontStyleMapSet;
+  fontStyleMapSet.Insert( "weight", "bold" );
+  propertyMap.Insert( "fontStyle", fontStyleMapSet );
+
+  propertyMap.Insert( "pointSize", 12.f );
+  propertyMap.Insert( "multiLine", true );
+  propertyMap.Insert( "horizontalAlignment", "CENTER" );
+  propertyMap.Insert( "verticalAlignment", "CENTER" );
+  propertyMap.Insert( "textColor", Color::RED );
+  Visual::Base textVisual = factory.CreateVisual( propertyMap );
+  textVisual.SetDepthIndex( 1.f );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, textVisual );
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetParentOrigin( ParentOrigin::CENTER );
+
+  Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
+
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL, false );
+
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
+
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL, true );
+
+  DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliVisualPremultipliedAlpha(void)
 {
   ToolkitTestApplication application;
