@@ -86,6 +86,20 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
   return true;
 }
 
+void PrepareResourceImage( ToolkitTestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat )
+{
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  platform.SetClosestImageSize(Vector2( imageWidth, imageHeight));
+
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
+  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
+  unsigned int bytesPerPixel = GetBytesPerPixel(  pixelFormat );
+  unsigned int initialColor = 0xFF;
+  memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
+
+  Integration::ResourcePointer resourcePtr(bitmap);
+  platform.SetSynchronouslyLoadedResource( resourcePtr );
+}
 } //namespace
 
 void dali_visual_startup(void)
@@ -217,6 +231,7 @@ int UtcDaliVisualSize(void)
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
 
   // image visual
+  PrepareResourceImage( application, 100u, 200u, Pixel::RGBA8888 );
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
   Visual::Base imageVisual = factory.CreateVisual( image );
   imageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
@@ -680,6 +695,7 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value->Get<bool>() == true );
 
   // Get an image visual with an image handle, and test the default property values
+  PrepareResourceImage( application, 100u, 200u, Pixel::RGBA8888 );
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
   imageVisual = factory.CreateVisual(image);
   imageVisual.CreatePropertyMap( resultMap );
