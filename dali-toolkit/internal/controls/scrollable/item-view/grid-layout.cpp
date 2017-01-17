@@ -534,10 +534,6 @@ Degree GridLayout::GetScrollDirection() const
 
 void GridLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
 {
-  if(HasLayoutChanged())
-  {
-    SetGridLayoutProperties(GetLayoutProperties());
-  }
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
@@ -685,7 +681,6 @@ void GridLayout::SetGridLayoutProperties(const Property::Map& properties)
       }
     }
   }
-  ResetLayoutChangedFlag();
 }
 
 Vector3 GridLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
