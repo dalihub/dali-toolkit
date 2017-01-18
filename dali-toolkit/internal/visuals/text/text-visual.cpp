@@ -137,6 +137,60 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     }\n
 );
 
+/**
+ * Return Property index for the given string key
+ * param[in] stringKey the string index key
+ * return the key as an index
+ */
+
+Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
+{
+  Dali::Property::Index result = Property::INVALID_KEY;
+
+  if( stringKey == VISUAL_TYPE )
+  {
+    result = Toolkit::Visual::Property::TYPE;
+  }
+  else if( stringKey == TEXT_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::TEXT;
+  }
+  else if( stringKey == FONT_FAMILY_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::FONT_FAMILY;
+  }
+  else if( stringKey == FONT_STYLE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::FONT_STYLE;
+  }
+  else if( stringKey == POINT_SIZE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::POINT_SIZE;
+  }
+  else if( stringKey == MULTI_LINE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::MULTI_LINE;
+  }
+  else if( stringKey == HORIZONTAL_ALIGNMENT_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT;
+  }
+  else if( stringKey == VERTICAL_ALIGNMENT_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT;
+  }
+  else if( stringKey == TEXT_COLOR_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::TEXT_COLOR;
+  }
+  else if( stringKey == ENABLE_MARKUP_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::ENABLE_MARKUP;
+  }
+
+  return result;
+}
+
 } // unnamed namespace
 
 TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -144,6 +198,27 @@ TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property:
   TextVisualPtr TextVisualPtr( new TextVisual( factoryCache ) );
   TextVisualPtr->SetProperties( properties );
   return TextVisualPtr;
+}
+
+void TextVisual::ConvertStringKeysToIndexKeys( Property::Map& propertyMap )
+{
+  Property::Map outMap;
+
+  for( Property::Map::SizeType index = 0u, count = propertyMap.Count(); index < count; ++index )
+  {
+    const KeyValuePair& keyValue = propertyMap.GetKeyValue( index );
+
+    Property::Index indexKey = keyValue.first.indexKey;
+
+    if ( keyValue.first.type == Property::Key::STRING )
+    {
+      indexKey = StringKeyToIndexKey( keyValue.first.stringKey );
+    }
+
+    outMap.Insert( indexKey, keyValue.second );
+  }
+
+  propertyMap = outMap;
 }
 
 float TextVisual::GetHeightForWidth( float width )
@@ -202,54 +277,14 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
   {
     const KeyValuePair& keyValue = propertyMap.GetKeyValue( index );
 
-    switch( keyValue.first.type )
+    Property::Index indexKey = keyValue.first.indexKey;
+
+    if( keyValue.first.type == Property::Key::STRING )
     {
-      case Property::Key::INDEX:
-      {
-        DoSetProperty( keyValue.first.indexKey, keyValue.second );
-        break;
-      }
-      case Property::Key::STRING:
-      {
-        if( keyValue.first.stringKey == TEXT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == FONT_FAMILY_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::FONT_FAMILY, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == FONT_STYLE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::FONT_STYLE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == POINT_SIZE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::POINT_SIZE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == MULTI_LINE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::MULTI_LINE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == HORIZONTAL_ALIGNMENT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == VERTICAL_ALIGNMENT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == TEXT_COLOR_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::TEXT_COLOR, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == ENABLE_MARKUP_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
-        }
-        break;
-      }
+      indexKey = StringKeyToIndexKey( keyValue.first.stringKey );
     }
+
+    DoSetProperty( indexKey, keyValue.second );
   }
 
   // Elide the text if it exceeds the boundaries.
