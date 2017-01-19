@@ -39,6 +39,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
@@ -1228,7 +1229,7 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
           DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetProperty Setting TextVisual with string[%s]\n", textString.c_str() );
 
           Property::Map setPropertyMap;
-          setPropertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT)
+          setPropertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
                         .Add( Toolkit::TextVisual::Property::TEXT, textString );
 
           GetImplementation( button ).MergeWithExistingLabelProperties( setPropertyMap, outTextVisualProperties );
@@ -1239,6 +1240,7 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
           Property::Map* setPropertyMap = value.GetMap();
           if( setPropertyMap )
           {
+            TextVisual::ConvertStringKeysToIndexKeys( *setPropertyMap );
             GetImplementation( button ).MergeWithExistingLabelProperties( *setPropertyMap, outTextVisualProperties );
           }
         }

@@ -76,6 +76,12 @@ public:
    */
   static TextVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
 
+  /**
+   * @brief Converts all strings keys in property map to index keys.  Property Map can then be merged correctly.
+   * @param[in,out] propertyMap containing string keys or a mix of strings and indexes. Will be changed to index keys.
+   */
+  static void ConvertStringKeysToIndexKeys( Property::Map& propertyMap );
+
 public: // from Visual::Base
 
   /**
