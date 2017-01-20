@@ -40,6 +40,20 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+// wrap modes
+DALI_ENUM_TO_STRING_TABLE_BEGIN( WRAP_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, DEFAULT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, CLAMP_TO_EDGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, REPEAT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, MIRRORED_REPEAT )
+DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
+
+const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
+}
+
 AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
 {
   AnimatedImageVisual* visual = new AnimatedImageVisual( factoryCache );
@@ -60,9 +74,12 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
 AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mFrameDelayTimer(),
+  mPixelArea( FULL_TEXTURE_RECT ),
   mImageUrl(),
   mImageSize(),
-  mCurrentFrameIndex( 0 )
+  mCurrentFrameIndex( 0 ),
+  mWrapModeU( WrapMode::DEFAULT ),
+  mWrapModeV( WrapMode::DEFAULT )
 {}
 
 AnimatedImageVisual::~AnimatedImageVisual()
@@ -83,16 +100,44 @@ void AnimatedImageVisual::GetNaturalSize( Vector2& naturalSize )
 void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
+
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+
   if( !mImageUrl.empty() )
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
   }
+
+  map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
+  map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
+  map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 }
 
 void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   // url already passed in from constructor
+
+  Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
+  if( pixelAreaValue )
+  {
+    pixelAreaValue->Get( mPixelArea );
+  }
+
+  Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
+  if( wrapModeValueU )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
+    mWrapModeU = Dali::WrapMode::Type( value );
+  }
+
+  Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
+  if( wrapModeValueV )
+  {
+    int value;
+    Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
+    mWrapModeV = Dali::WrapMode::Type( value );
+  }
 }
 
 void AnimatedImageVisual::DoSetOnStage( Actor& actor )
@@ -100,18 +145,34 @@ void AnimatedImageVisual::DoSetOnStage( Actor& actor )
   Texture texture = PrepareAnimatedImage();
   if( texture ) // if the image loading is successful
   {
-    Shader shader = ImageVisual::GetImageShader( mFactoryCache, true, true );
+    bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+    Shader shader = ImageVisual::GetImageShader( mFactoryCache, true, defaultWrapMode );
+
     Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
+
     TextureSet textureSet = TextureSet::New();
+    textureSet.SetTexture( 0u, texture );
+
     mImpl->mRenderer = Renderer::New( geometry, shader );
     mImpl->mRenderer.SetTextures( textureSet );
-    textureSet.SetTexture( 0u, PrepareAnimatedImage() );
-    mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mTextureRectContainer[0] );
 
     // Register transform properties
     mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
+    if( !defaultWrapMode ) // custom wrap mode
+    {
+      Vector2 wrapMode(mWrapModeU-WrapMode::CLAMP_TO_EDGE, mWrapModeV-WrapMode::CLAMP_TO_EDGE);
+      wrapMode.Clamp( Vector2::ZERO, Vector2( 2.f, 2.f ) );
+      mImpl->mRenderer.RegisterProperty( WRAP_MODE_UNIFORM_NAME, wrapMode );
+    }
+
+    if( mPixelArea != FULL_TEXTURE_RECT )
+    {
+      mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
+    }
+
     mCurrentFrameIndex = 0;
+    mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mTextureRectContainer[mCurrentFrameIndex] );
     if( mFrameDelayContainer.Count() > 1 )
     {
       mFrameDelayTimer = Timer::New( mFrameDelayContainer[0] );

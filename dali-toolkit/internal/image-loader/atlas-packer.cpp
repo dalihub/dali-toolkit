@@ -258,12 +258,11 @@ void AtlasPacker::GrowPack( SizeType blockWidth, SizeType blockHeight,
     firstFit = InsertNode( mRoot->child[1], blockWidth, blockHeight );
   }
 
-  if( firstFit != NULL )
-  {
-    firstFit->occupied = true;
-    packPositionX = firstFit->rectArea.x;
-    packPositionY = firstFit->rectArea.y;
-  }
+  DALI_ASSERT_ALWAYS( firstFit != NULL && "It should never happen!")
+
+  firstFit->occupied = true;
+  packPositionX = firstFit->rectArea.x;
+  packPositionY = firstFit->rectArea.y;
 }
 
 void AtlasPacker::GrowNode( SizeType blockWidth, SizeType blockHeight )

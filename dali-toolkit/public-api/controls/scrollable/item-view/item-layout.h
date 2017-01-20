@@ -181,19 +181,6 @@ public:
   Property::Map GetLayoutProperties();
 
   /**
-   * @brief Check if the Property has been changed.
-   * @SINCE_1_2.20
-   * @return whether the layout has been changed or not.if changed, return true.
-   */
-  bool HasLayoutChanged();
-
-  /**
-   * @brief Set the layout changed flag to false.
-   * @SINCE_1_2.20
-   */
-  void ResetLayoutChangedFlag();
-
-  /**
    * @brief Retrieve the target size of an item in the layout.
    *
    * This will return the default size for the layout unless overridden by calling SetItemSize().

@@ -41,7 +41,6 @@ namespace Internal
 
 namespace
 {
-const char * const COLOR_NAME("mixColor");
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -88,8 +87,7 @@ ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Propert
 }
 
 ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
-  mMixColorIndex( Property::INVALID_INDEX )
+: Visual::Base( factoryCache )
 {
 }
 
@@ -99,10 +97,20 @@ ColorVisual::~ColorVisual()
 
 void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* color = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME );
-  if( !( color && color->Get(mMixColor) ) )
+  // By virtue of DoSetProperties being called last, this will override
+  // anything set by DevelVisual::Property::MIX_COLOR
+  Property::Value* colorValue = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR );
+  if( colorValue )
   {
-    DALI_LOG_ERROR( "Fail to provide a color to the ColorVisual object\n" );
+    Vector4 color;
+    if( colorValue->Get( color ) )
+    {
+      SetMixColor( color );
+    }
+    else
+    {
+      DALI_LOG_ERROR("ColorVisual: mixColor property has incorrect type\n");
+    }
   }
 }
 
@@ -117,7 +125,7 @@ void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::COLOR );
-  map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mMixColor );
+  map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor );
 }
 
 void ColorVisual::OnSetTransform()
@@ -141,28 +149,17 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, COLOR_NAME, mMixColor );
-  if( mMixColor.a < 1.f )
+  // ColorVisual has it's own index key for mix color - use this instead
+  // of using the new base index to avoid changing existing applications
+  // String keys will get to this property.
+  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, mImpl->mMixColor );
+  if( mImpl->mMixColor.a < 1.f )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
 
-  //Register transform properties
+  // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-}
-
-void ColorVisual::SetColor(const Vector4& color)
-{
-  mMixColor = color;
-
-  if( mImpl->mRenderer )
-  {
-    (mImpl->mRenderer).SetProperty( mMixColorIndex, color );
-    if( color.a < 1.f )
-    {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-    }
-  }
 }
 
 } // namespace Internal

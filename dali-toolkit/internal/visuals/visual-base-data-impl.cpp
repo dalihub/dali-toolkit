@@ -83,9 +83,12 @@ Dali::Vector2 PointToVector2( Toolkit::Align::Type point, Toolkit::Direction::Ty
 
 Internal::Visual::Base::Impl::Impl()
 : mCustomShader( NULL ),
+  mBlendSlotDelegate( NULL ),
   mTransform(),
+  mMixColor( Color::WHITE ),
   mControlSize( Vector2::ZERO ),
   mDepthIndex( 0.0f ),
+  mMixColorIndex( Property::INVALID_INDEX ),
   mFlags( 0 )
 {
 }
@@ -93,6 +96,7 @@ Internal::Visual::Base::Impl::Impl()
 Internal::Visual::Base::Impl::~Impl()
 {
   delete mCustomShader;
+  delete mBlendSlotDelegate;
 }
 
 Internal::Visual::Base::Impl::CustomShader::CustomShader( const Property::Map& map )
@@ -215,6 +219,11 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Ma
   mOrigin = Toolkit::Align::CENTER;
   mAnchorPoint = Toolkit::Align::CENTER;
 
+  UpdatePropertyMap( map );
+}
+
+void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property::Map& map )
+{
   for( Property::Map::SizeType i(0); i<map.Count(); ++i )
   {
     KeyValuePair keyValue = map.GetKeyValue( i );

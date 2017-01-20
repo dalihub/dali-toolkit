@@ -141,7 +141,7 @@ int UtcDaliKeyInputFocusManagerSetFocus01(void)
   DALI_TEST_CHECK( ! focusedControl );
 
   DummyControl dummy = DummyControl::New(true);
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
   dummy.SetSize(100.0f, 100.0f);
   stage.Add( dummy );
   DALI_TEST_CHECK( ! dummyImpl.keyInputFocusGained );
@@ -168,7 +168,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
@@ -182,7 +182,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   dummy1Impl.keyInputFocusGained = false;
 
   DummyControl dummy2 = DummyControl::New(true);
-  DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetSize(100.0f, 100.0f);
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
@@ -213,14 +213,14 @@ int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
   DummyControl dummy2 = DummyControl::New(true);
-  DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetSize(100.0f, 100.0f);
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
@@ -265,14 +265,14 @@ int UtcDaliKeyInputFocusManagerRemoveFocus01(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
   DummyControl dummy2 = DummyControl::New(true);
-  DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetSize(100.0f, 100.0f);
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
@@ -320,21 +320,21 @@ int UtcDaliKeyInputFocusManagerRemoveFocus02(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
   DummyControl dummy2 = DummyControl::New(true);
-  DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetSize(100.0f, 100.0f);
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
 
   DummyControl dummy3 = DummyControl::New(true);
-  DummyControlImplOverride& dummy3Impl = static_cast<DummyControlImplOverride&>(dummy3.GetImplementation());
+  Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
   dummy3.SetSize(100.0f, 100.0f);
   stage.Add( dummy3 );
   DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusGained );
@@ -384,14 +384,14 @@ int UtcDaliKeyInputFocusManagerRemoveFocus03(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
   DummyControl dummy2 = DummyControl::New(true);
-  DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetSize(100.0f, 100.0f);
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
@@ -473,7 +473,7 @@ int UtcDaliKeyInputFocusManagerDestroyObject01(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
@@ -481,7 +481,7 @@ int UtcDaliKeyInputFocusManagerDestroyObject01(void)
 
   {
     DummyControl dummy2 = DummyControl::New(true);
-    DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+    Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
     dummy2.SetSize(100.0f, 100.0f);
     stage.Add( dummy2 );
     DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
@@ -518,7 +518,7 @@ int UtcDaliKeyInputFocusManagerDestroyObject02(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  DummyControlImplOverride& dummy1Impl = static_cast<DummyControlImplOverride&>(dummy1.GetImplementation());
+  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetSize(100.0f, 100.0f);
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
@@ -526,7 +526,7 @@ int UtcDaliKeyInputFocusManagerDestroyObject02(void)
 
 
   DummyControl dummy2 = DummyControl::New(true);
-  DummyControlImplOverride& dummy2Impl = static_cast<DummyControlImplOverride&>(dummy2.GetImplementation());
+  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetSize(100.0f, 100.0f);
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );

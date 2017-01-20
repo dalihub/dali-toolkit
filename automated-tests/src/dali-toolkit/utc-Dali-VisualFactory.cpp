@@ -1334,6 +1334,30 @@ int UtcDaliVisualFactoryGetMeshVisual2(void)
   END_TEST;
 }
 
+//Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location, but duff optional parameters
+int UtcDaliVisualFactoryGetMeshVisual3b(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct" );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::USE_MIPMAPPING, Color::GREEN ); // Test that wrong property types don't prevent the object load
+  propertyMap.Insert( MeshVisual::Property::USE_SOFT_NORMALS, 1.0f );
+  propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, 1.0f );
+  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
+
+  //Test to see if mesh loads correctly.
+  MeshVisualLoadsCorrectlyTest( propertyMap, application );
+
+  END_TEST;
+}
+
 //Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location.
 int UtcDaliVisualFactoryGetMeshVisual3(void)
 {
@@ -1347,6 +1371,9 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
   propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
+  propertyMap.Insert( MeshVisual::Property::USE_MIPMAPPING, false );
+  propertyMap.Insert( MeshVisual::Property::USE_SOFT_NORMALS, false );
+  propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3::XAXIS );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
   //Test to see if mesh loads correctly.
@@ -1374,7 +1401,6 @@ int UtcDaliVisualFactoryGetMeshVisual4(void)
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
 
-
   END_TEST;
 }
 
@@ -1389,10 +1415,13 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
-  propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
-  propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
-  propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
-  propertyMap.Insert( MeshVisual::Property::SHADING_MODE, MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING );
+  propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
+  propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
+  propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
+  propertyMap.Insert( "useMipmapping", false );
+  propertyMap.Insert( "useSoftNormals", false );
+  propertyMap.Insert( "lightPosition", Vector3::ZAXIS );
+  propertyMap.Insert( "shadingMode", MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING );
 
   //Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest( propertyMap, application );
@@ -2043,8 +2072,10 @@ int UtcDaliVisualFactoryGetBatchImageVisual3(void)
 
   // Create a property-map that enables batching.
   Property::Map propertyMap;
-  propertyMap.Insert( Dali::Toolkit::ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
+  propertyMap[ Dali::Toolkit::ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME ;
+  propertyMap[ "desiredHeight" ] = 200;
+  propertyMap[ "desiredWidth" ] = 200;
+  propertyMap[ "batchingEnabled" ] = true;
 
   // Create an ImageView, passing the property-map in to instruct it to use batching.
   Toolkit::ImageView imageView = Toolkit::ImageView::New();
@@ -2056,10 +2087,35 @@ int UtcDaliVisualFactoryGetBatchImageVisual3(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
+int UtcDaliVisualFactoryGetBatchImageVisual4N(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual: Request animated image visual with a gif url" );
+  tet_infoline( "UtcDaliVisualFactoryGetBatchImageVisual4: Create an ImageView that uses a batched visual, with desired properties of the wrong type" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Create a property-map that enables batching.
+  Property::Map propertyMap;
+  propertyMap[ Dali::Toolkit::ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME ;
+  propertyMap[ "desiredHeight" ] = Vector2(100, 100);
+  propertyMap[ "desiredWidth" ] = Vector3(1, 1, 1);
+  propertyMap[ "batchingEnabled" ] = true;
+
+  // Create an ImageView, passing the property-map in to instruct it to use batching.
+  Toolkit::ImageView imageView = Toolkit::ImageView::New();
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, propertyMap );
+
+  imageView.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( imageView );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual1: Request animated image visual with a gif url" );
 
   VisualFactory factory = VisualFactory::Get();
   Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
@@ -2072,6 +2128,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  actor.SetSize( 200.0f, 200.0f );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -2130,6 +2187,72 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual(void)
 
   // Test SetOffStage().
   actor.Unparent();
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area" );
+
+  const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
+  Property::Map propertyMap;
+  propertyMap.Add( Visual::Property::TYPE,  Visual::IMAGE  )
+             .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME  )
+             .Add( ImageVisual::Property::PIXEL_AREA, pixelArea )
+             .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT )
+             .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
+  texParameterTrace.Enable( true );
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  actor.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  // For animated image visual, the wrapping is handled manually in shader, so the following gl function should not be called
+  std::stringstream out;
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
+  DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
+
+  // test the uniforms which used to handle the wrap mode
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Value pixelAreaValue = renderer.GetProperty( renderer.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelArea, TEST_LOCATION );
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelArea, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  Property::Value wrapModeValue = renderer.GetProperty( renderer.GetPropertyIndex( "wrapMode" ) );
+  Vector2 wrapMode( WrapMode::MIRRORED_REPEAT-1, WrapMode::REPEAT-1 );
+  DALI_TEST_EQUALS( wrapModeValue.Get<Vector2>(), wrapMode, TEST_LOCATION );
+  Vector2 wrapModeUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector2>( "wrapMode", wrapModeUniform ) );
+  DALI_TEST_EQUALS( wrapMode, wrapModeUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;

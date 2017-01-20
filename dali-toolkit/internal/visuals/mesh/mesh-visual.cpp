@@ -164,10 +164,16 @@ const char* SIMPLE_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   precision mediump float;\n
   varying mediump vec3 vIllumination;\n
   uniform lowp vec4 uColor;\n
+  uniform lowp vec4 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
 
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+  }\n
   void main()\n
   {\n
-    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a );\n
+    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a ) * visualMixColor();\n
   }\n
 );
 
@@ -241,11 +247,18 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump float vSpecular;\n
   uniform sampler2D sDiffuse;\n
   uniform lowp vec4 uColor;\n
+  uniform lowp vec4 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
 
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+  }\n
   void main()\n
   {\n
     vec4 texture = texture2D( sDiffuse, vTexCoord );\n
-    gl_FragColor = vec4( vIllumination.rgb * texture.rgb * uColor.rgb + vSpecular * 0.3, texture.a * uColor.a );\n
+    vec4 visualMixColor = visualMixColor();\n
+    gl_FragColor = vec4( vIllumination.rgb * texture.rgb * uColor.rgb * visualMixColor.rgb + vSpecular * 0.3, texture.a * uColor.a * visualMixColor.a );\n
   }\n
 );
 
@@ -326,19 +339,26 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sNormal;\n
   uniform sampler2D sGloss;\n
   uniform lowp vec4 uColor;\n
+  uniform lowp vec4 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
 
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+  }\n
   void main()\n
   {\n
     vec4 texture = texture2D( sDiffuse, vTexCoord );\n
     vec3 normal = normalize( texture2D( sNormal, vTexCoord ).xyz * 2.0 - 1.0 );\n
     vec4 glossMap = texture2D( sGloss, vTexCoord );\n
+    vec4 visualMixColor = visualMixColor();\n
 
     float lightDiffuse = max( 0.0, dot( normal, normalize( vLightDirection ) ) );\n
     lightDiffuse = lightDiffuse * 0.5 + 0.5;\n
 
     float shininess = pow ( max ( dot ( normalize( vHalfVector ), normal ), 0.0 ), 16.0 )  ;
 
-    gl_FragColor = vec4( texture.rgb * uColor.rgb * lightDiffuse + shininess * glossMap.rgb, texture.a * uColor.a );\n
+    gl_FragColor = vec4( texture.rgb * uColor.rgb * visualMixColor.rgb * lightDiffuse + shininess * glossMap.rgb, texture.a * uColor.a * visualMixColor.a );\n
   }\n
 );
 
@@ -366,60 +386,119 @@ MeshVisual::~MeshVisual()
 
 void MeshVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* objectUrl = propertyMap.Find( Toolkit::MeshVisual::Property::OBJECT_URL, OBJECT_URL_NAME );
-  if( !objectUrl || !objectUrl->Get( mObjectUrl ) )
+  for( Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter )
   {
-    DALI_LOG_ERROR( "Fail to provide object URL to the MeshVisual object.\n" );
+    KeyValuePair keyValue = propertyMap.GetKeyValue( iter );
+    if( keyValue.first.type == Property::Key::INDEX )
+    {
+      DoSetProperty( keyValue.first.indexKey, keyValue.second );
+    }
+    else
+    {
+      if( keyValue.first == OBJECT_URL_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::OBJECT_URL, keyValue.second );
+      }
+      else if( keyValue.first == MATERIAL_URL_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::MATERIAL_URL, keyValue.second );
+      }
+      else if( keyValue.first == TEXTURES_PATH_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::TEXTURES_PATH, keyValue.second );
+      }
+      else if( keyValue.first == SHADING_MODE_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::SHADING_MODE, keyValue.second );
+      }
+      else if( keyValue.first == USE_MIPMAPPING_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::USE_MIPMAPPING, keyValue.second );
+      }
+      else if( keyValue.first == USE_SOFT_NORMALS_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::USE_SOFT_NORMALS, keyValue.second );
+      }
+      else if( keyValue.first == LIGHT_POSITION_NAME )
+      {
+        DoSetProperty( Toolkit::MeshVisual::Property::LIGHT_POSITION, keyValue.second );
+      }
+    }
   }
 
-  Property::Value* materialUrl = propertyMap.Find( Toolkit::MeshVisual::Property::MATERIAL_URL, MATERIAL_URL_NAME );
-  if( !materialUrl || !materialUrl->Get( mMaterialUrl ) || mMaterialUrl.empty() )
+  if( mMaterialUrl.empty() )
   {
     mUseTexture = false;
   }
 
-  Property::Value* imagesUrl = propertyMap.Find( Toolkit::MeshVisual::Property::TEXTURES_PATH, TEXTURES_PATH_NAME );
-  if( !imagesUrl || !imagesUrl->Get( mTexturesPath ) )
+  if( mLightPosition == Vector3::ZERO )
   {
-    //Default behaviour is to assume files are in the same directory,
-    // or have their locations detailed in full when supplied.
-    mTexturesPath.clear();
-  }
-
-  Property::Value* shadingMode = propertyMap.Find( Toolkit::MeshVisual::Property::SHADING_MODE, SHADING_MODE_NAME );
-  if( shadingMode )
-  {
-    Scripting::GetEnumerationProperty( *shadingMode, SHADING_MODE_TABLE, SHADING_MODE_TABLE_COUNT, mShadingMode );
-  }
-
-  Property::Value* useMipmapping = propertyMap.Find( Toolkit::MeshVisual::Property::USE_MIPMAPPING, USE_MIPMAPPING_NAME );
-  if( useMipmapping )
-  {
-    useMipmapping->Get( mUseMipmapping );
-  }
-
-  Property::Value* useSoftNormals = propertyMap.Find( Toolkit::MeshVisual::Property::USE_SOFT_NORMALS, USE_SOFT_NORMALS_NAME );
-  if( useSoftNormals )
-  {
-    useSoftNormals->Get( mUseSoftNormals );
-  }
-
-  Property::Value* lightPosition = propertyMap.Find( Toolkit::MeshVisual::Property::LIGHT_POSITION, LIGHT_POSITION_NAME );
-  if( lightPosition )
-  {
-    if( !lightPosition->Get( mLightPosition ) )
-    {
-      DALI_LOG_ERROR( "Invalid value passed for light position in MeshRenderer object.\n" );
-      mLightPosition = Vector3::ZERO;
-    }
-  }
-  else
-  {
-    //Default behaviour is to place the light directly in front of the object,
+    // Default behaviour is to place the light directly in front of the object,
     // at a reasonable distance to light everything on screen.
     Stage stage = Stage::GetCurrent();
 
     mLightPosition = Vector3( stage.GetSize().width / 2, stage.GetSize().height / 2, stage.GetSize().width * 5 );
+  }
+}
+
+void MeshVisual::DoSetProperty( Property::Index index, const Property::Value& value )
+{
+  switch( index )
+  {
+    case Toolkit::MeshVisual::Property::OBJECT_URL:
+    {
+      if( !value.Get( mObjectUrl ) )
+      {
+        DALI_LOG_ERROR("MeshVisual: property objectUrl is the wrong type, use STRING\n");
+      }
+      break;
+    }
+    case Toolkit::MeshVisual::Property::MATERIAL_URL:
+    {
+      if( ! value.Get( mMaterialUrl ) )
+      {
+        DALI_LOG_ERROR("MeshVisual: property materialUrl is the wrong type, use STRING\n");
+      }
+      break;
+    }
+    case Toolkit::MeshVisual::Property::TEXTURES_PATH:
+    {
+      if( ! value.Get( mTexturesPath ) )
+      {
+        mTexturesPath.clear();
+      }
+      break;
+    }
+    case Toolkit::MeshVisual::Property::SHADING_MODE:
+    {
+      Scripting::GetEnumerationProperty( value, SHADING_MODE_TABLE, SHADING_MODE_TABLE_COUNT, mShadingMode );
+      break;
+    }
+    case Toolkit::MeshVisual::Property::USE_MIPMAPPING:
+    {
+      if( !value.Get( mUseMipmapping ) )
+      {
+        DALI_LOG_ERROR("MeshVisual: property useMipmapping is the wrong type, use BOOLEAN\n");
+      }
+      break;
+    }
+    case Toolkit::MeshVisual::Property::USE_SOFT_NORMALS:
+    {
+      if( !value.Get( mUseSoftNormals ) )
+      {
+        DALI_LOG_ERROR("MeshVisual: property useSoftNormals is the wrong type, use BOOLEAN\n");
+      }
+      break;
+    }
+    case Toolkit::MeshVisual::Property::LIGHT_POSITION:
+    {
+      if( !value.Get( mLightPosition ) )
+      {
+        mLightPosition = Vector3::ZERO;
+        DALI_LOG_ERROR("MeshVisual: property lightPosition is the wrong type, use VECTOR3\n");
+      }
+      break;
+    }
   }
 }
 

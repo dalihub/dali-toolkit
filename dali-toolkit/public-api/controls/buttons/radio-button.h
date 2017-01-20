@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_RADIO_BUTTON_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class RadioButton;
  *
  * Radio buttons are designed to select one of many option at the same time.
  *
- * Every button have its own \e label and \e state, which can be modified by Button::SetLabelText and Button::SetSelected.
+ * Every button have its own \e label and \e state, which can be modified by Button::Property::LABEL and Button::Property::SELECTED.
  *
  * RadioButton can change its current state using Button::SetSelected.
  *
@@ -69,14 +69,14 @@ class RadioButton;
  *
  * // Make the first RadioButton and add it to its parent
  * RadioButton button1 = RadioButton::New();
- * button1.SetLabelText( "button1" );
+ * button1.SetProperty( Button::Property::LABEL, "button1" );
  * button1.SetBackgroundColor( Color::WHITE );
  * button1.SetPosition( 0, -40 );
  * radioGroup.Add( button1 );
  *
  * // Make more RadioButtons and add them to their parent
  * RadioButton button2 = RadioButton::New();
- * button2.SetLabelText( "button2" );
+ * button2.SetProperty( Toolkit::Button::Property::LABEL, "button2" );
  * button2.SetBackgroundColor( Color::WHITE );
  * button2.SetPosition( 0, 40 );
  * radioGroup.Add( button2 );

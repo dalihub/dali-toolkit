@@ -85,6 +85,34 @@
       }
     }
 
+    public bool BatchParent
+    {
+      get
+      {
+        bool temp = false;
+        GetProperty( Actor.Property.BATCH_PARENT).Get( ref temp );
+        return temp;
+      }
+      set
+      {
+        SetProperty( Actor.Property.BATCH_PARENT, new Dali.Property.Value( value ) );
+      }
+    }
+
+    public int SiblingOrder
+    {
+      get
+      {
+        int temp = 0;
+        GetProperty( Actor.Property.SIBLING_ORDER).Get( ref temp );
+        return temp;
+      }
+      set
+      {
+        SetProperty( Actor.Property.SIBLING_ORDER, new Dali.Property.Value( value ) );
+      }
+    }
+
     public void Show()
     {
       SetVisible(true);
@@ -94,7 +122,6 @@
     {
       SetVisible(false);
     }
-
 %}
 
 %enddef

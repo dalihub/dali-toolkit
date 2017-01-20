@@ -320,7 +320,6 @@ private:
   Shader mShader;
   Geometry mGeometry;
 
-  Vector4 mColor;                //Color of shape.
   Vector3 mObjectDimensions;     //Dimensions of shape, scaled to be between 0.0 and 1.0.
 
   Vector3 mSceneCenter;

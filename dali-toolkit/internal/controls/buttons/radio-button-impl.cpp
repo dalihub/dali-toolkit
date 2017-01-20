@@ -105,7 +105,7 @@ void RadioButton::OnStateChange( State newState )
         Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
         if( radioButtonChild && radioButtonChild != Self() )
         {
-          radioButtonChild.SetSelected( false );
+          radioButtonChild.SetProperty( Toolkit::Button::Property::SELECTED, false );
         }
       }
     }

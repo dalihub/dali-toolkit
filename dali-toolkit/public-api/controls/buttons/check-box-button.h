@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CHECK_BOX_BUTTON_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ class CheckBoxButton;
  * {
  *   CheckBoxButton button = CheckBoxButton::New();
  *   button.SetParentOrigin( ParentOrigin::CENTER );
- *   button.SetLabelText( "Check" );
+ *   button.SetProperty( Button::Property::LABEL, "Check" );
  *   button.SetSize( 200, 40 );
  *   button.SetBackgroundColor( Color::WHITE );
  *   Stage::GetCurrent().Add( button );

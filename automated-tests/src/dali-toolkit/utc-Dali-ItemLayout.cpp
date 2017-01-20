@@ -601,18 +601,6 @@ int UtcDaliItemLayoutSetAndGetLayoutProperties(void)
 
 }
 
-int UtcDaliItemLayoutSetandGetLayoutChangedFlag(void)
-{
-  ToolkitTestApplication application;
-
-  TestItemLayoutPtr layout = TestItemLayout::New();
-  DALI_TEST_CHECK( layout );
-  layout->ResetLayoutChangedFlag();
-  DALI_TEST_CHECK(layout->HasLayoutChanged() == false);
-
-  END_TEST;
-}
-
 int UtcDaliItemRangeIntersection(void)
 {
   ToolkitTestApplication application;

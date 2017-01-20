@@ -80,6 +80,9 @@ static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
 static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 
+// resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
+
 void TestImage( ImageView imageView, BufferImage image )
 {
   Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
@@ -363,6 +366,62 @@ int UtcDaliImageViewSetGetProperty03(void)
   END_TEST;
 }
 
+int UtcDaliImageViewPixelArea(void)
+{
+  // Test pixel area property
+  ToolkitTestApplication application;
+
+  // Gif image, use AnimatedImageVisual internally
+  // Atlasing is applied to pack multiple frames, use custom wrap mode
+  ImageView gifView = ImageView::New();
+  const Vector4 pixelAreaVisual( 0.f, 0.f, 2.f, 2.f );
+  gifView.SetProperty( ImageView::Property::IMAGE,
+                       Property::Map().Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+                                      .Add( ImageVisual::Property::PIXEL_AREA, pixelAreaVisual ) );
+
+  // Add to stage
+  Stage stage = Stage::GetCurrent();
+  stage.Add( gifView );
+
+  // loading started
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK( gifView.GetRendererCount() == 1u );
+
+  const Vector4 fullTextureRect( 0.f, 0.f, 1.f, 1.f );
+  // test that the pixel area value defined in the visual property map is registered on renderer
+  Renderer renderer = gifView.GetRendererAt(0);
+  Property::Value pixelAreaValue = renderer.GetProperty( renderer.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelAreaVisual, TEST_LOCATION );
+
+  // test that the shader has the default pixel area value registered.
+  Shader shader = renderer.GetShader();
+  pixelAreaValue = shader.GetProperty( shader.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), fullTextureRect, TEST_LOCATION );
+
+  // test that the uniform uses the pixelArea property on the renderer.
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  Vector4 pixelAreaUniform;
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelAreaVisual, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  // set the pixelArea property on the control
+  const Vector4 pixelAreaControl( -1.f, -1.f, 3.f, 3.f );
+  gifView.SetProperty( ImageView::Property::PIXEL_AREA, pixelAreaControl );
+  application.SendNotification();
+  application.Render(16);
+
+  // check the pixelArea property on the control
+  pixelAreaValue = gifView.GetProperty( gifView.GetPropertyIndex( "pixelArea" ) );
+  DALI_TEST_EQUALS( pixelAreaValue.Get<Vector4>(), pixelAreaControl, TEST_LOCATION );
+  // test that the uniform uses the pixelArea property on the control.
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
+  DALI_TEST_EQUALS( pixelAreaControl, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
 int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
 {
   ToolkitTestApplication application;
@@ -420,12 +479,54 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   END_TEST;
 }
 
+int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
+{
+  ToolkitTestApplication application;
+
+  //Async loading, automatic atlasing for small size image
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+  callStack.Reset();
+  callStack.Enable(true);
+
+  Property::Map asyncLoadingMap;
+  asyncLoadingMap[ "url" ] = gImage_34_RGBA;
+  asyncLoadingMap[ "desiredHeight" ] = 34;
+  asyncLoadingMap[ "desiredWidth" ] = 34;
+  asyncLoadingMap[ "synchronousLoading" ] = false;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty( ImageView::Property::IMAGE, asyncLoadingMap );
+
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+  application.Render(16);
+  application.SendNotification();
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  callStack.Enable(false);
+
+  TraceCallStack::NamedParams params;
+  params["width"] = ToString(34);
+  params["height"] = ToString(34);
+  DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliImageViewSyncLoading(void)
 {
   ToolkitTestApplication application;
 
+  tet_infoline("ImageView Testing sync loading and size using index key property map");
+
   Property::Map syncLoadingMap;
-  syncLoadingMap[ "synchronousLoading" ] = true;
+  syncLoadingMap[ ImageVisual::Property::SYNCHRONOUS_LOADING ] = true;
 
   // Sync loading, no atlasing for big size image
   {
@@ -452,6 +553,51 @@ int UtcDaliImageViewSyncLoading(void)
     syncLoadingMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
     syncLoadingMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
     syncLoadingMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    // loading is started even if the actor is offStage
+    BitmapLoader loader = BitmapLoader::GetLatestCreated();
+    DALI_TEST_CHECK( loader );
+
+    loader.WaitForLoading();
+
+    DALI_TEST_CHECK( loader.IsLoaded() );
+
+    Stage::GetCurrent().Add( imageView );
+    application.SendNotification();
+    application.Render(16);
+
+    TraceCallStack::NamedParams params;
+    params["width"] = ToString(34);
+    params["height"] = ToString(34);
+    DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
+                      true, TEST_LOCATION );
+  }
+  END_TEST;
+}
+
+
+int UtcDaliImageViewSyncLoading02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing sync loading and size using string key property map");
+
+  // Sync loading, automatic atlasing for small size image
+  {
+    BitmapLoader::ResetLatestCreated();
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+    callStack.Reset();
+    callStack.Enable(true);
+
+    ImageView imageView = ImageView::New( );
+
+    // Sync loading is used
+    Property::Map syncLoadingMap;
+    syncLoadingMap[ "url" ] = gImage_34_RGBA;
+    syncLoadingMap[ "desiredHeight" ] = 34;
+    syncLoadingMap[ "desiredWidth" ] = 34;
+    syncLoadingMap[ "synchronousLoading" ] = true;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // loading is started even if the actor is offStage

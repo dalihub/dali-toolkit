@@ -68,8 +68,11 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::DummyControl, Toolkit::Control, Create );
 DALI_TYPE_REGISTRATION_END()
 
-Dali::PropertyRegistration dummyControlVisualProperty(
+Dali::PropertyRegistration dummyControlVisualProperty01(
   typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+
+Dali::PropertyRegistration dummyControlVisualProperty02(
+  typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL2, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
 
 }
 
@@ -149,18 +152,16 @@ Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Propert
   return value;
 }
 
-
-
-DummyControl DummyControlImplOverride::New()
+Toolkit::DummyControl Impl::DummyControl::New()
 {
-  IntrusivePtr< DummyControlImplOverride > impl = new DummyControlImplOverride;
-  DummyControl control( *impl );
+  IntrusivePtr< Toolkit::Impl::DummyControl > impl = new Toolkit::Impl::DummyControl;
+  Toolkit::DummyControl control( *impl );
   impl->Initialize();
   return control;
 }
 
 
-DummyControlImplOverride::DummyControlImplOverride()
+Impl::DummyControl::DummyControl()
 : DummyControlImpl(),
   initializeCalled(false),
   activatedCalled(false),
@@ -187,56 +188,67 @@ DummyControlImplOverride::DummyControlImplOverride()
 {
 }
 
-DummyControlImplOverride::~DummyControlImplOverride() { }
+Impl::DummyControl::~DummyControl() { }
 
 
-void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
-bool DummyControlImplOverride::OnAccessibilityActivated() { activatedCalled = true; return true; }
-bool DummyControlImplOverride::OnAccessibilityTouch(const TouchEvent& touchEvent) { onAccTouchedCalled = true; return true; }
-bool DummyControlImplOverride::OnAccessibilityValueChange( bool isIncrease )
+void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
+bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }
+bool Impl::DummyControl::OnAccessibilityTouch(const TouchEvent& touchEvent) { onAccTouchedCalled = true; return true; }
+bool Impl::DummyControl::OnAccessibilityValueChange( bool isIncrease )
 {
   onAccValueChangeCalled = true; return true;
 }
 
-void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
+void Impl::DummyControl::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   themeChangeCalled = change == StyleChange::THEME_CHANGE;
   fontChangeCalled = change == StyleChange::DEFAULT_FONT_SIZE_CHANGE;
 }
-void DummyControlImplOverride::OnPinch(const PinchGesture& pinch) { pinchCalled = true; }
-void DummyControlImplOverride::OnPan(const PanGesture& pan) { panCalled = true; }
-void DummyControlImplOverride::OnTap(const TapGesture& tap) { tapCalled = true; }
-void DummyControlImplOverride::OnLongPress(const LongPressGesture& longPress) { longPressCalled = true; }
-void DummyControlImplOverride::OnStageConnection( int depth ) { stageConnectionCalled = true; Control::OnStageConnection( depth ); }
-void DummyControlImplOverride::OnStageDisconnection() { stageDisconnectionCalled = true; Control::OnStageDisconnection(); }
-void DummyControlImplOverride::OnChildAdd(Actor& child) { childAddCalled = true; Control::OnChildAdd( child ); }
-void DummyControlImplOverride::OnChildRemove(Actor& child) { childRemoveCalled = true; Control::OnChildRemove( child ); }
-void DummyControlImplOverride::OnSizeSet(const Vector3& targetSize) { sizeSetCalled = true; Control::OnSizeSet( targetSize ); }
-void DummyControlImplOverride::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { sizeAnimationCalled = true; Control::OnSizeAnimation( animation, targetSize ); }
-bool DummyControlImplOverride::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
-bool DummyControlImplOverride::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
-bool DummyControlImplOverride::OnWheelEvent(const WheelEvent& event) { wheelEventCalled = true; return false; }
-bool DummyControlImplOverride::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
-void DummyControlImplOverride::OnKeyInputFocusGained() { keyInputFocusGained = true; }
-void DummyControlImplOverride::OnKeyInputFocusLost() { keyInputFocusLost = true; }
+void Impl::DummyControl::OnPinch(const PinchGesture& pinch) { pinchCalled = true; }
+void Impl::DummyControl::OnPan(const PanGesture& pan) { panCalled = true; }
+void Impl::DummyControl::OnTap(const TapGesture& tap) { tapCalled = true; }
+void Impl::DummyControl::OnLongPress(const LongPressGesture& longPress) { longPressCalled = true; }
+void Impl::DummyControl::OnStageConnection( int depth ) { Control::OnStageConnection( depth ); stageConnectionCalled = true; }
+void Impl::DummyControl::OnStageDisconnection() { stageDisconnectionCalled = true; Control::OnStageDisconnection(); }
+void Impl::DummyControl::OnChildAdd(Actor& child) { childAddCalled = true; }
+void Impl::DummyControl::OnChildRemove(Actor& child) { childRemoveCalled = true; }
+void Impl::DummyControl::OnSizeSet(const Vector3& targetSize) { Control::OnSizeSet( targetSize ); sizeSetCalled = true; }
+void Impl::DummyControl::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { Control::OnSizeAnimation( animation, targetSize ); sizeAnimationCalled = true; }
+bool Impl::DummyControl::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
+bool Impl::DummyControl::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
+bool Impl::DummyControl::OnWheelEvent(const WheelEvent& event) { wheelEventCalled = true; return false; }
+bool Impl::DummyControl::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
+void Impl::DummyControl::OnKeyInputFocusGained() { keyInputFocusGained = true; }
+void Impl::DummyControl::OnKeyInputFocusLost() { keyInputFocusLost = true; }
 
-void DummyControlImplOverride::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void Impl::DummyControl::SetLayout( Property::Index visualIndex, Property::Map& map )
 {
-  Property::Map transformMap;
-  transformMap
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+  Property::Value value( map );
+  mLayouts[visualIndex] = value;
+}
+
+void Impl::DummyControl::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  Property::Map emptyMap;
 
   for( VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end() ; ++iter )
   {
     Visual::Base visual = GetVisual(*iter);
-    visual.SetTransformAndSize( transformMap, size );
+    Property::Value value = mLayouts[*iter];
+    Property::Map* map = NULL;
+
+    if( value.GetType() != Property::NONE )
+    {
+      map = value.GetMap();
+    }
+    if( map == NULL )
+    {
+      map = &emptyMap;
+    }
+
+    visual.SetTransformAndSize( *map, size );
   }
 }
-
 
 DummyControl DummyControl::New( bool override )
 {
@@ -244,7 +256,7 @@ DummyControl DummyControl::New( bool override )
 
   if (override)
   {
-    control = DummyControlImplOverride::New();
+    control = Impl::DummyControl::New();
   }
   else
   {

@@ -232,7 +232,7 @@ int UtcDaliControlImplOnGestureMethods(void)
     application.SendNotification();
     application.Render();
 
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
     dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
 
     DALI_TEST_CHECK( dummyImpl.pinchCalled == false );
@@ -347,7 +347,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
   {
     DummyControl dummy = DummyControl::New( true );
     Stage::GetCurrent().Add(dummy);
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     application.Render();
     application.SendNotification();
@@ -406,7 +406,7 @@ int UtcDaliControlImplStageConnection(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     DALI_TEST_EQUALS( dummyImpl.stageConnectionCalled, false, TEST_LOCATION );
     Stage::GetCurrent().Add(dummy);
@@ -446,7 +446,7 @@ int UtcDaliControlImplSizeSetP(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
     application.Render();
@@ -503,7 +503,7 @@ int UtcDaliControlImplSizeAnimation(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
 
@@ -550,7 +550,7 @@ int UtcDaliControlImplTouchEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -606,7 +606,7 @@ int UtcDaliControlImplHoverEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -665,7 +665,7 @@ int UtcDaliControlImplKeyEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
     dummy.SetKeyInputFocus();
@@ -709,7 +709,7 @@ int UtcDaliControlImplKeyInputFocusGained(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
 
@@ -739,7 +739,7 @@ int UtcDaliControlImplKeyInputFocusLost(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
 
@@ -761,7 +761,7 @@ int UtcDaliControlImplKeyInputFocusLost(void)
     dummy.SetKeyInputFocus();
     dummy.ClearKeyInputFocus();
 
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummyImpl.IsKeyboardNavigationSupported();
     dummyImpl.IsKeyboardFocusGroup();
@@ -803,7 +803,7 @@ int UtcDaliControlImplWheelEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -1350,7 +1350,6 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
 
   END_TEST;
 }
-
 int UtcDaliControlImplAutoClippingWithVisuals(void)
 {
   ToolkitTestApplication application;

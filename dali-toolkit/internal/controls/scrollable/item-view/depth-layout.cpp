@@ -447,10 +447,6 @@ Degree DepthLayout::GetScrollDirection() const
 void DepthLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
 {
 
-  if(HasLayoutChanged())
-  {
-    SetDepthLayoutProperties(GetLayoutProperties());
-  }
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
   if( itemView )
   {
@@ -559,7 +555,6 @@ void DepthLayout::SetDepthLayoutProperties(const Property::Map& properties)
       }
     }
   }
-  ResetLayoutChangedFlag();
 }
 
 Vector3 DepthLayout::GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const

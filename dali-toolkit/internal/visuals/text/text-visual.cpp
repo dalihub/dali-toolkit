@@ -50,8 +50,6 @@ const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
 const char * const TEXT_COLOR_PROPERTY( "textColor" );
 const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 
-const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
-
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
@@ -130,13 +128,68 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform sampler2D sTexture;\n
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
+    uniform lowp vec4 mixColor;\n
     \n
     void main()\n
     {\n
       mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
+      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * mixColor;\n
     }\n
 );
+
+/**
+ * Return Property index for the given string key
+ * param[in] stringKey the string index key
+ * return the key as an index
+ */
+
+Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
+{
+  Dali::Property::Index result = Property::INVALID_KEY;
+
+  if( stringKey == VISUAL_TYPE )
+  {
+    result = Toolkit::Visual::Property::TYPE;
+  }
+  else if( stringKey == TEXT_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::TEXT;
+  }
+  else if( stringKey == FONT_FAMILY_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::FONT_FAMILY;
+  }
+  else if( stringKey == FONT_STYLE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::FONT_STYLE;
+  }
+  else if( stringKey == POINT_SIZE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::POINT_SIZE;
+  }
+  else if( stringKey == MULTI_LINE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::MULTI_LINE;
+  }
+  else if( stringKey == HORIZONTAL_ALIGNMENT_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT;
+  }
+  else if( stringKey == VERTICAL_ALIGNMENT_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT;
+  }
+  else if( stringKey == TEXT_COLOR_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::TEXT_COLOR;
+  }
+  else if( stringKey == ENABLE_MARKUP_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::ENABLE_MARKUP;
+  }
+
+  return result;
+}
 
 } // unnamed namespace
 
@@ -145,6 +198,27 @@ TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property:
   TextVisualPtr TextVisualPtr( new TextVisual( factoryCache ) );
   TextVisualPtr->SetProperties( properties );
   return TextVisualPtr;
+}
+
+void TextVisual::ConvertStringKeysToIndexKeys( Property::Map& propertyMap )
+{
+  Property::Map outMap;
+
+  for( Property::Map::SizeType index = 0u, count = propertyMap.Count(); index < count; ++index )
+  {
+    const KeyValuePair& keyValue = propertyMap.GetKeyValue( index );
+
+    Property::Index indexKey = keyValue.first.indexKey;
+
+    if ( keyValue.first.type == Property::Key::STRING )
+    {
+      indexKey = StringKeyToIndexKey( keyValue.first.stringKey );
+    }
+
+    outMap.Insert( indexKey, keyValue.second );
+  }
+
+  propertyMap = outMap;
 }
 
 float TextVisual::GetHeightForWidth( float width )
@@ -203,54 +277,14 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
   {
     const KeyValuePair& keyValue = propertyMap.GetKeyValue( index );
 
-    switch( keyValue.first.type )
+    Property::Index indexKey = keyValue.first.indexKey;
+
+    if( keyValue.first.type == Property::Key::STRING )
     {
-      case Property::Key::INDEX:
-      {
-        DoSetProperty( keyValue.first.indexKey, keyValue.second );
-        break;
-      }
-      case Property::Key::STRING:
-      {
-        if( keyValue.first.stringKey == TEXT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::TEXT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == FONT_FAMILY_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::FONT_FAMILY, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == FONT_STYLE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::FONT_STYLE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == POINT_SIZE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::POINT_SIZE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == MULTI_LINE_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::MULTI_LINE, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == HORIZONTAL_ALIGNMENT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == VERTICAL_ALIGNMENT_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == TEXT_COLOR_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::TEXT_COLOR, keyValue.second );
-        }
-        else if( keyValue.first.stringKey == ENABLE_MARKUP_PROPERTY )
-        {
-          DoSetProperty( Toolkit::TextVisual::Property::ENABLE_MARKUP, keyValue.second );
-        }
-        break;
-      }
+      indexKey = StringKeyToIndexKey( keyValue.first.stringKey );
     }
+
+    DoSetProperty( indexKey, keyValue.second );
   }
 
   // Elide the text if it exceeds the boundaries.
@@ -269,15 +303,19 @@ void TextVisual::DoSetOnStage( Actor& actor )
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
-  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-  mFactoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::TEXT_SHADER );
+  if( ! shader )
+  {
+    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
 
-  shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+    mFactoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER, shader );
+  }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
 
-  UpdateRenderer();
+  UpdateRenderer( true ); // Renderer needs textures and to be added to control
 }
 
 void TextVisual::DoSetOffStage( Actor& actor )
@@ -299,7 +337,7 @@ void TextVisual::DoSetOffStage( Actor& actor )
 
 void TextVisual::OnSetTransform()
 {
-  UpdateRenderer();
+  UpdateRenderer( false );
 }
 
 void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
@@ -377,7 +415,7 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
   }
 }
 
-void TextVisual::UpdateRenderer()
+void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
 {
   Actor control = mControl.GetHandle();
   if( !control )
@@ -413,7 +451,7 @@ void TextVisual::UpdateRenderer()
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( relayoutSize );
 
-  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
+  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) || initializeRendererAndTexture )
   {
     // Removes the texture set.
     RemoveTextureSet();

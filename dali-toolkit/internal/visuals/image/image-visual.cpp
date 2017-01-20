@@ -58,8 +58,6 @@ const char * const IMAGE_FITTING_MODE( "fittingMode" );
 const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
-const char * const IMAGE_WRAP_MODE_U("wrapModeU");
-const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
 const char * const BATCHING_ENABLED( "batchingEnabled" );
 
@@ -90,9 +88,6 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, CLAMP_TO_EDGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, REPEAT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, MIRRORED_REPEAT )
 DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
-
-const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
-const std::string WRAP_MODE_UNIFORM_NAME = "wrapMode";
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
@@ -132,10 +127,16 @@ const char* FRAGMENT_SHADER_NO_ATLAS = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
+  uniform lowp vec4 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
   \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+  }\n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * visualMixColor();\n
   }\n
 );
 
@@ -144,12 +145,19 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform sampler2D sTexture;\n
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
+    uniform lowp vec4 mixColor;\n
+    uniform lowp float preMultipliedAlpha;\n
+    \n
+    lowp vec4 visualMixColor()\n
+    {\n
+        return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+    }\n
     \n
     void main()\n
     {\n
-      mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
-    }\n
+        mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * visualMixColor();\n
+     }\n
 );
 
 const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
@@ -159,6 +167,8 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
     // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
     uniform lowp vec2 wrapMode;\n
     uniform lowp vec4 uColor;\n
+    uniform lowp vec4 mixColor;\n
+    uniform lowp float preMultipliedAlpha;\n
     \n
     mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )\n
     {\n
@@ -170,11 +180,16 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
       return clamp( mix(range.x, range.y, coord), range.x, range.y );
     }\n
     \n
+    lowp vec4 visualMixColor()\n
+    {\n
+      return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+    }\n
+    \n
     void main()\n
     {\n
-      mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
-                                    wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor;\n
+        mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
+                                      wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );\n
+        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * visualMixColor();\n
     }\n
 );
 
@@ -263,86 +278,149 @@ ImageVisual::~ImageVisual()
 void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   // Url is already received in constructor
-  Property::Value* fittingValue = propertyMap.Find( Toolkit::ImageVisual::Property::FITTING_MODE, IMAGE_FITTING_MODE );
-  if( fittingValue )
+  for( Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter )
   {
-    int value;
-    Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, value );
-    mFittingMode = Dali::FittingMode::Type( value );
-  }
-
-  Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
-  if( samplingValue )
-  {
-    int value;
-    Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, value );
-    mSamplingMode = Dali::SamplingMode::Type( value );
-  }
-
-  // Use a variable to detect if the width or height have been modified by the property map.
-  bool desiredSizeSpecified = false;
-  int desiredWidth = 0;
-  Property::Value* desiredWidthValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_WIDTH, IMAGE_DESIRED_WIDTH );
-  if( desiredWidthValue )
-  {
-    desiredWidthValue->Get( desiredWidth );
-    desiredSizeSpecified = true;
-  }
-
-  int desiredHeight = 0;
-  Property::Value* desiredHeightValue = propertyMap.Find( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, IMAGE_DESIRED_HEIGHT );
-  if( desiredHeightValue )
-  {
-    desiredHeightValue->Get( desiredHeight );
-    desiredSizeSpecified = true;
-  }
-
-  // Only update the desired size if specified in the property map.
-  if( desiredSizeSpecified )
-  {
-    mDesiredSize = ImageDimensions( desiredWidth, desiredHeight );
-  }
-
-  Property::Value* pixelAreaValue = propertyMap.Find( Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME );
-  if( pixelAreaValue )
-  {
-    pixelAreaValue->Get( mPixelArea );
-  }
-
-  Property::Value* wrapModeValueU = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_U, IMAGE_WRAP_MODE_U );
-  if( wrapModeValueU )
-  {
-    int value;
-    Scripting::GetEnumerationProperty( *wrapModeValueU, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
-    mWrapModeU = Dali::WrapMode::Type( value );
-  }
-
-  Property::Value* wrapModeValueV = propertyMap.Find( Toolkit::ImageVisual::Property::WRAP_MODE_V, IMAGE_WRAP_MODE_V );
-  if( wrapModeValueV )
-  {
-    int value;
-    Scripting::GetEnumerationProperty( *wrapModeValueV, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, value );
-    mWrapModeV = Dali::WrapMode::Type( value );
-  }
-
-  Property::Value* syncLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
-  if( syncLoading )
-  {
-    bool sync;
-    syncLoading->Get( sync );
-    if( sync )
+    KeyValuePair keyValue = propertyMap.GetKeyValue( iter );
+    if( keyValue.first.type == Property::Key::INDEX )
     {
-      mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
-      // if sync loading is required, the loading should start immediately when new image url is set or the actor is off stage
-      // ( for on-stage actor with image url unchanged, resource loading is already finished)
-      if( mImageUrl.size() > 0u )
-      {
-        LoadResourceSynchronously();
-      }
+      DoSetProperty( keyValue.first.indexKey, keyValue.second );
     }
     else
     {
-      mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+      if( keyValue.first == IMAGE_FITTING_MODE )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::FITTING_MODE, keyValue.second );
+      }
+      else if( keyValue.first == IMAGE_SAMPLING_MODE )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::SAMPLING_MODE, keyValue.second );
+      }
+      else if( keyValue.first == IMAGE_DESIRED_WIDTH )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second );
+      }
+      else if( keyValue.first == IMAGE_DESIRED_HEIGHT )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second );
+      }
+      else if( keyValue.first == PIXEL_AREA_UNIFORM_NAME )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::PIXEL_AREA, keyValue.second );
+      }
+      else if( keyValue.first == IMAGE_WRAP_MODE_U )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::WRAP_MODE_U, keyValue.second );
+      }
+      else if( keyValue.first == IMAGE_WRAP_MODE_V )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::WRAP_MODE_V, keyValue.second );
+      }
+      else if( keyValue.first == SYNCHRONOUS_LOADING )
+      {
+        DoSetProperty( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second );
+      }
+    }
+  }
+
+  if( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING && mImageUrl.size() > 0u )
+  {
+    // if sync loading is required, the loading should start
+    // immediately when new image url is set or the actor is off stage
+    // ( for on-stage actor with image url unchanged, resource loading
+    // is already finished )
+    LoadResourceSynchronously();
+  }
+}
+
+void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& value )
+{
+  switch( index )
+  {
+    case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
+    {
+      bool sync;
+      if( value.Get( sync ) )
+      {
+        if( sync )
+        {
+          mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        }
+        else
+        {
+          mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        }
+      }
+      else
+      {
+        DALI_LOG_ERROR("ImageVisual: synchronousLoading property has incorrect type\n");
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
+    {
+      float desiredWidth;
+      if( value.Get( desiredWidth ) )
+      {
+        mDesiredSize.SetWidth( desiredWidth );
+      }
+      else
+      {
+        DALI_LOG_ERROR("ImageVisual: desiredWidth property has incorrect type\n");
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
+    {
+      float desiredHeight;
+      if( value.Get( desiredHeight ) )
+      {
+        mDesiredSize.SetHeight( desiredHeight );
+      }
+      else
+      {
+        DALI_LOG_ERROR("ImageVisual: desiredHeight property has incorrect type\n");
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::FITTING_MODE:
+    {
+      int fittingMode;
+      Scripting::GetEnumerationProperty( value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, fittingMode );
+      mFittingMode = Dali::FittingMode::Type( fittingMode );
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::SAMPLING_MODE:
+    {
+      int samplingMode;
+      Scripting::GetEnumerationProperty( value, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, samplingMode );
+      mSamplingMode = Dali::SamplingMode::Type( samplingMode );
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::PIXEL_AREA:
+    {
+      value.Get( mPixelArea );
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::WRAP_MODE_U:
+    {
+      int wrapMode;
+      Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
+      mWrapModeU = Dali::WrapMode::Type( wrapMode );
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::WRAP_MODE_V:
+    {
+      int wrapMode;
+      Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
+      mWrapModeV = Dali::WrapMode::Type( wrapMode );
+      break;
     }
   }
 }
@@ -599,7 +677,6 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 
 void ImageVisual::InitializeRenderer( const Image& image )
 {
-
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
 
   // don't reuse CreateTextureSet
@@ -643,7 +720,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     InitializeRenderer( mImage );
   }
 
-  if ( !mImpl->mRenderer)
+  if ( !mImpl->mRenderer )
   {
     return;
   }

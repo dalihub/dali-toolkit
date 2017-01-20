@@ -27,7 +27,6 @@
 %define CONTROL_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
   %typemap(cscode) NameSpace::ClassName %{
 
-
     /**
      * @brief Event arguments that passed via KeyInputFocusGained signal
      *
@@ -845,18 +844,30 @@
       return ret;
     }
 
-    %}
-
-    %enddef
+    public Dali.Property.Map Tooltip
+    {
+      get
+      {
+        Dali.Property.Map temp = new Dali.Property.Map();
+        GetProperty( View.Property.TOOLTIP).Get(  temp );
+        return temp;
+      }
+      set
+      {
+        SetProperty( View.Property.TOOLTIP, new Dali.Property.Value( value ) );
+      }
+    }
+ %}
+%enddef
 
 %define DALI_CONTROL_EVENTHANDLER_PARAM( NameSpace, ClassName)
 
   CONTROL_EVENTHANDLER_TYPEMAP_EVENTARG( NameSpace, ClassName);
   CONTROL_EVENTHANDLER_TYPEMAP_HELPER( NameSpace, ClassName);
 
-  %enddef
+%enddef
 
-  namespace Dali
+namespace Dali
 {
   DALI_CONTROL_EVENTHANDLER_PARAM( Dali::Toolkit, Control);
 }
