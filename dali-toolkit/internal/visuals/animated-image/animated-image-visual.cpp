@@ -84,6 +84,7 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+
   if( !mImageUrl.empty() )
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );

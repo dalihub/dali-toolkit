@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,12 +297,12 @@ void ShadowView::OnInitialize()
 
 void ShadowView::OnChildAdd( Actor& child )
 {
-  Control::OnChildAdd( child );
-
   if( child != mChildrenRoot && child != mBlurRootActor)
   {
     mChildrenRoot.Add( child );
   }
+
+  Control::OnChildAdd( child );
 }
 
 void ShadowView::OnChildRemove( Actor& child )

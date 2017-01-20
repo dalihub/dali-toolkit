@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1374,13 +1374,13 @@ void TextEditor::KeyboardStatusChanged(bool keyboardShown)
 
 void TextEditor::OnStageConnection( int depth )
 {
-  // Call the Control::OnStageConnection() to set the depth of the background.
-  Control::OnStageConnection( depth );
-
   // Sets the depth to the visuals inside the text's decorator.
   mDecorator->SetTextDepth( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
+
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
 }
 
 bool TextEditor::OnTouched( Actor actor, const TouchData& touch )

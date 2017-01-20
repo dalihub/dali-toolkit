@@ -73,10 +73,37 @@ struct Base::Impl
 
   struct Transform
   {
+    /**
+     * Default constructor ensures the visual fills the control
+     */
     Transform();
+
+    /**
+     * Use the property map to set zero or more of the transform
+     * attributes, and sets the remaining attributes to their default
+     * values.
+     */
     void SetPropertyMap( const Property::Map& map );
+
+    /**
+     * Add the transform attributes to the map (using integer keys)
+     */
     void GetPropertyMap( Property::Map& map ) const;
+
+    /**
+     * Update zero or more attributes from the property map.
+     */
+    void UpdatePropertyMap( const Property::Map& map );
+
+    /**
+     * Register or set the uniform properties onto the renderer
+     */
     void RegisterUniforms( Renderer renderer, Toolkit::Direction::Type direction );
+
+    /**
+     * Convert the control size and the transform attributes into the actual
+     * size of the visual.
+     */
     Vector2 GetVisualSize( const Vector2& controlSize );
 
     Vector2 mOffset;
@@ -86,13 +113,16 @@ struct Base::Impl
     Toolkit::Align::Type mAnchorPoint;
   };
 
-  Renderer      mRenderer;
-  CustomShader* mCustomShader;
-  std::string   mName;
-  Transform     mTransform;
-  Size          mControlSize;
-  float         mDepthIndex;
-  int           mFlags;
+  Renderer        mRenderer;
+  CustomShader*   mCustomShader;
+  SlotDelegate<Visual::Base>* mBlendSlotDelegate; ///< Used to own mix color animation connection
+  std::string     mName;
+  Transform       mTransform;
+  Vector4         mMixColor;
+  Size            mControlSize;
+  float           mDepthIndex;
+  Property::Index mMixColorIndex;
+  int             mFlags;
 };
 
 } // namespace Visual

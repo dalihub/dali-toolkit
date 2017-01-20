@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,15 +149,6 @@ void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& c
   float width = std::max ( mTableOfButtons.GetNaturalSize().width, size.width );
   mRulerX->SetDomain( RulerDomain( 0.0, width, true ) );
   mScrollView.SetRulerX( mRulerX );
-}
-
-void TextSelectionToolbar::OnStageConnection( int depth )
-{
-  // Call the Control::OnStageConnection() to set the depth of the background.
-  Control::OnStageConnection( depth );
-
-  // Texts are controls, they have their own OnStageConnection() implementation.
-  // Icons are inside a TableView. It has it's own OnStageConnection() implementation.
 }
 
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )

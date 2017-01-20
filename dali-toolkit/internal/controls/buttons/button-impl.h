@@ -149,13 +149,13 @@ public:
   std::string GetLabelText() const;
 
   /**
-   * @brief Produces a Property::Map of Text properties to create a Text Visual
+   * @brief Produces a Property::Map of Text properties to create a Text Visual, merging existing properties with supplied map
    * If the label does not exist yet, it is created.
    * The derived buttons are notified if any properties are changed.
    * @param[in] properties A Property::Map of key-value pairs of properties to set.
-   * @param[out] properties A Property::Map of text visual  properties to set.
+   * @param[out] properties A Property::Map of text visual properties to set after merging inMap with existing maps
    */
-  void MergeLabelProperties( const Property::Map& inMap, Property::Map& outMap );
+  void MergeWithExistingLabelProperties( const Property::Map& inMap, Property::Map& outMap );
 
   /**
    * Performs actions as requested using the action name.

@@ -23,8 +23,8 @@ if BUILD_MCS
 
 all-local: libNDalic.so NDali.dll
 
-libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o
-	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
+libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o manual/cpp/devel-property-wrap.o
+	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o manual/cpp/devel-property-wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
 
 automatic/cpp/dali_wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) automatic/cpp/dali_wrap.cpp -o automatic/cpp/dali_wrap.o
@@ -38,16 +38,22 @@ manual/cpp/view-wrapper-impl-wrap.o: $(BUILT_SOURCES)
 manual/cpp/callbackbase_wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/callbackbase_wrap.cpp -o manual/cpp/callbackbase_wrap.o
 
+manual/cpp/devel-property-wrap.o: $(BUILT_SOURCES)
+	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/devel-property-wrap.cpp -o manual/cpp/devel-property-wrap.o
+
 NDali.dll: $(BUILT_SOURCES)
-	$(MCS) -nologo -target:library -out:NDali.dll automatic/csharp/*.cs manual/csharp/*.cs
+	$(MCS) -nologo -target:library -out:NDali.dll automatic/csharp/*.cs manual/csharp/*.cs views/*.cs
 
 check-local: examples/dali-test.exe \
              examples/hello-world.exe \
              examples/scroll-view.exe \
              examples/custom-control.exe \
-             examples/spin-control.exe \
+             examples/date-picker.exe \
              examples/control-dashboard.exe \
+             examples/date-picker-using-json.exe \
+             examples/json-loader.exe \
              examples/user-alphafunction.exe \
+             examples/image-view.exe \
              examples/libNDalic.so examples/NDali.dll
 
 examples/%.exe: examples/%.cs

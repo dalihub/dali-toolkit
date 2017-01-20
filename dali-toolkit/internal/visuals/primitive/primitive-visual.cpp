@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ DALI_ENUM_TO_STRING_TABLE_END( SHAPE_TYPE )
 
 //Property names
 const char * const PRIMITIVE_SHAPE( "shape" );
-const char * const SHAPE_COLOR( "mixColor" );
 const char * const SLICES( "slices" );
 const char * const STACKS( "stacks" );
 const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
@@ -99,7 +98,6 @@ const char * const BEVELLED_CUBE_LABEL( "BEVELLED_CUBE" );
 
 //Shader properties
 const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
-const char * const COLOR_UNIFORM_NAME( "mixColor" );
 const char * const OBJECT_DIMENSIONS_UNIFORM_NAME( "uObjectDimensions" );
 const char * const STAGE_OFFSET_UNIFORM_NAME( "uStageOffset" );
 
@@ -138,6 +136,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vec3 originFlipY =  vec3(origin.x, -origin.y, 0.0);
     vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
     vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);\n
+
     return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );\n
   }\n
 
@@ -147,18 +146,18 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
 
-    //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
-    vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
+     //Illumination in Model-View space - Transform attributes and uniforms\n
+     vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
+     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
 
-    vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
-    mvLightPosition = uViewMatrix * mvLightPosition;\n
-    vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
+     vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
+     mvLightPosition = uViewMatrix * mvLightPosition;\n
+     vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
 
-    float lightDiffuse = max( dot( vectorToLight, normal ), 0.0 );\n
-    vIllumination = vec3( lightDiffuse * 0.5 + 0.5 );\n
+     float lightDiffuse = max( dot( vectorToLight, normal ), 0.0 );\n
+     vIllumination = vec3( lightDiffuse * 0.5 + 0.5 );\n
 
-    gl_Position = vertexPosition;\n
+     gl_Position = vertexPosition;\n
   }\n
 );
 
@@ -187,7 +186,6 @@ PrimitiveVisualPtr PrimitiveVisual::New( VisualFactoryCache& factoryCache, const
 
 PrimitiveVisual::PrimitiveVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
-  mColor( DEFAULT_COLOR ),
   mScaleDimensions( Vector3::ONE ),
   mScaleTopRadius( DEFAULT_SCALE_TOP_RADIUS ),
   mScaleBottomRadius( DEFAULT_SCALE_BOTTOM_RADIUS ),
@@ -199,6 +197,7 @@ PrimitiveVisual::PrimitiveVisual( VisualFactoryCache& factoryCache )
   mStacks( DEFAULT_STACKS ),
   mPrimitiveType( Toolkit::PrimitiveVisual::Shape::SPHERE )
 {
+  mImpl->mMixColor = DEFAULT_COLOR;
 }
 
 PrimitiveVisual::~PrimitiveVisual()
@@ -218,12 +217,16 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
     DALI_LOG_ERROR( "Fail to provide shape to the PrimitiveVisual object.\n" );
   }
 
-  //Read in other potential properties.
-
-  Property::Value* color = propertyMap.Find( Toolkit::PrimitiveVisual::Property::MIX_COLOR, SHAPE_COLOR );
-  if( color && !color->Get( mColor ) )
+  // By virtue of DoSetProperties being called last, this will override
+  // anything set by DevelVisual::Property::MIX_COLOR
+  Property::Value* colorValue = propertyMap.Find( Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR );
+  if( colorValue )
   {
-    DALI_LOG_ERROR( "Invalid type for color in PrimitiveVisual.\n" );
+    Vector4 color;
+    if( colorValue->Get( color ) )
+    {
+      SetMixColor( color );
+    }
   }
 
   Property::Value* slices = propertyMap.Find( Toolkit::PrimitiveVisual::Property::SLICES, SLICES );
@@ -392,6 +395,11 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
 
 void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
 {
+  if( !mGeometry )
+  {
+    CreateGeometry();
+  }
+
   naturalSize.x = mObjectDimensions.x;
   naturalSize.y = mObjectDimensions.y;
 }
@@ -407,8 +415,8 @@ void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
+  map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mImpl->mMixColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SHAPE, mPrimitiveType );
-  map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SLICES, mSlices );
   map.Insert( Toolkit::PrimitiveVisual::Property::STACKS, mStacks );
   map.Insert( Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS, mScaleTopRadius );
@@ -444,8 +452,10 @@ void PrimitiveVisual::InitializeRenderer()
   mImpl->mRenderer = Renderer::New( mGeometry, mShader );
   mImpl->mRenderer.SetProperty( Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK );
 
-  //Register transform properties
+  // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+
+  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR, mImpl->mMixColor );
 }
 
 void PrimitiveVisual::UpdateShaderUniforms()
@@ -461,7 +471,6 @@ void PrimitiveVisual::UpdateShaderUniforms()
   mShader.RegisterProperty( STAGE_OFFSET_UNIFORM_NAME, Vector2( width, height ) / 2.0f );
   mShader.RegisterProperty( LIGHT_POSITION_UNIFORM_NAME, mLightPosition );
   mShader.RegisterProperty( OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix );
-  DevelHandle::RegisterProperty( mShader, Toolkit::PrimitiveVisual::Property::MIX_COLOR, COLOR_UNIFORM_NAME, mColor );
   mShader.RegisterProperty( OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions );
 }
 
@@ -543,7 +552,7 @@ void PrimitiveVisual::CreateSphere( Vector<Vertex>& vertices, Vector<unsigned sh
 }
 
 void PrimitiveVisual::CreateConic( Vector<Vertex>& vertices, Vector<unsigned short>& indices, float scaleTopRadius,
-                                     float scaleBottomRadius, float scaleHeight, int slices )
+                                   float scaleBottomRadius, float scaleHeight, int slices )
 {
   ComputeConicVertices( vertices, scaleTopRadius, scaleBottomRadius, scaleHeight, slices );
   FormConicTriangles( indices, scaleTopRadius, scaleBottomRadius, slices );
@@ -558,7 +567,7 @@ void PrimitiveVisual::CreateConic( Vector<Vertex>& vertices, Vector<unsigned sho
 }
 
 void PrimitiveVisual::CreateBevelledCube( Vector<Vertex>& vertices, Vector<unsigned short>& indices,
-                                            Vector3 dimensions, float bevelPercentage, float bevelSmoothness )
+                                          Vector3 dimensions, float bevelPercentage, float bevelSmoothness )
 {
   float maxDimension = std::max( std::max( dimensions.x, dimensions.y ), dimensions.z );
   dimensions = dimensions / maxDimension;
@@ -583,7 +592,7 @@ void PrimitiveVisual::CreateBevelledCube( Vector<Vertex>& vertices, Vector<unsig
 }
 
 void PrimitiveVisual::ComputeCircleTables( Vector<float>& sinTable, Vector<float>& cosTable, int divisions,
-                                             bool halfCircle )
+                                           bool halfCircle )
 {
   if( divisions < 0 )
   {
@@ -724,7 +733,7 @@ void PrimitiveVisual::FormSphereTriangles( Vector<unsigned short>& indices, int 
 }
 
 void PrimitiveVisual::ComputeConicVertices( Vector<Vertex>& vertices, float scaleTopRadius,
-                                                     float scaleBottomRadius, float scaleHeight, int slices )
+                                            float scaleBottomRadius, float scaleHeight, int slices )
 {
   int vertexIndex = 0;  //Track progress through vertices.
   Vector<float> sinTable;
@@ -811,7 +820,7 @@ void PrimitiveVisual::ComputeConicVertices( Vector<Vertex>& vertices, float scal
 }
 
 void PrimitiveVisual::FormConicTriangles( Vector<unsigned short>& indices, float scaleTopRadius,
-                                                   float scaleBottomRadius, int slices )
+                                          float scaleBottomRadius, int slices )
 {
   int  indiceIndex = 0;  //Track progress through indices.
   int  numTriangles = 0;
@@ -1162,7 +1171,7 @@ void PrimitiveVisual::FormOctahedronTriangles( Vector<unsigned short>& indices )
 }
 
 void PrimitiveVisual::ComputeBevelledCubeVertices( Vector<Vertex>& vertices, Vector3 dimensions,
-                                                     float bevelPercentage, float bevelSmoothness )
+                                                   float bevelPercentage, float bevelSmoothness )
 {
   int numPositions = 24;
   int numFaces = 26;

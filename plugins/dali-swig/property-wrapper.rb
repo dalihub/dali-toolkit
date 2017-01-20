@@ -312,6 +312,13 @@ def writeCSharpData
                 next
             end
 
+            #exception case <<<
+            #Tooltip gives swig build error
+            if( property.name == "Tooltip" )
+                next
+            end
+            #exception case >>>
+
             $totalProperties+=1  #  keep track of total
 
             propertyType = propertyInfo[1]    # e.g. bool or int
@@ -328,9 +335,9 @@ def writeCSharpData
               hasChildProperties = true
             end
 
-            property.csharpGetter ="  public #{propertyType} #{property.name} \n"\
-                     "  { \n"\
-                     "    get \n" \
+            property.csharpGetter ="  public #{propertyType} #{property.name}\n"\
+                     "  {\n"\
+                     "    get\n" \
                      "    {\n"\
                      "      #{tempDeclaration}\n"\
                      "      GetProperty( #{propertyName}).Get( #{propertyArg} temp );\n"\
@@ -339,14 +346,31 @@ def writeCSharpData
 
             if property.writable
                   #text.SetProperty(TextLabel.Property.HORIZONTAL_ALIGNMENT, new Property.Value("CENTER"));
-                  property.csharpSetter = "    set \n" \
-                         "    { \n"\
+                  property.csharpSetter = "    set\n" \
+                         "    {\n"\
                          "      SetProperty( #{propertyName}, new Dali.Property.Value( value ) );\n" \
                          "    }\n"\
                          "  }\n"
             else
                    property.csharpSetter = "}"  # close the opening property declaration
             end
+
+            #exception case <<<
+            if( property.name == "Behavior" )
+                property.csharpGetter ="  public Layer.LayerBehavior #{property.name} \n"\
+                     "  { \n"\
+                     "    get \n" \
+                     "    {\n"\
+                     "      return GetBehavior();\n"\
+                     "    }\n"
+
+                property.csharpSetter = "    set \n" \
+                     "    { \n"\
+                     "      SetBehavior( value );\n" \
+                     "    }\n"\
+                     "  }\n"
+            end
+            #exception case >>>
         end
         # write normal properties to the class's own csharp file
         writePropertiesToCSharpFile( daliClass )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1574,16 +1574,14 @@ bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
 
 void Popup::OnStageConnection( int depth )
 {
-  Control::OnStageConnection( depth );
-
   mLayoutDirty = true;
   RelayoutRequest();
+
+  Control::OnStageConnection( depth );
 }
 
 void Popup::OnChildAdd( Actor& child )
 {
-  Control::OnChildAdd( child );
-
   // Re-parent any children added by user to the body layer.
   if( mAlterAddedChild )
   {
@@ -1594,6 +1592,8 @@ void Popup::OnChildAdd( Actor& child )
     mLayoutDirty = true;
     RelayoutRequest();
   }
+
+  Control::OnChildAdd( child );
 }
 
 void Popup::LayoutContext( const Vector2& size )

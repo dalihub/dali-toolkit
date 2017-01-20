@@ -19,47 +19,6 @@ namespace Dali
 {
   namespace Constants
   {
-    namespace AlphaFunction
-    {
-      public enum BuiltinFunction
-      {
-        Default       = Dali.AlphaFunction.BuiltinFunction.DEFAULT,
-        Linear        = Dali.AlphaFunction.BuiltinFunction.LINEAR,
-        Reverse       = Dali.AlphaFunction.BuiltinFunction.REVERSE,
-        EaseInSquare  = Dali.AlphaFunction.BuiltinFunction.EASE_IN_SQUARE,
-        EaseOutSquare = Dali.AlphaFunction.BuiltinFunction.EASE_OUT_SQUARE,
-        EaseIn        = Dali.AlphaFunction.BuiltinFunction.EASE_IN,
-        EaseOut       = Dali.AlphaFunction.BuiltinFunction.EASE_OUT,
-        EaseInOut     = Dali.AlphaFunction.BuiltinFunction.EASE_IN_OUT,
-        EaseInSine    = Dali.AlphaFunction.BuiltinFunction.EASE_IN_SINE,
-        EaseOutSine   = Dali.AlphaFunction.BuiltinFunction.EASE_OUT_SINE,
-        EaseInOutSine = Dali.AlphaFunction.BuiltinFunction.EASE_IN_OUT_SINE,
-        Bounce        = Dali.AlphaFunction.BuiltinFunction.BOUNCE,
-        Sin           = Dali.AlphaFunction.BuiltinFunction.SIN,
-        EaseOutBack   = Dali.AlphaFunction.BuiltinFunction.EASE_OUT_BACK,
-        Count         = Dali.AlphaFunction.BuiltinFunction.COUNT
-      }
-      public enum Mode
-      {
-        BuiltinFunction  = Dali.AlphaFunction.Mode.BUILTIN_FUNCTION,
-        CustomFunction   = Dali.AlphaFunction.Mode.CUSTOM_FUNCTION,
-        Bezier           = Dali.AlphaFunction.Mode.BEZIER
-      }
-    } // namespace AlphaFunction
-
-    namespace FrameBuffer
-    {
-      namespace Attachment
-      {
-        public enum Mask 
-        {
-          None          = Dali.FrameBuffer.Attachment.Mask.NONE,          ///< No attachments are created initially                            @SINCE_1_1.45
-          Depth         = Dali.FrameBuffer.Attachment.Mask.DEPTH,         ///< Depth buffer bit-mask value                                     @SINCE_1_1.45
-          Stencil       = Dali.FrameBuffer.Attachment.Mask.STENCIL ,      ///< Stencil buffer bit-mask value                                   @SINCE_1_1.45
-          DepthStencil  = Dali.FrameBuffer.Attachment.Mask.DEPTH_STENCIL  ///< The Framebuffer will be created with depth and stencil buffer   @SINCE_1_1.45
-        }
-      } //namespace Attachment
-    } // namespace FrameBuffer
 
     public enum TextureType 
     {
@@ -87,27 +46,6 @@ namespace Dali
       PerspectiveProjection  = Dali.ProjectionMode.PERSPECTIVE_PROJECTION,      ///< Distance causes foreshortening; objects further from the camera appear smaller @SINCE_1_0.0
       OrthographicProjection = Dali.ProjectionMode.ORTHOGRAPHIC_PROJECTION      ///< Relative distance from the camera does not affect the size of objects @SINCE_1_0.0
     }
-
-    namespace Animation
-    {
-      public enum EndAction
-      {
-        Cancel = Dali.Animation.DaliEndAction.Bake,
-        Discard = Dali.Animation.DaliEndAction.Discard,
-        Stop = Dali.Animation.DaliEndAction.BakeFinal
-      }
-      public enum Interpolation
-      {
-        Linear = Dali.Animation.Interpolation.Linear,
-        Cubic = Dali.Animation.Interpolation.Cubic
-      }
-      public enum State
-      {
-        Stopped = Dali.Animation.State.STOPPED,
-        Playing = Dali.Animation.State.PLAYING,
-        Paused = Dali.Animation.State.PAUSED
-      }
-    } //namespace Animation
 
     public struct ParentOrigin
     {
@@ -155,6 +93,56 @@ namespace Dali
       public static readonly Dali.Vector3 NegativeYaxis = Dali.Vector3.NEGATIVE_YAXIS;
       public static readonly Dali.Vector3 NegativeZaxis = Dali.Vector3.NEGATIVE_ZAXIS;
       public static readonly Dali.Vector3 Zero = Dali.Vector3.ZERO;
+    }
+
+    public struct Visual
+    {
+      public static readonly int PropertyType = NDalic.VISUAL_PROPERTY_TYPE;
+      public static readonly int PropertyShader = NDalic.VISUAL_PROPERTY_SHADER;
+
+      public static readonly int VertexShader = NDalic.VERTEX_SHADER;
+      public static readonly int FragmentShader = NDalic.FRAGMENT_SHADER;
+      public static readonly int SubdivideGridX = NDalic.SUBDIVIDE_GRID_X;
+      public static readonly int SubdivideGridY = NDalic.SUBDIVIDE_GRID_Y;
+      public static readonly int Hints = NDalic.HINTS;
+
+      public static readonly int Color = NDalic.COLOR;
+      public static readonly int Size = NDalic.SIZE;
+      public static readonly int AntiAliasing = NDalic.ANTI_ALIASING;
+
+      public static readonly int MixColor = NDalic.MIX_COLOR;
+
+      public static readonly int StartPosition = NDalic.START_POSITION;
+      public static readonly int EndPosition = NDalic.END_POSITION;
+      public static readonly int Center = NDalic.CENTER;
+      public static readonly int Radius = NDalic.RADIUS;
+      public static readonly int StopOffset = NDalic.STOP_OFFSET;
+      public static readonly int StopColor = NDalic.STOP_COLOR;
+      public static readonly int Units = NDalic.UNITS;
+      public static readonly int SpreadMethod = NDalic.SPREAD_METHOD;
+
+      public static readonly int ImageVisualURL = NDalic.IMAGE_VISUAL_URL;
+      public static readonly int ImageVisualFittingMode = NDalic.IMAGE_VISUAL_FITTING_MODE;
+      public static readonly int ImageVisualSamplingMode = NDalic.IMAGE_VISUAL_SAMPLING_MODE;
+      public static readonly int ImageVisualDesiredWidth = NDalic.IMAGE_VISUAL_DESIRED_WIDTH;
+      public static readonly int ImageVisualDesiredHeight = NDalic.IMAGE_VISUAL_DESIRED_HEIGHT;
+      public static readonly int ImageVisualSynchronousLoading = NDalic.IMAGE_VISUAL_SYNCHRONOUS_LOADING;
+      public static readonly int ImageVisualBorderOnly = NDalic.IMAGE_VISUAL_BORDER_ONLY;
+      public static readonly int ImageVisualBatchingEnabled = NDalic.IMAGE_VISUAL_BATCHING_ENABLED;
+      public static readonly int ImageVisualPixelArea = NDalic.IMAGE_VISUAL_PIXEL_AREA;
+      public static readonly int ImageVisualWrapModeU = NDalic.IMAGE_VISUAL_WRAP_MODE_U;
+      public static readonly int ImageVisualWrapModeV = NDalic.IMAGE_VISUAL_WRAP_MODE_V;
+
+      public enum Type
+      {
+        Border = Dali.VisualType.BORDER,
+        Color = Dali.VisualType.COLOR,
+        Gradient = Dali.VisualType.GRADIENT,
+        Image = Dali.VisualType.IMAGE,
+        Mesh = Dali.VisualType.MESH,
+        Primitive = Dali.VisualType.PRIMITIVE,
+        WireFrame = Dali.VisualType.WIREFRAME
+      }
     }
 
   } // namespace Constants

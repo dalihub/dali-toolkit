@@ -109,8 +109,6 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundColor() is deprecated and will be removed from next release. use Property::BACKGROUND instead.\n" );
-
   Internal::GetImplementation(*this).SetBackgroundColor( color );
 }
 
@@ -123,6 +121,8 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackgroundImage( Image image )
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundImage() is deprecated and will be removed from next release. use Property::BACKGROUND instead.\n" );
+
   Internal::GetImplementation(*this).SetBackgroundImage( image );
 }
 

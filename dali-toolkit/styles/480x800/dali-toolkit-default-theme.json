@@ -231,11 +231,11 @@
     {
       "progressValue": 0,
       "trackVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin.9.png",
+        "url":"{DALI_IMAGE_DIR}progress-skin.9.png",
         "size":[24,24]
       },
       "progressVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin-progress.9.png",
+        "url":"{DALI_IMAGE_DIR}progress-skin-progress.9.png",
         "size":[24,24]
       }
     },

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,7 +232,7 @@ int UtcDaliControlImplOnGestureMethods(void)
     application.SendNotification();
     application.Render();
 
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
     dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
 
     DALI_TEST_CHECK( dummyImpl.pinchCalled == false );
@@ -347,7 +347,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
   {
     DummyControl dummy = DummyControl::New( true );
     Stage::GetCurrent().Add(dummy);
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     application.Render();
     application.SendNotification();
@@ -406,7 +406,7 @@ int UtcDaliControlImplStageConnection(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     DALI_TEST_EQUALS( dummyImpl.stageConnectionCalled, false, TEST_LOCATION );
     Stage::GetCurrent().Add(dummy);
@@ -446,7 +446,7 @@ int UtcDaliControlImplSizeSetP(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
     application.Render();
@@ -503,7 +503,7 @@ int UtcDaliControlImplSizeAnimation(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
 
@@ -550,7 +550,7 @@ int UtcDaliControlImplTouchEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -606,7 +606,7 @@ int UtcDaliControlImplHoverEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -665,7 +665,7 @@ int UtcDaliControlImplKeyEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
     dummy.SetKeyInputFocus();
@@ -709,7 +709,7 @@ int UtcDaliControlImplKeyInputFocusGained(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
 
@@ -739,7 +739,7 @@ int UtcDaliControlImplKeyInputFocusLost(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
 
@@ -761,7 +761,7 @@ int UtcDaliControlImplKeyInputFocusLost(void)
     dummy.SetKeyInputFocus();
     dummy.ClearKeyInputFocus();
 
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummyImpl.IsKeyboardNavigationSupported();
     dummyImpl.IsKeyboardFocusGroup();
@@ -803,7 +803,7 @@ int UtcDaliControlImplWheelEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -1350,4 +1350,69 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
 
   END_TEST;
 }
+int UtcDaliControlImplAutoClippingWithVisuals(void)
+{
+  ToolkitTestApplication application;
 
+  tet_infoline( "Test to ensure a renderer does NOT get added when we've already registered a visual which we haven't enabled" );
+
+  DummyControl control = DummyControl::New();
+  DummyControlImpl& controlImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+  controlImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual, false );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplAutoClippingWithVisualsAlreadyOnStage(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Test to ensure a renderer does NOT get added when we've already registered a visual which we haven't enabled and we're already on the stage" );
+
+  DummyControl control = DummyControl::New();
+  DummyControlImpl& controlImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+  controlImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual, false );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  END_TEST;
+}

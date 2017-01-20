@@ -21,10 +21,10 @@
     using System.Runtime.InteropServices;
 
     /**
-      * @brief Event arguments that passed via AUIApplicationInit signal
+      * @brief Event arguments that passed via NUIApplicationInit signal
       *
       */
-    public class AUIApplicationInitEventArgs : EventArgs
+    public class NUIApplicationInitEventArgs : EventArgs
     {
     private Application _application;
 
@@ -46,10 +46,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationTerminate signal
+      * @brief Event arguments that passed via NUIApplicationTerminate signal
       *
       */
-    public class AUIApplicationTerminateEventArgs : EventArgs
+    public class NUIApplicationTerminateEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -70,10 +70,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationPause signal
+      * @brief Event arguments that passed via NUIApplicationPause signal
       *
       */
-    public class AUIApplicationPauseEventArgs : EventArgs
+    public class NUIApplicationPauseEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -94,10 +94,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationResume signal
+      * @brief Event arguments that passed via NUIApplicationResume signal
       *
       */
-    public class AUIApplicationResumeEventArgs : EventArgs
+    public class NUIApplicationResumeEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -118,10 +118,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationReset signal
+      * @brief Event arguments that passed via NUIApplicationReset signal
       *
       */
-    public class AUIApplicationResetEventArgs : EventArgs
+    public class NUIApplicationResetEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -142,10 +142,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationResize signal
+      * @brief Event arguments that passed via NUIApplicationResize signal
       *
       */
-    public class AUIApplicationResizeEventArgs : EventArgs
+    public class NUIApplicationResizeEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -166,10 +166,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationLanguageChanged signal
+      * @brief Event arguments that passed via NUIApplicationLanguageChanged signal
       *
       */
-    public class AUIApplicationLanguageChangedEventArgs : EventArgs
+    public class NUIApplicationLanguageChangedEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -190,10 +190,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationRegionChanged signal
+      * @brief Event arguments that passed via NUIApplicationRegionChanged signal
       *
       */
-    public class AUIApplicationRegionChangedEventArgs : EventArgs
+    public class NUIApplicationRegionChangedEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -214,10 +214,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationBatteryLow signal
+      * @brief Event arguments that passed via NUIApplicationBatteryLow signal
       *
       */
-    public class AUIApplicationBatteryLowEventArgs : EventArgs
+    public class NUIApplicationBatteryLowEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -238,10 +238,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationMemoryLow signal
+      * @brief Event arguments that passed via NUIApplicationMemoryLow signal
       *
       */
-    public class AUIApplicationMemoryLowEventArgs : EventArgs
+    public class NUIApplicationMemoryLowEventArgs : EventArgs
     {
     private Application _application;
       /**
@@ -262,10 +262,10 @@
     }
 
     /**
-      * @brief Event arguments that passed via AUIApplicationAppControl	 signal
+      * @brief Event arguments that passed via NUIApplicationAppControl	 signal
       *
       */
-    public class AUIApplicationAppControlEventArgs : EventArgs
+    public class NUIApplicationAppControlEventArgs : EventArgs
     {
     private Application _application;
     private IntPtr _voidp;
@@ -308,69 +308,69 @@
 %define APPLICATION_EVENTHANDLER_TYPEMAP_HELPER(NameSpace, ClassName)
   %typemap(cscode) NameSpace::ClassName %{
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationInitEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationInitEventArgs> _applicationInitEventHandler;
-    private AUIApplicationInitEventCallbackDelegate _applicationInitEventCallbackDelegate;
+    private delegate void NUIApplicationInitEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationInitEventArgs> _applicationInitEventHandler;
+    private NUIApplicationInitEventCallbackDelegate _applicationInitEventCallbackDelegate;
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationTerminateEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationTerminateEventArgs> _applicationTerminateEventHandler;
-    private AUIApplicationTerminateEventCallbackDelegate _applicationTerminateEventCallbackDelegate;
+    private delegate void NUIApplicationTerminateEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationTerminateEventArgs> _applicationTerminateEventHandler;
+    private NUIApplicationTerminateEventCallbackDelegate _applicationTerminateEventCallbackDelegate;
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationPauseEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationPauseEventArgs> _applicationPauseEventHandler;
-    private AUIApplicationPauseEventCallbackDelegate _applicationPauseEventCallbackDelegate;
+    private delegate void NUIApplicationPauseEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationPauseEventArgs> _applicationPauseEventHandler;
+    private NUIApplicationPauseEventCallbackDelegate _applicationPauseEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationResumeEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationResumeEventArgs> _applicationResumeEventHandler;
-    private AUIApplicationResumeEventCallbackDelegate _applicationResumeEventCallbackDelegate;
+    private delegate void NUIApplicationResumeEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationResumeEventArgs> _applicationResumeEventHandler;
+    private NUIApplicationResumeEventCallbackDelegate _applicationResumeEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationResetEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationResetEventArgs> _applicationResetEventHandler;
-    private AUIApplicationResetEventCallbackDelegate _applicationResetEventCallbackDelegate;
+    private delegate void NUIApplicationResetEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationResetEventArgs> _applicationResetEventHandler;
+    private NUIApplicationResetEventCallbackDelegate _applicationResetEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationResizeEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationResizeEventArgs> _applicationResizeEventHandler;
-    private AUIApplicationResizeEventCallbackDelegate _applicationResizeEventCallbackDelegate;
+    private delegate void NUIApplicationResizeEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationResizeEventArgs> _applicationResizeEventHandler;
+    private NUIApplicationResizeEventCallbackDelegate _applicationResizeEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationLanguageChangedEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationLanguageChangedEventArgs> _applicationLanguageChangedEventHandler;
-    private AUIApplicationLanguageChangedEventCallbackDelegate _applicationLanguageChangedEventCallbackDelegate;
+    private delegate void NUIApplicationLanguageChangedEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationLanguageChangedEventArgs> _applicationLanguageChangedEventHandler;
+    private NUIApplicationLanguageChangedEventCallbackDelegate _applicationLanguageChangedEventCallbackDelegate;
 
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationRegionChangedEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationRegionChangedEventArgs> _applicationRegionChangedEventHandler;
-    private AUIApplicationRegionChangedEventCallbackDelegate _applicationRegionChangedEventCallbackDelegate;
+    private delegate void NUIApplicationRegionChangedEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationRegionChangedEventArgs> _applicationRegionChangedEventHandler;
+    private NUIApplicationRegionChangedEventCallbackDelegate _applicationRegionChangedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationBatteryLowEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationBatteryLowEventArgs> _applicationBatteryLowEventHandler;
-    private AUIApplicationBatteryLowEventCallbackDelegate _applicationBatteryLowEventCallbackDelegate;
+    private delegate void NUIApplicationBatteryLowEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationBatteryLowEventArgs> _applicationBatteryLowEventHandler;
+    private NUIApplicationBatteryLowEventCallbackDelegate _applicationBatteryLowEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationMemoryLowEventCallbackDelegate(IntPtr application);
-    private DaliEventHandler<object,AUIApplicationMemoryLowEventArgs> _applicationMemoryLowEventHandler;
-    private AUIApplicationMemoryLowEventCallbackDelegate _applicationMemoryLowEventCallbackDelegate;
+    private delegate void NUIApplicationMemoryLowEventCallbackDelegate(IntPtr application);
+    private DaliEventHandler<object,NUIApplicationMemoryLowEventArgs> _applicationMemoryLowEventHandler;
+    private NUIApplicationMemoryLowEventCallbackDelegate _applicationMemoryLowEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void AUIApplicationAppControlEventCallbackDelegate(IntPtr application, IntPtr voidp);
-    private DaliEventHandler<object,AUIApplicationAppControlEventArgs> _applicationAppControlEventHandler;
-    private AUIApplicationAppControlEventCallbackDelegate _applicationAppControlEventCallbackDelegate;
+    private delegate void NUIApplicationAppControlEventCallbackDelegate(IntPtr application, IntPtr voidp);
+    private DaliEventHandler<object,NUIApplicationAppControlEventArgs> _applicationAppControlEventHandler;
+    private NUIApplicationAppControlEventCallbackDelegate _applicationAppControlEventCallbackDelegate;
 
     /**
       * @brief Event for Initialized signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationInitEventHandler - DaliEventHandler<object,AUIApplicationInitEventArgs>)
+      * (in the type of NUIApplicationInitEventHandler - DaliEventHandler<object,NUIApplicationInitEventArgs>)
       *  provided by the user. Initialized signal is emitted when application is initialised
       */
-    public event DaliEventHandler<object,AUIApplicationInitEventArgs> Initialized
+    public event DaliEventHandler<object,NUIApplicationInitEventArgs> Initialized
     {
       add
       {
@@ -381,7 +381,7 @@
           {
             _applicationInitEventHandler += value;
 
-            _applicationInitEventCallbackDelegate = new AUIApplicationInitEventCallbackDelegate(OnApplicationInit);
+            _applicationInitEventCallbackDelegate = new NUIApplicationInitEventCallbackDelegate(OnApplicationInit);
             this.InitSignal().Connect(_applicationInitEventCallbackDelegate);
           }
         }
@@ -404,9 +404,9 @@
     // Callback for Application InitSignal
     private void OnApplicationInit(IntPtr data)
     {
-      AUIApplicationInitEventArgs e = new AUIApplicationInitEventArgs();
+      NUIApplicationInitEventArgs e = new NUIApplicationInitEventArgs();
 
-      // Populate all members of "e" (AUIApplicationInitEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationInitEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationInitEventHandler != null)
@@ -418,10 +418,10 @@
 
     /**
       * @brief Event for Terminated signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationTerminateEventHandler-DaliEventHandler<object,AUIApplicationTerminateEventArgs>)
+      * (in the type of NUIApplicationTerminateEventHandler-DaliEventHandler<object,NUIApplicationTerminateEventArgs>)
       *  provided by the user. Terminated signal is emitted when application is terminated
       */
-    public event DaliEventHandler<object,AUIApplicationTerminateEventArgs> Terminated
+    public event DaliEventHandler<object,NUIApplicationTerminateEventArgs> Terminated
     {
       add
       {
@@ -432,7 +432,7 @@
           {
             _applicationTerminateEventHandler += value;
 
-            _applicationTerminateEventCallbackDelegate = new AUIApplicationTerminateEventCallbackDelegate(OnAUIApplicationTerminate);
+            _applicationTerminateEventCallbackDelegate = new NUIApplicationTerminateEventCallbackDelegate(OnNUIApplicationTerminate);
             this.TerminateSignal().Connect(_applicationTerminateEventCallbackDelegate);
           }
         }
@@ -453,11 +453,11 @@
     }
 
     // Callback for Application TerminateSignal
-    private void OnAUIApplicationTerminate(IntPtr data)
+    private void OnNUIApplicationTerminate(IntPtr data)
     {
-      AUIApplicationTerminateEventArgs e = new AUIApplicationTerminateEventArgs();
+      NUIApplicationTerminateEventArgs e = new NUIApplicationTerminateEventArgs();
 
-      // Populate all members of "e" (AUIApplicationTerminateEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationTerminateEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationTerminateEventHandler != null)
@@ -469,10 +469,10 @@
 
     /**
       * @brief Event for Paused signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationPauseEventHandler-DaliEventHandler<object,AUIApplicationPauseEventArgs>)
+      * (in the type of NUIApplicationPauseEventHandler-DaliEventHandler<object,NUIApplicationPauseEventArgs>)
       * provided by the user. Paused signal is emitted when application is paused
       */
-    public event DaliEventHandler<object,AUIApplicationPauseEventArgs> Paused
+    public event DaliEventHandler<object,NUIApplicationPauseEventArgs> Paused
     {
       add
       {
@@ -483,7 +483,7 @@
           {
             _applicationPauseEventHandler += value;
 
-            _applicationPauseEventCallbackDelegate = new AUIApplicationPauseEventCallbackDelegate(OnAUIApplicationPause);
+            _applicationPauseEventCallbackDelegate = new NUIApplicationPauseEventCallbackDelegate(OnNUIApplicationPause);
             this.PauseSignal().Connect(_applicationPauseEventCallbackDelegate);
           }
         }
@@ -504,11 +504,11 @@
     }
 
     // Callback for Application PauseSignal
-    private void OnAUIApplicationPause(IntPtr data)
+    private void OnNUIApplicationPause(IntPtr data)
     {
-      AUIApplicationPauseEventArgs e = new AUIApplicationPauseEventArgs();
+      NUIApplicationPauseEventArgs e = new NUIApplicationPauseEventArgs();
 
-      // Populate all members of "e" (AUIApplicationPauseEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationPauseEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationPauseEventHandler != null)
@@ -520,10 +520,10 @@
 
     /**
       * @brief Event for Resumed signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationResumeEventHandler-DaliEventHandler<object,AUIApplicationResumeEventArgs>)
+      * (in the type of NUIApplicationResumeEventHandler-DaliEventHandler<object,NUIApplicationResumeEventArgs>)
       *  provided by the user. Resumed signal is emitted when application is resumed
       */
-    public event DaliEventHandler<object,AUIApplicationResumeEventArgs> Resumed
+    public event DaliEventHandler<object,NUIApplicationResumeEventArgs> Resumed
     {
       add
       {
@@ -534,7 +534,7 @@
           {
             _applicationResumeEventHandler += value;
 
-            _applicationResumeEventCallbackDelegate = new AUIApplicationResumeEventCallbackDelegate(OnAUIApplicationResume);
+            _applicationResumeEventCallbackDelegate = new NUIApplicationResumeEventCallbackDelegate(OnNUIApplicationResume);
             this.ResumeSignal().Connect(_applicationResumeEventCallbackDelegate);
           }
         }
@@ -555,11 +555,11 @@
     }
 
     // Callback for Application ResumeSignal
-    private void OnAUIApplicationResume(IntPtr data)
+    private void OnNUIApplicationResume(IntPtr data)
     {
-      AUIApplicationResumeEventArgs e = new AUIApplicationResumeEventArgs();
+      NUIApplicationResumeEventArgs e = new NUIApplicationResumeEventArgs();
 
-      // Populate all members of "e" (AUIApplicationResumeEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationResumeEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationResumeEventHandler != null)
@@ -571,10 +571,10 @@
 
     /**
       * @brief Event for Reset signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationResetEventHandler-DaliEventHandler<object,AUIApplicationResetEventArgs>)
+      * (in the type of NUIApplicationResetEventHandler-DaliEventHandler<object,NUIApplicationResetEventArgs>)
       *  provided by the user. Reset signal is emitted when application is reset
       */
-    public event DaliEventHandler<object,AUIApplicationResetEventArgs> Reset
+    public event DaliEventHandler<object,NUIApplicationResetEventArgs> Reset
     {
       add
       {
@@ -585,7 +585,7 @@
           {
             _applicationResetEventHandler += value;
 
-            _applicationResetEventCallbackDelegate = new AUIApplicationResetEventCallbackDelegate(OnAUIApplicationReset);
+            _applicationResetEventCallbackDelegate = new NUIApplicationResetEventCallbackDelegate(OnNUIApplicationReset);
             this.ResetSignal().Connect(_applicationResetEventCallbackDelegate);
           }
         }
@@ -606,11 +606,11 @@
     }
 
     // Callback for Application ResetSignal
-    private void OnAUIApplicationReset(IntPtr data)
+    private void OnNUIApplicationReset(IntPtr data)
     {
-      AUIApplicationResetEventArgs e = new AUIApplicationResetEventArgs();
+      NUIApplicationResetEventArgs e = new NUIApplicationResetEventArgs();
 
-      // Populate all members of "e" (AUIApplicationResetEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationResetEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationResetEventHandler != null)
@@ -622,10 +622,10 @@
 
     /**
       * @brief Event for Resized signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationResizeEventHandler-DaliEventHandler<object,AUIApplicationResizeEventArgs>)
+      * (in the type of NUIApplicationResizeEventHandler-DaliEventHandler<object,NUIApplicationResizeEventArgs>)
       *  provided by the user. Resized signal is emitted when application is resized
       */
-    public event DaliEventHandler<object,AUIApplicationResizeEventArgs> Resized
+    public event DaliEventHandler<object,NUIApplicationResizeEventArgs> Resized
     {
       add
       {
@@ -636,7 +636,7 @@
           {
             _applicationResizeEventHandler += value;
 
-            _applicationResizeEventCallbackDelegate = new AUIApplicationResizeEventCallbackDelegate(OnAUIApplicationResize);
+            _applicationResizeEventCallbackDelegate = new NUIApplicationResizeEventCallbackDelegate(OnNUIApplicationResize);
             this.ResizeSignal().Connect(_applicationResizeEventCallbackDelegate);
           }
         }
@@ -657,11 +657,11 @@
     }
 
     // Callback for Application ResizeSignal
-    private void OnAUIApplicationResize(IntPtr data)
+    private void OnNUIApplicationResize(IntPtr data)
     {
-      AUIApplicationResizeEventArgs e = new AUIApplicationResizeEventArgs();
+      NUIApplicationResizeEventArgs e = new NUIApplicationResizeEventArgs();
 
-      // Populate all members of "e" (AUIApplicationResizeEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationResizeEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationResizeEventHandler != null)
@@ -673,10 +673,10 @@
 
     /**
       * @brief Event for LanguageChanged signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationLanguageChangedEventHandler-DaliEventHandler<object,AUIApplicationLanguageChangedEventArgs>)
+      * (in the type of NUIApplicationLanguageChangedEventHandler-DaliEventHandler<object,NUIApplicationLanguageChangedEventArgs>)
       *  provided by the user. LanguageChanged signal is emitted when the region of the device is changed.
       */
-    public event DaliEventHandler<object,AUIApplicationLanguageChangedEventArgs> LanguageChanged
+    public event DaliEventHandler<object,NUIApplicationLanguageChangedEventArgs> LanguageChanged
     {
       add
       {
@@ -687,7 +687,7 @@
           {
             _applicationLanguageChangedEventHandler += value;
 
-            _applicationLanguageChangedEventCallbackDelegate = new AUIApplicationLanguageChangedEventCallbackDelegate(OnAUIApplicationLanguageChanged);
+            _applicationLanguageChangedEventCallbackDelegate = new NUIApplicationLanguageChangedEventCallbackDelegate(OnNUIApplicationLanguageChanged);
             this.LanguageChangedSignal().Connect(_applicationLanguageChangedEventCallbackDelegate);
           }
         }
@@ -708,11 +708,11 @@
     }
 
     // Callback for Application LanguageChangedSignal
-    private void OnAUIApplicationLanguageChanged(IntPtr data)
+    private void OnNUIApplicationLanguageChanged(IntPtr data)
     {
-      AUIApplicationLanguageChangedEventArgs e = new AUIApplicationLanguageChangedEventArgs();
+      NUIApplicationLanguageChangedEventArgs e = new NUIApplicationLanguageChangedEventArgs();
 
-      // Populate all members of "e" (AUIApplicationLanguageChangedEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationLanguageChangedEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationLanguageChangedEventHandler != null)
@@ -724,10 +724,10 @@
 
     /**
       * @brief Event for RegionChanged signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationRegionChangedEventHandler-DaliEventHandler<object,AUIApplicationRegionChangedEventArgs>)
+      * (in the type of NUIApplicationRegionChangedEventHandler-DaliEventHandler<object,NUIApplicationRegionChangedEventArgs>)
       *  provided by the user. RegionChanged signal is emitted when the region of the device is changed.
       */
-    public event DaliEventHandler<object,AUIApplicationRegionChangedEventArgs> RegionChanged
+    public event DaliEventHandler<object,NUIApplicationRegionChangedEventArgs> RegionChanged
     {
       add
       {
@@ -738,7 +738,7 @@
           {
             _applicationRegionChangedEventHandler += value;
 
-            _applicationRegionChangedEventCallbackDelegate = new AUIApplicationRegionChangedEventCallbackDelegate(OnAUIApplicationRegionChanged);
+            _applicationRegionChangedEventCallbackDelegate = new NUIApplicationRegionChangedEventCallbackDelegate(OnNUIApplicationRegionChanged);
             this.RegionChangedSignal().Connect(_applicationRegionChangedEventCallbackDelegate);
           }
         }
@@ -759,11 +759,11 @@
     }
 
     // Callback for Application RegionChangedSignal
-    private void OnAUIApplicationRegionChanged(IntPtr data)
+    private void OnNUIApplicationRegionChanged(IntPtr data)
     {
-      AUIApplicationRegionChangedEventArgs e = new AUIApplicationRegionChangedEventArgs();
+      NUIApplicationRegionChangedEventArgs e = new NUIApplicationRegionChangedEventArgs();
 
-      // Populate all members of "e" (AUIApplicationRegionChangedEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationRegionChangedEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationRegionChangedEventHandler != null)
@@ -775,10 +775,10 @@
 
     /**
       * @brief Event for BatteryLow signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationBatteryLowEventHandler-DaliEventHandler<object,AUIApplicationBatteryLowEventArgs>) 
+      * (in the type of NUIApplicationBatteryLowEventHandler-DaliEventHandler<object,NUIApplicationBatteryLowEventArgs>) 
       * provided by the user. BatteryLow signal is emitted when the battery level of the device is low.
       */
-    public event DaliEventHandler<object,AUIApplicationBatteryLowEventArgs> BatteryLow
+    public event DaliEventHandler<object,NUIApplicationBatteryLowEventArgs> BatteryLow
     {
       add
       {
@@ -789,7 +789,7 @@
           {
             _applicationBatteryLowEventHandler += value;
 
-            _applicationBatteryLowEventCallbackDelegate = new AUIApplicationBatteryLowEventCallbackDelegate(OnAUIApplicationBatteryLow);
+            _applicationBatteryLowEventCallbackDelegate = new NUIApplicationBatteryLowEventCallbackDelegate(OnNUIApplicationBatteryLow);
             this.BatteryLowSignal().Connect(_applicationBatteryLowEventCallbackDelegate);
           }
         }
@@ -810,11 +810,11 @@
     }
 
     // Callback for Application BatteryLowSignal
-    private void OnAUIApplicationBatteryLow(IntPtr data)
+    private void OnNUIApplicationBatteryLow(IntPtr data)
     {
-      AUIApplicationBatteryLowEventArgs e = new AUIApplicationBatteryLowEventArgs();
+      NUIApplicationBatteryLowEventArgs e = new NUIApplicationBatteryLowEventArgs();
 
-      // Populate all members of "e" (AUIApplicationBatteryLowEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationBatteryLowEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationBatteryLowEventHandler != null)
@@ -826,10 +826,10 @@
 
     /**
       * @brief Event for MemoryLow signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationMemoryLowEventHandler-DaliEventHandler<object,AUIApplicationMemoryLowEventArgs>)
+      * (in the type of NUIApplicationMemoryLowEventHandler-DaliEventHandler<object,NUIApplicationMemoryLowEventArgs>)
       *  provided by the user. MemoryLow signal is emitted when the memory level of the device is low.
       */
-    public event DaliEventHandler<object,AUIApplicationMemoryLowEventArgs> MemoryLow
+    public event DaliEventHandler<object,NUIApplicationMemoryLowEventArgs> MemoryLow
     {
       add
       {
@@ -840,7 +840,7 @@
           {
             _applicationMemoryLowEventHandler += value;
 
-            _applicationMemoryLowEventCallbackDelegate = new AUIApplicationMemoryLowEventCallbackDelegate(OnAUIApplicationMemoryLow);
+            _applicationMemoryLowEventCallbackDelegate = new NUIApplicationMemoryLowEventCallbackDelegate(OnNUIApplicationMemoryLow);
             this.MemoryLowSignal().Connect(_applicationMemoryLowEventCallbackDelegate);
           }
         }
@@ -861,11 +861,11 @@
     }
 
     // Callback for Application MemoryLowSignal
-    private void OnAUIApplicationMemoryLow(IntPtr data)
+    private void OnNUIApplicationMemoryLow(IntPtr data)
     {
-      AUIApplicationMemoryLowEventArgs e = new AUIApplicationMemoryLowEventArgs();
+      NUIApplicationMemoryLowEventArgs e = new NUIApplicationMemoryLowEventArgs();
 
-      // Populate all members of "e" (AUIApplicationMemoryLowEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationMemoryLowEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(data);
 
       if (_applicationMemoryLowEventHandler != null)
@@ -877,10 +877,10 @@
 
     /**
       * @brief Event for AppControl signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of AUIApplicationAppControlEventHandler-DaliEventHandler<object,AUIApplicationAppControlEventArgs>)
+      * (in the type of NUIApplicationAppControlEventHandler-DaliEventHandler<object,NUIApplicationAppControlEventArgs>)
       *  provided by the user. AppControl signal is emitted when another application sends a launch request to the application.
       */
-    public event DaliEventHandler<object,AUIApplicationAppControlEventArgs> AppControl
+    public event DaliEventHandler<object,NUIApplicationAppControlEventArgs> AppControl
     {
       add
       {
@@ -891,7 +891,7 @@
           {
             _applicationAppControlEventHandler += value;
 
-            _applicationAppControlEventCallbackDelegate = new AUIApplicationAppControlEventCallbackDelegate(OnAUIApplicationAppControl);
+            _applicationAppControlEventCallbackDelegate = new NUIApplicationAppControlEventCallbackDelegate(OnNUIApplicationAppControl);
             this.AppControlSignal().Connect(_applicationAppControlEventCallbackDelegate);
           }
         }
@@ -912,11 +912,11 @@
     }
 
     // Callback for Application AppControlSignal
-    private void OnAUIApplicationAppControl(IntPtr application, IntPtr voidp)
+    private void OnNUIApplicationAppControl(IntPtr application, IntPtr voidp)
     {
-      AUIApplicationAppControlEventArgs e = new AUIApplicationAppControlEventArgs();
+      NUIApplicationAppControlEventArgs e = new NUIApplicationAppControlEventArgs();
 
-      // Populate all members of "e" (AUIApplicationAppControlEventArgs) with real data
+      // Populate all members of "e" (NUIApplicationAppControlEventArgs) with real data
       e.Application = Application.GetApplicationFromPtr(application);
       e.VoidP = voidp;
 
@@ -1017,6 +1017,9 @@
     }
 
     public static Application NewApplication(string stylesheet, Application.WINDOW_MODE windowMode) {
+
+      // register all Views with the type registry, so that can be created / styled via JSON
+      ViewRegistryHelper.Initialize();
 
       Application ret = New(1, stylesheet, windowMode);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();

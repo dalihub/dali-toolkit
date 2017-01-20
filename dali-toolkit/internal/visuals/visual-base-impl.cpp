@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADER
 #include <dali/public-api/common/dali-common.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
@@ -73,7 +74,29 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
     const KeyValuePair& pair = propertyMap.GetKeyValue( i );
     const Property::Key& key = pair.first;
     const Property::Value& value = pair.second;
-    switch( key.indexKey )
+
+    Property::Key matchKey = key;
+    if( matchKey.type == Property::Key::STRING )
+    {
+      if( matchKey == CUSTOM_SHADER )
+      {
+        matchKey = Property::Key( DevelVisual::Property::SHADER );
+      }
+      else if( matchKey == TRANSFORM )
+      {
+        matchKey = Property::Key( DevelVisual::Property::TRANSFORM );
+      }
+      else if( matchKey == PREMULTIPLIED_ALPHA )
+      {
+        matchKey = Property::Key( DevelVisual::Property::PREMULTIPLIED_ALPHA );
+      }
+      else if( matchKey == MIX_COLOR )
+      {
+        matchKey = Property::Key( DevelVisual::Property::MIX_COLOR );
+      }
+    }
+
+    switch( matchKey.indexKey )
     {
       case DevelVisual::Property::SHADER:
       {
@@ -101,6 +124,16 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         if( value.Get( premultipliedAlpha ) )
         {
           EnablePreMultipliedAlpha( premultipliedAlpha );
+        }
+        break;
+      }
+
+      case DevelVisual::Property::MIX_COLOR:
+      {
+        Vector4 mixColor;
+        if( value.Get( mixColor ) )
+        {
+          SetMixColor( mixColor );
         }
         break;
       }
@@ -188,6 +221,8 @@ void Visual::Base::SetOnStage( Actor& actor )
 
     if( mImpl->mRenderer )
     {
+      RegisterMixColor();
+
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
       mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
       mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
@@ -200,7 +235,7 @@ void Visual::Base::SetOffStage( Actor& actor )
   if( IsOnStage() )
   {
     DoSetOffStage( actor );
-
+    mImpl->mMixColorIndex = Property::INVALID_INDEX;
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
 }
@@ -220,6 +255,10 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 
   bool premultipliedAlpha( IsPreMultipliedAlphaEnabled() );
   map.Insert( DevelVisual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha );
+
+  // Note, Color and Primitive will also insert their own mix color into the map
+  // which is ok, because they have a different key value range.
+  map.Insert( DevelVisual::Property::MIX_COLOR, GetMixColor() );
 }
 
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
@@ -260,9 +299,222 @@ bool Visual::Base::IsFromCache() const
   return mImpl->mFlags & Impl::IS_FROM_CACHE;
 }
 
+void Visual::Base::RegisterMixColor()
+{
+  // Only register if not already registered.
+  // (Color and Primitive visuals will register their own and save to this index)
+  if( mImpl->mMixColorIndex == Property::INVALID_INDEX )
+  {
+    mImpl->mMixColorIndex = DevelHandle::RegisterProperty(
+      mImpl->mRenderer,
+      Toolkit::DevelVisual::Property::MIX_COLOR,
+      MIX_COLOR,
+      mImpl->mMixColor );
+
+    if( mImpl->mMixColor.a < 1.f )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+    }
+
+    float preMultipliedAlpha = 0.0f;
+    if( IsPreMultipliedAlphaEnabled() )
+    {
+      preMultipliedAlpha = 1.0f;
+    }
+    mImpl->mRenderer.RegisterProperty( "preMultipliedAlpha", preMultipliedAlpha );
+  }
+}
+
+void Visual::Base::SetMixColor( const Vector4& color )
+{
+  mImpl->mMixColor = color;
+
+  if( mImpl->mRenderer )
+  {
+    mImpl->mRenderer.SetProperty( mImpl->mMixColorIndex, color );
+    if( color.a < 1.f )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+    }
+  }
+}
+
+const Vector4& Visual::Base::GetMixColor() const
+{
+  return mImpl->mMixColor;
+}
+
 Renderer Visual::Base::GetRenderer()
 {
   return mImpl->mRenderer;
+}
+
+
+Property::Index Visual::Base::GetPropertyIndex( Property::Key key )
+{
+  Property::Index index = DevelHandle::GetPropertyIndex( mImpl->mRenderer, key );
+
+  if( index == Property::INVALID_INDEX )
+  {
+    // Is it a shader property?
+    Shader shader = mImpl->mRenderer.GetShader();
+    index = DevelHandle::GetPropertyIndex( shader, key );
+    if( index != Property::INVALID_INDEX )
+    {
+      // Yes - we should register it in the Renderer so it can be set / animated
+      // independently, as shaders are shared across multiple renderers.
+      std::string keyName;
+      Property::Index keyIndex( Property::INVALID_KEY );
+      if( key.type == Property::Key::INDEX )
+      {
+        keyName = shader.GetPropertyName( index );
+        keyIndex = key.indexKey;
+      }
+      else
+      {
+        keyName = key.stringKey;
+        // Leave keyIndex as INVALID_KEY - it can still be registered against the string key.
+      }
+      Property::Value value = shader.GetProperty( index );
+      index = DevelHandle::RegisterProperty( mImpl->mRenderer, keyIndex, keyName, value );
+    }
+  }
+  return index;
+}
+
+void Visual::Base::SetupTransition(
+  Dali::Animation& transition,
+  Internal::TransitionData::Animator& animator,
+  Property::Index index )
+{
+  if( index != Property::INVALID_INDEX )
+  {
+    if( mImpl->mRenderer )
+    {
+      if( animator.animate == false )
+      {
+        mImpl->mRenderer.SetProperty( index, animator.targetValue );
+      }
+      else
+      {
+        if( animator.initialValue.GetType() != Property::NONE )
+        {
+          mImpl->mRenderer.SetProperty( index, animator.initialValue );
+        }
+
+        if( ! transition )
+        {
+          transition = Dali::Animation::New( 0.1f );
+        }
+
+        transition.AnimateTo( Property( mImpl->mRenderer, index ),
+                              animator.targetValue,
+                              animator.alphaFunction,
+                              TimePeriod( animator.timePeriodDelay,
+                                          animator.timePeriodDuration ) );
+      }
+    }
+  }
+}
+
+void Visual::Base::AnimateProperty(
+  Dali::Animation& transition,
+  Internal::TransitionData::Animator& animator )
+{
+#if defined(DEBUG_ENABLED)
+  {
+    std::ostringstream oss;
+    oss << "Visual::Base::AnimateProperty(Visual:" << mImpl->mName << " Property:" << animator.propertyKey << " Target: " << animator.targetValue << std::endl;
+    DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, oss.str().c_str() );
+  }
+#endif
+
+  Property::Index index = Property::INVALID_INDEX;
+
+  bool isMixColor = false;
+  bool isMixColorOpaque = true;
+
+  // Get the property index
+  if( animator.propertyKey == Toolkit::DevelVisual::Property::MIX_COLOR ||
+      animator.propertyKey == MIX_COLOR )
+  {
+    isMixColor = true;
+    index = mImpl->mMixColorIndex;
+
+    Vector4 initialColor;
+    if( animator.initialValue.Get(initialColor) ) // if there is an initial color, test it
+    {
+      isMixColorOpaque = initialColor.a >= 1.0f;
+    }
+    else
+    {
+      isMixColorOpaque = mImpl->mMixColor.a >= 1.0f; // otherwise, test the current color
+    }
+  }
+  else if( mImpl->mRenderer )
+  {
+    index = GetPropertyIndex( animator.propertyKey );
+  }
+
+  // Set target value into data store
+  if( animator.targetValue.GetType() != Property::NONE )
+  {
+    if( isMixColor )
+    {
+      animator.targetValue.Get( mImpl->mMixColor );
+    }
+    else
+    {
+      // Note: there may be several of these calls if more than one
+      // transform property is animated.
+      Property::Map map;
+      if( animator.propertyKey.type == Property::Key::INDEX )
+      {
+        map.Add( animator.propertyKey.indexKey, animator.targetValue );
+      }
+      else
+      {
+        map.Add( animator.propertyKey.stringKey, animator.targetValue );
+      }
+
+      mImpl->mTransform.UpdatePropertyMap( map );
+    }
+  }
+
+  if( index != Property::INVALID_INDEX )
+  {
+    SetupTransition( transition, animator, index );
+
+    // For mix color, ensure the blend mode is on if the initial or final values are not opaque,
+    // and that it is turned off after the animation ends if the final value is opaque
+    if( isMixColor && (!isMixColorOpaque || mImpl->mMixColor.a < 1.0f) )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+
+      if( animator.animate == true && mImpl->mMixColor.a >= 1.0f )
+      {
+        // When it becomes opaque, set the blend mode back to automatically
+        if( ! mImpl->mBlendSlotDelegate )
+        {
+          mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
+        }
+        transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
+                                             &Visual::Base::OnMixColorFinished );
+      }
+    }
+  }
+}
+
+void Visual::Base::OnMixColorFinished( Animation& animation )
+{
+  if( mImpl->mRenderer )
+  {
+    DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "Visual::Base::OnMixColorFinished()\n");
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE,
+                                  ( mImpl->mMixColor.a < 1.0 ) ? BlendMode::ON : BlendMode::AUTO );
+  }
+  delete mImpl->mBlendSlotDelegate;
+  mImpl->mBlendSlotDelegate = NULL;
 }
 
 } // namespace Internal

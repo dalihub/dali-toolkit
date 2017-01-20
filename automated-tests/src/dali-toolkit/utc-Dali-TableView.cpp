@@ -915,3 +915,127 @@ int UtcDaliTableViewKeyboardFocus(void)
 
   END_TEST;
 }
+
+int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(3, 3);
+  tableView.SetKeyboardFocusable( true );
+  tableView.SetName( "TableView");
+
+  for ( int row = 0; row < 3; ++row )
+  {
+    for ( int col = 0; col < 3; ++col )
+    {
+      std::ostringstream str;
+      str << row << "-" << col;
+
+      if (row == 1 && col ==1)
+      {
+        // Add a nested 2x2 table view in the middle cell of the parent table view
+        TableView childTableView = TableView::New(2, 2);
+        childTableView.SetName( str.str() );
+
+        for(int childRow = 0; childRow < 2; childRow++)
+        {
+          for(int childCol = 0; childCol < 2; childCol++)
+          {
+            Control control = Control::New();
+            std::ostringstream nameStr;
+            nameStr << row << "-" << col << "-" << childRow << "-" << childCol;
+            control.SetName( nameStr.str() );
+            control.SetKeyboardFocusable( true );
+            childTableView.AddChild( control, TableView::CellPosition( childRow, childCol ) );
+          }
+        }
+        tableView.AddChild( childTableView, TableView::CellPosition( row, col ) );
+      }
+      else
+      {
+        Control control = Control::New();
+        control.SetName( str.str() );
+        control.SetKeyboardFocusable( true );
+        tableView.AddChild( control, TableView::CellPosition( row, col ) );
+      }
+    }
+  }
+
+  Stage::GetCurrent().Add( tableView );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor firstFocusActor = Toolkit::Internal::GetImplementation( tableView ).GetNextKeyboardFocusableActor( Actor(), Control::KeyboardFocus::RIGHT, true );
+  DALI_TEST_CHECK( firstFocusActor );
+  DALI_TEST_CHECK( firstFocusActor.GetName() == "0-0" );
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  manager.SetFocusGroupLoop( false );
+  manager.SetCurrentFocusActor( firstFocusActor );
+
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-1" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-2" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-2" );
+
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-0" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-2" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-1" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-0" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-0" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-0" );
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-1" );
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+
+  END_TEST;
+}

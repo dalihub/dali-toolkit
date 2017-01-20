@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -428,8 +428,6 @@ Property::Value Model3dView::GetProperty( BaseObject* object, Property::Index in
 
 void Model3dView::OnStageConnection( int depth )
 {
-  Control::OnStageConnection( depth );
-
   CustomActor self = Self();
   self.AddRenderer( mRenderer );
 
@@ -449,6 +447,8 @@ void Model3dView::OnStageConnection( int depth )
     constraint.AddSource( Source( self, Toolkit::Model3dView::Property::LIGHT_POSITION ) );
     constraint.Apply();
   }
+
+  Control::OnStageConnection( depth );
 }
 
 ///////////////////////////////////////////////////////////

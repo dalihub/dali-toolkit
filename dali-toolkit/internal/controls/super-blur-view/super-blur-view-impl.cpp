@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,6 +292,8 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
       SetImage( mInputImage );
     }
   }
+
+  Control::OnSizeSet( targetSize );
 }
 
 void SuperBlurView::OnStageConnection( int depth )
@@ -301,7 +303,7 @@ void SuperBlurView::OnStageConnection( int depth )
     return;
   }
 
-  // Chaining up first ensures visuals have SetOnStage called to create their renderers
+  // Exception to the rule, chaining up first ensures visuals have SetOnStage called to create their renderers
   Control::OnStageConnection( depth );
 
   Actor self = Self();
@@ -310,6 +312,7 @@ void SuperBlurView::OnStageConnection( int depth )
     // Note that the renderer indices are depending on the order they been added to the actor
     // which might be different from the blur level of its texture.
     // We can check the depth index of the renderer to know which blurred image it renders.
+    // All visuals WILL have renderers at this point as we are simply creating visuals with an Image handle.
     Renderer renderer = self.GetRendererAt( i );
     int depthIndex = renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX);
     if( depthIndex > 0 )
@@ -320,11 +323,6 @@ void SuperBlurView::OnStageConnection( int depth )
       constraint.Apply();
     }
   }
-}
-
-void SuperBlurView::OnStageDisconnection( )
-{
-  Control::OnStageDisconnection();
 }
 
 Vector3 SuperBlurView::GetNaturalSize()

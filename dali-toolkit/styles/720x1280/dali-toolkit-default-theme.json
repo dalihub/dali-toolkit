@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * This file is part of Dali Toolkit
  *
@@ -205,11 +205,11 @@
     {
       "progressValue": 0,
       "trackVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin.9.png",
+        "url":"{DALI_IMAGE_DIR}progress-skin.9.png",
         "size":[24,24]
       },
       "progressVisual":{
-        "url":"{DALI_IMAGE_DIR}slider-skin-progress.9.png",
+        "url":"{DALI_IMAGE_DIR}progress-skin-progress.9.png",
         "size":[24,24]
       }
     },
@@ -233,7 +233,7 @@
        {
          "visualType": "TEXT",
          "horizontalAlignment": "CENTER",
-         "pointSize" : 12.0, // Point size must always be provided to Text Visual
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
          "verticalAlignment": "CENTER"
        },
       "unselectedBackgroundVisual":
@@ -264,7 +264,7 @@
       "label":
        {
          "visualType": "TEXT",
-         "pointSize" : 12.0, // Point size must always be provided to Text Visual
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
          "verticalAlignment": "CENTER"
        },
       "unselectedVisual":
@@ -295,7 +295,7 @@
       "label":
        {
          "visualType": "TEXT",
-         "pointSize" : 12.0, // Point size must always be provided to Text Visual
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
          "verticalAlignment": "CENTER"
        },
       "unselectedVisual":

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -604,6 +604,120 @@ int UtcDaliControlImplGetControlExtensionP(void)
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( control );
 
   DALI_TEST_CHECK( NULL == controlImpl.GetControlExtension() );
+
+  END_TEST;
+}
+
+int UtcDaliControlAutoClipping(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+
+  tet_infoline( "Test to see if a renderer gets added when we are clipping children" );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1, control.GetRendererCount(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlAutoClippingN(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Visual::Property::TYPE, Visual::COLOR )
+                                                                     .Add( ColorVisual::Property::MIX_COLOR, Color::RED ) );
+
+  tet_infoline( "Test to ensure that a renderer does NOT get added when we are clipping children and already have renderers/visuals" );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1, control.GetRendererCount(), TEST_LOCATION ); // Only 1, not 2
+
+  // Ensure the background color is still RED rather than what's set by the automatic clipping
+  Property::Value value = control.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK( map );
+  Property::Value* colorValue = map->Find(ColorVisual::Property::MIX_COLOR );
+  DALI_TEST_CHECK( colorValue );
+  DALI_TEST_EQUALS( colorValue->Get< Vector4 >(), Color::RED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlAutoClippingWhenAlreadyOnStage(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+
+  tet_infoline( "Test to see if a renderer gets added when we are clipping children and when already on stage" );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1, control.GetRendererCount(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlAutoClippingWhenAlreadyOnStageN(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Visual::Property::TYPE, Visual::COLOR )
+                                                                     .Add( ColorVisual::Property::MIX_COLOR, Color::RED ) );
+
+  tet_infoline( "Test to ensure that a renderer does NOT get added when we are clipping children and already have renderers/visuals and when already on stage" );
+
+  DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1, control.GetRendererCount(), TEST_LOCATION );
+
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1, control.GetRendererCount(), TEST_LOCATION ); // Still should be 1
+
+  // Ensure the background color is still RED rather than what's set by the automatic clipping
+  Property::Value value = control.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK( map );
+  Property::Value* colorValue = map->Find(ColorVisual::Property::MIX_COLOR );
+  DALI_TEST_CHECK( colorValue );
+  DALI_TEST_EQUALS( colorValue->Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
   END_TEST;
 }

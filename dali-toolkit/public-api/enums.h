@@ -42,7 +42,7 @@ namespace ControlOrientation
 {
 
 /**
- * @brief The internal orientation of a control.
+ * @brief Enumeration for the internal orientation of a control.
  * @SINCE_1_0.0
  */
 enum Type
@@ -59,7 +59,7 @@ enum Type
  * @brief Query whether an orientation is vertical.
  *
  * @param[in] orientation The orientation.
- * @return True if the orientation is vertical.
+ * @return true if the orientation is vertical.
  */
 DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
 
@@ -68,7 +68,7 @@ DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
  *
  * @SINCE_1_0.0
  * @param[in] orientation The orientation.
- * @return True if the orientation is horizontal.
+ * @return true if the orientation is horizontal.
  */
 DALI_IMPORT_API bool IsHorizontal(ControlOrientation::Type orientation);
 

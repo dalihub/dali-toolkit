@@ -53,6 +53,8 @@
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/property-key.h>
+#include <dali/devel-api/object/csharp-type-info.h>
+#include <dali/devel-api/object/csharp-type-registry.h>
 
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/adaptor-framework/window.h>
@@ -165,7 +167,66 @@
   return $null;
 %}
 
+
+
+
+// Type registry type maps
+%typemap(cstype) Dali::TypeInfo::CreateFunction "System.Delegate"
+%typemap(csin, pre ="System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate($csinput); ")
+  Dali::TypeInfo::CreateFunction "new System.Runtime.InteropServices.HandleRef(null, ip)" // null was this
+
+%typemap(cstype) Dali::CSharpTypeInfo::CreateFunction "System.Delegate"
+%typemap(csin, pre ="System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate($csinput); ")
+   Dali::CSharpTypeInfo::CreateFunction "new System.Runtime.InteropServices.HandleRef(null, ip)" // null was this
+
+
+
+%typemap(cstype) Dali::CSharpTypeInfo::SetPropertyFunction "System.Delegate"
+%typemap(csin, pre ="System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate($csinput); ")
+   Dali::CSharpTypeInfo::SetPropertyFunction "new System.Runtime.InteropServices.HandleRef(null, ip)" // null was this
+
+
+
+%typemap(cstype) Dali::CSharpTypeInfo::GetPropertyFunction "System.Delegate"
+%typemap(csin, pre ="System.IntPtr ip2 = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate($csinput); ")
+   Dali::CSharpTypeInfo::GetPropertyFunction "new System.Runtime.InteropServices.HandleRef(null, ip2)" // null was this
+
+
+
+
+
+
+
 #endif
+
+
+
+/**
+ * Extend the type registry to allow for registering of C# controls and custom properties
+ */
+%extend Dali::TypeRegistration {
+
+
+   static void RegisterControl( const std::string& controlName, Dali::CSharpTypeInfo::CreateFunction createFunc )
+   {
+     Dali::CSharpTypeRegistry::RegisterType( controlName, typeid( Dali::Toolkit::Control), createFunc );
+   };
+
+
+   static void RegisterProperty( const std::string& controlName,
+                    const std::string& propertyName,
+                    int index,
+                    Property::Type type,
+                    Dali::CSharpTypeInfo::SetPropertyFunction setFunc,
+                    Dali::CSharpTypeInfo::GetPropertyFunction getFunc )
+   {
+     Dali::CSharpTypeRegistry::RegisterProperty( controlName, propertyName, index, type, setFunc, getFunc );
+   };
+
+};
+
+
+
 
 %ignore operator<<;
 %ignore *::GetImplementation();
@@ -218,8 +279,11 @@ using namespace Dali::Toolkit;
 %include events/videoview-event.i
 
 %include alphafunction.i
-
+%include name-changed.i
+%include property-value.i
 %include dali-operator.i
+%include devel-properties.i
+
 %include dali-core.i
 %include dali-adaptor.i
 %include dali-toolkit.i

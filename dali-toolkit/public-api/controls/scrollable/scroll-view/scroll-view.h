@@ -492,13 +492,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the ScrollView class.
+   * @brief Enumeration for the instance of properties belonging to the ScrollView class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the ScrollView class.
+     * @brief Enumeration for the instance of properties belonging to the ScrollView class.
      * @SINCE_1_0.0
      */
     enum

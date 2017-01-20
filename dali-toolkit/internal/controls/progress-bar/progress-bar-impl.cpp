@@ -59,7 +59,6 @@ const char* SKINNED_PROGRESS_VISUAL = DALI_IMAGE_DIR "slider-skin-progress.9.png
 float DEFAULT_VALUE = 0.0f;
 float DEFAULT_LOWER_BOUND = 0.0f;
 float DEFAULT_UPPER_BOUND = 1.0f;
-float DEFAULT_PADDING = 24.0f;
 
 } // Unnamed namespace
 
@@ -111,13 +110,10 @@ void ProgressBar::OnInitialize()
 
 void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  Vector2 trackSize( size );
-  trackSize.width = std::max( 0.0f, size.width - DEFAULT_PADDING ); // Ensure we don't go negative
-
   // Track
   if( mTrack )
   {
-    container.Add( mTrack, trackSize );
+    container.Add( mTrack, size );
 
     // mValueTextLabel will have its relayout method called automatically as it's a child of mTrack,
     // which is added to the container
@@ -126,13 +122,13 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
   // Progress bar
   if( mProgress )
   {
-    mDomain = CalcDomain( trackSize );
+    mDomain = CalcDomain( size );
 
-    Vector2 progressSize( trackSize );
+    Vector2 progressSize( size );
 
     // If no progress, then we do not want a n-patch image shown incorrectly
     progressSize.width = std::max( mProgressVisualSize.width, mDomain.from.x + mValue * ( mDomain.to.x - mDomain.from.x ) );
-    progressSize.width = std::min( progressSize.width, trackSize.width ); // We should not exceed given size
+    progressSize.width = std::min( progressSize.width, size.width ); // We should not exceed given size
 
     container.Add( mProgress, progressSize );
   }
