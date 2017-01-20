@@ -1198,6 +1198,11 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
   scrollView.SetOvershootEnabled(true);
+
+  Vector2 overshootSize = Vector2(100.0f,100.0f);
+  scrollView.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, overshootSize );
+  DALI_TEST_EQUALS( scrollView.GetProperty(Scrollable::Property::OVERSHOOT_SIZE).Get<Vector2>(), overshootSize, TEST_LOCATION );
+
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);

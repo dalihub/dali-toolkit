@@ -944,6 +944,12 @@ int UtcDaliItemViewSetGetProperty(void)
   view.SetProperty( Scrollable::Property::OVERSHOOT_ENABLED, false );
   DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_ENABLED).Get<bool>(), false, TEST_LOCATION );
 
+  // Test "overshootSize" property
+  DALI_TEST_CHECK( view.GetPropertyIndex("overshootSize") == Scrollable::Property::OVERSHOOT_SIZE  );
+  Vector2 overshootSize = Vector2(100.0f,100.0f);
+  view.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, overshootSize );
+  DALI_TEST_EQUALS( view.GetProperty(Scrollable::Property::OVERSHOOT_SIZE).Get<Vector2>(), overshootSize, TEST_LOCATION );
+
   // Animatable properties
 
   // Test "layoutPosition" property
