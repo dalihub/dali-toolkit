@@ -69,6 +69,8 @@ const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 const Vector4 OVERSHOOT_OVERLAY_NINE_PATCH_BORDER(0.0f, 0.0f, 1.0f, 12.0f);
 const float DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION = 0.2f;
 
+const unsigned int OVERSHOOT_SIZE_CONSTRAINT_TAG(42);
+
 /**
  * Local helper to convert pan distance (in actor coordinates) to the layout-specific scrolling direction
  */
@@ -289,6 +291,21 @@ bool FindById( const ItemContainer& items, ItemId id )
   }
 
   return false;
+}
+
+/**
+  * Helper to apply size constraint to mOvershootOverlay
+  * @param[in] overshootOverlay The overshootOverlay actor
+  * @param[in] The required height
+  */
+void ApplyOvershootSizeConstraint( Actor overshootOverlay, float height )
+{
+  Constraint constraint = Constraint::New<Vector3>( overshootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint( height ) );
+  constraint.AddSource( ParentSource( Dali::Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
+  constraint.AddSource( ParentSource( Dali::Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
+  constraint.AddSource( ParentSource( Dali::Actor::Property::SIZE ) );
+  constraint.SetTag( OVERSHOOT_SIZE_CONSTRAINT_TAG );
+  constraint.Apply();
 }
 
 } // unnamed namespace
@@ -1519,6 +1536,18 @@ void ItemView::ScrollTo(const Vector2& position, float duration)
   mRefreshEnabled = true;
 }
 
+void ItemView::SetOvershootSize( const Vector2& size )
+{
+  mOvershootSize = size;
+
+  if( mOvershootOverlay )
+  {
+    // Remove old & add new size constraint
+    mOvershootOverlay.RemoveConstraints( OVERSHOOT_SIZE_CONSTRAINT_TAG );
+    ApplyOvershootSizeConstraint( mOvershootOverlay, mOvershootSize.height );
+  }
+}
+
 void ItemView::SetOvershootEffectColor( const Vector4& color )
 {
   mOvershootEffectColor = color;
@@ -1543,15 +1572,9 @@ void ItemView::EnableScrollOvershoot( bool enable )
       mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
       self.Add(mOvershootOverlay);
 
-      Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(mOvershootSize.height) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
-      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      constraint.Apply();
+      ApplyOvershootSizeConstraint( mOvershootOverlay, mOvershootSize.height );
 
-      mOvershootOverlay.SetSize(mOvershootSize.width, mOvershootSize.height);
-
-      constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
+      Constraint constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
       constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_DIRECTION ) );
       constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_ORIENTATION ) );
       constraint.AddSource( ParentSource( Toolkit::ItemView::Property::OVERSHOOT ) );
