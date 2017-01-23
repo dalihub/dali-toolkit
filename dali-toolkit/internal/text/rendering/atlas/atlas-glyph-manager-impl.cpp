@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,12 +61,13 @@ void main()
 );
 
 const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
+uniform lowp    vec4      uColor;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord );
+  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
 }
 );
 
