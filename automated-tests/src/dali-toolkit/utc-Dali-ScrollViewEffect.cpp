@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,31 +211,6 @@ void CleanupTest()
 {
   gPages.clear();
   ResetScrollCallbackResults();
-}
-
-Actor AddActorToPage(Actor page, float x, float y, float cols, float rows)
-{
-  Stage stage = Stage::GetCurrent();
-  Vector2 stageSize = stage.GetSize();
-
-  const float margin = 10.0f;
-  const Vector2 actorSize((stageSize.x / cols) - margin, (stageSize.y / rows) - margin);
-
-  Actor actor = Actor::New();
-  actor.SetParentOrigin( ParentOrigin::CENTER );
-  actor.SetAnchorPoint( AnchorPoint::CENTER );
-
-  Vector3 position( margin * 0.5f + (actorSize.x + margin) * x - stageSize.width * 0.5f,
-                    margin * 0.5f + (actorSize.y + margin) * y - stageSize.height * 0.5f,
-                    0.0f);
-  Vector3 positionEnd( margin * 0.5f + (actorSize.x + margin) * (x + cols) - stageSize.width * 0.5f - margin,
-                       margin * 0.5f + (actorSize.y + margin) * (y + rows) - stageSize.height * 0.5f - margin,
-                       0.0f);
-  Vector3 size(positionEnd - position);
-  actor.SetPosition( position + size * 0.5f);
-  actor.SetSize( positionEnd - position );
-  page.Add(actor);
-  return actor;
 }
 
 } // unnamed namespace

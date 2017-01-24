@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,23 +106,6 @@ struct ValidateFontsData
 };
 
 //////////////////////////////////////////////////////////
-void PrintFontDescription( FontId id )
-{
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-
-  TextAbstraction::FontDescription description;
-  fontClient.GetDescription( id, description );
-
-  const TextAbstraction::PointSize26Dot6 pointSize = fontClient.GetPointSize( id );
-
-  std::cout << std::endl << "  font description for font id : " << id << std::endl;
-  std::cout << "  font family : [" << description.family << "]" << std::endl;
-  std::cout << "   font width : [" << TextAbstraction::FontWidth::Name[description.width] << "]" << std::endl;
-  std::cout << "  font weight : [" << TextAbstraction::FontWeight::Name[description.weight] << "]" << std::endl;
-  std::cout << "   font slant : [" << TextAbstraction::FontSlant::Name[description.slant] << "]" << std::endl;
-  std::cout << "    font size : " << pointSize << std::endl;
-}
-
 bool MergeFontDescriptionsTest( const MergeFontDescriptionsData& data )
 {
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
