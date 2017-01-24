@@ -247,6 +247,8 @@ using namespace Dali::Toolkit;
 %include signal-parameters.i
 %include signals.i
 
+%include doxygen.i
+
 %include events/actor-event.i
 %include events/accessibilitymanager-event.i
 %include events/application-event.i
