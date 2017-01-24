@@ -22,7 +22,6 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/rendering/texture-set.h>
-#include <dali/devel-api/images/atlas.h>
 
 namespace Dali
 {

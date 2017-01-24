@@ -33,6 +33,7 @@ namespace Toolkit
 
 namespace Internal
 {
+typedef unsigned char PixelBuffer;
 
 Texture ImageAtlas::PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  )
 {

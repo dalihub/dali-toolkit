@@ -22,7 +22,6 @@
 #include <cstring> // for strncasecmp
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
-#include <dali/devel-api/images/atlas.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/scripting/enum-helper.h>
