@@ -857,6 +857,14 @@
         SetProperty( View.Property.TOOLTIP, new Dali.Property.Value( value ) );
       }
     }
+
+    public string TooltipText
+    {
+      set
+      {
+        SetProperty( View.Property.TOOLTIP, new Dali.Property.Value( value ) );
+      }
+    }
  %}
 %enddef
 

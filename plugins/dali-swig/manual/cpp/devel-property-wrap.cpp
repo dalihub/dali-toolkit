@@ -26,6 +26,8 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/scrollable/item-view/item-view-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,6 +173,33 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Button_Property_VISUAL_PADDING_get() {
   int result;
 
   result = (int)Dali::Toolkit::DevelButton::Property::VISUAL_PADDING;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Visual_Property_TRANSFORM_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelVisual::Property::TRANSFORM;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Visual_Property_PREMULTIPLIED_ALPHA_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelVisual::Property::PREMULTIPLIED_ALPHA;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Visual_Property_MIX_COLOR_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelVisual::Property::MIX_COLOR;
   jresult = (int)result;
   return jresult;
 }

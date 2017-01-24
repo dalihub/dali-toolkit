@@ -82,6 +82,8 @@
 
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
+#include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
+
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
 // add here SWIG version check
@@ -224,8 +226,6 @@
    };
 
 };
-
-
 
 
 %ignore operator<<;
