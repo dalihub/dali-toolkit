@@ -15,6 +15,7 @@
  *
  */
 %apply unsigned int& OUTPUT { unsigned int& volume };
+%feature("director") Dali::Toolkit::ItemFactory;
 
 %ignore *::AccessibilityManager(Internal::AccessibilityManager*);
 %ignore *::Alignment(Internal::Alignment&);
