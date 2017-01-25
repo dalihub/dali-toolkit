@@ -45,7 +45,7 @@ namespace MyCSharpExample
 
         // List of items
         private Item[] mViewList = {
-            new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", false),
+            new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", true),
             new Item("InputField", false),  new Item("AnimateGif", false),  new Item("Loading", false),
             new Item("ProgressBar", false), new Item("CheckBox", false),    new Item("RadioButton", true),
             new Item("Tooltip", true),     new Item("Popup", true),       new Item("Toast", true),
@@ -154,7 +154,28 @@ namespace MyCSharpExample
                 }
                 if (item.name.CompareTo("Toggle") == 0)
                 {
+                    ToggleButton toggleButton = new ToggleButton();
+                    Dali.Property.Array array = new Dali.Property.Array();
+                    array.Add( new Dali.Property.Value("./images/star-highlight.png") );
+                    array.Add( new Dali.Property.Value("./images/star-mod.png") );
+                    array.Add( new Dali.Property.Value("./images/star-dim.png") );
+                    toggleButton.StateVisuals = array;
 
+                    Dali.Property.Array tooltips = new Dali.Property.Array();
+                    tooltips.Add( new Dali.Property.Value("State A") );
+                    tooltips.Add( new Dali.Property.Value("State B") );
+                    tooltips.Add( new Dali.Property.Value("State C") );
+                    toggleButton.Tooltips = tooltips;
+
+                    toggleButton.WidthResizePolicy  = "FILL_TO_PARENT";
+                    toggleButton.HeightResizePolicy = "FILL_TO_PARENT";
+                    toggleButton.Clicked += (obj, e) =>
+                    {
+                        Console.WriteLine("Toggle button state changed.");
+                        return true;
+                    };
+
+                    _contentContainer.AddChild(toggleButton, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
                 }
                 if (item.name.CompareTo("InputField") == 0)
                 {
