@@ -470,6 +470,11 @@ int UtcDaliToolkitScrollBarSetScrollIndicatorP(void)
   DALI_TEST_CHECK( indicator != scrollBar.GetScrollIndicator() );
   DALI_TEST_CHECK( newIndicator == scrollBar.GetScrollIndicator() );
 
+  // Check that the new control indicator is successfully set
+  Control controlIndicator = Control::New();
+  scrollBar.SetScrollIndicator(controlIndicator);
+
+  DALI_TEST_CHECK( controlIndicator == Control::DownCast( scrollBar.GetScrollIndicator() ) );
   END_TEST;
 }
 
