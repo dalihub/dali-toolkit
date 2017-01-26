@@ -60,13 +60,13 @@ For example, an offsetSizeMode of [0, 0, 1, 1], an offset of (0, 0.25) and a siz
 Visuals also have a custom **shader** property. Whilst it's possible to change the shader, please note that some visuals rely on the vertex shader to perform certain functions. For example, the NPatch visual uses the vertex shader to perform the stretching. The **shader** property is a Property::Map with the following keys:
 
 
-| Property                                        | String   | Type    | Required | Description               |
-|-------------------------------------------------|----------|:-------:|:--------:|---------------------------|
-| Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER | vertexShader | STRING | No      | The vertex shader code. |
-| Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER | fragmentShader | STRING | No      | The fragment shader code. |
-| Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X | subdivideGridX | INTEGER | No      | How to subdivide the grid along the X-Axis. Defaults to 1 |
-| Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y | subdivideGridY | INTEGER | No      | How to subdivide the grid along the Y-Axis. Defaults to 1 |
-| Dali::Toolkit::Visual::Shader::Property::HINTS | hints | INTEGER or ARRAY of STRING | No      | Shader hints bitmask [More info](@ref shader-hints) |
+| Property                                                  | String         | Type                       | Required | Description                                                                                |
+|-----------------------------------------------------------|----------------|:--------------------------:|:--------:|--------------------------------------------------------------------------------------------|
+| Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER    | vertexShader   | STRING or ARRAY of STRING  | No       | The vertex shader code. Can use an array of strings to split shader over multiple lines.   |
+| Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER  | fragmentShader | STRING or ARRAY of STRING  | No       | The fragment shader code. Can use an array of strings to split shader over multiple lines. |
+| Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X | subdivideGridX | INTEGER                    | No       | How to subdivide the grid along the X-Axis. Defaults to 1.                                 |
+| Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y | subdivideGridY | INTEGER                    | No       | How to subdivide the grid along the Y-Axis. Defaults to 1.                                 |
+| Dali::Toolkit::Visual::Shader::Property::HINTS            | hints          | INTEGER or ARRAY of STRING | No       | Shader hints bitmask [More info](@ref shader-hints)                                        |
 
 ## Shader hints {#shader-hints}
 
