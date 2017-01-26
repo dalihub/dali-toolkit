@@ -286,6 +286,9 @@ using namespace Dali::Toolkit;
 %include dali-operator.i
 %include devel-properties.i
 
+%include gestures/hover.i
+
+
 %include dali-core.i
 %include dali-adaptor.i
 %include dali-toolkit.i

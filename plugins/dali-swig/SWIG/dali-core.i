@@ -303,7 +303,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %template(LongPressGestureDetectedSignal) Dali::Signal<void (Dali::Actor, const Dali::LongPressGesture&)>;
 //%template(ActorTouchEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchEvent&)>;
 %template(ActorTouchDataSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchData&)>;
-%template(ActorHoverEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::HoverEvent&)>;
+%template(ActorHoverSignal) Dali::Signal<bool (Dali::Actor, const Dali::HoverEvent&)>;
 %template(ActorWheelEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::WheelEvent&)>;
 %template(ActorSignal) Dali::Signal<void (Dali::Actor)>;
 %template(KeyEventSignal) Dali::Signal<void (const Dali::KeyEvent&)>;
