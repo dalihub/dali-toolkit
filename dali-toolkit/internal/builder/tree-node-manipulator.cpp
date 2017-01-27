@@ -398,7 +398,7 @@ void TreeNodeManipulator::DoWrite(const TreeNode *value, std::ostream& output, i
     {
       bool groupMyChildren = false;
 
-      if( TreeNode::ARRAY == value->GetType() &&
+      if( TreeNode::ARRAY == value->GetType() && value->mFirstChild &&
           ( TreeNode::INTEGER == value->mFirstChild->GetType() ||
             TreeNode::FLOAT   == value->mFirstChild->GetType() ) )
       {
