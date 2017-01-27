@@ -1078,12 +1078,11 @@ void TableView::OnChildRemove( Actor& child )
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mCellData( initialRows, initialColumns ),
+  mPreviousFocusedActor(),
   mLayoutingChild( false ),
   mRowDirty( true ),     // Force recalculation first time
   mColumnDirty( true )
 {
-  mCurrentColumn = 0;
-  mCurrentRow = 0;
   SetKeyboardNavigationSupport( true );
   ResizeContainers( initialRows, initialColumns );
 }
@@ -1405,29 +1404,37 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
       // Move the focus if we haven't lost it.
       if(!focusLost)
       {
-        // Save the new focus cell positions of TableView.
-        mCurrentColumn = currentColumn;
-        mCurrentRow = currentRow;
-
         nextFocusableActor = GetChildAt(Toolkit::TableView::CellPosition(currentRow, currentColumn));
+
+        // Save the focused actor in the TableView.
+        mPreviousFocusedActor = nextFocusableActor;
       }
     }
     else
     {
-      // The current focused actor is not within TableView.
-      // This means that the TableView has gained the Focus again.
+      // The current focused actor is not within this TableView.
 
       unsigned int numberOfColumns = GetColumns();
       unsigned int numberOfRows = GetRows();
 
-      if( (mCurrentRow != 0 && mCurrentColumn != 0) && // Last saved cell was not the first cell
-          (mCurrentRow != numberOfRows - 1 && mCurrentColumn != numberOfColumns - 1) ) // Last saved cell was not the last cell
+      // Check whether the previous focused actor is a focus group (i.e. a layout container)
+      bool wasFocusedOnLayoutContainer = false;
+      Actor previousFocusedActor = mPreviousFocusedActor.GetHandle();
+      if( previousFocusedActor )
       {
-        // This condition handles the cases when parent TableView gained the focus again after the child layout
-        // container (i.e. TableView) has no more items (i.e. actors) to be focused on in a given direction.
+        Toolkit::Control control = Toolkit::Control::DownCast( previousFocusedActor );
+        if( control )
+        {
+          Internal::Control& controlImpl = static_cast<Internal::Control&>(control.GetImplementation());
+          wasFocusedOnLayoutContainer = controlImpl.IsKeyboardFocusGroup();
+        }
+      }
 
-        // Move the focus to next cell towards the given direction in a TableView if the last saved cell was not the first or last cell.
-        nextFocusableActor = GetNextKeyboardFocusableActor(GetChildAt(Toolkit::TableView::CellPosition(mCurrentRow, mCurrentColumn)), direction, loopEnabled);
+      // Check whether the previous focused actor is a layout container and also a child of this TableView
+      Toolkit::TableView::CellPosition position;
+      if( wasFocusedOnLayoutContainer && FindChildPosition( previousFocusedActor, position ) )
+      {
+        nextFocusableActor = GetNextKeyboardFocusableActor(previousFocusedActor, direction, loopEnabled);
       }
       else
       {
