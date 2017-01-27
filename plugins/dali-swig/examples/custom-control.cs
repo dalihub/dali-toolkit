@@ -62,7 +62,7 @@ namespace MyCSharpExample
             UpdateStartImages(_myRating);
 
             // Enable pan gesture detection
-            EnableGestureDetection(Gesture.Type.Pan);
+            EnableGestureDetection(Gesture.GestureType.Pan);
             _myDragEnabled = true; // Allow dragging by default (can be disabled)
         }
 
@@ -72,18 +72,18 @@ namespace MyCSharpExample
             // Only handle pan gesture if dragging is allowed
             if(_myDragEnabled)
             {
-                switch (gesture.state)
+                switch (gesture.State)
                 {
-                    case Gesture.State.Started:
+                    case Gesture.StateType.Started:
                     {
                         _gestureDisplacement = new Vector3(0.0f, 0.0f, 0.0f);
                         _currentValue = 0;
                         break;
                     }
-                    case Gesture.State.Continuing:
+                    case Gesture.StateType.Continuing:
                     {
                         // Calculate the rating according to pan desture displacement
-                        _gestureDisplacement.X += gesture.displacement.X;
+                        _gestureDisplacement.X += gesture.Displacement.X;
                         int delta = (int)Math.Ceiling(_gestureDisplacement.X / 40.0f);
                         _currentValue = _myRating + delta;
 

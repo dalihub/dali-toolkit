@@ -51,10 +51,10 @@ namespace MyCSharpExample
       Log("Initialize() is called!");
       Stage stage = Stage.GetCurrent();
       stage.BackgroundColor = Color.White;
-      stage.TouchEvent += OnStageTouched;
-      stage.TouchEvent += OnStageTouched2;
+      stage.Touch += OnStageTouched;
+      stage.Touch += OnStageTouched2;
       //stage.EventProcessingFinished += OnEventProcessingFinished;
-      stage.WheelEvent += OnStageWheelEvent;
+      stage.Wheel += OnStageWheelEvent;
 
       // Add a _text label to the stage
       _text = new TextLabel("Hello Mono World");
@@ -142,7 +142,7 @@ namespace MyCSharpExample
     public void OnStageTouched(object source, Stage.TouchEventArgs e)
     {
       // Only animate the _text label when touch down happens
-      if( e.TouchData.GetState(0) == PointStateType.DOWN )
+      if( e.Touch.GetState(0) == PointStateType.DOWN )
       {
         Log("OnStageTouched() is called! PointStateType.DOWN came!");
         myCount++;
@@ -157,7 +157,7 @@ namespace MyCSharpExample
     // Callback for stage touched signal handling
     public void OnStageTouched2(object source, Stage.TouchEventArgs e)
     {
-      Log("OnStageTouched2() is called!state="+ e.TouchData.GetState(0) );
+      Log("OnStageTouched2() is called!state="+ e.Touch.GetState(0) );
     }
 
     public void OnEventProcessingFinished(object source)

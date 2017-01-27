@@ -25,12 +25,12 @@
   * Required to get access to any data passed as a parameter in a Signal ( in C# they are delegate parameters).
   * E.g.
   *
-  * CREATE_CSHARP_WRAPPER_FROM_C_PTR_FUNCTION( TouchData );
-  * Creates a function called GetTouchDataFromPtr which allows you to:
+  * CREATE_CSHARP_WRAPPER_FROM_C_PTR_FUNCTION( Touch );
+  * Creates a function called GetTouchFromPtr which allows you to:
   *
   * static void OnStageTouched(IntPtr data)
   * {
-  *    TouchData touchData = TouchData.GetTouchDataFromPtr( data );
+  *    Touch touch = Touch.GetTouchFromPtr( data );
   * }
   *
   * ## means concat in a SWIG macro
@@ -54,14 +54,6 @@ DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, Actor );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, Image );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, ResourceImage );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, Animation );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, TouchEvent );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, TouchData );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, WheelEvent );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, KeyEvent );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, LongPressGesture );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, PanGesture );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, PinchGesture );
-DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, TapGesture );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, PropertyNotification );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, BaseHandle );
 DALI_CREATE_C_PTR_TO_CSHARP_FUNCTION( Dali, RefObject );

@@ -66,6 +66,57 @@
 %}
 %enddef
 
+%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( NameSpace, ClassName, NewClassName )
+%typemap(csfinalize) NameSpace::ClassName %{
+  ~NewClassName() {
+    DisposeQueue.Instance.Add(this);
+  }
+%}
+%enddef
+
+%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( NameSpace, ClassName, NewClassName )
+%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
+    if (!Stage.IsInstalled()) {
+      DisposeQueue.Instance.Add(this);
+      return;
+    }
+
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          NDalicPINVOKE.delete_##NewClassName(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
+  }
+%}
+%enddef
+
+%define DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION_RENAME( NameSpace, ClassName, NewClassName )
+%typemap(csdestruct_derived, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
+    if (!Stage.IsInstalled()) {
+      DisposeQueue.Instance.Add(this);
+      return;
+    }
+
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          NDalicPINVOKE.delete_##NewClassName(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+      base.Dispose();
+    }
+  }
+%}
+%enddef
+
 %define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VIDEOVIEWSIGNAL( NameSpace, ClassName )
 %typemap(csfinalize) NameSpace::ClassName %{
   ~VideoViewSignal() {
@@ -996,7 +1047,7 @@
 
 %define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_STAGESIGNAL( NameSpace, ClassName )
 %typemap(csfinalize) NameSpace::ClassName %{
-  ~StageWheelEventSignal() {
+  ~StageWheelSignal() {
     DisposeQueue.Instance.Add(this);
   }
 %}
@@ -1013,7 +1064,7 @@
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_StageWheelEventSignal(swigCPtr);
+          NDalicPINVOKE.delete_StageWheelSignal(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -1205,12 +1256,14 @@ DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, LongPressGesture );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, LongPressGestureDetector );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, LongPressGestureDetector );
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, KeyEvent );
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, KeyEvent );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, KeyEvent, Key );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, KeyEvent, Key );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, HoverEvent, Hover );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, HoverEvent, Hover );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, TouchEvent );
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, TouchEvent );
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, WheelEvent );
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, WheelEvent );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, WheelEvent, Wheel );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, WheelEvent, Wheel );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, Renderer );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, Renderer );
@@ -1295,8 +1348,8 @@ DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, PathConstrainer );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, TouchPoint );
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, TouchPoint );
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, TouchData );
-DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, TouchData );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, TouchData, Touch );
+DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION_RENAME( Dali, TouchData, Touch );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, Application );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, Application );

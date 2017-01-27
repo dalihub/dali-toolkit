@@ -578,6 +578,8 @@
       * @brief Event arguments that passed via ActionScroll signal
       *
       */
+/*
+    // To be replaced by a new event that takes Touch
     public class ActionScrollEventArgs : EventArgs
     {
       private AccessibilityManager _accessibilityManager;
@@ -607,6 +609,7 @@
         }
       }
     }
+*/
 
     /**
       * @brief Event arguments that passed via ActionPageUp signal
@@ -829,10 +832,13 @@
     private DaliEventHandlerWithReturnType<object,ActionStartStopEventArgs,bool> _accessibilityManagerActionStartStopEventHandler;
     private ActionStartStopEventCallbackDelegate _accessibilityManagerActionStartStopEventCallbackDelegate;
 
+/*
+    // To be replaced by a new event that takes Touch
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool ActionScrollEventCallbackDelegate(IntPtr accessibilityManager, IntPtr touchEvent);
     private DaliEventHandlerWithReturnType<object,ActionScrollEventArgs,bool> _accessibilityManagerActionScrollEventHandler;
     private ActionScrollEventCallbackDelegate _accessibilityManagerActionScrollEventCallbackDelegate;
+*/
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void FocusChangedEventCallbackDelegate(IntPtr actor1, IntPtr actor2);
@@ -2075,6 +2081,8 @@
       return false;
     }
 
+/*
+    // To be replaced by a new event that takes Touch
     public event DaliEventHandlerWithReturnType<object,ActionScrollEventArgs,bool> ActionScroll
     {
       add
@@ -2122,6 +2130,7 @@
       }
       return false;
     }
+*/
 
     public event DaliEventHandler<object,FocusChangedEventArgs> FocusChanged
     {

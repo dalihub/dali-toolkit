@@ -288,7 +288,14 @@ using namespace Dali::Toolkit;
 %include devel-properties.i
 
 %include gestures/hover.i
-
+%include gestures/gesture.i
+%include gestures/long-press-gesture.i
+%include gestures/pan-gesture.i
+%include gestures/tap-gesture.i
+%include gestures/pinch-gesture.i
+%include gestures/wheel.i
+%include gestures/touch.i
+%include gestures/key.i
 
 %include dali-core.i
 %include dali-adaptor.i

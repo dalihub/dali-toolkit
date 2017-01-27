@@ -10,8 +10,12 @@
     return ret;
   }
 
-  public uint GetTime() {
-    return time;
+  public uint Time
+  {
+    get
+    {
+      return time;
+    }
   }
 
   public int GetDeviceId(uint point) {

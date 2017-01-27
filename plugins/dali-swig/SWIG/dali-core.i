@@ -85,6 +85,7 @@
 %ignore *::SetPositionInheritanceMode(PositionInheritanceMode);
 %ignore *::GetKeyValue(SizeType) const;
 %ignore *::TypeInfo::GetCreator() const;
+%ignore Dali::Stage::TouchedSignal;
 
 %rename(ParentOriginTop) Dali::ParentOrigin::TOP;
 %rename(ParentOriginBottom) Dali::ParentOrigin::BOTTOM;
@@ -260,7 +261,6 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/events/pinch-gesture.h>
 %include <dali/public-api/events/tap-gesture-detector.h>
 %include <dali/public-api/events/tap-gesture.h>
-%include <dali/public-api/events/touch-event.h>
 
 %include <dali/public-api/animation/alpha-function.h>
 %include <dali/public-api/animation/key-frames.h>
@@ -304,12 +304,12 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 //%template(ActorTouchEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchEvent&)>;
 %template(ActorTouchDataSignal) Dali::Signal<bool (Dali::Actor, const Dali::TouchData&)>;
 %template(ActorHoverSignal) Dali::Signal<bool (Dali::Actor, const Dali::HoverEvent&)>;
-%template(ActorWheelEventSignal) Dali::Signal<bool (Dali::Actor, const Dali::WheelEvent&)>;
+%template(ActorWheelSignal) Dali::Signal<bool (Dali::Actor, const Dali::WheelEvent&)>;
 %template(ActorSignal) Dali::Signal<void (Dali::Actor)>;
 %template(KeyEventSignal) Dali::Signal<void (const Dali::KeyEvent&)>;
 //%template(TouchEventSignal) Dali::Signal<void (const Dali::TouchEvent&)>;
 %template(TouchSignal) Dali::Signal<void (const Dali::TouchData&)>;
-%template(StageWheelEventSignal) Dali::Signal<void (const Dali::WheelEvent&)>;
+%template(StageWheelSignal) Dali::Signal<void (const Dali::WheelEvent&)>;
 %template(AngleThresholdPair) std::pair<Dali::Radian, Dali::Radian>;
 %template(PanGestureDetectedSignal) Dali::Signal<void (Dali::Actor, const Dali::PanGesture&)>;
 %template(PinchGestureDetectedSignal) Dali::Signal<void (Dali::Actor, const Dali::PinchGesture&)>;

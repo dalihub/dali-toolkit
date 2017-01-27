@@ -78,16 +78,16 @@
     }
 
     /**
-     * @brief Event arguments that passed via KeyEvent signal
+     * @brief Event arguments that passed via Key signal
      *
      */
     public class KeyEventArgs : EventArgs
     {
       private View _view;
-      private KeyEvent _keyEvent;
+      private Key _key;
 
       /**
-       * @brief View - is the view that recieves the keyevent.
+       * @brief View - is the view that recieves the key.
        *
        */
       public View View
@@ -103,18 +103,18 @@
       }
 
       /**
-       * @brief KeyEvent - is the keyevent sent to the View.
+       * @brief Key - is the key sent to the View.
        *
        */
-      public KeyEvent KeyEvent
+      public Key Key
       {
         get
         {
-          return _keyEvent;
+          return _key;
         }
         set
         {
-          _keyEvent = value;
+          _key = value;
         }
       }
     }
@@ -152,7 +152,7 @@
     public class TouchEventArgs : EventArgs
     {
        private View _view;
-       private TouchData _touchData;
+       private Touch _touch;
 
       /**
         * @brief View - is the view that is being touched
@@ -171,18 +171,18 @@
       }
 
       /**
-        * @brief TouchData - contains the information of touch points
+        * @brief Touch - contains the information of touch points
         *
         */
-      public TouchData TouchData
+      public Touch Touch
       {
         get
         {
-          return _touchData;
+          return _touch;
         }
         set
         {
-          _touchData = value;
+          _touch = value;
         }
       }
     }
@@ -191,10 +191,10 @@
       * @brief Event arguments that passed via Hover signal
       *
       */
-    public class HoverArgs : EventArgs
+    public class HoverEventArgs : EventArgs
     {
-    private View _view;
-    private Hover _hover;
+       private View _view;
+       private Hover _hover;
 
       /**
         * @brief View - is the view that is being hovered
@@ -236,8 +236,8 @@
       */
     public class WheelEventArgs : EventArgs
     {
-    private View _view;
-    private WheelEvent _wheelEvent;
+      private View _view;
+      private Wheel _wheel;
 
       /**
         * @brief View - is the view that is being wheeled
@@ -256,18 +256,18 @@
       }
 
       /**
-        * @brief WheelEvent - store a wheel rolling type : MOUSE_WHEEL or CUSTOM_WHEEL
+        * @brief Wheel - store a wheel rolling type : MOUSE_WHEEL or CUSTOM_WHEEL
         *
         */
-      public WheelEvent WheelEvent
+      public Wheel Wheel
       {
         get
         {
-          return _wheelEvent;
+          return _wheel;
         }
         set
         {
-          _wheelEvent = value;
+          _wheel = value;
         }
       }
     }
@@ -333,8 +333,8 @@
     private KeyInputFocusLostCallbackDelegate _KeyInputFocusLostCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate bool KeyCallbackDelegate(IntPtr control, IntPtr keyEvent);
-    private DaliEventHandlerWithReturnType<object,KeyEventArgs,bool> _KeyEventHandler;
+    private delegate bool KeyCallbackDelegate(IntPtr control, IntPtr key);
+    private DaliEventHandlerWithReturnType<object,KeyEventArgs,bool> _KeyHandler;
     private KeyCallbackDelegate _KeyCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -343,19 +343,19 @@
     private OnRelayoutEventCallbackDelegate _viewOnRelayoutEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate bool TouchCallbackDelegate(IntPtr view, IntPtr touchData);
-    private DaliEventHandlerWithReturnType<object,TouchEventArgs,bool> _viewTouchDataEventHandler;
-    private TouchCallbackDelegate _viewTouchDataCallbackDelegate;
+    private delegate bool TouchCallbackDelegate(IntPtr view, IntPtr touch);
+    private DaliEventHandlerWithReturnType<object,TouchEventArgs,bool> _viewTouchHandler;
+    private TouchCallbackDelegate _viewTouchCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool HoverCallbackDelegate(IntPtr view, IntPtr hover);
-    private DaliEventHandlerWithReturnType<object,HoverArgs,bool> _viewHoverHandler;
+    private DaliEventHandlerWithReturnType<object,HoverEventArgs,bool> _viewHoverHandler;
     private HoverCallbackDelegate _viewHoverCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate bool WheelEventCallbackDelegate(IntPtr view, IntPtr wheelEvent);
-    private DaliEventHandlerWithReturnType<object,WheelEventArgs,bool> _viewWheelEventHandler;
-    private WheelEventCallbackDelegate _viewWheelEventCallbackDelegate;
+    private delegate bool WheelCallbackDelegate(IntPtr view, IntPtr wheel);
+    private DaliEventHandlerWithReturnType<object,WheelEventArgs,bool> _viewWheelHandler;
+    private WheelCallbackDelegate _viewWheelCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void OnStageEventCallbackDelegate(IntPtr control);
@@ -382,7 +382,7 @@
           if (_KeyInputFocusGainedEventHandler == null)
           {
             _KeyInputFocusGainedEventHandler += value;
-            Console.WriteLine("View Keyevent EVENT Locked....");
+            Console.WriteLine("View Key EVENT Locked....");
             _KeyInputFocusGainedCallbackDelegate = new KeyInputFocusGainedCallbackDelegate(OnKeyInputFocusGained);
             this.KeyInputFocusGainedSignal().Connect(_KeyInputFocusGainedCallbackDelegate);
           }
@@ -406,7 +406,7 @@
     private void OnKeyInputFocusGained(IntPtr view)
     {
       KeyInputFocusGainedEventArgs e = new KeyInputFocusGainedEventArgs();
-      Console.WriteLine("View Keyevent ....");
+      Console.WriteLine("View Key ....");
       // Populate all members of "e" (KeyInputFocusGainedEventArgs) with real data
       e.View = Dali.View.GetViewFromPtr(view);
 
@@ -470,7 +470,7 @@
 
     /**
      * @brief Event for KeyPressed signal which can be used to subscribe/unsubscribe the event handler
-     * (in the type of KeyEventEventHandler-DaliEventHandlerWithReturnType<object,KeyEventArgs,bool>) 
+     * (in the type of KeyHandler-DaliEventHandlerWithReturnType<object,KeyEventArgs,bool>)
      * provided by the user. KeyPressed signal is emitted when key event is received.
      */
     public event DaliEventHandlerWithReturnType<object,KeyEventArgs,bool> KeyPressed
@@ -480,11 +480,11 @@
         lock(this)
         {
           // Restricted to only one listener
-          if (_KeyEventHandler == null)
+          if (_KeyHandler == null)
           {
-            _KeyEventHandler += value;
+            _KeyHandler += value;
 
-            _KeyCallbackDelegate = new KeyCallbackDelegate(OnKeyEvent);
+            _KeyCallbackDelegate = new KeyCallbackDelegate(OnKey);
             this.KeyEventSignal().Connect(_KeyCallbackDelegate);
           }
         }
@@ -494,28 +494,28 @@
       {
         lock(this)
         {
-          if (_KeyEventHandler != null)
+          if (_KeyHandler != null)
           {
             this.KeyEventSignal().Disconnect(_KeyCallbackDelegate);
           }
 
-          _KeyEventHandler -= value;
+          _KeyHandler -= value;
         }
       }
     }
 
-    private bool OnKeyEvent(IntPtr view, IntPtr keyEvent)
+    private bool OnKey(IntPtr view, IntPtr key)
     {
       KeyEventArgs e = new KeyEventArgs();
 
       // Populate all members of "e" (KeyEventArgs) with real data
       e.View = Dali.View.GetViewFromPtr(view);
-      e.KeyEvent = Dali.KeyEvent.GetKeyEventFromPtr(keyEvent);
+      e.Key = Dali.Key.GetKeyFromPtr(key);
 
-      if (_KeyEventHandler != null)
+      if (_KeyHandler != null)
       {
         //here we send all data to user event handlers
-        return _KeyEventHandler(this, e);
+        return _KeyHandler(this, e);
       }
       return false;
 
@@ -574,7 +574,7 @@
 
     /**
       * @brief Event for Touched signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of TouchEventHandler-DaliEventHandlerWithReturnType<object,TouchEventArgs,bool>)
+      * (in the type of TouchHandler-DaliEventHandlerWithReturnType<object,TouchEventArgs,bool>)
       * provided by the user. Touched signal is emitted when touch input is received.
       */
     public event DaliEventHandlerWithReturnType<object,TouchEventArgs,bool> Touched
@@ -584,12 +584,12 @@
         lock(this)
         {
           // Restricted to only one listener
-          if (_viewTouchDataEventHandler == null)
+          if (_viewTouchHandler == null)
           {
-            _viewTouchDataEventHandler += value;
+            _viewTouchHandler += value;
             Console.WriteLine("View Touch EVENT LOCKED....");
-            _viewTouchDataCallbackDelegate = new TouchCallbackDelegate(OnTouch);
-            this.TouchSignal().Connect(_viewTouchDataCallbackDelegate);
+            _viewTouchCallbackDelegate = new TouchCallbackDelegate(OnTouch);
+            this.TouchSignal().Connect(_viewTouchCallbackDelegate);
           }
         }
       }
@@ -598,29 +598,29 @@
       {
         lock(this)
         {
-          if (_viewTouchDataEventHandler != null)
+          if (_viewTouchHandler != null)
           {
-            this.TouchSignal().Disconnect(_viewTouchDataCallbackDelegate);
+            this.TouchSignal().Disconnect(_viewTouchCallbackDelegate);
           }
 
-          _viewTouchDataEventHandler -= value;
+          _viewTouchHandler -= value;
         }
       }
     }
 
     // Callback for View TouchSignal
-    private bool OnTouch(IntPtr view, IntPtr touchData)
+    private bool OnTouch(IntPtr view, IntPtr touch)
     {
       TouchEventArgs e = new TouchEventArgs();
       Console.WriteLine("View Touch EVENT....");
       // Populate all members of "e" (TouchEventArgs) with real data
       e.View = View.GetViewFromPtr(view);
-      e.TouchData = Dali.TouchData.GetTouchDataFromPtr(touchData);
+      e.Touch = Dali.Touch.GetTouchFromPtr(touch);
 
-      if (_viewTouchDataEventHandler != null)
+      if (_viewTouchHandler != null)
       {
         //here we send all data to user event handlers
-        return _viewTouchDataEventHandler(this, e);
+        return _viewTouchHandler(this, e);
       }
 
       return false;
@@ -628,10 +628,10 @@
 
     /**
       * @brief Event for Hovered signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of HoverHandler-DaliEventHandlerWithReturnType<object,HoverArgs,bool>)
+      * (in the type of HoverHandler-DaliEventHandlerWithReturnType<object,HoverEventArgs,bool>)
       * provided by the user. Hovered signal is emitted when hover input is received.
       */
-    public event DaliEventHandlerWithReturnType<object,HoverArgs,bool> Hovered
+    public event DaliEventHandlerWithReturnType<object,HoverEventArgs,bool> Hovered
     {
       add
       {
@@ -665,9 +665,9 @@
     // Callback for View Hover signal
     private bool OnHover(IntPtr view, IntPtr hover)
     {
-      HoverArgs e = new HoverArgs();
+      HoverEventArgs e = new HoverEventArgs();
 
-      // Populate all members of "e" (HoverArgs) with real data
+      // Populate all members of "e" (HoverEventArgs) with real data
       e.View = View.GetViewFromPtr(view);
       e.Hover = Dali.Hover.GetHoverFromPtr(hover);
 
@@ -682,7 +682,7 @@
 
     /**
       * @brief Event for WheelMoved signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of WheelEventHandler-DaliEventHandlerWithReturnType<object,WheelEventArgs,bool>)
+      * (in the type of WheelHandler-DaliEventHandlerWithReturnType<object,WheelEventArgs,bool>)
       * provided by the user. WheelMoved signal is emitted when wheel event is received.
       */
     public event DaliEventHandlerWithReturnType<object,WheelEventArgs,bool> WheelMoved
@@ -692,12 +692,12 @@
         lock(this)
         {
           // Restricted to only one listener
-          if (_viewWheelEventHandler == null)
+          if (_viewWheelHandler == null)
           {
-            _viewWheelEventHandler += value;
+            _viewWheelHandler += value;
             Console.WriteLine("View Wheel EVENT LOCKED....");
-            _viewWheelEventCallbackDelegate = new WheelEventCallbackDelegate(OnWheelEvent);
-            this.WheelEventSignal().Connect(_viewWheelEventCallbackDelegate);
+            _viewWheelCallbackDelegate = new WheelCallbackDelegate(OnWheel);
+            this.WheelEventSignal().Connect(_viewWheelCallbackDelegate);
           }
         }
       }
@@ -706,29 +706,29 @@
       {
         lock(this)
         {
-          if (_viewWheelEventHandler != null)
+          if (_viewWheelHandler != null)
           {
-            this.WheelEventSignal().Disconnect(_viewWheelEventCallbackDelegate);
+            this.WheelEventSignal().Disconnect(_viewWheelCallbackDelegate);
           }
 
-          _viewWheelEventHandler -= value;
+          _viewWheelHandler -= value;
         }
       }
     }
 
     // Callback for View Wheel signal
-    private bool OnWheelEvent(IntPtr view, IntPtr wheelEvent)
+    private bool OnWheel(IntPtr view, IntPtr wheel)
     {
       WheelEventArgs e = new WheelEventArgs();
       Console.WriteLine("View Wheel EVENT ....");
       // Populate all members of "e" (WheelEventArgs) with real data
       e.View = View.GetViewFromPtr(view);
-      e.WheelEvent = Dali.WheelEvent.GetWheelEventFromPtr(wheelEvent);
+      e.Wheel = Dali.Wheel.GetWheelFromPtr(wheel);
 
-      if (_viewWheelEventHandler != null)
+      if (_viewWheelHandler != null)
       {
         //here we send all data to user event handlers
-        return _viewWheelEventHandler(this, e);
+        return _viewWheelHandler(this, e);
       }
 
       return false;

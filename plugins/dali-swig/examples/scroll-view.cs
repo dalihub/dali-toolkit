@@ -154,7 +154,7 @@ namespace MyCSharpExample
       Console.WriteLine("View TOUCH EVENT callback....");
 
       // Only animate the _text label when touch down happens
-      if( e.TouchData.GetState(0) == PointStateType.DOWN )
+      if( e.Touch.GetState(0) == PointStateType.DOWN )
       {
         Console.WriteLine("Customized Stage Touch event handler");
         // Create a new _animation
