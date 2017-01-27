@@ -22,7 +22,6 @@
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/devel-api/images/atlas.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 

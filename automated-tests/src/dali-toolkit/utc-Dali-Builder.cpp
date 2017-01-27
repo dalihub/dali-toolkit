@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,14 +74,6 @@ Dali::PropertyRegistration propertyNone(    typeRegistration, "noneProperty",   
 
 namespace
 {
-
-std::string ReplaceQuotes(const std::string &in_s)
-{
-  std::string s(in_s);
-  // wrong as no embedded quote but had regex link problems
-  std::replace(s.begin(), s.end(), '\'', '"');
-  return s;
-}
 
 struct BuilderFunctor
 {

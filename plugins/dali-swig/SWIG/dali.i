@@ -82,6 +82,8 @@
 
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
+#include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
+
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
 // add here SWIG version check
@@ -226,8 +228,6 @@
 };
 
 
-
-
 %ignore operator<<;
 %ignore *::GetImplementation();
 %ignore *::GetImplementation(Dali::BaseHandle&);
@@ -246,6 +246,8 @@ using namespace Dali::Toolkit;
 
 %include signal-parameters.i
 %include signals.i
+
+%include doxygen.i
 
 %include events/actor-event.i
 %include events/accessibilitymanager-event.i
@@ -283,6 +285,9 @@ using namespace Dali::Toolkit;
 %include property-value.i
 %include dali-operator.i
 %include devel-properties.i
+
+%include gestures/hover.i
+
 
 %include dali-core.i
 %include dali-adaptor.i

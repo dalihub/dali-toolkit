@@ -234,5 +234,14 @@ namespace Dali
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Button_Property_VISUAL_PADDING_get")]
         public static extern int Button_Property_VISUAL_PADDING_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Visual_Property_TRANSFORM_get")]
+        public static extern int Visual_Property_TRANSFORM_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Visual_Property_PREMULTIPLIED_ALPHA_get")]
+        public static extern int Visual_Property_PREMULTIPLIED_ALPHA_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Visual_Property_MIX_COLOR_get")]
+        public static extern int Visual_Property_MIX_COLOR_get();
     }
 }

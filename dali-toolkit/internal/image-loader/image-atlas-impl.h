@@ -22,7 +22,6 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/images/atlas.h>
 #include <dali/devel-api/common/owner-container.h>
 
 // INTERNAL INCLUDES
