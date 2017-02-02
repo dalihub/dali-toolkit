@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -653,6 +653,38 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Decoration bounding box
   field.SetProperty( TextField::Property::DECORATION_BOUNDING_BOX, Rect<int>( 0, 0, 1, 1 ) );
   DALI_TEST_EQUALS( field.GetProperty<Rect <int > >( TextField::Property::DECORATION_BOUNDING_BOX ), Rect<int>( 0, 0, 1, 1 ), TEST_LOCATION );
+
+  // Check the input method setting
+  Property::Map propertyMap;
+  InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
+  InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
+  InputMethod::ActionButtonTitle::Type actionButton = InputMethod::ActionButtonTitle::GO;
+  int inputVariation = 1;
+  propertyMap["PANEL_LAYOUT"] = panelLayout;
+  propertyMap["AUTO_CAPITALISE"] = autoCapital;
+  propertyMap["ACTION_BUTTON"] = actionButton;
+  propertyMap["VARIATION"] = inputVariation;
+  field.SetProperty( TextField::Property::INPUT_METHOD_SETTINGS, propertyMap );
+
+  Property::Value value = field.GetProperty( TextField::Property::INPUT_METHOD_SETTINGS );
+  Property::Map map;
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  int layout = 0;
+  DALI_TEST_CHECK( map[ "PANEL_LAYOUT" ].Get( layout ) );
+  DALI_TEST_EQUALS( static_cast<int>(panelLayout), layout, TEST_LOCATION );
+
+  int capital = 0;
+  DALI_TEST_CHECK( map[ "AUTO_CAPITALISE" ].Get( capital ) );
+  DALI_TEST_EQUALS( static_cast<int>(autoCapital), capital, TEST_LOCATION );
+
+  int action = 0;
+  DALI_TEST_CHECK( map[ "ACTION_BUTTON" ].Get( action ) );
+  DALI_TEST_EQUALS( static_cast<int>(actionButton), action, TEST_LOCATION );
+
+  int variation = 0;
+  DALI_TEST_CHECK( map[ "VARIATION" ].Get( variation ) );
+  DALI_TEST_EQUALS( inputVariation, variation, TEST_LOCATION );
 
   // Check input color property.
   field.SetProperty( TextField::Property::INPUT_COLOR, Color::YELLOW );
@@ -1840,6 +1872,9 @@ int utcDaliTextFieldEvent07(void)
   field.SetSize( 300.f, 50.f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Property::Map propertyMap;
+  propertyMap["PANEL_LAYOUT"] = InputMethod::PanelLayout::PASSWORD;
+  field.SetProperty( TextField::Property::INPUT_METHOD_SETTINGS, propertyMap );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );

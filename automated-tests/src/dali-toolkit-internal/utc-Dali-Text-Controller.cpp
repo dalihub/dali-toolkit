@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -433,6 +433,39 @@ int UtcDaliTextControllerSetGetAutoScrollEnabled(void)
 
   // Should be ebabled now.
   DALI_TEST_CHECK( controller->IsAutoScrollEnabled() );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetCheckProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetCheckProperty");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller, *controller );
+
+  // Enables the text input.
+  controller->EnableTextInput( decorator );
+
+  DALI_TEST_CHECK( !controller->IsInputModePassword() );
+
+  // Set the text input to password.
+  controller->SetInputModePassword( true );
+
+  DALI_TEST_CHECK( controller->IsInputModePassword() );
+
+  // Unset the text input to password.
+  controller->SetInputModePassword( false );
+
+  DALI_TEST_CHECK( !controller->IsInputModePassword() );
 
   tet_result(TET_PASS);
   END_TEST;

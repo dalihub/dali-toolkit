@@ -24,7 +24,6 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptors/adaptor.h>
@@ -995,6 +994,8 @@ void TextEditor::OnInitialize()
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
+  mImfManager = ImfManager::Get();
+
   self.TouchSignal().Connect( this, &TextEditor::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
@@ -1162,20 +1163,15 @@ void TextEditor::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnKeyInputFocusGained %p\n", mController.Get() );
 
-  VirtualKeyboard::StatusChangedSignal().Connect( this, &TextEditor::KeyboardStatusChanged );
+  mImfManager.StatusChangedSignal().Connect( this, &TextEditor::KeyboardStatusChanged );
 
-  ImfManager imfManager = ImfManager::Get();
+  mImfManager.EventReceivedSignal().Connect( this, &TextEditor::OnImfEvent );
 
-  if ( imfManager )
-  {
-    imfManager.EventReceivedSignal().Connect( this, &TextEditor::OnImfEvent );
+  // Notify that the text editing start.
+  mImfManager.Activate();
 
-    // Notify that the text editing start.
-    imfManager.Activate();
-
-    // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
-    imfManager.SetRestoreAfterFocusLost( true );
-  }
+  // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
+  mImfManager.SetRestoreAfterFocusLost( true );
 
    ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
@@ -1193,19 +1189,15 @@ void TextEditor::OnKeyInputFocusLost()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor:OnKeyInputFocusLost %p\n", mController.Get() );
 
-  VirtualKeyboard::StatusChangedSignal().Disconnect( this, &TextEditor::KeyboardStatusChanged );
+  mImfManager.StatusChangedSignal().Disconnect( this, &TextEditor::KeyboardStatusChanged );
 
-  ImfManager imfManager = ImfManager::Get();
-  if ( imfManager )
-  {
-    // The text editing is finished. Therefore the imf manager don't have restore activation.
-    imfManager.SetRestoreAfterFocusLost( false );
+  // The text editing is finished. Therefore the imf manager don't have restore activation.
+  mImfManager.SetRestoreAfterFocusLost( false );
 
-    // Notify that the text editing finish.
-    imfManager.Deactivate();
+  // Notify that the text editing finish.
+  mImfManager.Deactivate();
 
-    imfManager.EventReceivedSignal().Disconnect( this, &TextEditor::OnImfEvent );
-  }
+  mImfManager.EventReceivedSignal().Disconnect( this, &TextEditor::OnImfEvent );
 
   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
@@ -1223,11 +1215,7 @@ void TextEditor::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnTap %p\n", mController.Get() );
 
-  // Show the keyboard if it was hidden.
-  if (!VirtualKeyboard::IsVisible())
-  {
-    VirtualKeyboard::Show();
-  }
+  mImfManager.Activate();
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
@@ -1242,11 +1230,7 @@ void TextEditor::OnPan( const PanGesture& gesture )
 
 void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
-  // Show the keyboard if it was hidden.
-  if (!VirtualKeyboard::IsVisible())
-  {
-    VirtualKeyboard::Show();
-  }
+  mImfManager.Activate();
 
   mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
 
