@@ -17,8 +17,8 @@ Namespaces are important
 + The handle & body classes should have the same name but in different namespaces
 + TypeRegistry relies on this convention
 + Here our custom control requires
-  + MyControl
-  + Internal::MyControl
+  + MyUIControl
+  + Internal::MyUIControl
  
 ### General Guidelines:
 + Try to avoid adding C++ APIs as they become difficult to maintain.
@@ -46,7 +46,34 @@ Currently, this is devel-api though, so is subject to change.
  
 ![ ](../assets/img/creating-custom-controls/rendering.png)
 ![ ](creating-custom-controls/rendering.png)
- 
+
+To add a visual to a control, first create a Property for the visual of type MAP, and ensure the name has a suffix of "_VISUAL". Then the visual is normally defined in the stylesheet, and the definition sent via SetProperty(), where you would then create the visual:
+
+~~~{.cpp}
+// C++
+void Internal::MyUIControl::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  MyUIControl control = MyUIControl::DownCast( Dali::BaseHandle( object ) );
+  switch( index )
+  {
+    case MyUIControl::Property::MY_VISUAL:
+    {
+      Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+      const Property::Map *map = value.GetMap();
+      if( map && !map->Empty() )
+      {
+        Toolkit::Visual::Base visual = visualFactory.CreateVisual( *map );
+        GetImplementation( control ).RegisterVisual( index, visual );
+      }
+      break;
+    }
+    //...
+  }
+}
+~~~
+
+The [Visuals](@ref visuals) section describes the property maps that can be used for each visual type.
+
 ___________________________________________________________________________________________________
 
 ## Ensuring Control is Stylable {#creating-controls-stylable}
@@ -118,10 +145,10 @@ It is recommended to do provide a New() method in the custom control implementat
 
 ~~~{.cpp}
 // C++
-MyUIControl MyUIControlImpl::New()
+MyUIControl Internal::MyUIControl::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< MyUIControlImpl > controlImpl = new MyUIControlImpl;
+  IntrusivePtr< Internal::MyUIControl > controlImpl = new Internal::MyUIControl;
 
   // Pass ownership to handle
   MyUIControl handle( *controlImpl );
@@ -138,7 +165,7 @@ This will trigger the Dali::Toolkit::Internal::Control Initialize() method which
 This should be overridden by the custom ui control.
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnInitialize()
+void Internal::MyUIControl::OnInitialize()
 {
   // Create visuals using the VisualFactory, register events etc.
   // Register any created visuals with Control base class
@@ -169,7 +196,7 @@ ________________________________________________________________________________
 If the control needs to utilize hover and wheel events, then the correct behaviour flag should be used when constructing the control and then the appropriate method should be overridden.
 ~~~{.cpp}
 // C++
-bool MyUIControlImpl::OnHoverEvent( const HoverEvent& event )
+bool Internal::MyUIControl::OnHoverEvent( const HoverEvent& event )
 {
   bool consumed = false;
 
@@ -181,7 +208,7 @@ bool MyUIControlImpl::OnHoverEvent( const HoverEvent& event )
 ~~~
 ~~~{.cpp}
 // C++
-bool MyUIControlImpl::OnWheelEvent( const WheelEvent& event )
+bool Internal::MyUIControl::OnWheelEvent( const WheelEvent& event )
 {
   bool consumed = false;
 
@@ -210,7 +237,7 @@ If any of these detectors are required then this can be specified in the OnIniti
  
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnInitialize()
+void Internal::MyUIControl::OnInitialize()
 {
   // Only enable pan gesture detection
   EnableGestureDetection( Gesture::Pan );
@@ -232,28 +259,28 @@ panGestureDetector.AddDirection( PanGestureDetector::DIRECTION_VERTICAL );
 Finally, the appropriate method should be overridden:
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnPan( const PanGesture& pan )
+void Internal::MyUIControl::OnPan( const PanGesture& pan )
 {
   // Handle pan-gesture
 }
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnPinch( const PinchGesture& pinch )
+void Internal::MyUIControl::OnPinch( const PinchGesture& pinch )
 {
   // Handle pinch-event
 }
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnTap( const TapGesture& tap )
+void Internal::MyUIControl::OnTap( const TapGesture& tap )
 {
   // Handle tap-gesture
 }
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnLongPress( const LongPressGesture& longPress )
+void Internal::MyUIControl::OnLongPress( const LongPressGesture& longPress )
 {
   // Handle long-press-gesture
 }
@@ -339,7 +366,7 @@ An up call to the Control class is necessary if these methods are overridden.
  
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnChildAdd( Actor& child );
+void Internal::MyUIControl::OnChildAdd( Actor& child );
 {
   // Do any other operations required upon child addition
 
@@ -349,7 +376,7 @@ void MyUIControlImpl::OnChildAdd( Actor& child );
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnChildRemove( Actor& child );
+void Internal::MyUIControl::OnChildRemove( Actor& child );
 {
   // Do any other operations required upon child removal
 
@@ -369,7 +396,7 @@ An up call to the Control class is necessary if these methods are overridden.
  
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnStageConnection( int depth )
+void Internal::MyUIControl::OnStageConnection( int depth )
 {
   // Do any other operations required upon stage connection
 
@@ -379,7 +406,7 @@ void MyUIControlImpl::OnStageConnection( int depth )
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnStageDisconnection()
+void Internal::MyUIControl::OnStageDisconnection()
 {
   // Do any other operations required upon stage disconnection
 
@@ -396,7 +423,7 @@ The following methods must be overridden for size negotiation to work correctly 
  
 ~~~{.cpp}
 // C++
-Vector3 MyUIControlImpl::GetNaturalSize()
+Vector3 Internal::MyUIControl::GetNaturalSize()
 {
   // Return the natural size of the control
   // This depends on our layout
@@ -411,7 +438,7 @@ Vector3 MyUIControlImpl::GetNaturalSize()
 ~~~
 ~~~{.cpp}
 // C++
-float MyUIControlImpl::GetHeightForWidth( float width )
+float Internal::MyUIControl::GetHeightForWidth( float width )
 {
   // Called by the size negotiation algorithm if we have a fixed width
   // We should calculate the height we would like our control to be for that width
@@ -423,7 +450,7 @@ float MyUIControlImpl::GetHeightForWidth( float width )
 ~~~
 ~~~{.cpp}
 // C++
-float MyUIControlImpl::GetWidthForHeight( float height )
+float Internal::MyUIControl::GetWidthForHeight( float height )
 {
   // Called by the size negotiation algorithm if we have a fixed height
   // We should calculate the width we would like our control to be for that height
@@ -434,7 +461,7 @@ float MyUIControlImpl::GetWidthForHeight( float height )
 ~~~
 ~~~{.cpp}
 // C++
-void MyUIControlImpl::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void Internal::MyUIControl::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   // The size is what we have been given and what our control needs to fit into
   // Here, we need to set the position and the size of our visuals
@@ -452,9 +479,10 @@ ________________________________________________________________________________
 ### Clipping Support {#creating-controls-clipping}
 
 When an Actor is set to clip its children, the renderers have to be added manually in order to specify what its children need to clip to.
-The Control base class automates the creation of the renderers/visuals when it is set to clip its children.
+The Control base class automates the creation of the visuals when it is set to clip its children.
  
-This is only done if the application or custom control writer has not added any renderers to the Control or registered any visuals
+This is only done if the application or custom control writer has not
+added any Renderers to the Control or registered any visuals
 (regardless of whether these visuals are enabled or not).
  
 If custom control writers want to define the clipping visuals themselves, then they should register all required visuals before the control is staged.
