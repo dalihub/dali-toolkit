@@ -16,6 +16,7 @@ DALi provides the following visuals:
  + [Border](@ref border-visual)
  + [Mesh](@ref mesh-visual)
  + [Primitive](@ref primitive-visual)
+ + [Text](@ref text-visual)
  + [Wireframe](@ref wireframe-visual)
  
 Controls can provide properties that allow users to specify the visual type ( visualType ).
@@ -714,6 +715,53 @@ map[ PrimitiveVisual::Property::BEVEL_PERCENTAGE ] = 0.4f;
 control.SetProperty( Control::Property::BACKGROUND, map );
 ~~~
 ___________________________________________________________________________________________________
+
+## Text Visual {#text-visual}
+
+Renders text within a control.
+
+![ ](../assets/img/visuals/HelloWorld.png)
+![ ](visuals/HelloWorld.png)
+
+### Properties
+
+**VisualType:** Dali::Toolkit::Visual::TEXT, "TEXT"
+
+| Property                                                    | String              | Type          | Required | Description                                                                   | Default                |
+|-------------------------------------------------------------|---------------------|:-------------:|:--------:|-------------------------------------------------------------------------------|------------------------|
+| Dali::Toolkit::TextVisual::Property::TEXT                   | text                | STRING        | Yes      | The text to display in UTF-8 format                                           |                        |
+| Dali::Toolkit::TextVisual::Property::FONT_FAMILY            | fontFamily          | STRING        | No       | The requested font family to use                                              |                        |
+| Dali::Toolkit::TextVisual::Property::FONT_STYLE             | fontStyle           | MAP           | No       | The requested font style to use                                               |                        |
+| Dali::Toolkit::TextVisual::Property::POINT_SIZE             | pointSize           | FLOAT         | Yes      | The size of font in points                                                    |                        |
+| Dali::Toolkit::TextVisual::Property::MULTI_LINE             | multiLine           | BOOLEAN       | No       | The single-line or multi-line layout option                                   | false                  |
+| Dali::Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT   | horizontalAlignment | STRING        | No       | The line horizontal alignment: "BEGIN", "CENTER", "END"                       | "BEGIN"                |
+| Dali::Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT     | verticalAlignment   | STRING        | No       | The line vertical alignment: "TOP",   "CENTER", "BOTTOM"                      | "TOP"                  |
+| Dali::Toolkit::TextVisual::Property::TEXT_COLOR             | textColor           | VECTOR4       | No       | The color of the text                                                         | Color::BLACK           |
+| Dali::Toolkit::TextVisual::Property::ENABLE_MARKUP         | enableMarkup           | BOOL       | No       | If mark up should be enabled |                                                        |
+
+### Usage
+
+~~~{.cpp}
+    // C++
+    Dali::Stage stage = Dali::Stage::GetCurrent();
+    stage.SetBackgroundColor( Dali::Color::WHITE );
+
+    Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+    control.SetParentOrigin( ParentOrigin::CENTER );
+
+    Dali::Property::Map map;
+    map[ Dali::Toolkit::Visual::Property::TYPE ] = Dali::Toolkit::Visual::TEXT;
+    map[ Dali::Toolkit::TextVisual::Property::TEXT ] = "Hello world";
+    map[ Dali::Toolkit::TextVisual::Property::TEXT_COLOR ] = Dali::Color::BLACK;
+    map[ Dali::Toolkit::TextVisual::Property::FONT_FAMILY ] = "Sans";
+    map[ Dali::Toolkit::TextVisual::Property::POINT_SIZE ] = 30.f;
+    map[ Dali::Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT ] = "CENTER";
+    map[ Dali::Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT ] = "CENTER";
+
+    control.SetProperty( Dali::Toolkit::Control::Property::BACKGROUND, map );
+
+    stage.Add( control );
+~~~
 
 ## Wireframe Visual {#wireframe-visual}
 
