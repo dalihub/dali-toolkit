@@ -103,14 +103,14 @@ public:
       STYLE_NAME = PROPERTY_START_INDEX,
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "background-color", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
+       * @brief name "backgroundColor", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
        * @SINCE_1_0.0
        * @see SetStyleName
        */
       BACKGROUND_COLOR,
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "background-image", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
+       * @brief name "backgroundImage", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
        * @SINCE_1_0.0
        */
       BACKGROUND_IMAGE,
