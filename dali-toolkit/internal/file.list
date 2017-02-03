@@ -42,6 +42,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
+   $(toolkit_src_dir)/controls/buttons/toggle-button-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
    $(toolkit_src_dir)/controls/flex-container/flex-container-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \

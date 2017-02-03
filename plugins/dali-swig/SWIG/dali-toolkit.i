@@ -75,6 +75,8 @@
 %ignore *::Base(Dali::Internal::Visual::Base*);
 %ignore *::GetExtension();
 %ignore *::GetControlExtension();
+%ignore *::ToggleButton(Internal::ToggleButton&);
+%ignore *::ToggleButton(Dali::Internal::CustomActor*);
 
 %ignore *::Button::SetAnimationTime(float animationTime);
 %ignore *::Button::SetAutoRepeating(bool);
@@ -280,6 +282,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+%include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 
 %include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 %include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
