@@ -87,6 +87,9 @@ const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOut
 
 const char* const PROPERTY_NAME_SMOOTH_SCROLL                        = "smoothScroll";
 const char* const PROPERTY_NAME_SMOOTH_SCROLL_DURATION               = "smoothScrollDuration";
+const char* const PROPERTY_NAME_ENABLE_SCROLL_BAR                    = "enableScrollBar";
+const char* const PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION             = "scrollBarShowDuration";
+const char* const PROPERTY_NAME_SCROLL_BAR_FADE_DURATION             = "scrollBarFadeDuration";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -330,6 +333,9 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextEditor::Property::INPUT_OUTLINE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL ) == DevelTextEditor::Property::SMOOTH_SCROLL );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL_DURATION ) == DevelTextEditor::Property::SMOOTH_SCROLL_DURATION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SCROLL_BAR ) == DevelTextEditor::Property::ENABLE_SCROLL_BAR );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION );
 
   END_TEST;
 }
@@ -607,6 +613,16 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check the smooth scroll duration property
   editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the scroll bar property
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SCROLL_BAR ), false, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SCROLL_BAR ), true, TEST_LOCATION );
+
+  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION, 0.3f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1555,6 +1571,9 @@ int utcDaliTextEditorEvent05(void)
   editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
   editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
+  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION, 0.3f );
+  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1602,6 +1621,9 @@ int utcDaliTextEditorEvent05(void)
   }
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SCROLL_BAR ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Press Escape to increase coverage
   application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up ) );

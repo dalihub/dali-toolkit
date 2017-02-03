@@ -20,9 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
@@ -213,6 +215,13 @@ private: // Implementation
   void KeyboardStatusChanged( bool keyboardShown );
 
   /**
+   * @brief update scroll bar position
+   *
+   * If text scroll is occurred, create or update scroll bar position
+   */
+  void UpdateScrollBar();
+
+  /**
    * @brief Callback when TextEditor is touched
    *
    * @param[in] actor TextEditor touched
@@ -257,7 +266,6 @@ private: // Implementation
   void OnStageConnect( Dali::Actor actor );
 
 private: // Data
-
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
@@ -268,6 +276,9 @@ private: // Data
   Text::DecoratorPtr mDecorator;
   Text::TextVerticalScrollerPtr mTextVerticalScroller;
   Toolkit::Control mStencil;
+  Toolkit::ScrollBar mScrollBar;
+  Dali::Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.
+  Dali::TimePeriod mAnimationPeriod;
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
@@ -278,6 +289,7 @@ private: // Data
   int mRenderingBackend;
   bool mHasBeenStaged:1;
   bool mScrollAnimationEnabled:1;
+  bool mScrollBarEnabled:1;
 };
 
 } // namespace Internal

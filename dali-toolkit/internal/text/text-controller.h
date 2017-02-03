@@ -837,6 +837,18 @@ public: // Queries & retrieves.
    */
   float GetScrollAmountByUserInput();
 
+  /**
+   * @brief Get latest scroll amount, control size and layout size
+   *
+   * This method is used to get information of control's scroll
+   * @param[out] scrollPosition The current scrolled position
+   * @param[out] controlHeight The size of a UI control
+   * @param[out] layoutHeight The size of a bounding box to layout text within.
+   *
+   * @return Whether the text scroll position is changed or not after last update.
+   */
+  bool GetTextScrollInfo( float& scrollPosition, float& controlHeight, float& layoutHeight );
+
 public: // Relayout.
 
   /**
