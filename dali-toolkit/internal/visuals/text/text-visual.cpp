@@ -313,7 +313,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
-  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
+  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
 
   UpdateRenderer( true ); // Renderer needs textures and to be added to control
 }

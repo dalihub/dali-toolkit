@@ -19,7 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/compile-time-assert.h>
+#include <dali/devel-api/actors/layer-devel.h>
 
 namespace Dali
 {
@@ -30,13 +31,28 @@ namespace Toolkit
 namespace DepthIndex
 {
 
+// The negative value for background effect and background has been
+// chosen so that newer controls can have content without setting
+// depth index, and go in front of native controls with a background.
+// This backround negative value means that the highest possible value
+// is SIBLING_ORDER_MULTIPLIER-BACKGROUND_EFFECT-1.  The divisor of
+// 100 ensures the range fits within the sibling order range, and has
+// enough gaps to allow Control Authors to use other intermediate depths.
+
 enum Ranges
 {
-    BACKGROUND    = -Dali::Layer::TREE_DEPTH_MULTIPLIER / 10,
-    CONTENT       = 0,
-    TEXT          = Dali::Layer::TREE_DEPTH_MULTIPLIER / 100,
-    DECORATION    = Dali::Layer::TREE_DEPTH_MULTIPLIER / 10
+  BACKGROUND_EFFECT = -2 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100,
+  BACKGROUND    =     -1 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100,
+  CONTENT       =      0,
+  DECORATION    =      1 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100,
+  FOREGROUND_EFFECT =  2 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100
 };
+
+DALI_COMPILE_TIME_ASSERT( (unsigned int)DevelLayer::ACTOR_DEPTH_MULTIPLIER > (unsigned int)DevelLayer::SIBLING_ORDER_MULTIPLIER );
+DALI_COMPILE_TIME_ASSERT( BACKGROUND_EFFECT < BACKGROUND );
+DALI_COMPILE_TIME_ASSERT( BACKGROUND < CONTENT );
+DALI_COMPILE_TIME_ASSERT( CONTENT < DECORATION );
+DALI_COMPILE_TIME_ASSERT( DECORATION < FOREGROUND_EFFECT );
 
 } // namespace DepthIndex
 

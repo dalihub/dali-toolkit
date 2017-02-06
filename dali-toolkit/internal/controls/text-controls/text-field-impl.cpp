@@ -1272,7 +1272,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
     {
       renderableActor = mRenderer->Render( mController->GetView(),
                                            mAlignmentOffset,
-                                           DepthIndex::TEXT );
+                                           DepthIndex::CONTENT );
     }
 
     if( renderableActor != mRenderableActor )
