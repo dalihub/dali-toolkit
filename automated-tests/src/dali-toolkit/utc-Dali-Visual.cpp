@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1695,6 +1695,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
 
   //Set a new transform
   transform.Clear();
+  transform = DefaultTransform();
   transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
   transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
   transform.Insert( DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4(0.0f, 0.0f, 1.0f,1.0f) );
@@ -2083,8 +2084,8 @@ int UtcDaliVisualTextVisualRender(void)
   Renderer renderer = dummyControl.GetRendererAt(0u);
   Property::Index index = renderer.GetPropertyIndex("size");
 
-  tet_infoline( "Test that the TextVisual overrides anything set by developer" );
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(index), Vector2( 1.0, 1.0 ), 0.001f, TEST_LOCATION );
+  tet_infoline( "Test that the TextVisual has NOT overridden what was set by developer" );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(index), Vector2( 0.5f, 0.5f ), 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
