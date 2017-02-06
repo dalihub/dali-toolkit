@@ -237,6 +237,10 @@
          "url": "{DALI_IMAGE_DIR}button-disabled.9.png"
        }
     },
+    "ToggleButton":
+    {
+      "styles":["Button"]
+    },
     "CheckBoxButton":
     {
       "styles":["Button"],
