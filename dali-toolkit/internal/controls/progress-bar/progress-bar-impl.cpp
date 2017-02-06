@@ -25,6 +25,15 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/public-api/math/math-utils.h>
+#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -46,19 +55,36 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ProgressBar, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "progressValue",          FLOAT,    PROGRESS_VALUE         )
-DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "trackVisual",            MAP,      TRACK_VISUAL           )
-DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "progressVisual",         MAP,      PROGRESS_VISUAL        )
-DALI_SIGNAL_REGISTRATION(   Toolkit, ProgressBar, "valueChanged",                     SIGNAL_VALUE_CHANGED   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "progressValue",                     FLOAT,    PROGRESS_VALUE                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "secondaryProgressValue",            FLOAT,    SECONDARY_PROGRESS_VALUE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "indeterminate",                     BOOLEAN,  INDETERMINATE                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "trackVisual",                       MAP,      TRACK_VISUAL                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "progressVisual",                    MAP,      PROGRESS_VISUAL                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "secondaryProgressVisual",           MAP,      SECONDARY_PROGRESS_VISUAL        )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "indeterminateVisual",               MAP,      INDETERMINATE_VISUAL             )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "indeterminateVisualAnimation",      ARRAY,    INDETERMINATE_VISUAL_ANIMATION   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ProgressBar, "labelVisual",                       MAP,      LABEL_VISUAL                     )
+DALI_SIGNAL_REGISTRATION(   Toolkit, ProgressBar, "valueChanged",                      SIGNAL_VALUE_CHANGED                       )
 
 DALI_TYPE_REGISTRATION_END()
 
-const char* SKINNED_TRACK_VISUAL = DALI_IMAGE_DIR "slider-skin.9.png";
-const char* SKINNED_PROGRESS_VISUAL = DALI_IMAGE_DIR "slider-skin-progress.9.png";
+struct ProgressDepthIndex
+{
+  // Enum to make sure the visual order
+  enum
+  {
+    TRACK_VISUAL,
+    SECONDARY_PROGRESS_VISUAL,
+    PROGRESS_VISUAL,
+    LABEL_VISUAL,
+    INDETERMINATE_VISUAL
+  };
+};
 
 float DEFAULT_VALUE = 0.0f;
 float DEFAULT_LOWER_BOUND = 0.0f;
 float DEFAULT_UPPER_BOUND = 1.0f;
+float DEFAULT_FONT_SIZE = 12.0f;
 
 } // Unnamed namespace
 
@@ -83,12 +109,9 @@ Dali::Toolkit::ProgressBar ProgressBar::New()
 
 ProgressBar::ProgressBar()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
-  mTrackVisual(""),
-  mProgressVisual(""),
-  mTrackMap(),
-  mTrackVisualSize(),
-  mProgressVisualSize(),
-  mValue( DEFAULT_VALUE )
+  mProgressValue( DEFAULT_VALUE ),
+  mSecondaryProgressValue( DEFAULT_VALUE ),
+  mIndeterminate( false )
 {
 }
 
@@ -98,49 +121,96 @@ ProgressBar::~ProgressBar()
 
 void ProgressBar::OnInitialize()
 {
-  // Setup
-  CreateChildren();
-
-  // Properties
-  SetTrackVisual( SKINNED_TRACK_VISUAL );
-  SetProgressVisual( SKINNED_PROGRESS_VISUAL );
-
-  DisplayValue( mValue, false );       // Run this last to display the correct value
 }
 
 void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  // Track
-  if( mTrack )
-  {
-    container.Add( mTrack, size );
 
-    // mValueTextLabel will have its relayout method called automatically as it's a child of mTrack,
-    // which is added to the container
+  Vector2 trackSize( size );
+  mDomain = CalcDomain( size );
+
+  trackSize.width = std::max( 0.0f, size.width ); // Ensure we don't go negative
+
+  Toolkit::Visual::Base trackVisual = GetVisual( Toolkit::ProgressBar::Property::TRACK_VISUAL );
+  Toolkit::Visual::Base secondProgressVisual = GetVisual( Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
+  Toolkit::Visual::Base progressVisual = GetVisual( Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
+  Toolkit::Visual::Base labelVisual = GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+  Toolkit::Visual::Base indeterminateVisual = GetVisual( Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL );
+
+  if( trackVisual )
+  {
+    Property::Map visualTransform;
+
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+    trackVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
-  // Progress bar
-  if( mProgress )
+  if( secondProgressVisual )
   {
-    mDomain = CalcDomain( size );
+    Property::Map visualTransform;
 
-    Vector2 progressSize( size );
-
-    // If no progress, then we do not want a n-patch image shown incorrectly
-    progressSize.width = std::max( mProgressVisualSize.width, mDomain.from.x + mValue * ( mDomain.to.x - mDomain.from.x ) );
-    progressSize.width = std::min( progressSize.width, size.width ); // We should not exceed given size
-
-    container.Add( mProgress, progressSize );
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2( mDomain.from.x + mSecondaryProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height  ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                   .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+    secondProgressVisual.SetTransformAndSize( visualTransform, trackSize );
   }
+
+  if( progressVisual )
+  {
+    Property::Map visualTransform;
+
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2( mDomain.from.x + mProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                   .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+    progressVisual.SetTransformAndSize( visualTransform, trackSize );
+  }
+
+  if( labelVisual )
+  {
+    Property::Map visualTransform;
+
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+
+    labelVisual.SetTransformAndSize( visualTransform, trackSize );
+  }
+
+  if( indeterminateVisual )
+  {
+    Property::Map visualTransform;
+
+    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+    indeterminateVisual.SetTransformAndSize( visualTransform, trackSize );
+  }
+
 }
 
 Vector3 ProgressBar::GetNaturalSize()
 {
-  // Return the maximum width/height combinations of our visuals
+  // Return the bigger size after comparing trackVisual naturalSize and labelVisual naturalSize
+  Toolkit::Visual::Base trackVisual =  GetVisual( Toolkit::ProgressBar::Property::TRACK_VISUAL );
+  Toolkit::Visual::Base labelVisual =  GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+
+  Size trackSize;
+  Size labelSize;
+
+  if ( trackVisual )
+  {
+    trackVisual.GetNaturalSize( trackSize );
+  }
+  if ( labelVisual )
+  {
+    labelVisual.GetNaturalSize( labelSize );
+  }
 
   Vector3 naturalSize;
-  naturalSize.width = std::max( mTrackVisualSize.width, mProgressVisualSize.width );
-  naturalSize.height = std::max( mTrackVisualSize.height, mProgressVisualSize.height );
+  naturalSize.width = ( trackSize.width > labelSize.width ) ? trackSize.width: labelSize.width;
+  naturalSize.height = ( trackSize.height > labelSize.height ) ? trackSize.height: labelSize.height;
+
   return naturalSize;
 }
 
@@ -149,202 +219,184 @@ ProgressBar::Domain ProgressBar::CalcDomain( const Vector2& currentSize )
    return Domain( Vector2( 0.0f, 0.0f ), currentSize );
 }
 
-void ProgressBar::DisplayValue( float value, bool raiseSignals )
-{
-  // Signals
-  if( raiseSignals )
-  {
-    Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast( Self() );
-    mValueChangedSignal.Emit( self, value );
-  }
-
-  // Change the value of the text label
-  if( mValueTextLabel )
-  {
-    std::stringstream ss;
-    ss.precision( 0 );
-    ss << std::fixed << ( value * 100 ) << "%";
-
-    std::string label = mValueTextLabel.GetProperty<std::string>( Toolkit::TextLabel::Property::TEXT );
-    if( label.compare(ss.str()) )
-    {
-      mValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
-    }
-  }
-}
-
-Toolkit::ImageView ProgressBar::CreateTrack()
-{
-  Toolkit::ImageView track = Toolkit::ImageView::New();
-  track.SetParentOrigin( ParentOrigin::CENTER );
-  track.SetAnchorPoint( AnchorPoint::CENTER );
-  track.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
-
-  return track;
-}
-
-void ProgressBar::SetTrackVisual( const std::string& filename )
-{
-  if( mTrack && filename.size() > 0 )
-  {
-    mTrack.SetImage( filename );
-    mTrackVisual = filename;
-    mTrackVisualSize = Vector2::ZERO;
-    RelayoutRequest();
-  }
-}
-
-void ProgressBar::SetTrackVisual( Property::Map map )
-{
-  bool relayoutRequired = false;
-
-  Property::Value* imageValue = map.Find( "url" );
-  if( imageValue )
-  {
-    mTrackVisual.clear();
-    std::string filename;
-    if( imageValue->Get( filename ) )
-    {
-      if( mTrack && ( filename.size() > 0 ) )
-      {
-        mTrack.SetImage( filename );
-        mTrackMap = map;
-        relayoutRequired = true;
-      }
-    }
-  }
-
-  Property::Value* sizeValue = map.Find( "size" );
-  if( sizeValue )
-  {
-    Vector2 size;
-    if( sizeValue->Get( size ) )
-    {
-      mTrackVisualSize = size;
-      relayoutRequired = true;
-    }
-  }
-
-  // Visual and/or visual size changed so we need to relayout
-  if( relayoutRequired )
-  {
-    RelayoutRequest();
-  }
-}
-
-std::string ProgressBar::GetTrackVisual()
-{
-  return mTrackVisual;
-}
-
-Toolkit::ImageView ProgressBar::CreateProgress()
-{
-  Toolkit::ImageView progress = Toolkit::ImageView::New();
-  progress.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  progress.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-  progress.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
-
-  return progress;
-}
-
-void ProgressBar::SetProgressVisual( const std::string& filename )
-{
-  if( mProgress && ( filename.size() > 0 ) )
-  {
-    mProgress.SetImage( filename );
-    mProgressVisual = filename;
-    mProgressVisualSize = Vector2::ZERO;
-    RelayoutRequest();
-  }
-}
-
-void ProgressBar::SetProgressVisual( Property::Map map )
-{
-  bool relayoutRequired = false;
-
-  Property::Value* imageValue = map.Find( "url" );
-  if( imageValue )
-  {
-    mProgressVisual.clear();
-    std::string filename;
-    if( imageValue->Get( filename ) )
-    {
-      if( mProgress && ( filename.size() > 0 ) )
-      {
-        mProgress.SetImage( filename );
-        mProgressMap = map;
-        relayoutRequired = true;
-      }
-    }
-  }
-
-  Property::Value* sizeValue = map.Find( "size" );
-  if( sizeValue )
-  {
-    Vector2 size;
-    if( sizeValue->Get( size ) )
-    {
-      mProgressVisualSize = size;
-      relayoutRequired = true;
-    }
-  }
-
-  // Visual and/or visual size changed so we need to relayout
-  if( relayoutRequired )
-  {
-    RelayoutRequest();
-  }
-}
-
-std::string ProgressBar::GetProgressVisual()
-{
-  return mProgressVisual;
-}
-
 Toolkit::ProgressBar::ValueChangedSignalType& ProgressBar::ValueChangedSignal()
 {
   return mValueChangedSignal;
 }
 
-void ProgressBar::CreateChildren()
-{
-  Actor self = Self();
-
-  // Track
-  mTrack = CreateTrack();
-  self.Add( mTrack ); // Needs to be a direct child as we want to manipulate its size
-
-  // Progress bar
-  mProgress = CreateProgress();
-  self.Add( mProgress ); // Needs to be a direct child as we want to manipulate its size
-
-  // Value Text
-  mValueTextLabel = Toolkit::TextLabel::New();
-  mValueTextLabel.SetName( "ProgressBarValueTextLabel" );
-  mValueTextLabel.SetStyleName( "ProgressBarValueTextLabel" );
-  mValueTextLabel.SetParentOrigin( ParentOrigin::CENTER );
-  mValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
-  mValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
-  mValueTextLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-  mTrack.Add( mValueTextLabel ); // Add to mTrack and let it automatically set its size
-}
-
 void ProgressBar::SetProgressValue( float value )
 {
   // update the progress bar value (taking float precision errors into account)
-  if( ( mValue != value ) &&
+  // TODO : it seems 0.0f cannot into this statement.
+  if( ( mProgressValue != value ) &&
       ( ( value >= DEFAULT_LOWER_BOUND ) || ( Equals( value, DEFAULT_LOWER_BOUND ) ) ) &&
       ( ( value <= DEFAULT_UPPER_BOUND ) || ( Equals( value, DEFAULT_UPPER_BOUND ) ) ) )
   {
-    mValue = Clamp( value, DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND );
-    DisplayValue( mValue, true );
+    mProgressValue = Clamp( value, DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND );
+
+    Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast( Self() );
+    mValueChangedSignal.Emit( self, mProgressValue, mSecondaryProgressValue );
     RelayoutRequest();
   }
 }
 
 float ProgressBar::GetProgressValue() const
 {
-  return mValue;
+  return mProgressValue;
+}
+
+void ProgressBar::SetSecondaryProgressValue( float value )
+{
+  // update the progress bar value (taking float precision errors into account)
+  // TODO : it seems 0.0f cannot into this statement.
+  if( ( mSecondaryProgressValue != value ) &&
+      ( ( value >= DEFAULT_LOWER_BOUND ) || ( Equals( value, DEFAULT_LOWER_BOUND ) ) ) &&
+      ( ( value <= DEFAULT_UPPER_BOUND ) || ( Equals( value, DEFAULT_UPPER_BOUND ) ) ) )
+  {
+    mSecondaryProgressValue = Clamp( value, DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND );
+
+    Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast( Self() );
+    mValueChangedSignal.Emit( self, mProgressValue, mSecondaryProgressValue );
+
+    RelayoutRequest();
+  }
+}
+
+float ProgressBar::GetSecondaryProgressValue() const
+{
+  return mSecondaryProgressValue;
+}
+
+void ProgressBar::SetIndeterminate( bool value )
+{
+  mIndeterminate = value;
+  EnableVisual( Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL, mIndeterminate );
+
+  if( mIndeterminate )
+  {
+    RelayoutRequest();
+    if( mIndeterminateVisualTransition )
+    {
+      PlayIndeterminateVisualTransition();
+    }
+  }
+  else
+  {
+    if( mIndeterminateVisualAni )
+    {
+      mIndeterminateVisualAni.Stop();
+    }
+  }
+}
+
+bool ProgressBar::GetIndeterminate() const
+{
+  return mIndeterminate;
+}
+
+void ProgressBar::SetIndeterminateVisualTransition( Toolkit::TransitionData transition )
+{
+  mIndeterminateVisualTransition = transition;
+  if( mIndeterminate )
+  {
+    PlayIndeterminateVisualTransition();
+  }
+}
+
+void ProgressBar::PlayIndeterminateVisualTransition()
+{
+  if( mIndeterminateVisualAni )
+  {
+    mIndeterminateVisualAni.Stop();
+    mIndeterminateVisualAni.Clear();
+  }
+
+  mIndeterminateVisualAni = CreateTransition( mIndeterminateVisualTransition );
+
+  if( mIndeterminate && mIndeterminateVisualAni )
+  {
+    mIndeterminateVisualAni.SetLooping(true);
+    mIndeterminateVisualAni.Play();
+  }
+}
+
+Toolkit::TransitionData ProgressBar::ConvertPropertyToTransition( const Property::Value& value )
+{
+  Toolkit::TransitionData transitionData;
+
+  if( value.GetType() == Property::ARRAY )
+  {
+    transitionData = Toolkit::TransitionData::New( *value.GetArray() );
+  }
+  else if( value.GetType() == Property::MAP )
+  {
+    transitionData = Toolkit::TransitionData::New( *value.GetMap() );
+  }
+
+  return transitionData;
+}
+
+/**
+ * Create Visual for given index from a property map or url.
+ * 1) Check if value passed in is a url and create visual
+ * 2) Create visual from map if step (1) is false
+ * 3) Register visual with control with false for enable flag.
+ * 4) Unregister visual if empty map was provided. This is the method to remove a visual
+ */
+
+void ProgressBar::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth )
+{
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base progressVisual;
+
+  std::string imageUrl;
+  if( value.Get( imageUrl ) )
+  {
+    if ( !imageUrl.empty() )
+    {
+      progressVisual = visualFactory.CreateVisual(  imageUrl, ImageDimensions()  );
+    }
+  }
+  else // Does this code make text-visual can be accepted as visual?
+  {
+    // if its not a string then get a Property::Map from the property if possible.
+    Property::Map *map = value.GetMap();
+    if( map && !map->Empty()  ) // Empty map results in current visual removal.
+    {
+      progressVisual = visualFactory.CreateVisual( *map );
+    }
+  }
+
+  if ( progressVisual )
+  {
+    progressVisual.SetDepthIndex( visualDepth );
+    if( index == Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL )
+    {
+      RegisterVisual( index, progressVisual, mIndeterminate );
+    }
+    else
+    {
+      RegisterVisual( index, progressVisual, true );
+    }
+  }
+  else
+  {
+    UnregisterVisual( index );
+  }
+}
+
+bool ProgressBar::GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const
+{
+  bool success = false;
+  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+
+  if ( visual )
+  {
+    visual.CreatePropertyMap( retreivedMap );
+    success = true;
+  }
+
+  return success;
 }
 
 // Static class method to support script connecting signals
@@ -378,29 +430,89 @@ void ProgressBar::SetProperty( BaseObject* object, Property::Index propertyIndex
 
     switch ( propertyIndex )
     {
+      case Toolkit::ProgressBar::Property::TRACK_VISUAL:
+      {
+        progressBarImpl.CreateVisualsForComponent( propertyIndex, value, ProgressDepthIndex::TRACK_VISUAL );
+        break;
+      }
+
+      case Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL:
+      {
+        progressBarImpl.CreateVisualsForComponent( propertyIndex, value, ProgressDepthIndex::SECONDARY_PROGRESS_VISUAL );
+        break;
+      }
+
+      case Toolkit::ProgressBar::Property::PROGRESS_VISUAL:
+      {
+        progressBarImpl.CreateVisualsForComponent( propertyIndex, value, ProgressDepthIndex::PROGRESS_VISUAL );
+        break;
+      }
+
+      case Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL:
+      {
+        progressBarImpl.CreateVisualsForComponent( propertyIndex, value, ProgressDepthIndex::INDETERMINATE_VISUAL );
+        break;
+      }
+
+      case Toolkit::ProgressBar::Property::LABEL_VISUAL:
+      {
+        Property::Map map;
+        std::string textString;
+
+        if ( value.Get( textString ) )
+        {
+          // set new text string as TEXT property
+          Property::Map newTextMap;
+          Toolkit::Visual::Base label = progressBarImpl.GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+
+          if( label )
+          {
+            label.CreatePropertyMap( map );
+          }
+
+          // if LABEL_VISUAL doesn't set before, add Visual property "TYPE" to create new text Visual
+          if( map.Empty() )
+          {
+            newTextMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT );
+            newTextMap.Add( Toolkit::TextVisual::Property::POINT_SIZE, DEFAULT_FONT_SIZE );
+          }
+          newTextMap.Add( Toolkit::TextVisual::Property::TEXT, textString );
+
+          map.Merge( newTextMap );
+        }
+        else
+        {
+          value.Get( map );
+        }
+
+        if( !map.Empty() )
+        {
+          progressBarImpl.CreateVisualsForComponent( propertyIndex, map, ProgressDepthIndex::LABEL_VISUAL );
+        }
+        break;
+      }
+
       case Toolkit::ProgressBar::Property::PROGRESS_VALUE:
       {
         progressBarImpl.SetProgressValue( value.Get< float >() );
         break;
       }
 
-      case Toolkit::ProgressBar::Property::TRACK_VISUAL:
+      case Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VALUE:
       {
-        Property::Map map;
-        if( value.Get( map ) )
-        {
-          progressBarImpl.SetTrackVisual( map );
-        }
+        progressBarImpl.SetSecondaryProgressValue( value.Get< float >() );
         break;
       }
 
-      case Toolkit::ProgressBar::Property::PROGRESS_VISUAL:
+      case Toolkit::ProgressBar::Property::INDETERMINATE:
       {
-        Property::Map map;
-        if( value.Get( map ) )
-        {
-          progressBarImpl.SetProgressVisual( map );
-        }
+        progressBarImpl.SetIndeterminate( value.Get< bool >() );
+        break;
+      }
+
+      case Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL_ANIMATION:
+      {
+        progressBarImpl.SetIndeterminateVisualTransition( progressBarImpl.ConvertPropertyToTransition( value ) );
         break;
       }
     }
@@ -419,41 +531,57 @@ Property::Value ProgressBar::GetProperty( BaseObject* object, Property::Index pr
 
     switch ( propertyIndex )
     {
+      case Toolkit::ProgressBar::Property::TRACK_VISUAL:
+      case Toolkit::ProgressBar::Property::PROGRESS_VISUAL:
+      case Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL:
+      case Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL:
+      case Toolkit::ProgressBar::Property::LABEL_VISUAL:
+      {
+        Property::Map visualProperty;
+        if ( progressBarImpl.GetPropertyMapForVisual( propertyIndex, visualProperty ) )
+        {
+          value = visualProperty;
+        }
+        break;
+      }
+
       case Toolkit::ProgressBar::Property::PROGRESS_VALUE:
       {
         value = progressBarImpl.GetProgressValue();
         break;
       }
 
-      case Toolkit::ProgressBar::Property::TRACK_VISUAL:
+      case Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VALUE:
       {
-        if( !progressBarImpl.mTrackVisual.empty() )
-        {
-          value = progressBarImpl.GetTrackVisual();
-        }
-        else if( !progressBarImpl.mTrackMap.Empty() )
-        {
-          value = progressBarImpl.mTrackMap;
-        }
+        value = progressBarImpl.GetSecondaryProgressValue();
         break;
       }
 
-      case Toolkit::ProgressBar::Property::PROGRESS_VISUAL:
+      case Toolkit::ProgressBar::Property::INDETERMINATE:
       {
-        if( !progressBarImpl.mProgressVisual.empty() )
-        {
-          value = progressBarImpl.GetProgressVisual();
-        }
-        else if( !progressBarImpl.mProgressMap.Empty() )
-        {
-          value = progressBarImpl.mProgressMap;
-        }
+        value = progressBarImpl.GetIndeterminate();
         break;
+      }
+
+      case Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL_ANIMATION:
+      {
+        //TODO: Return INDETERMINATE_VISUAL_TRANSITION;
       }
     }
   }
 
   return value;
+}
+
+void ProgressBar::OnStageConnection( int depth )
+{
+  // Chain up first (ensures visuals are ready to draw)
+  Control::OnStageConnection( depth );
+
+  if( mIndeterminate )
+  {
+    PlayIndeterminateVisualTransition();
+  }
 }
 
 } // namespace Internal
