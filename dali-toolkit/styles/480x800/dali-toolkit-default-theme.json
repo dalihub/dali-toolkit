@@ -67,7 +67,7 @@
 
     "TextField":
     {
-      "pointSize":18,
+      "pointSize":8.5,
       "primaryCursorColor":[0.0,0.72,0.9,1.0],
       "secondaryCursorColor":[0.0,0.72,0.9,1.0],
       "cursorWidth":1,
@@ -77,26 +77,6 @@
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
     },
 
-    "TextFieldFontSize0":
-    {
-      "pointSize":10
-    },
-    "TextFieldFontSize1":
-    {
-      "pointSize":10
-    },
-    "TextFieldFontSize2":
-    {
-      "pointSize":10
-    },
-    "TextFieldFontSize3":
-    {
-      "pointSize":10
-    },
-    "TextFieldFontSize4":
-    {
-      "pointSize":10
-    },
     "TextSelectionPopup":
     {
       "popupMaxSize":[400,100],
